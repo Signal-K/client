@@ -1,4 +1,18 @@
+<html>
+
 <head>
+  <title> Metamask Demo </title>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script src="https://unpkg.com/moralis/dist/moralis.js"></script>
-  </head>                                                                          
+</head> 
+
+<body>
+  <button onclick="login()">Login with Metamask</button>
+
+  <script>
+    Moralis.initialize("OvIEo8OwtQWP6d2a27DdtSJGgAJD05fbRzIsaRBN"); // Application id from moralis.io admin
+    Moralis.serverURL = "https://ieb4i2un5l6y.moralisweb3.com:2053/server"// Server url from moralis.io installation
+  </script>
+</body>
+
+</html>
