@@ -72,6 +72,81 @@
 
       context.add.image(0, 0, 'background').setOrigin(0,0).setScale(1,1);
     }
+
+    async function update()
+    {  // Anticheating so that the player can't move without actually playing the game
+      cursors = this.input.keyboard.createCursorKeys();
+      const params = { cursors: cursors };
+
+      if (this.wKey.isDown) {
+        if (!buttonsLocked["up"]){
+          console.log('W is pressed');
+
+          buttonsLocked["up"]=true;
+          await Moralis.Cloud.run("move", {direction:"up"});
+          buttonsLocked["up"]=false;
+        }
+
+      }
+      else if(this.aKey.isDown){
+        if(!buttonsLocked["left"]){
+          console.log("A is pressed");
+
+          buttonsLocked["left"]=true;
+          await Moralis.Cloud.run("move", {direction:"left"});
+          buttonsLocked["left"]=false;
+        }
+
+      }
+      else if(this.sKey.isDown){
+        if(!buttonsLocked["down"]){
+          console.log("S is pressed");
+
+          buttonsLocked["down"]=true;
+          await Moralis.Cloud.run("move", {direction:"down"});
+          buttonsLocked["down"]=false;
+        }
+
+      }
+      else if(this.dKey.isDown){
+        if(!buttonsLocked["right"]){
+          console.log("D is pressed");
+
+          buttonsLocked["right"]=true;
+          await Moralis.Cloud.run("move", {direction:"right"});
+          buttonsLocked["right"]=false;
+        }
+
+      }
+      drawState()
+    }
+
+    async function ping(){
+      setTimeout(ping,1000)
+      await Moralis.Cloud.run("ping");
+    }
+
+    function drawState(){
+      for (let userId in state) {
+        // New player that hasn't logged in before - images need to be loaded & sprites need to be created
+        if(!sprites[userId]){
+          sprites[userId] = {loading:true}
+
+          const svgBlob = new Blob([state[userId].svg], {type:"image/svg+xml;charset=utf-8"})
+          const url = URL.createObjectURL(svgBlob)
+
+          context.load.image('player'+userId,url).on('filecomplete', function(){
+            if(sprites[userId].loading) // If sprite for user is loading
+            {
+              sprites[userId].loading = false
+              setTimeout(function(){ //add this delay for images to always show
+                sprites[userId] = context.physics.add.image(state[userId].x, state[userId].y, 'player'+userId).setScale(0.5,0.)
+              })
+            }
+          })
+        }
+      }
+    }
     
   </script>
 </body>
