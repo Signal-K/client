@@ -132,7 +132,7 @@
         if(!sprites[userId]){
           sprites[userId] = {loading:true}
 
-          const svgBlob = new Blob([state[userId].svg], {type:"image/svg+xml;charset=utf-8"})
+          const svgBlob = new Blob([state[userId].svg], {type:"image/svg+xml;charset=utf-8"}) // fetch svg from the server (which comes from the blockchain, which the server knows and understands)
           const url = URL.createObjectURL(svgBlob)
 
           context.load.image('player'+userId,url).on('filecomplete', function(){
@@ -140,10 +140,26 @@
             {
               sprites[userId].loading = false
               setTimeout(function(){ //add this delay for images to always show
-                sprites[userId] = context.physics.add.image(state[userId].x, state[userId].y, 'player'+userId).setScale(0.5,0.)
-              })
+                sprites[userId] = context.physics.add.image(state[userId].x, state[userId].y, 'player'+userId).setScale(0.5,0.).setOrigin(0,0);
+              },1000)
             }
-          })
+          }, context);
+          context.load.start()
+        }
+
+        // Existing player -> just move around existing sprite
+        else{
+          if(sprites[userId].x<state[userId].x)
+            sprites[userId].x+=5;
+
+          else if(sprites[userId].x>state[userId].x)
+            sprites[userId].x-=5;
+
+          if(sprites[userId].y<state[userId].y)
+            sprites[userId].y+=5;
+
+            else if(sprites[userId].y>state[userId].y)
+            sprites[userId].y-=5;
         }
       }
     }
