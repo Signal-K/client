@@ -33,6 +33,9 @@ var WorldScene = new Phaser.Class({
     preload: function ()
     {
         // Load the resources here for world scene
+
+        // Map tiles
+        this.load.image('tiles', 'assets/map/spritesheet.png');
     },
     create: function ()
     {
