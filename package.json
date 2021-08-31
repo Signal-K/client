@@ -11,7 +11,9 @@
     "fastify-formbody": "^5.0.0",
     "fastify-static": "^4.0.0",
     "handlebars": "^4.7.7",
-    "point-of-view": "^4.14.0"
+    "point-of-view": "^4.14.0",
+    "http-server": "^13.0.1",
+    "phaser": "^3.55.2"
   },
   "engines": {
     "node": "12.x"
