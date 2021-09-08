@@ -26,7 +26,6 @@
         preload: function ()
         {
             // Load the resources here
-            
             // map tiles
             this.load.image('tiles', 'assets/map/spritesheet.png');
 
@@ -65,7 +64,92 @@
                 var obstacles = map.createStaticLayer('Obstacles, tiles, 0, 0');
                 obstacles.setCollisionByExclusion([-1]);
 
-            this.player = this.physics.add.sprite(50, 100, 'player', 6);
+            // Add player (sprite)
+            this.player = this.physics.add.sprite(50, 100, 'player', 6); // 50 is x coordinate, 100 is y coordinate, 'player' is image resource, 6 is the frame from the asset tilemap
+            // Create the layer with the physics system in Phaser
+            this.physics.world.bounds.width = map.widthInPixels;
+            this.physics.world.bounds.height = map.heightInPixels;
+            this.player.setCollideWorldBounds(true); // Player will stay within the borders of the map (the player will now collide with the world's bounds)
+
+            // Make the camera follow the player sprite
+            this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels); // Makes the camera stay in the map bounds
+                this.cameras.main.startFollow(this.player); // camera will follow the player (sprite)
+                this.cameras.main.roundPixels = true; // prevent tiles bleeding
+
+            // Player animations
+            // Animation with key left
+            this.anims.create({
+                key: 'right',
+                frames: this.anims.generateFrameNumbers('player', { frames: [1, 7, 1, 13] }),
+                frameRate: 10,
+                repeat: -1
+            });
+            //animation with key right
+            this.anims.create({
+                key: 'right',
+                frames: this.anims.generateFrameNumbers('player', { frames: [1, 7, 1, 13] }),
+                frameRate: 10,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'up',
+                frames: this.anims.generateFrameNumbers('player', { frames: [2, 8, 0, 12] }),
+                frameRate: 10,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'down',
+                frames: this.anims.generateFrameNumbers('player', { frames: [0, 6, 0, 12] }),
+                frameRate: 10,
+                repeat: -1
+            });
+        },
+        update: function (time, delta)
+        {
+            // Player movement
+            this.player.body.setVelocity(0);
+
+                // Horizontal movement
+                if (this.cursors.left.isDown)
+                {
+                    this.player.body.setVelocityX(-80);
+                }
+                else if (this.cursors.right.isDown)
+                {
+                    this.player.body.setVelocityX(80);
+                }
+                
+                // Vertical movement
+                if (this.cursors.up.isDown)
+                {
+                    this.player.body.setVelocityY(-80);
+                }
+                else if (this.cursors.down.isDown)
+                {
+                    this.player.body.setVelocityY(80);
+                }
+
+            // Player animations
+            if (this.cursors.left.isDown) // Could we just add this into player movement?
+            {
+                this.player.anims.play('left', true);
+            }
+            else if (this.cursors.right.isDown)
+            {
+                this.player.anims.play('right', true);
+            }
+            else if (this.cursors.up.isDown)
+            {
+                this.player.anims.play('up', true);
+            }
+            else if (this.cursors.down.isDown)
+            {
+                this.player.anims.play('down', true);
+            }
+            else
+            {
+                this.player.anims.stop();
+            }
         }
     });
 
