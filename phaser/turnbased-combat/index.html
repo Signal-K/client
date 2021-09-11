@@ -103,7 +103,24 @@
                 frameRate: 10,
                 repeat: -1
             });
+
+            this.physics.add.collider(this.player, obstacles); // Physics collider created that takes the player/sprite and tilemap layer as parameters
+
+            // Create locations that when crossed by the player (sprite/gameObject) will generate a battle with an enemy - enemy zones/locations
+            this.spawns = this.physics.addgroup({ classType: Phaser.GameObjects.Zone });
+            for(var i = 0; i < 30; i++) {
+                var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
+                var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+
+                // Params are x, y, width, height
+                this.spawns.create(x, y, 20, 20);
+            }
+            this.physics.add.overlap(this.player, this.spawns, this.onMeetEnemy, false, this); // When the player overlaps with one of the zones the onMeetEnemy method is called
         },
+
+
+
+
         update: function (time, delta)
         {
             // Player movement
@@ -153,6 +170,19 @@
         }
     });
 
+    onMeetEnemy: function(player, zone) {
+        // we move the zone to another random location
+        zone.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
+        zone.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+
+        // Shake the battle at the start of the battle scene
+        this.cameras.main.shake(300);
+        this.cameras.main.flash(300);
+        this.cameras.main.fade(300); // Continue here
+
+        // Start battle
+    };
+
     var config = {
         type: Phaser.AUTO,
         parent: 'content',
@@ -163,7 +193,8 @@
         physics: {
             default: 'arcade',
             arcade: {
-                gravity: { y: 0 }
+                gravity: { y: 0 },
+                debug: true // Phaser.GameObjects.Zone - see where the enemies will be spawning
             }
         },
         scene: [
