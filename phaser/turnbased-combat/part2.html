@@ -40,6 +40,16 @@
             Unit.call(this, scene, x, y, texture, frame, type, hp, damage)
         }
     });
+    var PlayerCharacter = new Phaser.class({ // Player/character unit
+        Extends: Unit,
+
+        initialize:
+        function PlayerCharacter(scene, x, y, texture, frame, type, hp, damage) {
+            Unit.call(this, scene, x, y, texture, frame, type, hp, damage)
+            this.flipX = true; // Flip the image of the sprite across the x axis
+            this.setScale(2); // Set the sprite size to 2x
+        }
+    });
 
     var BootScene = new Phaser.Class({
         Extends: Phaser.Scene,
@@ -87,6 +97,13 @@
         create: function ()
         {    
             this.cameras.main.setBackgroundColor('rgba(0, 200, 0, 0.5)'); // Set scene background green without an image for the bg
+
+            // player character - warrior
+            var warrior = new PlayerCharacter(this, 250, 50, 'player', 1, 'Warrior', 100, 20);
+            this.add.existing(warrior);
+
+            // player character - mage
+            var mage = new PlayerCharacter(this, 250, 100, 'player', 4, 'Mage', 80, )
         }
     });
 
