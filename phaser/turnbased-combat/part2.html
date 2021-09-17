@@ -15,6 +15,24 @@
 
 <script type="text/javascript">
 
+    var MenuItem = new Phaser.Class({ // Menu item container/class
+        Extends: Phaser.GameObjects.Text,
+
+        initialize:
+
+        function menuItem(x, y, text, scene) {
+            Phaser.GameObjects.Text.call(this, scene, x, y, text, { color: '#ffffff', align: 'left', fontSize: 15});
+        },
+
+        select: function() {
+        this.setColor('#f8ff38');
+        },
+    
+        deselect: function() {
+        this.setColor('#ffffff');
+        }
+    });
+
     var Unit = new Phaser.Class({ // Base class unit
         Extends: Phaser.GameObjects.Sprite,
 
@@ -103,7 +121,23 @@
             this.add.existing(warrior);
 
             // player character - mage
-            var mage = new PlayerCharacter(this, 250, 100, 'player', 4, 'Mage', 80, )
+            var mage = new PlayerCharacter(this, 250, 100, 'player', 4, 'Mage', 80, 8)
+
+            // enemy character - blue dragon
+            var dragonblue = new Enemy(this, 50, 50, 'dragonblue', null, 'Dragon', 50, 3)
+
+            // enemy character - orange dragon
+            var dragonOrange = new Enemy(this, 50, 100, 'dragonorrange', null, 'Dragon2', 50, 3)
+
+            // array with the heroes
+            this.heroes = [ warrior, mage ];
+            // array with the enemies
+            this.enemies = [ dragonblue, dragonOrange ];
+            // array with both parties - who will attack
+            this.units = this.heroes.concat(this.enemies);
+
+            // Run UI scene at the same time
+            this.scene.launch('UIScene');
         }
     });
 
