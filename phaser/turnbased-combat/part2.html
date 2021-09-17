@@ -33,6 +33,67 @@
         }
     });
 
+    var Menu = new Phaser.Class({ // Menu that allows methods to be selected and deselected together
+        Extends: Phaser.GameObjects.Container,
+
+        initialize:
+        
+        function Menu(x, y, scene, heores) {
+            Phaser.GameObjects.Container.call(this, scene, x, y);
+            this.menuItems = [];
+            this.menuItemIndex = 0;
+            this.heroes = heroes;
+            this.x = x;
+            this.y = y;
+        },
+        addMenuItem: function(unit) {
+            var menuItem = new MenuItem(0, this.menuItems.length * 20, unit, this.scene);
+            this.menuItems.push(menuItem); // Appends the items in the menu to the array
+            this.add(menuItem);
+        },
+        moveSelectionUp: function() {
+            this.menuItems[this.menuItemIndex].deselect();
+            this.menuItemIndex--;
+            if(this.menuItemIndex < 0)
+                this.menuItemIndex = this.menuItems.length -1;
+            this.menuItems[this.menuItemIndex].select();
+        },
+        moveSelectionDown: function() {
+            this.menuItems[this.menuItemIndex].deselect();
+            this.menuItemIndex++;
+            if(this.menuItemIndex >= this.menuItems.length)
+                this.menuItemIndex = 0;
+            this.menuItems[this.menuItemIndex].select();
+        },
+
+        // Select the menu as a whole and an element with index from it
+        select: function(index) {
+            if(!index)
+                index = 0;
+            this.menuItems[this.menuItemIndex].deselect();
+            this.menuItemIndex = index;
+            this.menuItems[this.menuItemIndex].select();
+        },
+        // deselect this menu
+        deselect: function() {
+            this.menuItems[this.menuItemIndex].deselect();
+            this.menuItemIndex = 0;
+        },
+        confirm: function() {
+            // When the player confirms his selection, do the action
+        }
+    })
+
+    var heroesMenu = new Phaser.class({
+        Extends: Menu,
+
+        initialize: 
+
+        function heroesMenu(x, y, scene) {
+            Menu.call(this, x, y, scene);
+        }
+    });
+
     var Unit = new Phaser.Class({ // Base class unit
         Extends: Phaser.GameObjects.Sprite,
 
