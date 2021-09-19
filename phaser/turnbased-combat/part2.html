@@ -84,6 +84,42 @@
         }
     })
 
+    // All separate menus
+    var HeroesMenu = new Phaser.Class({
+        Extends: Menu,
+
+        initialise:
+
+        function HeroesMenu(x, y, scene) {
+            Menu.call(this, x, y, scene);
+        }
+    });
+    var ActionsMenu = new Phaser.Class({
+        Extends: Menu,
+
+        initialize: 
+
+        function ActionsMenu(x, y, scene) {
+            Menu.call(this, x, y, scene);
+            this.addMenuItem('Attack');
+        },
+        confirm: function() {
+            // Do something when the player selects an action
+        }
+    });
+    var EnemyMenu = new Phaser.Class({
+        Extends: Menu,
+
+        initialise: 
+
+        function EnemiesMenu(x, y, scene) {
+            Menu.call(this, x, y, scene);
+        },
+        confirm: function() {
+            //Do something when the player selects an enemy
+        }
+    });
+
     var heroesMenu = new Phaser.class({
         Extends: Menu,
 
@@ -199,6 +235,23 @@
 
             // Run UI scene at the same time
             this.scene.launch('UIScene');
+
+            // basic container to hold all the menus
+            this.menus = this.add.container();
+
+            this.heroesMenu = new HeroesMenu(195, 153, this);
+            this.actionsMenu = new ActionsMenu(100, 153, this);
+            this.enemiesMenu = new EnemiesMenu(8, 153, this);
+
+            // the currently selected menu
+            this.currentMenu = this.actionsMenu;
+
+            // add menus to the container
+            this.menus.add(this.heroesMenu);
+            this.menus.add(this.actionsMenu);
+            this.menus.add(this.enemiesMenu);
+
+            this.battleScene = this.scene.get('BattleScene'); // Add data for the Heroes & Enemies menu from the battle scene
         }
     });
 
