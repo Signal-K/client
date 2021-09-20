@@ -81,6 +81,22 @@
         },
         confirm: function() {
             // When the player confirms his selection, do the action
+        },
+
+        // Add functionality to clear all menuItems from the menu
+        clear: function() {
+            for(var i = 0; i < this.menuItems.length; i++) {
+                this.menuItems[i].destroy();
+            }
+            this.menuItems.length = 0; // Clearing the array
+            this.menuItemIndex = 0;
+        },
+        remap: function(units) {
+            this.clear();
+            for(var i = 0; i < units.length; i++) {
+                var unit = units[i];
+                this.addMenuItem(unit.type);
+            }
         }
     })
 
@@ -240,6 +256,11 @@
 
         create: function()
         {
+            // Call the menu enemies/heroes functions
+            this.remapHeroes();
+            this.remapEnemies();
+
+            // UI scene graphics
             this.graphics = this.add.graphics();
             this.graphics.lineStyle(1, 0xffffff);
             this.graphics.fillStyle(0x031f4c, 1);
@@ -266,7 +287,31 @@
             this.menus.add(this.enemiesMenu);
 
             this.battleScene = this.scene.get('BattleScene'); // Add data for the Heroes & Enemies menu from the battle scene
-        }
+
+            // Listen for user input / keyboard evenets
+            this.input.keyboard.on('keydown', this.onKeyInput, this);
+
+            onKeyInput: function(event) {
+                // There will be an active menu - the commands will be executed on the currentMenu (aka active menu)
+                if(this.currentMenu) {
+                    if(event.code === "ArrowUp") {
+                        this.currentMenu.moveSelectionUp();
+                    } else if(event.code === "ArrowDown") {
+                        this.currentMenu.moveSelectionDown();
+                    }
+                }
+            },
+        },
+
+        // Menu ui stuff
+        remapHeroes: function() { // Method to call the functions for the menus
+            var heroes = this.battleScene.heroes;
+            this.heroesMenu.remap(heroes);
+        },
+        remapEnemies: function() {
+            var enemies = this.battleScene.enemies;
+            this.enemiesMenu.remap(enemies);
+        },
     });
 
     var config = {
