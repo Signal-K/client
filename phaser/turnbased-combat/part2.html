@@ -121,6 +121,7 @@
         },
         confirm: function() {
             // Do something when the player selects an action
+            this.scene.events.emit('SelectEnemies');
         }
     });
     var EnemyMenu = new Phaser.Class({
@@ -133,6 +134,7 @@
         },
         confirm: function() {
             //Do something when the player selects an enemy
+            this.scene.events.emit("Enemy", this.menuItemIndex);
         }
     });
 
@@ -241,6 +243,32 @@
 
             // Run UI scene at the same time
             this.scene.launch('UIScene');
+
+            /* Implement the turns. An array with all the units (characters) will be created in BattleScene. 
+            If the currently active unit is a player we will wait for user input
+            else (if the currently active unit is an enemy) the AI will pick a random player hero and the enemy will attack it */
+            this.index = -1;
+
+            nextTurn: function() {
+                this.index++;
+                // If there are no more units, we start again from the first one
+                if(this.index >= this.units.length) {
+                    this.index = 0;
+                }
+                if(this.units[this.index]) {
+                    // If the active unit is a player hero
+                    if(this.units[this.index] instanceof PlayerCharacter) {
+                        this.events.emit('PlayerSelect', this.index);
+                    } else { // else if its enemy unit
+                        // Pick random hero (for the enemy to attack)
+                        var r = Math.floor(Math.random() * this.heroes.length);
+                        // Call the enemy's attack function
+                        this.unts[this.index].attack(this.heroes[r]);
+                        // Add timer for the next turn - smooth gameplay (transitions)
+                        this.time.addEvent({ delay: 3000, callback: this.nextTurn, callbackScope: this });
+                    }
+                }
+            };
         }
     });
 
@@ -304,6 +332,23 @@
                         this.currentMenu.confirm();
                     }
                 }
+            }
+
+            // Listen for PlayerSelect to output a way for users to select their "attack"/action (we can listen for events from one scene on another Scene)
+            this.battleScene.events.on("PlayerSelect", this.onPlayerSelect, this);
+
+            onPlayerSelect: function(id) { // Not sure if this belongs here
+                this.heroesMenu.select(id);
+                this.actionsMenu.select(0);
+                this.currentMenu = this.actionsMenu;
+            }
+
+            // When an action is confirmed a custom event called 'SelectEnemies' is called (it will become the enemies' turn to attack)
+            this.events.on("SelectEnemies", this.onSelectEnemies, this);
+
+            onSelectEnmies: function() {
+                this.currentMenu = this.enemiesMenu;
+                this.enemiesMenu.select(0); // Make the enemiesMenu active and select the first enemy (in the array)
             },
         },
 
