@@ -42,6 +42,44 @@
         }
     });
 
+    var BattleScene = new Phaser.Class({
+        Extends: Phaser.Scene,
+        initialize:
+        function BattleScene ()
+        {
+            Phaser.Scene.call(this, { key: 'BattleScene' });
+        },
+        create: function()
+        {
+            // Set the background of the main scene green
+            this.cameras.main.setBackgroundColor('rgba(0, 200, 0, 0.5');
+
+            // Run UI scene at the same time
+            this.scene.run('UIScene');
+        }
+    });
+
+    var UIScene = new Phaser.Class({
+        Extneds: Phaser.Scene,
+        initialize:
+        function UIScene ()
+        {
+            Phaser.Scene.call(this, { key: 'UIScene' });
+        },
+        create: function ()
+        {
+            this.graphics = this.add.graphics();
+            this.graphics.lineStyle(1, 0xffffff);
+            this.graphics.fillStyle(0x031f4c, 1);
+            this.graphics.strokeRect(2, 150, 90, 100);
+            this.graphics.fillRect(2, 150, 90, 100);
+            this.graphics.strokeRect(95, 150, 90, 100);
+            this.graphics.fillRect(95, 150, 90, 100);
+            this.graphics.strokeRect(188, 150, 130, 100);
+            this.graphics.fillRect(188, 150, 130, 100);
+        }
+    });
+
     var WorldScene = new Phaser.Class({
         Extends: Phaser.Scene,
         initialize:
@@ -171,17 +209,16 @@
     });
 
     onMeetEnemy: function(player, zone) {
-        // we move the zone to another random location
+        // We move the zone to some other location
         zone.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-        zone.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+        zone.y = Phaser.RND.between(0, this.physics.world.bounds.height);
 
-        // Shake the battle at the start of the battle scene
+        // Shake the world
         this.cameras.main.shake(300);
-        this.cameras.main.flash(300);
-        this.cameras.main.fade(300); // Continue here
 
-        // Start battle
-    };
+        // Switch to BattleScene
+        this.scene.switch('BattleScene');
+    }
 
     var config = {
         type: Phaser.AUTO,
@@ -194,12 +231,14 @@
             default: 'arcade',
             arcade: {
                 gravity: { y: 0 },
-                debug: true // Phaser.GameObjects.Zone - see where the enemies will be spawning
+                debug: false // set to true to view zones
             }
         },
         scene: [
             BootScene,
-            WorldScene
+            WorldScene,
+            BattleScene,
+            UIScene
         ]
     };
     var game = new Phaser.Game(config);
