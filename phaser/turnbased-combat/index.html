@@ -56,7 +56,11 @@
 
             // Run UI scene at the same time
             this.scene.run('UIScene');
-        }
+        },
+        exitBattle: function() { // When the battle segment ends
+            this.scene.sleep('UIScene'); // Make the scene not active, and not visible
+            this.scene.switch('WorldScene'); // Make this scene active after the battle ends
+        },
     });
 
     var UIScene = new Phaser.Class({
