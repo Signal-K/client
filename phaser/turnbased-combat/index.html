@@ -34,6 +34,10 @@
 
             // our two characters
             this.load.spritesheet('player', 'assets/RPG_assets.png', { frameWidth: 16, frameHeight: 16 });
+
+            // enemies
+            this.load.image("dragonblue", "assets/dragonblue.png");
+            this.load.image("dragonorrange", "assets/dragonorrange.png");
         },    
 
         create: function ()
@@ -56,11 +60,21 @@
 
             // Run UI scene at the same time
             this.scene.run('UIScene');
+
+            // Call the exit battle function
+            var timeEvent = this.time.addEvent({delay: 2000, callback: this.exitBattle, callbackScope: this});
+
+            // Listen to the scene 'wake' event
+            this.sys.events.on('wake', this.wake, this);
         },
         exitBattle: function() { // When the battle segment ends
             this.scene.sleep('UIScene'); // Make the scene not active, and not visible
             this.scene.switch('WorldScene'); // Make this scene active after the battle ends
         },
+        wake: function(){
+            this.scene.run('UIScene');
+            this.time.addEvent({delay: 2000, callback: this.exitBattle, callbackScope: this});
+        }
     });
 
     var UIScene = new Phaser.Class({
