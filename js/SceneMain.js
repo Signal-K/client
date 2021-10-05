@@ -73,5 +73,13 @@ class SceneMain extends Phaser.Scene {
             ],
             laser: this.sound.add("sndLaser")
         };
+
+        // Create an instance of the player
+        this.player = new this.player(
+            this,
+            this.game.config.width * 0.5,
+            this.game.config.height * 0.5,
+            "sprPlayer"
+        );
     }
 }
