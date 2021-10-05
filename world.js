@@ -1,5 +1,3 @@
-e
-
 var BootScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -20,10 +18,12 @@ var BootScene = new Phaser.Class({
         this.load.tilemapTiledJSON('map', 'assets/map/map.json');
         
         // enemies
-        this.load.image("dragonblue", "assets/dragonblue.png");
-        this.load.image("dragonorrange", "assets/dragonorrange.png");
+        this.load.image("dragonblue", "assets/Dreadnought_Pixel.png");
+        this.load.image("dragonorrange", "assets/Crusader_Pixel.png");
         
         // our two characters
+        //this.load.image("player", 'assets/Crusader_Pixel.png');
+        // Below line is for the spritesheet, above line is scaffolding for gemini station assets
         this.load.spritesheet('player', 'assets/RPG_assets.png', { frameWidth: 16, frameHeight: 16 });
     },
 
