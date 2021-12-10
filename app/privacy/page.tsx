@@ -1,17 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Shield, Mail, Eye, Lock, Users, Globe } from "lucide-react";
 import Link from "next/link";
 
 export default function PrivacyPolicyPage() {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    // Check if dark mode is enabled
-    setIsDark(document.documentElement.classList.contains("dark"));
-  }, []);
-
   return (
     <div className="min-h-screen w-full relative flex justify-center pb-20">
       {/* Background gradient similar to main page */}
@@ -48,7 +40,7 @@ export default function PrivacyPolicyPage() {
           <div className="flex items-center justify-center gap-4 mt-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Eye className="w-4 h-4" />
-              Last updated: July 27, 2025
+              Last updated: February 19, 2026
             </span>
             <span className="flex items-center gap-1">
               <Users className="w-4 h-4" />
@@ -240,6 +232,25 @@ export default function PrivacyPolicyPage() {
             </div>
           </div>
 
+          <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
+            <h2 className="text-2xl font-semibold text-primary mb-4">🗃️ Data Retention & Deletion</h2>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>• We retain account and gameplay records while your account is active.</p>
+              <p>• You can request account deletion at any time by contacting support.</p>
+              <p>• After deletion requests, we remove or anonymize personal data where legally and technically feasible.</p>
+              <p>• Some security logs and compliance records may be retained for a limited period.</p>
+            </div>
+          </div>
+
+          <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
+            <h2 className="text-2xl font-semibold text-primary mb-4">🔗 Third-Party Services</h2>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>• Authentication and database infrastructure are provided through Supabase.</p>
+              <p>• Optional sign-in may use Google OAuth, subject to Google's policies.</p>
+              <p>• Analytics and error monitoring may be used to improve reliability and performance.</p>
+            </div>
+          </div>
+
           {/* Your Rights */}
           <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
             <h2 className="text-2xl font-semibold text-primary mb-4">⚖️ Your Rights & Choices</h2>
@@ -308,8 +319,8 @@ export default function PrivacyPolicyPage() {
                 </p>
                 <div className="p-3 bg-card/50 rounded-lg">
                   <p className="text-xs text-muted-foreground">
-                    <strong>Current version:</strong> 1.0 (July 27, 2025)<br />
-                    <strong>Next review:</strong> January 2026
+                    <strong>Current version:</strong> 1.1 (February 19, 2026)<br />
+                    <strong>Next review:</strong> August 2026
                   </p>
                 </div>
               </div>

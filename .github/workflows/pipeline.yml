@@ -109,14 +109,14 @@ jobs:
       - name: Run unit tests
         run: yarn test:unit
 
-      - name: Run Cypress smoke (bare essentials)
-        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:smoke"
+      - name: Run Cypress smoke (minimal)
+        if: github.event_name == 'push'
+        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:smoke:minimal"
 
-      - name: Run Cypress full e2e (main only)
+      - name: Run Cypress smoke (full for PR to main)
         if: >
-          (github.event_name == 'push' && github.ref_name == 'main') ||
-          (github.event_name == 'pull_request' && github.base_ref == 'main')
-        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:headless"
+          github.event_name == 'pull_request' && github.base_ref == 'main'
+        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:smoke:full"
 
       - name: Upload Cypress artifacts
         if: always()
