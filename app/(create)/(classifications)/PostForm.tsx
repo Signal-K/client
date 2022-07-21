@@ -10,12 +10,21 @@ interface ClassificationOption {
     id: number;
     text: string;
 };
-  
-const classificationOptions: ClassificationOption[] = [
+
+const planetClassificationOptions: ClassificationOption[] = [
     { id: 1, text: 'No dips at all' },
     { id: 2, text: 'Repeating dips' },
     { id: 3, text: 'Dips with similar size' },
     { id: 4, text: 'Dips aligned to one side' },
+];
+
+const roverImgClassificationOptions: ClassificationOption[] = [
+    { id: 1, text: 'Dried-up water channels' },
+    { id: 2, text: 'Pebbles/medium-sized rocks' },
+    { id: 3, text: 'Hills/mountain formations' },
+    { id: 4, text: 'Volcano (dormant/extinct)' },
+    { id: 5, text: 'Mineral deposits' },
+    { id: 6, text: 'Sandy/rocky terrain' },
 ];
 
 interface ClassificationFormProps {
@@ -37,6 +46,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
 
     const { activePlanet } = useActivePlanet();
     const { userProfile } = useProfileContext();
+
+    const classificationOptions = anomalyType === "planet" ? planetClassificationOptions : roverImgClassificationOptions;
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -93,9 +104,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 value
             ])
         );
-    
+
         try {
-            // Insert the classification into the database
             const { data: classificationData, error: classificationError } = await supabase
                 .from("classifications")
                 .insert({
@@ -103,11 +113,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     content,
                     media: [uploads, assetMentioned],
                     anomaly: activePlanet?.id || anomalyId,
-                    classificationtype: 'lightcurve',
+                    classificationtype: anomalyType,
                     classificationConfiguration,
                 })
                 .single();
-    
+
             if (classificationError) {
                 console.error("Error creating classification:", classificationError.message);
                 alert("Failed to create classification. Please try again.");
@@ -118,28 +128,25 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 setSelectedOptions({});
                 setUploads([]);
             }
-    
-            // If the user doesn't have an active planet, update the profile with the new anomaly ID
+
             if (!activePlanet?.id) {
                 const { error: profileUpdateError } = await supabase
                     .from("profiles")
                     .update({ location: anomalyId })
                     .eq("id", session?.user?.id);
-    
+
                 if (profileUpdateError) {
                     console.error("Error updating profile with active planet:", profileUpdateError.message);
                     alert("Failed to update active planet. Please try again.");
                     return;
                 }
             }
-    
-            // Complete the mission
+
             await handleMissionComplete();
         } catch (error) {
             console.error("Unexpected error:", error);
         }
     };
-    
 
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -195,7 +202,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                     value={content}
                                     onChange={e => setContent(e.target.value)}
                                     className="flex-grow p-3 h-24 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 outline-none"
-                                    placeholder={"What do you think about this planet?"}
+                                    placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
                                 />
                             </div>
                             <div className="flex items-center mb-4">
@@ -219,19 +226,21 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                     ))}
                                 </div>
                             )}
-                            <button
-                                onClick={createPost}
-                                className="text-white px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600"
-                            >
-                                Create post
-                            </button>
                         </>
                     )}
+                </div>
+                <div className="flex flex-col gap-2 w-1/3">
+                    <button
+                        onClick={createPost}
+                        disabled={!content || Object.keys(selectedOptions).length === 0}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                    >
+                        Submit Classification
+                    </button>
                 </div>
             </div>
         </div>
     );
 };
-
 
 export default ClassificationForm;

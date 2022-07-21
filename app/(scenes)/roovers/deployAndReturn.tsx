@@ -132,19 +132,6 @@ export default function DeployRooversInitial() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-3 gap-4">
-                  {roverData?.photos.map((photo, index) => (
-                    <img
-                      key={index}
-                      src={photo}
-                      width={200}
-                      height={200}
-                      alt={`Rover Photo ${index + 1}`}
-                      className="rounded-lg"
-                      style={{ aspectRatio: "200/200", objectFit: "cover" }}
-                    />
-                  ))}
-                </div>
                 <div>
                   <h3 className="text-lg font-medium">Resource Sites</h3>
                   <ul className="space-y-2">
