@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import PostCard from "@/src/components/social/posts/TestPostCard";
+import { incrementClassificationVote } from "@/src/lib/gameplay/classification-vote";
 
 interface VotePlanetClassificationsProps { 
   classificationId: string | number;
@@ -68,43 +69,34 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
   }, [session, classificationId]);
 
   const handleVote = async (classificationId: number, currentConfig: any) => {
-    try {
-      const response = await fetch("/api/gameplay/classifications/configuration", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          classificationId,
-          action: "increment_vote",
-        }),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        console.error("PHVote: Error updating classificationConfiguration:", result?.error);
-      } else {
-        const updatedVotes = result?.classificationConfiguration?.votes ?? (currentConfig?.votes || 0) + 1;
-        setClassification((prev: any) =>
-          prev ? { ...prev, votes: updatedVotes } : prev
-        );
-        
-        // Show success popup
-        setShowSuccessPopup(true);
-        
-        // Redirect after 3 seconds
-        const redirectTimeout = setTimeout(() => {
-          try {
-            router.push('/');
-          } catch (error) {
-            console.error("PHVote: Router.push error:", error);
-            // Fallback to window.location
-            if (typeof window !== "undefined") {
-              window.location.href = '/';
-            }
-          }
-        }, 3000);
-      };
-    } catch (error) {
-      console.error("PHVote: Error voting:", error);
-    };
+    const updatedVotes = await incrementClassificationVote(
+      classificationId,
+      currentConfig?.votes || 0
+    );
+
+    if (updatedVotes === null) {
+      return;
+    }
+
+    setClassification((prev: any) =>
+      prev ? { ...prev, votes: updatedVotes } : prev
+    );
+
+    // Show success popup
+    setShowSuccessPopup(true);
+
+    // Redirect after 3 seconds
+    setTimeout(() => {
+      try {
+        router.push('/');
+      } catch (error) {
+        console.error("PHVote: Router.push error:", error);
+        // Fallback to window.location
+        if (typeof window !== "undefined") {
+          window.location.href = '/';
+        }
+      }
+    }, 3000);
   };
 
   return (

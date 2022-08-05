@@ -1,4 +1,33 @@
 import { defineConfig } from 'cypress'
+import dotenv from 'dotenv'
+import { execSync } from 'node:child_process'
+
+dotenv.config({ path: '.env.local' })
+dotenv.config()
+
+function tryReadLocalSupabaseJwtKeys() {
+    try {
+        const statusEnv = execSync('supabase status -o env', { encoding: 'utf8' })
+        const map = Object.fromEntries(
+            statusEnv
+                .split('\n')
+                .map((line) => line.trim())
+                .filter(Boolean)
+                .map((line) => {
+                    const [key, ...rest] = line.split('=')
+                    return [key, rest.join('=').replace(/^"|"$/g, '')]
+                })
+        ) as Record<string, string>
+
+        return {
+            anonKey: map.ANON_KEY || map.PUBLISHABLE_KEY || '',
+            serviceRoleKey: map.SERVICE_ROLE_KEY || '',
+            secretKey: map.SECRET_KEY || '',
+        }
+    } catch {
+        return { anonKey: '', serviceRoleKey: '', secretKey: '' }
+    }
+}
 
 export default defineConfig({
     e2e: {
@@ -10,22 +39,56 @@ export default defineConfig({
                 process.env.SUPABASE_URL ||
                 process.env.NEXT_PUBLIC_SUPABASE_URL ||
                 'http://127.0.0.1:54321'
+            const supabaseAnonKey =
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+                process.env.SUPABASE_ANON_KEY ||
+                process.env.CYPRESS_SUPABASE_ANON_KEY ||
+                ''
             const supabaseServiceRoleKey =
                 process.env.SUPABASE_SERVICE_ROLE_KEY ||
                 process.env.CYPRESS_SUPABASE_SERVICE_ROLE_KEY ||
                 ''
+            const supabaseSecretKey =
+                process.env.SUPABASE_SECRET_KEY ||
+                process.env.CYPRESS_SUPABASE_SECRET_KEY ||
+                ''
+
+            let resolvedAnonKey = supabaseAnonKey
+            let resolvedServiceRoleKey = supabaseServiceRoleKey
+            let resolvedSecretKey = supabaseSecretKey
+            if (supabaseUrl.includes('127.0.0.1')) {
+                const localKeys = tryReadLocalSupabaseJwtKeys()
+                if (localKeys.anonKey) {
+                    resolvedAnonKey = localKeys.anonKey
+                }
+                if (localKeys.serviceRoleKey) {
+                    resolvedServiceRoleKey = localKeys.serviceRoleKey
+                }
+                if (localKeys.secretKey) {
+                    resolvedSecretKey = localKeys.secretKey
+                }
+            }
 
             config.env.SUPABASE_URL = supabaseUrl
-            config.env.SUPABASE_SERVICE_ROLE_KEY = supabaseServiceRoleKey
+            config.env.SUPABASE_ANON_KEY = resolvedAnonKey
+            config.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = resolvedAnonKey
+            config.env.SUPABASE_SERVICE_ROLE_KEY = resolvedServiceRoleKey
+            config.env.SUPABASE_SECRET_KEY = resolvedSecretKey
 
-            const authHeaders = {
-                apikey: supabaseServiceRoleKey,
-                Authorization: `Bearer ${supabaseServiceRoleKey}`,
+            const restAuthHeaders = {
+                apikey: resolvedServiceRoleKey,
+                Authorization: `Bearer ${resolvedServiceRoleKey}`,
+                'Content-Type': 'application/json',
+            }
+            const adminKey = resolvedSecretKey || resolvedServiceRoleKey
+            const adminAuthHeaders = {
+                apikey: adminKey,
+                Authorization: `Bearer ${adminKey}`,
                 'Content-Type': 'application/json',
             }
 
             async function cleanupUserData(userId: string) {
-                if (!userId || !supabaseServiceRoleKey) return
+                if (!userId || !resolvedServiceRoleKey) return
 
                 const restBase = `${supabaseUrl}/rest/v1`
                 const tablesWithUserId = [
@@ -36,12 +99,16 @@ export default defineConfig({
                     'classifications',
                     'linked_anomalies',
                 ]
+                const tablesWithOwner = [
+                    'mineralDeposits',
+                    'user_mineral_inventory',
+                ]
 
                 for (const table of tablesWithUserId) {
                     await fetch(`${restBase}/${table}?user_id=eq.${encodeURIComponent(userId)}`, {
                         method: 'DELETE',
                         headers: {
-                            ...authHeaders,
+                            ...restAuthHeaders,
                             Prefer: 'return=minimal',
                         },
                     })
@@ -51,7 +118,17 @@ export default defineConfig({
                     await fetch(`${restBase}/${table}?author=eq.${encodeURIComponent(userId)}`, {
                         method: 'DELETE',
                         headers: {
-                            ...authHeaders,
+                            ...restAuthHeaders,
+                            Prefer: 'return=minimal',
+                        },
+                    })
+                }
+
+                for (const table of tablesWithOwner) {
+                    await fetch(`${restBase}/${table}?owner=eq.${encodeURIComponent(userId)}`, {
+                        method: 'DELETE',
+                        headers: {
+                            ...restAuthHeaders,
                             Prefer: 'return=minimal',
                         },
                     })
@@ -60,7 +137,7 @@ export default defineConfig({
                 await fetch(`${restBase}/profiles?id=eq.${encodeURIComponent(userId)}`, {
                     method: 'DELETE',
                     headers: {
-                        ...authHeaders,
+                        ...restAuthHeaders,
                         Prefer: 'return=minimal',
                     },
                 })
@@ -74,13 +151,13 @@ export default defineConfig({
                     email: string
                     password: string
                 }) {
-                    if (!supabaseServiceRoleKey) {
+                    if (!resolvedServiceRoleKey) {
                         throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for Cypress user creation')
                     }
 
                     const response = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
                         method: 'POST',
-                        headers: authHeaders,
+                        headers: adminAuthHeaders,
                         body: JSON.stringify({
                             email,
                             password,
@@ -101,12 +178,12 @@ export default defineConfig({
                     }
                 },
                 async cleanupSupabaseTestUser({ userId }: { userId: string }) {
-                    if (!supabaseServiceRoleKey || !userId) return null
+                    if (!resolvedServiceRoleKey || !userId) return null
 
                     await cleanupUserData(userId)
                     const response = await fetch(`${supabaseUrl}/auth/v1/admin/users/${userId}`, {
                         method: 'DELETE',
-                        headers: authHeaders,
+                        headers: adminAuthHeaders,
                     })
 
                     if (!response.ok) {
@@ -119,6 +196,36 @@ export default defineConfig({
                 async waitForSupabaseHealth() {
                     const response = await fetch(`${supabaseUrl}/auth/v1/health`)
                     return response.ok
+                },
+                async countSupabaseRows({
+                    table,
+                    filters = {},
+                }: {
+                    table: string
+                    filters?: Record<string, string | number | boolean>
+                }) {
+                    if (!resolvedServiceRoleKey) {
+                        throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for row count checks')
+                    }
+
+                    const params = new URLSearchParams()
+                    params.set('select', 'id')
+                    for (const [key, value] of Object.entries(filters)) {
+                        params.set(key, `eq.${encodeURIComponent(String(value))}`)
+                    }
+
+                    const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${params.toString()}`, {
+                        method: 'GET',
+                        headers: restAuthHeaders,
+                    })
+
+                    if (!response.ok) {
+                        const message = await response.text()
+                        throw new Error(`Failed to fetch ${table} rows: ${message}`)
+                    }
+
+                    const rows = (await response.json()) as Array<{ id: number }>
+                    return Array.isArray(rows) ? rows.length : 0
                 },
             })
 

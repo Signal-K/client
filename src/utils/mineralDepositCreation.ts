@@ -146,7 +146,6 @@ export async function isPlanetCompatible(
     }
 
     return false;
-    return false;
   } catch (error) {
     console.error("[Mineral Compatibility] Exception checking planet:", error);
     return false;
@@ -164,7 +163,7 @@ export function rollForMineralDeposit(): boolean {
  * Create a mineral deposit entry in the database
  */
 export async function createMineralDeposit({
-  supabase,
+  supabase: _supabase,
   userId,
   anomalyId,
   classificationId,
@@ -172,26 +171,26 @@ export async function createMineralDeposit({
   location
 }: CreateMineralDepositParams): Promise<{ success: boolean; depositId?: number; error?: any }> {
   try {
-    const { data, error } = await supabase
-      .from("mineralDeposits")
-      .insert({
+    const response = await fetch("/api/gameplay/mineral-deposits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         owner: userId,
         anomaly: anomalyId,
         discovery: classificationId,
         mineralconfiguration: mineralConfig,
         location: typeof window !== "undefined" ? location || null : null,
-        created_at: new Date().toISOString()
-      })
-      .select("id")
-      .single();
+        created_at: new Date().toISOString(),
+      }),
+    });
+    const result = await response.json().catch(() => ({}));
 
-    if (error) {
-      console.error("[Mineral Deposit] Error creating deposit:", error);
-      return { success: false, error };
+    if (!response.ok) {
+      console.error("[Mineral Deposit] Error creating deposit:", result?.error);
+      return { success: false, error: result?.error || "Failed to create mineral deposit" };
     }
 
-    
-    return { success: true, depositId: data.id };
+    return { success: true, depositId: result?.id };
   } catch (error) {
     console.error("[Mineral Deposit] Exception creating deposit:", error);
     return { success: false, error };

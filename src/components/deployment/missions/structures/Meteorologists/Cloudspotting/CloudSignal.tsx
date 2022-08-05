@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/src/components/ui/card"
 import { Textarea } from "@/src/components/ui/textarea"
 import { Plus, Trash2, Copy, ClipboardPasteIcon as Paste } from 'lucide-react'
+import { mergeClassificationConfiguration } from "@/src/lib/gameplay/classification-configuration"
 
 type CloudShape = 'arch' | 'loop' | 'wisp'
 type Cloud = {
@@ -152,18 +153,11 @@ export default function CloudSignal({ classificationConfig, classificationId }: 
     setExporting(true);
   
     try {
-      const response = await fetch("/api/gameplay/classifications/configuration", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          classificationId: Number(classificationId),
-          action: "merge",
-          patch: { cloudData: clouds },
-        }),
+      const result = await mergeClassificationConfiguration(Number(classificationId), {
+        cloudData: clouds,
       });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(result?.error || "Failed to export cloud configuration");
+      if (!result.ok) {
+        throw new Error(result.error || "Failed to export cloud configuration");
       }
   
       alert("Cloud configuration exported successfully!");

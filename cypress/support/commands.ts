@@ -12,66 +12,49 @@
 Cypress.Commands.add('login', (email: string, password: string) => {
   cy.session([email, password], () => {
     cy.visit('/auth')
-    
-    // Try multiple selectors for email input
-    const emailSelectors = [
-      '[data-testid="email-input"]',
-      'input[type="email"]',
-      'input[name="email"]',
-      '#email',
-      'input[placeholder*="Email"]',
-      'input[placeholder*="email"]'
-    ]
-    
-    let emailFound = false
-    emailSelectors.forEach(selector => {
-      cy.get('body').then(($body) => {
-        if ($body.find(selector).length > 0 && !emailFound) {
-          cy.get(selector).type(email)
-          emailFound = true
-        }
-      })
+
+    cy.get('body').then(($body) => {
+      const emailSelectors = [
+        '[data-testid="email-input"]',
+        'input[type="email"]',
+        'input[name="email"]',
+        '#email',
+        'input[placeholder*="Email"]',
+        'input[placeholder*="email"]'
+      ]
+      const passwordSelectors = [
+        '[data-testid="password-input"]',
+        'input[type="password"]',
+        'input[name="password"]',
+        '#password',
+        'input[placeholder*="Password"]',
+        'input[placeholder*="password"]'
+      ]
+      const buttonSelectors = [
+        '[data-testid="login-button"]',
+        'button[type="submit"]',
+        'input[type="submit"]'
+      ]
+
+      const emailSelector = emailSelectors.find((selector) => $body.find(`${selector}:enabled`).length > 0)
+      const passwordSelector = passwordSelectors.find((selector) => $body.find(`${selector}:enabled`).length > 0)
+      const buttonSelector = buttonSelectors.find((selector) => $body.find(`${selector}:enabled`).length > 0)
+
+      if (!emailSelector || !passwordSelector || !buttonSelector) {
+        throw new Error('Unable to find enabled login form controls')
+      }
+
+      cy.get(`${emailSelector}:enabled`).first().should('be.visible').click({ force: true })
+      cy.get(`${emailSelector}:enabled`).first().clear({ force: true })
+      cy.get(`${emailSelector}:enabled`).first().type(email, { force: true, delay: 20 })
+
+      cy.get(`${passwordSelector}:enabled`).first().should('be.visible').click({ force: true })
+      cy.get(`${passwordSelector}:enabled`).first().clear({ force: true })
+      cy.get(`${passwordSelector}:enabled`).first().type(password, { force: true, delay: 20 })
+
+      cy.get(`${buttonSelector}:enabled`).first().should('be.visible').click({ force: true })
     })
-    
-    // Try multiple selectors for password input
-    const passwordSelectors = [
-      '[data-testid="password-input"]',
-      'input[type="password"]',
-      'input[name="password"]',
-      '#password',
-      'input[placeholder*="Password"]',
-      'input[placeholder*="password"]'
-    ]
-    
-    let passwordFound = false
-    passwordSelectors.forEach(selector => {
-      cy.get('body').then(($body) => {
-        if ($body.find(selector).length > 0 && !passwordFound) {
-          cy.get(selector).type(password)
-          passwordFound = true
-        }
-      })
-    })
-    
-    // Try multiple selectors for login button
-    const buttonSelectors = [
-      '[data-testid="login-button"]',
-      'button[type="submit"]',
-      'input[type="submit"]',
-      'button:contains("Sign In")',
-      'button:contains("Login")'
-    ]
-    
-    let buttonFound = false
-    buttonSelectors.forEach(selector => {
-      cy.get('body').then(($body) => {
-        if ($body.find(selector).length > 0 && !buttonFound) {
-          cy.get(selector).click()
-          buttonFound = true
-        }
-      })
-    })
-    
+
     cy.wait(2000)
     // Don't require specific URL since auth flow might vary
   })

@@ -3,17 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { PostCardSingle } from "@/src/components/social/posts/PostSingle";
 import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
-
-interface Classification {
-    id: number;
-    created_at: string;
-    content: string | null; 
-    author: string | null;
-    anomaly: number | null;
-    media: any | null; 
-    classificationtype: string | null;
-    classificationConfiguration: any | null; 
-};
+import { incrementClassificationVote } from "@/src/lib/gameplay/classification-vote";
+import { fetchClassificationsForVoting } from "@/src/lib/gameplay/classification-list";
 
 export default function VoteDMPClassifications() {
     const supabase = useSupabaseClient();
@@ -33,28 +24,18 @@ export default function VoteDMPClassifications() {
         setLoading(true);
         setError(null);
         try {
-            const { data, error } = await supabase
-                .from("classifications")
-                .select('*')
-                .eq('classificationtype', 'telescope-minorPlanet')
-                .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
-
-            if (error) throw error;
-
-            const processedData = data.map((classification) => {
-                const media = classification.media;
-                let images: string[] = [];
-
-                if (Array.isArray(media) && media.length > 1) {
-                    images = media[1] && Array.isArray(media[1]) ? media[1] : [];
-                } 
-                else if (media && typeof media === "object" && media.uploadUrl) {
-                    images.push(media.uploadUrl);
-                }
-
-                const votes = classification.classificationConfiguration?.votes || 0;
-
-                return { ...classification, images, votes };
+            const processedData = await fetchClassificationsForVoting({
+                supabase,
+                classificationType: "telescope-minorPlanet",
+                getImages: (media) => {
+                    if (Array.isArray(media) && media.length > 1) {
+                        return media[1] && Array.isArray(media[1]) ? media[1] : [];
+                    }
+                    if (media && typeof media === "object" && "uploadUrl" in media && typeof (media as any).uploadUrl === "string") {
+                        return [(media as any).uploadUrl];
+                    }
+                    return [];
+                },
             });
 
             setClassifications(processedData);
@@ -71,32 +52,22 @@ export default function VoteDMPClassifications() {
     }, [session]);
 
     const handleVote = async (classificationId: number, currentConfig: any) => {
-        try {
-            const response = await fetch("/api/gameplay/classifications/configuration", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    classificationId,
-                    action: "increment_vote",
-                }),
-            });
-            const result = await response.json().catch(() => ({}));
+        const updatedVotes = await incrementClassificationVote(
+            classificationId,
+            currentConfig?.votes || 0
+        );
 
-            if (!response.ok) {
-                console.error("Error updating classificationConfiguration:", result?.error);
-            } else {
-                const updatedVotes = result?.classificationConfiguration?.votes ?? (currentConfig?.votes || 0) + 1;
-                setClassifications((prevClassifications) =>
-                    prevClassifications.map((classification) =>
-                        classification.id === classificationId
-                            ? { ...classification, votes: updatedVotes }
-                            : classification
-                    )
-                );
-            }
-        } catch (error) {
-            console.error("Error voting:", error);
-        };
+        if (updatedVotes === null) {
+            return;
+        }
+
+        setClassifications((prevClassifications) =>
+            prevClassifications.map((classification) =>
+                classification.id === classificationId
+                    ? { ...classification, votes: updatedVotes }
+                    : classification
+            )
+        );
     };
 
     return (

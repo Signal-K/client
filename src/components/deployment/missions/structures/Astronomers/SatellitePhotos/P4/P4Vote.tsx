@@ -3,17 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { PostCardSingle } from "@/src/components/social/posts/PostSingle";
 import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
-
-interface Classification {
-    id: number;
-    created_at: string;
-    content: string | null; 
-    author: string | null;
-    anomaly: number | null;
-    media: any | null; 
-    classificationtype: string | null;
-    classificationConfiguration: any | null; 
-};
+import { incrementClassificationVote } from "@/src/lib/gameplay/classification-vote";
+import { fetchClassificationsForVoting } from "@/src/lib/gameplay/classification-list";
 
 export default function VoteP4Classifications() {
     const supabase = useSupabaseClient();
@@ -33,29 +24,20 @@ export default function VoteP4Classifications() {
         setLoading(true);
         setError(null);
         try {
-          const { data, error } = await supabase
-            .from("classifications")
-            .select('*')
-            .eq('classificationtype', 'satellite-planetFour')
-            .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
-      
-          if (error) throw error;
-      
-          const processedData = data.map((classification) => {
-            const media = classification.media;
-            console.log(classification.media);
-            let images: string[] = [];
-          
-            if (Array.isArray(media)) {
-              images = media.map((item) => item.url); 
-            } else if (media?.url) {
-              images = [media.url]; 
-            }
-          
-            return {
-              ...classification,
-              images, 
-            };
+          const processedData = await fetchClassificationsForVoting({
+            supabase,
+            classificationType: "satellite-planetFour",
+            getImages: (media) => {
+              if (Array.isArray(media)) {
+                return media
+                  .map((item: any) => item?.url)
+                  .filter((url: unknown): url is string => typeof url === "string");
+              }
+              if (media && typeof media === "object" && "url" in media && typeof (media as any).url === "string") {
+                return [(media as any).url];
+              }
+              return [];
+            },
           });          
       
           setClassifications(processedData);
@@ -72,32 +54,22 @@ export default function VoteP4Classifications() {
     }, [session]);
 
     const handleVote = async (classificationId: number, currentConfig: any) => {
-        try {
-          const response = await fetch("/api/gameplay/classifications/configuration", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              classificationId,
-              action: "increment_vote",
-            }),
-          });
-          const result = await response.json().catch(() => ({}));
+        const updatedVotes = await incrementClassificationVote(
+          classificationId,
+          currentConfig?.votes || 0
+        );
 
-          if (!response.ok) {
-            console.error("Error updating classificationConfiguration:", result?.error);
-          } else {
-            const updatedVotes = result?.classificationConfiguration?.votes ?? (currentConfig?.votes || 0) + 1;
-            setClassifications((prevClassifications) =>
-              prevClassifications.map((classification) =>
-                classification.id === classificationId
-                  ? { ...classification, votes: updatedVotes }
-                  : classification
-              )
-            );
-          }
-        } catch (error) {
-          console.error("Error voting:", error);
-        };
+        if (updatedVotes === null) {
+          return;
+        }
+
+        setClassifications((prevClassifications) =>
+          prevClassifications.map((classification) =>
+            classification.id === classificationId
+              ? { ...classification, votes: updatedVotes }
+              : classification
+          )
+        );
     };
 
     return (

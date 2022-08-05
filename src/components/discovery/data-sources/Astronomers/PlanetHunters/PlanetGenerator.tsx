@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/src/components/ui/button";
 import { Textarea } from "@/src/components/ui/textarea";
 import { useSupabaseClient } from "@/src/lib/auth/session-context";
+import { mergeClassificationConfiguration } from "@/src/lib/gameplay/classification-configuration";
 
 interface PlanetGeneratorProps {
   classificationId: string;
@@ -144,14 +145,8 @@ export default function PlanetGenerator({
   const handleExport = async () => {
     const idAsNumber = Number.parseInt(classificationId);
     if (isNaN(idAsNumber)) return;
-    await fetch("/api/gameplay/classifications/configuration", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        classificationId: idAsNumber,
-        action: "merge",
-        patch: { planetConfiguration: planetConfig },
-      }),
+    await mergeClassificationConfiguration(idAsNumber, {
+      planetConfiguration: planetConfig,
     });
   };
 

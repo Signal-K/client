@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react"
+import { act, renderHook } from "@testing-library/react"
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest"
 import { useNPSManagement } from "@/hooks/useNPSManagement"
 import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context"
@@ -37,7 +37,9 @@ describe("useNPSManagement", () => {
 
     const { result } = renderHook(() => useNPSManagement())
 
-    await vi.runOnlyPendingTimersAsync()
+    await act(async () => {
+      await vi.runOnlyPendingTimersAsync()
+    })
 
     expect(query.limit).toHaveBeenCalledWith(1)
     expect(npsQuery.eq).toHaveBeenCalledWith("user_id", "user-1")

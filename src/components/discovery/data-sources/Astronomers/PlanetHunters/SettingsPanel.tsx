@@ -9,6 +9,7 @@ import { Download, Upload, Save } from "lucide-react"
 import BasicSettings from "./Settings/BasicSettings";
 import TerrainSettings from "./Settings/TerrainSettings";
 import ColorSettings from "./Settings/ColourSettings";
+import { mergeClassificationConfiguration } from "@/src/lib/gameplay/classification-configuration";
 
 interface SettingsPanelProps {
   planetConfig: PlanetConfig
@@ -41,18 +42,11 @@ export default function SettingsPanel({ planetConfig, onChange, classificationId
     setSaveStatus("saving")
 
     try {
-      const response = await fetch("/api/gameplay/classifications/configuration", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          classificationId,
-          action: "merge",
-          patch: { planetConfiguration: planetConfig },
-        }),
-      })
-      const result = await response.json().catch(() => ({}))
-      if (!response.ok) {
-        throw new Error(result?.error || "Failed to save configuration")
+      const result = await mergeClassificationConfiguration(classificationId, {
+        planetConfiguration: planetConfig,
+      });
+      if (!result.ok) {
+        throw new Error(result.error || "Failed to save configuration");
       }
 
       setSaveStatus("saved")

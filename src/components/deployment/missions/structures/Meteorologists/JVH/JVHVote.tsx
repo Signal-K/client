@@ -3,17 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { PostCardSingle } from "@/src/components/social/posts/PostSingle";
 import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
-
-interface Classification {
-    id: number;
-    created_at: string;
-    content: string | null; 
-    author: string | null;
-    anomaly: number | null;
-    media: any | null; 
-    classificationtype: string | null;
-    classificationConfiguration: any | null; 
-};
+import { incrementClassificationVote } from "@/src/lib/gameplay/classification-vote";
+import { fetchClassificationsForVoting } from "@/src/lib/gameplay/classification-list";
 
 export default function VoteJVH() {
     const supabase = useSupabaseClient();
@@ -35,29 +26,20 @@ export default function VoteJVH() {
         setError(null);
         
         try {
-            const { data, error } = await supabase
-            .from("classifications")
-            .select('*')
-            .eq('classificationtype', 'lidar-jovianVortexHunter')
-            .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
-        
-            if (error) throw error;
-        
-            const processedData = data.map((classification) => {
-            const media = classification.media;
-            let images: string[] = [];
-        
-            if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
-                images.push(media[1]);
-            } else if (media && media.uploadUrl) {
-                images.push(media.uploadUrl);
-            }
-        
-            const votes = classification.classificationConfiguration?.votes || 0;
-        
-            return { ...classification, images, votes };
+            const processedData = await fetchClassificationsForVoting({
+              supabase,
+              classificationType: "lidar-jovianVortexHunter",
+              getImages: (media) => {
+                if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
+                  return [media[1]];
+                }
+                if (media && typeof media === "object" && "uploadUrl" in media && typeof (media as any).uploadUrl === "string") {
+                  return [(media as any).uploadUrl];
+                }
+                return [];
+              },
             });
-        
+
             setClassifications(processedData);
         } catch (error) {
             console.error("Error fetching classifications:", error);
@@ -72,32 +54,22 @@ export default function VoteJVH() {
     }, [session]);
 
     const handleVote = async (classificationId: number, currentConfig: any) => {
-        try {
-          const response = await fetch("/api/gameplay/classifications/configuration", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              classificationId,
-              action: "increment_vote",
-            }),
-          });
-          const result = await response.json().catch(() => ({}));
+        const updatedVotes = await incrementClassificationVote(
+          classificationId,
+          currentConfig?.votes || 0
+        );
 
-          if (!response.ok) {
-            console.error("Error updating classificationConfiguration:", result?.error);
-          } else {
-            const updatedVotes = result?.classificationConfiguration?.votes ?? (currentConfig?.votes || 0) + 1;
-            setClassifications((prevClassifications) =>
-              prevClassifications.map((classification) =>
-                classification.id === classificationId
-                  ? { ...classification, votes: updatedVotes }
-                  : classification
-              )
-            );
-          }
-        } catch (error) {
-          console.error("Error voting:", error);
-        };
+        if (updatedVotes === null) {
+          return;
+        }
+
+        setClassifications((prevClassifications) =>
+          prevClassifications.map((classification) =>
+            classification.id === classificationId
+              ? { ...classification, votes: updatedVotes }
+              : classification
+          )
+        );
     };
     return (
           <div className="space-y-8">
