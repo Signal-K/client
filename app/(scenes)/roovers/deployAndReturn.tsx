@@ -31,7 +31,7 @@ interface InventoryItem {
 export default function DeployRooversInitial() {
   const supabase = useSupabaseClient();
   const session = useSession();
-  const { activePlanet } = useActivePlanet();
+  const { activePlanet } = useActivePlanet(); 
 
   const newRoverToInventoryData = {
     item: 23,
@@ -45,10 +45,12 @@ export default function DeployRooversInitial() {
 
   const [isDeployed, setIsDeployed] = useState<boolean>(false);
   const [roverData, setRoverData] = useState<RoverData | null>(null);
+  const [dialogueStep, setDialogueStep] = useState<number>(1);
 
   const deployRover = () => {
     console.log("Deploying rover...");
     setIsDeployed(true);
+    setDialogueStep(2);
     setTimeout(() => {
       setRoverData({
         photos: Array(6).fill("/placeholder.svg?height=200&width=200"),
@@ -58,6 +60,7 @@ export default function DeployRooversInitial() {
           { name: "Site C", deposits: ["Silicon", "Rare Earth"] },
         ],
       });
+      setDialogueStep(3);
     }, 5000);
   };
 
@@ -111,7 +114,25 @@ export default function DeployRooversInitial() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4">
-            {!isDeployed ? (
+            {dialogueStep === 1 && !isDeployed && (
+              <div className="text-lg font-medium">
+                Now that we've discovered a planet, let's deploy a rover to get a closer look!
+              </div>
+            )}
+            {dialogueStep === 2 && isDeployed && !roverData && (
+              <div className="text-lg font-medium">
+                Whoa! Now let's analyse your rover photos...
+              </div>
+            )}
+            {dialogueStep === 3 && roverData && (
+              <>
+                <RooverFromAppeears />
+                <div className="text-lg font-medium mt-4">
+                  Select from the available options based on what you can see in the photo.
+                </div>
+              </>
+            )}
+            {!isDeployed && (
               <div className="grid grid-cols-3 gap-4">
                 {["Rover 1"].map((rover, index) => (
                   <div
@@ -129,8 +150,6 @@ export default function DeployRooversInitial() {
                   </div>
                 ))}
               </div>
-            ) : (
-              <RooverFromAppeears />
             )}
             <Button
               className={`w-full ${

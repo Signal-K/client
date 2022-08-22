@@ -33,13 +33,23 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
   const renderComponentForStep = () => {
     switch (step) {
       case 1370102:
-        return <ProfileCardModal />;
+        return (
+          <div>
+            <ProfileCardModal />
+          </div>
+        );
       case 1370103:
         return (
-          <TelescopeClassification anomalyid={activePlanet?.id || getRandomPlanetId()} />
+          <div>
+            <TelescopeClassification anomalyid={activePlanet?.id || getRandomPlanetId()} />
+          </div>
         );
       case 1370104:
-        return <DeployRooversInitial />;
+        return (
+          <div>
+            <DeployRooversInitial />
+          </div>
+        );
       case 1370106:
         return (
           <div>
@@ -47,7 +57,11 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
           </div>
         );
       default:
-        return <div>Welcome message...</div>;
+        return (
+          <div>
+            Star Sailors
+          </div>
+        );
     }
   };
 

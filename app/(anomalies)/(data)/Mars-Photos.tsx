@@ -6,7 +6,7 @@ import ClassificationForm from "@/app/(create)/(classifications)/PostForm";
 import { MapPinIcon } from "@/app/(inventory)/items/MineralDeposits";
 
 export const RooverFromAppeears: React.FC = () => {
-    const supabase = useSupabaseClient();
+    const supabase = useSupabaseClient(); 
     const session = useSession();
     const { activePlanet } = useActivePlanet();
 

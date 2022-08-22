@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
@@ -131,6 +129,16 @@ const GeneratedStarterPlanet: React.FC = () => {
                         )}
                     </ul>
                 </div>
+            </div>
+            <div className="text-center mt-6 p-4 bg-blue-100 rounded-lg">
+                <h3 className="text-lg font-bold">Congratulations!</h3>
+                <p className="text-sm mt-2">
+                    Great job completing the onboarding! You're all set.
+                </p>
+                <p className="text-sm mt-2">
+                    Now, it's time to travel to your planet, where your adventure truly begins. Get ready to
+                    explore, discover, and make your mark!
+                </p>
             </div>
         </Card>
     );
