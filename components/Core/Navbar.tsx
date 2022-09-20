@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { AvatarPostCard } from '../PostCard';
 import Link from 'next/link';
+import SilfurBalance from '../Gameplay/Silfur/Balance';
 
 const navigation = [
   { name: 'Dashboard', href: '/' },
@@ -15,6 +16,7 @@ const navigation = [
   { name: 'Missions', href: '/tests/onboarding' },
   // { name: 'Playground', href: '/playground' },
   { name: 'Planets', href: '/tests/planets' },
+  { name: 'Economy', href: '/balance' },
   // { name: 'Documentation', href: '/docs' },
 ];
 
@@ -150,7 +152,10 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                               Sign out
                             </button>
                           )}
-                        </Menu.Item></>
+                        </Menu.Item>
+                        <Menu.Item>
+                        <SilfurBalance balance={100} />
+                      </Menu.Item></>
                       ) : (
                         <Menu.Item>
                           {({ active }) => (
