@@ -2,7 +2,8 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState, useRef, createRef } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import DashboardLayout from "../../components/Tests/Layout/Dashboard";
-import { PlanetPostCard } from "../../components/PostCard";
+// import { PlanetPostCard } from "../../components/PostCard";
+import PlanetPostCard from "../../components/Posts/PlanetPostsFetch";
 import PlanetAvatar from "../../components/Gameplay/Planets/PlanetAvatar";
 import { UserContext } from "../../context/UserContext";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
@@ -22,8 +23,6 @@ enum SidebarLink {
 
 export default function PlanetPage({ id }: { id: string }) {
   const router = useRouter();
-
-  const a = 'a';
 
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -268,7 +267,7 @@ export default function PlanetPage({ id }: { id: string }) {
                 <h2 className="text-xl font-bold text-gray-800">Object discussion</h2><br />
               {planetPosts?.length > 0 &&
                 planetPosts.map((post) => (
-                  <PlanetPostCard key={post.id} {...post} planets2={planetId} />
+                  <PlanetPostCard key={post.id} {...post} id={post.id} planets2={planetId} />
                 ))}
             </>
           )}
