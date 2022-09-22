@@ -26,29 +26,7 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const [upvotes, setUpvotes] = useState(0);
-    const [downvotes, setDownvotes] = useState(0);
-    const [voted, setVoted] = useState(false);
-
-    const handleVote = async ( type: 'upvote' | 'downvote' ) => {
-        if (voted) { return; };
-        try {
-            const { data, error } = await supabase
-                .from('post_votes')
-                .insert({ post_id: id, vote_type: type });
-            if (error) {
-                throw new Error(error.message);
-            }
-            if (type === 'upvote' ) {
-                setUpvotes(upvotes + 1);
-            } else {
-                setDownvotes(downvotes + 1);
-            }
-            setVoted(true);
-        } catch (error) {
-            console.log("Error voting: ", error);
-        }
-    };
+    const [voteCount, setVoteCount] = useState(false);
   
     const [dropdownOpen,setDropdownOpen] = useState(false);
   

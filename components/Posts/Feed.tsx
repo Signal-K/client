@@ -39,14 +39,6 @@ export default function SocialGraphHomeModal() {
 
   function fetchPosts() {
     supabase
-      .from("posts")
-      .select("id, content, created_at, profiles(id, avatar_url, username)")
-      .order("created_at", { ascending: false })
-      .then((result) => {
-        setPosts(result.data);
-      });
-
-    supabase
       .from('comments')
       .select("id, content, created_at, profiles(id, avatar_url, username), post_id")
       .order('created_at', { ascending: false })
@@ -58,7 +50,7 @@ export default function SocialGraphHomeModal() {
         }, {});
 
         supabase
-      .from("posts_duplicate")
+      .from("posts_duplicates")
       .select(
         "id, content, created_at, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)"
       )

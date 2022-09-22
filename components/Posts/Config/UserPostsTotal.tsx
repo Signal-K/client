@@ -28,7 +28,7 @@ const UserPostCount: React.FC<userPostCountProps> = () => {
     const fetchPostCount = async () => {
         try {
             const { data: posts, error } = await supabase
-                .from('posts_duplicate')
+                .from('posts_duplicates')
                 .select('id')
                 .eq('author', userId);
 

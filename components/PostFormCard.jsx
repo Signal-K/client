@@ -148,7 +148,7 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
   const [avatar_url, setAvatarUrl] = useState(null);
 
   function createPost () {
-    supabase.from('posts_duplicate').insert({
+    supabase.from('posts_duplicates').insert({
       author: session?.user?.id, // This is validated via RLS so users can't pretend to be other user
       content, // : content,
       media: uploads, // This should be changed to the user path `storage/userId/post/media...` like in the image gallery

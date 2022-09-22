@@ -156,7 +156,7 @@ export default function PlanetPage () {
 
     function fetchPostsForPlanet(planetId) {
         supabase
-          .from('posts_duplicate')
+          .from('posts_duplicates')
           .select('id, content, created_at, media, profiles(id, avatar_url, username)')
           .eq('planets2', planetId)
           .order('created_at', { ascending: false })

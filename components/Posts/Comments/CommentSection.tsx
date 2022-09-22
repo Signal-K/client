@@ -19,7 +19,7 @@ const CommentSection: React.FC = () => {
             const postIds = commentsData.map((comment) => comment.post_id)
 
             const { data: postsData, error: postsError } = await supabase
-                .from("posts_duplicate")
+                .from("posts_duplicates")
                 .select("id, content")
                 .in("id", postIds);
 

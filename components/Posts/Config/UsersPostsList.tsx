@@ -51,7 +51,7 @@ export default function UserPostList() {
         }, {});
 
         supabase
-      .from("posts_duplicate")
+      .from("posts_duplicates")
       .select(
         "id, content, created_at, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)"
       )
