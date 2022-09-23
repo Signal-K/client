@@ -25,7 +25,7 @@ export default function FileUpload() {
       if (error) {
         console.error("Error inserting data into Supabase:", error.message);
         return;
-      }
+      };
 
       console.log("Data inserted successfully:", data);
 
