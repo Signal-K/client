@@ -35,13 +35,13 @@ const Planet: React.FC<PlanetProps> = ({
           src={backgroundImage}
           className="object-cover absolute inset-0 size-full"
         />
-        <Header
+        {/* <Header
           logoImage={logoImage}
           planetName={planetName}
           leftArrowImage={leftArrowImage}
           rightArrowImage={rightArrowImage}
           compassImage={compassImage}
-        />
+        /> */}
         <RoverSection
           structureImage={structureImage}
           activeRoverImage={activeRoverImage}
@@ -68,45 +68,42 @@ const Header: React.FC<HeaderProps> = ({
   rightArrowImage,
   compassImage,
 }) => {
-  return (
-    <div className="flex relative flex-col justify-center w-full backdrop-blur-[5px] bg-white bg-opacity-0 max-md:max-w-full">
-      <div className="flex gap-2.5 justify-between items-center px-12 py-5 w-full max-md:flex-wrap max-md:px-5 max-md:max-w-full">
-        <img
-          loading="lazy"
-          src={logoImage}
-          className="shrink-0 self-stretch my-auto max-w-full aspect-square w-[100px]"
-        />
-        <div className="flex flex-col justify-center self-stretch max-md:max-w-full">
-          <div className="flex flex-col justify-center items-center py-1.5 max-md:max-w-full">
-            <div className="justify-center px-4 py-1 text-xl font-medium text-center text-white whitespace-nowrap rounded-xl shadow-sm bg-indigo-600 bg-opacity-40">
-              Main
-            </div>
-            <div className="flex gap-5 justify-center items-center self-stretch px-3 mt-2 text-3xl font-semibold text-center text-white uppercase tracking-[5.12px] max-md:flex-wrap">
+    return (
+        <div className="flex relative flex-col justify-center w-full backdrop-blur-[5px] bg-white bg-opacity-0 max-md:max-w-full">
+          <div className="flex flex-col justify-center items-center px-12 py-5 w-full max-md:px-5 max-md:max-w-full md:flex-row md:justify-between">
+            <div className="flex flex-col justify-center items-center md:flex-row md:items-center">
               <img
                 loading="lazy"
-                src={leftArrowImage}
-                className="shrink-0 self-stretch my-auto border-white border-solid aspect-square border-[3px] stroke-[3px] stroke-white w-[33px]"
+                src={logoImage}
+                className="shrink-0 self-stretch my-auto max-w-full aspect-square w-[100px] md:w-auto"
               />
-              <div className="self-stretch">{planetName}</div>
-              <img
-                loading="lazy"
-                src={rightArrowImage}
-                className="shrink-0 self-stretch my-auto border-white border-solid aspect-square border-[3px] stroke-[3px] stroke-white w-[33px]"
-              />
+              <div className="flex flex-col justify-center self-stretch">
+                <div className="flex gap-5 justify-center items-center self-stretch mt-2 text-3xl font-semibold text-center text-white uppercase tracking-[5.12px] md:mt-0">
+                  <img
+                    loading="lazy"
+                    src={leftArrowImage}
+                    className="shrink-0 self-stretch my-auto border-white border-solid aspect-square border-[3px] stroke-[3px] stroke-white w-[33px]"
+                  />
+                  <div className="self-stretch">{planetName}</div>
+                  <img
+                    loading="lazy"
+                    src={rightArrowImage}
+                    className="shrink-0 self-stretch my-auto border-white border-solid aspect-square border-[3px] stroke-[3px] stroke-white w-[33px]"
+                  />
+                </div>
+                <div className="flex justify-center items-center p-1.5 mt-2 w-[47px] md:mt-0">
+                  <img loading="lazy" src={compassImage} className="w-full aspect-square" />
+                </div>
+              </div>
             </div>
-            <div className="flex justify-center items-center p-1.5 mt-2 w-[47px]">
-              <img loading="lazy" src={compassImage} className="w-full aspect-square" />
-            </div>
+            <img
+              loading="lazy"
+              src={logoImage}
+              className="shrink-0 self-stretch my-auto max-w-full aspect-square w-[100px] md:w-auto"
+            />
           </div>
         </div>
-        <img
-          loading="lazy"
-          src={logoImage}
-          className="shrink-0 self-stretch my-auto max-w-full aspect-square w-[100px]"
-        />
-      </div>
-    </div>
-  );
+      );
 };
 
 interface RoverSectionProps {
