@@ -32,15 +32,36 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
     const [dropdownOpen,setDropdownOpen] = useState(false);
 
     const [votes, setVotes] = useState({});
-  const voteType = votes[id];
-  const [votingError, setVotingError] = useState<string | null>(null);
-
+    const voteType = votes[id];
+    const [votingError, setVotingError] = useState<string | null>(null);
+    const [upvotesCount, setUpvotesCount] = useState<number>(0);
+    const [downvotesCount, setDownvotesCount] = useState<number>(0);
+    
   useEffect(() => {
     // Fetch votes for the current post if the user is logged in
     if (session) {
       fetchVotesForPost(id);
     }
   }, [id, session]);
+
+  useEffect(() => {
+    let upvotes = 0;
+    let downvotes = 0;
+
+    Object.values(votes).forEach((voteType) => {
+        if (voteType === 'up') {
+            upvotes++;
+        } else if (voteType === 'down') {
+            downvotes++;
+        }
+    });
+
+    setUpvotesCount(upvotes);
+    setDownvotesCount(downvotes);
+  }, [votes]);
+
+  const rating = upvotesCount - downvotesCount;
+  const formattedRating = rating >= 0 ? `+${rating}` : `${rating}`
 
   const fetchVotesForPost = async (postId: number) => {
     try {
@@ -182,11 +203,7 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
         </div>
         {/* Vote buttons */}
         <div>
-          {/* Display vote buttons only for logged-in users */}
-          {/* Display vote count */}
-          <p>Vote Count: {voteCount}</p>
-          {/* Display user's vote */}
-          <p>User Vote: {userVote}</p>
+          
           {session && (
         <div className="flex gap-3 mt-3">
           <button
@@ -231,6 +248,7 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
               />
             </svg>
           </button>
+          <p className="text-lg font-bold my-2">{formattedRating}</p>
         </div>
       )}
       {votingError && <p className="text-red-500 mt-2">{votingError}</p>}

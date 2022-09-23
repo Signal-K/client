@@ -13,6 +13,7 @@ const CommentItem: React.FC<CommentProps> = ({ comments }) => {
                     <div className="h-6 w-6 rounded-full bg-gray-300"></div>
                     <div className="font-medium text-gray-700">{comment.author}</div>
                 </div>
+                {comment.post && <div className="mt-2 text-gray">{comment.post}</div>}
                 <div className="ml-8 mt-2 text-gray-800">{comment.content}</div>
                 {comment.replies && comment.replies.length > 0 && (
                     <div className="ml-8 mt-4">

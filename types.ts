@@ -3,4 +3,5 @@ export interface Comment {
     content: string;
     author: string;
     replies?: Comment[];
+    post?: string;
 }
