@@ -3,6 +3,7 @@ import { useEffect, useState, useRef, Fragment, createContext } from "react";
 import { Dialog, Transition } from '@headlessui/react';
 import { Header, CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { PlacedStructureSingle } from "./Structure";
 
 import { Button } from "@/ui/ui/button";
 import RoverSingle from "./Automation";
@@ -14,6 +15,32 @@ interface UserProfileData {
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
     setActivePlanet: (planet: UserPlanetData | null) => void;
+};
+
+interface StructureSingleProps {
+    userStructure: UserStructure;
+};
+
+export interface UserStructure {
+    id: string;
+    item: number;
+    name: string;
+    icon_url: string;
+    description: string;
+    // Function (what is executed upon click)
+};
+
+interface StructureSelectProps {
+    onStructureSelected: (structure: UserStructure) => void;
+    activeSectorId: number;
+};
+
+interface Structure {
+    id: string;
+    name: string;
+    description: string;
+    icon_url: string;
+    item: number;
 };
 
 export interface UserPlanetData {
@@ -56,15 +83,17 @@ interface UserAutomaton {
     item: number; // Add the 'item' property
 };
 
-export default function UserPlanetPage() {
+// View structures
+const UserPlanetPage = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
 
     const [loading, setLoading] = useState<boolean>(true);
-    const [roverData, setRoverData] = useState<UserAutomaton[]>([]);
+    const [userStructures, setUserStructures] = useState<UserStructure[]>([]);
     const [userProfile, setUserProfile] = useState<UserProfileData | null>(null);
     const [userPlanet, setUserPlanet] = useState<UserPlanetData | null>(null);
+    const [roverData, setRoverData] = useState<UserAutomaton[]>([]);
 
     useEffect(() => {
         const fetchRoverData = async () => {
@@ -98,6 +127,43 @@ export default function UserPlanetPage() {
             if (!session) return;
 
             try {
+                // Fetch user structures
+                const { data: userItems, error: userItemsError } = await supabase
+                    .from("inventoryUSERS")
+                    .select('item, "planetSector"')
+                    .eq('owner', session.user.id);
+
+                if (userItemsError) {
+                    console.error(userItemsError.message);
+                    return;
+                }
+
+                const structureIds = userItems
+                    .filter((item) => item.item)
+                    .map((item) => item.item);
+
+                const { data: structures, error: structuresError } = await supabase
+                    .from("inventoryITEMS")
+                    .select('id, name, description, icon_url')
+                    .in('id', structureIds)
+                    .eq('ItemCategory', 'Structure');
+
+                if (structuresError) {
+                    console.error(structuresError.message);
+                    return;
+                }
+
+                const structuredData: UserStructure[] = structures.map((item: any) => ({
+                    id: item.id,
+                    item: item.item,
+                    name: item.name,
+                    icon_url: item.icon_url,
+                    description: item.description
+                }));
+
+                setUserStructures(structuredData);
+
+                // Fetch user profile
                 const { data: profile, error: profileError } = await supabase
                     .from("profiles")
                     .select("location")
@@ -109,6 +175,7 @@ export default function UserPlanetPage() {
                 if (profile) {
                     setUserProfile(profile);
 
+                    // Fetch user planet
                     const { data: planet, error: planetError } = await supabase
                         .from("basePlanets")
                         .select("*")
@@ -128,7 +195,9 @@ export default function UserPlanetPage() {
             }
         };
 
-        fetchData();
+        if (session) {
+            fetchData();
+        }
     }, [session, supabase]);
 
     if (!session) {
@@ -142,7 +211,7 @@ export default function UserPlanetPage() {
     if (!userPlanet) {
         return <p>Data not found</p>;
     };
-    
+
     return (
         <>
             <Header planetName={userPlanet?.content} />
@@ -159,10 +228,16 @@ export default function UserPlanetPage() {
                         const isBlock36or37 = index + 1 === 36 || index + 1 === 37;
                         const isBlock51or54 = index + 1 === 51 || index + 1 === 54;
                         const isCombinedBlock = isBlock36or37 && index + 1 === 36;
+                        const isBlock19or20or21 = index + 1 === 19 || index + 1 === 20 || index + 1 === 21;
     
                         return (
                             <div key={`block-${index}`} className={`flex items-center justify-center p-6 border border-gray-200 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
                                 {isCombinedBlock && activePlanet && <UserPlanets userPlanet={activePlanet} />}
+                                {isBlock19or20or21 && activePlanet && userStructures.map((structure, structureIndex) => {
+                                    if (structureIndex === 0) {
+                                        return <PlacedStructureSingle key={structure.id} UserStructure={structure} />;
+                                    }
+                                })}
                                 {isBlock51or54 && roverData.length > 0 && roverData.map((rover, roverIndex) => {
                                     if (roverIndex === 0 && roverData.length >= 2) return <p>Null</p>; // Skip rendering the first rover if there are two or more items
                                     return (
@@ -179,8 +254,10 @@ export default function UserPlanetPage() {
             </div>
         </>
     );
-     
 };
+
+export default UserPlanetPage;
+
 
 // Background image & other stats, structure-based block for more info/title tag // For now, users only have one planet
 function UserPlanets({ userPlanet }: { userPlanet: UserPlanetData }) {

@@ -28,80 +28,18 @@ interface Structure {
     description: string;
     icon_url: string;
     item: number;
-}
+};
 
-// View structures
-export const PlacedStructures = ({ }) => { // This currently allows us to view all structures on a planet, not sure about clicking into the individual ones...
-    const supabase = useSupabaseClient();
-    const session = useSession();
-    const { activePlanet } = useActivePlanet();
-
-    const [userStructures, setUserStructures] = useState<UserStructure[]>([]);
-
-    useEffect(() => {
-        const fetchUserStructures = async () => {
-            if (!activePlanet || !session) return;
-
-            try {
-                const { data: userItems, error: userItemsError } = await supabase
-                    .from("inventoryUSERS")
-                    .select('item, "planetSector"')
-                    .eq('owner', session.user.id);
-
-                if (userItemsError) {
-                    console.error(userItemsError.message);
-                    return;
-                }
-
-                const structureIds = userItems
-                    .filter((item) => item.item)
-                    .map((item) => item.item);
-
-                const { data: structures, error: structuresError } = await supabase
-                    .from("inventoryITEMS")
-                    .select('id, name, description, icon_url')
-                    .in('id', structureIds)
-                    .eq('ItemCategory', 'Structure');
-
-                if (structuresError) {
-                    console.error(structuresError.message);
-                    return;
-                }
-
-                const structuredData: UserStructure[] = structures.map((item: any) => ({
-                    id: item.id,
-                    item: item.item, // Ensure the 'item' property is present
-                    name: item.name,
-                    icon_url: item.icon_url,
-                    description: item.description
-                }));
-
-                setUserStructures(structuredData);
-            } catch (error: any) {
-                console.error("Error fetching user structures:", error.message);
-            }
-        };
-
-        fetchUserStructures();
-    }, [activePlanet, session, supabase]);
-
+// View a single structure
+export const PlacedStructureSingle: React.FC<{ UserStructure: UserStructure }> = ({ UserStructure }) => {
     return (
-        <div>
-            <h2>Your Placed Structures</h2>
-            <ul>
-                {userStructures.map((structure) => (
-                    <li key={structure.id}>
-                        <img src={structure.icon_url} alt={structure.name} />
-                        <div>
-                            <h3>{structure.name}</h3>
-                            <p>{structure.description}</p>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+        <div className="flex flex-col items-center justify-center">
+            {/* <img src={UserStructure.icon_url} alt={UserStructure.name} /> */}
+            <h3>{UserStructure.name}</h3>
+            <p>{UserStructure.description}</p><br />
         </div>
     );
-}
+};
 
 // Create structures
 export const StructureSingle: React.FC<StructureSelectProps> = ({ onStructureSelected }) => { // <StructureSingleProps> = ({ userStructure }) => { /#/ -> activeSectorId
