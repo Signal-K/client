@@ -9,6 +9,7 @@ import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import Card from "../../components/Card";
 import UnityBuildLod1 from "../../components/Gameplay/Unity/Build/LOD-Rocky";
 import UnityBuildLod11 from "../../components/Gameplay/Unity/Build/LOD-Water";
+import UnityScreenshot from "../../components/Gameplay/Generator/UnityScreenshot";
 
 enum SidebarLink {
   Feed,
@@ -237,15 +238,17 @@ export default function PlanetPage({ id }: { id: string }) {
             </>
           )}
           {activeLink === SidebarLink.Demo && (
-            <div>
+            <div id="unityContainer">
                 <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br />
               <button onClick={() => setLoadUnityComponent(true)}>View Planet</button>
-              {unityBuild === 1 && (
+              <div>{loadUnityComponent && <UnityBuildLod1 />}</div>
+              {/* {unityBuild === 1 && (
                 <div>{loadUnityComponent && <UnityBuildLod11 />}</div>
               )}
               {unityBuild === 2 && (
                 <div>{loadUnityComponent && <UnityBuildLod1 />}</div>
-              )}
+              )} */}
+              <br /><br /><br /><br />
             </div>
           )}
           {activeLink === SidebarLink.Data && (<>
@@ -276,7 +279,7 @@ export default function PlanetPage({ id }: { id: string }) {
             <iframe title="Embedded cell output" src={planetData?.deepnote} height="650" width="100%"/>
             <p>{planetData?.temperature}</p>
             </Card></>
-          )}
+          )}<div><UnityScreenshot unityContainerId="unityContainer" /></div>
         </div>
       </div>
     </DashboardLayout>

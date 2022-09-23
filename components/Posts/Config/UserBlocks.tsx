@@ -20,7 +20,7 @@ export default function UserProfileBlocks () {
                 <Card>
                     <div className="container mx-auto py-8">
                         {/* <AccountEditor session={session} /> */}
-                        <IndexAuth />
+                        {/* <IndexAuth /> */}
                     </div>
                 </Card>
             </Grid>
