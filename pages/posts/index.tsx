@@ -122,7 +122,7 @@ export function SocialGraphHomeModal () {
 
     supabase.from('posts_duplicate')
       .select('id, content, created_at, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)')
-      .limit(2)
+      .limit(1)
       .order('created_at', { ascending: false })
       .then( result => { setPlanetPosts(result.data); });
   }
