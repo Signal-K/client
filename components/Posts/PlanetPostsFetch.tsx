@@ -17,18 +17,115 @@ interface PlanetPostCardProps {
         username: string;
     };
     planets2: number;
+    voteCount: number;
+    userVote: string;
+    onVote: ( postId: number, voteType: string) => void;
 }
 
-export default function PlanetPostCard ( { id, content, created_at, media, profiles:authorProfile, planets2 } ) {
-    const [loading, setLoading] = useState(false);
+export default function PlanetPostCard ( { id, content, created_at, media, profiles:authorProfile, planets2, voteCount, userVote, onVote }: PlanetPostCardProps ) {
     //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
     const [profiles, setProfiles] = useState();
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const [voteCount, setVoteCount] = useState(false);
-  
+    const [loading, setLoading] = useState(false);
     const [dropdownOpen,setDropdownOpen] = useState(false);
+
+    const [votes, setVotes] = useState({});
+  const voteType = votes[id];
+  const [votingError, setVotingError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Fetch votes for the current post if the user is logged in
+    if (session) {
+      fetchVotesForPost(id);
+    }
+  }, [id, session]);
+
+  const fetchVotesForPost = async (postId: number) => {
+    try {
+      const { data, error } = await supabase
+        .from("votes")
+        .select("*")
+        .eq("post_id", postId)
+        .eq("user_id", session?.user?.id);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const voteData = data && data.length > 0 ? data[0] : null;
+      setVotes((prevVotes) => ({
+        ...prevVotes,
+        [postId]: voteData?.vote_type || null,
+      }));
+    } catch (error) {
+      setVotingError(error.message);
+    }
+  };
+
+  const handleVote = async (postId: number, voteType: "up" | "down") => {
+    try {
+      setLoading(true);
+
+      // Check if the user has already voted on this post
+      if (votes[postId]) {
+        if (votes[postId] === voteType) {
+          // If the user has voted the same as the current vote type, remove the vote
+          await supabase
+            .from("votes")
+            .delete()
+            .eq("post_id", postId)
+            .eq("user_id", session?.user?.id);
+
+          setVotes((prevVotes) => ({
+            ...prevVotes,
+            [postId]: null,
+          }));
+        } else {
+          // If the user has voted differently, update the vote
+          const { data, error } = await supabase
+            .from("votes")
+            .update({ vote_type: voteType })
+            .eq("post_id", postId)
+            .eq("user_id", session?.user?.id);
+
+          if (error) {
+            throw new Error(error.message);
+          }
+
+          setVotes((prevVotes) => ({
+            ...prevVotes,
+            [postId]: data ? voteType : null,
+          }));
+        }
+      } else {
+        // If the user hasn't voted on this post yet, insert a new vote
+        const { data, error } = await supabase.from("votes").insert([
+          {
+            post_id: postId,
+            user_id: session?.user?.id,
+            vote_type: voteType,
+          },
+        ]);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        setVotes((prevVotes) => ({
+          ...prevVotes,
+          [postId]: data ? voteType : null,
+        }));
+      }
+
+      setLoading(false);
+      setVotingError(null);
+    } catch (error) {
+      setLoading(false);
+      setVotingError(error.message);
+    }
+  };
   
     function openDropdown(e) {
       e.stopPropagation();
@@ -73,10 +170,6 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
             )} 
           </div>
         </div>
-        <div className="flex items-center gap-2 mtp-4">
-            <button className="text-green-500" onClick={() => handleVote('upvote')}>Updoot</button><span>{upvotes}</span>
-            <button className="text-green-500" onClick={() => handleVote('downvote')}>Downdoot</button><span>{downvotes}</span>
-        </div>
         <div>
           <p className="my-3 text-sm">{content}</p>
           {media?.length > 0 && (
@@ -86,6 +179,61 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
               ))}
             </div>
           )}
+        </div>
+        {/* Vote buttons */}
+        <div>
+          {/* Display vote buttons only for logged-in users */}
+          {/* Display vote count */}
+          <p>Vote Count: {voteCount}</p>
+          {/* Display user's vote */}
+          <p>User Vote: {userVote}</p>
+          {session && (
+        <div className="flex gap-3 mt-3">
+          <button
+            className={`text-xl ${
+              voteType === "up" ? "text-blue-500" : "text-gray-500"
+            }`}
+            onClick={() => handleVote(id, "up")}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 15l7-7 7 7"
+              />
+            </svg>
+          </button>
+          <button
+            className={`text-xl ${
+              voteType === "down" ? "text-red-500" : "text-gray-500"
+            }`}
+            onClick={() => handleVote(id, "down")}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+        </div>
+      )}
+      {votingError && <p className="text-red-500 mt-2">{votingError}</p>}
         </div>
       </Card>
     );

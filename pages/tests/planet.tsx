@@ -267,7 +267,7 @@ export default function PlanetPage({ id }: { id: string }) {
                 <h2 className="text-xl font-bold text-gray-800">Object discussion</h2><br />
               {planetPosts?.length > 0 &&
                 planetPosts.map((post) => (
-                  <PlanetPostCard key={post.id} {...post} id={post.id} planets2={planetId} />
+                  <PlanetPostCard key={post.id} {...post} id={post.id} planets2={planetId}  />
                 ))}
             </>
           )}
