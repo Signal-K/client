@@ -147,6 +147,25 @@ export function PostFormCardPlanetTag ( { onPost } ) {
   //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(); 
   const [avatar_url, setAvatarUrl] = useState(null);
 
+  function createPost () {
+    supabase.from('posts_duplicate').insert({
+      author: session?.user?.id, // This is validated via RLS so users can't pretend to be other user
+      content, // : content,
+      media: uploads, // This should be changed to the user path `storage/userId/post/media...` like in the image gallery
+      planets2: planets2,
+      // File upload -> show an icon depending on what type of file.
+    }).then(response => {
+      if (!response.error) {
+        alert(`Post ${content} created`);
+        setContent('');
+        setUploads([]);
+        if ( onPost ) {
+          onPost();
+        }
+      }
+    });
+  }
+
   useEffect(() => {
     supabase.from('profiles')
       .select(`avatar_url`)
@@ -236,7 +255,7 @@ export function PostFormCardPlanetTag ( { onPost } ) {
           </button>
         </div>*/}
         <div className="grow text-right">
-          {/* <button onClick={createPost} className="bg-socialBlue text-white px-6 py-1 rounded-md">Share</button> */}
+          <button onClick={createPost} className="bg-socialBlue text-white px-6 py-1 rounded-md">Share</button>
         </div>
       </div>
     </Card>
