@@ -1,50 +1,72 @@
 import CommentItem from "./CommentsList";
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { PostgrestResponse } from "@supabase/supabase-js";
 
 const CommentSection: React.FC = () => {
     const [comments, setComments] = useState([]);
+    const [posts, setPosts] = useState([])
     const supabase = useSupabaseClient();
 
     useEffect(() => {
-        fetchComments();
+        fetchPostsAndComments();
     }, []);
 
-    const fetchComments = async () => {
+    const fetchPostsAndComments = async () => {
         try {
-            const { data: commentsData, error } = await supabase.from("comments").select("*");
-            if (error) { throw error; };
-
-            const postIds = commentsData.map((comment) => comment.post_id)
-
             const { data: postsData, error: postsError } = await supabase
                 .from("posts_duplicates")
-                .select("id, content")
-                .in("id", postIds);
+                .select("id, content, planets2")
 
             if (postsError) {
                 throw postsError;
             }
 
-            const commentsWithPosts = commentsData.map((comment) => {
-                const post = postsData.find((post) => post.id === comment.post_id);
-                return {
-                    ...comment,
-                    post: post ? post.content : null,
-                };
-            });
+            const { data: commentsData, error: commentsError } = await supabase
+                // .from<Comment>("comments")
+                .from("comments")
+                .select("*");
 
-            setComments(commentsWithPosts);
+            if (commentsError) {
+                throw commentsError;
+            }
+
+            // Organise the comments based on each post
+            const commentsHierarchy = commentsData.reduce((acc, comment) => {
+                if (comment.parent_id === null) {
+                    acc.push(comment);
+                } else {
+                    const parentComment = commentsData.find((c) => c.id === comment.parent_id);
+                    if (parentComment) {
+                        if (!parentComment.replies) {
+                            parentComment.replies = [];
+                        }
+                        parentComment.replies.push(comment);
+                    }
+                }
+                return acc;
+            }, []);
+            
+            // Merge the comments hierarchy into the posts data
+            const postsWithComments = postsData.map((post) => ({
+                ...post,
+                comments: commentsHierarchy.filter((c) => c.post_id === post.id),
+            }));
+
+            setPosts(postsWithComments);
         } catch (error) {
-            console.error(error.message);
-        };
+            console.error("Error fetching posts & comments, ", error.message);
+        }
     };
 
     return (
         <div>
-            <h2 className="text-2xl font-bold mb-4">Comments</h2>
-            <CommentItem comments={comments} />
+            {posts.map((post => (
+                <div key={post.id}>
+                    <h2 className="text-2xl font-bold mb-4">Post: {post.id}</h2>
+                    <p>{post.content}</p>
+                    <CommentItem comments={post.comments} />
+                </div>
+            )))}
         </div>
     );
 };
