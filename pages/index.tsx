@@ -6,6 +6,7 @@ import { SocialGraphHomeModal } from "./posts";
 import { Database } from "../utils/database.types";
 import IndexAuth from "../components/Core/indexAuth";
 import PlaygroundPage from "../components/Blocks/dashboard";
+import Feed from "./feed";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -21,6 +22,10 @@ export default function Home() {
 
     const [profile, setProfile] = useState(null);
     const [username, setUsername] = useState<Profiles['username']>(null);
+
+    if (session) {
+      return <Feed />
+    }
 
     return (
             <CoreLayout>

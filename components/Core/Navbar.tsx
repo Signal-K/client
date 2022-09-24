@@ -1,16 +1,20 @@
 'use client';
 
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { AvatarPostCard } from '../PostCard';
 
 const navigation = [
   { name: 'Dashboard', href: '/' },
-  { name: 'Playground', href: '/playground' }
+  // { name: 'Feed', href: '/feed' },
+  { name: 'Missions', href: '/tests/onboarding' },
+  // { name: 'Playground', href: '/playground' },
+  { name: 'Planets', href: '/tests/planets' }
 ];
 
 function classNames(...classes: string[]) {
@@ -21,22 +25,19 @@ export default function Navbar(/*{ user }: { user: any }*/) {
   const pathname = usePathname();
   const session = useSession();
   const supabase = useSupabaseClient();
+  const [profile, setProfile] = useState(null);
 
-    const [profile, setProfile] = useState(null);
-
-  function fetchUser() {
-    supabase.from('profiles')
+  useEffect(() => {    
+    supabase
+      .from("profiles")
       .select()
-      .eq('id', session?.user?.id)
-      .then(result => {
-        if (result.error) {
-          throw result.error;
-        }
+      .eq("id", session?.user?.id)
+      .then((result) => {
         if (result.data) {
           setProfile(result.data[0]);
         }
-      });
-  }
+    });
+  }, []);
 
   return (
     <Disclosure as="nav" className="bg-white shadow-sm">
@@ -180,12 +181,13 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                 <>
                   <div className="flex items-center px-4">
                     <div className="flex-shrink-0">
-                      {/* <Image
+                    {session && (<AvatarPostCard profiles={profile} /> )}
+                    {/* <Image
                         className="h-8 w-8 rounded-full"
-                        src={user.image}
+                        src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Kepler-22b.jpg/1200px-Kepler-22b.jpg'
                         height={32}
                         width={32}
-                        alt={`${user.name} avatar`}
+                        alt={`${session?.user?.id} avatar`}
                       /> */}
                     </div>
                     <div className="ml-3">

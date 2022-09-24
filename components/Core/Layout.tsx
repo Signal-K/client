@@ -86,7 +86,7 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      {isMobileView ? (
+      {/* {isMobileView ? (
         <>
           {sidebarOpen && (
             <div
@@ -126,13 +126,13 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
             </ul>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Content */}
       <div className="flex flex-col flex-grow">
         {/* Header */}
         <Navbar />
-        <header className="bg-white border-b p-4 flex items-center">
+        {/* <header className="bg-white border-b p-4 flex items-center">
           <div className="ml-4 flex items-center space-x-4 flex-grow">
             {isMobileView && (
               <button className="p-2 rounded-lg bg-gray-200 hover:bg-gray-300 focus:outline-none" onClick={toggleSidebar}>
@@ -145,12 +145,12 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
               </button>
             )}
             <input type="text" className="p-2 rounded-lg border border-gray-300 focus:outline-none" placeholder="Search..." />
-            {/* Add other header menu items */}
+            {/* Add other header menu items 
           </div>
           <div className="flex-grow"></div>
           {session && (<AvatarPostCard profiles={profile} /> )}
-          {/* <div className="w-10 h-10 bg-gray-300 rounded-full"></div> */}
-        </header>
+          {/* <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+        </header> */}
 
         {/* Page Content */}
         <main className={`flex-grow p-4 ${isMobileView ? '' : 'overflow-y-auto'}`}>

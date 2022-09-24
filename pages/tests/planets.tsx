@@ -5,6 +5,7 @@ import { Container, Row } from "react-bootstrap";
 import Login from "../login";
 import PlanetGalleryCard from "../../components/Gameplay/Planets/PlanetGalleryCard";
 import DashboardLayout from "../../components/Tests/Layout/Dashboard";
+import CoreLayout from "../../components/Core/Layout";
 
 export default function PlanetGalleryIndex() {
   const supabase = useSupabaseClient();
@@ -42,7 +43,7 @@ export default function PlanetGalleryIndex() {
   }
 
   return (
-    <DashboardLayout>
+    <CoreLayout>
       <Container>
         <Row>
           {planets.map((planet) => (
@@ -50,6 +51,6 @@ export default function PlanetGalleryIndex() {
           ))}
         </Row>
       </Container>
-    </DashboardLayout>
+    </CoreLayout>
   );
 }
