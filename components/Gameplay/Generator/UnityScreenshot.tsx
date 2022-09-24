@@ -7,6 +7,7 @@ interface UnityScreenshotProps {
 
 const UnityScreenshot: React.FC<UnityScreenshotProps> = ({ unityContainerId }) => {
     const screenshotRef = useRef<HTMLCanvasElement | null>(null);
+    
     const captureScreenshot = () => {
         if (!screenshotRef.current) { return; };
         console.log("Clicked")
@@ -19,7 +20,7 @@ const UnityScreenshot: React.FC<UnityScreenshotProps> = ({ unityContainerId }) =
 
     useEffect(() => {
         console.log(screenshotRef);
-    }, [screenshotRef]);
+    }, []);
 
     return (
         <div>
