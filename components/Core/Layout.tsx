@@ -5,6 +5,7 @@ import { FiMenu, FiBell, FiUser, FiHome, FiCircle, FiRss, FiFileText, FiBookOpen
 import { PostCardAvatar } from '../AccountAvatar';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { AvatarPostCard } from '../PostCard';
+import Navbar from "./Navbar";
 // import Footer from "./Footer";
 
 interface DashboardLayoutProps {
@@ -130,6 +131,7 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
       {/* Content */}
       <div className="flex flex-col flex-grow">
         {/* Header */}
+        <Navbar />
         <header className="bg-white border-b p-4 flex items-center">
           <div className="ml-4 flex items-center space-x-4 flex-grow">
             {isMobileView && (

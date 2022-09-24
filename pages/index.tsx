@@ -5,6 +5,7 @@ import CoreLayout from "../components/Core/Layout";
 import { SocialGraphHomeModal } from "./posts";
 import { Database } from "../utils/database.types";
 import IndexAuth from "../components/Core/indexAuth";
+import PlaygroundPage from "../components/Blocks/dashboard";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -24,7 +25,7 @@ export default function Home() {
     return (
             <CoreLayout>
               {/* <IndexAuth /> */}
-              
+              <PlaygroundPage />
         <div className="px-4 mx-auto max-w-7xl sm:px-6 md:px-12 lg:px-24">
           <div className="flex flex-col w-full mb-12 text-center">
             <div className="inline-flex items-center justify-center flex-shrink-0 w-20 h-20 mx-auto mb-5 text-blue-600 rounded-full bg-gray-50">
