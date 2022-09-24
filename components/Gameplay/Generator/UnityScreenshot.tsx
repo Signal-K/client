@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { createRef, useEffect, useRef } from "react";
 import html2canvas from 'html2canvas';
+import { useScreenshot, createFileName } from 'use-react-screenshot';
 
 interface UnityScreenshotProps {
     unityContainerId: string;
@@ -7,6 +8,20 @@ interface UnityScreenshotProps {
 
 const UnityScreenshot: React.FC<UnityScreenshotProps> = ({ unityContainerId }) => {
     const screenshotRef = useRef<HTMLCanvasElement | null>(null);
+    const ref = createRef();
+    const [image, takeScreenshot] = useScreenshot({
+        type: "image/jpeg",
+        quality: 1.0,
+    })
+
+    const download = ( image, { name = "img", extension = "jpg" } = {}) => {
+        const a = document.createElement('a');
+        a.href = image;
+        a.download = createFileName(extension, name);
+        a.click();
+    };
+
+    const downloadScreenshot = () => takeScreenshot(ref.current).then(download);
     
     const captureScreenshot = () => {
         if (!screenshotRef.current) { return; };
