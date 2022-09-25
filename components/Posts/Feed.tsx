@@ -45,7 +45,6 @@ export default function SocialGraphHomeModal() {
       .select(
         "id, content, created_at, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)"
       )
-      .limit(7)
       .order("created_at", { ascending: false })
       .then((result) => {
         setPlanetPosts(result.data);
@@ -55,7 +54,7 @@ export default function SocialGraphHomeModal() {
   return (
     <div className="container mx-auto py-8">
         {/* <UserContext.Provider value={{profile}}><PostFormCard onPost={fetchPosts()} /></UserContext.Provider><br /> */}
-      <div className="grid grid-cols-2 gap-4">
+        <div className="flex-grow flex flex-col overflow-hidden">
         {planetPosts?.map((post) => (
           <PostModal key={post.id} {...post} />
         ))}

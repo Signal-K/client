@@ -32,7 +32,7 @@ export default function PostModal({ content, created_at, profiles: authorProfile
   };
 
   return (
-    <div className="bg-white rounded shadow-sm p-4 my-4">
+    <div className="bg-white rounded shadow-sm p-4 my-0.2">
       <div className="flex items-center mb-2">
         <PostCardAvatar url={authorProfile?.avatar_url} size={45} />
         <div className="flex flex-wrap items-center ml-2">
