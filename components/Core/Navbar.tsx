@@ -8,10 +8,11 @@ import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { AvatarPostCard } from '../PostCard';
+import Link from 'next/link';
 
 const navigation = [
   { name: 'Dashboard', href: '/' },
-  // { name: 'Feed', href: '/feed' },
+  { name: 'Feed', href: '/feed' },
   { name: 'Missions', href: '/tests/onboarding' },
   // { name: 'Playground', href: '/playground' },
   { name: 'Planets', href: '/tests/planets' }
@@ -92,13 +93,13 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                   <div>
                     <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
                       <span className="sr-only">Open user menu</span>
-                      {/* <Image
+                      <img
                         className="h-8 w-8 rounded-full"
-                        src={user?.image || 'https://avatar.vercel.sh/leerob'}
+                        src={'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Kepler-22b.jpg/1200px-Kepler-22b.jpg'}
                         height={32}
                         width={32}
-                        alt={`${user?.name || 'placeholder'} avatar`}
-                      /> */}
+                        alt={`${'placeholder'} avatar`}
+                      />
                     </Menu.Button>
                   </div>
                   <Transition
@@ -112,7 +113,20 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       {session?.user ? (
-                        <Menu.Item>
+                        <><Link href='/tests/planets'><Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={classNames(
+                              active ? 'bg-gray-100' : '',
+                              'flex w-full px-4 py-2 text-sm text-gray-700'
+                            )}
+                            onClick={() => signOut()}
+                          >
+                            My planets
+                          </button>
+                        )}
+                      </Menu.Item></Link>
+                      <Menu.Item>
                           {({ active }) => (
                             <button
                               className={classNames(
@@ -124,7 +138,7 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                               Sign out
                             </button>
                           )}
-                        </Menu.Item>
+                        </Menu.Item></>
                       ) : (
                         <Menu.Item>
                           {({ active }) => (
@@ -192,10 +206,10 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                     </div>
                     <div className="ml-3">
                       <div className="text-base font-medium text-gray-800">
-                        Username{/* {user.name} */}
+                        {profile?.username}
                       </div>
                       <div className="text-sm font-medium text-gray-500">
-                        User email{/* {user.email} */}
+                        {profile?.full_name}
                       </div>
                     </div>
                   </div>
@@ -210,12 +224,11 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                 </>
               ) : (
                 <div className="mt-3 space-y-1">
-                  <button
-                    onClick={() => signIn('github')}
+                  <Link href='/login'><button
                     className="flex w-full px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                   >
                     Sign in
-                  </button>
+                  </button></Link>
                 </div>
               )}
             </div>

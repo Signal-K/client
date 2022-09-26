@@ -4,7 +4,6 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import DashboardLayout from "../../components/Tests/Layout/Dashboard";
 import { PlanetPostCard } from "../../components/PostCard";
 import PlanetAvatar from "../../components/Gameplay/Planets/PlanetAvatar";
-import SocialGraphHomeNoSidebar, { SocialGraphHomeModal } from "../posts";
 import { UserContext } from "../../context/UserContext";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import Card from "../../components/Card";

@@ -1,39 +1,53 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import CoreLayout from "../../../../components/Core/Layout";
-import Instructions from "../../../../components/onboarding/LightKurve/transitMethod";
-import ProgressSidebar from "../../../../components/onboarding/blocks/ProgressSidebar";
-import { useEffect, useState } from "react";
 
-export default function PlanetHuntersOnboardingPage1 () {
-    const percent = 23; // Assuming credits is a value in percentage
-    const buffer = 2; // Assuming buffer is a value in percentage
-    const credits = 10;
-    const currentPage = 1
-    const breakpoint = 800;
+const Instructions = dynamic(() =>
+  import("../../../../components/onboarding/LightKurve/transitMethod")
+);
+const ProgressSidebar = dynamic(() =>
+  import("../../../../components/onboarding/blocks/ProgressSidebar")
+);
 
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    const isMobile = windowWidth < breakpoint;
+export default function PlanetHuntersOnboardingPage1() {
+  const percent = 23; // Assuming credits is a value in percentage
+  const buffer = 2; // Assuming buffer is a value in percentage
+  const credits = 10;
+  const currentPage = 1;
+  const breakpoint = 800;
 
-    useEffect(() => {
-        const handleResize = () => {
-          setWindowWidth(window.innerWidth);
-        };
-    
-        window.addEventListener('resize', handleResize);
-    
-        return () => {
-          window.removeEventListener('resize', handleResize);
-        };
-      }, []);
+  const [windowWidth, setWindowWidth] = useState(0);
+  const isMobile = windowWidth < breakpoint;
 
-    return (<CoreLayout>
-        <div style={{ display: 'flex' }}>
-            <div style={{ width: isMobile ? '100%' : `${100 - credits - buffer}%`, paddingRight: isMobile ? 0 : `${buffer}%` }}>
-                <Instructions />
-            </div>
-            <div style={{ width: `${percent}%` }}>
-                <ProgressSidebar credits={credits} currentPage={currentPage} />
-            </div>
-        </div></CoreLayout>
-    );
-};
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return (
+    <CoreLayout>
+      <div style={{ display: "flex" }}>
+        <div
+          style={{
+            width: isMobile ? "100%" : `${100 - credits - buffer}%`,
+            paddingRight: isMobile ? 0 : `${buffer}%`,
+          }}
+        >
+          <Instructions />
+        </div>
+        <div style={{ width: `${percent}%` }}>
+          <ProgressSidebar credits={credits} currentPage={currentPage} />
+        </div>
+      </div>
+    </CoreLayout>
+  );
+}

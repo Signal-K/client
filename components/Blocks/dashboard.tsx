@@ -3,43 +3,43 @@
 import { Card, Metric, Text, Title, BarList, Flex, Grid } from '@tremor/react';
 import Chart from './chart';
 
-const website = [
-  { name: '/home', value: 1230 },
-  { name: '/contact', value: 751 },
-  { name: '/gallery', value: 471 },
-  { name: '/august-discount-offer', value: 280 },
-  { name: '/case-studies', value: 78 }
+const planets = [
+  { name: 'Transit', value: 4089 },
+  { name: 'Radial Velocity', value: 1044 },
+  { name: 'Microlensing', value: 200 },
+  { name: 'Direct imaging', value: 67 },
+  { name: 'Others', value: 63 }
 ];
 
 const shop = [
-  { name: '/home', value: 453 },
-  { name: '/imprint', value: 351 },
-  { name: '/shop', value: 271 },
-  { name: '/pricing', value: 191 }
+  { name: 'TIC', value: 6500 },
+  { name: 'KOI', value: 182 },
+  // { name: '/shop', value: 271 },
+  // { name: '/pricing', value: 191 }
 ];
 
 const app = [
-  { name: '/shop', value: 789 },
-  { name: '/product-features', value: 676 },
-  { name: '/about', value: 564 },
-  { name: '/login', value: 234 },
-  { name: '/downloads', value: 191 }
+  { name: 'TESS', value: 50 },
+  { name: 'Exofop', value: 4 }
+  // { name: '/about', value: 564 },
+  // { name: '/login', value: 234 },
+  // { name: '/downloads', value: 191 }
 ];
 
 const data = [
   {
-    category: 'Website',
-    stat: '10,234',
-    data: website
+    category: 'Confirmed planets', // link this up to exofop API
+    stat: '5463',
+    data: planets
   },
   {
-    category: 'Online Shop',
-    stat: '12,543',
+    category: 'TESS Candidates',
+    stat: '6682',
     data: shop
   },
   {
-    category: 'Mobile App',
-    stat: '2,543',
+    category: 'Planets in Star Sailors',
+    stat: '54',
     data: app
   }
 ];
@@ -57,11 +57,11 @@ export default function PlaygroundPage() {
               className="space-x-2"
             >
               <Metric>{item.stat}</Metric>
-              <Text>Total views</Text>
+              <Text>Total planets</Text>
             </Flex>
             <Flex className="mt-6">
               <Text>Pages</Text>
-              <Text className="text-right">Views</Text>
+              <Text className="text-right">Anomalies</Text>
             </Flex>
             <BarList
               data={item.data}

@@ -62,12 +62,12 @@ export default function SocialGraphHomeNoSidebar () {
 
   function fetchPosts () {
     supabase.from('posts')
-      .select('id, content, created_at, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+      .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
       .order('created_at', { ascending: false })
       .then( result => { setPosts(result.data); });
 
     supabase.from('posts_duplicate')
-      .select('id, content, created_at, planets2, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+      .select('id, content, created_at, media, planets2, profiles(id, avatar_url, username)') // Reset id on testing playground server later
       .order('created_at', { ascending: false })
       .then( result => { setPlanetPosts(result.data); });
     }
@@ -87,7 +87,7 @@ export default function SocialGraphHomeNoSidebar () {
   );
 }
 
-export function SocialGraphHomeModal () {
+export function SocialGraphHomeModal1 () {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);

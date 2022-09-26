@@ -3,8 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
 }
 
-module.exports = nextConfig
-/* module.exports = () => {
+module.exports = () => {
    const rewrites = () => {
      return [
        {
@@ -15,5 +14,5 @@ module.exports = nextConfig
    };
    return {
      rewrites,
-   };
-*/
+    };
+}
