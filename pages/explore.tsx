@@ -15,5 +15,5 @@ export default function Explore() {
             <OwnedItemsList />
             <MySpaceships />
         </Layout>
-    )
-}
+    );
+};
