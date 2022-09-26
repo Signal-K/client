@@ -133,7 +133,7 @@ export default function PostFormCard ( { onPost } ) {
   );
 }
 
-export function PostFormCardPlanetTag ( { onPost } ) {
+export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
   const supabase = useSupabaseClient();
   const [content, setContent] = useState('');
   const session = useSession();
@@ -152,7 +152,7 @@ export function PostFormCardPlanetTag ( { onPost } ) {
       author: session?.user?.id, // This is validated via RLS so users can't pretend to be other user
       content, // : content,
       media: uploads, // This should be changed to the user path `storage/userId/post/media...` like in the image gallery
-      planets2: planets2,
+      planets2: planetId2,
       // File upload -> show an icon depending on what type of file.
     }).then(response => {
       if (!response.error) {

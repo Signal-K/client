@@ -32,21 +32,6 @@ export default function PlanetPage({ id }: { id: string }) {
   const [planetPosts, setPlanetPosts] = useState([]);
   const { id: planetId } = router.query; // Rename the variable to 'planetId'
   const [unityBuild, setUnityBuild] = useState(null);
-
-  const ref = useRef();
-    const [image, takeScreenshot] = useScreenshot({
-        type: "image/jpeg",
-        quality: 1.0,
-    })
-
-    const download = ( image, { name = "img", extension = "jpg" } = {}) => {
-        const a = document.createElement('a');
-        a.href = image;
-        a.download = createFileName(extension, name);
-        a.click();
-    };
-
-    const downloadScreenshot = () => takeScreenshot(ref.current).then(download);
   
   useEffect(() => {
     if (planetData?.temperature < 300) { setUnityBuild(1); };
@@ -275,7 +260,7 @@ export default function PlanetPage({ id }: { id: string }) {
         <div className="w-3/4 p-8 ml-auto">
           <center>
             <h1 className="text-2xl font-bold text-gray-800">{content}</h1>
-            {session?.user?.id && ( <> <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={() => fetchPostsForPlanet(planetId)} /></UserContext.Provider><br /> </> )}
+            {session?.user?.id && ( <> <UserContext.Provider value={{profile}}><PostFormCardPlanetTag planetId2={planetId} onPost={() => fetchPostsForPlanet(planetId)} /></UserContext.Provider><br /> </> )}
           </center>
           <br />
           {activeLink === SidebarLink.Feed && (
@@ -288,10 +273,10 @@ export default function PlanetPage({ id }: { id: string }) {
             </>
           )}
           {activeLink === SidebarLink.Demo && (
-            <div id="unityContainer" ref={ref}>
+            <div id="unityContainer">
                 <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br />
               <button onClick={() => setLoadUnityComponent(true)}>View Planet</button>
-              <div>{loadUnityComponent && <UnityBuildLod1 />}</div>
+              <div>{loadUnityComponent && <UnityBuildLod1 />}</div> {/* planet={planetData?.content} user={profile?.username} />}</div> */}
               {/* {unityBuild === 1 && (
                 <div>{loadUnityComponent && <UnityBuildLod11 />}</div>
               )}
@@ -299,7 +284,6 @@ export default function PlanetPage({ id }: { id: string }) {
                 <div>{loadUnityComponent && <UnityBuildLod1 />}</div>
               )} */}
               <br /><br /><br /><br />
-              <button onClick={downloadScreenshot}>Screenshot</button>
             </div>
           )}
           {activeLink === SidebarLink.Data && (<>
