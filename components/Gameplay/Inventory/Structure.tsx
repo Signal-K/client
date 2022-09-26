@@ -14,6 +14,7 @@ export interface UserStructure {
     name: string;
     icon_url: string;
     description: string;
+    planetSector: number;
     // Function (what is executed upon click)
 };
 
@@ -31,12 +32,11 @@ interface Structure {
 };
 
 // View a single structure
-export const PlacedStructureSingle: React.FC<{ UserStructure: UserStructure }> = ({ UserStructure }) => {
+export const PlacedStructureSingle: React.FC<{ UserStructure: UserStructure; }> = ({ UserStructure }) => {
     return (
         <div className="flex flex-col items-center justify-center">
-            {/* <img src={UserStructure.icon_url} alt={UserStructure.name} /> */}
-            <h3>{UserStructure.name}</h3>
-            <p>{UserStructure.description}</p><br />
+            <img src={UserStructure.icon_url} alt={UserStructure.name} className="w-14 h-14 mb-2" />
+            <p>{UserStructure.id}</p>
         </div>
     );
 };
@@ -61,10 +61,11 @@ export const StructureSingle: React.FC<StructureSelectProps> = ({ onStructureSel
             if (data) {
                 const structuredData: UserStructure[] = data.map((item: any) => ({
                     id: item.id,
-                    item: item.item, // Ensure the 'item' property is present
+                    item: item.item,
                     name: item.name,
                     icon_url: item.icon_url,
-                    description: item.description
+                    description: item.description,
+                    planetSector: item.planetSector
                 }));
                 setStructures(structuredData);
             };
