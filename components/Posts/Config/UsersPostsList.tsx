@@ -56,7 +56,7 @@ export default function UserPostList() {
         "id, content, created_at, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)"
       )
       .eq("author", userId)
-      .limit(3)
+      .limit(2)
       .order("created_at", { ascending: false })
       .then((result) => {
         setPlanetPosts(result.data);

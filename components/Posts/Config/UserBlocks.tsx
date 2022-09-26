@@ -2,6 +2,8 @@ import React from "react";
 import { useSession } from "@supabase/auth-helpers-react";
 import UserPostCount from "./UserPostsTotal";
 import { Grid, Card } from "@tremor/react";
+import AccountEditor from "../../Core/UpdateProfile";
+import IndexAuth from "../../Core/indexAuth";
 
 export default function UserProfileBlocks () {
     const session = useSession();
@@ -13,6 +15,12 @@ export default function UserProfileBlocks () {
                 <Card>
                     <div className="container mx-auto py-8">
                         <UserPostCount userId={userId} />
+                    </div>
+                </Card>
+                <Card>
+                    <div className="container mx-auto py-8">
+                        {/* <AccountEditor session={session} /> */}
+                        <IndexAuth />
                     </div>
                 </Card>
             </Grid>

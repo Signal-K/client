@@ -17,7 +17,8 @@ const navigation = [
   // { name: 'Playground', href: '/playground' },
   { name: 'Planets', href: '/tests/planets' },
   { name: 'Economy', href: '/balance' },
-  // { name: 'Documentation', href: '/docs' },
+  { name: 'Inventory', href: '/#'}, // href: '/inventory' },
+  { name: 'Documentation', href: '/#'}, // href: '/docs' },
 ];
 
 function classNames(...classes: string[]) {
@@ -134,9 +135,20 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                               active ? 'bg-gray-100' : '',
                               'flex w-full px-4 py-2 text-sm text-gray-700'
                             )}
-                            onClick={() => supabase.auth.signOut()}
                           >
                             My planets
+                          </button>
+                        )}
+                      </Menu.Item></Link>
+                      <Link href='/tests/planets'><Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={classNames(
+                              active ? 'bg-gray-100' : '',
+                              'flex w-full px-4 py-2 text-sm text-gray-700'
+                            )}
+                          >
+                            My inventory
                           </button>
                         )}
                       </Menu.Item></Link>

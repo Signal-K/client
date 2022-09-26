@@ -30,9 +30,9 @@ export default function PlanetPage({ id }: { id: string }) {
   const [unityBuild, setUnityBuild] = useState(null);
   
   useEffect(() => {
-    if (planetData?.temperature < 100) { setUnityBuild(1); };
-    if (planetData?.temperature > 100) { setUnityBuild(2); };
-  })
+    if (planetData?.temperature < 300) { setUnityBuild(1); };
+    if (planetData?.temperature > 300) { setUnityBuild(2); };
+  }, []);
 
   const [profile, setProfile] = useState(null);
   const [activeLink, setActiveLink] = useState(SidebarLink.Feed); // Track the active link
