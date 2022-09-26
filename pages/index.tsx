@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { Metadata } from "next";
 import FileUpload from "../components/Content/FileUpload";
 import CreateNode from "../components/Content/CreateRepo";
+import CheckPostsOld from "../components/Content/CheckUserData";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -27,6 +28,7 @@ export default function Home() {
         {/* {userId} */}
         <div className="flex flex-col gap-4">
           <CreateNode />
+          <CheckPostsOld />
           <FileUpload />
         </div>
       </Layout>
