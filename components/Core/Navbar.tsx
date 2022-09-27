@@ -4,7 +4,6 @@ import { Fragment, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { AvatarPostCard } from '../PostCard';
@@ -120,7 +119,7 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                               active ? 'bg-gray-100' : '',
                               'flex w-full px-4 py-2 text-sm text-gray-700'
                             )}
-                            onClick={() => signOut()}
+                            onClick={() => supabase.auth.signOut()}
                           >
                             My planets
                           </button>
@@ -133,7 +132,7 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                                 active ? 'bg-gray-100' : '',
                                 'flex w-full px-4 py-2 text-sm text-gray-700'
                               )}
-                              onClick={() => signOut()}
+                              onClick={() => supabase.auth.signOut()}
                             >
                               Sign out
                             </button>
@@ -142,15 +141,15 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                       ) : (
                         <Menu.Item>
                           {({ active }) => (
-                            <button
+                            <Link href='/login'><button
                               className={classNames(
                                 active ? 'bg-gray-100' : '',
                                 'flex w-full px-4 py-2 text-sm text-gray-700'
                               )}
-                              onClick={() => signIn('github')}
+                              onClick={() => console.log(session)}
                             >
                               Sign in
-                            </button>
+                            </button></Link>
                           )}
                         </Menu.Item>
                       )}
@@ -215,7 +214,7 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                   </div>
                   <div className="mt-3 space-y-1">
                     <button
-                      onClick={() => signOut()}
+                      onClick={() => supabase.auth.signOut()}
                       className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                     >
                       Sign out

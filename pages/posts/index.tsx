@@ -138,8 +138,6 @@ export function SocialGraphHomeModal1 () {
     })
   }
 
-  if (!session) { return <Login />; };
-
   return (
     <Layout hideNavigation={true}>
       <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}

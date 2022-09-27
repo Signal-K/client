@@ -16,6 +16,7 @@ const ProgressSidebar: React.FC<SidebarProps> = ({ currentPage, credits }) => {
     { id: 1, title: 'Planet Hunters Introduction', icon: 'book' },
     { id: 2, title: 'What is Lightkurve?', icon: 'graph' },
     { id: 3, title: 'How do we look at the data from these telescopes?', icon: 'telescope' },
+    { id: 4, title: 'How do we play?', icon: 'telescope' },
     // ... Add data for remaining pages here
   ];
 
@@ -68,8 +69,8 @@ const ProgressSidebar: React.FC<SidebarProps> = ({ currentPage, credits }) => {
             <span className="flex-grow">{chapter.title}</span>
           </a>
         ))}
-      </div>
-      <div className="flex items-center justify-center bg-gray-200 py-2">
+      </div><br /><br /><br /><br /><br /><br /><br /><br /><br />
+      <div className="flex justify-center py-2 object-bottom">
         <svg
           className="w-5 h-5 mr-2"
           viewBox="0 0 24 24"

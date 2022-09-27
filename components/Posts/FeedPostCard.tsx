@@ -49,15 +49,16 @@ export default function PostModal({ content, created_at, profiles: authorProfile
         </div>
       </div>
       <div className="my-3 text-sm">{content}</div>
-      <center><div className="flex gap-4"><div className="rounded-md overflow-hidden"><img src={planetsImagesCdnAddress + planets2 + '/' + 'download.png'} height='80%' width='80%' /></div></div></center>
+      {/* <center><div className="flex gap-4"><div className="rounded-md overflow-hidden"><img src={planets2?.cover} height='5%' width='5%' /></div></div></center> */}
+      {/*<center><div className="flex gap-4"><div className="rounded-md overflow-hidden"><img src={planetsImagesCdnAddress + planets2 + '/' + 'download.png'} height='5%' width='5%' /></div></div></center>
                         {media?.length > 0 && (
                           <div className="flex gap-4">
                             {media?.length > 0 && media.map(media => (
                               <div key={media} className="rounded-md overflow-hidden"><img src={media} width='25%' height='25%' /></div>
                             ))}
                           </div>
-                        )}
-      {lightboxOpen && (
+                        )} */}
+      {/* {lightboxOpen && (
         <Lightbox
           mainSrc={media[lightboxIndex]}
           nextSrc={media[(lightboxIndex + 1) % media.length]}
@@ -66,7 +67,7 @@ export default function PostModal({ content, created_at, profiles: authorProfile
           onMovePrevRequest={() => setLightboxIndex((lightboxIndex + media.length - 1) % media.length)}
           onMoveNextRequest={() => setLightboxIndex((lightboxIndex + 1) % media.length)}
         />
-      )}
+      )} */}
     </div>
   );
 }
