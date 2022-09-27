@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/Avatar";
 import {
   BellRing,
   Bug,
@@ -15,9 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import NavItem from "./NavItem";
-import { Button } from "../ui/Button";
+import React, { useEffect, useState } from "react"; 
 
 const navCategoryItems = [
   {
@@ -83,57 +80,24 @@ const Sidebar: React.FC = () => {
             Components
           </h2>
           <ul className="space-y-4">
-            {navCategoryItems.map((item, idx) => (
-              <NavItem {...item} key={idx} active={pathname === item.url} />
-            ))}
           </ul>
 
           <h2 className="text-lg font-bold mt-4 text-foreground/70">
             Your stuff
           </h2>
           <ul className="space-y-4 mt-4">
-            {navSettingItems.map((item, idx) => (
-              <NavItem {...item} key={idx} active={pathname === item.url} />
-            ))}
-            {user.role === "developer" && (
-              <NavItem
-                url="/reported-post"
-                label="Reported Post"
-                Icon={Megaphone}
-                active={pathname === "/reported-post"}
-              />
-            )}
           </ul>
         </div>
 
         <div>
           <div className="flex items-start gap-2">
-            <Avatar className="rounded-full">
-              <AvatarImage src={user.image ?? ""} />
-              <AvatarFallback className="rounded-full">
-                {user.username && user.username[0].toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
           </div>
 
-          <Button
-            className="w-full flex items-center space-x-2 justify-start mt-4 bg-white lg:hidden"
-            variant="outline"
-            onClick={() => setOpenAside(false)}
-          >
-            <Menu className="w-6 aspect-square" />
-            <span>Menu</span>
-          </Button>
+  
         </div>
       </aside>
       <div className="fixed lg:hidden bottom-0 p-4 inset-x-0 z-10 bg-white supports-[backdrop-filter]:bg-white/60 border-t supports-[backdrop-filter]:backdrop-blur-md">
-        <Button
-          onClick={() => setOpenAside(true)}
-          className="w-full flex items-center justify-start space-x-2"
-        >
-          <Menu className="w-6 aspect-square" />
-          <span>Menu</span>
-        </Button>
+        
       </div>
     </>
   );

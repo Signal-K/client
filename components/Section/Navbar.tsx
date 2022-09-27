@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/Avatar";
+// import { Avatar, AvatarFallback, AvatarImage } from "../ui/Avatar";
 import { useEffect, Fragment, useState, useRef } from "react";
 import Link from "next/link";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
@@ -479,9 +479,9 @@ export function Navbar() {
         </Popover.Group>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
             <Link href="/profile">
-                <Avatar className="cursor-pointer rounded-md">
+                {/* <Avatar className="cursor-pointer rounded-md">
                     <AvatarImage src="https://avatars.githubusercontent.com/u/78838067?s=200&v=4" />
-                </Avatar>
+                </Avatar> */}
             </Link>
         </div>
       </nav>
@@ -555,9 +555,9 @@ export function Navbar() {
               </div>
               <div className="py-6">
                 <Link href="/profile">
-                    <Avatar className="cursor-pointer rounded-md">
+                    {/* <Avatar className="cursor-pointer rounded-md">
                         <AvatarImage src="https://avatars.githubusercontent.com/u/78838067?s=200&v=4" />
-                    </Avatar>
+                    </Avatar> */}
                 </Link>
               </div>
             </div>
