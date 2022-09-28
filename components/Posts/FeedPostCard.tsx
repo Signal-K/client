@@ -3,6 +3,7 @@ import { UserContext } from "../../context/UserContext";
 import { PostCardAvatar } from "../AccountAvatar";
 import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
+import { planetsImagesCdnAddress } from "../../constants/cdn";
 
 interface Post {
   id: number;
@@ -48,19 +49,14 @@ export default function PostModal({ content, created_at, profiles: authorProfile
         </div>
       </div>
       <div className="my-3 text-sm">{content}</div>
-      {media?.length > 0 && (
-        <div className="flex gap-4">
-          {media.map((image, index) => (
-            <div
-              key={image}
-              className="rounded-md overflow-hidden cursor-pointer"
-              onClick={() => openLightbox(index)}
-            >
-              <img src={image} alt="Post media" />
-            </div>
-          ))}
-        </div>
-      )}
+      <center><div className="flex gap-4"><div className="rounded-md overflow-hidden"><img src={planetsImagesCdnAddress + planets2 + '/' + 'download.png'} height='80%' width='80%' /></div></div></center>
+                        {media?.length > 0 && (
+                          <div className="flex gap-4">
+                            {media?.length > 0 && media.map(media => (
+                              <div key={media} className="rounded-md overflow-hidden"><img src={media} width='25%' height='25%' /></div>
+                            ))}
+                          </div>
+                        )}
       {lightboxOpen && (
         <Lightbox
           mainSrc={media[lightboxIndex]}

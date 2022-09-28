@@ -29,6 +29,7 @@ export default function Home() {
         <CoreLayout>
           <PlaygroundPage />
           <SocialGraphHomeModal />
+          {/* <SocialGraphHomeModal1 /> */}
         </CoreLayout>
       )
     }
