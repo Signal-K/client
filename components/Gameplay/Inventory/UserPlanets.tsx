@@ -27,7 +27,6 @@ export interface UserStructure {
     name: string;
     icon_url: string;
     description: string;
-    planetSector: number;
     // Function (what is executed upon click)
 };
 
@@ -159,8 +158,7 @@ const UserPlanetPage = () => {
                     item: item.item,
                     name: item.name,
                     icon_url: item.icon_url,
-                    description: item.description,
-                    planetSector: item.planetSector,
+                    description: item.description
                 }));
 
                 setUserStructures(structuredData);
@@ -235,13 +233,11 @@ const UserPlanetPage = () => {
                         return (
                             <div key={`block-${index}`} className={`flex items-center justify-center p-6 border border-gray-200 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
                                 {isCombinedBlock && activePlanet && <UserPlanets userPlanet={activePlanet} />}
-                                {isBlock19or20or21 && activePlanet && (
-                                    <>
-                                        {userStructures.map((structure, structureIndex) => (
-                                            <PlacedStructureSingle key={structure.id} UserStructure={structure} />
-                                        ))}
-                                    </>
-                                )}
+                                {isBlock19or20or21 && activePlanet && userStructures.map((structure, structureIndex) => {
+                                    if (structureIndex === 0) {
+                                        return <PlacedStructureSingle key={structure.id} UserStructure={structure} />;
+                                    }
+                                })}
                                 {isBlock51or54 && roverData.length > 0 && roverData.map((rover, roverIndex) => {
                                     if (roverIndex === 0 && roverData.length >= 2) return <p>Null</p>; // Skip rendering the first rover if there are two or more items
                                     return (

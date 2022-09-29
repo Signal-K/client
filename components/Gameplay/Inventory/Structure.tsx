@@ -8,13 +8,19 @@ interface StructureSingleProps {
     userStructure: UserStructure;
 };
 
+interface OwnedItem {
+    id: string;
+    item: string;
+    quantity: number;
+    sector: string;
+};
+
 export interface UserStructure {
     id: string;
     item: number;
     name: string;
     icon_url: string;
     description: string;
-    planetSector: number;
     // Function (what is executed upon click)
 };
 
@@ -37,6 +43,82 @@ export const PlacedStructureSingle: React.FC<{ UserStructure: UserStructure; }> 
         <div className="flex flex-col items-center justify-center">
             <img src={UserStructure.icon_url} alt={UserStructure.name} className="w-14 h-14 mb-2" />
             <p>{UserStructure.id}</p>
+        </div>
+    );
+};
+
+export const SectorStructureOwnedAllSectorsOneUser: React.FC<{}> = () => {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+    const { activePlanet } = useActivePlanet(); // Assuming this hook returns the active planet
+
+    const [ownedItems, setOwnedItems] = useState<OwnedItem[]>([]);
+    const [itemDetails, setItemDetails] = useState<any[]>([]);
+
+    useEffect(() => {
+        async function fetchOwnedItems() {
+            if (session && activePlanet) {
+                try {
+                    const { data: ownedItemsData, error: ownedItemsError } = await supabase
+                       .from('inventoryUSERS')
+                       .select('*')
+                       .eq("owner", session?.user?.id)
+                    //    .eq("planetSector", activePlanet.id); // Filter by activePlanet.id
+
+                    if (ownedItemsError) {
+                        throw ownedItemsError;
+                    };
+
+                    if (ownedItemsData) {
+                        setOwnedItems(ownedItemsData);
+                    };
+                } catch (error) {
+                    console.error('Error fetching owned items:', error);
+                };
+            };
+        };
+
+        fetchOwnedItems();
+    }, [session, activePlanet, supabase]);
+
+    useEffect(() => {
+        async function fetchItemDetails() {
+            if (ownedItems.length > 0) {
+                const itemIds = ownedItems.map(item => item.item);
+                const { data: itemDetailsData, error: itemDetailsError } = await supabase
+                   .from('inventoryITEMS')
+                   .select('*')
+                   .in('id', itemIds)
+                   .eq('ItemCategory', 'Structure');
+
+                if (itemDetailsError) {
+                    console.error('Error fetching item details:', itemDetailsError);
+                }
+
+                if (itemDetailsData) {
+                    setItemDetails(itemDetailsData);
+                };
+            };
+        };
+
+        fetchItemDetails();
+    }, [ownedItems, supabase]);
+
+    return (
+        <div className="bg-gray-100 p-4">
+            <h2 className="text-2xl font-semibold mb-4">Your Items</h2>
+            <ul className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {itemDetails.map(item => {
+                    const ownedItem = ownedItems.find(ownedItem => ownedItem.item === item.id);
+                    return (
+                        <li key={item.id} className="bg-white shadow-md p-4 rounded-md">
+                            <h3 className="text-lg font-medium mb-2">{item.name}</h3>
+                            <p className="text-gray-600">Quantity: {ownedItem?.quantity}</p>
+                            <p className="text-gray-600">On sector (id): {ownedItem?.sector}</p>
+                        </li>
+                    );
+                })}
+            </ul>
         </div>
     );
 };
@@ -65,7 +147,6 @@ export const StructureSingle: React.FC<StructureSelectProps> = ({ onStructureSel
                     name: item.name,
                     icon_url: item.icon_url,
                     description: item.description,
-                    planetSector: item.planetSector
                 }));
                 setStructures(structuredData);
             };
