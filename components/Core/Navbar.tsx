@@ -14,7 +14,8 @@ const navigation = [
   { name: 'Feed', href: '/feed' },
   { name: 'Missions', href: '/tests/onboarding' },
   // { name: 'Playground', href: '/playground' },
-  { name: 'Planets', href: '/tests/planets' }
+  { name: 'Planets', href: '/tests/planets' },
+  // { name: 'Documentation', href: '/docs' },
 ];
 
 function classNames(...classes: string[]) {
@@ -112,7 +113,19 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       {session?.user ? (
-                        <><Link href='/tests/planets'><Menu.Item>
+                        <><Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={classNames(
+                              active ? 'bg-gray-100' : '',
+                              'flex w-full px-4 py-2 text-sm text-gray-700'
+                            )}
+                          >
+                            Welcome, {profile?.username}
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Link href='/tests/planets'><Menu.Item>
                         {({ active }) => (
                           <button
                             className={classNames(

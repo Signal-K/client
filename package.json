@@ -67,6 +67,8 @@
     "nano": "^10.1.2",
     "next": "13.0.2",
     "next-auth": "^4.22.1",
+    "nextra": "^2.9.0",
+    "nextra-theme-docs": "^2.9.0",
     "omit-deep": "^0.3.0",
     "package.json": "^2.0.1",
     "plotly.js": "^2.22.0",

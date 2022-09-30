@@ -16,6 +16,12 @@ export default function SocialGraphHomeModal() {
   }, [session?.user?.id]);
 
   useEffect(() => {
+    if (planetPosts.length > 0) {
+      console.log("Comments: ", planetPosts.flatMap((post) => post.comments));
+    }
+  }, [planetPosts]);
+
+  useEffect(() => {
     if (!session?.user?.id) {
       return;
     }
@@ -41,6 +47,17 @@ export default function SocialGraphHomeModal() {
       });
 
     supabase
+      .from('comments')
+      .select("id, content, created_at, profiles(id, avatar_url, username), post_id")
+      .order('created_at', { ascending: false })
+      .then((result) => {
+        const comments = result.data.reduce((acc, comment) => {
+          if (!acc[comment.post_id]) { acc[comment.post_id] = []; };
+          acc[comment.post_id].push(comment);
+          return acc;
+        }, {});
+
+        supabase
       .from("posts_duplicate")
       .select(
         "id, content, created_at, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)"
@@ -49,6 +66,7 @@ export default function SocialGraphHomeModal() {
       .then((result) => {
         setPlanetPosts(result.data);
       });
+      })
   }
 
   return (
