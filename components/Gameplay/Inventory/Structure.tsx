@@ -224,7 +224,7 @@ export const StructureSingle: React.FC<StructureSelectProps> = ({ onStructureSel
     };
 
     const createInventoryUserEntry = async (structure: UserStructure) => {
-        if (session && activePlanet?.id) {
+        if (session && activeSector && activePlanet?.id) {
             try {
                 const { data, error } = await supabase
                     .from('inventoryUSERS')
@@ -234,6 +234,9 @@ export const StructureSingle: React.FC<StructureSelectProps> = ({ onStructureSel
                             owner: session?.user?.id,
                             quantity: 1,
                             planetSector: activeSector,
+                            time_of_deploy: new Date().toISOString,
+                            notes: "Structure",
+                            basePlanet: activePlanet.id,
                         },
                     ]);
 
