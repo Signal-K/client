@@ -60,5 +60,5 @@
     "components/Journal/Discussion/Reply.js",
     "pages/tests/planet.tsx",
     ".next/types/**/*.ts"
-  ]
+, "list-components.js"  ]
 }

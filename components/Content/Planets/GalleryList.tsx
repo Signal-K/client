@@ -315,24 +315,10 @@ export const Garden: React.FC<GardenProps> = ({ onClose }) => {
   );
 };
 
-export const GardenBar: React.FC = () => {
-
-  return (
-    <div className={`fixed inset-x-0 bottom-0 flex justify-center transition-transform duration-300`}>
-      <div className="bg-cover bg-center w-full sm:max-w-screen-lg sm:w-full max-h-96vh overflow-y-auto shadow-lg relative rounded-t-3xl">
-        <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-96vh flex items-center justify-center relative rounded-t-3xl">
-          <PlanetGalleryWithSectors />
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export const ArchivedGarden: React.FC = () => {
   return (
     <>
       <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-screen flex items-center justify-center relative">
-        {/* <GardenSidebar /> */}
         <ArchivedPlanetGallery />
       </div>
     </>
