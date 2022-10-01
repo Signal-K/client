@@ -8,6 +8,7 @@ import { UserContext } from "../../context/UserContext";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import Card from "../../components/Card";
 import UnityBuildLod1 from "../../components/Gameplay/Unity/Build/LOD-Rocky";
+import UnityBuildLod11 from "../../components/Gameplay/Unity/Build/LOD-Water";
 
 enum SidebarLink {
   Feed,
@@ -26,6 +27,12 @@ export default function PlanetPage({ id }: { id: string }) {
   const [planetData, setPlanetData] = useState(null);
   const [planetPosts, setPlanetPosts] = useState([]);
   const { id: planetId } = router.query; // Rename the variable to 'planetId'
+  const [unityBuild, setUnityBuild] = useState(null);
+  
+  useEffect(() => {
+    if (planetData?.temperature < 100) { setUnityBuild(1); };
+    if (planetData?.temperature > 100) { setUnityBuild(2); };
+  })
 
   const [profile, setProfile] = useState(null);
   const [activeLink, setActiveLink] = useState(SidebarLink.Feed); // Track the active link
@@ -233,7 +240,12 @@ export default function PlanetPage({ id }: { id: string }) {
             <div>
                 <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br />
               <button onClick={() => setLoadUnityComponent(true)}>View Planet</button>
-              {loadUnityComponent && <UnityBuildLod1 />}
+              {unityBuild === 1 && (
+                <div>{loadUnityComponent && <UnityBuildLod11 />}</div>
+              )}
+              {unityBuild === 2 && (
+                <div>{loadUnityComponent && <UnityBuildLod1 />}</div>
+              )}
             </div>
           )}
           {activeLink === SidebarLink.Data && (<>
@@ -262,6 +274,7 @@ export default function PlanetPage({ id }: { id: string }) {
             <Card noPadding={false}>
             {/* <iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/> Set this based on planet id/temperature */}
             <iframe title="Embedded cell output" src={planetData?.deepnote} height="650" width="100%"/>
+            <p>{planetData?.temperature}</p>
             </Card></>
           )}
         </div>
