@@ -15,7 +15,7 @@ export default function () {
             {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
             <RoverControlPanel /> */}
             {/* <StructureSingle userStructure={} /> */}
-            {activePlanet?.id} Hello
+            {activePlanet?.content} Hello
             <SectorStructureOwnedAllSectorsOneUser />
             <StructureSingle onStructureSelected={handleStructureSelected} activeSectorId={0} />
             <p>Whatever I want goes in here, lol</p>

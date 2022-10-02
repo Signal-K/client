@@ -8,17 +8,9 @@ import { PlacedStructureSingle } from "./Structure";
 import { Button } from "@/ui/ui/button";
 import RoverSingle from "./Automation";
 
-interface UserProfileData {
-    location: string;
-};
-
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
     setActivePlanet: (planet: UserPlanetData | null) => void;
-};
-
-interface StructureSingleProps {
-    userStructure: UserStructure;
 };
 
 export interface UserStructure {
@@ -28,19 +20,6 @@ export interface UserStructure {
     icon_url: string;
     description: string;
     // Function (what is executed upon click)
-};
-
-interface StructureSelectProps {
-    onStructureSelected: (structure: UserStructure) => void;
-    activeSectorId: number;
-};
-
-interface Structure {
-    id: string;
-    name: string;
-    description: string;
-    icon_url: string;
-    item: number;
 };
 
 export interface UserPlanetData {
@@ -70,10 +49,6 @@ const ActivePlanetContext = createContext<ActivePlanetContextValue>({
     setActivePlanet: () => {} // Provide a default empty function
 });
 
-interface PlanetPageProps {
-    planetName: string;
-};
-
 interface UserAutomaton {
     id: string;
 };
@@ -91,7 +66,6 @@ const UserPlanetPage = () => {
 
     const [loading, setLoading] = useState<boolean>(true);
     const [userStructures, setUserStructures] = useState<UserStructure[]>([]);
-    const [userProfile, setUserProfile] = useState<UserProfileData | null>(null);
     const [userPlanet, setUserPlanet] = useState<UserPlanetData | null>(null);
     const [roverData, setRoverData] = useState<UserAutomaton[]>([]);
 
@@ -125,80 +99,43 @@ const UserPlanetPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             if (!session) return;
-
+    
             try {
                 // Fetch user structures
                 const { data: userItems, error: userItemsError } = await supabase
                     .from("inventoryUSERS")
                     .select('item, "planetSector"')
-                    .eq('owner', session.user.id);
-
+                    .eq('owner', session.user.id)
+                    .eq("basePlanet", activePlanet?.id)
+                    .eq("notes", "Structure");
+    
                 if (userItemsError) {
                     console.error(userItemsError.message);
                     return;
                 }
-
-                const structureIds = userItems
-                    .filter((item) => item.item)
-                    .map((item) => item.item);
-
-                const { data: structures, error: structuresError } = await supabase
-                    .from("inventoryITEMS")
-                    .select('id, name, description, icon_url')
-                    .in('id', structureIds)
-                    .eq('ItemCategory', 'Structure');
-
-                if (structuresError) {
-                    console.error(structuresError.message);
-                    return;
-                }
-
-                const structuredData: UserStructure[] = structures.map((item: any) => ({
-                    id: item.id,
-                    item: item.item,
-                    name: item.name,
-                    icon_url: item.icon_url,
-                    description: item.description
+    
+                // Transform fetched data into UserStructure type
+                const structuredData: UserStructure[] = userItems.map((item: any) => ({
+                    id: item.item, // Assuming 'item' field corresponds to structure id
+                    item: item.item, // Assuming 'item' field corresponds to structure id
+                    planetSector: item.planetSector, // Assuming 'planetSector' field corresponds to sector id
+                    name: "", // Placeholder for name, replace with actual data
+                    icon_url: "", // Placeholder for icon_url, replace with actual data
+                    description: "", // Placeholder for description, replace with actual data
                 }));
-
+    
                 setUserStructures(structuredData);
-
-                // Fetch user profile
-                const { data: profile, error: profileError } = await supabase
-                    .from("profiles")
-                    .select("location")
-                    .eq("id", session.user.id)
-                    .single();
-
-                if (profileError) throw profileError;
-
-                if (profile) {
-                    setUserProfile(profile);
-
-                    // Fetch user planet
-                    const { data: planet, error: planetError } = await supabase
-                        .from("basePlanets")
-                        .select("*")
-                        .eq("id", profile.location)
-                        .single();
-
-                    if (planetError) throw planetError;
-
-                    if (planet) {
-                        setUserPlanet(planet);
-                    }
-                }
             } catch (error: any) {
                 console.error("Error fetching data: ", error.message);
             } finally {
                 setLoading(false);
             }
         };
-
+    
         if (session) {
             fetchData();
         }
-    }, [session, supabase]);
+    }, [session, supabase]);    
 
     if (!session) {
         return <p>Loading session...</p>;
@@ -208,13 +145,9 @@ const UserPlanetPage = () => {
         return <p>Loading data...</p>;
     };
 
-    if (!userPlanet) {
-        return <p>Data not found</p>;
-    };
-
     return (
         <>
-            <Header planetName={userPlanet?.content} />
+            {activePlanet && (<Header planetName={activePlanet.content} /> )}
             <div className="w-full">
                 <div className="mx-auto max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4" style={{
                     gridTemplateAreas: `
