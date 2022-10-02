@@ -27,19 +27,6 @@ export function PlanetGalleryCard({ planet, position }: Props) {
   );
 }
 
-function ArchivedPlanetGalleryCard({ planet, position }: Props) {
-  // const { id, content, cover } = planet;
-  const { id, content } = planet;
-
-  return (
-    <Link legacyBehavior href={`https://starprotocol-og3j6xuus-gizmotronn.vercel.app/tests/planets/${id}`}>
-      <a style={{ position: "absolute", top: position.top, left: position.left }}>
-        {/* <img src={cover} className="w-1/2" /> */}
-      </a>
-    </Link>
-  );
-}
-
 export default function PlanetGallery() {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -214,72 +201,6 @@ const PlanetGalleryWithSectors: React.FC = () => {
  );
 };
 
-
-export function ArchivedPlanetGallery() {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-  const [planets, setPlanets] = useState<Planet[]>([]);
-
-  useEffect(() => {
-    getPlanets();
-  }, [session]);
-
-  const getPlanets = async (): Promise<void> => {
-    try {
-      let query = supabase
-        .from("planetsss")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(200)
-        .gte("id", 1)
-        .lt("id", 75);
-
-      const { data, error } = await query;
-
-      if (data != null) {
-        setPlanets(data);
-      }
-
-      if (error) {
-        throw error;
-      }
-    } catch (error: any) {
-      alert(error.message);
-    }
-  };
-
-  const getRandomPosition = (): { top: number; left: number } => {
-    const top = Math.floor(Math.random() * window.innerHeight);
-    const left = Math.floor(Math.random() * window.innerWidth);
-    return { top, left };
-  };
-
-  const buttonStyle = {
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    border: "none",
-    color: "black",
-    transition: "background-color 0.3s ease",
-    cursor: "pointer",
-    marginRight: "8px",
-  };
-
-  const activeButtonStyle = {
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-  };
-
-  if (!session) {
-    return <Login />;
-  }
-
-  return (
-    <>
-      {planets.map((planet, index) => (
-        <ArchivedPlanetGalleryCard key={planet.id} planet={planet} position={getRandomPosition()} />
-      ))}
-    </>
-  );
-}
-
 interface GardenProps {
   onClose: () => void;
 }
@@ -315,12 +236,15 @@ export const Garden: React.FC<GardenProps> = ({ onClose }) => {
   );
 };
 
-export const ArchivedGarden: React.FC = () => {
+export const GardenBar: React.FC = () => {
+
   return (
-    <>
-      <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-screen flex items-center justify-center relative">
-        <ArchivedPlanetGallery />
+    <div className={`fixed inset-x-0 bottom-0 flex justify-center transition-transform duration-300`}>
+      <div className="bg-cover bg-center w-full sm:max-w-screen-lg sm:w-full max-h-96vh overflow-y-auto shadow-lg relative rounded-t-3xl">
+        <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-96vh flex items-center justify-center relative rounded-t-3xl">
+          <PlanetGalleryWithSectors />
+        </div>
       </div>
-    </>
+    </div>
   );
 };

@@ -245,11 +245,15 @@ const SkeletonFive = () => {
         variants={variants}
         className="flex flex-row rounded-2xl border border-neutral-100 dark:border-white/[0.2] p-2  items-start space-x-2 bg-white dark:bg-black"
       >
-        <ItemsVerticalList />
+        {/* Ensure each instance of ItemsVerticalList has a unique key */}
+        {mobileItems.map((item, index) => (
+          <ItemsVerticalList key={index} />
+        ))}
       </motion.div>
     </motion.div>
   );
 };
+
 const items = [
   {
     title: "AI Content Generation",
