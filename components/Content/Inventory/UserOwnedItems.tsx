@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import Link from "next/link";
 
 interface InventoryItem {
   item: number;

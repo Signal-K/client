@@ -49,43 +49,6 @@ export default function ContentPlaceholder(planetIdDeepnote) {
   );
 };
 
-export function ActivateButton(planetIdDeepnote) {
-    const [showContent, setShowContent] = useState(false);
-  
-    const handleClick = () => {
-      setShowContent(true);
-    };
-  
-    return (
-      <div>
-        {/* Your existing content goes here */}
-        
-        {/* Button to show ContentPlaceholder */}
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-          onClick={handleClick}
-        >
-          Show Content
-        </button>
-  
-        {/* Conditionally render ContentPlaceholder */}
-        {showContent && (
-          <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
-            <ContentPlaceholder planetIdDeepnote={planetIdDeepnote} />
-  
-            {/* Close button */}
-            <button
-              className="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded"
-              onClick={() => setShowContent(false)}
-            >
-              Close
-            </button>
-          </div>
-        )}
-      </div>
-    );
-}
-
 export function LightkurveBaseGraph({ planetId }: { planetId: { planetId: string } }) {
   const supabase = useSupabaseClient();
   const [planetData, setPlanetData] = useState(null);
