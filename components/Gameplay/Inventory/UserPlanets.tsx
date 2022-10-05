@@ -96,47 +96,6 @@ const UserPlanetPage = () => {
         }
     }, [supabase, session]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!session) return;
-    
-            try {
-                // Fetch user structures
-                const { data: userItems, error: userItemsError } = await supabase
-                    .from("inventoryUSERS")
-                    .select('item, "planetSector"')
-                    .eq('owner', session.user.id)
-                    .eq("basePlanet", activePlanet?.id)
-                    .eq("notes", "Structure");
-    
-                if (userItemsError) {
-                    console.error(userItemsError.message);
-                    return;
-                }
-    
-                // Transform fetched data into UserStructure type
-                const structuredData: UserStructure[] = userItems.map((item: any) => ({
-                    id: item.item, // Assuming 'item' field corresponds to structure id
-                    item: item.item, // Assuming 'item' field corresponds to structure id
-                    planetSector: item.planetSector, // Assuming 'planetSector' field corresponds to sector id
-                    name: "", // Placeholder for name, replace with actual data
-                    icon_url: "", // Placeholder for icon_url, replace with actual data
-                    description: "", // Placeholder for description, replace with actual data
-                }));
-    
-                setUserStructures(structuredData);
-            } catch (error: any) {
-                console.error("Error fetching data: ", error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-    
-        if (session) {
-            fetchData();
-        }
-    }, [session, supabase]);    
-
     if (!session) {
         return <p>Loading session...</p>;
     };

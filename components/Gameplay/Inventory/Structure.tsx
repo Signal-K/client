@@ -1,12 +1,7 @@
 // A component to show the structures on the user's active planet
-
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
-
-interface StructureSingleProps {
-    userStructure: UserStructure;
-};
 
 interface OwnedItem {
     id: string;
@@ -29,14 +24,6 @@ interface StructureSelectProps {
     activeSectorId: number;
 };
 
-interface Structure {
-    id: string;
-    name: string;
-    description: string;
-    icon_url: string;
-    item: number;
-};
-
 // View a single structure
 export const PlacedStructureSingle: React.FC<{ UserStructure: UserStructure; }> = ({ UserStructure }) => {
     return (
@@ -47,7 +34,8 @@ export const PlacedStructureSingle: React.FC<{ UserStructure: UserStructure; }> 
     );
 };
 
-export const SectorStructureOwnedAllSectorsOneUser: React.FC<{}> = () => {
+// View all structures
+export const AllStructures: React.FC<{}> = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet(); // Assuming this hook returns the active planet
@@ -63,6 +51,8 @@ export const SectorStructureOwnedAllSectorsOneUser: React.FC<{}> = () => {
                        .from('inventoryUSERS')
                        .select('*')
                        .eq("owner", session?.user?.id)
+                       .eq("basePlanet", activePlanet?.id)
+                       .eq("notes", "Structure");
                     //    .eq("planetSector", activePlanet.id); // Filter by activePlanet.id
 
                     if (ownedItemsError) {
@@ -124,7 +114,7 @@ export const SectorStructureOwnedAllSectorsOneUser: React.FC<{}> = () => {
 };
 
 // Create structures
-export const StructureSingle: React.FC<StructureSelectProps> = ({ onStructureSelected }) => { // <StructureSingleProps> = ({ userStructure }) => { /#/ -> activeSectorId
+export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSelected }) => { // <StructureSingleProps> = ({ userStructure }) => { /#/ -> activeSectorId
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
