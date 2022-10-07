@@ -20,7 +20,7 @@ function MyApp({ Component, pageProps }) {
 <Head>
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>Star Sailors</title>
-        <meta name="description" content="Best PWA app in the world!" />
+        <meta name="description" content="Catalogue the Stars" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="mask-icon" href="/icons/mask-icon.svg" color="#FFFFFF" />
         <meta name="theme-color" content="#ffffff" />
