@@ -4,47 +4,18 @@ import { IndividualBasePlanetDesktop } from "../../components/Content/[id]/Indiv
 import { ClassificationFeedForIndividualPlanet } from "../../components/Content/Classify/ClassificationFeed";
 import PostFormCardAnomalyTag from "../../components/Content/Classify/AnomalyPostFormCard";
 import Navbar from "../../components/_Core/Section/Navbar";
-import { CreateBar, CreateMenuBar } from "../../components/_Core/Section/BottomBar";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import ContentPlaceholder from "../../components/Content/Planets/PlanetData/ContentPlaceholder";
 
 export default function PlanetIdPage () {
     const router = useRouter();
     const { id } = router.query;
-    const [activeView, setActiveView] = useState('home');
-
-    const supabase = useSupabaseClient();
-
     const [showUpdates, setShowUpdates] = useState(false);
     const [showSecondItem, setShowSecondItem] = useState(false);
-
-    const handleUpdatesClick = () => {
-      setShowUpdates(true);
-    };
-
-    const handleSecondButtonClick = () => {
-      setShowSecondItem(true);
-    }
   
     const handleCloseUpdates = () => {
       setShowUpdates(false);
     };
-
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-        const checkIsMobile = () => {
-            setIsMobile(window.innerWidth <= 768);
-        };
-        console.log(router.query, "protect");
-        checkIsMobile();
-        window.addEventListener("resize", checkIsMobile);
-        return () => {
-            window.removeEventListener("resize", checkIsMobile);
-        };
-        }
-    }, []);
 
     if (!id) {
         return null; 
@@ -56,7 +27,6 @@ export default function PlanetIdPage () {
           <div className="h-screen py-4">
             <IndividualBasePlanetDesktop id={id as string} />
           </div>
-          <CreateMenuBar onUpdatesClick={handleUpdatesClick} onSecondButtonClick={handleSecondButtonClick} />
           {showUpdates && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
         <div className="bg-white rounded-lg md:w-4/6 lg:w-3/6 xl:w-2/6 p-4">

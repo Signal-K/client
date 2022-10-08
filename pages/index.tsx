@@ -13,12 +13,7 @@ import {
   modules,
   navigation,
 } from "../components/_Core/Section/Info/LandingContent";
-import Navigation, {
-  UserDropdownMenu,
-  UserMenuItems,
-} from "../components/_Core/Section/Navbar";
-import { MinimalAccordion, OnboardingWindows } from "../components/Gameplay/onboarding";
-import PlanetCharacter, { RoverCharacter } from "../components/Content/Assets/PlanetCharacter";
+import Navigation from "../components/_Core/Section/Navbar";
 import Link from "next/link";
 import { BentoGridMobileDemo, BentoGridThirdDemo } from "../components/Content/Visuals/Bento";
 
@@ -55,45 +50,6 @@ export function PublicLanding() {
   // Screen size parameters
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' });
-
-  // Character queries
-  const [characterPosition, setCharacterPosition] = useState<{ rover: { x: number; y: number }; planet: { x: number; y: number } }>(() => {
-    // Initial position for the characters
-    return { rover: { x: 0, y: 0 }, planet: { x: 0, y: 0 } };
-  });
-
-  useEffect(() => {
-    // Calculate initial position for the characters after component mount
-    const calculatePosition = () => {
-      const minX = -window.innerWidth / 2 + 100; // Adjust 100 to your desired margin
-      const maxX = window.innerWidth / 2 - 100; // Adjust 100 to your desired margin
-      const minY = -window.innerHeight / 2 + 100; // Adjust 100 to your desired margin
-      const maxY = window.innerHeight / 2 - 100; // Adjust 100 to your desired margin
-
-      const randomX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
-      const randomY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
-
-      setCharacterPosition({
-        rover: { x: randomX, y: randomY },
-        planet: { x: randomX, y: randomY }, // You can adjust this to have different positions for rover and planet
-      });
-    };
-
-    calculatePosition();
-
-    // Recalculate position when window size changes
-    const handleResize = () => {
-      calculatePosition();
-    };
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup event listener on unmount
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  const [showGalaxy, setShowGalaxy] = useState(true);
 
   // if (session && profile?.location) {
     if (session) {

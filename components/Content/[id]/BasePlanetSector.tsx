@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import RoverImageGallery, { RoverImage, RoverImageNoHandle } from "../Planets/PlanetData/RandomRoverImage";
 import StructureComponent, { PlacedStructures } from "../Populate/StructureCreate";
 import { SectorStructureOwned } from "../Inventory/UserOwnedItems";
-// import { CreateMenuBar, SectorCircularMenu } from "../../../Core/BottomBar";
 
 interface PlanetData {
   content?: string; // Define the properties of planetData
