@@ -567,4 +567,3 @@ export function Navbar() {
     </header>
   );
 };
-
