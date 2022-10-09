@@ -12,7 +12,7 @@ import {
   footerNavigation,
   modules,
   navigation,
-} from "../components/_Core/Section/Info/LandingContent";
+} from "../components/_Core/Section/LandingContent";
 import Navigation from "../components/_Core/Section/Navbar";
 import Link from "next/link";
 import { BentoGridMobileDemo, BentoGridThirdDemo } from "../components/Content/Visuals/Bento";
