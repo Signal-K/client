@@ -4,7 +4,6 @@ import { RoverMobileTest } from "../../components/Modals/rover-mobile-test";
 import { RoverInterface, RoverInterfaceDark, RoverInterfaceDarkMobile } from "../../components/Modals/rover-interface";
 import Layout from "../../components/_Core/Section/Layout";
 import Navigation from "../../components/_Core/Section/Navbar";
-import FeedOverlay from "../../components/Overlays/1-Feed";
 import { useMediaQuery } from "react-responsive";
 
 export default function Explore() {
@@ -43,15 +42,6 @@ export default function Explore() {
             <div className="">
                 {isDesktopOrLaptop && ( <RoverInterfaceDark /> )};
                 {isTabletOrMobile && (<RoverInterfaceDarkMobile /> )};
-                <div className="mt-20">
-             {showFeedOverlay && (
-               <>
-                 <div className="mt-20">
-                   <FeedOverlay onClose={() => setShowFeedOverlay(false)} />
-                 </div>
-               </>
-             )}
-           </div>
             </div>
         </>
     );
