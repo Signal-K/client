@@ -17,7 +17,7 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <>
-<Head>
+      <Head>
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>Star Sailors</title>
         <meta name="description" content="Catalogue the Stars" />
@@ -44,7 +44,6 @@ function MyApp({ Component, pageProps }) {
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Star Sailors" />
         <meta property="og:image" content="/icons/og.png" />
-        {/* add the following only if you want to add a startup image for Apple devices. */}
         <link
           rel="apple-touch-startup-image"
           href="https://i.ibb.co/qrSP4gq/Removebg.png"
@@ -57,13 +56,13 @@ function MyApp({ Component, pageProps }) {
         />
       </Head>
       <SessionContextProvider
-      supabaseClient={supabaseClient}
-      initialSession={pageProps.initialSession}
->
-            <Component {...pageProps} />
-    </SessionContextProvider>
+        supabaseClient={supabaseClient}
+        initialSession={pageProps.initialSession}
+      >
+        <Component {...pageProps} />
+      </SessionContextProvider>
     </>
   );
-}
+};
 
 export default MyApp;
