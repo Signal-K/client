@@ -19,96 +19,98 @@ export interface UserStructure {
     // Function (what is executed upon click)
 };
 
+interface PlacedStructureSingleProps {
+    UserStructure: UserStructure;
+}
+
 interface StructureSelectProps {
     onStructureSelected: (structure: UserStructure) => void;
     activeSectorId: number;
 };
 
 // View a single structure
-export const PlacedStructureSingle: React.FC<{ UserStructure: UserStructure; }> = ({ UserStructure }) => {
+interface OwnedItem {
+    id: string;
+    item: string;
+    quantity: number;
+    sector: string;
+};
+
+export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: UserStructure }> = ({ ownedItem, structure }) => {
     return (
         <div className="flex flex-col items-center justify-center">
-            <img src={UserStructure.icon_url} alt={UserStructure.name} className="w-14 h-14 mb-2" />
-            <p>{UserStructure.id}</p>
+            <img src={structure.icon_url} alt={structure.name} className="w-14 h-14 mb-2" />
+            <p>{ownedItem.id}</p>
         </div>
     );
 };
 
-// View all structures
 export const AllStructures: React.FC<{}> = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
-    const { activePlanet } = useActivePlanet(); // Assuming this hook returns the active planet
+    const { activePlanet } = useActivePlanet();
 
-    const [ownedItems, setOwnedItems] = useState<OwnedItem[]>([]);
-    const [itemDetails, setItemDetails] = useState<any[]>([]);
+    const [userStructures, setUserStructures] = useState<{ ownedItem: OwnedItem; structure: UserStructure }[]>([]);
 
     useEffect(() => {
-        async function fetchOwnedItems() {
+        async function fetchData() {
             if (session && activePlanet) {
                 try {
                     const { data: ownedItemsData, error: ownedItemsError } = await supabase
-                       .from('inventoryUSERS')
-                       .select('*')
-                       .eq("owner", session?.user?.id)
-                       .eq("basePlanet", activePlanet?.id)
-                       .eq("notes", "Structure");
-                    //    .eq("planetSector", activePlanet.id); // Filter by activePlanet.id
+                        .from('inventoryUSERS')
+                        .select('*')
+                        .eq("owner", session.user.id)
+                        .eq("basePlanet", activePlanet.id)
+                        .eq("notes", "Structure");
 
                     if (ownedItemsError) {
                         throw ownedItemsError;
-                    };
+                    }
 
                     if (ownedItemsData) {
-                        setOwnedItems(ownedItemsData);
-                    };
+                        const itemIds = ownedItemsData.map(item => item.item);
+                        const { data: itemDetailsData, error: itemDetailsError } = await supabase
+                            .from('inventoryITEMS')
+                            .select('*')
+                            .in('id', itemIds)
+                            .eq('ItemCategory', 'Structure');
+
+                        if (itemDetailsError) {
+                            throw itemDetailsError;
+                        }
+
+                        if (itemDetailsData) {
+                            const structuresData: { ownedItem: OwnedItem; structure: UserStructure }[] = itemDetailsData.map(itemDetail => {
+                                const ownedItem = ownedItemsData.find(ownedItem => ownedItem.item === itemDetail.id);
+                                const structure: UserStructure = {
+                                    id: itemDetail.id,
+                                    item: itemDetail.id,
+                                    name: itemDetail.name,
+                                    icon_url: itemDetail.icon_url,
+                                    description: itemDetail.description
+                                };
+                                return { ownedItem: ownedItem || { id: "", item: "", quantity: 0, sector: "" }, structure };
+                            });
+                            setUserStructures(structuresData);
+                        }
+                    }
                 } catch (error) {
-                    console.error('Error fetching owned items:', error);
-                };
-            };
-        };
-
-        fetchOwnedItems();
-    }, [session, activePlanet, supabase]);
-
-    useEffect(() => {
-        async function fetchItemDetails() {
-            if (ownedItems.length > 0) {
-                const itemIds = ownedItems.map(item => item.item);
-                const { data: itemDetailsData, error: itemDetailsError } = await supabase
-                   .from('inventoryITEMS')
-                   .select('*')
-                   .in('id', itemIds)
-                   .eq('ItemCategory', 'Structure');
-
-                if (itemDetailsError) {
-                    console.error('Error fetching item details:', itemDetailsError);
+                    console.error('Error fetching data:', error);
                 }
+            }
+        }
 
-                if (itemDetailsData) {
-                    setItemDetails(itemDetailsData);
-                };
-            };
-        };
-
-        fetchItemDetails();
-    }, [ownedItems, supabase]);
+        fetchData();
+    }, [session, activePlanet, supabase]);
 
     return (
         <div className="bg-gray-100 p-4">
-            <h2 className="text-2xl font-semibold mb-4">Your Items</h2>
-            <ul className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                {itemDetails.map(item => {
-                    const ownedItem = ownedItems.find(ownedItem => ownedItem.item === item.id);
-                    return (
-                        <li key={item.id} className="bg-white shadow-md p-4 rounded-md">
-                            <h3 className="text-lg font-medium mb-2">{item.name}</h3>
-                            <p className="text-gray-600">Quantity: {ownedItem?.quantity}</p>
-                            <p className="text-gray-600">On sector (id): {ownedItem?.sector}</p>
-                        </li>
-                    );
-                })}
-            </ul>
+            <h2 className="text-2xl font-semibold mb-4">Your Structures</h2>
+            <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {userStructures.map(({ ownedItem, structure }) => (
+                    <PlacedStructureSingle key={structure.id} ownedItem={ownedItem} structure={structure} />
+                ))}
+            </div>
         </div>
     );
 };
