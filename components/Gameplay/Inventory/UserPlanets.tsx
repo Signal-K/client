@@ -58,7 +58,7 @@ interface UserAutomaton {
     item: number; // Add the 'item' property
 };
 
-// View structures
+// View structures, planet info & automatons
 const UserPlanetPage = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -69,6 +69,9 @@ const UserPlanetPage = () => {
     const [userPlanet, setUserPlanet] = useState<UserPlanetData | null>(null);
     const [roverData, setRoverData] = useState<UserAutomaton[]>([]);
 
+
+
+    // For rovers -> collect users' automatons
     useEffect(() => {
         const fetchRoverData = async () => {
             try {
@@ -77,6 +80,7 @@ const UserPlanetPage = () => {
                     .select("*")
                     .eq("item", 23 || 22 || 18)
                     .eq("owner", session?.user?.id)
+                    .eq("basePlanet", activePlanet?.id)
                     .limit(2);
 
                 if (error) throw error;

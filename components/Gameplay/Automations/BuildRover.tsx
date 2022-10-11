@@ -82,6 +82,7 @@ export default function BuildFirstRover() {
     );
 };
 
+// To-Do: Evaluate if this function is actually required
 export function ViewRovers({ onRoverSelect }: { onRoverSelect?: (rover: any) => void }) {
     const supabase = useSupabaseClient();
     const session = useSession();
