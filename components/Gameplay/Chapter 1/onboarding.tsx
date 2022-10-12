@@ -9,7 +9,7 @@ export function PickYourPlanet() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (session?.user?.id) {
+        if (session?.user?.id) { 
             supabase
                 .from("profiles")
                 .select()
