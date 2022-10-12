@@ -1,3 +1,4 @@
+import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 
@@ -5,6 +6,7 @@ import { useEffect, useState } from "react";
 export default function BuildFirstRover() {
     const supabase = useSupabaseClient();
     const session = useSession();
+    const { activePlanet } = useActivePlanet();
 
     const [roverCreated, setRoverCreated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -18,21 +20,22 @@ export default function BuildFirstRover() {
                     .from("inventoryUSERS")
                     .select("*")
                     .eq("owner", session.user.id)
+                    .eq("basePlanet", activePlanet?.id)
                     .eq("notes", "first rover created by user");
 
                 if (userItemsError) {
                     throw userItemsError;
-                }
+                };
 
                 if (userItems && userItems.length > 0) {
                     setRoverCreated(true);
-                }
+                };
             } catch (error: any) {
                 console.error("Error checking rover status:", error.message);
             } finally {
                 setLoading(false);
-            }
-        }
+            };
+        };
 
         checkRoverStatus();
     }, [supabase, session?.user?.id]);
@@ -52,6 +55,7 @@ export default function BuildFirstRover() {
                         owner: session?.user?.id,
                         sector: "18",
                         planetSector: "18",
+                        basePlanet: activePlanet?.id,
                         notes: "first rover created by user"
                     }
                 ]);

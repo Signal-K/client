@@ -5,7 +5,8 @@ import Layout from "@/components/Layout";
 import { useActivePlanet } from "@/context/ActivePlanet";
 
 export default function () {
-    const { activePlanet, activeSector } = useActivePlanet();
+    // const { activePlanet, activeSector } = useActivePlanet();
+    const { activePlanet, userSector } = useActivePlanet();
     
 
     const handleStructureSelected = (structure: any) => {
@@ -17,7 +18,7 @@ export default function () {
             {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
             <RoverControlPanel /> */}
             {activePlanet?.content} Hello
-            {activeSector}
+            {userSector}
             <AllStructures />
             <BuildFirstRover />
             <CreateStructure onStructureSelected={handleStructureSelected} activeSectorId={0} />
