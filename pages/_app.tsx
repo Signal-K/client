@@ -1,18 +1,12 @@
-// Global imports
-import React, { useState } from 'react';
-import { AppProps } from 'next/app';
-import Head from 'next/head';
+import "@/styles/globals.css";
+import type { AppProps } from "next/app";
 
-// Styling imports
-import '../styles/globals.css';
+import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { SessionContextProvider } from "@supabase/auth-helpers-react";
+import { useState } from "react";
+import Head from "next/head";
 
-// Offchain/Postgres Session Provider
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
-import { SessionContextProvider } from '@supabase/auth-helpers-react';
-import { useRouter } from 'next/router';
-
-function MyApp({ Component, pageProps }) {
-  const router = useRouter();
+export default function StarSailors ({ Component, pageProps }: AppProps) {
   const [supabaseClient] = useState(() => createBrowserSupabaseClient());
 
   return (
@@ -55,14 +49,9 @@ function MyApp({ Component, pageProps }) {
           sizes="1668x2224"
         />
       </Head>
-      <SessionContextProvider
-        supabaseClient={supabaseClient}
-        initialSession={pageProps.initialSession}
-      >
-        <Component {...pageProps} />
+      <SessionContextProvider supabaseClient={supabaseClient} initialSession={pageProps.initialSession}>
+        <Component {...pageProps} />;
       </SessionContextProvider>
     </>
   );
 };
-
-export default MyApp;
