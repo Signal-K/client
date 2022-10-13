@@ -50,7 +50,7 @@ export default function StarSailors ({ Component, pageProps }: AppProps) {
         />
       </Head>
       <SessionContextProvider supabaseClient={supabaseClient} initialSession={pageProps.initialSession}>
-        <Component {...pageProps} />;
+        <Component {...pageProps} />
       </SessionContextProvider>
     </>
   );

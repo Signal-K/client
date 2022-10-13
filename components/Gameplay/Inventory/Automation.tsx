@@ -4,14 +4,14 @@ export default function RoverSingle() {
     return (
             <img
                 alt="Structure 4"
-                className="w-32 h-32"
-                height="50"
+                className="w-8 h-8"
+                height="25"
                 src="https://cdn-icons-png.flaticon.com/512/7717/7717354.png"
                 style={{
-                aspectRatio: "50/50",
+                aspectRatio: "25/25",
                 objectFit: "cover",
                 }}
-                width="50"
+                width="25"
             />
     );
 };
