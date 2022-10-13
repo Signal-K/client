@@ -17,8 +17,7 @@ export default function () {
         <Layout bg={false}>
             {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
             <RoverControlPanel /> */}
-            {activePlanet?.content} Hello
-            {userSector}
+            {activePlanet?.id}
             <AllStructures />
             <BuildFirstRover />
             <CreateStructure onStructureSelected={handleStructureSelected} activeSectorId={0} />

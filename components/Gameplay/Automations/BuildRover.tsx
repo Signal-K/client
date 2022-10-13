@@ -13,61 +13,64 @@ export default function BuildFirstRover() {
 
     useEffect(() => {
         async function checkRoverStatus() {
-            try {
-                if (!session?.user?.id) return;
+            if (activePlanet) {
+                try {
+                    if (!session?.user?.id) return;
+                    const { data: userItems, error: userItemsError } = await supabase
+                        .from("inventoryUSERS")
+                        .select("*")
+                        .eq("owner", session.user.id)
+                        .eq("basePlanet", activePlanet?.id)
+                        .eq("notes", "first rover created by user");
 
-                const { data: userItems, error: userItemsError } = await supabase
-                    .from("inventoryUSERS")
-                    .select("*")
-                    .eq("owner", session.user.id)
-                    .eq("basePlanet", activePlanet?.id)
-                    .eq("notes", "first rover created by user");
+                    if (userItemsError) {
+                        throw userItemsError;
+                    };
 
-                if (userItemsError) {
-                    throw userItemsError;
+                    if (userItems && userItems.length > 0) {
+                        setRoverCreated(true);
+                    };
+                } catch (error: any) {
+                    console.error("Error checking rover status:", error.message);
+                } finally {
+                    setLoading(false);
                 };
-
-                if (userItems && userItems.length > 0) {
-                    setRoverCreated(true);
-                };
-            } catch (error: any) {
-                console.error("Error checking rover status:", error.message);
-            } finally {
-                setLoading(false);
-            };
+            }
         };
 
         checkRoverStatus();
     }, [supabase, session?.user?.id]);
 
     async function addRoverToSupa() {
-        try {
-            if (roverCreated) {
-                console.log("You've already created your first rover");
-                return;
+        if (activePlanet?.id) {
+            try {
+                if (roverCreated) {
+                    console.log("You've already created your first rover");
+                    return;
+                }
+
+                const { data, error } = await supabase
+                    .from("inventoryUSERS")
+                    .insert([
+                        {
+                            item: 23,
+                            owner: session?.user?.id,
+                            // sector: "18",
+                            // planetSector: "18",
+                            basePlanet: activePlanet?.id,
+                            notes: "first rover created by user"
+                        }
+                    ]);
+
+                if (error) {
+                    throw error;
+                }
+
+                console.log("Rover added successfully:", data);
+                setRoverCreated(true);
+            } catch (error: any) {
+                console.error("Error adding rover:", error.message);
             }
-
-            const { data, error } = await supabase
-                .from("inventoryUSERS")
-                .insert([
-                    {
-                        item: 23,
-                        owner: session?.user?.id,
-                        sector: "18",
-                        planetSector: "18",
-                        basePlanet: activePlanet?.id,
-                        notes: "first rover created by user"
-                    }
-                ]);
-
-            if (error) {
-                throw error;
-            }
-
-            console.log("Rover added successfully:", data);
-            setRoverCreated(true);
-        } catch (error: any) {
-            console.error("Error adding rover:", error.message);
         }
     }
 

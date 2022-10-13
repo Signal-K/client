@@ -50,7 +50,7 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
 
         if (planet) {
           setActivePlanet(planet);
-          fetchSectorsForPlanet(); // Fetch sectors after setting the active planet
+          // fetchSectorsForPlanet(); // Fetch sectors after setting the active planet
         }
       } catch (error: any) {
         console.error("Error fetching data: ", error.message);
