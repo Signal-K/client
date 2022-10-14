@@ -1,4 +1,3 @@
-import BuildFirstRover from "@/components/Gameplay/Automations/BuildRover";
 import { AutomatonControlPanel, RoverControlPanel } from "@/components/Gameplay/Inventory/Automation";
 import { AllStructures, CreateStructure } from "@/components/Gameplay/Inventory/Structure";
 import Layout from "@/components/Layout";
@@ -6,7 +5,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 
 export default function () {
     // const { activePlanet, activeSector } = useActivePlanet();
-    const { activePlanet, userSector } = useActivePlanet();
+    const { activePlanet } = useActivePlanet();
     
 
     const handleStructureSelected = (structure: any) => {
@@ -19,7 +18,6 @@ export default function () {
             <RoverControlPanel /> */}
             {activePlanet?.id}
             <AllStructures />
-            <BuildFirstRover />
             <CreateStructure onStructureSelected={handleStructureSelected} activeSectorId={0} />
             <p>Whatever I want goes in here, lol</p>
         </Layout>
