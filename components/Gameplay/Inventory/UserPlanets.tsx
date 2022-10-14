@@ -1,6 +1,7 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState, useRef, Fragment } from "react";
 import { Dialog, Transition } from '@headlessui/react';
+import { Header } from "@/ui/Sections/PlanetLayout";
 
 interface UserProfileData {
     location: string;
@@ -28,48 +29,17 @@ interface UserPlanetData {
     lightkurve: string;
 };
 
-export default function UserPlanetPage() {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    return (
-        <div className="w-full">
-       <div className="mx-auto max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4" style={{
-         gridTemplateAreas: `
-           "block36 block37"
-           "block51 block54"
-           "block55 block56"
-           "block57 block58"
-           // Add more rows as needed
-         `
-       }}>
-         {Array.from({ length: 64 }, (_, index) => {
-           const isBlock36or37 = index + 1 === 36 || index + 1 === 37;
-           const isBlock51or54 = index + 1 === 51 || index + 1 === 54;
-           const isCombinedBlock = isBlock36or37 && index + 1 === 36; // Only true for the first of the combined blocks
- 
-           return (
-             <div key={index} className={`flex items-center justify-center p-6 border border-gray-200 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
-               {isCombinedBlock && <UserPlanets />}
-               {/* {isBlock51or54 && <RoverSingle />} */}
-               {!isCombinedBlock && !isBlock51or54 && (index + 1)}
-             </div>
-           );
-         })}
-       </div>
-     </div>
-    );
+interface PlanetPageProps {
+    planetName: string;
 };
 
-// Background image & other stats, structure-based block for more info/title tag // For now, users only have one planet
-function UserPlanets() {
+export default function UserPlanetPage() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
     const [loading, setLoading] = useState<boolean>(true);
     const [userProfile, setUserProfile] = useState<UserProfileData | null>(null);
     const [userPlanet, setUserPlanet] = useState<UserPlanetData | null>(null);
-    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -111,6 +81,54 @@ function UserPlanets() {
         fetchData();
     }, [session, supabase]);
 
+    if (!session) {
+        return <p>Loading session...</p>;
+    };
+
+    if (loading) {
+        return <p>Loading data...</p>;
+    };
+
+    if (!userProfile || !userPlanet) {
+        return <p>Data not found</p>;
+    };
+
+    return (
+        <>
+            <Header planetName={userPlanet.content} />
+            <div className="w-full">
+                <div className="mx-auto max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4" style={{
+                    gridTemplateAreas: `
+                    "block36 block37"
+                    "block51 block54"
+                    "block55 block56"
+                    "block57 block58"
+                    // Add more rows as needed
+                    `
+                }}>
+                    {Array.from({ length: 64 }, (_, index) => {
+                        const isBlock36or37 = index + 1 === 36 || index + 1 === 37;
+                        const isBlock51or54 = index + 1 === 51 || index + 1 === 54;
+                        const isCombinedBlock = isBlock36or37 && index + 1 === 36; // Only true for the first of the combined blocks
+            
+                        return (
+                            <div key={index} className={`flex items-center justify-center p-6 border border-gray-200 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
+                                {isCombinedBlock && <UserPlanets userPlanet={userPlanet} />}
+                                {/* {isBlock51or54 && <RoverSingle />} */}
+                                {!isCombinedBlock && !isBlock51or54 && (index + 1)}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </>
+    );
+};
+
+// Background image & other stats, structure-based block for more info/title tag // For now, users only have one planet
+function UserPlanets({ userPlanet }: { userPlanet: UserPlanetData }) {
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
     const handleOpenDialog = () => {
         setDialogOpen(true);
     };
@@ -119,30 +137,16 @@ function UserPlanets() {
         setDialogOpen(false);
     };
 
-    // Handle loading states
-    if (!session) {
-        return <p>Loading session...</p>;
-    }
-
-    if (loading) {
-        return <p>Loading data...</p>;
-    }
-
-    if (!userProfile || !userPlanet) {
-        return <p>Data not found</p>;
-    }
-
-    // Once all data is loaded, render the component
     return (
         <>
-        <button onClick={handleOpenDialog}>
-            <img src={userPlanet.avatar_url} height={128} width={128} alt="User planet avatar" />
-        </button>
-        <p>{userPlanet?.content}</p>
-        <SinglePlanetDialogue open={dialogOpen} onClose={handleCloseDialog} userPlanet={userPlanet} />
-    </>
-);
-};    
+            <button onClick={handleOpenDialog}>
+                <img src={userPlanet.avatar_url} height={128} width={128} alt="User planet avatar" />
+            </button>
+            <p>{userPlanet.content}</p>
+            <SinglePlanetDialogue open={dialogOpen} onClose={handleCloseDialog} userPlanet={userPlanet} />
+        </>
+    );
+} 
 
 function SinglePlanetDialogue({ open, onClose, userPlanet }: { open: boolean; onClose: () => void; userPlanet: UserPlanetData; }) {
     const cancelButtonRef = useRef(null);
