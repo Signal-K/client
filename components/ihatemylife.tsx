@@ -1,8 +1,15 @@
-import { Button } from "@/components/ui/button"
+import { PlaygroundGrid } from "@/ui/Sections/Grid";
+import { Button } from "@/ui/ui/button"
+import { ReactNode } from "react";
 
-export function Component() {
+interface PlanetLayoutProps {
+  children: ReactNode;
+}
+
+export function Ihatemylife({children}: PlanetLayoutProps) {
   return (
     <>
+    <PlaygroundGrid />
       <div className="fixed top-0 left-0 right-0 bottom-0 z-0 bg-gradient-to-br from-[#0077b6] to-[#00a8e8] dark:from-[#1a1a1a] dark:to-[#333333]" />
       <header className="fixed top-0 left-0 right-0 z-50 flex h-16 w-full items-center justify-between bg-white/80 px-4 shadow-sm backdrop-blur-md dark:bg-gray-950/80 dark:text-gray-50">
         <div className="flex items-center gap-4">
@@ -32,7 +39,7 @@ export function Component() {
           </Button>
         </div>
       </header>
-      <main className="pt-20 pb-20 md:pb-0" />
+      <main className="pt-20 pb-20 md:pb-0">{children}</main>
       <footer className="fixed bottom-0 left-0 right-0 z-50 flex h-16 w-full items-center justify-center bg-white/80 px-4 shadow-sm backdrop-blur-md dark:bg-gray-950/80 dark:text-gray-50 md:hidden">
         <Button className="rounded-full p-2" size="icon" variant="outline">
           <HomeIcon className="h-5 w-5" />

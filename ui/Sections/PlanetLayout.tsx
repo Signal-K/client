@@ -1,14 +1,18 @@
 import { Button } from "@/ui/ui/button";
+import { ReactNode } from "react";
 
-export function PlanetLayout() {
+interface PlanetLayoutProps {
+    children: ReactNode;
+  }
+export function PlanetLayout({ children }: PlanetLayoutProps) {
     return (
-      <>
-        <Header />
-        <MainContent />
-        <Footer />
-      </>
+        <>
+            <Header />
+            <MainContent>{children}</MainContent>
+            <Footer />
+        </>
     );
-  };
+}
 
 export function Header() {
     return (
@@ -16,11 +20,11 @@ export function Header() {
         <div className="flex items-center gap-4">
           <Button className="rounded-full p-2" size="icon" variant="outline">
             <CompassIcon className="h-5 w-5" />
-            <span className="sr-only">Explore</span>
+            {/* <span className="sr-only">Explore</span> */}
           </Button>
           <Button className="rounded-full p-2" size="icon" variant="outline">
             <ArrowLeftIcon className="h-5 w-5" />
-            <span className="sr-only">Previous page</span>
+            {/* <span className="sr-only">Previous page</span> */}
           </Button>
         </div>
         <div className="flex flex-col items-center">
@@ -32,20 +36,27 @@ export function Header() {
         <div className="flex items-center gap-4 relative">
           <Button className="rounded-full p-2" size="icon" variant="outline">
             <ArrowRightIcon className="h-5 w-5" />
-            <span className="sr-only">Next page</span>
+            {/* <span className="sr-only">Next page</span> */}
           </Button>
           <Button className="rounded-full p-2" size="icon" variant="outline">
             <BookOpenIcon className="h-5 w-5" />
-            <span className="sr-only">Guides</span>
+            {/* <span className="sr-only">Guides</span> */}
           </Button>
         </div>
       </header>
     );
 };
 
-export function MainContent() {
+interface MainContentProps {
+    children: ReactNode;
+    backgroundImage?: string;
+}
+
+export function MainContent({ children, backgroundImage }: MainContentProps) {
     return (
-      <main className="pt-20 pb-20 md:pb-0" />
+        <main className="pt-20 pb-20 md:pb-0" style={{ backgroundImage }}>
+            {children}
+        </main>
     );
 }
 
