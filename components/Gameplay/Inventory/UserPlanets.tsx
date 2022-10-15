@@ -69,8 +69,6 @@ const UserPlanetPage = () => {
     const [userPlanet, setUserPlanet] = useState<UserPlanetData | null>(null);
     const [roverData, setRoverData] = useState<UserAutomaton[]>([]);
 
-
-
     // For rovers -> collect users' automatons
     useEffect(() => {
         const fetchRoverData = async () => {
@@ -80,7 +78,7 @@ const UserPlanetPage = () => {
                     .select("*")
                     .eq("item", 23 || 22 || 18)
                     .eq("owner", session?.user?.id)
-                    .eq("basePlanet", activePlanet?.id)
+                    // .eq("basePlanet", activePlanet?.id)
                     .limit(2);
 
                 if (error) throw error;
@@ -112,14 +110,7 @@ const UserPlanetPage = () => {
         <>
             {activePlanet && (<Header planetName={activePlanet.content} /> )}
             <div className="w-full">
-                <div className="mx-auto max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4" style={{
-                    gridTemplateAreas: `
-                    "block36 block37"
-                    "block51 block54"
-                    "block55 block56"
-                    "block57 block58"
-                    `
-                }}>
+                <div className="mx-auto max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
                     {Array.from({ length: 64 }, (_, index) => {
                         const isBlock36or37 = index + 1 === 36 || index + 1 === 37;
                         const isBlock51or54 = index + 1 === 51 || index + 1 === 54;
