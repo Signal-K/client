@@ -1,7 +1,10 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState, useRef, Fragment } from "react";
 import { Dialog, Transition } from '@headlessui/react';
-import { Header } from "@/ui/Sections/PlanetLayout";
+import { Header, CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
+
+import { Button } from "@/ui/ui/button";
+
 
 interface UserProfileData {
     location: string;
@@ -146,7 +149,36 @@ function UserPlanets({ userPlanet }: { userPlanet: UserPlanetData }) {
             <SinglePlanetDialogue open={dialogOpen} onClose={handleCloseDialog} userPlanet={userPlanet} />
         </>
     );
-} 
+}; 
+
+export function ActivePlanet({ activePlanet }: { activePlanet: UserPlanetData }) {
+    return (
+        <>
+            <div className="flex items-center gap-4">
+                <Button className="rounded-full p-2" size="icon" variant="outline">
+                    <CompassIcon className="h-5 w-5" />
+                </Button>
+                <Button className="rounded-full p-2" size="icon" variant="outline">
+                    <ArrowLeftIcon className="h-5 w-5" />
+                </Button>
+            </div>
+            <div className="flex flex-col items-center">
+                <div className="inline-block rounded-lg bg-gray-100/80 px-3 py-1 text-sm backdrop-blur-md dark:bg-gray-800/80">
+                    Home
+                </div>
+                <h1 className="text-lg font-semibold">{activePlanet?.content}</h1>
+            </div>
+            <div className="flex items-center gap-4 relative">
+                <Button className="rounded-full p-2" size="icon" variant="outline">
+                    <ArrowRightIcon className="h-5 w-5" />
+                </Button>
+                <Button className="rounded-full p-2" size="icon" variant="outline">
+                    <BookOpenIcon className="h-5 w-5" />
+                </Button>
+            </div>
+        </>
+    )
+}
 
 function SinglePlanetDialogue({ open, onClose, userPlanet }: { open: boolean; onClose: () => void; userPlanet: UserPlanetData; }) {
     const cancelButtonRef = useRef(null);

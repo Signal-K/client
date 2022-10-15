@@ -87,7 +87,7 @@ export function Footer() {
     );
 };
 
-function ArrowLeftIcon(props: any) {
+export function ArrowLeftIcon(props: any) {
     return (
       <svg
         {...props}
@@ -108,7 +108,7 @@ function ArrowLeftIcon(props: any) {
   }
   
   
-  function ArrowRightIcon(props: any) {
+  export function ArrowRightIcon(props: any) {
     return (
       <svg
         {...props}
@@ -129,7 +129,7 @@ function ArrowLeftIcon(props: any) {
   }
   
   
-  function BookOpenIcon(props: any) {
+  export function BookOpenIcon(props: any) {
     return (
       <svg
         {...props}
@@ -150,7 +150,7 @@ function ArrowLeftIcon(props: any) {
   }
   
   
-  function CompassIcon(props: any) {
+  export function CompassIcon(props: any) {
     return (
       <svg
         {...props}
@@ -171,7 +171,7 @@ function ArrowLeftIcon(props: any) {
   }
   
   
-  function HomeIcon(props: any) {
+  export function HomeIcon(props: any) {
     return (
       <svg
         {...props}
@@ -192,7 +192,7 @@ function ArrowLeftIcon(props: any) {
   }
   
   
-  function SearchIcon(props: any) {
+  export function SearchIcon(props: any) {
     return (
       <svg
         {...props}
