@@ -32,7 +32,7 @@ export default function MissionList() {
             try {
                 const { data: profile, error: profileError } = await supabase
                     .from("profiles")
-                    .select("location")
+                    .select("location") 
                     .eq("id", session?.user?.id)
                     .single();
 

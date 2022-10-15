@@ -1,3 +1,5 @@
+import Header from "@/ui/Sections/Header";
+import { PlanetLayout } from "@/ui/Sections/PlanetLayout";
 import { ReactNode } from "react";
 import { useMediaQuery } from "react-responsive";
 
@@ -50,6 +52,8 @@ const Layout: React.FC<Layout> = ({ children }) => {
       )} */}
         <main className="h-max pb-10 grow overflow-y-auto">
             <div className="p-5">
+                {/* <Header /> */}
+                <PlanetLayout />
                 {children}
             </div>
         </main>
