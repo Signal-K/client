@@ -1,4 +1,4 @@
-import { AutomatonControlPanel, RoverControlPanel } from "@/components/Gameplay/Inventory/Automation";
+// import { AutomatonControlPanel, RoverControlPanel } from "@/components/Gameplay/Inventory/Automation";
 import { AllStructures, CreateStructure } from "@/components/Gameplay/Inventory/Structure";
 import Layout from "@/components/Layout";
 import { useActivePlanet } from "@/context/ActivePlanet";
