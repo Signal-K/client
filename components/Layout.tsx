@@ -17,13 +17,13 @@ const Layout: React.FC<Layout> = ({ children }) => {
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
   }}>  
+    <PlanetLayout>
       <div className="flex relative items-start h-screen y-full">
         <main className="h-max pb-10 grow overflow-y-auto">
-          <PlanetLayout>
               {children}
-          </PlanetLayout>
-        </main>
-    </div>
+          </main>
+        </div>
+      </PlanetLayout>
     </div>
   );
 };

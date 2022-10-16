@@ -13,4 +13,4 @@ export default function Home() {
   );
 }; 
 
-{/* <UserPlanets /> Add a block for sectors? */}
+{/* Add a block for sectors? */}

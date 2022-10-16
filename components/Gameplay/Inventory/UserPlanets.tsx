@@ -4,6 +4,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Header, CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
 
 import { Button } from "@/ui/ui/button";
+import RoverSingle from "./Automation";
 
 
 interface UserProfileData {
@@ -98,8 +99,8 @@ export default function UserPlanetPage() {
 
     return (
         <>
-            <Header planetName={userPlanet.content} />
-            <div className="w-full">
+            {/* <Header planetName={userPlanet.content} /> */}
+            <div className="w-full h-full w-full bg-blue-100 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-20 border border-gray-100 mt-10">
                 <div className="mx-auto max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4" style={{
                     gridTemplateAreas: `
                     "block36 block37"
@@ -117,7 +118,7 @@ export default function UserPlanetPage() {
                         return (
                             <div key={index} className={`flex items-center justify-center p-6 border border-gray-200 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
                                 {isCombinedBlock && <UserPlanets userPlanet={userPlanet} />}
-                                {/* {isBlock51or54 && <RoverSingle />} */}
+                                {isBlock51or54 && <RoverSingle />}
                                 {!isCombinedBlock && !isBlock51or54 && (index + 1)}
                             </div>
                         );
@@ -143,15 +144,15 @@ function UserPlanets({ userPlanet }: { userPlanet: UserPlanetData }) {
     return (
         <>
             <button onClick={handleOpenDialog}>
-                <img src={userPlanet.avatar_url} height={128} width={128} alt="User planet avatar" />
+                <img src={userPlanet.avatar_url} height={40} width={40} alt="User planet avatar" />
             </button>
-            <p>{userPlanet.content}</p>
+            {/* <p>{userPlanet.content}</p> */}
             <SinglePlanetDialogue open={dialogOpen} onClose={handleCloseDialog} userPlanet={userPlanet} />
         </>
     );
 }; 
 
-export function ActivePlanet({ activePlanet }: { activePlanet: UserPlanetData }) {
+/* export function ActivePlanet({ activePlanet }: { activePlanet: UserPlanetData }) {
     return (
         <>
             <div className="flex items-center gap-4">
@@ -178,7 +179,7 @@ export function ActivePlanet({ activePlanet }: { activePlanet: UserPlanetData })
             </div>
         </>
     )
-}
+};*/
 
 function SinglePlanetDialogue({ open, onClose, userPlanet }: { open: boolean; onClose: () => void; userPlanet: UserPlanetData; }) {
     const cancelButtonRef = useRef(null);
@@ -212,7 +213,7 @@ function SinglePlanetDialogue({ open, onClose, userPlanet }: { open: boolean; on
                             <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                                 <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                                     <div className="sm:flex sm:items-start">
-                                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"><img src={userPlanet.avatar_url} height={128} width={128} alt="User planet avatar" />
+                                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"><img src={userPlanet.avatar_url} height={64} width={64} alt="User planet avatar" />
                                         </div>
                                         <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                                             <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
