@@ -6,6 +6,7 @@ import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useState } from "react";
 import Head from "next/head";
 import { ActivePlanetProvider } from "@/context/ActivePlanet";
+import {NextUIProvider} from "@nextui-org/system";
 
 export default function StarSailors ({ Component, pageProps }: AppProps) {
   const [supabaseClient] = useState(() => createBrowserSupabaseClient());
@@ -52,7 +53,9 @@ export default function StarSailors ({ Component, pageProps }: AppProps) {
       </Head>
       <SessionContextProvider supabaseClient={supabaseClient} initialSession={pageProps.initialSession}>
         <ActivePlanetProvider>
-          <Component {...pageProps} />
+          <NextUIProvider>
+            <Component {...pageProps} />
+          </NextUIProvider>
         </ActivePlanetProvider>
       </SessionContextProvider>
     </>

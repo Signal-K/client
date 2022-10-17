@@ -19,7 +19,7 @@ export default function () {
             <RoverControlPanel /> */}
             {activePlanet?.id}
             <AllStructures />
-            <AllAutomatons />
+            {/* <AllAutomatons /> */}
             <CreateStructure onStructureSelected={handleStructureSelected} activeSectorId={0} />
             <p>Whatever I want goes in here, lol</p>
         </Layout>
