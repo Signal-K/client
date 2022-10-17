@@ -1,6 +1,7 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 
+// Functionally these components are archived for now. BuildFirstRover is kind of ready to go...
 export default function BuildFirstRover() {
     const supabase = useSupabaseClient();
     const session = useSession();

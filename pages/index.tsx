@@ -7,7 +7,7 @@ import UserPlanetPage from "@/components/Gameplay/Inventory/UserPlanets";
 
 export default function Home() {
   return (
-    <Layout>
+    <Layout bg={true}>
       <UserPlanetPage />
     </Layout>
   );
