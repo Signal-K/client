@@ -37,6 +37,16 @@ interface PlanetPageProps {
     planetName: string;
 };
 
+interface UserAutomaton {
+    id: string;
+};
+
+interface UserAutomaton {
+    id: string;
+    item: number; // Add the 'item' property
+}
+
+
 export default function UserPlanetPage() {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -44,13 +54,40 @@ export default function UserPlanetPage() {
     const [loading, setLoading] = useState<boolean>(true);
     const [userProfile, setUserProfile] = useState<UserProfileData | null>(null);
     const [userPlanet, setUserPlanet] = useState<UserPlanetData | null>(null);
+    const [roverData, setRoverData] = useState<UserAutomaton[]>([]);
+
+    useEffect(() => {
+        const fetchRoverData = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from("inventoryUSERS")
+                    .select("*")
+                    .eq("item", 23 || 22 || 18)
+                    .eq("owner", session?.user?.id)
+                    .limit(2);
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    setRoverData(data);
+                }
+            } catch (error: any) {
+                console.error("Error fetching rover data:", error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (session) {
+            fetchRoverData();
+        }
+    }, [supabase, session]);
 
     useEffect(() => {
         const fetchData = async () => {
             if (!session) return;
 
             try {
-                // Fetch user profile data
                 const { data: profile, error: profileError } = await supabase
                     .from("profiles")
                     .select("location")
@@ -62,7 +99,6 @@ export default function UserPlanetPage() {
                 if (profile) {
                     setUserProfile(profile);
 
-                    // If profile exists, fetch user planet data
                     const { data: planet, error: planetError } = await supabase
                         .from("basePlanets")
                         .select("*")
@@ -99,26 +135,28 @@ export default function UserPlanetPage() {
 
     return (
         <>
-            {/* <Header planetName={userPlanet.content} /> */}
-            <div className="w-full h-full w-full bg-blue-100 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-20 border border-gray-100 mt-10">
+            <Header planetName={userPlanet.content} />
+            <div className="w-full">
                 <div className="mx-auto max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4" style={{
                     gridTemplateAreas: `
                     "block36 block37"
                     "block51 block54"
                     "block55 block56"
                     "block57 block58"
-                    // Add more rows as needed
                     `
                 }}>
                     {Array.from({ length: 64 }, (_, index) => {
                         const isBlock36or37 = index + 1 === 36 || index + 1 === 37;
                         const isBlock51or54 = index + 1 === 51 || index + 1 === 54;
-                        const isCombinedBlock = isBlock36or37 && index + 1 === 36; // Only true for the first of the combined blocks
-            
+                        const isCombinedBlock = isBlock36or37 && index + 1 === 36;
+    
                         return (
-                            <div key={index} className={`flex items-center justify-center p-6 border border-gray-200 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
+                            <div key={`block-${index}`} className={`flex items-center justify-center p-6 border border-gray-200 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
                                 {isCombinedBlock && <UserPlanets userPlanet={userPlanet} />}
-                                {isBlock51or54 && <RoverSingle />}
+                                {isBlock51or54 && roverData.length > 0 && roverData.map((rover, roverIndex) => {
+                                    if (roverIndex === 0 && roverData.length >= 2) return null; // Skip rendering the first rover if there are two or more items
+                                    return <RoverSingle key={roverIndex} userAutomaton={rover} />;
+                                })}
                                 {!isCombinedBlock && !isBlock51or54 && (index + 1)}
                             </div>
                         );
@@ -126,7 +164,7 @@ export default function UserPlanetPage() {
                 </div>
             </div>
         </>
-    );
+    );    
 };
 
 // Background image & other stats, structure-based block for more info/title tag // For now, users only have one planet
@@ -144,15 +182,15 @@ function UserPlanets({ userPlanet }: { userPlanet: UserPlanetData }) {
     return (
         <>
             <button onClick={handleOpenDialog}>
-                <img src={userPlanet.avatar_url} height={40} width={40} alt="User planet avatar" />
+                <img src={userPlanet.avatar_url} height={128} width={128} alt="User planet avatar" />
             </button>
-            {/* <p>{userPlanet.content}</p> */}
+            <p>{userPlanet.content}</p>
             <SinglePlanetDialogue open={dialogOpen} onClose={handleCloseDialog} userPlanet={userPlanet} />
         </>
     );
 }; 
 
-/* export function ActivePlanet({ activePlanet }: { activePlanet: UserPlanetData }) {
+export function ActivePlanet({ activePlanet }: { activePlanet: UserPlanetData }) {
     return (
         <>
             <div className="flex items-center gap-4">
@@ -179,7 +217,7 @@ function UserPlanets({ userPlanet }: { userPlanet: UserPlanetData }) {
             </div>
         </>
     )
-};*/
+}
 
 function SinglePlanetDialogue({ open, onClose, userPlanet }: { open: boolean; onClose: () => void; userPlanet: UserPlanetData; }) {
     const cancelButtonRef = useRef(null);
@@ -213,7 +251,7 @@ function SinglePlanetDialogue({ open, onClose, userPlanet }: { open: boolean; on
                             <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                                 <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                                     <div className="sm:flex sm:items-start">
-                                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"><img src={userPlanet.avatar_url} height={64} width={64} alt="User planet avatar" />
+                                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"><img src={userPlanet.avatar_url} height={128} width={128} alt="User planet avatar" />
                                         </div>
                                         <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                                             <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">

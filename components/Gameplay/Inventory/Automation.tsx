@@ -1,44 +1,66 @@
 import { Dialog, Transition } from '@headlessui/react';
-import React, { Fragment, useRef, useState } from 'react';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 
-interface UserAutomaton {
-    id: string;
+interface RoverSingleProps {
+    userAutomaton: UserAutomaton;
 }
 
-export default function RoverSingle() {
-    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+export interface UserAutomaton {
+    id: string;
+    item: number;
+}
 
-    const handleOpenDialog = () => {
-        setDialogOpen(true);
-    };
+const RoverSingle: React.FC<RoverSingleProps> = ({ userAutomaton }) => {
+    const supabase = useSupabaseClient();
+    const [roverInfo, setRoverInfo] = useState<any>(null);
 
-    const handleCloseDialog = () => {
-        setDialogOpen(false);
-    };
+    useEffect(() => {
+        const fetchRoverInfo = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from("inventoryITEMS")
+                    .select("icon_url, name")
+                    .eq("id", userAutomaton.item)
+                    .single();
 
-    const openModal = () => {
-        const modal = document.getElementById('my_modal_1') as HTMLDialogElement | null;
-        if (modal) {
-            modal.showModal();
+                if (error) throw error;
+
+                if (data) {
+                    setRoverInfo(data);
+                }
+            } catch (error: any) {
+                console.error("Error fetching rover info:", error.message);
+            }
         };
+
+        fetchRoverInfo();
+    }, [supabase, userAutomaton.item]);
+
+    if (!roverInfo) {
+        return <p>Loading rover info...</p>;
     };
+
+    // const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
+    // const handleOpenDialog = () => {
+    //     setDialogOpen(true);
+    // };
+
+    // const handleCloseDialog = () => {
+    //     setDialogOpen(false);
+    // };
 
     return (
-        <button onClick={handleOpenDialog}>
-            <img
-                alt="Structure 4"
-                className="w-8 h-8"
-                height="25"
-                src="https://cdn-icons-png.flaticon.com/512/7717/7717354.png"
-                style={{
-                    aspectRatio: "25/25",
-                    objectFit: "cover",
-                }}
-                width="25"
-            />
-        </button>
+        <div className="flex flex-col items-center justify-center">
+            <img src={roverInfo.icon_url} alt="Rover" className="w-24 h-24 mb-2" />
+            <p className="text-center">Type: {roverInfo.name}</p>
+            {/* <SingleAutomatonDialogue open={dialogOpen} onClose={handleCloseDialog} userAutomaton={roverInfo} /> */}
+        </div>
     );
 };
+
+export default RoverSingle;
 
 function SingleAutomatonDialogue({ open, onClose, userAutomaton }: { open: boolean; onClose: () => void; userAutomaton?: UserAutomaton; }) {
     const cancelButtonRef = useRef(null);
