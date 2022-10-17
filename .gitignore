@@ -14,6 +14,8 @@
 /coverage
 .env
 .venv
+/galaxy/.venv
+galaxy/.venv
 /.venv
 venv
 /venv

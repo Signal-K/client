@@ -47,7 +47,7 @@ export default function BuildFirstRover() {
                 .from("inventoryUSERS")
                 .insert([
                     {
-                        item: 23, // Assuming 23 is the ID of the rover item in inventoryITEMS table
+                        item: 23,
                         owner: session?.user?.id,
                         sector: "18",
                         planetSector: "18",
@@ -131,7 +131,7 @@ export function ViewRovers({ onRoverSelect }: { onRoverSelect?: (rover: any) => 
         } finally {
             setIsLoading(false);
         };
-    };
+    }; 
 
     const combinedRovers = userRovers.map(userRover => {
         const roverDetail = roverDetails.find(detail => detail.id === userRover.item);

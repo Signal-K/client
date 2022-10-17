@@ -6,7 +6,7 @@ app = Flask(__name__)
 # app.config["SQLALCHEMY_DATABASE_URI"] = ""
 # db.init_app(app)
 
-# Create Supabase client
+# Create Supabase client 
 SUPABASE_URL = 'https://qwbufbmxkjfaikoloudl.supabase.co'
 SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3YnVmYm14a2pmYWlrb2xvdWRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk5NDE3NTksImV4cCI6MTk4NTUxNzc1OX0.RNz5bvsVwLvfYpZtUjy0vBPcho53_VS2AIVzT8Fm-lk'
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
