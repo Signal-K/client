@@ -1,7 +1,9 @@
 // A component to show the structures on the user's active planet
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, RadioGroup, Radio} from "@nextui-org/react";
 
 interface OwnedItem {
     id: string;
@@ -41,9 +43,53 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
         <div className="flex flex-col items-center justify-center">
             <img src={structure.icon_url} alt={structure.name} className="w-14 h-14 mb-2" />
             <p>{ownedItem.id}</p>
+            <StructureModal />
         </div>
     );
 };
+
+function StructureModal() {
+  const {isOpen, onOpen, onOpenChange} = useDisclosure();
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Button onPress={onOpen} className="max-w-fit">Open Modal</Button>
+      <Modal 
+        isOpen={isOpen} 
+        placement="bottom-center"
+        onOpenChange={onOpenChange} 
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Modal Title</ModalHeader>
+              <ModalBody>
+                <p> 
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Nullam pulvinar risus non risus hendrerit venenatis.
+                  Pellentesque sit amet hendrerit risus, sed porttitor quam.
+                </p>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Nullam pulvinar risus non risus hendrerit venenatis.
+                  Pellentesque sit amet hendrerit risus, sed porttitor quam.
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button color="primary" onPress={onClose}>
+                  Action
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </div>
+  );
+}
 
 export const AllStructures: React.FC<{}> = () => {
     const supabase = useSupabaseClient();

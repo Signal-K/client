@@ -15,13 +15,14 @@ export default function () {
 
     return (
         <Layout bg={false}>
-            {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
-            <RoverControlPanel /> */}
-            {activePlanet?.id}
-            <AllStructures />
-            {/* <AllAutomatons /> */}
-            <CreateStructure onStructureSelected={handleStructureSelected} activeSectorId={0} />
-            <p>Whatever I want goes in here, lol</p>
+            <div className="p-5">
+                {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
+                <RoverControlPanel /> */}
+                {activePlanet?.id}
+                <AllStructures />
+                {/* <AllAutomatons /> */}
+                <CreateStructure onStructureSelected={handleStructureSelected} activeSectorId={0} />
+            </div>
         </Layout>
     );
 };
