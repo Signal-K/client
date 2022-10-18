@@ -5,7 +5,7 @@ import { Header, CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { PlacedStructureSingle } from "./Structure";
 
-import { Button } from "@/ui/ui/button";
+import { Button } from "@/ui/button";
 import RoverSingle from "./Automation";
 
 interface ActivePlanetContextValue {

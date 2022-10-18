@@ -3,7 +3,7 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 
 // For the control panel
-import { Button } from "@/ui/ui/button";
+import { Button } from "@/ui/button";
 import { ScrollArea } from "@/ui/scroll-area";
 import { RoverImageNoHandle } from '@/Classifications/RoverContent';
 import { useActivePlanet } from '@/context/ActivePlanet';
@@ -88,13 +88,37 @@ const RoverSingle: React.FC<RoverSingleProps> = ({ userAutomaton }) => {
 
 export default RoverSingle;
 
-function AllAutomatons () {
+export function AllAutomatons () {
   const supabase = useSupabaseClient();
   const session = useSession();
   const { activePlanet } = useActivePlanet();
 
+  const [roverInfo, setRoverInfo] = useState<any>(null); // We then need to fetch the data from `inventoryITEMS` table for the details of each item e.g. its name, icon, etc
+  const [userAutomatons, setUserAutomatons] = useState<any[]>([]);
+
+  const fetchAlUserRovers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("inventoryUSERS")
+        .select("id, item, notes, time_of_deploy, basePlanet, planetSector, owner")
+        .eq("owner", session?.user?.id)
+        .eq("item", 23)
+        .eq("basePlanet", activePlanet?.id)
+
+      if (data) {
+        setUserAutomatons(data);
+      };
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchAlUserRovers();
+  })
+
   return (
-    <></>
+    <>{userAutomatons}</>
   );
 };
 
