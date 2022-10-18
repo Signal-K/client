@@ -136,7 +136,7 @@ export default function UserPlanetPage() {
     return (
         <>
             <Header planetName={userPlanet.content} />
-            <div className="w-full">
+                <div className="w-full">
                 <div className="mx-auto max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4" style={{
                     gridTemplateAreas: `
                     "block36 block37"
@@ -149,7 +149,7 @@ export default function UserPlanetPage() {
                         const isBlock36or37 = index + 1 === 36 || index + 1 === 37;
                         const isBlock51or54 = index + 1 === 51 || index + 1 === 54;
                         const isCombinedBlock = isBlock36or37 && index + 1 === 36;
-    
+
                         return (
                             <div key={`block-${index}`} className={`flex items-center justify-center p-6 border border-gray-200 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
                                 {isCombinedBlock && <UserPlanets userPlanet={userPlanet} />}
@@ -157,7 +157,7 @@ export default function UserPlanetPage() {
                                     if (roverIndex === 0 && roverData.length >= 2) return null; // Skip rendering the first rover if there are two or more items
                                     return <RoverSingle key={roverIndex} userAutomaton={rover} />;
                                 })}
-                                {!isCombinedBlock && !isBlock51or54 && (index + 1)}
+                                {!isCombinedBlock && !isBlock51or54 && null}
                             </div>
                         );
                     })}
