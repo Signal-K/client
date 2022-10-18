@@ -180,6 +180,60 @@ function SingleAutomatonDialogue({ open, onClose, userAutomaton, roverInfo, depl
         }
     };
 
+    if (!deployedRover) { // This should actually be if the rover is deployed, however as we're having issues with managing the state...
+        return (
+            <Transition.Root show={open} as={Fragment}>
+            <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" initialFocus={cancelButtonRef} onClose={onClose}>
+                <div className="flex items-center justify-center min-h-screen">
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+                    </Transition.Child>
+
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 scale-95"
+                        enterTo="opacity-100 scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 scale-100"
+                        leaveTo="opacity-0 scale-95"
+                    >
+                        <div className="relative max-w-lg w-full bg-white rounded-lg shadow-lg">
+                            <Dialog.Panel className="p-4">
+                                <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                                    <div className="sm:flex sm:items-start">
+                                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                            <img src={roverInfo.icon_url} height={64} width={64} alt="Rover" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <AutomatonControlPanel />
+                                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                    <button
+                                        type="button"
+                                        className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+                                        onClick={onClose}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </Dialog.Panel>
+                        </div>
+                    </Transition.Child>
+                </div>
+            </Dialog>
+        </Transition.Root>
+        );
+    };
+
     return (
         <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" initialFocus={cancelButtonRef} onClose={onClose}>
@@ -266,21 +320,13 @@ function SingleAutomatonDialogue({ open, onClose, userAutomaton, roverInfo, depl
 };
 
 export function AutomatonControlPanel() {
+    // Show sector the rover is deployed on
     return (
         <div className="mockup-window border border-base-300">
             <div className="grid grid-cols-3 gap-4">
                 {/* First Column */}
                 <div className="stats shadow">
-                    <StatItem 
-                        icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
-                        title="Atmospheric Pressure"
-                        value="847kPa"
-                        description="838-874"
-                    />
-                </div>
-                {/* Duplicate First Column */}
-                <div className="stats shadow">
-                    <StatItem 
+                    <StatItem // Compass item goes here
                         icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>}
                         title="Atmospheric Pressure"
                         value="847kPa"
@@ -315,26 +361,8 @@ export function AutomatonControlPanel() {
                         description="↗︎ 10% drain/minute"
                     />
                 </div>
-                {/* Duplicate Second Column */}
-                <div className="stats shadow">
-                    <StatItem 
-                        icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>}
-                        title="Battery cell status"
-                        value="85%"
-                        description="↗︎ 10% drain/minute"
-                    />
-                </div>
 
                 {/* Third Column */}
-                <div className="stats shadow">
-                    <StatItem 
-                        icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>}
-                        title="Temperature"
-                        value="145K"
-                        description="↘︎ 139-198 (14%)"
-                    />
-                </div>
-                {/* Duplicate Third Column */}
                 <div className="stats shadow">
                     <StatItem 
                         icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>}
