@@ -43,12 +43,14 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
         <div className="flex flex-col items-center justify-center">
             <img src={structure.icon_url} alt={structure.name} className="w-14 h-14 mb-2" />
             <p>{ownedItem.id}</p>
-            <StructureModal />
+            {structure.id == "12" && (
+                <TelescopeReceiverStructureModal ownedItem={ownedItem} structure={structure} />
+            )}
         </div>
     );
 };
 
-function StructureModal() {
+const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structure: UserStructure }> = ({ ownedItem, structure }) => {
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
   return (
@@ -62,7 +64,7 @@ function StructureModal() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Modal Title</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">{structure.name}</ModalHeader>
               <ModalBody>
                 <p> 
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
