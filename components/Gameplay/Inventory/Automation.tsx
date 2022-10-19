@@ -5,6 +5,7 @@ import React, { Fragment, useEffect, useRef, useState } from 'react';
 // For the control panel
 import { Button } from "@/ui/ui/button";
 import { ScrollArea } from "@/ui/scroll-area";
+import { RoverImageNoHandle } from '@/Classifications/RoverContent';
 
 interface RoverSingleProps {
     userAutomaton: UserAutomaton;
@@ -479,7 +480,7 @@ export function RoverControlPanel() {
         </div>
         <div className="flex-1">
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <img
+            {/* <img
               alt="Rover Image"
               className="rounded-lg"
               height="100"
@@ -489,7 +490,8 @@ export function RoverControlPanel() {
                 objectFit: "cover",
               }}
               width="100"
-            />
+            /> */}
+            <RoverImageNoHandle date="721" rover="perseverance" /> {/* sectorNo="5" /> */}
             <img
               alt="Rover Image"
               className="rounded-lg"
