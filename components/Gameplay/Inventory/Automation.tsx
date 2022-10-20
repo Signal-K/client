@@ -491,83 +491,49 @@ export function RoverControlPanel() {
               }}
               width="100"
             /> */}
-            <RoverImageNoHandle date="721" rover="perseverance" /> {/* sectorNo="5" /> */}
-            <img
-              alt="Rover Image"
-              className="rounded-lg"
-              height="100"
-              src="/placeholder.svg"
-              style={{
-                aspectRatio: "100/100",
-                objectFit: "cover",
-              }}
-              width="100"
-            />
-            <img
-              alt="Rover Image"
-              className="rounded-lg"
-              height="100"
-              src="/placeholder.svg"
-              style={{
-                aspectRatio: "100/100",
-                objectFit: "cover",
-              }}
-              width="100"
-            />
-            <img
-              alt="Rover Image"
-              className="rounded-lg"
-              height="100"
-              src="/placeholder.svg"
-              style={{
-                aspectRatio: "100/100",
-                objectFit: "cover",
-              }}
-              width="100"
-            />
-            <img
-              alt="Rover Image"
-              className="rounded-lg"
-              height="100"
-              src="/placeholder.svg"
-              style={{
-                aspectRatio: "100/100",
-                objectFit: "cover",
-              }}
-              width="100"
-            />
-            <img
-              alt="Rover Image"
-              className="rounded-lg"
-              height="100"
-              src="/placeholder.svg"
-              style={{
-                aspectRatio: "100/100",
-                objectFit: "cover",
-              }}
-              width="100"
-            />
+            {/* <RoverImageNoHandle date="721" rover="perseverance" /> sectorNo="5" /> | Update values based on population */}
+            <RoverImageNoHandle date="718" rover="perseverance" className='' />
+            <RoverImageNoHandle date="649" rover="perseverance" className='' />
+            <RoverImageNoHandle date="868" rover="perseverance" className='' />
+            <RoverImageNoHandle date="363" rover="perseverance" className='' />
+            <RoverImageNoHandle date="185" rover="perseverance" className='' />
+            <RoverImageNoHandle date="721" rover="perseverance" className="" />
+            <div className="flex-1">
+            {/* <BlockGrid /> */}
+            
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            {/* <div className="relative w-full h-96">
+              <RoverImageNoHandle date="721" rover="perseverance" className="absolute inset-0 w-full h-full object-cover" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <RoverImageNoHandle date="718" rover="perseverance" className='' />
+              <RoverImageNoHandle date="649" rover="perseverance" className='' />
+              <RoverImageNoHandle date="868" rover="perseverance" className='' />
+              <RoverImageNoHandle date="363" rover="perseverance" className='' />
+              <RoverImageNoHandle date="185" rover="perseverance" className='' />
+            </div> */}
+          </div>
           </div>
           <div className="bg-[#222222] p-4 rounded-lg mb-6">
-            <h3 className="font-semibold mb-2">Results</h3>
+            <h3 className="font-semibold mb-2">Log of events</h3>
             <ScrollArea className="space-y-2 h-48">
               <p>
-                <CheckIcon className="w-4 h-4" /> Sample taken
+                <BatteryFullIcon className="w-4 h-4" /> Sample taken
               </p>
               <p>
-                <XIcon className="w-4 h-4" /> Error in Cam 7
+                <XIcon className="w-4 h-4" /> Moved to deposit
               </p>
               <p>
-                <CheckIcon className="w-4 h-4" /> Cam 7 selfixed
+                <CheckIcon className="w-4 h-4" /> Mined deposit in sector {}
               </p>
               <p>
-                <CheckIcon className="w-4 h-4" /> Picture taken
+                <CheckIcon className="w-4 h-4" /> New surface measurement
               </p>
               <p>
-                <CheckIcon className="w-4 h-4" /> Sample taken
+                <CheckIcon className="w-4 h-4" /> Moved to sector {}
               </p>
               <p>
-                <CheckIcon className="w-4 h-4" /> Rover moved
+                <CheckIcon className="w-4 h-4" /> 
               </p>
             </ScrollArea>
             <Button className="mt-4" variant="outline">
@@ -575,13 +541,14 @@ export function RoverControlPanel() {
             </Button>
           </div>
           <div className="flex justify-center">
-            <CurvedlineChart className="w-[200px] h-[200px]" />
+            {/* <CurvedlineChart className="w-[200px] h-[200px]" /> */}
           </div>
         </div>
       </div>
-    )
-  }
-  
+      </div>
+    );
+  };
+
   function BatteryFullIcon(props: any) {
     return (
       <svg

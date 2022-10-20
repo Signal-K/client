@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-export const RoverImageNoHandle = ({ date, rover, }: { date: string; rover: string;}) => { // sectorNo }: { date: string; rover: string; sectorNo: string;}) => {
+export const RoverImageNoHandle = ({ date, rover, className }: { date: string; rover: string; className: string; }) => { // sectorNo }: { date: string; rover: string; sectorNo: string;}) => {
     const [imageUrl, setImageUrl] = useState('');
     const apiKey = 'iT0FQTZKpvadCGPzerqXdO5F4b62arNBOP0dtkXE';
 
@@ -25,15 +25,9 @@ export const RoverImageNoHandle = ({ date, rover, }: { date: string; rover: stri
     }, [date, rover]);
 
     return (
-        <div>
-            {imageUrl ? (
-                <img src={imageUrl} alt="Rover image"  className="rounded-lg"
-                height="100"
-                style={{
-                  aspectRatio: "100/100",
-                  objectFit: "cover",
-                }}
-                width="100"/>
+<div>
+            {imageUrl? (
+                <img src={imageUrl} alt="Rover image" className={`rounded-lg ${className}`} style={{ aspectRatio: "100/100", objectFit: "cover" }} />
             ) : (
                 <p>Loading...</p> 
             )}
