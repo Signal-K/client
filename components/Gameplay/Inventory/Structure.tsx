@@ -51,47 +51,82 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
 };
 
 const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structure: UserStructure }> = ({ ownedItem, structure }) => {
-  const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    const supabase = useSupabaseClient();
+    const session = useSession();
 
-  return (
-    <div className="flex flex-col gap-2">
-      <Button onPress={onOpen} className="max-w-fit">Open Modal</Button>
-      <Modal 
-        isOpen={isOpen} 
-        placement="bottom-center"
-        onOpenChange={onOpenChange} 
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">{structure.name}</ModalHeader>
-              <ModalBody>
-                <p> 
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Nullam pulvinar risus non risus hendrerit venenatis.
-                  Pellentesque sit amet hendrerit risus, sed porttitor quam.
-                </p>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Nullam pulvinar risus non risus hendrerit venenatis.
-                  Pellentesque sit amet hendrerit risus, sed porttitor quam.
-                </p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onPress={onClose}>
-                  Action
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </div>
-  );
-}
+    const { activePlanet } = useActivePlanet();
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+
+    const [activeModules, setActiveModules] = useState([]);
+    const [inactiveModules, setInactiveModules] = useState([]);
+
+    async function getActiveModules() {
+        if (session && structure) {
+            try {
+                const { data: activeData, error: activeError } = await supabase
+                    .from("inventoryUSERS")
+                    .select("*")
+                    .eq("owner", session?.user?.id)
+                    .eq("basePlanet", activePlanet?.id)
+                    .eq("item", 14 || 29);
+
+                if (activeError) {
+                    throw activeError;
+                };
+
+                if (activeData) {
+                    const activeModuleIds = activeData.map(activeModule => activeModule.item);
+                    setActiveModules(activeData);
+                };
+            } catch (error: any) {
+                console.error(error);
+            };
+        };
+    };
+
+    useEffect(() => {
+        getActiveModules();
+    },[session, activePlanet]);
+
+    return (
+        <div className="flex flex-col gap-2">
+        <Button onPress={onOpen} className="max-w-fit">Open Modal</Button>
+        <Modal 
+            isOpen={isOpen} 
+            placement="bottom-center"
+            onOpenChange={onOpenChange} 
+        >
+            <ModalContent>
+            {(onClose) => (
+                <div className="bg-indigo-500 text-white">
+                <ModalHeader className="flex flex-col gap-1">{structure.name}</ModalHeader>
+                <ModalBody>
+                    <p> 
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Nullam pulvinar risus non risus hendrerit venenatis.
+                    Pellentesque sit amet hendrerit risus, sed porttitor quam.
+                    </p>
+                    <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Nullam pulvinar risus non risus hendrerit venenatis.
+                    Pellentesque sit amet hendrerit risus, sed porttitor quam.
+                    </p>
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="danger" variant="light" onPress={onClose}>
+                    Close
+                    </Button>
+                    <Button color="primary" onPress={onClose}>
+                    Action
+                    </Button>
+                </ModalFooter>
+                </div>
+            )}
+            </ModalContent>
+        </Modal>
+        </div>
+    );
+};
 
 export const AllStructures: React.FC<{}> = () => {
     const supabase = useSupabaseClient();
