@@ -53,77 +53,112 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
 const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structure: UserStructure }> = ({ ownedItem, structure }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
-
     const { activePlanet } = useActivePlanet();
-    const {isOpen, onOpen, onOpenChange} = useDisclosure();
-
-    const [activeModules, setActiveModules] = useState([]);
-    const [inactiveModules, setInactiveModules] = useState([]);
-
-    async function getActiveModules() {
-        if (session && structure) {
-            try {
-                const { data: activeData, error: activeError } = await supabase
-                    .from("inventoryUSERS")
-                    .select("*")
-                    .eq("owner", session?.user?.id)
-                    .eq("basePlanet", activePlanet?.id)
-                    .eq("item", 14 || 29);
-
-                if (activeError) {
-                    throw activeError;
-                };
-
-                if (activeData) {
-                    const activeModuleIds = activeData.map(activeModule => activeModule.item);
-                    setActiveModules(activeData);
-                };
-            } catch (error: any) {
-                console.error(error);
-            };
-        };
-    };
+    const [activeModules, setActiveModules] = useState<string[]>([]);
+    const [inactiveModules, setInactiveModules] = useState<string[]>([]);
+    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-        getActiveModules();
-    },[session, activePlanet]);
+        if (session && activePlanet) {
+            getActiveModules();
+        };
+    }, [session, activePlanet]);
+
+    const getActiveModules = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('inventoryUSERS')
+                .select('item')
+                .eq('owner', session?.user?.id)
+                .eq('basePlanet', activePlanet?.id)
+                .in('item', [14, 29]);
+    
+            if (error) {
+                throw error;
+            }
+    
+            const activeModuleIds = data.map((module: any) => String(module.item)); 
+            setActiveModules(activeModuleIds);
+            setInactiveModules(["14", "29"].filter(id => !activeModuleIds.includes(id))); 
+        } catch (error: any) {
+            console.error('Error fetching active telescope modules:', error.message);
+        };
+    };    
+
+    const handleClose = () => {
+        setIsOpen(false);
+    };
+
+    const handleOpen = () => {
+        setIsOpen(true);
+    };
+
+
+    const handleModuleClick = async (moduleId: string) => {
+        try {
+            const { data, error } = await supabase
+                .from('inventoryUSERS')
+                .upsert([
+                    {
+                        item: moduleId,
+                        owner: session?.user?.id,
+                        quantity: 1,
+                        time_of_deploy: new Date().toISOString,
+                        notes: "Structure",
+                        basePlanet: activePlanet?.id,
+                    },
+                ]);
+
+            if (error) {
+                throw error;
+            }
+
+            console.log('Module created successfully:', data);
+            // Refresh active modules after creating the new module
+            getActiveModules();
+        } catch (error: any) {
+            console.error('Error creating module:', error.message);
+        }
+    };
 
     return (
         <div className="flex flex-col gap-2">
-        <Button onPress={onOpen} className="max-w-fit">Open Modal</Button>
-        <Modal 
-            isOpen={isOpen} 
-            placement="bottom-center"
-            onOpenChange={onOpenChange} 
-        >
-            <ModalContent>
-            {(onClose) => (
-                <div className="bg-indigo-500 text-white">
-                <ModalHeader className="flex flex-col gap-1">{structure.name}</ModalHeader>
-                <ModalBody>
-                    <p> 
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Nullam pulvinar risus non risus hendrerit venenatis.
-                    Pellentesque sit amet hendrerit risus, sed porttitor quam.
-                    </p>
-                    <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Nullam pulvinar risus non risus hendrerit venenatis.
-                    Pellentesque sit amet hendrerit risus, sed porttitor quam.
-                    </p>
-                </ModalBody>
-                <ModalFooter>
-                    <Button color="danger" variant="light" onPress={onClose}>
-                    Close
-                    </Button>
-                    <Button color="primary" onPress={onClose}>
-                    Action
-                    </Button>
-                </ModalFooter>
-                </div>
-            )}
-            </ModalContent>
-        </Modal>
+            <Button onClick={handleOpen} className="max-w-fit">
+                Open Modal
+            </Button>
+            <Modal isOpen={isOpen} placement="bottom-center" onClose={handleClose}>
+                    <ModalContent>
+                        <div className="bg-indigo-500">
+                            <ModalHeader>{structure.name}</ModalHeader>
+                            <ModalBody>
+                                <p>
+                                </p>
+                                <div>
+                                    {inactiveModules.map(moduleId => (
+                                        <div key={moduleId} className="flex items-center justify-between mb-2">
+                                            <span>Module {moduleId}</span>
+                                            <Button color="primary" onClick={() => handleModuleClick(moduleId)}>Create</Button>
+                                        </div>
+                                    ))}
+                                    {activeModules.map(moduleId => (
+                                        <div key={moduleId} className="flex items-center justify-between mb-2">
+                                            <span>Module {moduleId}</span>
+                                            <span>Unlocked</span>
+                                        </div>
+                                    ))}
+                                </div>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="danger" variant="light" onClick={handleClose}>
+                                Close
+                            </Button>
+                            <Button color="primary" onClick={handleClose}>
+                                Action
+                            </Button>
+                        </ModalFooter>
+                    </div>
+                </ModalContent>
+            </Modal>
         </div>
     );
 };
