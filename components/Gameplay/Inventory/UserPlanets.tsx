@@ -1,17 +1,22 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useEffect, useState, useRef, Fragment } from "react";
+import { useEffect, useState, useRef, Fragment, createContext } from "react";
 import { Dialog, Transition } from '@headlessui/react';
 import { Header, CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
+import { useActivePlanet } from "@/context/ActivePlanet";
 
 import { Button } from "@/ui/ui/button";
 import RoverSingle from "./Automation";
-
 
 interface UserProfileData {
     location: string;
 };
 
-interface UserPlanetData {
+interface ActivePlanetContextValue {
+    activePlanet: UserPlanetData | null;
+    setActivePlanet: (planet: UserPlanetData | null) => void;
+};
+
+export interface UserPlanetData {
     id: string;
     content: string;
     ticId: string;
@@ -33,6 +38,11 @@ interface UserPlanetData {
     lightkurve: string;
 };
 
+const ActivePlanetContext = createContext<ActivePlanetContextValue>({
+    activePlanet: null,
+    setActivePlanet: () => {} // Provide a default empty function
+});
+
 interface PlanetPageProps {
     planetName: string;
 };
@@ -50,6 +60,7 @@ interface UserAutomaton {
 export default function UserPlanetPage() {
     const supabase = useSupabaseClient();
     const session = useSession();
+    const { setActivePlanet } = useActivePlanet();
 
     const [loading, setLoading] = useState<boolean>(true);
     const [userProfile, setUserProfile] = useState<UserProfileData | null>(null);
@@ -57,31 +68,45 @@ export default function UserPlanetPage() {
     const [roverData, setRoverData] = useState<UserAutomaton[]>([]);
 
     useEffect(() => {
-        const fetchRoverData = async () => {
+        const fetchData = async () => {
+            if (!session) return;
+
             try {
-                const { data, error } = await supabase
-                    .from("inventoryUSERS")
-                    .select("*")
-                    .eq("item", 23 || 22 || 18)
-                    .eq("owner", session?.user?.id)
-                    .limit(2);
+                // Fetch user profile
+                const { data: profile, error: profileError } = await supabase
+                    .from("profiles")
+                    .select("location")
+                    .eq("id", session.user.id)
+                    .single();
 
-                if (error) throw error;
+                if (profileError) throw profileError;
 
-                if (data && data.length > 0) {
-                    setRoverData(data);
+                if (profile) {
+                    setUserProfile(profile);
+
+                    // Fetch user planet
+                    const { data: planet, error: planetError } = await supabase
+                        .from("basePlanets")
+                        .select("*")
+                        .eq("id", profile.location)
+                        .single();
+
+                    if (planetError) throw planetError;
+
+                    if (planet) {
+                        setUserPlanet(planet);
+                        setActivePlanet(planet); // Set active planet
+                    }
                 }
             } catch (error: any) {
-                console.error("Error fetching rover data:", error.message);
+                console.error("Error fetching data: ", error.message);
             } finally {
                 setLoading(false);
             }
         };
 
-        if (session) {
-            fetchRoverData();
-        }
-    }, [supabase, session]);
+        fetchData();
+    }, [session, supabase, setActivePlanet]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -190,7 +215,9 @@ function UserPlanets({ userPlanet }: { userPlanet: UserPlanetData }) {
     );
 }; 
 
-export function ActivePlanet({ activePlanet }: { activePlanet: UserPlanetData }) {
+export function ActivePlanet() {
+    const { activePlanet } = useActivePlanet();
+
     return (
         <>
             <div className="flex items-center gap-4">
@@ -216,8 +243,8 @@ export function ActivePlanet({ activePlanet }: { activePlanet: UserPlanetData })
                 </Button>
             </div>
         </>
-    )
-}
+    );
+};
 
 function SinglePlanetDialogue({ open, onClose, userPlanet }: { open: boolean; onClose: () => void; userPlanet: UserPlanetData; }) {
     const cancelButtonRef = useRef(null);
