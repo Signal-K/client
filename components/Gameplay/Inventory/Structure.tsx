@@ -17,7 +17,7 @@ export interface UserStructure {
     // Function (what is executed upon click)
 };
 
-export const StructureSingle: React.FC<StructureSingleProps> = ({ userStructure }) => {
+export const StructureSingle: React.FC = () => { // <StructureSingleProps> = ({ userStructure }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
@@ -31,18 +31,25 @@ export const StructureSingle: React.FC<StructureSingleProps> = ({ userStructure 
             const { data, error } = await supabase
                 .from('inventoryITEMS')
                 .select('id, name, description, icon_url')
-                .eq('ItemCategory', 'Structure')
+                .eq('ItemCategory', 'Structure');
 
             if (data) {
-                setStructures(data);
+                const structuredData: UserStructure[] = data.map((item: any) => ({
+                    id: item.id,
+                    item: item.item, // Ensure the 'item' property is present
+                    name: item.name,
+                    icon_url: item.icon_url,
+                    description: item.description
+                }));
+                setStructures(structuredData);
             };
 
             if (error) {
                 console.error(error.message);
-            };
+            }
         } catch (error: any) {
             console.error(error.message);
-        };
+        }
     };
 
     const fetchUserSector = async () => { // Temporary function to determine where to put the structure. We haven't got this determined yet from a narrative standpoint
@@ -52,18 +59,18 @@ export const StructureSingle: React.FC<StructureSingleProps> = ({ userStructure 
                 .select('id')
                 .eq("anomaly", activePlanet?.id)
                 .eq('owner', session?.user?.id)
-                .limit(1)
+                .limit(1);
 
-            if (data) {
-                setActiveSector(data)
-            };
+            if (data && data.length > 0) {
+                setActiveSector(data[0].id);
+            }
 
             if (error) {
                 console.error(error.message);
-            };
+            }
         } catch (error: any) {
             console.log(error.message);
-        };
+        }
     };
 
     const createInventoryUserEntry = async (structure: UserStructure) => {

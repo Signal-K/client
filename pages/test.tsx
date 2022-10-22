@@ -12,6 +12,7 @@ export default function () {
             <RoverControlPanel /> */}
             {/* <StructureSingle userStructure={} /> */}
             {activePlanet?.content} Hello
+            <StructureSingle />
             <p>Whatever I want goes in here, lol</p>
         </Layout>
     );
