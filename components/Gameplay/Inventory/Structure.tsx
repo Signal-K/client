@@ -22,38 +22,85 @@ interface StructureSelectProps {
     activeSectorId: number;
 };
 
+interface Structure {
+    id: string;
+    name: string;
+    description: string;
+    icon_url: string;
+    item: number;
+}
+
 // View structures
-export const PlacedStructures = ({ planetId }) => { // This currently allows us to view all structures on a planet, not sure about clicking into the individual ones...
+export const PlacedStructures = ({ }) => { // This currently allows us to view all structures on a planet, not sure about clicking into the individual ones...
     const supabase = useSupabaseClient();
+    const session = useSession();
     const { activePlanet } = useActivePlanet();
 
-    const [placedStructures, setPlacedStructures] = useState([]);
-
-    const fetchPlacedStructures = async () => {
-        const { data: structureItems, error: structureItemsError } = await supabase
-            .from("inventoryITEMS")
-            .select('id, name, description, icon_url')
-            .eq('ItemCategory', 'Structure')
-
-        if (structureItemsError) {
-            console.error(structureItemsError.message);
-            return;
-        };
-
-        const { data: userItems, error: userItemsError } = await supabase
-            .from("inventoryUSERS")
-            .select('item')
-            .eq('planetSector', sectorId);
-
-        if (userItemsError) {
-            console.error(userItemsError.message);
-            return;
-        };
-    }
+    const [userStructures, setUserStructures] = useState<UserStructure[]>([]);
 
     useEffect(() => {
-        fetchPlacedStructures();
-    }, [supabase]);
+        const fetchUserStructures = async () => {
+            if (!activePlanet || !session) return;
+
+            try {
+                const { data: userItems, error: userItemsError } = await supabase
+                    .from("inventoryUSERS")
+                    .select('item, "planetSector"')
+                    .eq('owner', session.user.id);
+
+                if (userItemsError) {
+                    console.error(userItemsError.message);
+                    return;
+                }
+
+                const structureIds = userItems
+                    .filter((item) => item.item)
+                    .map((item) => item.item);
+
+                const { data: structures, error: structuresError } = await supabase
+                    .from("inventoryITEMS")
+                    .select('id, name, description, icon_url')
+                    .in('id', structureIds)
+                    .eq('ItemCategory', 'Structure');
+
+                if (structuresError) {
+                    console.error(structuresError.message);
+                    return;
+                }
+
+                const structuredData: UserStructure[] = structures.map((item: any) => ({
+                    id: item.id,
+                    item: item.item, // Ensure the 'item' property is present
+                    name: item.name,
+                    icon_url: item.icon_url,
+                    description: item.description
+                }));
+
+                setUserStructures(structuredData);
+            } catch (error: any) {
+                console.error("Error fetching user structures:", error.message);
+            }
+        };
+
+        fetchUserStructures();
+    }, [activePlanet, session, supabase]);
+
+    return (
+        <div>
+            <h2>Your Placed Structures</h2>
+            <ul>
+                {userStructures.map((structure) => (
+                    <li key={structure.id}>
+                        <img src={structure.icon_url} alt={structure.name} />
+                        <div>
+                            <h3>{structure.name}</h3>
+                            <p>{structure.description}</p>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 }
 
 // Create structures
