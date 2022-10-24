@@ -22,6 +22,41 @@ interface StructureSelectProps {
     activeSectorId: number;
 };
 
+// View structures
+export const PlacedStructures = ({ planetId }) => { // This currently allows us to view all structures on a planet, not sure about clicking into the individual ones...
+    const supabase = useSupabaseClient();
+    const { activePlanet } = useActivePlanet();
+
+    const [placedStructures, setPlacedStructures] = useState([]);
+
+    const fetchPlacedStructures = async () => {
+        const { data: structureItems, error: structureItemsError } = await supabase
+            .from("inventoryITEMS")
+            .select('id, name, description, icon_url')
+            .eq('ItemCategory', 'Structure')
+
+        if (structureItemsError) {
+            console.error(structureItemsError.message);
+            return;
+        };
+
+        const { data: userItems, error: userItemsError } = await supabase
+            .from("inventoryUSERS")
+            .select('item')
+            .eq('planetSector', sectorId);
+
+        if (userItemsError) {
+            console.error(userItemsError.message);
+            return;
+        };
+    }
+
+    useEffect(() => {
+        fetchPlacedStructures();
+    }, [supabase]);
+}
+
+// Create structures
 export const StructureSingle: React.FC<StructureSelectProps> = ({ onStructureSelected }) => { // <StructureSingleProps> = ({ userStructure }) => { /#/ -> activeSectorId
     const supabase = useSupabaseClient();
     const session = useSession();
