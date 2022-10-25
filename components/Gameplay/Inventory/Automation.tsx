@@ -9,12 +9,12 @@ import { RoverImageNoHandle } from '@/Classifications/RoverContent';
 
 interface RoverSingleProps {
     userAutomaton: UserAutomaton;
-}
+};
 
 export interface UserAutomaton {
     id: string;
     item: number;
-}
+};
 
 const RoverSingle: React.FC<RoverSingleProps> = ({ userAutomaton }) => {
     const supabase = useSupabaseClient();

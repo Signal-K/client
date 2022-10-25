@@ -179,8 +179,12 @@ export default function UserPlanetPage() {
                             <div key={`block-${index}`} className={`flex items-center justify-center p-6 border border-gray-200 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
                                 {isCombinedBlock && <UserPlanets userPlanet={userPlanet} />}
                                 {isBlock51or54 && roverData.length > 0 && roverData.map((rover, roverIndex) => {
-                                    if (roverIndex === 0 && roverData.length >= 2) return null; // Skip rendering the first rover if there are two or more items
-                                    return <RoverSingle key={roverIndex} userAutomaton={rover} />;
+                                    if (roverIndex === 0 && roverData.length >= 2) return <p>Null</p>; // Skip rendering the first rover if there are two or more items
+                                    return (
+                                        <>
+                                            <RoverSingle key={roverIndex} userAutomaton={rover} />
+                                        </>
+                                    );
                                 })}
                                 {!isCombinedBlock && !isBlock51or54 && null}
                             </div>
