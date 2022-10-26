@@ -54,59 +54,44 @@ interface UserAutomaton {
 interface UserAutomaton {
     id: string;
     item: number; // Add the 'item' property
-}
-
+};
 
 export default function UserPlanetPage() {
     const supabase = useSupabaseClient();
     const session = useSession();
-    const { setActivePlanet } = useActivePlanet();
+    const { activePlanet } = useActivePlanet();
 
     const [loading, setLoading] = useState<boolean>(true);
+    const [roverData, setRoverData] = useState<UserAutomaton[]>([]);
     const [userProfile, setUserProfile] = useState<UserProfileData | null>(null);
     const [userPlanet, setUserPlanet] = useState<UserPlanetData | null>(null);
-    const [roverData, setRoverData] = useState<UserAutomaton[]>([]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (!session) return;
-
+        const fetchRoverData = async () => {
             try {
-                // Fetch user profile
-                const { data: profile, error: profileError } = await supabase
-                    .from("profiles")
-                    .select("location")
-                    .eq("id", session.user.id)
-                    .single();
+                const { data, error } = await supabase
+                    .from("inventoryUSERS")
+                    .select("*")
+                    .eq("item", 23 || 22 || 18)
+                    .eq("owner", session?.user?.id)
+                    .limit(2);
 
-                if (profileError) throw profileError;
+                if (error) throw error;
 
-                if (profile) {
-                    setUserProfile(profile);
-
-                    // Fetch user planet
-                    const { data: planet, error: planetError } = await supabase
-                        .from("basePlanets")
-                        .select("*")
-                        .eq("id", profile.location)
-                        .single();
-
-                    if (planetError) throw planetError;
-
-                    if (planet) {
-                        setUserPlanet(planet);
-                        setActivePlanet(planet); // Set active planet
-                    }
+                if (data && data.length > 0) {
+                    setRoverData(data);
                 }
             } catch (error: any) {
-                console.error("Error fetching data: ", error.message);
+                console.error("Error fetching rover data:", error.message);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchData();
-    }, [session, supabase, setActivePlanet]);
+        if (session) {
+            fetchRoverData();
+        }
+    }, [supabase, session]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -154,14 +139,14 @@ export default function UserPlanetPage() {
         return <p>Loading data...</p>;
     };
 
-    if (!userProfile || !userPlanet) {
+    if (!userPlanet) {
         return <p>Data not found</p>;
     };
-
+    
     return (
         <>
-            <Header planetName={userPlanet.content} />
-                <div className="w-full">
+            <Header planetName={userPlanet?.content} />
+            <div className="w-full">
                 <div className="mx-auto max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4" style={{
                     gridTemplateAreas: `
                     "block36 block37"
@@ -174,10 +159,10 @@ export default function UserPlanetPage() {
                         const isBlock36or37 = index + 1 === 36 || index + 1 === 37;
                         const isBlock51or54 = index + 1 === 51 || index + 1 === 54;
                         const isCombinedBlock = isBlock36or37 && index + 1 === 36;
-
+    
                         return (
                             <div key={`block-${index}`} className={`flex items-center justify-center p-6 border border-gray-200 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
-                                {isCombinedBlock && <UserPlanets userPlanet={userPlanet} />}
+                                {isCombinedBlock && activePlanet && <UserPlanets userPlanet={activePlanet} />}
                                 {isBlock51or54 && roverData.length > 0 && roverData.map((rover, roverIndex) => {
                                     if (roverIndex === 0 && roverData.length >= 2) return <p>Null</p>; // Skip rendering the first rover if there are two or more items
                                     return (
@@ -193,7 +178,8 @@ export default function UserPlanetPage() {
                 </div>
             </div>
         </>
-    );    
+    );
+     
 };
 
 // Background image & other stats, structure-based block for more info/title tag // For now, users only have one planet
