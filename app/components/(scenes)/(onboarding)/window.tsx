@@ -8,8 +8,8 @@ import { TelescopeClassification } from "@/app/components/(structures)/Telescope
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ProgressBar from "../(missions)/ProgressBar";
 import DeployRooversInitial from "../roovers/deployAndReturn";
+import { Header } from "@/app/components/sections/header";
 import GeneratedStarterPlanet from "../../(anomalies)/(planets)/generated";
-import { Header } from "../../sections/Header";
 
 interface Mission {
   id: number;

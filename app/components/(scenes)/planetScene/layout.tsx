@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, CSSProperties } from "react";
-import { Header } from "../../sections/Header";
+import { Header } from "@/app/components/sections/header";
 import { Essendonitis, background2, background3, callme, mining } from "@/constants/backgrounds";
 
 interface PlanetViewLayoutProps {
