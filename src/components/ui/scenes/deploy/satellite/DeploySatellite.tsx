@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState, useCallback } from "react"
+import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import { useRouter } from "next/navigation"
@@ -22,7 +22,7 @@ type LocalAnomaly = Anomaly & { dbData: DatabaseAnomaly };
 function seededRandom1(seed: number, salt: number = 0) {
   let x = Math.sin(seed + salt) * 1000;
   return x - Math.floor(x);
-}
+};
 
 function generateAnomalyFromDB(dbAnomaly: DatabaseAnomaly, sectorX: number, sectorY: number): LocalAnomaly {
   const seed = dbAnomaly.id + sectorX * 1000 + sectorY;

@@ -6,13 +6,13 @@ import { useSessionContext } from "@supabase/auth-helpers-react"
 
 // Mission imports
 import PlanetHuntersSteps from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetHunters"
-import { StarterSunspot } from "@/src/components/research/projects/Telescopes/Sunspots"
-import { StarterTelescopeTess, TelescopeTessWithId } from "@/src/components/research/projects/Telescopes/Transiting"
+import { StarterSunspot } from "@/src/components/projects/Telescopes/Sunspots"
+import { StarterTelescopeTess, TelescopeTessWithId } from "@/src/components/projects/Telescopes/Transiting"
 import GameNavbar from "@/src/components/layout/Tes"
 import PlanetTypeCommentForm from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetType"
 import VotePlanetClassifications from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PHVote"
 import PlanetGenerator from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator"
-import { DailyMinorPlanetWithId } from "@/src/components/research/projects/Telescopes/DailyMinorPlanet"
+import { DailyMinorPlanetWithId } from "@/src/components/projects/Telescopes/DailyMinorPlanet"
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
 
 export default function TelescopeClassifyPage() {

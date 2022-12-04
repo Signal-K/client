@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
-import ClassificationForm from "@/src/components/research/projects/(classifications)/PostForm";
+import ClassificationForm from "../(classifications)/PostForm";
 import { MapPinIcon } from "@/src/components/ui/icons/MapPin";
 import Spinner from "@/src/components/ui/Spinner";
 

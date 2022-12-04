@@ -3,10 +3,10 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useParams } from "next/navigation";
 import { BarChartBigIcon, GlassWater, Guitar, HelpCircle, PenBoxIcon, RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
 import MissionShell from "../../BasePlate";
-import { DailyMinorPlanetWithId, StarterDailyMinorPlanet } from "@/src/components/research/projects/Telescopes/DailyMinorPlanet";
+import { DailyMinorPlanetWithId, StarterDailyMinorPlanet } from "@/src/components/projects/Telescopes/DailyMinorPlanet";
 import VoteDMPClassifications from "./DMPVote";
 import DMPGenerator from "./AsteroidMaker";
-import { ActiveAsteroidWithId } from "@/src/components/research/projects/Telescopes/ActiveAsteroids";
+import { ActiveAsteroidWithId } from "@/src/components/projects/Telescopes/ActiveAsteroids";
 
 interface Mission {
   id: number;

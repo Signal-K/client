@@ -6,7 +6,7 @@ import GameNavbar from "@/src/components/layout/Tes";
 import AI4M from "@/src/components/deployment/missions/structures/Astronomers/SatellitePhotos/AI4M/AIForMars";
 import PlanetFour from "@/src/components/deployment/missions/structures/Astronomers/SatellitePhotos/P4/PlanetFour";
 import React, { useEffect, useState } from "react";
-import { AiForMarsProjectWithID } from "@/src/components/research/projects/Auto/AI4Mars";
+import { AiForMarsProjectWithID } from "@/src/components/projects/Auto/AI4Mars";
 import { RoverBackground } from "@/src/components/classification/telescope/rover-background";
 
 export default function SeiscamProjectRoute() {

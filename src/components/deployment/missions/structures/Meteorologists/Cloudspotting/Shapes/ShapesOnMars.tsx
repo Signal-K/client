@@ -4,7 +4,7 @@ import MissionShell from "../../../BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 // import { CloudspottingShapesWrapper } from "@/src/components/research/projects/Lidar/CloudspottingOnMarsShapes";
 import { Mission } from "../../../Astronomers/SatellitePhotos/AI4M/AIForMars";
-import { StarterCoMShapes } from "@/src/components/research/projects/Lidar/CloudspottingOnMarsShapes";
+import { StarterCoMShapes } from "@/src/components/projects/Lidar/CloudspottingOnMarsShapes";
 
 interface MissionPoints {
     [key: number]: number;

@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "@/src/components/deployment/missions/structures/BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, Paintbrush2Icon, PaintBucket, Vote } from "lucide-react";
-import { CloudspottingOnMarsWithId, StarterLidar } from "@/src/components/research/projects/Lidar/Clouds";
+import { CloudspottingOnMarsWithId } from "@/src/components/projects/Lidar/Clouds";
 import VoteCoMClassifications from "./CoMVote";
 import CloudClassificationGenerator from "./CloudMaker";
-import { CloudspottingOnMarsTutorial } from "@/src/components/research/projects/Lidar/cloudspottingOnMars";
-import { StarterCoMShapes } from "@/src/components/research/projects/Lidar/CloudspottingOnMarsShapes";
+import { CloudspottingOnMarsTutorial } from "@/src/components/projects/Lidar/cloudspottingOnMars";
+import { StarterCoMShapes } from "@/src/components/projects/Lidar/CloudspottingOnMarsShapes";
 // import { CloudspottingShapesWrapper } from "@/src/components/research/projects/Lidar/CloudspottingOnMarsShapes";
 
 interface Mission {

@@ -6,9 +6,9 @@ import { useSessionContext } from "@supabase/auth-helpers-react";
 
 import GameNavbar from "@/src/components/layout/Tes";
 import PlanetHuntersSteps from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetHunters";
-import { TelescopeDiskDetector } from "@/src/components/research/projects/Telescopes/DiskDetector";
+import { TelescopeDiskDetector } from "@/src/components/projects/Telescopes/DiskDetector";
 import DailyMinorPlanetMissions from "@/src/components/deployment/missions/structures/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
-import SunspotSteps from "@/src/components/research/projects/Telescopes/Sunspots/SunspotShell";
+import SunspotSteps from "@/src/components/projects/Telescopes/Sunspots/SunspotShell";
 
 export default function TelescopeProjectRoute() {
   const params = useParams();

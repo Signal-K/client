@@ -3,7 +3,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../../BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 import VoteP4Classifications from "./P4Vote";
-import { PlanetFourProject, StarterPlanetFour } from "@/src/components/research/projects/Satellite/PlanetFour";
+import { PlanetFourProject, StarterPlanetFour } from "@/src/components/projects/Satellite/PlanetFour";
 
 interface Mission {
     id: number;

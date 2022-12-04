@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/src/core/context/ActivePlanet'; 
 import ImageAnnotator from '../(classifications)/Annotating/Annotator';
-import { planetClassificationConfig } from '@/src/components/research/projects/(classifications)/FormConfigurations';
 // import PreferredTerrestrialClassifications from '@/src/components/deployment/missions/structures/PickPlanet';
 import { Button } from "@/src/components/ui/button";
 import { useRouter } from 'next/navigation';
