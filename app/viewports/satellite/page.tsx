@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import GameNavbar from "@/src/components/layout/Tes";
 import { Dialog, DialogContent } from "@/src/components/ui/dialog";
-import SatellitePosition from "@/src/components/ui/scenes/deploy/satellite/SatellitePosition";
+import SatellitePosition from "@/src/components/scenes/deploy/satellite/SatellitePosition";
 import { usePageData } from "@/hooks/usePageData";
 
 type PageSatellite = {

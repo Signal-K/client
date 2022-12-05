@@ -2,8 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
-import SatelliteCard from "./SatelliteCard";
 import Section from "@/src/components/sections/Section";
 import WeatherSatelliteMissionType from "./WeatherSatelliteMissionType";
 import SatelliteProgressBar from "./SatelliteProgressBar";
@@ -15,8 +13,6 @@ import {
   getTimeSinceLastAction,
 } from "./satelliteTimeUtils";
 import { calculateSatellitePosition } from "./satellitePositionUtils";
-import { Button } from "@/src/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/src/components/ui/dialog";
 import { PlanetGeneratorMinimal } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator";
 import { useRouter } from "next/navigation";
 

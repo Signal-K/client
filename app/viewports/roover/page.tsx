@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import GameNavbar from "@/src/components/layout/Tes"
 import { Dialog, DialogContent } from "@/src/components/ui/dialog"
-import RoverViewportSection from "@/src/components/ui/scenes/deploy/Rover/RoverSection"
+import RoverViewportSection from "@/src/components/scenes/deploy/Rover/RoverSection"
 
 export default function RoverViewportExpandedPage() {
     const router = useRouter();

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import GameNavbar from "@/src/components/layout/Tes";
-import DeploySatelliteViewport from "@/src/components/ui/scenes/deploy/satellite/DeploySatellite";
+import DeploySatelliteViewport from "@/src/components/scenes/deploy/satellite/DeploySatellite";
 
 export default function SatelliteDeployPage() {
     const router = useRouter();

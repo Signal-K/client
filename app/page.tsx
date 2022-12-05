@@ -18,28 +18,17 @@ import AnonymousUserPrompt from "@/src/components/profile/auth/AnonymousUserProm
 
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
-import NextStepsSection from "@/src/components/profile/dashboard/NextStepsSection";
-// import TipsGuidanceSection from "@/src/components/profile/dashboard/TipsGuidanceSection";
-import ResearchProgressSection from "@/src/components/research/ResearchProgressSection";
-import StructuresEquipmentSection from "@/src/components/deployment/structures/StructuresEquipmentSection";
-import MilestonesSection from "@/src/components/deployment/missions/MilestonesSection";
-import ProfileSetupSection from "@/src/components/profile/setup/ProfileSetupSection";
-import CompleteStructuresSection from "@/src/components/deployment/structures/CompleteStructuresSection";
 import ProfileSetupRequired from "@/src/components/profile/setup/ProfileSetupRequired";
-import LegacyTipsPanel from "@/src/components/profile/dashboard/LegacyTipsPanel";
-import LegacyMilestonesSection from "@/src/components/profile/dashboard/LegacyMilestonesSection";
-import RecentDiscoveries from "@/src/components/social/activity/RecentDiscoveries";
 import NotificationSubscribeButton from "@/src/components/providers/NotificationSubscribeButton";
 
 // Import custom hooks
 import { usePageData } from "@/hooks/usePageData";
-import { useSatelliteManagement } from "@/hooks/useSatelliteManagement";
 import { useNPSManagement } from "@/hooks/useNPSManagement";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
-import SatellitePosition from "@/src/components/ui/scenes/deploy/satellite/SatellitePosition";
-import SolarHealth from "@/src/components/ui/scenes/deploy/solar/SolarHealth";
-import TelescopeViewportSection from "@/src/components/ui/scenes/deploy/Telescope/TelescopeSection";
-import RoverViewportSection from "@/src/components/ui/scenes/deploy/Rover/RoverSection";
+import SatellitePosition from "@/src/components/scenes/deploy/satellite/SatellitePosition";
+import SolarHealth from "@/src/components/scenes/deploy/solar/SolarHealth";
+import TelescopeViewportSection from "@/src/components/scenes/deploy/Telescope/TelescopeSection";
+import RoverViewportSection from "@/src/components/scenes/deploy/Rover/RoverSection";
 import ViewportSkillTree from "@/src/components/research/section/skillTreeSection";
 
 type PageSatellite = {
@@ -57,13 +46,7 @@ export default function ActivityPage() {
   const session = useSession();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [landmarksExpanded, setLandmarksExpanded] = useState(false);
-  const [showTipsPanel, setShowTipsPanel] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  
-  // Additional state for the new components
-  const [weeklyMissions, setWeeklyMissions] = useState<any[]>([]);
-  const [userMissionsLoading, setUserMissionsLoading] = useState(false);
-  const [profileCreated, setProfileCreated] = useState(false);
 
   // Custom hooks for data management
   const {
@@ -72,10 +55,6 @@ export default function ActivityPage() {
     profile,
     classifications,
     otherClassifications,
-    incompletePlanet,
-    planetTargets,
-    visibleStructures,
-    loading,
   } = usePageData();
 
   const { showNpsModal, handleCloseNps } = useNPSManagement();

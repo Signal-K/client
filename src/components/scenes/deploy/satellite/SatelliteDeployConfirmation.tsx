@@ -1,7 +1,7 @@
 import React from "react";
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "../../../card";
-import { Badge } from "../../../badge";
-import { Button } from "../../../button";
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/src/components/ui/card";
+import { Button } from "@/src/components/ui/button";
+import { Badge } from "@/src/components/ui/badge";
 import { CheckCircle, Target, Telescope, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 

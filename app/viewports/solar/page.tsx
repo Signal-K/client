@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import GameNavbar from "@/src/components/layout/Tes"
 import { Dialog, DialogContent } from "@/src/components/ui/dialog"
-import SolarHealth from "@/src/components/ui/scenes/deploy/solar/SolarHealth"
+import SolarHealth from "@/src/components/scenes/deploy/solar/SolarHealth"
 
 export default function SolarHealthViewportExpandedPage() {
     const router = useRouter();

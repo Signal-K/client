@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar"
-import DeployTelescopeViewport from "@/src/components/ui/scenes/deploy/TelescopeViewportRange"
+import DeployTelescopeViewport from "@/src/components/scenes/deploy/TelescopeViewportRange"
 import { Button } from "@/src/components/ui/button"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import { ArrowLeft, User, Sun, Moon } from "lucide-react"

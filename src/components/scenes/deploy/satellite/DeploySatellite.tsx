@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import type { Anomaly, Star } from "@/types/Structures/telescope"
 import { DatabaseAnomaly } from "../TelescopeViewportRange"
 import { generateSectorName, generateStars } from "@/src/components/classification/telescope/utils/sector-utils"
-import { Button } from "../../../button"
+import { Button } from "@/src/components/ui/button"
 import SatelliteDeployConfirmation from "./SatelliteDeployConfirmation";
 import InvestigationModeSelect from "./InvestigationModeSelect";
 import SatelliteSidebar from "./SatelliteSidebar";

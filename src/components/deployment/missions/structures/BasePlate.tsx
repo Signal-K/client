@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/src/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { EarthViewLayout } from "@/src/components/ui/scenes/planetScene/layout";
+import { EarthViewLayout } from "@/src/components/scenes/planetScene/layout";
 import Navbar from "@/src/components/layout/Navbar";
 import Link from "next/link";
 import ProfileSetupForm from "@/src/components/profile/setup/ProfileSetup";
