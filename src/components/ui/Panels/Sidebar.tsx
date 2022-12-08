@@ -1,4 +1,5 @@
 "use client"
+import TotalPoints from "@/src/components/deployment/missions/structures/Stardust/Total";
 
 import type React from "react"
 import { useState, useEffect } from "react"
@@ -65,7 +66,9 @@ export function SectionSidebar() {
     { name: "Research", icon: Search, href: "/research", color: "text-primary" },
     { name: "Inventory", icon: Package, href: "/inventory/classifications", color: "text-secondary" },
     { name: "Feed", icon: Rss, href: "/feed", color: "text-chart-1" },
-  ]
+  ];
+
+  const Link = require("next/link").default;
 
   const toolStatuses: ToolStatus[] = [
     {
@@ -141,9 +144,20 @@ export function SectionSidebar() {
     <div className={cn(sidebarClass, "mt-[60px]")}> 
       {/* Header with Minimise/Expand Button and Mission Control text */}
       <div className="flex items-center justify-between px-4 py-5 border-b border-border/50 bg-card/95 sticky top-0 z-50">
-        {!isCollapsed && (
-          <h2 className="text-lg font-mono font-semibold text-foreground">MISSION CONTROL</h2>
-        )}
+        <div className="flex items-center gap-2">
+          {!isCollapsed && (
+            <h2 className="text-lg font-mono font-semibold text-foreground">MISSION CONTROL</h2>
+          )}
+          {/* Stardust display */}
+          {!isCollapsed && (
+            <div className="ml-4 flex items-center gap-1 px-3 py-1 rounded-lg bg-[#232a36]/80">
+              <span className="text-xs font-mono text-[#4cc9f0]">Stardust:</span>
+              <span className="font-bold text-[#4cc9f0] text-base">
+                <TotalPoints />
+              </span>
+            </div>
+          )}
+        </div>
         <Button
           variant="ghost"
           size="sm"
@@ -162,7 +176,7 @@ export function SectionSidebar() {
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+  <div className="flex-1 overflow-y-auto">
         {/* Navigation Links */}
         <div className="p-4">
           {!isCollapsed && (
@@ -172,14 +186,17 @@ export function SectionSidebar() {
           )}
           <div className="space-y-2">
             {navigationItems.map((item) => (
-              <Button
-                key={item.name}
-                variant="ghost"
-                className={cn("w-full justify-start h-10 font-mono hover:bg-accent/20", isCollapsed ? "px-2" : "px-3")}
-              >
-                <item.icon className={cn("h-4 w-4", item.color)} />
-                {!isCollapsed && <span className="ml-3 text-sm">{item.name}</span>}
-              </Button>
+              <Link href={item.href} key={item.name} passHref legacyBehavior>
+                <span>
+                  <Button
+                    variant="ghost"
+                    className={cn("w-full justify-start h-10 font-mono hover:bg-accent/20", isCollapsed ? "px-2" : "px-3")}
+                  >
+                    <item.icon className={cn("h-4 w-4", item.color)} />
+                    {!isCollapsed && <span className="ml-3 text-sm">{item.name}</span>}
+                  </Button>
+                </span>
+              </Link>
             ))}
           </div>
         </div>
