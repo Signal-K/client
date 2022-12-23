@@ -3,7 +3,6 @@
 import Section from "@/src/components/sections/Section";
 import { Anomaly } from "@/types/Structures/telescope";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useRouter } from "next/router"
 import { useEffect, useState } from "react";
 import { Button } from "@/src/components/ui/button";
 import { SciFiAnomalyComponent } from "@/src/components/classification/viewport/sci-fi-anomaly-component";
@@ -23,7 +22,10 @@ export default function RoverViewportSection() {
     const [hoveredWaypoint, setHoveredWaypoint] = useState<string | null>(null);
     const [hoveredAnomaly, setHoveredAnomaly] = useState<string | null>(null);
     const [isMobile, setIsMobile] = useState(false);
-    const [routeProgress, setRouteProgress] = useState<string>('');
+    const [classifications, setClassifications] = useState<any[]>([]);
+    const [classificationProgress, setClassificationProgress] = useState<string>('');
+    const [roverStatus, setRoverStatus] = useState<string>('');
+    const [roverPos, setRoverPos] = useState({x: 0, y: 0, angle: 0});
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -35,6 +37,7 @@ export default function RoverViewportSection() {
     // Check for linked_anomalies of relevant type
     useEffect(() => {
         async function fetchLinkedAnomaliesAndWaypoints() {
+            const now = new Date();
             if (!session) {
                 return;
             }
@@ -50,8 +53,8 @@ export default function RoverViewportSection() {
 
             // Map user's linked_anomalies to their anomalies[id] counterpart
             const mapped = (linked || []).map((row: any) => ({
-                id: `db-${row.anomaly_id}`,
                 ...row.anomaly,
+                id: `db-${row.anomaly_id}`,
                 x: Math.random() * 80 + 10,
                 y: Math.random() * 80 + 10,
                 size: 1,
@@ -70,7 +73,6 @@ export default function RoverViewportSection() {
             // Fetch waypoints/routes if rover deployed
             if (linked && linked.length > 0) {
                 // Calculate cutoff: last Sunday 00:01 AEST, which is last Saturday 14:01 UTC
-                const now = new Date();
                 const utcDay = now.getUTCDay(); // 0=Sun, 6=Sat
                 const daysToLastSaturday = utcDay === 6 ? 0 : (utcDay + 1) % 7;
                 const cutoff = new Date(now);
@@ -83,21 +85,143 @@ export default function RoverViewportSection() {
                     .eq("author", session.user.id)
                     .gte("timestamp", cutoff.toISOString())
                     .order("timestamp", { ascending: true });
-                setWaypoints(routes || []);
 
-                // Compute progress for latest route
                 if (routes && routes.length > 0) {
                     const latestRoute = routes[routes.length - 1];
                     const config = latestRoute.routeConfiguration;
+
+                    if (!config || !config.anomalies || !config.waypoints) {
+                        setWaypoints([]);
+                        return;
+                    }
+                    setWaypoints(routes);
+
+                    // Determine which anomalies from the route have been classified
+                    const routeAnomalies = new Set(config.anomalies);
+                    const linkedAnomalyIds = new Set(linked.map(l => l.anomaly_id));
+                    const classifiedAnomalyIds = new Set(
+                        [...routeAnomalies].filter(id => !linkedAnomalyIds.has(id))
+                    );
+
+                    let classData = [];
+                    if (classifiedAnomalyIds.size > 0) {
+                        const anomalyIdsToFetch = [...classifiedAnomalyIds];
+                        console.log("Querying classifications for author:", session.user.id, "and anomaly IDs:", anomalyIdsToFetch);
+                        const { data, error } = await supabase
+                            .from("classifications")
+                            .select("*")
+                            .eq("author", session.user.id)
+                            .in("anomaly", anomalyIdsToFetch);
+                        
+                        if (error) {
+                            console.error("Error fetching classifications:", error);
+                        }
+                        if (data) {
+                            classData = data;
+                        }
+                    }
+                    
+                    const classifications = classData;
+                    setClassifications(classifications);
+
+                    console.log("Route Anomalies:", [...routeAnomalies]);
+                    console.log("Linked (unclassified) Anomaly IDs:", [...linkedAnomalyIds]);
+                    console.log("Classified Anomaly IDs:", [...classifiedAnomalyIds]);
+                    console.log("Fetched Classifications:", classifications);
+
+                    // Compute classification progress
                     if (config && config.anomalies) {
                         const total = config.anomalies.length;
-                        const classified = config.anomalies.filter((id: number) => !linkedIds.has(id)).length;
-                        setRouteProgress(`Anomalies classified: ${classified}/${total}`);
+                        setClassificationProgress(`Anomalies classified: ${classifiedAnomalyIds.size}/${total}`);
                     } else {
-                        setRouteProgress('');
+                        setClassificationProgress('');
                     }
+
+                    // Compute rover position and status
+                    const routeTime = new Date(latestRoute.timestamp);
+                    const base = { x: 1, y: 95 };
+                    const refuel = { x: 99, y: 95 };
+                    let roverX = base.x;
+                    let roverY = base.y;
+                    let angle = 0;
+                    let status = '';
+
+                    for (let i = 0; i <= config.anomalies.length; i++) {
+                        if (i === 0) {
+                            // from base to wp0
+                            const arrival = new Date(routeTime.getTime() + 60 * 60 * 1000);
+                            if (now < arrival) {
+                                const progress = (now.getTime() - routeTime.getTime()) / (60 * 60 * 1000);
+                                roverX = base.x + progress * (config.waypoints[0].x - base.x);
+                                roverY = base.y + progress * (config.waypoints[0].y - base.y);
+                                angle = Math.atan2(config.waypoints[0].y - base.y, config.waypoints[0].x - base.x) * 180 / Math.PI;
+                                status = `${Math.ceil((arrival.getTime() - now.getTime()) / 60000)} min until Waypoint 1`;
+                                break;
+                            } else {
+                                // at wp0
+                                roverX = config.waypoints[0].x;
+                                roverY = config.waypoints[0].y;
+                                const isWp0AnomalyClassified = classifiedAnomalyIds.has(config.anomalies[0]);
+                                if (!isWp0AnomalyClassified) {
+                                    status = 'Waiting for classification of Waypoint 1';
+                                    angle = Math.atan2(config.waypoints[0].y - base.y, config.waypoints[0].x - base.x) * 180 / Math.PI;
+                                    break;
+                                }
+                            }
+                        } else {
+                            // from wp i-1 to wp i or refuel
+                            const prevWp = config.waypoints[i-1];
+                            const nextWp = i < config.waypoints.length ? config.waypoints[i] : refuel;
+                            
+                            // Find the classification for the previous waypoint's anomaly
+                            const prevAnomalyId = config.anomalies[i-1];
+                            const classif = classifications.find(c => c.anomaly === prevAnomalyId);
+                            
+                            if (!classif) { // This means the anomaly is classified (not in linked_anomalies) but we don't have its classification data yet.
+                                // This can happen if the classification fetch hasn't completed or returned the data yet.
+                                // We should wait at the previous waypoint.
+                                roverX = prevWp.x;
+                                roverY = prevWp.y;
+                                status = `Waiting for classification of Waypoint ${i}`;
+                                angle = Math.atan2(prevWp.y - (i > 1 ? config.waypoints[i-2].y : base.y), prevWp.x - (i > 1 ? config.waypoints[i-2].x : base.x)) * 180 / Math.PI;
+                                break;
+                            }
+
+                            const arrival = new Date(new Date(classif.created_at).getTime() + 60 * 60 * 1000);
+                            if (now < arrival) {
+                                const progress = (now.getTime() - new Date(classif.created_at).getTime()) / (60 * 60 * 1000);
+                                roverX = prevWp.x + progress * (nextWp.x - prevWp.x);
+                                roverY = prevWp.y + progress * (nextWp.y - prevWp.y);
+                                angle = Math.atan2(nextWp.y - prevWp.y, nextWp.x - prevWp.x) * 180 / Math.PI;
+                                const wpLabel = i < config.waypoints.length ? `Waypoint ${i+1}` : 'Refueling Station';
+                                status = `${Math.ceil((arrival.getTime() - now.getTime()) / 60000)} min until ${wpLabel}`;
+                                break;
+                            } else {
+                                if (i < config.waypoints.length) {
+                                    // at wp i
+                                    roverX = config.waypoints[i].x;
+                                    roverY = config.waypoints[i].y;
+                                    const isNextAnomalyClassified = classifiedAnomalyIds.has(config.anomalies[i]);
+                                    if (!isNextAnomalyClassified) {
+                                        status = `Waiting for classification of Waypoint ${i+1}`;
+                                        angle = Math.atan2(config.waypoints[i].y - config.waypoints[i-1].y, config.waypoints[i].x - config.waypoints[i-1].x) * 180 / Math.PI;
+                                        break;
+                                    }
+                                } else {
+                                    // at refuel
+                                    roverX = refuel.x;
+                                    roverY = refuel.y;
+                                    status = 'At refueling station';
+                                    angle = Math.atan2(refuel.y - config.waypoints[i-1].y, refuel.x - config.waypoints[i-1].x) * 180 / Math.PI;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    setRoverPos({x: roverX, y: roverY, angle});
+                    setRoverStatus(status);
                 } else {
-                    setRouteProgress('');
+                    setWaypoints([]);
                 }
             } else {
                 setWaypoints([]);
@@ -167,8 +291,11 @@ export default function RoverViewportSection() {
                             {waypoints.map((route) => {
                                 const config = route.routeConfiguration;
                                 if (!config || !config.waypoints || config.waypoints.length < 2) return null;
-                                return config.waypoints.slice(1).map((wp: { x: number; y: number }, idx: number) => {
-                                    const prev = config.waypoints[idx];
+                                const base = { x: 1, y: 95 };
+                                const refuel = { x: 99, y: 95 };
+                                const extendedWaypoints = [base, ...config.waypoints, refuel];
+                                return extendedWaypoints.slice(1).map((wp: { x: number; y: number }, idx: number) => {
+                                    const prev = extendedWaypoints[idx];
                                     return (
                                         <line
                                             key={`track-${route.id}-${idx}`}
@@ -185,96 +312,121 @@ export default function RoverViewportSection() {
                                 });
                             })}
                         </svg>
-                        {/* Render rover just after first waypoint if available */}
-                        {waypoints.map((route) => {
-                            const config = route.routeConfiguration;
-                            if (!config || !config.waypoints || config.waypoints.length < 2) return null;
-                            const wp0 = config.waypoints[0];
-                            const wp1 = config.waypoints[1];
-                            const angle = Math.atan2(wp1.y - wp0.y, wp1.x - wp0.x) * 180 / Math.PI;
-                            // Position rover 10% along the line from wp0 to wp1
-                            const roverX = wp0.x + 0.1 * (wp1.x - wp0.x);
-                            const roverY = wp0.y + 0.1 * (wp1.y - wp0.y);
-                            return (
-                                <div
-                                    key={`rover-${route.id}`}
-                                    className="absolute"
-                                    style={{
-                                        left: `${roverX}%`,
-                                        top: `${roverY}%`,
-                                        transform: `translate(-50%, -50%) rotate(${angle}deg)`,
-                                        zIndex: 25,
-                                    }}
-                                >
-                                    <svg width="50" height="25" viewBox="0 0 50 25">
-                                        {/* Body */}
-                                        <rect x="8" y="8" width="34" height="12" fill="#ff3c1a" rx="3" />
-                                        {/* Solar panels */}
-                                        <rect x="2" y="5" width="10" height="18" fill="#18dda1" rx="1" />
-                                        <rect x="38" y="5" width="10" height="18" fill="#18dda1" rx="1" />
-                                        {/* Wheels */}
-                                        <circle cx="12" cy="22" r="4" fill="#333" stroke="#666" strokeWidth="1" />
-                                        <circle cx="25" cy="22" r="4" fill="#333" stroke="#666" strokeWidth="1" />
-                                        <circle cx="38" cy="22" r="4" fill="#333" stroke="#666" strokeWidth="1" />
-                                        {/* Wheel details */}
-                                        <circle cx="12" cy="22" r="1" fill="#666" />
-                                        <circle cx="25" cy="22" r="1" fill="#666" />
-                                        <circle cx="38" cy="22" r="1" fill="#666" />
-                                        {/* Antenna */}
-                                        <line x1="40" y1="8" x2="45" y2="3" stroke="#fff" strokeWidth="2" />
-                                        <circle cx="45" cy="3" r="1" fill="#ff3c1a" />
-                                        {/* Headlights */}
-                                        <circle cx="8" cy="10" r="1.5" fill="#ffff00" />
-                                        <circle cx="8" cy="15" r="1.5" fill="#ffff00" />
-                                        {/* Details on body */}
-                                        <rect x="10" y="10" width="6" height="2" fill="#fff" />
-                                        <rect x="18" y="10" width="6" height="2" fill="#fff" />
-                                        <rect x="26" y="10" width="6" height="2" fill="#fff" />
-                                        {/* Simple animation: pulse */}
-                                        <animateTransform
-                                            attributeName="transform"
-                                            type="scale"
-                                            values="1;1.05;1"
-                                            dur="2s"
-                                            repeatCount="indefinite"
-                                        />
-                                    </svg>
-                                </div>
-                            );
-                        })}
+                        {/* Render rover just after base waypoint if available */}
+                                                {/* Render rover */}
+                        <div
+                            className="absolute"
+                            style={{
+                                left: `${roverPos.x}%`,
+                                top: `${roverPos.y}%`,
+                                transform: `translate(-50%, -50%) rotate(${roverPos.angle}deg)`,
+                                zIndex: 25,
+                            }}
+                        >
+                            <svg width="50" height="25" viewBox="0 0 50 25">
+                                {/* Body */}
+                                <rect x="8" y="8" width="34" height="12" fill="#ff3c1a" rx="3" />
+                                {/* Solar panels */}
+                                <rect x="2" y="5" width="10" height="18" fill="#18dda1" rx="1" />
+                                <rect x="38" y="5" width="10" height="18" fill="#18dda1" rx="1" />
+                                {/* Wheels */}
+                                <circle cx="12" cy="22" r="4" fill="#333" stroke="#666" strokeWidth="1" />
+                                <circle cx="25" cy="22" r="4" fill="#333" stroke="#666" strokeWidth="1" />
+                                <circle cx="38" cy="22" r="4" fill="#333" stroke="#666" strokeWidth="1" />
+                                {/* Wheel details */}
+                                <circle cx="12" cy="22" r="1" fill="#666" />
+                                <circle cx="25" cy="22" r="1" fill="#666" />
+                                <circle cx="38" cy="22" r="1" fill="#666" />
+                                {/* Antenna */}
+                                <line x1="40" y1="8" x2="45" y2="3" stroke="#fff" strokeWidth="2" />
+                                <circle cx="45" cy="3" r="1" fill="#ff3c1a" />
+                                {/* Headlights */}
+                                <circle cx="8" cy="10" r="1.5" fill="#ffff00" />
+                                <circle cx="8" cy="15" r="1.5" fill="#ffff00" />
+                                {/* Details on body */}
+                                <rect x="10" y="10" width="6" height="2" fill="#fff" />
+                                <rect x="18" y="10" width="6" height="2" fill="#fff" />
+                                <rect x="26" y="10" width="6" height="2" fill="#fff" />
+                                {/* Simple animation: pulse */}
+                                <animateTransform
+                                    attributeName="transform"
+                                    type="scale"
+                                    values="1;1.05;1"
+                                    dur="2s"
+                                    repeatCount="indefinite"
+                                />
+                            </svg>
+                        </div>
                         {/* Render waypoints if available */}
                         {waypoints.map((route) => {
                             const config = route.routeConfiguration;
                             if (!config || !config.waypoints) return null;
-                            return config.waypoints.map((wp: { x: number; y: number }, idx: number) => (
-                                <div
-                                    key={`${route.id}-${idx}`}
-                                    className="absolute"
-                                    style={{
-                                        left: `${wp.x}%`,
-                                        top: `${wp.y}%`,
-                                    }}
-                                    onMouseEnter={() => setHoveredWaypoint(`${route.id}-${idx}`)}
-                                    onMouseLeave={() => setHoveredWaypoint(null)}
-                                >
+                            const base = { x: 1, y: 95, label: 'Base' };
+                            const refuel = { x: 99, y: 95, label: 'Refueling Station' };
+                            
+                            const routeAnomalies = new Set(config.anomalies);
+                            const linkedAnomalyIds = new Set(linkedAnomalies.map(l => parseInt(l.id.split('-')[1])));
+                            const classifiedAnomalyIds = new Set(
+                                [...routeAnomalies].filter(id => !linkedAnomalyIds.has(id as number))
+                            );
+
+                            const waypointsWithClassifications = config.waypoints.map((wp: { x: number; y: number }, idx: number) => {
+                                const anomalyId = config.anomalies[idx];
+                                if (classifiedAnomalyIds.has(anomalyId)) {
+                                    const classification = classifications.find(c => c.anomaly === anomalyId);
+                                    return { 
+                                        ...wp, 
+                                        label: `Waypoint ${idx + 1}`,
+                                        classificationId: classification?.id,
+                                        classificationTime: classification?.created_at
+                                    };
+                                }
+                                return { ...wp, label: `Waypoint ${idx + 1}` };
+                            });
+
+                            const extendedWaypoints = [base, ...waypointsWithClassifications, refuel];
+                            
+                            return extendedWaypoints.map((wp: { x: number; y: number; label: string; classificationId?: number; classificationTime?: string }, idx: number) => {
+                                const isSpecial = idx === 0 || idx === extendedWaypoints.length - 1;
+                                return (
                                     <div
-                                        className="w-3 h-3 bg-yellow-400 rounded-full border-2 border-white shadow"
+                                        key={`${route.id}-${idx}`}
+                                        className="absolute"
                                         style={{
-                                            zIndex: 20,
+                                            left: `${wp.x}%`,
+                                            top: `${wp.y}%`,
                                         }}
-                                        title={`Waypoint ${idx + 1}`}
-                                    />
-                                    {(hoveredWaypoint === `${route.id}-${idx}` || isMobile) && (
-                                        <span className="absolute text-white text-xs bg-black/50 px-1 rounded" style={{ top: '-20px', left: '50%', transform: 'translateX(-50%)' }}>
-                                            Waypoint {idx + 1}
-                                        </span>
-                                    )}
-                                </div>
-                            ));
+                                        onMouseEnter={() => setHoveredWaypoint(`${route.id}-${idx}`)}
+                                        onMouseLeave={() => setHoveredWaypoint(null)}
+                                    >
+                                        <div
+                                            className={`${isSpecial ? 'w-4 h-4 bg-blue-400' : 'w-3 h-3 bg-yellow-400'} rounded-full border-2 border-white shadow`}
+                                            style={{
+                                                zIndex: 20,
+                                            }}
+                                            title={wp.label}
+                                        />
+                                        {(hoveredWaypoint === `${route.id}-${idx}` || isMobile) && (
+                                            <span className="absolute text-white text-xs bg-black/50 px-1 rounded" style={{ top: '-20px', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}>
+                                                {wp.label}
+                                                {wp.classificationId && (
+                                                    <>
+                                                        <br />
+                                                        Classified: {new Date(wp.classificationTime!).toLocaleString()}
+                                                        <br />
+                                                        ID: {wp.classificationId}
+                                                    </>
+                                                )}
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            });
                         })}
-                        {routeProgress && (
-                            <div className="absolute bottom-0 right-0 text-white text-xs bg-black/50 p-2 rounded m-2">
-                                {routeProgress}
+                        {roverStatus && (
+                            <div className="fixed bottom-0 right-0 text-white text-xs bg-black/50 p-2 rounded m-2 z-50">
+                                <div>{roverStatus}</div>
+                                {classificationProgress && <div>{classificationProgress}</div>}
                             </div>
                         )}
                     </div>
