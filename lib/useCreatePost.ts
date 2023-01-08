@@ -1,8 +1,47 @@
 import { useMutation } from "@tanstack/react-query";
+import { useSDK } from "@thirdweb-dev/react";
+import { useCreatePostTypedDataMutation } from "../graphql/generated";
+import useLensUser from "./auth/useLensUser";
+import { signTypedDataWithOmittedTypename } from "./helpers";
 
-type CreatePostArgs = { // Consider adding more fields as described https://www.notion.so/skinetics/Lens-posting-a07f0e9c243249c0a3517e4160874137#1aa987be357644e596b1bd6b6cba88f9
-    image: File;
-    title: string;
-    description: string;
-    content: string;
-};
+export default function useCreatePost() {
+    const { mutateAsync: requestTypedData } = useCreatePostTypedDataMutation();
+    const { profileQuery } = useLensUser();
+    const sdk = useSDK();
+
+    async function createPost(
+        image: File,
+        title: string,
+        description: string,
+        content: string,
+        classificationMetadata: string
+    ) {
+        const typedData = await requestTypedData({
+            request: {
+                collectModule: { // Set this to be custom DAO contract?
+                    freeCollectModule: {
+                        followerOnly: false,
+                    },
+                },
+                contentURI: 'todo', // IPFS Hash (upload ALL content to IPFS)
+                profileId: profileQuery.data?.defaultProfile?.id,
+            },
+        });
+
+        const {domain, types, value} = typedData.createPostTypedData.typedData;
+        if (!sdk) return;
+
+        // Sign typed data
+        const signature = await signTypedDataWithOmittedTypename(
+            sdk,
+            domain,
+            types,
+            value
+        );
+
+        // Send the transaction data & ipfs hash to the custom publication module
+        // todo
+    }
+
+    //return useMutation(createPost);
+}

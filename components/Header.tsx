@@ -7,9 +7,18 @@ export default function Header () {
     return (
         <>
             <div className={styles.headerContainer}>
-                <div>
+                <div className={styles.left}>
                     <Link href={'/'}>
                         <img src="/logo.png" alt='logo' className={styles.logo}/>
+                    </Link>
+                    <Link href={'http://skinetics.tech'}>
+                        Portal
+                    </Link>
+                    <Link href={'https://github.com/signal-k'}>
+                        Github
+                    </Link>
+                    <Link href={'/publications/create'}>
+                        Create
                     </Link>
                 </div>
                 <div className={styles.right}>
