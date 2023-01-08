@@ -1,0 +1,26 @@
+.headerContainer {
+    height: 64px;
+    display: flex;
+    flex-direction: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin-bottom: 64px;
+    background-color: azure;
+    border-bottom: 1px solid white;
+    z-index: 99999;
+}
+
+.logo {
+    height: 84px;
+    width: 84px;
+    margin-left: 16px;
+    margin-top: -12px;
+}
+
+.right {
+    margin-right: 16px;
+    margin-top: 5px;
+}
