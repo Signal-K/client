@@ -1,5 +1,8 @@
+import { Web3Button } from '@thirdweb-dev/react';
 import React, { useState } from 'react';
 import styles from '../../styles/Create.module.css';
+import { useCreatePost } from '../../lib/useCreatePost';
+import { LENS_CONTRACT_ABI, LENS_CONTRACT_ADDRESS } from '../../constants/contracts';
 
 export default function Create() {
     const [image, setImage] = useState<File | null>(null);
@@ -7,6 +10,7 @@ export default function Create() {
     const [description, setDescription] = useState<string>("");
     const [classificationMetadata, setClassificationMetadata] = useState<string>(""); // Token id (rendering template will add the contract address)
     const [content, setContent] = useState('');
+    const { mutateAsync: createPost } = useCreatePost();
 
     return (
         <div className={styles.container}>
@@ -44,6 +48,19 @@ export default function Create() {
                         onChange={(e) => setClassificationMetadata(e.target.value)}
                     />
                 </div>
+                <Web3Button
+                    contractAddress={LENS_CONTRACT_ADDRESS}
+                    contractAbi={LENS_CONTRACT_ABI}
+                    action={ async () => {
+                        if (!image) return;
+                        return await createPost({
+                            image,
+                            title,
+                            description,
+                            content,
+                        })}
+                    } 
+                >Create Post</Web3Button>
             </div>
         </div>
     )
