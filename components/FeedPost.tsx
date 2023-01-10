@@ -29,9 +29,9 @@ export default function FeedPost ({publication}: Props) {
                 <h3 className={styles.feedPostContentTitle}>{publication.metadata.name}</h3>
                 <p className={styles.feedPostContentDescription}>{publication.metadata.content}</p>
 
-                { publication.metadata.media?.length > 0 && (
+                {(publication.metadata.image || publication.metadata.media?.length > 0) && (
                     <MediaRenderer
-                        src={publication.metadata.media[0].original.url}
+                        src={publication.metadata.image || publication.metadata.media[0].original.url}
                         alt={publication.metadata.name || ""}
                         className={styles.feedPostContentImage}
                     />
