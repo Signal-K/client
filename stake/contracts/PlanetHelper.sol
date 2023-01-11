@@ -32,6 +32,32 @@ contract PlanetHelper is ReentrancyGuard, ERC1155Holder {
         if (playerHelper[msg.sender].isData) { // If the user has a helper that is already staked : send it back to address (unstake)
             planetNFTCollection.safeTransferFrom(address(this), msg.sender, playerHelper[msg.sender].value, 1, "Returning your old helper item");
         }
+        
+        uint256 reward = calculateRewards(msg.sender); // Calculate the rewards owed to the address
+        rewardsToken.transfer(msg.sender, reward);
+
+        planetNFTCollection.safeTransferFrom(msg.sender, address(this), _tokenId, 1, "Staking your planet"); // Actual statement that transfers the nft from the user to this staking contract to begin staking
+        playerHelper[msg.sender].value = _tokenId; // Update the mapping for the helper NFT once it's been staked
+        playerhelper[msg.sender].isData = true;
+        playerLastUpdate[msg.sender].value = block.timestamp; // Update the mapping for the playerLastUpdate tag. It's set to the current time (and we can use that and the state of the nft to calculate rewards)
+        playerLastUpdate[msg.sender].isData = true;
+    }
+
+    function withdraw () external nonReentrant {
+        require(playerHelper[msg.sender].isData, "You do not have a helper staked to withdraw"); // The user can't execute this function if they aren't staking anything
+        uint256 reward = calculateRewards(msg.sender);
+        rewardsToken.transfer(msg.sender, reward);
+        planetNFTCollection.safeTransferFrom(address(this), msg.sender, playerHelper[msg.sender].value, 1, "Transferring your previously staked nft to your wallet");
+        playerHelper[msg.sender].isData = false; // Update the helper mapping
+        playerLastUpdate[msg.sender].isData = true; // There's been a new update -> so update the mapping
+        playerLastUpdate[msg.sender].value = block.timestamp;
+    }
+
+    function claim () external nonReentrant {
+        uint256 reward = calculateRewards(msg.sender);
+        rewardsToken.transfer(msg.sender, reward);
+        playerLastUpdate[msg.sender].isData = true; // Update mappings for last event for player
+        playerLastUpdate[msg.sender].value = block.timestamp;
     }
 
     function calculateRewards (address _player) public view returns (uint256 _rewards) { // 20,000,000 rewards/minerals per block. Uses block.timestamp & playerLastUpdate. Requires the player to have staked a helper item
