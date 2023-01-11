@@ -11,8 +11,8 @@ import "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 
 //  ==========  Internal imports    ==========
 
-import "../openzeppelin-presets/metatx/ERC2771ContextUpgradeable.sol";
-import "../lib/CurrencyTransferLib.sol";
+import "./openzeppelin-presets/metatx/ERC2771ContextUpgradeable.sol";
+import "./lib/CurrencyTransferLib.sol";
 
 //  ==========  Features    ==========
 
@@ -26,7 +26,7 @@ import "./extension/PermissionsEnumerable.sol";
 import "./extension/Drop1155.sol";
 
 // OpenSea operator filter
-import "../extension/DefaultOperatorFiltererUpgradeable.sol";
+import "./extension/DefaultOperatorFiltererUpgradeable.sol";
 
 contract DropERC1155 is
     Initializable,
