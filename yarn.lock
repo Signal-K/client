@@ -3568,6 +3568,16 @@
     rpc-websockets "^7.5.0"
     superstruct "^0.14.2"
 
+"@stitches/core@^1.2.8":
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/@stitches/core/-/core-1.2.8.tgz#dce3b8fdc764fbc6dbea30c83b73bfb52cf96173"
+  integrity sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==
+
+"@stitches/react@^1.2.8":
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/@stitches/react/-/react-1.2.8.tgz#954f8008be8d9c65c4e58efa0937f32388ce3a38"
+  integrity sha512-9g9dWI4gsSVe8bNLlb+lMkBYsnIKCZTmvqvDG+Avnn69XfmHZKiaMrx7cgTaddq7aTPPmXiTsbFcUy0xgI4+wA==
+
 "@supabase/auth-helpers-nextjs@^0.5.2":
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/@supabase/auth-helpers-nextjs/-/auth-helpers-nextjs-0.5.2.tgz#54b0e097d4dd21ca8c0621865214dc46f75f26f5"
@@ -3584,6 +3594,17 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@supabase/auth-helpers-shared/-/auth-helpers-shared-0.2.3.tgz#da2cd1144f016c61b30ee6ac0da0f3dac7ccc99e"
   integrity sha512-Xwnd2UQ/VTjTKIuVg1Xl/ryrElbSccOJhC11jbVPHOs7Y6yxzy9APxQs//jj4IpbDH4uOEDCdpMIJ0tzRxj9DQ==
+
+"@supabase/auth-ui-react@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@supabase/auth-ui-react/-/auth-ui-react-0.2.6.tgz#5ca41b9ef9cf5f52fbad0d67af56cd56f4f79961"
+  integrity sha512-N2qxgsjxPQZPdDotVumzruj4RHaKNFb9ZRecttMeGOvrYFbMWRQVpWT/rYkTPsRW2phKiGXQlMwha6YxUE+t6Q==
+  dependencies:
+    "@stitches/core" "^1.2.8"
+    "@stitches/react" "^1.2.8"
+    prop-types "^15.7.2"
+  optionalDependencies:
+    fsevents "^2.3.2"
 
 "@supabase/functions-js@^2.0.0":
   version "2.0.0"
@@ -3606,10 +3627,10 @@
   dependencies:
     cross-fetch "^3.1.5"
 
-"@supabase/realtime-js@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@supabase/realtime-js/-/realtime-js-2.1.0.tgz#699ac012bc1c721cd6446ad93226085be348e998"
-  integrity sha512-iplLCofTeYjnx9FIOsIwHLhMp0+7UVyiA4/sCeq40VdOgN9eTIhjEno9Tgh4dJARi4aaXoKfRX1DTxgZaOpPAw==
+"@supabase/realtime-js@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@supabase/realtime-js/-/realtime-js-2.3.1.tgz#b567441073e0b86c9be59bf8eccdc03df3e810fd"
+  integrity sha512-AX4pzZozVPvHAWfPcKl0UWj19pqwogD9TnCEHq1x/6oQjVoqA3n6H+1Ea2of9MheSroajHguaQMen3xLEoWrug==
   dependencies:
     "@types/phoenix" "^1.5.4"
     websocket "^1.0.34"
@@ -3621,15 +3642,15 @@
   dependencies:
     cross-fetch "^3.1.5"
 
-"@supabase/supabase-js@^2.2.3":
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/@supabase/supabase-js/-/supabase-js-2.2.3.tgz#787639f14b5887d299839825aafa3f6a51dbff1b"
-  integrity sha512-UOKnbkwtCGpI/yoW5FbiDqV1tvtP+kJkYROosCGS7M+EAaNhklNYaU3l3wNfxpR5LW7wOO1O17cb+5CSRjv/zg==
+"@supabase/supabase-js@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@supabase/supabase-js/-/supabase-js-2.4.0.tgz#fa925c6bde521ceed0b6be668202db02425aaef9"
+  integrity sha512-fouVDoTcxM4/xEsh2iaR0wr0liwER7Pth8pvmbqqm7JVDLd2Z3+ie+k9fesg0OAd8VR1plOi80gdjxYm/ZIYMA==
   dependencies:
     "@supabase/functions-js" "^2.0.0"
     "@supabase/gotrue-js" "^2.6.1"
     "@supabase/postgrest-js" "^1.1.1"
-    "@supabase/realtime-js" "^2.1.0"
+    "@supabase/realtime-js" "^2.3.1"
     "@supabase/storage-js" "^2.1.0"
     cross-fetch "^3.1.5"
 
@@ -7677,7 +7698,7 @@ fs.realpath@^1.0.0:
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
   integrity sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==
 
-fsevents@~2.3.2:
+fsevents@^2.3.2, fsevents@~2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"
   integrity sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==
