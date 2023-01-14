@@ -74,7 +74,7 @@ export default function useCreatePost() {
         // Sign typed data
         const signature = await signTypedDataWithOmittedTypename(
             sdk,
-            domain,
+            domain, 
             types,
             value
         );

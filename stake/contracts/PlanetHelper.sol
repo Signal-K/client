@@ -1,17 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
 
-// Thirdweb contracts to import
-import "@thirdweb-dev/contracts/drop/DROPERC1155.sol"; // For the collection of mining tools
-import "@thirdweb-dev/contracts/token/TokenERC20.sol"; // Rewards token (this will later be extended into multiple contracts for each "element")
+// Import thirdweb contracts
+import "@thirdweb-dev/contracts/drop/DropERC1155.sol"; // For my collection of Pickaxes
+import "@thirdweb-dev/contracts/token/TokenERC20.sol"; // For my ERC-20 Token contract
+import "@thirdweb-dev/contracts/openzeppelin-presets/utils/ERC1155/ERC1155Holder.sol"; // For my ERC-1155 Receiver contract
+/* Extra metadata/tags contracts (no function)
+import "@thirdweb-dev/contracts/drop/ERC721.sol";
+import "@thirdweb-dev/contracts/drop/ERC20.sol";
+import "@thirdweb-dev/contracts/token/Token721.sol";*/
 
-// Open-Zeppelin contracts -> Reentrancy Guard
+
+// OpenZeppelin (ReentrancyGuard)
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 contract PlanetHelper is ReentrancyGuard, ERC1155Holder {
     DropERC1155 public immutable planetNFTCollection; // Edition drop for the planets (terminology & game item may change around...e.g. PlanetHelper or planetNFTCollection may become a pickaxe/mining bot)
     TokenERC20 public immutable rewardsToken; // Starting off with rewarding Minerals to the user - more resource types will be added
+
+    // Metadata deeplinks (taken out of constructor)
+    string public classificationContractArchive = 'goerli/0xed6e837Fda815FBf78E8E7266482c5Be80bC4bF9';  // Archived version of the classification proposal contract on the Mumbai testnet. Used for archival purposes
+    string public jupyterNotebook  = 'https://deepnote.com/workspace/star-sailors-49d2efda-376f-4329-9618-7f871ba16007/project/Star-Sailors-Light-Curve-Plot-b4c251b4-c11a-481e-8206-c29934eb75da/notebook/Light%20Curve%20Demo-0c60a045940145ba950f2c0e51cac7c1'; // Deeplink to a copy of the Deepnote notebook
+    string public jupyterNftTagId = 'goerli/0xdf35Bb26d9AAD05EeC5183c6288f13c0136A7b43/1';  // Deep link to a goerli NFT with some metadata relevant to the jupyterNotebook
+    // This contract is a 'helper', aka multitool provider for your planets in the Star Sailors game. Using this contract, you'll be able to perform different actions on the planets in your inventory, such as mining, building & customising the terrain and life. More documentation is available on Notion at https://skinetics.notion.site/421c898e3583496bb9dc950e3150b8d0?v=db85a572b6c5409e998451318d6b5187 and on our Github -> https://github.com/signal-k/sytizen
     
     constructor(DropERC1155 planetNFTCollectionAddress, TokenERC20 mineralsTokenAddress) {
         planetNFTCollection = planetNFTCollectionAddress;
@@ -38,7 +49,7 @@ contract PlanetHelper is ReentrancyGuard, ERC1155Holder {
 
         planetNFTCollection.safeTransferFrom(msg.sender, address(this), _tokenId, 1, "Staking your planet"); // Actual statement that transfers the nft from the user to this staking contract to begin staking
         playerHelper[msg.sender].value = _tokenId; // Update the mapping for the helper NFT once it's been staked
-        playerhelper[msg.sender].isData = true;
+        playerHelper[msg.sender].isData = true;
         playerLastUpdate[msg.sender].value = block.timestamp; // Update the mapping for the playerLastUpdate tag. It's set to the current time (and we can use that and the state of the nft to calculate rewards)
         playerLastUpdate[msg.sender].isData = true;
     }
@@ -61,7 +72,7 @@ contract PlanetHelper is ReentrancyGuard, ERC1155Holder {
     }
 
     function calculateRewards (address _player) public view returns (uint256 _rewards) { // 20,000,000 rewards/minerals per block. Uses block.timestamp & playerLastUpdate. Requires the player to have staked a helper item
-        if (!playerLastUpdate[_player].isData || !planetHelper[_player].isData) { // Either nothing is being staked, or the player hasn't ever staked/edited their stake items
+        if (!playerLastUpdate[_player].isData || !playerHelper[_player].isData) { // Either nothing is being staked, or the player hasn't ever staked/edited their stake items
             return 0; // No rewards are owed to the player/address
         }
 
