@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Transition } from '@headlessui/react';
 
+import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+const session = useSession();
+const supabase = useSupabaseClient();
+
 type Views = 'magic_link' | 'awaiting_confirmation';
 interface MagicLinkViewProps {
     email: string;
