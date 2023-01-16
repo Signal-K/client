@@ -27,43 +27,42 @@ export default function OwnedGear ({ multitoolContract, helperContract }: Props)
     }
 
     async function equip(id: string) {
-        if (!address) return;
-        const hasApproval = await multitoolContract.isApproved( // The contract requires approval to be able to transfer/transact the multitool
-            address, HELPER_ADDRESS, // Does the helper contract have the ability to transfer NFTs from the multitool contract?
-        );
+      if (!address) return;
+      const hasApproval = await multitoolContract.isApproved( // Is the contract approved by the account to be able to transfer the multitool?
+          address,
+          HELPER_ADDRESS
+      );
 
-        if (!hasApproval) {
-            await multitoolContract.setApprovalForAll(HELPER_ADDRESS, true);
-        }
+      if (!hasApproval) {
+          await multitoolContract.setApprovalForAll(HELPER_ADDRESS, true);
+      };
 
-        await helperContract.call('stake', id);
-        window.location.reload();
-    }
+      await helperContract.call("stake", id);
 
-    return (
-        <>
-          <div className={styles.nftBoxGrid}>
+      window.location.reload();
+  }
+
+  return (
+    <>
+        <div className={styles.nftBoxGrid}>
             {ownedMultitools?.map((p) => (
-              <div className={styles.nftBox} key={p.metadata.id.toString()}>
-                <ThirdwebNftMedia
-                  metadata={p.metadata}
-                  className={`${styles.nftMedia} ${styles.spacerTop}`}
-                  height={"64"}
-                />
-                <h3>{p.metadata.name}</h3>
-    
-                <div className={styles.smallMargin}>
-                  <Web3Button
-                    colorMode="light"
-                    contractAddress={HELPER_ADDRESS}
-                    action={() => equip(p.metadata.id)}
-                  >
-                    Equip
-                  </Web3Button>
+                <div className={styles.nftBox} key={p.metadata.id.toString()}>
+                    <ThirdwebNftMedia
+                        metadata={p.metadata}
+                        className={`${styles.nftMedia} ${styles.spacerTop}`}
+                        height={"64"}
+                    />
+                    <h3>{p.metadata.name}</h3>
+
+                    <Web3Button
+                        contractAddress={HELPER_ADDRESS}
+                        action={() => equip(p.metadata.id)}
+                    >
+                        Equip
+                    </Web3Button>
                 </div>
-              </div>
             ))}
-          </div>
-        </>
-    );
+        </div>
+    </>
+);
 }
