@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import styles from '../styles/Home.module.css';
+import styles from '../styles/planetInteraction.module.css';
 import {
   ConnectWallet,
   useAddress,
@@ -12,7 +12,7 @@ import { useRouter } from "next/router";
 import MintContainer from "../components/MintContainer";
 
 const Home: NextPage = () => {
-  const { contract: editionDrop } = useContract(PLANETS_ADDRESS, 'edition-drop');
+  const { contract: editionDrop} = useContract(PLANETS_ADDRESS, 'edition-drop');
   const address = useAddress();
   const router = useRouter();
   const { data: ownedNfts, isLoading, isError, } = useOwnedNFTs(editionDrop, address);
@@ -45,7 +45,7 @@ const Home: NextPage = () => {
       <button
         className={`${styles.mainButton} ${styles.spacerBottom}`}
         onClick={() => router.push(`/play`)}
-      >Interact with your planets!</button>
+      >Planet interaction</button>
     </div>
   );
 };
