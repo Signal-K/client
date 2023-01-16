@@ -18,7 +18,7 @@ export default function MintContainer() {
             <h1>Edition drop</h1>
             <p>Claim your planet NFT to start playing</p>
             <div className={`${styles.nftBox} ${styles.spacerBottom}`}>
-                <img src='../assets/mine.gif' style={{ height: 200 }} />
+                <img src='./mine.gif' style={{ height: 200 }} />
             </div>
             <Web3Button contractAddress={PLANETS_ADDRESS}
                 action={() => {

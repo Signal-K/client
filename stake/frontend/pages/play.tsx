@@ -41,7 +41,7 @@ export default function Play() {
                         />
                         <Rewards
                             helperContract={helperContract}
-                            rewardContract={rewardsContract}
+                            rewardsContract={rewardsContract}
                         />
                     </div>
                 ) : ( // Contracts are still loading in

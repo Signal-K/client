@@ -66,7 +66,7 @@ export default function CurrentGear ({ // Shows the currently equiped planet cha
           marginTop: 24
         }}
       >
-        <img src='../assets/mine.gif' height={64} alt='planet-mining' />
+        <img src='./mine.gif' height={64} alt='planet-mining' />
         <GameplayAnimation multitool={multitool} />
       </div>
     </div>
