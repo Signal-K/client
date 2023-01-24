@@ -17,6 +17,9 @@ export default function Header () {
                     <Link href={'https://github.com/signal-k'}>
                         Github
                     </Link>
+                    <Link href={'/generator'}>
+                        Explore worlds {/* Make submenu items */}
+                    </Link>
                     <Link href={'/publications/create'}>
                         Create
                     </Link>

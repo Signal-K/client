@@ -1,0 +1,1 @@
+type Observable<T> = unknown;

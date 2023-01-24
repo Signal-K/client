@@ -11,6 +11,11 @@ import { useState } from "react";
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react';
 
+// For threejs generator components
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'rc-slider/assets/index.css';
+import 'rc-tooltip/assets/bootstrap.css';
+
 function MyApp({ Component, pageProps }: AppProps<{
     initialSession: Session, // Supabase user session
   }>) {
