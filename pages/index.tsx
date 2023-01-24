@@ -5,7 +5,15 @@ import { useState, useEffect } from "react";
 import Sidebar from '../components/Navigation/Sidebar';
 import { Flex, Text, IconButton } from '@chakra-ui/react';
 
+// Off-chain Authentication components via Supabase
+import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+
 export default function Home () {
+  // Off-chain authenticated user session (via Supabase)
+  const session = useSession();
+  const supabase = useSupabaseClient();
+
   const { isLoading, error, data } = useExplorePublicationsQuery({
     request: {
       sortCriteria: PublicationSortCriteria.Latest,
