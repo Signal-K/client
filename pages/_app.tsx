@@ -19,8 +19,7 @@ import 'rc-tooltip/assets/bootstrap.css';
 function MyApp({ Component, pageProps }: AppProps<{
     initialSession: Session, // Supabase user session
   }>) {
-    const [supabase] = useState(() => createBrowserSupabaseClient());
-
+  const [supabase] = useState(() => createBrowserSupabaseClient());
   const AnyComponent = Component as any;
   const activeChainId = ChainId.Polygon; // Set to `.Mumbai` for testnet interaction
   const queryClient = new QueryClient();
