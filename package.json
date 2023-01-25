@@ -41,6 +41,8 @@
     "ethers": "^5.7.2",
     "framer-motion": "^6",
     "graphql": "^16.6.0",
+    "html2canvas": "^1.4.1",
+    "image-data-uri": "^2.0.1",
     "moralis": "^2.10.3",
     "moralis-v1": "^1.12.0",
     "next": "^13.1.4",
@@ -63,6 +65,7 @@
     "supabase": "^1.34.5",
     "swr": "^2.0.0",
     "three": "0.108.0",
+    "use-react-screenshot": "^3.0.0",
     "uuid": "^9.0.0",
     "uuidv4": "^6.2.13",
     "web3uikit": "^1.0.4"

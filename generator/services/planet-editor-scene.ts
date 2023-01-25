@@ -45,6 +45,7 @@ export default class PlanetEditorSceneManager implements SceneManager {
 		canvas.width = canvas.height;// * (16 / 9);
 
 		this._renderer = new THREE.WebGLRenderer({
+			preserveDrawingBuffer: true,
 			canvas,
 			antialias: true
 		});
