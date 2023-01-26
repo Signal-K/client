@@ -3824,22 +3824,22 @@
     cookie "^0.5.0"
     cookie-parser "^1.4.6"
 
-"@thirdweb-dev/contracts-js@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@thirdweb-dev/contracts-js/-/contracts-js-1.2.2.tgz#92977adc912fd264ed8b4ca767eb629eac2d112e"
-  integrity sha512-6OZ5zDCLHAGjJkf9pcOJ1InR506SnU7P3+a7ggNawn3NzQs8G6wSyfsoIn3e+ZmmEqVtbdv49qX7GMgCxVXZQg==
+"@thirdweb-dev/contracts-js@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@thirdweb-dev/contracts-js/-/contracts-js-1.2.3.tgz#3b9362feec94055a5fa2604604d2223b34a4d28a"
+  integrity sha512-/WrnOOUlpeYHPFjzpQxYhnJEFx/WWTpTVYXTJk7chXspxowrFEi2O5sZc3iNSCUQAUV2joqCxvRGdeHPn1yHEg==
   dependencies:
-    "@thirdweb-dev/contracts" "3.2.8-0"
+    "@thirdweb-dev/contracts" "3.3.0"
 
-"@thirdweb-dev/contracts@3.2.8-0":
-  version "3.2.8-0"
-  resolved "https://registry.yarnpkg.com/@thirdweb-dev/contracts/-/contracts-3.2.8-0.tgz#74a5775deece2f143d1f4d2d96920efc1f8659df"
-  integrity sha512-yoFoXx2s/baxZx05WYgTGIb6ze/pUwLQ2CkiK9ms3IoUY51mlmN0T8bbRBAJlQBMqJuHRGk4HzB+BUrpFYAZig==
+"@thirdweb-dev/contracts@3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@thirdweb-dev/contracts/-/contracts-3.3.0.tgz#acbec36746bd8a9176b01c792d3d8aa6483a16c3"
+  integrity sha512-UE6Gc4xUTJ3PYJ6WWHtrIXynid5z7TZSnoaqzhiMcLnch6YqMJI1b7uB9NunYEY1N3SB75BYOgun9e1T3RoSbQ==
 
-"@thirdweb-dev/react@^3.6.8":
-  version "3.6.9"
-  resolved "https://registry.yarnpkg.com/@thirdweb-dev/react/-/react-3.6.9.tgz#d286f303c2ad08e79d95a7c73ff569740a0b24e5"
-  integrity sha512-vhRpqS8ISX/Xch9Im/3FGIRryq/pkpMuGciCcnSaQgkV4FjKW5lrGHEAi9tZjR+u3q9PD9SSvGEvkrghogvXZQ==
+"@thirdweb-dev/react@^3.6.11":
+  version "3.6.11"
+  resolved "https://registry.yarnpkg.com/@thirdweb-dev/react/-/react-3.6.11.tgz#27df0267637fa32c14b638f179a4b617dcca5ac7"
+  integrity sha512-NJqz4mgfrr0wy+aF//slN2NQatpRbBi8My6LDaeE30EHhDUEYQDxZCUjkQX0h9qf19orI1KXnqO3XlgokgaXVA==
   dependencies:
     "@emotion/react" "^11.10.0"
     "@emotion/styled" "^11.10.0"
@@ -3861,17 +3861,17 @@
     tiny-invariant "^1.2.0"
     wagmi "^0.2.28"
 
-"@thirdweb-dev/sdk@^3.6.8":
-  version "3.6.9"
-  resolved "https://registry.yarnpkg.com/@thirdweb-dev/sdk/-/sdk-3.6.9.tgz#e846562a32d526af0f35eade940fd203cbf1fc62"
-  integrity sha512-SXlVo4EVetGUDSou82oWKz9/zWnIuvRnwGrcbN5yAEnqZXlmYqfzbheuSylFXqUkTkoEVwy4Gs9IWyKayWvTXA==
+"@thirdweb-dev/sdk@^3.6.11":
+  version "3.6.11"
+  resolved "https://registry.yarnpkg.com/@thirdweb-dev/sdk/-/sdk-3.6.11.tgz#1b658ebe7f49ab94636ff1d7d70e2c24c317b92b"
+  integrity sha512-sbfdvgKn34+vJD1mk65p1lklTPDyHzWksm7xX8/LynFPeou62Wxypm3K8JAaY5o3tQC3tq7sncGclpMsWGDdoQ==
   dependencies:
     "@metaplex-foundation/js" "^0.17.6"
     "@metaplex-foundation/mpl-token-metadata" "^2.3.3"
     "@project-serum/anchor" "^0.25.0"
     "@solana/spl-token" "^0.3.5"
     "@solana/web3.js" "^1.62.0"
-    "@thirdweb-dev/contracts-js" "^1.2.2"
+    "@thirdweb-dev/contracts-js" "^1.2.3"
     "@thirdweb-dev/storage" "^1.0.6"
     bn.js "^5.2.1"
     bs58 "^5.0.0"

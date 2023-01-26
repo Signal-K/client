@@ -7,6 +7,9 @@ import { ChakraProvider } from '@chakra-ui/react';
 
 import { useState } from "react";
 
+// For proposals smart contract
+import { StateContextProvider } from "../context/proposals";
+
 // For off-chain authentication (Supabase)
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react';
@@ -36,10 +39,12 @@ function MyApp({ Component, pageProps }: AppProps<{
           }}
         >
           <MoralisProvider initializeOnMount={false}>
-            <ChakraProvider>
-              <Header />
-              <AnyComponent {...pageProps} />
-            </ChakraProvider>
+            <StateContextProvider>
+              <ChakraProvider>
+                <Header />
+                <AnyComponent {...pageProps} />
+              </ChakraProvider>
+            </StateContextProvider>
           </MoralisProvider>
         </ThirdwebProvider>
       </QueryClientProvider>
