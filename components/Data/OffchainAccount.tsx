@@ -29,6 +29,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
 
     useEffect(() => {
         getProfile();
+        console.log(user.id)
     }, [session]);
 
     async function getProfile() {
@@ -247,7 +248,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 <PlanetEditor />
             </div>
             <br />
-            <Container className='container-sm mt-4'>
+            <Container className='container-sm mt-4 mx-auto border-5 border-emerald-500'>
                 <>
                     <h1>Your photos</h1>
                     <br />

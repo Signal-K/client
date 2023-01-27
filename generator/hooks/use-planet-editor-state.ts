@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Planet } from '../models/planet';
 import { randomSeed, guid } from '../services/helpers';
@@ -10,6 +10,7 @@ export type StateInstance<T> = { current: T, set(value: T): void };
 
 function usePlanetEditorFieldState<T>(key: string, initialValue: T, map?: (value: T) => T) {
 	const [current, set] = useStatePersisted<T>(`world-gen:planet-editor:${key}`, initialValue);
+	const [radiusRef, setRadiusRef] = useState();
 
 	function mappedSet(value: T) {
 		if (map) value = map(value);

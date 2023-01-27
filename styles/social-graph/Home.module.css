@@ -1,0 +1,6 @@
+.container {
+  border-color: aqua;
+  border-radius: 5;
+  flex: auto;
+  max-width: 3xl;
+}
