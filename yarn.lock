@@ -11458,6 +11458,11 @@ react-bootstrap@1.0.0-beta.12:
     uncontrollable "^7.0.0"
     warning "^4.0.3"
 
+react-clickout-handler@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/react-clickout-handler/-/react-clickout-handler-1.2.1.tgz#f2bc3f5a7b01d50e2875702a026c5c517e54027b"
+  integrity sha512-A7sK2M4LW7S+Bq3wdPZoDfrQK9wARS2/lGH1i7R5e5DP+e84d1LIRPPkVe+AsiiYP6AH8eiaFfczbiiF3wx3MQ==
+
 react-clientside-effect@^1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/react-clientside-effect/-/react-clientside-effect-1.2.6.tgz#29f9b14e944a376b03fb650eed2a754dd128ea3a"
