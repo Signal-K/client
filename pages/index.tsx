@@ -8,6 +8,7 @@ import { Flex, Text, IconButton } from '@chakra-ui/react';
 // Off-chain Authentication components via Supabase
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import NavigationCard from "../components/Sidebar";
 
 export default function Home () {
   // Off-chain authenticated user session (via Supabase)

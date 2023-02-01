@@ -35,7 +35,7 @@ export function usePlanetEditorState(planet: Planet): PlanetEditorState {
 	});
 
 	const radius = usePlanetEditorFieldState('radius', 2, value => {
-		planet.surface.radius = value;
+		planet.surface.radius = value; // Set this value via a get request from Flask based on Lightkurve output, add an option to override for demo purposes
 		planet.regenerateTerrain();
 		planet.regenerateShading();
 		return planet.surface.radius;

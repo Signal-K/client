@@ -10,6 +10,7 @@ import PlanetEditor from "../../pages/generator/planet-editor";
 import { useScreenshot } from "use-react-screenshot";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
+type Planets = Database['public']['Tables']['planets']['Row'];
 
 export default function OffchainAccount({ session }: { session: Session}) {
     const supabase = useSupabaseClient<Database>();
@@ -21,8 +22,12 @@ export default function OffchainAccount({ session }: { session: Session}) {
     const [address, setAddress] = useState<Profiles['address']>(null); // This should be set by the handler eventually (connected address).
     const [images, setImages] = useState([]);
 
+    // User planet
+    const [userIdForPlanet, setUserIdForPlanet] = useState<Planets['userId']>(null);
+    const [planetGeneratorImage, setPlanetGeneratorImage] = useState<Planets['screenshot']>(null);
+
     const ref = createRef();
-    let width = '1080'
+    let width = '100%'
     const [image, takeScreenShot] = useScreenshot();
 
     const getImage = () => takeScreenShot(ref.current);
@@ -179,6 +184,55 @@ export default function OffchainAccount({ session }: { session: Session}) {
         });
     }
 
+    /* PLANET manipulation */
+    async function createPlanet({ // Maybe we should add a getPlanet (getUserPlanet) helper as well?
+        userId, temperature, radius, date, ticId
+    } : {
+        //id: Planets['id']
+        userId: Planets['userId'] // Check to see if this page gets the userId as well, or just the username. Foreign key still works regardless
+        temperature: Planets['temperature']
+        radius: Planets['radius']
+        date: Planets['date']
+        ticId: Planets['ticId']
+    }) {
+        try {
+            setLoading(true);
+            // Is the planet ID going to be based on the user id (obviously not in production, but in this version?)
+            const newPlanetParams = {
+                id: user.id, // Generate a random id later
+                // .. other params from database types
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function getUserPlanet() {
+        try {
+            setLoading(true);
+            if (!user) throw new Error('No user authenticated');
+            let { data, error, status } = await supabase
+                .from('planets')
+                .select(`id, userId, temperature, radius, ticId`)
+                .eq('userId', username)
+                .single()
+
+            if (error && status !== 406) {
+                throw error;
+            }
+
+            if (data) {
+                setUserIdForPlanet(data.userId);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return (
         <div className="form-widget">
             <AccountAvatar
@@ -193,7 +247,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
             <div>
                 <label htmlFor='email'>Email</label>
                 <input id='email' type='text' value={session.user.email} disabled />
-            </div>
+            </div><br />
             <div>
                 <label htmlFor='username'>Username</label>
                 <input
@@ -202,7 +256,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                     value={ username || '' }
                     onChange={(e) => setUsername(e.target.value)}
                 />
-            </div>
+            </div><br />
             <div>
                 <label htmlFor='website'>Website</label>
                 <input
@@ -210,8 +264,8 @@ export default function OffchainAccount({ session }: { session: Session}) {
                     type='website'
                     value={ website || '' }
                     onChange={(e) => setWebsite(e.target.value)}
-                />
-            </div>
+                /><br />
+            </div><br />
             <div>
                 <label htmlFor='address'>Address</label>
                 <input
@@ -220,7 +274,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                     value={ address || '' }
                     onChange={(e) => setAddress(e.target.value)}
                 />
-            </div>
+            </div><br />
             <div>
                 <button
                     className="button primary block"
@@ -229,8 +283,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 >
                     {loading ? 'Loading ...' : 'Update'}
                 </button>
-            </div>
-            <br />
+            </div><br />
             <div>
                 <button style={{ marginBottom: "10px" }} onClick={getImage}>
                     Take screenshot
@@ -250,16 +303,13 @@ export default function OffchainAccount({ session }: { session: Session}) {
             <br />
             <Container className='container-sm mt-4 mx-auto border-5 border-emerald-500'>
                 <>
-                    <h1>Your photos</h1>
-                    <br />
+                    <h1>Your photos</h1><br />
                     <p>Upload image of your model for analysis</p>
                     <Form.Group className="mb-3" style={{maxWidth: '500px'}}>
                         <Form.Control type='file' accept='image/png, image/jpeg' onChange={(e) => uploadImage(e)} />
-                    </Form.Group>
-                    <Button variant='outline-info' onClick={() => uploadScreenshot(image)} />
-                    <br />
-                    <hr />
-                    <br />
+                    </Form.Group><br />
+                    <Button variant='outline-info' onClick={() => uploadScreenshot(image)}>Upload planet metadata</Button>
+                    <br /><br /><hr /><br />
                     <h3>Your images</h3>
                     <Row className='g-4'>
                         {images.map((image) => {
@@ -278,9 +328,9 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 </>
             </Container>
             <div>
-                <button className="button block" onClick={() => supabase.auth.signOut()}>
+                <Button variant='outline-info' onClick={() => supabase.auth.signOut()}>
                     Sign Out
-                </button>
+                </Button>
             </div>
         </div>
     )

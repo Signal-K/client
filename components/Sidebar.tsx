@@ -1,11 +1,24 @@
 import Card from "./Posts/Card";
 import styles from '../styles/social-graph/Home.module.css';
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { Database } from "../utils/database.types";
 
 export default function NavigationCard () {
+    const router = useRouter();
+    const { asPath:pathname } = router;
+    const activeElementClass = 'styles.activeSidebarNavItem';
+    const elementClass = 'styles.sidebarNavItems';
+
+    const supabase = useSupabaseClient<Database>();
+    const user = useUser();
+
     return (
         <Card>
             <div className={styles.paddingThing}>
-            <h2>Navigation</h2>
+                <h2>Navigation</h2>
+                {/*<Link href='/' className={pathname === '/' ? activeElementClass : elementClass}>Home</Link>*/}
                 <a href='/' className={styles.activeSidebarNavItem}>
                     <div className={styles.navIcon}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" /></svg></div>
                     Home
@@ -26,7 +39,7 @@ export default function NavigationCard () {
                     <div className={styles.navIcon}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0M3.124 7.5A8.969 8.969 0 015.292 3m13.416 0a8.969 8.969 0 012.168 4.5" /></svg></div>
                     Notifications
                 </a>
-                <a href='/' className={styles.sidebarNavItems}>
+                <a className={styles.sidebarNavItems} onClick={() => supabase.auth.signOut()}>
                     <div className={styles.navIcon}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg></div>
                     Logout
                 </a>
