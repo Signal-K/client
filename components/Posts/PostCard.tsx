@@ -5,8 +5,13 @@ import { HiOutlineHeart, HiOutlineSpeakerphone, HiOutlineTrash, HiOutlineShare, 
 import ClickOutHandler from 'react-clickout-handler';
 import { useState } from "react";
 import Link from "next/link";
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 
 export default function PostCard () {
+    const supabase = useSupabaseClient();
+    const [avatar_url, setAvatarUrl] = useState('');
+    const user = useUser();
+
     const [dropdownOpen, setDropdownOpen] = useState(false);
     function openDropdown(e) {
         e.stopPropagation();
@@ -23,7 +28,11 @@ export default function PostCard () {
                 <div>
                     <Link href={'/profile'}>
                         <span className={styles.avatarPointer}>
-                            <Avatar />
+                            <Avatar
+                                /*uid={user!.id}
+                                url={avatar_url}
+                                size={1}*/
+                            />
                         </span>
                     </Link>
                 </div>
@@ -75,7 +84,11 @@ export default function PostCard () {
             </div>
             <div className={styles.postCommentSectionWrapper}> {/* Commenting section */}
                 <div>
-                    <Avatar />
+                    <Avatar
+                        /*uid={user!.id}
+                        url={avatar_url}
+                        size={1}*/
+                    />
                 </div>
                 <div className={styles.postCommentSectionContentWrapper}>
                     <textarea className={styles.postCommentSectionTextArea} placeholder="Leave a commment"></textarea>

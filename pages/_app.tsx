@@ -39,12 +39,12 @@ function MyApp({ Component, pageProps }: AppProps<{
           }}
         >
           <MoralisProvider initializeOnMount={false}>
-            <StateContextProvider>
+            {/*<StateContextProvider>*/}
               <ChakraProvider>
                 <Header />
                 <AnyComponent {...pageProps} />
               </ChakraProvider>
-            </StateContextProvider>
+            {/*</StateContextProvider>*/}
           </MoralisProvider>
         </ThirdwebProvider>
       </QueryClientProvider>
