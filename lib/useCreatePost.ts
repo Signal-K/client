@@ -32,7 +32,7 @@ export function useCreatePost() {
     await loginUser();
 
     // 0. Upload the image to IPFS
-    const imageIpfsUrl = (await uploadToIpfs({ data: [image] }))[0];
+    const imageIpfsUrl = (await uploadToIpfs({ data: [image] }))[0]; // Let's upload the other data to IPFS and then return it
 
     console.log("imageIpfsUrl", imageIpfsUrl);
     const postMetadata = {

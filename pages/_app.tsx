@@ -7,15 +7,22 @@ import { ChakraProvider } from '@chakra-ui/react';
 
 import { useState } from "react";
 
+// For proposals smart contract
+import { StateContextProvider } from "../context/proposals";
+
 // For off-chain authentication (Supabase)
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react';
 
+// For threejs generator components
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'rc-slider/assets/index.css';
+import 'rc-tooltip/assets/bootstrap.css';
+
 function MyApp({ Component, pageProps }: AppProps<{
     initialSession: Session, // Supabase user session
   }>) {
-    const [supabase] = useState(() => createBrowserSupabaseClient());
-
+  const [supabase] = useState(() => createBrowserSupabaseClient());
   const AnyComponent = Component as any;
   const activeChainId = ChainId.Polygon; // Set to `.Mumbai` for testnet interaction
   const queryClient = new QueryClient();
@@ -32,10 +39,12 @@ function MyApp({ Component, pageProps }: AppProps<{
           }}
         >
           <MoralisProvider initializeOnMount={false}>
-            <ChakraProvider>
-              <Header />
-              <AnyComponent {...pageProps} />
-            </ChakraProvider>
+            {/*<StateContextProvider>*/}
+              <ChakraProvider>
+                <Header />
+                <AnyComponent {...pageProps} />
+              </ChakraProvider>
+            {/*</StateContextProvider>*/}
           </MoralisProvider>
         </ThirdwebProvider>
       </QueryClientProvider>

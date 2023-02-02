@@ -12,13 +12,22 @@ export default function Header () {
                         <img src="/logo.png" alt='logo' className={styles.logo}/>
                     </Link>
                     <Link href={'http://skinetics.tech'}>
-                        Portal
+                        🚀
                     </Link>
                     <Link href={'https://github.com/signal-k'}>
-                        Github
+                        ⌚️
+                    </Link>
+                    <Link href={'/generator'}>
+                        🪐 {/* Make submenu items */}
                     </Link>
                     <Link href={'/publications/create'}>
-                        Create
+                        🎨
+                    </Link>
+                    <Link href={'/gallery'}>
+                        🌌
+                    </Link>
+                    <Link href={'/auth/offchain'}>
+                        ⛓
                     </Link>
                 </div>
                 <div className={styles.right}>
