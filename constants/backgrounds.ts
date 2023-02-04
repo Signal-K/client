@@ -8,3 +8,6 @@ export const backgroundImages = {
 };
 
 export const bgImage = "https://images.unsplash.com/photo-1462726625343-6a2ab0b9f020?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" // "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=2372&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+export const Essendonitis = "https://cdna.artstation.com/p/assets/images/images/010/098/756/large/adrian-marc-amarc-alien-touchdown1.jpg?1522580611";
+export const background2 = "";
+export const background3 = "https://as1.ftcdn.net/v2/jpg/05/30/39/12/1000_F_530391201_9PFvub2I4q8XxeowP9EyZfsFBBxYH7Cb.jpg";
