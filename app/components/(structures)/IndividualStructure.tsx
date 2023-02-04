@@ -40,6 +40,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
   const [expanded, setExpanded] = useState(false);
   const [activeComponent, setActiveComponent] = useState<React.ReactNode | null>(null);
   const [modalSizePercentage, setModalSizePercentage] = useState(100); // Default to 100%
+  const [tooltip, setTooltip] = useState<{ visible: boolean; text: string } | null>(null);
 
   // Handle clicks on actions
   const handleActionClick = (actionText: string, component: React.ReactNode, sizePercentage: number = 100) => {
@@ -80,7 +81,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               </div>
               <StarIcon className="w-6 h-6 text-[#ebcb8b]" />
             </div>
-            <div className="flex justify-center my-4">
+            <div className="relative flex justify-center my-4">
               <img
                 src={imageSrc}
                 alt={title}
@@ -88,7 +89,14 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                 width="80"
                 height="80"
                 style={{ aspectRatio: "80/80", objectFit: "cover" }}
+                onMouseEnter={() => setTooltip({ visible: true, text: name })}
+                onMouseLeave={() => setTooltip(null)}
               />
+              {tooltip?.visible && (
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-800 text-white text-xs p-1 rounded-md shadow-lg">
+                  {tooltip.text}
+                </div>
+              )}
             </div>
             <div className="flex justify-center space-x-4">
               {labels.map((label, index) => {

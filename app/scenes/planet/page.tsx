@@ -41,7 +41,7 @@ export default function PlanetViewPage() {
                 console.error('Error checking mission:', error.message);
             } finally {
                 setIsLoading(false);
-            };
+            }
         };
 
         const checkFirstClassificationStatus = async () => {
@@ -61,7 +61,7 @@ export default function PlanetViewPage() {
                 console.error('Error checking mission:', error.message);
             } finally {
                 setIsLoading(false);
-            };
+            }
         };
 
         checkMission();
@@ -79,7 +79,7 @@ export default function PlanetViewPage() {
                 <div><ChapterOneIntroduction /></div>
             </PlanetViewLayout>
         );
-    };
+    }
 
     if (!hasChosenFirstClassification) {
         return (
@@ -88,14 +88,11 @@ export default function PlanetViewPage() {
                 <div><ChooseClassificationStarter /></div>
             </PlanetViewLayout>
         );
-    };
+    }
 
     return (
         <div className="relative min-h-screen">
             <PlanetStructures />
-            {/* <div className="hidden lg:block lg:absolute lg:bottom-0 lg:right-0 lg:w-1/3 lg:h-1/3 lg:max-h-[30vh] lg:bg-white lg:z-50">
-                <MissionLog />
-            </div> */}
             <BottomMenuBar onClose={() => null} />
         </div>
     );
@@ -109,6 +106,7 @@ function PlanetStructures() {
     const [orbitalStructures, setOrbitalStructures] = useState<InventoryStructureItem[]>([]);
     const [atmosphereStructures, setAtmosphereStructures] = useState<InventoryStructureItem[]>([]);
     const [surfaceStructures, setSurfaceStructures] = useState<InventoryStructureItem[]>([]);
+    const [tooltip, setTooltip] = useState<{ visible: boolean, text: string } | null>(null);
 
     const handleStructuresFetch = (
         orbital: InventoryStructureItem[],
@@ -152,8 +150,22 @@ function PlanetStructures() {
             <div className="w-full">
                 <div className="flex flex-row space-y-4">
                     {orbitalStructures.map((structure) => (
-                        <div key={structure.id} className="flex items-center space-x-4">
-                            <img src={structure.itemDetail?.icon_url} alt={structure.itemDetail?.name} className="w-16 h-16 object-cover" />
+                        <div
+                            key={structure.id}
+                            className="relative flex items-center space-x-4"
+                            onMouseEnter={() => setTooltip({ visible: true, text: structure.itemDetail?.name || 'Unknown' })}
+                            onMouseLeave={() => setTooltip(null)}
+                        >
+                            <img
+                                src={structure.itemDetail?.icon_url}
+                                alt={structure.itemDetail?.name}
+                                className="w-16 h-16 object-cover"
+                            />
+                            {tooltip?.visible && (
+                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm p-2 rounded-md">
+                                    {tooltip.text}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -167,8 +179,22 @@ function PlanetStructures() {
             <div className="w-full">
                 <div className="flex flex-row space-y-4">
                     {atmosphereStructures.map((structure) => (
-                        <div key={structure.id} className="flex items-center space-x-4">
-                            <img src={structure.itemDetail?.icon_url} alt={structure.itemDetail?.name} className="w-16 h-16 object-cover" />
+                        <div
+                            key={structure.id}
+                            className="relative flex items-center space-x-4"
+                            onMouseEnter={() => setTooltip({ visible: true, text: structure.itemDetail?.name || 'Unknown' })}
+                            onMouseLeave={() => setTooltip(null)}
+                        >
+                            <img
+                                src={structure.itemDetail?.icon_url}
+                                alt={structure.itemDetail?.name}
+                                className="w-16 h-16 object-cover"
+                            />
+                            {tooltip?.visible && (
+                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm p-2 rounded-md">
+                                    {tooltip.text}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -180,8 +206,22 @@ function PlanetStructures() {
                 <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
                 <div className="flex flex-row space-y-4">
                     {surfaceStructures.map((structure) => (
-                        <div key={structure.id} className="flex items-center space-x-4">
-                            <img src={structure.itemDetail?.icon_url} alt={structure.itemDetail?.name} className="w-16 h-16 object-cover" />
+                        <div
+                            key={structure.id}
+                            className="relative flex items-center space-x-4"
+                            onMouseEnter={() => setTooltip({ visible: true, text: structure.itemDetail?.name || 'Unknown' })}
+                            onMouseLeave={() => setTooltip(null)}
+                        >
+                            <img
+                                src={structure.itemDetail?.icon_url}
+                                alt={structure.itemDetail?.name}
+                                className="w-16 h-16 object-cover"
+                            />
+                            {tooltip?.visible && (
+                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm p-2 rounded-md">
+                                    {tooltip.text}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -194,7 +234,7 @@ function PlanetStructures() {
             </div>
         </PlanetViewLayout>
     );
-}
+};
 
 /*
 

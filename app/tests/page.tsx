@@ -10,7 +10,6 @@ export default function TestPage() {
         <div>
             <ClassificationViewer classificationType="planet" />
             <ChooseClassificationStarter />
-            {/* <AllStructures /> */}
         </div>
     )
 }
