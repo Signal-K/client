@@ -1,12 +1,10 @@
-import Layout from "../components/Layout";
-import PostFormCard from "../components/Posts/PostFormCard";
-import PostCard from "../components/Posts/PostCard";
+import { useSession } from "@supabase/auth-helpers-react";
+import React from "react";
 
 export default function Home() {
-  return (
-    <Layout hideNavigation={false}>
-      <PostFormCard />
-      <PostCard />
-    </Layout>
-  )
+    const session = useSession();
+
+    return (
+        <div>Entry point to client</div>
+    )
 }

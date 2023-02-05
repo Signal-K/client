@@ -1,31 +1,19 @@
-import Head from "next/head";
-import Image from "next/image";
-import Card from "../../components/Posts/Card";
-import PostCard from "../../components/Posts/PostCard";
-import PostFormCard from "../../components/Posts/PostFormCard";
-import NavigationCard from "../../components/Sidebar";
-import styles from '../../styles/social-graph/Home.module.css';
-import { Session } from "@supabase/supabase-js";
+import Layout from "../../components/Layout";
+import PostFormCard from "../../components/PostFormCard";
+import PostCard from "../../components/PostCard";
+import React from "react";
 import { useSession } from "@supabase/auth-helpers-react";
+import LoginPage from "../login/social-login";
 
-export default function SocialIndex () {
-    const session = useSession();
+export default function SocialGraphHome() {
+  const session = useSession();
+  console.log(session);
+  if (!session) { return <LoginPage /> };
 
-    if (!session) {
-        return ("Hello World");
-    };
-
-    return (
-        <div className={styles.background}>
-                <div className={styles.header}>
-                    <div className={styles.thing1}> {/* Sidebar */}
-                        <NavigationCard />
-                    </div>
-                    <div className={styles.thing2}>
-                        <PostFormCard/>
-                        <PostCard />
-                    </div>
-                </div>
-        </div>
-    )
+  return (
+    <Layout hideNavigation={false}>
+      <PostFormCard />
+      <PostCard />
+    </Layout>
+  )
 }
