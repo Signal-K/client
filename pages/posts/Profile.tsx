@@ -5,7 +5,12 @@ import Link from "next/link";
 import PostCard from "../../components/PostCard";
 import {useRouter} from "next/router";
 import FriendInfo from "../../components/FriendInfo";
-import React from "react";
+import React, { useEffect, useState} from "react";
+import { Database } from "../../utils/database.types";
+import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import AccountAvatar from "../../components/AccountAvatar";
+
+type Profiles = Database['public']['Tables']['profiles']['Row'];
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -16,6 +21,23 @@ export default function ProfilePage() {
   const isPhotos = pathname.includes('photos');
   const tabClasses = 'flex gap-1 px-4 py-1 items-center border-b-4 border-b-white';
   const activeTabClasses = 'flex gap-1 px-4 py-1 items-center border-socialBlue border-b-4 text-socialBlue font-bold';
+
+  const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null);
+  const [profiles, setProfiles] = useState(null);
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  useEffect(() => {
+    supabase.from('profiles') // Fetch profile from user id matching session
+      .select()
+      .eq('id', session.user.id)
+      .then(result => {
+        if (result.data.length > 0) {
+          setProfiles(result.data[0]);
+        }
+      });
+  }, []);
+
   return (
     <Layout hideNavigation={false}>
       <Card noPadding={true}>
@@ -24,7 +46,9 @@ export default function ProfilePage() {
             <img src="https://images.unsplash.com/photo-1454789591675-556c287e39e2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1472&q=80" alt=""/>
           </div>
           <div className="absolute top-40 left-4">
-            <Avatar size={'lg'} />
+            <AccountAvatar uid={session.user!.id}
+                url={profiles.avatar_url}
+                size={50} />
           </div>
           <div className="p-4 pt-0 md:pt-4 pb-0">
             <div className="ml-24 md:ml-40">

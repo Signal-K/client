@@ -6,33 +6,45 @@ import { Database } from "../utils/database.types";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
-export default function PostFormCard() {
+export default function PostFormCard ( { onPost } ) {
   const [profile, setProfile] = useState(null);
   const supabase = useSupabaseClient();
+  const [content, setContent] = useState('');
   const session = useSession();
+  
   const [loading, setLoading] = useState(false);
-  const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null);
+  const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
 
   useEffect(() => {
     supabase.from('profiles') // Fetch profile from user id matching session
       .select()
       .eq('id', session.user.id)
       .then(result => {
-        if (result.data.length) {
-          setProfile(result.data[0]);
-        }
+        setProfile(result.data[0]);
       });
   }, []);
+
+  function createPost () {
+    supabase.from('posts').insert({
+      author: session.user.id, // This is validated via RLS so users can't pretend to be other user
+      content, // : content,
+    }).then(response => {
+      if (!response.error) {
+        alert(`Post ${content} created`);
+        setContent('');
+        if ( onPost ) {
+          onPost();
+        }
+      }
+    });
+  }
 
   useEffect(() => {
     supabase.from('profiles')
       .select(`avatar_url`)
       .eq('id', session.user.id)
       .then(result => {
-        if (result.data.length) {
-          console.log(result.data[0].avatar_url)
-          setAvatarUrl(result.data[0].avatar_url)
-        }
+        setAvatarUrl(result.data[0].avatar_url) //console.log(result.data[0].avatar_url)
       })
   }, []);
 
@@ -50,8 +62,8 @@ export default function PostFormCard() {
         }
 
         if (data) {
+            console.log('Received')
             setAvatarUrl(data.avatar_url);
-            console.log(avatar_url)
         }
     } catch (error) {
         console.log(error);
@@ -66,9 +78,9 @@ export default function PostFormCard() {
         <div>
           <AccountAvatar uid={session.user!.id}
                 url={avatar_url}
-                size={75}/>
-        </div>
-        <textarea className="grow p-3 h-14" placeholder={'Whats on your mind, User?'} />
+                size={60}/>
+        </div> { profile && (
+          <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-14" placeholder={`What's on your mind, ${profile?.username}?`} /> )}
       </div>
       <div className="flex gap-5 items-center mt-2">
         <div>
@@ -97,7 +109,7 @@ export default function PostFormCard() {
           </button>
         </div>
         <div className="grow text-right">
-          <button className="bg-socialBlue text-white px-6 py-1 rounded-md">Share</button>
+          <button onClick={createPost} className="bg-socialBlue text-white px-6 py-1 rounded-md">Share</button>
         </div>
       </div>
     </Card>

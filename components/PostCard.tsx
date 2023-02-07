@@ -1,26 +1,63 @@
 import Avatar from "./Avatar";
 import Card from "./Card";
 import ClickOutHandler from 'react-clickout-handler'
-import {useState} from "react";
+import React, { useEffect,useState } from "react";
 import Link from "next/link";
+import AccountAvatar from "./AccountAvatar";
+import { Database } from "../utils/database.types";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import ReactTimeAgo from "react-time-ago";
 
-export default function PostCard() {
+type Profiles = Database['public']['Tables']['profiles']['Row'];
+
+export default function PostCard ( { content, created_at, profiles:profile } ) {
+  const [loading, setLoading] = useState(false);
+  const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
+  const [profiles, setProfiles] = useState();
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
   const [dropdownOpen,setDropdownOpen] = useState(false);
+
   function openDropdown(e) {
     e.stopPropagation();
     setDropdownOpen(true);
   }
+
   function handleClickOutsideDropdown(e) {
     e.stopPropagation();
     setDropdownOpen(false);
   }
+
+  /*useEffect(() => {
+    supabase.from('profiles') // Fetch profile from user id matching session
+      .select()
+      .eq('id', session.user.id)
+      .then(result => {
+        if (result.data.length) {
+          setProfiles(result.data[0]);
+        }
+      });
+  }, []); */
+
+  /*useEffect(() => {
+    supabase.from('profiles')
+      .select(`avatar_url`)
+      .eq('id', session.user.id)
+      .then(result => {
+        setAvatarUrl(result.data[0].avatar_url) //console.log(result.data[0].avatar_url)
+      })
+  }, []);*/
+
   return (
-    <Card>
+    <Card noPadding={false}>
       <div className="flex gap-3">
         <div>
           <Link href={'/posts/profile'}>
             <span className="cursor-pointer">
-              <Avatar />
+              <AccountAvatar uid={session.user!.id}
+                url={profile.avatar_url}
+                size={50} />
             </span>
           </Link>
         </div>
@@ -28,12 +65,12 @@ export default function PostCard() {
           <p>
             <Link href={'/posts/profile'}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
-                John Doe
+                {profile?.username}
               </span>
             </Link>
-            shared a <a className="text-socialBlue">album</a>
+            shared a <a className="text-socialBlue">post</a>
           </p>
-          <p className="text-gray-500 text-sm">2 hours ago</p>
+          <p className="text-gray-500 text-sm"><ReactTimeAgo date={created_at} /></p>
         </div>
         <div className="relative">
           <button className="text-gray-400" onClick={openDropdown}>
@@ -81,7 +118,7 @@ export default function PostCard() {
         </div>
       </div>
       <div>
-        <p className="my-3 text-sm">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores, cum cupiditate deleniti ducimus et eveniet ex excepturi fuga magnam, maiores nam pariatur quibusdam, recusandae reprehenderit sapiente sed sint veniam? Beatae.</p>
+        <p className="my-3 text-sm">{content}</p>
         <div className="rounded-md overflow-hidden">
           <img src="https://images.unsplash.com/photo-1530841377377-3ff06c0ca713?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt=""/>
         </div>
@@ -107,8 +144,10 @@ export default function PostCard() {
         </button>
       </div>
       <div className="flex mt-4 gap-3">
-        <div>
-          <Avatar />
+        <div className="mt-1">
+          <AccountAvatar uid={session.user!.id}
+              url={profile.avatar_url}
+              size={45} />
         </div>
         <div className="border grow rounded-full relative">
           <textarea className="block w-full p-3 px-4 overflow-hidden h-12 rounded-full" placeholder="Leave a comment"/>
