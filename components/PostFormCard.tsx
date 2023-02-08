@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Database } from "../utils/database.types";
 import { UserContext } from "../context/UserContext";
+import { ClimbingBoxLoader } from "react-spinners";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -12,18 +13,22 @@ export default function PostFormCard ( { onPost } ) {
   const [content, setContent] = useState('');
   const session = useSession();
   const { profile } = useContext(UserContext);
-  
-  const [loading, setLoading] = useState(false);
+
+  const [uploads, setUploads] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
   const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
 
   function createPost () {
     supabase.from('posts').insert({
       author: session.user.id, // This is validated via RLS so users can't pretend to be other user
       content, // : content,
+      media: uploads, // This should be changed to the user path `storage/userId/post/media...` like in the image gallery
+      // File upload -> show an icon depending on what type of file.
     }).then(response => {
       if (!response.error) {
         alert(`Post ${content} created`);
         setContent('');
+        setUploads([]);
         if ( onPost ) {
           onPost();
         }
@@ -40,29 +45,29 @@ export default function PostFormCard ( { onPost } ) {
       })
   }, []);
 
-  async function getProfile() {
-    try {
-        setLoading(true);
-        let { data, error, status } = await supabase
-            .from('profiles')
-            .select(`username, website, avatar_url, address`)
-            .eq('id', session.user.id)
-            .single()
+  async function addMedia (e: { target: { files: any; }; }) {
+    const files = e.target.files;
+    if (files.length > 0) {
+      setIsUploading(true);
+      for (const file of files) { // To-Do: List of user's photos from the image gallery in wb3-10
+        const fileName = Date.now() + session?.user?.id + file.name; // Generate a random string to make the file unique
+        const result = await supabase.storage
+          .from('media') // Upload the file/media
+          .upload(fileName, file);
 
-        if (error && status !== 406) {
-            throw error;
+        if (result.data) {
+          const url = process.env.NEXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/media/' + result.data.path;
+          setUploads(prevUploads => [...prevUploads, url]); // Add the most recently uploaded image to an array of images that are in state
+        } else {
+          console.log(result);
         }
-
-        if (data) {
-            console.log('Received')
-            setAvatarUrl(data.avatar_url);
-        }
-    } catch (error) {
-        console.log(error);
-    } finally {
-        setLoading(false);
+      }
+      setIsUploading(false);
     }
   }
+
+  // https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/1675853386903cebdc7a2-d8af-45b3-b37f-80f328ff54d6image-asset.jpg
+  // https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media1675853386903cebdc7a2-d8af-45b3-b37f-80f328ff54d6image-asset.jpg
 
   return (
     <Card noPadding={false}>
@@ -74,7 +79,26 @@ export default function PostFormCard ( { onPost } ) {
         </div> { profile && (
           <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-14" placeholder={`What's on your mind, ${profile?.username}?`} /> )}
       </div>
+      {isUploading && (
+        <div><ClimbingBoxLoader /></div>
+      )}
+      {uploads.length > 0 && (
+        <div className="flex gap-2 mt-4">
+          {uploads.map(upload => (
+            <div className=""><img src={upload} className='w-auto h-48 rounded-md' /></div>
+          ))}
+        </div>
+      )}
       <div className="flex gap-5 items-center mt-2">
+        <div>
+          <label className="flex gap-1">
+            <input type='file' className="hidden" onChange={addMedia} />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+            </svg>
+            <span className="hidden md:block">Media / File</span>
+          </label>
+        </div>
         <div>
           <button className="flex gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">

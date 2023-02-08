@@ -37,7 +37,7 @@ export default function SocialGraphHome() {
 
   function fetchPosts () {
     supabase.from('posts')
-      .select('id, content, created_at, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+      .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
       .order('created_at', { ascending: false })
       .then(result => { setPosts(result.data); })
   }

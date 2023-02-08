@@ -11,7 +11,7 @@ import { UserContext } from "../context/UserContext";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
-export default function PostCard ( { content, created_at, profiles:authorProfile } ) {
+export default function PostCard ( { content, created_at, media, profiles:authorProfile } ) {
   const [loading, setLoading] = useState(false);
   const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
   const { profile: myProfile } = useContext(UserContext);
@@ -31,33 +31,13 @@ export default function PostCard ( { content, created_at, profiles:authorProfile
     setDropdownOpen(false);
   }
 
-  /*useEffect(() => {
-    supabase.from('profiles') // Fetch profile from user id matching session
-      .select()
-      .eq('id', session.user.id)
-      .then(result => {
-        if (result.data.length) {
-          setProfiles(result.data[0]);
-        }
-      });
-  }, []); */
-
-  /*useEffect(() => {
-    supabase.from('profiles')
-      .select(`avatar_url`)
-      .eq('id', session.user.id)
-      .then(result => {
-        setAvatarUrl(result.data[0].avatar_url) //console.log(result.data[0].avatar_url)
-      })
-  }, []);*/
-
   return (
     <Card noPadding={false}>
       <div className="flex gap-3">
         <div>
           <Link href={'/posts/profile'}>
             <span className="cursor-pointer">
-              <PostCardAvatar url={profile.avatar_url}
+              <PostCardAvatar url={authorProfile.avatar_url}
                 size={50} />
             </span>
           </Link>
@@ -66,7 +46,7 @@ export default function PostCard ( { content, created_at, profiles:authorProfile
           <p>
             <Link href={'/posts/profile'}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
-                {profile?.username}
+                {authorProfile?.username}
               </span>
             </Link>
             shared a <a className="text-socialBlue">post</a>
@@ -120,8 +100,11 @@ export default function PostCard ( { content, created_at, profiles:authorProfile
       </div>
       <div>
         <p className="my-3 text-sm">{content}</p>
+        {media?.length > 0 && media.map(media => (
+          <div><img src={media} /></div>
+        ))}
         <div className="rounded-md overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1530841377377-3ff06c0ca713?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt=""/>
+          <img src="" alt=""/>
         </div>
       </div>
       <div className="mt-5 flex gap-8">
@@ -147,7 +130,7 @@ export default function PostCard ( { content, created_at, profiles:authorProfile
       <div className="flex mt-4 gap-3">
         <div className="mt-1">
           <AccountAvatar uid={session.user!.id}
-              url={profile.avatar_url}
+              url={authorProfile.avatar_url}
               size={45} />
         </div>
         <div className="border grow rounded-full relative">
