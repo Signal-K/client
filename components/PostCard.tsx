@@ -1,18 +1,20 @@
 import Avatar from "./Avatar";
 import Card from "./Card";
 import ClickOutHandler from 'react-clickout-handler'
-import React, { useEffect,useState } from "react";
+import React, { useContext, useEffect,useState } from "react";
 import Link from "next/link";
-import AccountAvatar from "./AccountAvatar";
+import AccountAvatar, { PostCardAvatar } from "./AccountAvatar";
 import { Database } from "../utils/database.types";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ReactTimeAgo from "react-time-ago";
+import { UserContext } from "../context/UserContext";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
-export default function PostCard ( { content, created_at, profiles:profile } ) {
+export default function PostCard ( { content, created_at, profiles:authorProfile } ) {
   const [loading, setLoading] = useState(false);
   const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
+  const { profile: myProfile } = useContext(UserContext);
   const [profiles, setProfiles] = useState();
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -55,8 +57,7 @@ export default function PostCard ( { content, created_at, profiles:profile } ) {
         <div>
           <Link href={'/posts/profile'}>
             <span className="cursor-pointer">
-              <AccountAvatar uid={session.user!.id}
-                url={profile.avatar_url}
+              <PostCardAvatar url={profile.avatar_url}
                 size={50} />
             </span>
           </Link>

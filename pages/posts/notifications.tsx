@@ -12,7 +12,7 @@ export default function NotificationsPage() {
         <div className="">
           <div className="flex gap-2 items-center border-b border-b-gray-100 p-4">
             <Link href={'/profile'}>
-              <Avatar size='5' />
+              {/*<Avatar size='5' />*/}
             </Link>
             <div>
               <Link href={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>
@@ -22,7 +22,7 @@ export default function NotificationsPage() {
           </div>
           <div className="flex gap-2 items-center border-b border-b-gray-100 p-4">
             <Link href={'/profile'}>
-              <Avatar size='5' />
+              {/*<Avatar size='5' />*/}
             </Link>
             <div>
               <Link href={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>
@@ -32,7 +32,7 @@ export default function NotificationsPage() {
           </div>
           <div className="flex gap-2 items-center border-b border-b-gray-100 p-4">
             <Link href={'/profile'}>
-              <Avatar size='5' />
+              {/*<Avatar size='5' />*/}
             </Link>
             <div>
               <Link href={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>

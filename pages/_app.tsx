@@ -9,10 +9,6 @@ import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router';
 
-import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en.json';
-TimeAgo.addDefaultLocale(en);
-
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const [supabaseClient] = useState(() => createBrowserSupabaseClient());

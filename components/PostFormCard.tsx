@@ -1,28 +1,20 @@
 import Card from "./Card";
 import AccountAvatar from "./AccountAvatar";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Database } from "../utils/database.types";
+import { UserContext } from "../context/UserContext";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
 export default function PostFormCard ( { onPost } ) {
-  const [profile, setProfile] = useState(null);
   const supabase = useSupabaseClient();
   const [content, setContent] = useState('');
   const session = useSession();
+  const { profile } = useContext(UserContext);
   
   const [loading, setLoading] = useState(false);
   const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
-
-  useEffect(() => {
-    supabase.from('profiles') // Fetch profile from user id matching session
-      .select()
-      .eq('id', session.user.id)
-      .then(result => {
-        setProfile(result.data[0]);
-      });
-  }, []);
 
   function createPost () {
     supabase.from('posts').insert({
