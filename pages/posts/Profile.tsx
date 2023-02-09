@@ -5,16 +5,23 @@ import Link from "next/link";
 import PostCard from "../../components/PostCard";
 import {useRouter} from "next/router";
 import FriendInfo from "../../components/FriendInfo";
-import React, { useEffect, useState} from "react";
+import React, { useContext, useEffect, useState} from "react";
 import { Database } from "../../utils/database.types";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import AccountAvatar from "../../components/AccountAvatar";
+import AccountAvatar, { PostCardAvatar } from "../../components/AccountAvatar";
+import { UserContext } from "../../context/UserContext";
+import UserCoverImage from "../../components/Cover";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
 export default function ProfilePage() {
+  const [profile, setProfile] = useState(null);
   const router = useRouter();
+  const userId = router.query.id;
   const {asPath:pathname} = router;
+
+  const supabase = useSupabaseClient();
+
   const isPosts = pathname.includes('posts') || pathname === '/profile';
   const isAbout = pathname.includes('about');
   const isFriends = pathname.includes('friends');
@@ -22,41 +29,66 @@ export default function ProfilePage() {
   const tabClasses = 'flex gap-1 px-4 py-1 items-center border-b-4 border-b-white';
   const activeTabClasses = 'flex gap-1 px-4 py-1 items-center border-socialBlue border-b-4 text-socialBlue font-bold';
 
-  const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null);
+  // Toggle different profile actions (like changing picture) IF profile being viewed is the logged in user's picture
+  const session = useSession();
+  const isLoggedUser = userId === session?.user?.id;
+
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+
+    supabase.from('profiles') // Grab profile of userId
+      .select()
+      .eq('id', userId)
+      .then(result => {
+        if (result.error) { throw result.error; };
+        if (result.data) { setProfile(result.data[0]); };
+      })
+  }, [userId]);
+
+  /*const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null);
   const [profiles, setProfiles] = useState(null);
   const supabase = useSupabaseClient();
   const session = useSession();
+  const { profile } = useContext(UserContext);
 
   useEffect(() => {
     supabase.from('profiles') // Fetch profile from user id matching session
       .select()
-      .eq('id', session.user.id)
+      .eq('id', session?.user?.id)
       .then(result => {
-        if (result.data.length > 0) {
+        if (result.data/*.length > 0*//*) {
           setProfiles(result.data[0]);
         }
       });
   }, []);
 
+  /*useEffect(() => { // Get the user's avatar (currently this is the logged in user's avatar, it should be changed to match the profile id being viewed #TO-DO)
+    supabase.from('profiles')
+      .select(`avatar_url`)
+      .eq('id', session?.user.id)
+      .then(result => {
+        setAvatarUrl(result.data[0].avatar_url) //console.log(result.data[0].avatar_url)
+      })
+  }, []);*/
+
   return (
     <Layout hideNavigation={false}>
       <Card noPadding={true}>
         <div className="relative overflow-hidden rounded-md">
-          <div className="h-60 overflow-hidden flex justify-center items-center">
-            <img src="https://images.unsplash.com/photo-1454789591675-556c287e39e2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1472&q=80" alt=""/>
-          </div>
-          <div className="absolute top-40 left-4">
-            <AccountAvatar uid={session.user!.id}
-                url={profiles.avatar_url}
-                size={50} />
+          <UserCoverImage url={profile?.cover} editable={true} />
+          <div className="absolute top-40 mt-12 left-4 w-full">
+            {profile && (<PostCardAvatar
+                url={profile?.avatar_url}
+                size={120} /> )}
           </div>
           <div className="p-4 pt-0 md:pt-4 pb-0">
             <div className="ml-24 md:ml-40">
-              <h1 className=" text-3xl font-bold">
-                Liam Arbuckle
-              </h1>
-              <div className="text-gray-500 leading-4">Melbourne, Australia</div>
-              <div className="@apply text-gray-500 leading-4 mb-2 mt-2">0x734gr874h4t4g8g4y384yt4490x</div> {/* Profile Location (from styles css) */}
+              <div className="flex">
+              <h1 className=" text-3xl font-bold">{profile?.full_name}</h1><p className="@apply text-blue-200 leading-4 mb-2 mt-2">{profile?.username}</p></div>
+              <div className="text-gray-500 leading-4">{profile?.location}</div>
+              <div className="@apply text-blue-200 leading-4 mb-2 mt-2">{profile?.address}{/* | {profile?.username}*/}</div> {/* Profile Location (from styles css) */}
             </div>
             <div className="mt-4 md:mt-10 flex gap-0">
               <Link href={'/profile/posts'} className={isPosts ? activeTabClasses : tabClasses}>
@@ -89,7 +121,7 @@ export default function ProfilePage() {
       </Card>
       {isPosts && (
         <div>
-          <PostCard />
+          {/*<PostCard key = { postMessage.id } { ..post } />*/}
         </div>
       )}
       {isAbout && (

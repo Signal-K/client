@@ -1,4 +1,5 @@
-import Card from "./Posts/Card";
+import React from 'react';
+import Card from './Card';
 import styles from '../styles/social-graph/Home.module.css';
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -12,9 +13,10 @@ export default function NavigationCard () {
     const activeElementClass = 'styles.activeSidebarNavItem';
     const elementClass = 'styles.sidebarNavItems';
     const user = useUser();
+    const supabase = useSupabaseClient();
 
     return (
-        <Card>
+        <Card noPadding={false}>
             <div className={styles.paddingThing}>
                 <h2>Navigation</h2>
                 {/*<Link href='/' className={pathname === '/' ? activeElementClass : elementClass}>Home</Link>*/}

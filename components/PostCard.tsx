@@ -9,6 +9,10 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ReactTimeAgo from "react-time-ago";
 import { UserContext } from "../context/UserContext";
 
+import en from 'javascript-time-ago/locale/en.json';
+import TimeAgo from "javascript-time-ago";
+TimeAgo.addDefaultLocale(en);
+
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
 export default function PostCard ( { content, created_at, media, profiles:authorProfile } ) {
@@ -35,16 +39,16 @@ export default function PostCard ( { content, created_at, media, profiles:author
     <Card noPadding={false}>
       <div className="flex gap-3">
         <div>
-          <Link href={'/posts/profile'}>
+          <Link href={'/posts/profile/'+authorProfile.id}>
             <span className="cursor-pointer">
-              <PostCardAvatar url={authorProfile.avatar_url}
+              <PostCardAvatar url={authorProfile?.avatar_url}
                 size={50} />
             </span>
           </Link>
         </div>
         <div className="grow">
           <p>
-            <Link href={'/posts/profile'}>
+            <Link href={'/posts/profile/'+authorProfile.id}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
                 {authorProfile?.username}
               </span>
@@ -100,12 +104,13 @@ export default function PostCard ( { content, created_at, media, profiles:author
       </div>
       <div>
         <p className="my-3 text-sm">{content}</p>
-        {media?.length > 0 && media.map(media => (
-          <div><img src={media} /></div>
-        ))}
-        <div className="rounded-md overflow-hidden">
-          <img src="" alt=""/>
-        </div>
+        {media?.length > 0 && (
+          <div className="flex gap-4">
+            {media?.length > 0 && media.map(media => (
+              <div className="rounded-md overflow-hidden"><img src={media} /></div>
+            ))}
+          </div>
+        )}
       </div>
       <div className="mt-5 flex gap-8">
         <button className="flex gap-2 items-center">
@@ -129,8 +134,8 @@ export default function PostCard ( { content, created_at, media, profiles:author
       </div>
       <div className="flex mt-4 gap-3">
         <div className="mt-1">
-          <AccountAvatar uid={session.user!.id}
-              url={authorProfile.avatar_url}
+          <AccountAvatar uid={session?.user!.id}
+              url={authorProfile?.avatar_url}
               size={45} />
         </div>
         <div className="border grow rounded-full relative">

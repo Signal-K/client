@@ -8,6 +8,7 @@ import { UserContext } from "../../context/UserContext";
 
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
+import Login from "../login";
 TimeAgo.addDefaultLocale(en);
 
 export default function SocialGraphHome() {
@@ -53,7 +54,7 @@ export default function SocialGraphHome() {
     })
   }
 
-  if (!session) { return <LoginPage /> };
+  if (!session) { return <Login /> };
 
   return (
     <Layout hideNavigation={false}>
