@@ -65,7 +65,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
           </button>
           {dropdownOpen && (
             <div className="bg-red w-5 h-5 absolute top-0"></div>
-          )}
+          )} {/* Add a button/handler to show Sandbox info if available */}
           <ClickOutHandler onClickOut={handleClickOutsideDropdown}>
             <div className="relative">
               {dropdownOpen && (

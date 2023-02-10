@@ -1,4 +1,4 @@
-import Layout from "../../components/Layout";
+import Layout, { ProfileLayout } from "../../components/Layout";
 import Card from "../../components/Card";
 import Avatar from "../../components/Avatar";
 import Link from "next/link";
@@ -37,48 +37,26 @@ export default function ProfilePage() {
     if (!userId) {
       return;
     }
+    fetchProfile();
+  }, [userId]);
 
+  function fetchProfile () {
     supabase.from('profiles') // Grab profile of userId
       .select()
       .eq('id', userId)
       .then(result => {
         if (result.error) { throw result.error; };
         if (result.data) { setProfile(result.data[0]); };
-      })
-  }, [userId]);
-
-  /*const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null);
-  const [profiles, setProfiles] = useState(null);
-  const supabase = useSupabaseClient();
-  const session = useSession();
-  const { profile } = useContext(UserContext);
-
-  useEffect(() => {
-    supabase.from('profiles') // Fetch profile from user id matching session
-      .select()
-      .eq('id', session?.user?.id)
-      .then(result => {
-        if (result.data/*.length > 0*//*) {
-          setProfiles(result.data[0]);
-        }
-      });
-  }, []);
-
-  /*useEffect(() => { // Get the user's avatar (currently this is the logged in user's avatar, it should be changed to match the profile id being viewed #TO-DO)
-    supabase.from('profiles')
-      .select(`avatar_url`)
-      .eq('id', session?.user.id)
-      .then(result => {
-        setAvatarUrl(result.data[0].avatar_url) //console.log(result.data[0].avatar_url)
-      })
-  }, []);*/
+      }
+    )
+  }
 
   return (
-    <Layout hideNavigation={false}>
+    <ProfileLayout hideNavigation={false}>
       <Card noPadding={true}>
         <div className="relative overflow-hidden rounded-md">
-          <UserCoverImage url={profile?.cover} editable={true} />
-          <div className="absolute top-40 mt-12 left-4 w-full">
+          <UserCoverImage url={profile?.cover} editable={true} onChange={fetchProfile()} />
+          <div className="absolute top-40 mt-12 left-4 w-full z-20">
             {profile && (<PostCardAvatar
                 url={profile?.avatar_url}
                 size={120} /> )}
@@ -114,6 +92,12 @@ export default function ProfilePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                 </svg>
                 <span className="hidden sm:block">Photos</span>
+              </Link>
+              <Link href={'/profile/sandbox'} className={isPhotos ? activeTabClasses : tabClasses}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg> {/* Add Generator here, highlight the "ProfileNavigation" there */}
+                <span className="hidden sm:block">Sandbox</span>
               </Link>
             </div>
           </div>
@@ -183,6 +167,6 @@ export default function ProfilePage() {
           </Card>
         </div>
       )}
-    </Layout>
+    </ProfileLayout>
   );
 }
