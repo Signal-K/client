@@ -114,7 +114,7 @@ export function PostCardAvatar ({
     }
 
     return (
-        <div className="${width} rounded-full overflow-hidden">
+        <div className="${width} rounded-lg overflow-hidden">
             {avatarUrl ? (
                 <img
                     src={avatarUrl}

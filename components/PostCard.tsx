@@ -8,6 +8,7 @@ import { Database } from "../utils/database.types";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ReactTimeAgo from "react-time-ago";
 import { UserContext } from "../context/UserContext";
+import UtterancesComments from "./Lens/Utterances";
 
 import en from 'javascript-time-ago/locale/en.json';
 import TimeAgo from "javascript-time-ago";
@@ -132,6 +133,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
           4
         </button>
       </div>
+      <UtterancesComments />
       <div className="flex mt-4 gap-3">
         <div className="mt-1">
           <AccountAvatar uid={session?.user!.id}
@@ -146,6 +148,14 @@ export default function PostCard ( { content, created_at, media, profiles:author
             </svg>
           </button>
         </div>
+        {/*<script src="https://utteranc.es/client.js"
+          repo="signal-k/starsailors"
+          issue-term="title"
+          label="ansible"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+        </script>*/}
       </div>
     </Card>
   );
