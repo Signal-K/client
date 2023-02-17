@@ -6,13 +6,13 @@ import Link from "next/link";
 import AccountAvatar, { PostCardAvatar } from "./AccountAvatar";
 import { Database } from "../utils/database.types";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import ReactTimeAgo from "react-time-ago";
 import { UserContext } from "../context/UserContext";
 import UtterancesComments from "./Lens/Utterances";
 
-import en from 'javascript-time-ago/locale/en.json';
-import TimeAgo from "javascript-time-ago";
-TimeAgo.addDefaultLocale(en);
+//import en from 'javascript-time-ago/locale/en.json';
+//import TimeAgo from "javascript-time-ago";
+//TimeAgo.addDefaultLocale(en);
+//import ReactTimeAgo from "react-time-ago";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -40,7 +40,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
     <Card noPadding={false}>
       <div className="flex gap-3">
         <div>
-          <Link href={'/posts/profile/'+authorProfile.id}>
+          <Link href={'/posts/profile/'+authorProfile?.id}>
             <span className="cursor-pointer">
               <PostCardAvatar url={authorProfile?.avatar_url}
                 size={50} />
@@ -49,14 +49,14 @@ export default function PostCard ( { content, created_at, media, profiles:author
         </div>
         <div className="grow">
           <p>
-            <Link href={'/posts/profile/'+authorProfile.id}>
+            <Link href={'/posts/profile/'+authorProfile?.id}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
                 {authorProfile?.username}
               </span>
             </Link>
-            shared a <a className="text-socialBlue">post</a>
+            shared a <a className="text-socialBlue">post</a> {/* Add link to ORCHID publication ID/Lens ID */}
           </p>
-          <p className="text-gray-500 text-sm"><ReactTimeAgo date={created_at} /></p>
+          <p className="text-gray-500 text-sm">{/*<ReactTimeAgo date={created_at} />*/} Undefined hours ago</p>
         </div>
         <div className="relative">
           <button className="text-gray-400" onClick={openDropdown}>
