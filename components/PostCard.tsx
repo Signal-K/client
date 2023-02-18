@@ -9,10 +9,10 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UserContext } from "../context/UserContext";
 import UtterancesComments from "./Lens/Utterances";
 
-//import en from 'javascript-time-ago/locale/en.json';
-//import TimeAgo from "javascript-time-ago";
-//TimeAgo.addDefaultLocale(en);
-//import ReactTimeAgo from "react-time-ago";
+import en from 'javascript-time-ago/locale/en.json';
+import TimeAgo from "javascript-time-ago";
+TimeAgo.addDefaultLocale(en);
+import ReactTimeAgo from "react-time-ago";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -56,7 +56,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
             </Link>
             shared a <a className="text-socialBlue">post</a> {/* Add link to ORCHID publication ID/Lens ID */}
           </p>
-          <p className="text-gray-500 text-sm">{/*<ReactTimeAgo date={created_at} />*/} Undefined hours ago</p>
+          <p className="text-gray-500 text-sm"><ReactTimeAgo date={ ( new Date(created_at)).getTime() } /></p>{/* <ReactTimeAgo date={ ( created_at instanceof Date ? created_at.getTime() : created_at ) } /> */}
         </div>
         <div className="relative">
           <button className="text-gray-400" onClick={openDropdown}>
@@ -108,7 +108,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
         {media?.length > 0 && (
           <div className="flex gap-4">
             {media?.length > 0 && media.map(media => (
-              <div className="rounded-md overflow-hidden"><img src={media} /></div>
+              <div key={media} className="rounded-md overflow-hidden"><img src={media} /></div>
             ))}
           </div>
         )}

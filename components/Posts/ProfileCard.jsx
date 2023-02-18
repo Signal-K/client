@@ -3,28 +3,38 @@ import UtterancesComments from "../Lens/Utterances"
 import Card from "../Card"
 import FriendInfo from "../FriendInfo"
 import PostCard from "../PostCard"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSupabaseClient } from "@supabase/auth-helpers-react"
 
 export function ProfileContent ({ activeTab, userId }) {
     const supabase = useSupabaseClient();
-    const session = useSession();
     
     const [posts, setPosts] = useState([]);
+    const [profile, setProfile] = useState(null);
 
-    useEffect(() => {
+    useEffect (() => {
         if (!userId) { return; };
-        userPosts();
+        if (activeTab === 'posts') {
+            loadProfile().then(() => {});
+        }
     }, [userId]);
 
-    async function userPosts(userId) {
+    async function loadProfile () {
+        const posts = await userPosts(userId);
+        const profile = await userProfile(userId);
+        setPosts(posts)
+        setProfile(profile);
+        return { posts, profile };
+    }
+
+    async function userPosts (userId) {
         const { data } = await supabase.from('posts')
             .select('id, content, created_at, media, author') // profiles(id, avatar_url, username)')
+            .order('created_at', { ascending: false })
             .eq('author', userId) // session?.user?.id)
-            .then(result => { console.log(result); } );
         return data;
     };
 
-    async function userProfile(userId) {
+    async function userProfile (userId) {
         const { data } = await supabase.from('profiles')
             .select()
             .eq('id', userId);
@@ -35,8 +45,11 @@ export function ProfileContent ({ activeTab, userId }) {
         <div>
             {activeTab === 'posts' && (
                 <div>
-                <PostCard />
+                { posts.length > 0 && posts.map(post => (
+                    <PostCard key={post.created_at} {...post} profiles={profile} /*media={media}*/ />
+                ))}
                 {/*<PostCard key = { postMessage.id } { ..post } />*/}
+                {/* Create a post card to tag the user */}
                 </div>
             )}
             {activeTab === 'about' && (

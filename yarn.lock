@@ -3325,6 +3325,20 @@
     uuid "^9.0.0"
     zod "^3.20.2"
 
+"@thirdweb-dev/auth@^3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@thirdweb-dev/auth/-/auth-3.0.4.tgz#af2055087c25a88eb02c8edfb8135e637b40bbc7"
+  integrity sha512-MSB72gugjMMrscxxCKCHWgRZS6ToYbAO6ZHX9x1rBYWm/I2BsZAQW0lC1+HzEeAciC0XsctqSRcn9kGFBkTQzQ==
+  dependencies:
+    cookie "^0.5.0"
+    uuid "^9.0.0"
+    zod "^3.20.2"
+
+"@thirdweb-dev/chains@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@thirdweb-dev/chains/-/chains-0.1.0.tgz#f284aadd4100ab03744ff17a4d41f27e15017cd3"
+  integrity sha512-JCHViDUMBVFnX8xLBik2bU9M3pqGXC66Kh/KI+hzLcHtTbRNRngOL9oaoGz93oSOgD3POgxlqVlFZkQlYzFguQ==
+
 "@thirdweb-dev/contracts-js@^1.3.1":
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/@thirdweb-dev/contracts-js/-/contracts-js-1.3.1.tgz#e1e6a0d0c33fc2a7b87caaf556211238d028e326"
@@ -3342,19 +3356,20 @@
   resolved "https://registry.yarnpkg.com/@thirdweb-dev/contracts/-/contracts-3.4.2.tgz#030eb87aff70223aa92316e4829195871f94f3d1"
   integrity sha512-mfEm+EeDhZSuCjm5Ig/EgGWamxGMN9tPc0c+l/bU1/uRzEnEw5nzHH8y5H0snjXn6r2oJ9V0FTN956699MHSfg==
 
-"@thirdweb-dev/react-core@^3.8.2":
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/@thirdweb-dev/react-core/-/react-core-3.8.2.tgz#eed7091543bd5928826e179a9adc6bdea358a72c"
-  integrity sha512-+S8ZSZ+qIPE+GpCNaxOa3FvcINPp5Nr8jSJq22i8/9gKmK5no9x8zBT4SBtKLsaiw769jrpBtK2Y7hVZMBUEdg==
+"@thirdweb-dev/react-core@^3.9.0":
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/@thirdweb-dev/react-core/-/react-core-3.9.0.tgz#353a7539d369be3e29df9a091949982e53ddb337"
+  integrity sha512-9SeMpuTSQgCsK3vSu9kcaqf2DeTDb2EP7PIAeoBJcNFxKykLbsQixCH7zguKMaVlskMn6o8e7z5SxFV7M01Vsw==
   dependencies:
     "@tanstack/react-query" "^4.0.10"
-    "@thirdweb-dev/auth" "^3.0.3"
+    "@thirdweb-dev/auth" "^3.0.4"
+    "@thirdweb-dev/chains" "^0.1.0"
     tiny-invariant "^1.2.0"
 
-"@thirdweb-dev/react@^3.8.2":
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/@thirdweb-dev/react/-/react-3.8.2.tgz#8af235bc3ce26aec8ce5eadd6ef6188c2042ef76"
-  integrity sha512-NEHIeO2TMX+o8SweHFyXpe/394AIgIb+xv/7pi3901KeUTnP8XO779TZN3Mkjxj/g0UrPatZn09AcMM67jPK6w==
+"@thirdweb-dev/react@^3.9.0":
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/@thirdweb-dev/react/-/react-3.9.0.tgz#a729e34119d4b0b241f215add6e07cf0f5eb016f"
+  integrity sha512-vzJPyAToLg+7SpW48HU1t11BXMRY08tKjTPvm+MuO6d7uAleOm6KcKUVye5e1qUdwh9WjghF3ihg3vgCYb8N1Q==
   dependencies:
     "@emotion/react" "^11.10.0"
     "@emotion/styled" "^11.10.0"
@@ -3364,7 +3379,9 @@
     "@safe-global/safe-ethers-adapters" "0.1.0-alpha.13"
     "@safe-global/safe-ethers-lib" "^1.7.0"
     "@tanstack/react-query" "^4.0.10"
-    "@thirdweb-dev/react-core" "^3.8.2"
+    "@thirdweb-dev/chains" "^0.1.0"
+    "@thirdweb-dev/react-core" "^3.9.0"
+    "@thirdweb-dev/wallets" "^0.2.1"
     "@zag-js/menu" "0.3.4"
     "@zag-js/react" "0.3.4"
     buffer "^6.0.3"
@@ -3373,15 +3390,15 @@
     detect-browser "^5.3.0"
     magic-sdk "^10.1.0"
     mime "^3.0.0"
-    react-cool-dimensions "^2.0.7"
     tiny-invariant "^1.2.0"
     wagmi "^0.2.28"
 
-"@thirdweb-dev/sdk@^3.8.2":
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/@thirdweb-dev/sdk/-/sdk-3.8.2.tgz#0e2a96eefd6233cc3cf5aec316fbe108b1b92919"
-  integrity sha512-T3AJZXZX6QMYFU4Uh78BC7roFPOs1r9IpUd6WEw30nUG49sIgstcpjbsPt4kpQSSPftlD9Af/2qDwsaxdygTFw==
+"@thirdweb-dev/sdk@^3.9.0":
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/@thirdweb-dev/sdk/-/sdk-3.9.0.tgz#4b2fc0446e487ba537dd70ea406393136434cbab"
+  integrity sha512-QSErdjOchuurqKvhRFM1WC6IBj9VC2lQ3sKdIeH2Fe8DRAAvDNYQuWEqmAuJcIaLbJTSnEa7E41fN+HbIDzcaA==
   dependencies:
+    "@thirdweb-dev/chains" "^0.1.0"
     "@thirdweb-dev/contracts-js" "^1.3.1"
     "@thirdweb-dev/storage" "^1.0.8"
     bn.js "^5.2.1"
@@ -3404,6 +3421,14 @@
     cross-fetch "^3.1.5"
     form-data "^4.0.0"
     uuid "^9.0.0"
+
+"@thirdweb-dev/wallets@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@thirdweb-dev/wallets/-/wallets-0.2.1.tgz#cf8c10fcfa2d4632f0b7fb2b5898a3cedfd52659"
+  integrity sha512-imTzhvqiHKlrThWuUWVZE16TsHMpyyxNTgC0TOlyR+arXJHxKe4z3HCqkpmXHL3gH3kpZkJyExeeZ8fQwyJPTA==
+  dependencies:
+    eventemitter3 "^5.0.0"
+    localforage "^1.10.0"
 
 "@tootallnate/once@2":
   version "2.0.0"
@@ -3505,7 +3530,7 @@
   resolved "https://registry.yarnpkg.com/@types/lru-cache/-/lru-cache-5.1.1.tgz#c48c2e27b65d2a153b19bfc1a317e30872e01eef"
   integrity sha512-ssE3Vlrys7sdIzs5LOxCzTVMsU7i9oa/IaW92wF32JFb3CVczqOkru2xspuKczHEbG3nvmPY7IFqVmGGHdNbYw==
 
-"@types/node@*", "@types/node@^18.11.18":
+"@types/node@*":
   version "18.13.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.13.0.tgz#0400d1e6ce87e9d3032c19eb6c58205b0d3f7850"
   integrity sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==
@@ -3514,6 +3539,11 @@
   version "12.20.55"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.55.tgz#c329cbd434c42164f846b909bd6f85b5537f6240"
   integrity sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==
+
+"@types/node@^18.14.0":
+  version "18.14.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.14.0.tgz#94c47b9217bbac49d4a67a967fdcdeed89ebb7d0"
+  integrity sha512-5EWrvLmglK+imbCJY0+INViFWUHg1AHel1sq4ZVSfdcNqGy9Edv3UB9IIzzg+xPaUcAgZYcfVs2fBcwDeZzU0A==
 
 "@types/omit-deep@^0.3.0":
   version "0.3.0"
@@ -3578,7 +3608,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^18.0.27":
+"@types/react@*", "@types/react@^18.0.28":
   version "18.0.28"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.28.tgz#accaeb8b86f4908057ad629a26635fe641480065"
   integrity sha512-RD0ivG1kEztNBdoAK7lekI9M+azSnitIn85h4iOiaLjaTrMjzslhaqCGaI4IyCJ1RljWiLCEu4jyrLLgqxBTew==
@@ -7909,7 +7939,7 @@ lit@^2.2.3:
     lit-element "^3.2.0"
     lit-html "^2.6.0"
 
-localforage@^1.7.4:
+localforage@^1.10.0, localforage@^1.7.4:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/localforage/-/localforage-1.10.0.tgz#5c465dc5f62b2807c3a84c0c6a1b1b3212781dd4"
   integrity sha512-14/H1aX7hzBBmmh7sGPd+AOMkkIrHM3Z1PAyGgZigA1H1p5O5ANnMyWzvpAETtG68/dC4pC0ncy3+PPGzXZHPg==
@@ -8084,6 +8114,11 @@ md5.js@^1.3.4:
     hash-base "^3.0.0"
     inherits "^2.0.1"
     safe-buffer "^5.1.2"
+
+memoize-one@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-6.0.0.tgz#b2591b871ed82948aee4727dc6abceeeac8c1045"
+  integrity sha512-rkpe71W0N0c0Xz6QD0eJETuWAJGnJ9afsl1srmwPrI+yBCkge5EycXXbYRyvL29zZVUWQCY7InPRCv3GDXuZNw==
 
 memory-level@^1.0.0:
   version "1.0.0"
@@ -8723,6 +8758,11 @@ pbkdf2@^3.0.17:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
+performance-now@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
+  integrity sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==
+
 picocolors@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.0.0.tgz#cb5bdc74ff3f51892236eaf79d68bc44564ab81c"
@@ -8949,6 +8989,13 @@ quick-lru@^5.1.1:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-5.1.1.tgz#366493e6b3e42a3a6885e2e99d18f80fb7a8c932"
   integrity sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==
 
+raf@^3.4.1:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/raf/-/raf-3.4.1.tgz#0742e99a4a6552f445d73e3ee0328af0ff1ede39"
+  integrity sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==
+  dependencies:
+    performance-now "^2.1.0"
+
 randombytes@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/randombytes/-/randombytes-2.1.0.tgz#df6f84372f0270dc65cdf6291349ab7a473d4f2a"
@@ -9073,11 +9120,6 @@ react-context-toolbox@^2.0.2:
   resolved "https://registry.yarnpkg.com/react-context-toolbox/-/react-context-toolbox-2.0.2.tgz#35637287cb23f801e6ed802c2bb7a97e1f04e3fb"
   integrity sha512-tY4j0imkYC3n5ZlYSgFkaw7fmlCp3IoQQ6DxpqeNHzcD0hf+6V+/HeJxviLUZ1Rv1Yn3N3xyO2EhkkZwHn0m1A==
 
-react-cool-dimensions@^2.0.7:
-  version "2.0.7"
-  resolved "https://registry.yarnpkg.com/react-cool-dimensions/-/react-cool-dimensions-2.0.7.tgz#2fe6657608f034cd7c89f149ed14e79cf1cb2d50"
-  integrity sha512-z1VwkAAJ5d8QybDRuYIXTE41RxGr5GYsv1bQhbOBE8cMfoZQZpcF0odL64vdgrQVzat2jayedj1GoYi80FWcbA==
-
 react-dom@18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.2.0.tgz#22aaf38708db2674ed9ada224ca4aa708d821e3d"
@@ -9172,6 +9214,15 @@ react-style-singleton@^2.2.1:
     get-nonce "^1.0.0"
     invariant "^2.2.4"
     tslib "^2.0.0"
+
+react-time-ago@^7.2.1:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/react-time-ago/-/react-time-ago-7.2.1.tgz#101a549a8d7f51c225c82c74abc517ecef647b24"
+  integrity sha512-X5zwJDZHa1fsMwMvh8mrHN31g85s84zMCp+d7YL6IX50kNnr6YMAS2wpt1BmO9OxBV2Ue5J1ptD6JI8Zjd35HA==
+  dependencies:
+    memoize-one "^6.0.0"
+    prop-types "^15.8.1"
+    raf "^3.4.1"
 
 react-transition-group@^4.0.0:
   version "4.4.5"
