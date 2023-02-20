@@ -36,3 +36,26 @@ export default function PlanetEditor () {
 		</SubPage>
 	);
 }
+
+export function PlanetEditorFromData () {
+	const planetState = usePlanetEditorState(sceneManager.planet);
+	
+	const ref = createRef(null); // Should be createRef(null) -> if experiencing problems, fix this line and change file to be `planet-editor.jsx` rather than `..tsx`
+	const [width, setWidth] = useState(300);
+	const [image, takeScreenShot] = useScreenshot();
+	const getImage = () => takeScreenShot();
+
+	return (
+		<SubPage header='Planet Editor'>
+			<br />
+			<Row style={{ height: '' }}>
+				<Col lg={6} xs={12} className="display">
+					<SceneDisplay sceneManager={sceneManager} />
+				</Col>
+				{/*<Col lg={6} xs={12} className="controls">
+					<Controls {...{ planetState }}  />
+				</Col>*/}
+			</Row>
+		</SubPage>
+	);
+}

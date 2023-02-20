@@ -24,11 +24,16 @@ export default function ProfilePage () {
   const session = useSession();
   const isLoggedUser = userId === session?.user?.id;
 
+  // For testing
+  const [planet, setPlanet] = useState(null);
+  const planetId = 'cebdc7a2-d8af-45b3-b37f-80f328ff54d6';
+
   useEffect(() => {
     if (!userId) {
       return;
     }
     fetchProfile();
+    fetchPlanet();
   }, [userId]);
 
   function fetchProfile () {
@@ -41,6 +46,20 @@ export default function ProfilePage () {
       }
     )
   }
+
+  function fetchPlanet () {
+    supabase.from('planets')
+        .select()
+        .eq('id', planetId)
+        .then(result => {
+            if (result.error) { throw result.error; };
+            if (result.data) {
+              setPlanet(result.data[0]);
+              console.log('Planet: ', planet);
+            };
+        }
+    );
+  };
 
   return (
     <UserContextProvider>

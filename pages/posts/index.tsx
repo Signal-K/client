@@ -11,7 +11,7 @@ import en from 'javascript-time-ago/locale/en.json';
 import Login from "../login";
 TimeAgo.addDefaultLocale(en);
 
-export default function SocialGraphHome() {
+export default function SocialGraphHome () {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);

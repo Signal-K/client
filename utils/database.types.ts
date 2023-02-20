@@ -49,6 +49,7 @@ export interface Database {
           radius: number | null // Measured in Earth radius ratio
           date: string | null // UNIX time format?
           ticId: string | null
+          avatar_url: string | null
           screenshot: string | null // Link/ref to screenshot that was saved from the generator
           // We can add json types here, that could be useful for all the traits?
         }
@@ -59,6 +60,7 @@ export interface Database {
           radius: number | null
           date: string | null
           ticId: string | null
+          avatar_url: string | null
           screenshot: string | null
         }
         Update: {
@@ -68,6 +70,7 @@ export interface Database {
           radius: number | null
           date: string | null
           ticId: string | null
+          avatar_url: string | null
           screenshot: string | null
         }
       }
