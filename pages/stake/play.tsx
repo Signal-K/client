@@ -6,7 +6,7 @@ import { ConnectWallet, useAddress, useContract } from "@thirdweb-dev/react";
 import { ApproxRewards, CurrentGear, GameplayAnimation, LoadingSection, OwnedGear, Rewards, Shop, ShopItem } from "../../components/Stake";
 import { HELPER_ADDRESS, PLANETS_ADDRESS, MINERALS_ADDRESS, MULTITOOLS_ADDRESS } from "../../constants/contractAddresses";
 
-export default function Play() {
+export default function StakePlay () {
     const address = useAddress(); // Connect to user wallet
     const { contract: helperContract } = useContract(HELPER_ADDRESS); // Connect to all the contracts relevant to this page
     const { contract: planetContract } = useContract(PLANETS_ADDRESS, 'edition-drop');

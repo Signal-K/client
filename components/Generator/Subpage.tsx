@@ -7,7 +7,7 @@ export default function SubPage ( { header, children }: { header: string, childr
     return (
         <Layout>
             <Row>
-                <Col><h1 className="display-4">Hello {header}</h1></Col>
+                <Col><h1 className="display-4">{header}</h1></Col>
             </Row>
             {children}
         </Layout>
