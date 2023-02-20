@@ -6,12 +6,13 @@ import Link from "next/link";
 import AccountAvatar, { PostCardAvatar } from "./AccountAvatar";
 import { Database } from "../utils/database.types";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import ReactTimeAgo from "react-time-ago";
 import { UserContext } from "../context/UserContext";
+import UtterancesComments from "./Lens/Utterances";
 
 import en from 'javascript-time-ago/locale/en.json';
 import TimeAgo from "javascript-time-ago";
 TimeAgo.addDefaultLocale(en);
+import ReactTimeAgo from "react-time-ago";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -39,7 +40,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
     <Card noPadding={false}>
       <div className="flex gap-3">
         <div>
-          <Link href={'/posts/profile/'+authorProfile.id}>
+          <Link href={'/posts/profile/'+authorProfile?.id}>
             <span className="cursor-pointer">
               <PostCardAvatar url={authorProfile?.avatar_url}
                 size={50} />
@@ -48,14 +49,14 @@ export default function PostCard ( { content, created_at, media, profiles:author
         </div>
         <div className="grow">
           <p>
-            <Link href={'/posts/profile/'+authorProfile.id}>
+            <Link href={'/posts/profile/'+authorProfile?.id}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
                 {authorProfile?.username}
               </span>
             </Link>
-            shared a <a className="text-socialBlue">post</a>
+            shared a <a className="text-socialBlue">post</a> {/* Add link to ORCHID publication ID/Lens ID */}
           </p>
-          <p className="text-gray-500 text-sm"><ReactTimeAgo date={created_at} /></p>
+          <p className="text-gray-500 text-sm"><ReactTimeAgo date={ ( new Date(created_at)).getTime() } /></p>{/* <ReactTimeAgo date={ ( created_at instanceof Date ? created_at.getTime() : created_at ) } /> */}
         </div>
         <div className="relative">
           <button className="text-gray-400" onClick={openDropdown}>
@@ -107,7 +108,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
         {media?.length > 0 && (
           <div className="flex gap-4">
             {media?.length > 0 && media.map(media => (
-              <div className="rounded-md overflow-hidden"><img src={media} /></div>
+              <div key={media} className="rounded-md overflow-hidden"><img src={media} /></div>
             ))}
           </div>
         )}
@@ -132,6 +133,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
           4
         </button>
       </div>
+      <UtterancesComments />
       <div className="flex mt-4 gap-3">
         <div className="mt-1">
           <AccountAvatar uid={session?.user!.id}
@@ -146,6 +148,14 @@ export default function PostCard ( { content, created_at, media, profiles:author
             </svg>
           </button>
         </div>
+        {/*<script src="https://utteranc.es/client.js"
+          repo="signal-k/starsailors"
+          issue-term="title"
+          label="ansible"
+          theme="github-light"
+          crossorigin="anonymous"
+          async>
+        </script>*/}
       </div>
     </Card>
   );

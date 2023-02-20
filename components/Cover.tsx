@@ -25,7 +25,7 @@ export default function UserCoverImage ( { url, editable, onChange } ) {
                         cover: url,
                     })
                     .eq('id', session?.user?.id)
-                    .then(({data, error}) => {
+                    .then(({ data, error }) => {
                         if (error) throw error;
                         if (data && onChange) { onChange(); };
                     })

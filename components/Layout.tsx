@@ -32,7 +32,7 @@ export function ProfileLayout({children,hideNavigation}) {
     <div className="md:flex mt-4 max-w-4xl mx-auto gap-6 mb-24 md:mb-0">
       {!hideNavigation && (
         <div className="fixed md:static w-full bottom-0 md:w-3/12 -mb-5">
-          <ProfileNavigationCard />
+          <ProfileNavigationCard /> {/* Hide second nav behind drawer on mobile view */}
         </div>
       )}
       <div className={rightColumnClasses}>
