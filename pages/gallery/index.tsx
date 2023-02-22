@@ -45,7 +45,7 @@ export default function GalleryIndex () {
             .storage
             .from('images')
             .upload(session?.user?.id + '/' + uuidv4(), file);
-
+            // send request to Flask with url of (session?.user?.id + '/' + uuidv4(), file)
         if (data) {
             getImages();
         } else {

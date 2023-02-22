@@ -131,3 +131,16 @@ export default function PostFormCard ( { onPost } ) {
     </Card>
   );
 }
+
+export function PlanetTagPostForm ( { onPost } ) {
+  const supabase = useSupabaseClient();
+  const [content, setContent] = useState('');
+  const session = useSession();
+  const { profile } = useContext(UserContext);
+
+  const [uploads, setUploads] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
+
+  const [planet, setPlanet] = useState('');
+}

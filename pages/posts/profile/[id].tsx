@@ -1,4 +1,4 @@
-import ProfilePage from "../profile";
+import ProfilePage from "../Profile";
 import React from "react";
 import { useRouter } from "next/router";
 
