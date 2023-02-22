@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Card from "../Card";
 
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { PlanetEditorFromData } from "../../pages/generator/planet-editor";
+import PlanetEditor, { PlanetEditorFromData } from "../../pages/generator/planet-editor";
 import StakePlay from "../../pages/stake/play";
 
 export function PlanetCard ({ activeTab, planetId }) {
