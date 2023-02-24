@@ -1,5 +1,5 @@
 {
-  "name": "social-media",
+  "name": "desci-journal-client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,6 +11,7 @@
   "dependencies": {
     "@chakra-ui/react": "^2.4.9",
     "@lens-protocol/react": "^0.3.0",
+    "@nextui-org/react": "^1.0.0-beta.12",
     "@primer/octicons-react": "9.1.1",
     "@supabase/auth-helpers-nextjs": "^0.5.4",
     "@supabase/auth-helpers-react": "^0.3.1",
