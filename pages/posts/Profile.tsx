@@ -1,130 +1,92 @@
-import Layout from "../../generator/components/Layout";
-import NavigationCard from "../../components/Sidebar";
-import styles from '../../styles/social-graph/Home.module.css';
-import Card, { ProfileCard } from "../../components/Posts/Card";
-import Avatar, { BigAvatar } from "../../components/Posts/Avatar";
-import { HiPencilAlt, HiOutlineUserGroup, HiOutlineDocumentText, HiOutlineVideoCamera } from 'react-icons/hi';
-import Link from "next/link";
-import PostCard from "../../components/Posts/PostCard";
+import Layout, { ProfileLayout } from "../../components/Layout";
+import Card from "../../components/Card";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import ProfileAbout from "../../components/Profile/ProfileAbout";
-import ProfileFriends from "../../components/Profile/ProfileFriends";
-import ProfileMedia from "../../components/Profile/ProfileMedia";
+import React, { useEffect, useState} from "react";
+import { Database } from "../../utils/database.types";
+import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import AccountAvatar, { PostCardAvatar } from "../../components/AccountAvatar";
+import { UserContextProvider } from "../../context/UserContext";
+import UserCoverImage from "../../components/Cover";
+import ProfileTabs from "../../components/Posts/ProfileNavigation";
+import { ProfileContent } from "../../components/Posts/ProfileCard";
 
-export default function ProfilePage() {
-    const router = useRouter();
-    const { asPath: pathname } = router;
-    const isPosts = pathname.includes('posts') || pathname == '/profile';
-    const isAbout = pathname.includes('about') || pathname == '/about';
-    const isFriends = pathname.includes('friends') || pathname == '/friends';
-    const isMedia = pathname.includes('media') || pathname == '/media';
-    const [isPostsButton, setIsPostsButton] = useState(true);
-    const [isFriendsButton, setIsFriendsButton] = useState(false);
-    const [isAboutButton, setIsAboutButton] = useState(false);
-    const [isMediaButton, setIsMediaButton] = useState(false);
-    const clickPosts = () => {
-        console.log(isPostsButton);
-        setIsPostsButton(true);
-        setIsFriendsButton(false)
-        setIsAboutButton(false)
-        setIsMediaButton(false)
-    }
-    const clickFriends = () => {
-        console.log(isPostsButton);
-        setIsPostsButton(false);
-        setIsFriendsButton(true)
-        setIsAboutButton(false)
-        setIsMediaButton(false)
-    }
-    const clickAbout = () => {
-        console.log(isPostsButton);
-        setIsPostsButton(false);
-        setIsFriendsButton(false)
-        setIsAboutButton(true)
-        setIsMediaButton(false)
-    }
-    const clickMedia = () => {
-        console.log(isMediaButton);
-        setIsPostsButton(false);
-        setIsFriendsButton(false)
-        setIsAboutButton(false)
-        setIsMediaButton(true)
-    }
+type Profiles = Database['public']['Tables']['profiles']['Row'];
 
-    return (
-        <div className={styles.background}>
-            <div className={styles.header}>
-                <div className={styles.thing1}> {/* Sidebar */}
-                    <NavigationCard />
-                </div>
-                <div className={styles.thing2}>
-                    <ProfileCard>
-                        <div className={styles.profileContentsWrapper}>
-                            <div className={styles.profileCoverImage}>
-                                <img src="https://images.unsplash.com/photo-1454789591675-556c287e39e2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1472&q=80" />
-                            </div>
-                            <div className={styles.profilePicWrapper}>
-                                <BigAvatar />
-                            </div>
-                            <div className={styles.profileContents}>
-                                <div className={styles.profileContentsText}>
-                                    <h1 className={styles.profileName}>Liam Arbuckle</h1>
-                                    <div className={styles.profileLocation}>Melbourne, Australia</div>
-                                    <div className={styles.profileLocation}>0x734gr874h4t4g8g4y384yt4490x</div>
-                                </div>
-                                <div className={styles.postAdditions}> {/* Add a section to show their planet. Create a publication that references the planet they've generated */}
-                                    <a onClick={() => clickPosts()}><div><button className={styles.postAdditionButton}> <HiPencilAlt className={styles.postAdditionButtonIcons}/>
-                                        Posts
-                                    </button></div></a>
-                                    <a onClick={() => clickFriends()}><div><button className={styles.postAdditionButton}> <HiOutlineUserGroup className={styles.postAdditionButtonIcons}/>
-                                        Friends
-                                    </button></div></a>
-                                    <a onClick={() => clickAbout()}><div><button className={styles.postAdditionButton}> <HiOutlineDocumentText className={styles.postAdditionButtonIcons}/>
-                                        About
-                                    </button></div></a>
-                                    <a onClick={() => clickMedia()}><div><button className={styles.postAdditionButton}> <HiOutlineVideoCamera className={styles.postAdditionButtonIcons}/>
-                                        Media
-                                    </button></div></a>
-                                    {/*<div><button className={styles.postAdditionButton}> <HiUserGroup className={styles.postAdditionButtonIcons}/>
-                                            Notebooks
-                                    </button></div>
-                                    <div><button className={styles.postAdditionButton}> <HiUserGroup className={styles.postAdditionButtonIcons}/>
-                                            Sandbox
-                                    </button></div>
-                                    <div><button className={styles.postAdditionButton}> <HiUserGroup className={styles.postAdditionButtonIcons}/>
-                                            Proposals
-                                    </button></div>
-                                    <div><button className={styles.postAdditionButton}> <HiUserGroup className={styles.postAdditionButtonIcons}/>
-                                            Publications
-                                    </button></div>
-                                    <div><button className={styles.postAdditionButton}> <HiUserGroup className={styles.postAdditionButtonIcons}/>
-                                            Collections
-                                    </button></div>*/}
-                                </div>
-                            </div>
-                        </div>
-                    </ProfileCard>
-                    {clickPosts && (
-                        <div>
-                            <PostCard />
-                            <ProfileAbout />
-                            <ProfileFriends />
-                            <ProfileMedia />
-                        </div>
-                    )}
-                    {/* Now, the rest of the page should be laid out like this, however...I'm going to put everything inside {clickPosts... as we appear unable to change state this way */}
-                    {isAbout && (
-                        <ProfileAbout />
-                    )}
-                    {isFriends && (
-                        <ProfileFriends />
-                    )}
-                    {isMedia && (
-                        <ProfileMedia />
-                    )}
-                </div>
-            </div>
-        </div>
+export default function ProfilePage () {
+  const [profile, setProfile] = useState(null);
+  const router = useRouter();
+  const tab = router?.query?.tab?.[0] || 'posts';
+  const userId = router.query.id;
+
+  const supabase = useSupabaseClient();
+
+  // Toggle different profile actions (like changing picture) IF profile being viewed is the logged in user's picture
+  const session = useSession();
+  const isLoggedUser = userId === session?.user?.id;
+
+  // For testing
+  const [planet, setPlanet] = useState(null);
+  const planetId = 'cebdc7a2-d8af-45b3-b37f-80f328ff54d6';
+
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+    fetchProfile();
+    fetchPlanet();
+  }, [userId]);
+
+  function fetchProfile () {
+    supabase.from('profiles') // Grab profile of userId
+      .select()
+      .eq('id', userId)
+      .then(result => {
+        if (result.error) { throw result.error; };
+        if (result.data) { setProfile(result.data[0]); };
+      }
     )
+  }
+
+  function fetchPlanet () {
+    supabase.from('planets')
+        .select()
+        .eq('id', planetId)
+        .then(result => {
+            if (result.error) { throw result.error; };
+            if (result.data) {
+              setPlanet(result.data[0]);
+              console.log('Planet: ', planet);
+            };
+        }
+    );
+  };
+
+  return (
+    <UserContextProvider>
+      <Layout hideNavigation={false}>{/* Should be <ProfileLayout></> */}
+        <Card noPadding={true}>
+          <div className="relative overflow-hidden rounded-md">
+            <UserCoverImage url={profile?.cover} editable={true} onChange={fetchProfile()} />
+            <div className="absolute top-40 mt-12 left-4 w-full z-20">
+              {profile && (<PostCardAvatar // Add upload handler from AccountAvatarV1
+                  url={profile?.avatar_url}
+                  size={120} /> )}
+            </div>
+            <div className="p-4 pt-0 md:pt-4 pb-0">
+              <div className="ml-24 md:ml-40 mt-1">
+                <div className="flex ml-0"> {/* Profile Name - Set up styling rule to remove the ml-10 on mobile */}<h1 className="text-3xl font-bold">{profile?.full_name}</h1>{/* Only show userma,e on mouseover, along with the address (like a metamask profile view) <p className="@apply text-blue-200 leading-4 mb-2 mt-2">{profile?.username}</p>*/}</div>
+                <div className="text-gray-500 leading-4 mt-1 ml-0">{profile?.location}</div><div className="items-center cursor-pointer absolute right-0 bottom-0 m-2"><label className="flex items-center gap-2 bg-white py-1 px-2 rounded-md shadow-md shadow-black cursor-pointer">
+                    <input type='file' className='hidden' /> {/* Use this to update location, address (will later be handled by Thirdweb), username, profile pic. Maybe just have a blanket button to include the cover as well */}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" /></svg>Update profile</label>
+                  </div>
+                {/*<div className="@apply text-blue-200 leading-4 mb-2 mt-2 ml-10">{profile?.address}{/* | Only show this on mouseover {profile?.username}*/}{/*</div> {/* Profile Location (from styles css) */}
+              </div>
+              <ProfileTabs activeTab={tab} userId={profile?.id} />
+            </div>
+          </div>
+        </Card>
+        <ProfileContent activeTab={tab} userId={userId} />
+      </Layout>
+    </UserContextProvider>
+  );
 }

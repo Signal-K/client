@@ -1,36 +1,47 @@
-import Link from 'next/link';
-import Avatar from '../../components/Posts/Avatar';
-import Card from '../../components/Posts/Card';
-import NavigationCard from '../../components/Sidebar';
-import styles from '../../styles/social-graph/SavedPosts.module.css';
+import Layout from "../../components/Layout";
+import React from "react";
+import Card from "../../components/Card";
+import Avatar from "../../components/Avatar";
+import Link from "next/link";
 
-export default function UserNotificationsPage () {
-    return (
-        <div className={styles.background}>
-            <div className={styles.header}>
-                <div className={styles.thing1}> {/* Sidebar */}
-                    <NavigationCard />
-                </div>
-                <div className={styles.thing2}>
-                    <h1 className={styles.savedPostsHeader}>Notifications</h1>
-                    <Card>
-                        <div className={styles.notificationOuterWrapper}>
-                            <div className={styles.notificationWrapper}>
-                                <Avatar />
-                                <div><Link href='/' className={styles.notificationUser}>David Wilson</Link> liked <Link href='/' className={styles.notificationItemLink}>your photo</Link></div>
-                            </div>
-                            <div className={styles.notificationWrapper}>
-                                <Avatar />
-                                <div><Link href='/' className={styles.notificationUser}>David Wilson</Link> disliked <Link href='/' className={styles.notificationItemLink}>your photo</Link></div>
-                            </div>
-                            <div className={styles.notificationWrapper}>
-                                <Avatar />
-                                <div><Link href='/' className={styles.notificationUser}>David Wilson</Link> dunked on <Link href='/' className={styles.notificationItemLink}>your photo</Link></div>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
+export default function NotificationsPage() {
+  return (
+    <Layout hideNavigation={false}>
+      <h1 className="text-6xl mb-4 text-gray-300">Notifications</h1>
+      <Card noPadding={true}>
+        <div className="">
+          <div className="flex gap-2 items-center border-b border-b-gray-100 p-4">
+            <Link href={'/profile'}>
+              {/*<Avatar size='5' />*/}
+            </Link>
+            <div>
+              <Link href={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>
+              liked
+              <Link href={''} className={'ml-1 text-socialBlue hover:underline'}>your photo</Link>
             </div>
-        </div> 
-    )
+          </div>
+          <div className="flex gap-2 items-center border-b border-b-gray-100 p-4">
+            <Link href={'/profile'}>
+              {/*<Avatar size='5' />*/}
+            </Link>
+            <div>
+              <Link href={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>
+              liked
+              <Link href={''} className={'ml-1 text-socialBlue hover:underline'}>your photo</Link>
+            </div>
+          </div>
+          <div className="flex gap-2 items-center border-b border-b-gray-100 p-4">
+            <Link href={'/profile'}>
+              {/*<Avatar size='5' />*/}
+            </Link>
+            <div>
+              <Link href={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>
+              liked
+              <Link href={''} className={'ml-1 text-socialBlue hover:underline'}>your photo</Link>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </Layout>
+  );
 }

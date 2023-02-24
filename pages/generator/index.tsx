@@ -1,8 +1,9 @@
-import Row from 'react-bootstrap/Row';
+{/* Provide reference to ansible blueprint in signal-k/sytizen */}
+import Row from "react-bootstrap/Row";
 import Col from 'react-bootstrap/Col';
 import ListGroup from 'react-bootstrap/ListGroup';
 import NextLink from 'next/link';
-import Layout from '../../generator/components/Layout';
+import Layout from "../../components/Generator/Layout";
 
 export default function GeneratorIndexPage() {
     return (
@@ -18,7 +19,7 @@ export default function GeneratorIndexPage() {
                     <ListGroupMenuItem label="Planet Editor" href="/generator/planet-editor" />
                     {/* <ListGroupMenuItem label="Planet Generator" href="/planet-gen" />
                     <ListGroupMenuItem label="Settings" href="/settings" /> */}
-                    <ListGroupMenuItem label="About" href="/about" />
+                    {/*<ListGroupMenuItem label="About" href="/about" />*/}
                 </ListGroup>
                 </Col>
             </Row>
