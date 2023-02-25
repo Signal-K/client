@@ -7,7 +7,6 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import PlanetCoverImage from "../../components/Planets/Cover";
 import PlanetAvatar from "../../components/Planets/PlanetAvatar";
 import PlanetTabs from "../../components/Planets/PlanetNavigation";
-import PlanetEditor, { PlanetEditorFromData } from "../generator/planet-editor";
 
 // import { Database } from "../../utils/database.types"; // Use this for later when we are drawing from the Planets table
 // type Planets = Database['public']['Tables']['planets']['Row'];

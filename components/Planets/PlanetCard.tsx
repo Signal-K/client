@@ -17,7 +17,7 @@ export function PlanetCard ({ activeTab, planetId }) {
             )};
             {activeTab === 'data' && (
                 <div><Card noPadding={false}>
-                    {/*<PlanetEditor />*/}
+                    <PlanetEditor />
                     <PlanetEditorFromData
                         // temperature = planet?.temperature
                     /> {/* Put inside pages/planets/planet.tsx underneath the tabs to see in action temporarily */}
