@@ -12,7 +12,7 @@ export default function PostFormCard ( { onPost } ) {
   const supabase = useSupabaseClient();
   const [content, setContent] = useState('');
   const session = useSession();
-  const { profile } = useContext(UserContext);
+  // const { profile } = useContext(UserContext);
 
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -76,8 +76,10 @@ export default function PostFormCard ( { onPost } ) {
           <AccountAvatar uid={session.user!.id}
                 url={avatar_url}
                 size={60}/>
-        </div> { profile && (
-          <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-14" placeholder={`What's on your mind, ${profile?.username}?`} /> )}
+        </div> 
+        {/* { profile && (
+          <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-14" placeholder={`What's on your mind, ${profile?.username}?`} /> 
+        )} */}
       </div>
       {isUploading && (
         <div><ClimbingBoxLoader /></div>

@@ -18,7 +18,7 @@ type Profiles = Database['public']['Tables']['profiles']['Row'];
 export default function PostCard ( { content, created_at, media, profiles:authorProfile } ) {
   const [loading, setLoading] = useState(false);
   const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
-  const { profile: myProfile } = useContext(UserContext);
+  // const { profile: myProfile } = useContext(UserContext);
   const [profiles, setProfiles] = useState();
   const supabase = useSupabaseClient();
   const session = useSession();
