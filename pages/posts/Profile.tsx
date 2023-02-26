@@ -29,9 +29,7 @@ export default function ProfilePage () {
   const planetId = 'cebdc7a2-d8af-45b3-b37f-80f328ff54d6';
 
   useEffect(() => {
-    if (!userId) {
-      return;
-    }
+    if (!userId) { return; };
     fetchProfile();
     fetchPlanet();
   }, [userId]);

@@ -7,7 +7,7 @@ import AccountAvatar, { PostCardAvatar } from "./AccountAvatar";
 import { Database } from "../utils/database.types";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UserContext } from "../context/UserContext";
-import UtterancesComments from "./Lens/Utterances";
+// import UtterancesComments from "./Lens/Utterances";
 
 import en from 'javascript-time-ago/locale/en.json';
 import TimeAgo from "javascript-time-ago";

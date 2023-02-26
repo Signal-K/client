@@ -4,6 +4,7 @@ import Card from "../Card";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import PlanetEditor, { PlanetEditorFromData } from "../../pages/generator/planet-editor";
 import StakePlay from "../../pages/stake/play";
+import UtterancesComments from "../Lens/Utterances";
 
 export function PlanetCard ({ activeTab, planetId }) {
     const supabase = useSupabaseClient();
@@ -26,7 +27,7 @@ export function PlanetCard ({ activeTab, planetId }) {
             {activeTab === 'refs' && (
                 <div><Card noPadding={false}>
                     Planet Name
-                </Card></div>
+                </Card><Card noPadding={false}><UtterancesComments /></Card></div>
             )};
             {activeTab === 'sandbox' && (
                 <div><Card noPadding={false}>
