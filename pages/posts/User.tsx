@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 import Layout from "../../components/Layout";
 import Card from "../../components/Card";
 
-import { Database } from "../../utils/database.types";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 //import AnomalyContextProvider from '../../context/AnomalyContext';
 import { UserContext, UserContextProvider } from "../../context/UserContext";
@@ -13,8 +12,6 @@ import { ProfileContent } from "../../components/Posts/ProfileCard";
 import ProfileTabs from "../../components/Posts/ProfileNavigation";
 import UserCoverImage from "../../components/Cover";
 import { PostCardAvatar } from "../../components/AccountAvatar";
-
-type Profiles = Database['public']['Tables']['profiles']['Row'];
 
 export default function UserPage () {
     const supabase = useSupabaseClient();
