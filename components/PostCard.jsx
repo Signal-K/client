@@ -14,11 +14,11 @@ import TimeAgo from "javascript-time-ago";
 TimeAgo.addDefaultLocale(en);
 import ReactTimeAgo from "react-time-ago";
 
-type Profiles = Database['public']['Tables']['profiles']['Row'];
+// type Profiles = Database['public']['Tables']['profiles']['Row'];
 
 export default function PostCard ( { content, created_at, media, profiles:authorProfile } ) {
   const [loading, setLoading] = useState(false);
-  const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
+  //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
   const { profile: myProfile } = useContext(UserContext);
   const [profiles, setProfiles] = useState();
   const supabase = useSupabaseClient();
@@ -136,7 +136,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
       {/*<UtterancesComments />*/}
       <div className="flex mt-4 gap-3">
         <div className="mt-1">
-          <AccountAvatar uid={session?.user!.id}
+          <AccountAvatar uid={session.user.id}
               url={authorProfile?.avatar_url}
               size={45} />
         </div>
