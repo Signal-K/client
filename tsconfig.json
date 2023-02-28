@@ -16,5 +16,5 @@
       "incremental": true
     },
     "exclude": ["node_modules"],
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/PostFormCard.tsx", "constants/contracts.ts", "pages/posts/index.jsx", "pages/generator/planet-editor.jsx", "pages/generator/planet-editor.jsx", "components/Lens/Utterances.jsx", "components/Lens/Utterances.jsx", "components/Posts/ProfileCard.tsx", "components/Posts/ProfileCard.tsx", "context/UserContext.js", "context/UserContext.js", "components/PostCard.jsx", "components/PostCard.jsx"  ]
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/PostFormCard.tsx", "constants/contracts.ts", "pages/posts/index.jsx", "pages/generator/planet-editor.jsx", "pages/generator/planet-editor.jsx", "components/Lens/Utterances.jsx", "components/Lens/Utterances.jsx", "components/Posts/ProfileCard.tsx", "components/Posts/ProfileCard.tsx", "context/UserContext.js", "context/UserContext.js", "components/PostCard.jsx", "components/PostCard.jsx", "components/Generator/Controls.jsx", "components/Generator/Controls.jsx"  ]
   }

@@ -56,6 +56,7 @@ export default function PlanetPage () {
                         {/*<div className="@apply text-blue-200 leading-4 mb-2 mt-2 ml-10">{profile?.address}{/* | Only show this on mouseover {profile?.username}*/}{/*</div> {/* Profile Location (from styles css) */}
                     </div>
                     <PlanetTabs activeTab={tab} planetId={planet?.id} />
+                    <PlanetEditor />
                     </div>
                 </div>
             </Card>
