@@ -8,3 +8,7 @@ import { LENS_CONTRACT_ABI, LENS_CONTRACT_ADDRESS } from '../../../constants/con
 
 // Base imports  ||  Method to import/fork from Supabase handler
 import React, { useState } from 'react';
+
+export default function LensCreate () {
+    return <div>Hello</div>;
+}

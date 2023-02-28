@@ -6,7 +6,7 @@ import { Database } from "../utils/database.types";
 import { UserContext } from "../context/UserContext";
 import { ClimbingBoxLoader } from "react-spinners";
 
-type Profiles = Database['public']['Tables']['profiles']['Row'];
+// type Profiles = Database['public']['Tables']['profiles']['Row'];
 
 export default function PostFormCard ( { onPost } ) {
   const supabase = useSupabaseClient();
@@ -16,7 +16,8 @@ export default function PostFormCard ( { onPost } ) {
 
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
+  //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
+  const [avatar_url, setAvatarUrl] = useState(null);
 
   function createPost () {
     supabase.from('posts').insert({
@@ -45,7 +46,7 @@ export default function PostFormCard ( { onPost } ) {
       })
   }, []);
 
-  async function addMedia (e: { target: { files: any; }; }) {
+  async function addMedia (e) {
     const files = e.target.files;
     if (files.length > 0) {
       setIsUploading(true);
@@ -73,7 +74,7 @@ export default function PostFormCard ( { onPost } ) {
     <Card noPadding={false}>
       <div className="flex gap-2">
         <div>
-          <AccountAvatar uid={session.user!.id}
+          <AccountAvatar uid={session?.user?.id}
                 url={avatar_url}
                 size={60}/>
         </div> { profile && (
