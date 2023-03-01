@@ -1,5 +1,6 @@
 // Global imports
 import React, { useState } from 'react';
+import { AppProps } from 'next/app';
 
 // Styling imports
 import '../styles/globals.css';
@@ -12,8 +13,14 @@ import { useRouter } from 'next/router';
 
 // On-Chain session provider
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; // For Lens graphql queries
-// import { ChakraProvider } from '@chakra-ui/react'; -> We're replacing the chakra lens feed (for now) with <Card /> from `./components/`
 import { ChainId, ThirdwebProvider } from '@thirdweb-dev/react';
+// import { StateContextProvider } from "../context/proposals";
+// import { MoralisProvider } from "react-moralis";
+
+// Anomaly/Generator Providers
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'rc-slider/assets/index.css';
+import 'rc-tooltip/assets/bootstrap.css';
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();

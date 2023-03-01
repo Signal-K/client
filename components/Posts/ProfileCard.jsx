@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import UtterancesComments from "../Lens/Utterances"
 import Card from "../Card"
 import FriendInfo from "../FriendInfo"
 import PostCard from "../PostCard"
@@ -47,7 +46,7 @@ export function ProfileContent ({ activeTab, userId }) {
                 <div>
                 { posts.length > 0 && posts.map(post => (
                     <PostCard key={post.created_at} {...post} profiles={profile} /*media={media}*/ />
-                ))}
+                ))} {/* Section to show their long-form articles here */}
                 {/*<PostCard key = { postMessage.id } { ..post } />*/}
                 {/* Create a post card to tag the user */}
                 </div>
@@ -59,7 +58,6 @@ export function ProfileContent ({ activeTab, userId }) {
                     <p className="mb-2 text-sm">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut doloremque harum maxime mollitia perferendis praesentium quaerat. Adipisci, delectus eum fugiat incidunt iusto molestiae nesciunt odio porro quae quaerat, reprehenderit, sed.</p>
                     <p className="mb-2 text-sm">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet assumenda error necessitatibus nesciunt quas quidem quisquam reiciendis, similique. Amet consequuntur facilis iste iure minima nisi non praesentium ratione voluptas voluptatem?</p>
                     </Card>
-                    <UtterancesComments />
                 </div>
             )}
             {activeTab === 'friends' && (

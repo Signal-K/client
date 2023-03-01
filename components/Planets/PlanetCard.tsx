@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import Card from "../Card";
 
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { PlanetEditorFromData } from "../../pages/generator/planet-editor";
+import PlanetEditor, { PlanetEditorFromData } from "../../pages/generator/planet-editor";
 import StakePlay from "../../pages/stake/play";
+import UtterancesComments from "../Lens/Utterances";
 
 export function PlanetCard ({ activeTab, planetId }) {
     const supabase = useSupabaseClient();
@@ -17,7 +18,7 @@ export function PlanetCard ({ activeTab, planetId }) {
             )};
             {activeTab === 'data' && (
                 <div><Card noPadding={false}>
-                    {/*<PlanetEditor />*/}
+                    <PlanetEditor />
                     <PlanetEditorFromData
                         // temperature = planet?.temperature
                     /> {/* Put inside pages/planets/planet.tsx underneath the tabs to see in action temporarily */}
@@ -26,7 +27,7 @@ export function PlanetCard ({ activeTab, planetId }) {
             {activeTab === 'refs' && (
                 <div><Card noPadding={false}>
                     Planet Name
-                </Card></div>
+                </Card><Card noPadding={false}><UtterancesComments /></Card></div>
             )};
             {activeTab === 'sandbox' && (
                 <div><Card noPadding={false}>
