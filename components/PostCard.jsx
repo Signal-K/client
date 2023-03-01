@@ -134,6 +134,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
         </button>
       </div>
       <UtterancesComments />
+      {/*<UtterancesComments />*/}
       <div className="flex mt-4 gap-3">
         <div className="mt-1">
           <AccountAvatar uid={session?.user?.id}

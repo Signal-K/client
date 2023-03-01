@@ -17,7 +17,6 @@ export default function PostFormCard ( { onPost } ) {
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
-  const [avatar_url, setAvatarUrl] = useState(null);
 
   function createPost () {
     supabase.from('posts').insert({
@@ -46,7 +45,7 @@ export default function PostFormCard ( { onPost } ) {
       })
   }, []);
 
-  async function addMedia (e) {
+  async function addMedia ( e ) {
     const files = e.target.files;
     if (files.length > 0) {
       setIsUploading(true);
@@ -131,4 +130,19 @@ export default function PostFormCard ( { onPost } ) {
       </div>
     </Card>
   );
+}
+
+export function PlanetTagPostForm ( { onPost } ) {
+  const supabase = useSupabaseClient();
+  const [content, setContent] = useState('');
+  const session = useSession();
+  const { profile } = useContext(UserContext);
+
+  const [uploads, setUploads] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
+
+  const [planet, setPlanet] = useState('');
+  
+  return <div>Test</div>;
 }
