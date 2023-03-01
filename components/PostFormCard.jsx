@@ -17,6 +17,7 @@ export default function PostFormCard ( { onPost } ) {
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
+  const [avatar_url, setAvatarUrl] = useState(null);
 
   function createPost () {
     supabase.from('posts').insert({
