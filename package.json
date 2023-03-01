@@ -1,5 +1,5 @@
 {
-  "name": "social-media",
+  "name": "desci-journal-client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,6 +11,7 @@
   "dependencies": {
     "@chakra-ui/react": "^2.4.9",
     "@lens-protocol/react": "^0.3.0",
+    "@nextui-org/react": "^1.0.0-beta.12",
     "@primer/octicons-react": "9.1.1",
     "@supabase/auth-helpers-nextjs": "^0.5.4",
     "@supabase/auth-helpers-react": "^0.3.1",
@@ -27,6 +28,7 @@
     "@types/react-dom": "^18.0.10",
     "alea": "^1.0.1",
     "autoprefixer": "^10.4.13",
+    "bootstrap": "^5.2.3",
     "eslint": "8.30.0",
     "eslint-config-next": "13.1.0",
     "ethers": "5.7.2",
@@ -40,7 +42,7 @@
     "rc-slider": "^10.1.1",
     "rc-tooltip": "^6.0.1",
     "react": "18.2.0",
-    "react-bootstrap": "^2.7.2",
+    "react-bootstrap": "1.0.0-beta.12",
     "react-clickout-handler": "^1.2.1",
     "react-color": "^2.19.3",
     "react-dom": "18.2.0",
