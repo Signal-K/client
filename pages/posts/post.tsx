@@ -33,8 +33,9 @@ export default function IndividualPost () {
     }
 
     return (
-        <Layout hideNavigation={true}>
+        <>{/*<Layout hideNavigation={true}>
             <PostCard {...post} />
-        </Layout>
+        </Layout>*/}
+        <div>Test</div></>
     )
 }
