@@ -16,7 +16,7 @@ export default function PostFormCard ( { onPost } ) {
 
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [avatar_url, setAvatarUrl] = useState(null);
+  //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
 
   function createPost () {
     supabase.from('posts').insert({
@@ -143,4 +143,6 @@ export function PlanetTagPostForm ( { onPost } ) {
   //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
 
   const [planet, setPlanet] = useState('');
+  
+  return <div>Test</div>;
 }

@@ -3,11 +3,10 @@ import { useRouter } from "next/router";
 
 import Layout, { ProfileLayout } from "../../components/Layout";
 import Card from "../../components/Card";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import PlanetCoverImage from "../../components/Planets/Cover";
 import PlanetAvatar from "../../components/Planets/PlanetAvatar";
 import PlanetTabs from "../../components/Planets/PlanetNavigation";
-import PlanetEditor, { PlanetEditorFromData } from "../generator/planet-editor";
 
 // import { Database } from "../../utils/database.types"; // Use this for later when we are drawing from the Planets table
 // type Planets = Database['public']['Tables']['planets']['Row'];
@@ -19,21 +18,45 @@ export default function PlanetPage () {
 
     const supabase = useSupabaseClient();
     const [planet, setPlanet] = useState(null);
+    const [planetOwner, setPlanetOwner] = useState(null);
+
+    const session = useSession();
+    const [profile, setProfile] = useState(null);
 
     useEffect(() => {
         if (!planetId) { return; }
+        fetchPlanet();
     })
 
     function fetchPlanet () {
         supabase.from('planets')
-            .select()
+            .select("*")
             .eq('id', planetId) // How should the ID be generated -> similar to how `userId` is generated? Combination of user + org + article + dataset number??
             .then(result => {
                 if (result.error) { throw result.error; };
-                if (result.data) { setPlanet(result.data[0]); };
+                if (result.data) { setPlanet(result.data[0]); /*console.log(planet);*/ setPlanetOwner(planet?.ownerId); };
             }
         );
     };
+
+    function fetchProfile () {
+        supabase.from('profiles') // Grab profile of userId
+            .select()
+            .eq('id', session?.user?.id)
+            .then(result => {
+                if (result.error) { throw result.error; };
+                if (result.data) { setProfile(result.data[0]); };
+            }
+        )
+    }
+
+    function claimPlanet () {
+        supabase.from('planets').upsert({
+            'id': planetId,
+            //'userId': 'profile?.username',
+            'ownerId': session?.user?.id,
+        })
+    }
 
     return (
         <Layout hideNavigation={false}> {/* Should be set to <ProfileLayout /> */}
@@ -53,10 +76,18 @@ export default function PlanetPage () {
                             <input type='file' className='hidden' /> {/* Use this to update location, address (will later be handled by Thirdweb), username, profile pic. Maybe just have a blanket button to include the cover as well */} {/*
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" /></svg>Update profile</label>
                         </div>*/}
+                        
                         {/*<div className="@apply text-blue-200 leading-4 mb-2 mt-2 ml-10">{profile?.address}{/* | Only show this on mouseover {profile?.username}*/}{/*</div> {/* Profile Location (from styles css) */}
                     </div>
                     <PlanetTabs activeTab={tab} planetId={planet?.id} />
-                    <PlanetEditor />
+                    <br /><br /><br />
+                    <button onClick={claimPlanet}>Claim Planet</button>
+                    <br /><br />
+                    <p>Owner of this anomaly: {planetOwner}</p>
+                    {planetOwner == session?.user?.id && (
+                        <div>Hello World</div>
+                    )}
+                    <br /><br /><br />
                     </div>
                 </div>
             </Card>

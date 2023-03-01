@@ -8,29 +8,25 @@
     position: absolute;
     padding: 0 24px;
   }
-
+  
   .h1 {
     margin-bottom: 0px;
   }
-
   .explain {
     font-size: 1.125rem;
     max-width: 1200px;
   }
-
   .divider {
     width: 50%;
     border-color: grey;
     opacity: 0.25;
   }
-
   .smallDivider {
     width: 25%;
     border-color: grey;
     margin-top: 64px;
     opacity: 0.25;
   }
-
   .nftBoxGrid {
     width: 1200px;
     max-width: 95vw;
@@ -42,7 +38,6 @@
     margin-top: 28px;
     flex-wrap: wrap;
   }
-
   .nftBox {
     border-radius: 16px;
     border: 1px solid #ccc;
@@ -50,7 +45,6 @@
     min-height: 200px;
     padding: 16px;
   }
-
   .optionSelectBox {
     border-radius: 16px;
     border: 1px solid #ccc;
@@ -65,18 +59,15 @@
     padding-right: 12px;
     cursor: pointer;
   }
-
   .selectBoxTitle {
     font-size: 1.75rem;
     margin-top: 8px;
     margin-bottom: 8px;
   }
-
   .selectBoxDescription {
     color: rgba(255, 255, 255, 0.9);
     margin-top: 0px;
   }
-
   /* Between 1200 and 800 */
   @media only screen and (min-width: 800px) and (max-width: 1200px) {
     .nftBox {
@@ -84,7 +75,6 @@
       margin-top: 16px;
     }
   }
-
   /* beneath 800
   */
   @media only screen and (max-width: 800px) {
@@ -100,7 +90,6 @@
       margin-top: 16px;
     }
   }
-
   .tokenGrid {
     display: flex;
     flex-direction: row;
@@ -112,7 +101,6 @@
     flex-wrap: wrap;
     margin: 16px 0;
   }
-
   .tokenItem {
     width: 35%;
     height: 120px;
@@ -124,23 +112,18 @@
     border: 1px solid rgba(255, 255, 255, 0.4);
     gap: 16px;
   }
-
   .tokenLabel {
     margin-top: 0px;
     margin-bottom: 0px;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.7);
   }
-
-  /* Second tokenLabel item */
-
   .tokenValue {
     font-size: 1.3rem;
     margin-top: 8px;
     margin-bottom: 0px;
     font-weight: 500;
   }
-
   /* On Mobile, make tokenGrid 100% width */
   @media only screen and (max-width: 850px) {
     .tokenItem {
@@ -148,7 +131,6 @@
       margin-top: 12px;
     }
   }
-
   /* Screen less than 630, then hide .center */
   @media only screen and (max-width: 630px) {
     .center {
@@ -156,23 +138,10 @@
     }
   }
 
-  .spacerTop {
-    margin-top: 16px;
-  }
-
-  .bigSpacerTop {
-    margin-top: 32px;
-  }
-
-  .spacerBottom {
-    margin-bottom: 16px;
-  }
-
   .detailPageHr {
     margin-top: 0px;
     margin-bottom: 32px;
-  }
-
+}
   .nftMedia {
     width: 100%;
     max-height: 300px;

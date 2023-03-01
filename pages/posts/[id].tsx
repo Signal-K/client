@@ -4,5 +4,5 @@ import { useRouter } from "next/router";
 import IndividualPost from "./post";
 
 export default function Post () {
-    return <IndividualPost />;
+    return <div>Test</div> //<IndividualPost />;
 };

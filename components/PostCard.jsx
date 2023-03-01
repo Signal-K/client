@@ -18,7 +18,7 @@ import ReactTimeAgo from "react-time-ago";
 
 export default function PostCard ( { content, created_at, media, profiles:authorProfile } ) {
   const [loading, setLoading] = useState(false);
-  const [avatar_url, setAvatarUrl] = useState(null);
+  //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
   const { profile: myProfile } = useContext(UserContext);
   const [profiles, setProfiles] = useState();
   const supabase = useSupabaseClient();
@@ -133,6 +133,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
           4
         </button>
       </div>
+      <UtterancesComments />
       {/*<UtterancesComments />*/}
       <div className="flex mt-4 gap-3">
         <div className="mt-1">
