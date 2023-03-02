@@ -2,7 +2,6 @@ import Card from "./Card";
 import AccountAvatar from "./AccountAvatar";
 import React, { useContext, useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Database } from "../utils/database.types";
 import { UserContext } from "../context/UserContext";
 import { ClimbingBoxLoader } from "react-spinners";
 
@@ -40,9 +39,9 @@ export default function PostFormCard ( { onPost } ) {
   useEffect(() => {
     supabase.from('profiles')
       .select(`avatar_url`)
-      .eq('id', session.user.id)
+      .eq('id', session?.user?.id)
       .then(result => {
-        setAvatarUrl(result.data[0].avatar_url) //console.log(result.data[0].avatar_url)
+        setAvatarUrl(result.data[0].avatar_url); //console.log(result.data[0].avatar_url)
       })
   }, []);
 
@@ -76,7 +75,7 @@ export default function PostFormCard ( { onPost } ) {
         <div>
           <AccountAvatar uid={session?.user?.id}
                 url={avatar_url}
-                size={60}/>
+                size={60} />
         </div> { profile && (
           <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-14" placeholder={`What's on your mind, ${profile?.username}?`} /> )}
       </div>
@@ -97,7 +96,7 @@ export default function PostFormCard ( { onPost } ) {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
             </svg>
-            <span className="hidden md:block">Media / File</span>
+            <span className="hidden md:block">Media</span>
           </label>
         </div>
         <div>
@@ -114,7 +113,7 @@ export default function PostFormCard ( { onPost } ) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
             </svg>
-            <span className="hidden md:block">Check in</span>
+            <span className="hidden md:block">Checkin</span>
           </button>
         </div>
         <div>

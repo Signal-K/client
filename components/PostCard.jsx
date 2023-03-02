@@ -54,7 +54,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
                 {authorProfile?.username}
               </span>
             </Link>
-            shared a <a className="text-socialBlue">post</a> {/* Add link to ORCHID publication ID/Lens ID */}
+            shared a <Link legacyBehavior href='/posts/'><a className="text-socialBlue">post</a></Link> {/* Add link to ORCHID publication ID/Lens ID */}
           </p>
           <p className="text-gray-500 text-sm"><ReactTimeAgo date={ ( new Date(created_at)).getTime() } /></p>{/* <ReactTimeAgo date={ ( created_at instanceof Date ? created_at.getTime() : created_at ) } /> */}
         </div>
@@ -133,7 +133,6 @@ export default function PostCard ( { content, created_at, media, profiles:author
           4
         </button>
       </div>
-      <UtterancesComments />
       {/*<UtterancesComments />*/}
       <div className="flex mt-4 gap-3">
         <div className="mt-1">

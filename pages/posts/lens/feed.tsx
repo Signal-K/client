@@ -7,6 +7,8 @@ import { Flex, Text, IconButton } from '@chakra-ui/react';
 
 import { useSession } from "@supabase/auth-helpers-react";
 
+import CoreLayout from "../../../components/Core/Layout";
+
 export default function Home () {
     const session = useSession();
     const { isLoading, error, data } = useExplorePublicationsQuery ({
@@ -25,6 +27,7 @@ export default function Home () {
     if (error) { return ( <div className={styles.container}>Error</div>); };
 
     return (
+      <CoreLayout>
         <Flex w='100%'>
           {/* Taken from the old version of `wb3-11` branch on signal-k/client <Sidebar />*/}
             <Flex
@@ -42,5 +45,6 @@ export default function Home () {
             </div>
           </Flex>
         </Flex>
+      </CoreLayout>
     );
 }
