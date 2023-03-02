@@ -1,51 +1,65 @@
-import type { NextPage } from "next";
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import { Text, NextUIProvider } from '@nextui-org/react';
+import React, { useEffect, useState } from "react";
+
+import Layout from "../../components/Layout";
+import SearchFormCard from "../../components/Journal/SearchFormCard";
+import PostCard from "../../components/PostCard";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import JournalArticleCard from "../../components/Journal/ArticleCard";
-import JournalNavbarComponent from "../../components/Journal/JournalNavbar";
-import { Box } from "../../components/Journal/Box";
+import { UserContext } from "../../context/UserContext";
 
-const JournalFeed: NextPage = () => {
+import TimeAgo from "javascript-time-ago";
+import en from 'javascript-time-ago/locale/en.json';
+import Login from "../login";
+TimeAgo.addDefaultLocale(en);
+
+export default function SearchToExtract () {
     const supabase = useSupabaseClient();
     const session = useSession();
-
-    const router = useRouter();
-    const [articles, setArticles] = useState([]);
+    const [posts, setPosts] = useState([]);
+    const [profile, setProfile] = useState(null);
 
     useEffect(() => {
-        getArticles();
+        fetchPosts(); // Will later be fetching recently searched/saved papers by the user (in Cards)
     }, []);
 
-    const getArticles = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('articles')
-                .select("*")
-                .limit(10)
-            console.log(data);
-            if (data != null) { setArticles(data); };
-        } catch (error: any) { alert(error.message) };
-    };
+    useEffect(() => {
+        if (!session?.user?.id) { return; };
+        supabase.from('profiles')
+            .select()
+            .eq("id", session?.user?.id)
+            .then( result => {
+                if (result.data.length) { setProfile(result.data[0]); };
+            })
+    }, [session?.user?.id]);
+
+    function fetchPosts () {
+        supabase.from('posts')
+            .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+            .order('created_at', { ascending: false })
+            .then(result => { setPosts(result.data); })
+    }
+
+    function fetchProfile () {
+        supabase.from('profiles')
+            .select()
+            .eq('id', session.user.id)
+            .then(result => {
+                if (result.data) {
+                    setProfile(result.data[0]);
+                }
+        })
+    }
+
+    if (!session) { return <Login />; };
 
     return (
-        <NextUIProvider>
-            <JournalNavbarComponent />
-            <Box css={{ px: "$12", py: "$15", mt: "$12", "@xsMax": {px: "$10"}, maxWidth: "800px", margin: "0 auto" }}>
-                <>
-                    <Text h2>Main Feed</Text>
-                    <Text size="$lg" css={{my: "$8"}}>
-                        Check out articles from users here
-                    </Text>
-                    {articles.map((article) => (
-                        <JournalArticleCard article={article}/>
-                    ))}
-                </>
-            </Box>
-        </NextUIProvider>
+        <Layout hideNavigation={false}>
+          <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
+            <SearchFormCard onSearch={fetchPosts} />
+            {posts?.length > 0 && posts.map(post => (
+              <PostCard key = { post.id } {...post} />
+            ))}
+          </UserContext.Provider>
+        </Layout>
     );
-};
-
-export default JournalFeed;
+}

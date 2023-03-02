@@ -40,7 +40,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
         console.log(user.id)
     }, [session]);
 
-    async function getProfile() {
+    async function getProfile () {
         try {
             setLoading(true);
             if (!user) throw new Error('No user authenticated');
