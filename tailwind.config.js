@@ -11,6 +11,7 @@ module.exports = {
         socialBg: '#FFFFFF',
         //socialBg:'#F5F7FB',
         socialBlue: '#218DFA',
+        buttonColour: '#F11957',
       },
     },
   },

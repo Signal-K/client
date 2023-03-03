@@ -41,6 +41,7 @@ export default function SocialGraphHome () {
       .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
       .order('created_at', { ascending: false })
       .then(result => { setPosts(result.data); })
+      console.log(posts);
   }
 
   function fetchProfile () {
@@ -97,7 +98,7 @@ export function SocialGraphHomeNoSidebar () {
     supabase.from('posts')
       .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
       .order('created_at', { ascending: false })
-      .then(result => { setPosts(result.data); })
+      .then( result => { setPosts(result.data); });
   }
 
   function fetchProfile () {
@@ -111,7 +112,7 @@ export function SocialGraphHomeNoSidebar () {
     })
   }
 
-  if (!session) { return <Login /> };
+  if (!session) { return <Login />; };
 
   return (
     <Layout hideNavigation={true}>

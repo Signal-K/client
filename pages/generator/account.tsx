@@ -61,7 +61,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 setAddress(data.address);
             }
         } catch (error) {
-            alert('Error loading your user data');
+            //alert('Error loading your user data');
             console.log(error);
         } finally {
             setLoading(false);

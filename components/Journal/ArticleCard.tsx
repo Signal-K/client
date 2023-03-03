@@ -1,7 +1,6 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { Card, Text, NextUIProvider } from "@nextui-org/react";
-import { Box } from "./Box";
+import Card from "../Card";
 import JournalNavbarComponent from "./JournalNavbar";
 
 import { useSession } from "@supabase/auth-helpers-react";
@@ -16,20 +15,26 @@ const JournalArticleCard: NextPage<Props> = ( props ) => {
         let time = Date.parse(article.inserted_at)
     } */
 
-    return (
-        <NextUIProvider>
-        <Card
-            isPressable
-            css = {{ mb: "$10" }}
-            onPress={() => router.push("/journal/Article?id=" + article.id)}
-        >
-            <Card.Body>
-                <Text h2>{article.title}</Text>
-                {/*<Text b>posted {getDate()}</Text>*/}
-                <Text b>By {article.user_id.toLowerCase()}</Text>
-            </Card.Body>
+    return (<>
+        <Card noPadding={false}>
+            <div className="relative">
+                <p>{article.title}</p>
+                <p>Posted by {article.user_id.toLowerCase()}</p>
+            </div>
         </Card>
-        </NextUIProvider>
+        {/*<NextUIProvider>
+            <Card
+                isPressable
+                css = {{ mb: "$10" }}
+                onPress={() => router.push("/journal/Article?id=" + article.id)}
+            >
+                <Card.Body>
+                    <Text h2>{article.title}</Text>
+                    <Text b>posted {getDate()}</Text>
+                    <Text b>By {article.user_id.toLowerCase()}</Text>
+                </Card.Body>
+            </Card>
+        </NextUIProvider>*/}</>
     )
 }
 

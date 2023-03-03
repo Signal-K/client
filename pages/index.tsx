@@ -7,6 +7,7 @@ import { SocialGraphHomeNoSidebar } from "./posts";
 
 export default function Home() {
     const session = useSession();
+    // add an iframe/ref to super.so dashboard
 
     return (
         <>

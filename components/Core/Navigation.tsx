@@ -1,6 +1,9 @@
 import { Fragment, forwardRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { ConnectWallet, useAddress, /* useEditionDrop, */ useOwnedNFTs, useContract } from "@thirdweb-dev/react";
+import styles from '../../styles/Staking-P2E/planetInteraction.module.css';
+
 import {
     Bars3CenterLeftIcon,
     PencilIcon,
@@ -18,6 +21,8 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 export default function CoreNavigation ({ showNav, setShowNav }) {
     const session = useSession();
     const supabase = useSupabaseClient();
+    const address = useAddress();
+    const router = useRouter();
 
     const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState(null);
@@ -43,7 +48,7 @@ export default function CoreNavigation ({ showNav, setShowNav }) {
                 setAvatarUrl(data.avatar_url);
             }
         } catch (error) {
-            alert('Error loading your user data');
+            //alert('Error loading your user data');
             console.log(error);
         } finally {
             setLoading(false);
@@ -181,7 +186,7 @@ export default function CoreNavigation ({ showNav, setShowNav }) {
                     </Menu.Item>
                     <Menu.Item>
                       <Link
-                        href="#"
+                        href="https://orcid.org/my-orcid?orcid=0009-0000-9139-5148"
                         className="flex hover:bg-orange-500 hover:text-white text-gray-700 rounded p-2 text-sm group transition-colors items-center"
                       >
                         <CreditCardIcon className="h-4 w-4 mr-2" />
@@ -197,6 +202,10 @@ export default function CoreNavigation ({ showNav, setShowNav }) {
                                         Settings
                                     </Link>
                                 </Menu.Item>
+                                <Menu.Item>
+                                {/*<div className={styles.container}>*/}
+                                  <ConnectWallet />
+                              </Menu.Item>
                             </div>
                         </Menu.Items>
                     </Transition>
