@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 
 import CoreLayout from "../../components/Core/Layout";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { UserContext } from "../../context/UserContext";
+// import { UserContext } from "../../context/UserContext";
 import { Database } from "../../utils/database.types";
 import { HELPER_ADDRESS, PLANETS_ADDRESS, MINERALS_ADDRESS, MULTITOOLS_ADDRESS } from "../../constants/contractAddresses";
 import { ConnectWallet, useAddress, useContract } from "@thirdweb-dev/react";
@@ -12,7 +11,7 @@ import { ConnectWallet, useAddress, useContract } from "@thirdweb-dev/react";
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
 import Login from "../login";
-import ShipyardCard from "../../components/Gameplay/Vehicles/ShipyardCard";
+import ShipyardCard, { ShipyardCardProps } from "../../components/Gameplay/Vehicles/ShipyardCard";
 import { Shop } from "../../components/Stake";
 TimeAgo.addDefaultLocale(en);
 
@@ -36,17 +35,22 @@ export default function ShipyardIndex () {
     const [shipLocaiton, setShipLocation] = useState(null);
 
     useEffect(() => {
-        fetchShips();
+        getShips();
     }, [session]);
 
-    async function fetchShips () {
-        supabase.from('spaceships')
-            .select('id, name, image, hp, attack, speed')
-            .order('id', { ascending: true })
-            .then( result => { setShips( result.data ); });
-    }
+    const getShips = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('spaceships')
+                .select("*")
+                .limit(10)
+            console.log(data);
+            if (data != null) { setShips(data); };
+            if (error) throw error;
+        } catch (error: any) { alert(error.message); };
+    };
 
-    // if (!session) { return <Login />; };
+    if (!session) { return <Login />; };
 
     return (
         <CoreLayout>

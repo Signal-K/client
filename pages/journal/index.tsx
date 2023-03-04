@@ -27,13 +27,14 @@ export default function JournalFeed () {
             console.log(data);
             if (data != null) { setArticles(data); };
             if (error) throw error;
-        } catch (error: any) { alert(error.message) };
+        } catch (error: any) { alert(error.message); };
     };
 
     return (
-        <><div></div>
+        <>
         <NextUIProvider>
             <CoreLayout>
+                {/*<JournalNavbarComponent />*/}
                 <Box css={{ px: "$12", py: "$15", mt: "$12", "@xsMax": {px: "$10"}, maxWidth: "800px", margin: "0 auto" }}>
                     <>
                         {articles.map((article) => (
