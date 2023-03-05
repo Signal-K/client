@@ -49,6 +49,10 @@ const JournalArticle: NextPage = () => {
         }
     }
 
+    function editArticleLink () {
+        router.push('/journal/editArticle?id=' + article.id);
+    }
+
     return (
         <CoreLayout>
             <NextUIProvider>
@@ -68,6 +72,8 @@ const JournalArticle: NextPage = () => {
                                 </Button>
                             </>
                         : null}*/}
+                        <br /><br /><br />
+                        <button onClick={editArticleLink}>Edit article</button>
                     </>
                 </Box>
             </NextUIProvider>

@@ -204,7 +204,7 @@ export default function CoreNavigation ({ showNav, setShowNav }) {
                                 </Menu.Item>
                                 <Menu.Item>
                                 {/*<div className={styles.container}>*/}
-                                  <ConnectWallet />
+                                  <ConnectWallet /> {/* OnClick -> add the returned signature & address to the user's supabase "address" field on table "profiles" */}
                               </Menu.Item>
                             </div>
                         </Menu.Items>

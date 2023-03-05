@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import CoreLayout from "../../components/Core/Layout";
+import { GameplayLayout } from "../../components/Core/Layout";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 // import { UserContext } from "../../context/UserContext";
@@ -20,19 +20,10 @@ type Spaceships = Database['public']['Tables']['spaceships']['Row'];
 export default function ShipyardIndex () {
     const supabase = useSupabaseClient();
     const session = useSession();
-    const [posts, setPosts] = useState([]);
-    const [profile, setProfile] = useState(null);
     const [ships, setShips] = useState([]);
     const { contract: multitoolContract } = useContract(MULTITOOLS_ADDRESS, 'edition-drop');
     
-    const [shipId, setShipId] = useState(null); // Set this all as a ship type later
-    const [shipName, setShipName] = useState(null);
-    const [shipImage, setShipImage] = useState(null);
-    const [shipOwner, setShipOwner] = useState(null);
-    const [shipHp, setShipHp] = useState(null);
-    const [shipAttack, setShipAttack] = useState(null);
-    const [shipSpeed, setShipSeed] = useState(null);
-    const [shipLocaiton, setShipLocation] = useState(null);
+    // const [shipId, setShipId] = useState(null); // Set this all as a ship type later
 
     useEffect(() => {
         getShips();
@@ -44,7 +35,6 @@ export default function ShipyardIndex () {
                 .from('spaceships')
                 .select("*")
                 .limit(10)
-            console.log(data);
             if (data != null) { setShips(data); };
             if (error) throw error;
         } catch (error: any) { alert(error.message); };
@@ -53,19 +43,19 @@ export default function ShipyardIndex () {
     if (!session) { return <Login />; };
 
     return (
-        <CoreLayout>
+        <GameplayLayout>
             <div className="flex px-10">
                 {ships.map(ship => (
-                    <ShipyardCard key = { ship.id } {...ship}></ShipyardCard>
+                    <div className="mx-4"><ShipyardCard key = { ship.id } {...ship}></ShipyardCard></div>
                 ))}
+                {/*<div className="px-2"><ShipyardCard image='eagle.png' name='Ludmilla' shipId='1' hp='100' attack='100' speed='100' location='Mars' owner='Gizmotronn'></ShipyardCard></div>
                 <div className="px-2"><ShipyardCard image='eagle.png' name='Ludmilla' shipId='1' hp='100' attack='100' speed='100' location='Mars' owner='Gizmotronn'></ShipyardCard></div>
-                <div className="px-2"><ShipyardCard image='eagle.png' name='Ludmilla' shipId='1' hp='100' attack='100' speed='100' location='Mars' owner='Gizmotronn'></ShipyardCard></div>
-                <div className="px-2"><ShipyardCard image='eagle.png' name='Ludmilla' shipId='1' hp='100' attack='100' speed='100' location='Mars' owner='Gizmotronn'></ShipyardCard></div>
+                <div className="px-2"><ShipyardCard image='eagle.png' name='Ludmilla' shipId='1' hp='100' attack='100' speed='100' location='Mars' owner='Gizmotronn'></ShipyardCard></div>*/}
             </div>
             <div className="flex px-10">
+                {/*<div className="px-2"><ShipyardCard image='eagle.png' name='Ludmilla' shipId='1' hp='100' attack='100' speed='100' location='Mars' owner='Gizmotronn'></ShipyardCard></div>
                 <div className="px-2"><ShipyardCard image='eagle.png' name='Ludmilla' shipId='1' hp='100' attack='100' speed='100' location='Mars' owner='Gizmotronn'></ShipyardCard></div>
-                <div className="px-2"><ShipyardCard image='eagle.png' name='Ludmilla' shipId='1' hp='100' attack='100' speed='100' location='Mars' owner='Gizmotronn'></ShipyardCard></div>
-                <div className="px-2"><ShipyardCard image='eagle.png' name='Ludmilla' shipId='1' hp='100' attack='100' speed='100' location='Mars' owner='Gizmotronn'></ShipyardCard></div>
+                <div className="px-2"><ShipyardCard image='eagle.png' name='Ludmilla' shipId='1' hp='100' attack='100' speed='100' location='Mars' owner='Gizmotronn'></ShipyardCard></div>*/}
             </div>
             <Shop multitoolContract={multitoolContract} />
             {/*<div className="flex px-10">
@@ -73,6 +63,6 @@ export default function ShipyardIndex () {
                 <div className="px-2"><ShipyardCard image='1ST FRAME.PNG'></ShipyardCard></div>
                 <div className="px-2"><ShipyardCard image='1ST FRAME.PNG'></ShipyardCard></div>
             </div>*/}
-        </CoreLayout>
+        </GameplayLayout>
     )
 }

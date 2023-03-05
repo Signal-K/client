@@ -4,6 +4,7 @@ import Card from "../Card";
 import JournalNavbarComponent from "./JournalNavbar";
 
 import { useSession } from "@supabase/auth-helpers-react";
+import Link from "next/link";
 
 interface Props { article: any };
 
@@ -15,12 +16,16 @@ const JournalArticleCard: NextPage<Props> = ( props ) => {
         let time = Date.parse(article.inserted_at)
     } */
 
+    function routerPush () {
+        router.push('/journal/Article?id=' + article.id);
+    }
+
     return (<>
         <Card noPadding={false}>
-            <div className="relative">
+            <button onClick={routerPush}><div className="relative">
                 <p>{article.title}</p>
                 <p>Posted by {article.user_id.toLowerCase()}</p>
-            </div>
+            </div></button>
         </Card>
         {/*<NextUIProvider>
             <Card

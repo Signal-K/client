@@ -9,10 +9,10 @@ import { Database } from "../../../utils/database.types";
 type Spaceships = Database['public']['Tables']['spaceships']['Row'];
 interface Props { ship: any };
 
-export default function ShipyardCard ( { image, name, shipId, hp, attack, speed, location, owner } ) {
+export default function ShipyardCard ( { id, image, name, shipId, hp, attack, speed, location, owner } ) {
     const supabase = useSupabaseClient();
     const session = useSession();
-    
+
     return (
         <>
             <Card noPadding={false}>
@@ -24,7 +24,7 @@ export default function ShipyardCard ( { image, name, shipId, hp, attack, speed,
                         <p className="my-3 text-sm">Speed: {speed}</p>
                         <p className="buttonColour my-3 text-sm">Location: {location}</p>
                     </div>
-                    <div className="flex gap-4 rounded-md overflow-hidden">
+                    <div className="rounded-md overflow-hidden h-48 flex">
                         <img src={image} />
                     </div>
                 </div>
