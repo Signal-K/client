@@ -46,7 +46,7 @@ export default function CoreNavigation ({ showNav, setShowNav }) {
             if ( data ) {
                 setUsername(data.username);
                 setAvatarUrl(data.avatar_url);
-            }
+            };
         } catch (error) {
             //alert('Error loading your user data');
             console.log(error);
