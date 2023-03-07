@@ -8,6 +8,8 @@ import { Database } from "../../utils/database.types";
 
 import Login from "../login";
 import PlanetGalleryCard from "../../components/Planets/PlanetGalleryCard";
+import Link from "next/link";
+import PlanetFormCard from "./createPlanet";
 
 type Planets = Database['public']['Tables']['planets']['Row'];
 
@@ -39,7 +41,9 @@ export default function PlanetGalleryIndex () {
             <center>{planets.map(planet => (
                     <PlanetGalleryCard key = { planet.id } {...planet}></PlanetGalleryCard>
                 ))}</center>
-                <div className="mx-10">Hello</div> {/* Maybe show user's planets or metadata here... */}
+                <div className="mx-10">
+                    <PlanetFormCard onCreate={getPlanets} />
+                </div> {/* Maybe show user's planets or metadata here... */}
             </div>
         </GameplayLayout>
     )
