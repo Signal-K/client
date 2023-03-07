@@ -217,7 +217,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
             setLoading(true);
             if (!user) throw new Error('No user authenticated');
             let { data, error, status } = await supabase
-                .from('planets')
+                .from('planetsss')
                 .select(`id, userId, temperature, radius, ticId`)
                 .eq('userId', username)
                 .single()

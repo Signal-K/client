@@ -14,6 +14,10 @@ interface Props { planet: any };
 export default function PlanetGalleryCard ( { id, radius, userId, ticId, cover } ) {
     // const { planet } = props;
 
+    function buyPlanet () {
+        // pass
+    }
+
     return (
         <>
             <Card noPadding={false}>

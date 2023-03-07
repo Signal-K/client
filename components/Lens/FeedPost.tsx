@@ -19,7 +19,7 @@ export default function LensPostFeed ({ publication }: Props) {
                     // @ts-ignore
                     src={publication?.profile?.picture?.original?.url || ""}
                     alt={publication.profile.name || publication.profile.handle}
-                    className={styles.feedPostProfilePicture}
+                    className='w-3 h-3 rounded-full'
                 />
                 <Link href={`/profile/${publication.profile.handle}`} className={styles.feedPostProfileName}>
                     {publication.profile.name || publication.profile.handle}

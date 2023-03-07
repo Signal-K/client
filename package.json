@@ -2,11 +2,14 @@
   "name": "desci-journal-client",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://127.0.0.1:5000",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "start-server": "cd server && venv/bin/activate && flask run --no-debugger",
+    "test-api": "cd server && venv/bin/activate && flask test"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.4.9",

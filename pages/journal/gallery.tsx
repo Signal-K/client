@@ -102,7 +102,7 @@ export default function GalleryIndex () {
             setLoading(true);
             if (!user) throw new Error('No user authenticated');
             let { data, error, status } = await supabase
-                .from('planets')
+                .from('planetsss')
                 .select(`id, userId, temperature, radius, ticId`)
                 .eq('userId', username)
                 .single()
