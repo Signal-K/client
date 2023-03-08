@@ -13,19 +13,56 @@ import PlanetFormCard from "./createPlanet";
 
 type Planets = Database['public']['Tables']['planets']['Row'];
 
+import axios from "axios";
+
 export default function PlanetGalleryIndex () {
     const supabase = useSupabaseClient();
     const session = useSession();
     const [planets, setPlanets] = useState([]);
     const [planetTitle, setPlanetTitle] = useState('');
-    
+    const [currentTime, setCurrentTime] = useState(0);
+
     useEffect(() => {
+        fetchPlanets();
+    }, []);
+
+    const fetchPlanets = async() => {
+        try {
+          const response = await axios("http://127.0.0.1:5000/planets");
+          console.log(response.data.planets[0].title);
+        } catch (error) {
+          console.log(error)
+        }
+      };
+
+    const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(true);
+    
+    /* useEffect(() => {
         getPlanets();
-        /*fetch('/planets').then(res => res.json()).then(data => {
-            setPlanetTitle(data.title);
-        });*/
-        fetch('/planets').then(response => response.json().then(data => {console.log(data)}))
-    }, [session]);
+        fetch('/time').then(res => res.json()).then(data => {
+            console.log(data.time);
+        });
+        /*fetch('/', {
+            headers : {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        }).then(res => console.log(res.json())).then(data => {
+            //setPlanetTitle(data.title);
+        });
+        fetch('/planets').then(response => response.json().then(data => {console.log(data)}))*/
+    //}, [session]);
+
+    /*useEffect(() => {
+        fetch("/planets")
+        .then(response => response.json()
+        .then(data => {
+          console.log(response);
+          console.log(data[0]);
+          setPlanets(data[0].title);
+        })
+    )}, []);*/
 
     const getPlanets = async () => {
         try {
@@ -43,6 +80,7 @@ export default function PlanetGalleryIndex () {
     return (
         <GameplayLayout>
             <div className="flex px-10">
+                <p> {!loading ? message : "Loading.."}</p>
                 <div className="w-1/2">{planets.map(planet => (
                     <PlanetGalleryCard key = { planet.id } {...planet}></PlanetGalleryCard>
                     ))}

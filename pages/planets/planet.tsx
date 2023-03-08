@@ -83,7 +83,7 @@ export default function PlanetPage () {
             const { data, error } = await supabase
                 .from('planetsss')
                 .update([
-                    { ownerId2: session?.user?.id, /*userId: username*/ }
+                    { owner: session?.user?.id, /*userId: username*/ }
                 ])
                 .eq('id', planetId);
                 updatePlayerReputation(); // Do this for posts, journals as well
