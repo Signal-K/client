@@ -28,15 +28,12 @@ export default function PlanetGalleryIndex () {
 
     const fetchPlanets = async() => {
         try {
-          const response = await axios("http://127.0.0.1:5000/planets");
+          const response = await axios("https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/planets");
           console.log(response.data.planets[0].title);
         } catch (error) {
           console.log(error)
         }
-      };
-
-    const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(true);
+    };
     
     /* useEffect(() => {
         getPlanets();
@@ -70,7 +67,20 @@ export default function PlanetGalleryIndex () {
                 .from('planetsss')
                 .select("*")
                 .limit(10)
-            if (data != null) { setPlanets(data); };
+            if (data != null) { 
+                setPlanets(data); 
+                /*if (!planets) { // Just testing for now -> pointing out where requests for the new data (new planet data) will go
+                    axios.post('http://127.0.0.1:5000/tic_classify/select_planet', {
+                        planetId: '{data.ticId}', // See kurve_parse.py blueprint
+                    })
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                    }*/
+                };
             if (error) throw error;
         } catch (error: any) { alert(error.message); };
     };
@@ -80,7 +90,6 @@ export default function PlanetGalleryIndex () {
     return (
         <GameplayLayout>
             <div className="flex px-10">
-                <p> {!loading ? message : "Loading.."}</p>
                 <div className="w-1/2">{planets.map(planet => (
                     <PlanetGalleryCard key = { planet.id } {...planet}></PlanetGalleryCard>
                     ))}

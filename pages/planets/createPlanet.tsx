@@ -82,6 +82,7 @@ export default function PlanetFormCard ( { onCreate } ) {
           content, // : content,
           temperature: planetTemperature,
           ownerAddress: ownerAddress,
+          ticId: ticId, // Send this to Flask as a post request, then do axios.get to receive the result (graph, image). Request for radius from Tic.
           /* ticId,
             radius: planetRadius,
             contract: '0xdf35Bb26d9AAD05EeC5183c6288f13c0136A7b43',
@@ -150,15 +151,16 @@ export default function PlanetFormCard ( { onCreate } ) {
     return (
         <>
             <ProfileCard noPadding={false}>
-                <div className="flex gap-2">
+                <div className="flex">
                     <div>
                         <AccountAvatar uid={session?.user?.id}
                             url={avatar_url}
                             size={60} />
                     </div> { session?.user?.id && (
                         <>
-                            <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-14" placeholder={`What's on your mind, ${profile?.username}?`} />
+                            <div className="columns-1"><textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-14" placeholder={`Planet name?`} />
                             <textarea value={planetTemperature} onChange={e => setPlanetTemperature(e.target.value)} className='grow p-3 h-14' placeholder={"What's the temperature?"} />
+                            <textarea value={ticId} onChange={e => setTicId(e.target.value)} className='grow p-3 h-14' placeholder={"TIC ID"} /></div>
                         </>
                     )}
                 </div>
