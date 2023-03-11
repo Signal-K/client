@@ -10,7 +10,7 @@ export default function AnomalyContextProvider ( { children, planetId } ) {
 
     useEffect(() => {
         if (!session?.user?.id) { return; };
-        supabase.from('planets') // Change to specific anomaly table
+        supabase.from('planetsss') // Change to specific anomaly table
             .select()
             .eq('id', planetId )
             .then( result => {
