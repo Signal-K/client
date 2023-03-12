@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { Database } from "../../utils/database.types";
+import { Database } from "../../../utils/database.types";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 type Planets = Database['public']['Tables']['planets']['Row'];
@@ -11,10 +11,10 @@ export default function PlanetAvatar ({ uid, url, size, /*onUpload*/ }: {
     size: number,
 }) {
     let width = 'w-12';
-    const [uploading, setUploading] = useState(false);
+    const [uploading, setUploading] = useState(false); // Uploading/updating avatar should only be supported if user owns the object/entity. Either the avatar or cover should be an image/source of the entity
 
     const supabase = useSupabaseClient<Database>();
-    const [avatarUrl, setAvatarUrl] = useState<Planets['avatar_url']>(null); // I believe this is causing the invalid uuid syntax error
+    const [avatarUrl, setAvatarUrl] = useState<Planets['avatar_url']>(null);
 
     useEffect(() => {
         if (url) downloadImage(url);
@@ -27,7 +27,7 @@ export default function PlanetAvatar ({ uid, url, size, /*onUpload*/ }: {
             const url = URL.createObjectURL(data);
             setAvatarUrl(url);
         } catch (error) {
-            console.log('Error download avatar: ', error);
+            console.log('Error downloading avatar for planet anomaly: ', error);
         };
     };
 

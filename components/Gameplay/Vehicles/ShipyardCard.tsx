@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NextPage } from "next";
+import Link from "next/link";
 
 import Card from "../../Card";
 
@@ -30,6 +31,7 @@ export default function ShipyardCard ( { id, image, name, shipId, hp, attack, sp
                 </div>
                 <div className="grow text-right">
                     <button className="bg-buttonColour text-white px-6 py-1 rounded-md">Buy ship</button> {/* If there is an owner, don't show this button */}
+                    <div className="mx-1"><Link href={`/ships/${id}`}><button className="bg-buttonColour text-white px-6 py-1 rounded-md">View profile</button></Link></div>
                 </div>
             </Card>
             {/*<CoreLayout>

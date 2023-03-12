@@ -1,11 +1,11 @@
 import React from "react";
-import styles from '../../styles/Staking-P2E/planetInteraction.module.css';
+import styles from '../../../styles/Staking-P2E/planetInteraction.module.css';
 
 import { ThirdwebNftMedia, useActiveClaimCondition, Web3Button } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
 import { NFT, EditionDrop } from "@thirdweb-dev/sdk";
 
-import { MULTITOOLS_ADDRESS } from "../../constants/contractAddresses";
+import { MULTITOOLS_ADDRESS } from "../../../constants/contractAddresses";
 
 type Props = { multitoolContract: EditionDrop; item: NFT; };
 

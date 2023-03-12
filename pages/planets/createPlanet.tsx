@@ -6,6 +6,7 @@ import { UserContext } from "../../context/UserContext";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import AccountAvatar from "../../components/AccountAvatar";
 import PostFormCard from "../../components/PostFormCard";
+import axios from "axios";
 
 export default function PlanetFormCard ( { onCreate } ) {
     // Take TIC id/stellar id, generate in python, return. Require reputation, take reputation. Long-term: generate planets via tic id with dynamic routes
@@ -55,26 +56,22 @@ export default function PlanetFormCard ( { onCreate } ) {
         };
     };
     
-    /*function createPlanet () {
-        supabase.from('planetsss').insert({
-            temperature: planetTemperature,
-            ticId,
-            radius: planetRadius,
-            userId: session?.user?.id,
-            name,
-            contract: '0xdf35Bb26d9AAD05EeC5183c6288f13c0136A7b43',
-            tokenId: 0,
-            chainId: 'goerli',
-            ownerAddress,
-        }).then(response => {
-            if (!response.error) {
-                alert(`Planet ${name} created`);
-                if ( onCreate ) {
-                    onCreate();
-                }
-            }
-        });
-    }*/
+    useEffect(() => {
+        fetchPlanets();
+    }, []);
+
+    const fetchPlanets = async() => {
+        try {
+          const response = await axios("https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/planets");
+          const newTic = await axios("https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/create-tic");
+          //setPlanetTitle(response.data.planets[0].title)
+          console.log(response.data.planets[0].title);
+          console.log(newTic.data);
+          setTicId(newTic.data);
+        } catch (error) {
+          console.log(error)
+        }
+    };
 
     function createPlanet () {
         supabase.from('planetsss').insert({
@@ -82,6 +79,7 @@ export default function PlanetFormCard ( { onCreate } ) {
           content, // : content,
           temperature: planetTemperature,
           ownerAddress: ownerAddress,
+          ticId: ticId, // Send this to Flask as a post request, then do axios.get to receive the result (graph, image). Request for radius from Tic.
           /* ticId,
             radius: planetRadius,
             contract: '0xdf35Bb26d9AAD05EeC5183c6288f13c0136A7b43',
@@ -97,7 +95,7 @@ export default function PlanetFormCard ( { onCreate } ) {
                 body: JSON.stringify(ticId)
             })*/
             alert(`Post ${content} created`);
-            setContent(''); setPlanetTemperature('');
+            setContent(''); setPlanetTemperature(''); setTicId("");
             if ( onCreate ) {
               onCreate();
             }
@@ -150,15 +148,16 @@ export default function PlanetFormCard ( { onCreate } ) {
     return (
         <>
             <ProfileCard noPadding={false}>
-                <div className="flex gap-2">
+                <div className="flex">
                     <div>
                         <AccountAvatar uid={session?.user?.id}
                             url={avatar_url}
                             size={60} />
                     </div> { session?.user?.id && (
                         <>
-                            <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-14" placeholder={`What's on your mind, ${profile?.username}?`} />
+                            <div className="columns-1"><textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-14" placeholder={`Planet name?`} />
                             <textarea value={planetTemperature} onChange={e => setPlanetTemperature(e.target.value)} className='grow p-3 h-14' placeholder={"What's the temperature?"} />
+                            <textarea value={ticId} onChange={e => setTicId(e.target.value)} className='grow p-3 h-14' placeholder={"TIC ID"} /></div>
                         </>
                     )}
                 </div>

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-import Card from "../Card";
+import Card from "../../Card";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import PlanetEditor from "../../pages/generator/planet-editor";
-import { UserContext } from "../../context/UserContext";
-import { Database } from "../../utils/database.types";
+import PlanetEditor from "../../../pages/generator/planet-editor";
+import { UserContext } from "../../../context/UserContext";
+import { Database } from "../../../utils/database.types";
 import Link from "next/link";
 
 type Planets = Database['public']['Tables']['planets']['Row'];

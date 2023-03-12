@@ -4,11 +4,12 @@ import { useRouter } from "next/router";
 import Layout from "../../components/Layout";
 import Card from "../../components/Card";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import PlanetCoverImage from "../../components/Planets/Cover";
-import PlanetAvatar from "../../components/Planets/PlanetAvatar";
-import PlanetTabs from "../../components/Planets/PlanetNavigation";
+import PlanetCoverImage from "../../components/Gameplay/Planets/Cover";
+import PlanetAvatar from "../../components/Gameplay/Planets/PlanetAvatar";
+import PlanetTabs from "../../components/Gameplay/Planets/PlanetNavigation";
 import { GameplayLayout } from "../../components/Core/Layout";
 import { useContract, useContractRead, useContractWrite, useLazyMint } from "@thirdweb-dev/react";
+import Link from "next/link";
 
 // import { Database } from "../../utils/database.types"; // Use this for later when we are drawing from the Planets table
 // type Planets = Database['public']['Tables']['planets']['Row'];
@@ -83,7 +84,7 @@ export default function PlanetPage () {
             const { data, error } = await supabase
                 .from('planetsss')
                 .update([
-                    { ownerId2: session?.user?.id, /*userId: username*/ }
+                    { owner: session?.user?.id, /*userId: username*/ }
                 ])
                 .eq('id', planetId);
                 updatePlayerReputation(); // Do this for posts, journals as well
@@ -157,6 +158,7 @@ export default function PlanetPage () {
                             <>
                                 <div>Hello World</div><br />
                                 <div><button onClick={() => lazyMint({ metadatas: [{ name: planet?.content, media: planet?.cover, description: planet?.ticId, properties: { trait_type1: 'value' }}]})}>Mint NFT of planet</button></div>
+                                <Link href='https://deepnote.com/workspace/star-sailors-49d2efda-376f-4329-9618-7f871ba16007/project/Star-Sailors-Light-Curve-Plot-b4c251b4-c11a-481e-8206-c29934eb75da/notebook/notebook-377269a4c09f46908203c402cb8545b0'><div><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/b56a0704304940e49c38823795edaa20/b1b6860bdf364fcea023992c1ae527d6?height=294.6875" height="294.6875" width="500"/><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/></div></Link> {/* https://codesandbox.io/s/nextjs-example-react-jupyter-notebook-viewer-lzjcb5?file=/pages/index.js:21-33 */}
                             </>
                         )}
                         <br /><br /><br />

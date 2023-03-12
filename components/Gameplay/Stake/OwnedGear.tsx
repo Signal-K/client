@@ -1,11 +1,11 @@
 import React from "react";
-import styles from '../../styles/Staking-P2E/planetInteraction.module.css';
+import styles from '../../../styles/Staking-P2E/planetInteraction.module.css';
 
 import { ThirdwebNftMedia, useAddress, useOwnedNFTs, Web3Button } from "@thirdweb-dev/react";
 import { EditionDrop, SmartContract } from "@thirdweb-dev/sdk";
 
 import LoadingSection from "./LoadingSection";
-import { HELPER_ADDRESS } from "../../constants/contractAddresses";
+import { HELPER_ADDRESS } from "../../../constants/contractAddresses";
 
 type Props = { multitoolContract: EditionDrop, helperContract: SmartContract<any>; };
 

@@ -1,10 +1,10 @@
 import React from "react";
-import styles from '../../styles/Staking-P2E/planetInteraction.module.css';
+import styles from '../../../styles/Staking-P2E/planetInteraction.module.css';
 
 import { ThirdwebNftMedia, useAddress, useMetadata, useContractRead, useTokenBalance, Web3Button } from "@thirdweb-dev/react";
 import { SmartContract, Token } from "@thirdweb-dev/sdk";
 import { ethers } from "ethers";
-import { HELPER_ADDRESS } from "../../constants/contractAddresses"; // Create a param/argument so that the helper contract can be changed per page like the rewards/planet (aka character) contracts
+import { HELPER_ADDRESS } from "../../../constants/contractAddresses"; // Create a param/argument so that the helper contract can be changed per page like the rewards/planet (aka character) contracts
 
 import ApproxRewards from "./ApproxRewards";
 
