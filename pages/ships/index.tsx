@@ -12,7 +12,7 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
 import Login from "../login";
 import ShipyardCard, { ShipyardCardProps } from "../../components/Gameplay/Vehicles/ShipyardCard";
-import { Shop } from "../../components/Stake";
+import { Shop } from "../../components/Gameplay/Stake";
 TimeAgo.addDefaultLocale(en);
 
 type Spaceships = Database['public']['Tables']['spaceships']['Row'];

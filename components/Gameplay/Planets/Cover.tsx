@@ -22,7 +22,7 @@ export default function PlanetCoverImage ( { url, editable, onChange } ) {
                 if (error) throw error;
                 if (data) {
                     const url = process.env.NEXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/covers/' + data.path;
-                    supabase.from('planets')
+                    supabase.from('planetsss')
                         .update({ cover: url, })
                         .eq('id', session?.user?.id) // Should be set to the equivalent of `planet?.id`
                         .then(({ data, error }) => {

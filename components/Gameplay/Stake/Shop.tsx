@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import styles from '../../styles/Staking-P2E/planetInteraction.module.css';
+import styles from '../../../styles/Staking-P2E/planetInteraction.module.css';
 
 import { ThirdwebNftMedia, useNFTs } from "@thirdweb-dev/react";
 import { EditionDrop } from "@thirdweb-dev/sdk";

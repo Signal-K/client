@@ -1,8 +1,8 @@
 import React from "react";
-import styles from '../../styles/Staking-P2E/Home.module.css';
+import styles from '../../../styles/Staking-P2E/Home.module.css';
 
 import { useAddress, useClaimNFT, useEditionDrop, Web3Button } from "@thirdweb-dev/react";
-import { PLANETS_ADDRESS } from "../../constants/contractAddresses";
+import { PLANETS_ADDRESS } from "../../../constants/contractAddresses";
 
 export default function MintContainer () {
     const editionDrop = useEditionDrop(PLANETS_ADDRESS);

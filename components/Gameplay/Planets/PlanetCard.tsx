@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Card from "../Card";
+import Card from "../../Card";
 
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import PlanetEditor, { PlanetEditorFromData } from "../../pages/generator/planet-editor";
-import StakePlay from "../../pages/stake/play";
-import UtterancesComments from "../Lens/Utterances";
+import PlanetEditor, { PlanetEditorFromData } from "../../../pages/generator/planet-editor";
+import StakePlay from "../../../pages/stake/play";
+import UtterancesComments from "../../Lens/Utterances";
 
 export function PlanetCard ({ activeTab, planetId }) {
     const supabase = useSupabaseClient();
