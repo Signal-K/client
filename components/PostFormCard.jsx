@@ -2,7 +2,6 @@ import Card from "./Card";
 import AccountAvatar from "./AccountAvatar";
 import React, { useContext, useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Database } from "../utils/database.types";
 import { UserContext } from "../context/UserContext";
 import { ClimbingBoxLoader } from "react-spinners";
 
@@ -16,12 +15,12 @@ export default function PostFormCard ( { onPost } ) {
 
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
-  //const [avatar_url, setAvatarUrl] = useState/*<Profiles*/[/*'avatar_url'*/]/*>*/();
+  //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(); 
   const [avatar_url, setAvatarUrl] = useState(null);
 
   function createPost () {
     supabase.from('posts').insert({
-      author: session.user.id, // This is validated via RLS so users can't pretend to be other user
+      author: session?.user?.id, // This is validated via RLS so users can't pretend to be other user
       content, // : content,
       media: uploads, // This should be changed to the user path `storage/userId/post/media...` like in the image gallery
       // File upload -> show an icon depending on what type of file.
@@ -40,13 +39,13 @@ export default function PostFormCard ( { onPost } ) {
   useEffect(() => {
     supabase.from('profiles')
       .select(`avatar_url`)
-      .eq('id', session.user.id)
+      .eq('id', session?.user?.id)
       .then(result => {
-        setAvatarUrl(result.data[0].avatar_url) //console.log(result.data[0].avatar_url)
+        setAvatarUrl(result.data[0].avatar_url); //console.log(result.data[0].avatar_url)
       })
   }, []);
 
-  async function addMedia (e/*: { target: { files: any; }; }*/) {
+  async function addMedia ( e ) {
     const files = e.target.files;
     if (files.length > 0) {
       setIsUploading(true);
@@ -74,9 +73,9 @@ export default function PostFormCard ( { onPost } ) {
     <Card noPadding={false}>
       <div className="flex gap-2">
         <div>
-          <AccountAvatar uid={session.user.id}
+          <AccountAvatar uid={session?.user?.id}
                 url={avatar_url}
-                size={60}/>
+                size={60} />
         </div> { profile && (
           <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-14" placeholder={`What's on your mind, ${profile?.username}?`} /> )}
       </div>
@@ -141,7 +140,9 @@ export default function PostFormCard ( { onPost } ) {
 
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
+  //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
 
   const [planet, setPlanet] = useState('');
-}*/
+  
+  return <div>Test</div>;
+*/

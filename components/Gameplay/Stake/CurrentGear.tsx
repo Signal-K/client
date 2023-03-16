@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import styles from '../../styles/Staking-P2E/planetInteraction.module.css';
+import styles from '../../../styles/Staking-P2E/planetInteraction.module.css';
 
 import { ThirdwebNftMedia, useAddress, useNFT } from "@thirdweb-dev/react"; // https://www.notion.so/skinetics/February-Flow-Planets-8c864b66147c447f82136772336e9bc6?pvs=4#3f8fd072ce514882a1a05e89a6cf63db
 import { EditionDrop, NFT, SmartContract } from "@thirdweb-dev/sdk";
-import ContractMappingResponse from "../../constants/contractMappingResponse";
+import ContractMappingResponse from "../../../constants/contractMappingResponse";
 import GameplayAnimation from "./GameplayAnimation";
-import { PLANETS_ADDRESS } from "../../constants/contractAddresses";
+import { PLANETS_ADDRESS } from "../../../constants/contractAddresses";
 
 type Props = {
     helperContract: SmartContract<any>;

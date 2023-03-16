@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 
 import { ConnectWallet, useAddress, /* useEditionDrop, */ useOwnedNFTs, useContract } from "@thirdweb-dev/react";
 
-import MintContainer from "../../components/Stake/MintContainer";
+import MintContainer from "../../components/Gameplay/Stake/MintContainer";
 import { PLANETS_ADDRESS } from "../../constants/contractAddresses";
 
 const StakingHome: NextPage = () => {

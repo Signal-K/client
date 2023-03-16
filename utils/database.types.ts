@@ -74,6 +74,35 @@ export interface Database {
           screenshot: string | null
         }
       }
+      spaceships: {
+        Row: {
+          id: number
+          owner: number | null
+          name: string | null
+          image: string | null
+          hp: number | null
+          attack: number | null
+          speed: number | null
+        }
+        Insert: {
+          id: number
+          owner: number | null
+          name: string | null
+          image: string | null
+          hp: number | null
+          attack: number | null
+          speed: number | null
+        }
+        Update: {
+          id: number
+          owner: number | null
+          name: string | null
+          image: string | null
+          hp: number | null
+          attack: number | null
+          speed: number | null
+        }
+      }
     }
     Views: {
       [_ in never]: never

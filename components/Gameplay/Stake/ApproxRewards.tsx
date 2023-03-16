@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useAddress } from "@thirdweb-dev/react";
 import { SmartContract } from "@thirdweb-dev/sdk";
 import { ethers } from "ethers";
-import ContractMappingResponse from "../../constants/contractMappingResponse";
+import ContractMappingResponse from "../../../constants/contractMappingResponse";
 
 type Props = { helperContract: SmartContract<any>; };
 

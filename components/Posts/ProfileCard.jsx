@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import Card from "../Card"
 import FriendInfo from "../FriendInfo"
-import PostCard from "../PostCard"
+import PostCard, { PostCardProfile } from "../PostCard"
 import { useSupabaseClient } from "@supabase/auth-helpers-react"
 
 export function ProfileContent ({ activeTab, userId }) {
@@ -45,7 +45,7 @@ export function ProfileContent ({ activeTab, userId }) {
             {activeTab === 'posts' && (
                 <div>
                 { posts.length > 0 && posts.map(post => (
-                    <PostCard key={post.created_at} {...post} profiles={profile} /*media={media}*/ />
+                    <PostCardProfile key={post.created_at} {...post} profiles={profile} /*media={media}*/ />
                 ))} {/* Section to show their long-form articles here */}
                 {/*<PostCard key = { postMessage.id } { ..post } />*/}
                 {/* Create a post card to tag the user */}

@@ -40,7 +40,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
         console.log(user.id)
     }, [session]);
 
-    async function getProfile() {
+    async function getProfile () {
         try {
             setLoading(true);
             if (!user) throw new Error('No user authenticated');
@@ -61,7 +61,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 setAddress(data.address);
             }
         } catch (error) {
-            alert('Error loading your user data');
+            //alert('Error loading your user data');
             console.log(error);
         } finally {
             setLoading(false);
@@ -217,7 +217,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
             setLoading(true);
             if (!user) throw new Error('No user authenticated');
             let { data, error, status } = await supabase
-                .from('planets')
+                .from('planetsss')
                 .select(`id, userId, temperature, radius, ticId`)
                 .eq('userId', username)
                 .single()

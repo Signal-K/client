@@ -29,17 +29,20 @@ export default function Controls ({ planetState }: { planetState: PlanetEditorSt
 			<Row>
 				<Col>
 					<Form autoComplete='off' data-lpignore="true">
-						<Tabs id='control-tabs' activeKey={tab} onSelect={setTab} className='nav-fill' transition={false}>
-							<Tab id='planet-info-tab' eventKey='planet-info-tab' title='Info' className={tabClasses} style={tabStyles} tabIndex="-1" >
+						<InfoPanel {...{ planetState }} />
+						<LayerPanel {...{ planetState }} />
+						<GraphicsPanel {...{ planetState }} />
+						{/*<Tabs id='control-tabs' activeKey={tab} onSelect={setTab} className='nav-fill' transition={false}>
+							<Tab id='planet-info-tab' eventKey='planet-info-tab' title='Info' className={tabClasses} style={tabStyles} tabIndex="" >
 								<InfoPanel {...{ planetState }} />
 							</Tab>
-							<Tab id='layers-tab' eventKey='layers-tab' title='Layers' className={tabClasses} style={{ ...tabStyles, paddingTop: 0, paddingLeft: 0, paddingRight: 0 }} tabIndex="-1">
+							<Tab id='layers-tab' eventKey='layers-tab' title='Layers' className={tabClasses} style={{ ...tabStyles, paddingTop: 0, paddingLeft: 0, paddingRight: 0 }} tabIndex="">
 								<LayerPanel {...{ planetState }} />
 							</Tab>
-							<Tab id='graphics-tab' eventKey='graphics-tab' title='Graphics' className={tabClasses} style={tabStyles} tabIndex="-1">
+							<Tab id='graphics-tab' eventKey='graphics-tab' title='Graphics' className={tabClasses} style={tabStyles} tabIndex=''>
 								<GraphicsPanel {...{ planetState }} />
 							</Tab>
-						</Tabs>
+						</Tabs>*/}
 					</Form>
 				</Col>
 			</Row>
