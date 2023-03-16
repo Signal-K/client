@@ -1,5 +1,5 @@
 import React from "react";
-import styles from '../../styles/Staking-P2E/Gameplay.module.css';
+import styles from '../../../styles/Staking-P2E/Gameplay.module.css';
 import { NFT } from "@thirdweb-dev/sdk";
 
 const Minerals = ( <div className={styles.slide}><img src='.stake/mineral.png' height='48' width='48' alt='mineral' /></div>) // This should be changed to the collection picture (via Thirdweb)
