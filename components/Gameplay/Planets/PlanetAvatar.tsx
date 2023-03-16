@@ -14,7 +14,7 @@ export default function PlanetAvatar ({ uid, url, size, /*onUpload*/ }: {
     const [uploading, setUploading] = useState(false); // Uploading/updating avatar should only be supported if user owns the object/entity. Either the avatar or cover should be an image/source of the entity
 
     const supabase = useSupabaseClient<Database>();
-    const [avatarUrl, setAvatarUrl] = useState<Planets['avatar_url']>(null);
+    const [avatarUrl, setAvatarUrl] = useState<Planets['avatar_url']>(null); // I believe this is causing the invalid uuid syntax error
 
     useEffect(() => {
         if (url) downloadImage(url);

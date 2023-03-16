@@ -132,7 +132,7 @@ export default function PostFormCard ( { onPost } ) {
   );
 }
 
-export function PlanetTagPostForm ( { onPost } ) {
+/*export function PlanetTagPostForm ( { onPost } ) {
   const supabase = useSupabaseClient();
   const [content, setContent] = useState('');
   const session = useSession();
@@ -145,4 +145,4 @@ export function PlanetTagPostForm ( { onPost } ) {
   const [planet, setPlanet] = useState('');
   
   return <div>Test</div>;
-}
+*/

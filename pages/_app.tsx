@@ -5,7 +5,6 @@ import { AppProps } from 'next/app';
 // Styling imports
 import '../styles/globals.css';
 import { ChakraProvider } from '@chakra-ui/react';
-import { NextUIProvider } from '@nextui-org/react';
 
 // Offchain/Postgres Session Provider
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
