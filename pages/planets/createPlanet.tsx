@@ -118,10 +118,7 @@ export default function PlanetFormCard ( { onCreate } ) {
           content, // : content,
           temperature: planetTemperature,
           ownerAddress: ownerAddress,
-<<<<<<< HEAD
           // radius: planetRadius,
-=======
->>>>>>> 76e5293d5f52c63bc724d7bf0fb6b1325f6e5429
           ticId: ticId, // Send this to Flask as a post request, then do axios.get to receive the result (graph, image). Request for radius from Tic.
           /* ticId,
             contract: '0xdf35Bb26d9AAD05EeC5183c6288f13c0136A7b43',
