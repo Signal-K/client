@@ -1,8 +1,4 @@
-<<<<<<< HEAD
- [submodule "api"]
-=======
 [submodule "api"]
->>>>>>> 76e5293d5f52c63bc724d7bf0fb6b1325f6e5429
 	path = api
 	url = https://github.com/signal-k/sytizen
 	branch = wb3-14--generate-asset-id-statselements-for-container

@@ -20,13 +20,9 @@ export default function PlanetGalleryIndex () {
     const supabase = useSupabaseClient();
     const session = useSession();
     const [planets, setPlanets] = useState([]);
-<<<<<<< HEAD
-    
-=======
     const [planetTitle, setPlanetTitle] = useState('');
     const [currentTime, setCurrentTime] = useState(0);
 
->>>>>>> 76e5293d5f52c63bc724d7bf0fb6b1325f6e5429
     useEffect(() => {
         fetchPlanets();
     }, []);
@@ -42,7 +38,6 @@ export default function PlanetGalleryIndex () {
     
     /* useEffect(() => {
         getPlanets();
-<<<<<<< HEAD
     }, [session]);
 =======
         fetch('/time').then(res => res.json()).then(data => {
@@ -68,7 +63,6 @@ export default function PlanetGalleryIndex () {
           setPlanets(data[0].title);
         })
     )}, []);*/
->>>>>>> 76e5293d5f52c63bc724d7bf0fb6b1325f6e5429
 
     const getPlanets = async () => {
         try {
