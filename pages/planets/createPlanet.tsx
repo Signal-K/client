@@ -63,25 +63,64 @@ export default function PlanetFormCard ( { onCreate } ) {
     const fetchPlanets = async() => {
         try {
           const response = await axios("https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/planets");
-          const newTic = await axios("https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/create-tic");
+          //const newTic = await axios("https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/create-tic");
           //setPlanetTitle(response.data.planets[0].title)
-          console.log(response.data.planets[0].title);
-          console.log(newTic.data);
-          setTicId(newTic.data);
+          console.log(response.data.planets[1].title);
+          //console.log(newTic.data);
+          //setTicId(newTic.data);
         } catch (error) {
           console.log(error)
         }
     };
 
+    function createItem () { // Testing -> with deployed Deepnote code. When running locally, use the `api/app/app.py` Flask code
+        axios.post('https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/planets/add', {
+            title: 'title'
+        }).then(res => {
+            console.log('res', res.data);
+        }).catch(err => {
+            console.log('error in request', err);
+        })
+    }
+
+    function retrieveSectorData () { // Testing -> with deployed Deepnote code. When running locally, use the `api/app/app.py` Flask code
+        axios.post('https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/planets/classify', {
+            ticId: ticId
+        }).then(res => {
+            console.log('res', res.data);
+        }).catch(err => {
+            console.log('error in request', err);
+        })
+
+        if (planetRadius) {
+            // Getting planet radius
+            axios.get('https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/planets/classify', {}).then(res => {
+                console.log('res', res.data);
+                setPlanetRadius(res.data);
+            }).catch(err => {
+                console.log('error in request', err);
+            })
+        }
+    }
+
     function createPlanet () {
+        axios.post('http://127.0.0.1:5000/planets/add', {
+            title: content,
+            ticId: ticId,
+        }).then(res => {
+            console.log('res', res.data);
+        }).catch(err => {
+            console.log('error in request', err);
+        });
+        retrieveSectorData(); // This then updates the radius field locally
         supabase.from('planetsss').insert({
           owner: session?.user?.id, // This is validated via RLS so users can't pretend to be other user
           content, // : content,
           temperature: planetTemperature,
           ownerAddress: ownerAddress,
+          // radius: planetRadius,
           ticId: ticId, // Send this to Flask as a post request, then do axios.get to receive the result (graph, image). Request for radius from Tic.
           /* ticId,
-            radius: planetRadius,
             contract: '0xdf35Bb26d9AAD05EeC5183c6288f13c0136A7b43',
             tokenId: 0,
             chainId: 'goerli', */
