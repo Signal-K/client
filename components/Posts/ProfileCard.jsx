@@ -43,7 +43,7 @@ export function ProfileContent ({ activeTab, userId }) {
     return (
         <div>
             {activeTab === 'posts' && (
-                <div>
+                <div> 
                 { posts.length > 0 && posts.map(post => (
                     <PostCardProfile key={post.created_at} {...post} profiles={profile} /*media={media}*/ />
                 ))} {/* Section to show their long-form articles here */}

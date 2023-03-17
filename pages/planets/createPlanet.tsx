@@ -57,10 +57,13 @@ export default function PlanetFormCard ( { onCreate } ) {
     };
     
     useEffect(() => {
-        fetchPlanets();
+        //fetchPlanets();
+        axios.get('http://127.0.0.1:5000/get_image').then(res => {
+            return (res);
+        })
     }, []);
 
-    const fetchPlanets = async() => {
+    /*const fetchPlanets = async() => {
         try {
           const response = await axios("https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/planets");
           //const newTic = await axios("https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/create-tic");
@@ -71,7 +74,7 @@ export default function PlanetFormCard ( { onCreate } ) {
         } catch (error) {
           console.log(error)
         }
-    };
+    };*/
 
     function createItem () { // Testing -> with deployed Deepnote code. When running locally, use the `api/app/app.py` Flask code
         axios.post('https://b4c251b4-c11a-481e-8206-c29934eb75da.deepnoteproject.com/planets/add', {
@@ -104,7 +107,7 @@ export default function PlanetFormCard ( { onCreate } ) {
     }
 
     function createPlanet () {
-        axios.post('http://127.0.0.1:5000/planets/add', {
+        axios.post('http://127.0.0.1:5000/classify/planets/add', {
             title: content,
             ticId: ticId,
         }).then(res => {

@@ -10,6 +10,7 @@ import PlanetTabs from "../../components/Gameplay/Planets/PlanetNavigation";
 import { GameplayLayout } from "../../components/Core/Layout";
 import { useContract, useContractRead, useContractWrite, useLazyMint } from "@thirdweb-dev/react";
 import Link from "next/link";
+import { PlanetCard } from "../../components/Gameplay/Planets/PlanetCard";
 
 // import { Database } from "../../utils/database.types"; // Use this for later when we are drawing from the Planets table
 // type Planets = Database['public']['Tables']['planets']['Row'];
@@ -165,6 +166,7 @@ export default function PlanetPage () {
                         </div>
                     </div>
                 </Card>
+                <PlanetCard activeTab={tab} planetId={planetId} />
             </Layout>
         </GameplayLayout>
     );

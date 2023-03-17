@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function PlanetTabs ({ planetId, activeTab }) {
     const tabClasses = 'flex gap-1 px-4 py-1 items-center border-b-4 border-b-white';
     const activeTabClasses = 'flex gap-1 px-4 py-1 items-center border-socialBlue border-b-4 text-socialBlue font-bold';
-
+ 
     return (
         <div className="mt-6 md:mt-10 flex gap-0">
             <Link href={`/planets/${planetId}/`} className={activeTab === 'planet' ? activeTabClasses : tabClasses}>
