@@ -127,7 +127,7 @@ export default function PlanetFormCard ( { onCreate } ) {
             contract: '0xdf35Bb26d9AAD05EeC5183c6288f13c0136A7b43',
             tokenId: 0,
             chainId: 'goerli', */
-        }).then(response => {
+        }).select().then(response => { // Select - return the id, we can then pass this into Flask to get the image upserted
           if (!response.error) {
             /*const ticResponse = fetch('check_ticId', {
                 methods: "POST",

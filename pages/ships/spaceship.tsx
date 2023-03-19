@@ -113,7 +113,9 @@ export default function SpaceshipPage () {
                             <SpaceshipTabs activeTab={tab} spaceshipId={spaceship?.id} /><br /><br />
                             <p>Spaceship ID: {spaceship?.id}</p>
                             <p>Owner of this spaceship: {spaceship?.owner}</p>
-                            <button onClick={claimShip}>Claim ship</button>
+                            {spaceship?.owner != session?.user?.id && (
+                                <button onClick={claimShip}>Claim ship</button>
+                            )}
                             {spaceship?.owner == session?.user?.id && (
                                 <><div>You own this ship! Your id: {session?.user?.id}</div></>
                             )}<br /><br />
