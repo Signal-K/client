@@ -4,6 +4,7 @@ import PostCard from "../../components/PostCard";
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UserContext } from "../../context/UserContext";
+// import { StarSystem } from 'stellardream';
 // import LoginPage from "../login/social-login";
 
 import TimeAgo from 'javascript-time-ago';
@@ -17,8 +18,30 @@ export default function SocialGraphHome () {
   const [posts, setPosts] = useState([]);
   const [profile, setProfile] = useState(null);
 
+  function generateSystem () {
+    myNumber = Math.floor(Math.random() * 10);
+  }
+
   useEffect(() => {
     fetchPosts();
+    // const starSystem = new StarSystem(1549748672440);
+    // console.log(JSON.stringify(starSystem, null, 2));
+    var myNumber1 = Math.floor(Math.random() * 10);
+    var myNumber2 = Math.floor(Math.random() * 10);
+    var myNumber3 = Math.floor(Math.random() * 10);
+    var myNumber4 = Math.floor(Math.random() * 10);
+    var myNumber5 = Math.floor(Math.random() * 10);
+    var myNumber6 = Math.floor(Math.random() * 10);
+    var myNumber7 = Math.floor(Math.random() * 10);
+    var myNumber8 = Math.floor(Math.random() * 10);
+    var myNumber9 = Math.floor(Math.random() * 10);
+    var myNumber10 = Math.floor(Math.random() * 10);
+    var myNumber11 = Math.floor(Math.random() * 10);
+    var myNumber12 = Math.floor(Math.random() * 10);
+    var myNumber13 = Math.floor(Math.random() * 10);
+    var myNumber = myNumber1.toString() + myNumber2.toString() + myNumber3.toString() + myNumber4.toString() + myNumber5.toString() + myNumber6.toString() + myNumber7.toString() + myNumber8.toString() + myNumber9.toString() + myNumber10.toString() + myNumber11.toString() + myNumber12.toString() + myNumber13.toString();
+    //const starSystem = new StarSystem(myNumber)
+    //console.log(JSON.stringify(starSystem, null, 2));
   }, []);
 
   useEffect(() => {

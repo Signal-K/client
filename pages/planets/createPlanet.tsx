@@ -143,6 +143,7 @@ export default function PlanetFormCard ( { onCreate } ) {
             }
           }
         });
+        window.location.replace('/planets/8') // This should be changed to the returned id of the newly created anomaly
     }
 
     useEffect (() => {

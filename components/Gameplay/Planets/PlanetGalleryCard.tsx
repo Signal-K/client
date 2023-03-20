@@ -11,7 +11,7 @@ import Link from "next/link";
 type Planets = Database['public']['Tables']['planets']['Row'];
 interface Props { planet: any };
 
-export default function PlanetGalleryCard ( { id, radius, userId, ticId, cover } ) {
+export default function PlanetGalleryCard ( { id, content, radius, userId, ticId, cover } ) {
     // const { planet } = props;
 
     function buyPlanet () {
@@ -23,7 +23,7 @@ export default function PlanetGalleryCard ( { id, radius, userId, ticId, cover }
             <Card noPadding={false}>
                 <div className="flex gap-3">
                     <div className="grow">
-                        <p className="my-3 text-sm">Owner: {userId}</p>
+                        <p className="my-3 text-sm">Name: {content}</p>
                         <p className="my-3 text-sm">Radius: {radius}</p>
                         <p className="my-3 text-sm">TIC: {ticId}</p>
                         <p className="buttonColour my-3 text-sm">ID: {id}</p>

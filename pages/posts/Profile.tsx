@@ -1,5 +1,5 @@
 import { GameplayLayout } from "../../components/Core/Layout";
-import Card, { ProfileCard } from "../../components/Card";
+import { ProfileCard } from "../../components/Card";
 import { useRouter } from "next/router";
 import React, { useEffect, useState} from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";

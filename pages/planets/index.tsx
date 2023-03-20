@@ -43,7 +43,7 @@ export default function PlanetGalleryIndex () {
                     <PlanetGalleryCard key = { planet.id } {...planet}></PlanetGalleryCard>
                 ))}</div>
                 <div className="mx-10">
-                    <img src="http://127.0.0.1:5000/get_image" />
+                    {/*<img src="http://127.0.0.1:5000/get_image" />*/}
                     <PlanetFormCard onCreate={getPlanets} />
                 </div> {/* Maybe show user's planets or metadata here... */}
             </div>

@@ -62,13 +62,13 @@ export default function PlanetAvatar ({ uid, url, size, /*onUpload*/ }: {
     return (
         <div className="${width} rounded-full overflow-hidden">
             {avatarUrl ? (
-                <>{/*<img
+                <><img
                     src={avatarUrl}
                     alt='Avatar'
                     className="avatar image"
                     style={{ height: size, width: size }}
-            />*/}
-                <img src="http://127.0.0.1:5000/get_image" /></>
+            />
+                {/*<img src="http://127.0.0.1:5000/get_image" />*/}</>
             ) : (
                 <div className="avatar no-image" style={{ height: size, width: size }} />
             )}

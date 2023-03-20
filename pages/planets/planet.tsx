@@ -122,6 +122,10 @@ export default function PlanetPage () {
         }
     }
 
+    function updatePlanetTic ( ) {
+
+    }
+
     return (
         <GameplayLayout>
             <Layout hideNavigation={true}> {/* Should be set to <ProfileLayout /> */}
@@ -145,6 +149,16 @@ export default function PlanetPage () {
                             {/*<div className="@apply text-blue-200 leading-4 mb-2 mt-2 ml-10">{profile?.address}{/* | Only show this on mouseover {profile?.username}*/}{/*</div> {/* Profile Location (from styles css) */}
                         </div>
                         <PlanetTabs activeTab={tab} planetId={planet?.id} /><br /><br />
+                        {planet?.owner == session?.user?.id /*&& planet?.userId == username*/ && (
+                            <>
+                            Move this underneath Datasets tab in PlanetCard.tsx
+                                <button onClick={() => lazyMint({ metadatas: [{ name: planet?.content, media: planet?.cover, description: planet?.ticId, properties: { trait_type1: 'value' }}]})}>Mint NFT of planet</button>
+                                {!planet?.ticId && (
+                                    <p>This planet doesn't have a TIC ID</p>
+                                    // Update planet tic textarea & button
+                                )}
+                            </>
+                        )}
                         <p>Planet ID: {planet?.id}</p>
                         <p>Temperatue: {planet?.temperature} Kelvin</p>
                         <p>Created at: {planet?.created_at}</p>
@@ -155,13 +169,6 @@ export default function PlanetPage () {
                         <p>Contract info: {planet?.contract} ↝ {planet?.tokenId} on {planet?.chainId} </p>
                         <br /><br />
                         <p>Owner of this anomaly: {planet?.owner}</p>
-                        {planet?.owner == session?.user?.id /*&& planet?.userId == username*/ && (
-                            <>
-                                <div>Hello World</div><br />
-                                <div><button onClick={() => lazyMint({ metadatas: [{ name: planet?.content, media: planet?.cover, description: planet?.ticId, properties: { trait_type1: 'value' }}]})}>Mint NFT of planet</button></div>
-                                <Link href='https://deepnote.com/workspace/star-sailors-49d2efda-376f-4329-9618-7f871ba16007/project/Star-Sailors-Light-Curve-Plot-b4c251b4-c11a-481e-8206-c29934eb75da/notebook/notebook-377269a4c09f46908203c402cb8545b0'><div><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/b56a0704304940e49c38823795edaa20/b1b6860bdf364fcea023992c1ae527d6?height=294.6875" height="294.6875" width="500"/><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/></div></Link> {/* https://codesandbox.io/s/nextjs-example-react-jupyter-notebook-viewer-lzjcb5?file=/pages/index.js:21-33 */}
-                            </>
-                        )}
                         <br /><br /><br />
                         </div>
                     </div>

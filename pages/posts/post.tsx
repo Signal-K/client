@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-
-import Layout from "../../components/Layout";
+import Link from "next/link";
+import ClickOutHandler from 'react-clickout-handler';
 import Card from "../../components/Card";
 
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import AccountAvatar, { PostCardAvatar } from "../../components/AccountAvatar";
+import { GameplayLayout } from "../../components/Core/Layout";
 import PostCard from "../../components/PostCard";
 
-export default function IndividualPost () {
+export default function PostPage () {
+    const [post, setPost] = useState(null);
     const router = useRouter();
-    const postId = router.query.id;
+    const postId = router?.query?.id;
 
     const supabase = useSupabaseClient();
-    const [post, setPost] = useState(null);
+    const session = useSession();
 
     useEffect(() => {
         if (!postId) { return; };
@@ -21,21 +24,20 @@ export default function IndividualPost () {
 
     function fetchPost () {
         supabase.from('posts')
-            .select() 
+            .select()
             .eq('id', postId)
-            .then ( result => {
-                if ( result.error ) { throw result.error; };
-                if ( result.data ) {
-                    console.log(result?.data[0]); 
-                    setPost(result?.data[0]);
-                };
-            })
+            .then(result => {
+                if (result.error) { throw result.error; };
+                if (result.data) { setPost(result.data[0]); };
+            }
+        )
     }
 
     return (
-        <>{/*<Layout hideNavigation={true}>
-            <PostCard {...post} />
-        </Layout>*/}
-        <div>Test</div></>
+        <GameplayLayout>
+            <div className="mx-100">
+                <PostCard key = { post?.id } {...post} />
+            </div>
+        </GameplayLayout>
     )
 }

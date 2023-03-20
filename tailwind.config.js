@@ -6,6 +6,7 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    typography: ( theme ) => ({}),
     extend: {
       colors: {
         socialBg: '#FFFFFF',
@@ -15,5 +16,6 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  variants: {},
+  plugins: [require('@tailwindcss/typography')],
 }

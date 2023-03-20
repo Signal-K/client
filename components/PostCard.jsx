@@ -1,13 +1,10 @@
-import Avatar from "./Avatar";
 import Card, { ProfileCard } from "./Card";
 import ClickOutHandler from 'react-clickout-handler'
-import React, { useContext, useEffect,useState } from "react";
+import React, { useContext, useState } from "react";
 import Link from "next/link";
 import AccountAvatar, { PostCardAvatar } from "./AccountAvatar";
-import { Database } from "../utils/database.types";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UserContext } from "../context/UserContext";
-import UtterancesComments from "./Lens/Utterances";
 
 import en from 'javascript-time-ago/locale/en.json';
 import TimeAgo from "javascript-time-ago";
