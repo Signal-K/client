@@ -2,6 +2,7 @@ import { useSession } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import React from "react";
 import CoreLayout from "../components/Core/Layout";
+import UserOnboarding from "../components/onboarding";
 import { SocialGraphHomeNoSidebar } from "./posts";
 
 export default function Home() {
@@ -11,7 +12,8 @@ export default function Home() {
     return (
         <>
             <CoreLayout>      
-                <SocialGraphHomeNoSidebar />          
+                <SocialGraphHomeNoSidebar /> 
+                <UserOnboarding />         
             </CoreLayout>
         </>
     )

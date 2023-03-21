@@ -18,10 +18,6 @@ export default function SocialGraphHome () {
   const [posts, setPosts] = useState([]);
   const [profile, setProfile] = useState(null);
 
-  function generateSystem () {
-    myNumber = Math.floor(Math.random() * 10);
-  }
-
   useEffect(() => {
     fetchPosts();
     // const starSystem = new StarSystem(1549748672440);
