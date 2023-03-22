@@ -2,6 +2,7 @@ import React, { useState, useEffect, Fragment } from "react";
 import { Transition } from "@headlessui/react";
 import CoreNavigation from "./Navigation";
 import CoreSidebar, { GameplaySidebar } from './Sidebar';
+import Footer from "./Footer";
 
 export default function CoreLayout ( { children } ) {
     // Handling responsive UI
@@ -101,6 +102,7 @@ export function GameplayLayout ( { children } ) {
             >
                 <div className="px-4 md:px-16">{children}</div>
             </main>
+            <Footer />
         </>
     );
 };

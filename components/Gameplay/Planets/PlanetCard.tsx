@@ -70,7 +70,9 @@ export function PlanetCard ({ activeTab, planetId }) {
             )}
             {activeTab === 'refs' && (
                 <div><Card noPadding={false}>
-                    Planet Name
+                    <div className="mockup-code">
+  <pre data-prefix="$"><code>npm i daisyui</code></pre>
+</div>
                 </Card><Card noPadding={false}><UtterancesComments /></Card></div>
             )}
             {activeTab === 'sandbox' && (
