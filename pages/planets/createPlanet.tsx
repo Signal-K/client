@@ -10,27 +10,35 @@ import axios from "axios";
 
 export default function PlanetFormCard ( { onCreate } ) {
     // Take TIC id/stellar id, generate in python, return. Require reputation, take reputation. Long-term: generate planets via tic id with dynamic routes
+    // User management state
     const supabase = useSupabaseClient();
-    const [content, setContent] = useState('');
     const session = useSession();
     const [profile, setProfile] = useState(null);
-
-    const [userReputation, setUserReputation] = useState(null);
     const [avatar_url, setAvatarUrl] = useState(null);
     const [username, setUsername] = useState('');
-    const [name, setPlanetName] = useState('');
+
+    // State management for new planet creation
     const [planetTemperature, setPlanetTemperature] = useState('');
     const [planetRadius, setPlanetRadius] = useState();
+    const [userReputation, setUserReputation] = useState(null);
+    const [content, setContent] = useState('');
+    const [ownerAddress, setOwnerAddress] = useState('');
     const [ticId, setTicId] = useState(''); // Will later be calculated/generated randomly by python
-    const [planetAvatar_url, setPlanetAvatarUrl] = useState(''); // This will be set upon returning the image from python
+    // Additional metadata fields
+    // forks, forkFrom, posts, articles, datasets, generator (params)
+    /* const [planetAvatar_url, setPlanetAvatarUrl] = useState(''); // This will be set upon returning the image from python
     const [planetContract, setPlanetContract] = useState(''); // This will be set by default to `0xdf35Bb26d9AAD05EeC5183c6288f13c0136A7b43`
     const [planetTokenId, setPlanetTokenId] = useState(); // This will be set by Thirdweb after it is lazy minted
     const [planetChainId, setPlanetChainId] = useState(''); // Set by default to Goerli, will be changed either by user or by default later
-    // forks, forkFrom, posts, articles, datasets, generator (params)
-    const [planetMultiplier, setPlanetMultiplier] = useState(); // Set by default to 1
-    const [ownerAddress, setOwnerAddress] = useState('');
+    const [name, setPlanetName] = useState('');
     const [avatarUrlPre, setAvatarUrlPre] = useState(''); // Used (testing) for when user adds the profile pic for the planet when they're creating it. avatar_url is filled by calling the python/3js/unity generator
+    const [planetMultiplier, setPlanetMultiplier] = useState(); // Set by default to 1 */
 
+    // New planet/anomaly created, then what?
+    //const [planetCreationResponse, setPlanetCreationResponse] = useState(null);
+    const [newPlanetId, setNewPlanetId] = useState(null);
+
+    // General state
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
 
@@ -56,12 +64,12 @@ export default function PlanetFormCard ( { onCreate } ) {
         };
     };
     
-    useEffect(() => {
+    /*useEffect(() => {
         //fetchPlanets();
         axios.get('http://127.0.0.1:5000/get_image').then(res => {
             return (res);
         })
-    }, []);
+    }, []);*/
 
     /*const fetchPlanets = async() => {
         try {
@@ -107,14 +115,14 @@ export default function PlanetFormCard ( { onCreate } ) {
     }
 
     function createPlanet () {
-        axios.post('http://127.0.0.1:5000/classify/planets/add', {
+        /*axios.post('http://127.0.0.1:5000/classify/planets/add', {
             title: content,
             ticId: ticId,
         }).then(res => {
             console.log('res', res.data);
         }).catch(err => {
             console.log('error in request', err);
-        });
+        });*/
         retrieveSectorData(); // This then updates the radius field locally
         supabase.from('planetsss').insert({
           owner: session?.user?.id, // This is validated via RLS so users can't pretend to be other user
@@ -136,14 +144,18 @@ export default function PlanetFormCard ( { onCreate } ) {
                 }, https://javascript.plainenglish.io/sending-a-post-to-your-flask-api-from-a-react-js-app-6496692514e
                 body: JSON.stringify(ticId)
             })*/
-            alert(`Post ${content} created`);
+            //setPlanetCreationResponse(response);
+            console.log(response?.data);
+            setNewPlanetId(response.data);
+            console.log(newPlanetId);
+            alert(`Planet ${content} created`);
             setContent(''); setPlanetTemperature(''); setTicId("");
             if ( onCreate ) {
               onCreate();
             }
           }
         });
-        window.location.replace('/planets/8') // This should be changed to the returned id of the newly created anomaly
+        //window.location.replace('/planets/{newPlanetId}') // This should be changed to the returned id of the newly created anomaly
     }
 
     useEffect (() => {

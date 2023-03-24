@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { Box } from "../../components/Journal/Box";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { Comments, AuthModal, CommentsProvider } from 'supabase-comments-extension';
 import Avatar from "../../components/Avatar";
 import { NextUIProvider } from "@nextui-org/react";
 import CoreLayout from "../../components/Core/Layout";
@@ -58,25 +59,29 @@ const JournalArticle: NextPage = () => {
             <NextUIProvider>
                 <Box css={{ px: "$12", py: "$15", mt: "$12", "@xsMax": {px: "$10"}, maxWidth: "800px", margin: "0 auto" }}>
                     <>
-                        <h1 className="text-4xl mb-10">{article.title}</h1>
-                        <p>{article.content}</p>
-                        {/*{ session?.user && article.user_id === session?.user?.id ?
-                            <>
-                                <Spacer y={.5} />
-                                <Button size="sm" onPress={() => router.push("/journal/editArticle?id=" + id)}> {/* localhost:3000/editArticle */}{/*
-                                    Edit
-                                </Button>
-                                <Spacer y={.5} />
-                                <Button size="sm" color="error" onPress={() => deleteArticle()}>
-                                    Delete
-                                </Button>
-                            </>
-                        : null}*/}
-                        <br /><br /><br />
-                        <button onClick={editArticleLink}>Edit article</button>
-                        <div className="articleTags mt-10">
-                        <h2 className="text-xl">Tags</h2>
-                        <p>{article?.tags?.tag1}, {article?.tags?.tag2}</p></div>
+                        {/*<CommentsProvider
+                            supabaseClient={supabase}
+    >*/}
+                            <h1 className="text-4xl mb-10">{article.title}</h1>
+                            <p>{article.content}</p>
+                            {/*{ session?.user && article.user_id === session?.user?.id ?
+                                <>
+                                    <Spacer y={.5} />
+                                    <Button size="sm" onPress={() => router.push("/journal/editArticle?id=" + id)}> {/* localhost:3000/editArticle */}{/*
+                                        Edit
+                                    </Button>
+                                    <Spacer y={.5} />
+                                    <Button size="sm" color="error" onPress={() => deleteArticle()}>
+                                        Delete
+                                    </Button>
+                                </>
+                            : null}*/}
+                            <br /><br /><br />
+                            <button onClick={editArticleLink}>Edit article</button>
+                            <div className="articleTags mt-10">
+                            <h2 className="text-xl">Tags</h2>
+                            <p>{article?.tags?.tag1}, {article?.tags?.tag2}</p></div>
+                        
                     </>
                 </Box>
             </NextUIProvider>
