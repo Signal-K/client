@@ -38,8 +38,8 @@ export default function PlanetGalleryIndex () {
 
     return (
         <GameplayLayout>
-            <div className="flex px-10">
-            <div className="w-1/2">{planets.map(planet => (
+            <div className="px-10">
+                <div className="w-1/2">{planets.map(planet => ( // TODO: Update to be carousel of cards
                     <PlanetGalleryCard key = { planet.id } {...planet}></PlanetGalleryCard>
                 ))}</div>
                 <div className="mx-10">

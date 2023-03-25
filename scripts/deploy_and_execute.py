@@ -27,7 +27,7 @@ def execute_proposal():
     vote(proposal_id, 1)
     if network.show_active() == "development":
         move_blocks(VOTING_PERIOD + 1)
-    print(f"Proposal State {MoralisGovernor[-1].state(proposal_id)}")
+    print(f"Proposal State {AnomalyGovernor[-1].state(proposal_id)}")
     queue_and_execute(STORE_VALUE)
 
 
@@ -38,7 +38,7 @@ def propose(store_value):
         *args
     )
     print(encoded_function)
-    propose_tx = MoralisGovernor[-1].propose(
+    propose_tx = AnomalyGovernor[-1].propose(
         [Box[-1].address],
         [0],
         [encoded_function],
@@ -50,9 +50,9 @@ def propose(store_value):
         tx.wait(1)
     propose_tx.wait(2)
     proposal_id = propose_tx.events["ProposalCreated"]["proposalId"]
-    print(f"Proposal State {MoralisGovernor[-1].state(proposal_id)}")
-    print(f"Proposal Snapshot {MoralisGovernor[-1].proposalSnapshot(proposal_id)}")
-    print(f"Proposal deadline {MoralisGovernor[-1].proposalDeadline(proposal_id)}")
+    print(f"Proposal State {AnomalyGovernor[-1].state(proposal_id)}")
+    print(f"Proposal Snapshot {AnomalyGovernor[-1].proposalSnapshot(proposal_id)}")
+    print(f"Proposal deadline {AnomalyGovernor[-1].proposalDeadline(proposal_id)}")
 
     return proposal_id
 
@@ -61,7 +61,7 @@ def vote(proposal_id: int, vote: int):
     # 0 => Against, 1 => For, 2 => Abstain
     print(f"Voting yes on {proposal_id}")
     account = get_account()
-    tx = MoralisGovernor[-1].castVoteWithReason(
+    tx = AnomalyGovernor[-1].castVoteWithReason(
         proposal_id, vote, "I vote yes because reasons...", {"from": account}
     )
     tx.wait(1)
@@ -76,7 +76,7 @@ def queue_and_execute(store_value):
     )
     # description hash
     description_hash = Web3.keccak(text=PROPOSAL_DESCRIPTION).hex()
-    tx = MoralisGovernor[-1].queue(
+    tx = AnomalyGovernor[-1].queue(
         [Box[-1].address],
         [0],
         [encoded_function],
@@ -89,7 +89,7 @@ def queue_and_execute(store_value):
     if network.show_active() == "development":
         time.sleep(5)
 
-    tx = MoralisGovernor[-1].execute(
+    tx = AnomalyGovernor[-1].execute(
         [Box[-1].address],
         [0],
         [encoded_function],

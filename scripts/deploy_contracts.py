@@ -7,7 +7,7 @@ from brownie import (
     config,
     Contract,
 )
-from helpful_scripts import get_account
+from scripts.helpful_scripts import get_account
 from web3 import Web3
 
 initial_supply = Web3.toWei(100, "ether")
@@ -43,7 +43,7 @@ def deploy_contracts():
     )
 
     print(f"Governance TimeLock: {governance_time_lock.address}")
-    governor = MoralisGovernor.deploy(
+    governor = AnomalyGovernor.deploy(
         governance_token.address,
         governance_time_lock.address,
         QUORUM_PERCENTAGE,
