@@ -42,6 +42,7 @@ const StakingHome: NextPage = () => {
           className={`${styles.mainButton} ${styles.spacerBottom}`}
           onClick={() => router.push(`/play`)}
         >Planet interaction</button>
+        <p>Address: {address}</p>
       </div>
     );
   };

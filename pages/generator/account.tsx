@@ -51,7 +51,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 .single()
 
             if (error && status !== 406) {
-                throw error;
+                throw error; 
             }
 
             if (data) {
