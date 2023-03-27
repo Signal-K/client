@@ -53,3 +53,5 @@ Transaction sent: 0xba42563cfb61250a7f8405e2322699b5c85de249f241f876def451c6e3a9
   Box.transferOwnership confirmed   Block: 9   Gas used: 30084 (0.25%)
 
 Terminating local RPC client..
+
+https://app.warp.dev/block/dn3RaXkYnkkHjqevP1dtX0
