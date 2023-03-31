@@ -27,7 +27,6 @@ export const ExecuteProposal = ({ lastId, signer, value, description }) => {
 
     const shortId = lastId ? lastId.slice(0, 11) + "..." : 0;
 
-
     return (<>
         <CardContent>
             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>

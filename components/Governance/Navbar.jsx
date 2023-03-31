@@ -47,7 +47,7 @@ export const Navbar = ({ signer }) => {
     return (
         <>
             <GlobalStyles styles={{ ul: { margin: 0, padding: 0, listStyle: 'none' } }} />
-            <CssBaseline />
+            {/*<CssBaseline />*/}
             <div className='presentation-container'>
                 <div className='presentation'>
                     <Typography variant="h5" align="left" color="white" component="p" width="70%">

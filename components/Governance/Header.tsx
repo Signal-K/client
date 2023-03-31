@@ -12,7 +12,7 @@ export const Header = ({ isConnected, account, signer, connectToMetamask }) => {
     return (
         <React.Fragment>
             <GlobalStyles styles={{ ul: { margin: 0, padding: 0, listStyle: 'none' } }} />
-            <CssBaseline />
+            {/*<CssBaseline />*/}
             <AppBar
                 position="static"
                 color="default"
