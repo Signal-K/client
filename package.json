@@ -51,7 +51,7 @@
     "extract-colors": "^2.0.5",
     "framer-motion": "^9.0.2",
     "fs": "^0.0.1-security",
-    "hardhat": "^2.12.7",
+    "hardhat": "^2.13.0",
     "html2canvas": "^1.4.1",
     "javascript-time-ago": "^2.5.9",
     "material-kit": "^2.0.4",
