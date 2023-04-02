@@ -21,8 +21,10 @@ const VotingEntrance = () => {
     );
 
     // Initialise token contract
+    var voteTokenContract = MINERALS_ADDRESS;
+    voteTokenContract = "0xa791a3e0F2D2300Ee85eC7105Eee9E9E8eb57908"; // Temporarily testing with a contract deployed based on MINERALS_ADDRESS but immediately separate. Will be able to transfer between the two
     const { contract: token } = useContract(
-        MINERALS_ADDRESS,
+        voteTokenContract,
         'token',
     );
 

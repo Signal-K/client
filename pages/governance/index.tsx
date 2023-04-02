@@ -29,12 +29,12 @@ export default function GovernanceDAOIndex () {
                                             <h2>{proposal/*[0]*/}</h2>
                                             <Web3Button
                                                 contractAddress={contractAddress}
-                                                action={(contract) => contract.call("vote", 0, true)}
+                                                //action={(contract) => contract.call("vote", 0, true)}
                                             >Yes</Web3Button>
                                             <br />
                                             <Web3Button
                                                 contractAddress={contractAddress}
-                                                action={(contract) => contract.call("vote", 0, false)}
+                                                //action={(contract) => contract.call("vote", 0, false)}
                                             >No</Web3Button>
                                         </div>
                                     ) : (
