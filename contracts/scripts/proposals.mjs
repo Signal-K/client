@@ -27,12 +27,13 @@ const sdk = ThirdwebSDK.fromPrivateKey('71cc30029998f3282069d43e547efd1894f51269
                 ]),
             },
         ];
-        await vote.propose(description, executions);
 
+        await vote.propose(description, executions);
         console.log("✅ Successfully created proposal to mint tokens");
-        
+
         } catch (error) {
             console.error("failed to create first proposal", error);
-        process.exit(1);
-    };
-})
+            process.exit(1);
+        };
+    }
+);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { ethers } from "ethers";
-import { useAddress, useNetwork, useContract, ConnectWallet, useNFTBalance, Web3Button } from "@thirdweb-dev/react";
+import { useAddress, useNetwork, useContract, ConnectWallet, useNFTBalance, Web3Button, useContractWrite } from "@thirdweb-dev/react";
 import { ChainId } from '@thirdweb-dev/sdk';
 import { AddressZero } from '@ethersproject/constants';
 import styles from '../../styles/Proposals/proposalsIndex.module.css';
@@ -9,6 +9,13 @@ import styles from '../../styles/Proposals/proposalsIndex.module.css';
 import { PLANETS_ADDRESS } from "../../constants/contractAddresses";
 import { MINERALS_ADDRESS } from "../../constants/contractAddresses";
 import CoreLayout from "../../components/Core/Layout";
+
+// For contract actions
+import { ThirdwebSDK } from "@thirdweb-dev/sdk";
+//import "dotenv/config";
+const NETWORK = "goerli";
+//const GOERLI_PRIVATE_KEY = process.env.PRIVATE_KEY;
+const sdk = ThirdwebSDK.fromPrivateKey('71cc30029998f3282069d43e547efd1894f51269e15a833815e5ed5f418a38e7', NETWORK);
 
 const VotingEntrance = () => {
     const address = useAddress();
@@ -36,6 +43,37 @@ const VotingEntrance = () => {
         voteModuleAddress,
         'vote',
     );
+
+    // Mutation for creating proposals
+    const { mutateAsync: propose, isLoading } = useContractWrite(vote, "propose")
+    async function createProposalTest () {
+        const voteContract = await sdk.getContract("0xd0F59Ed6EBf7f754fC3D5Fd7bb3181EBDeEd9E9d", "vote");
+        const tokenContract = await sdk.getContract("0xa791a3e0F2D2300Ee85eC7105Eee9E9E8eb57908", "token");
+        const description = "Here's the proposal contents";
+        const amount = 420_000; 
+        const executions = [
+            {
+                toAddress: token.getAddress(),
+                nativeTokenValue: 0,
+                transactionData: token.encoder.encode("mintTo", [
+                    vote.getAddress(),
+                    ethers.utils.parseUnits(amount.toString(), 18),
+                ]),
+            },
+        ];
+
+        await vote.propose(description, executions);
+        console.log("✅ Successfully created proposal to mint tokens");
+    };
+
+    const createProposal = async () => {
+        try {
+            const data = await propose({ args: [targets, values, calldatas, description] });
+            console.info("contract call successs", data);
+        } catch (err) {
+            console.error("contract call failure", err);
+        }
+    }
 
     // Check if the user has the edition drop (allows them to enter the DAO)
     const { data: nftBalance } = useNFTBalance(editionDrop, address, '0');
@@ -283,6 +321,7 @@ const VotingEntrance = () => {
                                 <button disabled={isVoting || hasVoted} type="submit">{isVoting ? 'Voting...' : hasVoted ? 'You Already Voted' : 'Submit Votes' }</button>
                                 {!hasVoted && ( <small>This will trigger multiple transactions that you will need to sign.</small> )}
                             </form>
+                            <button onClick={createProposalTest}>Create Proposal</button>
                         </div>
                     </div>
                 </div>
