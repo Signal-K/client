@@ -53,10 +53,10 @@ const VotingEntrance = () => {
         const amount = 420_000; 
         const executions = [
             {
-                toAddress: token.getAddress(),
+                toAddress: tokenContract.getAddress(),
                 nativeTokenValue: 0,
                 transactionData: token.encoder.encode("mintTo", [
-                    vote.getAddress(),
+                    voteContract.getAddress(),
                     ethers.utils.parseUnits(amount.toString(), 18),
                 ]),
             },
