@@ -37,7 +37,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
 
     useEffect(() => {
         getProfile();
-        console.log(user.id)
+        //console.log(user.id)
     }, [session]);
 
     async function getProfile () {

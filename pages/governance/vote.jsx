@@ -12,6 +12,7 @@ import CoreLayout from "../../components/Core/Layout";
 
 // For contract actions
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
+import AuthenticateWalletToDb from "../../components/Governance/Connections/AuthenticateAccount";
 //import "dotenv/config";
 const NETWORK = "goerli";
 //const GOERLI_PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -322,6 +323,7 @@ const VotingEntrance = () => {
                                 {!hasVoted && ( <small>This will trigger multiple transactions that you will need to sign.</small> )}
                             </form>
                             <button onClick={createProposalTest}>Create Proposal</button>
+                            <AuthenticateWalletToDb />
                         </div>
                     </div>
                 </div>
