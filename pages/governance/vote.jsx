@@ -211,6 +211,8 @@ const VotingEntrance = () => {
                     <div>
                         <div>
                             <h2>Member list</h2>
+                            <ConnectWallet />
+                            {address}
                             <table className="card">
                                 <thead>
                                     <tr>
