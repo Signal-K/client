@@ -1,19 +1,19 @@
 "use client";
 
-import MissionList from "@/components/Content/MissionList";
+import MissionList from "@/app/components/_[archive]/Content/MissionList";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/_[archive]/ui/button";
 import { PaintRollerIcon, ArrowRightIcon as LucideArrowRightIcon, ArrowLeftIcon as LucideArrowLeftIcon, BookOpenIcon as LucideBookOpenIcon } from "lucide-react";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
-import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
-import ClassificationsFeed from "@/Classifications/ClassificationFeed";
+import GoToYourPlanet from "@/app/components/_[archive]/Gameplay/Travel/InitTravel";
+import ClassificationsFeed from "@/app/components/_[archive]/Classifications/ClassificationFeed";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import NavMenu from "@/app/components/_[archive]/(layout)/menu";
 import { MainContentProps } from "@/types/Layout/Globals";
 import { PostCard } from "@/app/components/_[archive]/(create)/(classifications)/ClassificationByType";
 import { PlanetLayoutProps } from "@/types/Layout/Globals";
-import { TellUsWhatYouThinkClassificationBlock } from "@/components/Tutorial/TextBlocks";
+import { TellUsWhatYouThinkClassificationBlock } from "@/app/components/_[archive]/Tutorial/TextBlocks";
  
 export default function PlanetLayout({ children }: { children: React.ReactNode }) {
   const supabase = useSupabaseClient();

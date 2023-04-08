@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { CreateFirstBaseClassification, CreateCloudClassification, CreateFirstMeteorologyClassification } from '@/Classifications/ClassificationForm';
-import CreateBaseClassification from '@/Classifications/ClassificationForm';
+import { CreateFirstBaseClassification } from '../../_[archive]/Classifications/ClassificationForm';
+import CreateBaseClassification from '../../_[archive]/Classifications/ClassificationForm';
 import { useActivePlanet } from '@/context/ActivePlanet';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import ClassificationForm from '../../(create)/(classifications)/PostForm';

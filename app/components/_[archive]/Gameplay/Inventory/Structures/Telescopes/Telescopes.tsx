@@ -5,9 +5,8 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 
-import CreateBaseClassification, { CreateFirstBaseClassification } from "@/Classifications/ClassificationForm";
+import { CreateFirstBaseClassification } from "@/app/components/_[archive]/Classifications/ClassificationForm";
 import { useProfileContext } from "@/context/UserProfile";
-import PlanetData from "@/components/Content/Anomalies/PlanetData";
 
 interface OwnedItem { 
     id: string;

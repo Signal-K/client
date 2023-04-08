@@ -5,20 +5,19 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 
 import { AllAutomatons, SingleAutomaton } from "./Automatons/Automaton";
 import SingleAutomatonCraftItem from "./Automatons/AutomatonCrafting";
-import { PlanetGrid } from "@/components/Onboarding";
+import { PlanetGrid } from "@/app/components/_[archive]/Onboarding";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ProfileCard } from "@/app/auth/UserProfileFields";
 import UserItemsUndeployed from "./InactiveItems";
 import { AllStructures } from "./Structures/Structure";
 import CraftStructure from "./Actions/CraftStructure";
-import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
 import ExampleComponent from "./Structures/structure-borderline";
-import TravelBuddy from "@/components/Utilities/TravelBuddy";
+import TravelBuddy from "@/app/components/_[archive]/Utilities/TravelBuddy";
 import SpacecraftButton from "./Structures/Vehicles/Spacecraft";
 // import { SidebarLayout } from "@/app/layout";
 import { SidebarLayout } from "@/app/components/_[archive]/(layout)/sectionStructure";
-import TutorialText from "@/components/Tutorial/TextBlocks";
-import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
+import TutorialText from "@/app/components/_[archive]/Tutorial/TextBlocks";
+import { TellUsWhatYouThinkClassification } from "../../Classifications/ClassificationForm";
 
 export interface UserStructure {
   id: string;

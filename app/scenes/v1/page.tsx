@@ -1,22 +1,21 @@
 "use client";
 
-import { AllStructures } from "@/components/Gameplay/Inventory/Structures/Structure";
-import { Button } from "@/components/ui/button";
+import { AllStructures } from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Structure";
+import { Button } from "@/app/components/_[archive]/ui/button";
 import { useEffect, useState } from "react";
 import UserStructures from "../../components/_[archive]/(structures)/StructureModal";
-import TutorialText from "@/components/Tutorial/TextBlocks";
-import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
-import TravelBuddyButton from "@/components/Utilities/TravelBuddy";
+import TutorialText from "@/app/components/_[archive]/Tutorial/TextBlocks";
+import CraftStructure from "@/app/components/_[archive]/Gameplay/Inventory/Actions/CraftStructure";
+import TravelBuddyButton from "@/app/components/_[archive]/Utilities/TravelBuddy";
 import {
   AllAutomatons,
   SingleAutomaton,
-} from "@/components/Gameplay/Inventory/Automatons/Automaton";
-import UserItemsUndeployed from "@/components/Gameplay/Inventory/InactiveItems";
-import { PlanetGrid } from "@/components/Onboarding";
+} from "@/app/components/_[archive]/Gameplay/Inventory/Automatons/Automaton";
+import UserItemsUndeployed from "@/app/components/_[archive]/Gameplay/Inventory/InactiveItems";
+import { PlanetGrid } from "@/app/components/_[archive]/Onboarding";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
-import Layout from "@/components/Layout";
+import Layout from "@/app/components/Layout";
 import DeployRooversInitial from "@/app/components/(scenes)/roovers/deployAndReturn";
 
 export default function Home() {

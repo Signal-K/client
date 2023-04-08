@@ -1,9 +1,9 @@
 "use client"
 
-import Layout, { OnboardingLayout } from "@/components/Layout";
-import UserPlanetPage from "@/components/Gameplay/Inventory/UserPlanets";
+import Layout, { OnboardingLayout } from "@/app/components/Layout";
+import UserPlanetPage from "@/app/components/_[archive]/Gameplay/Inventory/UserPlanets";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Landing } from "@/components/landing";
+import { Landing } from "@/app/components/landing";
 import { Panels } from "./components/_[archive]/(layout)/currentSections";
 import { useEffect, useState } from "react";
 import FirstScene from "./components/_[archive]/(scenes)/starterPlanets";

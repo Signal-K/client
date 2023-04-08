@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button'; 
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/app/components/_[archive]/ui/card';
+import { Button } from '@/app/components/_[archive]/ui/button'; 
 
 const StructureCard = ({ structure }: { structure: any }) => {
   return (

@@ -6,14 +6,14 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import {
   CreateStructureWithItemRequirementinfo,
   PlacedStructureSingle,
-} from "@/components/Gameplay/Inventory/Structures/Structure";
-import { Button } from "@/components/ui/button";
+} from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Structure";
+import { Button } from "@/app/components/_[archive]/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/app/components/_[archive]/ui/dialog";
 import { AllAutomatons } from "../../Automatons/Automaton";
 import CraftStructure from "../../Actions/CraftStructure";
 

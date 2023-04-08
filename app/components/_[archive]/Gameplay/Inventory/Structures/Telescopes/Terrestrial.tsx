@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { CreateCloudClassification, CreateFirstMeteorologyClassification } from "@/Classifications/ClassificationForm";
+import { CreateFirstMeteorologyClassification } from "@/app/components/_[archive]/Classifications/ClassificationForm";
 
 interface UserStructure {
     id: number;

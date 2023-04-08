@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
+import { TellUsWhatYouThinkClassification } from "../Classifications/ClassificationForm";
 import RefreshPageButton from "../RefreshState";
 import Link from "next/link";
 

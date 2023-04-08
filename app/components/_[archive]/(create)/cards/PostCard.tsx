@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Card } from '@/components/ui/card';
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Separator } from '@/components/ui/separator';
+import { Card } from '@/app/components/_[archive]/ui/card';
+import { Button } from "@/app/components/_[archive]/ui/button";
+import { Progress } from "@/app/components/_[archive]/ui/progress";
+import { Dialog, DialogContent, DialogTrigger } from "@/app/components/_[archive]/ui/dialog";
+import { Separator } from '@/app/components/_[archive]/ui/separator';
 import { motion } from 'framer-motion';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet';

@@ -1,5 +1,5 @@
-import { AllStructures } from "@/components/Gameplay/Inventory/Structures/Structure";
-import { Button } from "@/components/ui/button";
+import { AllStructures } from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Structure";
+import { Button } from "@/app/components/_[archive]/ui/button";
 import { useState } from "react";
 import UserStructures from "../(structures)/StructureModal";
 

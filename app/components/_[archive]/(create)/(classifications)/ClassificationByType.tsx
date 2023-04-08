@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/_[archive]/ui/button";
 import { useActivePlanet } from '@/context/ActivePlanet';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/app/components/_[archive]/ui/card';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 

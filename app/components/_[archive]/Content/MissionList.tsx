@@ -7,7 +7,7 @@ import {
     CardContent,
     CardFooter,
     Card,
-} from "@/components/ui/card";
+} from "@/app/components/_[archive]/ui/card";
 import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 

@@ -5,9 +5,9 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-} from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+} from "@/app/components/_[archive]/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/app/components/_[archive]/ui/avatar";
+import { Button } from "@/app/components/_[archive]/ui/button";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { RooverFromAppeears } from "@/app/components/(anomalies)/(data)/Mars-Photos";

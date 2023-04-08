@@ -5,15 +5,15 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 import { OwnedItem, UserStructure } from "./StructureModal";
-import { TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "@/components/Gameplay/Inventory/Structures/Telescopes/Telescopes";
-import MiningStationPlaceable from "@/components/Gameplay/Inventory/Structures/Mining";
-import { AnomalyStructureModal } from "@/components/Gameplay/Inventory/Automatons/Automaton";
-import { MeteorologyToolModal } from "@/components/Gameplay/Inventory/Structures/Telescopes/Terrestrial";
-import { AutomatonUpgradeStructureModal } from "@/components/Gameplay/Inventory/Structures/Automatons/Automatons";
-import { CameraAutomatonModule } from "@/components/Gameplay/Inventory/Structures/Automatons/Modules";
-import { CameraReceiverStation } from "@/components/Gameplay/Inventory/Structures/Automatons/Modules";
-import { SurveyorStructureModal } from "@/components/Gameplay/Inventory/Structures/Telescopes/Telescopes";
-import LaunchpadButton from "@/components/Gameplay/Inventory/Structures/Vehicles/Launchpad";
+import { TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Telescopes/Telescopes";
+import MiningStationPlaceable from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Mining";
+import { AnomalyStructureModal } from "@/app/components/_[archive]/Gameplay/Inventory/Automatons/Automaton";
+import { MeteorologyToolModal } from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Telescopes/Terrestrial";
+import { AutomatonUpgradeStructureModal } from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Automatons/Automatons";
+import { CameraAutomatonModule } from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Automatons/Modules";
+import { CameraReceiverStation } from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Automatons/Modules";
+import { SurveyorStructureModal } from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Telescopes/Telescopes";
+import LaunchpadButton from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Vehicles/Launchpad";
 
 export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: UserStructure; style: any; }> = ({ ownedItem, structure, style }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);

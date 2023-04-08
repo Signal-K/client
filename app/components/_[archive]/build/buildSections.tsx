@@ -1,11 +1,11 @@
 "use client"
 
-import { AllStructures } from "@/components/Gameplay/Inventory/Structures/Structure";
-import { Button } from "@/components/ui/button";
+import { AllStructures } from "@/app/components/_[archive]/Gameplay/Inventory/Structures/Structure";
+import { Button } from "@/app/components/_[archive]/ui/button";
 import React, { useEffect, useState } from "react";
-import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
-import { SingleAutomaton } from "@/components/Gameplay/Inventory/Automatons/Automaton";
-import SingleAutomatonCraftItem from "@/components/Gameplay/Inventory/Automatons/AutomatonCrafting";
+import CraftStructure from "@/app/components/_[archive]/Gameplay/Inventory/Actions/CraftStructure";
+import { SingleAutomaton } from "@/app/components/_[archive]/Gameplay/Inventory/Automatons/Automaton";
+import SingleAutomatonCraftItem from "@/app/components/_[archive]/Gameplay/Inventory/Automatons/AutomatonCrafting";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 // import NavigationMenu from "../(layout)/navigation/pogo-menu";

@@ -6,7 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { CreateStructureWithItemRequirementinfo } from "../Structure";
 import CraftStructure from "../../Actions/CraftStructure";
 import LaunchpadButton from "./Launchpad";
-import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
+import GoToYourPlanet from "@/app/components/_[archive]/Gameplay/Travel/InitTravel";
 
 interface SpacecraftModalProps {
     isOpen: boolean;

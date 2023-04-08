@@ -11,7 +11,7 @@ import { InventoryProvider } from "@/context/InventoryContext";
 import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 import { bgImage, backgroundImages } from "@/constants/backgrounds";
 import { RefreshProvider } from "@/context/RefreshState";
-import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
+import CraftStructure from "@/app/components/_[archive]/Gameplay/Inventory/Actions/CraftStructure";
 import { MissionProvider } from "@/context/MissionContext";
 // import { CreateStructureWithItemRequirementinfo } from "@/components/Gameplay/Inventory/Structures/Structure";
 
