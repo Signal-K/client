@@ -1,4 +1,10 @@
-// Base imports / next
+type Props = {};
+
+export default function LensProfilePage ( {}: Props ) {
+    return "Stub"
+}
+
+/*/ Base imports / next
 import React from "react";
 import { useRouter } from "next/router";
 
@@ -45,7 +51,7 @@ export default function LensProfilePage ( {}: Props ) {
 
     return (
         <Flex w='100%'>
-            {/*<Sidebar />*/}
+            {/*<Sidebar />*/{/*
             <center><Flex
                 pos="absolute"
                 top="50%"
@@ -55,7 +61,7 @@ export default function LensProfilePage ( {}: Props ) {
             >
                 <div className={styles.profileContainer}>
                     <div className={styles.profileContentContainer}>
-                        {/* @ts-ignore */}
+                        {/* @ts-ignore */}{/*
                         {profileData?.profile?.coverPicture?.original?.url && (
                                 <MediaRenderer
                                     // @ts-ignore
@@ -64,7 +70,7 @@ export default function LensProfilePage ( {}: Props ) {
                                     className={styles.coverImageContainer}
                                 />
                         )}
-                        {/* @ts-ignore */}
+                        {/* @ts-ignore */}{/*
                         {profileData?.profile?.picture?.original?.url && (
                                 <MediaRenderer
                                     // @ts-ignore
@@ -92,6 +98,7 @@ export default function LensProfilePage ( {}: Props ) {
                     </div></center>
                 </div>
             </Flex></center>
-        </Flex>
-    );
+                    </Flex>*/}
+    /*);
 }
+}*/
