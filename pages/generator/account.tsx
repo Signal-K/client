@@ -22,6 +22,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
     const [username, setUsername] = useState<Profiles['username']>(null);
     const [website, setWebsite] = useState<Profiles['website']>(null); // I believe this is the email field
     const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null);
+    const [address2, setAddress2] = useState<Profiles['address2']>(null);
     const [address, setAddress] = useState<Profiles['address']>(null); // This should be set by the handler eventually (connected address).
     const [images, setImages] = useState([]);
 
@@ -46,7 +47,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
             if (!user) throw new Error('No user authenticated');
             let { data, error, status } = await supabase
                 .from('profiles')
-                .select(`username, website, avatar_url, address`)
+                .select(`username, website, avatar_url, address, address2`)
                 .eq('id', user.id)
                 .single()
 
@@ -88,6 +89,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 website,
                 avatar_url,
                 address,
+                address2,
                 updated_at: new Date().toISOString(),
             }
             let { error } = await supabase.from('profiles').upsert(updates);
