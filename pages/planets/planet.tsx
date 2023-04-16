@@ -80,20 +80,16 @@ export default function PlanetPage () {
         }
     }
 
-    const claimPlanet = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('planetsss')
-                .update([
-                    { owner: session?.user?.id, /*userId: username*/ }
-                ])
-                .eq('id', planetId);
-                updatePlayerReputation(); // Do this for posts, journals as well
-            
-                if (error) throw error;
-        } catch (error: any) {
-            console.log(error);
+    function showNftMetadataUri (planet) {
+        const { contract } = useContract(`{planet?.contract}`);
+        const { data, isLoading } = useContractRead( contract, "uri", `{planet?.tokenId}`)
+        if ( data ) {
+            setPlanetUri( data );
         }
+    }
+
+    function updatePlanetTic ( ) {
+
     }
 
     const updatePlayerReputation = async () => {
@@ -114,23 +110,27 @@ export default function PlanetPage () {
         }
     }
 
-    function showNftMetadataUri (planet) {
-        const { contract } = useContract(`{planet?.contract}`);
-        const { data, isLoading } = useContractRead( contract, "uri", `{planet?.tokenId}`)
-        if ( data ) {
-            setPlanetUri( data );
+    const claimPlanet = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('planetsss')
+                .update([
+                    { owner: session?.user?.id, /*userId: username*/ }
+                ])
+                .eq('id', planetId);
+                updatePlayerReputation(); // Do this for posts, journals as well
+            
+                if (error) throw error;
+        } catch (error: any) {
+            console.log(error);
         }
-    }
-
-    function updatePlanetTic ( ) {
-
     }
 
     return (
         <GameplayLayout>
             <Layout hideNavigation={true}> {/* Should be set to <ProfileLayout /> */}
                 <Card noPadding={true}>
-                    <div className="relative overflow-hidden rounded-md">
+                    <div className="relative overflow-hidden rounded-md mb-5">
                         <PlanetCoverImage url={planet?.cover} editable={true} onChange={fetchPlanet()} />
                         <div className="absolute top-40 mt-12 left-5">
                             {planet && (<PlanetAvatar // Add upload handler from AccountAvatarV1
@@ -149,27 +149,9 @@ export default function PlanetPage () {
                             {/*<div className="@apply text-blue-200 leading-4 mb-2 mt-2 ml-10">{profile?.address}{/* | Only show this on mouseover {profile?.username}*/}{/*</div> {/* Profile Location (from styles css) */}
                         </div>
                         <PlanetTabs activeTab={tab} planetId={planet?.id} /><br /><br />
-                        {planet?.owner == session?.user?.id /*&& planet?.userId == username*/ && (
-                            <>
-                            Move this underneath Datasets tab in PlanetCard.tsx
-                                <button onClick={() => lazyMint({ metadatas: [{ name: planet?.content, media: planet?.cover, description: planet?.ticId, properties: { trait_type1: 'value' }}]})}>Mint NFT of planet</button>
-                                {!planet?.ticId && (
-                                    <p>This planet doesn't have a TIC ID</p>
-                                    // Update planet tic textarea & button
-                                )}
-                            </>
-                        )}
-                        <p>Planet ID: {planet?.id}</p>
-                        <p>Temperatue: {planet?.temperature} Kelvin</p>
-                        <p>Created at: {planet?.created_at}</p>
-                        <p>Contract: {planet?.contract}</p>
-                        <br /><br /><br />
+                        Planet temperature: {planet?.temperature} <br />
                         <button onClick={claimPlanet}>Claim Planet</button>
-                        <br /><br />
-                        <p>Contract info: {planet?.contract} ↝ {planet?.tokenId} on {planet?.chainId} </p>
-                        <br /><br />
                         <p>Owner of this anomaly: {planet?.owner}</p>
-                        <br /><br /><br />
                         </div>
                     </div>
                 </Card>

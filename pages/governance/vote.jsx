@@ -52,7 +52,7 @@ const VotingEntrance = () => {
     async function createProposalTest () {
         const voteContract = await sdk.getContract("0xd0F59Ed6EBf7f754fC3D5Fd7bb3181EBDeEd9E9d", "vote");
         const tokenContract = await sdk.getContract("0xa791a3e0F2D2300Ee85eC7105Eee9E9E8eb57908", "token");
-        const description = "Here's the proposal contents";
+        const description = "Here's the proposal contents"; // Set this to be the planet name of the first planet in the user's wallet/inventory
         const amount = 420_000; 
         const executions = [
             {
