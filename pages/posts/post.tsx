@@ -1,4 +1,10 @@
-import React, { useState, useEffect } from "react";
+export default function PostPage () {
+    return (
+        <div>Post page stub</div>
+    )
+}
+
+/*import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import ClickOutHandler from 'react-clickout-handler';
@@ -40,4 +46,4 @@ export default function PostPage () {
             </div>
         </GameplayLayout>
     )
-}
+}*/

@@ -71,13 +71,13 @@ export default function AuthenticateWalletToDb () {
 
     if (loading) {
         return (
-            "Loading"
+            <div>Loading</div>
         );
     }
 
     if (!userAddress) {
         return (
-            "Please authenticate via Metamask"
+            <div>Please authenticate via Metamask</div>
         )
     }
 

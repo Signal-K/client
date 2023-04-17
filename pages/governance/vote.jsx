@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { useAddress, useNetwork, useContract, ConnectWallet, useNFTBalance, Web3Button, useContractWrite } from "@thirdweb-dev/react";
 import { ChainId } from '@thirdweb-dev/sdk';
 import { AddressZero } from '@ethersproject/constants';
-import styles from '../../styles/Proposals/proposalsIndex.module.css';
+//import styles from '../../styles/Proposals/proposalsIndex.module.css';
 
 // For testing -> using contracts from pages/stake
 import { PLANETS_ADDRESS } from "../../constants/contractAddresses";
@@ -67,14 +67,14 @@ const VotingEntrance = () => {
         console.log("✅ Successfully created proposal to mint tokens");
     };
 
-    const createProposal = async () => {
+    /*const createProposal = async () => {
         try {
             const data = await propose({ args: [targets, values, calldatas, description] });
             console.info("contract call successs", data);
         } catch (err) {
             console.error("contract call failure", err);
         }
-    }
+    }*/
 
     // Check if the user has the edition drop (allows them to enter the DAO)
     const { data: nftBalance } = useNFTBalance(editionDrop, address, '0');

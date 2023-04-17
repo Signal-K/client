@@ -147,4 +147,8 @@ module.exports = {
   //     }
   //   }
   // }
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> wb3-15-add-voting-mechanism-for-anomaly
