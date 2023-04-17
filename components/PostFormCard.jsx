@@ -166,7 +166,7 @@ export function PostFormCardPlanetTag ( { onPost } ) {
       .select(`avatar_url`)
       .eq('id', session?.user?.id)
       .then(result => {
-        setAvatarUrl(result.data[0]?.avatar_url); //console.log(result.data[0].avatar_url)
+        setAvatarUrl(result?.data[0]?.avatar_url); //console.log(result.data[0].avatar_url)
       })
   }, []);
 

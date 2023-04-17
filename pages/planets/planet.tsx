@@ -14,6 +14,7 @@ import { useContract, useContractRead, useContractWrite, useLazyMint } from "@th
 import Link from "next/link";
 import { PlanetCard } from "../../components/Gameplay/Planets/PlanetCard";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
+import { planetsImagesCdnAddress } from "../../constants/cdn";
 
 // import { Database } from "../../utils/database.types"; // Use this for later when we are drawing from the Planets table
 // type Planets = Database['public']['Tables']['planets']['Row'];
@@ -54,6 +55,7 @@ export default function PlanetPage () {
     useEffect(() => {
         if (!planetId) { return; }
         fetchPlanet();
+        //console.log(planet?.id);
     })
 
     // Getting profile information -> for postform
@@ -178,6 +180,7 @@ export default function PlanetPage () {
                             {/*<div className="@apply text-blue-200 leading-4 mb-2 mt-2 ml-10">{profile?.address}{/* | Only show this on mouseover {profile?.username}*/}{/*</div> {/* Profile Location (from styles css) */}
                         </div>
                         <PlanetTabs activeTab={tab} planetId={planet?.id} /><br /><br />
+                        <img src={planetsImagesCdnAddress + planet?.id + '/' + 'download.png'} />
                         Planet temperature: {planet?.temperature} <br />
                         <button onClick={claimPlanet}>Claim Planet</button>
                         <p>Owner of this anomaly: {planet?.owner}</p>
