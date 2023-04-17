@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import Layout from "../../components/Layout";
 import Card from "../../components/Card";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+//import { UserContextProvider } from "../../context/UserContext";
+import { UserContext } from "../../context/UserContext";
 import PlanetCoverImage from "../../components/Gameplay/Planets/Cover";
 import PlanetAvatar from "../../components/Gameplay/Planets/PlanetAvatar";
 import PlanetTabs from "../../components/Gameplay/Planets/PlanetNavigation";
@@ -11,6 +13,7 @@ import { GameplayLayout } from "../../components/Core/Layout";
 import { useContract, useContractRead, useContractWrite, useLazyMint } from "@thirdweb-dev/react";
 import Link from "next/link";
 import { PlanetCard } from "../../components/Gameplay/Planets/PlanetCard";
+import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 
 // import { Database } from "../../utils/database.types"; // Use this for later when we are drawing from the Planets table
 // type Planets = Database['public']['Tables']['planets']['Row'];
@@ -22,11 +25,13 @@ export default function PlanetPage () {
 
     const supabase = useSupabaseClient();
     const session = useSession();
+    const [profile, setProfile] = useState(null);
     const [planet, setPlanet] = useState(null);
     const [planetOwner, setPlanetOwner] = useState(null);
     const [planetUri, setPlanetUri] = useState();
     const [username, setUsername] = useState('');
     const [playerReputation, setPlayerRepuation] = useState<number>();
+    const [posts, setPosts] = useState([]);
 
     const { contract } = useContract(planet?.contract);
     /*const { mutateAsync: lazyMint, isLoading } = useContractWrite(contract, "lazymint");
@@ -50,6 +55,22 @@ export default function PlanetPage () {
         if (!planetId) { return; }
         fetchPlanet();
     })
+
+    // Getting profile information -> for postform
+    useEffect(() => {
+        if (!session?.user?.id) {
+            return;
+        }
+    
+        supabase.from('profiles')
+            .select()
+            .eq('id', session?.user?.id)
+            .then(result => {
+                if (result.data.length) {
+                    setProfile(result.data[0]);
+                }
+            })
+    }, [session?.user?.id]); // Run it again if auth/session state changes
 
     function fetchPlanet () {
         supabase.from('planetsss')
@@ -126,6 +147,14 @@ export default function PlanetPage () {
         }
     }
 
+    function fetchPosts () {
+        supabase.from('posts')
+            .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+            .order('created_at', { ascending: false })
+            .then(result => { setPosts(result.data); })
+            console.log(posts);
+    }
+
     return (
         <GameplayLayout>
             <Layout hideNavigation={true}> {/* Should be set to <ProfileLayout /> */}
@@ -156,6 +185,7 @@ export default function PlanetPage () {
                     </div>
                 </Card>
                 <PlanetCard activeTab={tab} planetId={planetId} />
+                <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={fetchPosts} /></UserContext.Provider><br /><br /><br />
             </Layout>
         </GameplayLayout>
     );

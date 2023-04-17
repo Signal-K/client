@@ -39,6 +39,9 @@ export default function Home() {
       <p className="text-lg mb-4">
       As you participate in the game and contribute your expertise, you'll earn points that can be redeemed for rewards and recognition within the Star Sailors community. 
       </p>
+      <p className="text-lg mb-4">
+      Keep an eye on planets that have a light curve with consistent dips, and a temperature that appears consistent with the dips (for example, the larger the dips appear, the higher the temperature (measured in Kelvin) should be. )
+      </p> {/* Once radius comes in, discuss dips in relation to proposed radius & temperature. These two params would be determined by the user in the next build. Line 43 is just demo content for the current build and the explanation regarding dips and temperatures is obviously incorrect -> however this build is about having something to identify and measure */}
     </div>
                 <SocialGraphHomeNoSidebar /> 
                 <UserOnboarding />         
