@@ -21,7 +21,7 @@ export default function CurrentGear ({ // Shows the currently equipped planet ch
     const address = useAddress();
     const { data: planetNft } = useNFT(planetContract, 0); // Maps the data to the first planet nft (as for this version of the demo, we're only interacting with WASP-48b aka token id 1)
     const [multitool, setMultitool] = useState<NFT>(); // If user has any multitools staked onto the helper contract. Previously <EditionDropMetadata>()
-    useEffect(() => {
+    /*useEffect(() => {
         (async () => {
             if (!address) return;
             const p = ( await helperContract.call( // Connect to the helper contract
@@ -33,7 +33,7 @@ export default function CurrentGear ({ // Shows the currently equipped planet ch
                 setMultitool(multitoolMetadata);
             }
         })();
-    }, [address, helperContract, multitoolContract]); // Refresh this function if any of these values change. This component is reusable across multiple contracts (the contract addresses are defined in the page, not the component)
+    }, [address, helperContract, multitoolContract]); // Refresh this function if any of these values change. This component is reusable across multiple contracts (the contract addresses are defined in the page, not the component)*/
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>

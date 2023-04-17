@@ -1,3 +1,4 @@
+//require("@nomicfoundation/hardhat-toolbox")
 require(`@nomiclabs/hardhat-waffle`);
 
 const INFURA_API_KEY = process.env.WEB3_INFURA_PROJECT_ID;
