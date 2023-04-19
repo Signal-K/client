@@ -142,7 +142,7 @@ export function PlanetCard ({ activeTab, planetId }) {
                     <Link href='https://deepnote.com/workspace/star-sailors-49d2efda-376f-4329-9618-7f871ba16007/project/Star-Sailors-Light-Curve-Plot-b4c251b4-c11a-481e-8206-c29934eb75da/notebook/notebook-377269a4c09f46908203c402cb8545b0'><div><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/></div></Link> {/* https://codesandbox.io/s/nextjs-example-react-jupyter-notebook-viewer-lzjcb5?file=/pages/index.js:21-33 */}<br />
                     <br />
                     <img src={planetsImagesCdnAddress + planet?.id + '/' + 'download.png'} />
-                    <Row className="g-4">
+                    {/*<Row className="g-4">
                         {images.map((image) => {
                             return (
                                 <Col key={planetsImagesCdnAddress + planet?.id + '/' + image.name}>
@@ -151,7 +151,7 @@ export function PlanetCard ({ activeTab, planetId }) {
                                 </Col>
                             );
                         })}
-                    </Row>
+                    </Row>*/}
                 </Card></div>
             )}
             {activeTab === 'data' && (

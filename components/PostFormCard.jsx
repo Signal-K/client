@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UserContext } from "../context/UserContext";
 import { ClimbingBoxLoader } from "react-spinners";
+import { useRouter } from "next/router";
 
 // type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -136,6 +137,9 @@ export function PostFormCardPlanetTag ( { onPost } ) {
   const supabase = useSupabaseClient();
   const [content, setContent] = useState('');
   const session = useSession();
+  const router = useRouter();
+  const planetId = router.query.id;
+  //const [planetId, setPlanetId] = useState();
   const { profile } = useContext(UserContext);
 
   const [uploads, setUploads] = useState([]);
@@ -144,9 +148,10 @@ export function PostFormCardPlanetTag ( { onPost } ) {
   const [avatar_url, setAvatarUrl] = useState(null);
 
   function createPost () {
-    supabase.from('posts').insert({
+    supabase.from('posts_duplicate').insert({
       author: session?.user?.id, // This is validated via RLS so users can't pretend to be other user
       content, // : content,
+      planets2: planetId,
       media: uploads, // This should be changed to the user path `storage/userId/post/media...` like in the image gallery
       // File upload -> show an icon depending on what type of file.
     }).then(response => {
@@ -215,7 +220,7 @@ export function PostFormCardPlanetTag ( { onPost } ) {
         </div>
       )}
       <div className="flex gap-5 items-center mt-2">
-        {/*<div>
+        <div>
           <label className="flex gap-1">
             <input type='file' className="hidden" onChange={addMedia} />
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -224,7 +229,7 @@ export function PostFormCardPlanetTag ( { onPost } ) {
             <span className="hidden md:block">Media</span>
           </label>
         </div>
-        <div>
+        {/*<div>
           <button className="flex gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
