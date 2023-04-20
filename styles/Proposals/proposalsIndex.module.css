@@ -1,5 +1,6 @@
-/*html,
-body {
+/*
+.html,
+.body {
   margin: 0;
   font-family: Inter, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -13,7 +14,7 @@ body {
   display: flex;
 }
 
-h1 {
+.h1 {
   font-size: 5rem;
 }
 @media screen and (max-width: 768px) {
@@ -21,6 +22,7 @@ h1 {
     font-size: 3rem;
   }
 }
+*/
 
 .unsupported-network {
   width: 340px;
@@ -42,10 +44,15 @@ h1 {
   background-color: #f00;
 }
 
+.btnhero {
+  margin: auto;
+  width: 250px;
+}
+
 .landing,
-.connect-wallet,
-.mint-nft,
-.member-page {
+.connectwallet,
+.mintnft,
+.memberpage {
   flex-direction: column;
   width: 960px;
   max-width: calc(100% - 1rem);
@@ -57,52 +64,52 @@ h1 {
   text-align: center;
 }
 
-.member-page > div {
+.memberpage > div {
   display: flex;
   flex-direction: row;
   width: 100%;
   text-align: left;
   gap: 2rem;
 }
-.member-page > div > div {
+.memberpage > div > div {
   display: flex;
   flex-direction: column;
   width: 50%;
   gap: 1rem;
 }
 @media screen and (max-width: 768px) {
-  .member-page > div {
+  .memberpage > div {
     flex-direction: column;
   }
-  .member-page > div > div {
+  .memberpage > div > div {
     width: 100%;
   }
 }
 
-.member-page form {
+.memberpage form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.member-page form > div {
+.memberpage form > div {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.member-page form h5 {
+.memberpage form h5 {
   margin-top: 0;
   color: #7700ee;
 }
 
-.member-page form .card > div {
+.memberpage form .card > div {
   display: flex;
   gap: 1rem;
   justify-content: space-between;
 }
 
-.member-page form small {
+.memberpage form small {
   text-align: center;
 }
 
@@ -119,7 +126,7 @@ h1 {
   width: 250px;
 }
 
-button {
+.button {
   cursor: pointer;
   background-color: #000;
   color: #fff;
@@ -132,15 +139,15 @@ button {
   font-size: 1.2rem;
 }
 
-button:hover {
+.button:hover {
   background-color: #121212;
 }
 
-button:focus {
+.button:focus {
   background-color: #222;
 }
 
-button:disabled {
+.button:disabled {
   opacity: 0.8;
   pointer-events: none;
-}*/
+}
