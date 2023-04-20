@@ -3,7 +3,9 @@ import { ethers } from "ethers";
 import { useAddress, useNetwork, useContract, ConnectWallet, useNFTBalance, Web3Button, useContractWrite } from "@thirdweb-dev/react";
 import { ChainId } from '@thirdweb-dev/sdk';
 import { AddressZero } from '@ethersproject/constants';
-//import styles from '../../styles/Proposals/proposalsIndex.module.css';
+import styles from '../../styles/Proposals/proposalsIndex.module.css';
+import StakePlay from '../stake/play';
+// import styles from '../../styles/governance/governance.module.css';
 
 // For testing -> using contracts from pages/stake
 import { PLANETS_ADDRESS } from "../../constants/contractAddresses";
@@ -181,7 +183,7 @@ const VotingEntrance = () => {
 
     if (address && network?.[0].data.chain.id !== ChainId.Goerli) {
         return (
-            <div className="unsupported-network">
+            <div className={styles.unsupported-network}>
                 <h2>Please connect to Goerli</h2>
                 <p>
                     This dapp only works on the Goerli network, please switch networks in your connected wallet.
@@ -193,9 +195,9 @@ const VotingEntrance = () => {
     // If the user hasn't connected their wallet yet
     if (!address) {
         return (
-            <div className="landing">
+            <div className={styles.landing}>
                 <h1>Welcome to the voting area</h1>
-                <div className="btn-hero">
+                <div className={styles.btnhero}>
                     <ConnectWallet />
                 </div>
             </div>
@@ -206,14 +208,14 @@ const VotingEntrance = () => {
     if (hasClaimedNFT) {
         return (
             <CoreLayout>
-                <div className="member-page">
+                <div className={styles.memberpage}>
                     <h1>🦔 Planet Voting page</h1>
                     <div>
                         <div>
                             <h2>Member list</h2>
                             <ConnectWallet />
                             {address}
-                            <table className="card">
+                            <table className={styles.card}>
                                 <thead>
                                     <tr>
                                         <th>Address</th>
@@ -231,6 +233,27 @@ const VotingEntrance = () => {
                                     })}
                                 </tbody>
                             </table>
+                            <h2>Contribution tokens</h2>
+                            {/*<table className="card">
+                                <thead>
+                                    <tr>
+                                        <th>Token address</th>
+                                        <th>Token embed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Goerli/0xdf35Bb26d9AAD05EeC5183c6288f13c0136A7b43</td>
+                                        <td><iframe
+    src="https://ipfs.thirdwebcdn.com/ipfs/QmfK9mw9eQKE9vCbtZht9kygpkNWffdwibsJPnCo7MBN4M/erc1155.html?contract=0xdf35Bb26d9AAD05EeC5183c6288f13c0136A7b43&chain=%7B%22name%22%3A%22Goerli%22%2C%22chain%22%3A%22ETH%22%2C%22rpc%22%3A%5B%22https%3A%2F%2Fgoerli.rpc.thirdweb.com%2F5a9bc94b87f7cbbbfbbc234bf1e07f0adf5f3cf3012c9f26f9fc9820d64df93a%22%5D%2C%22nativeCurrency%22%3A%7B%22name%22%3A%22Goerli+Ether%22%2C%22symbol%22%3A%22ETH%22%2C%22decimals%22%3A18%7D%2C%22shortName%22%3A%22gor%22%2C%22chainId%22%3A5%2C%22testnet%22%3Atrue%2C%22slug%22%3A%22goerli%22%7D&tokenId=0"
+    width="600px"
+    height="600px"
+    style="max-width:100%;"
+    frameborder="0"
+    ></iframe></td>
+                                    </tr>
+                                </tbody>
+                            </table>*/}
                         </div>
                         <div>
                             <h2>Active Proposals</h2>
@@ -303,7 +326,7 @@ const VotingEntrance = () => {
                                 }}
                             >
                                 {proposals.map((proposal) => (
-                                    <div key={proposal.proposalId} className="card">
+                                    <div key={proposal.proposalId} className={styles.card}>
                                         <h5>{proposal.description}</h5>
                                         <div>
                                         {proposal.votes.map(({ type, label }) => (
@@ -329,6 +352,7 @@ const VotingEntrance = () => {
                         </div>
                     </div>
                 </div>
+                <StakePlay />
             </CoreLayout>
         );
     };
@@ -336,9 +360,9 @@ const VotingEntrance = () => {
     // Render mint nft screen
     return (
         <CoreLayout>
-            <div className="mint-nft">
+            <div className={styles.mintnft}>
                 <h1>Mint your free 🍪DAO Membership NFT</h1>
-                <div className="btn-hero">
+                <div className={styles.btnhero}>
                     <Web3Button contractAddress={editionDropAddress} action={(contract) => { contract.erc1155.claim(0, 1); }}
                     onSuccess={() => { console.log( `🌊 Successfully Minted! Check it out on OpenSea: https://testnets.opensea.io/assets/${editionDrop.getAddress()}/0`, ); }}
                     onError={(error) => { console.error('Failed to mint NFT', error); }}

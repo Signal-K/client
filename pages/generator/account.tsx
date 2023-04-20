@@ -19,10 +19,11 @@ export default function OffchainAccount({ session }: { session: Session}) {
     const supabase = useSupabaseClient<Database>();
     const user = useUser();
     const [loading, setLoading] = useState(true);
-    const [username, setUsername] = useState(''); //useState<Profiles['username']>(null);
-    const [website, setWebsite] = useState(''); //useState<Profiles['website']>(null); // I believe this is the email field
-    const [avatar_url, setAvatarUrl] = useState(''); //useState<Profiles['avatar_url']>(null);
-    const [address, setAddress] = useState(''); //useState<Profiles['address']>(null); // This should be set by the handler eventually (connected address).
+    const [username, setUsername] = useState<Profiles['username']>(null);
+    const [website, setWebsite] = useState<Profiles['website']>(null); // I believe this is the email field
+    const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null);
+    const [address2, setAddress2] = useState<Profiles['address2']>(null);
+    const [address, setAddress] = useState<Profiles['address']>(null); // This should be set by the handler eventually (connected address).
     const [images, setImages] = useState([]);
     const [address2, setAddress2] = useState('');
 
@@ -92,6 +93,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 avatar_url,
                 address,
                 address2,
+                updated_at: new Date().toISOString()
             }
             let { error } = await supabase.from('profiles').upsert(updates);
             if (error) throw error;
