@@ -1,4 +1,8 @@
-// Web3 interaction & setup
+export function useFollow () {
+    return "Stub"
+}
+
+/*// Web3 interaction & setup
 import { useAddress, useSDK } from "@thirdweb-dev/react";
 import { signTypedDataWithOmittedTypename, splitSignature } from "./helpers";
 
@@ -49,4 +53,4 @@ export function useFollow () {
     };
 
     return useMutation(follow);
-}
+}*/
