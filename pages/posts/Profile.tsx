@@ -46,7 +46,12 @@ export default function ProfilePage () {
             <div className="absolute top-40 mt-12 left-4 w-full z-20">
               {profile && (<PostCardAvatar // Add upload handler from AccountAvatarV1
                   url={profile?.avatar_url}
-                  size={120} /> )}
+                  size={120} 
+                  uid={session?.user?.id} 
+                  /*onUpload={
+                    updateProfile({ username, website, avatar_url: url, address})
+                  }*//> 
+                  )}
             </div>
             <div className="p-4 pt-0 md:pt-4 pb-0">
               <div className="ml-24 md:ml-40 mt-1">

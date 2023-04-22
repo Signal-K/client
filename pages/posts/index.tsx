@@ -93,6 +93,7 @@ export function SocialGraphHomeNoSidebar () {
   const session = useSession();
   const [posts, setPosts] = useState([]);
   const [profile, setProfile] = useState(null);
+  const [planetPosts, setPlanetPosts] = useState([]);
 
   useEffect(() => {
     fetchPosts();
@@ -118,6 +119,11 @@ export function SocialGraphHomeNoSidebar () {
       .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
       .order('created_at', { ascending: false })
       .then( result => { setPosts(result.data); });
+
+    supabase.from('posts_duplicate')
+      .select('id, content, created_at, media, planets2, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+      .order('created_at', { ascending: false })
+      .then( result => { setPlanetPosts(result.data); });
   }
 
   function fetchProfile () {
@@ -137,6 +143,9 @@ export function SocialGraphHomeNoSidebar () {
     <Layout hideNavigation={true}>
       <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
         <PostFormCard onPost={fetchPosts} />
+        {planetPosts?.length > 0 && planetPosts.map(post => (
+          <PostCard key = { post.id } {...post} />
+        ))}
         {posts?.length > 0 && posts.map(post => (
           <PostCard key = { post.id } {...post} />
         ))}
