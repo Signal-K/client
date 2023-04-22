@@ -84,14 +84,13 @@ export default function AccountAvatar ({
 export function PostCardAvatar ({
     url,
     size,
-    uid,
-    onUpload,
-    //onUpload
+    //uid,
+    //onUpload,
 }: {
     url: Profiles['avatar_url']
     size: number,
-    onUpload: (url: string) => void,
-    uid: string
+    //onUpload: (url: string) => void,
+    //uid: string
 }) {
     let width = 'w-12';
     //width = 'w-24 md:w-36';
@@ -103,7 +102,7 @@ export function PostCardAvatar ({
         if (url) downloadImage(url);
     }, [url]);
 
-    const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
+    /*const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
         try {
             setUploading(true);
             if (!event.target.files || event.target.files.length === 0) { // If there is no file selected
@@ -128,7 +127,7 @@ export function PostCardAvatar ({
         } finally {
             setUploading(false);
         }
-    }
+    }*/
 
     async function downloadImage(path: string) { // Get the avatar url from Supabase for the user (if it exists)
         try {

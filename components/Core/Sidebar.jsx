@@ -98,7 +98,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
                 <p>Shipyard</p>
               </div>
             </div>
-          </Link>*/}
+          </Link>
           <Link href="/journal/ipfs">
             <div
               className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
@@ -146,7 +146,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
                 <p>Lens</p>
               </div>
             </div>
-          </Link>
+          </Link>*/}
         </div>
       </div>
     );

@@ -47,8 +47,8 @@ export default function ProfilePage () {
               {profile && (<PostCardAvatar // Add upload handler from AccountAvatarV1
                   url={profile?.avatar_url}
                   size={120} 
-                  uid={session?.user?.id} 
-                  /*onUpload={
+                  /*uid={session?.user?.id} 
+                  onUpload={
                     updateProfile({ username, website, avatar_url: url, address})
                   }*//> 
                   )}
