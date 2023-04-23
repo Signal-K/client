@@ -141,7 +141,7 @@ export const RooverFromAppeears: React.FC = () => {
                     onClick={handleCollectAndClassify}
                     className="col-span-3 mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
                 >
-                    Collect these images
+                    Collect this image
                 </button>
             )}
             {imagesCollected && (
