@@ -59,7 +59,7 @@ export default function PlanetPage () {
         if (!planetId) { return; }
         fetchPlanet();
         //console.log(planet?.id);
-    })
+    }, [session?.user?.id]);
 
     // Getting profile information -> for postform
     useEffect(() => {
@@ -168,15 +168,15 @@ export default function PlanetPage () {
             <Layout hideNavigation={true}> {/* Should be set to <ProfileLayout /> */}
                 <Card noPadding={true}>
                     <div className="relative overflow-hidden rounded-md mb-5">
-                        <PlanetCoverImage url={planet?.cover} editable={true} onChange={fetchPlanet()} />
-                        <div className="absolute top-40 mt-12 left-5">
-                            {/*{planet && (<PlanetAvatar // Add upload handler from AccountAvatarV1
+                        {/*<PlanetCoverImage url={planet?.cover} editable={true} onChange={fetchPlanet()} />*/}
+                        <div className="absolute left-5">
+                            {planet && (<PlanetAvatar // Add upload handler from AccountAvatarV1
                                 uid={''} // Behaviour for profile: `{session?.user!.id}`. Right now it's just set to a default, so same planet every time. In practice, it should infer the planet id based on the url (which will have the id inside it)
                                 url={planet?.avatar_url}
-                                size={120} /> )}*/}
+                                size={120} /> )}
                         </div>
                         <div className="p-4 pt-0 md:pt-4 pb-0">
-                        <div className="ml-24 md:ml-10 mt-1"> {/* Should be ml-40 when avatar is added back */}
+                        <div className="ml-24 md:ml-40 mt-1">
                             <br /><div className="flex ml--2"> {/* Profile Name - Set up styling rule to remove the ml-10 on mobile */}<h1 className="text-3xl font-bold">{planet?.content}</h1>{/* Only show userma,e on mouseover, along with the address (like a metamask profile view) <p className="@apply text-blue-200 leading-4 mb-2 mt-2">{profile?.username}</p>*/}</div>
                             <div className="text-gray-500 mt-1 ml-0">{planet?.temperature} KELVIN</div>{/*<div className="items-center cursor-pointer absolute right-0 bottom-0 m-2"><label className="flex items-center gap-2 bg-white py-1 px-2 rounded-md shadow-md shadow-black cursor-pointer">
                                 <input type='file' className='hidden' /> {/* Use this to update location, address (will later be handled by Thirdweb), username, profile pic. Maybe just have a blanket button to include the cover as well */} {/*
@@ -186,7 +186,7 @@ export default function PlanetPage () {
                             {/*<div className="@apply text-blue-200 leading-4 mb-2 mt-2 ml-10">{profile?.address}{/* | Only show this on mouseover {profile?.username}*/}{/*</div> {/* Profile Location (from styles css) */}
                         </div>
                         <PlanetTabs activeTab={tab} planetId={planet?.id} /><br /><br />
-                        <center><h1 className="display-5">Star's Lightcurve (KEPLER)</h1></center><br />
+                        <center><h1 className="display-5">Star's Lightcurve</h1></center><br />
                         <img src={planetsImagesCdnAddress + planet?.id + '/' + 'download.png'} />
                         Planet temperature: {planet?.temperature} <br />
                         <button onClick={claimPlanet}>Claim Planet</button>

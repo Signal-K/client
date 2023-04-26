@@ -29,7 +29,8 @@ export default function PlanetGalleryIndex () {
             const { data, error } = await supabase
                 .from('planetsss')
                 .select("*")
-                .limit(10)
+                .order('created_at', { ascending: false })
+                .limit(20)
             if (data != null) { setPlanets(data); };
             if (error) throw error;
         } catch (error: any) { alert(error.message); };
@@ -40,7 +41,7 @@ export default function PlanetGalleryIndex () {
     return (
         <GameplayLayout><center>
             <div className="px-10 col-span-2">
-                <div className="w-1/2 col-span-2">{planets.map(planet => ( // TODO: Update to be carousel of cards
+                <div className="w-1/3">{planets.map(planet => ( // TODO: Update to be carousel of cards
                     <Col><PlanetGalleryCard key = { planet.id } {...planet}></PlanetGalleryCard></Col>
                 ))}</div>
                 <div className="mx-10">
