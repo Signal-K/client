@@ -15,7 +15,7 @@ import Link from "next/link";
 import { PlanetCard } from "../../components/Gameplay/Planets/PlanetCard";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import { planetsImagesCdnAddress } from "../../constants/cdn";
-import PostCard from "../../components/PostCard";
+import PostCard, { PlanetPostCard } from "../../components/PostCard";
 import { SocialGraphHomeNoSidebarIndividualPlanet } from "../posts";
 
 // import { Database } from "../../utils/database.types"; // Use this for later when we are drawing from the Planets table
@@ -190,18 +190,17 @@ export default function PlanetPage () {
                         <img src={planetsImagesCdnAddress + planet?.id + '/' + 'download.png'} />
                         Planet temperature: {planet?.temperature} <br />
                         <button onClick={claimPlanet}>Claim Planet</button>
-                        <p>Owner of this anomaly: {planet?.owner}</p>
+                        {planet?.owner && (
+                            <p>Owner of this anomaly: {planet?.owner}</p>
+                        )}
                         </div>
                     </div>
                 </Card>
-                <PlanetCard activeTab={tab} planetId={planetId} />
+                <PlanetCard activeTab = { tab } planetId = { planetId } />
                 <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={fetchPosts} /></UserContext.Provider><br />
                 <center><h1 className="display-6">Related Posts</h1></center>
                 {planetPosts?.length > 0 && planetPosts.map(post => (
-                    <PostCard key = { post.id } {...post} />
-                ))}
-                {posts?.length > 0 && posts.map(post => (
-                    <PostCard key = { post.id } {...post} />
+                    <PlanetPostCard key = { post.id } {...post} planets2 = { planetId } />
                 ))}
                 {/*<SocialGraphHomeNoSidebarIndividualPlanet planetId={ planetId } />*/}
                 <SocialGraphHomeNoSidebarIndividualPlanet planetId={ session?.user?.id } />
