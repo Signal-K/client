@@ -16,7 +16,10 @@ import { PlanetCard } from "../../components/Gameplay/Planets/PlanetCard";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import { planetsImagesCdnAddress } from "../../constants/cdn";
 import PostCard, { PlanetPostCard } from "../../components/PostCard";
-import { SocialGraphHomeNoSidebarIndividualPlanet } from "../posts";
+import { SocialGraphHomeNoSidebarIndividualPlanet, SocialGraphHomeNoSidebarIndividualPlanetReturn } from "../posts";
+
+//import * as astro from 'astrojs';
+//import { Line } from 'react-chartjs-2';
 
 // import { Database } from "../../utils/database.types"; // Use this for later when we are drawing from the Planets table
 // type Planets = Database['public']['Tables']['planets']['Row'];
@@ -58,6 +61,7 @@ export default function PlanetPage () {
     useEffect(() => {
         if (!planetId) { return; }
         fetchPlanet();
+        //FetchPlanetPosts(planetId);
         //console.log(planet?.id);
     }, [session?.user?.id]);
 
@@ -152,16 +156,20 @@ export default function PlanetPage () {
         }
     }
 
-    function fetchPosts () {
-        supabase.from('posts')
-            .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
-            .order('created_at', { ascending: false })
-            .then( result => { setPosts(result.data); });
-        supabase.from('posts_duplicate')
-          .select('id, content, created_at, media, planets2, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+    async function fetchPostsForPlanet(planetId) {
+        supabase
+          .from('posts_duplicate')
+          .select('*')//'id, content, created_at, media, planets2, profiles(id, avatar_url, username)')
+          .eq('planets2', planetId)
           .order('created_at', { ascending: false })
-          .then( result => { setPlanetPosts(result.data); });
-      }
+          .then(result => {
+            setPlanetPosts(result.data);
+          });
+    }
+
+    const period = 3.5; // days
+    const radius = 1.5; // Jupiter radii
+    const inclination = 89; // degrees
 
     return (
         <GameplayLayout>
@@ -197,13 +205,17 @@ export default function PlanetPage () {
                     </div>
                 </Card>
                 <PlanetCard activeTab = { tab } planetId = { planetId } />
-                <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={fetchPosts} /></UserContext.Provider><br />
+                <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={fetchPostsForPlanet} /></UserContext.Provider><br />
                 <center><h1 className="display-6">Related Posts</h1></center>
+                {planetPosts?.length > 0 && planetPosts.map(post => (
+                    <PlanetPostCard key = { post.id } {...post} />
+                ))}
+                <SocialGraphHomeNoSidebarIndividualPlanetReturn />
+                <center><h2 className="display-6">{planet?.content} Discussion (coming soon)</h2></center><br />
+                <SocialGraphHomeNoSidebarIndividualPlanet planetId = { planetId } />
                 {planetPosts?.length > 0 && planetPosts.map(post => (
                     <PlanetPostCard key = { post.id } {...post} planets2 = { planetId } />
                 ))}
-                {/*<SocialGraphHomeNoSidebarIndividualPlanet planetId={ planetId } />*/}
-                <SocialGraphHomeNoSidebarIndividualPlanet planetId={ session?.user?.id } />
             </Layout>
         </GameplayLayout>
     );

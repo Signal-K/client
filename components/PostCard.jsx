@@ -51,7 +51,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
                 {authorProfile?.username}
               </span>
             </Link>
-            shared a <Link legacyBehavior href='/posts/'><a className="text-socialBlue">post</a></Link> on <Link href="https://play.skinetics.tech/planets/{planets2}">planet {planets2}</Link> {/* Add link to ORCHID publication ID/Lens ID */}
+            shared a <Link legacyBehavior href='/posts/'><a className="text-socialBlue">post</a></Link> on <Link legacyBehavior href="https://play.skinetics.tech/planets/{planets2}"><a className="text-socialBlue">planet {planets2}</a></Link> {/* Add link to ORCHID publication ID/Lens ID */}
           </p>
           <p className="text-gray-500 text-sm"><ReactTimeAgo date={ ( new Date(created_at)).getTime() } /></p>{/* <ReactTimeAgo date={ ( created_at instanceof Date ? created_at.getTime() : created_at ) } /> */}
         </div>
@@ -303,6 +303,7 @@ export function PlanetPostCard ( { content, created_at, media, profiles:authorPr
     </Card>
   );
 }
+
 
 export function PostCardProfile ( { content, created_at, media, profiles:authorProfile } ) {
   const [loading, setLoading] = useState(false);
