@@ -13,6 +13,68 @@ import ReactTimeAgo from "react-time-ago";
 
 // type Profiles = Database['public']['Tables']['profiles']['Row'];
 
+export function PostModal ( { content, created_at, media, profiles:authorProfile, planets2 } ) {
+  const [loading, setLoading] = useState(false);
+  const { profile: myProfile } = useContext(UserContext);
+  const [profiles, setProfiles] = useState();
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  function openDropdown(e) {
+    e.stopPropagation();
+    setDropdownOpen(true);
+  }
+
+  return (
+    <div className="overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div className="flex items-end justify-center min- px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+    
+        <div className="transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true"></div>
+        <span className="hidden sm:inline-block sm:align-middle sm:" aria-hidden="true">​</span>
+        
+        <div className="inline-block p-5 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-2xl lg:p-16 sm:my-8 sm:align-middle sm:max-w-xl sm:w-full">
+            <div>
+                <div className="mt-3 text-left sm:mt-5">
+                    <div className="py-6 text-center">
+                        <p className="mb-8 text-2xl font-semibold leading-none tracking-tighter text-neutral-600">Your shot is ready to Export!</p>
+                        <p className="mt-1 text-sm text-gray-500">Export to Figma, Framer or download it!</p>
+                    </div>
+                </div>
+            </div>
+            <div className="justify-between w-full mx-auto mt-4 overflow-hidden rounded-lg wt-10 sm:flex">
+                <div className="flex flex-row w-full">
+                    <a href="#" className="flex items-center justify-center px-4 py-4 text-base font-normal text-white bg-blue-500 border border-transparent lg:w-1/3 hover:bg-gray-800 sm:text-sm">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 21L12 9L6 9L6 15L12 21Z" fill="currentColor" fill-opacity="0.5"></path>
+                            <path d="M18 9V3H6L12 9H6V15H18L12 9H18Z" fill="currentColor"></path>
+                        </svg>
+                    </a>
+
+                    <a href="#" className="flex items-center justify-center px-4 py-4 text-base font-normal text-white bg-blue-500 border border-transparent lg:w-1/3 hover:bg-gray-800 sm:text-sm">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8.5 2C6.84315 2 5.5 3.34315 5.5 5C5.5 6.65685 6.84315 8 8.5 8H15.5C17.1569 8 18.5 6.65685 18.5 5C18.5 3.34315 17.1569 2 15.5 2H8.5Z" fill="currentColor"></path>
+                            <path d="M15.5 9C13.8431 9 12.5 10.3431 12.5 12C12.5 13.6569 13.8431 15 15.5 15C17.1569 15 18.5 13.6569 18.5 12C18.5 10.3431 17.1569 9 15.5 9Z" fill="currentColor"></path>
+                            <path d="M5.5 12C5.5 10.3431 6.84315 9 8.5 9H11.5V15H8.5C6.84315 15 5.5 13.6569 5.5 12Z" fill="currentColor"></path>
+                            <path d="M8.5 16C6.84315 16 5.5 17.3431 5.5 19C5.5 20.6569 6.84315 22 8.5 22C10.1569 22 11.5 20.6569 11.5 19V16H8.5Z" fill="currentColor"></path>
+                        </svg>
+                    </a>
+
+                    <a href="#" className="flex items-center justify-center px-4 py-4 text-base font-normal text-white bg-blue-500 border border-transparent lg:w-1/3 hover:bg-gray-800 sm:text-sm">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.8284 12.0259L16.2426 13.4402L12 17.6828L7.75733 13.4402L9.17155 12.0259L11 13.8544V6.31724H13V13.8544L14.8284 12.0259Z" fill="currentColor"></path>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M1 5C1 2.79086 2.79086 1 5 1H19C21.2091 1 23 2.79086 23 5V19C23 21.2091 21.2091 23 19 23H5C2.79086 23 1 21.2091 1 19V5ZM5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3Z" fill="currentColor"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  )
+}
+
 export default function PostCard ( { content, created_at, media, profiles:authorProfile, planets2 } ) {
   const [loading, setLoading] = useState(false);
   //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();

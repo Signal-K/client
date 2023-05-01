@@ -16,6 +16,7 @@
     "@emotion/react": "11.10.5",
     "@emotion/styled": "11.10.5",
     "@ethersproject/solidity": "^5.7.0",
+    "@geist-ui/core": "^2.3.8",
     "@headlessui/react": "^1.7.12",
     "@heroicons/react": "^2.0.16",
     "@lens-protocol/react": "^0.3.0",
