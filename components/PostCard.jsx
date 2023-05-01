@@ -32,6 +32,8 @@ export function PostModal ( { content, created_at, media, profiles:authorProfile
     setDropdownOpen(false);
   };
 
+  const planetString = String(planets2);
+
   return (
     <div className="overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div className="flex items-end justify-center min- px-4 pt-4 pb-20 text-center sm:block sm:p-0">
@@ -43,8 +45,8 @@ export function PostModal ( { content, created_at, media, profiles:authorProfile
             <div>
                 <div className="mt-3 text-left sm:mt-5">
                     <div className="py-6 text-center">
-                        <p className="mb-8 text-2xl font-semibold leading-none tracking-tighter text-neutral-600">Classification by {authorProfile.username}</p>
-                        <p className="mt-1 text-sm text-gray-500">{content}</p>
+                        <p className="mb-8 text-2xl font-semibold leading-none tracking-tighter text-neutral-600">Classification by  {authorProfile.full_name}</p>
+                        <p className="mt-1 text-sm text-gray-500">{content} (Planet {planets2}) {planets2?.temperature}</p>
                         {media?.length > 0 && (
                           <div className="flex gap-4">
                             {media?.length > 0 && media.map(media => (
@@ -57,12 +59,12 @@ export function PostModal ( { content, created_at, media, profiles:authorProfile
             </div>
             <div className="justify-between w-full mx-auto mt-4 overflow-hidden rounded-lg wt-10 sm:flex">
                 <div className="flex flex-row w-full">
-                    {/* <a href="#" className="flex items-center justify-center px-4 py-4 text-base font-normal text-white bg-blue-500 border border-transparent lg:w-1/3 hover:bg-gray-800 sm:text-sm">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 21L12 9L6 9L6 15L12 21Z" fill="currentColor" fill-opacity="0.5"></path>
-                            <path d="M18 9V3H6L12 9H6V15H18L12 9H18Z" fill="currentColor"></path>
-                        </svg>
-                    </a> */}
+                    <a href="/planets/${planetString}" className="flex items-center justify-center px-4 py-4 text-base font-normal text-white bg-blue-500 border border-transparent lg:w-1/3 hover:bg-gray-800 sm:text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <circle cx="12" cy="12" r="10" fill="#f9dc9c" />
+  <path d="M11.847 14.872c-.875-.054-1.738-.365-2.545-.918-1.243-.863-2.184-2.209-2.605-3.777-.374-1.312-.321-2.7.113-3.959.434-1.258 1.26-2.379 2.413-3.119.826-.474 1.74-.731 2.662-.743.212-.002.422-.01.631-.023.379-.03.758-.08 1.13-.152.98-.23 1.94-.67 2.812-1.28l-.011.012c.982-.69 1.907-1.582 2.749-2.639 1.181-1.495 2.014-3.13 2.427-4.878.008-.03.013-.06.02-.089l.001-.004c.198-.675.284-1.39.248-2.106-.055-1.123-.449-2.214-1.15-3.124-.65-.841-1.5-1.5-2.438-1.955-.24-.115-.482-.215-.727-.3-.165-.058-.332-.107-.5-.15-.47-.115-.94-.18-1.416-.193l-.298-.002c-.25.004-.5.029-.746.074-1.142.226-2.212.766-3.116 1.587-.842.791-1.523 1.762-1.937 2.844-.238.647-.392 1.321-.454 2.013-.046.487-.014.975.083 1.449.183.867.53 1.677 1.018 2.408.621.912 1.447 1.628 2.399 2.088.219.089.443.167.67.231.113.032.226.06.34.084.457.1.922.15 1.386.154h.181c.243-.002.485-.018.725-.048.771-.103 1.526-.348 2.239-.725 1.191-.582 2.186-1.488 2.914-2.631l.002-.003c.898 1.195 1.19 2.707.843 4.11-.204 1.036-.727 2.025-1.492 2.878-.813 1-1.875 1.774-3.07 2.282l-.007.002c-.088.029-.176.057-.264.083-.339.1-.684.19-1.033.268-.08.018-.16.035-.24.05-.508.096-1.023.16-1.54.192z" fill="#e3c7a2" />
+</svg>
+                    </a>
 
                     <a href="#" className="flex items-center justify-center px-4 py-4 text-base font-normal text-white bg-blue-500 border border-transparent lg:w-1/3 hover:bg-gray-800 sm:text-sm">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

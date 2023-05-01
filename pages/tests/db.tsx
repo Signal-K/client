@@ -1,3 +1,5 @@
+import { SocialGraphHomeModal } from "../posts";
+
 export default function db () {
     return (
         <>
@@ -99,7 +101,7 @@ export default function db () {
     </div>
   </div>
 </section>
-
+<SocialGraphHomeModal />
 <footer className="bg-white" aria-labelledby="footer-heading">
   <h2 id="footer-heading" className="sr-only">Footer</h2>
   <div className="px-5 py-12 mx-auto max-w-7xl lg:py-16 md:px-12 lg:px-20">

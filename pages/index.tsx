@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 import CoreLayout from "../components/Core/Layout";
 import UserOnboarding from "../components/onboarding";
-import { SocialGraphHomeNoSidebar } from "./posts";
+import { SocialGraphHomeModal, SocialGraphHomeNoSidebar } from "./posts";
 import Db from "./tests/db";
 
 export default function Home() {
@@ -56,6 +56,7 @@ export default function Home() {
     <br />
     <p className="text-lg mb-4">Throughout this first release, you'll be cataloguing different planetary candidates observed by different TESS telescopes and cataloguing them based on their initial light curve. In future releases, more data for each candidate will be added, as well as new scientific projects to contribute to - and more ways to play.</p>
     </div>
+                {/* <SocialGraphHomeModal /> */}
                 <SocialGraphHomeNoSidebar /> 
                 <button onClick={logoutUser}>Logout</button>
                 <UserOnboarding />         

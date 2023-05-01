@@ -311,7 +311,7 @@ export function SocialGraphHomeModal () {
       .then( result => { setPosts(result.data); });
 
     supabase.from('posts_duplicate')
-      .select('id, content, created_at, media, planets2, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+      .select('id, content, created_at, media, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)') // Reset id on testing playground server later
       .order('created_at', { ascending: false })
       .then( result => { setPlanetPosts(result.data); });
   }
@@ -332,7 +332,7 @@ export function SocialGraphHomeModal () {
   return (
     <Layout hideNavigation={true}>
       <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
-        <PostFormCard onPost={fetchPosts} />
+        {/* <PostFormCard onPost={fetchPosts} /> */}
         {planetPosts?.length > 0 && planetPosts.map(post => (
           <PostModal key = { post.id } {...post} />
         ))}
