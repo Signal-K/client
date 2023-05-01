@@ -25,7 +25,12 @@ export function PostModal ( { content, created_at, media, profiles:authorProfile
   function openDropdown(e) {
     e.stopPropagation();
     setDropdownOpen(true);
-  }
+  };
+
+  function handleClickOutsideDropdown(e) {
+    e.stopPropagation();
+    setDropdownOpen(false);
+  };
 
   return (
     <div className="overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -38,19 +43,26 @@ export function PostModal ( { content, created_at, media, profiles:authorProfile
             <div>
                 <div className="mt-3 text-left sm:mt-5">
                     <div className="py-6 text-center">
-                        <p className="mb-8 text-2xl font-semibold leading-none tracking-tighter text-neutral-600">Your shot is ready to Export!</p>
-                        <p className="mt-1 text-sm text-gray-500">Export to Figma, Framer or download it!</p>
+                        <p className="mb-8 text-2xl font-semibold leading-none tracking-tighter text-neutral-600">Classification by {authorProfile.username}</p>
+                        <p className="mt-1 text-sm text-gray-500">{content}</p>
+                        {media?.length > 0 && (
+                          <div className="flex gap-4">
+                            {media?.length > 0 && media.map(media => (
+                              <div key={media} className="rounded-md overflow-hidden"><img src={media} /></div>
+                            ))}
+                          </div>
+                        )}
                     </div>
                 </div>
             </div>
             <div className="justify-between w-full mx-auto mt-4 overflow-hidden rounded-lg wt-10 sm:flex">
                 <div className="flex flex-row w-full">
-                    <a href="#" className="flex items-center justify-center px-4 py-4 text-base font-normal text-white bg-blue-500 border border-transparent lg:w-1/3 hover:bg-gray-800 sm:text-sm">
+                    {/* <a href="#" className="flex items-center justify-center px-4 py-4 text-base font-normal text-white bg-blue-500 border border-transparent lg:w-1/3 hover:bg-gray-800 sm:text-sm">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 21L12 9L6 9L6 15L12 21Z" fill="currentColor" fill-opacity="0.5"></path>
                             <path d="M18 9V3H6L12 9H6V15H18L12 9H18Z" fill="currentColor"></path>
                         </svg>
-                    </a>
+                    </a> */}
 
                     <a href="#" className="flex items-center justify-center px-4 py-4 text-base font-normal text-white bg-blue-500 border border-transparent lg:w-1/3 hover:bg-gray-800 sm:text-sm">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
