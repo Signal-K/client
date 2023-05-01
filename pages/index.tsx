@@ -18,6 +18,7 @@ export default function Home() {
     return (
         <>
             <CoreLayout>  
+            {/* <button onClick={logoutUser}>Logout</button> */}
             <Db />    
     {/*<div className="max-w-2xl mx-auto py-8">
       <div className="flex items-center mb-8">
@@ -33,9 +34,6 @@ export default function Home() {
         <p className="text-lg">Anytown, USA 12345</p>
       </div>
     </div>*/}
-
-
-            <div className="max-w-md mx-auto py-5">
       {/* <h1 className="text-4xl font-bold mb-8">Welcome to Star Sailors!</h1>
       <p className="text-lg mb-4">
       Our game offers a truly unique and engaging experience that combines the excitement of gaming with the pursuit of scientific knowledge. By playing our game, you can actively contribute to real-world scientific research projects by collecting and classifying objects based on actual data. We are currently focused on our planets mini-game, where you can help identify potential new planets that have been discovered by the TESS telescope. To begin, simply log in to the Star Sailors website and navigate to the planets page, where you'll be presented with various objects to classify along with relevant information to assist you in making informed decisions. Once you've made your decision, you can create a post about it and invite other users to vote on your assessment. As you participate, you'll earn points that can be redeemed for rewards and recognition within the Star Sailors community. Join us today and embark on a thrilling journey of discovery and learning!
@@ -43,7 +41,7 @@ export default function Home() {
        {/*<p className="text-lg mb-4">
       Keep an eye on planets that have a light curve with consistent dips, and a temperature that appears consistent with the dips (for example, the larger the dips appear, the higher the temperature (measured in Kelvin) should be. )
       </p> Once radius comes in, discuss dips in relation to proposed radius & temperature. These two params would be determined by the user in the next build. Line 43 is just demo content for the current build and the explanation regarding dips and temperatures is obviously incorrect -> however this build is about having something to identify and measure */}
-      <br /><br />
+      {/* <br /><br />
     <h2 className="text-2xl font-bold mb-8">How to play</h2>
     <p className="text-lg mb-4">A transit event occurs when a planet passes in front of its host star, causing a slight dip in the star's brightness. Telescopes like TESS observe possible transit events when a dip in a star's brightness is observed</p>
     <p className="text-lg mb-4">By measuring the dip in brightness, our game engine can infer the size and orbital period of the planetary candidate</p>
@@ -55,10 +53,9 @@ export default function Home() {
 
     <br />
     <p className="text-lg mb-4">Throughout this first release, you'll be cataloguing different planetary candidates observed by different TESS telescopes and cataloguing them based on their initial light curve. In future releases, more data for each candidate will be added, as well as new scientific projects to contribute to - and more ways to play.</p>
-    </div>
-                {/* <SocialGraphHomeModal /> */}
-                <SocialGraphHomeNoSidebar /> 
-                <button onClick={logoutUser}>Logout</button>
+    </div> */}
+                {/* <SocialGraphHomeModal />
+                <SocialGraphHomeNoSidebar />  */}
                 <UserOnboarding />         
                 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="starsailors" data-description="Support me on Buy me a coffee!" data-message="I hope you enjoyed using Star Sailors. Please consider contributing so I can get extra features out faster." data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
             </CoreLayout>

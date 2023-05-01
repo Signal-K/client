@@ -196,6 +196,7 @@ export default function PlanetPage () {
                         <PlanetTabs activeTab={tab} planetId={planet?.id} /><br /><br />
                         <center><h1 className="display-5">Star's Lightcurve</h1></center><br />
                         <img src={planetsImagesCdnAddress + planet?.id + '/' + 'download.png'} />
+                        {planet?.id}
                         Planet temperature: {planet?.temperature} <br />
                         <button onClick={claimPlanet}>Claim Planet</button>
                         {planet?.owner && (
