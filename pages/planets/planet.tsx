@@ -206,13 +206,17 @@ export default function PlanetPage () {
                     </div>
                 </Card>
                 <PlanetCard activeTab = { tab } planetId = { planetId } />
-                <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={fetchPostsForPlanet} /></UserContext.Provider><br />
+                <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={fetchPostsForPlanet(planetId)} /></UserContext.Provider><br />
+                
+                
                 <center><h1 className="display-6">Related Posts</h1></center>
                 {planetPosts?.length > 0 && planetPosts.map(post => (
                     <PlanetPostCard key = { post.id } {...post} />
                 ))}
                 <SocialGraphHomeNoSidebarIndividualPlanetReturn />
-                <center><h2 className="display-6">{planet?.content} Discussion (coming soon)</h2></center><br />
+
+
+                <center><h2 className="display-6">{planet?.content} Discussion</h2></center><br />
                 <SocialGraphHomeNoSidebarIndividualPlanet planetId = { planetId } />
                 {planetPosts?.length > 0 && planetPosts.map(post => (
                     <PlanetPostCard key = { post.id } {...post} planets2 = { planetId } />
