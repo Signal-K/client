@@ -270,7 +270,6 @@ export function PlanetPostCard ( { content, created_at, media, profiles:authorPr
             <Link href={'/posts/profile/'+authorProfile?.id}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
                 {authorProfile?.username}
-                {planets2}
               </span>
             </Link>
             shared a <Link legacyBehavior href='/posts/'><a className="text-socialBlue">post</a></Link> {/* Add link to ORCHID publication ID/Lens ID */}

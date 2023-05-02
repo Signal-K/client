@@ -154,7 +154,7 @@ export function SocialGraphHomeNoSidebar () {
   );
 }
 
-export function SocialGraphHomeNoSidebarIndividualPlanet (planetId) {
+export function SocialGraphHomeNoSidebarIndividualPlanet (props) {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);
@@ -162,8 +162,8 @@ export function SocialGraphHomeNoSidebarIndividualPlanet (planetId) {
   const [planetPosts, setPlanetPosts] = useState([]);
 
   useEffect(() => {
-    fetchPostsForPlanet(planetId);
-  }, [planetId]);
+    fetchPostsForPlanet(props.planetId);
+  }, [props]);
   
 
   useEffect(() => {
