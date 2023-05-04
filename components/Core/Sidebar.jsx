@@ -51,7 +51,23 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
               </div>
             </div>
           </Link>
-          <Link href="/billing">
+          <Link href="/planets">
+          <div
+            className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
+              router.pathname == "/planets"
+                ? "bg-green-100 text-green-500"
+                : "text-gray-400 hover:bg-green-100 hover:text-green-500"
+            }`}
+          >
+            <div className="mr-2">
+              <StarIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <p>Planets</p>
+            </div>
+          </div>
+        </Link>
+          {/*<Link href="/billing">
             <div
               className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
                 router.pathname == "/billing"
@@ -66,7 +82,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
                 <p>ORCID</p>
               </div>
             </div>
-          </Link>
+            </Link>
           <Link href="/ships">
             <div
               className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
@@ -130,7 +146,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
                 <p>Lens</p>
               </div>
             </div>
-          </Link>
+          </Link>*/}
         </div>
       </div>
     );
@@ -141,6 +157,77 @@ CoreSidebar.displayName = "SideBar";
 export default CoreSidebar;
 
 export const GameplaySidebar = forwardRef(({ showNav }, ref) => {
+  const router = useRouter();
+
+  return (
+    <div ref={ref} className="fixed w-64 h-full bg-white shadow-sm">
+      <div className="flex justify-center mt-6 mb-14">
+        <picture>
+          <img
+            className="w-32 h-auto"
+            src="https://user-images.githubusercontent.com/31812229/222339335-ae57fdb9-6fbd-4d26-9225-a18c02b6edeb.png"
+            alt="signal kinetics logo"
+          />
+        </picture>
+      </div>
+
+      <div className="flex flex-col">
+        <Link href="/">
+          <div
+            className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
+              router.pathname == "/"
+                ? "bg-green-100 text-green-500"
+                : "text-gray-400 hover:bg-green-100 hover:text-green-500"
+            }`}
+          >
+            <div className="mr-2">
+              <HomeIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <p>Home</p>
+            </div>
+          </div>
+        </Link>
+        <Link href="/planets">
+          <div
+            className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
+              router.pathname == "/planets"
+                ? "bg-green-100 text-green-500"
+                : "text-gray-400 hover:bg-green-100 hover:text-green-500"
+            }`}
+          >
+            <div className="mr-2">
+              <StarIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <p>Planets</p>
+            </div>
+          </div>
+        </Link>
+        <Link href="/governance/vote">
+          <div
+            className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
+              router.pathname == "/governance/vote"
+                ? "bg-green-100 text-green-500"
+                : "text-gray-400 hover:bg-green-100 hover:text-green-500"
+            }`}
+          >
+            <div className="mr-2">
+              <RocketLaunchIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <p>Vote</p>
+            </div>
+          </div>
+        </Link>
+      </div>
+    </div>
+  );
+});
+
+CoreSidebar.displayName = "SideBar";
+
+export const GameplaySidebarFull = forwardRef(({ showNav }, ref) => {
   const router = useRouter();
 
   return (
@@ -201,6 +288,22 @@ export const GameplaySidebar = forwardRef(({ showNav }, ref) => {
             </div>
             <div>
               <p>Planets</p>
+            </div>
+          </div>
+        </Link>
+        <Link href="/governance/vote">
+          <div
+            className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
+              router.pathname == "/governance/vote"
+                ? "bg-green-100 text-green-500"
+                : "text-gray-400 hover:bg-green-100 hover:text-green-500"
+            }`}
+          >
+            <div className="mr-2">
+              <RocketLaunchIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <p>Vote</p>
             </div>
           </div>
         </Link>
@@ -272,5 +375,3 @@ export const GameplaySidebar = forwardRef(({ showNav }, ref) => {
     </div>
   );
 });
-
-CoreSidebar.displayName = "SideBar";

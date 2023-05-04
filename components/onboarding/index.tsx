@@ -19,7 +19,7 @@ const UserOnboarding = () => {
         >
           <Comments topic="tutorial-one" />
         </CommentsProvider>*/}
-        <div>Onboarding</div></>
+        </>
     );
 }
 

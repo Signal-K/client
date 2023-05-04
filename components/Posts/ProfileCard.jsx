@@ -8,6 +8,7 @@ export function ProfileContent ({ activeTab, userId }) {
     const supabase = useSupabaseClient();
     
     const [posts, setPosts] = useState([]);
+    const [planetPosts, setPlanetPosts] = useState([]);
     const [profile, setProfile] = useState(null);
 
     useEffect (() => {
@@ -19,11 +20,22 @@ export function ProfileContent ({ activeTab, userId }) {
 
     async function loadProfile () {
         const posts = await userPosts(userId);
+        const planetPosts = await userPlanetPosts(userId);
         const profile = await userProfile(userId);
         setPosts(posts)
+        setPlanetPosts(planetPosts);
         setProfile(profile);
         return { posts, profile };
     }
+
+    async function userPlanetPosts (userId) {
+        const { data } = await supabase.from('posts_duplicate')
+            .select('*') //('id, content, created_at, media, planets2, profiles(id, avatar_url, username)') // profiles(id, avatar_url, username)')
+            .order('created_at', { ascending: false })
+            .eq('author', userId) // session?.user?.id)
+        return data;
+        console.log(data);
+    };
 
     async function userPosts (userId) {
         const { data } = await supabase.from('posts')
@@ -44,6 +56,9 @@ export function ProfileContent ({ activeTab, userId }) {
         <div>
             {activeTab === 'posts' && (
                 <div> 
+                { planetPosts?.length > 0 && planetPosts.map(post => (
+                    <PostCardProfile key={post.created_at} {...post} profiles={profile} /*media={media}*/ />
+                ))}
                 { posts.length > 0 && posts.map(post => (
                     <PostCardProfile key={post.created_at} {...post} profiles={profile} /*media={media}*/ />
                 ))} {/* Section to show their long-form articles here */}

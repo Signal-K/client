@@ -20,12 +20,12 @@ export default function PlanetGalleryCard ( { id, content, radius, userId, ticId
 
     return (
         <>
-            <div className="width-full mb-2">
-                <div className="card w-96 bg-base-100 shadow-xl image-full">
+            <div className="width-full mb-3">
+                <div className="card w-1000 bg-base-100 shadow-l image-full">
                     <figure><img src={cover} alt="Planet cover image" /></figure>
                     <div className="card-body">
                         <h2 className="card-title">{content}</h2> {/* Planet name */}
-                        <p>Radius: {radius}</p>
+                        {/*<p>Radius: {radius}</p>*/}<br /><br /><br /><br /><br /><br />
                         <p>TIC: {ticId}</p>
                         <Link href={`/planets/${id}`}><div className="card-actions justify-end">
                             <button className="btn btn-primary">Explore</button> {/* Land on planet */}
