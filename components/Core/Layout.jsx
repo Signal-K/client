@@ -57,7 +57,7 @@ export default function CoreLayout ( { children } ) {
 
 export function GameplayLayout ( { children } ) {
     // Handling responsive UI
-    const [showNav, setShowNav] = useState(true);
+    const [showNav, setShowNav] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
     function handleResize () {

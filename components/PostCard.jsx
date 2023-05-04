@@ -1,5 +1,5 @@
 import Card, { ProfileCard } from "./Card";
-import ClickOutHandler from 'react-clickout-handler'
+import ClickOutHandler from 'react-clickout-handler';
 import React, { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import AccountAvatar, { PostCardAvatar } from "./AccountAvatar";
@@ -44,9 +44,22 @@ export function PostModal ( { content, created_at, media, profiles:authorProfile
             <div>
                 <div className="mt-3 text-left sm:mt-5">
                     <div className="py-6 text-center">
-                        <p className="mb-8 text-2xl font-semibold leading-none tracking-tighter text-neutral-600">Classification by  {authorProfile.username}</p>
-                        <p className="mt-1 text-sm text-gray-500">{content} (Planet {planets2}) {planets2?.temperature}</p>
-                        <center><div className="flex gap-4"><div className="rounded-md overflow-hidden"><img src={planetsImagesCdnAddress + planets2 + '/' + 'download.png'} height='80%' width='80%' /></div></div></center>
+                      <div className="flex text-center">
+                        <Link href={'/posts/profile/'+authorProfile?.id}>
+                          <PostCardAvatar
+                            url={authorProfile?.avatar_url}
+                            size={45}
+                          />
+                        </Link>
+                      </div>
+                      {authorProfile !== null && (
+                        <center><p className="mb-8 text-2xl font-semibold leading-none tracking-tighter text-neutral-600">Classification by {authorProfile.username}</p></center>
+                      )}
+                      {authorProfile === null && (
+                        <center><p className="mb-8 text-2xl font-semibold leading-none tracking-tighter text-neutral-600">Classification by Anon</p></center>
+                      )}
+                      <p className="mt-1 text-sm text-gray-500">{content} (Planet {planets2}) {planets2?.temperature}</p>
+                      <center><div className="flex gap-4"><div className="rounded-md overflow-hidden"><img src={planetsImagesCdnAddress + planets2 + '/' + 'download.png'} height='80%' width='80%' /></div></div></center>
                         {media?.length > 0 && (
                           <div className="flex gap-4">
                             {media?.length > 0 && media.map(media => (

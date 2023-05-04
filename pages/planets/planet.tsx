@@ -18,6 +18,8 @@ import { planetsImagesCdnAddress } from "../../constants/cdn";
 import PostCard, { PlanetPostCard } from "../../components/PostCard";
 import { SocialGraphHomeNoSidebarIndividualPlanet, SocialGraphHomeNoSidebarIndividualPlanetReturn } from "../posts";
 
+// import { StarSystem } from 'stellardream';
+
 //import * as astro from 'astrojs';
 //import { Line } from 'react-chartjs-2';
 
@@ -39,6 +41,11 @@ export default function PlanetPage () {
     const [playerReputation, setPlayerRepuation] = useState<number>();
     const [planetPosts, setPlanetPosts] = useState([]);
     const [posts, setPosts] = useState([]);
+
+    useEffect(() => {
+        //const starSystem = new StarSystem(1);
+        //console.log(JSON.stringify(starSystem, null, 2))
+    }, [session?.user])
 
     const { contract } = useContract(planet?.contract);
     /*const { mutateAsync: lazyMint, isLoading } = useContractWrite(contract, "lazymint");

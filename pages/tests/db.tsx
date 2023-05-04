@@ -9,6 +9,7 @@ export default function db () {
       <div className="inline-flex items-center justify-center flex-shrink-0 w-20 h-20 mx-auto mb-5 text-blue-600 rounded-full bg-gray-50">
        <svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="300.000000pt" height="302.000000pt" viewBox="0 0 300.000000 302.000000"  preserveAspectRatio="xMidYMid meet">  <g transform="translate(0.000000,302.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none"> <path d="M1483 2768 c-7 -398 -140 -814 -330 -1027 -109 -122 -190 -153 -309 -115 -126 39 -212 101 -250 182 -46 96 -89 126 -127 88 -20 -20 -43 -96 -56 -183 -34 -222 93 -476 312 -627 l55 -38 -39 -55 c-103 -147 -90 -278 38 -407 75 -75 158 -94 267 -61 65 20 63 20 58 -20 -5 -45 19 -82 66 -102 30 -12 46 -13 95 -3 62 12 70 9 109 -35 18 -21 75 -133 98 -195 7 -19 16 -38 20 -43 3 -4 21 25 40 65 41 89 105 190 130 206 14 8 34 9 68 2 96 -18 157 21 157 102 0 21 2 38 5 38 3 0 27 -7 54 -15 69 -21 149 -19 195 5 44 22 124 107 152 161 45 90 29 203 -42 297 -21 29 -39 54 -39 56 0 2 26 21 58 44 72 51 169 151 214 222 93 148 120 315 78 484 -22 87 -41 116 -76 116 -30 0 -52 -24 -79 -85 -13 -28 -40 -68 -61 -89 -67 -67 -260 -144 -323 -130 -72 17 -194 126 -266 238 -120 188 -215 488 -241 761 -4 44 -8 85 -9 90 -1 6 -3 56 -3 113 -1 56 -5 102 -9 102 -5 0 -9 -64 -10 -142z m46 -477 c73 -286 196 -517 339 -638 103 -87 150 -102 244 -78 154 38 265 116 324 225 47 88 68 76 93 -48 25 -122 6 -253 -53 -370 -47 -92 -103 -160 -194 -233 -42 -34 -84 -72 -92 -86 -14 -21 -13 -27 4 -56 71 -118 80 -141 80 -201 1 -74 -27 -128 -102 -198 -54 -51 -96 -65 -163 -54 -21 3 -57 9 -79 12 -45 7 -80 -14 -80 -47 0 -62 -50 -92 -128 -77 -72 13 -126 -30 -186 -149 -14 -28 -30 -54 -35 -58 -6 -3 -25 23 -42 57 -69 137 -99 158 -210 151 -71 -5 -77 -4 -93 18 -9 13 -16 36 -16 50 0 17 -9 35 -25 47 -24 19 -28 19 -83 5 -118 -31 -199 0 -274 107 -66 94 -64 172 8 293 54 91 54 91 -50 176 -102 83 -160 152 -206 243 -50 101 -64 169 -57 293 9 180 46 227 98 126 51 -98 131 -162 257 -206 138 -48 218 -29 329 77 147 141 249 338 318 613 33 134 35 139 39 134 2 -2 18 -60 35 -128z"/> <path d="M1432 2053 c-12 -10 -54 -79 -93 -153 -72 -137 -109 -193 -186 -283 -24 -28 -43 -54 -43 -58 0 -4 11 -21 25 -37 l24 -29 -117 -6 c-132 -6 -188 -23 -227 -69 -51 -60 -35 -86 108 -181 62 -40 144 -103 181 -138 68 -63 166 -190 166 -215 0 -7 12 -26 26 -43 39 -46 75 -42 131 14 l45 44 -4 118 -3 118 -47 93 c-60 118 -123 208 -167 238 l-34 23 45 21 c57 26 98 69 137 144 17 33 31 50 31 39 0 -20 -50 -106 -70 -118 -6 -4 -24 -25 -40 -47 -34 -47 -32 -56 32 -126 21 -23 53 -75 72 -115 18 -39 40 -78 50 -86 14 -12 19 -11 39 7 12 11 33 48 46 81 14 35 47 87 77 123 30 34 54 65 54 69 0 4 -27 39 -59 78 -33 39 -67 92 -76 118 -10 27 -22 60 -27 75 -12 32 -32 42 -59 28 -10 -6 -19 -7 -19 -3 0 16 39 195 43 199 2 3 18 -51 34 -120 48 -195 109 -298 205 -347 l41 -21 -37 -22 c-48 -29 -112 -115 -172 -234 -49 -97 -49 -97 -52 -210 -4 -109 -3 -114 23 -147 28 -37 72 -65 103 -65 25 0 53 33 93 110 48 93 176 218 321 314 146 95 163 122 117 180 -40 51 -93 69 -222 74 l-118 5 25 26 c15 15 26 32 26 38 0 6 -26 42 -58 79 -67 81 -102 136 -178 282 -31 59 -67 118 -81 132 l-24 25 -20 -24 -20 -24 -23 22 c-22 21 -24 21 -44 4z m13 -111 c-35 -180 -84 -300 -147 -361 -34 -33 -88 -53 -116 -44 -9 3 -23 7 -30 9 -9 3 3 20 32 50 64 63 137 177 209 325 34 70 64 122 65 117 2 -5 -4 -48 -13 -96z m110 81 c10 -42 98 -214 150 -294 26 -39 69 -96 97 -125 l50 -54 -26 -10 c-84 -32 -180 61 -232 225 -22 70 -64 251 -64 276 0 21 18 7 25 -18z m-55 -283 c0 -60 40 -141 102 -204 32 -34 54 -62 47 -65 -47 -15 -129 -140 -145 -220 -4 -17 -9 -31 -13 -31 -3 0 -14 26 -23 58 -21 70 -71 149 -115 178 l-32 21 49 48 c61 60 99 130 107 195 6 54 23 69 23 20z m-248 -327 c38 -36 108 -149 148 -237 29 -63 32 -79 32 -169 0 -88 -3 -102 -22 -122 -13 -13 -35 -28 -51 -34 -27 -9 -28 -8 -58 55 -62 133 -203 275 -374 376 -100 59 -113 75 -91 106 34 49 97 62 268 57 114 -4 120 -5 148 -32z m847 12 c36 -18 64 -56 56 -76 -3 -8 -31 -27 -63 -44 -172 -90 -354 -267 -415 -402 -27 -62 -28 -62 -58 -51 -17 6 -39 23 -51 38 -18 25 -20 41 -19 127 2 96 3 100 52 196 85 170 130 223 194 230 81 10 273 -1 304 -18z"/> <path d="M854 970 c-50 -20 -94 -103 -94 -178 0 -92 88 -192 169 -192 49 0 159 50 192 87 57 65 32 128 -84 217 -96 73 -133 87 -183 66z m166 -101 c127 -102 129 -147 6 -198 -87 -36 -110 -38 -154 -11 -84 51 -99 184 -29 258 36 39 82 26 177 -49z"/> <path d="M2035 967 c-30 -14 -126 -86 -155 -116 -82 -85 -60 -165 59 -217 107 -48 162 -42 223 23 58 60 74 153 39 228 -36 78 -102 111 -166 82z m103 -49 c46 -50 57 -149 22 -206 -23 -37 -75 -72 -108 -72 -29 0 -140 45 -164 67 -21 18 -24 70 -5 93 16 21 148 125 167 133 32 12 67 6 88 -15z"/> </g> </svg> 
       </div>
+
       <h1 className="max-w-5xl text-2xl font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-6xl lg:max-w-7xl">
         Welcome to Star Sailors <br />
       </h1>
@@ -35,11 +36,11 @@ export default function db () {
           </svg>
         </div>
         <h1 className="mx-auto mb-8 text-2xl font-semibold leading-none tracking-tighter text-neutral-600 lg:text-3xl">How to play</h1>
-        <p className="mx-auto text-base leading-relaxed text-gray-500">A transit event occurs when a planet passes in front of its host star, causing a slight dip in the star's brightness. Telescopes like TESS observe possible transit events when a dip in a star's brightness is observed
-
-By measuring the dip in brightness, our game engine can infer the size and orbital period of the planetary candidate
-
-TESS also looks for repeated transit events to confirm the existence of a planet and determine its orbital period more precisely</p>
+        <p className="mx-auto text-base leading-relaxed text-gray-500">
+            A transit event occurs when a planet passes in front of its host star, causing a slight dip in the star's brightness. Telescopes like TESS observe possible transit events when a dip in a star's brightness is observed
+            By measuring the dip in brightness, our game engine can infer the size and orbital period of the planetary candidate
+            TESS also looks for repeated transit events to confirm the existence of a planet and determine its orbital period more precisely
+        </p>
       </div>
       <div className="p-6">
         <div className="inline-flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto mb-5 text-blue-600 rounded-full bg-blue-50">
@@ -73,7 +74,7 @@ TESS also looks for repeated transit events to confirm the existence of a planet
     </div>
   </div>
 </section><br />
-    <center><h1 className="max-w-5xl text-2xl font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-6xl lg:max-w-7xl">Classifications <br /></h1></center>
+<center><h1 className="max-w-5xl text-2xl font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-6xl lg:max-w-7xl">Classifications <br /></h1></center>
 <SocialGraphHomeModal />
 <footer className="bg-white" aria-labelledby="footer-heading">
   <h2 id="footer-heading" className="sr-only">Footer</h2>
@@ -182,6 +183,20 @@ TESS also looks for repeated transit events to confirm the existence of a planet
         </svg>
       </a> */}
     </div>
+    {/* <div className="h-24 w-24"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <circle cx="24" cy="24" r="22" fill="#D8D8D8"/>
+  <rect x="8" y="20" width="32" height="8" fill="#287b7a"/>
+  <circle cx="24" cy="24" r="12" fill="#b1b1b1"/>
+</svg></div>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <path fill="#D8D8D8" d="M62.5,47.5H37.5V52.5h25v-5zM50,32.5a17.5,17.5 0 1,0 0,35a17.5,17.5 0 1,0 0,-35z" />
+  <path fill="#6C6E70" d="M50,72.5c-6.9,0-12.5-5.6-12.5-12.5V52.5h25v7.5C62.5,66.9,56.9,72.5,50,72.5z" />
+  <path fill="#6C6E70" d="M37.5,55V60c0,6.9,5.6,12.5,12.5,12.5s12.5-5.6,12.5-12.5v-5H37.5z" />
+  <circle fill="#0081FF" cx="50" cy="32.5" r="15" />
+  <circle fill="#ffffff" cx="50" cy="32.5" r="10" />
+</svg> */}
+
+
 
     <div className="mt-8 md:mt-0 md:order-1">
       <span className="mt-2 text-sm font-light text-gray-500">

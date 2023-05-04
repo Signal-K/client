@@ -15,6 +15,8 @@ export default function ProfilePage () {
   const tab = router?.query?.tab?.[0] || 'posts';
   const userId = router.query.id;
 
+  const [username, setUsername] = useState('');
+
   const supabase = useSupabaseClient();
 
   // Toggle different profile actions (like changing picture) IF profile being viewed is the logged in user's picture
@@ -35,6 +37,19 @@ export default function ProfilePage () {
         if (result.data) { setProfile(result.data[0]); };
       }
     )
+  }
+
+  function updateProfile () {
+    supabase.from('profiles')
+      .update({
+        username,
+      })
+      .eq('id', session?.user?.id)
+      .then(result => {
+        if (!result.error) {
+          setProfile(prev => ({ ...prev, username, }));
+        }
+      })
   }
 
   return (

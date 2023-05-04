@@ -8,14 +8,11 @@ import { Database } from "../../utils/database.types";
 import { AccountAvatarV1 } from "../../components/AccountAvatar";
 import { imagesCdnAddress } from "../../constants/cdn";
 import { v4 as uuidv4 } from 'uuid';
-import { useScreenshot } from 'use-react-screenshot';
-
-import PlanetEditor from "./planet-editor";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
-type Planets = Database['public']['Tables']['planets']['Row']; // See `wb3-10` at this point https://github.com/Signal-K/client/blob/wb3-10-implement-off-chain-commenting-post/components/Data/OffchainAccount.tsx / https://github.com/Signal-K/client/commit/17301ae88f3f8d1aa673ac968ceef360192fa3b1 -> Clone that branch and compare the behaviour and UI to what occurs here and in planet-editor
+type Planets = Database['public']['Tables']['planets']['Row']; 
 
-export default function OffchainAccount({ session }: { session: Session}) {
+export default function AccountEditor({ session }: { session: Session }) {
     const supabase = useSupabaseClient<Database>();
     const user = useUser();
     const [loading, setLoading] = useState(true);
@@ -32,9 +29,6 @@ export default function OffchainAccount({ session }: { session: Session}) {
 
     const ref = createRef();
     let width = '100%'
-    const [image, takeScreenShot] = useScreenshot();
-
-    const getImage = () => takeScreenShot(ref.current);
 
     useEffect(() => {
         getProfile();
@@ -128,20 +122,6 @@ export default function OffchainAccount({ session }: { session: Session}) {
 
     async function uploadImage(e) {
         let file = e.target.files[0];
-        const { data, error } = await supabase
-            .storage
-            .from('images')
-            .upload(user.id + '/' + uuidv4(), file);
-
-        if (data) {
-            getImages();
-        } else {
-            console.log(error);
-        }
-    }
-
-    async function uploadScreenshot(e) {
-        let file = image + '.png';
         const { data, error } = await supabase
             .storage
             .from('images')
@@ -249,94 +229,6 @@ export default function OffchainAccount({ session }: { session: Session}) {
                     updateProfile({ username, website, avatar_url: url, address})
                 }}
             />
-            <div>
-                <label htmlFor='email'>Email</label>
-                <input id='email' type='text' value={session?.user?.email} disabled />
-            </div><br />
-            <div>
-                <label htmlFor='username'>Username</label>
-                <input
-                    id='username'
-                    type='text'
-                    value={ username || '' }
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-            </div><br />
-            <div>
-                <label htmlFor='website'>Website</label>
-                <input
-                    id='website'
-                    type='website'
-                    value={ website || '' }
-                    onChange={(e) => setWebsite(e.target.value)}
-                /><br />
-            </div><br />
-            <div>
-                <label htmlFor='address'>Address</label>
-                <input
-                    id='address'
-                    type='text'
-                    value={ address || '' }
-                    onChange={(e) => setAddress(e.target.value)}
-                />
-            </div><br />
-            <div>
-                <button
-                    className="button primary block"
-                    onClick={() => updateProfile({ username, website, avatar_url, address })}
-                    disabled={loading}
-                >
-                    {loading ? 'Loading ...' : 'Update'}
-                </button>
-            </div><br />
-            <div>
-                <button style={{ marginBottom: "10px" }} onClick={getImage}>
-                    Take screenshot
-                </button>
-            </div>
-            <img width={width} src={image} alt={"ScreenShot"} />
-            <div
-                ref={ref as React.RefObject<HTMLDivElement>}
-                style={{
-                    border: "1px solid #ccc",
-                    padding: "10px",
-                    marginTop: "20px"
-                }}
-            >
-                <PlanetEditor />
-            </div>
-            <br />
-            <Container className='container-sm mt-4 mx-auto border-5 border-emerald-500'>
-                <>
-                    <h1>Your photos</h1><br />
-                    <p>Upload image of your model for analysis</p>
-                    <Form.Group className="mb-3" style={{maxWidth: '500px'}}>
-                        <Form.Control type='file' accept='image/png, image/jpeg' onChange={(e) => uploadImage(e)} />
-                    </Form.Group><br />
-                    <Button variant='outline-info' onClick={() => uploadScreenshot(image)}>Upload planet metadata</Button>
-                    <br /><br /><hr /><br />
-                    <h3>Your images</h3>
-                    <Row className='g-4'>
-                        {images.map((image) => {
-                            return (
-                                <Col key={imagesCdnAddress + user.id + '/' + image.name}>
-                                    <Card>
-                                        <Card.Img variant='top' src={imagesCdnAddress + user.id + '/' + image.name} />
-                                        <Card.Body>
-                                            <Button variant='danger' onClick={() => deleteImage(image.name)}>Delete image</Button>
-                                        </Card.Body>
-                                    </Card>
-                                </Col>
-                            )
-                        })}
-                    </Row>
-                </>
-            </Container>
-            <div>
-                <Button variant='outline-info' onClick={() => supabase.auth.signOut()}>
-                    Sign Out
-                </Button>
-            </div>
         </div>
     )
 }
