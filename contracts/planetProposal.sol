@@ -39,3 +39,7 @@ contract PlanetProposal {
         );
     }
 }
+
+/*
+For use in testing voting on proposals from users on generated anomalies in play.skinetics.tech, working in the github/desci-md scripts
+*/

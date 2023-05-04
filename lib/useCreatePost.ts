@@ -1,4 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+export function useCreatePost() {
+  return "Stub"
+}
+
+/*import { useMutation } from "@tanstack/react-query";
 import { useSDK, useStorageUpload } from "@thirdweb-dev/react";
 import { PublicationMainFocus, useCreatePostTypedDataMutation } from "../graphql/generated";
 import useLensUser from "./auth/useLensUser";
@@ -122,4 +126,4 @@ export function useCreatePost() {
   }
 
   return useMutation(createPost);
-}
+}*/

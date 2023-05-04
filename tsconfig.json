@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "compilerOptions": {
       "target": "es5",
       "lib": ["dom", "dom.iterable", "esnext"],
@@ -16,5 +17,37 @@
       "incremental": true
     },
     "exclude": ["node_modules"],
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/PostFormCard.jsx", "constants/contracts.ts", "pages/posts/index.jsx", "pages/generator/planet-editor.jsx", "pages/generator/planet-editor.jsx", "components/Lens/Utterances.jsx", "components/Lens/Utterances.jsx", "components/Posts/ProfileCard.tsx", "components/Posts/ProfileCard.tsx", "context/UserContext.js", "context/UserContext.js", "components/PostCard.jsx", "components/PostCard.jsx", "components/Core/Sidebar.jsx", "components/Core/Sidebar.jsx", "components/Core/Layout.jsx", "components/Core/Layout.jsx", "components/Gameplay/Generator/Notebooks/Notebook.js", "components/Gameplay/Generator/Notebooks/Notebook.js", "components/Governance/Connections/ConnectWallet.js", "components/Governance/Connections/ConnectWallet.js", "components/Governance/Navbar.jsx", "components/Governance/Navbar.jsx"  ]
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/PostFormCard.jsx", "constants/contracts.ts", "pages/posts/index.jsx", "pages/generator/planet-editor.jsx", "pages/generator/planet-editor.jsx", "components/Lens/Utterances.jsx", "components/Lens/Utterances.jsx", "components/Posts/ProfileCard.tsx", "components/Posts/ProfileCard.tsx", "context/UserContext.js", "context/UserContext.js", "components/PostCard.jsx", "components/PostCard.jsx", "components/Core/Sidebar.jsx", "components/Core/Sidebar.jsx", "components/Core/Layout.jsx", "components/Core/Layout.jsx", "components/Gameplay/Generator/Notebooks/Notebook.js", "components/Gameplay/Generator/Notebooks/Notebook.js", "components/Governance/Connections/ConnectWallet.js", "components/Governance/Connections/ConnectWallet.js", "components/Governance/Navbar.jsx", "components/Governance/Navbar.jsx", "pages/governance/vote.jsx", "pages/governance/vote.jsx"  ]
   }
+=======
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ]
+  // "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/PostFormCard.jsx", "constants/contracts.ts", "pages/posts/index.jsx", "pages/generator/planet-editor.jsx", "pages/generator/planet-editor.jsx", "components/Lens/Utterances.jsx", "components/Lens/Utterances.jsx", "components/Posts/ProfileCard.tsx", "components/Posts/ProfileCard.tsx", "context/UserContext.js", "context/UserContext.js", "components/PostCard.jsx", "components/PostCard.jsx", "components/Core/Sidebar.jsx", "components/Core/Sidebar.jsx", "components/Core/Layout.jsx", "components/Core/Layout.jsx", "components/Gameplay/Generator/Notebooks/Notebook.js", "components/Gameplay/Generator/Notebooks/Notebook.js", "components/Governance/Connections/ConnectWallet.js", "components/Governance/Connections/ConnectWallet.js", "components/Governance/Navbar.jsx", "components/Governance/Navbar.jsx", "contracts/scripts/deploy.js", "contracts/scripts/deploy.js", "pages/governance/index.tsx", "pages/governance/index.tsx", "scripts/deploy_voteContract.js", "scripts/deploy_voteContract.js", "contracts/scripts/deploy_voteContract.mjs", "contracts/scripts/deploy_voteContract.mjs", "pages/governance/vote.jsx", "pages/governance/vote.jsx", "components/Gameplay/Stake/CurrentGear.jsx", "components/Gameplay/Stake/CurrentGear.jsx"  ]
+}
+>>>>>>> wb3-15-add-voting-mechanism-for-anomaly
