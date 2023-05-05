@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useTransition, lazy } from "react"
 import Card from "../Card"
 import FriendInfo from "../FriendInfo"
 import PostCard, { PostCardProfile } from "../PostCard"
-import { useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export function ProfileContent ({ activeTab, userId }) {
     const supabase = useSupabaseClient();
@@ -18,6 +18,10 @@ export function ProfileContent ({ activeTab, userId }) {
         }
     }, [userId]);
 
+    useEffect(() => {
+        userPlanetPosts(userId);
+    }, [userId]);
+
     async function loadProfile () {
         const posts = await userPosts(userId);
         const planetPosts = await userPlanetPosts(userId);
@@ -28,8 +32,8 @@ export function ProfileContent ({ activeTab, userId }) {
         return { posts, profile };
     }
 
-    async function userPlanetPosts (userId) {
-        const { data } = await supabase.from('posts_duplicate')
+    function userPlanetPosts (userId) {
+        const { data } = supabase.from('posts_duplicate')
             .select('*') //('id, content, created_at, media, planets2, profiles(id, avatar_url, username)') // profiles(id, avatar_url, username)')
             .order('created_at', { ascending: false })
             .eq('author', userId) // session?.user?.id)

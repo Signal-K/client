@@ -183,7 +183,7 @@ export function PlanetCard ({ activeTab, planetId }) {
                         <br /><br />
                         <p>Contract info: {planet?.contract} ↝ {planet?.tokenId} on {planet?.chainId} </p>
                         <br /><br />
-                        <p>Owner of this anomaly: {planet?.owner}</p>
+                        {/* <p>Owner of this anomaly: {planet?.owner?.username}</p> */}
                         <br /><br /><br />
                 </Card></div>
             )}

@@ -51,6 +51,8 @@
     "ether": "^0.0.9",
     "ethers": "5.7.2",
     "extract-colors": "^2.0.5",
+    "flowbite": "^1.6.5",
+    "flowbite-react": "^0.4.4",
     "framer-motion": "^9.0.2",
     "fs": "^0.0.1-security",
     "hardhat": "^2.13.0",

@@ -102,7 +102,7 @@ export function GameplayLayout ( { children } ) {
             >
                 <div className="px-4 md:px-16">{children}</div>
             </main>
-            <Footer />
+            {/* <Footer /> */}
         </>
     );
 };

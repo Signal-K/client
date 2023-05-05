@@ -1,3 +1,4 @@
+import InfoFAQ from "../../components/Info/faq";
 import { SocialGraphHomeModal } from "../posts";
 
 export default function db () {
@@ -74,8 +75,9 @@ export default function db () {
     </div>
   </div>
 </section><br />
-<center><h1 className="max-w-5xl text-2xl font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-6xl lg:max-w-7xl">Classifications <br /></h1></center>
+<center><h1 className="max-w-5xl text-2xl font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-6xl lg:max-w-7xl">Recent classifications by our users<br /></h1></center>
 <SocialGraphHomeModal />
+<InfoFAQ />
 <footer className="bg-white" aria-labelledby="footer-heading">
   <h2 id="footer-heading" className="sr-only">Footer</h2>
   <div className="px-5 py-12 mx-auto max-w-7xl lg:py-16 md:px-12 lg:px-20">
@@ -90,7 +92,7 @@ export default function db () {
             <h3 className="text-xs font-semibold tracking-wider text-blue-600 uppercase">Breadboard</h3>
             <ul role="list" className="mt-4 space-y-4">
               <li>
-                <a href="/planets" className="text-sm font-normal text-gray-500 hover:text-gray-900"> All planets </a>
+                <a href="https://play.skinetics.tech/planets" className="text-sm font-normal text-gray-500 hover:text-gray-900"> All planets </a>
               </li>
 
               <li>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useTransition, lazy } from "react";
 import { useRouter } from "next/router";
 
 import Layout from "../../components/Layout";
@@ -17,6 +17,9 @@ import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import { planetsImagesCdnAddress } from "../../constants/cdn";
 import PostCard, { PlanetPostCard } from "../../components/PostCard";
 import { SocialGraphHomeNoSidebarIndividualPlanet, SocialGraphHomeNoSidebarIndividualPlanetReturn } from "../posts";
+// import PlanetEditor from "../generator/planet-editor";
+
+const HeavyComponent = lazy(() => import ('../generator/planet-editor'));
 
 // import { StarSystem } from 'stellardream';
 
@@ -42,9 +45,13 @@ export default function PlanetPage () {
     const [planetPosts, setPlanetPosts] = useState([]);
     const [posts, setPosts] = useState([]);
 
+    // For loading planet editor
+    const [, startTransition] = useTransition();
+    const [load, setLoad] = useState(false);
+
     useEffect(() => {
         //const starSystem = new StarSystem(1);
-        //console.log(JSON.stringify(starSystem, null, 2))
+        // console.log(JSON.stringify(starSystem, null, 2))
     }, [session?.user])
 
     const { contract } = useContract(planet?.contract);
@@ -163,7 +170,11 @@ export default function PlanetPage () {
         }
     }
 
-    async function fetchPostsForPlanet(planetId) {
+    useEffect(() => {
+        fetchPostsForPlanet(planetId);
+    }, [planetId, session?.user?.id])
+
+    function fetchPostsForPlanet(planetId) {
         supabase
           .from('posts_duplicate')
           .select('id, content, created_at, media, profiles(id, avatar_url, username)')
@@ -171,7 +182,7 @@ export default function PlanetPage () {
           .order('created_at', { ascending: false })
           .then(result => {
             setPlanetPosts(result.data);
-          });
+        });
     }
 
     const period = 3.5; // days
@@ -203,12 +214,11 @@ export default function PlanetPage () {
                         <PlanetTabs activeTab={tab} planetId={planet?.id} /><br /><br />
                         <center><h1 className="display-5">Star's Lightcurve</h1></center><br />
                         <img src={planetsImagesCdnAddress + planet?.id + '/' + 'download.png'} />
-                        {planet?.id}
-                        Planet temperature: {planet?.temperature} <br />
-                        <button onClick={claimPlanet}>Claim Planet</button>
-                        {planet?.owner && (
+                        
+                        <button className="hidden p-2 mr-3 text-gray-600 rounded cursor-pointer lg:inline hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700" onClick={claimPlanet}>Claim Planet</button>
+                        {/* {planet?.owner && (
                             <p>Owner of this anomaly: {planet?.owner}</p>
-                        )}
+                        )} */}
                         </div>
                     </div>
                 </Card>
@@ -218,7 +228,18 @@ export default function PlanetPage () {
                 <center><h2 className="display-6">{planet?.content} Discussion</h2></center><br />
                 {planetPosts?.length > 0 && planetPosts.map(post => (
                     <PlanetPostCard key = { post.id } {...post} planets2 = { planetId } />
-                ))}
+                ))} <br />
+
+                <center><h2 className="display-6">Paint your planet</h2></center><br />
+                <center><button
+                    onClick = {() => {
+                        startTransition(() => {
+                            setLoad(true);
+                        });
+                    }}
+                >Load planet editor</button></center>
+                {load && <HeavyComponent />}
+                {/* <Card noPadding={false}><PlanetEditor /></Card> */}
             </Layout>
         </GameplayLayout>
     );

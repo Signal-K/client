@@ -38,7 +38,7 @@ export default function SocialGraphHome () {
     var myNumber = myNumber1.toString() + myNumber2.toString() + myNumber3.toString() + myNumber4.toString() + myNumber5.toString() + myNumber6.toString() + myNumber7.toString() + myNumber8.toString() + myNumber9.toString() + myNumber10.toString() + myNumber11.toString() + myNumber12.toString() + myNumber13.toString();
     //const starSystem = new StarSystem(myNumber)
     //console.log(JSON.stringify(starSystem, null, 2));
-  }, []);
+  }, [session?.user?.id]);
 
   useEffect(() => {
     if (!session?.user?.id) {
@@ -97,7 +97,7 @@ export function SocialGraphHomeNoSidebar () {
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [session?.user?.id]);
 
   useEffect(() => {
     if (!session?.user?.id) {
@@ -287,7 +287,7 @@ export function SocialGraphHomeModal () {
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [session?.user?.id]);
 
   useEffect(() => {
     if (!session?.user?.id) {
@@ -307,11 +307,13 @@ export function SocialGraphHomeModal () {
   function fetchPosts () {
     supabase.from('posts')
       .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+      .limit(2)
       .order('created_at', { ascending: false })
       .then( result => { setPosts(result.data); });
 
     supabase.from('posts_duplicate')
       .select('id, content, created_at, media, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)') // Reset id on testing playground server later
+      .limit(2)
       .order('created_at', { ascending: false })
       .then( result => { setPlanetPosts(result.data); });
   }

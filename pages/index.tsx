@@ -9,6 +9,7 @@ import { Database } from "../utils/database.types";
 import AccountAvatar, { AccountAvatarV1, AccountAvatarV2 } from "../components/AccountAvatar";
 import { url } from "inspector";
 import AccountEditor from "../components/Core/UpdateProfile";
+import DbHeader from "../components/Backend/Header";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -145,6 +146,7 @@ export default function Home() {
     return (
         <>
             <CoreLayout>
+              {/* <DbHeader /> */}
             <button className="bg-white rounded-full p-4" onClick={() => setShowProfile(true)}>
   <div className="relative w-10 h-10">
     <div className="absolute top-0 left-0 w-10 h-2 bg-gray-400 rounded-full"></div>
