@@ -1,7 +1,7 @@
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 import React from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import SocialGraphHome from '../posts';
+import SocialGraphHome, { SocialGraphHomeModal } from '../posts';
 
 const Login = () => {
     const session = useSession();
@@ -13,7 +13,8 @@ const Login = () => {
                 // <><SocialGraphHome />
                 <div className='w-80%'><Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa}} theme='dark' /></div>//</>
             ) : (
-                <SocialGraphHome />
+                // <SocialGraphHome />
+                <SocialGraphHomeModal />
             )}
         </div>
     );

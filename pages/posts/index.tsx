@@ -12,7 +12,7 @@ import en from 'javascript-time-ago/locale/en.json';
 import Login from "../login";
 TimeAgo.addDefaultLocale(en);
 
-export default function SocialGraphHome () {
+/*export default function SocialGraphHome () {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);
@@ -78,7 +78,7 @@ export default function SocialGraphHome () {
 
   return (
     <Layout hideNavigation={false}>
-      <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
+      <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later 
         <PostFormCard onPost={fetchPosts} />
         {posts?.length > 0 && posts.map(post => (
           <PostCard key = { post.id } {...post} />
@@ -86,7 +86,7 @@ export default function SocialGraphHome () {
       </UserContext.Provider>
     </Layout>
   );
-}
+} */
 
 export function SocialGraphHomeNoSidebar () {
   const supabase = useSupabaseClient();
@@ -143,9 +143,9 @@ export function SocialGraphHomeNoSidebar () {
     <Layout hideNavigation={true}>
       <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
         <PostFormCard onPost={fetchPosts} />
-        {/*{planetPosts?.length > 0 && planetPosts.map(post => (
+        {planetPosts?.length > 0 && planetPosts.map(post => (
           <PostCard key = { post.id } {...post} />
-        ))}*/}
+        ))}
         {posts?.length > 0 && posts.map(post => (
           <PostCard key = { post.id } {...post} />
         ))}

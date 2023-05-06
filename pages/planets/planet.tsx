@@ -52,6 +52,7 @@ export default function PlanetPage () {
     useEffect(() => {
         //const starSystem = new StarSystem(1);
         // console.log(JSON.stringify(starSystem, null, 2))
+        console.log(planet?.owner)
     }, [session?.user])
 
     const { contract } = useContract(planet?.contract);
@@ -101,7 +102,7 @@ export default function PlanetPage () {
             .eq('id', planetId) // How should the ID be generated -> similar to how `userId` is generated? Combination of user + org + article + dataset number??
             .then(result => {
                 if (result.error) { throw result.error; };
-                if (result.data) { setPlanet(result.data[0]); /*console.log(planet);*/ setPlanetOwner(planet?.ownerId); };
+                if (result.data) { setPlanet(result.data[0]); /*console.log(planet);*/ setPlanetOwner(planet?.owner); };
             }
         );
     }
@@ -230,16 +231,18 @@ export default function PlanetPage () {
                     <PlanetPostCard key = { post.id } {...post} planets2 = { planetId } />
                 ))} <br />
 
-                <center><h2 className="display-6">Paint your planet</h2></center><br />
-                <center><button
-                    onClick = {() => {
-                        startTransition(() => {
-                            setLoad(true);
-                        });
-                    }}
-                >Load planet editor</button></center>
-                {load && <HeavyComponent />}
-                {/* <Card noPadding={false}><PlanetEditor /></Card> */}
+                {planetOwner == session?.user?.id && (
+                    <><center><h2 className="display-6">Paint your planet</h2></center><br />
+                    <center><button
+                        onClick = {() => {
+                            startTransition(() => {
+                                setLoad(true);
+                            });
+                        }}
+                    >Load planet editor</button></center>
+                    {load && <HeavyComponent />}
+                    {/* <Card noPadding={false}><PlanetEditor /></Card> */}</>
+                )}
             </Layout>
         </GameplayLayout>
     );
