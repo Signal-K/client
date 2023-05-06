@@ -37,7 +37,8 @@ export default function Rewards({ helperContract, rewardsContract }: Props ) { /
                 Unclaimed: {" "}
                 <b>{unclaimedAmount && ethers.utils.formatUnits(unclaimedAmount)}</b>
             </p>
-            <ApproxRewards helperContract={helperContract} />
+            <p>Approx rewards would go here</p>
+            {/*<ApproxRewards helperContract={helperContract} />*/}
             <div className={styles.smallMargin}>
                 <Web3Button
                     contractAddress={HELPER_ADDRESS}
