@@ -16,7 +16,7 @@ import { PlanetCard } from "../../components/Gameplay/Planets/PlanetCard";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import { planetsImagesCdnAddress } from "../../constants/cdn";
 import PostCard, { PlanetPostCard } from "../../components/PostCard";
-import { SocialGraphHomeNoSidebarIndividualPlanet, SocialGraphHomeNoSidebarIndividualPlanetReturn } from "../posts";
+import { SocialGraphHomeNoSidebar } from "../posts";
 // import PlanetEditor from "../generator/planet-editor";
 
 const HeavyComponent = lazy(() => import ('../generator/planet-editor'));
@@ -228,7 +228,8 @@ export default function PlanetPage () {
 
                 <center><h2 className="display-6">{planet?.content} Discussion</h2></center><br />
                 {planetPosts?.length > 0 && planetPosts.map(post => (
-                    <PlanetPostCard key = { post.id } {...post} planets2 = { planetId } />
+                    // <PlanetPostCard key = { post.id } {...post} planets2 = { planetId } />
+                    <SocialGraphHomeNoSidebar key = { post.id } {...post} planets2 = {planetId} />
                 ))} <br />
 
                 {planetOwner == session?.user?.id && (

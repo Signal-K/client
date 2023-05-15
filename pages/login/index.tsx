@@ -1,7 +1,7 @@
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 import React from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import SocialGraphHome, { SocialGraphHomeModal } from '../posts';
+import { SocialGraphHomeModal } from '../posts';
 
 const Login = () => {
     const session = useSession();
