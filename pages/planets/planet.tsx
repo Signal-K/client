@@ -17,6 +17,7 @@ import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import { planetsImagesCdnAddress } from "../../constants/cdn";
 import PostCard, { PlanetPostCard } from "../../components/PostCard";
 import SocialGraphHomeNoSidebar from "../posts";
+import UnityBuildLod1 from "../../components/Gameplay/Planets/Unity/lod1/Build";
 // import PlanetEditor from "../generator/planet-editor";
 
 const HeavyComponent = lazy(() => import ('../generator/planet-editor'));
@@ -241,7 +242,7 @@ export default function PlanetPage () {
                             });
                         }}
                     >Load planet editor</button></center>
-                    {load && <HeavyComponent />}
+                    {load && <> <HeavyComponent /> <UnityBuildLod1 /> </>}
                     {/* <Card noPadding={false}><PlanetEditor /></Card> */}</>
                 )}
             </Layout>
