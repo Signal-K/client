@@ -16,7 +16,7 @@ import { PlanetCard } from "../../components/Gameplay/Planets/PlanetCard";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import { planetsImagesCdnAddress } from "../../constants/cdn";
 import PostCard, { PlanetPostCard } from "../../components/PostCard";
-import { SocialGraphHomeNoSidebar } from "../posts";
+import SocialGraphHomeNoSidebar from "../posts";
 // import PlanetEditor from "../generator/planet-editor";
 
 const HeavyComponent = lazy(() => import ('../generator/planet-editor'));
@@ -51,8 +51,8 @@ export default function PlanetPage () {
 
     useEffect(() => {
         //const starSystem = new StarSystem(1);
-        // console.log(JSON.stringify(starSystem, null, 2))
-        console.log(planet?.owner)
+        // console.log(JSON.stringify(starSystem, null, 2));
+        console.log(planet?.owner);
     }, [session?.user])
 
     const { contract } = useContract(planet?.contract);

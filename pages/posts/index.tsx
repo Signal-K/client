@@ -89,7 +89,7 @@ TimeAgo.addDefaultLocale(en);
   );
 } */
 
-export function SocialGraphHomeNoSidebar () {
+export default function SocialGraphHomeNoSidebar () {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);
