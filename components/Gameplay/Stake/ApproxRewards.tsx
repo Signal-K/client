@@ -1,4 +1,10 @@
-import React, { useState, useEffect } from "react";
+export default function ApproxRewards () {
+    return (
+        "This currently doesn't do anything due to compilation errors"
+    )
+}
+
+/*import React, { useState, useEffect } from "react";
 
 import { useAddress } from "@thirdweb-dev/react";
 import { SmartContract } from "@thirdweb-dev/sdk";
@@ -9,6 +15,7 @@ type Props = { helperContract: SmartContract<any>; };
 
 export default function ApproxRewards ({ helperContract }: Props ) { // Calls contract to estimate the rewards owed to the authenticated player/user
     const address = useAddress();
+    const addressString = address
     const everyMillisecondAmount = parseInt(
         (10_000_000_000_000 / 2.1).toFixed(0) // Assumes each block (on EVM) takes ~2.1 seconds to be mined. Begins when component isMounted
     );
@@ -39,4 +46,4 @@ export default function ApproxRewards ({ helperContract }: Props ) { // Calls co
             </b>
         </p>
     );
-}
+}*/

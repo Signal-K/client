@@ -1,4 +1,8 @@
-import React from "react";
+export default function OwnedGear () {
+    return "This export is a stub for the original ownedGear component"
+}
+
+/*import React from "react";
 import styles from '../../../styles/Staking-P2E/planetInteraction.module.css';
 
 import { ThirdwebNftMedia, useAddress, useOwnedNFTs, Web3Button } from "@thirdweb-dev/react";
@@ -59,4 +63,4 @@ export default function OwnedGear ({ multitoolContract, helperContract }: Props)
         </div>
     </>
 );
-}
+}*/
