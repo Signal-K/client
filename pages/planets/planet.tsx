@@ -17,6 +17,7 @@ import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import { planetsImagesCdnAddress } from "../../constants/cdn";
 import PostCard, { PlanetPostCard } from "../../components/PostCard";
 import { SocialGraphHomeNoSidebarIndividualPlanet, SocialGraphHomeNoSidebarIndividualPlanetReturn } from "../posts";
+import UnityBuildLod1 from "../../components/Gameplay/Unity/Build/LOD-Rocky1";
 // import PlanetEditor from "../generator/planet-editor";
 
 const HeavyComponent = lazy(() => import ('../generator/planet-editor'));
@@ -239,6 +240,7 @@ export default function PlanetPage () {
                     }}
                 >Load planet editor</button></center>
                 {load && <HeavyComponent />}
+                <UnityBuildLod1 />
                 {/* <Card noPadding={false}><PlanetEditor /></Card> */}
             </Layout>
         </GameplayLayout>
