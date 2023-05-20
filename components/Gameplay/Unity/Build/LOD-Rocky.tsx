@@ -7,10 +7,10 @@ export default function UnityBuildLod1 () {
         // dataUrl: '/Unity/LOD1/Build/Webgl.data.gz',
         // frameworkUrl: '/Unity/LOD1/Build/Webgl.framework.js.gz',
         // codeUrl: '/Unity/LOD1/Build/Webgl.wasm.gz',
-        loaderUrl: "/assets/Earth/LOD1.loader.js",
-        dataUrl: "/assets/Earth/LOD1.data",
-        frameworkUrl: "/assets/Earth/LOD1.framework.js",
-        codeUrl: "/assets/Earth/LOD1.wasm",
+        loaderUrl: "/assets/Earth/Rocky_Earth-base.loader.js",
+        dataUrl: "/assets/Earth/Rocky_Earth-base.data",
+        frameworkUrl: "/assets/Earth/Rocky_Earth-base.framework.js",
+        codeUrl: "/assets/Earth/Rocky_Earth-base.wasm",
     });
 
     return <Unity unityProvider={unityProvider} />
