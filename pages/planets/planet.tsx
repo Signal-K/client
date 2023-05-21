@@ -239,7 +239,7 @@ export default function PlanetPage () {
                         });
                     }}
                 >Load planet editor</button></center>
-                {load && <> <UnityBuildLod1 /> <HeavyComponent /> </>}
+                {load && <> <UnityBuildLod1 /> {/*<HeavyComponent />*/} </>}
                 {/* <Card noPadding={false}><PlanetEditor /></Card> */}
             </Layout>
         </GameplayLayout>
