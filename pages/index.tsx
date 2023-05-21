@@ -10,6 +10,7 @@ import AccountAvatar, { AccountAvatarV1, AccountAvatarV2 } from "../components/A
 import { url } from "inspector";
 import AccountEditor from "../components/Core/UpdateProfile";
 import DbHeader from "../components/Backend/Header";
+import UnityTest1 from "../components/Gameplay/Unity/Build/Tests/LOD-Test";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -146,6 +147,7 @@ export default function Home() {
     return (
         <>
             <CoreLayout>
+              <UnityTest1 />
               {/* <DbHeader /> */}
             <button className="bg-white rounded-full p-4" onClick={() => setShowProfile(true)}>
   <div className="relative w-10 h-10">
