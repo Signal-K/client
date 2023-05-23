@@ -7,13 +7,13 @@ export default function UnityBuildLod1 () {
         // dataUrl: '/Unity/LOD1/Build/Webgl.data.gz',
         // frameworkUrl: '/Unity/LOD1/Build/Webgl.framework.js.gz',
         // codeUrl: '/Unity/LOD1/Build/Webgl.wasm.gz',
-        loaderUrl: "/assets/Earth/Rocky_Earth-base.loader.js",
-        dataUrl: "/assets/Earth/Rocky_Earth-base.data",
-        frameworkUrl: "/assets/Earth/Rocky_Earth-base.framework.js",
-        codeUrl: "/assets/Earth/Rocky_Earth-base.wasm",
+        loaderUrl: "/assets/Earth/Rocky_Earth-gen.loader.js",
+        dataUrl: "/assets/Earth/Rocky_Earth-gen.data",
+        frameworkUrl: "/assets/Earth/Rocky_Earth-gen.framework.js",
+        codeUrl: "/assets/Earth/Rocky_Earth-gen.wasm",
     });
 
-    return <Unity unityProvider={unityProvider} />
+    return <Unity unityProvider={unityProvider} style={{ width: "100%", height: "500px" }} />
     // return (
     //     <iframe src='Unity/index.html' height='1000px' width='1000px' />
     // )
