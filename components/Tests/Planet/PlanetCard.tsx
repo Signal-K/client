@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Card from "../../Card";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { SocialGraphHomeNoSidebar } from "../../../pages/posts";
+import SocialGraphHomeNoSidebar from "../../../pages/posts";
 
 export default function PlanetContent ({ activeTab, planetId }) {
     const supabase = useSupabaseClient();
