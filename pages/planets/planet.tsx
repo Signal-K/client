@@ -16,7 +16,7 @@ import { PlanetCard } from "../../components/Gameplay/Planets/PlanetCard";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import { planetsImagesCdnAddress } from "../../constants/cdn";
 import PostCard, { PlanetPostCard } from "../../components/PostCard";
-import { SocialGraphHomeNoSidebarIndividualPlanet, SocialGraphHomeNoSidebarIndividualPlanetReturn } from "../posts";
+// import { SocialGraphHomeNoSidebarIndividualPlanet, SocialGraphHomeNoSidebarIndividualPlanetReturn } from "../posts";
 import UnityBuildLod1 from "../../components/Gameplay/Unity/Build/LOD-Rocky";
 // import PlanetEditor from "../generator/planet-editor";
 

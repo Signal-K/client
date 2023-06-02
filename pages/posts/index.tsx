@@ -4,6 +4,7 @@ import PostCard, { PostModal } from "../../components/PostCard";
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UserContext } from "../../context/UserContext";
+import { useRouter } from "next/router";
 // import { StarSystem } from 'stellardream';
 // import LoginPage from "../login/social-login";
 
@@ -12,7 +13,7 @@ import en from 'javascript-time-ago/locale/en.json';
 import Login from "../login";
 TimeAgo.addDefaultLocale(en);
 
-export default function SocialGraphHome () {
+/*export default function SocialGraphHome () {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);
@@ -78,7 +79,7 @@ export default function SocialGraphHome () {
 
   return (
     <Layout hideNavigation={false}>
-      <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
+      <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later 
         <PostFormCard onPost={fetchPosts} />
         {posts?.length > 0 && posts.map(post => (
           <PostCard key = { post.id } {...post} />
@@ -86,9 +87,9 @@ export default function SocialGraphHome () {
       </UserContext.Provider>
     </Layout>
   );
-}
+} */
 
-export function SocialGraphHomeNoSidebar () {
+export default function SocialGraphHomeNoSidebar () {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);
@@ -143,9 +144,9 @@ export function SocialGraphHomeNoSidebar () {
     <Layout hideNavigation={true}>
       <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
         <PostFormCard onPost={fetchPosts} />
-        {/*{planetPosts?.length > 0 && planetPosts.map(post => (
+        {planetPosts?.length > 0 && planetPosts.map(post => (
           <PostCard key = { post.id } {...post} />
-        ))}*/}
+        ))}
         {posts?.length > 0 && posts.map(post => (
           <PostCard key = { post.id } {...post} />
         ))}
@@ -154,6 +155,133 @@ export function SocialGraphHomeNoSidebar () {
   );
 }
 
+export function SocialGraphHomeModal () {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const [posts, setPosts] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [planetPosts, setPlanetPosts] = useState([]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (!session?.user?.id) {
+      return;
+    }
+
+    supabase.from('profiles')
+      .select()
+      .eq('id', session?.user?.id)
+      .then(result => {
+        if (result.data.length) {
+          setProfile(result.data[0]);
+        }
+      })
+  }, [session?.user?.id]); // Run it again if auth/session state changes
+
+  function fetchPosts () {
+    supabase.from('posts')
+      .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+      .limit(2)
+      .order('created_at', { ascending: false })
+      .then( result => { setPosts(result.data); });
+
+    supabase.from('posts_duplicate')
+      .select('id, content, created_at, media, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)')
+      .limit(2)
+      .order('created_at', { ascending: false })
+      .then( result => { setPlanetPosts(result.data); });
+  }
+
+  function fetchProfile () {
+    supabase.from('profiles')
+      .select()
+      .eq('id', session.user.id)
+      .then(result => {
+        if (result.data) {
+          setProfile(result.data[0]);
+        }
+    })
+  }
+
+  if (!session) { return <Login />; };
+
+  return (
+    <Layout hideNavigation={true}>
+      <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
+        {/* <PostFormCard onPost={fetchPosts} /> */}
+        {planetPosts?.length > 0 && planetPosts.map(post => (
+          <PostModal key = { post.id } {...post} />
+        ))}
+      </UserContext.Provider>
+    </Layout>
+  );
+}
+
+/*export function SocialGraphHomeNoSidebarIndividualPlanetReturn (planetId) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const [posts, setPosts] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [planetPosts, setPlanetPosts] = useState([]);
+
+  useEffect(() => {
+    fetchPostsForPlanet(planetId);
+  }, [planetId]);
+  
+
+  useEffect(() => {
+    if (!session?.user?.id) {
+      return;
+    }
+
+    supabase.from('profiles')
+      .select()
+      .eq('id', session?.user?.id)
+      .then(result => {
+        if (result.data.length) {
+          setProfile(result.data[0]);
+        }
+      })
+  }, [session?.user?.id]); // Run it again if auth/session state changes
+
+  async function fetchPostsForPlanet ( planetId ) {
+    supabase.from('posts_duplicate')
+      .select('*') //id, content, created_at, media, planets2, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+      .order('created_at', { ascending: false })
+      // .eq('author', planetId)
+      //.eq('planets2', planetId)
+      .then( result => { setPlanetPosts(result.data); });
+      // console.log("horeui", planetPosts[0]?.planets2/*?.planets2)
+  }
+
+  function fetchProfile () {
+    supabase.from('profiles')
+      .select()
+      .eq('id', session.user.id)
+      .then(result => {
+        if (result.data) {
+          setProfile(result.data[0]);
+        }
+    })
+  }
+
+  if (!session) { return <Login />; };
+
+  return (
+    <Layout hideNavigation={true}>
+      <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later 
+        {planetPosts?.length > 0 && planetPosts.map(post => (
+          <PostCard key = { post.id } {...post} />
+        ))}
+      </UserContext.Provider>
+    </Layout>
+  );
+} */
+
+/*
 export function SocialGraphHomeNoSidebarIndividualPlanet (props) {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -208,85 +336,28 @@ export function SocialGraphHomeNoSidebarIndividualPlanet (props) {
 
   return (
     <Layout hideNavigation={true}>
-      <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
-        {planetPosts?.length > 0 && planetPosts.map(post => (
-          <PostCard key = { post.id } {...post} />
-        ))}
-      </UserContext.Provider>
-    </Layout>
-  );
+      <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later 
+      {planetPosts?.length > 0 && planetPosts.map(post => (
+        <PostCard key = { post.id } {...post} />
+      ))}
+    </UserContext.Provider>
+  </Layout>
+);
 }
+*/
 
-export function SocialGraphHomeNoSidebarIndividualPlanetReturn (planetId) {
+export function SocialGraphPlanet () {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);
   const [profile, setProfile] = useState(null);
   const [planetPosts, setPlanetPosts] = useState([]);
 
-  useEffect(() => {
-    fetchPostsForPlanet(planetId);
-  }, [planetId]);
-  
+  const router = useRouter();
+  const planetId = router.query.id;
 
   useEffect(() => {
-    if (!session?.user?.id) {
-      return;
-    }
-
-    supabase.from('profiles')
-      .select()
-      .eq('id', session?.user?.id)
-      .then(result => {
-        if (result.data.length) {
-          setProfile(result.data[0]);
-        }
-      })
-  }, [session?.user?.id]); // Run it again if auth/session state changes
-
-  async function fetchPostsForPlanet ( planetId ) {
-    supabase.from('posts_duplicate')
-      .select('*') //id, content, created_at, media, planets2, profiles(id, avatar_url, username)') // Reset id on testing playground server later
-      .order('created_at', { ascending: false })
-      // .eq('author', planetId)
-      //.eq('planets2', planetId)
-      .then( result => { setPlanetPosts(result.data); });
-      // console.log("horeui", planetPosts[0]?.planets2/*?.planets2)
-  }
-
-  function fetchProfile () {
-    supabase.from('profiles')
-      .select()
-      .eq('id', session.user.id)
-      .then(result => {
-        if (result.data) {
-          setProfile(result.data[0]);
-        }
-    })
-  }
-
-  if (!session) { return <Login />; };
-
-  return (
-    <Layout hideNavigation={true}>
-      <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
-        {planetPosts?.length > 0 && planetPosts.map(post => (
-          <PostCard key = { post.id } {...post} />
-        ))}
-      </UserContext.Provider>
-    </Layout>
-  );
-}
-
-export function SocialGraphHomeModal () {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-  const [posts, setPosts] = useState([]);
-  const [profile, setProfile] = useState(null);
-  const [planetPosts, setPlanetPosts] = useState([]);
-
-  useEffect(() => {
-    fetchPosts();
+    fetchPosts(planetId);
   }, [session?.user?.id]);
 
   useEffect(() => {
@@ -304,19 +375,12 @@ export function SocialGraphHomeModal () {
       })
   }, [session?.user?.id]); // Run it again if auth/session state changes
 
-  function fetchPosts () {
-    supabase.from('posts')
-      .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
-      .limit(2)
-      .order('created_at', { ascending: false })
-      .then( result => { setPosts(result.data); });
-
+  function fetchPosts (planetId) {
     supabase.from('posts_duplicate')
-      .select('id, content, created_at, media, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)') // Reset id on testing playground server later
-      .limit(2)
+      .select('id, content, created_at, media, planets2, profiles(id, avatar_url, username)') // Reset id on testing playground server later
       .order('created_at', { ascending: false })
       .then( result => { setPlanetPosts(result.data); });
-  }
+    }
 
   function fetchProfile () {
     supabase.from('profiles')
@@ -334,9 +398,9 @@ export function SocialGraphHomeModal () {
   return (
     <Layout hideNavigation={true}>
       <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
-        {/* <PostFormCard onPost={fetchPosts} /> */}
+        <PostFormCard onPost={fetchPosts} />
         {planetPosts?.length > 0 && planetPosts.map(post => (
-          <PostModal key = { post.id } {...post} />
+          <PostCard key = { post.id } {...post} planets2 = { planetId } />
         ))}
       </UserContext.Provider>
     </Layout>

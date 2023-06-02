@@ -3,7 +3,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import CoreLayout from "../components/Core/Layout";
 import UserOnboarding from "../components/onboarding";
-import { SocialGraphHomeModal, SocialGraphHomeNoSidebar } from "./posts";
+import SocialGraphHomeNoSidebar, { SocialGraphHomeModal } from "./posts";
 import Db from "./tests/db";
 import { Database } from "../utils/database.types";
 import AccountAvatar, { AccountAvatarV1, AccountAvatarV2 } from "../components/AccountAvatar";
