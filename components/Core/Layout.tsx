@@ -1,41 +1,42 @@
-import React, { ReactNode, useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import React, { ReactNode, useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { FiMenu, FiBell, FiUser, FiHome, FiCircle, FiRss, FiFileText, FiBookOpen, FiBarChart2, FiStar } from 'react-icons/fi';
-import { PostCardAvatar } from '../../AccountAvatar';
+import { PostCardAvatar } from '../AccountAvatar';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import { AvatarPostCard } from '../../PostCard';
+import { AvatarPostCard } from '../PostCard';
+// import Footer from "./Footer";
 
 interface DashboardLayoutProps {
-  children: ReactNode;
+    children: ReactNode;
 }
-
-interface SidebarItemProps {
-  icon: React.ReactNode;
-  label: string;
-  href: string;
+  
+  interface SidebarItemProps {
+    icon: React.ReactNode;
+    label: string;
+    href: string;
 }
 
 const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, href }) => {
-  const router = useRouter();
-  const isActive = router.pathname === href;
-
-  return (
-    <Link legacyBehavior href={href}>
-      <a
-        className={`flex items-center px-4 py-2 text-gray-500 hover:bg-gray-200 hover:text-gray-700 ${
-          isActive ? 'bg-green-500 text-white' : ''
-        }`}
-      >
-        {icon}
-        <span className="ml-2">{label}</span>
-      </a>
-    </Link>
-  );
+    const router = useRouter();
+    const isActive = router.pathname === href;
+  
+    return (
+      <Link legacyBehavior href={href}>
+        <a
+          className={`flex items-center px-4 py-2 text-gray-500 hover:bg-gray-200 hover:text-gray-700 ${
+            isActive ? 'bg-green-500 text-white' : ''
+          }`}
+        >
+          {icon}
+          <span className="ml-2">{label}</span>
+        </a>
+      </Link>
+    );
 };
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
-  const [isMobileView, setIsMobileView] = useState(false);
+const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
+    const [isMobileView, setIsMobileView] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false); // Closed by default on both mobile and desktop
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -156,4 +157,4 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   );
 };
 
-export default DashboardLayout;
+export default CoreLayout;

@@ -1,4 +1,4 @@
-import PlanetPage from "../Planet";
+import PlanetPage from "../planet";
 import React from "react";
 import { useRouter } from "next/router";
 
