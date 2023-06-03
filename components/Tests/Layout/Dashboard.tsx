@@ -2,10 +2,6 @@ import React, { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FiMenu, FiBell, FiUser, FiHome, FiCircle, FiRss, FiFileText, FiBookOpen, FiBarChart2, FiStar } from 'react-icons/fi';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import { AccountAvatarV1 } from '../../AccountAvatar';
-import { PostCardAvatar } from '../../AccountAvatar';
-import AccountAvatar from '../../AccountAvatar';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -20,25 +16,6 @@ interface SidebarItemProps {
 const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, href }) => {
   const router = useRouter();
   const isActive = router.pathname === href;
-
-  const session = useSession();
-  const supabase = useSupabaseClient();
-  const [profile, setProfile] = useState(null);
-  const userId = session?.user?.id;
-
-  /*useEffect(() => {
-    if (!session) { return; } else { fetchProfile(); };
-  }, [session]);*/
-
-  function fetchProfile () {
-    supabase.from('profiles')
-        .select()
-        .eq('id', userId)
-        .then(result => {
-            if (result.error) { throw result.error; };
-            if (result.data) { setProfile(result.data[0]); };
-        })
-  }
 
   return (
     <Link legacyBehavior href={href}>
@@ -56,7 +33,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, href }) => {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobileView, setIsMobileView] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobileView); // Closed by default on mobile
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Closed by default on both mobile and desktop
 
   const toggleSidebar = () => {
     setSidebarOpen((prevState) => !prevState);
@@ -79,32 +56,49 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     };
   }, []);
 
+  useEffect(() => {
+    // Disable body scrolling when the sidebar is open in desktop view
+    if (!isMobileView) {
+      document.body.style.overflow = sidebarOpen ? 'hidden' : 'initial';
+    } else {
+      document.body.style.overflow = 'initial'; // Enable scrolling on mobile view
+    }
+  }, [isMobileView, sidebarOpen]);
+
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
       {isMobileView ? (
-        <div
-          className={`fixed inset-0 bg-gray-200 w-full z-50 transition-all duration-300 ease-in-out ${
-            sidebarOpen ? '' : 'opacity-0 pointer-events-none'
-          }`}
-        >
-          <div className="p-4">
-            <ul className="space-y-4">
-              <SidebarItem icon={<FiHome size={20} />} label="Home" href="/" />
-              <SidebarItem icon={<FiStar size={20} />} label="Planets" href="/planets" />
-              <SidebarItem icon={<FiRss size={20} />} label="Feed" href="/feed" />
-              <SidebarItem icon={<FiFileText size={20} />} label="Journals" href="/journal" />
-              <SidebarItem icon={<FiBookOpen size={20} />} label="Documentation" href="/docs" />
-              <SidebarItem icon={<FiBarChart2 size={20} />} label="Changelog" href="/changelog" />
-            </ul>
+        <>
+          {sidebarOpen && (
+            <div
+              className="fixed inset-0 bg-gray-200 z-50"
+              onClick={toggleSidebar}
+            ></div>
+          )}
+          <div
+            className={`fixed inset-y-0 left-0 bg-white w-64 z-50 transform duration-300 ease-in-out overflow-y-auto ${
+              sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
+          >
+            <div className="p-4">
+              <ul className="space-y-4">
+                <SidebarItem icon={<FiHome size={20} />} label="Home" href="/tests/dashboard" />
+                <SidebarItem icon={<FiStar size={20} />} label="Planets" href="/tests/planets" />
+                <SidebarItem icon={<FiRss size={20} />} label="Feed" href="/feed" />
+                <SidebarItem icon={<FiFileText size={20} />} label="Journals" href="/journal" />
+                <SidebarItem icon={<FiBookOpen size={20} />} label="Documentation" href="/docs" />
+                <SidebarItem icon={<FiBarChart2 size={20} />} label="Changelog" href="/changelog" />
+              </ul>
+            </div>
           </div>
-        </div>
+        </>
       ) : (
-        <div className={`bg-gray-200 w-64 flex-shrink-0 ${sidebarOpen ? '' : 'hidden'}`}>
+        <div className={`bg-gray-200 w-64 ${sidebarOpen ? '' : 'hidden'}`}>
           <div className="p-4">
             <ul className="space-y-4">
-              <SidebarItem icon={<FiHome size={20} />} label="Home" href="/" />
-              <SidebarItem icon={<FiStar size={20} />} label="Planets" href="/planets" />
+              <SidebarItem icon={<FiHome size={20} />} label="Home" href="/tests/dashboard" />
+              <SidebarItem icon={<FiStar size={20} />} label="Planets" href="/tests/planets" />
               <SidebarItem icon={<FiRss size={20} />} label="Feed" href="/feed" />
               <SidebarItem icon={<FiFileText size={20} />} label="Journals" href="/journal" />
               <SidebarItem icon={<FiBookOpen size={20} />} label="Documentation" href="/docs" />
@@ -133,13 +127,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             {/* Add other header menu items */}
           </div>
           <div className="flex-grow"></div>
-          {/* <AccountAvatar uid={session?.user?.id} url={profile?.avatar_url} size={45} /> */}
-          {/* {profile && (
-            <PostCardAvatar
-                url={profile?.avatar_url}
-                size={64}
-            />
-          )} */}
           <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
         </header>
 

@@ -10,9 +10,10 @@ import { Col, Container, Row, Form } from "react-bootstrap";
 import Login from "../login";
 import PlanetGalleryCard from "../../components/Gameplay/Planets/PlanetGalleryCard";
 import Link from "next/link";
-import PlanetFormCard from "./createPlanet";
+import PlanetFormCard from "../planets/createPlanet";
 import { UserContext } from "../../context/UserContext";
 import DashboardLayout from "../../components/Tests/Layout/Dashboard";
+import PlanetList from "../../components/Gameplay/Planets/PlanetList";
 
 // type Planets = Database['public']['Tables']['planets']['Row'];
 
@@ -76,20 +77,17 @@ export default function PlanetGalleryIndex () {
     if (!session) { return <Login />; };
 
     return (
-        <GameplayLayout><center>
+        // <GameplayLayout><center>
+        <DashboardLayout><center>
             {/*<button onClick={deployImages}><h1>Deploy images</h1></button>*/}
             <div className="px-10 col-span-2">
-                <div className="width-full">{planets.map(planet => ( // TODO: Update to be carousel of cards
-                <PlanetGalleryCard key = { planet.id } {...planet}></PlanetGalleryCard>
-                ))}{/*{lightKurves.map(planet => (
-            <PlanetGalleryCard key = { planet.id } {...planet}></PlanetGalleryCard>
-                ))}*/}</div>
-                <div className="mx-10">
-                    {/*<img src="http://127.0.0.1:5000/get_image" />*/}
-                    {/*<PlanetFormCard onCreate={getPlanets} />*/}
-                </div> {/* Maybe show user's planets or metadata here... */}
+                {/* <div className="width-full">{planets.map(planet => ( // TODO: Update to be carousel of cards
+                <PlanetList key = { planet.id } { ...planet }></PlanetList>
+                ))}</div> */}
+                <PlanetList />
+                {planets.map(planet => (<PlanetGalleryCard key = {planet.id} { ...planet }></PlanetGalleryCard>))}
             </div></center>
-        {/* </DashboardLayout> */}
+        </DashboardLayout>
         // </GameplayLayout>
     )
 }

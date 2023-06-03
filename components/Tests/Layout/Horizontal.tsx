@@ -59,7 +59,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="bg-white border-b p-4 flex items-center">
+      <header className="bg-white border-b p-4 flex items-center fixed w-full z-10">
         <div className="ml-4 flex items-center space-x-4 flex-grow">
           {isMobileView && (
             <button className="p-2 rounded-lg bg-gray-200 hover:bg-gray-300 focus:outline-none" onClick={toggleMenu}>
@@ -93,6 +93,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       )}
 
       {/* Content */}
+      <br />
       <main className={`flex-grow p-4 ${isMobileView && menuOpen ? 'translate-y-16' : ''}`}>
         {children}
       </main>

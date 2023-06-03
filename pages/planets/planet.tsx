@@ -35,6 +35,10 @@ export default function PlanetPage () {
     const tab = router?.query?.tab?.[0] || 'planet'; // Planet stats & information
     const planetId = router.query.id;
 
+    useEffect(() => {
+        console.log(planetId);
+    })
+
     const supabase = useSupabaseClient();
     const session = useSession();
     const [profile, setProfile] = useState(null);
@@ -56,15 +60,6 @@ export default function PlanetPage () {
     }, [session?.user])
 
     const { contract } = useContract(planet?.contract);
-    /*const { mutateAsync: lazyMint, isLoading } = useContractWrite(contract, "lazymint");
-    const lazyMintAnomaly = async () => {
-        try {
-            const data = await lazyMint([ _amount, _baseURIForTokens, _data ]);
-            console.info('contract call success: ', data);
-        } catch (err) {
-            console.error('contract call failure: ', err);
-        }
-    }*/
     const {
         mutate: lazyMint,
         isLoading,
@@ -75,7 +70,7 @@ export default function PlanetPage () {
 
     useEffect(() => {
         if (!planetId) { return; }
-        fetchPlanet();
+        fetchPlanet(planetId);
         //FetchPlanetPosts(planetId);
         //console.log(planet?.id);
     }, [session?.user?.id]);
@@ -96,7 +91,7 @@ export default function PlanetPage () {
             })
     }, [session?.user?.id]); // Run it again if auth/session state changes
 
-    function fetchPlanet () {
+    function fetchPlanet (planetId) {
         supabase.from('planetsss')
             .select("*")
             .eq('id', planetId) // How should the ID be generated -> similar to how `userId` is generated? Combination of user + org + article + dataset number??
