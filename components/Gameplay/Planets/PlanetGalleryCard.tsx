@@ -19,7 +19,7 @@ export default function PlanetGalleryCard({ planet }: Props) {
         <Card.Img variant="top" src={cover} alt="Planet cover image" />
         <Card.Body>
           <Card.Title>{content}</Card.Title>
-          <Link legacyBehavior href={`/tests/planets/${id}`}>
+          <Link legacyBehavior href={`/tests/planets/${planet.id}`}>
             <a className="btn btn-primary">Explore</a>
           </Link>
         </Card.Body>

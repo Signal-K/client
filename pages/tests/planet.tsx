@@ -1,34 +1,50 @@
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
-export default function PlanetPage () {
+export default function PlanetPage({ id }: { id: string }) {
     const router = useRouter();
-    const planetId = router.query.id;
 
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const [planet, setPlanet] = useState(null);
+    const [planetData, setPlanetData] = useState(null);
+    const { id: planetId } = router.query; // Rename the variable to 'planetId'
 
     useEffect(() => {
-        if (!planetId) { return; };
-        fetchPlanet(planetId);
-    }, []);
+        if (planetId) { // Use 'planetId' here
+            getPlanetData();
+        }
+    }, [planetId]);
 
-    async function fetchPlanet ( planetId ) {
-        supabase.from('planetsss')
-            .select('*')
-            .eq('id', planetId)
-            .then(result => {
-                if (result.error) { throw result.error; };
-                if (result.data) { setPlanet(result.data[0]); 
+    const getPlanetData = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('planetsss')
+                .select("*")
+                .eq("id", planetId) // Use 'planetId' here
+                .single();
+
+            if (data) {
+                setPlanetData(data);
             }
-        });
+
+            if (error) {
+                throw error;
+            }
+        } catch (error: any) {
+            console.error(error.message);
+        }
+    }
+
+    if (!planetData) {
+        return <div>Loading...</div>;
     }
 
     return (
-        <p>{planet?.id}
-        Test</p>
-    )
+        <div>
+            <h1>{planetData.content}</h1>
+            {/* Display other fields from planetData */}
+        </div>
+    );
 }
