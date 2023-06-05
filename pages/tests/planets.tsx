@@ -22,7 +22,8 @@ export default function PlanetGalleryIndex() {
         .select("*")
         .order("created_at", { ascending: false })
         .limit(20)
-        .lt("id", 52); // Temporarily taking out planets that are incomplete
+        .gte("id", 45) // Temporarily taking out planets that are incomplete
+        .lt("id", 52);
 
       if (data != null) {
         setPlanets(data);

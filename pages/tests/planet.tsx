@@ -31,6 +31,10 @@ export default function PlanetPage({ id }: { id: string }) {
   const [showUnity, setShowUnity] = useState(false); // Track the visibility of Unity component
     const[loadUnityComponent, setLoadUnityComponent] = useState(false);
 
+    const planetBinned = 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/' + id + '/binned.png';
+    const planetPhased = 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/' + id + '/phase.png';
+    const planetCover = 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/' + id + '/download.png';
+
   useEffect(() => {
     if (planetId) {
       getPlanetData();
@@ -237,15 +241,34 @@ export default function PlanetPage({ id }: { id: string }) {
           )}
           {activeLink === SidebarLink.Data && (<>
             <h2 className="text-xl font-bold text-gray-800">Lightkurve graph</h2><br />
+            {/* <Card noPadding={false}>
+              <img src={cover} height='500px' width='500px' alt="Planet Cover" className="" />
+            </Card> */}
             <Card noPadding={false}>
-              <img src={cover} alt="Planet Cover" className="" />
+            {planetData?.deepnote && (
+  <div>
+    <h3 className="text-l font-bold text-gray-800">Binned data</h3>
+    <br />
+    <img src={planetBinned} alt="Planet Cover" className="" />
+    <br /><br />
+    <h3 className="text-l font-bold text-gray-800">Phase folded data</h3>
+    <br />
+    <img src={planetPhased} alt="Planet Cover" className="" />
+  </div>
+)}
+ {/* Add planetCover (download.png) */}
+ {!planetData?.deepnote && (
+    <img src={planetCover} alt="Planet Cover" className="" />
+ )}
+                <p>What does this mean?</p>
             </Card>
             <Card noPadding={false}>
-            <iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/> {/* Set this based on planet id/temperature */}
+            {/* <iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/> Set this based on planet id/temperature */}
+            <iframe title="Embedded cell output" src={planetData?.deepnote} height="650" width="100%"/>
             </Card></>
           )}
         </div>
       </div>
     </DashboardLayout>
-  );
+  ); // https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/51/download.png
 }
