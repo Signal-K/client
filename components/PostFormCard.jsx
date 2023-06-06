@@ -207,7 +207,7 @@ export function PostFormCardPlanetTag ( { onPost } ) {
                 url={avatar_url}
                 size={60} />
         </div> { profile && (
-          <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-14" placeholder={`What do you think about this planet candidate, ${profile?.username}?`} /> )}
+          <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-16 rounded-lg" placeholder={`What do you think about this planet candidate, ${profile?.username}?`} /> )}
       </div>
       {isUploading && (
         <div><ClimbingBoxLoader /></div>

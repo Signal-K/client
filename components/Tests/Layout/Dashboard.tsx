@@ -2,6 +2,9 @@ import React, { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FiMenu, FiBell, FiUser, FiHome, FiCircle, FiRss, FiFileText, FiBookOpen, FiBarChart2, FiStar } from 'react-icons/fi';
+import { PostCardAvatar } from '../../AccountAvatar';
+import { AvatarPostCard } from '../../PostCard';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -34,6 +37,9 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, href }) => {
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobileView, setIsMobileView] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false); // Closed by default on both mobile and desktop
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const [profile, setProfile] = useState(null);
 
   const toggleSidebar = () => {
     setSidebarOpen((prevState) => !prevState);
@@ -44,6 +50,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     const handleWindowResize = () => {
       setIsMobileView(window.innerWidth < 768);
     };
+    
+    supabase
+      .from("profiles")
+      .select()
+      .eq("id", session?.user?.id)
+      .then((result) => {
+        if (result.data.length) {
+          setProfile(result.data[0]);
+        }
+    });
 
     handleWindowResize(); // Set the initial view mode
 
@@ -127,7 +143,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             {/* Add other header menu items */}
           </div>
           <div className="flex-grow"></div>
-          <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+          {session && (<AvatarPostCard profiles={profile} /> )}
+          {/* <div className="w-10 h-10 bg-gray-300 rounded-full"></div> */}
         </header>
 
         {/* Page Content */}

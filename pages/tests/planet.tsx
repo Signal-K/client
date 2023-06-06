@@ -1,50 +1,251 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import DashboardLayout from "../../components/Tests/Layout/Dashboard";
+import { PlanetPostCard } from "../../components/PostCard";
+import PlanetAvatar from "../../components/Gameplay/Planets/PlanetAvatar";
+import SocialGraphHomeNoSidebar, { SocialGraphHomeModal } from "../posts";
+import { UserContext } from "../../context/UserContext";
+import { PostFormCardPlanetTag } from "../../components/PostFormCard";
+import Card from "../../components/Card";
+import UnityBuildLod1 from "../../components/Gameplay/Unity/Build/LOD-Rocky";
+
+enum SidebarLink {
+  Feed,
+  Demo,
+  Data,
+}
 
 export default function PlanetPage({ id }: { id: string }) {
-    const router = useRouter();
+  const router = useRouter();
 
-    const supabase = useSupabaseClient();
-    const session = useSession();
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-    const [planetData, setPlanetData] = useState(null);
-    const { id: planetId } = router.query; // Rename the variable to 'planetId'
+  const [planetData, setPlanetData] = useState(null);
+  const [planetPosts, setPlanetPosts] = useState([]);
+  const { id: planetId } = router.query; // Rename the variable to 'planetId'
 
-    useEffect(() => {
-        if (planetId) { // Use 'planetId' here
-            getPlanetData();
-        }
-    }, [planetId]);
+  const [profile, setProfile] = useState(null);
+  const [activeLink, setActiveLink] = useState(SidebarLink.Feed); // Track the active link
+  const [showUnity, setShowUnity] = useState(false); // Track the visibility of Unity component
+    const[loadUnityComponent, setLoadUnityComponent] = useState(false);
 
-    const getPlanetData = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('planetsss')
-                .select("*")
-                .eq("id", planetId) // Use 'planetId' here
-                .single();
+  useEffect(() => {
+    if (planetId) {
+      getPlanetData();
+      // fetchPostsForPlanet();
+    }
+  }, [planetId]);
 
-            if (data) {
-                setPlanetData(data);
-            }
-
-            if (error) {
-                throw error;
-            }
-        } catch (error: any) {
-            console.error(error.message);
-        }
+  useEffect(() => {
+    if (!session?.user?.id) {
+      return;
     }
 
-    if (!planetData) {
-        return <div>Loading...</div>;
-    }
+    supabase
+      .from("profiles")
+      .select()
+      .eq("id", session?.user?.id)
+      .then((result) => {
+        if (result.data.length) {
+          setProfile(result.data[0]);
+        }
+      });
+  }, [session?.user?.id]);
 
-    return (
-        <div>
-            <h1>{planetData.content}</h1>
-            {/* Display other fields from planetData */}
+  const getPlanetData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("planetsss")
+        .select("*")
+        .eq("id", planetId) // Use 'planetId' here
+        .single();
+
+      if (data) {
+        setPlanetData(data);
+      }
+
+      if (error) {
+        throw error;
+      }
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
+  function fetchPostsForPlanet(planetId) {
+    supabase
+      .from("posts_duplicate")
+      .select(
+        "id, content, created_at, media, profiles(id, avatar_url, username)"
+      )
+      .eq("planets2", planetId)
+      .order("created_at", { ascending: false })
+      .then((result) => {
+        setPlanetPosts(result.data);
+      });
+  }
+
+  useEffect(() => {
+    fetchPostsForPlanet(planetId);
+  }, [planetId, session?.user?.id]);
+
+  const handleSidebarLinkClick = (link: SidebarLink) => {
+    setActiveLink(link);
+    if (link === SidebarLink.Demo) {
+      setShowUnity(true);
+    } else {
+      setShowUnity(false);
+    }
+  };
+
+  if (!planetData) {
+    return <div>Loading...</div>;
+  }
+
+  const { content, avatar_url, cover } = planetData;
+
+  return (
+    <DashboardLayout>
+      <div className="flex bg-gray-25 mt-[-1.51rem]">
+        {/* Sidebar */}
+        <div className="w-1/5 bg-gray-50 overflow-hidden fixed h-full">
+          <div className="h-64 relative">
+            <img
+              src={cover}
+              alt="Planet Cover" // Note that the cover image should be cropped to a consistent size (if it isn't already)
+              className="object-cover h-full w-full"
+            />
+            <img
+              src={avatar_url}
+              alt="Planet Avatar"
+              className="absolute bottom-0 left-0 h-24 w-24 m-4 rounded-full border-4 border-white"
+            />
+          </div>
+          <div className="px-4 py-8">
+            <nav>
+              <ul className="space-y-4">
+                <li>
+                  <a
+                    href="#"
+                    className={`flex items-center space-x-2 text-gray-800 ${
+                      activeLink === SidebarLink.Feed ? "font-bold" : ""
+                    }`}
+                    onClick={() => handleSidebarLinkClick(SidebarLink.Feed)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-5 h-5"
+                    >
+                      <path d="M3 9l4-4 4 4m5 7l-4 4-4-4"></path>
+                    </svg>
+                    <span>Feed</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className={`flex items-center space-x-2 text-gray-800 ${
+                      activeLink === SidebarLink.Demo ? "font-bold" : ""
+                    }`}
+                    onClick={() => handleSidebarLinkClick(SidebarLink.Demo)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-5 h-5"
+                    >
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                      <line x1="12" y1="6" x2="12" y2="11"></line>
+                      <line x1="6" y1="16" x2="18" y2="16"></line>
+                    </svg>
+                    <span>Demo</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className={`flex items-center space-x-2 text-gray-800 ${
+                      activeLink === SidebarLink.Data ? "font-bold" : ""
+                    }`}
+                    onClick={() => handleSidebarLinkClick(SidebarLink.Data)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-5 h-5"
+                    >
+                      <rect
+                        x="3"
+                        y="3"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <line x1="3" y1="9" x2="21" y2="9"></line>
+                      <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                    <span>Data</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
-    );
+
+        {/* Content Section */}
+        <div className="w-3/4 p-8 ml-auto">
+          <center>
+            <h1 className="text-2xl font-bold text-gray-800">{content}</h1>
+          </center>
+          <br />
+          {activeLink === SidebarLink.Feed && (
+            <>
+                <h2 className="text-xl font-bold text-gray-800">Object discussion</h2><br />
+                <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={fetchPostsForPlanet(planetId)} /></UserContext.Provider><br />
+              {planetPosts?.length > 0 &&
+                planetPosts.map((post) => (
+                  <PlanetPostCard key={post.id} {...post} planets2={planetId} />
+                ))}
+            </>
+          )}
+          {activeLink === SidebarLink.Demo && (
+            <div>
+                <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br />
+              <button onClick={() => setLoadUnityComponent(true)}>View Planet</button>
+              {loadUnityComponent && <UnityBuildLod1 />}
+            </div>
+          )}
+          {activeLink === SidebarLink.Data && (<>
+            <h2 className="text-xl font-bold text-gray-800">Lightkurve graph</h2><br />
+            <Card noPadding={false}>
+              <img src={cover} alt="Planet Cover" className="" />
+            </Card>
+            <Card noPadding={false}>
+            <iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/> {/* Set this based on planet id/temperature */}
+            </Card></>
+          )}
+        </div>
+      </div>
+    </DashboardLayout>
+  );
 }
