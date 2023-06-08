@@ -220,12 +220,12 @@ export default function PlanetPage({ id }: { id: string }) {
         <div className="w-3/4 p-8 ml-auto">
           <center>
             <h1 className="text-2xl font-bold text-gray-800">{content}</h1>
+            {session?.user?.id && ( <> <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={fetchPostsForPlanet(planetId)} /></UserContext.Provider><br /> </> )}
           </center>
           <br />
           {activeLink === SidebarLink.Feed && (
             <>
                 <h2 className="text-xl font-bold text-gray-800">Object discussion</h2><br />
-                {session?.user?.id && ( <> <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={fetchPostsForPlanet(planetId)} /></UserContext.Provider><br /> </> )}
               {planetPosts?.length > 0 &&
                 planetPosts.map((post) => (
                   <PlanetPostCard key={post.id} {...post} planets2={planetId} />
