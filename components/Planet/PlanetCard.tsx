@@ -19,19 +19,6 @@ export default function PlanetContent ({ activeTab, planetId }) {
         //
     }
 
-    async function getPlanetPosts ( planetId ) {
-        const { data, error } = await supabase.from('posts_duplicate')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .eq('planets2', planetId)
-        return data;
-
-        if (error) {
-            console.error(error);
-            return [];
-        }
-    };
-
     async function getPlanetData ( planetId ) {
         const { data } = await supabase.from('planetsss')
             .select()

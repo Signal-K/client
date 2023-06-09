@@ -14,7 +14,7 @@ import Card from "../../components/Card";
 
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import AccountAvatar, { PostCardAvatar } from "../../components/AccountAvatar";
-import { GameplayLayout } from "../../components/Core/Layout";
+import CoreLayout from "../../components/Core/Layout";
 import PostCard from "../../components/PostCard";
 
 export default function PostPage () {
@@ -42,10 +42,10 @@ export default function PostPage () {
     }
 
     return (
-        <GameplayLayout>
+        <CoreLayout>
             <div className="mx-100">
                 <PostCard key = { post?.id } {...post} />
             </div>
-        </GameplayLayout>
+        </CoreLayout>
     )
 }*/

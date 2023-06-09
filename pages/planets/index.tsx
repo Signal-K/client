@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { GameplayLayout } from "../../components/Core/Layout";
+import CoreLayout from "../../components/Core/Layout";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Col, Container, Row, Form } from "react-bootstrap";
@@ -76,7 +76,7 @@ export default function PlanetGalleryIndex () {
     if (!session) { return <Login />; };
 
     return (
-        <GameplayLayout><center>
+        <CoreLayout><center>
             {/*<button onClick={deployImages}><h1>Deploy images</h1></button>*/}
             <div className="px-10 col-span-2">
                 <div className="width-full">{planets.map(planet => ( // TODO: Update to be carousel of cards
@@ -90,6 +90,6 @@ export default function PlanetGalleryIndex () {
                 </div> {/* Maybe show user's planets or metadata here... */}
             </div></center>
         {/* </DashboardLayout> */}
-        // </GameplayLayout>
+        // </CoreLayout>
     )
 }

@@ -1,18 +1,13 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import CoreLayout from "../components/Core/Layout";
-import UserOnboarding from "../components/onboarding/comments";
-import SocialGraphHomeNoSidebar, { SocialGraphHomeModal } from "./posts";
-import Db from "./tests/db";
-import { Database } from "../utils/database.types";
-import AccountAvatar, { AccountAvatarV1, AccountAvatarV2 } from "../components/AccountAvatar";
-import { url } from "inspector";
-import AccountEditor from "../components/Core/UpdateProfile";
-import DbHeader from "../components/Backend/Header";
-import Login from "./login";
-import IndexAuth from "../components/Core/indexAuth";
-import Instructions from "../components/onboarding";
+import CoreLayout from "../../components/Core/Layout";
+//import UserOnboarding from "../components/onboarding/comments";
+import { Database } from "../../utils/database.types";
+import DbHeader from "../../components/Backend/Header";
+import Login from "../login";
+import IndexAuth from "../../components/Core/indexAuth";
+import Instructions from "../../components/onboarding";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -42,7 +37,7 @@ export default function Home() {
               )}
               { session && (
                 <><IndexAuth />
-                  {/* <Instructions /> */}
+                  <Instructions />
                 </>
               )}
             </CoreLayout>

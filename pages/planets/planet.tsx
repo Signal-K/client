@@ -9,7 +9,7 @@ import { UserContext } from "../../context/UserContext";
 import PlanetCoverImage from "../../components/Gameplay/Planets/Cover";
 import PlanetAvatar from "../../components/Gameplay/Planets/PlanetAvatar";
 import PlanetTabs from "../../components/Gameplay/Planets/PlanetNavigation";
-import { GameplayLayout } from "../../components/Core/Layout";
+import CoreLayout from "../../components/Core/Layout";
 import { useContract, useContractRead, useContractWrite, useLazyMint } from "@thirdweb-dev/react";
 import Link from "next/link";
 import { PlanetCard } from "../../components/Gameplay/Planets/PlanetCard";
@@ -120,13 +120,13 @@ export default function PlanetPage () {
         }
     }
 
-    function showNftMetadataUri (planet) {
-        const { contract } = useContract(`{planet?.contract}`);
-        const { data, isLoading } = useContractRead( contract, "uri", `{planet?.tokenId}`)
-        if ( data ) {
-            setPlanetUri( data );
-        }
-    }
+    // function showNftMetadataUri (planet) {
+    //     const { contract } = useContract(`{planet?.contract}`);
+    //     const { data, isLoading } = useContractRead( contract, "uri", `{planet?.tokenId}`)
+    //     if ( data ) {
+    //         setPlanetUri( data );
+    //     }
+    // }
 
     function updatePlanetTic ( ) {
 
@@ -186,7 +186,7 @@ export default function PlanetPage () {
     const inclination = 89; // degrees
 
     return (
-        <GameplayLayout>
+        <CoreLayout>
             <Layout hideNavigation={true}> {/* Should be set to <ProfileLayout /> */}
                 <Card noPadding={true}>
                     <div className="relative overflow-hidden rounded-md mb-5">
@@ -237,6 +237,6 @@ export default function PlanetPage () {
                 {load && <> <UnityBuildLod1 /> {/*<HeavyComponent />*/} </>}
                 {/* <Card noPadding={false}><PlanetEditor /></Card> */}
             </Layout>
-        </GameplayLayout>
+        </CoreLayout>
     );
 };

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import PlanetEditor, { PlanetEditorFromData } from "../../../pages/generator/planet-editor";
-import StakePlay from "../../../pages/stake/play";
+// import StakePlay from "../../../pages/stake/play";
 import UtterancesComments from "../../Lens/Utterances";
 import { useContract, useContractRead, useContractWrite, useLazyMint } from "@thirdweb-dev/react";
 import { planetsImagesCdnAddress } from "../../../constants/cdn";
@@ -47,13 +47,13 @@ export function PlanetCard ({ activeTab, planetId }) {
         error,
     } = useLazyMint(contract);
 
-    function showNftMetadataUri (planet) {
-        const { contract } = useContract(`{planet?.contract}`);
-        const { data, isLoading } = useContractRead( contract, "uri", `{planet?.tokenId}`)
-        if ( data ) {
-            setPlanetUri( data );
-        }
-    }
+    // function showNftMetadataUri (planet) {
+    //     const { contract } = useContract(`{planet?.contract}`);
+    //     const { data, isLoading } = useContractRead( contract, "uri", `{planet?.tokenId}`)
+    //     if ( data ) {
+    //         setPlanetUri( data );
+    //     }
+    // }
 
     const updatePlayerReputation = async () => {
         let newReputation = playerReputation + 1;

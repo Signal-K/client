@@ -38,7 +38,6 @@ export default function PlanetPage({ id }: { id: string }) {
   useEffect(() => {
     if (planetId) {
       getPlanetData();
-      // fetchPostsForPlanet();
     }
   }, [planetId]);
 
@@ -92,7 +91,7 @@ export default function PlanetPage({ id }: { id: string }) {
   }
 
   useEffect(() => {
-    fetchPostsForPlanet(planetId);
+    // fetchPostsForPlanet(planetId);
   }, [planetId, session?.user?.id]);
 
   const handleSidebarLinkClick = (link: SidebarLink) => {

@@ -1,4 +1,4 @@
-import { GameplayLayout } from "../../components/Core/Layout";
+import CoreLayout from "../../components/Core/Layout";
 import { ProfileCard } from "../../components/Card";
 import { useRouter } from "next/router";
 import React, { useEffect, useState} from "react";
@@ -54,7 +54,7 @@ export default function ProfilePage () {
 
   return (
     <UserContextProvider>
-      <GameplayLayout>{/* Should be <ProfileLayout></> */}<div className="mx-100">
+      <CoreLayout>{/* Should be <ProfileLayout></> */}<div className="mx-100">
         <ProfileCard noPadding={true}>
           <div className="relative overflow-hidden rounded-md">
             <UserCoverImage url={profile?.cover} editable={true} onChange={fetchProfile()} />
@@ -82,7 +82,7 @@ export default function ProfilePage () {
           </div>
         </ProfileCard>
         <ProfileContent activeTab={tab} userId={userId} /></div>
-      </GameplayLayout>
+      </CoreLayout>
     </UserContextProvider>
   );
 }

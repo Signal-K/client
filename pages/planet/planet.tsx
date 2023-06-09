@@ -2,7 +2,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { UserContextProvider } from "../../context/UserContext";
-import { GameplayLayout } from "../../components/Core/Layout";
+import CoreLayout from "../../components/Core/Layout";
 import Layout from "../../components/Layout";
 import Card from "../../components/Card";
 import PlanetAvatar from "../../components/Gameplay/Planets/PlanetAvatar";
@@ -44,7 +44,7 @@ export default function FreshPlanetPage () {
     }
 
     return (
-        <GameplayLayout>
+        <CoreLayout>
             <Layout hideNavigation={true}>
                 <Card noPadding={true}>
                 <div className="relative overflow-hidden rounded-md mb-5">
@@ -57,6 +57,6 @@ export default function FreshPlanetPage () {
                 </div>
                 </Card>
             </Layout>
-        </GameplayLayout>
+        </CoreLayout>
     );
 }

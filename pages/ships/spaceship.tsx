@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 
 import Layout from "../../components/Layout";
 import Card from "../../components/Card";
-import { GameplayLayout } from "../../components/Core/Layout";
+import CoreLayout from "../../components/Core/Layout";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
@@ -91,7 +91,7 @@ export default function SpaceshipPage () {
     }
 
     return (
-        <GameplayLayout>
+        <CoreLayout>
             <Layout hideNavigation={true}>
                 <Card noPadding={true}>
                    <div className="relative overflow-hidden">
@@ -123,6 +123,6 @@ export default function SpaceshipPage () {
                     </div> 
                 </Card>
             </Layout>
-        </GameplayLayout>
+        </CoreLayout>
     )
 }
