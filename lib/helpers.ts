@@ -1,5 +1,9 @@
+export function useCreatePost() {
+    return "Stub"
+  }
+
 // Web3 Interaction
-import { ThirdwebSDK } from "@thirdweb-dev/sdk";
+/*import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { EIP712Domain } from "@thirdweb-dev/sdk/dist/declarations/src/evm/common/sign";
 import { ethers } from "ethers";
 import omitDeep from 'omit-deep';
@@ -23,4 +27,4 @@ export async function signTypedDataWithOmittedTypename ( sdk: ThirdwebSDK, // Pe
 
 export function splitSignature ( signature: string ) { // Split signature from user [auth] to extra v r s
     return ethers.utils.splitSignature(signature);
-}
+}*/

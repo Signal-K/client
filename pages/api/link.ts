@@ -1,4 +1,8 @@
-import { NextApiRequest, NextApiResponse } from "next";
+export function useCreatePost() {
+    return "Stub"
+  }
+
+/*import { NextApiRequest, NextApiResponse } from "next";
 import { verifyLogin } from '@thirdweb-dev/auth/evm';
 import { createSupabaseServer } from "../../lib/createSupabaseAdmin";
 
@@ -26,4 +30,4 @@ export default async ( req: NextApiRequest, res: NextApiResponse ) => {
         user_metadata: { address: address.toLowerCase() },
     });
     return res.status(200).end();
-}
+}*/

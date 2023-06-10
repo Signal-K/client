@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useAddress } from "@thirdweb-dev/react";
 import { Database } from "../../../utils/database.types";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
@@ -8,7 +7,7 @@ type Profiles = Database['public']['Tables']['profiles']['Row'];
 export default function AuthenticateWalletToDb () {
     const session = useSession();
     const supabase = useSupabaseClient();
-    const address = useAddress();
+    const address = useState()
 
     const [loading, setLoading] = useState(false);
     const [userAddress, setUserAddress] = useState();

@@ -10,7 +10,6 @@ import PlanetCoverImage from "../../components/Gameplay/Planets/Cover";
 import PlanetAvatar from "../../components/Gameplay/Planets/PlanetAvatar";
 import PlanetTabs from "../../components/Gameplay/Planets/PlanetNavigation";
 import CoreLayout from "../../components/Core/Layout";
-import { useContract, useContractRead, useContractWrite, useLazyMint } from "@thirdweb-dev/react";
 import Link from "next/link";
 import { PlanetCard } from "../../components/Gameplay/Planets/PlanetCard";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
@@ -58,13 +57,6 @@ export default function PlanetPage () {
         //const starSystem = new StarSystem(1);
         // console.log(JSON.stringify(starSystem, null, 2))
     }, [session?.user])
-
-    const { contract } = useContract(planet?.contract);
-    const {
-        mutate: lazyMint,
-        isLoading,
-        error,
-    } = useLazyMint(contract);
 
     const [loading, setLoading] = useState(false);
 
