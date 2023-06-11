@@ -7,5 +7,5 @@ export default function OnboardingSignupPage () {
         <CoreLayout>
             <Instructions />
         </CoreLayout>
-    )
-}
+    );
+};
