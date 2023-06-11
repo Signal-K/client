@@ -12,7 +12,7 @@ import { useScreenshot } from 'use-react-screenshot';
 
 import PlanetEditor from "./planet-editor";
 
-type Profiles = Database['public']['Tables']['profiles']['Row'];
+//type Profiles = Database['public']['Tables']['profiles']['Row'];
 type Planets = Database['public']['Tables']['planets']['Row']; // See `wb3-10` at this point https://github.com/Signal-K/client/blob/wb3-10-implement-off-chain-commenting-post/components/Data/OffchainAccount.tsx / https://github.com/Signal-K/client/commit/17301ae88f3f8d1aa673ac968ceef360192fa3b1 -> Clone that branch and compare the behaviour and UI to what occurs here and in planet-editor
 
 export default function OffchainAccount({ session }: { session: Session}) {
@@ -22,8 +22,10 @@ export default function OffchainAccount({ session }: { session: Session}) {
     const [username, setUsername] = useState<Profiles['username']>(null);
     const [website, setWebsite] = useState<Profiles['website']>(null); // I believe this is the email field
     const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null);
+    const [address2, setAddress2] = useState<Profiles['address2']>(null);
     const [address, setAddress] = useState<Profiles['address']>(null); // This should be set by the handler eventually (connected address).
     const [images, setImages] = useState([]);
+    const [address2, setAddress2] = useState('');
 
     // User planet
     const [userIdForPlanet, setUserIdForPlanet] = useState<Planets['userId']>(null);
@@ -37,7 +39,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
 
     useEffect(() => {
         getProfile();
-        console.log(user.id)
+        console.log(session?.user?.id)
     }, [session]);
 
     async function getProfile () {
@@ -46,12 +48,12 @@ export default function OffchainAccount({ session }: { session: Session}) {
             if (!user) throw new Error('No user authenticated');
             let { data, error, status } = await supabase
                 .from('profiles')
-                .select(`username, website, avatar_url, address`)
+                .select(`username, website, avatar_url, address, address2`)
                 .eq('id', user.id)
                 .single()
 
             if (error && status !== 406) {
-                throw error;
+                throw error; 
             }
 
             if (data) {
@@ -59,6 +61,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 setWebsite(data.website);
                 setAvatarUrl(data.avatar_url);
                 setAddress(data.address);
+                setAddress2(data.address2);
             }
         } catch (error) {
             //alert('Error loading your user data');
@@ -74,21 +77,22 @@ export default function OffchainAccount({ session }: { session: Session}) {
         avatar_url,
         address,
     } : {
-        username: Profiles['username']
-        website: Profiles['website']
-        avatar_url: Profiles['avatar_url']
-        address: Profiles['address']
+        username: string //Profiles['username']
+        website: string //Profiles['website']
+        avatar_url: string //Profiles['avatar_url']
+        address: string //Profiles['address']
     }) {
         try {
             setLoading(true);
             if (!user) throw new Error('No user authenticated!');
             const updates = {
                 id: user.id,
+                updated_at: new Date().toISOString(),
                 username,
                 website,
                 avatar_url,
                 address,
-                updated_at: new Date().toISOString(),
+                address2,
             }
             let { error } = await supabase.from('profiles').upsert(updates);
             if (error) throw error;
@@ -243,7 +247,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 url={avatar_url}
                 size={150}
                 onUpload={(url) => {
-                    setAvatarUrl(url)
+                    setAvatarUrl(url) 
                     updateProfile({ username, website, avatar_url: url, address})
                 }}
             />

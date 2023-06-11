@@ -23,7 +23,7 @@ export default function PlanetEditor () {
 	const getImage = () => takeScreenShot();
 
 	return (
-		<SubPage header='Planet Editor'>
+		<SubPage header=''> {/* Was "Planet Editor" */}
 			<br />
 			<Row style={{ height: '' }}>
 				<Col lg={6} xs={12} className="display">

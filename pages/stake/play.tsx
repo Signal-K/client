@@ -46,10 +46,10 @@ export default function StakePlay () {
                     <>
                         <h2 className={`${styles.noGapTop} ${styles.noGapBottom}`}>Your multitools</h2>
                         <div className={styles.shop}>
-                            <OwnedGear
+                            {/*<OwnedGear
                                 multitoolContract={multitoolContract}
                                 helperContract={helperContract}
-                            />
+                            />*/}
                         </div>
                     </>
                 ) : (

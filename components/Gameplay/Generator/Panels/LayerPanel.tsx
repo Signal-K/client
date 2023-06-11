@@ -95,7 +95,7 @@ export default function LayerPanel({ planetState }: { planetState: PlanetEditorS
         return function () {
             planetState.layers.push({
                 id: guid(),
-                name: '',
+                name: 'Test',
                 enabled: true,
                 maskType: planetState.layers.current.length === 0 ? MaskTypes.None : MaskTypes.FirstLayer,
                 noiseSettings: type === 'Continents' ? createContintentNoise() : createMountainNoise()
