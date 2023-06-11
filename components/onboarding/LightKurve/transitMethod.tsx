@@ -1,7 +1,16 @@
 import Link from 'next/link';
 import React from 'react';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import Login from '../../../pages/login';
 
 const Instructions: React.FC = () => {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  if (!session) {
+    return <Login />
+  }
+
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 font-sans">
       <div className="mb-8">
@@ -23,13 +32,13 @@ const Instructions: React.FC = () => {
           An investigation into the data collected by space observatories like the Kepler Space Telescope & TESS project. These telescopes observe stars in our local neighbourhood to discover evidence of exoplanets orbiting those stars. There are a number of ways that scientists observe stars to find planets, including radial velocity and microlensing, however these telescopes use the transit method.
         </p>
         <div className="my-8">
-        <img src="https://file.notion.so/f/s/2fc56936-935f-4149-89c4-0a77c26bb003/Untitled.png?id=ccb438a2-d95a-40db-b0de-9ff9934c4969&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1688104800000&signature=QnILxudP6wVs_KIt8fAhh49KZNiBdWIbIHXFp3D8bTI&downloadName=Untitled.png" alt="Transit Method" className="w-full" />
+        <img src="https://file.notion.so/f/s/2fc56936-935f-4149-89c4-0a77c26bb003/Untitled.png?id=ccb438a2-d95a-40db-b0de-9ff9934c4969&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1688522400000&signature=luOobzS3HUI8rzC57hVuJGqpoJ7AX_VLPHTC2dyGAa8&downloadName=Untitled.png" alt="Transit Method" className="w-full" />
         </div>
         <p className="text-gray-700">
           Using the transit method to find exoplanets reveals a lot of information about the planet itself - the size of the dip in light is related to the fraction of light that is being blocked out by a planet - for a given star, a larger planet means the dip is larger, and a smaller planet results in a smaller dip.
         </p>
         <div className="my-8">
-        <img src="https://file.notion.so/f/s/93246fc4-b0db-46a7-b488-37a82c7e53d1/Untitled.png?id=f02de9d7-b9a6-41e9-8adc-54b773d5295b&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1688104800000&signature=0pxfyuWzoTSrZ0Fcggay1xvDhieon_3npbbrJlHfp9g&downloadName=Untitled.png" alt="Size Estimation" className="w-full" />
+        <img src="https://file.notion.so/f/s/93246fc4-b0db-46a7-b488-37a82c7e53d1/Untitled.png?id=f02de9d7-b9a6-41e9-8adc-54b773d5295b&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1688522400000&signature=ZzYUMEzpkLyT3ImAuFjiBNrdmurBLc8gXSp6GaUjx1w&downloadName=Untitled.png" alt="Size Estimation" className="w-full" />
         </div>
         <p className="text-gray-700">
           Space-based satellites such as <a href="https://solarsystem.nasa.gov/missions/gaia/in-depth/" className="text-accent underline">Gaia</a> can tell us the size of stars that TESS looks at, meaning that when a transit event is found, its depth can be used to estimate the size of the planet.
