@@ -15,6 +15,8 @@ export default function ProfilePage () {
   const tab = router?.query?.tab?.[0] || 'posts';
   const userId = router.query.id;
 
+  const [username, setUsername] = useState('');
+
   const supabase = useSupabaseClient();
 
   // Toggle different profile actions (like changing picture) IF profile being viewed is the logged in user's picture
@@ -37,6 +39,19 @@ export default function ProfilePage () {
     )
   }
 
+  function updateProfile () {
+    supabase.from('profiles')
+      .update({
+        username,
+      })
+      .eq('id', session?.user?.id)
+      .then(result => {
+        if (!result.error) {
+          setProfile(prev => ({ ...prev, username, }));
+        }
+      })
+  }
+
   return (
     <UserContextProvider>
       <GameplayLayout>{/* Should be <ProfileLayout></> */}<div className="mx-100">
@@ -46,7 +61,12 @@ export default function ProfilePage () {
             <div className="absolute top-40 mt-12 left-4 w-full z-20">
               {profile && (<PostCardAvatar // Add upload handler from AccountAvatarV1
                   url={profile?.avatar_url}
-                  size={120} /> )}
+                  size={120} 
+                  /*uid={session?.user?.id} 
+                  onUpload={
+                    updateProfile({ username, website, avatar_url: url, address})
+                  }*//> 
+                  )}
             </div>
             <div className="p-4 pt-0 md:pt-4 pb-0">
               <div className="ml-24 md:ml-40 mt-1">

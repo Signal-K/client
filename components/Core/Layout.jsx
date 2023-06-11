@@ -6,7 +6,7 @@ import Footer from "./Footer";
 
 export default function CoreLayout ( { children } ) {
     // Handling responsive UI
-    const [showNav, setShowNav] = useState(true);
+    const [showNav, setShowNav] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
     function handleResize () {
@@ -57,7 +57,7 @@ export default function CoreLayout ( { children } ) {
 
 export function GameplayLayout ( { children } ) {
     // Handling responsive UI
-    const [showNav, setShowNav] = useState(true);
+    const [showNav, setShowNav] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
     function handleResize () {
@@ -102,7 +102,7 @@ export function GameplayLayout ( { children } ) {
             >
                 <div className="px-4 md:px-16">{children}</div>
             </main>
-            <Footer />
+            {/* <Footer /> */}
         </>
     );
 };

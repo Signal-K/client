@@ -1,6 +1,6 @@
 import React from "react";
 import CoreLayout from "../components/Core/Layout";
-import { SocialGraphHomeNoSidebar } from "./posts";
+import SocialGraphHomeNoSidebar from "./posts";
 
 import { useSession } from "@supabase/auth-helpers-react";
 

@@ -61,7 +61,7 @@ export function usePlanetEditorState(planet: Planet): PlanetEditorState {
 
 	const layers = useStateArray<PlanetLayer>([{
 		id: guid(),
-		name: '',
+		name: 'Test',
 		enabled: true,
 		maskType: MaskTypes.None,
 		noiseSettings: createContintentNoise()
