@@ -44,7 +44,7 @@ export default function PostFormCard ( { onPost } ) {
       .then(result => {
         setAvatarUrl(result.data[0].avatar_url); //console.log(result.data[0].avatar_url)
       })
-  }, session);
+  }, [session]);
 
   async function addMedia ( e ) {
     const files = e.target.files;
@@ -173,7 +173,7 @@ export function PostFormCardPlanetTag ( { onPost } ) {
       .then(result => {
         setAvatarUrl(result?.data[0]?.avatar_url); //console.log(result.data[0].avatar_url)
       })
-  }, session);
+  }, [session]);
 
   async function addMedia ( e ) {
     const files = e.target.files;

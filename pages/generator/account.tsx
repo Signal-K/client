@@ -39,11 +39,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
 
     useEffect(() => {
         getProfile();
-<<<<<<< HEAD
         console.log(session?.user?.id)
-=======
-        //console.log(user.id)
->>>>>>> main
     }, [session]);
 
     async function getProfile () {
@@ -97,7 +93,6 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 avatar_url,
                 address,
                 address2,
-                updated_at: new Date().toISOString()
             }
             let { error } = await supabase.from('profiles').upsert(updates);
             if (error) throw error;

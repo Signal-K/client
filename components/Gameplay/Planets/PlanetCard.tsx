@@ -81,7 +81,8 @@ export function PlanetCard ({ activeTab, planetId }) {
                     { owner: session?.user?.id, /*userId: username*/ }
                 ])
                 .eq('id', planetId);
-                updatePlayerReputation(); // Do this for posts, journals as well
+                console.log(planet?.owner)
+                // updatePlayerReputation(); // Do this for posts, journals as well
             
                 if (error) throw error;
         } catch (error: any) {
