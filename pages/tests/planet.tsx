@@ -81,7 +81,7 @@ export default function PlanetPage({ id }: { id: string }) {
 
   function fetchPostsForPlanet(planetId) {
     supabase
-      .from("posts_duplicate_2")
+      .from("posts_duplicate")
       .select(
         "id, content, created_at, media, profiles(id, avatar_url, username)"
       )

@@ -1,22 +1,11 @@
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import React from 'react';
-import Login from '../../pages/login';
 
 const Instructions: React.FC = () => {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-
-  if (!session) {
-    return (
-      <Login />
-    )
-  }
-
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 font-sans">
       <div className="mb-8">
         <h2 className="text-3xl font-bold mb-4 text-primary">
-          Welcome to the Star Sailors training program!
+          The first study we’re taking part in is the Planet Hunters project
         </h2>
         <p className="text-gray-700">
           An investigation into the data collected by space observatories like the Kepler Space Telescope & TESS project. These telescopes observe stars in our local neighbourhood to discover evidence of exoplanets orbiting those stars. There are a number of ways that scientists observe stars to find planets, including radial velocity and microlensing, however these telescopes use the transit method.
