@@ -10,7 +10,6 @@ import AccountAvatar, { AccountAvatarV1, AccountAvatarV2 } from "../components/A
 import { url } from "inspector";
 import AccountEditor from "../components/Core/UpdateProfile";
 import DbHeader from "../components/Backend/Header";
-import Login from "./login";
 import IndexAuth from "../components/Core/indexAuth";
 import Instructions from "../components/onboarding";
 
@@ -36,16 +35,9 @@ export default function Home() {
 
     return (
         <>
-            <CoreLayout>
-              { !session && (
-                <Login />                
-              )}
-              { session && (
-                <><IndexAuth />
-                  {/* <Instructions /> */}
-                </>
-              )}
-            </CoreLayout>
+          <CoreLayout>
+            <IndexAuth />
+          </CoreLayout>
         </>
     )
 }
