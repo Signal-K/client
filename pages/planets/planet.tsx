@@ -16,8 +16,8 @@ import { PlanetCard } from "../../components/Gameplay/Planets/PlanetCard";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import { planetsImagesCdnAddress } from "../../constants/cdn";
 import PostCard, { PlanetPostCard } from "../../components/PostCard";
-import SocialGraphHomeNoSidebar from "../posts";
-import UnityBuildLod1 from "../../components/Gameplay/Planets/Unity/lod1/Build";
+// import { SocialGraphHomeNoSidebarIndividualPlanet, SocialGraphHomeNoSidebarIndividualPlanetReturn } from "../posts";
+import UnityBuildLod1 from "../../components/Gameplay/Unity/Build/LOD-Rocky";
 // import PlanetEditor from "../generator/planet-editor";
 
 const HeavyComponent = lazy(() => import ('../generator/planet-editor'));
@@ -52,8 +52,7 @@ export default function PlanetPage () {
 
     useEffect(() => {
         //const starSystem = new StarSystem(1);
-        // console.log(JSON.stringify(starSystem, null, 2));
-        console.log(planet?.owner);
+        // console.log(JSON.stringify(starSystem, null, 2))
     }, [session?.user])
 
     const { contract } = useContract(planet?.contract);
@@ -103,7 +102,7 @@ export default function PlanetPage () {
             .eq('id', planetId) // How should the ID be generated -> similar to how `userId` is generated? Combination of user + org + article + dataset number??
             .then(result => {
                 if (result.error) { throw result.error; };
-                if (result.data) { setPlanet(result.data[0]); /*console.log(planet);*/ setPlanetOwner(planet?.owner); };
+                if (result.data) { setPlanet(result.data[0]); /*console.log(planet);*/ setPlanetOwner(planet?.ownerId); };
             }
         );
     }
@@ -229,22 +228,19 @@ export default function PlanetPage () {
 
                 <center><h2 className="display-6">{planet?.content} Discussion</h2></center><br />
                 {planetPosts?.length > 0 && planetPosts.map(post => (
-                    // <PlanetPostCard key = { post.id } {...post} planets2 = { planetId } />
-                    <SocialGraphHomeNoSidebar key = { post.id } {...post} planets2 = {planetId} />
+                    <PlanetPostCard key = { post.id } {...post} planets2 = { planetId } />
                 ))} <br />
 
-                {planetOwner == session?.user?.id && (
-                    <><center><h2 className="display-6">Paint your planet</h2></center><br />
-                    <center><button
-                        onClick = {() => {
-                            startTransition(() => {
-                                setLoad(true);
-                            });
-                        }}
-                    >Load planet editor</button></center>
-                    {load && <> <HeavyComponent /> <UnityBuildLod1 /> </>}
-                    {/* <Card noPadding={false}><PlanetEditor /></Card> */}</>
-                )}
+                <center><h2 className="display-6">Paint your planet</h2></center><br />
+                <center><button
+                    onClick = {() => {
+                        startTransition(() => {
+                            setLoad(true);
+                        });
+                    }}
+                >Load planet editor</button></center>
+                {load && <> <UnityBuildLod1 /> {/*<HeavyComponent />*/} </>}
+                {/* <Card noPadding={false}><PlanetEditor /></Card> */}
             </Layout>
         </GameplayLayout>
     );
