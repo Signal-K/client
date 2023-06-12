@@ -1,10 +1,15 @@
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import React from 'react';
 import Login from '../../pages/login';
+import { useDarkMode } from '../Globals/DarkModeToggle';
 
 const Instructions: React.FC = () => {
+  // User prefs
   const supabase = useSupabaseClient();
   const session = useSession();
+
+  // Styling hooks
+  const [isDarkMode, toggleDarkMode] = useDarkMode();
 
   if (!session) {
     return (
@@ -18,12 +23,12 @@ const Instructions: React.FC = () => {
         <h2 className="text-3xl font-bold mb-4 text-primary">
           Welcome to the Star Sailors training program!
         </h2>
+        {/* <button onClick={toggleDarkMode}>
+          {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+        </button> */}
         <p className="text-gray-700">
-          An investigation into the data collected by space observatories like the Kepler Space Telescope & TESS project. These telescopes observe stars in our local neighbourhood to discover evidence of exoplanets orbiting those stars. There are a number of ways that scientists observe stars to find planets, including radial velocity and microlensing, however these telescopes use the transit method.
+          There's a number of exciting research projects you're going to be able to contribute to!
         </p>
-        <div className="my-8">
-        <img src="https://file.notion.so/f/s/2fc56936-935f-4149-89c4-0a77c26bb003/Untitled.png?id=ccb438a2-d95a-40db-b0de-9ff9934c4969&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1688104800000&signature=QnILxudP6wVs_KIt8fAhh49KZNiBdWIbIHXFp3D8bTI&downloadName=Untitled.png" alt="Transit Method" className="w-full" />
-        </div>
         <p className="text-gray-700">
           Using the transit method to find exoplanets reveals a lot of information about the planet itself - the size of the dip in light is related to the fraction of light that is being blocked out by a planet - for a given star, a larger planet means the dip is larger, and a smaller planet results in a smaller dip.
         </p>
@@ -50,6 +55,7 @@ const Instructions: React.FC = () => {
           There are several citizen science projects that focus on the discovery, analysis, and follow-up of exoplanets - planets outside our Solar System. The Planet Hunters TESS Coffee Chat team works in collaboration with these projects, in particular, <a href="https://www.zooniverse.org/projects/nora-dot-eisner/planet-hunters-tess" className="text-accent underline">Planet Hunters Transiting Exoplanet Survey Satellite</a> or TESS.
         </p>
       </div>
+      
     </div>
   );
 };
