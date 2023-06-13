@@ -1,7 +1,6 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import InfoFAQ from "../../components/Info/faq";
 import { SocialGraphHomeModal } from "../posts";
-import Login from "../login";
 import Link from "next/link";
 
 export default function Db () {
@@ -10,10 +9,6 @@ export default function Db () {
 
   return (
     <div className='container' style={{ padding: '50px 0 100px 0' }}>
-    {!session ? (
-      <></>
-    ): (
-      <>
       <section>
         <div className="px-4 mx-auto max-w-7xl sm:px-6 md:px-12 lg:px-24">
           <div className="flex flex-col w-full mb-12 text-center">
@@ -196,8 +191,7 @@ export default function Db () {
         </div>
       </div>
     </footer>
-  </>
-    )}</div>
+</div>
   )
 }
 

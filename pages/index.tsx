@@ -2,17 +2,11 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import CoreLayout from "../components/Core/Layout";
-import UserOnboarding from "../components/onboarding/comments";
 import SocialGraphHomeNoSidebar, { SocialGraphHomeModal } from "./posts";
-import Db from "./tests/db";
 import { Database } from "../utils/database.types";
 import AccountAvatar, { AccountAvatarV1, AccountAvatarV2 } from "../components/AccountAvatar";
-import { url } from "inspector";
-import AccountEditor from "../components/Core/UpdateProfile";
-import DbHeader from "../components/Backend/Header";
 import Login from "./login";
 import IndexAuth from "../components/Core/indexAuth";
-import Instructions from "../components/onboarding";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -35,14 +29,8 @@ export default function Home() {
     const [username, setUsername] = useState<Profiles['username']>(null);
 
     return (
-        <>
             <CoreLayout>
-              { !session && (
-                <Login />                
-              )}
-              { session && (
-                <><IndexAuth />
-                  <>
+              <IndexAuth />
                   <section>
         <div className="px-4 mx-auto max-w-7xl sm:px-6 md:px-12 lg:px-24">
           <div className="flex flex-col w-full mb-12 text-center">
@@ -173,10 +161,6 @@ export default function Home() {
         </div>
       </div>
     </footer>
-                  </>
-                </>
-              )}
             </CoreLayout>
-        </>
     )
 }
