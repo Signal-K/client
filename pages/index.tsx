@@ -22,11 +22,7 @@ import Navigation, {
 import { GardenDashboard } from "../components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
 import UponSignupModal from "../components/Modals/UponSignup";
-import { MinimalAccordion, OnboardingWindows } from "../components/Gameplay/onboarding";
-import PlanetCharacter, { RoverCharacter } from "../components/Content/Assets/PlanetCharacter";
-import { Garden } from "../components/Content/Planets/GalleryList";
-import Link from "next/link";
-import { AllSectors } from "../components/Content/Planets/Sectors/SectorSetup";
+import PlanetCharacter from "../components/Content/Assets/PlanetCharacter";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -42,118 +38,137 @@ export function PublicLanding() {
     />
   );
 
-  // User data config
   const session = useSession();
-  const supabase = useSupabaseClient();
-  const [profile, setProfile] = useState<any>(null);
-  useEffect(() => {
-    supabase.from("profiles")
-      .select()
-      .eq("id", session?.user?.id)
-      .then((result) => {
-        if (result.data) {
-          setProfile(result.data[0]);
-        };
-      });
-  }, [session, supabase]);
-  useEffect(() => {
-    if (profile) {
-      console.log(profile.location ?? "Location not available");
-    };
-  }, [profile]);
 
-  // Screen size parameters
+  // Component context
+  const [showFeedOverlay, setShowFeedOverlay] = useState(false);
+  const handleOpenFeedOverlay = () => {
+    setShowFeedOverlay(true);
+  };
+
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' });
 
-  // Character queries
-  const [characterPosition, setCharacterPosition] = useState<{ rover: { x: number; y: number }; planet: { x: number; y: number } }>(() => {
-    // Initial position for the characters
-    return { rover: { x: 0, y: 0 }, planet: { x: 0, y: 0 } };
-  });
+  if (session) {
+    return (
+      <LayoutNoNav>
+         <Navigation />
+         <div className="flex-col justify-center mt-10">
+           <style jsx global>
+             {`
+               body {
+                 background: url('garden.png') center/cover;
+               }
+               
+               @media only screen and (max-width: 767px) {
+                 .planet-heading {
+                   color: white;
+                   font-size: 24px;
+                   text-align: center;
+                   margin-bottom: 10px;
+                 }
+               }
+             `}
+           </style>
+           <style jsx global>
+{`
+ .chat {
+    margin-top: 40px; /* Adjust this value to move the chat bubbles down */
+ }
 
-  useEffect(() => {
-    // Calculate initial position for the characters after component mount
-    const calculatePosition = () => {
-      const minX = -window.innerWidth / 2 + 100; // Adjust 100 to your desired margin
-      const maxX = window.innerWidth / 2 - 100; // Adjust 100 to your desired margin
-      const minY = -window.innerHeight / 2 + 100; // Adjust 100 to your desired margin
-      const maxY = window.innerHeight / 2 - 100; // Adjust 100 to your desired margin
+ .chat-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* This centers the chat bubbles horizontally */
+    justify-content: center; /* This centers the chat bubbles vertically */
+ }
 
-      const randomX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
-      const randomY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+ /* Additional styles for responsiveness or other adjustments */
+ @media only screen and (max-width: 767px) {
+    .chat {
+      margin-top: 20px; /* Adjust for smaller screens if necessary */
+    }
+ }
+`}
+</style>
 
-      setCharacterPosition({
-        rover: { x: randomX, y: randomY },
-        planet: { x: randomX, y: randomY }, // You can adjust this to have different positions for rover and planet
-      });
-    };
-
-    calculatePosition();
-
-    // Recalculate position when window size changes
-    const handleResize = () => {
-      calculatePosition();
-    };
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup event listener on unmount
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  const [showGalaxy, setShowGalaxy] = useState(true);
-
-
-  // if (session && !profile?.location) {
-  //   return (
-  //     <p>Location</p>
-  //   );
-  // };
-
-  // if (session?.user?.id === 'cebdc7a2-d8af-45b3-b37f-80f328ff54d6' && isTabletOrMobile) {
-  //   return (
-  //     <LayoutNoNav>
-  //       <Navigation />
-  //       <iframe src="https://deta.space/?horizon=sj38ZfjmeF" height='2532px' width='100%' />
-  //     </LayoutNoNav>
-  //   );
-  // };
-
-  // if (session && profile?.location) {
-    if (session) {
-      return (
-        <LayoutNoNav>
-          {isDesktopOrLaptop && ( <Navigation /> )}
-          <div className="flex-col justify-center mt-10">
-            <div className="image-container mx-3 absolute top-0 left-1/2 transform -translate-x-1/2 mt-10 mb-10">
-              {/* <div className="flex justify-center items-center flex-row mt-20">
-                {isDesktopOrLaptop && (
-                  <>
-                    <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png" alt="Planet 1" className="responsive-image h-12 w-12 mx-10" />
-                    <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/Group%201000002854.png" alt="Planet 2" className="responsive-image h-12 w-12" />
-                  </>
-                )}
-                {isTabletOrMobile && (
-                  <>
-                    <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png" alt="Planet 1" className="responsive-image h-12 w-12 mx-10" />
-                    <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/Group%201000002854.png" alt="Planet 2" className="responsive-image h-12 w-12" />
-                  </>
-                )}
-              </div> */}
-            </div>
-            {isDesktopOrLaptop && (<OnboardingWindows />)}
-            </div>
-            <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 mb-20">
-        <div className="flex justify-center mb-20">
-          <PlanetCharacter position={characterPosition.planet} />
-          <RoverCharacter position={characterPosition.rover} />
-          <AllSectors />
-        </div>
-      </div>
-        </LayoutNoNav>
-      );      
+           <div className="image-container mx-3 absolute top-0 left-1/2 transform -translate-x-1/2 mt-10 mb-10">
+             <div className="flex justify-center items-center flex-row mt-20">
+               {isDesktopOrLaptop && (
+                 <>
+                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png" alt="Planet 1" className="responsive-image h-12 w-12 mx-10" />
+                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/Group%201000002854.png" alt="Planet 2" className="responsive-image h-12 w-12" />
+                 </>
+               )}
+               {isTabletOrMobile && (
+                 <>
+                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png" alt="Planet 1" className="responsive-image h-12 w-12 mx-10" />
+                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/Group%201000002854.png" alt="Planet 2" className="responsive-image h-12 w-12" />
+                 </>
+               )}
+             </div>
+           </div>
+           <div className="chat-container">
+           <div className="mx-20 mt-20">
+           <div className="chat chat-start mt-20 justify-left mt-20">
+  <div className="chat-bubble">You need to pick a planet!</div>
+</div>
+<div className="chat chat-end">
+  <div className="chat-bubble">You've got 5 new deposits to explore</div>
+</div>
+<div className="chat chat-start">
+  <div className="chat-bubble">A dust storm is brewing on your home planet, time to investigate.</div>
+</div>
+<PlanetCharacter /></div>
+{isDesktopOrLaptop && ( <UponSignupModal /> )}
+           </div>
+           <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
+             {/* Content here */}
+           </div>
+           <div className="mt-20">
+             {showFeedOverlay && (
+               <>
+                 <div className="mt-20">
+                   <FeedOverlay onClose={() => setShowFeedOverlay(false)} />
+                 </div>
+               </>
+             )}
+           </div>
+         </div>
+         {/* Menu Button */}
+         {!showFeedOverlay && (
+           <button
+             onClick={handleOpenFeedOverlay}
+             className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-2 text-white rounded"
+           >
+             <a
+               href="#_"
+               className="inline-flex overflow-hidden text-white bg-gray-900 rounded group"
+             >
+               <span className="px-3.5 py-2 text-white bg-purple-500 group-hover:bg-purple-600 flex items-center justify-center">
+                 <svg
+                   className="w-5 h-5"
+                   fill="none"
+                   stroke="currentColor"
+                   viewBox="0 0 24 24"
+                   xmlns="http://www.w3.org/2000/svg"
+                 >
+                   <path
+                     strokeLinecap="round"
+                     strokeLinejoin="round"
+                     strokeWidth="2"
+                     d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                   ></path>
+                 </svg>
+               </span>
+               <span className="pl-4 pr-5 py-2.5">Menu</span>
+             </a>
+           </button>
+         )}
+      </LayoutNoNav>
+     );
+     
+     
   };
 
   return (
@@ -301,11 +316,11 @@ export function PublicLanding() {
                   <span className="italic">Star Sailors</span>
                 </h1>
                 <p className="mt-6 mx-auto max-w-2xl text-lg leading-8 text-gray-600 dark:text-white">
-                  Star Sailors V2 is currently under development, please go to v1
+                  One-liner about Star Sailors
                 </p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
                   <a
-                    href="https://starprotocol-og3j6xuus-gizmotronn.vercel.app"
+                    href="/login"
                     className="rounded-md px-3.5 py-2.5 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-200 hover:ring-2 hover:ring-yellow-300 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-white"
                   >
                     Get Started <span aria-hidden="true">→</span>
@@ -314,13 +329,13 @@ export function PublicLanding() {
               </div>
               <div className="mt-14 flow-root sm:mt-14 ">
                 <div className="-m-2 rounded-xl  lg:-m-4 lg:rounded-2xl lg:p-4">
-                  <Link href="/login"><img
+                  <img
                     src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/garden.png"
                     alt="App screenshot"
                     width={2432}
                     height={1442}
                     className="rounded-md shadow-2xl ring-1 ring-gray-900/10"
-                  /></Link>
+                  />
                 </div>
               </div>
             </div>
@@ -566,4 +581,4 @@ export default function Home() {
   const userId = session?.user?.id;
 
   return <PublicLanding />;
-};
+}

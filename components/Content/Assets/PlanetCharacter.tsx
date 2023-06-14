@@ -1,63 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 
-export const RoverCharacter: React.FC<{ position: { x: number; y: number } }> = ({ position }) => {
-  const [angle, setAngle] = useState<number>(0);
-  const [direction, setDirection] = useState<number>(1);
-
-  useEffect(() => {
-    const interval = setInterval(updateAnimation, 50);
-    return () => clearInterval(interval);
-  }, []);
-
-  const updateAnimation = () => {
-    const newAngle = angle + 1 * direction;
-    if (newAngle >= 10 || newAngle <= -10) {
-      setDirection(direction * -1);
-    }
-    setAngle(newAngle);
-  };
-
-  return (
-    <div className="absolute" style={{ left: `${position.x}px`, bottom: `${position.y}px` }}>
-      <Image
-        src="/assets/Inventory/Planets/rover.png"
-        alt="Character"
-        layout="fill"
-        objectFit="contain"
-        className="transform transition-transform duration-500"
-        style={{ transform: `rotate(${angle}deg)` }}
-      />
-    </div>
-  );
-};
-
-export const PlanetCharacter: React.FC<{ position: { x: number; y: number } }> = ({ position }) => {
-  const [angle, setAngle] = useState<number>(0);
-  const [direction, setDirection] = useState<number>(1);
-
-  useEffect(() => {
-    const interval = setInterval(updateAnimation, 50);
-    return () => clearInterval(interval);
-  }, []);
-
-  const updateAnimation = () => {
-    const newAngle = angle + 1 * direction;
-    if (newAngle >= 10 || newAngle <= -10) {
-      setDirection(direction * -1);
-    }
-    setAngle(newAngle);
-  };
+const PlanetCharacter: React.FC = () => {
+    const [angle, setAngle] = useState<number>(0);
+    // State to store animation direction (1 for right, -1 for left)
+    const [direction, setDirection] = useState<number>(1);
+  
+    // Function to update animation angle and direction
+    const updateAnimation = () => {
+      // Increment angle based on direction
+      const newAngle = angle + 1 * direction;
+      // Change direction when angle reaches certain limits
+      if (newAngle >= 10 || newAngle <= -10) {
+        setDirection(direction * -1);
+      }
+      // Update angle
+      setAngle(newAngle);
+    };
+  
+    // Update animation angle every 50 milliseconds
+    useEffect(() => {
+      const interval = setInterval(updateAnimation, 50);
+      return () => clearInterval(interval); // Cleanup interval on unmount
+    }, [angle, direction]);
 
   return (
-    <div className="absolute" style={{ left: `${position.x}px`, bottom: `${position.y}px` }}>
+    <div className="relative w-64 h-64">
       <Image
-        src="/assets/Inventory/Planets/Mars.png"
+        src="/assets/Inventory/Planets/Mars caricature.png" // Replace with the path to your character image
         alt="Character"
-        layout="fill"
-        objectFit="contain"
+        width={256}
+        height={256}
         className="transform transition-transform duration-500"
-        style={{ transform: `rotate(${angle}deg)` }}
+        style={{ transform: `rotate(${angle}deg)` }} // Apply rotation based on angle
       />
     </div>
   );
