@@ -3,7 +3,7 @@ import React from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import Login from '../../../pages/login';
 
-const Instructions: React.FC = () => {
+const IntroToLightkurve: React.FC = () => {
   const supabase = useSupabaseClient();
   const session = useSession();
 
@@ -19,15 +19,17 @@ const Instructions: React.FC = () => {
   <Link href="/tests/onboarding/">
     <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Back</button>
   </Link>
-  <Link href="/tests/planets/"> {/* Add a component/test that the user has to pass before getting to view the next step. How do we make this persistent though? Maybe just have this for milestones, provided they've updated their basic profile information */}
+  <Link href="/tests/onboarding/planetHunters/2"> {/* Add a component/test that the user has to pass before getting to view the next step. How do we make this persistent though? Maybe just have this for milestones, provided they've updated their basic profile information */}
     <div className="float-right">
       <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Next</button>
     </div>
   </Link>
 </div><br />
         <h2 className="text-3xl font-bold mb-4 text-primary">
-          The first study we’re taking part in is the Planet Hunters project
+          How do we look at the data from these telescopes?
         </h2>
+        {/* <iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/631fb065957043e38cfe0db4261051c6/f7d1222c160444109b4afa48c74c46cb?height=736" height="736" width="500"/> */}
+        <center><iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/631fb065957043e38cfe0db4261051c6/f7d1222c160444109b4afa48c74c46cb" height="121" width="500"/></center><br />
         <p className="text-gray-700">
           An investigation into the data collected by space observatories like the Kepler Space Telescope & TESS project. These telescopes observe stars in our local neighbourhood to discover evidence of exoplanets orbiting those stars. There are a number of ways that scientists observe stars to find planets, including radial velocity and microlensing, however these telescopes use the transit method.
         </p>
@@ -64,7 +66,7 @@ const Instructions: React.FC = () => {
   <Link href="/tests/onboarding/">
     <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Back</button>
   </Link>
-  <Link href="/tests/planets/">
+  <Link href="/tests/onboarding/planetHunters/2">
     <div className="float-right">
       <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Next</button>
     </div>
@@ -74,4 +76,4 @@ const Instructions: React.FC = () => {
   );
 };
 
-export default Instructions;
+export default IntroToLightkurve;

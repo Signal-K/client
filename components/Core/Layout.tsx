@@ -100,7 +100,7 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
           >
             <div className="p-4">
               <ul className="space-y-4">
-                <SidebarItem icon={<FiHome size={20} />} label="Home" href="/tests/dashboard" />
+                <SidebarItem icon={<FiHome size={20} />} label="Home" href="/" />
                 <SidebarItem icon={<FiStar size={20} />} label="Planets" href="/tests/planets" />
                 <SidebarItem icon={<FiRss size={20} />} label="Feed" href="/feed" />
                 <SidebarItem icon={<FiBookmark size={20} />} label="Training" href="/tests/onboarding" />
@@ -115,7 +115,7 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
         <div className={`bg-gray-200 w-64 ${sidebarOpen ? '' : 'hidden'}`}>
           <div className="p-4">
             <ul className="space-y-4">
-              <SidebarItem icon={<FiHome size={20} />} label="Home" href="/tests/dashboard" />
+              <SidebarItem icon={<FiHome size={20} />} label="Home" href="/" />
               <SidebarItem icon={<FiStar size={20} />} label="Planets" href="/tests/planets" />
               <SidebarItem icon={<FiRss size={20} />} label="Feed" href="/feed" />
               <SidebarItem icon={<FiBookmark size={20} />} label="Training" href="/tests/onboarding" />

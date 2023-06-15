@@ -187,7 +187,7 @@ export default function IndexAuth() {
 //             <Db />
 //                 {/* <UserOnboarding />          */}
 //                 {session?.user?.id == 'cebdc7a2-d8af-45b3-b37f-80f328ff54d6' && (
-//                   <Link legacyBehavior href='/tests/dashboard'>Test</Link>
+//                   <Link legacyBehavior href='/'>Test</Link>
 //                 )}
 //                 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="starsailors" data-description="Support me on Buy me a coffee!" data-message="I hope you enjoyed using Star Sailors. Please consider contributing so I can get extra features out faster." data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
 //         </></CoreLayout>
