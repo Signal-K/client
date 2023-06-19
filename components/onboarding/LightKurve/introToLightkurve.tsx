@@ -26,34 +26,28 @@ const IntroToLightkurve: React.FC = () => {
   </Link>
 </div><br />
         <h2 className="text-3xl font-bold mb-4 text-primary">
-          How do we look at the data from these telescopes?
+          Introduction to Lightkurve
         </h2>
         {/* <iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/631fb065957043e38cfe0db4261051c6/f7d1222c160444109b4afa48c74c46cb?height=736" height="736" width="500"/> */}
-        <h3 className="text-xl font-bold mb-4 text-primary">What is a Tic ID?</h3>
-        <p className="text-gray-700">TIC IDs are unique identifiers assigned to individual stars or other astronomical objects within the game. These IDs allow players to locate and interact with specific celestial entities, providing a sense of realism and accuracy in the virtual universe.</p><br />
+        <h3 className="text-xl font-bold mb-4 text-primary">What is Lightkurve?</h3>
+        <p className="text-gray-700">Lightkurve is a powerful Python package designed for working with Kepler and TESS mission data. It provides a user-friendly interface for retrieving, analyzing, and visualizing light curves from these space-based observatories. In this notebook, we will explore the basics of Lightkurve and learn how to load and visualize light curves. We will start by loading a sample light curve from the Kepler mission.</p><br />
         
-        <h3 className="text-xl font-bold mb-4 text-primary">What is a Light Curve?</h3>
-        <p className="text-gray-700">Light curves represent the brightness variations of astronomical objects over time. In Star Sailors, light curves are used to simulate the natural changes in luminosity exhibited by stars, planets, and other celestial bodies. By analyzing the light curves of various objects, players can gain insights into their characteristics, such as their size, composition, and potential anomalies.</p> <br />
+        <h3 className="text-xl font-bold mb-4 text-primary">Identifying celestial objects using TIC IDs</h3>
+        <p className="text-gray-700">TIC IDs (Target Identifier for Computation) are unique identifiers assigned to individual stars and other celestial objects. They serve as a standardized way to refer to specific astronomical targets. In our case, we are working with Tic IDs related to stars within the Star Sailors game universe.</p> <br />
+        <h3 className="text-xl font-bold mb-4 text-primary">Observing periods using sectors</h3>
+        <p className="text-gray-700">In astronomical missions like Kepler and TESS, the observations are divided into sectors. Each sector represents a specific period of time during which the telescope observes a particular region of the sky. These sectors are sequentially numbered, allowing astronomers to organize and reference the data collected during specific observing periods.</p> <br />
+        <h3 className="text-xl font-bold mb-4 text-primary">Analysing light curves</h3>
+        <p className="text-gray-700">Lightkurve is a Python package designed for working with time series data, specifically light curves from space-based telescopes. It provides a range of tools and functionalities to analyze and visualize light curves effectively.
+Now, let's dive into the basics of Lightkurve by loading and visualizing a light curve corresponding to a specific Tic ID and sector.</p><br />
 
-        <h3 className="text-xl font-bold mb-4 text-primary">Exploring curves</h3>
-        <p className="text-gray-700">These code blocks demonstrate how to search, download, plot, normalize, and stitch light curves associated with a specific TIC ID in Star Sailors. The analysis of light curves allows players to explore and understand the behavior of celestial objects within the game's virtual universe. When exploring the planets, you'll be observing the graphs and visual data this code generates for your chosen planet</p> <br />
+<center><iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/bf7ad22fd19341d0a5738169228b6279/b4d63c1675d2440894536c3528b25585?height=530.609375" height="730.609375" width="800"/></center><br />
 
-        <h5 className="text-md font-bold mb-4 text-primary">Installing lightkurve package</h5>
-        <p className="text-gray-700">This line installs the Lightkurve package, a powerful tool for working with light curves in astronomy, which will be used in subsequent code blocks.</p> <br />
-        <center><iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/631fb065957043e38cfe0db4261051c6/f7d1222c160444109b4afa48c74c46cb" height="125" width="625"/></center><br />
-        
-        <h5 className="text-md font-bold mb-4 text-primary">Searching & downloading lightcurves</h5>
-        <p className="text-gray-700">Here, we search for light curves associated with a specific TIC ID, 'TIC 470710327', collected by the SPOC (Science Processing Operations Center) and from sector 18.</p> <br /> {/* The light curve data is then downloaded and stored in the 'lc' variable. -> save this for the in-depth tutorial which covers coding/scripting */}
-        <center><iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/631fb065957043e38cfe0db4261051c6/4d718dccb37f436586045be95902a568?height=173" height="180" width="625"/></center><br />
-        
-        <h5 className="text-md font-bold mb-4 text-primary">Plotting available data</h5>
-        <p className="text-gray-700">This code block retrieves all available light curve data for the given TIC ID. It displays information about the available data, including the sector and author.</p> <br />
-        <center><iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/631fb065957043e38cfe0db4261051c6/c813b2ebdebd45a2a431696f0e67dcd8" height="360.1875" width="650"/></center><br />
+        <h3 className="text-xl font-bold mb-4 text-primary">Normalising light curves</h3>
+        <p className="text-gray-700">Light curves often exhibit variations in their overall brightness due to factors like instrumental effects or the star's intrinsic variability. To analyze the intrinsic properties of the star, it is common to normalize the light curve by dividing each data point by the median flux value. Here, we normalize the light curve obtained for the Tic ID 'TIC 470710327' in sector 18 using Lightkurve's built-in 'normalize()' method. This normalization allows us to focus on the relative changes in the star's brightness, enabling a more accurate analysis.</p> <br />
 
-        <h5 className="text-md font-bold mb-4 text-primary">Downloading multiple curves (same TIC ID)</h5>
-        <p className="text-gray-700">In this block, a subset of the available light curves (first four sectors) is selected and downloaded as a collection using the 'download_all()' method. The downloaded light curve collection is stored in the 'lc_collection' variable.</p> <br />
-        <center><iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/631fb065957043e38cfe0db4261051c6/72c56e417abe439a98c6bc95f3c8d0d4?height=365.984375" height="500.1875" width="650"/></center><br />
-
+        <center><iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/bf7ad22fd19341d0a5738169228b6279/3c14a302235b4f798a8d700155ee1833?height=614.1875" height="514.1875" width="600"/></center><br />
+        <center><iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/bf7ad22fd19341d0a5738169228b6279/d9ebb33fcad346d9aeab389280e3ab3e?height=650.1875" height="560.1875" width="650"/></center><br />
+        <center><iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/bf7ad22fd19341d0a5738169228b6279/d8a68cfac5c74d36bf478cea51a05f31?height=560.1875" height="410.1875" width="500"/></center><br />
 
 
 
