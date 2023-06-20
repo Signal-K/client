@@ -2,7 +2,7 @@
 pragma solidity ^0.8.11;
 
 contract ClassificationProposal {
-    struct Classification {
+    struct Classification { 
         // What types will this struct/campaign have?
         address owner;
         string title; // Title of the Proposal, type string
