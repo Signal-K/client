@@ -3,7 +3,7 @@ import styles from '../../styles/Staking-P2E/planetInteraction.module.css';
 
 import { ConnectWallet, useAddress, useContract } from "@thirdweb-dev/react";
 
-import { ApproxRewards, CurrentGear, GameplayAnimation, LoadingSection, OwnedGear, Rewards, Shop, ShopItem } from "../../components/Stake";
+import { ApproxRewards, CurrentGear, GameplayAnimation, LoadingSection, OwnedGear, Rewards, Shop, ShopItem } from "../../components/Gameplay/Stake";
 import { HELPER_ADDRESS, PLANETS_ADDRESS, MINERALS_ADDRESS, MULTITOOLS_ADDRESS } from "../../constants/contractAddresses";
 
 export default function StakePlay () {
@@ -46,10 +46,10 @@ export default function StakePlay () {
                     <>
                         <h2 className={`${styles.noGapTop} ${styles.noGapBottom}`}>Your multitools</h2>
                         <div className={styles.shop}>
-                            <OwnedGear
+                            {/*<OwnedGear
                                 multitoolContract={multitoolContract}
                                 helperContract={helperContract}
-                            />
+                            />*/}
                         </div>
                     </>
                 ) : (

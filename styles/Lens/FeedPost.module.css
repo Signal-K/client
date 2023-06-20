@@ -18,12 +18,12 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    gap: 12px;
+    gap: px;
 }
 
 .feedPostProfilePicture {
-    width: 48px;
-    height: 48px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: 1px solid black;
 }

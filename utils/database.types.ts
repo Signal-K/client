@@ -18,6 +18,7 @@ export interface Database {
           avatar_url: string | null
           website: string | null
           address: string | null
+          address2: string | null
           //userId: string | null
         }
         Insert: {
@@ -28,6 +29,7 @@ export interface Database {
           avatar_url?: string | null
           website?: string | null
           address?: string | null
+          address2: string | null
           //userId?: string | null
         }
         Update: {
@@ -38,6 +40,7 @@ export interface Database {
           avatar_url?: string | null
           website?: string | null
           address?: string | null
+          address2: string | null
           //userId?: string | null
         }
       }
@@ -72,6 +75,35 @@ export interface Database {
           ticId: string | null
           avatar_url: string | null
           screenshot: string | null
+        }
+      }
+      spaceships: {
+        Row: {
+          id: number
+          owner: number | null
+          name: string | null
+          image: string | null
+          hp: number | null
+          attack: number | null
+          speed: number | null
+        }
+        Insert: {
+          id: number
+          owner: number | null
+          name: string | null
+          image: string | null
+          hp: number | null
+          attack: number | null
+          speed: number | null
+        }
+        Update: {
+          id: number
+          owner: number | null
+          name: string | null
+          image: string | null
+          hp: number | null
+          attack: number | null
+          speed: number | null
         }
       }
     }

@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import { useRouter } from "next/router";
+import CoreLayout from "../../components/Core/Layout";
 import { useState, useEffect } from "react";
 import { Text, NextUIProvider } from '@nextui-org/react';
 
@@ -8,11 +8,10 @@ import JournalArticleCard from "../../components/Journal/ArticleCard";
 import JournalNavbarComponent from "../../components/Journal/JournalNavbar";
 import { Box } from "../../components/Journal/Box";
 
-const JournalFeed: NextPage = () => {
+export default function JournalFeed () {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const router = useRouter();
     const [articles, setArticles] = useState([]);
 
     useEffect(() => {
@@ -27,25 +26,23 @@ const JournalFeed: NextPage = () => {
                 .limit(10)
             console.log(data);
             if (data != null) { setArticles(data); };
-        } catch (error: any) { alert(error.message) };
+            if (error) throw error;
+        } catch (error: any) { alert(error.message); };
     };
 
     return (
+        <>
         <NextUIProvider>
-            <JournalNavbarComponent />
-            <Box css={{ px: "$12", py: "$15", mt: "$12", "@xsMax": {px: "$10"}, maxWidth: "800px", margin: "0 auto" }}>
-                <>
-                    <Text h2>Main Feed</Text>
-                    <Text size="$lg" css={{my: "$8"}}>
-                        Check out articles from users here
-                    </Text>
-                    {articles.map((article) => (
-                        <JournalArticleCard article={article}/>
-                    ))}
-                </>
-            </Box>
-        </NextUIProvider>
-    );
-};
-
-export default JournalFeed;
+            <CoreLayout>
+                {/*<JournalNavbarComponent />*/}
+                <Box css={{ px: "$12", py: "$15", mt: "$12", "@xsMax": {px: "$10"}, maxWidth: "800px", margin: "0 auto" }}>
+                    <>
+                        {articles.map((article) => (
+                            <JournalArticleCard article={article} />
+                        ))}
+                    </>
+                </Box>
+            </CoreLayout>
+        </NextUIProvider></>
+    )
+}
