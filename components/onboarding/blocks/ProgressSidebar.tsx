@@ -1,23 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 type Chapter = {
-    id: number;
-    title: string;
-    icon: string;
-  };
-  
-  type SidebarProps = {
-    currentPage: number;
-    credits: number;
-  };
+  id: number;
+  title: string;
+  icon: string;
+};
+
+type SidebarProps = {
+  currentPage: number;
+  credits: number;
+};
 
 const ProgressSidebar: React.FC<SidebarProps> = ({ currentPage, credits }) => {
-  const chapterData = [
+  const chapterData: Chapter[] = [
     { id: 1, title: 'Planet Hunters Introduction', icon: 'book' },
     { id: 2, title: 'What is Lightkurve?', icon: 'graph' },
     { id: 3, title: 'How do we look at the data from these telescopes?', icon: 'telescope' },
     // ... Add data for remaining pages here
   ];
+
+  const [showSidebar, setShowSidebar] = useState(true);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setShowSidebar(window.innerWidth >= 800);
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  if (!showSidebar) {
+    return null;
+  }
 
   return (
     <aside className="fixed right-0 top-0 bottom-0 z-10 bg-white w-64 shadow-lg overflow-y-auto">
@@ -56,7 +76,7 @@ const ProgressSidebar: React.FC<SidebarProps> = ({ currentPage, credits }) => {
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            fill="currentColor"
+           fill="currentColor"
             d="M19 5H5C3.89543 5 3 5.89543 3 7V21L9 17H19C20.1046 17 21 16.1046 21 15V7C21 5.89543 20.1046 5 19 5ZM19 15H9L5 18.382V7H19V15Z"
           />
         </svg>
