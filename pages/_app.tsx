@@ -5,7 +5,6 @@ import { AppProps } from 'next/app';
 // Styling imports
 import '../styles/globals.css';
 import { ChakraProvider } from '@chakra-ui/react';
-import { NextUIProvider } from '@nextui-org/react';
 
 // Offchain/Postgres Session Provider
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
@@ -36,9 +35,9 @@ function MyApp({ Component, pageProps }) {
     >
       <QueryClientProvider client={queryClient}>
         <ThirdwebProvider
-          desiredChainId={activeChainId} // Because our staking contracts are on Goerli, we'll need to move them onto Polygon/Mumbai so they work with the provider here. To-Do: Set to mumbai and confirm if Lens still works || Lens is using the contract ABI & Graphql -> write might require being set back to Polygon (with the Lens Mumbai/Polygon ABI & address)
+          desiredChainId={5} // Because our staking contracts are on Goerli, we'll need to move them onto Polygon/Mumbai so they work with the provider here. To-Do: Set to mumbai and confirm if Lens still works || Lens is using the contract ABI & Graphql -> write might require being set back to Polygon (with the Lens Mumbai/Polygon ABI & address)
           authConfig={{
-            domain: "sailors.skinetics.tech",
+            domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN, // originally set to sailors.skinetics.tech
             authUrl: "/api/auth",
           }}
         >

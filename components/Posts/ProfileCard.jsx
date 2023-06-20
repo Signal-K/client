@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useTransition, lazy } from "react"
 import Card from "../Card"
 import FriendInfo from "../FriendInfo"
-import PostCard from "../PostCard"
-import { useSupabaseClient } from "@supabase/auth-helpers-react"
+import PostCard, { PostCardProfile } from "../PostCard"
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export function ProfileContent ({ activeTab, userId }) {
     const supabase = useSupabaseClient();
     
     const [posts, setPosts] = useState([]);
+    const [planetPosts, setPlanetPosts] = useState([]);
     const [profile, setProfile] = useState(null);
 
     useEffect (() => {
@@ -17,13 +18,28 @@ export function ProfileContent ({ activeTab, userId }) {
         }
     }, [userId]);
 
+    useEffect(() => {
+        userPlanetPosts(userId);
+    }, [userId]);
+
     async function loadProfile () {
         const posts = await userPosts(userId);
+        const planetPosts = await userPlanetPosts(userId);
         const profile = await userProfile(userId);
         setPosts(posts)
+        setPlanetPosts(planetPosts);
         setProfile(profile);
         return { posts, profile };
     }
+
+    function userPlanetPosts (userId) {
+        const { data } = supabase.from('posts_duplicate')
+            .select('*') //('id, content, created_at, media, planets2, profiles(id, avatar_url, username)') // profiles(id, avatar_url, username)')
+            .order('created_at', { ascending: false })
+            .eq('author', userId) // session?.user?.id)
+        return data;
+        console.log(data);
+    };
 
     async function userPosts (userId) {
         const { data } = await supabase.from('posts')
@@ -43,9 +59,12 @@ export function ProfileContent ({ activeTab, userId }) {
     return (
         <div>
             {activeTab === 'posts' && (
-                <div>
+                <div> 
+                { planetPosts?.length > 0 && planetPosts.map(post => (
+                    <PostCardProfile key={post.created_at} {...post} profiles={profile} /*media={media}*/ />
+                ))}
                 { posts.length > 0 && posts.map(post => (
-                    <PostCard key={post.created_at} {...post} profiles={profile} /*media={media}*/ />
+                    <PostCardProfile key={post.created_at} {...post} profiles={profile} /*media={media}*/ />
                 ))} {/* Section to show their long-form articles here */}
                 {/*<PostCard key = { postMessage.id } { ..post } />*/}
                 {/* Create a post card to tag the user */}
@@ -54,9 +73,9 @@ export function ProfileContent ({ activeTab, userId }) {
             {activeTab === 'about' && (
                 <div>
                     <Card noPadding={false}>
-                    <h2 className="text-3xl mb-2">About me</h2>
-                    <p className="mb-2 text-sm">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut doloremque harum maxime mollitia perferendis praesentium quaerat. Adipisci, delectus eum fugiat incidunt iusto molestiae nesciunt odio porro quae quaerat, reprehenderit, sed.</p>
-                    <p className="mb-2 text-sm">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet assumenda error necessitatibus nesciunt quas quidem quisquam reiciendis, similique. Amet consequuntur facilis iste iure minima nisi non praesentium ratione voluptas voluptatem?</p>
+                        <h2 className="text-3xl mb-2">About me</h2>
+                        <p className="mb-2 text-sm">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut doloremque harum maxime mollitia perferendis praesentium quaerat. Adipisci, delectus eum fugiat incidunt iusto molestiae nesciunt odio porro quae quaerat, reprehenderit, sed.</p>
+                        <p className="mb-2 text-sm">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet assumenda error necessitatibus nesciunt quas quidem quisquam reiciendis, similique. Amet consequuntur facilis iste iure minima nisi non praesentium ratione voluptas voluptatem?</p>
                     </Card>
                 </div>
             )}
