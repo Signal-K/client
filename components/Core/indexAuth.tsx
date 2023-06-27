@@ -2,7 +2,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import CoreLayout from "./Layout";
-import UserOnboarding from "../onboarding";
+import UserOnboarding from "../onboarding/comments";
 import Db from "../../pages/tests/db";
 import { Database } from "../../utils/database.types";
 import { url } from "inspector";
