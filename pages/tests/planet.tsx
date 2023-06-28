@@ -19,6 +19,8 @@ enum SidebarLink {
 export default function PlanetPage({ id }: { id: string }) {
   const router = useRouter();
 
+  const a = 'a';
+
   const supabase = useSupabaseClient();
   const session = useSession();
 
@@ -79,7 +81,7 @@ export default function PlanetPage({ id }: { id: string }) {
 
   function fetchPostsForPlanet(planetId) {
     supabase
-      .from("posts_duplicate")
+      .from("posts_duplicate_2")
       .select(
         "id, content, created_at, media, profiles(id, avatar_url, username)"
       )
@@ -90,9 +92,9 @@ export default function PlanetPage({ id }: { id: string }) {
       });
   }
 
-  useEffect(() => {
-    // fetchPostsForPlanet(planetId);
-  }, [planetId, session?.user?.id]);
+  // useEffect(() => {
+  //   // fetchPostsForPlanet(planetId);
+  // }, [planetId, session?.user?.id]);
 
   const handleSidebarLinkClick = (link: SidebarLink) => {
     setActiveLink(link);
