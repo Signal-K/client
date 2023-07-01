@@ -3,39 +3,47 @@ import React, { useState } from "react";
 import Login from "../../../pages/login";
 
 enum QuizStatus {
-    NotStarted,
-    InProgress,
-    Completed
+  NotStarted,
+  InProgress,
+  Completed,
 }
 
 interface QuizQuestion {
-    questionText: string;
-    imageUrl: string;
-    isCorrect: boolean;
+  questionText: string;
+  imageUrl: string;
+  isCorrect: boolean;
 }
 
 const quizQuestions: QuizQuestion[] = [
-    {
-        questionText: '❓ - This light curve shows the brightness of a star monitored by NASA\'s TESS mission. \n Do you notice any dips that could indicate a transiting exoplanet?',
-        imageUrl: 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture2.PNG.png',
-        isCorrect: false,
-    },
-    {
-        questionText: '❓ - Do you see a potential exoplanet transit in this light curve? Which parts indicate the transit?',
-        imageUrl: 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture3.PNG.png',
-        isCorrect: true,
-    },
-    {
-        questionText: '❓ - This one is a bit tricky. Does it have a clear exoplanet transit or not?',
-        imageUrl: 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture4.PNG.png',
-        isCorrect: false,
-    },
-    {
-        questionText: '❓ - What\'s your classification? Exoplanet or false positive?',
-        imageUrl: 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture5.PNG.png',
-        isCorrect: true,
-    }
-]
+  {
+    questionText:
+      "❓ - This light curve shows the brightness of a star monitored by NASA's TESS mission. \n Do you notice any dips that could indicate a transiting exoplanet?",
+    imageUrl:
+      "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture2.PNG.png",
+    isCorrect: false,
+  },
+  {
+    questionText:
+      "❓ - Do you see a potential exoplanet transit in this light curve? Which parts indicate the transit?",
+    imageUrl:
+      "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture3.PNG.png",
+    isCorrect: true,
+  },
+  {
+    questionText:
+      "❓ - This one is a bit tricky. Does it have a clear exoplanet transit or not?",
+    imageUrl:
+      "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture4.PNG.png",
+    isCorrect: false,
+  },
+  {
+    questionText:
+      "❓ - What's your classification? Exoplanet or false positive?",
+    imageUrl:
+      "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture5.PNG.png",
+    isCorrect: true,
+  },
+];
 
 /* const quizImages: QuizImage[] = [
      {
@@ -45,9 +53,9 @@ const quizQuestions: QuizQuestion[] = [
      }, */
 
 const LightkurveQuiz: React.FC = () => {
-    const session = useSession();
+  const session = useSession();
 
-    const [quizStatus, setQuizStatus] = useState(QuizStatus.NotStarted);
+  const [quizStatus, setQuizStatus] = useState(QuizStatus.NotStarted);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [userAnswer, setUserAnswer] = useState<boolean | null>(null);
@@ -127,8 +135,8 @@ const LightkurveQuiz: React.FC = () => {
     return (
       <div className="flex justify-center items-center h-screen">
         <p className="text-2xl">
-          Congratulations! You got {correctAnswers} out of {quizQuestions.length}{' '}
-          correct.
+          Congratulations! You got {correctAnswers} out of{" "}
+          {quizQuestions.length} correct.
         </p>
       </div>
     );

@@ -57,7 +57,6 @@ export default function Home() {
               // src='/assets/Videos/StarSailors.mp4'
               // title='Star Sailors'
             />
-            <PlaygroundPage />
             <div className="bg-white rounded-lg overflow-hidden shadow-lg p-6">
       <p className="mb-4">
         Our game offers a unique and engaging experience that combines the excitement of gaming with scientific knowledge.
@@ -75,6 +74,7 @@ export default function Home() {
         The more you classify, the more items you collect, and the more items you collect, the more planets you can colonize. You can earn points that can be redeemed for rewards and recognition within the Star Sailors community. This is also where you can create posts about your decisions and invite other users to vote on your assessments.
       </p>
     </div>
+    <PlaygroundPage />
           </div>
         </div>      
         <br />
