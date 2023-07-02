@@ -5,7 +5,7 @@ import Login from "../../../pages/login";
 enum QuizStatus {
   NotStarted,
   InProgress,
-  Completed,
+  Completed, // Use state management to award items based on enum
 }
 
 interface QuizQuestion {
