@@ -13,6 +13,7 @@ import UnityBuildLod11 from "../../components/Gameplay/Unity/Build/LOD-Water";
 import UnityScreenshot from "../../components/Gameplay/Generator/UnityScreenshot";
 import PostCard from "../../components/Posts/Postcards/Postcard";
 import { useScreenshot, createFileName } from 'use-react-screenshot';
+import CoreLayout from "../../components/Core/Layout";
 
 enum SidebarLink {
   Feed,
@@ -169,7 +170,7 @@ export default function PlanetPage({ id }: { id: string }) {
   const { content, avatar_url, cover } = planetData;
 
   return (
-    <DashboardLayout>
+    <CoreLayout><br />
       <div id='unityContainer1' className="flex bg-gray-25 mt-[-1.51rem]">
         {/* Sidebar */}
         <div className="w-1/5 bg-gray-50 overflow-hidden fixed h-full">
@@ -381,6 +382,6 @@ export default function PlanetPage({ id }: { id: string }) {
           {/* <div><UnityScreenshot unityContainerId="unityContainer1" /></div> */}
         </div>
       </div>
-    </DashboardLayout>
+    </CoreLayout>
   ); // https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/51/download.png
 }

@@ -43,7 +43,7 @@ export default function PlanetGalleryIndex() {
   }
 
   return (
-    <CoreLayout>
+    <DashboardLayout>
       <Container>
         <Row>
           {planets.map((planet) => (
@@ -51,6 +51,6 @@ export default function PlanetGalleryIndex() {
           ))}
         </Row>
       </Container>
-    </CoreLayout>
+    </DashboardLayout>
   );
 }
