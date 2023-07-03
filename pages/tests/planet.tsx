@@ -213,6 +213,43 @@ export default function PlanetPage({ id }: { id: string }) {
 
   return (
     <CoreLayout>
+      {/* Buttons for smaller screens */}
+      {!showSidebar && (
+          <div className="flex justify-around mb-8">
+            <button
+              onClick={() => handleSidebarLinkClick(SidebarLink.Feed)}
+              className={`text-gray-800 p-2 ${
+                activeLink === SidebarLink.Feed ? "font-bold" : ""
+              }`}
+            >
+              Feed
+            </button>
+            <button
+              onClick={() => handleSidebarLinkClick(SidebarLink.Demo)}
+              className={`text-gray-800 p-2 ${
+                activeLink === SidebarLink.Demo ? "font-bold" : ""
+              }`}
+            >
+              Demo
+            </button>
+            <button
+              onClick={() => handleSidebarLinkClick(SidebarLink.Data)}
+              className={`text-gray-800 p-2 ${
+                activeLink === SidebarLink.Data ? "font-bold" : ""
+              }`}
+            >
+              Data
+            </button>
+            <button
+              onClick={() => handleSidebarLinkClick(SidebarLink.Visit)}
+              className={`text-gray-800 p-2 ${
+                activeLink === SidebarLink.Visit ? "font-bold" : ""
+              }`}
+            >
+              Visit
+            </button>
+          </div>
+        )}
       <div id='unityContainer1' className="flex mt-[-1.51rem]">
         {/* Sidebar */}
         <div
@@ -354,44 +391,6 @@ export default function PlanetPage({ id }: { id: string }) {
             </nav>
           </div>
         </div>
-
-        {/* Buttons for smaller screens */}
-        {!showSidebar && (
-          <div className="flex justify-around mb-8">
-            <button
-              onClick={() => handleSidebarLinkClick(SidebarLink.Feed)}
-              className={`text-gray-800 p-2 ${
-                activeLink === SidebarLink.Feed ? "font-bold" : ""
-              }`}
-            >
-              Feed
-            </button>
-            <button
-              onClick={() => handleSidebarLinkClick(SidebarLink.Demo)}
-              className={`text-gray-800 p-2 ${
-                activeLink === SidebarLink.Demo ? "font-bold" : ""
-              }`}
-            >
-              Demo
-            </button>
-            <button
-              onClick={() => handleSidebarLinkClick(SidebarLink.Data)}
-              className={`text-gray-800 p-2 ${
-                activeLink === SidebarLink.Data ? "font-bold" : ""
-              }`}
-            >
-              Data
-            </button>
-            <button
-              onClick={() => handleSidebarLinkClick(SidebarLink.Visit)}
-              className={`text-gray-800 p-2 ${
-                activeLink === SidebarLink.Visit ? "font-bold" : ""
-              }`}
-            >
-              Visit
-            </button>
-          </div>
-        )}
 
         {/* Content Section */}
         <div className={`${showSidebar ? "ml-1/5" : ""} w-full p-8`}>
