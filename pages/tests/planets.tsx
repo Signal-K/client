@@ -11,7 +11,7 @@ export default function PlanetGalleryIndex() {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [planets, setPlanets] = useState([]);
-  const [selectedDifficulty, setSelectedDifficulty] = useState("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<number | null>(1);
 
   useEffect(() => {
     getPlanets();
@@ -27,7 +27,7 @@ export default function PlanetGalleryIndex() {
         .gte("id", 45)
         .lt("id", 102);
 
-      if (selectedDifficulty !== "") {
+      if (selectedDifficulty !== null) {
         query = query.eq("difficulty", selectedDifficulty);
       } else {
         query = query.is("difficulty", null); // Filter planets with no difficulty
@@ -48,7 +48,6 @@ export default function PlanetGalleryIndex() {
   };
 
   const difficultyOptions = [
-    { value: "", label: "Base Difficulty" },
     { value: 1, label: "Difficulty 1" },
     { value: 2, label: "Difficulty 2" },
     { value: 3, label: "Difficulty 3" },
@@ -83,7 +82,7 @@ export default function PlanetGalleryIndex() {
               name="difficulty"
               value={option.value}
               checked={selectedDifficulty === option.value}
-              onChange={() => setSelectedDifficulty(String(option.value))}
+              onChange={() => setSelectedDifficulty(option.value)}
               style={
                 selectedDifficulty === option.value
                   ? { ...buttonStyle, ...activeButtonStyle }

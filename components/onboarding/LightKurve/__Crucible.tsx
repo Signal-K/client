@@ -93,6 +93,7 @@ const CrucibleComponent: React.FC = () => {
                     <p className="text-gray-700">At Star Sailors, everyone has the power to make a difference. That's why our training program is designed to be accessible and engaging for everyone, regardless of their technical background.</p>
                 </blockquote>
             </div><br />
+            <LightkurveQuiz />
 
             <div className="mb-8 mt-5">
             <h3

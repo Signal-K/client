@@ -1,5 +1,5 @@
-import { useSession } from "@supabase/auth-helpers-react";
-import React, { useState } from "react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import React, { useEffect, useState } from "react";
 import Login from "../../../pages/login";
 
 enum QuizStatus {
@@ -54,11 +54,68 @@ const quizQuestions: QuizQuestion[] = [
 
 const LightkurveQuiz: React.FC = () => {
   const session = useSession();
+  const supabase = useSupabaseClient();
 
   const [quizStatus, setQuizStatus] = useState(QuizStatus.NotStarted);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [userAnswer, setUserAnswer] = useState<boolean | null>(null);
+
+  // Fields for determining if the user should be awarded the first telescope
+  const [hasItem, setHasItem] = useState(false);
+
+  useEffect(() => {
+    async function checkIfUserHasItem() {
+      if (session) {
+        try {
+          const user = session?.user;
+          const { data, error } = await supabase
+            .from('inventoryUSERS')
+            .select('*')
+            .eq('owner', user.id)
+            .eq('item', 9);
+
+          if (error) {
+            throw error;
+          };
+
+          if (data && data.length > 0) {
+            setHasItem(true);
+          }
+        } catch (error) {
+          console.error('Error checking user inventory for Golden Telescope - Level 1. Error: ', error);
+        }
+      }
+    }
+
+    checkIfUserHasItem();
+  }, [session]);
+
+  const handleAddToInventory = async () => {
+    if (session && !hasItem) {
+      try {
+        const user = session?.user;
+        const { error } = await supabase
+          .from('inventoryUSERS')
+          .upsert([
+            {
+              item: 9,
+              owner: user.id,
+              quantity: 1
+            }
+          ]);
+
+        if (error) {
+          throw error;
+        };
+
+        console.log('Added item to inventory successfully');
+        setHasItem(true);
+      } catch (error) {
+        console.error('Error adding golden telescope - level 1 to inventory. Error: ', error);
+      }
+    }
+  };
 
   const startQuiz = () => {
     setQuizStatus(QuizStatus.InProgress);
@@ -138,6 +195,14 @@ const LightkurveQuiz: React.FC = () => {
           Congratulations! You got {correctAnswers} out of{" "}
           {quizQuestions.length} correct.
         </p>
+        !hasItem && (
+          <button
+            onClick={handleAddToInventory}
+            className="bg-blue-500 text-white px-3 py-1 rounded"
+          >
+            Add to Inventory
+          </button>
+        )
       </div>
     );
   }
