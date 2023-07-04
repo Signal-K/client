@@ -14,6 +14,7 @@ import UnityScreenshot from "../../components/Gameplay/Generator/UnityScreenshot
 import PostCard from "../../components/Posts/Postcards/Postcard";
 import { useScreenshot, createFileName } from 'use-react-screenshot';
 import CoreLayout from "../../components/Core/Layout";
+import ProfilePage from "../../components/Tests/Planet/ProfileCardTest";
 
 enum SidebarLink {
   Feed,
@@ -213,6 +214,7 @@ export default function PlanetPage({ id }: { id: string }) {
 
   return (
     <CoreLayout>
+      {/* <ProfilePage /> */}
       {/* Buttons for smaller screens */}
       {!showSidebar && (
           <div className="flex justify-around mb-8">
