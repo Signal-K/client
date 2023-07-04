@@ -9,6 +9,9 @@ links:
   - name: null
     type: REPOSITORY
     url: https://github.com/Signal-K/client
+  - name: null
+    type: REPOSITORY
+    url: https://github.com/Signal-K/theclub
 relationships:
   DEPENDS_ON: []
 labels:
