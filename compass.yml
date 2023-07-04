@@ -1,0 +1,21 @@
+name: client
+id: ari:cloud:compass:6c5f0aad-3609-46b8-ab18-2bbe3c8d954a:component/877cb673-9bea-4a28-ab02-5c00556706db/8331d730-74b1-4792-9611-864727df9b99
+description: Frontend for viewing citizen science proposals on Lens Protocol
+configVersion: 1
+typeId: APPLICATION
+fields:
+  tier: 4
+links:
+  - name: null
+    type: REPOSITORY
+    url: https://github.com/Signal-K/client
+relationships:
+  DEPENDS_ON: []
+labels:
+  - citizen-science
+  - foldingathome
+  - language:typescript
+  - lens-protocol
+  - source:github
+  - zooniverse
+customFields: null
