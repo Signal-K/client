@@ -22,6 +22,16 @@ enum SidebarLink {
   Visit,
 }
 
+const getRandomGradientColors = () => {
+  const colors = ["red", "blue", "green", "purple", "orange", "pink"];
+  const color1 = colors[Math.floor(Math.random() * colors.length)];
+  let color2 = color1;
+  while (color2 === color1) {
+    color2 = colors[Math.floor(Math.random() * colors.length)];
+  }
+  return [color1, color2];
+};
+
 export default function PlanetPage({ id }: { id: string }) {
   const router = useRouter();
 
@@ -46,6 +56,38 @@ export default function PlanetPage({ id }: { id: string }) {
   const [activeLink, setActiveLink] = useState(SidebarLink.Feed); // Track the active link
   const [showUnity, setShowUnity] = useState(false); // Track the visibility of Unity component
   const [loadUnityComponent, setLoadUnityComponent] = useState(false);
+
+    // State to hold the gradient colors
+    const [gradientColor1, setGradientColor1] = useState("gray-200");
+    const [gradientColor2, setGradientColor2] = useState("gray-300");
+  
+    // State to hold the screen width
+    const [screenWidth, setScreenWidth] = useState<number>(0);
+  
+    // State to track whether to show the sidebar or not
+    const [showSidebar, setShowSidebar] = useState<boolean>(true);
+  
+    useEffect(() => {
+      // Calculate the gradient colors
+      const [color1, color2] = getRandomGradientColors();
+      setGradientColor1(color1);
+      setGradientColor2(color2);
+  
+      // Update the screen width
+      const handleResize = () => {
+        setScreenWidth(window.innerWidth);
+      };
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }, []);
+  
+    useEffect(() => {
+      // Check screen width to show/hide the sidebar
+      setShowSidebar(screenWidth >= 800);
+    }, [screenWidth]);
 
   const planetBinned =
     "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/" +
@@ -170,10 +212,16 @@ export default function PlanetPage({ id }: { id: string }) {
   const { content, avatar_url, cover } = planetData;
 
   return (
-    <CoreLayout><br />
-      <div id='unityContainer1' className="flex bg-gray-25 mt-[-1.51rem]">
+    <CoreLayout>
+      <div id='unityContainer1' className="flex mt-[-1.51rem]">
         {/* Sidebar */}
-        <div className="w-1/5 bg-gray-50 overflow-hidden fixed h-full">
+        <div
+        id='sidebarContainer'
+        className={`flex ${
+          showSidebar ? "fixed h-screen" : "flex-col items-center"
+        } bg-gradient-to-b from-${gradientColor1} to-${gradientColor2} w-1/5 p-4`}
+      ></div>
+        <div className={`w-full md:w-1/5 md:block bg-gradient-to-b from-${gradientColor1} via-${gradientColor2} to-${gradientColor1} md:bg-gray-50 overflow-hidden fixed h-full md:h-auto md:relative md:flex md:flex-col md:justify-between md:space-y-8 ${!showSidebar && 'hidden'} ${screenWidth < 800 && 'hidden'}`}>
           <div className="h-64 relative">
             <img
               src={cover}
@@ -307,8 +355,46 @@ export default function PlanetPage({ id }: { id: string }) {
           </div>
         </div>
 
+        {/* Buttons for smaller screens */}
+        {!showSidebar && (
+          <div className="flex justify-around mb-8">
+            <button
+              onClick={() => handleSidebarLinkClick(SidebarLink.Feed)}
+              className={`text-gray-800 p-2 ${
+                activeLink === SidebarLink.Feed ? "font-bold" : ""
+              }`}
+            >
+              Feed
+            </button>
+            <button
+              onClick={() => handleSidebarLinkClick(SidebarLink.Demo)}
+              className={`text-gray-800 p-2 ${
+                activeLink === SidebarLink.Demo ? "font-bold" : ""
+              }`}
+            >
+              Demo
+            </button>
+            <button
+              onClick={() => handleSidebarLinkClick(SidebarLink.Data)}
+              className={`text-gray-800 p-2 ${
+                activeLink === SidebarLink.Data ? "font-bold" : ""
+              }`}
+            >
+              Data
+            </button>
+            <button
+              onClick={() => handleSidebarLinkClick(SidebarLink.Visit)}
+              className={`text-gray-800 p-2 ${
+                activeLink === SidebarLink.Visit ? "font-bold" : ""
+              }`}
+            >
+              Visit
+            </button>
+          </div>
+        )}
+
         {/* Content Section */}
-        <div className="w-3/4 p-8 ml-auto">
+        <div className={`${showSidebar ? "ml-1/5" : ""} w-full p-8`}>
           <center>
             <h1 className="text-2xl font-bold text-gray-800">{content}</h1>
             {session?.user?.id && ( <> <UserContext.Provider value={{profile}}><PostFormCardPlanetTag planetId2={planetId} onPost={() => fetchPostsForPlanet(planetId)} /></UserContext.Provider><br /> </> )}
@@ -328,60 +414,48 @@ export default function PlanetPage({ id }: { id: string }) {
                 <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br />
               <button onClick={() => setLoadUnityComponent(true)}>View Planet</button>
               <div>{loadUnityComponent && planetData?.temperature <= 300 && <UnityBuildLod11 />}</div>
-              <div>{loadUnityComponent && planetData?.temperature >= 300 && <UnityBuildLod1 />}</div> {/* planet={planetData?.content} user={profile?.username} />}</div> */}
-              {/* {unityBuild === 1 && (
-                <div>{loadUnityComponent && <UnityBuildLod11 />}</div>
-              )}
-              {unityBuild === 2 && (
-                <div>{loadUnityComponent && <UnityBuildLod1 />}</div>
-              )} */}
+              <div>{loadUnityComponent && planetData?.temperature >= 300 && <UnityBuildLod1 />}</div>
               <br /><br /><br /><br />
             </div>
           )}
-          {activeLink === SidebarLink.Data && (<>
-            <h2 className="text-xl font-bold text-gray-800">Lightkurve graphs</h2><br />
-            {/* <Card noPadding={false}>
-              <img src={cover} height='500px' width='500px' alt="Planet Cover" className="" />
-            </Card> */}
-            <Card noPadding={false}>
-            {planetData?.deepnote && (<>
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 items-center">
-      <div>
-        <h3 className="text-l font-bold text-gray-800">Binned data</h3>
-        <img src={planetBinned} alt="Planet Cover" className="w-full sm:w-auto" />
-      </div>
-      <div>
-        <h3 className="text-l font-bold text-gray-800">Phase folded data</h3>
-        <img src={planetPhased} alt="Planet Cover" className="w-full sm:w-auto" />
-      </div>
-    </div><br />
-    <center><iframe title="Embedded cell output" src={planetData?.deepnote} height="650" width="60%"/></center></>
-)}
- {/* Add planetCover (download.png) */}
- {!planetData?.deepnote && (
-    <img src={planetCover} alt="Planet Cover" className="" />
- )}
-                {/* <p>What does this mean?</p> */}
-            </Card>
-            {/* <Card noPadding={false}>
-            {/* <iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/> Set this based on planet id/temperature 
-            <iframe title="Embedded cell output" src={planetData?.deepnote} height="650" width="100%"/>
-            {/* <iframe src="https://deepnote.com/@star-sailors/Step-by-step-50ad3984-69a9-496e-a121-efb59231e7e9" height="100%" width="100%" /> 
-            <p>Temperature: {planetData?.temperature}</p>
- </Card></div>*/}</>
+          {activeLink === SidebarLink.Data && (
+            <>
+              <h2 className="text-xl font-bold text-gray-800">Lightkurve graphs</h2><br />
+              <Card noPadding={false}>
+                {planetData?.deepnote ? (
+                  <>
+                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 items-center">
+                      <div>
+                        <h3 className="text-l font-bold text-gray-800">Binned data</h3>
+                        <img src={planetBinned} alt="Planet Cover" className="w-full sm:w-auto" />
+                      </div>
+                      <div>
+                        <h3 className="text-l font-bold text-gray-800">Phase folded data</h3>
+                        <img src={planetPhased} alt="Planet Cover" className="w-full sm:w-auto" />
+                      </div>
+                    </div>
+                    <br />
+                    <center><iframe title="Embedded cell output" src={planetData?.deepnote} height="650" width="60%" /></center>
+                  </>
+                ) : (
+                  <img src={planetCover} alt="Planet Cover" className="" />
+                )}
+              </Card>
+            </>
           )}
           {activeLink === SidebarLink.Visit && (
             <>
-              <PostCard planetImage = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Kepler-22b.jpg/1200px-Kepler-22b.jpg'
-        time = '11 July 2023'
-        user = {profile?.username}
-        planet = {planetData?.content}
-        comment = 'Generated by Liam'/>
+              <PostCard
+                planetImage='https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Kepler-22b.jpg/1200px-Kepler-22b.jpg'
+                time='11 July 2023'
+                user={profile?.username}
+                planet={planetData?.content}
+                comment='Generated by Liam'
+              />
             </>
           )}
-          {/* <div><UnityScreenshot unityContainerId="unityContainer1" /></div> */}
         </div>
       </div>
     </CoreLayout>
-  ); // https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/51/download.png
+  );
 }
