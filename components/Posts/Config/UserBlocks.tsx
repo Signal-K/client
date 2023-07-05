@@ -27,3 +27,16 @@ export default function UserProfileBlocks () {
         </main></div>
     );
 }
+
+export function UserProfileEditBlock () {
+    const session = useSession();
+
+    return (
+        <Card>
+            <div className="container mx-auto py-8">
+                {/* <AccountEditor session={session} /> */}
+                <IndexAuth />
+            </div>
+        </Card>
+    )
+}

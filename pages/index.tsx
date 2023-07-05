@@ -10,7 +10,7 @@ import Feed from "./feed";
 import { SocialGraphHomeModal1 } from "./posts";
 import PostCard from "../components/Posts/Postcards/Postcard";
 import CommentSection from "../components/Posts/Comments/CommentSection";
-import UserProfileBlocks from "../components/Posts/Config/UserBlocks";
+import UserProfileBlocks, { UserProfileEditBlock } from "../components/Posts/Config/UserBlocks";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -34,6 +34,7 @@ export default function Home() {
         <CoreLayout>
           <PlaygroundPage />
           <UserProfileBlocks />
+          {/* <UserProfileEditBlock /> */}
           <SocialGraphHomeModal />
           {/* <CommentSection /> */}
           {/* <SocialGraphHomeModal1 /> */}
