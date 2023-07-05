@@ -1,7 +1,7 @@
 import React, { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FiMenu, FiBell, FiUser, FiHome, FiCircle, FiRss, FiFileText, FiBookOpen, FiBarChart2, FiStar } from 'react-icons/fi';
+import { FiMenu, FiBell, FiUser, FiHome, FiCircle, FiRss, FiFileText, FiBookOpen, FiBarChart2, FiStar, FiBookmark } from 'react-icons/fi';
 import { PostCardAvatar } from '../AccountAvatar';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { AvatarPostCard } from '../PostCard';
@@ -57,7 +57,7 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
       .select()
       .eq("id", session?.user?.id)
       .then((result) => {
-        if (result.data.length) {
+        if (result.data) {
           setProfile(result.data[0]);
         }
     });
@@ -100,9 +100,10 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
           >
             <div className="p-4">
               <ul className="space-y-4">
-                <SidebarItem icon={<FiHome size={20} />} label="Home" href="/tests/dashboard" />
+                <SidebarItem icon={<FiHome size={20} />} label="Home" href="/" />
                 <SidebarItem icon={<FiStar size={20} />} label="Planets" href="/tests/planets" />
                 <SidebarItem icon={<FiRss size={20} />} label="Feed" href="/feed" />
+                <SidebarItem icon={<FiBookmark size={20} />} label="Training" href="/tests/onboarding" />
                 <SidebarItem icon={<FiFileText size={20} />} label="Journals" href="/journal" />
                 <SidebarItem icon={<FiBookOpen size={20} />} label="Documentation" href="/docs" />
                 <SidebarItem icon={<FiBarChart2 size={20} />} label="Changelog" href="/changelog" />
@@ -114,9 +115,10 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
         <div className={`bg-gray-200 w-64 ${sidebarOpen ? '' : 'hidden'}`}>
           <div className="p-4">
             <ul className="space-y-4">
-              <SidebarItem icon={<FiHome size={20} />} label="Home" href="/tests/dashboard" />
+              <SidebarItem icon={<FiHome size={20} />} label="Home" href="/" />
               <SidebarItem icon={<FiStar size={20} />} label="Planets" href="/tests/planets" />
               <SidebarItem icon={<FiRss size={20} />} label="Feed" href="/feed" />
+              <SidebarItem icon={<FiBookmark size={20} />} label="Training" href="/tests/onboarding" />
               <SidebarItem icon={<FiFileText size={20} />} label="Journals" href="/journal" />
               <SidebarItem icon={<FiBookOpen size={20} />} label="Documentation" href="/docs" />
               <SidebarItem icon={<FiBarChart2 size={20} />} label="Changelog" href="/changelog" />

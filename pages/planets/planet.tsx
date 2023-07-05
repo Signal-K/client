@@ -112,14 +112,6 @@ export default function PlanetPage () {
         }
     }
 
-    // function showNftMetadataUri (planet) {
-    //     const { contract } = useContract(`{planet?.contract}`);
-    //     const { data, isLoading } = useContractRead( contract, "uri", `{planet?.tokenId}`)
-    //     if ( data ) {
-    //         setPlanetUri( data );
-    //     }
-    // }
-
     function updatePlanetTic ( ) {
 
     }
@@ -211,7 +203,7 @@ export default function PlanetPage () {
                     </div>
                 </Card>
                 <PlanetCard activeTab = { tab } planetId = { planetId } />
-                <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={fetchPostsForPlanet(planetId)} /></UserContext.Provider><br />
+                <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={ fetchPostsForPlanet(planetId)} /></UserContext.Provider><br />
 
                 <center><h2 className="display-6">{planet?.content} Discussion</h2></center><br />
                 {planetPosts?.length > 0 && planetPosts.map(post => (
