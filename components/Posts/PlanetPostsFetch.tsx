@@ -20,10 +20,37 @@ interface PlanetPostCardProps {
     planets2: number;
     voteCount: number;
     userVote: string;
+    comments?: Comment[];
     onVote: ( postId: number, voteType: string) => void;
 }
 
-export default function PlanetPostCard ( { id, content, created_at, media, profiles:authorProfile, planets2, voteCount, userVote, onVote }: PlanetPostCardProps ) {
+interface Comment {
+  id: number;
+  content: string;
+  created_at: string;
+  profiles: {
+    id: number;
+    avatar_url: string;
+    username: string;
+  };
+}
+
+const CommentItem: React.FC<Comment> = ({ id, content, created_at, profiles }) => {
+  return (
+    <div className="ml-8 my-3">
+      <div className="flex items-center mb-2">
+        <PostCardAvatar url={profiles?.avatar_url} size={25} />
+        <div className="flex flex-wrap items-center ml-2">
+          <div className="font-bold">{profiles?.username}</div>
+          <div className="text-xs text-gray-500 ml-2">{new Date(created_at).toLocaleString()}</div>
+        </div>
+      </div>
+      <div className="my-3 text-sm">{content}</div>
+    </div>
+  );
+};
+
+export default function PlanetPostCard ( { id, content, created_at, media, profiles:authorProfile, planets2, voteCount, userVote, onVote, comments }: PlanetPostCardProps ) {
     //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
     const [profiles, setProfiles] = useState();
     const supabase = useSupabaseClient();
@@ -37,6 +64,12 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
     const [votingError, setVotingError] = useState<string | null>(null);
     const [upvotesCount, setUpvotesCount] = useState<number>(0);
     const [downvotesCount, setDownvotesCount] = useState<number>(0);
+
+    const [showComments, setShowComments] = useState(true);
+
+    const toggleComments = () => {
+      setShowComments(!showComments);
+    };
     
   useEffect(() => {
     // Fetch votes for the current post if the user is logged in
@@ -254,6 +287,26 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
       )}
       {votingError && <p className="text-red-500 mt-2">{votingError}</p>}
         </div>
+        {comments && comments.length > 0 && (
+        <div className="my-3 text-sm">
+          <button className="text-blue-500" onClick={toggleComments}>
+            {showComments ? "Hide Comments" : "Show Comments"}
+          </button>
+          {showComments &&
+            comments.map((comment) => (
+              <>
+              <div
+            className="absolute top-2 -left-3 h-10 border-l-2 border-gray-300"
+            style={{
+              transform: "rotate(30deg)",
+              zIndex: -1,
+            }}
+          ></div>
+              <CommentItem key={comment.id} {...comment} />
+              </>
+            ))}
+        </div>
+      )}
         <CommentFormCard postId={id} onComment={null} />
       </Card>
     );

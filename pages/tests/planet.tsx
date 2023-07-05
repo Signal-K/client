@@ -31,20 +31,33 @@ export default function PlanetPage({ id }: { id: string }) {
   const [planetPosts, setPlanetPosts] = useState([]);
   const { id: planetId } = router.query; // Rename the variable to 'planetId'
   const [unityBuild, setUnityBuild] = useState(null);
-  
+
   useEffect(() => {
-    if (planetData?.temperature < 300) { setUnityBuild(1); };
-    if (planetData?.temperature > 300) { setUnityBuild(2); };
-  }, []);
+    if (planetData?.temperature < 300) {
+      setUnityBuild(1);
+    }
+    if (planetData?.temperature >= 300) {
+      setUnityBuild(2);
+    }
+  }, [planetData?.temperature]);
 
-    const [profile, setProfile] = useState(null);
-    const [activeLink, setActiveLink] = useState(SidebarLink.Feed); // Track the active link
-    const [showUnity, setShowUnity] = useState(false); // Track the visibility of Unity component
-    const[loadUnityComponent, setLoadUnityComponent] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [activeLink, setActiveLink] = useState(SidebarLink.Feed); // Track the active link
+  const [showUnity, setShowUnity] = useState(false); // Track the visibility of Unity component
+  const [loadUnityComponent, setLoadUnityComponent] = useState(false);
 
-    const planetBinned = 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/' + id + '/binned.png';
-    const planetPhased = 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/' + id + '/phase.png';
-    const planetCover = 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/' + id + '/download.png';
+  const planetBinned =
+    "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/" +
+    id +
+    "/binned.png";
+  const planetPhased =
+    "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/" +
+    id +
+    "/phase.png";
+  const planetCover =
+    "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/" +
+    id +
+    "/download.png";
 
   useEffect(() => {
     if (planetId) {
@@ -89,18 +102,56 @@ export default function PlanetPage({ id }: { id: string }) {
     }
   };
 
-  function fetchPostsForPlanet(planetId) {
-    supabase
-      .from("posts_duplicates")
-      .select(
-        "id, content, created_at, media, profiles(id, avatar_url, username)"
-      )
-      .eq("planets2", planetId)
-      .order("created_at", { ascending: false })
-      .then((result) => {
-        setPlanetPosts(result.data);
-      });
+  async function fetchPostsForPlanet(planetId) {
+    try {
+      const { data: postsData, error: postsError } = await supabase
+        .from("posts_duplicates")
+        .select("id, content, created_at, media, profiles(id, avatar_url, username)")
+        .eq("planets2", planetId)
+        .order("created_at", { ascending: false });
+
+      if (postsData) {
+        setPlanetPosts(postsData);
+      }
+
+      if (postsError) {
+        throw postsError;
+      }
+    } catch (error: any) {
+      console.error("Error fetching posts:", error.message);
+    }
   }
+
+  useEffect(() => {
+    if (planetPosts.length > 0) {
+      const postIds = planetPosts.map((post) => post.id);
+      supabase
+        .from("comments")
+        .select("id, content, created_at, profiles(id, avatar_url, username), post_id")
+        .in("post_id", postIds)
+        .order("created_at", { ascending: true })
+        .then((commentsResponse) => {
+          const commentsByPostId: { [postId: number]: Comment[] } = commentsResponse.data.reduce(
+            (acc, comment) => {
+              const postId = comment.post_id;
+              if (!acc[postId]) {
+                acc[postId] = [];
+              }
+              acc[postId].push(comment);
+              return acc;
+            },
+            {}
+          );
+  
+          const postsWithComments = planetPosts.map((post) => ({
+            ...post,
+            comments: commentsByPostId[post.id] || [],
+          }));
+  
+          setPlanetPosts(postsWithComments);
+        })
+    }
+  }, [planetPosts]);
 
   const handleSidebarLinkClick = (link: SidebarLink) => {
     setActiveLink(link);
@@ -267,7 +318,7 @@ export default function PlanetPage({ id }: { id: string }) {
                 <h2 className="text-xl font-bold text-gray-800">Object discussion</h2><br />
               {planetPosts?.length > 0 &&
                 planetPosts.map((post) => (
-                  <PlanetPostCard key={post.id} {...post} id={post.id} planets2={planetId}  />
+                  <PlanetPostCard key={post.id} {...post} id={post.id} planets2={planetId} comments={post.comments} />
                 ))}
             </>
           )}

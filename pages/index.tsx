@@ -36,7 +36,6 @@ export default function Home() {
           <UserProfileBlocks />
           {/* <UserProfileEditBlock />g */}
           <SocialGraphHomeModal />
-          {/* <CommentSection /> */}
           {/* <SocialGraphHomeModal1 /> */}
         </CoreLayout>
       )

@@ -25,21 +25,36 @@ const CommentFormCard: React.FC<CommentFormCardProps> = ({ postId, onComment }) 
             });
     }, [session]);
 
-    function createComment() {
-        supabase.from("comments")
-        .insert({
-            author: session?.user?.id,
-            content: comment,
-            post_id: postId,
-        })
-        .then((response) => {
-            if (!response.error) {
-                alert(`Comment "${comment}" created`);
-                setComment("");
-                if (onComment) { onComment(); };
-            }
-        });
+    async function createComment(postId: number, content: string) {
+        const { user } = session;
+        if (!user) return;
+
+        const { data, error } = await supabase
+            .from("comments")
+            .insert([
+                {
+                    author: session?.user?.id,
+                    content: comment,
+                    post_id: postId,
+                    parent_comment_id: 1,
+                },
+            ]);
+        
+        if (error) {
+            console.error(error);
+        } else {
+            console.log(data);
+        }
     }
+
+    const [commentsCount, setCommentsCount] = useState(0);
+
+    const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        await createComment(postId, comment);
+        setComment("");
+        setCommentsCount((prevCount) => prevCount + 1);
+    };
 
     return (
         <div className="flex gap-2 ml-8">
@@ -52,7 +67,7 @@ const CommentFormCard: React.FC<CommentFormCardProps> = ({ postId, onComment }) 
                     placeholder={`Write a comment...`}
                 />
             )}
-            <button onClick={createComment} className="bg-socialBlue text-white px-3 py-1 rounded-md">Post</button>
+            <button onClick={handleSubmit} className="bg-socialBlue text-white px-3 py-1 rounded-md">Post</button>
         </div>
     )
 }

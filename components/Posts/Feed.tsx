@@ -11,7 +11,7 @@ export default function SocialGraphHomeModal() {
 
   useEffect(() => {
     fetchPosts();
-  }, [session?.user?.id]);
+  }, [session?.user?.id]); 
 
   useEffect(() => {
     if (planetPosts.length > 0) {
