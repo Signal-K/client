@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import CoreLayout from "../../../../components/Core/Layout";
+import ExoPlanetDetective from "../../../../components/onboarding/LightKurve/_Introduction";
 
 const Instructions = dynamic(() =>
   import("../../../../components/onboarding/LightKurve/transitMethod")
@@ -42,7 +43,7 @@ export default function PlanetHuntersOnboardingPage1() {
             paddingRight: isMobile ? 0 : `${buffer}%`,
           }}
         >
-          <Instructions />
+          <ExoPlanetDetective />
         </div>
         <div style={{ width: `${percent}%` }}>
           <ProgressSidebar credits={credits} currentPage={currentPage} />

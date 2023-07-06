@@ -61,6 +61,11 @@ export default function PlanetPage({ id }: { id: string }) {
   const [showUnity, setShowUnity] = useState(false); // Track the visibility of Unity component
   const [loadUnityComponent, setLoadUnityComponent] = useState(false);
 
+  const displayPlanet = async () => {
+    setLoadUnityComponent(true);
+    handleSidebarLinkClick(SidebarLink.Demo);
+  }
+
     // State to hold the gradient colors
     const [gradientColor1, setGradientColor1] = useState("gray-200");
     const [gradientColor2, setGradientColor2] = useState("gray-300");
@@ -348,7 +353,7 @@ export default function PlanetPage({ id }: { id: string }) {
 
   {/* Stats Icon */}
   <button
-  onClick={() => handleSidebarLinkClick(SidebarLink.Demo)}
+  onClick={() => displayPlanet()}
   className={`text-gray-800 p-2 ${activeLink === SidebarLink.Demo ? "font-bold" : ""}`}
 >
   <div className="flex items-center">
@@ -409,7 +414,6 @@ export default function PlanetPage({ id }: { id: string }) {
           {activeLink === SidebarLink.Demo && (
             <div id="unityContainer">
                 <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br /><Card noPadding={false}>
-              <button onClick={() => setLoadUnityComponent(true)}>View Planet</button>
               <div>{loadUnityComponent && planetData?.temperature <= 300 && <UnityBuildLod11 />}</div>
               <div>{loadUnityComponent && planetData?.temperature >= 300 && <UnityBuildLod1 />}</div>
               {session?.user?.id == "cebdc7a2-d8af-45b3-b37f-80f328ff54d6" && ( <><iframe src="https://flask-8gn2.onrender.com/" height="50%" width="100%" /><iframe src="https://flask-8gn2.onrender.com/input" height="50%" width="100%" /> {/* <YourComponent /> */} <LightkurveForm /> </> )}
