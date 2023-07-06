@@ -10,7 +10,7 @@ export default function UnityBuildLod111 () {
     });
 
     // const [planetName, setPlanetName] = useState("");
-    const planetName = 'test';
+    const planetName = 'Pluto';
 
     // const handlePlanetNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     //     setPlanetName(event.target.value);
@@ -26,7 +26,7 @@ export default function UnityBuildLod111 () {
             <input
                 type="text"
                 placeholder="Enter planet name"
-                value='55'
+                value='Pluto'
                 // onChange={handlePlanetNameChange}
             />
             <button onClick={handleSendPlanetName}>Send Planet Name</button>
