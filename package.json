@@ -73,6 +73,7 @@
     "react-dom": "18.2.0",
     "react-dropzone": "14.2.3",
     "react-icons": "4.8.0",
+    "react-image-lightbox": "^5.1.4",
     "react-jupyter-notebook-viewer": "1.1.13",
     "react-query": "3.39.3",
     "react-spinners": "0.13.8",
