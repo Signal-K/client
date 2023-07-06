@@ -5,6 +5,7 @@ import Link from "next/link";
 import AccountAvatar, { PostCardAvatar } from "../AccountAvatar";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UserContext } from "../../context/UserContext";
+import CommentFormCard from "./Comments/CommentForm";
 
 interface PlanetPostCardProps {
     id: number;
@@ -253,6 +254,7 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
       )}
       {votingError && <p className="text-red-500 mt-2">{votingError}</p>}
         </div>
+        <CommentFormCard postId={id} onComment={null} />
       </Card>
     );
   }
