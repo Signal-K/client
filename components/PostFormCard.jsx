@@ -200,14 +200,14 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
   // https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media1675853386903cebdc7a2-d8af-45b3-b37f-80f328ff54d6image-asset.jpg
 
   return (
-    <Card noPadding={false}>
+    <>
       <div className="flex gap-2">
         <div>
           <AccountAvatar uid={session?.user?.id}
                 url={avatar_url}
                 size={60} />
         </div> { profile && (
-          <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-16 rounded-lg" placeholder={`What do you think about this planet candidate, ${profile?.username}?`} /> )}
+          <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-24 rounded-xl" placeholder={`What do you think about this planet candidate, ${profile?.username}?`} /> )}
       </div>
       {isUploading && (
         <div><ClimbingBoxLoader /></div>
@@ -233,7 +233,7 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
           <button onClick={createPost} className="bg-socialBlue text-white px-6 py-1 rounded-md">Share</button>
         </div>
       </div>
-    </Card>
+      </>
   );
 }
 
