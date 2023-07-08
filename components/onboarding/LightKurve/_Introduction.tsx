@@ -57,11 +57,11 @@ const ExoPlanetDetective: React.FC = () => {
                     In the era of supercomputers and AI, you might wonder: Why involve humans? Here's the deal: <br />
                     Computers are great at spotting regular patterns but can sometimes overlook unusual ones. Especially for longer-period planets, the human eye and intuition can be invaluable. By blending computational precision with human insight, we ensure no exoplanet goes unnoticed.
                 </p><br />
-
-                Your journey in Star Sailors is not a solitary one:
-
-1. **Collaboration**: Engage in team discussions, share observations, and debate theories with fellow sailors.
-2. **Voting**: After discussions, cast your vote on potential discoveries contributing to the community’s collective intelligence.
+                <h3 className="text-xl font-bold mb-4 text-primary">Your journey in Star Sailors is not a solitary one:</h3>
+                <p className="text-gray-700">
+                    1. Collaboration: Engage in team discussions, share observations, and debate theories with fellow sailors. <br />
+                    2. Voting: After discussions, cast your vote on potential discoveries contributing to the community’s collective intelligence.
+                </p><br />
             </div>
         </div>
     )
