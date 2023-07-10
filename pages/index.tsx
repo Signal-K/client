@@ -62,8 +62,8 @@ export default function Home() {
       
         <br />
         <center><Link href="/tests/onboarding/"><button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Play Star Sailors</button></Link></center> <br /><br /><br />
-      <center><h2 className="max-w-3xl text-l font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-4xl lg:max-w-4xl">Recent classifications by our users<br /></h2></center>
-      <SocialGraphHomeModal1 />
+      {/* <center><h2 className="max-w-3xl text-l font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-4xl lg:max-w-4xl">Recent classifications by our users<br /></h2></center> */}
+      {/* <SocialGraphHomeModal1 /> */}
       <br /><br />
             </CoreLayout>
     )

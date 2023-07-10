@@ -19,6 +19,7 @@ const navigation = [
   { name: 'Economy', href: '/balance' },
   { name: 'Inventory', href: '/#'}, // href: '/inventory' },
   { name: 'Documentation', href: '/#'}, // href: '/docs' },
+  { name: 'Discord', href: 'https://discord.gg/zhMPVUa7yd' },
 ];
 
 function classNames(...classes: string[]) {

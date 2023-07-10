@@ -39,7 +39,7 @@ const PlanetHuntersOnboardingPage2: React.FC = () => {
                 <iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/149ecbf466df401e902afc4a543fe729/1b07961e806f4d91a47a297bdb6268ef?height=509.0390625" height="689.0390625" width="100%"/><br />
                 <h3 className="text-xl font-bold mb-4 text-primary">Let's review your journey so far:</h3>
                 <p className="text-gray-700">
-                    1. Analyselight curves using Lightkurve. <br />
+                    1. Analyse light curves using Lightkurve. <br />
                     2. Spot potential exoplanets by looking for dips in star brightness. <br />
                     3. Discuss your findings with the community. <br />
                     4. Vote on the most promising discoveries. <br />
