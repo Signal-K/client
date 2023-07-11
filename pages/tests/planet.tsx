@@ -442,6 +442,7 @@ export default function PlanetPage({ id }: { id: string }) {
                 <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br /><Card noPadding={false}>
               <div>{loadUnityComponent && planetData?.temperature <= 300 && <UnityBuildLod11 />}</div>
               <div>{loadUnityComponent && planetData?.temperature >= 300 && <UnityBuildLod1 />}</div>
+              {/* <UnityBuildLod111 /> */}
               {session?.user?.id == "cebdc7a2-d8af-45b3-b37f-80f328ff54d6" && ( <><iframe src="https://flask-8gn2.onrender.com/" height="50%" width="100%" /><iframe src="https://flask-8gn2.onrender.com/input" height="50%" width="100%" /> {/* <YourComponent /> */} <LightkurveForm /> </> )}
               <br /><br /><br /><br /></Card>
             </div>
@@ -459,7 +460,6 @@ export default function PlanetPage({ id }: { id: string }) {
           )}
         </div>
       </div>
-      <UnityBuildLod111 />
     </CoreLayout>
   );
 }
