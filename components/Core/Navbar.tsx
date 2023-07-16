@@ -17,7 +17,7 @@ const navigation = [
   // { name: 'Playground', href: '/playground' },
   { name: 'Planets', href: '/tests/planets' },
   { name: 'Economy', href: '/balance' },
-  { name: 'Inventory', href: '/#'}, // href: '/inventory' },
+  { name: 'Inventory', href: '/inventory'}, // href: '/inventory' },
   { name: 'Documentation', href: '/#'}, // href: '/docs' },
   { name: 'Discord', href: 'https://discord.gg/zhMPVUa7yd' },
 ];

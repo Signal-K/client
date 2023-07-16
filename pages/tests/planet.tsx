@@ -19,6 +19,7 @@ import fetchTic from "../../components/Gameplay/Inventory/fetchTic";
 import YourComponent from "../../components/Gameplay/Inventory/fetchTic";
 import LightkurveForm from "../../components/Gameplay/Inventory/fetchTic2";
 import UnityBuildLod111 from "../../components/Gameplay/Unity/Build/LOD-Design";
+import { PostModal } from "../../components/Posts/FeedPostCard";
 
 enum SidebarLink {
   Feed,
@@ -433,7 +434,10 @@ export default function PlanetPage({ id }: { id: string }) {
                 <h2 className="text-xl font-bold text-gray-800">Object discussion</h2><br />
               {planetPosts?.length > 0 &&
                 planetPosts.map((post) => (
-                  <PlanetPostCard key={post.id} {...post} id={post.id} planets2={planetId} comments={post.comments} />
+                  <>
+                    <PlanetPostCard key={post.id} {...post} id={post.id} planets2={planetId} comments={post.comments} />
+                    {/* <PostModal key={post.id} {...post} /> */}
+                  </>
                 ))}
             </>
           )}
