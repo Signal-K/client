@@ -15,6 +15,9 @@ import PostCard from "../../components/Posts/Postcards/Postcard";
 import { useScreenshot, createFileName } from 'use-react-screenshot';
 import CoreLayout from "../../components/Core/Layout";
 import ProfilePage from "../../components/Tests/Planet/ProfileCardTest";
+import fetchTic from "../../components/Gameplay/Inventory/fetchTic";
+import YourComponent from "../../components/Gameplay/Inventory/fetchTic";
+import LightkurveForm from "../../components/Gameplay/Inventory/fetchTic2";
 
 enum SidebarLink {
   Feed,
@@ -407,6 +410,7 @@ export default function PlanetPage({ id }: { id: string }) {
               <button onClick={() => setLoadUnityComponent(true)}>View Planet</button>
               <div>{loadUnityComponent && planetData?.temperature <= 300 && <UnityBuildLod11 />}</div>
               <div>{loadUnityComponent && planetData?.temperature >= 300 && <UnityBuildLod1 />}</div>
+              {session?.user?.id == "cebdc7a2-d8af-45b3-b37f-80f328ff54d6" && ( <><iframe src="https://flask-8gn2.onrender.com/" height="50%" width="100%" /><iframe src="https://flask-8gn2.onrender.com/input" height="50%" width="100%" /> {/* <YourComponent /> */} <LightkurveForm /> </> )}
               <br /><br /><br /><br /></Card>
             </div>
           )}
