@@ -169,6 +169,8 @@ export default function PlanetPage({ id }: { id: string }) {
     }
   }
 
+  const a = 0;
+
   useEffect(() => {
     if (planetPosts.length > 0) {
       const postIds = planetPosts.map((post) => post.id);
@@ -198,7 +200,7 @@ export default function PlanetPage({ id }: { id: string }) {
           setPlanetPosts(postsWithComments);
         })
     }
-  }, [planetPosts]);
+  }, [a]);
 
   const handleSidebarLinkClick = (link: SidebarLink) => {
     setActiveLink(link);

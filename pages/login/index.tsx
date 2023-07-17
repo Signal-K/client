@@ -1,7 +1,6 @@
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 import React from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-// import { SocialGraphHomeModal } from '../posts';
 import Feed from '../feed';
 
 const Login = () => {

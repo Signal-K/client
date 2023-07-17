@@ -6,10 +6,12 @@ const CommentSection: React.FC = () => {
     const [comments, setComments] = useState([]);
     const [posts, setPosts] = useState([])
     const supabase = useSupabaseClient();
+    const session = useSession();
+    const a = 0;
 
     useEffect(() => {
         fetchPostsAndComments();
-    }, []);
+    }, [a]);
 
     const fetchPostsAndComments = async () => {
         try {
