@@ -9,14 +9,24 @@ const data = [
     Sailors: 4
   },
   {
-    Month: 'May 21',
+    Month: 'May 23',
     TESS: 83,
     Sailors: 10
   },
   {
-    Month: 'Jun 22',
+    Month: 'Jun 23',
     TESS: 29,
     Sailors: 23
+  },
+  {
+    Month: 'Jul 23',
+    TESS: 39,
+    Sailors: 11
+  },
+  {
+    Month: 'Aug 23',
+    TESS: 27,
+    Sailors: 18
   }
 ];
 

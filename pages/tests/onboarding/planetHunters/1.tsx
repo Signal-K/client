@@ -45,7 +45,7 @@ export default function PlanetHuntersOnboardingPage1() {
           }}
         >
           <ExoPlanetDetective />
-          {/* <LightkurveQuiz /> */}
+          <LightkurveQuiz />
         </div>
         <div style={{ width: `${percent}%` }}>
           <ProgressSidebar credits={credits} currentPage={currentPage} />

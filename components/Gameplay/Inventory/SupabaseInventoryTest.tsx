@@ -51,6 +51,7 @@ const SupabaseInventoryList: React.FC = () => {
                         </div>
                         <p className="text-gray-600">{item.description}</p>
                         <p className="text-gray-600">Cost: {item.cost}</p>
+                        <p className="text-gray-600">Cost: {item.ItemCategory}</p>
                     </li>
                 ))}
             </ul>

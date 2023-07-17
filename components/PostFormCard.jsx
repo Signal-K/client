@@ -18,31 +18,45 @@ export default function PostFormCard ( { onPost } ) {
   const [isUploading, setIsUploading] = useState(false);
   //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(); 
   const [avatar_url, setAvatarUrl] = useState(null);
+  const [userExperience, setUserExperience] = useState();
 
-  function createPost () {
-    supabase.from('posts').insert({
-      author: session?.user?.id, // This is validated via RLS so users can't pretend to be other user
-      content, // : content,
-      media: uploads, // This should be changed to the user path `storage/userId/post/media...` like in the image gallery
-      // File upload -> show an icon depending on what type of file.
-    }).then(response => {
-      if (!response.error) {
-        alert(`Post ${content} created`);
-        setContent('');
-        setUploads([]);
-        if ( onPost ) {
-          onPost();
+  function createPost() {
+    supabase.from('posts_duplicates')
+      .insert({
+        author: session?.user?.id,
+        content,
+        media: uploads,
+        planets2: planetId2,
+      })
+      .then(response => {
+        if (!response.error) {
+          // Increment the user's experience locally
+          setUserExperience(userExperience + 1);
+  
+          // Update the user's experience in the database
+          supabase.from('profiles')
+            .update({
+              experience: userExperience + 1,
+            })
+            .eq('id', session?.user?.id);
+  
+          alert(`Post ${content} created`);
+          setContent('');
+          setUploads([]);
+          if (onPost) {
+            onPost();
+          }
         }
-      }
-    });
-  }
+      });
+  }  
 
   useEffect(() => {
     supabase.from('profiles')
-      .select(`avatar_url`)
+      .select(`avatar_url, experience`)
       .eq('id', session?.user?.id)
       .then(result => {
         setAvatarUrl(result.data.avatar_url); //console.log(result.data[0].avatar_url)
+        setUserExperience(result.data.experience);
       })
   }, [session]);
 
@@ -132,7 +146,7 @@ export default function PostFormCard ( { onPost } ) {
     </Card>
   );
 }
-
+ 
 export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
   const supabase = useSupabaseClient();
   const [content, setContent] = useState('');
@@ -146,32 +160,52 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
   const [isUploading, setIsUploading] = useState(false);
   //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(); 
   const [avatar_url, setAvatarUrl] = useState(null);
+  const [userExperience, setUserExperience] = useState();
 
-  function createPost () {
-    supabase.from('posts_duplicates').insert({
-      author: session?.user?.id, // This is validated via RLS so users can't pretend to be other user
-      content, // : content,
-      media: uploads, // This should be changed to the user path `storage/userId/post/media...` like in the image gallery
-      planets2: planetId2,
-      // File upload -> show an icon depending on what type of file.
-    }).then(response => {
-      if (!response.error) {
-        alert(`Post ${content} created`);
-        setContent('');
-        setUploads([]);
-        if ( onPost ) {
-          onPost();
+  function createPost() {
+    supabase
+      .from('posts_duplicates')
+      .insert({
+        author: session?.user?.id,
+        content,
+        media: uploads,
+        planets2: planetId2,
+      })
+      .then(response => {
+        if (!response.error) {
+          // Update the user's experience in the database
+          supabase
+            .from('profiles')
+            .update({
+              experience: userExperience + 1,
+            })
+            .eq('id', session?.user?.id)
+            .then(updateResponse => {
+              if (!updateResponse.error) {
+                // Increment the user's experience in the state
+                setUserExperience(userExperience + 1);
+  
+                alert(`Post ${content} created`);
+                setContent('');
+                setUploads([]);
+                if (onPost) {
+                  onPost();
+                }
+              } else {
+                console.error('Error updating experience:', updateResponse.error);
+              }
+            });
         }
-      }
-    });
-  }
+      });
+  }  
 
   useEffect(() => {
     supabase.from('profiles')
-      .select(`avatar_url`)
+      .select(`avatar_url, experience`)
       .eq('id', session?.user?.id)
       .then(result => {
         setAvatarUrl(result?.data[0]?.avatar_url); //console.log(result.data[0].avatar_url)
+        setUserExperience(result?.data[0]?.experience);
       })
   }, [session]);
 
@@ -220,6 +254,7 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
         </div>
       )}
       <div className="flex gap-5 items-center mt-2">
+        <p>F{userExperience}</p>
         <div>
           <label className="flex gap-1">
             <input type='file' className="hidden" onChange={addMedia} />
