@@ -254,7 +254,7 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
         </div>
       )}
       <div className="flex gap-5 items-center mt-2">
-        <p>F{userExperience}</p>
+        <p>Your Silfur: {userExperience}</p>
         <div>
           <label className="flex gap-1">
             <input type='file' className="hidden" onChange={addMedia} />
