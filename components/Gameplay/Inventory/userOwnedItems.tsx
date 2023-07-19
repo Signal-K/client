@@ -86,8 +86,8 @@ const OwnedItemsList: React.FC = () => {
         </div>
         <OwnedPlanetsList />
         <br />
-        <ToolItemsList />
-        <CosmeticItemList />
+        {/* <ToolItemsList />
+        <CosmeticItemList /> */}
     </>
   );
 };

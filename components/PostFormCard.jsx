@@ -21,24 +21,31 @@ export default function PostFormCard ( { onPost } ) {
   const [userExperience, setUserExperience] = useState();
 
   function createPost() {
-    supabase.from('posts_duplicates')
+    supabase
+      .from('posts_duplicates')
       .insert({
         author: session?.user?.id,
         content,
         media: uploads,
         planets2: planetId2,
       })
-      .then(response => {
+      .then(async response => {
         if (!response.error) {
           // Increment the user's experience locally
           setUserExperience(userExperience + 1);
   
           // Update the user's experience in the database
-          supabase.from('profiles')
-            .update({
-              experience: userExperience + 1,
-            })
-            .eq('id', session?.user?.id);
+          await supabase.from('profiles').update({
+            experience: userExperience + 1,
+          }).eq('id', session?.user?.id);
+  
+          // Add a copy of the planet to the user's inventory
+          await supabase.from('inventoryPLANETS').insert([
+            {
+              planet_id: planetId2,
+              owner_id: session?.user?.id,
+            },
+          ]);
   
           alert(`Post ${content} created`);
           setContent('');
@@ -173,6 +180,9 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
       })
       .then(response => {
         if (!response.error) {
+          // Increment the user's experience locally
+          setUserExperience(userExperience + 1);
+  
           // Update the user's experience in the database
           supabase
             .from('profiles')
@@ -182,20 +192,48 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
             .eq('id', session?.user?.id)
             .then(updateResponse => {
               if (!updateResponse.error) {
-                // Increment the user's experience in the state
-                setUserExperience(userExperience + 1);
+                // Fetch the newly added planet's data
+                supabase
+                  .from('planetsss')
+                  .select('*')
+                  .eq('id', planetId2)
+                  .then(planetResponse => {
+                    if (!planetResponse.error && planetResponse.data.length > 0) {
+                      const planetToAdd = planetResponse.data[0];
   
-                alert(`Post ${content} created`);
-                setContent('');
-                setUploads([]);
-                if (onPost) {
-                  onPost();
-                }
+                      // Add the planet to the user's inventory
+                      supabase
+                        .from('inventoryPLANETS')
+                        .insert([
+                          {
+                            planet_id: planetToAdd.id,
+                            owner_id: session?.user?.id,
+                          },
+                        ])
+                        .then(inventoryResponse => {
+                          if (!inventoryResponse.error) {
+                            alert(`Post ${content} created and planet added to your inventory`);
+                            setContent('');
+                            setUploads([]);
+                            if (onPost) {
+                              onPost();
+                            }
+                          } else {
+                            console.error('Error adding planet to inventory:', inventoryResponse.error);
+                          }
+                        });
+                    } else {
+                      console.error('Error fetching planet data:', planetResponse.error);
+                    }
+                  });
               } else {
-                console.error('Error updating experience:', updateResponse.error);
+                console.error('Error updating user experience:', updateResponse.error);
               }
             });
         }
+      })
+      .catch(error => {
+        console.error('Error creating post:', error);
       });
   }  
 
