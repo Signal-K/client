@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
+import OwnedPlanetsList from './userOwnedPlanets';
 
 interface OwnedItem {
   id: number;
@@ -83,6 +84,7 @@ const OwnedItemsList: React.FC = () => {
             ))}
         </ul>
         </div>
+        <OwnedPlanetsList />
         <br />
         <ToolItemsList />
         <CosmeticItemList />
