@@ -13,7 +13,7 @@ interface Planet {
   avatar_url: string;
 }
 
-const OwnedPlanetsList: React.FC = () => {
+const OwnedPlanetsListBlock: React.FC = () => {
   const session = useSession();
   const supabase = useSupabaseClient();
   const [ownedPlanets, setOwnedPlanets] = useState([]);
@@ -27,7 +27,8 @@ const OwnedPlanetsList: React.FC = () => {
           const { data, error } = await supabase
             .from('inventoryPLANETS')
             .select('*')
-            .eq('owner_id', user);
+            .eq('owner_id', user)
+            .limit(1);
 
           if (error) {
             throw error;
@@ -55,7 +56,7 @@ const OwnedPlanetsList: React.FC = () => {
           .in('id', planetIds);
 
         if (error) {
-          console.error('Error fetching planet details: ', error);
+          console.error('Error fetching planet details:', error);
         }
 
         if (data) {
@@ -69,9 +70,9 @@ const OwnedPlanetsList: React.FC = () => {
 
   return (
     <>
-      <div className="bg-gray-100 p-4">
-        <h2 className="text-2xl font-semibold mb-4">Your Planets</h2>
-        <ul className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      <div className="p-4">
+        <h2 className="text-2xl font-semibold mb-4">Your recent classifications</h2>
+        <ul className="grid gap-4">
           {planetDetails.map((planet, index) => (
             <Link legacyBehavior href={`https://play.skinetics.tech/tests/planets/${planet.id}`}>
             <li key={planet.id} className="bg-white shadow-md p-4 rounded-md">
@@ -89,4 +90,4 @@ const OwnedPlanetsList: React.FC = () => {
   );
 };
 
-export default OwnedPlanetsList;
+export default OwnedPlanetsListBlock;
