@@ -2,15 +2,14 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import CoreLayout from "../../components/Core/Layout";
-import Card from "../../components/Card";
+import PlanetItemsList from "../../components/Gameplay/Inventory/itemsOnPlanet";
 
 export default function MyPlanetPage({ id }: { id: string }) {
   const supabase = useSupabaseClient();
   const session = useSession();
-
   const router = useRouter();
+  const planetId = router.query.id; // Assuming the query parameter is named 'id'
 
-  const { id: planetId } = router.query;
   const [planetData, setPlanetData] = useState(null);
   const [planetBaseData, setPlanetBaseData] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -82,6 +81,7 @@ export default function MyPlanetPage({ id }: { id: string }) {
       <p>{planetBaseData?.content}</p>
       <img src={planetBaseData?.cover} alt={`Planet ${planetData?.planet_id}`} />
       <p>{planetData?.planet_id}</p>
+      <PlanetItemsList planetId={planetId} /> {/* Pass planetId here */}
     </CoreLayout>
   );
 }

@@ -2,40 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
 import OwnedPlanetsList from './userOwnedPlanets';
 
-interface OwnedItem {
-  id: number;
-  item: number;
-  quantity: number;
-}
-
-interface Item {
-  id: number;
-  name: string;
-  icon_url: string;
-}
-
 const OwnedItemsList: React.FC = () => {
   const session = useSession();
   const supabase = useSupabaseClient();
   const [ownedItems, setOwnedItems] = useState([]);
   const [itemDetails, setItemDetails] = useState([]);
+  const [planets, setPlanets] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedPlanet, setSelectedPlanet] = useState(null);
+  const [isTransferring, setIsTransferring] = useState(false);
 
   useEffect(() => {
     async function fetchOwnedItems() {
       if (session) {
         try {
           const user = session.user.id;
-          const { data, error } = await supabase
+          const { data: ownedItemsData, error: ownedItemsError } = await supabase
             .from('inventoryUSERS')
             .select('*')
             .eq('owner', user);
 
-          if (error) {
-            throw error;
+          if (ownedItemsError) {
+            throw ownedItemsError;
           }
 
-          if (data) {
-            setOwnedItems(data);
+          if (ownedItemsData) {
+            setOwnedItems(ownedItemsData);
           }
         } catch (error) {
           console.error('Error fetching owned items:', error);
@@ -50,17 +42,17 @@ const OwnedItemsList: React.FC = () => {
     async function fetchItemDetails() {
       if (ownedItems.length > 0) {
         const itemIds = ownedItems.map(item => item.item);
-        const { data, error } = await supabase
+        const { data: itemDetailsData, error: itemDetailsError } = await supabase
           .from('inventoryITEMS')
           .select('*')
           .in('id', itemIds);
 
-        if (error) {
-          console.error('Error fetching item details:', error);
+        if (itemDetailsError) {
+          console.error('Error fetching item details:', itemDetailsError);
         }
 
-        if (data) {
-          setItemDetails(data);
+        if (itemDetailsData) {
+          setItemDetails(itemDetailsData);
         }
       }
     }
@@ -68,26 +60,105 @@ const OwnedItemsList: React.FC = () => {
     fetchItemDetails();
   }, [ownedItems]);
 
+  useEffect(() => {
+    async function fetchUserPlanets() {
+      if (session) {
+        try {
+          const user = session.user.id;
+          const { data: userPlanetsData, error: userPlanetsError } = await supabase
+            .from('inventoryPLANETS')
+            .select('*')
+            .eq('owner_id', user);
+
+          if (userPlanetsError) {
+            throw userPlanetsError;
+          }
+
+          if (userPlanetsData) {
+            setPlanets(userPlanetsData);
+          }
+        } catch (error) {
+          console.error('Error fetching user planets:', error);
+        }
+      }
+    }
+
+    fetchUserPlanets();
+  }, [session]);
+
+  const handleTransferButtonClick = (item) => {
+    setSelectedItem(item);
+    setIsTransferring(true);
+  };
+
+  const handlePlanetSelect = (event) => {
+    setSelectedPlanet(event.target.value);
+  };
+
+  const handleConfirmTransfer = async () => {
+    if (selectedItem && selectedPlanet) {
+      try {
+        await supabase
+          .from('inventoryUSERS')
+          .update({ location: selectedPlanet })
+          .eq('id', selectedItem.id);
+
+        // Update the ownedItems state to reflect the change
+        setOwnedItems(prevOwnedItems =>
+          prevOwnedItems.map(item => {
+            if (item.id === selectedItem.id) {
+              return { ...item, location: selectedPlanet };
+            }
+            return item;
+          })
+        );
+
+        setSelectedItem(null);
+        setSelectedPlanet(null);
+        setIsTransferring(false);
+      } catch (error) {
+        console.error('Error transferring item:', error);
+      }
+    }
+  };
+
   return (
     <>
-        <div className="bg-gray-100 p-4">
+      <div className="bg-gray-100 p-4">
         <h2 className="text-2xl font-semibold mb-4">Your Items</h2>
         <ul className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {itemDetails.map((item, index) => (
-            <li key={item.id} className="bg-white shadow-md p-4 rounded-md">
+          {itemDetails.map(item => {
+            const ownedItem = ownedItems.find(ownedItem => ownedItem.item === item.id);
+            return (
+              <li key={item.id} className="bg-white shadow-md p-4 rounded-md">
                 <h3 className="text-lg font-medium mb-2">{item.name}</h3>
                 <div className="mb-2">
-                <img src={item.icon_url} alt={item.name} className="w-full h-auto" />
+                  <img src={item.icon_url} alt={item.name} className="w-full h-auto" />
                 </div>
-                <p className="text-gray-600">Quantity: {ownedItems[index]?.quantity}</p>
-            </li>
-            ))}
+                <p className="text-gray-600">Quantity: {ownedItem?.quantity}</p>
+                <p className="text-gray-600">Location: {ownedItem?.location}</p>
+                <button className="mt-2 bg-blue-500 text-white px-2 py-1 rounded" onClick={() => handleTransferButtonClick(ownedItem)}>Transfer Item</button>
+              </li>
+            );
+          })}
         </ul>
+      </div>
+      {isTransferring && (
+        <div className="bg-gray-100 p-4 mt-4">
+          <h2 className="text-2xl font-semibold mb-4">Transfer Item</h2>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-bold mb-2">Select Planet:</label>
+            <select className="w-full px-3 py-2 border rounded" value={selectedPlanet} onChange={handlePlanetSelect}>
+              <option value="">Select a planet</option>
+              {planets.map(planet => (
+                <option key={planet.id} value={planet.id}>{planet.name}</option>
+              ))}
+            </select>
+          </div>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleConfirmTransfer}>Confirm Transfer</button>
         </div>
-        <OwnedPlanetsList />
-        <br />
-        {/* <ToolItemsList />
-        <CosmeticItemList /> */}
+      )}
+      <OwnedPlanetsList />
     </>
   );
 };
