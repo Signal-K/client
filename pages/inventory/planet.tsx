@@ -8,7 +8,7 @@ export default function MyPlanetPage({ id }: { id: string }) {
   const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
-  const planetId = router.query.id; // Assuming the query parameter is named 'id'
+  const planetId = Array.isArray(router.query.id) ? router.query.id[0] : router.query.id; // Handle the possibility of an array
 
   const [planetData, setPlanetData] = useState(null);
   const [planetBaseData, setPlanetBaseData] = useState(null);
