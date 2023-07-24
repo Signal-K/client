@@ -51,6 +51,7 @@ export default function Home() {
             <h1 className="max-w-5xl text-2xl font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-6xl lg:max-w-7xl">
               Welcome to Star Sailors <br />
             </h1>
+            <PlaygroundPage />
             <p className="max-w-xl mx-auto mt-8 text-base leading-relaxed text-center text-gray-500">Our game offers a unique and engaging experience that combines the excitement of gaming with scientific knowledge. By playing, you can actively contribute to scientific research by classifying objects based on real-world data. Our current focus is on the planets mini-game, where you can help identify potential new planets discovered by the TESS telescope. To start playing, log in to the Star Sailors website and navigate to the planets page where you'll classifying different objects with relevant information to help you make informed decisions. You can create posts about your decisions and invite other users to vote on your assessment. As you participate, you'll earn points that can be redeemed for rewards and recognition within the Star Sailors community. Join us today and embark on a thrilling journey of discovery and learning!</p>
             {/* <a className="mx-auto mt-8 text-sm font-semibold text-blue-600 hover:text-neutral-600" title="read more"> Read more about the offer » </a> */}
           </div>
