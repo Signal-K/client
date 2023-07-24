@@ -168,8 +168,34 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
   //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(); 
   const [avatar_url, setAvatarUrl] = useState(null);
   const [userExperience, setUserExperience] = useState();
+  const [hasRequiredItem, setHasRequiredItem] = useState(false); // Added state for required item check
+
+  useEffect(() => {
+    // Check if the user has the required item with ID 8 in their inventory
+    async function checkRequiredItem() {
+      const { data: inventoryData, error: inventoryError } = await supabase
+        .from('inventoryUSERS')
+        .select('*')
+        .eq('owner', session?.user?.id)
+        .eq('item', 8); // Check if the user has the item with ID 8 in their inventory
+
+      if (inventoryError) {
+        console.error('Error fetching inventory data:', inventoryError);
+        return;
+      }
+
+      setHasRequiredItem(inventoryData.length > 0);
+    }
+
+    checkRequiredItem();
+  }, [session]);
 
   function createPost() {
+    if (!hasRequiredItem) {
+      alert('You need the required item to create a classification post.');
+      return;
+    }
+
     supabase
       .from('posts_duplicates')
       .insert({
