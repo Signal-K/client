@@ -180,7 +180,7 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
         .eq('item', 8); // Check if the user has the item with ID 8 in their inventory
 
       if (inventoryError) {
-        console.error('Error fetching inventory data:', inventoryError);
+        console.error('Error fetching inventory data: ', inventoryError);
         return;
       }
 
