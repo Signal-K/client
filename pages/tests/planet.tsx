@@ -20,6 +20,7 @@ import YourComponent from "../../components/Gameplay/Inventory/fetchTic";
 import LightkurveForm from "../../components/Gameplay/Inventory/fetchTic2";
 import UnityBuildLod111 from "../../components/Gameplay/Unity/Build/LOD-Design";
 import { PostModal } from "../../components/Posts/FeedPostCard";
+import UnityBuildSupabaseTest from "../../components/Gameplay/Unity/Build/LOD-SupabaseTest";
 
 enum SidebarLink {
   Feed,
@@ -465,6 +466,8 @@ export default function PlanetPage({ id }: { id: string }) {
         </div>
       </div>
       {/* <UnityBuildLod111 /> */}
+      <UnityBuildSupabaseTest />
+      {/* <UnityBuildLod1 /> */}
     </CoreLayout>
   );
 }
