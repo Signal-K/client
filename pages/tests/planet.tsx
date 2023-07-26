@@ -37,9 +37,9 @@ export default function PlanetPage({ id }: { id: string }) {
     if (planetData?.temperature > 300) { setUnityBuild(2); };
   }, []);
 
-  const [profile, setProfile] = useState(null);
-  const [activeLink, setActiveLink] = useState(SidebarLink.Feed); // Track the active link
-  const [showUnity, setShowUnity] = useState(false); // Track the visibility of Unity component
+    const [profile, setProfile] = useState(null);
+    const [activeLink, setActiveLink] = useState(SidebarLink.Feed); // Track the active link
+    const [showUnity, setShowUnity] = useState(false); // Track the visibility of Unity component
     const[loadUnityComponent, setLoadUnityComponent] = useState(false);
 
     const planetBinned = 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/' + id + '/binned.png';
@@ -275,7 +275,8 @@ export default function PlanetPage({ id }: { id: string }) {
             <div id="unityContainer">
                 <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br />
               <button onClick={() => setLoadUnityComponent(true)}>View Planet</button>
-              <div>{loadUnityComponent && <UnityBuildLod1 />}</div> {/* planet={planetData?.content} user={profile?.username} />}</div> */}
+              <div>{loadUnityComponent && planetData?.temperature <= 300 && <UnityBuildLod11 />}</div>
+              <div>{loadUnityComponent && planetData?.temperature >= 300 && <UnityBuildLod1 />}</div> {/* planet={planetData?.content} user={profile?.username} />}</div> */}
               {/* {unityBuild === 1 && (
                 <div>{loadUnityComponent && <UnityBuildLod11 />}</div>
               )}
@@ -286,33 +287,36 @@ export default function PlanetPage({ id }: { id: string }) {
             </div>
           )}
           {activeLink === SidebarLink.Data && (<>
-            <h2 className="text-xl font-bold text-gray-800">Lightkurve graph</h2><br />
+            <h2 className="text-xl font-bold text-gray-800">Lightkurve graphs</h2><br />
             {/* <Card noPadding={false}>
               <img src={cover} height='500px' width='500px' alt="Planet Cover" className="" />
             </Card> */}
             <Card noPadding={false}>
-            {planetData?.deepnote && (
-  <div>
-    <h3 className="text-l font-bold text-gray-800">Binned data</h3>
-    <br />
-    <img src={planetBinned} alt="Planet Cover" className="" />
-    <br /><br />
-    <h3 className="text-l font-bold text-gray-800">Phase folded data</h3>
-    <br />
-    <img src={planetPhased} alt="Planet Cover" className="" />
-  </div>
+            {planetData?.deepnote && (<>
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 items-center">
+      <div>
+        <h3 className="text-l font-bold text-gray-800">Binned data</h3>
+        <img src={planetBinned} alt="Planet Cover" className="w-full sm:w-auto" />
+      </div>
+      <div>
+        <h3 className="text-l font-bold text-gray-800">Phase folded data</h3>
+        <img src={planetPhased} alt="Planet Cover" className="w-full sm:w-auto" />
+      </div>
+    </div><br />
+    <center><iframe title="Embedded cell output" src={planetData?.deepnote} height="650" width="60%"/></center></>
 )}
  {/* Add planetCover (download.png) */}
  {!planetData?.deepnote && (
     <img src={planetCover} alt="Planet Cover" className="" />
  )}
-                <p>What does this mean?</p>
+                {/* <p>What does this mean?</p> */}
             </Card>
-            <Card noPadding={false}>
-            {/* <iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/> Set this based on planet id/temperature */}
+            {/* <Card noPadding={false}>
+            {/* <iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/> Set this based on planet id/temperature 
             <iframe title="Embedded cell output" src={planetData?.deepnote} height="650" width="100%"/>
-            <p>{planetData?.temperature}</p>
-            </Card></>
+            {/* <iframe src="https://deepnote.com/@star-sailors/Step-by-step-50ad3984-69a9-496e-a121-efb59231e7e9" height="100%" width="100%" /> 
+            <p>Temperature: {planetData?.temperature}</p>
+ </Card></div>*/}</>
           )}
           {activeLink === SidebarLink.Visit && (
             <>
