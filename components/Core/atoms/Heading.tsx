@@ -5,6 +5,7 @@ type HeadingType = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 interface HeadingProps {
   type: HeadingType & string;
   className?: string;
+  children?: any;
 }
 
 const typeClassNames: Record<HeadingType, string> = {

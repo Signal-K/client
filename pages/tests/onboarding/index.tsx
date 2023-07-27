@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import CoreLayout from "../../../components/Core/Layout";
 import Instructions from "../../../components/onboarding/";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import BigProjectsSection from "../../../components/onboarding/Missions/MissionList";
+import Card from "../../../components/Card";
+import { Container } from "react-bootstrap";
 
 export default function OnboardingSignupPage () {
     const supabase = useSupabaseClient();
@@ -33,8 +36,8 @@ export default function OnboardingSignupPage () {
     if (hasGoldenTelescope === true) {
         return (
             <CoreLayout>
-                <center><p>You have the telescope!<br /><br /><br /><br /><br /><br /></p></center>
-                <Instructions />
+                <Container><BigProjectsSection /></Container>
+                {/* <Instructions /> */}
             </CoreLayout>
         )
     }

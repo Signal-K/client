@@ -12,6 +12,7 @@ interface ParagraphProps {
   characterLimit?: number;
   weight?: keyof typeof paragraphWeights;
   alignRight?: boolean;
+  children?: any;
 }
 
 const Paragraph: React.FC<ParagraphProps> = ({
@@ -33,3 +34,5 @@ const Paragraph: React.FC<ParagraphProps> = ({
 };
 
 export default Paragraph;
+
+// whitespace-pre-line leading-7 font-normal text-left
