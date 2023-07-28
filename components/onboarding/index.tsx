@@ -22,32 +22,27 @@ const Instructions: React.FC = () => {
           {isDarkMode ? 'Light Mode' : 'Dark Mode'}
         </button> */}
         <p className="text-gray-700">
-        Welcome to the world of Star Sailors, where you'll embark on a thrilling journey through space and contribute to ground-breaking scientific research!
-        </p> <br />
-        <p className="text-gray-700">
         As a Star Sailor, you'll be part of a community of citizen scientists passionate about exploring the mysteries of the universe. Through our training program, you'll learn how to analyse graphs, videos, and data to identify exoplanets - planets that orbit stars beyond our solar system.
+        </p> <br />
+        <div className="mb-8">
+        <blockquote className="italic bg-beige p-4 border-l-4 border-accent">
+          <p className="text-gray-700">
+          At Star Sailors, everyone has the power to make a difference. That's why our training program is designed to be accessible and engaging for everyone, regardless of their technical background. 
+          </p>
+        </blockquote>
+      </div>
+        <p className="text-gray-700">
+        You'll also learn how to collaborate with your fellow Star Sailors, sharing insights and ideas to uncover the secrets hidden within the data. Together, you'll leverage collective knowledge to make informed classifications and contribute to the collective wisdom of the Star Sailor community by making informed classifications.
         </p> <br />
         {/* <div className="my-8">
         <img src="https://file.notion.so/f/s/93246fc4-b0db-46a7-b488-37a82c7e53d1/Untitled.png?id=f02de9d7-b9a6-41e9-8adc-54b773d5295b&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1688104800000&signature=0pxfyuWzoTSrZ0Fcggay1xvDhieon_3npbbrJlHfp9g&downloadName=Untitled.png" alt="Size Estimation" className="w-full" />
         </div> */}
-        <p className="text-gray-700">
-        But that's not all! You'll also learn how to collaborate with your fellow Star Sailors, sharing insights and ideas to uncover the secrets hidden within the data. Together, you'll leverage collective knowledge to make informed classifications and contribute to the collective wisdom of the Star Sailor community by making informed classifications.
-        </p>
       </div>
 
       <div className="mb-8">
         {/* <h2 className="text-3xl font-bold mb-4 text-primary">Collaboration</h2> */}
         <blockquote className="italic bg-beige p-4 border-l-4 border-accent">
           <p className="text-gray-700">And the best part? You'll get to vote on the classifications you've helped create! By voting, you'll play an active role in shaping the course of astronomical discoveries.
-          </p>
-        </blockquote>
-      </div>
-
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4 text-primary">Your power</h2>
-        <blockquote className="italic bg-beige p-4 border-l-4 border-accent">
-          <p className="text-gray-700">
-          At Star Sailors, everyone has the power to make a difference. That's why our training program is designed to be accessible and engaging for everyone, regardless of their technical background. So come aboard and join us on this cosmic adventure! Together, we'll sail the stars and uncover the wonders of the universe.
           </p>
         </blockquote>
       </div>

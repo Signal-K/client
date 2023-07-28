@@ -11,6 +11,8 @@ import { SocialGraphHomeModal1 } from "./posts";
 import PostCard from "../components/Posts/Postcards/Postcard";
 import CommentSection from "../components/Posts/Comments/CommentSection";
 import UserProfileBlocks, { UserProfileEditBlock } from "../components/Posts/Config/UserBlocks";
+import VideoEmbed from "../components/Core/atoms/VideoEmbed";
+import gameLoopInfo from "../components/Core/intro/gameLoopInfo";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -51,9 +53,28 @@ export default function Home() {
             <h1 className="max-w-5xl text-2xl font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-6xl lg:max-w-7xl">
               Welcome to Star Sailors <br />
             </h1>
+            <VideoEmbed
+              src='/assets/Videos/StarSailors.mp4'
+              title='Star Sailors'
+            />
             <PlaygroundPage />
-            <p className="max-w-xl mx-auto mt-8 text-base leading-relaxed text-center text-gray-500">Our game offers a unique and engaging experience that combines the excitement of gaming with scientific knowledge. By playing, you can actively contribute to scientific research by classifying objects based on real-world data. Our current focus is on the planets mini-game, where you can help identify potential new planets discovered by the TESS telescope. To start playing, log in to the Star Sailors website and navigate to the planets page where you'll classifying different objects with relevant information to help you make informed decisions. You can create posts about your decisions and invite other users to vote on your assessment. As you participate, you'll earn points that can be redeemed for rewards and recognition within the Star Sailors community. Join us today and embark on a thrilling journey of discovery and learning!</p>
-            {/* <a className="mx-auto mt-8 text-sm font-semibold text-blue-600 hover:text-neutral-600" title="read more"> Read more about the offer » </a> */}
+            <div className="bg-white rounded-lg overflow-hidden shadow-lg p-6">
+      <p className="mb-4">
+        Our game offers a unique and engaging experience that combines the excitement of gaming with scientific knowledge.
+      </p>
+      <p className="mb-4">
+        By playing, you can actively contribute to scientific research by classifying objects based on real-world data. The current focus is on the planets mini-game, where you can help identify potential new planets discovered by the TESS telescope.
+      </p>
+      <p className="mb-4">
+        To start playing, sign up & create an account. Once you have logged in, you will be redirected to our training program, where we teach you how to play.
+      </p>
+      <p className="mb-4">
+        Once complete, you will have the ability to navigate to the planets page where you'll classify different objects with relevant information to help you make informed decisions.
+      </p>
+      <p className="mb-4">
+        The more you classify, the more items you collect, and the more items you collect, the more planets you can colonize. You can earn points that can be redeemed for rewards and recognition within the Star Sailors community. This is also where you can create posts about your decisions and invite other users to vote on your assessments.
+      </p>
+    </div>
           </div>
         </div>      
         <br />
