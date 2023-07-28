@@ -17,22 +17,22 @@ interface QuizQuestion {
 const quizQuestions: QuizQuestion[] = [
     {
         questionText: '❓ - This light curve shows the brightness of a star monitored by NASA\'s TESS mission. \n Do you notice any dips that could indicate a transiting exoplanet?',
-        imageUrl: 'https://file.notion.so/f/s/5044406f-a71e-4b3c-83ce-4b78886b113b/Capture2.png?id=d0586e06-1251-4906-90d6-160b85603a0e&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1693137600000&signature=-PYuxmpWEbuCJIGoWuuFfy9t_owR88lTg582QjXTf6s&downloadName=Capture2.PNG.png',
+        imageUrl: 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture2.PNG.png',
         isCorrect: false,
     },
     {
         questionText: '❓ - Do you see a potential exoplanet transit in this light curve? Which parts indicate the transit?',
-        imageUrl: 'https://file.notion.so/f/s/8381ba5c-9c2a-450b-a145-57d08cf7b23d/Capture3.png?id=3adaa43a-08d4-4091-ac7a-2842375df68b&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1693137600000&signature=mH1uS2vldFLLANeu0XoQK2RKXepBMFisRBuFZPt-gNY&downloadName=Capture3.PNG.png',
+        imageUrl: 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture3.PNG.png',
         isCorrect: true,
     },
     {
         questionText: '❓ - This one is a bit tricky. Does it have a clear exoplanet transit or not?',
-        imageUrl: 'https://file.notion.so/f/s/1f7d2232-5a59-46cd-8693-6e89c83421a2/Capture4.png?id=47d43c61-e3a4-49d0-8767-450fd96fc370&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1693137600000&signature=fytAWZyiqUbnvKjaXiAk3Z3Ah3f90BbClWqdlOmLPCY&downloadName=Capture4.PNG.png',
+        imageUrl: 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture4.PNG.png',
         isCorrect: false,
     },
     {
         questionText: '❓ - What\'s your classification? Exoplanet or false positive?',
-        imageUrl: 'https://file.notion.so/f/s/8543a5be-9a25-4917-b6e3-69baade7c2ae/Capture5.png?id=6a55bb37-dfec-493f-80c9-d17b6b052609&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1693137600000&signature=kPf7MDdbM3mdy23DHgK1Cc4qZ8V88wftd2cyI-uN70A&downloadName=Capture5.PNG.png',
+        imageUrl: 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture5.PNG.png',
         isCorrect: true,
     }
 ]

@@ -57,7 +57,7 @@ export default function PlanetGalleryIndex() {
   const buttonStyle = {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     border: "none",
-    color: "white",
+    color: "black",
     transition: "background-color 0.3s ease",
     cursor: "pointer",
     marginRight: "8px",

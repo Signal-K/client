@@ -36,8 +36,7 @@ export default function OnboardingSignupPage () {
     if (hasGoldenTelescope === true) {
         return (
             <CoreLayout>
-                <Container><BigProjectsSection /></Container>
-                {/* <Instructions /> */}
+                <Container><BigProjectsSection /></Container>{/* <Instructions /> */}
             </CoreLayout>
         )
     }
