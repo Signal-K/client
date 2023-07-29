@@ -1,45 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 
 import BigProject from "../../Core/atoms/ListComponent";
 import Section from "../../Core/atoms/Section";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const BigProjectsSection: React.VFC = () => {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+    const [hasGoldenTelescope, setHasGoldenTelescope] = useState(false);
+
   return (
     <Section title="Your missions" label="Tools">
+        {/* if (hasGoldenTelescope === false) { showMissionsAsIncomplete } */}
       <BigProject
         inProgress={false}
-        name="Star Sailors"
-        link="https://play.skinetics.tech"
+        name="Learning the transit system"
+        link="/tests/onboarding/planetHunters/1"
         textGradient="pink"
-        description="Classify planets & sail the stars in an open-source citizen science adventure."
+        description="Learn how to discover exoplanets and discover your first one!"
       />
       <BigProject
         inProgress={false}
-        name="Silfur"
+        name="Increasing difficulty"
         textGradient="pink"
-        link="https://github.com/signal-k/silfur"
-        description="Lightweight blockchain for gamifying scientific media"
-      />
-      <BigProject
-        inProgress={false}
-        name="Fjall"
-        textGradient="pink"
-        link='https://github.com/Signal-K/Fjall'
-        description="Plugin interface for Nodes on the DeSci framework"
+        link="/tests/onboarding/planetHunters/2"
+        description="New planet candidates, more challenging transits to classify"
       />
       <BigProject
         inProgress
-        name="Matr"
+        name="Final challenge"
         textGradient="purple"
-        link="https://punchcard.so/"
-        description="Developing and decentralising aligned AI innovation transparently"
-      />
-      <BigProject
-        inProgress
-        name="Talon Interface"
-        textGradient="purple"
-        link="https://punchcard.so/"
-        description="UI schema for citizen science projects"
+        link="/tests/onboarding/planetHunters/4"
+        description="The most complex planets"
       />
     </Section>
   );

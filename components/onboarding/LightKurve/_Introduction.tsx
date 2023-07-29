@@ -2,6 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import Login from '../../../pages/login';
+import { UserProfileEditBlock } from '../../Posts/Config/UserBlocks';
 
 const ExoPlanetDetective: React.FC = () => {
     const supabase = useSupabaseClient();
@@ -47,6 +48,7 @@ const ExoPlanetDetective: React.FC = () => {
                     1. Collaboration: Engage in team discussions, share observations, and debate theories with fellow sailors. <br />
                     2. Voting: After discussions, cast your vote on potential discoveries contributing to the community’s collective intelligence.
                 </p><br />
+                <UserProfileEditBlock />
             </div>
             <div className="flex justify-between">
                     <Link href="/tests/onboarding/">
