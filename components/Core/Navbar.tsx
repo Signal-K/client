@@ -16,7 +16,7 @@ const navigation = [
   // { name: 'Economy', href: '/balance' },
   // { name: 'Documentation', href: '/#'}, // href: '/docs' },
   { name: 'Feed', href: '/feed' },
-  // { name: 'Missions', href: '/tests/onboarding' },
+  { name: 'Missions', href: '/tests/onboarding' },
   // { name: 'Playground', href: '/playground' },
   // { name: 'Planets', href: '/tests/planets' },
   // { name: 'Inventory', href: '/#'}, // href: '/inventory' },
