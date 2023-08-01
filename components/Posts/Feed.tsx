@@ -27,6 +27,7 @@ export default function SocialGraphHomeModal() {
     .select(
       "id, content, created_at, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)"
     )
+    .limit(10)
     .order('created_at', { ascending: false });
 
   const postIds = postsResponse.data.map((post) => post.id);

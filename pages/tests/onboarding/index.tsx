@@ -47,7 +47,11 @@ export default function OnboardingSignupPage () {
 
     return (
         <CoreLayout>
-            <Instructions />
+            <Card noPadding={false}><Container>
+                <NewMissions />
+            </Container></Card>
+            {/* <Instructions />
+            <NewMissions /> */}
         </CoreLayout>
     );
 }; 

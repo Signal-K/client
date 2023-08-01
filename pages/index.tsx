@@ -32,12 +32,13 @@ export default function Home() {
     const userId = session?.user?.id;
 
     if (session) {
-      return (
+    return (
         <CoreLayout>
           <PlaygroundPage />
           <UserProfileBlocks />
           {/* <UserProfileEditBlock />g */}
           <SocialGraphHomeModal />
+          <iframe width='100%' height="1100px" src="https://noteforms.com/forms/user-feedback-rkkndz"></iframe>
         </CoreLayout>
       )
     }

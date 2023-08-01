@@ -32,7 +32,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <script
+        {/* <script
           type="text/javascript"
           dangerouslySetInnerHTML={{
             __html: `
@@ -46,7 +46,8 @@ function MyApp({ Component, pageProps }) {
               })(window,document);
             `,
           }}
-        />
+        /> */}
+        <script async data-nf='{"formurl":"https://noteforms.com/forms/user-feedback-rkkndz","emoji":"💬","position":"right","bgcolor":"#3B82F6","width":"500"}' src='https://d29ykaszcd1t1v.cloudfront.net/173eb069-229a-481a-98ad-4a70caf83ee6/widgets/embed-min.js'></script>
       </Head>
       <SessionContextProvider
       supabaseClient={supabaseClient}
