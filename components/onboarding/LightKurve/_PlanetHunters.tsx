@@ -35,10 +35,10 @@ const PlanetHuntersOnboardingPage2: React.FC = () => {
                     4. Vote on the most promising discoveries. <br />
                 </p><br />
                 <div className="flex justify-between">
-  <Link href="/tests/onboarding/planetHunters/2">
+  <Link href="/tests/onboarding/planetHunters/1">
     <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Back</button>
   </Link>
-  <Link href="/tests/onboarding/planetHunters/4">
+  <Link href="/tests/onboarding/planetHunters/3">
     <div className="float-right">
       <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Next</button>
     </div>
