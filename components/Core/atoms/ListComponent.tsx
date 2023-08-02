@@ -75,7 +75,7 @@ const BigProject: React.VFC<BigProjectProps> = ({
         <p className="whitespace-pre-line leading-7 font-normal text-left">{description}</p>
         <div className="flex items-center justify-end gap-2 -translate-x-1">
           <span className="font-light">
-            {!inProgress ? "Completed" : "Start mission"}
+            {!inProgress ? "View mission" : "Start mission"}
           </span>
           {!inProgress ?? (
             <ArrowRightIcon className="transition-transform group-hover:translate-x-1" />

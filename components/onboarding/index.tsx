@@ -31,6 +31,20 @@ const Instructions: React.FC = () => {
           </p>
         </blockquote>
       </div>
+      {/* <div className="bg-white rounded-lg overflow-hidden shadow-lg p-6">
+      <p className="mb-4">
+      By playing, you can actively contribute to scientific research by classifying objects based on real-world data. The current focus is on the planets mini-game, where you can help identify potential new planets discovered by the TESS telescope. 
+      </p>
+      <p className="mb-4">
+      Step into the boundless expanse of the universe with Star Sailors—a unique platform that not only captivates your imagination but also contributes to astronomical research. Focus your efforts on the Planets mini-game to help pinpoint undiscovered celestial bodies, all while collaborating with a community of dedicated citizen scientists.
+      </p>
+      <p className="mb-4">
+      As you become proficient in classification, accrue valuable items that enable you to colonise new planets.
+      </p>
+      <p className="mb-4">
+      Engage within the Star Sailors community to earn points, redeem rewards, and influence collective discoveries.
+      </p>
+    </div> */}
         <p className="text-gray-700">
         You'll also learn how to collaborate with your fellow Star Sailors, sharing insights and ideas to uncover the secrets hidden within the data. Together, you'll leverage collective knowledge to make informed classifications and contribute to the collective wisdom of the Star Sailor community by making informed classifications.
         </p> <br />

@@ -10,8 +10,15 @@ const BigProjectsSection: React.VFC = () => {
     const [hasGoldenTelescope, setHasGoldenTelescope] = useState(false);
 
   return (
-    <Section title="Your missions" label="Tools">
+    <Section title="Archived/extra missions" label="Tools">
         {/* if (hasGoldenTelescope === false) { showMissionsAsIncomplete } */}
+        {/* <BigProject
+        inProgress={false}
+        name="The Crucible of a Star Sailor"
+        link="/tests/onboarding/planetHunters/Crucible"
+        textGradient="pink"
+        description="Objective: Unearth Hidden Celestial Bodies"
+      /> */}
       <BigProject
         inProgress={false}
         name="Learning the transit system"
@@ -38,3 +45,22 @@ const BigProjectsSection: React.VFC = () => {
 };
 
 export default BigProjectsSection;
+
+const NewMissions: React.VFC = () => {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const [hasGoldenTelescope, setHasGoldenTelescope] = useState(false);
+
+return (
+  <Section title="Your missions" label="Tools">
+      {/* if (hasGoldenTelescope === false) { showMissionsAsIncomplete } */}
+      <BigProject
+      inProgress={false}
+      name="The Crucible of a Star Sailor"
+      link="/tests/onboarding/planetHunters/Crucible"
+      textGradient="pink"
+      description="Objective: Unearth Hidden Celestial Bodies"
+    />
+  </Section>
+);
+};

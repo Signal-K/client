@@ -5,6 +5,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import BigProjectsSection from "../../../components/onboarding/Missions/MissionList";
 import Card from "../../../components/Card";
 import { Container } from "react-bootstrap";
+import NewMissions from "../../../components/onboarding/Missions/NewMissions";
 
 export default function OnboardingSignupPage () {
     const supabase = useSupabaseClient();
@@ -36,7 +37,10 @@ export default function OnboardingSignupPage () {
     if (hasGoldenTelescope === true) {
         return (
             <CoreLayout>
-                <Container><BigProjectsSection /></Container>{/* <Instructions /> */}
+                <Card noPadding={false}><Container><NewMissions /></Container></Card>
+                <Card noPadding={false}><Container>
+                    <BigProjectsSection />
+                </Container></Card>{/* <Instructions /> */}
             </CoreLayout>
         )
     }
