@@ -13,12 +13,19 @@ const NewMissions: React.VFC = () => {
     <Section title="Your missions" label="Tools">
         {/* if (hasGoldenTelescope === false) { showMissionsAsIncomplete } */}
         <BigProject
-        inProgress={false}
-        name="The Crucible of a Star Sailor"
-        link="/tests/onboarding/planetHunters/Crucible"
-        textGradient="green"
-        description="Objective: Unearth Hidden Celestial Bodies"
-      />
+          inProgress={false}
+          name="Your emergence as a Star Sailor"
+          link="/tests/onboarding/planetHunters/Emergence"
+          textGradient="green"
+          description="Objective: Unearth Hidden Celestial Bodies"
+        />
+        <BigProject
+          inProgress={false}
+          name="The Crucible of a Star Sailor"
+          link="/tests/onboarding/planetHunters/Crucible"
+          textGradient="green"
+          description="Objective: Unearth Hidden Celestial Bodies"
+        />
     </Section>
   );
   };

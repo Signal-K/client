@@ -41,7 +41,7 @@ export default function Example() {
       <Title>Performance</Title>
       <Text>Comparison between Tess & Star Sailors</Text>
       <AreaChart
-        className="mt-4 h-80"
+        className="mt-6 h-80"
         data={data}
         categories={['TESS', 'Sailors', 'Exofop']}
         index="Month"
