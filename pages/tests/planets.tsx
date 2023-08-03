@@ -48,7 +48,7 @@ export default function PlanetGalleryIndex() {
   };
 
   const difficultyOptions = [
-    { value: "", label: "All" },
+    { value: "", label: "Base Difficulty" },
     { value: 1, label: "Difficulty 1" },
     { value: 2, label: "Difficulty 2" },
     { value: 3, label: "Difficulty 3" },
