@@ -16,7 +16,7 @@ const NewMissions: React.VFC = () => {
         inProgress={false}
         name="The Crucible of a Star Sailor"
         link="/tests/onboarding/planetHunters/Crucible"
-        textGradient="pink"
+        textGradient="green"
         description="Objective: Unearth Hidden Celestial Bodies"
       />
     </Section>

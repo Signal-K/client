@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 
-type BigProjectsGradientBase = "purple" | "green" | "pink";
+type BigProjectsGradientBase = "purple" | "blue" | "green" | "pink"; 
 
 interface BigProjectProps {
   inProgress: boolean;
@@ -53,7 +53,8 @@ const BigProject: React.VFC<BigProjectProps> = ({
   containerClassName = "",
 }) => {
   const textGradientMap: Record<BigProjectsGradientBase, string> = {
-    green: "from-green-500 to-blue-500",
+    green: "from-green-500 to-green-900",
+    blue: "from-blue-500 to yellow-500",
     pink: "from-pink-500 to-orange-500",
     purple: "from-purple-500 to-blue-500",
   };

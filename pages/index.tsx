@@ -52,10 +52,10 @@ export default function Home() {
             </div>
             <h1 className="max-w-5xl text-2xl font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-6xl lg:max-w-7xl">
               Welcome to Star Sailors <br />
-            </h1>
+            </h1><br />
             <VideoEmbed
-              src='/assets/Videos/StarSailors.mp4'
-              title='Star Sailors'
+              // src='/assets/Videos/StarSailors.mp4'
+              // title='Star Sailors'
             />
             <PlaygroundPage />
             <div className="bg-white rounded-lg overflow-hidden shadow-lg p-6">

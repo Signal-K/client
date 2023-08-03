@@ -12,7 +12,7 @@ const ProgressSidebar = dynamic(() =>
   import("../../../../components/onboarding/blocks/ProgressSidebar")
 );
 
-export default function PlanetHuntersOnboardingPage1() {
+export default function PlanetHuntersOnboardingPage1 () {
   const percent = 23; // Assuming credits is a value in percentage
   const buffer = 2; // Assuming buffer is a value in percentage
   const credits = 10;

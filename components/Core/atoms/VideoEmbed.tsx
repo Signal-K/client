@@ -1,20 +1,18 @@
 import React from 'react';
 
-interface VideoEmbedProps {
-  src: string;
-  title?: string;
-};
-
-const VideoEmbed: React.FC<VideoEmbedProps> = ({ src, title }) => {
+const VideoEmbed = () => {
   return (
-    <div className="rounded-lg overflow-hidden shadow-lg">
-      <iframe
-        title={title || 'Embedded Video'}
-        src={src}
-        frameBorder="0"
-        allowFullScreen
-        className="w-full h-full"
-      ></iframe>
+    <div className="bg-black">
+      <div className="relative h-0" style={{ paddingBottom: '56.25%' }}>
+        {/* 16:9 aspect ratio, adjust as needed */}
+        <iframe
+          src="/assets/Videos/StarSailors.mp4"
+          title="Welcome to Star Sailors"
+          frameBorder="0"
+          allowFullScreen
+          className="absolute top-0 left-0 w-full h-full"
+        ></iframe>
+      </div>
     </div>
   );
 };

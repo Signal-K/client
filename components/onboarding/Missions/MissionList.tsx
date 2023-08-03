@@ -33,13 +33,13 @@ const BigProjectsSection: React.VFC = () => {
         link="/tests/onboarding/planetHunters/2"
         description="New planet candidates, more challenging transits to classify"
       />
-      <BigProject
+      {/* <BigProject
         inProgress
         name="Final challenge"
         textGradient="purple"
         link="/tests/onboarding/planetHunters/4"
         description="The most complex planets"
-      />
+      /> */}
     </Section>
   );
 };
@@ -58,7 +58,7 @@ return (
       inProgress={false}
       name="The Crucible of a Star Sailor"
       link="/tests/onboarding/planetHunters/Crucible"
-      textGradient="pink"
+      textGradient="blue"
       description="Objective: Unearth Hidden Celestial Bodies"
     />
   </Section>
