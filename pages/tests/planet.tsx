@@ -1,27 +1,27 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState, useRef, createRef } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import DashboardLayout from "../../components/Tests/Layout/Dashboard";
-// import { PlanetPostCard } from "../../components/PostCard";
 import PlanetPostCard from "../../components/Posts/PlanetPostsFetch";
-import PlanetAvatar from "../../components/Gameplay/Planets/PlanetAvatar";
 import { UserContext } from "../../context/UserContext";
 import { PostFormCardPlanetTag } from "../../components/PostFormCard";
 import Card from "../../components/Card";
 import UnityBuildLod1 from "../../components/Gameplay/Unity/Build/LOD-Rocky";
 import UnityBuildLod11 from "../../components/Gameplay/Unity/Build/LOD-Water";
-import UnityScreenshot from "../../components/Gameplay/Generator/UnityScreenshot";
 import PostCard from "../../components/Posts/Postcards/Postcard";
-import { useScreenshot, createFileName } from 'use-react-screenshot';
 import CoreLayout from "../../components/Core/Layout";
+import LightkurveForm from "../../components/Gameplay/Inventory/fetchTic2";
+/* import PlanetAvatar from "../../components/Gameplay/Planets/PlanetAvatar";
+import UnityScreenshot from "../../components/Gameplay/Generator/UnityScreenshot";
+import { useScreenshot, createFileName } from 'use-react-screenshot';
 import ProfilePage from "../../components/Tests/Planet/ProfileCardTest";
 import fetchTic from "../../components/Gameplay/Inventory/fetchTic";
 import YourComponent from "../../components/Gameplay/Inventory/fetchTic";
-import LightkurveForm from "../../components/Gameplay/Inventory/fetchTic2";
 import UnityBuildLod111 from "../../components/Gameplay/Unity/Build/LOD-Design";
 import { PostModal } from "../../components/Posts/FeedPostCard";
 import UnityBuildSupabaseTest from "../../components/Gameplay/Unity/Build/LOD-SupabaseTest";
 import UnityBuildLod1Mars from "../../components/Gameplay/Unity/Build/LOD-Mars";
+// import { PlanetPostCard } from "../../components/PostCard";
+import DashboardLayout from "../../components/Tests/Layout/Dashboard"; */
 
 enum SidebarLink {
   Feed,
