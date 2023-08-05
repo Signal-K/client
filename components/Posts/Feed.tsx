@@ -30,7 +30,7 @@ export default function SocialGraphHomeModal() {
     .limit(10)
     .order('created_at', { ascending: false });
 
-  const postIds = postsResponse.data.map((post) => post.id);
+  const postIds = postsResponse.data?.map((post) => post.id);
   const commentsResponse = await supabase
     .from("comments")
     .select("id, content, created_at, profiles(id, avatar_url, username), post_id") // Add the closing parenthesis for profiles select
@@ -46,8 +46,8 @@ export default function SocialGraphHomeModal() {
       return acc;
     }, {});
 
-    // const postsWithComments: Post[] = postsResponse.data.map((post) => ({
-    const postsWithComments = postsResponse.data.map((post) => ({
+    // const postsWithComments: Post[] = postsResponse.data?.map((post) => ({
+    const postsWithComments = postsResponse.data?.map((post) => ({
       ...post,
       comments: commentsByPostId[post.id] || [],
     }));
@@ -59,7 +59,7 @@ export default function SocialGraphHomeModal() {
     <div className="container mx-auto py-8">
         {/* <UserContext.Provider value={{profile}}><PostFormCard onPost={fetchPosts()} /></UserContext.Provider><br /> */}
         <div className="flex-grow flex flex-col overflow-hidden">
-        {posts?.map((post) => ( // planetPosts?.map
+        {posts?.map((post) => ( // planetPosts??.map
           <PostModal key={post.id} {...post} />
         ))}
       </div>

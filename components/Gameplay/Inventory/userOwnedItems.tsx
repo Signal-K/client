@@ -136,8 +136,8 @@ const OwnedItemsList: React.FC = () => {
                   <img src={item.icon_url} alt={item.name} className="w-full h-auto" />
                 </div>
                 <p className="text-gray-600">Quantity: {ownedItem?.quantity}</p>
-                <p className="text-gray-600">Location: {ownedItem?.location}</p>
-                <button className="mt-2 bg-blue-500 text-white px-2 py-1 rounded" onClick={() => handleTransferButtonClick(ownedItem)}>Transfer Item</button>
+                {/* <p className="text-gray-600">Location: {ownedItem?.location}</p> */}
+                {/* <button className="mt-2 bg-blue-500 text-white px-2 py-1 rounded" onClick={() => handleTransferButtonClick(ownedItem)}>Transfer Item</button> */}
               </li>
             );
           })}

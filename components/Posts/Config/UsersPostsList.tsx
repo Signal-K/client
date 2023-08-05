@@ -17,7 +17,7 @@ export default function UserPostList() {
   }, [session?.user?.id]);
 
   useEffect(() => {
-    if (planetPosts.length > 0) {
+    if (planetPosts?.length > 0) {
       console.log("Comments: ", planetPosts.flatMap((post) => post.comments));
     }
   }, [planetPosts]);
@@ -32,7 +32,7 @@ export default function UserPostList() {
       .select()
       .eq("id", session?.user?.id)
       .then((result) => {
-        if (result.data.length) {
+        if (result?.data?.length) {
           setProfile(result.data[0]);
         }
       });
@@ -44,7 +44,7 @@ export default function UserPostList() {
       .select("id, content, created_at, profiles(id, avatar_url, username), post_id")
       .order('created_at', { ascending: false })
       .then((result) => {
-        const comments = result.data.reduce((acc, comment) => {
+        const comments = result?.data?.reduce((acc, comment) => {
           if (!acc[comment.post_id]) { acc[comment.post_id] = []; };
           acc[comment.post_id].push(comment);
           return acc;
