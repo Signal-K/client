@@ -118,7 +118,7 @@ const CrucibleComponent: React.FC = () => {
             </h3>
             {isBlockVisible && <UserProfileEditBlock />}
             </div>
-            {/* <Link href='/tests/onboarding/checklist/preflight'><button className="btn glass">Continue to pre-flight checklist</button></Link> */}
+            <Link href='/tests/onboarding/checklist/preflight'><button className="btn glass">Continue to pre-flight checklist</button></Link>
         </div>
     )
 }
