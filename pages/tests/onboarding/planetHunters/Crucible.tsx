@@ -18,5 +18,5 @@ export default function StarSailorsCrucible1 () {
         <CoreLayout>
             <CrucibleComponent />
         </CoreLayout>
-    )
-}
+    );
+};

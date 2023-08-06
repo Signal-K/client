@@ -91,7 +91,17 @@ const CrucibleComponent: React.FC = () => {
 
                 <blockquote className="italic bg-beige p-4 border-l-4 border-accent">
                     <p className="text-gray-700">At Star Sailors, everyone has the power to make a difference. That's why our training program is designed to be accessible and engaging for everyone, regardless of their technical background.</p>
-                </blockquote>
+                </blockquote><br />
+
+                <h2 className="text-lg font-bold mb-4 text-primary bg-gradient-to-r from-gold-500 to-yellow-500">Milestones achieved:</h2>
+                <p>
+                    ✅ Grasped the essence of Star Sailors. <br />
+                    ✅ Acquired your first collectibles. <br />
+                    ✅ Identified potential planets. <br />
+                    ✅ Mastered Lightkurve. <br />
+                    ✅ Engaged with the community. <br />
+                    ✅ Participated in pivotal votes. <br />
+                </p><br />
             </div><br />
             <LightkurveQuiz />
 
@@ -108,6 +118,7 @@ const CrucibleComponent: React.FC = () => {
             </h3>
             {isBlockVisible && <UserProfileEditBlock />}
             </div>
+            {/* <Link href='/tests/onboarding/checklist/preflight'><button className="btn glass">Continue to pre-flight checklist</button></Link> */}
         </div>
     )
 }

@@ -138,7 +138,7 @@ const LightkurveQuiz: React.FC = () => {
 
   if (quizStatus === QuizStatus.NotStarted) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center">
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           onClick={startQuiz}
@@ -190,19 +190,19 @@ const LightkurveQuiz: React.FC = () => {
 
   if (quizStatus === QuizStatus.Completed) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center">
         <p className="text-2xl">
           Congratulations! You got {correctAnswers} out of{" "}
           {quizQuestions.length} correct.
-        </p>
-        !hasItem && (
+        </p> <br /><br />
+        {!hasItem && (
           <button
             onClick={handleAddToInventory}
             className="bg-blue-500 text-white px-3 py-1 rounded"
           >
-            Add to Inventory
+            Add to Inventory {/* Show image, allow user to see the item and a message */}
           </button>
-        )
+        )}
       </div>
     );
   }
