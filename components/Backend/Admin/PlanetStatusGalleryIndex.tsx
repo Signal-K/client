@@ -2,20 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Container, Row, ButtonGroup, ToggleButton } from "react-bootstrap";
 
-import Login from "../login";
-import PlanetGalleryCard from "../../components/Gameplay/Planets/PlanetGalleryCard";
-import DashboardLayout from "../../components/Tests/Layout/Dashboard";
-import CoreLayout from "../../components/Core/Layout";
+import Login from "../../../pages/login";
+import PlanetGalleryCard from "../../Gameplay/Planets/PlanetGalleryCard";
+import DashboardLayout from "../../Tests/Layout/Dashboard";
 
-export default function PlanetGalleryIndex() {
+export default function PlanetStatusGalleryIndex() {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [planets, setPlanets] = useState([]);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<number | null>(1);
+  const [selectedClassificationStatus, setSelectedClassificationStatus] =
+    useState<string | null>("incomplete");
 
   useEffect(() => {
     getPlanets();
-  }, [session, selectedDifficulty]);
+  }, [session, selectedClassificationStatus]);
 
   const getPlanets = async () => {
     try {
@@ -27,10 +27,10 @@ export default function PlanetGalleryIndex() {
         .gte("id", 45)
         .lt("id", 102);
 
-      if (selectedDifficulty !== null) {
-        query = query.eq("difficulty", selectedDifficulty);
+      if (selectedClassificationStatus !== null) {
+        query = query.eq("classification_status", selectedClassificationStatus);
       } else {
-        query = query.is("difficulty", null); // Filter planets with no difficulty
+        query = query.is("classification_status", null); // Filter planets with no classification_status
       }
 
       const { data, error } = await query;
@@ -47,10 +47,10 @@ export default function PlanetGalleryIndex() {
     }
   };
 
-  const difficultyOptions = [
-    { value: 1, label: "Difficulty 1" },
-    { value: 2, label: "Difficulty 2" },
-    { value: 3, label: "Difficulty 3" },
+  const classificationStatusOptions = [
+    { value: "incomplete", label: "Incomplete" },
+    { value: "in progress", label: "In Progress" },
+    { value: "completed", label: "Completed" },
   ];
 
   const buttonStyle = {
@@ -71,21 +71,20 @@ export default function PlanetGalleryIndex() {
   }
 
   return (
-    // <DashboardLayout>
-    <CoreLayout>
+    <DashboardLayout>
       <Container>
         <ButtonGroup className="mb-3">
-          {difficultyOptions.map((option) => (
+          {classificationStatusOptions.map((option) => (
             <ToggleButton
               key={option.value}
               type="radio"
               variant="outline-secondary"
-              name="difficulty"
+              name="classification_status"
               value={option.value}
-              checked={selectedDifficulty === option.value}
-              onChange={() => setSelectedDifficulty(option.value)}
+              checked={selectedClassificationStatus === option.value}
+              onChange={() => setSelectedClassificationStatus(option.value)}
               style={
-                selectedDifficulty === option.value
+                selectedClassificationStatus === option.value
                   ? { ...buttonStyle, ...activeButtonStyle }
                   : buttonStyle
               }
@@ -100,6 +99,6 @@ export default function PlanetGalleryIndex() {
           ))}
         </Row>
       </Container>
-    </CoreLayout>
+    </DashboardLayout>
   );
 }
