@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Card from "../../Card";
+import FactionSelection from "../blocks/FactionSelection";
 
 const EmergenceComponent: React.FC = () => {
   const supabase = useSupabaseClient();
@@ -208,6 +209,9 @@ const EmergenceComponent: React.FC = () => {
         />
       </div>{" "}
       </div><br />
+      <Card noPadding={false}>
+        <FactionSelection />
+      </Card>
       <Link href='/tests/onboarding/checklist/preflight'><button className="btn glass">Continue to pre-flight checklist</button></Link>
     </div>
   );
