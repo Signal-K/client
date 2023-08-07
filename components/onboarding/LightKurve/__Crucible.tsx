@@ -77,17 +77,6 @@ const CrucibleComponent: React.FC = () => {
                 <Card noPadding={false}>
                     <iframe title="Embedded cell output" src="https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/149ecbf466df401e902afc4a543fe729/1b07961e806f4d91a47a297bdb6268ef?height=707.1640625" height="707.1640625" width="100%"/>    
                 </Card>
-                <div className="mt-2"><Card noPadding={false}>
-                    <h2 className="text-lg font-bold mb-4 text-primary bg-gradient-to-r from-gold-500 to-yellow-500"> The Imperative of Human Insight </h2>
-                    🤖 Amid the era of Artificial Intelligence, your instinct and discerning eye serve as invaluable assets. Meld human intuition with algorithmic accuracy to ensure no celestial body remains hidden! <br /> <br />
-                    <div className="mb-10">
-                        <img src="/assets/Onboarding/Missions/Crucible/CrucibleImage2.png" alt="Transit Method" className="w-full" />
-                    </div><br />
-                </Card></div>
-                <h2 className="text-lg font-bold mb-4 text-primary bg-gradient-to-r from-gold-500 to-yellow-500"> Collaboration & Community </h2>
-                    1. Team Discourse: Share insights and theorise with fellow Star Sailors. <br />
-                    2. Community Voting: Participate in the democratic process to validate or refute discoveries. <br />
-                <br />
 
                 <blockquote className="italic bg-beige p-4 border-l-4 border-accent">
                     <p className="text-gray-700">At Star Sailors, everyone has the power to make a difference. That's why our training program is designed to be accessible and engaging for everyone, regardless of their technical background.</p>

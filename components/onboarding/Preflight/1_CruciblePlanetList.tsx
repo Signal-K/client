@@ -193,6 +193,7 @@ const PlanetClassificationCheck: React.FC<PlanetClassificationCheckProps> = ({ u
         <>
           <h2>Congratulations!</h2>
           <p>You've successfully completed level 1 on planets 47, 50, and 51.</p>
+          <AddToInventoryButton itemId={10} />
         </>
       ) : (
         <>
@@ -203,7 +204,6 @@ const PlanetClassificationCheck: React.FC<PlanetClassificationCheckProps> = ({ u
             <>
               <p>You don't have item 10 in your inventory.</p>
               <p>Add it to your inventory to unlock level 1 on planets 47, 50, and 51.</p>
-              <AddToInventoryButton itemId={10} /> {/* Use the AddToInventoryButton component */}
             </>
           )}
         </>
