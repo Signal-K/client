@@ -212,7 +212,7 @@ const EmergenceComponent: React.FC = () => {
       <Card noPadding={false}>
         <FactionSelection />
       </Card>
-      <Link href='/tests/onboarding/checklist/preflight'><button className="btn glass">Continue to pre-flight checklist</button></Link>
+      <Link href='/tests/onboarding/'><button className="btn glass">Complete mission</button></Link>
     </div>
   );
 };

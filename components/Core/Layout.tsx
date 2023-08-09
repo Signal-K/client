@@ -6,6 +6,7 @@ import { PostCardAvatar } from '../AccountAvatar';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { AvatarPostCard } from '../PostCard';
 import Navbar from "./Navbar";
+import MusicPlayer from "./assets/MusicPlayer";
 // import Footer from "./Footer";
 
 interface DashboardLayoutProps {
@@ -155,6 +156,7 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
         {/* Page Content */}
         <main className={`flex-grow p-4 ${isMobileView ? '' : 'overflow-y-auto'}`}>
           {children}
+          <MusicPlayer />
         </main>
       </div>
     </div>
