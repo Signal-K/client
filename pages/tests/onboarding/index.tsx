@@ -6,6 +6,7 @@ import { Container } from "react-bootstrap";
 import NewMissions from "../../../components/onboarding/Missions/NewMissions";
 import NewMissionsFactionChosen from "../../../components/onboarding/Missions/Chapter2MissionBase";
 import BigProjectsSection from "../../../components/onboarding/Missions/MissionList";
+import Login from "../../login";
 
 export default function OnboardingSignupPage() {
   const supabase = useSupabaseClient();
@@ -47,6 +48,12 @@ export default function OnboardingSignupPage() {
     checkForGoldenTelescope();
     checkForFaction();
   }, [session]);
+
+  if (!session) return (
+    <CoreLayout>
+      <Login />
+    </CoreLayout>
+  )
 
   if (hasFaction) {
     return (

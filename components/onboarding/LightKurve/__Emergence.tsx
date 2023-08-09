@@ -40,9 +40,9 @@ const EmergenceComponent: React.FC = () => {
           Planets and Exoplanets: Your New Frontier{" "}
         </h2>
         <p className="text-gray-700">
-          - Planets: Celestial bodies revolving around a star, with a nearly
+          <span>Planets</span>: Celestial bodies revolving around a star, with a nearly
           spherical shape, paving the way for your explorations in the Star
-          Sailors universe. <br />- Exoplanets: Mysterious worlds orbiting stars
+          Sailors universe. <br /> <span>Exoplanets:</span> Mysterious worlds orbiting stars
           in other solar systems, holding secrets and potentially groundbreaking
           discoveries.
         </p>
