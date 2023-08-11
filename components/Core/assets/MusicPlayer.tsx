@@ -58,7 +58,7 @@ const MusicPlayer: React.FC = () => {
       <div className="h-[10%] flex items-center justify-center p-4"> {/* Center content */}
       <div className="flex items-center pl-4">
           <img
-            src="https://github.com/Signal-K/client/blob/FCDB-4/public/assets/Onboarding/Missions/Emergence/Navigators.png?raw=true"
+            src="https://github.com/Signal-K/client/blob/FCDB-4/public/assets/Onboarding/Missions/Emergence/navigator.png?raw=true"
             alt="Album Art"
             className="w-12 h-12 object-cover mr-4"
           />
