@@ -13,6 +13,7 @@ import CommentSection from "../components/Posts/Comments/CommentSection";
 import UserProfileBlocks, { UserProfileEditBlock } from "../components/Posts/Config/UserBlocks";
 import VideoEmbed from "../components/Core/atoms/VideoEmbed";
 import gameLoopInfo from "../components/Core/intro/gameLoopInfo";
+import Example from "../components/Blocks/chart";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -75,7 +76,7 @@ export default function Home() {
         The more you classify, the more items you collect, and the more items you collect, the more planets you can colonize. You can earn points that can be redeemed for rewards and recognition within the Star Sailors community. This is also where you can create posts about your decisions and invite other users to vote on your assessments.
       </p>
     </div>
-    <PlaygroundPage />
+    <Example />
           </div>
         </div>      
         <br />

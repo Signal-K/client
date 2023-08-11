@@ -6,6 +6,7 @@ import { Container } from "react-bootstrap";
 import NewMissions from "../../../components/onboarding/Missions/NewMissions";
 import NewMissionsFactionChosen from "../../../components/onboarding/Missions/Chapter2MissionBase";
 import BigProjectsSection from "../../../components/onboarding/Missions/MissionList";
+import NewMissionsPlanetsChosen from "../../../components/onboarding/Missions/Chapter3MissionBase";
 import Login from "../../login";
 
 export default function OnboardingSignupPage() {
@@ -14,9 +15,10 @@ export default function OnboardingSignupPage() {
 
   const [hasGoldenTelescope, setHasRequiredItem] = useState(false);
   const [hasFaction, setHasFaction] = useState(false);
+  const [hasMadePlanetPosts, setHasMadePlanetPosts] = useState(false);
 
   useEffect(() => {
-    async function checkForGoldenTelescope () {
+    async function checkForGoldenTelescope() {
       const { data: inventoryData, error: inventoryError } = await supabase
         .from("inventoryUSERS")
         .select("*")
@@ -45,8 +47,30 @@ export default function OnboardingSignupPage() {
       setHasFaction(!!profileData[0]?.faction);
     }
 
+    async function checkForPlanetPosts() {
+      if (session?.user?.id) {
+        const planetIdsToCheck = [47, 50, 51];
+
+        // Fetch posts made by the user mentioning specific planet IDs
+        const { data: postIds, error: postError } = await supabase
+          .from("posts_duplicates")
+          .select("id")
+          .eq("author", session.user.id)
+          .in("planets2", planetIdsToCheck);
+
+        if (postError) {
+          console.error("Error fetching posts: ", postError);
+          return;
+        }
+
+        // Check if the user has made posts mentioning all specified planets
+        setHasMadePlanetPosts(postIds.length === planetIdsToCheck.length);
+      }
+    }
+
     checkForGoldenTelescope();
     checkForFaction();
+    checkForPlanetPosts();
   }, [session]);
 
   if (!session) return (
@@ -54,6 +78,21 @@ export default function OnboardingSignupPage() {
       <Login />
     </CoreLayout>
   )
+
+  if (hasMadePlanetPosts && hasGoldenTelescope) {
+    return (
+      <CoreLayout>
+        <Card noPadding={false}>
+          <Container>
+            <NewMissionsPlanetsChosen />
+          </Container>
+        </Card>
+        <Card noPadding={false}><Container>
+          <BigProjectsSection />
+        </Container></Card>
+      </CoreLayout>
+    );
+  }
 
   if (hasFaction) {
     return (
@@ -64,7 +103,7 @@ export default function OnboardingSignupPage() {
           </Container>
         </Card>
         <Card noPadding={false}><Container>
-            <BigProjectsSection />
+          <BigProjectsSection />
         </Container></Card>
       </CoreLayout>
     );
@@ -79,7 +118,7 @@ export default function OnboardingSignupPage() {
           </Container>
         </Card>
         <Card noPadding={false}><Container>
-            <BigProjectsSection />
+          <BigProjectsSection />
         </Container></Card>
       </CoreLayout>
     );
