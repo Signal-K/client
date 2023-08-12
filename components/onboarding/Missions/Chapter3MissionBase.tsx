@@ -26,6 +26,13 @@ const NewMissionsPlanetsChosen: React.VFC = () => {
           textGradient="purple"
           description="Objective: Unearth Hidden Celestial Bodies"
         />
+        <BigProject
+          inProgress={false}
+          name="Navigating the cosmic ocean"
+          link="/tests/onboarding/planetHunters/Navigate"
+          textGradient="green"
+          description="Objective: Learn more about lightcurves"
+        />
     </Section>
   );
   };

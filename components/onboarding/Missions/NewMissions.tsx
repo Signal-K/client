@@ -20,11 +20,18 @@ const NewMissions: React.VFC = () => {
           description="Objective: Unearth Hidden Celestial Bodies"
         />
         <BigProject
-          inProgress={false}
+          inProgress={true}
           name="The Crucible of a Star Sailor"
           link="/tests/onboarding/planetHunters/Crucible"
           textGradient="green"
           description="Objective: Unearth Hidden Celestial Bodies"
+        />
+        <BigProject
+          inProgress={true}
+          name="Navigating the cosmic ocean"
+          link="/tests/onboarding/planetHunters/Navigate"
+          textGradient="green"
+          description="Objective: Learn more about lightcurves"
         />
     </Section>
   );
