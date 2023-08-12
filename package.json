@@ -102,6 +102,7 @@
     "react-query": "3.39.3",
     "react-spinners": "0.13.8",
     "react-time-ago": "7.2.1",
+    "react-timeago": "^7.2.0",
     "react-toastify": "9.1.2",
     "react-unity-webgl": "^9.4.2",
     "redux-typescript": "1.2.1",
