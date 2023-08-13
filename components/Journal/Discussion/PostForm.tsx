@@ -14,7 +14,7 @@ type FormData = {
 };
 
 type FormProps = {
-  slug?: string;
+  slug?: string | string[];
 };
 
 export default function Form({ slug }: FormProps) {
