@@ -15,7 +15,7 @@ export default function OnboardingSignupPage() {
   const [hasFaction, setHasFaction] = useState(false);
 
   useEffect(() => {
-    async function checkForGoldenTelescope() {
+    async function checkForGoldenTelescope () {
       const { data: inventoryData, error: inventoryError } = await supabase
         .from("inventoryUSERS")
         .select("*")
