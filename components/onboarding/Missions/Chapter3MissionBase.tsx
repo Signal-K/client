@@ -27,7 +27,7 @@ const NewMissionsPlanetsChosen: React.VFC = () => {
           description="Objective: Unearth Hidden Celestial Bodies"
         />
         <BigProject
-          inProgress={false}
+          inProgress={true}
           name="Navigating the cosmic ocean"
           link="/tests/onboarding/planetHunters/Navigate"
           textGradient="green"
