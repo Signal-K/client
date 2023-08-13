@@ -141,6 +141,13 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                             Inventory
                           </a>
                         </Link>
+                        <Link href="/tests/spaceships" legacyBehavior={true}>
+                          <a
+                            className="block px-4 py-2 text-sm text-gray-700"
+                          >
+                            Spaceships
+                          </a>
+                        </Link>
                       </Menu.Items>
                     </Transition>
                   </Menu>

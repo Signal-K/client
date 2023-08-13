@@ -8,9 +8,9 @@ const FactionSelect: React.FC = () => {
 
   // Define faction options and their corresponding image URLs
   const factions = [
-    { name: 'Cartographer', icon: '/assets/Onboarding/Missions/Emergence/Cartographer.png' },
-    { name: 'Guardian', icon: '/assets/Onboarding/Missions/Emergence/Guardian.png' },
-    { name: 'Navigator', icon: '/assets/Onboarding/Missions/Emergence/Navigator.png' },
+    { name: 'Cartographer', icon: 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/cartographer.png' },
+    { name: 'Guardian', icon: 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/guardian.png' },
+    { name: 'Navigator', icon: 'https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/navigator.png' },
   ];
 
   useEffect(() => {
