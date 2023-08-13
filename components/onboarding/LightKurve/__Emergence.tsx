@@ -201,7 +201,7 @@ const EmergenceComponent: React.FC = () => {
         </div><br />
         <h2 className="text-3xl font-bold mb-4 text-primary bg-gradient-to-r from-gold-500 to-yellow-500">Next: Your Star Sailor Mission Awaits</h2>
         With your avatar ready and a basic understanding of the cosmos, you stand on the verge of thrilling discoveries. Up next, a hands-on mission where you will classify your first set of planets, setting the stage for an adventure rich with learning and real-world contributions to space science.
-        <div className="mb-10">
+        <div className="mb-10"><br />
         <img
           src="/assets/Onboarding/Missions/Emergence/EmergenceImage5.png"
           alt="Transit Method"
