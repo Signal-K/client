@@ -17,7 +17,7 @@ const NewMissions: React.VFC = () => {
           name="Your emergence as a Star Sailor"
           link="/tests/onboarding/planetHunters/Emergence"
           textGradient="green"
-          description="Objective: Unearth Hidden Celestial Bodies"
+          description="Objective: Meet Capt'n Cosmos & start your journey"
         />
         <BigProject
           inProgress={true}
@@ -25,6 +25,13 @@ const NewMissions: React.VFC = () => {
           link="/tests/onboarding/planetHunters/Crucible"
           textGradient="green"
           description="Objective: Unearth Hidden Celestial Bodies"
+        />
+        <BigProject
+          inProgress={true}
+          name="The galactic economy"
+          link="/tests/onboarding/planetHunters/Silfur"
+          textGradient="green"
+          description="Objective: Find out what life is like in the Star Sailors universe"
         />
         <BigProject
           inProgress={true}
