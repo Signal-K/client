@@ -12,13 +12,15 @@ interface TutorialMessageProps {
   toggleExpand: () => void;
 };
 
+
 interface Useractivemission {
   id: number;
   name: string;
-  starterMission: number;
   structure?: number;
   createStructure?: number;
+  starterMission?: number;
 };
+
 
 export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpanded, toggleExpand }) => {
   const supabase = useSupabaseClient();
@@ -88,11 +90,19 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
   }, [session, supabase]);
 
   const getNextMission = () => {
-    return missions.find(
-      (mission) =>
-        !completedMissions.includes(mission.starterMission) &&
-        (activemission === null || mission.starterMission > activemission)
+    /* --- Start of changes ---
+    Sorted missions and updated logic to use 'starterMission' if available, otherwise 'id'
+    */
+    const sortedMissions = [...missions].sort((a, b) => 
+      (a.starterMission || a.id) - (b.starterMission || b.id)
     );
+
+    return sortedMissions.find(
+      (mission) =>
+        !completedMissions.includes(mission.starterMission || mission.id) &&
+        (activemission === null || (mission.starterMission || mission.id) > activemission)
+    );
+    /* --- End of changes --- */
   };
 
   const resetMission = async (mission: Useractivemission) => {
@@ -107,12 +117,16 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
       // Reset the mission after clearing
       const { error: resetError } = await supabase
         .from('profiles')
-        .update({ activemission: mission.starterMission })
+        .update({ activemission: mission.starterMission || mission.id })
         .eq('id', session?.user?.id);
 
       if (resetError) throw resetError;
 
-      setactivemission(mission.starterMission);
+      /* --- Start of changes ---
+      Updated state setter to use 'starterMission' if available, otherwise 'id'
+      */
+      setactivemission(mission.starterMission || mission.id);
+      /* --- End of changes --- */
       setError(null);
     } catch (error: any) {
       console.error("Error resetting mission:", error.message);
@@ -129,12 +143,15 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
     try {
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ activemission: mission.starterMission })
+        .update({ activemission: mission.starterMission || mission.id })
         .eq('id', session?.user?.id);
-
       if (updateError) throw updateError;
 
-      setactivemission(mission.starterMission);
+      /* --- Start of changes ---
+      Updated state setter to use 'starterMission' if available, otherwise 'id'
+      */
+      setactivemission(mission.starterMission || mission.id);
+      /* --- End of changes --- */
 
       if (mission.createStructure) {
         const { error: inventoryError } = await supabase
@@ -193,13 +210,17 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
                 {/* Display the current mission */}
                 {activemission && (
                   <div className="mb-4">
-                    <p className="text-sm mt-1">Current Mission: {missions.find(m => m.starterMission === activemission)?.name || "Unknown Mission"}</p>
+                    {/* --- Start of changes ---
+                    Updated to use 'starterMission' if available, otherwise 'id'
+                    */}
+                    <p className="text-sm mt-1">Current Mission: {missions.find(m => (m.starterMission || m.id) === activemission)?.name || "Unknown Mission"}</p>
                     <button
                       className="mt-2 px-4 py-2 bg-red-500 text-white text-xs rounded-md"
-                      onClick={() => resetMission(missions.find(m => m.starterMission === activemission)!)}
+                      onClick={() => resetMission(missions.find(m => (m.starterMission || m.id) === activemission)!)}
                     >
                       Reset Mission
                     </button>
+                    {/* --- End of changes --- */}
                   </div>
                 )}
 

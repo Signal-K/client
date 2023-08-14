@@ -25,6 +25,9 @@ export default function PlanetViewPage() {
     const [isTutorialExpanded, setIsTutorialExpanded] = useState(true)
     const toggleTutorial = () => setIsTutorialExpanded(!isTutorialExpanded)
 
+    /* --- Start of changes ---
+    Consolidated loading state management using Promise.all
+    */
     useEffect(() => {
         const checkMission = async () => {
             if (!session?.user) return;
@@ -41,9 +44,12 @@ export default function PlanetViewPage() {
                 setHasMission1370201(missions?.length > 0);
             } catch (error: any) {
                 console.error('Error checking mission:', error.message);
-            } finally {
+            }
+            /* --- Removed finally block ---
+            finally {
                 setIsLoading(false);
             };
+            */
         };
 
         const checkFirstClassificationStatus = async () => {
@@ -61,13 +67,25 @@ export default function PlanetViewPage() {
                 setHasChosenFirstClassification(missions?.length > 0);
             } catch (error: any) {
                 console.error('Error checking mission:', error.message);
-            } finally {
+            }
+            /* --- Removed finally block ---
+            finally {
                 setIsLoading(false);
             };
+            */
         };
 
-        checkMission();
-        checkFirstClassificationStatus();
+        /* --- Start of changes ---
+        Consolidated loading state management using Promise.all
+        */
+        const fetchData = async () => {
+            setIsLoading(true);
+            await Promise.all([checkMission(), checkFirstClassificationStatus()]);
+            setIsLoading(false);
+        };
+
+        fetchData();
+        /* --- End of changes --- */
     }, [session?.user, supabase]);
 
     if (isLoading) {
