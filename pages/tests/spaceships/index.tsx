@@ -23,9 +23,9 @@ const SpaceshipsPage: React.FC = () => {
             <MySpaceships /><br /><br />
             <h1 className="text-2xl font-semibold mb-4">Buy Spaceships</h1>
             <AllSpaceships /><br />
-            {isModalOpen && (
+            {/* {isModalOpen && (
               <MoveShipToPlanet onClose={closeModal} />
-            )}
+            )} */}
         </div>
       </CoreLayout>
   );

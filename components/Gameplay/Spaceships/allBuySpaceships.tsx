@@ -15,7 +15,9 @@ const AllSpaceships: React.FC = () => {
       if (error) {
         console.error("Error fetching spaceships:", error);
       } else {
-        setSpaceships(data || []);
+        // setSpaceships(data || []);
+        const filteredSpaceships = data.filter((spaceship) => spaceship.id !== 3);
+        setSpaceships(filteredSpaceships);
       }
     };
 
