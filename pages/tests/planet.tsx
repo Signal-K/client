@@ -117,6 +117,8 @@ export default function PlanetPage({ id }: { id: string }) {
     id +
     "/download.png";
 
+  const [extraValue, setExtraValue] = useState(false);
+
   useEffect(() => {
     if (planetId) {
       getPlanetData();
@@ -150,6 +152,10 @@ export default function PlanetPage({ id }: { id: string }) {
 
       if (data) {
         setPlanetData(data);
+      }
+
+      if (data.planets) {
+        setExtraValue(true);
       }
 
       if (error) {
@@ -430,7 +436,7 @@ export default function PlanetPage({ id }: { id: string }) {
             <>
               <h2 className="text-xl font-bold text-gray-800">Lightkurve graphs</h2><br />
               <Card noPadding={false}>
-                {planetData?.deepnote ? (
+                {planetData?.deepnote ? ( // Could also do based on value as a filter...
                   <>
                     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 items-center">
                       <div>
