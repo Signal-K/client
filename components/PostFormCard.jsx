@@ -153,34 +153,31 @@ export default function PostFormCard ( { onPost } ) {
     </Card>
   );
 }
- 
-export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
+
+export function PostFormCardPlanetTag({ onPost, planetId2 }) {
   const supabase = useSupabaseClient();
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const session = useSession();
   const router = useRouter();
   const planetId = router.query.id;
-  //const [planetId, setPlanetId] = useState();
   const { profile } = useContext(UserContext);
 
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
-  //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(); 
   const [avatar_url, setAvatarUrl] = useState(null);
   const [userExperience, setUserExperience] = useState();
-  const [hasRequiredItem, setHasRequiredItem] = useState(false); // Added state for required item check
+  const [hasRequiredItem, setHasRequiredItem] = useState(false);
 
   useEffect(() => {
-    // Check if the user has the required item with ID 8 in their inventory
     async function checkRequiredItem() {
       const { data: inventoryData, error: inventoryError } = await supabase
-        .from('inventoryUSERS')
-        .select('*')
-        .eq('owner', session?.user?.id)
-        .eq('item', 8); // Check if the user has the item with ID 8 in their inventory
+        .from("inventoryUSERS")
+        .select("*")
+        .eq("owner", session?.user?.id)
+        .eq("item", 8);
 
       if (inventoryError) {
-        console.error('Error fetching inventory data: ', inventoryError);
+        console.error("Error fetching inventory data: ", inventoryError);
         return;
       }
 
@@ -190,102 +187,105 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
     checkRequiredItem();
   }, [session]);
 
-  function createPost() {
+  async function createPost() {
     if (!hasRequiredItem) {
-      alert('You need the required item to create a classification post.');
+      alert("You need the required item to create a classification post.");
       return;
     }
 
+    // Check how many posts mention the planet
+    const { data: mentionCount, error: mentionError } = await supabase
+      .from("posts_duplicates")
+      .select("id")
+      .eq("planets2", planetId2);
+
+    if (mentionError) {
+      console.error("Error counting mentions:", mentionError);
+      return;
+    }
+
+    const classification_status = mentionCount.length > 0 ? "in progress" : "unclassified";
+
     supabase
-      .from('posts_duplicates')
-      .insert({
-        author: session?.user?.id,
-        content,
-        media: uploads,
-        planets2: planetId2,
-      })
-      .then(response => {
+      .from("planetsss")
+      .update({ classification_status })
+      .eq("id", planetId2)
+      .then((response) => {
         if (!response.error) {
-          // Increment the user's experience locally
           setUserExperience(userExperience + 1);
-  
-          // Update the user's experience in the database
           supabase
-            .from('profiles')
+            .from("profiles")
             .update({
               experience: userExperience + 1,
             })
-            .eq('id', session?.user?.id)
-            .then(updateResponse => {
+            .eq("id", session?.user?.id)
+            .then((updateResponse) => {
               if (!updateResponse.error) {
-                // Fetch the newly added planet's data
                 supabase
-                  .from('planetsss')
-                  .select('*')
-                  .eq('id', planetId2)
-                  .then(planetResponse => {
+                  .from("planetsss")
+                  .select("*")
+                  .eq("id", planetId2)
+                  .then((planetResponse) => {
                     if (!planetResponse.error && planetResponse.data.length > 0) {
                       const planetToAdd = planetResponse.data[0];
-  
-                      // Add the planet to the user's inventory
+
                       supabase
-                        .from('inventoryPLANETS')
+                        .from("inventoryPLANETS")
                         .insert([
                           {
                             planet_id: planetToAdd.id,
                             owner_id: session?.user?.id,
                           },
                         ])
-                        .then(inventoryResponse => {
+                        .then((inventoryResponse) => {
                           if (!inventoryResponse.error) {
                             alert(`Post ${content} created and planet added to your inventory`);
-                            setContent('');
+                            setContent("");
                             setUploads([]);
                             if (onPost) {
                               onPost();
                             }
                           } else {
-                            console.error('Error adding planet to inventory:', inventoryResponse.error);
+                            console.error("Error adding planet to inventory:", inventoryResponse.error);
                           }
                         });
                     } else {
-                      console.error('Error fetching planet data:', planetResponse.error);
+                      console.error("Error fetching planet data:", planetResponse.error);
                     }
                   });
               } else {
-                console.error('Error updating user experience:', updateResponse.error);
+                console.error("Error updating user experience:", updateResponse.error);
               }
             });
         }
       })
-      .catch(error => {
-        console.error('Error creating post:', error);
+      .catch((error) => {
+        console.error("Error creating post:", error);
       });
-  }  
+  }
 
   useEffect(() => {
-    supabase.from('profiles')
+    supabase
+      .from("profiles")
       .select(`avatar_url, experience`)
-      .eq('id', session?.user?.id)
-      .then(result => {
-        setAvatarUrl(result?.data[0]?.avatar_url); //console.log(result.data[0].avatar_url)
+      .eq("id", session?.user?.id)
+      .then((result) => {
+        setAvatarUrl(result?.data[0]?.avatar_url);
         setUserExperience(result?.data[0]?.experience);
-      })
+      });
   }, [session]);
 
-  async function addMedia ( e ) {
+  async function addMedia(e) {
     const files = e.target.files;
     if (files.length > 0) {
       setIsUploading(true);
-      for (const file of files) { // To-Do: List of user's photos from the image gallery in wb3-10
-        const fileName = Date.now() + session?.user?.id + file.name; // Generate a random string to make the file unique
-        const result = await supabase.storage
-          .from('media') // Upload the file/media
-          .upload(fileName, file);
+      for (const file of files) {
+        const fileName = Date.now() + session?.user?.id + file.name;
+        const result = await supabase.storage.from("media").upload(fileName, file);
 
         if (result.data) {
-          const url = process.env.NEXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/media/' + result.data.path;
-          setUploads(prevUploads => [...prevUploads, url]); // Add the most recently uploaded image to an array of images that are in state
+          const url = process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/media/" + result.data.path;
+          setUploads((prevUploads) => [...prevUploads, url]);
         } else {
           console.log(result);
         }
@@ -294,26 +294,26 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
     }
   }
 
-  // https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/1675853386903cebdc7a2-d8af-45b3-b37f-80f328ff54d6image-asset.jpg
-  // https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media1675853386903cebdc7a2-d8af-45b3-b37f-80f328ff54d6image-asset.jpg
-
   return (
     <>
       <div className="flex gap-2">
         <div>
-          <AccountAvatar uid={session?.user?.id}
-                url={avatar_url}
-                size={60} />
-        </div> { profile && (
-          <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-24 rounded-xl" placeholder={`What do you think about this planet candidate, ${profile?.username}?`} /> )}
+          <AccountAvatar uid={session?.user?.id} url={avatar_url} size={60} />
+        </div>
+        {profile && (
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="grow p-3 h-24 rounded-xl"
+            placeholder={`What do you think about this planet candidate, ${profile?.username}?`}
+          />
+        )}
       </div>
-      {isUploading && (
-        <div><ClimbingBoxLoader /></div>
-      )}
+      {isUploading && <div><ClimbingBoxLoader /></div>}
       {uploads.length > 0 && (
         <div className="flex gap-2 mt-4">
-          {uploads.map(upload => (
-            <div className=""><img src={upload} className='w-auto h-48 rounded-md' /></div>
+          {uploads.map((upload) => (
+            <div className=""><img src={upload} className="w-auto h-48 rounded-md" /></div>
           ))}
         </div>
       )}
@@ -321,7 +321,7 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
         <p>Your Silfur: {userExperience}</p>
         <div>
           <label className="flex gap-1">
-            <input type='file' className="hidden" onChange={addMedia} />
+            <input type="file" className="hidden" onChange={addMedia} />
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
             </svg>
@@ -332,7 +332,7 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
           <button onClick={createPost} className="bg-socialBlue text-white px-6 py-1 rounded-md">Share</button>
         </div>
       </div>
-      </>
+    </>
   );
 }
 

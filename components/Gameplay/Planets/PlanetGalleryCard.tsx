@@ -7,11 +7,12 @@ interface Props {
     id: string;
     content: string;
     cover: string;
+    classification_status: string; // Add classification_status field
   };
 }
 
 export default function PlanetGalleryCard({ planet }: Props) {
-  const { id, content, cover } = planet;
+  const { id, content, cover, classification_status } = planet;
 
   return (
     <div className="col-md-4 mb-4">
@@ -27,6 +28,7 @@ export default function PlanetGalleryCard({ planet }: Props) {
         </div>
         <Card.Body>
           <Card.Title>{content}</Card.Title>
+          <p>Classification Status: {classification_status}</p> {/* Display classification_status */}<br />
           <Link legacyBehavior href={`/tests/planets/${planet.id}`}>
             <a className="btn btn-primary">Explore</a>
           </Link>
