@@ -8,6 +8,250 @@ import { useRouter } from "next/router";
 
 // type Profiles = Database['public']['Tables']['profiles']['Row'];
 
+export function PostFormCardPlanetTag({ onPost, planetId2 }) {
+  const supabase = useSupabaseClient();
+  const [content, setContent] = useState("");
+  const session = useSession();
+  const router = useRouter();
+  const planetId = router.query.id;
+  const { profile } = useContext(UserContext);
+
+  const [uploads, setUploads] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [avatar_url, setAvatarUrl] = useState(null);
+  const [userExperience, setUserExperience] = useState();
+  const [hasRequiredItem, setHasRequiredItem] = useState(false);
+
+  useEffect(() => {
+    async function checkRequiredItem() {
+      const { data: inventoryData, error: inventoryError } = await supabase
+        .from("inventoryUSERS")
+        .select("*")
+        .eq("owner", session?.user?.id)
+        .eq("item", 8);
+
+      if (inventoryError) {
+        console.error("Error fetching inventory data: ", inventoryError);
+        return;
+      }
+
+      setHasRequiredItem(inventoryData.length > 0);
+    }
+
+    checkRequiredItem();
+  }, [session]);
+
+  async function createPost() {
+    if (!hasRequiredItem) {
+      alert("You need the required item to create a classification post.");
+      return;
+    }
+  
+    // Check how many posts mention the planet
+    const { data: mentionCount, error: mentionError } = await supabase
+      .from("posts_duplicates")
+      .select("id")
+      .eq("planets2", planetId2);
+  
+    if (mentionError) {
+      console.error("Error counting mentions:", mentionError);
+      return;
+    }
+  
+    const classification_status = mentionCount.length > 0 ? "in progress" : "unclassified";
+  
+    // Insert the post into the `posts_duplicates` table
+    supabase
+      .from("posts_duplicates")
+      .insert({
+        author: session?.user?.id,
+        content,
+        media: uploads,
+        planets2: planetId2,
+      })
+      .then((response) => {
+        if (!response.error) {
+          setUserExperience(userExperience + 1);
+          supabase
+            .from("profiles")
+            .update({
+              experience: userExperience + 1,
+            })
+            .eq("id", session?.user?.id)
+            .then((updateResponse) => {
+              if (!updateResponse.error) {
+                // Update the classification_status of the planet in the `planetsss` table
+                supabase
+                  .from("planetsss")
+                  .update({
+                    classification_status,
+                  })
+                  .eq("id", planetId2)
+                  .then((planetUpdateResponse) => {
+                    if (!planetUpdateResponse.error) {
+                      supabase
+                        .from("planetsss")
+                        .select("*")
+                        .eq("id", planetId2)
+                        .then((planetResponse) => {
+                          if (!planetResponse.error && planetResponse.data.length > 0) {
+                            const planetToAdd = planetResponse.data[0];
+  
+                            supabase
+                              .from("inventoryPLANETS")
+                              .insert([
+                                {
+                                  planet_id: planetToAdd.id,
+                                  owner_id: session?.user?.id,
+                                },
+                              ])
+                              .then((inventoryResponse) => {
+                                if (!inventoryResponse.error) {
+                                  alert(`Post ${content} created and planet added to your inventory`);
+                                  setContent("");
+                                  setUploads([]);
+                                  if (onPost) {
+                                    onPost();
+                                  }
+                                } else {
+                                  console.error("Error adding planet to inventory:", inventoryResponse.error);
+                                }
+                              });
+                          } else {
+                            console.error("Error fetching planet data:", planetResponse.error);
+                          }
+                        });
+                    } else {
+                      console.error("Error updating planet classification status:", planetUpdateResponse.error);
+                    }
+                  });
+              } else {
+                console.error("Error updating user experience:", updateResponse.error);
+              }
+            });
+        } else {
+          console.error("Error inserting post:", response.error);
+        }
+      })
+      .catch((error) => {
+        console.error("Error creating post:", error);
+      });
+  }
+  
+
+  useEffect(() => {
+    supabase
+      .from("profiles")
+      .select(`avatar_url, experience`)
+      .eq("id", session?.user?.id)
+      .then((result) => {
+        setAvatarUrl(result?.data[0]?.avatar_url);
+        setUserExperience(result?.data[0]?.experience);
+      });
+  }, [session]);
+
+  async function addMedia(e) {
+    const files = e.target.files;
+    if (files.length > 0) {
+      setIsUploading(true);
+      for (const file of files) {
+        const fileName = Date.now() + session?.user?.id + file.name;
+        const result = await supabase.storage.from("media").upload(fileName, file);
+
+        if (result.data) {
+          const url = process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/media/" + result.data.path;
+          setUploads((prevUploads) => [...prevUploads, url]);
+        } else {
+          console.log(result);
+        }
+      }
+      setIsUploading(false);
+    }
+  }
+
+  return (
+    <>
+      <div className="flex gap-2">
+        <div>
+          <AccountAvatar uid={session?.user?.id} url={avatar_url} size={60} />
+        </div>
+        {profile && (
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="grow p-3 h-24 rounded-xl"
+            placeholder={`What do you think about this planet candidate, ${profile?.username}?`}
+          />
+        )}
+      </div>
+      {isUploading && <div><ClimbingBoxLoader /></div>}
+      {uploads.length > 0 && (
+        <div className="flex gap-2 mt-4">
+          {uploads.map((upload) => (
+            <div className=""><img src={upload} className="w-auto h-48 rounded-md" /></div>
+          ))}
+        </div>
+      )}
+      <div className="flex gap-5 items-center mt-2">
+        <p>Your Silfur: {userExperience}</p>
+        <div>
+          <label className="flex gap-1">
+            <input type="file" className="hidden" onChange={addMedia} />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+            </svg>
+            <span className="hidden md:block">Media</span>
+          </label>
+        </div>
+        <div className="grow text-right">
+          <button onClick={createPost} className="bg-socialBlue text-white px-6 py-1 rounded-md">Share</button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+{/*<div>
+          <button className="flex gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+            <span className="hidden md:block">People</span>
+          </button>
+        </div>
+        <div>
+          <button className="flex gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+            </svg>
+            <span className="hidden md:block">Checkin</span>
+          </button>
+        </div>
+        <div>
+          <button className="flex gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
+            </svg>
+            <span className="hidden md:block">Mood</span>
+          </button>
+        </div>*/}
+
+/*export function PlanetTagPostForm ( { onPost } ) {
+  const supabase = useSupabaseClient();
+  const [content, setContent] = useState('');
+  const session = useSession();
+  const { profile } = useContext(UserContext);
+
+  const [uploads, setUploads] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
+
+  const [planet, setPlanet] = useState('');
+  
+  return <div>Test</div>;
+*/
+
 export default function PostFormCard ( { onPost } ) {
   const supabase = useSupabaseClient();
   const [content, setContent] = useState('');
@@ -153,226 +397,3 @@ export default function PostFormCard ( { onPost } ) {
     </Card>
   );
 }
-
-export function PostFormCardPlanetTag({ onPost, planetId2 }) {
-  const supabase = useSupabaseClient();
-  const [content, setContent] = useState("");
-  const session = useSession();
-  const router = useRouter();
-  const planetId = router.query.id;
-  const { profile } = useContext(UserContext);
-
-  const [uploads, setUploads] = useState([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [avatar_url, setAvatarUrl] = useState(null);
-  const [userExperience, setUserExperience] = useState();
-  const [hasRequiredItem, setHasRequiredItem] = useState(false);
-
-  useEffect(() => {
-    async function checkRequiredItem() {
-      const { data: inventoryData, error: inventoryError } = await supabase
-        .from("inventoryUSERS")
-        .select("*")
-        .eq("owner", session?.user?.id)
-        .eq("item", 8);
-
-      if (inventoryError) {
-        console.error("Error fetching inventory data: ", inventoryError);
-        return;
-      }
-
-      setHasRequiredItem(inventoryData.length > 0);
-    }
-
-    checkRequiredItem();
-  }, [session]);
-
-  async function createPost() {
-    if (!hasRequiredItem) {
-      alert("You need the required item to create a classification post.");
-      return;
-    }
-
-    // Check how many posts mention the planet
-    const { data: mentionCount, error: mentionError } = await supabase
-      .from("posts_duplicates")
-      .select("id")
-      .eq("planets2", planetId2);
-
-    if (mentionError) {
-      console.error("Error counting mentions:", mentionError);
-      return;
-    }
-
-    const classification_status = mentionCount.length > 0 ? "in progress" : "unclassified";
-
-    supabase
-      .from("planetsss")
-      .update({ classification_status })
-      .eq("id", planetId2)
-      .then((response) => {
-        if (!response.error) {
-          setUserExperience(userExperience + 1);
-          supabase
-            .from("profiles")
-            .update({
-              experience: userExperience + 1,
-            })
-            .eq("id", session?.user?.id)
-            .then((updateResponse) => {
-              if (!updateResponse.error) {
-                supabase
-                  .from("planetsss")
-                  .select("*")
-                  .eq("id", planetId2)
-                  .then((planetResponse) => {
-                    if (!planetResponse.error && planetResponse.data.length > 0) {
-                      const planetToAdd = planetResponse.data[0];
-
-                      supabase
-                        .from("inventoryPLANETS")
-                        .insert([
-                          {
-                            planet_id: planetToAdd.id,
-                            owner_id: session?.user?.id,
-                          },
-                        ])
-                        .then((inventoryResponse) => {
-                          if (!inventoryResponse.error) {
-                            alert(`Post ${content} created and planet added to your inventory`);
-                            setContent("");
-                            setUploads([]);
-                            if (onPost) {
-                              onPost();
-                            }
-                          } else {
-                            console.error("Error adding planet to inventory:", inventoryResponse.error);
-                          }
-                        });
-                    } else {
-                      console.error("Error fetching planet data:", planetResponse.error);
-                    }
-                  });
-              } else {
-                console.error("Error updating user experience:", updateResponse.error);
-              }
-            });
-        }
-      })
-      .catch((error) => {
-        console.error("Error creating post:", error);
-      });
-  }
-
-  useEffect(() => {
-    supabase
-      .from("profiles")
-      .select(`avatar_url, experience`)
-      .eq("id", session?.user?.id)
-      .then((result) => {
-        setAvatarUrl(result?.data[0]?.avatar_url);
-        setUserExperience(result?.data[0]?.experience);
-      });
-  }, [session]);
-
-  async function addMedia(e) {
-    const files = e.target.files;
-    if (files.length > 0) {
-      setIsUploading(true);
-      for (const file of files) {
-        const fileName = Date.now() + session?.user?.id + file.name;
-        const result = await supabase.storage.from("media").upload(fileName, file);
-
-        if (result.data) {
-          const url = process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/media/" + result.data.path;
-          setUploads((prevUploads) => [...prevUploads, url]);
-        } else {
-          console.log(result);
-        }
-      }
-      setIsUploading(false);
-    }
-  }
-
-  return (
-    <>
-      <div className="flex gap-2">
-        <div>
-          <AccountAvatar uid={session?.user?.id} url={avatar_url} size={60} />
-        </div>
-        {profile && (
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="grow p-3 h-24 rounded-xl"
-            placeholder={`What do you think about this planet candidate, ${profile?.username}?`}
-          />
-        )}
-      </div>
-      {isUploading && <div><ClimbingBoxLoader /></div>}
-      {uploads.length > 0 && (
-        <div className="flex gap-2 mt-4">
-          {uploads.map((upload) => (
-            <div className=""><img src={upload} className="w-auto h-48 rounded-md" /></div>
-          ))}
-        </div>
-      )}
-      <div className="flex gap-5 items-center mt-2">
-        <p>Your Silfur: {userExperience}</p>
-        <div>
-          <label className="flex gap-1">
-            <input type="file" className="hidden" onChange={addMedia} />
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
-            </svg>
-            <span className="hidden md:block">Media</span>
-          </label>
-        </div>
-        <div className="grow text-right">
-          <button onClick={createPost} className="bg-socialBlue text-white px-6 py-1 rounded-md">Share</button>
-        </div>
-      </div>
-    </>
-  );
-}
-
-{/*<div>
-          <button className="flex gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-            </svg>
-            <span className="hidden md:block">People</span>
-          </button>
-        </div>
-        <div>
-          <button className="flex gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-            </svg>
-            <span className="hidden md:block">Checkin</span>
-          </button>
-        </div>
-        <div>
-          <button className="flex gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
-            </svg>
-            <span className="hidden md:block">Mood</span>
-          </button>
-        </div>*/}
-
-/*export function PlanetTagPostForm ( { onPost } ) {
-  const supabase = useSupabaseClient();
-  const [content, setContent] = useState('');
-  const session = useSession();
-  const { profile } = useContext(UserContext);
-
-  const [uploads, setUploads] = useState([]);
-  const [isUploading, setIsUploading] = useState(false);
-  //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
-
-  const [planet, setPlanet] = useState('');
-  
-  return <div>Test</div>;
-*/
