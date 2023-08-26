@@ -50,27 +50,44 @@ const PlanetTable: React.FC = () => {
     }
   };
 
+  // CSS styles as template literals
+  const tableStyles = `
+    width: 100%;
+    overflow-x: auto;
+  `;
+
+  const wrapperStyles = `
+    padding: 10px; /* Minimum 10px padding between columns */
+    white-space: nowrap; /* Prevent text from wrapping */
+  `;
+
+  const cellStyles = `
+    padding: 8px 10px; /* Adjust padding as needed */
+    border: 1px solid #ddd;
+    text-align: left;
+  `;
+
   return (
-    <div>
-      <table>
-        <thead>
+    <div style={{ width: "100%", overflowX: "auto" }}>
+      <div style={{ padding: "10px", whiteSpace: "nowrap" }}>
+        <table style={{ ...tableStyles }}>
+          
           <tr>
             <th>ID</th>
             <th>Content</th>
             <th>Owner</th>
-            <th>Created At</th>
-            <th>Media</th>
-            <th>Planets</th>
+            {/* <th>Created At</th> */}
+            {/* <th>Media</th> */}
+            {/* <th>Planets</th> */}
             <th>Temperature</th>
-            <th>Owner Address</th>
-            <th>Avatar URL</th>
-            <th>Cover</th>
+            {/* <th>Owner Address</th> */}
+            {/* <th>Avatar URL</th> */}
+            {/* <th>Cover</th> */}
             <th>Contract</th>
             <th>TIC ID</th>
             <th>Orbital Period</th>
             <th>Radius</th>
-            <th>Deepnote</th>
-            <th>Difficulty</th>
+            {/* <th>Difficulty</th> */}
           </tr>
         </thead>
         <tbody>
@@ -79,7 +96,14 @@ const PlanetTable: React.FC = () => {
               <td>{planet.id.toString()}</td>
               <td>{planet.content}</td>
               <td>{planet.owner}</td>
-              <td>{planet.created_at}</td>
+              {/* <td>{planet.created_at}</td> */}
+              <td>{planet.temperature}</td>
+              <td>{planet.contract}</td>
+              <td>{planet.ticId}</td>
+              <td>{planet.orbital_period}</td>
+              <td>{planet.radius}</td>
+              {/* <td>{planet.deepnote}</td> */}
+              {/* <td>{planet.difficulty}</td> */}
               {/* Add rendering logic for other columns */}
             </tr>
           ))}
