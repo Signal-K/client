@@ -13,7 +13,7 @@ export default function SocialGraphHomeModal() {
 
   useEffect(() => {
     fetchPosts();
-  }, [a]); 
+  }, [a]);  
 
   useEffect(() => {
     if (planetPosts.length > 0) {

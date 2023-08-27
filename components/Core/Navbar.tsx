@@ -17,8 +17,9 @@ const navigation = [
   // { name: 'Playground', href: '/playground' },
   { name: 'Planets', href: '/tests/planets' },
   { name: 'Economy', href: '/balance' },
-  { name: 'Inventory', href: '/#'}, // href: '/inventory' },
+  { name: 'Inventory', href: '/inventory'}, // href: '/inventory' },
   { name: 'Documentation', href: '/#'}, // href: '/docs' },
+  { name: 'Discord', href: 'https://discord.gg/zhMPVUa7yd' },
 ];
 
 function classNames(...classes: string[]) {
@@ -34,7 +35,7 @@ export default function Navbar(/*{ user }: { user: any }*/) {
   useEffect(() => {    
     supabase
       .from("profiles")
-      .select()
+      .select('*')
       .eq("id", session?.user?.id)
       .then((result) => {
         if (result.data) {
@@ -148,7 +149,7 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                               'flex w-full px-4 py-2 text-sm text-gray-700'
                             )}
                           >
-                            My inventory
+                            My inventory {profile?.reputation}
                           </button>
                         )}
                       </Menu.Item></Link>
@@ -166,7 +167,7 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                           )}
                         </Menu.Item>
                         <Menu.Item>
-                        <SilfurBalance balance={100} />
+                        <SilfurBalance balance={profile?.reputation} />
                       </Menu.Item></>
                       ) : (
                         <Menu.Item>

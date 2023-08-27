@@ -33,8 +33,8 @@ export default function PlanetHuntersOnboardingPage1 () {
     return (
         <CoreLayout>
             <Stitching />
-            <ProgressSidebar credits={credits} currentPage={currentPage} />
-            {session?.user?.id && ( <> <UserContext.Provider value={{profile}}><PostFormCardPlanetTag planetId2={1} onPost={null} /></UserContext.Provider> </> )}
+            {/* <ProgressSidebar credits={credits} currentPage={currentPage} /> */}
+            {/* {session?.user?.id && ( <> <UserContext.Provider value={{profile}}><PostFormCardPlanetTag planetId2={1} onPost={null} /></UserContext.Provider> </> )} */}
         </CoreLayout>
     );
 };

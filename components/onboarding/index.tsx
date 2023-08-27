@@ -31,7 +31,7 @@ const Instructions: React.FC = () => {
         <img src="https://file.notion.so/f/s/93246fc4-b0db-46a7-b488-37a82c7e53d1/Untitled.png?id=f02de9d7-b9a6-41e9-8adc-54b773d5295b&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1688104800000&signature=0pxfyuWzoTSrZ0Fcggay1xvDhieon_3npbbrJlHfp9g&downloadName=Untitled.png" alt="Size Estimation" className="w-full" />
         </div> */}
         <p className="text-gray-700">
-        But that's not all! You'll also learn how to collaborate with your fellow Star Sailors, sharing insights and ideas to uncover the secrets hidden within the data. Together, you'll leverage collective knowledge to make informed classifications and contribute to the collective wisdom of the Star Sailor community.se in making informed classifications.
+        But that's not all! You'll also learn how to collaborate with your fellow Star Sailors, sharing insights and ideas to uncover the secrets hidden within the data. Together, you'll leverage collective knowledge to make informed classifications and contribute to the collective wisdom of the Star Sailor community by making informed classifications.
         </p>
       </div>
 
