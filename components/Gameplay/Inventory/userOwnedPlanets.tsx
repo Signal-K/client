@@ -70,7 +70,7 @@ const OwnedPlanetsList: React.FC = () => {
   return (
     <>
       <div className="bg-gray-100 p-4">
-        <h2 className="text-2xl font-semibold mb-4">Your Planets</h2>
+        <h2 className="text-2xl font-semibold mb-4">Planets</h2>
         <ul className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {planetDetails.map((planet, index) => (
             <Link legacyBehavior href={`https://play.skinetics.tech/tests/planets/${planet.id}`}>

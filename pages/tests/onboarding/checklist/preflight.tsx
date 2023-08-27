@@ -10,10 +10,12 @@ export default function CrucibleFlightCheck () {
 
     return (
         <CoreLayout>
-            <Container><p>Classify these planets!</p> <br /></Container>
-            <Crucible1BaseplanetList />
-            {/* <OwnedItemsList /> */}
-            {/* <CharacterCanvas /> */}
+            <div className="mb-20">
+                <Container><p>Classify these planets!</p> <br /></Container>
+                <Crucible1BaseplanetList />
+                {/* <OwnedItemsList /> */}
+                {/* <CharacterCanvas /> */}
+            </div>
         </CoreLayout>
     );
 };

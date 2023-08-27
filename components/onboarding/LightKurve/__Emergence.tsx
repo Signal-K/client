@@ -9,7 +9,7 @@ const EmergenceComponent: React.FC = () => {
   const session = useSession();
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 font-sans">
+    <div className="max-w-4xl mx-auto py-8 px-4 font-sans mb-20">
       <h1 className="text-3xl font-bold mb-4 text-primary bg-gradient-to-r from-gold-500 to-yellow-500">
         {" "}
         The emergence of a Star Sailor{" "}
@@ -151,7 +151,7 @@ const EmergenceComponent: React.FC = () => {
               </li>
             </ul>
           </div>
-          <div className="w-full sm:w-1/2 p-4"> <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/cartographer.png" alt="Faction Image" className="w-full h-auto" /> </div>
+          <div className="w-full sm:w-1/2 p-4"> <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/cartographer.svg" alt="Faction Image" className="w-full h-auto" /> </div>
         </div>
         <div className="flex flex-wrap">
           <div className="w-full sm:w-1/2 p-4">
@@ -174,7 +174,7 @@ const EmergenceComponent: React.FC = () => {
               </li>
             </ul>
           </div>
-          <div className="w-full sm:w-1/2 p-4"> <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/guardian.png" alt="Faction Image" className="w-full h-auto" /> </div>
+          <div className="w-full sm:w-1/2 p-4"> <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/guardian.svg" alt="Faction Image" className="w-full h-auto" /> </div>
         </div>
         <div className="flex flex-wrap">
           <div className="w-full sm:w-1/2 p-4">
@@ -197,7 +197,7 @@ const EmergenceComponent: React.FC = () => {
               </li>
             </ul>
           </div>
-          <div className="w-full sm:w-1/2 p-4"> <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/navigator.png" alt="Faction Image" className="w-full h-auto" /> </div>
+          <div className="w-full sm:w-1/2 p-4"> <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/navigator.svg" alt="Faction Image" className="w-full h-auto" /> </div>
         </div><br />
         <h2 className="text-3xl font-bold mb-4 text-primary bg-gradient-to-r from-gold-500 to-yellow-500">Next: Your Star Sailor Mission Awaits</h2>
         With your avatar ready and a basic understanding of the cosmos, you stand on the verge of thrilling discoveries. Up next, a hands-on mission where you will classify your first set of planets, setting the stage for an adventure rich with learning and real-world contributions to space science.
