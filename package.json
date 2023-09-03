@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@chakra-ui/react": "2.4.9",
+    "@datalayer/jupyter-react": "^0.7.10",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "11.10.5",
     "@ethersproject/solidity": "^5.7.0",
