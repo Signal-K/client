@@ -120,6 +120,5 @@ module.exports = {
     require('daisyui'),
     require('flowbite/plugin'),
     require('@headlessui/tailwindcss'),
-    require('preline/plugin'),
   ]
 };

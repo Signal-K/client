@@ -9,15 +9,15 @@ interface OwnedPlanet {
 
 interface Planet {
   id: number;
-  name: string;
-  avatar_url: string;
+  content: string; // Changed 'name' to 'content' based on your interface definition
+  cover: string; // Changed 'avatar_url' to 'cover' based on your interface definition
 }
 
 const OwnedPlanetsListBlock: React.FC = () => {
   const session = useSession();
   const supabase = useSupabaseClient();
-  const [ownedPlanets, setOwnedPlanets] = useState([]);
-  const [planetDetails, setPlanetDetails] = useState([]);
+  const [ownedPlanets, setOwnedPlanets] = useState<OwnedPlanet[]>([]);
+  const [planetDetails, setPlanetDetails] = useState<Planet[]>([]);
 
   useEffect(() => {
     async function fetchOwnedPlanets() {
@@ -49,7 +49,7 @@ const OwnedPlanetsListBlock: React.FC = () => {
   useEffect(() => {
     async function fetchPlanetDetails() {
       if (ownedPlanets.length > 0) {
-        const planetIds = ownedPlanets.map(planet => planet.planet_id);
+        const planetIds = ownedPlanets.map((planet) => planet.planet_id);
         const { data, error } = await supabase
           .from('planetsss')
           .select('*')
@@ -73,15 +73,18 @@ const OwnedPlanetsListBlock: React.FC = () => {
       <div className="p-4">
         <h2 className="text-2xl font-semibold mb-4">Your recent classifications</h2>
         <ul className="grid gap-4">
-          {planetDetails.map((planet, index) => (
-            <Link legacyBehavior href={`https://play.skinetics.tech/tests/planets/${planet.id}`}>
-            <li key={planet.id} className="bg-white shadow-md p-4 rounded-md">
-              <h3 className="text-lg font-medium mb-2">{planet.content}</h3>
-              <div className="mb-2">
-                <img src={planet.cover} alt={planet.content} className="w-full h-auto" />
-              </div>
-              {/* Add additional planet details here */}
-            </li></Link>
+          {planetDetails.map((planet) => (
+            <Link key={planet.id} href={`https://play.skinetics.tech/tests/planets/${planet.id}`}>
+              <a>
+                <li className="bg-white shadow-md p-4 rounded-md">
+                  <h3 className="text-lg font-medium mb-2">{planet?.content}</h3>
+                  <div className="mb-2">
+                    <img src={planet.cover} alt={planet?.content} className="w-full h-auto" />
+                  </div>
+                  {/* Add additional planet details here */}
+                </li>
+              </a>
+            </Link>
           ))}
         </ul>
       </div>
