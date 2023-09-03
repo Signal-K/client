@@ -18,7 +18,7 @@ export default function UnityBuildLod11 () {
     const handleSendPlanetName = () => {
         sendMessage("PlanetName", "UpdatePlanetName", planetName);
     };
-
+ 
     return (
         <Fragment>
             <Unity unityProvider={unityProvider} style={{ width: "100%", height: "500px" }}/>
