@@ -109,7 +109,7 @@ const CrucibleComponent: React.FC = () => {
             {isBlockVisible && <UserProfileEditBlock />}
             <TrophyBlockLightkurveOnboardingPt1 />
             </div>
-            <Link href='/tests/onboarding/checklist/preflight'><button className="btn glass">Continue to pre-flight checklist</button></Link>
+            <Link legacyBehavior href ='/tests/onboarding/checklist/preflight'><button className="btn glass">Continue to pre-flight checklist</button></Link>
         </div>
     )
 }

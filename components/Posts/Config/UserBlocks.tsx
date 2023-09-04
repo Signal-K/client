@@ -19,7 +19,7 @@ export default function UserProfileBlocks () {
             <Grid numItemsSm={2} numItemsLg={2} className="gap-6">
                 <Card>
                     <div className="container mx-auto py-8">
-                        <UserPostCount userId={userId} />
+                        <UserPostCount userId={userId || ''} />
                     </div>
                 </Card>
                 <Card>

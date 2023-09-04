@@ -7,7 +7,7 @@ function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
             {'Copyright - MIT License - '}
-            <Link color="inherit" href="https://skinetics.tech/">
+            <Link legacyBehaviorcolor="inherit" href="https://skinetics.tech/">
                 Signal Kinetics
             </Link>{' '}
             {new Date().getFullYear()}
@@ -63,7 +63,7 @@ export const Footer = () => {
                         <ul>
                             {footer.description.map((item) => (
                                 <li key={item}>
-                                    <Link href="#" variant="subtitle1" color="text.secondary">
+                                    <Link legacyBehavior href ="#" variant="subtitle1" color="text.secondary">
                                         {item}
                                     </Link>
                                 </li>

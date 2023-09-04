@@ -18,7 +18,7 @@ export default function Layout({ children }: LayoutProps) {
     <>
       <Head>
         <title>Discuss-OS Supabase</title>
-        <link rel="icon" href="/favicon.ico" />
+        <Link legacyBehaviorrel="icon" href="/favicon.ico" />
       </Head>
 
       <nav
@@ -28,7 +28,7 @@ export default function Layout({ children }: LayoutProps) {
       >
         <div className="container is-max-desktop">
           <div className="navbar-brand">
-            <Link href="/">
+            <Link legacyBehavior href ="/">
               <a className="navbar-item">
                 <svg
                   width="50"
@@ -67,16 +67,16 @@ export default function Layout({ children }: LayoutProps) {
             className={`navbar-menu ${isActive ? 'is-active' : ''}`}
           >
             <div className="navbar-end">
-              <Link href="/posts">
+              <Link legacyBehavior href ="/posts">
                 <a className={'navbar-item'}>Forum</a>
               </Link>
 
               {session ? (
                 <>
-                  <Link href="/posts/create">
+                  <Link legacyBehavior href ="/posts/create">
                     <a className={'navbar-item'}>New+</a>
                   </Link>
-                  <Link href="/profile">
+                  <Link legacyBehavior href ="/profile">
                     <a className="navbar-item">Profile</a>
                   </Link>
                   <a
@@ -90,7 +90,7 @@ export default function Layout({ children }: LayoutProps) {
                   </a>
                 </>
               ) : (
-                <Link href="/login">
+                <Link legacyBehavior href ="/login">
                   <a className={'navbar-item'}>Login</a>
                 </Link>
               )}

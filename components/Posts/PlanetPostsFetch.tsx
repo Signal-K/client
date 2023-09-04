@@ -197,7 +197,7 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
       <Card noPadding={false}>
         <div className="flex gap-3">
           <div>
-            <Link href={'/posts/profile/'+authorProfile?.id}>
+            <Link legacyBehavior href ={'/posts/profile/'+authorProfile?.id}>
               <span className="cursor-pointer">
                 <PostCardAvatar url={authorProfile?.avatar_url}
                   size={50} />
@@ -206,12 +206,12 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
           </div>
           <div className="grow">
             <p>
-              <Link href={'/posts/profile/'+authorProfile?.id}>
+              <Link legacyBehavior href ={'/posts/profile/'+authorProfile?.id}>
                 <span className="mr-1 font-semibold cursor-pointer hover:underline">
                   {authorProfile?.username}
                 </span>
               </Link>
-              shared a <Link legacyBehavior href='/posts/'><a className="text-socialBlue">post</a></Link> {/* Add link to ORCHID publication ID/Lens ID */}
+              shared a <Link legacyBehavior href ='/posts/'><a className="text-socialBlue">post</a></Link> {/* Add link to ORCHID publication ID/Lens ID */}
             </p>
             <p className="text-gray-500 text-sm"><ReactTimeAgo date={ ( new Date(created_at)).getTime() } /></p>{/* <ReactTimeAgo date={ ( created_at instanceof Date ? created_at.getTime() : created_at ) } /> */}
           </div>

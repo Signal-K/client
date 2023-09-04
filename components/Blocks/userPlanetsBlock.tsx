@@ -74,7 +74,7 @@ const OwnedPlanetsListBlock: React.FC = () => {
         <h2 className="text-2xl font-semibold mb-4">Your recent classifications</h2>
         <ul className="grid gap-4">
           {planetDetails.map((planet) => (
-            <Link key={planet.id} href={`https://play.skinetics.tech/tests/planets/${planet.id}`}>
+            <Link legacyBehavior key={planet.id} href={`https://play.skinetics.tech/tests/planets/${planet.id}`}>
               <a>
                 <li className="bg-white shadow-md p-4 rounded-md">
                   <h3 className="text-lg font-medium mb-2">{planet?.content}</h3>

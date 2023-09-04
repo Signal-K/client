@@ -11,33 +11,33 @@ export default function NotificationsPage() {
       <Card noPadding={true}>
         <div className="">
           <div className="flex gap-2 items-center border-b border-b-gray-100 p-4">
-            <Link href={'/profile'}>
+            <Link legacyBehavior href ={'/profile'}>
               {/*<Avatar size='5' />*/}
             </Link>
             <div>
-              <Link href={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>
+              <Link legacyBehavior href ={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>
               liked
-              <Link href={''} className={'ml-1 text-socialBlue hover:underline'}>your photo</Link>
+              <Link legacyBehavior href ={''} className={'ml-1 text-socialBlue hover:underline'}>your photo</Link>
             </div>
           </div>
           <div className="flex gap-2 items-center border-b border-b-gray-100 p-4">
-            <Link href={'/profile'}>
+            <Link legacyBehavior href ={'/profile'}>
               {/*<Avatar size='5' />*/}
             </Link>
             <div>
-              <Link href={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>
+              <Link legacyBehavior href ={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>
               liked
-              <Link href={''} className={'ml-1 text-socialBlue hover:underline'}>your photo</Link>
+              <Link legacyBehavior href ={''} className={'ml-1 text-socialBlue hover:underline'}>your photo</Link>
             </div>
           </div>
           <div className="flex gap-2 items-center border-b border-b-gray-100 p-4">
-            <Link href={'/profile'}>
+            <Link legacyBehavior href ={'/profile'}>
               {/*<Avatar size='5' />*/}
             </Link>
             <div>
-              <Link href={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>
+              <Link legacyBehavior href ={'/profile'} className={'font-semibold mr-1 hover:underline'}>John Doe</Link>
               liked
-              <Link href={''} className={'ml-1 text-socialBlue hover:underline'}>your photo</Link>
+              <Link legacyBehavior href ={''} className={'ml-1 text-socialBlue hover:underline'}>your photo</Link>
             </div>
           </div>
         </div>

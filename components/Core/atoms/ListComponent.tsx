@@ -33,7 +33,7 @@ const BigProjectContainer: React.FC<
       </div>
     );
   return (
-    <Link legacyBehavior href={href} passHref>
+    <Link legacyBehavior href ={href} passHref>
       <a
         // target="big_project"
         className={`group block p-6 space-y-4 sm:-mx-6 rounded-md bg-neutral-100 dark:bg-neutral-800 text-white gap-4 after:bg-transparent ${containerClassName}`}

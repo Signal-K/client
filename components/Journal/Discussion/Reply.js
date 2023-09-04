@@ -219,7 +219,7 @@ export default function Reply({post_id, replies}) {
                               <p className='reply_text' data-id={reply.id} data-index={index}>
                                   <ReactMarkdown>{reply.body}</ReactMarkdown>
                                   </p>
-                              <small className='has-text-grey'><Link href={'/user/' + reply.commenter.username}><a className='has-text-grey'>@{reply.commenter.username} </a></Link>
+                              <small className='has-text-grey'><Link legacyBehavior href ={'/user/' + reply.commenter.username}><a className='has-text-grey'>@{reply.commenter.username} </a></Link>
                               replied <TimeAgo date={reply.created_at} /> </small>
 
                               {commentOwner &&

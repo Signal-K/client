@@ -82,7 +82,7 @@ export const PostModal: React.FC<PostModalProps> = ({ content, created_at, profi
           <div className="font-bold">{authorProfile?.username}</div>
           {planets2 && (
             <div className="bg-green-200 py-1 px-2 text-xs rounded-sm text-green-800 ml-2">
-              Planet: <Link href="/tests/planets/{planets2}">{planets2}</Link>
+              Planet: <Link legacyBehavior href ="/tests/planets/{planets2}">{planets2}</Link>
             </div>
           )}
         </div>

@@ -112,28 +112,28 @@ export default function Navbar() {
                       leaveTo="transform opacity-0 scale-95"
                     >
                       <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"> 
-                        <Link href="/tests/planets" passHref>
+                        <Link legacyBehavior href ="/tests/planets" passHref>
                           <a
                             className="block px-4 py-2 text-sm text-gray-700"
                           >
                             Planets
                           </a>
                         </Link>
-                        <Link href="/tests/onboarding" passHref>
+                        <Link legacyBehavior href ="/tests/onboarding" passHref>
                           <a
                             className="block px-4 py-2 text-sm text-gray-700"
                           >
                             Missions
                           </a>
                         </Link>
-                        <Link href="/inventory" passHref>
+                        <Link legacyBehavior href ="/inventory" passHref>
                           <a
                             className="block px-4 py-2 text-sm text-gray-700"
                           >
                             Inventory
                           </a>
                         </Link>
-                        <Link href="/tests/spaceships" passHref>
+                        <Link legacyBehavior href ="/tests/spaceships" passHref>
                           <a
                             className="block px-4 py-2 text-sm text-gray-700"
                           >
@@ -184,7 +184,7 @@ export default function Navbar() {
                               </button>
                             )}
                           </Menu.Item>
-                          <Link href='/tests/planets' passHref>
+                          <Link legacyBehavior href ='/tests/planets' passHref>
                             <Menu.Item>
                               {({ active }) => (
                                 <button
@@ -198,7 +198,7 @@ export default function Navbar() {
                               )}
                             </Menu.Item>
                           </Link>
-                          <Link href='/tests/planets' passHref>
+                          <Link legacyBehavior href ='/tests/planets' passHref>
                             <Menu.Item>
                               {({ active }) => (
                                 <button
@@ -232,7 +232,7 @@ export default function Navbar() {
                       ) : (
                         <Menu.Item>
                           {({ active }) => (
-                            <Link href='/login' passHref>
+                            <Link legacyBehavior href ='/login' passHref>
                               <button
                                 className={classNames(
                                   active ? 'bg-gray-100' : '',
@@ -309,7 +309,7 @@ export default function Navbar() {
                 </>
               ) : (
                 <div className="mt-3 space-y-1">
-                  <Link href='/login' passHref>
+                  <Link legacyBehavior href ='/login' passHref>
                     <button
                       className="flex w-full px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                     >

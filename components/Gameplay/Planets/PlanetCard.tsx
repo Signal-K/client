@@ -1,129 +1,149 @@
 import React, { useEffect, useState } from "react";
 import Card from "../../Card";
 import Link from "next/link";
-
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import PlanetEditor, { PlanetEditorFromData } from "../../../pages/generator/planet-editor";
-// import StakePlay from "../../../pages/stake/play";
 import { planetsImagesCdnAddress } from "../../../constants/cdn";
 import { v4 as uuidv4 } from 'uuid';
-import { Col, Container, Row, Form } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 
-export function PlanetCard ({ activeTab, planetId }) {
+interface Planet {
+    id: string;
+    ownerId: string;
+    temperature: number;
+    created_at: string;
+    contract: string;
+    tokenId: string;
+    chainId: string;
+    owner: string;
+    ticId: string | null;
+}
+
+export function PlanetCard({ activeTab, planetId }: { activeTab: string; planetId: string }) {
     const supabase = useSupabaseClient();
-    const [planet, setPlanet] = useState(null);
+    const [planet, setPlanet] = useState<Planet | null>(null);
     const session = useSession();
-    const [planetUri, setPlanetUri] = useState();
-    const [planetOwner, setPlanetOwner] = useState(null);
-    const [username, setUsername] = useState('');
-    const [images, setImages] = useState([]);
-    const [playerReputation, setPlayerRepuation] = useState<number>();
-    function fetchPlanet () {
-        supabase.from('planetsss')
-            .select("*")
-            .eq('id', planetId) // How should the ID be generated -> similar to how `userId` is generated? Combination of user + org + article + dataset number??
-            .then(result => {
-                if (result.error) { throw result.error; };
-                if (result.data) { setPlanet(result?.data[0]); /*console.log(planet);*/ setPlanetOwner(planet?.ownerId); };
+    const [planetUri, setPlanetUri] = useState<string | undefined>();
+    const [planetOwner, setPlanetOwner] = useState<string | null>(null);
+    const [username, setUsername] = useState<string>('');
+    const [images, setImages] = useState<any[]>([]);
+    const [playerReputation, setPlayerReputation] = useState<number | undefined>(0);
+
+    useEffect(() => {
+        async function fetchPlanet() {
+            try {
+                const { data, error } = await supabase
+                    .from('planetsss')
+                    .select("*")
+                    .eq('id', planetId);
+
+                if (error) {
+                    throw error;
+                }
+
+                if (data) {
+                    setPlanet(data[0]);
+                    setPlanetOwner(data[0]?.ownerId);
+                }
+            } catch (error) {
+                console.error('Error fetching planet:', error);
             }
-        );
-    }
+        }
 
-    // function showNftMetadataUri (planet) {
-    //     const { contract } = useContract(`{planet?.contract}`);
-    //     const { data, isLoading } = useContractRead( contract, "uri", `{planet?.tokenId}`)
-    //     if ( data ) {
-    //         setPlanetUri( data );
-    //     }
-    // }
+        fetchPlanet();
+    }, [planetId, supabase]);
 
-    const updatePlayerReputation = async () => {
-        let newReputation = playerReputation + 1;
-        setPlayerRepuation(newReputation);
-
+    async function updatePlayerReputation() {
         try {
-            const { data, error } = await supabase
+            const newReputation = (playerReputation || 0) + 1;
+            setPlayerReputation(newReputation);
+
+            const { error } = await supabase
                 .from('profiles')
-                .update([
-                    { reputation: newReputation, }
-                ])
+                .update([{ reputation: newReputation }])
                 .eq('id', session?.user?.id);
 
-                if (error) throw error;
-        } catch (error: any) {
-            console.log(error);
+            if (error) {
+                throw error;
+            }
+        } catch (error) {
+            console.error('Error updating player reputation:', error);
         }
     }
 
-    const claimPlanet = async () => {
+    async function claimPlanet() {
+        try {
+            const { error } = await supabase
+                .from('planetsss')
+                .update([{ owner: session?.user?.id }])
+                .eq('id', planetId);
+
+            if (error) {
+                throw error;
+            }
+        } catch (error) {
+            console.error('Error claiming planet:', error);
+        }
+    }
+
+    async function getPlanetImages() {
         try {
             const { data, error } = await supabase
-                .from('planetsss')
-                .update([
-                    { owner: session?.user?.id, /*userId: username*/ }
-                ])
-                .eq('id', planetId);
-                console.log(planet?.owner)
-                // updatePlayerReputation(); // Do this for posts, journals as well
-            
-                if (error) throw error;
-        } catch (error: any) {
-            console.log(error);
+                .storage
+                .from('planets')
+                .list(planet?.id + '/', {
+                    limit: 100,
+                    offset: 0,
+                    sortBy: {
+                        column: 'name',
+                        order: 'asc',
+                    }
+                });
+
+            if (data !== null) {
+                setImages(data);
+            } else {
+                alert('Error loading images');
+                console.error(error);
+            }
+        } catch (error) {
+            console.error('Error getting planet images:', error);
         }
     }
 
-    async function getPlanetImages () {
-        const { data, error } = await supabase
-            .storage
-            .from('planets')
-            .list(planet?.id + '/', {
-                limit: 100,
-                offset: 0,
-                sortBy: {
-                    column: 'name',
-                    order: 'asc',
+    async function uploadImageForPlanet(e: React.ChangeEvent<HTMLInputElement>) {
+        try {
+            const file = e.target.files?.[0];
+            if (file) {
+                const { data, error } = await supabase
+                    .storage
+                    .from('planets')
+                    .upload(session?.user?.id + '/' + uuidv4(), file);
+
+                if (data) {
+                    getPlanetImages();
+                } else {
+                    console.error(error);
                 }
-            });
-
-        if (data !== null) {
-            setImages(data);
-        } else {
-            alert('Error loading images');
-            console.log(error);
+            }
+        } catch (error) {
+            console.error('Error uploading image for planet:', error);
         }
     }
 
-    async function uploadImageForPlanet (e) {
-        let file = e.target.files[0];
-        const { data, error } = await supabase
-            .storage
-            .from('planets')
-            .upload(session?.user?.id + '/' + uuidv4(), file); // Also add to media/planet post media bucket
-        
-        if (data) {
-            getPlanetImages();
-        } else {
-            console.log(error);
-        }
-    }
-
-    // Get the planet's assets/images
     useEffect(() => {
         if (planet) {
-            fetchPlanet();
-            console.log(planet);
+            // fetchPlanet();
             getPlanetImages();
-            console.log(planet?.id);
-            console.log(planetsImagesCdnAddress + planet?.id + '/' + 'download.png');
         }
-    }, [planet?.id]);
+    }, [planet?.id, supabase]);
 
     return (
         <div>
             {activeTab === 'planet' && (
                 <div>{/*<Card noPadding={false}>
                     <iframe src="https://deepnote.com/@star-sailors/Star-Sailors-Light-Curve-Plot-b4c251b4-c11a-481e-8206-c29934eb75da" />
-                    {/*<Link href='https://deepnote.com/workspace/star-sailors-49d2efda-376f-4329-9618-7f871ba16007/project/Star-Sailors-Light-Curve-Plot-b4c251b4-c11a-481e-8206-c29934eb75da/notebook/notebook-377269a4c09f46908203c402cb8545b0'><div><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/></div></Link> {/* https://codesandbox.io/s/nextjs-example-react-jupyter-notebook-viewer-lzjcb5?file=/pages/index.js:21-33 <br />
+                    {/*<Link legacyBehavior href ='https://deepnote.com/workspace/star-sailors-49d2efda-376f-4329-9618-7f871ba16007/project/Star-Sailors-Light-Curve-Plot-b4c251b4-c11a-481e-8206-c29934eb75da/notebook/notebook-377269a4c09f46908203c402cb8545b0'><div><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/></div></Link> {/* https://codesandbox.io/s/nextjs-example-react-jupyter-notebook-viewer-lzjcb5?file=/pages/index.js:21-33 <br />
                     <br />
                     <img src={planetsImagesCdnAddress + planet?.id + '/' + 'download.png'} />
                     {/*<Row className="g-4">
@@ -140,12 +160,12 @@ export function PlanetCard ({ activeTab, planetId }) {
             )}
             {activeTab === 'data' && (
                 <div><Card noPadding={false}>
-                    <Link href='https://deepnote.com/workspace/star-sailors-49d2efda-376f-4329-9618-7f871ba16007/project/Star-Sailors-Light-Curve-Plot-b4c251b4-c11a-481e-8206-c29934eb75da/notebook/notebook-377269a4c09f46908203c402cb8545b0'><div><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/b56a0704304940e49c38823795edaa20/b1b6860bdf364fcea023992c1ae527d6?height=294.6875" height="294.6875" width="500"/><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/></div></Link> {/* https://codesandbox.io/s/nextjs-example-react-jupyter-notebook-viewer-lzjcb5?file=/pages/index.js:21-33 */}
+                    <Link legacyBehavior href ='https://deepnote.com/workspace/star-sailors-49d2efda-376f-4329-9618-7f871ba16007/project/Star-Sailors-Light-Curve-Plot-b4c251b4-c11a-481e-8206-c29934eb75da/notebook/notebook-377269a4c09f46908203c402cb8545b0'><div><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/b56a0704304940e49c38823795edaa20/b1b6860bdf364fcea023992c1ae527d6?height=294.6875" height="294.6875" width="500"/><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/></div></Link> {/* https://codesandbox.io/s/nextjs-example-react-jupyter-notebook-viewer-lzjcb5?file=/pages/index.js:21-33 */}
                     <p>{planet?.owner} Owner</p>
                                 {planet?.owner == session?.user?.id /*&& planet?.userId == username*/ && (
                             <>
                                 {/* <button onClick={() => lazyMint({ metadatas: [{ name: planet?.content, media: planet?.cover, description: planet?.ticId, properties: { trait_type1: 'value' }}]})}>Mint NFT of planet</button> */}
-                                <Link href='https://deepnote.com/workspace/star-sailors-49d2efda-376f-4329-9618-7f871ba16007/project/Star-Sailors-Light-Curve-Plot-b4c251b4-c11a-481e-8206-c29934eb75da/notebook/notebook-377269a4c09f46908203c402cb8545b0'><div><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/b56a0704304940e49c38823795edaa20/b1b6860bdf364fcea023992c1ae527d6?height=294.6875" height="294.6875" width="500"/><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/></div></Link> {/* https://codesandbox.io/s/nextjs-example-react-jupyter-notebook-viewer-lzjcb5?file=/pages/index.js:21-33 */} {/* Set this to pull in different blocks, with different inputs (from Deepnote/flask API) depending on `{planet?.ticId}`  */}
+                                <Link legacyBehavior href ='https://deepnote.com/workspace/star-sailors-49d2efda-376f-4329-9618-7f871ba16007/project/Star-Sailors-Light-Curve-Plot-b4c251b4-c11a-481e-8206-c29934eb75da/notebook/notebook-377269a4c09f46908203c402cb8545b0'><div><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/b56a0704304940e49c38823795edaa20/b1b6860bdf364fcea023992c1ae527d6?height=294.6875" height="294.6875" width="500"/><iframe title="Embedded cell output" src="https://embed.deepnote.com/b4c251b4-c11a-481e-8206-c29934eb75da/377269a4c09f46908203c402cb8545b0/2b82b4f1d68a4ca282977277e09df860?height=43" height="650" width="100%"/></div></Link> {/* https://codesandbox.io/s/nextjs-example-react-jupyter-notebook-viewer-lzjcb5?file=/pages/index.js:21-33 */} {/* Set this to pull in different blocks, with different inputs (from Deepnote/flask API) depending on `{planet?.ticId}`  */}
                             </>
                         )}
                     {planet?.owner == session?.user?.id /*&& planet?.userId == username*/ && (

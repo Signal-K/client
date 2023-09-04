@@ -342,7 +342,7 @@ export default function PlanetPage({ id }: { id: string }) {
         </p>
         {session?.user?.id && ( <> <UserContext.Provider value={{profile}}><PostFormCardPlanetTag planetId2={planetId} onPost={() => fetchPostsForPlanet(planetId)} /></UserContext.Provider> </> )}
         {hasMadePostOnPlanet && (
-          <><br /><Link href='/tests/onboarding/checklist/preflight'><button className="btn glass">Return to planet list</button></Link></>
+          <><br /><Link legacyBehavior href ='/tests/onboarding/checklist/preflight'><button className="btn glass">Return to planet list</button></Link></>
         )}
         <div className="mt-6 pb-16 lg:pb-0 w-4/5 lg:w-full mx-auto flex flex-wrap items-center justify-between">
   {/* Feed Icon */}

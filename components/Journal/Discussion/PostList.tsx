@@ -53,11 +53,11 @@ export default function PostList({ posts, totalPosts, tag = null }: PostListProp
         <div className="columns is-mobile">
           <div className="column is-hidden-mobile is-3">
             <p className="is-size-5"> Categories </p>
-            <Link href='/posts'>
+            <Link legacyBehavior href ='/posts'>
               <a className="is-block py-1">All</a>
             </Link>
             {categories.map((cat, index) => (
-              <Link key={index} href={'/posts/tag/'+ cat.key}>
+              <Link legacyBehavior key ={index} href={'/posts/tag/'+ cat.key}>
                 <a className="is-block py-1">{cat.name}</a>
               </Link>
             ))}
@@ -80,12 +80,12 @@ export default function PostList({ posts, totalPosts, tag = null }: PostListProp
                 </div>
 
                 <div className=''>
-                  <p> <Link href={'/posts/' + post.slug}>
+                  <p> <Link legacyBehavior href ={'/posts/' + post.slug}>
                     <a className='has-text-dark is-size-4 is-size-5-mobile'> {capitalize(post.title)} </a>
                   </Link>
                   </p>
                   <p> <small className='has-text-grey'>
-                    <Link href={'/user/' + post.owner.username}> 
+                    <Link legacyBehavior href ={'/user/' + post.owner.username}> 
                       <a className='has-text-grey'>@{post.owner.username} </a>
                     </Link>
                     posted <TimeAgo date={post.created_at} />
@@ -100,7 +100,7 @@ export default function PostList({ posts, totalPosts, tag = null }: PostListProp
                 <ul className="pagination-list">
                   {Array(totalPage).fill(null).map((value, index) => (
                     <li key={index}>
-                      <Link href={pathName + '?page=' + (index+1)}>
+                      <Link legacyBehavior href ={pathName + '?page=' + (index+1)}>
                         <a className="pagination-link"> {index+1} </a>
                       </Link>
                     </li>

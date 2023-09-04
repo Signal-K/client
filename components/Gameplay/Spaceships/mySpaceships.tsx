@@ -1,16 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
+// Define the type for spaceships
+interface Spaceship {
+  id: number;
+  name: string;
+  image: string;
+  hp: number;
+  speed: number;
+  attack: number;
+  state: string;
+  current_planet: string;
+}
+
 const MySpaceships: React.FC = () => {
   const supabase = useSupabaseClient();
   const session = useSession();
-  const [userSpaceships, setUserSpaceships] = useState([]);
+  const [userSpaceships, setUserSpaceships] = useState<any[]>([]); // Use a more specific type if possible
 
   useEffect(() => {
-    // Function to fetch user's spaceships from the inventorySPACESHIPS table
     const fetchUserSpaceships = async () => {
       if (session?.user) {
-        // Fetch spaceships owned by the logged-in user from the inventorySPACESHIPS table
         const { data: userSpaceshipsData, error: userSpaceshipsError } = await supabase
           .from("inventorySPACESHIPS")
           .select("*")
@@ -19,10 +29,8 @@ const MySpaceships: React.FC = () => {
         if (userSpaceshipsError) {
           console.error("Error fetching user's spaceships:", userSpaceshipsError);
         } else {
-          // Extract spaceship IDs from userSpaceshipsData
           const spaceshipIds = userSpaceshipsData.map((userSpaceship) => userSpaceship.spaceship_id);
 
-          // Fetch spaceship details from the spaceships table using the IDs
           const { data: spaceshipsData, error: spaceshipsError } = await supabase
             .from("spaceships")
             .select("*")
@@ -31,7 +39,6 @@ const MySpaceships: React.FC = () => {
           if (spaceshipsError) {
             console.error("Error fetching spaceship details:", spaceshipsError);
           } else {
-            // Combine userSpaceshipsData and spaceshipsData based on spaceship_id
             const combinedData = userSpaceshipsData.map((userSpaceship) => {
               const matchingSpaceship = spaceshipsData.find((spaceship) => spaceship.id === userSpaceship.spaceship_id);
               return {
@@ -50,28 +57,28 @@ const MySpaceships: React.FC = () => {
   }, [session, supabase]);
 
   return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {userSpaceships.map((userSpaceship) => (
-            <div key={userSpaceship.id} className="bg-white p-4 rounded-lg shadow-md">
-              <h2 className="text-lg font-semibold">
-                {userSpaceship.spaceship?.name}
-              </h2>
-              <img
-                src={userSpaceship.spaceship?.image}
-                alt={userSpaceship.spaceship?.name}
-                className="mt-2 w-full h-40 object-cover"
-              />
-              <p className="text-sm mt-2">
-                HP: {userSpaceship.spaceship?.hp}, Speed: {userSpaceship.spaceship?.speed}, Attack:{" "}
-                {userSpaceship.spaceship?.attack}
-              </p>
-              <p className="text-sm mt-2">
-                State: {userSpaceship.spaceship?.state}, Current Planet:{" "}
-                {userSpaceship.spaceship?.current_planet}
-              </p>
-            </div>
-          ))}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {userSpaceships.map((userSpaceship) => (
+        <div key={userSpaceship.id} className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-lg font-semibold">
+            {userSpaceship.spaceship?.name || "N/A"} {/* Handle potential null/undefined */}
+          </h2>
+          <img
+            src={userSpaceship.spaceship?.image || ""}
+            alt={userSpaceship.spaceship?.name || ""}
+            className="mt-2 w-full h-40 object-cover"
+          />
+          <p className="text-sm mt-2">
+            HP: {userSpaceship.spaceship?.hp || 0}, Speed: {userSpaceship.spaceship?.speed || 0}, Attack:{" "}
+            {userSpaceship.spaceship?.attack || 0}
+          </p>
+          <p className="text-sm mt-2">
+            State: {userSpaceship.spaceship?.state || "N/A"}, Current Planet:{" "}
+            {userSpaceship.spaceship?.current_planet || "N/A"}
+          </p>
         </div>
+      ))}
+    </div>
   );
 };
 

@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 
+interface ItemDetail {
+  id: string;
+  quantity: number;
+  item: {
+    name: string;
+    description: string;
+    icon_url: string;
+  };
+}
+
 const PlanetItemsList: React.FC<{ planetId: string }> = ({ planetId }) => {
   const supabase = useSupabaseClient();
-  const [itemDetails, setItemDetails] = useState([]);
+  const [itemDetails, setItemDetails] = useState<ItemDetail[]>([]);
 
   useEffect(() => {
     async function fetchItemDetails() {
@@ -17,7 +27,7 @@ const PlanetItemsList: React.FC<{ planetId: string }> = ({ planetId }) => {
           throw planetItemsError;
         }
 
-        setItemDetails(planetItemsData);
+        setItemDetails(planetItemsData || []);
       } catch (error) {
         console.error('Error fetching item details:', error);
       }

@@ -244,7 +244,7 @@ const PlanetClassificationCheck: React.FC<PlanetClassificationCheckProps> = ({ u
           <h2>Congratulations!</h2>
           {/* <p>You've successfully completed level 1 on planets 47, 50, and 51.</p> */}
           <AddToInventoryButton itemId={10} /><br />
-          <Link href='/tests/onboarding/'><button className="btn glass">Next mission</button></Link>
+          <Link legacyBehavior href ='/tests/onboarding/'><button className="btn glass">Next mission</button></Link>
         </>
       ) : (
         <>

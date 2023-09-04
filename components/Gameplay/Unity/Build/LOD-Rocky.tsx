@@ -26,17 +26,17 @@ export default function UnityBuildLod1 () { /*planet, user*/
 
     const [screenshotUrl, setScreenshotUrl] = useState<string | null>(null);
 
-    function handleUnityScreenshot() {
-        const dataUrl = takeScreenshot("image/jpg", 10);
-        // window.open(dataUrl);
-        setScreenshotUrl(dataUrl);
-        console.log(dataUrl);
-    }
+    // function handleUnityScreenshot() {
+    //     const dataUrl = takeScreenshot("image/jpg", 10);
+    //     // window.open(dataUrl);
+    //     setScreenshotUrl(dataUrl);
+    //     console.log(dataUrl);
+    // }
 
     return (
         <Fragment>
             <Unity unityProvider={unityProvider} style={{ width: "100%", height: "500px" }} /><br />
-            <button onClick={handleUnityScreenshot}>Create a postcard</button>
+            {/* <button onClick={handleUnityScreenshot}>Create a postcard</button>
             {screenshotUrl && (
                 <PostCard 
                     planetImage={screenshotUrl}
@@ -45,7 +45,7 @@ export default function UnityBuildLod1 () { /*planet, user*/
                     planet = "your planet"
                     // comment = "username"
                 />
-            )}
+            )} */}
          </Fragment>
     );
     // return (

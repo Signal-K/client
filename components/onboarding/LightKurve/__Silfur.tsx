@@ -117,7 +117,7 @@ const SilfurComponentOnboarding3: React.FC = () => {
                 <p className="text-gray-700">Collaboration is at the heart of the Star Sailors community. Join forces with fellow explorers to tackle complex missions, analyse data, and uncover the secrets of the cosmos. By working together, you can achieve more significant discoveries and contribute to the collective knowledge of the universe.</p>
             </div>
             <h3 className="text-md font-bold mb-4 text-primary bg-gradient-to-r from-gold-500 to-yellow-500">You have now gained the knowledge and skills necessary to wield your Solar Starship effectively and harness the power of Silfur, propelling you further into the cosmos and towards the enigmatic horizons of the universe. - See you soon, Star Sailor!</h3>
-            <Link href='/tests/onboarding/'><button className="btn glass">Next mission</button></Link>
+            <Link legacyBehavior href ='/tests/onboarding/'><button className="btn glass">Next mission</button></Link>
         </div>
     );
 };
