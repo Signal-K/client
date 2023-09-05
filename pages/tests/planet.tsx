@@ -494,7 +494,7 @@ export default function PlanetPage({ id }: { id: string }) {
                       // ref={postCardRef}
                     /><br />
                     {/* <UnityBuildLod11 /> */}
-                    <UnityBuildSupabaseMesh />
+                    <UnityBuildSupabaseMesh planetName={planetData?.content}/>
                     <Card noPadding={false}><OwnedPlanetsListBlock /></Card>
                     {/* <button onClick={handleCaptureClick}>Capture PostCard</button> */}
                 {/* <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br /><Card noPadding={false}>
