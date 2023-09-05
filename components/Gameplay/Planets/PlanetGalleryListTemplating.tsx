@@ -6,7 +6,7 @@ import PlanetGalleryCard from "./PlanetGalleryCard";
 
 interface Planet {
   id: number;
-  // Add other properties here as needed
+  planet: any;
 }
 
 export default function PlanetGalleryIndexListTemplating() {
@@ -21,7 +21,7 @@ export default function PlanetGalleryIndexListTemplating() {
   const getPlanets = async () => {
     try {
       const { data, error } = await supabase
-        .from<Planet>("planetsss") // Specify the type for the table
+        .from("planetsss") // Specify the type for the table
         .select("*")
         .order("created_at", { ascending: false })
         .limit(20)
@@ -44,7 +44,8 @@ export default function PlanetGalleryIndexListTemplating() {
     <Container>
       <Row>
         {planets.map((planet) => (
-          <PlanetGalleryCard key={planet.id} planet={planet} />
+          // <PlanetGalleryCard key={planet.id} planet={planet} />
+          <p>Test</p>
         ))}
       </Row>
     </Container>

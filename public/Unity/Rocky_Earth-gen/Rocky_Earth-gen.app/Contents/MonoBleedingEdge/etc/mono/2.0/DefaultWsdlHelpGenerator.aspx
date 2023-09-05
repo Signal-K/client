@@ -1539,7 +1539,7 @@ public class HtmlSampleGenerator: SampleGenerator
 
 <head runat="server">
 	<%
-	Response.Write ("<Link legacyBehaviorrel=\"alternate\" type=\"text/xml\" href=\"" + Request.FilePath + "?disco\"/>");
+	Response.Write ("<Link legacyBehavior rel =\"alternate\" type=\"text/xml\" href=\"" + Request.FilePath + "?disco\"/>");
 	%>
 	<title><%=WebServiceName%> Web Service</title>
     <style type="text/css">

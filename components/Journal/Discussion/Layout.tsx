@@ -18,7 +18,7 @@ export default function Layout({ children }: LayoutProps) {
     <>
       <Head>
         <title>Discuss-OS Supabase</title>
-        <Link legacyBehaviorrel="icon" href="/favicon.ico" />
+        <Link legacyBehavior rel ="icon" href="/favicon.ico" />
       </Head>
 
       <nav
