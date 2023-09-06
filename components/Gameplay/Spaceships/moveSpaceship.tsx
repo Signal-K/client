@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
+interface Spaceship {
+  spaceship_id: number;
+  spaceships: {
+    name: string;
+  };
+}
+
+interface ClassifiedPlanet {
+  id: number;
+  content: string;
+}
+
 interface MoveShipToPlanetProps {
   onClose: () => void;
 }
@@ -8,40 +20,62 @@ interface MoveShipToPlanetProps {
 const MoveShipToPlanet: React.FC<MoveShipToPlanetProps> = ({ onClose }) => {
   const supabase = useSupabaseClient();
   const session = useSession();
+  
+  // Specify the types for the selectedSpaceship and selectedPlanet states
   const [selectedSpaceship, setSelectedSpaceship] = useState<number | null>(null);
   const [selectedPlanet, setSelectedPlanet] = useState<number | null>(null);
-  const [userSpaceships, setUserSpaceships] = useState([]);
-  const [userClassifiedPlanets, setUserClassifiedPlanets] = useState([]);
+  
+  // Specify the types for userSpaceships and userClassifiedPlanets
+  const [userSpaceships, setUserSpaceships] = useState<Spaceship[]>([]);
+  const [userClassifiedPlanets, setUserClassifiedPlanets] = useState<ClassifiedPlanet[]>([]);
 
   useEffect(() => {
     // Fetch user's spaceships from the database
     const fetchUserSpaceships = async () => {
-        if (session?.user) {
+      if (session?.user) {
+        try {
           const { data, error } = await supabase
             .from("inventorySPACESHIPS")
-            .select("spaceship_id,spaceships(*)")
+            .select("spaceship_id, spaceships(*)")
             .eq("owner", session.user.id);
-      
+    
           if (error) {
             console.error("Error fetching user's spaceships:", error);
           } else {
-            setUserSpaceships(data || []);
+            // Ensure data is an array and specify the correct type
+            // Assuming data is an array of objects with spaceship_id and spaceships properties
+            const userSpaceshipsData: Spaceship[] = data.map((item: any) => ({
+              spaceship_id: item.spaceship_id,
+              spaceships: {
+                name: item.spaceships.name,
+              },
+            }));
+    
+            setUserSpaceships(userSpaceshipsData);
           }
+        } catch (error) {
+          console.error("Error fetching user's spaceships:", error);
         }
-      };      
+      }
+    };
 
     // Fetch user's classified planets from the database
     const fetchUserClassifiedPlanets = async () => {
       if (session?.user) {
-        const { data, error } = await supabase
-          .from("planetsss")
-          .select("id, content")
-          .eq("owner", session.user.id);
+        try {
+          const { data, error } = await supabase
+            .from("planetsss")
+            .select("id, content")
+            .eq("owner", session.user.id);
 
-        if (error) {
+          if (error) {
+            console.error("Error fetching user's classified planets:", error);
+          } else {
+            // Ensure data is an array and specify the correct type
+            setUserClassifiedPlanets(data || []);
+          }
+        } catch (error) {
           console.error("Error fetching user's classified planets:", error);
-        } else {
-          setUserClassifiedPlanets(data || []);
         }
       }
     };
@@ -51,7 +85,7 @@ const MoveShipToPlanet: React.FC<MoveShipToPlanetProps> = ({ onClose }) => {
   }, [session, supabase]);
 
   const moveSpaceshipToPlanet = () => {
-    if (selectedSpaceship && selectedPlanet) {
+    if (selectedSpaceship !== null && selectedPlanet !== null) {
       // Database update logic here
       onClose();
     }
@@ -69,7 +103,8 @@ const MoveShipToPlanet: React.FC<MoveShipToPlanetProps> = ({ onClose }) => {
           <option value="">Select Spaceship</option>
           {userSpaceships.map((spaceship) => (
             <option key={spaceship.spaceship_id} value={spaceship.spaceship_id}>
-              {spaceship.name}
+              {/* {spaceship.name} */}
+              Spaceship name
             </option>
           ))}
         </select>

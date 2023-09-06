@@ -61,5 +61,5 @@
     "components/Gameplay/Models/Character/Interface.jsx",
     "components/Journal/Discussion/Reply.js",
     ".next/types/**/*.ts"
-  ]
+, "pages/tests/planet.jsx"  ]
 }

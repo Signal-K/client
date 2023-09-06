@@ -5,7 +5,7 @@ interface User {
     id: number;
     name: string;
     balance: number;
-};
+}
 
 interface Credits {
     user_id: string;
@@ -13,7 +13,7 @@ interface Credits {
 }
 
 const UserBalanceTable: React.FC = () => {
-    const [users, setUsers] = useState<User[]>([]);
+    const [users, setUsers] = useState<User[]>([]); // Explicitly type users as an array of User
     const supabase = useSupabaseClient();
 
     useEffect(() => {
@@ -23,53 +23,53 @@ const UserBalanceTable: React.FC = () => {
     const fetchUsers = async () => {
         try {
             const { data: credits, error } = await supabase.from('credits').select('user_id, amount');
-            if (error) { throw new Error(error.message); };
+            if (error) { throw new Error(error.message); }
 
             // Fetch user profiles
             const { data: profiles } = await supabase.from('profiles').select('id, username');
 
             // Merge the credits & profile data together
-            const users: User[] = credits.map((credit) => {
-                const profile = profiles.find((profile) => profile.id === credit.user_id)
-                return {
-                    id: credit.user_id,
-                    name: profile?.username || 'Unknown',
-                    balance: credit.amount,
-                };
+            // Merge the credits & profile data together
+            const mappedUsers: User[] = credits.map((credit) => {
+              const profile = profiles ? profiles.find((profile) => profile.id === credit.user_id) : undefined;
+              return {
+                  id: profile ? Number(profile.id) : 0,
+                  name: profile?.username || 'Unknown',
+                  balance: credit.amount,
+              };
             });
-
-            setUsers(users || []);
+            setUsers(mappedUsers);
         } catch (error) {
             console.error(error);
         }
-    }
+    };
 
     return (
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                User ID
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Balance
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.balance}</td>
-              </tr>
-            ))}
-          </tbody>
+            <thead className="bg-gray-50">
+                <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        User ID
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Balance
+                    </th>
+                </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+                {users.map((user) => (
+                    <tr key={user.id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.id}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.balance}</td>
+                    </tr>
+                ))}
+            </tbody>
         </table>
-      );
-}
+    );
+};
 
 export default UserBalanceTable;

@@ -21,7 +21,7 @@ interface PlanetPostCardProps {
     voteCount: number;
     userVote: string;
     comments?: Comment[];
-    onVote: ( postId: number, voteType: string) => void;
+    // onVote: ( postId: number, voteType: string) => void;
 }
 
 interface Comment {
@@ -50,7 +50,7 @@ const CommentItem: React.FC<Comment> = ({ id, content, created_at, profiles }) =
   );
 };
 
-export default function PlanetPostCard ( { id, content, created_at, media, profiles:authorProfile, planets2, voteCount, userVote, onVote, comments }: PlanetPostCardProps ) {
+export default function PlanetPostCard ( { id, content, created_at, media, profiles:authorProfile, planets2, voteCount, userVote, /* onVote, /*comments*/ }: PlanetPostCardProps ) {
     //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>();
     const [profiles, setProfiles] = useState();
     const supabase = useSupabaseClient();
@@ -75,7 +75,7 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
     // Fetch votes for the current post if the user is logged in
     if (session) {
       fetchVotesForPost(id);
-      console.log(comments);
+      // console.log(comments);
     }
   }, [id, session]);
 
@@ -289,7 +289,7 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
       {votingError && <p className="text-red-500 mt-2">{votingError}</p>}
         </div>
         
-        {comments && comments.length > 0 && (
+        {/* {comments && comments.length > 0 && (
         <div className="my-3 text-sm">
           <button className="text-blue-500" onClick={toggleComments}>
             {showComments ? "Hide Comments" : "Show Comments"}
@@ -308,8 +308,8 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
               </>
             ))}
         </div>
-      )}
-        <CommentFormCard postId={id} onComment={null} />
+      )} */}
+        <CommentFormCard postId={id} onComment={null} /> {/* This might be the cause of the comment bug in the individual planet feed? */}
       </Card>
     );
   }
