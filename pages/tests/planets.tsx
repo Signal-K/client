@@ -74,7 +74,7 @@ export default function PlanetGalleryIndex() {
     // <DashboardLayout>
     <CoreLayout>
       <Container>
-        <ButtonGroup className="mb-3">
+        {/* <ButtonGroup className="mb-3">
           {difficultyOptions.map((option) => (
             <ToggleButton
               key={option.value}
@@ -93,7 +93,7 @@ export default function PlanetGalleryIndex() {
               {option.label}
             </ToggleButton>
           ))}
-        </ButtonGroup>
+        </ButtonGroup> */}
         <Row className="mb-20">
           {planets.map((planet) => (
             <PlanetGalleryCard key={planet.id} planet={planet} />
