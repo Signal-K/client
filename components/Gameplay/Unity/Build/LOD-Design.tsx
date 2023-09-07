@@ -1,3 +1,4 @@
+import { useSession } from "@supabase/auth-helpers-react";
 import React, { Fragment, useState } from "react";
 import { Unity, useUnityContext } from 'react-unity-webgl';
 
@@ -11,13 +12,14 @@ export default function UnityBuildLod111 () {
 
     // const [planetName, setPlanetName] = useState("");
     const planetName = 'Pluto';
+    const session = useSession();
 
     // const handlePlanetNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     //     setPlanetName(event.target.value);
     // };
 
     const handleSendPlanetName = () => {
-        sendMessage("5", "UpdatePlanetName", planetName);
+        sendMessage("5", "UpdatePlanetName", session?.user?.id);
     };
 
     return (

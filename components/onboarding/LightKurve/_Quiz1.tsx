@@ -1,41 +1,49 @@
-import { useSession } from "@supabase/auth-helpers-react";
-import React, { useState } from "react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import React, { useEffect, useState } from "react";
 import Login from "../../../pages/login";
 
 enum QuizStatus {
-    NotStarted,
-    InProgress,
-    Completed
+  NotStarted,
+  InProgress,
+  Completed, // Use state management to award items based on enum
 }
 
 interface QuizQuestion {
-    questionText: string;
-    imageUrl: string;
-    isCorrect: boolean;
+  questionText: string;
+  imageUrl: string;
+  isCorrect: boolean;
 }
 
 const quizQuestions: QuizQuestion[] = [
-    {
-        questionText: '❓ - This light curve shows the brightness of a star monitored by NASA\'s TESS mission. \n Do you notice any dips that could indicate a transiting exoplanet?',
-        imageUrl: 'https://file.notion.so/f/s/5044406f-a71e-4b3c-83ce-4b78886b113b/Capture2.png?id=d0586e06-1251-4906-90d6-160b85603a0e&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1693137600000&signature=-PYuxmpWEbuCJIGoWuuFfy9t_owR88lTg582QjXTf6s&downloadName=Capture2.PNG.png',
-        isCorrect: false,
-    },
-    {
-        questionText: '❓ - Do you see a potential exoplanet transit in this light curve? Which parts indicate the transit?',
-        imageUrl: 'https://file.notion.so/f/s/8381ba5c-9c2a-450b-a145-57d08cf7b23d/Capture3.png?id=3adaa43a-08d4-4091-ac7a-2842375df68b&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1693137600000&signature=mH1uS2vldFLLANeu0XoQK2RKXepBMFisRBuFZPt-gNY&downloadName=Capture3.PNG.png',
-        isCorrect: true,
-    },
-    {
-        questionText: '❓ - This one is a bit tricky. Does it have a clear exoplanet transit or not?',
-        imageUrl: 'https://file.notion.so/f/s/1f7d2232-5a59-46cd-8693-6e89c83421a2/Capture4.png?id=47d43c61-e3a4-49d0-8767-450fd96fc370&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1693137600000&signature=fytAWZyiqUbnvKjaXiAk3Z3Ah3f90BbClWqdlOmLPCY&downloadName=Capture4.PNG.png',
-        isCorrect: false,
-    },
-    {
-        questionText: '❓ - What\'s your classification? Exoplanet or false positive?',
-        imageUrl: 'https://file.notion.so/f/s/8543a5be-9a25-4917-b6e3-69baade7c2ae/Capture5.png?id=6a55bb37-dfec-493f-80c9-d17b6b052609&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1693137600000&signature=kPf7MDdbM3mdy23DHgK1Cc4qZ8V88wftd2cyI-uN70A&downloadName=Capture5.PNG.png',
-        isCorrect: true,
-    }
-]
+  {
+    questionText:
+      "❓ - This light curve shows the brightness of a star monitored by NASA's TESS mission. \n Do you notice any dips that could indicate a transiting exoplanet?",
+    imageUrl:
+      "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture2.PNG.png",
+    isCorrect: false,
+  },
+  {
+    questionText:
+      "❓ - Do you see a potential exoplanet transit in this light curve? Which parts indicate the transit?",
+    imageUrl:
+      "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture3.PNG.png",
+    isCorrect: true,
+  },
+  {
+    questionText:
+      "❓ - This one is a bit tricky. Does it have a clear exoplanet transit or not?",
+    imageUrl:
+      "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture4.PNG.png",
+    isCorrect: false,
+  },
+  {
+    questionText:
+      "❓ - What's your classification? Exoplanet or false positive?",
+    imageUrl:
+      "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/quiz/Capture5.PNG.png",
+    isCorrect: true,
+  },
+];
 
 /* const quizImages: QuizImage[] = [
      {
@@ -45,12 +53,69 @@ const quizQuestions: QuizQuestion[] = [
      }, */
 
 const LightkurveQuiz: React.FC = () => {
-    const session = useSession();
+  const session = useSession();
+  const supabase = useSupabaseClient();
 
-    const [quizStatus, setQuizStatus] = useState(QuizStatus.NotStarted);
+  const [quizStatus, setQuizStatus] = useState(QuizStatus.NotStarted);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [userAnswer, setUserAnswer] = useState<boolean | null>(null);
+
+  // Fields for determining if the user should be awarded the first telescope
+  const [hasItem, setHasItem] = useState(false);
+
+  useEffect(() => {
+    async function checkIfUserHasItem() {
+      if (session) {
+        try {
+          const user = session?.user;
+          const { data, error } = await supabase
+            .from('inventoryUSERS')
+            .select('*')
+            .eq('owner', user.id)
+            .eq('item', 9);
+
+          if (error) {
+            throw error;
+          };
+
+          if (data && data.length > 0) {
+            setHasItem(true);
+          }
+        } catch (error) {
+          console.error('Error checking user inventory for Golden Telescope - Level 1. Error: ', error);
+        }
+      }
+    }
+
+    checkIfUserHasItem();
+  }, [session]);
+
+  const handleAddToInventory = async () => {
+    if (session && !hasItem) {
+      try {
+        const user = session?.user;
+        const { error } = await supabase
+          .from('inventoryUSERS')
+          .upsert([
+            {
+              item: 9,
+              owner: user.id,
+              quantity: 1
+            }
+          ]);
+
+        if (error) {
+          throw error;
+        };
+
+        console.log('Added item to inventory successfully');
+        setHasItem(true);
+      } catch (error) {
+        console.error('Error adding golden telescope - level 1 to inventory. Error: ', error);
+      }
+    }
+  };
 
   const startQuiz = () => {
     setQuizStatus(QuizStatus.InProgress);
@@ -73,7 +138,7 @@ const LightkurveQuiz: React.FC = () => {
 
   if (quizStatus === QuizStatus.NotStarted) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center">
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           onClick={startQuiz}
@@ -125,11 +190,19 @@ const LightkurveQuiz: React.FC = () => {
 
   if (quizStatus === QuizStatus.Completed) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center">
         <p className="text-2xl">
-          Congratulations! You got {correctAnswers} out of {quizQuestions.length}{' '}
-          correct.
-        </p>
+          Congratulations! You got {correctAnswers} out of{" "}
+          {quizQuestions.length} correct.
+        </p> <br /><br />
+        {!hasItem && (
+          <button
+            onClick={handleAddToInventory}
+            className="bg-blue-500 text-white px-3 py-1 rounded"
+          >
+            Add to Inventory {/* Show image, allow user to see the item and a message */}
+          </button>
+        )}
       </div>
     );
   }

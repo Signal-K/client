@@ -2,6 +2,8 @@ import Link from 'next/link';
 import React from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import Login from '../../../pages/login';
+import { UserProfileEditBlock } from '../../Posts/Config/UserBlocks';
+import LightkurveQuiz from './_Quiz1';
 
 const ExoPlanetDetective: React.FC = () => {
     const supabase = useSupabaseClient();
@@ -9,9 +11,13 @@ const ExoPlanetDetective: React.FC = () => {
 
     if (!session) { return <Login />; };
 
+    // Potentially add a blocker that if the user doesn't have a username set, render only the <UserProfileEditBlock /> component
+
     return (
         <div className="max-w-3xl mx-auto py-8 px-4 font-sans">
             <div className="mb-8">
+                <br />
+                <UserProfileEditBlock />
                 <br />
                 <h2 className="text-3xl font-bold mb-4 text-primary">What is Star Sailors?</h2>
                 <p className="text-gray-700">
@@ -47,6 +53,7 @@ const ExoPlanetDetective: React.FC = () => {
                     1. Collaboration: Engage in team discussions, share observations, and debate theories with fellow sailors. <br />
                     2. Voting: After discussions, cast your vote on potential discoveries contributing to the community’s collective intelligence.
                 </p><br />
+                <LightkurveQuiz />
             </div>
             <div className="flex justify-between">
                     <Link href="/tests/onboarding/">

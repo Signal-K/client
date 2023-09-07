@@ -43,7 +43,7 @@ export default function UnityBuildLod1 () { /*planet, user*/
                     time = "Today"
                     user = {session?.user?.id}
                     planet = "your planet"
-                    comment = "username"
+                    // comment = "username"
                 />
             )}
          </Fragment>

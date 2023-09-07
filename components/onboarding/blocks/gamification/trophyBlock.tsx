@@ -14,7 +14,7 @@ const AddToInventoryButton: React.FC<AddToInventoryButtonProps> = ({ itemId }) =
     async function checkIfUserHasItem() {
       if (session) {
         try {
-          const user = session.user;
+          const user = session?.user;
           const { data, error } = await supabase
             .from('inventoryUSERS')
             .select('*')
