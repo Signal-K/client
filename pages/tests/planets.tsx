@@ -22,30 +22,29 @@ export default function PlanetGalleryIndex() {
       let query = supabase
         .from("planetsss")
         .select("*")
+        .order("difficulty", { ascending: true })
         .order("created_at", { ascending: false })
         .limit(20)
         .gte("id", 45)
         .lt("id", 102);
-
-      if (selectedDifficulty !== null) {
-        query = query.eq("difficulty", selectedDifficulty);
-      } else {
-        query = query.is("difficulty", null); // Filter planets with no difficulty
-      }
-
+  
+      // if (selectedDifficulty !== null) {
+      //   query = query.eq("difficulty", selectedDifficulty);
+      // }
+  
       const { data, error } = await query;
-
+  
       if (data != null) {
         setPlanets(data);
       }
-
+  
       if (error) {
         throw error;
       }
     } catch (error: any) {
       alert(error.message);
     }
-  };
+  };   
 
   const difficultyOptions = [
     { value: 1, label: "Difficulty 1" },

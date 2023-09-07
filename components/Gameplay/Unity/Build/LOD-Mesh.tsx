@@ -30,7 +30,7 @@ export default function UnityBuildSupabaseMesh ({ planetName }) {
 
     return (
         <Fragment>
-            <Unity unityProvider={unityProvider} style={{ width: "100%", height: "500px" }}/>
+            <center><Unity unityProvider={unityProvider} style={{ width: "90%", height: "500px" }}/></center>
             {/* <input
                 type="text"
                 placeholder="Enter planet name"
