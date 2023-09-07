@@ -66,7 +66,7 @@ export default function SocialGraphHomeNoSidebar () {
       .order('created_at', { ascending: false })
       .then( result => { setPosts(result.data); });
 
-    supabase.from('posts_duplicate')
+    supabase.from('posts_duplicates')
       .select('id, content, created_at, media, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)') // Reset id on testing playground server later
       .order('created_at', { ascending: false })
       .then( result => { setPlanetPosts(result.data); });
@@ -120,7 +120,7 @@ export function SocialGraphHomeModal1 () {
     //   .order('created_at', { ascending: false })
     //   .then( result => { setPosts(result.data); });
 
-    supabase.from('posts_duplicate')
+    supabase.from('posts_duplicates')
       .select('id, content, created_at, media, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)')
       .limit(2)
       .order('created_at', { ascending: false })

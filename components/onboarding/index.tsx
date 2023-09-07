@@ -22,42 +22,44 @@ const Instructions: React.FC = () => {
           {isDarkMode ? 'Light Mode' : 'Dark Mode'}
         </button> */}
         <p className="text-gray-700">
-          There's a number of exciting research projects you're going to be able to contribute to!
+        As a Star Sailor, you'll be part of a community of citizen scientists passionate about exploring the mysteries of the universe. Through our training program, you'll learn how to analyse graphs, videos, and data to identify exoplanets - planets that orbit stars beyond our solar system.
         </p> <br />
+        <div className="mb-8">
+        <blockquote className="italic bg-beige p-4 border-l-4 border-accent">
+          <p className="text-gray-700">
+          At Star Sailors, everyone has the power to make a difference. That's why our training program is designed to be accessible and engaging for everyone, regardless of their technical background. 
+          </p>
+        </blockquote>
+      </div>
+      {/* <div className="bg-white rounded-lg overflow-hidden shadow-lg p-6">
+      <p className="mb-4">
+      By playing, you can actively contribute to scientific research by classifying objects based on real-world data. The current focus is on the planets mini-game, where you can help identify potential new planets discovered by the TESS telescope. 
+      </p>
+      <p className="mb-4">
+      Step into the boundless expanse of the universe with Star Sailors—a unique platform that not only captivates your imagination but also contributes to astronomical research. Focus your efforts on the Planets mini-game to help pinpoint undiscovered celestial bodies, all while collaborating with a community of dedicated citizen scientists.
+      </p>
+      <p className="mb-4">
+      As you become proficient in classification, accrue valuable items that enable you to colonise new planets.
+      </p>
+      <p className="mb-4">
+      Engage within the Star Sailors community to earn points, redeem rewards, and influence collective discoveries.
+      </p>
+    </div> */}
         <p className="text-gray-700">
-        Welcome to "Star Sailors," an exciting realm of citizen science where you'll embark on a captivating journey as a star sailor. Immerse yourself in our training program, which will guide you through various projects focused on scientific research. Get ready to explore the vast expanse of space and contribute to unraveling the mysteries of the universe.
+        You'll also learn how to collaborate with your fellow Star Sailors, sharing insights and ideas to uncover the secrets hidden within the data. Together, you'll leverage collective knowledge to make informed classifications and contribute to the collective wisdom of the Star Sailor community by making informed classifications.
         </p> <br />
         {/* <div className="my-8">
         <img src="https://file.notion.so/f/s/93246fc4-b0db-46a7-b488-37a82c7e53d1/Untitled.png?id=f02de9d7-b9a6-41e9-8adc-54b773d5295b&table=block&spaceId=215717d6-87ba-4724-a957-c84891dfbb82&expirationTimestamp=1688104800000&signature=0pxfyuWzoTSrZ0Fcggay1xvDhieon_3npbbrJlHfp9g&downloadName=Untitled.png" alt="Size Estimation" className="w-full" />
         </div> */}
-        <p className="text-gray-700">
-        In the training program, you'll become skilled at analyzing graphs, videos, and data to identify exoplanets—planets that orbit stars beyond our solar system. Through informative tutorials, you'll learn to decipher the intricate patterns and anomalies within the graphs, gaining expertise in making informed classifications.
-        </p>
       </div>
 
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4 text-primary">Collaboration</h2>
+        {/* <h2 className="text-3xl font-bold mb-4 text-primary">Collaboration</h2> */}
         <blockquote className="italic bg-beige p-4 border-l-4 border-accent">
-          <p className="text-gray-700">
-          Collaboration is at the heart of the training program. Engage in discussions with fellow star sailors, sharing insights and exchanging ideas. Together, you'll uncover the secrets hidden within the data. Consensus is sought through collaborative decision-making, allowing the community to leverage collective knowledge.
+          <p className="text-gray-700">And the best part? You'll get to vote on the classifications you've helped create! By voting, you'll play an active role in shaping the course of astronomical discoveries.
           </p>
         </blockquote>
       </div>
-
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4 text-primary">Voting</h2>
-        <blockquote className="italic bg-beige p-4 border-l-4 border-accent">
-          <p className="text-gray-700">
-          Once discussions have taken place, it's time to cast your vote. By voting, you contribute to the collective wisdom of the star sailor community, bringing us closer to understanding the cosmos. This user flow of data analysis, discussion, and voting forms the core of the training program, which remains consistent across all projects within "Star Sailors."
-          </p>
-        </blockquote>
-      </div>
-
-      <div>
-        <p className="text-gray-700">
-        Prepare for an extraordinary journey as a Star Sailor, where your contributions as a citizen scientist will shape the course of astronomical discoveries. Welcome aboard this cosmic adventure!
-        </p>
-      </div><br /><br />
      {/* Add user profile section, check username :) */}
       <center><Link href="/tests/onboarding/planetHunters/1"><button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Begin training</button></Link></center>
     </div>

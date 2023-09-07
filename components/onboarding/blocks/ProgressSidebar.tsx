@@ -70,7 +70,7 @@ const ProgressSidebar: React.FC<SidebarProps> = ({ currentPage, credits }) => {
           </a>
         ))}
       </div><br /><br /><br /><br /><br /><br /><br /><br /><br />
-      <div className="flex justify-center py-2 object-bottom">
+      {/* <div className="flex justify-center py-2 object-bottom">
         <svg
           className="w-5 h-5 mr-2"
           viewBox="0 0 24 24"
@@ -81,8 +81,8 @@ const ProgressSidebar: React.FC<SidebarProps> = ({ currentPage, credits }) => {
             d="M19 5H5C3.89543 5 3 5.89543 3 7V21L9 17H19C20.1046 17 21 16.1046 21 15V7C21 5.89543 20.1046 5 19 5ZM19 15H9L5 18.382V7H19V15Z"
           />
         </svg>
-        <span className="text-gray-600 text-sm">{credits} Credits</span>
-      </div>
+        {/* <span className="text-gray-600 text-sm">{credits} Credits</span> 
+      </div> */}
     </aside>
   );
 };

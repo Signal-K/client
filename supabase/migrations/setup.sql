@@ -35,7 +35,7 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 
 -- Alter the existing posts table
-alter table posts_duplicate
+alter table posts_duplicates
   rename to posts;
 
 alter table posts enable row level security;
