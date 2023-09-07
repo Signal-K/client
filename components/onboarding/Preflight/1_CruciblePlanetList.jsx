@@ -3,11 +3,12 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Container, Row, ButtonGroup, ToggleButton } from "react-bootstrap";
 import Link from "next/link";
 
-interface AddToInventoryButtonProps {
-  itemId: number; // The item ID to add to the user's inventory
-}
+// interface AddToInventoryButtonProps {
+//   itemId: number; // The item ID to add to the user's inventory
+// }
 
-const AddToInventoryButton: React.FC<AddToInventoryButtonProps> = ({ itemId }) => {
+// const AddToInventoryButton: React.FC<AddToInventoryButtonProps> = ({ itemId }) => {
+const AddToInventoryButton = () => {
   const [hasItem, setHasItem] = useState(false);
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -100,13 +101,13 @@ export default function Crucible1BaseplanetList() {
       const { data, error } = await query;
   
       if (data != null) {
-        setPlanets(data as any); // Explicitly cast the data to the correct type
+        setPlanets(data)// as any); // Explicitly cast the data to the correct type
       }
   
       if (error) {
         throw error;
       }
-    } catch (error: any) {
+    } catch (error) { //: any) {
       alert(error.message);
     }
   };
@@ -158,7 +159,7 @@ export default function Crucible1BaseplanetList() {
               };
             });
 
-            setUserSpaceships(combinedData as any);
+            setUserSpaceships(combinedData)// as any);
           }
         }
       }
@@ -189,11 +190,11 @@ export default function Crucible1BaseplanetList() {
 }
 
 
-interface PlanetClassificationCheckProps {
-  userId: string; // The user ID to check
-}
+// interface PlanetClassificationCheckProps {
+//   userId: string; // The user ID to check
+// }
 
-const PlanetClassificationCheck: React.FC<PlanetClassificationCheckProps> = ({ userId }) => {
+const PlanetClassificationCheck = () => {
   const supabase = useSupabaseClient();
   const [hasClassifiedPlanets, setHasClassifiedPlanets] = useState(false);
   const [hasItem10, setHasItem10] = useState(false);

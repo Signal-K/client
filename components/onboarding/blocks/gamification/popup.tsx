@@ -20,7 +20,7 @@ const OnboardingPopup = ({ imageSrc, message }: { imageSrc: string; message: str
     height: '50px',
   };
 
-  return (
+  return ( 
     <div style={popupStyle}>
       <img src={imageSrc} alt="Popup" style={imageStyle} />
       <p>{message}</p>

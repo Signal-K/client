@@ -34,117 +34,154 @@ TimeAgo.addDefaultLocale(en);
     //console.log(JSON.stringify(starSystem, null, 2));
   }, [session?.user?.id]); */
 
-export default function SocialGraphHomeNoSidebar () {
+interface SocialGraphHomeNoSidebarProps {
+  planets2: string;
+  // Other props you have
+}
+
+interface SupabaseResponse<T> {
+  data: T[] | null;
+  error: Error | null;
+}
+
+interface PlanetPost {
+  id: number;
+  content: string;
+  created_at: string;
+  media: string[];
+  planets2: string;
+  planetsss: { id: number; temperature: string }[];
+  profiles: {
+    id: number;
+    avatar_url: string;
+    full_name: string;
+    username: string;
+  }[];
+}
+
+export default function SocialGraphHomeNoSidebar() {
   const supabase = useSupabaseClient();
   const session = useSession();
-  const [posts, setPosts] = useState([]);
-  const [profile, setProfile] = useState(null);
-  const [planetPosts, setPlanetPosts] = useState([]);
+  const user = session?.user?.id;
+  const [profile, setProfile] = useState<any>(null); // Update the type as needed
+  const [planetPosts, setPlanetPosts] = useState<PlanetPost[]>([]);
 
   useEffect(() => {
-    // fetchPosts();
-  }, [session?.user?.id]);
+    fetchProfile();
+    fetchPlanetPosts();
+  }, [user]);
 
-  useEffect(() => {
-    if (!session?.user?.id) {
+  async function fetchProfile() {
+    if (session) {
       return;
     }
 
-    supabase.from('profiles')
+    const { data, error } = await supabase
+      .from("profiles")
       .select()
-      .eq('id', session?.user?.id)
-      .then(result => {
-        if (result.data.length) {
-          setProfile(result.data);
-        }
-      })
-  }, [session?.user?.id]); // Run it again if auth/session state changes
+      .eq("id", user);
 
-  function fetchPosts () {
-    supabase.from('posts')
-      .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
-      .order('created_at', { ascending: false })
-      .then( result => { setPosts(result.data); });
-
-    supabase.from('posts_duplicates')
-      .select('id, content, created_at, media, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)') // Reset id on testing playground server later
-      .order('created_at', { ascending: false })
-      .then( result => { setPlanetPosts(result.data); });
+    if (error) {
+      console.error("Error fetching profile:", error);
+      return;
     }
+
+    if (data.length) {
+      setProfile(data[0]);
+    }
+  }
+
+  async function fetchPlanetPosts() {
+    const { data, error } = await supabase
+      .from("posts_duplicates")
+      .select("*")
+      .order("created_at", { ascending: false });
+  
+    if (error) {
+      console.error("Error fetching planet posts:", error);
+      return;
+    }
+  
+    setPlanetPosts(data || []);
+  }
+  
+  
 
   return (
     <Layout hideNavigation={true}>
-      <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
-        <PostFormCard onPost={fetchPosts} />
-        {planetPosts?.length > 0 && planetPosts.map(post => (
-          <PostCard key = { post.id } {...post} />
-        ))}
-        {/* {posts?.length > 0 && posts.map(post => (
-          <PostCard key = { post.id } {...post} />
-        ))} */}
+      <UserContext.Provider value={{ profile }}>
+        <PostFormCard onPost={fetchPlanetPosts} />
+        {planetPosts?.length > 0 &&
+          planetPosts.map((post) => (
+            <PostCard key={post.id} {...post} />
+          ))}
       </UserContext.Provider>
     </Layout>
   );
 }
 
-export function SocialGraphHomeModal1 () {
+
+export function SocialGraphHomeModal1() {
   const supabase = useSupabaseClient();
   const session = useSession();
-  const [posts, setPosts] = useState([]);
-  const [profile, setProfile] = useState(null);
-  const [planetPosts, setPlanetPosts] = useState([]);
+  const [profile, setProfile] = useState<any>(null);
+  const [planetPosts, setPlanetPosts] = useState<PlanetPost[]>([]);
 
   useEffect(() => {
     fetchPosts();
-  }, [session?.user?.id]);
+    fetchProfile();
+  }, [session?.user]);
 
-  useEffect(() => {
-    if (!session?.user?.id) {
-      return;
+  async function fetchPosts() {
+    try {
+      if (!session?.user?.id) {
+        return;
+      }
+
+      const { data: planetPostsData, error: planetPostsError } = await supabase
+        .from("posts_duplicates")
+        .select("*")
+        .limit(2)
+        .order("created_at", { ascending: false });
+
+      if (planetPostsError) {
+        console.error("Error fetching planet posts:", planetPostsError);
+      } else {
+        setPlanetPosts(planetPostsData || []);
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
     }
-
-    supabase.from('profiles')
-      .select()
-      .eq('id', session?.user?.id)
-      .then(result => {
-        if (result.data.length) {
-          setProfile(result.data);
-        }
-      })
-  }, [session?.user?.id]); // Run it again if auth/session state changes
-
-  function fetchPosts () {
-    // supabase.from('posts')
-    //   .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
-    //   .limit(2)
-    //   .order('created_at', { ascending: false })
-    //   .then( result => { setPosts(result.data); });
-
-    supabase.from('posts_duplicates')
-      .select('id, content, created_at, media, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)')
-      .limit(2)
-      .order('created_at', { ascending: false })
-      .then( result => { setPlanetPosts(result.data); });
   }
 
-  function fetchProfile () {
-    supabase.from('profiles')
-      .select()
-      .eq('id', session.user.id)
-      .then(result => {
-        if (result.data) {
-          setProfile(result.data);
-        }
-    })
+  async function fetchProfile() {
+    try {
+      if (!session?.user?.id) {
+        return;
+      }
+
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select()
+        .eq("id", session.user.id);
+
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
+      } else {
+        setProfile(profileData[0] || null);
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    }
   }
 
   return (
     <Layout hideNavigation={true}>
-      <UserContext.Provider value={{profile}}> {/* Move this into `_app.tsx` later */}
-        {/* <PostFormCard onPost={fetchPosts} /> */}
-        {planetPosts?.length > 0 && planetPosts.map(post => (
-          <PostModal key = { post.id } {...post} />
-        ))}
+      <UserContext.Provider value={{ profile }}>
+        {planetPosts?.length > 0 &&
+          planetPosts.map((post) => (
+            <PostModal key={post.id} {...post} />
+          ))}
       </UserContext.Provider>
     </Layout>
   );
