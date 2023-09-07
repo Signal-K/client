@@ -37,7 +37,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, href }) => {
 };
 
 const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
-    const [isMobileView, setIsMobileView] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false); // Closed by default on both mobile and desktop
   const supabase = useSupabaseClient();
   const session = useSession();

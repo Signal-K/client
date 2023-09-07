@@ -75,6 +75,7 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
     // Fetch votes for the current post if the user is logged in
     if (session) {
       fetchVotesForPost(id);
+      console.log(comments);
     }
   }, [id, session]);
 
@@ -287,6 +288,7 @@ export default function PlanetPostCard ( { id, content, created_at, media, profi
       )}
       {votingError && <p className="text-red-500 mt-2">{votingError}</p>}
         </div>
+        
         {comments && comments.length > 0 && (
         <div className="my-3 text-sm">
           <button className="text-blue-500" onClick={toggleComments}>

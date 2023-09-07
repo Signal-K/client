@@ -9,15 +9,17 @@ export default function SocialGraphHomeModal() {
   const [profile, setProfile] = useState(null);
   const [planetPosts, setPlanetPosts] = useState([]);
 
+  const a = 0;
+
   useEffect(() => {
     fetchPosts();
-  }, [session?.user?.id]); 
+  }, [a]);  
 
   useEffect(() => {
     if (planetPosts.length > 0) {
       console.log("Comments: ", planetPosts.flatMap((post) => post.comments));
     }
-  }, [planetPosts]);
+  }, [a]);
 
   async function fetchPosts() {
     const postsResponse = await supabase

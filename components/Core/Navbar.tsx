@@ -9,15 +9,27 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { AvatarPostCard } from '../PostCard';
 import Link from 'next/link';
 import SilfurBalance from '../Gameplay/Silfur/Balance';
+import { FiChevronDown } from 'react-icons/fi';
 
 const navigation = [
+  { name: 'Dashboard', href: '/' },
+  // { name: 'Economy', href: '/balance' },
+  // { name: 'Documentation', href: '/#'}, // href: '/docs' },
+  { name: 'Feed', href: '/feed' },
+  { name: 'Missions', href: '/tests/onboarding' },
+  // { name: 'Playground', href: '/playground' },
+  // { name: 'Planets', href: '/tests/planets' },
+  // { name: 'Inventory', href: '/#'}, // href: '/inventory' },
+];
+
+const mobileNavigation = [
   { name: 'Dashboard', href: '/' },
   { name: 'Feed', href: '/feed' },
   { name: 'Missions', href: '/tests/onboarding' },
   // { name: 'Playground', href: '/playground' },
   { name: 'Planets', href: '/tests/planets' },
-  { name: 'Economy', href: '/balance' },
   { name: 'Inventory', href: '/#'}, // href: '/inventory' },
+  { name: 'Economy', href: '/balance' },
   { name: 'Documentation', href: '/#'}, // href: '/docs' },
 ];
 
@@ -89,6 +101,50 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                       {item.name}
                     </a>
                   ))}
+                  <div className="hidden sm:flex sm:items-center">
+                  <Menu as="div" className="relative">
+                    <div>
+                      <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
+                        <span className="sr-only">Open My Stuff menu</span>
+                        My Stuff
+                        <FiChevronDown className="w-5 h-5 ml-2 -mr-1 text-gray-400" aria-hidden="true" />
+                      </Menu.Button>
+                    </div>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-200"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"> {/* Increase z-index */}
+                        <Link href="/tests/planets" legacyBehavior={true}>
+                          <a
+                            className="block px-4 py-2 text-sm text-gray-700"
+                          >
+                            Planets
+                          </a>
+                        </Link>
+                        <Link href="/tests/onboarding" legacyBehavior={true}>
+                          <a
+                            className="block px-4 py-2 text-sm text-gray-700"
+                          >
+                            Missions
+                          </a>
+                        </Link>
+                        <Link href="/inventory" legacyBehavior={true}>
+                          <a
+                            className="block px-4 py-2 text-sm text-gray-700"
+                          >
+                            Inventory
+                          </a>
+                        </Link>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
+              </div>
                 </div>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
@@ -202,7 +258,7 @@ export default function Navbar(/*{ user }: { user: any }*/) {
 
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 pt-2 pb-3">
-              {navigation.map((item) => (
+              {mobileNavigation.map((item) => (
                 <Disclosure.Button
                   key={item.name}
                   as="a"

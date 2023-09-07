@@ -18,31 +18,52 @@ export default function PostFormCard ( { onPost } ) {
   const [isUploading, setIsUploading] = useState(false);
   //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(); 
   const [avatar_url, setAvatarUrl] = useState(null);
+  const [userExperience, setUserExperience] = useState();
 
-  function createPost () {
-    supabase.from('posts').insert({
-      author: session?.user?.id, // This is validated via RLS so users can't pretend to be other user
-      content, // : content,
-      media: uploads, // This should be changed to the user path `storage/userId/post/media...` like in the image gallery
-      // File upload -> show an icon depending on what type of file.
-    }).then(response => {
-      if (!response.error) {
-        alert(`Post ${content} created`);
-        setContent('');
-        setUploads([]);
-        if ( onPost ) {
-          onPost();
+  function createPost() {
+    supabase
+      .from('posts_duplicates')
+      .insert({
+        author: session?.user?.id,
+        content,
+        media: uploads,
+        planets2: planetId2,
+      })
+      .then(async response => {
+        if (!response.error) {
+          // Increment the user's experience locally
+          setUserExperience(userExperience + 1);
+  
+          // Update the user's experience in the database
+          await supabase.from('profiles').update({
+            experience: userExperience + 1,
+          }).eq('id', session?.user?.id);
+  
+          // Add a copy of the planet to the user's inventory
+          await supabase.from('inventoryPLANETS').insert([
+            {
+              planet_id: planetId2,
+              owner_id: session?.user?.id,
+            },
+          ]);
+  
+          alert(`Post ${content} created`);
+          setContent('');
+          setUploads([]);
+          if (onPost) {
+            onPost();
+          }
         }
-      }
-    });
-  }
+      });
+  }  
 
   useEffect(() => {
     supabase.from('profiles')
-      .select(`avatar_url`)
+      .select(`avatar_url, experience`)
       .eq('id', session?.user?.id)
       .then(result => {
         setAvatarUrl(result.data.avatar_url); //console.log(result.data[0].avatar_url)
+        setUserExperience(result.data.experience);
       })
   }, [session]);
 
@@ -132,7 +153,7 @@ export default function PostFormCard ( { onPost } ) {
     </Card>
   );
 }
-
+ 
 export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
   const supabase = useSupabaseClient();
   const [content, setContent] = useState('');
@@ -146,32 +167,109 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
   const [isUploading, setIsUploading] = useState(false);
   //const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(); 
   const [avatar_url, setAvatarUrl] = useState(null);
+  const [userExperience, setUserExperience] = useState();
+  const [hasRequiredItem, setHasRequiredItem] = useState(false); // Added state for required item check
 
-  function createPost () {
-    supabase.from('posts_duplicates').insert({
-      author: session?.user?.id, // This is validated via RLS so users can't pretend to be other user
-      content, // : content,
-      media: uploads, // This should be changed to the user path `storage/userId/post/media...` like in the image gallery
-      planets2: planetId2,
-      // File upload -> show an icon depending on what type of file.
-    }).then(response => {
-      if (!response.error) {
-        alert(`Post ${content} created`);
-        setContent('');
-        setUploads([]);
-        if ( onPost ) {
-          onPost();
-        }
+  useEffect(() => {
+    // Check if the user has the required item with ID 8 in their inventory
+    async function checkRequiredItem() {
+      const { data: inventoryData, error: inventoryError } = await supabase
+        .from('inventoryUSERS')
+        .select('*')
+        .eq('owner', session?.user?.id)
+        .eq('item', 8); // Check if the user has the item with ID 8 in their inventory
+
+      if (inventoryError) {
+        console.error('Error fetching inventory data: ', inventoryError);
+        return;
       }
-    });
-  }
+
+      setHasRequiredItem(inventoryData.length > 0);
+    }
+
+    checkRequiredItem();
+  }, [session]);
+
+  function createPost() {
+    if (!hasRequiredItem) {
+      alert('You need the required item to create a classification post.');
+      return;
+    }
+
+    supabase
+      .from('posts_duplicates')
+      .insert({
+        author: session?.user?.id,
+        content,
+        media: uploads,
+        planets2: planetId2,
+      })
+      .then(response => {
+        if (!response.error) {
+          // Increment the user's experience locally
+          setUserExperience(userExperience + 1);
+  
+          // Update the user's experience in the database
+          supabase
+            .from('profiles')
+            .update({
+              experience: userExperience + 1,
+            })
+            .eq('id', session?.user?.id)
+            .then(updateResponse => {
+              if (!updateResponse.error) {
+                // Fetch the newly added planet's data
+                supabase
+                  .from('planetsss')
+                  .select('*')
+                  .eq('id', planetId2)
+                  .then(planetResponse => {
+                    if (!planetResponse.error && planetResponse.data.length > 0) {
+                      const planetToAdd = planetResponse.data[0];
+  
+                      // Add the planet to the user's inventory
+                      supabase
+                        .from('inventoryPLANETS')
+                        .insert([
+                          {
+                            planet_id: planetToAdd.id,
+                            owner_id: session?.user?.id,
+                          },
+                        ])
+                        .then(inventoryResponse => {
+                          if (!inventoryResponse.error) {
+                            alert(`Post ${content} created and planet added to your inventory`);
+                            setContent('');
+                            setUploads([]);
+                            if (onPost) {
+                              onPost();
+                            }
+                          } else {
+                            console.error('Error adding planet to inventory:', inventoryResponse.error);
+                          }
+                        });
+                    } else {
+                      console.error('Error fetching planet data:', planetResponse.error);
+                    }
+                  });
+              } else {
+                console.error('Error updating user experience:', updateResponse.error);
+              }
+            });
+        }
+      })
+      .catch(error => {
+        console.error('Error creating post:', error);
+      });
+  }  
 
   useEffect(() => {
     supabase.from('profiles')
-      .select(`avatar_url`)
+      .select(`avatar_url, experience`)
       .eq('id', session?.user?.id)
       .then(result => {
         setAvatarUrl(result?.data[0]?.avatar_url); //console.log(result.data[0].avatar_url)
+        setUserExperience(result?.data[0]?.experience);
       })
   }, [session]);
 
@@ -200,14 +298,14 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
   // https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media1675853386903cebdc7a2-d8af-45b3-b37f-80f328ff54d6image-asset.jpg
 
   return (
-    <Card noPadding={false}>
+    <>
       <div className="flex gap-2">
         <div>
           <AccountAvatar uid={session?.user?.id}
                 url={avatar_url}
                 size={60} />
         </div> { profile && (
-          <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-16 rounded-lg" placeholder={`What do you think about this planet candidate, ${profile?.username}?`} /> )}
+          <textarea value={content} onChange={e => setContent(e.target.value)} className="grow p-3 h-24 rounded-xl" placeholder={`What do you think about this planet candidate, ${profile?.username}?`} /> )}
       </div>
       {isUploading && (
         <div><ClimbingBoxLoader /></div>
@@ -220,6 +318,7 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
         </div>
       )}
       <div className="flex gap-5 items-center mt-2">
+        <p>Your Silfur: {userExperience}</p>
         <div>
           <label className="flex gap-1">
             <input type='file' className="hidden" onChange={addMedia} />
@@ -233,7 +332,7 @@ export function PostFormCardPlanetTag ( { onPost, planetId2 } ) {
           <button onClick={createPost} className="bg-socialBlue text-white px-6 py-1 rounded-md">Share</button>
         </div>
       </div>
-    </Card>
+      </>
   );
 }
 

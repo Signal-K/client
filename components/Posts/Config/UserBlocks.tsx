@@ -4,6 +4,9 @@ import UserPostCount from "./UserPostsTotal";
 import { Grid, Card } from "@tremor/react";
 import AccountEditor from "../../Core/UpdateProfile";
 import IndexAuth from "../../Core/indexAuth";
+import OwnedItemsList from "../../Gameplay/Inventory/userOwnedItems";
+import OwnedPlanetsList from "../../Gameplay/Inventory/userOwnedPlanets";
+import OwnedPlanetsListBlock from "../../Blocks/userPlanetsBlock";
 
 export default function UserProfileBlocks () {
     const session = useSession();
@@ -21,9 +24,15 @@ export default function UserProfileBlocks () {
                     <div className="container mx-auto py-8">
                         {/* <AccountEditor session={session} /> */}
                         {/* <IndexAuth /> */}
+                        <OwnedPlanetsListBlock />
                     </div>
                 </Card>
-            </Grid>
+            </Grid><br />
+            <Card>
+                <div className="container mx-auto py-8">
+                    <OwnedItemsList />
+                </div>
+            </Card>
         </main></div>
     );
 }

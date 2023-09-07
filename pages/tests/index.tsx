@@ -8,7 +8,6 @@ import DbHeader from "../../components/Backend/Header";
 import Login from "../login";
 import IndexAuth from "../../components/Core/indexAuth";
 import Instructions from "../../components/onboarding";
-import { SocialGraphHomeModal1 } from "../posts";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
