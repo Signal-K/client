@@ -298,7 +298,7 @@ export function PlanetPostCard ( { content, created_at, media, profiles:authorPr
           {dropdownOpen && (
             <div className="bg-red w-5 h-5 absolute top-0"></div>
           )} {/* Add a button/handler to show Sandbox info if available */}
-          <ClickOutHandler onClickOut={handleClickOutsideDropdown}>
+          {/* <ClickOutHandler onClickOut={handleClickOutsideDropdown}>
             <div className="relative">
               {dropdownOpen && (
                 <div className="absolute -right-6 bg-white shadow-md shadow-gray-300 p-3 rounded-sm border border-gray-100 w-52">
@@ -331,7 +331,7 @@ export function PlanetPostCard ( { content, created_at, media, profiles:authorPr
                 </div>
               )}
             </div>
-          </ClickOutHandler>
+          </ClickOutHandler> */}
         </div>
       </div>
       <div>

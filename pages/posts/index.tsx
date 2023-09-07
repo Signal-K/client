@@ -55,19 +55,19 @@ export default function SocialGraphHomeNoSidebar () {
       .eq('id', session?.user?.id)
       .then(result => {
         if (result.data.length) {
-          setProfile(result.data[0]);
+          setProfile(result.data);
         }
       })
   }, [session?.user?.id]); // Run it again if auth/session state changes
 
   function fetchPosts () {
     supabase.from('posts')
-      .select('id, content, created_at, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+      .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
       .order('created_at', { ascending: false })
       .then( result => { setPosts(result.data); });
 
-    supabase.from('posts_duplicate')
-      .select('id, content, created_at, planets2, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+    supabase.from('posts_duplicates')
+      .select('id, content, created_at, media, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)') // Reset id on testing playground server later
       .order('created_at', { ascending: false })
       .then( result => { setPlanetPosts(result.data); });
     }
@@ -79,15 +79,15 @@ export default function SocialGraphHomeNoSidebar () {
         {planetPosts?.length > 0 && planetPosts.map(post => (
           <PostCard key = { post.id } {...post} />
         ))}
-        {posts?.length > 0 && posts.map(post => (
+        {/* {posts?.length > 0 && posts.map(post => (
           <PostCard key = { post.id } {...post} />
-        ))}
+        ))} */}
       </UserContext.Provider>
     </Layout>
   );
 }
 
-export function SocialGraphHomeModal () {
+export function SocialGraphHomeModal1 () {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);
@@ -108,21 +108,21 @@ export function SocialGraphHomeModal () {
       .eq('id', session?.user?.id)
       .then(result => {
         if (result.data.length) {
-          setProfile(result.data[0]);
+          setProfile(result.data);
         }
       })
   }, [session?.user?.id]); // Run it again if auth/session state changes
 
   function fetchPosts () {
-    supabase.from('posts')
-      .select('id, content, created_at, profiles(id, avatar_url, username)') // Reset id on testing playground server later
-      .limit(2)
-      .order('created_at', { ascending: false })
-      .then( result => { setPosts(result.data); });
+    // supabase.from('posts')
+    //   .select('id, content, created_at, media, profiles(id, avatar_url, username)') // Reset id on testing playground server later
+    //   .limit(2)
+    //   .order('created_at', { ascending: false })
+    //   .then( result => { setPosts(result.data); });
 
-    supabase.from('posts_duplicate')
-      .select('id, content, created_at, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)')
-      .limit(1)
+    supabase.from('posts_duplicates')
+      .select('id, content, created_at, media, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)')
+      .limit(2)
       .order('created_at', { ascending: false })
       .then( result => { setPlanetPosts(result.data); });
   }
@@ -133,7 +133,7 @@ export function SocialGraphHomeModal () {
       .eq('id', session.user.id)
       .then(result => {
         if (result.data) {
-          setProfile(result.data[0]);
+          setProfile(result.data);
         }
     })
   }

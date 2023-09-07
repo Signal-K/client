@@ -1,6 +1,6 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import InfoFAQ from "../../components/Info/faq";
-import { SocialGraphHomeModal } from "../posts";
+import { SocialGraphHomeModal1 } from "../posts";
 import Link from "next/link";
 
 export default function Db () {
@@ -81,7 +81,7 @@ export default function Db () {
         </div>
       </section><br />
       <center><h1 className="max-w-5xl text-2xl font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-6xl lg:max-w-7xl">Recent classifications by our users<br /></h1></center>
-      <SocialGraphHomeModal />
+      <SocialGraphHomeModal1 />
       <center><Link href="/tests/onboarding"><button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Get Started - Play now</button></Link></center>
       <InfoFAQ />
       <footer className="bg-white" aria-labelledby="footer-heading">

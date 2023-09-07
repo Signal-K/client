@@ -142,53 +142,44 @@ export default function IndexAuth() {
     }, [session?.user?.id])
 
     return (
-      <p></p>
-    )
+        <>
+              {/* <button className="bg-white rounded-full p-4" onClick={() => setShowProfile(true)}>
+                <div className="relative w-10 h-10">
+                  <div className="absolute top-0 left-0 w-10 h-2 bg-gray-400 rounded-full"></div>
+                  <div className="absolute top-4 left-0 w-2 h-4 bg-gray-400 rounded-full"></div>
+                  <div className="absolute top-4 right-0 w-2 h-4 bg-gray-400 rounded-full"></div>
+                  <div className="absolute bottom-0 left-0 w-4 h-2 bg-gray-400 rounded-full"></div>
+                  <div className="absolute bottom-0 right-0 w-4 h-2 bg-gray-400 rounded-full"></div>
+                  <div className="absolute top-2 left-2 w-6 h-6 bg-blue-400 rounded-full"></div>
+                </div>
+              </button>
 
-//     return (<CoreLayout>
-//         <>
-//               <button className="bg-white rounded-full p-4" onClick={() => setShowProfile(true)}>
-//                 <div className="relative w-10 h-10">
-//                   <div className="absolute top-0 left-0 w-10 h-2 bg-gray-400 rounded-full"></div>
-//                   <div className="absolute top-4 left-0 w-2 h-4 bg-gray-400 rounded-full"></div>
-//                   <div className="absolute top-4 right-0 w-2 h-4 bg-gray-400 rounded-full"></div>
-//                   <div className="absolute bottom-0 left-0 w-4 h-2 bg-gray-400 rounded-full"></div>
-//                   <div className="absolute bottom-0 right-0 w-4 h-2 bg-gray-400 rounded-full"></div>
-//                   <div className="absolute top-2 left-2 w-6 h-6 bg-blue-400 rounded-full"></div>
-//                 </div>
-//               </button>
-
-//               {session?.user?.id && showProfile == true && (
+              {session?.user?.id && showProfile == true && ( */}
                 
-//                 <center>
-//                                     <h1 className="">Your profile</h1><div className="align-content: center">
+                <center>
+                                    <h1 className="">Your profile</h1><div className="align-content: center">
                   
-// <br />
-// <AccountEditor session={session} />
+<br />
+<AccountEditor session={session} /><br />
 
-//                   <p>Username: {profile?.username}</p>
-//                   <button onClick={() => {setEditMode(true)}}>Edit Profile</button>
-//                     <div>
-//                       <input
-//                         id='username'
-//                         type='text'
-//                         className="border py-2 px-3 rounded-md mt-1"
-//                         placeholder={profile?.username}
-//                         onChange={(e) => setUsername(e.target.value)}
-//                         value={username}
-//                       />
-//                       <button onClick={() => updateProfile({ username, avatar_url })} className="inline-flex mx-1 gap-1 bg-white rounded-md shadow-sm shadow-gray-500 py-1 px-2">
-//                         Save profile
-//                       </button>
-//                     </div>
-//                   {/* )} */}
-//                 </div></center>
-//               )}
-//             <Db />
-//                 {/* <UserOnboarding />          */}
-//                 {session?.user?.id == 'cebdc7a2-d8af-45b3-b37f-80f328ff54d6' && (
-//                   <Link legacyBehavior href='/'>Test</Link>
-//                 )}
-//                 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="starsailors" data-description="Support me on Buy me a coffee!" data-message="I hope you enjoyed using Star Sailors. Please consider contributing so I can get extra features out faster." data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
-//         </></CoreLayout>
+                  <p>Username: {profile?.username}</p><br />
+                  <button onClick={() => {setEditMode(true)}}>Edit Profile</button><br />
+                    <div><br />
+                      <input
+                        id='username'
+                        type='text'
+                        className="border py-2 px-3 rounded-md mt-1"
+                        placeholder={profile?.username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        value={username}
+                      />
+                      <button onClick={() => updateProfile({ username, avatar_url })} className="inline-flex mx-1 gap-1 bg-white rounded-md shadow-sm shadow-gray-500 py-1 px-2">
+                        Save profile
+                      </button>
+                    </div>
+                  {/* )} */}
+                </div></center>
+                {/* <UserOnboarding />          */}
+                {/* <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="starsailors" data-description="Support me on Buy me a coffee!" data-message="I hope you enjoyed using Star Sailors. Please consider contributing so I can get extra features out faster." data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script> */}
+        </>)
 }

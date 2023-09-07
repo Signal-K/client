@@ -3,8 +3,13 @@ const nextConfig = {
   reactStrictMode: true,
 }
 
-module.exports = nextConfig
-/* module.exports = () => {
+const withNextra = require('nextra')({
+  //theme: 'nextra-theme-docs',
+  theme: './theme.tsx',
+  themeConfig: './theme.config.tsx'
+})
+
+module.exports = withNextra()/* () => {
    const rewrites = () => {
      return [
        {
@@ -15,5 +20,5 @@ module.exports = nextConfig
    };
    return {
      rewrites,
-   };
-*/
+    };
+}*/

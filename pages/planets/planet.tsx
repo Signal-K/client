@@ -156,7 +156,7 @@ export default function PlanetPage () {
 
     function fetchPostsForPlanet(planetId) {
         supabase
-          .from('posts_duplicate')
+          .from('posts_duplicates')
           .select('id, content, created_at, media, profiles(id, avatar_url, username)')
           .eq('planets2', planetId)
           .order('created_at', { ascending: false })
@@ -203,7 +203,7 @@ export default function PlanetPage () {
                     </div>
                 </Card>
                 <PlanetCard activeTab = { tab } planetId = { planetId } />
-                <UserContext.Provider value={{profile}}><PostFormCardPlanetTag onPost={ fetchPostsForPlanet(planetId)} /></UserContext.Provider><br />
+                <UserContext.Provider value={{profile}}><PostFormCardPlanetTag planetId2={planet} onPost={ fetchPostsForPlanet(planetId)} /></UserContext.Provider><br />
 
                 <center><h2 className="display-6">{planet?.content} Discussion</h2></center><br />
                 {planetPosts?.length > 0 && planetPosts.map(post => (

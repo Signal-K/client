@@ -4,17 +4,33 @@ import { Fragment, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { AvatarPostCard } from '../PostCard';
+import Link from 'next/link';
+import SilfurBalance from '../Gameplay/Silfur/Balance';
+import { FiChevronDown } from 'react-icons/fi';
 
 const navigation = [
   { name: 'Dashboard', href: '/' },
-  // { name: 'Feed', href: '/feed' },
+  // { name: 'Economy', href: '/balance' },
+  // { name: 'Documentation', href: '/#'}, // href: '/docs' },
+  { name: 'Feed', href: '/feed' },
   { name: 'Missions', href: '/tests/onboarding' },
   // { name: 'Playground', href: '/playground' },
-  { name: 'Planets', href: '/tests/planets' }
+  // { name: 'Planets', href: '/tests/planets' },
+  // { name: 'Inventory', href: '/#'}, // href: '/inventory' },
+];
+
+const mobileNavigation = [
+  { name: 'Dashboard', href: '/' },
+  { name: 'Feed', href: '/feed' },
+  { name: 'Missions', href: '/tests/onboarding' },
+  // { name: 'Playground', href: '/playground' },
+  { name: 'Planets', href: '/tests/planets' },
+  { name: 'Inventory', href: '/#'}, // href: '/inventory' },
+  { name: 'Economy', href: '/balance' },
+  { name: 'Documentation', href: '/#'}, // href: '/docs' },
 ];
 
 function classNames(...classes: string[]) {
@@ -85,6 +101,50 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                       {item.name}
                     </a>
                   ))}
+                  <div className="hidden sm:flex sm:items-center">
+                  <Menu as="div" className="relative">
+                    <div>
+                      <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
+                        <span className="sr-only">Open My Stuff menu</span>
+                        My Stuff
+                        <FiChevronDown className="w-5 h-5 ml-2 -mr-1 text-gray-400" aria-hidden="true" />
+                      </Menu.Button>
+                    </div>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-200"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"> {/* Increase z-index */}
+                        <Link href="/tests/planets" legacyBehavior={true}>
+                          <a
+                            className="block px-4 py-2 text-sm text-gray-700"
+                          >
+                            Planets
+                          </a>
+                        </Link>
+                        <Link href="/tests/onboarding" legacyBehavior={true}>
+                          <a
+                            className="block px-4 py-2 text-sm text-gray-700"
+                          >
+                            Missions
+                          </a>
+                        </Link>
+                        <Link href="/inventory" legacyBehavior={true}>
+                          <a
+                            className="block px-4 py-2 text-sm text-gray-700"
+                          >
+                            Inventory
+                          </a>
+                        </Link>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
+              </div>
                 </div>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
@@ -92,13 +152,13 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                   <div>
                     <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
                       <span className="sr-only">Open user menu</span>
-                      {/* <Image
+                      <img
                         className="h-8 w-8 rounded-full"
-                        src={user?.image || 'https://avatar.vercel.sh/leerob'}
+                        src={'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Kepler-22b.jpg/1200px-Kepler-22b.jpg'}
                         height={32}
                         width={32}
-                        alt={`${user?.name || 'placeholder'} avatar`}
-                      /> */}
+                        alt={`${'placeholder'} avatar`}
+                      />
                     </Menu.Button>
                   </div>
                   <Transition
@@ -112,31 +172,70 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       {session?.user ? (
-                        <Menu.Item>
+                        <><Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={classNames(
+                              active ? 'bg-gray-100' : '',
+                              'flex w-full px-4 py-2 text-sm text-gray-700'
+                            )}
+                          >
+                            Welcome, {profile?.username}
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Link href='/tests/planets'><Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={classNames(
+                              active ? 'bg-gray-100' : '',
+                              'flex w-full px-4 py-2 text-sm text-gray-700'
+                            )}
+                          >
+                            My planets
+                          </button>
+                        )}
+                      </Menu.Item></Link>
+                      <Link href='/tests/planets'><Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={classNames(
+                              active ? 'bg-gray-100' : '',
+                              'flex w-full px-4 py-2 text-sm text-gray-700'
+                            )}
+                          >
+                            My inventory
+                          </button>
+                        )}
+                      </Menu.Item></Link>
+                      <Menu.Item>
                           {({ active }) => (
                             <button
                               className={classNames(
                                 active ? 'bg-gray-100' : '',
                                 'flex w-full px-4 py-2 text-sm text-gray-700'
                               )}
-                              onClick={() => signOut()}
+                              onClick={() => supabase.auth.signOut()}
                             >
                               Sign out
                             </button>
                           )}
                         </Menu.Item>
+                        <Menu.Item>
+                        <SilfurBalance balance={100} />
+                      </Menu.Item></>
                       ) : (
                         <Menu.Item>
                           {({ active }) => (
-                            <button
+                            <Link href='/login'><button
                               className={classNames(
                                 active ? 'bg-gray-100' : '',
                                 'flex w-full px-4 py-2 text-sm text-gray-700'
                               )}
-                              onClick={() => signIn('github')}
+                              onClick={() => console.log(session)}
                             >
                               Sign in
-                            </button>
+                            </button></Link>
                           )}
                         </Menu.Item>
                       )}
@@ -159,7 +258,7 @@ export default function Navbar(/*{ user }: { user: any }*/) {
 
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 pt-2 pb-3">
-              {navigation.map((item) => (
+              {mobileNavigation.map((item) => (
                 <Disclosure.Button
                   key={item.name}
                   as="a"
@@ -192,16 +291,16 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                     </div>
                     <div className="ml-3">
                       <div className="text-base font-medium text-gray-800">
-                        Username{/* {user.name} */}
+                        {profile?.username}
                       </div>
                       <div className="text-sm font-medium text-gray-500">
-                        User email{/* {user.email} */}
+                        {profile?.full_name}
                       </div>
                     </div>
                   </div>
                   <div className="mt-3 space-y-1">
                     <button
-                      onClick={() => signOut()}
+                      onClick={() => supabase.auth.signOut()}
                       className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                     >
                       Sign out
@@ -210,12 +309,11 @@ export default function Navbar(/*{ user }: { user: any }*/) {
                 </>
               ) : (
                 <div className="mt-3 space-y-1">
-                  <button
-                    onClick={() => signIn('github')}
+                  <Link href='/login'><button
                     className="flex w-full px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                   >
                     Sign in
-                  </button>
+                  </button></Link>
                 </div>
               )}
             </div>
