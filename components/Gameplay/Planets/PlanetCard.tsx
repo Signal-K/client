@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Card from "../../Card";
 import Link from "next/link";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import PlanetEditor, { PlanetEditorFromData } from "../../../pages/generator/planet-editor";
+// import PlanetEditor, { PlanetEditorFromData } from "../../../pages/generator/planet-editor";
 import { planetsImagesCdnAddress } from "../../../constants/cdn";
 import { v4 as uuidv4 } from 'uuid';
 import { Col, Container, Row } from "react-bootstrap";
@@ -199,10 +199,10 @@ export function PlanetCard({ activeTab, planetId }: { activeTab: string; planetI
             )}
             {activeTab === 'sandbox' && (
                 <div><Card noPadding={false}>
-                    <PlanetEditor />
+                    {/* <PlanetEditor />
                     <PlanetEditorFromData
                         // temperature = planet?.temperature
-                    />
+                    /> */}
                     {/*<StakePlay />*/}
                 </Card></div>
             )}

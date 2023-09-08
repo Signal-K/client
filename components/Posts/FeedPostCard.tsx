@@ -82,7 +82,7 @@ export const PostModal: React.FC<PostModalProps> = ({ content, created_at, profi
           <div className="font-bold">{authorProfile?.username}</div>
           {planets2 && (
             <div className="bg-green-200 py-1 px-2 text-xs rounded-sm text-green-800 ml-2">
-              Planet: <Link legacyBehavior href ="/tests/planets/{planets2}">{planets2}</Link>
+              Planet: <Link href="/tests/planets/{planets2}">{planets2}</Link>
             </div>
           )}
         </div>
@@ -174,7 +174,26 @@ export const PostModalForUserList: React.FC<PostModalProps> = ({ content, create
       <div className="my-3 text-sm">{content}</div>
       {showComments && comments && comments.map((comment) => (
         <CommentItem key={comment.id} {...comment} />
-      ))}  
+      ))}
+      {/* <center><div className="flex gap-4"><div className="rounded-md overflow-hidden"><img src={planets2?.cover} height='5%' width='5%' /></div></div></center> */}
+      {/*<center><div className="flex gap-4"><div className="rounded-md overflow-hidden"><img src={planetsImagesCdnAddress + planets2 + '/' + 'download.png'} height='5%' width='5%' /></div></div></center>
+                        {media?.length > 0 && (
+                          <div className="flex gap-4">
+                            {media?.length > 0 && media.map(media => (
+                              <div key={media} className="rounded-md overflow-hidden"><img src={media} width='25%' height='25%' /></div>
+                            ))}
+                          </div>
+                        )} */}
+      {/* {lightboxOpen && (
+        <Lightbox
+          mainSrc={media[lightboxIndex]}
+          nextSrc={media[(lightboxIndex + 1) % media.length]}
+          prevSrc={media[(lightboxIndex + media.length - 1) % media.length]}
+          onCloseRequest={closeLightbox}
+          onMovePrevRequest={() => setLightboxIndex((lightboxIndex + media.length - 1) % media.length)}
+          onMoveNextRequest={() => setLightboxIndex((lightboxIndex + 1) % media.length)}
+        />
+      )} */}
     </div>
   );
 }

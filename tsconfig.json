@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -17,49 +13,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "strictNullChecks": true
+    "incremental": true
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "components/PostFormCard.jsx",
-    "constants/contracts.ts",
-    "pages/posts/index.jsx",
-    "pages/generator/planet-editor.jsx",
-    "pages/generator/planet-editor.jsx",
-    "components/Lens/Utterances.jsx",
-    "components/Lens/Utterances.jsx",
-    "components/Posts/ProfileCard.tsx",
-    "components/Posts/ProfileCard.tsx",
-    "context/UserContext.js",
-    "context/UserContext.js",
-    "components/PostCard.jsx",
-    "components/PostCard.jsx",
-    "components/Core/Sidebar.jsx",
-    "components/Core/Sidebar.jsx",
-    "components/Core/Layout.tsx",
-    "components/Core/Layout.tsx",
-    "components/Gameplay/Generator/Notebooks/Notebook.js",
-    "components/Gameplay/Generator/Notebooks/Notebook.js",
-    "components/Governance/Connections/ConnectWallet.js",
-    "components/Governance/Connections/ConnectWallet.js",
-    "components/Governance/Navbar.jsx",
-    "components/Governance/Navbar.jsx",
-    "pages/governance/vote.jsx",
-    "pages/governance/vote.jsx",
-    "components/Gameplay/Models/Character/CharacterCanvas.jsx",
-    "components/Gameplay/Models/Character/Interface.jsx",
-    "components/Journal/Discussion/Reply.js",
-    ".next/types/**/*.ts"
-, "pages/tests/planet.jsx", "components/onboarding/Preflight/1_CruciblePlanetList.jsx", "components/Posts/Feed.jsx"  ]
+  "exclude": ["node_modules"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/PostFormCard.jsx", "constants/contracts.ts", "pages/posts.tsx/index.jsx", "components/Lens/Utterances.jsx", "components/Lens/Utterances.jsx", "components/Posts/ProfileCard.tsx", "components/Posts/ProfileCard.tsx", "context/UserContext.js", "context/UserContext.js", "components/PostCard.jsx", "components/PostCard.jsx", "components/Core/Sidebar.jsx", "components/Core/Sidebar.jsx", "components/Core/Layout.tsx", "components/Core/Layout.tsx", "components/Gameplay/Generator/Notebooks/Notebook.js", "components/Gameplay/Generator/Notebooks/Notebook.js", "components/Governance/Connections/ConnectWallet.js", "components/Governance/Connections/ConnectWallet.js", "components/Governance/Navbar.jsx", "components/Governance/Navbar.jsx", "pages/governance/vote.jsx", "pages/governance/vote.jsx", "components/Gameplay/Models/Character/CharacterCanvas.jsx", "components/Gameplay/Models/Character/Interface.jsx", "components/Journal/Discussion/Reply.js"  ]
 }

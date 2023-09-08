@@ -7,7 +7,6 @@ import { Database } from "../utils/database.types";
 import IndexAuth from "../components/Core/indexAuth";
 import PlaygroundPage from "../components/Blocks/dashboard";
 import Feed from "./feed";
-import { SocialGraphHomeModal1 } from "./posts";
 import PostCard from "../components/Posts/Postcards/Postcard";
 import CommentSection from "../components/Posts/Comments/CommentSection";
 import UserProfileBlocks, { UserProfileEditBlock } from "../components/Posts/Config/UserBlocks";
