@@ -88,7 +88,7 @@ export default function PlanetGalleryIndex() {
                 selectedDifficulty === option.value
                   ? { ...buttonStyle, ...activeButtonStyle }
                   : buttonStyle
-              }
+              } // Need to update button spacing -> bug report
             >
               {option.label}
             </ToggleButton>
