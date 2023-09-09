@@ -15,7 +15,7 @@ import { useScreenshot } from 'use-react-screenshot';
 const sceneManager = new PlanetEditorSceneManager(); // Then add a section to mint the image as an NFT
 
 export default function PlanetEditor () {
-	const planetState = usePlanetEditorState(sceneManager.planet);
+	const planetState = usePlanetEditorState(sceneManager.planet); 
 	
 	const ref = createRef(null); // Should be createRef(null) -> if experiencing problems, fix this line and change file to be `planet-editor.jsx` rather than `..tsx`
 	const [width, setWidth] = useState(300);
