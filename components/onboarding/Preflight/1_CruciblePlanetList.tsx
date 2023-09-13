@@ -2,26 +2,26 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Container, Row, ButtonGroup, ToggleButton } from "react-bootstrap";
 import Link from "next/link";
+// import AddToInventory
 
-// interface AddToInventoryButtonProps {
-//   itemId: number; // The item ID to add to the user's inventory
-// }
+interface AddToInventoryButtonProps {
+  itemId: number; // The item ID to add to the user's inventory
+}
 
-// const AddToInventoryButton: React.FC<AddToInventoryButtonProps> = ({ itemId }) => {
-const AddToInventoryButton = () => {
+const AddToInventoryButton: React.FC<AddToInventoryButtonProps> = ({ itemId }) => {
+  const session = useSession();
   const [hasItem, setHasItem] = useState(false);
   const supabase = useSupabaseClient();
-  const session = useSession();
-  const user = session?.user?.id
 
   useEffect(() => {
     async function checkIfUserHasItem() {
-      if (user) {
+      if (session) {
         try {
+          const user = session?.user;
           const { data, error } = await supabase
             .from('inventoryUSERS')
             .select('*')
-            .eq('owner', session?.user?.id)
+            .eq('owner', user.id)
             .eq('item', itemId);
 
           if (error) {
@@ -38,17 +38,18 @@ const AddToInventoryButton = () => {
     }
 
     checkIfUserHasItem();
-  }, [user]);
+  }, [session]);
 
   const handleAddToInventory = async () => {
-    if (user && !hasItem) {
+    if (session && !hasItem) {
       try {
+        const user = session.user;
         const { error } = await supabase
           .from('inventoryUSERS')
           .upsert([
             {
               item: itemId,
-              owner: session?.user?.id,
+              owner: user.id,
               quantity: 1
             }
           ]);
@@ -76,11 +77,11 @@ const AddToInventoryButton = () => {
   );
 };
 
+import Login from "../../../pages/login";
 import PlanetGalleryCard from "../../Gameplay/Planets/PlanetGalleryCard";
 import GetSpaceshipPage from "./3_SpaceshipChecksum";
-import Login from "../../../pages/login";
 
-export default function Crucible1BaseplanetList() {
+export default function Crucible1BaseplanetList () {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [planets, setPlanets] = useState([]);
@@ -97,17 +98,17 @@ export default function Crucible1BaseplanetList() {
         .select("*")
         .order("created_at", { ascending: false })
         .in("id", [47, 50, 51]); // Filter by specific IDs
-  
+
       const { data, error } = await query;
-  
+
       if (data != null) {
-        setPlanets(data)// as any); // Explicitly cast the data to the correct type
+        setPlanets(data);
       }
-  
+
       if (error) {
         throw error;
       }
-    } catch (error) { //: any) {
+    } catch (error: any) {
       alert(error.message);
     }
   };
@@ -131,70 +132,69 @@ export default function Crucible1BaseplanetList() {
     const fetchUserSpaceships = async () => {
       if (session?.user) {
         const { data: userSpaceshipsData, error: userSpaceshipsError } = await supabase
-          .from("inventorySPACESHIPS")
-          .select("*")
-          .eq("owner", session.user.id);
+          .from('inventorySPACESHIPS')
+          .select('*')
+          .eq('owner', session?.user?.id);
 
-        if (userSpaceshipsError) {
-          console.error("Error fetching user spaceships, error: ", userSpaceshipsError);
-        } else {
-          // Extract spaceship IDs from userSpaceshipsData
-          const spaceshipIds = userSpaceshipsData.map((userSpaceship) => userSpaceship.spaceship_id);
-
-          // Fetch spaceship details from the spaceships table using the IDs
-          const { data: spaceshipsData, error: spaceshipsError } = await supabase
-            .from("spaceships")
-            .select("*")
-            .in("id", spaceshipIds);
-
-          if (spaceshipsError) {
-            console.error("Error fetching spaceship details:", spaceshipsError);
+          if (userSpaceshipsError) {
+            console.error('Error fetching user spaceshops, error: ', userSpaceshipsError);
           } else {
-            // Combine userSpaceshipsData and spaceshipsData based on spaceship_id
-            const combinedData = userSpaceshipsData.map((userSpaceship) => {
-              const matchingSpaceship = spaceshipsData.find((spaceship) => spaceship.id === userSpaceship.spaceship_id);
-              return {
-                ...userSpaceship,
-                spaceship: matchingSpaceship,
-              };
-            });
+            // Extract spaceship IDs from userSpaceshipsData
+            const spaceshipIds = userSpaceshipsData.map((userSpaceship) => userSpaceship.spaceship_id);
 
-            setUserSpaceships(combinedData)// as any);
+            // Fetch spaceship details from the spaceships table using the IDs
+            const { data: spaceshipsData, error: spaceshipsError } = await supabase
+              .from("spaceships")
+              .select("*")
+              .in("id", spaceshipIds);
+
+              if (spaceshipsError) {
+                console.error("Error fetching spaceship details:", spaceshipsError);
+              } else {
+                // Combine userSpaceshipsData and spaceshipsData based on spaceship_id
+                const combinedData = userSpaceshipsData.map((userSpaceship) => {
+                  const matchingSpaceship = spaceshipsData.find((spaceship) => spaceship.id === userSpaceship.spaceship_id);
+                  return {
+                    ...userSpaceship,
+                    spaceship: matchingSpaceship,
+                  };
+                });
+
+              setUserSpaceships(combinedData);
+            }
           }
-        }
       }
-    };
 
-    fetchUserSpaceships();
+      if (!session) {
+        return (
+          <></>
+        )
+      }
+    }
   }, [session, supabase]);
 
   if (!session) {
-    return <Login />
+    return <Login />;
   }
 
   return (
       <Container>
         <Row>
-          {planets.length === 0 ? (
-            <p>No planets available.</p>
-          ) : (
-            planets.map((planet) => (
-              <PlanetGalleryCard key={planet} planet={planet} />
-            ))
-          )}
+          {planets.map((planet) => (
+            <PlanetGalleryCard key={planet.id} planet={planet} />
+          ))}
         </Row>
         <GetSpaceshipPage />
-        <PlanetClassificationCheck userId={session?.user?.id} />
+        <PlanetClassificationCheck userId={session?.user?.id} /><br />
       </Container>
   );
 }
 
+interface PlanetClassificationCheckProps {
+  userId: string; // The user ID to check
+}
 
-// interface PlanetClassificationCheckProps {
-//   userId: string; // The user ID to check
-// }
-
-const PlanetClassificationCheck = () => {
+const PlanetClassificationCheck: React.FC<PlanetClassificationCheckProps> = ({ userId }) => {
   const supabase = useSupabaseClient();
   const [hasClassifiedPlanets, setHasClassifiedPlanets] = useState(false);
   const [hasItem10, setHasItem10] = useState(false);
@@ -244,7 +244,7 @@ const PlanetClassificationCheck = () => {
           <h2>Congratulations!</h2>
           {/* <p>You've successfully completed level 1 on planets 47, 50, and 51.</p> */}
           <AddToInventoryButton itemId={10} /><br />
-          <Link legacyBehavior href ='/tests/onboarding/'><button className="btn glass">Next mission</button></Link>
+          <Link href='/tests/onboarding/'><button className="btn glass">Next mission</button></Link>
         </>
       ) : (
         <>
