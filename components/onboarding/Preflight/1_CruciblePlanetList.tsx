@@ -173,9 +173,9 @@ export default function Crucible1BaseplanetList () {
     }
   }, [session, supabase]);
 
-  if (!session) {
-    return <Login />;
-  }
+  // if (!session) {
+  //   return <Login />;
+  // }
 
   return (
       <Container>

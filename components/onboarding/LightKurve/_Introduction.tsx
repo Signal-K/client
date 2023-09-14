@@ -9,7 +9,7 @@ const ExoPlanetDetective: React.FC = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    if (!session) { return <Login />; };
+    // if (!session) { return <Login />; };
 
     // Potentially add a blocker that if the user doesn't have a username set, render only the <UserProfileEditBlock /> component
 

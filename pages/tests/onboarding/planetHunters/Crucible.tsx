@@ -11,14 +11,14 @@ export default function StarSailorsCrucible1 () {
     const session = useSession();
     const router = useRouter();
 
-    if (!session) {
-        // router.push('/login');
-        return (
-            <CoreLayout>
-                <Login />
-            </CoreLayout>
-        )
-    }
+    // if (!session) {
+    //     // router.push('/login');
+    //     return (
+    //         <CoreLayout>
+    //             <Login />
+    //         </CoreLayout>
+    //     )
+    // }
 
     return (
         <CoreLayout>

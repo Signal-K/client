@@ -7,7 +7,7 @@ const PlanetHuntersOnboardingPage2: React.FC = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    if (!session) { return <Login />; };
+    // if (!session) { return <Login />; };
 
     return (
         <div className="max-w-3xl mx-auto py-8 px-4 font-sans">

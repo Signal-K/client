@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CoreLayout from "../../../components/Core/Layout";
+import RoverImagePage from "../../../components/Gameplay/Planets/RoverData/RandomImage";
 
 // Define the TypeScript types for product data
 interface ProductData {
@@ -56,7 +57,7 @@ const Product = () => {
 
   return (
     <CoreLayout>
-        <div>
+        {/* <div>
         <form>
             <label>Select a Product:</label>
             <select onChange={handleProductChange} value={selectedProduct}>
@@ -85,7 +86,8 @@ const Product = () => {
                 ))}
             </ul>
         )}
-        </div>
+        </div> */}
+        <RoverImagePage />
     </CoreLayout>
   );
 };

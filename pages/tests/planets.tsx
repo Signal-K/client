@@ -65,9 +65,9 @@ export default function PlanetGalleryIndex() {
     backgroundColor: "rgba(255, 255, 255, 0.3)",
   };
 
-  if (!session) {
-    return <Login />;
-  }
+  // if (!session) {
+  //   return <Login />;
+  // }
 
   return (
     // <DashboardLayout>

@@ -5,10 +5,11 @@ import axios from 'axios';
 
 const RoverImage = ({ date, rover }) => {
   const [imageUrl, setImageUrl] = useState('');
+  const apiKey = "iT0FQTZKpvadCGPzerqXdO5F4b62arNBOP0dtkXE"
 
   useEffect(() => {
     // Construct the API URL
-    const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?sol=${date}&api_key=DEMO_KEY`;
+    const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?sol=${date}&api_key=${apiKey}`;
 
     // Make a GET request to the API
     axios.get(apiUrl)

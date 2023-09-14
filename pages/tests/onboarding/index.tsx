@@ -73,11 +73,11 @@ export default function OnboardingSignupPage() {
     checkForPlanetPosts();
   }, [session]);
 
-  if (!session) return (
-    <CoreLayout>
-      <Login />
-    </CoreLayout>
-  )
+  // if (!session) return (
+  //   <CoreLayout>
+  //     <Login />
+  //   </CoreLayout>
+  // )
 
   if (hasMadePlanetPosts && hasGoldenTelescope) {
     return (
@@ -126,14 +126,14 @@ export default function OnboardingSignupPage() {
 
   return (
     <CoreLayout>
+      <Card noPadding={false}><Container>
+          <BigProjectsSection />
+        </Container></Card>
       <Card noPadding={false}>
         <Container>
           <NewMissions />
         </Container>
       </Card>
-      <Card noPadding={false}><Container>
-          <BigProjectsSection />
-        </Container></Card>
     </CoreLayout>
   );
 }
