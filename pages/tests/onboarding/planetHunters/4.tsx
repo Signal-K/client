@@ -15,8 +15,8 @@ export default function PlanetHuntersOnboardingPage1 () {
     return (
         <CoreLayout>
             <Stitching />
-            <TrophyBlockLightkurveOnboardingPt1 />
-            <OwnedItemsList/>
+            {/* <TrophyBlockLightkurveOnboardingPt1 /> */}
+            {/* <OwnedItemsList/> */}
             {/* <ProgressSidebar credits={credits} currentPage={currentPage} /> */}
         </CoreLayout>
     );

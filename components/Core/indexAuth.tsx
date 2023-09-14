@@ -145,11 +145,6 @@ export default function IndexAuth() {
   };
 
   useEffect(() => {
-    const userSession = useSession();
-    setSession(userSession);
-  }, []);
-
-  useEffect(() => {
     if (session?.user) {
       fetchUser();
     }

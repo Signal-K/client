@@ -131,6 +131,9 @@ export default function OnboardingSignupPage() {
           <NewMissions />
         </Container>
       </Card>
+      <Card noPadding={false}><Container>
+          <BigProjectsSection />
+        </Container></Card>
     </CoreLayout>
   );
 }

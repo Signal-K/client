@@ -56,10 +56,10 @@ export default function Home() {
             <h1 className="max-w-5xl text-2xl font-bold leading-none tracking-tighter text-neutral-600 md:text-5xl lg:text-6xl lg:max-w-7xl">
               Welcome to Star Sailors <br />
             </h1><br />
-            <VideoEmbed
+            {/* <VideoEmbed
               // src='/assets/Videos/StarSailors.mp4'
               // title='Star Sailors'
-            />
+            /> */}
             <div className="bg-white rounded-lg overflow-hidden shadow-lg p-6">
       <p className="mb-4">
         Our game offers a unique and engaging experience that combines the excitement of gaming with scientific knowledge.
