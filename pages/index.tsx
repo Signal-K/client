@@ -13,7 +13,6 @@ import UserProfileBlocks, { UserProfileEditBlock } from "../components/Posts/Con
 import VideoEmbed from "../components/Core/atoms/VideoEmbed";
 import gameLoopInfo from "../components/Core/intro/gameLoopInfo";
 import Example from "../components/Blocks/chart";
-import RoverImagePage from "../components/Gameplay/Planets/RoverData/RandomImage";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 

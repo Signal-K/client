@@ -1,6 +1,8 @@
 import { useSession } from "@supabase/auth-helpers-react";
 import React, { Fragment, useState, useEffect } from "react";
 import { Unity, useUnityContext } from 'react-unity-webgl';
+import SendPlanetsssDataToFlask from "../../Planets/Data/PlanetDataSend";
+import RoverImagePage from "../../Planets/RoverData/RandomImage";
 
 export default function UnityBuildSupabaseMesh ({ planetName }) {
     const session = useSession();
@@ -40,6 +42,8 @@ export default function UnityBuildSupabaseMesh ({ planetName }) {
             <center><button className="btn glass mr-5 mt-1.5" onClick={handleSendPlanetName}>Send Planet Name</button>
             <button className="btn glass mr-5 mt-1.5" onClick={handleUpdatePlanetSpeed}>Increase rotation</button>
             <button className="btn glass mr-5 mt-1.5" onClick={handleGeneratePlanet}>Generate planet</button></center>
+            <SendPlanetsssDataToFlask />
+            {/* <RoverImagePage /> */}
         </Fragment>
     );
 }
