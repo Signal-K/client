@@ -37,7 +37,7 @@ const data = [
 
 export default function Example() {
   return (
-    <Card className="mt-8">
+    <Card className="mt-6">
       <Title>Performance</Title>
       <Text>Comparison between Tess & Star Sailors</Text>
       <AreaChart
