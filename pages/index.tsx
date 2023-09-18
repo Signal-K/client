@@ -37,7 +37,6 @@ export default function Home() {
         <CoreLayout>
           <PlaygroundPage />
           <UserProfileBlocks />
-          <RoverImagePage />
           {/* <UserProfileEditBlock />g */}
           <SocialGraphHomeModal />
           {/* <iframe width='100%' height="1400px" src="https://noteforms.com/forms/user-feedback-rkkndz"></iframe> */}
