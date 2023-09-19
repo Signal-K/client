@@ -13,6 +13,7 @@ import VideoEmbed from "../components/Core/atoms/VideoEmbed";
 import gameLoopInfo from "../components/Core/intro/gameLoopInfo";
 import Example from "../components/Blocks/chart";
 import AccountAvatar from "../components/AccountAvatar";
+import AccountEditor from "../components/Core/UpdateProfile";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -37,7 +38,7 @@ export default function Home() {
           <PlaygroundPage />
           <UserProfileBlocks />
           {/* <UserProfileEditBlock /> */}
-          {/* <AccountAvatar uid={session?.user?.id} url={profile?.avatar_url} size={60} /> */}
+          {/* <AccountEditor session={session} /> */}
           <SocialGraphHomeModal />
           {/* <iframe width='100%' height="1400px" src="https://noteforms.com/forms/user-feedback-rkkndz"></iframe> */}
         </CoreLayout>
