@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import CoreLayout from "../components/Core/Layout";
 import SocialGraphHomeModal from "../components/Posts/Feed";
 import { Database } from "../utils/database.types";
-import IndexAuth from "../components/Core/indexAuth";
 import PlaygroundPage from "../components/Blocks/dashboard";
 import Feed from "./feed";
 import PostCard from "../components/Posts/Postcards/Postcard";
@@ -13,6 +12,7 @@ import UserProfileBlocks, { UserProfileEditBlock } from "../components/Posts/Con
 import VideoEmbed from "../components/Core/atoms/VideoEmbed";
 import gameLoopInfo from "../components/Core/intro/gameLoopInfo";
 import Example from "../components/Blocks/chart";
+import AccountAvatar from "../components/AccountAvatar";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
@@ -36,7 +36,8 @@ export default function Home() {
         <CoreLayout>
           <PlaygroundPage />
           <UserProfileBlocks />
-          {/* <UserProfileEditBlock />g */}
+          {/* <UserProfileEditBlock /> */}
+          {/* <AccountAvatar uid={session?.user?.id} url={profile?.avatar_url} size={60} /> */}
           <SocialGraphHomeModal />
           {/* <iframe width='100%' height="1400px" src="https://noteforms.com/forms/user-feedback-rkkndz"></iframe> */}
         </CoreLayout>
