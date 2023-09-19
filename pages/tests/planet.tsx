@@ -9,6 +9,7 @@ import CoreLayout from "../../components/Core/Layout";
 import html2canvas from "html2canvas";
 import OwnedPlanetsListBlock from "../../components/Blocks/userPlanetsBlock";
 import Link from "next/link";
+import UnityBuildSupabaseMesh from "../../components/Gameplay/Unity/Build/LOD-Mesh";
 
 enum SidebarLink {
   Feed,
@@ -555,12 +556,13 @@ export default function PlanetPage({ id }: { id: string }) {
                     /><br /> */}
               <Card noPadding={false}>
                 <OwnedPlanetsListBlock />
+                <UnityBuildSupabaseMesh planetName={planetData?.content}/> 
               </Card>
               {/* <button onClick={handleCaptureClick}>Capture PostCard</button> */}
               {/* <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br /><Card noPadding={false}>
               <div>{loadUnityComponent && planetData?.temperature <= 300 && <UnityBuildLod11 />}</div>
               <div>{loadUnityComponent && planetData?.temperature >= 300 && <UnityBuildLod1 />}</div>
-              {/* <UnityBuildSupabaseMesh planetName={planetData?.content}/> */}
+              <UnityBuildSupabaseMesh planetName={planetData?.content}/> 
               {/* <UnityBuildLod111 /> 
               {session?.user?.id == "cebdc7a2-d8af-45b3-b37f-80f328ff54d6" && ( <><iframe src="https://flask-8gn2.onrender.com/" height="50%" width="100%" /><iframe src="https://flask-8gn2.onrender.com/input" height="50%" width="100%" /> {/* <YourComponent />  <LightkurveForm /> </> )} */}
             </div>
