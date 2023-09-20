@@ -11,6 +11,8 @@ import OwnedPlanetsListBlock from "../../components/Blocks/userPlanetsBlock";
 import Link from "next/link";
 import UnityBuildSupabaseMesh from "../../components/Gameplay/Unity/Build/LOD-Mesh";
 import { RoverGallerySingle } from "../../components/Gameplay/Planets/RoverData/RandomImage";
+import CreateSectorComponent from "../../components/Gameplay/Planets/Data/CreatePlanetSector";
+import PlanetSectors from "../../components/Gameplay/Planets/Data/PlanetSectors";
 
 enum SidebarLink {
   Feed,
@@ -40,6 +42,7 @@ export default function PlanetPage({ id }: { id: string }) {
   const [unityBuild, setUnityBuild] = useState<number | null>(null);
   const [hasPlanetInInventory, setHasPlanetInInventory] = useState(false);
   const [inventoryPlanetId, setInventoryPlanetId] = useState<string | null>(null);
+  const [sectors, setSectors] = useState([]);  
 
   useEffect(() => {
     if (planetData?.temperature !== undefined) {
@@ -49,6 +52,8 @@ export default function PlanetPage({ id }: { id: string }) {
         setUnityBuild(2);
       }
     }
+
+    fetchSectorsForPlanet(inventoryPlanetId);
   }, [planetData]);
 
   const [profile, setProfile] = useState<any | null>(null);
@@ -291,6 +296,25 @@ export default function PlanetPage({ id }: { id: string }) {
     if (data.length > 0) {
       setHasPlanetInInventory(true);
       setInventoryPlanetId(data[0].id);
+    }
+  }
+
+  async function fetchSectorsForPlanet(planetId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('planetsssSECTORS')
+        .select('*')
+        .eq('planetId', planetId);
+  
+      if (error) {
+        console.error('Error fetching sectors data:', error.message);
+        return;
+      }
+  
+      // Set the fetched sectors data in the 'sectors' state
+      setSectors(data);
+    } catch (error) {
+      console.error('Error fetching sectors data:', error);
     }
   }
 
@@ -576,7 +600,9 @@ export default function PlanetPage({ id }: { id: string }) {
             <div id="unityContainer" className="mb-30">
               {hasPlanetInInventory ? (
                 <div>
-                  <p>You have this planet in your inventory.</p>
+                  <p>You have this planet in your inventory.</p><br />
+                  <PlanetSectors sectors={sectors} />
+                  <br /><CreateSectorComponent planetId={inventoryPlanetId} />
                 </div>
               ) : (
                 <div>
@@ -593,7 +619,7 @@ export default function PlanetPage({ id }: { id: string }) {
                     /><br /> */}
               <Card noPadding={false}>
                 <OwnedPlanetsListBlock />
-                <RoverGallerySingle />
+                <RoverGallerySingle inventoryPlanetId = {inventoryPlanetId} />
                 {/* <UnityBuildSupabaseMesh planetName={planetData?.content}/>  */}
               </Card>
               {/* <button onClick={handleCaptureClick}>Capture PostCard</button> */}

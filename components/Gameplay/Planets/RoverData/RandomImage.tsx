@@ -58,7 +58,7 @@ const RoverImagePage = () => {
 
 export default RoverImagePage;
 
-export function RoverGallerySingle() {
+export function RoverGallerySingle({ inventoryPlanetId }) {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [roverImage, setRoverImage] = useState(null);
@@ -115,7 +115,7 @@ export function RoverGallerySingle() {
             author: user,
             metadata: imageMetadata,
             imageLink: roverImage,
-            planet: null,
+            planet: inventoryPlanetId,
             content,
             media: null,
           },
