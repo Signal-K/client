@@ -37,6 +37,7 @@ export default function PlanetPage({ id }: { id: string }) {
   const [planetPosts, setPlanetPosts] = useState<any[]>([]);
   const planetId = Array.isArray(router.query.id) ? router.query.id[0] : router.query.id;
   const [unityBuild, setUnityBuild] = useState<number | null>(null);
+  const [hasPlanetInInventory, setHasPlanetInInventory] = useState(false);
 
   useEffect(() => {
     if (planetData?.temperature !== undefined) {
@@ -111,6 +112,7 @@ export default function PlanetPage({ id }: { id: string }) {
     if (planetId) {
       getPlanetData();
       fetchPostsForPlanet(planetId);
+      checkUserInventory();
     }
   }, [planetId]);
 
@@ -265,6 +267,29 @@ export default function PlanetPage({ id }: { id: string }) {
   }
 
   const { content, avatar_url, cover } = planetData;
+
+  // Check to see if user owns/has classified this anomaly
+  // Function to check user's inventory
+  async function checkUserInventory() {
+    if (!session?.user?.id || !planetId) {
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("inventoryPLANETS")
+      .select()
+      .eq("planet_id", planetId)
+      .eq("owner_id", session?.user?.id);
+
+    if (error) {
+      console.error("Error checking user inventory:", error);
+      return;
+    }
+
+    if (data.length > 0) {
+      setHasPlanetInInventory(true);
+    }
+  }
 
   return (
     <CoreLayout>
@@ -556,7 +581,19 @@ export default function PlanetPage({ id }: { id: string }) {
                     /><br /> */}
               <Card noPadding={false}>
                 <OwnedPlanetsListBlock />
-                <UnityBuildSupabaseMesh planetName={planetData?.content}/> 
+                {/* <UnityBuildSupabaseMesh planetName={planetData?.content}/>  */}
+                {hasPlanetInInventory ? (
+        // Display the component if the user has the planet in their inventory
+        <div>
+          <p>You have this planet in your inventory.</p>
+          {/* Add your component here */}
+        </div>
+      ) : (
+        // Display a message if the user does not have the planet in their inventory
+        <div>
+          <p>You do not have this planet in your inventory.</p>
+        </div>
+      )}
               </Card>
               {/* <button onClick={handleCaptureClick}>Capture PostCard</button> */}
               {/* <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br /><Card noPadding={false}>
