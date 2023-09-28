@@ -4,15 +4,21 @@ import OnboardingPopup from "../../../../components/onboarding/blocks/gamificati
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import CrucibleComponent from "../../../../components/onboarding/LightKurve/__Crucible";
+import Login from "../../../login";
 
 export default function StarSailorsCrucible1 () {
     const supabase = useSupabaseClient();
     const session = useSession();
-    // const router = useRouter();
+    const router = useRouter();
 
-    // if (!session) {
-    //     router.push('/login');
-    // }
+    if (!session) {
+        // router.push('/login');
+        return (
+            <CoreLayout>
+                <Login />
+            </CoreLayout>
+        )
+    }
 
     return (
         <CoreLayout>

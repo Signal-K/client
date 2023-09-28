@@ -4,6 +4,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import LightkurveQuiz from "./_Quiz1";
 import { UserProfileEditBlock } from "../../Posts/Config/UserBlocks";
 import Card from "../../Card";
+import TrophyBlockLightkurveOnboardingPt1 from "../blocks/gamification/trophyBlock";
 
 const CrucibleComponent: React.FC = () => {
     const supabase = useSupabaseClient();
@@ -18,7 +19,7 @@ const CrucibleComponent: React.FC = () => {
     // Potentially add a blocker that if the user doesn't have a username set, render only the <UserProfileEditBlock /> component
 
     return (
-        <div className="max-w-3xl mx-auto py-8 px-4 font-sans">
+        <div className="max-w-3xl mx-auto py-8 px-4 font-sans mb-20">
             <div className="container mx-auto py-8">
                 <h2 className="text-3xl font-bold mb-4 text-primary bg-gradient-to-r from-gold-500 to-yellow-500"> Unearth Hidden Celestial Bodies </h2>
                 <p className="text-gray-700">
@@ -106,6 +107,7 @@ const CrucibleComponent: React.FC = () => {
                 )} Edit your profile
             </h3>
             {isBlockVisible && <UserProfileEditBlock />}
+            <TrophyBlockLightkurveOnboardingPt1 />
             </div>
             <Link href='/tests/onboarding/checklist/preflight'><button className="btn glass">Continue to pre-flight checklist</button></Link>
         </div>

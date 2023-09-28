@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Container, Row, ButtonGroup, ToggleButton } from "react-bootstrap";
+import Link from "next/link";
 // import AddToInventory
 
 interface AddToInventoryButtonProps {
@@ -78,6 +79,7 @@ const AddToInventoryButton: React.FC<AddToInventoryButtonProps> = ({ itemId }) =
 
 import Login from "../../../pages/login";
 import PlanetGalleryCard from "../../Gameplay/Planets/PlanetGalleryCard";
+import GetSpaceshipPage from "./3_SpaceshipChecksum";
 
 export default function Crucible1BaseplanetList () {
   const supabase = useSupabaseClient();
@@ -124,6 +126,53 @@ export default function Crucible1BaseplanetList () {
     backgroundColor: "rgba(255, 255, 255, 0.3)",
   };
 
+  const [userSpaceships, setUserSpaceships] = useState([]);
+
+  useEffect(() => {
+    const fetchUserSpaceships = async () => {
+      if (session?.user) {
+        const { data: userSpaceshipsData, error: userSpaceshipsError } = await supabase
+          .from('inventorySPACESHIPS')
+          .select('*')
+          .eq('owner', session?.user?.id);
+
+          if (userSpaceshipsError) {
+            console.error('Error fetching user spaceshops, error: ', userSpaceshipsError);
+          } else {
+            // Extract spaceship IDs from userSpaceshipsData
+            const spaceshipIds = userSpaceshipsData.map((userSpaceship) => userSpaceship.spaceship_id);
+
+            // Fetch spaceship details from the spaceships table using the IDs
+            const { data: spaceshipsData, error: spaceshipsError } = await supabase
+              .from("spaceships")
+              .select("*")
+              .in("id", spaceshipIds);
+
+              if (spaceshipsError) {
+                console.error("Error fetching spaceship details:", spaceshipsError);
+              } else {
+                // Combine userSpaceshipsData and spaceshipsData based on spaceship_id
+                const combinedData = userSpaceshipsData.map((userSpaceship) => {
+                  const matchingSpaceship = spaceshipsData.find((spaceship) => spaceship.id === userSpaceship.spaceship_id);
+                  return {
+                    ...userSpaceship,
+                    spaceship: matchingSpaceship,
+                  };
+                });
+
+              setUserSpaceships(combinedData);
+            }
+          }
+      }
+
+      if (!session) {
+        return (
+          <></>
+        )
+      }
+    }
+  }, [session, supabase]);
+
   if (!session) {
     return <Login />;
   }
@@ -135,7 +184,8 @@ export default function Crucible1BaseplanetList () {
             <PlanetGalleryCard key={planet.id} planet={planet} />
           ))}
         </Row>
-        <PlanetClassificationCheck userId={session?.user?.id} />
+        <GetSpaceshipPage />
+        <PlanetClassificationCheck userId={session?.user?.id} /><br />
       </Container>
   );
 }
@@ -192,8 +242,9 @@ const PlanetClassificationCheck: React.FC<PlanetClassificationCheckProps> = ({ u
       {hasClassifiedPlanets ? (
         <>
           <h2>Congratulations!</h2>
-          <p>You've successfully completed level 1 on planets 47, 50, and 51.</p>
-          <AddToInventoryButton itemId={10} />
+          {/* <p>You've successfully completed level 1 on planets 47, 50, and 51.</p> */}
+          <AddToInventoryButton itemId={10} /><br />
+          <Link href='/tests/onboarding/'><button className="btn glass">Next mission</button></Link>
         </>
       ) : (
         <>

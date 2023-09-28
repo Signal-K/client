@@ -7,6 +7,7 @@ import IndexAuth from "../../Core/indexAuth";
 import OwnedItemsList from "../../Gameplay/Inventory/userOwnedItems";
 import OwnedPlanetsList from "../../Gameplay/Inventory/userOwnedPlanets";
 import OwnedPlanetsListBlock from "../../Blocks/userPlanetsBlock";
+import MissionSelectionForIndexPage from "../../Core/intro/missionSelectIndex";
 
 export default function UserProfileBlocks () {
     const session = useSession();
@@ -32,7 +33,8 @@ export default function UserProfileBlocks () {
                 <div className="container mx-auto py-8">
                     <OwnedItemsList />
                 </div>
-            </Card>
+            </Card><br />
+            <Card><MissionSelectionForIndexPage /></Card>
         </main></div>
     );
 }

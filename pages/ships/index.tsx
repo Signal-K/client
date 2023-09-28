@@ -14,7 +14,7 @@ import ShipyardCard, { ShipyardCardProps } from "../../components/Gameplay/Vehic
 // import { Shop } from "../../components/Gameplay/Stake";
 TimeAgo.addDefaultLocale(en);
 
-type Spaceships = Database['public']['Tables']['spaceships']['Row'];
+type Spaceships = Database['public']['Tables']['spaceships']['Row']; 
 
 export default function ShipyardIndex () {
     const supabase = useSupabaseClient();

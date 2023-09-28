@@ -94,7 +94,7 @@ export default function PlanetGalleryIndex() {
             </ToggleButton>
           ))}
         </ButtonGroup>
-        <Row>
+        <Row className="mb-20">
           {planets.map((planet) => (
             <PlanetGalleryCard key={planet.id} planet={planet} />
           ))}

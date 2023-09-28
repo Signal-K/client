@@ -40,9 +40,9 @@ const EmergenceComponent: React.FC = () => {
           Planets and Exoplanets: Your New Frontier{" "}
         </h2>
         <p className="text-gray-700">
-          - Planets: Celestial bodies revolving around a star, with a nearly
+          <span>Planets</span>: Celestial bodies revolving around a star, with a nearly
           spherical shape, paving the way for your explorations in the Star
-          Sailors universe. <br />- Exoplanets: Mysterious worlds orbiting stars
+          Sailors universe. <br /> <span>Exoplanets:</span> Mysterious worlds orbiting stars
           in other solar systems, holding secrets and potentially groundbreaking
           discoveries.
         </p>
@@ -151,7 +151,7 @@ const EmergenceComponent: React.FC = () => {
               </li>
             </ul>
           </div>
-          <div className="w-full sm:w-1/2 p-4"> <img src="/assets/Onboarding/Missions/Emergence/cartographer.png" alt="Faction Image" className="w-full h-auto" /> </div>
+          <div className="w-full sm:w-1/2 p-4"> <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/cartographer.png" alt="Faction Image" className="w-full h-auto" /> </div>
         </div>
         <div className="flex flex-wrap">
           <div className="w-full sm:w-1/2 p-4">
@@ -174,7 +174,7 @@ const EmergenceComponent: React.FC = () => {
               </li>
             </ul>
           </div>
-          <div className="w-full sm:w-1/2 p-4"> <img src="/assets/Onboarding/Missions/Emergence/guardian.png" alt="Faction Image" className="w-full h-auto" /> </div>
+          <div className="w-full sm:w-1/2 p-4"> <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/guardian.png" alt="Faction Image" className="w-full h-auto" /> </div>
         </div>
         <div className="flex flex-wrap">
           <div className="w-full sm:w-1/2 p-4">
@@ -197,11 +197,11 @@ const EmergenceComponent: React.FC = () => {
               </li>
             </ul>
           </div>
-          <div className="w-full sm:w-1/2 p-4"> <img src="/assets/Onboarding/Missions/Emergence/navigator.png" alt="Faction Image" className="w-full h-auto" /> </div>
+          <div className="w-full sm:w-1/2 p-4"> <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/factions/navigator.png" alt="Faction Image" className="w-full h-auto" /> </div>
         </div><br />
         <h2 className="text-3xl font-bold mb-4 text-primary bg-gradient-to-r from-gold-500 to-yellow-500">Next: Your Star Sailor Mission Awaits</h2>
         With your avatar ready and a basic understanding of the cosmos, you stand on the verge of thrilling discoveries. Up next, a hands-on mission where you will classify your first set of planets, setting the stage for an adventure rich with learning and real-world contributions to space science.
-        <div className="mb-10">
+        <div className="mb-10"><br />
         <img
           src="/assets/Onboarding/Missions/Emergence/EmergenceImage5.png"
           alt="Transit Method"

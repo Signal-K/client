@@ -12,18 +12,7 @@ import CoreLayout from "../../components/Core/Layout";
 import LightkurveForm from "../../components/Gameplay/Inventory/fetchTic2";
 import html2canvas from "html2canvas";
 import OwnedPlanetsListBlock from "../../components/Blocks/userPlanetsBlock";
-/* import PlanetAvatar from "../../components/Gameplay/Planets/PlanetAvatar";
-import UnityScreenshot from "../../components/Gameplay/Generator/UnityScreenshot";
-import { useScreenshot, createFileName } from 'use-react-screenshot';
-import ProfilePage from "../../components/Tests/Planet/ProfileCardTest";
-import fetchTic from "../../components/Gameplay/Inventory/fetchTic";
-import YourComponent from "../../components/Gameplay/Inventory/fetchTic";
-import UnityBuildLod111 from "../../components/Gameplay/Unity/Build/LOD-Design";
-import { PostModal } from "../../components/Posts/FeedPostCard";
-import UnityBuildSupabaseTest from "../../components/Gameplay/Unity/Build/LOD-SupabaseTest";
-import UnityBuildLod1Mars from "../../components/Gameplay/Unity/Build/LOD-Mars";
-// import { PlanetPostCard } from "../../components/PostCard";
-import DashboardLayout from "../../components/Tests/Layout/Dashboard"; */
+import Link from "next/link";
 
 enum SidebarLink {
   Feed,
@@ -66,6 +55,8 @@ export default function PlanetPage({ id }: { id: string }) {
   const [activeLink, setActiveLink] = useState(SidebarLink.Data); // Track the active link
   const [showUnity, setShowUnity] = useState(false); // Track the visibility of Unity component
   const [loadUnityComponent, setLoadUnityComponent] = useState(false);
+  // Conditional check to see if the user has made a post on the planet
+  const [hasMadePostOnPlanet, setHasMadePostOnPlanet] = useState(false);
 
   const displayPlanet = async () => {
     setLoadUnityComponent(true);
@@ -117,6 +108,8 @@ export default function PlanetPage({ id }: { id: string }) {
     id +
     "/download.png";
 
+  const [extraValue, setExtraValue] = useState(false);
+
   useEffect(() => {
     if (planetId) {
       getPlanetData();
@@ -138,6 +131,26 @@ export default function PlanetPage({ id }: { id: string }) {
           setProfile(result.data[0]);
         }
       });
+
+      async function checkUserPost() {
+        const { data, error } = await supabase
+          .from('posts_duplicates')
+          .select()
+          .eq('author', session?.user?.id)
+          .eq('planets2', planetId);
+  
+        if (error) {
+          console.error('Error fetching user posts:', error);
+          return;
+        }
+  
+        // If there are records, the user has made a post on the planet
+        if (data.length > 0) {
+          setHasMadePostOnPlanet(true);
+        }
+      }
+  
+      checkUserPost();
   }, [session?.user?.id]);
 
   const getPlanetData = async () => {
@@ -150,6 +163,10 @@ export default function PlanetPage({ id }: { id: string }) {
 
       if (data) {
         setPlanetData(data);
+      }
+
+      if (data.planets) {
+        setExtraValue(true);
       }
 
       if (error) {
@@ -323,6 +340,9 @@ export default function PlanetPage({ id }: { id: string }) {
         <p className="pt-8 text-sm">
         </p>
         {session?.user?.id && ( <> <UserContext.Provider value={{profile}}><PostFormCardPlanetTag planetId2={planetId} onPost={() => fetchPostsForPlanet(planetId)} /></UserContext.Provider> </> )}
+        {hasMadePostOnPlanet && (
+          <><br /><Link href='/tests/onboarding/checklist/preflight'><button className="btn glass">Return to planet list</button></Link></>
+        )}
         <div className="mt-6 pb-16 lg:pb-0 w-4/5 lg:w-full mx-auto flex flex-wrap items-center justify-between">
   {/* Feed Icon */}
   {/* <a className="link" href="#" data-tippy-content="Feed">
@@ -393,7 +413,6 @@ export default function PlanetPage({ id }: { id: string }) {
     <span className="text-gray-800">Demo</span>
   </div>
 </button>
-
 </div>
 
         {/* Use https://simpleicons.org/ to find the svg for your preferred product */}
@@ -430,7 +449,7 @@ export default function PlanetPage({ id }: { id: string }) {
             <>
               <h2 className="text-xl font-bold text-gray-800">Lightkurve graphs</h2><br />
               <Card noPadding={false}>
-                {planetData?.deepnote ? (
+                {planetData?.deepnote ? ( // Could also do based on value as a filter...
                   <>
                     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 items-center">
                       <div>
