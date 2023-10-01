@@ -14,7 +14,6 @@ import gameLoopInfo from "../components/Core/intro/gameLoopInfo";
 import Example from "../components/Blocks/chart";
 import AccountAvatar from "../components/AccountAvatar";
 import AccountEditor from "../components/Core/UpdateProfile";
-import UnityBuildSupabaseMesh from "../components/Gameplay/Unity/Build/LOD-Mesh";
 
 type Profiles = Database['public']['Tables']['profiles']['Row'];
 
