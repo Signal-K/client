@@ -28,10 +28,18 @@ export default function PlanetGalleryCard({ planet }: Props) {
         </div>
         <Card.Body>
           <Card.Title>{content}</Card.Title>
-          <p>Classification Status: {classification_status}</p> {/* Display classification_status */}<br />
-          <Link legacyBehavior href={`/tests/planets/${planet.id}`}>
+          <Link className="mx-2" legacyBehavior href={`/tests/planets/${planet.id}`}>
             <a className="btn btn-primary">Explore</a>
           </Link>
+          {classification_status == 'unclassified' && (
+            <div className="badge badge-neutral badge-outline mx-3">{classification_status}</div>
+          )}
+          {classification_status == 'incomplete' && (
+            <div className="badge badge-accent badge-outline mx-3">{classification_status}</div>
+          )}
+          {classification_status == 'in progress' && (
+            <div className="badge badge-secondary badge-outline mx-3">{classification_status}</div>
+          )}
         </Card.Body>
       </Card>
     </div>
