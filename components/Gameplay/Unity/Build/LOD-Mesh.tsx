@@ -26,6 +26,10 @@ export default function UnityBuildSupabaseMesh ({ planetName }) {
         sendMessage("5", "UpdatePlanetName", planetName);//session?.user?.id);
     };
 
+    const handleTogglePlanetVisibility = () => {
+        sendMessage('Planet', 'TogglePlanetVisibility');
+    };
+
     const handleUpdatePlanetSpeed = () => {
         sendMessage("Planet", "UpdatePlanetTurnSpeed", 75); // set value from supa
     };
@@ -50,6 +54,7 @@ export default function UnityBuildSupabaseMesh ({ planetName }) {
             <center><button className="btn glass mr-5 mt-1.5" onClick={handleSendPlanetName}>Send Planet Name</button>
             <button className="btn glass mr-5 mt-1.5" onClick={handleUpdatePlanetSpeed}>Increase rotation</button>
             <button className="btn glass mr-5 mt-1.5" onClick={handleUpdatePlanetStrength}>Increase strength</button>
+            <button className="btn glass mr-5 mt-1.5" onClick={handleTogglePlanetVisibility}>Toggle Planet Visibility</button>
             <button className="btn glass mr-5 mt-1.5" onClick={handleGeneratePlanet}>Generate planet</button></center>
             <SendPlanetsssDataToFlask />
             {/* <RoverImagePage /> */}

@@ -542,21 +542,25 @@ export default function PlanetPage({ id }: { id: string }) {
                         <h3 className="text-l font-bold text-gray-800">
                           Binned data
                         </h3>
-                        <img
+                        {planetBinned !== '' && (
+                          <img
                           src={planetBinned}
                           alt="Planet Cover"
                           className="w-full sm:w-auto"
                         />
+                        )}
                       </div>
                       <div>
                         <h3 className="text-l font-bold text-gray-800">
                           Phase folded data
                         </h3>
-                        <img
-                          src={planetPhased}
-                          alt="Planet Cover"
-                          className="w-full sm:w-auto"
-                        />
+                        {planetPhased !== '' && (
+                          <img
+                            src={planetPhased}
+                            alt="Planet Cover"
+                            className="w-full sm:w-auto"
+                          />
+                        )}
                       </div>
                     </div>
                     <br />

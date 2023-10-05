@@ -69,7 +69,7 @@ def calculate_number_of_trees(habitability):
 
     # Extract the value from the habitability quantity if it's a quantity
     if hasattr(habitability, 'value'):
-        habitability = habitability.value
+        habitability = habitability.value 
 
     # Find the corresponding number of trees based on the habitability score
     for i, threshold in enumerate(thresholds):
