@@ -8,6 +8,7 @@ import OwnedItemsList from "../../Gameplay/Inventory/userOwnedItems";
 import OwnedPlanetsList from "../../Gameplay/Inventory/userOwnedPlanets";
 import OwnedPlanetsListBlock from "../../Blocks/userPlanetsBlock";
 import MissionSelectionForIndexPage from "../../Core/intro/missionSelectIndex";
+import MySpaceships from "../../Gameplay/Spaceships/mySpaceships";
 
 export default function UserProfileBlocks () {
     const session = useSession();
@@ -25,13 +26,14 @@ export default function UserProfileBlocks () {
                     <div className="container mx-auto py-8">
                         {/* <AccountEditor session={session} /> */}
                         {/* <IndexAuth /> */}
-                        <OwnedPlanetsListBlock />
+                        <OwnedPlanetsListBlock /> 
                     </div>
                 </Card>
             </Grid><br />
             <Card>
                 <div className="container mx-auto py-8">
                     <OwnedItemsList />
+                    <MySpaceships />
                 </div>
             </Card><br />
             <Card><MissionSelectionForIndexPage /></Card>
