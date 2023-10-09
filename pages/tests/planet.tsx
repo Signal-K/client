@@ -607,6 +607,7 @@ export default function PlanetPage({ id }: { id: string }) {
                   <p>You have this planet in your inventory.</p><br />
                   <PlanetSectors sectors={sectors} />
                   <br /><CreateSectorComponent planetId={inventoryPlanetId} />
+                  <UnityBuildSupabaseMesh planetName={planetData?.content}/> 
                 </div>
               ) : (
                 <div>
