@@ -47,7 +47,7 @@ export default function PlanetGalleryCard({ planet }: Props) {
           {classification_status == 'in progress' && (
             <div className="badge badge-secondary badge-outline mx-0.25">{classification_status}</div>
           )}
-          <Link className="mx-2 items-end align-items: flex-end" legacyBehavior href={`/tests/planets/${planet.id}`}>
+          <Link legacyBehavior className="mx-2 items-end align-items: flex-end" href={`/tests/planets/${planet.id}`}>
             {/* <button className="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
               <span className="relative px-5 py-0.65 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
                 explore

@@ -7,19 +7,19 @@ const IntroToLightkurve: React.FC = () => {
   const supabase = useSupabaseClient();
   const session = useSession();
 
-  if (!session) {
-    return <Login />
-  }
+  // if (!session) {
+  //   return <Login />
+  // }
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 font-sans">
       <div className="mb-8">
       <br />
       <div className="flex justify-between">
-  <Link href="/tests/onboarding/planetHunters/1">
+  <Link legacyBehavior href ="/tests/onboarding/planetHunters/1">
     <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Back</button>
   </Link>
-  <Link href="/tests/onboarding/planetHunters/3"> {/* Add a component/test that the user has to pass before getting to view the next step. How do we make this persistent though? Maybe just have this for milestones, provided they've updated their basic profile information */}
+  <Link legacyBehavior href ="/tests/onboarding/planetHunters/3"> {/* Add a component/test that the user has to pass before getting to view the next step. How do we make this persistent though? Maybe just have this for milestones, provided they've updated their basic profile information */}
     <div className="float-right">
       <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Next</button>
     </div>
@@ -58,16 +58,16 @@ Now, let's dive into the basics of Lightkurve by loading and visualizing a light
         </div> */}
       </div>
       <div className="flex justify-between">
-  <Link href="/tests/onboarding/planetHunters/1">
+  <Link legacyBehavior href ="/tests/onboarding/planetHunters/1">
     <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Back</button>
   </Link>
-  <Link href="/tests/onboarding/planetHunters/3">
+  <Link legacyBehavior href ="/tests/onboarding/planetHunters/3">
     <div className="float-right">
       <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Next</button>
     </div>
   </Link>
 
-  <Link href="/tests/planets"> {/* Add a component/test that the user has to pass before getting to view the next step. How do we make this persistent though? Maybe just have this for milestones, provided they've updated their basic profile information */}
+  <Link legacyBehavior href ="/tests/planets"> {/* Add a component/test that the user has to pass before getting to view the next step. How do we make this persistent though? Maybe just have this for milestones, provided they've updated their basic profile information */}
       <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Play</button>
   </Link>
 </div><br />

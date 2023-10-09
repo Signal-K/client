@@ -19,7 +19,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
         </div>
   
         <div className="flex flex-col">
-          <Link href="/">
+          <Link legacyBehavior href ="/">
             <div
               className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
                 router.pathname == "/"
@@ -35,7 +35,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
               </div>
             </div>
           </Link>
-          <Link href="/feed">
+          <Link legacyBehavior href ="/feed">
             <div
               className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
                 router.pathname == "/feed"
@@ -51,7 +51,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
               </div>
             </div>
           </Link>
-          <Link href="/planets">
+          <Link legacyBehavior href ="/planets">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/planets"
@@ -67,7 +67,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
             </div>
           </div>
         </Link>
-          {/*<Link href="/billing">
+          {/*<Link legacyBehavior href ="/billing">
             <div
               className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
                 router.pathname == "/billing"
@@ -83,7 +83,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
               </div>
             </div>
             </Link>
-          <Link href="/ships">
+          <Link legacyBehavior href ="/ships">
             <div
               className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
                 router.pathname == "/ships"
@@ -99,7 +99,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
               </div>
             </div>
           </Link>
-          <Link href="/journal/ipfs">
+          <Link legacyBehavior href ="/journal/ipfs">
             <div
               className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
                 router.pathname == "/journal/ipfs"
@@ -115,7 +115,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
               </div>
             </div>
           </Link>
-          <Link href="/journal">
+          <Link legacyBehavior href ="/journal">
             <div
               className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
                 router.pathname == "/journal"
@@ -131,7 +131,7 @@ const CoreSidebar = forwardRef(({ showNav }, ref) => {
               </div>
             </div>
           </Link>
-          <Link href="/posts/lens/parselay.lens">
+          <Link legacyBehavior href ="/posts/lens/parselay.lens">
             <div
               className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
                 router.pathname == "/posts/lens/parselay.lens"
@@ -172,7 +172,7 @@ export const GameplaySidebar = forwardRef(({ showNav }, ref) => {
       </div>
 
       <div className="flex flex-col">
-        <Link href="/">
+        <Link legacyBehavior href ="/">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/"
@@ -188,7 +188,7 @@ export const GameplaySidebar = forwardRef(({ showNav }, ref) => {
             </div>
           </div>
         </Link>
-        <Link href="/planets">
+        <Link legacyBehavior href ="/planets">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/planets"
@@ -204,7 +204,7 @@ export const GameplaySidebar = forwardRef(({ showNav }, ref) => {
             </div>
           </div>
         </Link>
-        <Link href="/governance/vote">
+        <Link legacyBehavior href ="/governance/vote">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/governance/vote"
@@ -243,7 +243,7 @@ export const GameplaySidebarFull = forwardRef(({ showNav }, ref) => {
       </div>
 
       <div className="flex flex-col">
-        <Link href="/">
+        <Link legacyBehavior href ="/">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/"
@@ -259,7 +259,7 @@ export const GameplaySidebarFull = forwardRef(({ showNav }, ref) => {
             </div>
           </div>
         </Link>
-        <Link href="/posts">
+        <Link legacyBehavior href ="/posts">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/posts"
@@ -275,7 +275,7 @@ export const GameplaySidebarFull = forwardRef(({ showNav }, ref) => {
             </div>
           </div>
         </Link>
-        <Link href="/planets">
+        <Link legacyBehavior href ="/planets">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/planets"
@@ -291,7 +291,7 @@ export const GameplaySidebarFull = forwardRef(({ showNav }, ref) => {
             </div>
           </div>
         </Link>
-        <Link href="/governance/vote">
+        <Link legacyBehavior href ="/governance/vote">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/governance/vote"
@@ -307,7 +307,7 @@ export const GameplaySidebarFull = forwardRef(({ showNav }, ref) => {
             </div>
           </div>
         </Link>
-        <Link href="/ships">
+        <Link legacyBehavior href ="/ships">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/ships"
@@ -323,7 +323,7 @@ export const GameplaySidebarFull = forwardRef(({ showNav }, ref) => {
             </div>
           </div>
         </Link>
-        <Link href="/journal/ipfs">
+        <Link legacyBehavior href ="/journal/ipfs">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/journal/ipfs"
@@ -339,7 +339,7 @@ export const GameplaySidebarFull = forwardRef(({ showNav }, ref) => {
             </div>
           </div>
         </Link>
-        <Link href="/journal">
+        <Link legacyBehavior href ="/journal">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/journal"
@@ -355,7 +355,7 @@ export const GameplaySidebarFull = forwardRef(({ showNav }, ref) => {
             </div>
           </div>
         </Link>
-        <Link href="/posts/lens/parselay.lens">
+        <Link legacyBehavior href ="/posts/lens/parselay.lens">
           <div
             className={`pl-6 py-3 mx-5 rounded text-center cursor-pointer mb-3 flex items-center transition-colors ${
               router.pathname == "/posts/lens/parselay.lens"

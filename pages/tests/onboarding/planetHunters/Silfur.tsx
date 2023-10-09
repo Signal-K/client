@@ -7,11 +7,11 @@ import SilfurComponentOnboarding3 from "../../../../components/onboarding/LightK
 export default function StarSailorsSilfur3 () {
     const session = useSession();
 
-    if (!session) return (
-        <CoreLayout>
-            <Login />
-        </CoreLayout>
-    );
+    // if (!session) return (
+    //     <CoreLayout>
+    //         <Login />
+    //     </CoreLayout>
+    // );
 
     return (
         <CoreLayout>

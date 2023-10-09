@@ -15,7 +15,8 @@ export default function CrucibleFlightCheck () {
                 <Crucible1BaseplanetList />
                 {/* <OwnedItemsList /> */}
                 {/* <CharacterCanvas /> */}
-            </div>
+            </div> 
+            Test
         </CoreLayout>
     );
 };

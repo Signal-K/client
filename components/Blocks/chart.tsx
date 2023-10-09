@@ -32,6 +32,12 @@ const data = [
     TESS: 27,
     Sailors: 18,
     Exofop: 17
+  },
+  {
+    Month: 'Sep 23',
+    TESS: 73,
+    Sailors: 19,
+    Exofop: 43
   }
 ];
 

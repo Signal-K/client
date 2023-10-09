@@ -10,7 +10,7 @@ interface DashboardLayoutProps {
     children: ReactNode;
 }
   
-  interface SidebarItemProps {
+interface SidebarItemProps {
     icon: React.ReactNode;
     label: string;
     href: string;
@@ -21,7 +21,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, href }) => {
     const isActive = router.pathname === href;
   
     return (
-      <Link legacyBehavior href={href}>
+      <Link legacyBehavior href ={href}>
         <a
           className={`flex items-center px-4 py-2 text-gray-500 hover:bg-gray-200 hover:text-gray-700 ${
             isActive ? 'bg-green-500 text-white' : ''
@@ -91,7 +91,7 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
         {/* Page Content */}
         <main className={`flex-grow p-4 ${isMobileView ? '' : 'overflow-y-auto'}`}>
           {children}
-          <MusicPlayer />
+          {/* <MusicPlayer /> */}
         </main>
       </div>
     </div>

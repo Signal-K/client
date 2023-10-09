@@ -45,10 +45,10 @@ export default function PlanetHuntersOnboardingPage1 () {
             paddingRight: isMobile ? 0 : `${buffer}%`,
           }}
         >
-          <OnboardingPopup
+          {/* <OnboardingPopup
             imageSrc="https://cdn-icons-png.flaticon.com/512/2991/2991566.png"
             message="In order to complete your training, you will be given the Golden Telescope, which allows you to view planets!"
-          />
+          /> */}
           <ExoPlanetDetective />
         </div>
         <div style={{ width: `${percent}%` }}>

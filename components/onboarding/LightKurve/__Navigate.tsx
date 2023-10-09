@@ -33,7 +33,7 @@ const NavigateComponent: React.FC = () => {
                 <img src="/assets/Onboarding/Missions/Navigate/NavigateImage3.png" alt="Transit Method" className="w-full"/>
                 <p className="text-gray-700"><span role='alert'>Phase folding:</span> Enhance the signal of potential planets by aligning repeating signals in a star’s light curve.</p>
             </div><br />
-            <Link href='/tests/onboarding/'><button className="btn glass">Complete mission</button></Link>
+            <Link legacyBehavior href ='/tests/onboarding/'><button className="btn glass">Complete mission</button></Link>
         </div>
     );
 };

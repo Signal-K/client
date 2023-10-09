@@ -2,15 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
 import OwnedPlanetsList from './userOwnedPlanets';
 
+// Define the type for InventoryItem
+interface InventoryItem {
+  id: number;
+  name: string;
+  description: string;
+  cost: number;
+  icon_url: string;
+  item: number;
+  quantity: number;
+}
+
 const OwnedItemsList: React.FC = () => {
   const session = useSession();
   const supabase = useSupabaseClient();
-  const [ownedItems, setOwnedItems] = useState([]);
-  const [itemDetails, setItemDetails] = useState([]);
-  const [planets, setPlanets] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [selectedPlanet, setSelectedPlanet] = useState(null);
-  const [isTransferring, setIsTransferring] = useState(false);
+  const [ownedItems, setOwnedItems] = useState<InventoryItem[]>([]); // Specify the type
+  const [itemDetails, setItemDetails] = useState<InventoryItem[]>([]); // Specify the type
+  const [planets, setPlanets] = useState<any[]>([]); // You should specify the type of planets if possible
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null); // Specify the type
+  const [selectedPlanet, setSelectedPlanet] = useState<number | null>(null); // Specify the type
+  const [isTransferring, setIsTransferring] = useState<boolean>(false); // Specify the type
 
   useEffect(() => {
     async function fetchOwnedItems() {
@@ -41,24 +52,24 @@ const OwnedItemsList: React.FC = () => {
   useEffect(() => {
     async function fetchItemDetails() {
       if (ownedItems.length > 0) {
-        const itemIds = ownedItems.map(item => item.item);
+        const itemIds = ownedItems.map(item => item.id); // Change 'item.item' to 'item.id'
         const { data: itemDetailsData, error: itemDetailsError } = await supabase
           .from('inventoryITEMS')
           .select('*')
           .in('id', itemIds);
-
+  
         if (itemDetailsError) {
           console.error('Error fetching item details:', itemDetailsError);
         }
-
+  
         if (itemDetailsData) {
           setItemDetails(itemDetailsData);
         }
       }
     }
-
+  
     fetchItemDetails();
-  }, [ownedItems]);
+  }, [ownedItems]);  
 
   useEffect(() => {
     async function fetchUserPlanets() {
@@ -86,17 +97,17 @@ const OwnedItemsList: React.FC = () => {
     fetchUserPlanets();
   }, [session]);
 
-  const handleTransferButtonClick = (item) => {
+  const handleTransferButtonClick = (item: InventoryItem) => {
     setSelectedItem(item);
     setIsTransferring(true);
   };
 
-  const handlePlanetSelect = (event) => {
-    setSelectedPlanet(event.target.value);
+  const handlePlanetSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedPlanet(event.target.value ? parseInt(event.target.value) : null); // Parse the selected value to a number
   };
 
   const handleConfirmTransfer = async () => {
-    if (selectedItem && selectedPlanet) {
+    if (selectedItem && selectedPlanet !== null) {
       try {
         await supabase
           .from('inventoryUSERS')
@@ -148,7 +159,7 @@ const OwnedItemsList: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4">Transfer Item</h2>
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2">Select Planet:</label>
-            <select className="w-full px-3 py-2 border rounded" value={selectedPlanet} onChange={handlePlanetSelect}>
+            <select className="w-full px-3 py-2 border rounded" value={selectedPlanet !== null ? selectedPlanet.toString() : ''} onChange={handlePlanetSelect}>
               <option value="">Select a planet</option>
               {planets.map(planet => (
                 <option key={planet.id} value={planet.id}>{planet.name}</option>
@@ -164,14 +175,6 @@ const OwnedItemsList: React.FC = () => {
 };
 
 export default OwnedItemsList;
-
-interface InventoryItem {
-  id: number;
-  name: string;
-  description: string;
-  cost: number;
-  icon_url: string;
-}
 
 const ToolItemsList: React.FC = () => {
   const session = useSession();
