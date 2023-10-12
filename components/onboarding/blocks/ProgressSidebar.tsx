@@ -16,6 +16,7 @@ const ProgressSidebar: React.FC<SidebarProps> = ({ currentPage, credits }) => {
     { id: 1, title: 'Planet Hunters Introduction', icon: 'book' },
     { id: 2, title: 'What is Lightkurve?', icon: 'graph' },
     { id: 3, title: 'How do we look at the data from these telescopes?', icon: 'telescope' },
+    { id: 4, title: 'How do we play?', icon: 'telescope' },
     // ... Add data for remaining pages here
   ];
 
@@ -68,8 +69,8 @@ const ProgressSidebar: React.FC<SidebarProps> = ({ currentPage, credits }) => {
             <span className="flex-grow">{chapter.title}</span>
           </a>
         ))}
-      </div>
-      <div className="flex items-center justify-center bg-gray-200 py-2">
+      </div><br /><br /><br /><br /><br /><br /><br /><br /><br />
+      {/* <div className="flex justify-center py-2 object-bottom">
         <svg
           className="w-5 h-5 mr-2"
           viewBox="0 0 24 24"
@@ -80,8 +81,8 @@ const ProgressSidebar: React.FC<SidebarProps> = ({ currentPage, credits }) => {
             d="M19 5H5C3.89543 5 3 5.89543 3 7V21L9 17H19C20.1046 17 21 16.1046 21 15V7C21 5.89543 20.1046 5 19 5ZM19 15H9L5 18.382V7H19V15Z"
           />
         </svg>
-        <span className="text-gray-600 text-sm">{credits} Credits</span>
-      </div>
+        {/* <span className="text-gray-600 text-sm">{credits} Credits</span> 
+      </div> */}
     </aside>
   );
 };

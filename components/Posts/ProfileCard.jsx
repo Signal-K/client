@@ -33,7 +33,7 @@ export function ProfileContent ({ activeTab, userId }) {
     }
 
     function userPlanetPosts (userId) {
-        const { data } = supabase.from('posts_duplicate')
+        const { data } = supabase.from('posts_duplicates')
             .select('*') //('id, content, created_at, media, planets2, profiles(id, avatar_url, username)') // profiles(id, avatar_url, username)')
             .order('created_at', { ascending: false })
             .eq('author', userId) // session?.user?.id)

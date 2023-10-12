@@ -31,7 +31,7 @@ export default function ShipyardCard ( { id, image, name, shipId, hp, attack, sp
                 </div>
                 <div className="grow text-right">
                     <button className="bg-buttonColour text-white px-6 py-1 rounded-md">Buy ship</button> {/* If there is an owner, don't show this button */}
-                    <div className="mx-1"><Link href={`/ships/${id}`}><button className="bg-buttonColour text-white px-6 py-1 rounded-md">View profile</button></Link></div>
+                    <div className="mx-1"><Link legacyBehavior href ={`/ships/${id}`}><button className="bg-buttonColour text-white px-6 py-1 rounded-md">View profile</button></Link></div>
                 </div>
             </Card>
             {/*<CoreLayout>
@@ -40,7 +40,7 @@ export default function ShipyardCard ( { id, image, name, shipId, hp, attack, sp
                     <Card noPadding={false}>
                         <div className="flex gap-3">
                             <div className="grow">
-                                <p><Link href={'/posts/ship' + ship}>
+                                <p><Link legacyBehavior href ={'/posts/ship' + ship}>
                                     <span className="mr-1 font-semibold cursor-pointer hover:underline">Spaceship Name</span>
                                 </Link></p>
                             </div>
@@ -80,7 +80,7 @@ export const ShipyardCardProps: NextPage<Props> = ( props ) => {
                     <Card noPadding={false}>
                         <div className="flex gap-3">
                             <div className="grow">
-                                <p><Link href={'/posts/ship' + ship}>
+                                <p><Link legacyBehavior href ={'/posts/ship' + ship}>
                                     <span className="mr-1 font-semibold cursor-pointer hover:underline">Spaceship Name</span>
                                 </Link></p>
                             </div>
