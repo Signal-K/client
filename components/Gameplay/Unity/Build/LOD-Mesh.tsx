@@ -1,15 +1,21 @@
 import { useSession } from "@supabase/auth-helpers-react";
 import React, { Fragment, useState, useEffect } from "react";
 import { Unity, useUnityContext } from 'react-unity-webgl';
+import SendPlanetsssDataToFlask from "../../Planets/Data/PlanetDataSend";
+import RoverImagePage from "../../Planets/RoverData/RandomImage";
 
 export default function UnityBuildSupabaseMesh ({ planetName }) {
     const session = useSession();
 
     const { unityProvider, sendMessage, addEventListener, removeEventListener } = useUnityContext({
-        loaderUrl: "/assets/Mars/Mesh/Rocky_Earth-base.Mesh.loader.js",
-        dataUrl: "/assets/Mars/Mesh/Rocky_Earth-base.Mesh.data",
-        frameworkUrl: "/assets/Mars/Mesh/Rocky_Earth-base.Mesh.framework.js",
-        codeUrl: "/assets/Mars/Mesh/Rocky_Earth-base.Mesh.wasm",
+        // loaderUrl: "/assets/Mars/Mesh/Rocky_Earth-base.Mesh.loader.js",
+        // dataUrl: "/assets/Mars/Mesh/Rocky_Earth-base.Mesh.data",
+        // frameworkUrl: "/assets/Mars/Mesh/Rocky_Earth-base.Mesh.framework.js",
+        // codeUrl: "/assets/Mars/Mesh/Rocky_Earth-base.Mesh.wasm",
+        loaderUrl: "/assets/Supabase/Supabase_Base.loader.js",
+        dataUrl: "/assets/Supabase/Supabase_Base.data",
+        frameworkUrl: "/assets/Supabase/Supabase_Base.framework.js",
+        codeUrl: "/assets/Supabase/Supabase_Base.wasm",
     });
  
     // const handlePlanetNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,8 +27,12 @@ export default function UnityBuildSupabaseMesh ({ planetName }) {
     };
 
     const handleUpdatePlanetSpeed = () => {
-        sendMessage("Planet", "UpdatePlanetTurnSpeed", 75);
+        sendMessage("Planet", "UpdatePlanetTurnSpeed", 75); // set value from supa
     };
+
+    const handleUpdatePlanetStrength = () => {
+        sendMessage("Planet", "UpdatePlanetStrength", 3); // Set from supa
+    }
 
     const handleGeneratePlanet = () => {
         sendMessage("Planet", "GeneratePlanet");
@@ -39,7 +49,10 @@ export default function UnityBuildSupabaseMesh ({ planetName }) {
             /> */}
             <center><button className="btn glass mr-5 mt-1.5" onClick={handleSendPlanetName}>Send Planet Name</button>
             <button className="btn glass mr-5 mt-1.5" onClick={handleUpdatePlanetSpeed}>Increase rotation</button>
+            <button className="btn glass mr-5 mt-1.5" onClick={handleUpdatePlanetStrength}>Increase strength</button>
             <button className="btn glass mr-5 mt-1.5" onClick={handleGeneratePlanet}>Generate planet</button></center>
+            <SendPlanetsssDataToFlask />
+            {/* <RoverImagePage /> */}
         </Fragment>
     );
 }
