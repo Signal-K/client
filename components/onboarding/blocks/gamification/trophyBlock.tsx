@@ -92,7 +92,7 @@ const TrophyBlockLightkurveOnboardingPt1: React.FC = () => {
         const { data, error } = await supabase
           .from('inventoryITEMS')
           .select('*')
-          .eq('id', 8)
+          .eq('id', 9)
           .single();
 
         if (error) {

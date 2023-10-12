@@ -10,7 +10,7 @@ interface DashboardLayoutProps {
     children: ReactNode;
 }
   
-  interface SidebarItemProps {
+interface SidebarItemProps {
     icon: React.ReactNode;
     label: string;
     href: string;
@@ -91,7 +91,7 @@ const CoreLayout: React.FC<DashboardLayoutProps> = ( { children } ) => {
         {/* Page Content */}
         <main className={`flex-grow p-4 ${isMobileView ? '' : 'overflow-y-auto'}`}>
           {children}
-          <MusicPlayer />
+          {/* <MusicPlayer /> */}
         </main>
       </div>
     </div>

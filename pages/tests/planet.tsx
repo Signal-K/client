@@ -1,155 +1,156 @@
-import { useRouter } from "next/router"
-import React, { useEffect, useState, useRef } from "react"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
-import PlanetPostCard from "../../components/Posts/PlanetPostsFetch"
-import { UserContext } from "../../context/UserContext"
-import { PostFormCardPlanetTag } from "../../components/PostFormCard"
-import Card from "../../components/Card"
-import CoreLayout from "../../components/Core/Layout"
-import html2canvas from "html2canvas"
-import OwnedPlanetsListBlock from "../../components/Blocks/userPlanetsBlock"
-import Link from "next/link"
-var SidebarLink
+import { useRouter } from "next/router";
+import React, { useEffect, useState, useRef } from "react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import PlanetPostCard from "../../components/Posts/PlanetPostsFetch";
+import { UserContext } from "../../context/UserContext";
+import { PostFormCardPlanetTag } from "../../components/PostFormCard";
+import Card from "../../components/Card";
+import CoreLayout from "../../components/Core/Layout";
+import html2canvas from "html2canvas";
+import OwnedPlanetsListBlock from "../../components/Blocks/userPlanetsBlock";
+import Link from "next/link";
+import UnityBuildSupabaseMesh from "../../components/Gameplay/Unity/Build/LOD-Mesh";
 
-;(function(SidebarLink) {
-  SidebarLink[(SidebarLink["Feed"] = 0)] = "Feed"
-  SidebarLink[(SidebarLink["Demo"] = 1)] = "Demo"
-  SidebarLink[(SidebarLink["Data"] = 2)] = "Data"
-  SidebarLink[(SidebarLink["Visit"] = 3)] = "Visit"
-})(SidebarLink || (SidebarLink = {}))
-
-const getRandomGradientColors = () => {
-  const colors = ["red", "blue", "green", "purple", "orange", "pink"]
-  const color1 = colors[Math.floor(Math.random() * colors.length)]
-  let color2 = color1
-  while (color2 === color1) {
-    color2 = colors[Math.floor(Math.random() * colors.length)]
-  }
-  return [color1, color2]
+enum SidebarLink {
+  Feed,
+  Demo,
+  Data,
+  Visit,
 }
 
-export default function PlanetPage({ id }) {
-  const router = useRouter()
+const getRandomGradientColors = (): [string, string] => {
+  const colors = ["red", "blue", "green", "purple", "orange", "pink"];
+  const color1 = colors[Math.floor(Math.random() * colors.length)];
+  let color2 = color1;
+  while (color2 === color1) {
+    color2 = colors[Math.floor(Math.random() * colors.length)];
+  }
+  return [color1, color2];
+};
 
-  const supabase = useSupabaseClient()
-  const session = useSession()
+export default function PlanetPage({ id }: { id: string }) {
+  const router = useRouter();
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-  const [planetData, setPlanetData] = useState(null)
-  const [planetPosts, setPlanetPosts] = useState([])
-  const { id: planetId } = router.query
-  const [unityBuild, setUnityBuild] = useState(null)
+  const [planetData, setPlanetData] = useState<any | null>(null);
+  const [planetPosts, setPlanetPosts] = useState<any[]>([]);
+  const planetId = Array.isArray(router.query.id) ? router.query.id[0] : router.query.id;
+  const [unityBuild, setUnityBuild] = useState<number | null>(null);
+  const [hasPlanetInInventory, setHasPlanetInInventory] = useState(false);
 
   useEffect(() => {
     if (planetData?.temperature !== undefined) {
       if (planetData.temperature < 300) {
-        setUnityBuild(1)
+        setUnityBuild(1);
       } else if (planetData.temperature >= 300) {
-        setUnityBuild(2)
+        setUnityBuild(2);
       }
     }
-  }, [planetData])
+  }, [planetData]);
 
-  const [profile, setProfile] = useState(null)
-  const [activeLink, setActiveLink] = useState(SidebarLink.Data) // Track the active link
-  const [showUnity, setShowUnity] = useState(false) // Track the visibility of Unity component
-  const [loadUnityComponent, setLoadUnityComponent] = useState(false)
+  const [profile, setProfile] = useState<any | null>(null);
+  const [activeLink, setActiveLink] = useState(SidebarLink.Data); // Track the active link
+  const [showUnity, setShowUnity] = useState(false); // Track the visibility of the Unity component
+  const [loadUnityComponent, setLoadUnityComponent] = useState(false);
   // Conditional check to see if the user has made a post on the planet
-  const [hasMadePostOnPlanet, setHasMadePostOnPlanet] = useState(false)
+  const [hasMadePostOnPlanet, setHasMadePostOnPlanet] = useState(false);
 
   const displayPlanet = async () => {
-    setLoadUnityComponent(true)
-    handleSidebarLinkClick(SidebarLink.Demo)
-  }
+    setLoadUnityComponent(true);
+    handleSidebarLinkClick(SidebarLink.Demo);
+  };
 
   // State to hold the gradient colors
-  const [gradientColor1, setGradientColor1] = useState("gray-200")
-  const [gradientColor2, setGradientColor2] = useState("gray-300")
+  const [gradientColor1, setGradientColor1] = useState("gray-200");
+  const [gradientColor2, setGradientColor2] = useState("gray-300");
 
   // State to hold the screen width
-  const [screenWidth, setScreenWidth] = useState(0)
+  const [screenWidth, setScreenWidth] = useState(0);
 
   // State to track whether to show the sidebar or not
-  const [showSidebar, setShowSidebar] = useState(true)
+  const [showSidebar, setShowSidebar] = useState(true);
 
   useEffect(() => {
     // Calculate the gradient colors
-    const [color1, color2] = getRandomGradientColors()
-    setGradientColor1(color1)
-    setGradientColor2(color2)
+    const [color1, color2] = getRandomGradientColors();
+    setGradientColor1(color1);
+    setGradientColor2(color2);
 
     // Update the screen width
     const handleResize = () => {
-      setScreenWidth(window.innerWidth)
-    }
-    handleResize()
-    window.addEventListener("resize", handleResize)
+      setScreenWidth(window.innerWidth);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize)
-    }
-  }, [])
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     // Check screen width to show/hide the sidebar
-    setShowSidebar(screenWidth >= 800)
-  }, [screenWidth])
+    setShowSidebar(screenWidth >= 800);
+  }, [screenWidth]);
 
   const planetBinned =
     "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/" +
     id +
-    "/binned.png"
+    "/binned.png";
   const planetPhased =
     "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/" +
     id +
-    "/phase.png"
+    "/phase.png";
   const planetCover =
     "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/" +
     id +
-    "/download.png"
+    "/download.png";
 
-  const [extraValue, setExtraValue] = useState(false)
+  const [extraValue, setExtraValue] = useState(false);
 
   useEffect(() => {
     if (planetId) {
-      getPlanetData()
-      fetchPostsForPlanet(planetId)
+      getPlanetData();
+      fetchPostsForPlanet(planetId);
+      checkUserInventory();
     }
-  }, [planetId])
+  }, [planetId]);
 
   useEffect(() => {
     if (!session?.user?.id) {
-      return
+      return;
     }
 
     supabase
       .from("profiles")
       .select()
       .eq("id", session?.user?.id)
-      .then(result => {
+      .then((result: any) => {
         if (result?.data?.length) {
-          setProfile(result.data[0])
+          setProfile(result.data[0]);
         }
-      })
+      });
 
     async function checkUserPost() {
       const { data, error } = await supabase
         .from("posts_duplicates")
         .select()
         .eq("author", session?.user?.id)
-        .eq("planets2", planetId)
+        .eq("planets2", planetId);
 
       if (error) {
-        console.error("Error fetching user posts:", error)
-        return
+        console.error("Error fetching user posts:", error);
+        return;
       }
 
       // If there are records, the user has made a post on the planet
       if (data.length > 0) {
-        setHasMadePostOnPlanet(true)
+        setHasMadePostOnPlanet(true);
       }
     }
 
-    checkUserPost()
-  }, [session?.user?.id])
+    checkUserPost();
+  }, [session?.user?.id]);
 
   const getPlanetData = async () => {
     try {
@@ -157,25 +158,25 @@ export default function PlanetPage({ id }) {
         .from("planetsss")
         .select("*")
         .eq("id", planetId) // Use 'planetId' here
-        .single()
+        .single();
 
       if (data) {
-        setPlanetData(data)
+        setPlanetData(data);
       }
 
       if (data.planets) {
-        setExtraValue(true)
+        setExtraValue(true);
       }
 
       if (error) {
-        throw error
+        throw error;
       }
     } catch (error) {
-      console.error(error.message)
+      console.error(error.message);
     }
-  }
+  };
 
-  async function fetchPostsForPlanet(planetId) {
+  async function fetchPostsForPlanet(planetId: string) {
     try {
       const { data: postsData, error: postsError } = await supabase
         .from("posts_duplicates")
@@ -183,43 +184,43 @@ export default function PlanetPage({ id }) {
           "id, content, created_at, media, profiles(id, avatar_url, username)"
         )
         .eq("planets2", planetId)
-        .order("created_at", { ascending: false })
+        .order("created_at", { ascending: false });
 
       if (postsData) {
-        setPlanetPosts(postsData)
+        setPlanetPosts(postsData);
       }
 
       if (postsError) {
-        throw postsError
+        throw postsError;
       }
     } catch (error) {
-      console.error("Error fetching posts:", error.message)
+      console.error("Error fetching posts:", error.message);
     }
   }
 
-  const a = 0
+  const a = 0;
 
   // Managing screenshots & post cards
-  const postCardRef = useRef(null)
+  const postCardRef = useRef(null);
 
   const handleCaptureClick = () => {
     if (postCardRef.current) {
       html2canvas(postCardRef.current).then(canvas => {
         // Convert the canvas to a data URL
-        const imageUrl = canvas.toDataURL("image/png")
+        const imageUrl = canvas.toDataURL("image/png");
 
         // Create an anchor element to trigger the download
-        const a = document.createElement("a")
-        a.href = imageUrl
-        a.download = "post_card.png"
-        a.click()
-      })
+        const a = document.createElement("a");
+        a.href = imageUrl;
+        a.download = "post_card.png";
+        a.click();
+      });
     }
-  }
+  };
 
   useEffect(() => {
     if (planetPosts.length > 0) {
-      const postIds = planetPosts.map(post => post.id)
+      const postIds = planetPosts.map(post => post.id);
       supabase
         .from("comments")
         .select(
@@ -227,45 +228,68 @@ export default function PlanetPage({ id }) {
         )
         .in("post_id", postIds)
         .order("created_at", { ascending: true })
-        .then(commentsResponse => {
+        .then((commentsResponse: any) => {
           if (commentsResponse?.data) {
             const commentsByPostId = commentsResponse.data.reduce(
-              (acc, comment) => {
-                const postId = comment.post_id
+              (acc: any, comment: any) => {
+                const postId = comment.post_id;
                 if (!acc[postId]) {
-                  acc[postId] = []
+                  acc[postId] = [];
                 }
-                acc[postId].push(comment)
-                return acc
+                acc[postId].push(comment);
+                return acc;
               },
               {}
-            )
+            );
 
             const postsWithComments = planetPosts.map(post => ({
               ...post,
-              comments: commentsByPostId[post.id] || []
-            }))
+              comments: commentsByPostId[post.id] || [],
+            }));
 
-            setPlanetPosts(postsWithComments)
+            setPlanetPosts(postsWithComments);
           }
-        })
+        });
     }
-  }, [a])
+  }, [a]);
 
-  const handleSidebarLinkClick = link => {
-    setActiveLink(link)
+  const handleSidebarLinkClick = (link: SidebarLink) => {
+    setActiveLink(link);
     if (link === SidebarLink.Demo) {
-      setShowUnity(true)
+      setShowUnity(true);
     } else {
-      setShowUnity(false)
+      setShowUnity(false);
     }
-  }
+  };
 
   if (!planetData) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
-  const { content, avatar_url, cover } = planetData
+  const { content, avatar_url, cover } = planetData;
+
+  // Check to see if user owns/has classified this anomaly
+  // Function to check user's inventory
+  async function checkUserInventory() {
+    if (!session?.user?.id || !planetId) {
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("inventoryPLANETS")
+      .select()
+      .eq("planet_id", planetId)
+      .eq("owner_id", session?.user?.id);
+
+    if (error) {
+      console.error("Error checking user inventory:", error);
+      return;
+    }
+
+    if (data.length > 0) {
+      setHasPlanetInInventory(true);
+    }
+  }
 
   return (
     <CoreLayout>
@@ -557,12 +581,25 @@ export default function PlanetPage({ id }) {
                     /><br /> */}
               <Card noPadding={false}>
                 <OwnedPlanetsListBlock />
+                {/* <UnityBuildSupabaseMesh planetName={planetData?.content}/>  */}
+                {hasPlanetInInventory ? (
+        // Display the component if the user has the planet in their inventory
+        <div>
+          <p>You have this planet in your inventory.</p>
+          {/* Add your component here */}
+        </div>
+      ) : (
+        // Display a message if the user does not have the planet in their inventory
+        <div>
+          <p>You do not have this planet in your inventory.</p>
+        </div>
+      )}
               </Card>
               {/* <button onClick={handleCaptureClick}>Capture PostCard</button> */}
               {/* <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br /><Card noPadding={false}>
               <div>{loadUnityComponent && planetData?.temperature <= 300 && <UnityBuildLod11 />}</div>
               <div>{loadUnityComponent && planetData?.temperature >= 300 && <UnityBuildLod1 />}</div>
-              {/* <UnityBuildSupabaseMesh planetName={planetData?.content}/> */}
+              <UnityBuildSupabaseMesh planetName={planetData?.content}/> 
               {/* <UnityBuildLod111 /> 
               {session?.user?.id == "cebdc7a2-d8af-45b3-b37f-80f328ff54d6" && ( <><iframe src="https://flask-8gn2.onrender.com/" height="50%" width="100%" /><iframe src="https://flask-8gn2.onrender.com/input" height="50%" width="100%" /> {/* <YourComponent />  <LightkurveForm /> </> )} */}
             </div>

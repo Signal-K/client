@@ -9,7 +9,7 @@ const ExoPlanetDetective: React.FC = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    if (!session) { return <Login />; };
+    // if (!session) { return <Login />; };
 
     // Potentially add a blocker that if the user doesn't have a username set, render only the <UserProfileEditBlock /> component
 
@@ -17,7 +17,7 @@ const ExoPlanetDetective: React.FC = () => {
         <div className="max-w-3xl mx-auto py-8 px-4 font-sans">
             <div className="mb-8">
                 <br />
-                <UserProfileEditBlock />
+                {/* <UserProfileEditBlock /> */}
                 <br />
                 <h2 className="text-3xl font-bold mb-4 text-primary">What is Star Sailors?</h2>
                 <p className="text-gray-700">
@@ -43,7 +43,7 @@ const ExoPlanetDetective: React.FC = () => {
                     Imagine you're looking at a distant streetlight. Suddenly, a bird flies by, and the light dims momentarily before shining bright again. On a cosmic scale, this momentary dimming is what we're looking for — but instead of birds, we're spotting planets! <br />
                     Size Matters: The amount of dimming hints at the planet. A big planet, like Jupiter, will cause a bigger drop in light, while a smaller planet, like Earth, will create a more subtle dip.
                 </p><br />
-                <h3 className="text-xl font-bold mb-4 text-primary">The human touch - why we need you</h3>
+                <h3 className="text-xl font-bold mb-4 text-primary">Why we need you</h3>
                 <p className="text-gray-700">
                     In the era of supercomputers and AI, you might wonder: Why involve humans? Here's the deal: <br />
                     Computers are great at spotting regular patterns but can sometimes overlook unusual ones. Especially for longer-period planets, the human eye and intuition can be invaluable. By blending computational precision with human insight, we ensure no exoplanet goes unnoticed.
@@ -55,16 +55,6 @@ const ExoPlanetDetective: React.FC = () => {
                 </p><br />
                 <LightkurveQuiz />
             </div>
-            <div className="flex justify-between">
-                    <Link legacyBehavior href ="/tests/onboarding/">
-                        <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Back</button>
-                    </Link>
-                    <Link legacyBehavior href ="/tests/onboarding/planetHunters/2"> {/* Add a component/test that the user has to pass before getting to view the next step. How do we make this persistent though? Maybe just have this for milestones, provided they've updated their basic profile information */}
-                        <div className="float-right">
-                            <button type="submit" value="Subscribe" name="member[subscribe]" id="member_submit" className="block px-5 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300 sm:px-10">Next</button>
-                        </div>
-                    </Link>
-                </div><br />
         </div>
     )
 }

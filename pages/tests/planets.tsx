@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Container, Row, ButtonGroup, ToggleButton } from "react-bootstrap";
+import { Container, Row } from "react-bootstrap";
 
 import Login from "../login";
 import PlanetGalleryCard from "../../components/Gameplay/Planets/PlanetGalleryCard";
-import DashboardLayout from "../../components/Tests/Layout/Dashboard";
 import CoreLayout from "../../components/Core/Layout";
 
 export default function PlanetGalleryIndex() {
@@ -27,10 +26,6 @@ export default function PlanetGalleryIndex() {
         .limit(20)
         .gte("id", 45)
         .lt("id", 102);
-  
-      // if (selectedDifficulty !== null) {
-      //   query = query.eq("difficulty", selectedDifficulty);
-      // }
   
       const { data, error } = await query;
   
@@ -65,34 +60,14 @@ export default function PlanetGalleryIndex() {
     backgroundColor: "rgba(255, 255, 255, 0.3)",
   };
 
-  if (!session) {
-    return <Login />;
-  }
+  // if (!session) {
+  //   return <Login />;
+  // }
 
   return (
     // <DashboardLayout>
     <CoreLayout>
       <Container>
-        {/* <ButtonGroup className="mb-3">
-          {difficultyOptions.map((option) => (
-            <ToggleButton
-              key={option.value}
-              type="radio"
-              variant="outline-secondary"
-              name="difficulty"
-              value={option.value}
-              checked={selectedDifficulty === option.value}
-              onChange={() => setSelectedDifficulty(option.value)}
-              style={
-                selectedDifficulty === option.value
-                  ? { ...buttonStyle, ...activeButtonStyle }
-                  : buttonStyle
-              } // Need to update button spacing -> bug report
-            >
-              {option.label}
-            </ToggleButton>
-          ))}
-        </ButtonGroup> */}
         <Row className="mb-20">
           {planets.map((planet) => (
             <PlanetGalleryCard key={planet.id} planet={planet} />

@@ -148,6 +148,15 @@ export default function AccountEditor({ session }: { session: Session }) {
 
     return (
         <div className="form-widget">
+            <AccountAvatarV1
+                uid={user?.id}
+                url={avatar_url}
+                size={150}
+                onUpload={(url) => {
+                    setAvatarUrl(url) 
+                    updateProfile({ username, website, avatar_url: url, address})
+                }}
+            />
         </div>
     )
 }

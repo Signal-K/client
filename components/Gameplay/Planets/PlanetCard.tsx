@@ -15,7 +15,7 @@ interface Planet {
     contract: string;
     tokenId: string;
     chainId: string;
-    owner: string;
+    owner: string; 
     ticId: string | null;
 }
 

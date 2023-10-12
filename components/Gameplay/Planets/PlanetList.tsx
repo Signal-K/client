@@ -44,9 +44,9 @@ export default function PlanetList({ id }: PlanetListProps) {
     }
   };
 
-  if (!session) {
-    return <Login />;
-  }
+  // if (!session) {
+  //   return <Login />;
+  // }
 
   return (
     <center>
