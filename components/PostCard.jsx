@@ -45,7 +45,7 @@ export function PostModal ( { content, created_at, media, profiles:authorProfile
                 <div className="mt-3 text-left sm:mt-5">
                     <div className="py-6 text-center">
                       <div className="flex text-center">
-                        <Link href={'/posts/profile/'+authorProfile?.id}>
+                        <Link legacyBehavior href ={'/posts/profile/'+authorProfile?.id}>
                           <PostCardAvatar
                             url={authorProfile?.avatar_url}
                             size={45}
@@ -126,7 +126,7 @@ export default function PostCard ( { content, created_at, media, profiles:author
     <Card noPadding={false}>
       <div className="flex gap-3">
         <div>
-          <Link href={'/posts/profile/'+authorProfile?.id}>
+          <Link legacyBehavior href ={'/posts/profile/'+authorProfile?.id}>
             <span className="cursor-pointer">
               <PostCardAvatar url={authorProfile?.avatar_url}
                 size={50} />
@@ -135,12 +135,12 @@ export default function PostCard ( { content, created_at, media, profiles:author
         </div>
         <div className="grow">
           <p>
-            <Link href={'/posts/profile/'+authorProfile?.id}>
+            <Link legacyBehavior href ={'/posts/profile/'+authorProfile?.id}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
                 {authorProfile?.username}
               </span>
             </Link>
-            shared a <Link legacyBehavior href='/posts/'><a className="text-socialBlue">post</a></Link> on <Link legacyBehavior href="https://play.skinetics.tech/planets/{planets2}"><a className="text-socialBlue">planet {planets2}</a></Link> {/* Add link to ORCHID publication ID/Lens ID */}
+            shared a <Link legacyBehavior href ='/posts/'><a className="text-socialBlue">post</a></Link> on <Link legacyBehavior href ="https://play.skinetics.tech/planets/{planets2}"><a className="text-socialBlue">planet {planets2}</a></Link> {/* Add link to ORCHID publication ID/Lens ID */}
           </p>
           <p className="text-gray-500 text-sm"><ReactTimeAgo date={ ( new Date(created_at)).getTime() } /></p>{/* <ReactTimeAgo date={ ( created_at instanceof Date ? created_at.getTime() : created_at ) } /> */}
         </div>
@@ -271,7 +271,7 @@ export function PlanetPostCard ( { content, created_at, media, profiles:authorPr
     <Card noPadding={false}>
       <div className="flex gap-3">
         <div>
-          <Link href={'/posts/profile/'+authorProfile?.id}>
+          <Link legacyBehavior href ={'/posts/profile/'+authorProfile?.id}>
             <span className="cursor-pointer">
               <PostCardAvatar url={authorProfile?.avatar_url}
                 size={50} />
@@ -280,12 +280,12 @@ export function PlanetPostCard ( { content, created_at, media, profiles:authorPr
         </div>
         <div className="grow">
           <p>
-            <Link href={'/posts/profile/'+authorProfile?.id}>
+            <Link legacyBehavior href ={'/posts/profile/'+authorProfile?.id}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
                 {authorProfile?.username}
               </span>
             </Link>
-            shared a <Link legacyBehavior href='/posts/'><a className="text-socialBlue">post</a></Link> {/* Add link to ORCHID publication ID/Lens ID */}
+            shared a <Link legacyBehavior href ='/posts/'><a className="text-socialBlue">post</a></Link> {/* Add link to ORCHID publication ID/Lens ID */}
           </p>
           <p className="text-gray-500 text-sm"><ReactTimeAgo date={ ( new Date(created_at)).getTime() } /></p>{/* <ReactTimeAgo date={ ( created_at instanceof Date ? created_at.getTime() : created_at ) } /> */}
         </div>
@@ -388,7 +388,7 @@ export function PostCardProfile ( { content, created_at, media, profiles:authorP
     <ProfileCard noPadding={false}>
       <div className="flex gap-3">
         <div>
-          <Link href={'/posts/profile/'+authorProfile?.id}>
+          <Link legacyBehavior href ={'/posts/profile/'+authorProfile?.id}>
             <span className="cursor-pointer">
               <PostCardAvatar url={authorProfile?.avatar_url}
                 size={50} />
@@ -397,12 +397,12 @@ export function PostCardProfile ( { content, created_at, media, profiles:authorP
         </div>
         <div className="grow">
           <p>
-            <Link href={'/posts/profile/'+authorProfile?.id}>
+            <Link legacyBehavior href ={'/posts/profile/'+authorProfile?.id}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
                 {authorProfile?.username}
               </span>
             </Link>
-            shared a <Link legacyBehavior href='/posts/'><a className="text-socialBlue">post</a></Link> {/* Add link to ORCHID publication ID/Lens ID */}
+            shared a <Link legacyBehavior href ='/posts/'><a className="text-socialBlue">post</a></Link> {/* Add link to ORCHID publication ID/Lens ID */}
           </p>
           <p className="text-gray-500 text-sm"><ReactTimeAgo date={ ( new Date(created_at)).getTime() } /></p>{/* <ReactTimeAgo date={ ( created_at instanceof Date ? created_at.getTime() : created_at ) } /> */}
         </div>

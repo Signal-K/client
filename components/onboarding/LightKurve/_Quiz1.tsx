@@ -196,12 +196,13 @@ const LightkurveQuiz: React.FC = () => {
           {quizQuestions.length} correct.
         </p> <br /><br />
         {!hasItem && (
-          <button
-            onClick={handleAddToInventory}
-            className="bg-blue-500 text-white px-3 py-1 rounded"
-          >
-            Add to Inventory {/* Show image, allow user to see the item and a message */}
-          </button>
+          // <button
+          //   onClick={handleAddToInventory}
+          //   className="bg-blue-500 text-white px-3 py-1 rounded"
+          // >
+          //   Add to Inventory {/* Show image, allow user to see the item and a message */}
+          // </button>
+          <></>
         )}
       </div>
     );

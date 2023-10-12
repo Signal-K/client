@@ -85,7 +85,8 @@ const PlanetTable: React.FC = () => {
                 <td style={cellStyles}>
                   <Link legacyBehavior  href={`/tests/planets/${planet.id}`}>
                     {/* Wrap in Link */}
-                    <a>{planet.id.toString()}</a>
+                    {/* <a>{planet.id.toString()}</a> */}
+                    <p>Hello</p>
                   </Link>
                 </td>
                 <td style={cellStyles}>{planet.content}</td>

@@ -6,21 +6,22 @@ interface InventoryItem {
     name: string;
     description: string;
     cost: number;
-    icon: string;
+    icon_url: string; // Make sure this property matches your data structure
+    ItemCategory: string; // Add the missing property
 }
 
 const SupabaseInventoryList: React.FC = () => {
     const session = useSession();
     const supabase = useSupabaseClient();
 
-    const [inventoryItems, setInventoryItems] = useState([]);
+    const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
 
     const getItems = async () => {
         try {
             const { data, error } = await supabase
-                .from('inventoryITEMS')
+                .from('inventoryITEMS') // Specify the type parameter for better TypeScript support
                 .select("*")
-                .limit(100)
+                .limit(100);
 
             if (data) {
                 setInventoryItems(data);
@@ -51,7 +52,7 @@ const SupabaseInventoryList: React.FC = () => {
                         </div>
                         <p className="text-gray-600">{item.description}</p>
                         <p className="text-gray-600">Cost: {item.cost}</p>
-                        <p className="text-gray-600">Cost: {item.ItemCategory}</p>
+                        <p className="text-gray-600">Item Category: {item.ItemCategory}</p>
                     </li>
                 ))}
             </ul>

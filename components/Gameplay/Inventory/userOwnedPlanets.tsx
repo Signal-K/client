@@ -16,8 +16,8 @@ interface Planet {
 const OwnedPlanetsList: React.FC = () => {
   const session = useSession();
   const supabase = useSupabaseClient();
-  const [ownedPlanets, setOwnedPlanets] = useState([]);
-  const [planetDetails, setPlanetDetails] = useState([]);
+  const [ownedPlanets, setOwnedPlanets] = useState<OwnedPlanet[]>([]);
+  const [planetDetails, setPlanetDetails] = useState<Planet[]>([]);
 
   useEffect(() => {
     async function fetchOwnedPlanets() {
@@ -70,17 +70,20 @@ const OwnedPlanetsList: React.FC = () => {
   return (
     <>
       <div className="bg-gray-100 p-4">
-        <h2 className="text-2xl font-semibold mb-4">Your Planets</h2>
+        <h2 className="text-2xl font-semibold mb-4">Planets</h2>
         <ul className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {planetDetails.map((planet, index) => (
-            <Link legacyBehavior href={`https://play.skinetics.tech/tests/planets/${planet.id}`}>
-            <li key={planet.id} className="bg-white shadow-md p-4 rounded-md">
-              <h3 className="text-lg font-medium mb-2">{planet.content}</h3>
-              <div className="mb-2">
-                <img src={planet.cover} alt={planet.content} className="w-full h-auto" />
-              </div>
-              {/* Add additional planet details here */}
-            </li></Link>
+            <Link legacyBehavior key ={planet.id} href={`https://play.skinetics.tech/tests/planets/${planet.id}`}>
+              <a>
+                <li className="bg-white shadow-md p-4 rounded-md">
+                  <h3 className="text-lg font-medium mb-2">{planet.name}</h3>
+                  <div className="mb-2">
+                    <img src={planet.avatar_url} alt={planet.name} className="w-full h-auto" />
+                  </div>
+                  {/* Add additional planet details here */}
+                </li>
+              </a>
+            </Link>
           ))}
         </ul>
       </div>

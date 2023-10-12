@@ -14,7 +14,7 @@ const AddToInventoryButton: React.FC<AddToInventoryButtonProps> = ({ itemId }) =
     async function checkIfUserHasItem() {
       if (session) {
         try {
-          const user = session?.user;
+          const user = session.user;
           const { data, error } = await supabase
             .from('inventoryUSERS')
             .select('*')
@@ -35,7 +35,7 @@ const AddToInventoryButton: React.FC<AddToInventoryButtonProps> = ({ itemId }) =
     }
 
     checkIfUserHasItem();
-  }, [session]);
+  }, [session, itemId]);
 
   const handleAddToInventory = async () => {
     if (session && !hasItem) {
@@ -47,8 +47,8 @@ const AddToInventoryButton: React.FC<AddToInventoryButtonProps> = ({ itemId }) =
             {
               item: itemId,
               owner: user.id,
-              quantity: 1
-            }
+              quantity: 1,
+            },
           ]);
 
         if (error) {
@@ -63,16 +63,15 @@ const AddToInventoryButton: React.FC<AddToInventoryButtonProps> = ({ itemId }) =
   };
 
   return (
-    !hasItem && (
-      <button
-        onClick={handleAddToInventory}
-        className="bg-blue-500 text-white px-3 py-1 rounded"
-      >
-        Add to Inventory
-      </button>
-    )
+    <button
+      onClick={handleAddToInventory}
+      className="bg-blue-500 text-white px-3 py-1 rounded"
+    >
+      Add to Inventory
+    </button>
   );
 };
+
 
 interface InventoryItem {
   id: number;
@@ -83,7 +82,7 @@ interface InventoryItem {
 }
 
 const TrophyBlockLightkurveOnboardingPt1: React.FC = () => {
-  const [inventoryItem, setInventoryItem] = useState(null);
+  const [inventoryItem, setInventoryItem] = useState<InventoryItem | null>(null); // Added type annotation
   const supabase = useSupabaseClient();
   const session = useSession();
 
@@ -93,7 +92,7 @@ const TrophyBlockLightkurveOnboardingPt1: React.FC = () => {
         const { data, error } = await supabase
           .from('inventoryITEMS')
           .select('*')
-          .eq('id', 8)
+          .eq('id', 9)
           .single();
 
         if (error) {

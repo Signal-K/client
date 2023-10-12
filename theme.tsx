@@ -14,7 +14,7 @@ export default function NextraLayout({ children, pageOpts }: NextraThemeLayoutPr
             {pageMap.map(item => {
                 if (item.kind === 'MdxPage') {
                     return (
-                        <Link key={item.name} href={item.route}>
+                        <Link legacyBehavior key ={item.name} href={item.route}>
                             {item.route}
                         </Link>
                     )

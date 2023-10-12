@@ -7,11 +7,11 @@ import Login from "../../../login";
 export default function StarSailorsEmergence1 () {
     const session = useSession();
 
-    if (!session) return (
-        <CoreLayout>
-            <Login />
-        </CoreLayout>
-    )
+    // if (!session) return (
+    //     <CoreLayout>
+    //         <Login />
+    //     </CoreLayout>
+    // )
 
     return (
         <CoreLayout>

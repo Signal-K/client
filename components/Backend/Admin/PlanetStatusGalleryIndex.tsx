@@ -35,9 +35,9 @@ export default function PlanetStatusGalleryIndex() {
 
       const { data, error } = await query;
 
-      if (data != null) {
-        setPlanets(data);
-      }
+      // if (data != null) {
+      //   setPlanets(data);
+      // }
 
       if (error) {
         throw error;
@@ -94,9 +94,10 @@ export default function PlanetStatusGalleryIndex() {
           ))}
         </ButtonGroup>
         <Row>
-          {planets.map((planet) => (
+          {/* {planets.map((planet) => (
             <PlanetGalleryCard key={planet.id} planet={planet} />
-          ))}
+          ))} */}
+          <p>Test</p>
         </Row>
       </Container>
     </DashboardLayout>

@@ -119,6 +119,6 @@ module.exports = {
   plugins: [
     require('daisyui'),
     require('flowbite/plugin'),
-    require('@headlessui/tailwindcss')
+    require('@headlessui/tailwindcss'),
   ]
 };
