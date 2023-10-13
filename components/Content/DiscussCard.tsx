@@ -1,7 +1,6 @@
 import { AvatarFallback, Avatar, AvatarImage } from "../ui/Avatar";
 import { Button } from "../ui/Button";
 import { Card, CardContent, CardFooter, CardTitle } from "./PostCard";
-// import { Input } from "@/components/ui/input";
 import { Separator } from "@radix-ui/react-separator";
 import { useToast } from "../ui/use-toast";
 import { getMetaData } from "../../lib/helper/str.helper";
@@ -10,28 +9,57 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 type TProps = {
-  public_id: string;
+  id: number;
   content: string;
   created_at: string;
-  user?: {
-    name: string;
+  profiles: {
+    id: number;
+    avatar_url: string;
     username: string;
-    image: string | null;
-  } | null;
-  anonymous?: {
-    username: string;
-  } | null;
+  };
+  planets2?: string;
+  comments?: Comment[];
   _count: {
     comments: number;
   };
 };
 
+interface Comment {
+  id: number;
+  content: string;
+  created_at: string;
+  profiles: {
+    id: number;
+    avatar_url: string;
+    username: string;
+  };
+}
+
+const CommentItem: React.FC<Comment> = ({ id, content, created_at, profiles }) => {
+  return (
+    <div className="ml-2 my-3">
+      <div className="flex items-center mb-2">
+        <Avatar className="rounded-full">
+        <AvatarImage src={"https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/avatars/" + profiles?.avatar_url ?? ""} />
+          <AvatarFallback>Test</AvatarFallback> {/* {profiles?.username[0].toUpperCase()} */}
+        </Avatar>
+        <div className="flex flex-wrap items-center ml-2">
+          <div className="font-bold">{profiles?.username}</div>
+          {/* <div className="text-xs text-gray-500 ml-2">{new Date(created_at).toLocaleString()}</div> */}
+        </div>
+      </div>
+      <div className="my-3 text-sm">{content}</div>
+    </div>
+  );
+};
+
 const CardForum: React.FC<TProps> = ({
-  public_id,
+  id,
   content,
   created_at,
-  user,
-  anonymous,
+  profiles,
+  planets2,
+  comments,
   _count,
 }) => {
   const [reason, setReason] = useState("");
@@ -40,14 +68,14 @@ const CardForum: React.FC<TProps> = ({
     message: "",
   });
 
-  const { toast } = useToast();
+  const [showComments, setShowComments] = useState(false);
 
-//   const { mutate: reportPost, isLoading } = trpc.post.reportPost.useMutation();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!!response.message) {
       toast({
-        title: "Notifikasi",
+        title: "Notification",
         description: response.message,
       });
 
@@ -57,22 +85,19 @@ const CardForum: React.FC<TProps> = ({
     }
   }, [response]);
 
+  const toggleComments = () => {
+    setShowComments(!showComments);
+  };
+
   return (
-    <>
+    <><div style={{ width: '80%', margin: 'auto' }}>
       <div
         className={`fixed inset-0 bg-white/80 backdrop-blur-md z-20 items-center justify-center ${openReason ? "flex" : "hidden"
           }`}
       >
         <Card>
-          <CardTitle className="font-bold p-4">Apa alasan lo bre ?</CardTitle>
+          <CardTitle className="font-bold p-4">What's your reason?</CardTitle>
           <CardContent className="p-4 pt-0">
-            {/* <Input
-              onChange={(e) => setReason(e.target.value)}
-              required
-              autoFocus={true}
-              type="text"
-              placeholder="Jangan panjang panjang..."
-            /> */}
           </CardContent>
           <CardFooter className="p-4 pt-0 flex gap-2 justify-between">
             <Button
@@ -80,32 +105,32 @@ const CardForum: React.FC<TProps> = ({
               className="w-1/2"
               variant="outline"
             >
-              Gak Jadi
+              Cancel
             </Button>
           </CardFooter>
         </Card>
       </div>
       <Card>
-        <Link href={`/profil/${user?.username}`}>
+        <Link href={`/profile/${profiles?.username}`}>
           <CardTitle
-            className={`p-4 pb-0 group ${!anonymous && "cursor-pointer"}`}
+            className={`p-4 pb-0 group ${!profiles && "cursor-pointer"}`}
           >
             <div className="flex items-start gap-4">
               <Avatar className="rounded-md">
-                <AvatarImage src={(user && user.image) ?? ""} />
+                <AvatarImage src={"https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/avatars/" + profiles?.avatar_url ?? ""} />
                 <AvatarFallback className="rounded-md">
-                  {(user && user.name[0].toUpperCase()) ?? "A"}
+                  Test {/* {profiles?.username[0].toUpperCase() ?? "A"} */}
                 </AvatarFallback>
               </Avatar>
               <div className="space-y-1">
-                <h2 className={`${!anonymous && "group-hover:underline"}`}>
-                  {anonymous ? "Anonymous" : user && user.name}
+                <h2 className={`${!profiles && "group-hover:underline"}`}>
+                  {/* {profiles ? profiles.username : "Anonymous"} */}
                 </h2>
                 <p
-                  className={`text-foreground/60 ${!anonymous && "group-hover:underline"
+                  className={`text-foreground/60 ${!profiles && "group-hover:underline"
                     }`}
                 >
-                  {anonymous ? anonymous.username : user && user.username}
+                    <div className="font-bold mt-3">{profiles?.username}</div> 
                 </p>
               </div>
             </div>
@@ -114,33 +139,43 @@ const CardForum: React.FC<TProps> = ({
         <CardContent className="p-4 pt-2">
           <div>
             <small className="text-foreground/60 text-sm">
-              Metadata {getMetaData(created_at)}
+              Posted {getMetaData(created_at)}
             </small>
           </div>
-          <p className="mt-1 break-all">{content}</p>
+          <p className="mt-1 break-all max-w-full">
+            {content}
+          </p>
         </CardContent>
         <CardFooter className="p-0 flex-col items-start pb-2">
           <Separator className="mb-2" />
           <div className="space-x-2 px-4 py-2">
-            <Link href={`/forum/${public_id}`}>
-              <Button variant="outline" size="default" className="space-x-2">
+            {comments && (
+              <Button onClick={toggleComments} variant="outline" size="default" className="space-x-2">
                 <MessagesSquare className="w-5 aspect-square" />
-                <span>{_count.comments}</span>
+                {/* <span>{_count?.comments || 0}</span> */}
               </Button>
-            </Link>
+            )}
             <Button variant="outline" size="icon">
               <Share2 className="w-5 aspect-square" />
             </Button>
             <Button
-              onClick={() => setOpenReason(true)}
+              onClick={toggleComments}
               variant="destructive"
               size="icon"
             >
               <Megaphone className="w-5 aspect-square" />
             </Button>
           </div>
+          {showComments && comments && comments.length > 0 && (
+            <CardContent className="p-4 pt-2">
+              <h3 className="text-lg font-semibold mb-2">Comments</h3>
+              {comments.map((comment) => (
+                <CommentItem key={comment.id} {...comment} />
+              ))}
+            </CardContent>
+          )}
         </CardFooter>
-      </Card>
+      </Card></div>
     </>
   );
 };

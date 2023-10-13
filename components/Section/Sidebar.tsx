@@ -21,8 +21,8 @@ import { Button } from "../ui/Button";
 
 const navCategoryItems = [
   {
-    url: "/",
-    label: "STAR",
+    url: "/feed",
+    label: "Feed",
     Icon: StarHalfIcon,
   },
   {

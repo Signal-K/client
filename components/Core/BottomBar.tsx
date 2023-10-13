@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 const bottombarLinks = [
   {
     imgURL: "home.svg",
-    route: "/",
+    route: "/feed",
     label: "Feed",
   },
   {

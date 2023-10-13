@@ -1,7 +1,5 @@
 import React from 'react';
 import Layout from '../Section/Layout';
-import Footer from '../Core/Footer';
-import MusicPlayer from '../Core/assets/MusicPlayer';
 import Bottombar from '../Core/BottomBar';
 // import { PlanetGalleryIndexComp } from '../../../../pages/tests/planets';
 

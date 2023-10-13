@@ -12,7 +12,7 @@ const Login = () => {
     useEffect(() => {
         // Check if the user is logged in and then redirect
         if (session) {
-            router.push('/tests/onboarding');
+            router.push('/feed');
         }
     }, [session, router]);
 
