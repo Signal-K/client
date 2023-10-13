@@ -3,24 +3,29 @@ import { useRouter } from "next/router";
 
 const bottombarLinks = [
   {
-    imgURL: "/assets/icons/home.svg",
+    imgURL: "home.svg",
     route: "/",
-    label: "Home",
+    label: "Feed",
   },
   {
-    imgURL: "/assets/icons/wallpaper.svg",
-    route: "/explore",
+    imgURL: "planet.svg",
+    route: "/garden",
+    label: "Garden",
+  },
+  {
+    imgURL: "eagle.svg",
+    route: "/saved",
     label: "Explore",
   },
   {
-    imgURL: "/assets/icons/bookmark.svg",
-    route: "/saved",
-    label: "Saved",
+    imgURL: "rover.svg",
+    route: "/create-post",
+    label: "Gather",
   },
   {
-    imgURL: "/assets/icons/gallery-add.svg",
+    imgURL: "satellite.svg",
     route: "/create-post",
-    label: "Create",
+    label: "Missions",
   },
 ];
 
@@ -28,22 +33,24 @@ const Bottombar = () => {
   const { pathname } = useRouter();
 
   return (
-    <section className="bottom-bar flex justify-between p-4 bg-white fixed bottom-0 left-0 w-full">
+    <section className="bottom-bar flex justify-between items-center p-4 bg-white fixed bottom-0 left-0 w-full border-t">
       {bottombarLinks.map((link) => {
         const isActive = pathname === link.route;
         return (
-          <Link legacyBehavior key={`bottombar-${link.label}`} href={link.route}>
+          <Link legacyBehavior key={`bottombar-${link.label}`} href={link.route} passHref>
             <a className={`${
               isActive && "rounded-[10px] bg-primary-500 "
-            } flex-center flex-col gap-1 p-2 transition`}>
+            } flex flex-col items-center justify-center p-2 transition`}>
               <img
                 src={link.imgURL}
                 alt={link.label}
-                width={16}
-                height={16}
-                className={`${isActive && "invert-white"}`}
+                width={24} 
+                height={24}
+                className={`mb-1 ${isActive ? "invert-white" : "text-light-2"}`}
               />
-              <p className="tiny-medium text-light-2">{link.label}</p>
+              <p className={`tiny-medium ${isActive ? "text-light-3" : "text-light-2"}`}>
+                {link.label}
+              </p>
             </a>
           </Link>
         );

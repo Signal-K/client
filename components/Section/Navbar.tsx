@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
     return (
         <nav className="py-4 border-bg">
             <div className="container flex justify-between items-center">
-                <Link href="/" className="font-bold text-xl">Discussion<span className="text-red-600">SS</span></Link>
+                <Link href="/" className="font-bold text-xl">Star Sailors<span className="text-red-600"></span></Link>
                 <Link href="/profile">
                     <Avatar className="cursor-pointer rounded-md">
                         <AvatarImage src="https://avatars.githubusercontent.com/u/78838067?s=200&v=4" />

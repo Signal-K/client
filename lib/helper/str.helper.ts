@@ -1,5 +1,10 @@
 import { ReadonlyURLSearchParams } from "next/navigation";
 
+/**
+ * Generates a random string of the specified length.
+ * @param length The length of the random string.
+ * @returns The generated random string.
+ */
 export const generateAnonymousRandomString = (length: number) => {
   let result = "";
 
@@ -16,6 +21,11 @@ export const generateAnonymousRandomString = (length: number) => {
   return result;
 };
 
+/**
+ * Trims the user profile name if it exceeds 15 characters.
+ * @param name The user profile name.
+ * @returns The trimmed user profile name.
+ */
 export const trimUserProfileName = (name: string) => {
   if (name.length <= 15) return name;
 
@@ -25,10 +35,17 @@ export const trimUserProfileName = (name: string) => {
   return splittedName.join("");
 };
 
+/**
+ * Checks if the current URL is the active URL.
+ * @param pathname The current pathname.
+ * @param url The URL to check against.
+ * @param query The URL query parameters.
+ * @returns True if the current URL is active, otherwise false.
+ */
 export const checkCurrentActiveUrl = (
   pathname: string | null,
   url: string,
-  query: ReadonlyURLSearchParams | null,
+  query: ReadonlyURLSearchParams | null
 ) => {
   if (!pathname && !query) return false;
 
@@ -40,10 +57,15 @@ export const checkCurrentActiveUrl = (
   return pathname === url;
 };
 
+/**
+ * Gets the relative time format for the provided date.
+ * @param createdAt The date for which to generate the relative time.
+ * @returns The formatted relative time.
+ */
 export const getMetaData = (createdAt: string | Date) => {
   const date = createdAt instanceof Date ? createdAt : new Date(createdAt);
 
-  const formatter = new Intl.RelativeTimeFormat("id");
+  const formatter = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
   const ranges = {
     years: 3600 * 24 * 365,
     months: 3600 * 24 * 30,
@@ -54,18 +76,12 @@ export const getMetaData = (createdAt: string | Date) => {
     seconds: 1,
   };
 
-  // EXPLAIN: detik yg sudah berlalu di jadiin Math.abs (jadi angka positif) xxx.123 (karena di bagi 1000 makannya ada 3 angka di belakang)
   const secondsElapsed = (date.getTime() - Date.now()) / 1000;
-
-  // console.log('sebelum /1000 ' + (date.getTime() - Date.now()))
-  // console.log('sesudah /1000 ' + Math.abs(secondsElapsed))
 
   type TRange = keyof typeof ranges;
 
   for (let key in ranges) {
-    // EXPLAIN: apakah detik yang sudah berlalu tersebut melebihi dari ranges[key] ? jika iya maka range nya adalah ranges[key] contoh (secondsElapsed sudah melebihi 3600 / 1 jam lebih lah) maka range nya adalah hours / jam jika sudah melebihi 1 hari maka range nya day / hari dst..
     if (ranges[key as TRange] < Math.abs(secondsElapsed)) {
-      // console.log(key, ranges[key as TRange])
       const delta = secondsElapsed / ranges[key as TRange];
       return formatter.format(Math.round(delta), key as TRange);
     }

@@ -21,7 +21,7 @@ const Login = () => {
             {!session ? (
                 <div className='w-80%'><Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme='dark' /></div>
             ) : (
-                <Layout />
+                <Layout>Logged in</Layout>
             )}
         </div>
     );
