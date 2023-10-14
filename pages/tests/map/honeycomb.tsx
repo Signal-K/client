@@ -16,7 +16,7 @@ const generateUnfilledHexagons = (count) => {
   return hexagons;
 };
 
-function App() {
+function HoneycombComponent() {
   const hexagons = generateUnfilledHexagons(100);
 
   return (
@@ -26,4 +26,4 @@ function App() {
   );
 }
 
-export default App;
+export default HoneycombComponent;
