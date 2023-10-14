@@ -26,8 +26,8 @@ const navCategoryItems = [
     Icon: StarHalfIcon,
   },
   {
-    url: "/profile",
-    label: "PROFILE",
+    url: "/garden",
+    label: "Garden",
     Icon: User2Icon,
   },
 ];
