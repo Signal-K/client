@@ -3,27 +3,27 @@ import { useRouter } from "next/router";
 
 const bottombarLinks = [
   {
-    imgURL: "home.svg",
+    imgURL: "/home.svg",
     route: "/feed",
     label: "Feed",
   },
   {
-    imgURL: "planet.svg",
+    imgURL: "/planet.svg",
     route: "/garden",
     label: "Garden",
   },
   {
-    imgURL: "eagle.svg",
-    route: "/saved",
+    imgURL: "/eagle.svg",
+    route: "/planets/68",
     label: "Explore",
   },
   {
-    imgURL: "rover.svg",
+    imgURL: "/rover.svg",
     route: "/create-post",
     label: "Gather",
   },
   {
-    imgURL: "satellite.svg",
+    imgURL: "/satellite.svg",
     route: "/create-post",
     label: "Missions",
   },

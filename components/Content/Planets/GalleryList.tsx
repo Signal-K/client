@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Container } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Login from "../../../pages/login";
-import Bottombar from "../../Core/BottomBar";
 
 interface Planet {
   id: string;
@@ -20,7 +18,7 @@ export function PlanetGalleryCard({ planet, position }: Props) {
   const { id, content, cover } = planet;
 
   return (
-    <Link legacyBehavior href={`https://starsailors.space/tests/planets/${planet.id}`}>
+    <Link legacyBehavior href={`/planets/${id}`}>
       <a style={{ position: "absolute", top: position.top, left: position.left }}>
         <img src={cover} className="w-1/2" />
       </a>
