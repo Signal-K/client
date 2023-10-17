@@ -26,10 +26,12 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <>
-      {/* Navbar component goes here */}
       <div className="hidden md:flex relative items-start">
         <DesktopSidebar />
-        <main className="h-max pb-10 grow ml-64 pt-6">{children}</main>
+        <main className="h-max pb-10 grow ml-64 pt-6">
+          {/* <Navbar /> */}
+          {children}
+        </main>
       </div>
       {isMobile && (
         <div className="md:hidden overflow-y-auto h-screen p-4">
