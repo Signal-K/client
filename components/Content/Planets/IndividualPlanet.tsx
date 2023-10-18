@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React, { useState, useEffect, useRef } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UserContext } from "../../../context/UserContext";
-import Layout from "../../Section/Layout";
+import { LayoutNoNav } from "../../Section/Layout";
 import CardForum from "../DiscussCard";
 
 enum SidebarLink {
@@ -40,8 +40,6 @@ export default function IndividualPlanet({ id }: { id: string }) {
     useEffect(() => {
         setShowSidebar(screenWidth >= 800);
     }, [screenWidth]);
-
-    const planetCover = "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/" + id + "/download.png";
 
     useEffect(() => {
         if (planetId) {
@@ -93,17 +91,39 @@ export default function IndividualPlanet({ id }: { id: string }) {
     };
 
     const { content, avatar_url, cover } = planetData;
+    const rings = [2, 3, 4];
 
     return (
-        <Layout>
-            <div className="mb-7"><center><img height="20%" width="20%" src={cover} /></center></div>
-            {planetPosts?.length > 0 && 
-                planetPosts.map((post) => (
-                    <>
-                        <CardForum key={post.id} {...post} />
-                    </>
-                ))
-            }
-        </Layout>
+        <LayoutNoNav>
+            <div style={{ backgroundImage: `url('/bg.jpg')` }} className="bg-cover bg-center h-screen flex items-center justify-center relative">
+                <div className="mb-7 flex items-center justify-center h-screen relative">
+                    {rings.map((radius, index) => (
+                        <div
+                            key={index}
+                            className="absolute border-white border-solid border-2 rounded-full"
+                            style={{
+                                width: `${(radius * 24) / 100 * screenWidth}px`,
+                                height: `${(radius * 24) / 100 * screenWidth}px`,
+                                top: "50%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                            }}
+                        ></div>
+                        ))}
+                    <img
+                        src={avatar_url}
+                        alt="Planet Image"
+                        className="w-4/12 h-4/12 object-contain z-10"
+                    />
+                </div>
+                {planetPosts?.length > 0 && 
+                    planetPosts.map((post) => (
+                        <>
+                            <CardForum key={post.id} {...post} />
+                        </>
+                    ))
+                }
+            </div>
+        </LayoutNoNav>
     );
 };

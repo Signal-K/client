@@ -43,7 +43,7 @@ export default function PlanetGallery() {
         .order("created_at", { ascending: false })
         .limit(200)
         .gte("id", 67)
-        .lt("id", 69);
+        .lt("id", 75);
 
       const { data, error } = await query;
 

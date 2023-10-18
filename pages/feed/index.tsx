@@ -4,6 +4,7 @@ import CoreLayout from "../../components/Core/Layout";
 import Layout from "../../components/Section/Layout";
 import CardForum from "../../components/Content/DiscussCard";
 import ClassificationFeed from "../../components/Content/ClassificationFeed";
+import CreatePostForm from "../../components/Content/CreatePostForm";
 
 export default function Home() {
     const session = useSession();
@@ -21,6 +22,7 @@ export default function Home() {
     return (
       <Layout>
         {/* {userId} */}
+        {/* <CreatePostForm planetId2={68} /> */}
         <ClassificationFeed />
       </Layout>
         // <CoreLayout>
