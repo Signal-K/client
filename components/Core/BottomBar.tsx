@@ -14,7 +14,7 @@ const bottombarLinks = [
   },
   {
     imgURL: "/eagle.svg",
-    route: "/planets/68",
+    route: "/explore",
     label: "Explore",
   },
   {
