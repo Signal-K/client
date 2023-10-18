@@ -180,28 +180,40 @@ export default function IndividualBasePlanet({ id }: { id: string }) {
           {/* Rings */}
           {[...Array(ringCount)].map((_, index) => (
             <div
-              key={index}
-              className="absolute border-white border-solid border-2 rounded-full"
-              style={{
-                width: `${
-                  ((planetSizeDesktop * ringSizeFactor * (index + 1)) / 100) *
-                  screenWidth
-                }px`,
-                height: `${
-                  ((planetSizeDesktop * ringSizeFactor * (index + 1)) / 100) *
-                  screenWidth
-                }px`,
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                zIndex: 10,
-              }}
-            >
-                
-            </div>
+            key={index}
+            className="absolute border-white border-solid border-2 rounded-full"
+            style={{
+              width: `${
+                ((planetSizeDesktop * ringSizeFactor * (index + 1)) / 100) *
+                screenWidth
+              }px`,
+              height: `${
+                ((planetSizeDesktop * ringSizeFactor * (index + 1)) / 100) *
+                screenWidth
+              }px`,
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 10,
+            }}
+          >
+            {index === 0 && (
+              <img
+                src="https://github.com/Signal-K/client/blob/CPW-8/public/assets/Inventory/Items/GoldenTelescopeLevel1noBg.png?raw=true"
+                alt="Telescope Icon"
+                className="w-12 h-12 absolute top-3 left-12 transform -translate-x-1/2 -translate-y-1/2"
+              />
+            )}
+            {index === 1 && (
+              <img
+                src="https://github.com/Signal-K/client/blob/CPW-8/public/assets/Inventory/Items/GoldenTelescopeLevel1noBg.png?raw=true"
+                alt="Telescope Icon"
+                className="w-12 h-12 absolute top-10 right-4 transform -translate-x-1/2 -translate-y-1/2"
+              />
+            )}
+          </div>
           ))}
 
-          {/* Planet Image */}
           <img
             src={avatar_url}
             alt="Planet Image"
@@ -211,9 +223,9 @@ export default function IndividualBasePlanet({ id }: { id: string }) {
             }}
           />
         </div>
-        <p>{type}</p>
+        {/* <p>{type}</p> */}
         <div className="pt-10">
-            <iframe title="Embedded cell output" src={deepnote} height="613.1875" width="500"/>
+            <center><iframe title="Embedded cell output" src={deepnote} height="613.1875" width="80%"/></center>
         </div>
         {/* {hasPlanetInInventory && (
           <>
