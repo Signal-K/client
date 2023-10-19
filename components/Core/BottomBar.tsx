@@ -22,9 +22,14 @@ const bottombarLinks = [
     route: "/create-post",
     label: "Gather",
   },
+  // {
+  //   imgURL: "/satellite.svg",
+  //   route: "/create-post",
+  //   label: "Missions",
+  // },
   {
     imgURL: "/satellite.svg",
-    route: "/create-post",
+    route: "/planets/1",
     label: "Missions",
   },
 ];
