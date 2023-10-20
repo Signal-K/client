@@ -163,7 +163,7 @@ export default function IndividualPlanet({ id }: { id: string }) {
           <img
             src={avatar_url}
             alt="Planet Image"
-            className={`w-4/12 h-4/12 sm:w-4/12 sm:h-4/12 object-contain z-20`}
+            className={`w-2/12 h-2/12 sm:w-4/12 sm:h-4/12 object-contain z-20`}
             style={{
               zIndex: 20,
             }}
