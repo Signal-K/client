@@ -181,7 +181,7 @@ export default function IndividualBasePlanet({ id }: { id: string }) {
           {[...Array(ringCount)].map((_, index) => (
             <div
             key={index}
-            className="absolute border-white border-solid border-2 rounded-full"
+            className="absolute border-solid border-2 rounded-full"
             style={{
               width: `${
                 ((planetSizeDesktop * ringSizeFactor * (index + 1)) / 100) *
@@ -195,20 +195,28 @@ export default function IndividualBasePlanet({ id }: { id: string }) {
               left: "50%",
               transform: "translate(-50%, -50%)",
               zIndex: 10,
+              border: `1px solid rgba(255, 255, 255, 0.5)`,
             }}
           >
             {index === 0 && (
               <img
                 src="https://github.com/Signal-K/client/blob/CPW-8/public/assets/Inventory/Items/GoldenTelescopeLevel1noBg.png?raw=true"
                 alt="Telescope Icon"
-                className="w-12 h-12 absolute top-3 left-12 transform -translate-x-1/2 -translate-y-1/2"
+                className="w-12 h-12 absolute top-1 left-12 transform -translate-x-1/2 -translate-y-1/2"
               />
             )}
             {index === 1 && (
               <img
-                src="https://github.com/Signal-K/client/blob/CPW-8/public/assets/Inventory/Items/GoldenTelescopeLevel1noBg.png?raw=true"
+                src="https://github.com/Signal-K/client/blob/FCDB-21/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png?raw=true"
                 alt="Telescope Icon"
-                className="w-12 h-12 absolute top-10 right-4 transform -translate-x-1/2 -translate-y-1/2"
+                className="w-12 h-12 absolute top-4 right-4 transform -translate-x-1/2 -translate-y-1/2"
+              />
+            )}
+            {index === 2 && (
+              <img
+                src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/69/Kepler22.png"
+                alt="Telescope Icon"
+                className="w-8 h-8 absolute bottom-12 left-5 transform"
               />
             )}
           </div>

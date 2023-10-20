@@ -6,7 +6,7 @@ import Login from "../../../pages/login";
 interface Planet {
   id: string;
   content: string;
-  cover: string;
+  avatar_url: string;
 }
 
 interface Props {
@@ -15,12 +15,12 @@ interface Props {
 }
 
 export function PlanetGalleryCard({ planet, position }: Props) {
-  const { id, content, cover } = planet;
+  const { id, content, avatar_url } = planet;
 
   return (
     <Link legacyBehavior href={`/planets/${id}`}>
       <a style={{ position: "absolute", top: position.top, left: position.left }}>
-        <img src={cover} className="w-1/2" />
+        <img src={avatar_url} className="w-1/2" />
       </a>
     </Link>
   );
@@ -38,12 +38,13 @@ export default function PlanetGallery() {
   const getPlanets = async (): Promise<void> => {
     try {
       let query = supabase
-        .from("planetsss")
+        // .from("planetsss")
+        .from("basePlanets")
         .select("*")
         .order("created_at", { ascending: false })
         .limit(200)
-        .gte("id", 67)
-        .lt("id", 75);
+        // .gte("id", 67)
+        // .lt("id", 75);
 
       const { data, error } = await query;
 

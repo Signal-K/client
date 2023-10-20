@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient, SupabaseClient } from "@supabase/auth-helpers-react";
 import CardForum from "./DiscussCard";
+import Link from "next/link";
 
 export default function ClassificationFeed() {
     const supabase: SupabaseClient = useSupabaseClient();
@@ -55,9 +56,9 @@ export default function ClassificationFeed() {
 
     return (
         <div className="flex flex-col items-center gap-4" style={{ maxWidth: '100%', margin: 'auto' }}>
-            {posts.map((post) => (
+            <Link href="/planets/1">{posts.map((post) => (
                 <CardForum key={post.id} {...post} />
-            ))}
+            ))}</Link>
         </div>
     );
 };
