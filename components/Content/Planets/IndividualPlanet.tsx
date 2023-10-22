@@ -4,6 +4,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UserContext } from "../../../context/UserContext";
 import { LayoutNoNav } from "../../Section/Layout";
 import CardForum from "../DiscussCard";
+import { RoverGallerySingle } from "../RoverData/RandomImage";
 
 enum SidebarLink {
   Feed,
@@ -21,6 +22,9 @@ export default function IndividualPlanet({ id }: { id: string }) {
   const [planetData, setPlanetData] = useState(null);
   const [planetPosts, setPlanetPosts] = useState([]);
   const { id: planetId } = router.query;
+  const [hasPlanetInInventory, setHasPlanetInInventory] = useState(false);
+  const [inventoryPlanetId, setInventoryPlanetId] = useState<string | null>(null);
+  const [sectors, setSectors] = useState([]);
 
   const [activeLink, setActiveLink] = useState(SidebarLink.Data);
   const [screenWidth, setScreenWidth] = useState<number>(0);
@@ -45,6 +49,8 @@ export default function IndividualPlanet({ id }: { id: string }) {
     if (planetId) {
       getPlanetData();
       fetchPostsForPlanet(id);
+      fetchSectorsForPlanet(inventoryPlanetId);
+      checkUserInventory();
     }
   });
 
@@ -95,6 +101,47 @@ export default function IndividualPlanet({ id }: { id: string }) {
   }
 
   const { content, avatar_url, cover } = planetData;
+
+  async function checkUserInventory() {
+    if (!session || !planetId) {
+      return;
+    };
+
+    const { data, error } = await supabase
+      .from("inventoryPLANETS")
+      .select()
+      .eq("planet_id", planetId)
+      .eq("owner_id", session?.user?.id);
+
+    if (error) {
+      console.error("Error checking user inventory:", error);
+      return;
+    };
+
+    if (data.length > 0) {
+      setHasPlanetInInventory(true);
+      setInventoryPlanetId(data[0].id);
+    };
+  };
+
+  async function fetchSectorsForPlanet(planetId: string) {
+    try {
+      const { data, error } = await supabase
+      .from('planetsssSECTORS')
+      .select('*')
+      .eq('planetId', planetId);
+
+    if (error) {
+      console.error('Error fetching sectors data:', error.message);
+      return;
+    };
+
+    setSectors(data);
+    } catch (error) {
+      console.error(error);
+    };
+  };
+
   const rings = [2, 3, 4];
   const planetSizeMobile = 8; // 8% of the screen size
   const planetSizeDesktop = 14; // 14% of the screen size
@@ -168,6 +215,10 @@ export default function IndividualPlanet({ id }: { id: string }) {
               zIndex: 20,
             }}
           />
+          {hasPlanetInInventory && (<>
+            <p>{inventoryPlanetId}</p>
+            <RoverGallerySingle inventoryPlanetId={inventoryPlanetId} />
+          </>)}
         </div>
       </div>
     </LayoutNoNav>
