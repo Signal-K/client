@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'space.starsailors',
+  appId: 'space.starsailors.app',
   appName: 'Star Sailors',
   webDir: 'out',
   server: {

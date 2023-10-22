@@ -1,4 +1,4 @@
-package space.starsailors;
+package space.starsailors.app;
 
 import com.getcapacitor.BridgeActivity;
 
