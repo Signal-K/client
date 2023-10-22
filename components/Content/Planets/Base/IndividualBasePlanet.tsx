@@ -202,16 +202,23 @@ export default function IndividualBasePlanet({ id }: { id: string }) {
               <img
                 src="https://github.com/Signal-K/client/blob/FCDB-21/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png?raw=true"
                 alt="Telescope Icon"
-                className="w-12 h-12 absolute top-4 right-4 transform -translate-x-1/2 -translate-y-1/2"
+                className="w-12 h-12 absolute top-8 right-4 transform -translate-x-1/2 -translate-y-1/2"
               />
             )}
-            {/* {index === 2 && (
+            {index === 2 && (
               <img
                 src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/69/Kepler22.png"
                 alt="Telescope Icon"
-                className="w-8 h-8 absolute bottom-12 left-8 transform"
+                className="w-8 h-8 absolute bottom-20 left-8 transform"
               />
-            )} */}
+            )}
+            {index === 2 && (
+              <img
+                src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/72/Trappist.png"
+                alt="Telescope Icon"
+                className="w-20 h-16 absolute bottom-1 right-2 transform -translate-x-1/2 -translate-y-1/2"
+              />
+            )}
           </div>
           ))}
 
