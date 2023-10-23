@@ -5,6 +5,7 @@ import IndividualBasePlanet, { IndividualBasePlanetDesktop } from "../../compone
 import Layout, { LayoutNoNav } from "../../components/Section/Layout";
 import { DesktopSidebar } from "../../components/Section/Sidebar";
 import ClassificationFeed from "../../components/Content/ClassificationFeed";
+import { ActivateButton } from "../../components/Content/Planets/PlanetData/ContentPlaceholder";
 
 export default function PlanetIdPage () {
     const router = useRouter();
@@ -42,10 +43,11 @@ export default function PlanetIdPage () {
             <div className="w-1/6 bg-gray-50">
                 <DesktopSidebar />
             </div>
-            <div className="w-2/6 overflow-y-auto mr-4">
+            <div className="w-2/6 overflow-y-auto mr-4 z-40">
+                <br /><ActivateButton />
                 <IndividualBasePlanetDesktop id={id as string} />
             </div>
-            <div className="w-3/6 bg-gray-50 overflow-y-auto">
+            <div className="w-3/6 bg-gray-50 overflow-y-auto z-">
                 <ClassificationFeed />
             </div>
         </div>

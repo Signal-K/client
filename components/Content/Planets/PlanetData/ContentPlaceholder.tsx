@@ -1,18 +1,20 @@
 import { CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/react/20/solid';
+import React, { useState } from 'react';
 
 export default function ContentPlaceholder() {
   return (
-      <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg">
-        <p className="text-base font-semibold leading-7 text-indigo-600">Deploy faster</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">A better workflow</h1>
+      <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg z-50">
+        <p className="text-base font-semibold leading-7 text-indigo-600">Planet type</p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Planet name</h1>
         <p className="mt-6 text-xl leading-8 text-gray-700">
-          Aliquet nec orci mattis amet quisque ullamcorper neque, nibh sem. At arcu, sit dui mi, nibh dui, diam eget aliquam. Quisque id at vitae feugiat egestas.
+          Brief summary
         </p>
 
-        <div className="mt-8 text-gray-700">
-          <p>
-            Faucibus commodo massa rhoncus, volutpat. Dignissim sed eget risus enim. Mattis mauris semper sed amet vitae sed turpis id. Id dolor praesent donec est. Odio penatibus risus viverra tellus varius sit neque erat velit. Faucibus commodo massa rhoncus, volutpat. Dignissim sed eget risus enim. Mattis mauris semper sed amet vitae sed turpis id.
-          </p>
+        <div className="text-gray-700">
+            <div className="pt-10">
+                <center><iframe title="Embedded cell output" src='https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/444f50e799124ee0ba9b190392d8450b/55ff2dff45fa41d1a6d038a7b088b5ef?height=613.1875
+' height="500.1875" width="90%"/></center>
+            </div>
 
           <ul role="list" className="mt-8 space-y-8 text-gray-600">
             <li className="flex gap-x-3">
@@ -38,12 +40,44 @@ export default function ContentPlaceholder() {
           <p className="mt-8">
             Et vitae blandit facilisi magna lacus commodo. Vitae sapien duis odio id et. Id blandit molestie auctor fermentum dignissim. Lacus diam tincidunt ac cursus in vel. Mauris varius vulputate et ultrices hac adipiscing egestas. Iaculis convallis ac tempor et ut. Ac lorem vel integer orci.
           </p>
-
-          <h2 className="mt-16 text-2xl font-bold tracking-tight text-gray-900">No server? No problem.</h2>
-          <p className="mt-6">
-            Id orci tellus laoreet id ac. Dolor, aenean leo, ac etiam consequat in. Convallis arcu ipsum urna nibh. Pharetra, euismod vitae interdum mauris enim, consequat vulputate nibh. Maecenas pellentesque id sed tellus mauris, ultrices mauris. Tincidunt enim cursus ridiculus mi. Pellentesque nam sed nullam sed diam turpis ipsum eu a sed convallis diam.
-          </p>
         </div>
       </div>
   );
 };
+
+export function ActivateButton() {
+    const [showContent, setShowContent] = useState(false);
+  
+    const handleClick = () => {
+      setShowContent(true);
+    };
+  
+    return (
+      <div>
+        {/* Your existing content goes here */}
+        
+        {/* Button to show ContentPlaceholder */}
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={handleClick}
+        >
+          Show Content
+        </button>
+  
+        {/* Conditionally render ContentPlaceholder */}
+        {showContent && (
+          <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
+            <ContentPlaceholder />
+  
+            {/* Close button */}
+            <button
+              className="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded"
+              onClick={() => setShowContent(false)}
+            >
+              Close
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }

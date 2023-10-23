@@ -141,7 +141,7 @@ export default function IndividualBasePlanet({ id }: { id: string }) {
   const ringCount = 3; // Number of rings
 
   return (
-      <div className="h-screen relative">
+      <div className="h-screen relative z-10">
         {/* Background Styles */}
         <style jsx global>
           {`
