@@ -8,7 +8,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { VenetianMask } from "lucide-react";
 import React, { useContext, useEffect, useState} from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { UserContext } from "../../context/UserContext";
 import { useRouter } from "next/router";
 import { Avatar, AvatarFallback } from "../ui/Avatar";
