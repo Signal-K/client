@@ -381,7 +381,7 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
     const rings = [2, 3, 4];
     const planetSizeMobile = 8; // 8% of the screen size
     const planetSizeDesktop = 11;
-    const ringSizeFactor = 1; // Start rings around 2 times the size of the planet image
+    const ringSizeFactor = 1.4; // Start rings around 2 times the size of the planet image
     const ringCount = 3; // Number of rings
   
     return (
@@ -439,23 +439,23 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
                 <img
                   src="https://github.com/Signal-K/client/blob/CPW-8/public/assets/Inventory/Items/GoldenTelescopeLevel1noBg.png?raw=true"
                   alt="Telescope Icon"
-                  className="w-12 h-12 absolute top-1 left-12 transform -translate-x-1/2 -translate-y-1/2"
+                  className="w-12 h-12 absolute top-8 left-12 transform -translate-x-1/2 -translate-y-1/2"
                 />
               )}
               {index === 1 && (
                 <img
                   src="https://github.com/Signal-K/client/blob/FCDB-21/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png?raw=true"
                   alt="Telescope Icon"
-                  className="w-12 h-12 absolute top-8 right-4 transform -translate-x-1/2 -translate-y-1/2"
+                  className="w-12 h-12 absolute bottom-14 right-4 transform -translate-x-1/2 -translate-y-1/2"
                 />
               )}
-              {/* {index === 2 && (
+              {index === 2 && (
                 <img
                   src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/69/Kepler22.png"
                   alt="Telescope Icon"
-                  className="w-8 h-8 absolute bottom-12 left-8 transform"
+                  className="w-12 h-12 absolute bottom-0.6 left-80 transform"
                 />
-              )} */}
+              )}
             </div>
             ))}
   
