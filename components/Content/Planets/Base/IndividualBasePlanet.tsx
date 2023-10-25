@@ -481,4 +481,17 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
           )} */}
         </div>
     );
-  };
+};
+
+export function BasePlanetData (planetId) { // Repurpose/rename syntax for generic anomalies/non-base entities
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  useEffect(() => {
+    async function fetchPlanetData() {
+      supabase.from
+    }
+  }, [planetId]);
+
+  // Scaffolding for mobile/desktop formats (in current interim state)
+}
