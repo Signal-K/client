@@ -487,11 +487,23 @@ export function BasePlanetData (planetId) { // Repurpose/rename syntax for gener
   const supabase = useSupabaseClient();
   const session = useSession();
 
+  const [basePlanetData, setBasePlanetData] = useState(null);
+
   useEffect(() => {
-    async function fetchPlanetData() {
-      supabase.from
-    }
-  }, [planetId]);
+    const planetData = supabase
+      .from('basePlanets')
+      .select(
+        'id, content, ticId, type, radius, mass, density, gravity, temperatureEq, temperature, smaxis, orbital_period, classification_status, avatar_url, deepnote' // Link in with starSystem later
+      )
+      .eq('id', planetId)
+
+      console.log(planetData);
+    setBasePlanetData(planetData);
+  }, [session]);
 
   // Scaffolding for mobile/desktop formats (in current interim state)
+
+  return (
+    <p>{basePlanetData}</p>
+  )
 }
