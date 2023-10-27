@@ -49,7 +49,7 @@ export default function PlanetIdPage () {
                 <IndividualBasePlanetDesktop id={id as string} />
             </div>
             <div className="w-2/6 bg-gray-50 overflow-y-auto z-">
-                <BasePlanetData planetId={id} />
+                <BasePlanetData planetId={{ id: id as string }} />
                 <PostFormCardAnomalyTag planetId={id} onPost={null} />
                 <ClassificationFeedForIndividualPlanet planetId={id} />
             </div>

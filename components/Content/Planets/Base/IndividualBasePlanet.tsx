@@ -483,27 +483,51 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
     );
 };
 
-export function BasePlanetData (planetId) { // Repurpose/rename syntax for generic anomalies/non-base entities
+export function BasePlanetData ({ planetId }) { // Repurpose/rename syntax for generic anomalies/non-base entities
   const supabase = useSupabaseClient();
   const session = useSession();
 
   const [basePlanetData, setBasePlanetData] = useState(null);
 
   useEffect(() => {
-    const planetData = supabase
-      .from('basePlanets')
-      .select(
-        'id, content, ticId, type, radius, mass, density, gravity, temperatureEq, temperature, smaxis, orbital_period, classification_status, avatar_url, deepnote' // Link in with starSystem later
-      )
-      .eq('id', planetId)
+    const fetchPlanetData = async () => {
+      if (!planetId || !planetId.id) {
+        return;
+      }
 
-      console.log(planetData);
-    setBasePlanetData(planetData);
-  }, [session]);
+      try {
+        const { data, error } = await supabase
+          .from('basePlanets')
+          .select(
+            // 'id, content, ticId, type, radius, mass, density, gravity, temperatureEq, temperature, smaxis, orbital_period, classification_status, avatar_url, deepnote' // Add starsystems value & moons, items down the line (including instances of planets)
+            
+          )
+          .eq('id', planetId.id);
+
+        if (error) {
+          console.error('Error fetching planet data:', error.message);
+          return;
+        }
+
+        setBasePlanetData(data[0]);
+      } catch (error) {
+        console.error('Error fetching planet data:', error.message);
+      }
+    };
+
+    fetchPlanetData();
+  }, [session, planetId]);
 
   // Scaffolding for mobile/desktop formats (in current interim state)
 
+  if (!basePlanetData) {
+    return <p>Loading...</p>;
+  }
+
   return (
-    <p>{basePlanetData}</p>
+    <div>
+      <p>ID: {basePlanetData.id}</p>
+      <p>Temperature: {basePlanetData.temperature}</p>
+    </div>
   )
 }
