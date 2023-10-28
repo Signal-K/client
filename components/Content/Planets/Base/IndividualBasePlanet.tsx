@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import ContentPlaceholder, { ActivateButton } from "../PlanetData/ContentPlaceholder";
 
 export default function IndividualBasePlanet({ id }: { id: string }) {
   const router = useRouter();
@@ -528,6 +529,9 @@ export function BasePlanetData ({ planetId }) { // Repurpose/rename syntax for g
     <div>
       <p>ID: {basePlanetData.id}</p>
       <p>Temperature: {basePlanetData.temperature}</p>
+      {/* <ActivateButton planetIdDeepnote={basePlanetData.deepnote} /> */}
+      {/* <ContentPlaceholder planetIdDeepnote='https://embed.deepnote.com/f8de697b-ba49-4014-b2b2-fe5f4cc3c026/3c7a3d159d33438fae3b08ca3e5aa88e/9a872bcf31674fcf8f46c75daf205168?height=564.1875' /> */}
+      <center><iframe src={basePlanetData.deepnote} height='659' width='80%' /></center>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/react/20/solid';
 import React, { useState } from 'react';
 
-export default function ContentPlaceholder() {
+export default function ContentPlaceholder(planetIdDeepnote) {
   return (
       <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg z-50">
         <p className="text-base font-semibold leading-7 text-indigo-600">Planet type</p>
@@ -12,8 +12,8 @@ export default function ContentPlaceholder() {
 
         <div className="text-gray-700">
             <div className="pt-10">
-                <center><iframe title="Embedded cell output" src='https://embed.deepnote.com/50ad3984-69a9-496e-a121-efb59231e7e9/444f50e799124ee0ba9b190392d8450b/55ff2dff45fa41d1a6d038a7b088b5ef?height=613.1875
-' height="500.1875" width="90%"/></center>
+                {/* <center><iframe title="Embedded cell output" src={planetIdDeepnote}/></center> */}
+                <iframe src="https://embed.deepnote.com/f8de697b-ba49-4014-b2b2-fe5f4cc3c026/3c7a3d159d33438fae3b08ca3e5aa88e/9a872bcf31674fcf8f46c75daf205168?height=264.1875" />
             </div>
 
           <ul role="list" className="mt-8 space-y-8 text-gray-600">
@@ -45,7 +45,7 @@ export default function ContentPlaceholder() {
   );
 };
 
-export function ActivateButton() {
+export function ActivateButton(planetIdDeepnote) {
     const [showContent, setShowContent] = useState(false);
   
     const handleClick = () => {
@@ -67,7 +67,7 @@ export function ActivateButton() {
         {/* Conditionally render ContentPlaceholder */}
         {showContent && (
           <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50">
-            <ContentPlaceholder />
+            <ContentPlaceholder planetIdDeepnote={planetIdDeepnote} />
   
             {/* Close button */}
             <button
