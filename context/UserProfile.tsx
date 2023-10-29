@@ -2,15 +2,7 @@
 
 import { createContext, useState, useEffect, ReactNode, useContext, Dispatch, SetStateAction } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-
-interface UserProfile {
-    username: string;
-    full_name: string;
-    location: number;
-    id: string;
-    avatar_url: string;
-    faction: string;
-};
+import { UserProfile } from "@/types/User";
 
 type UserProfileContextType = {
     userProfile: UserProfile | null;

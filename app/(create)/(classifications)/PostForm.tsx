@@ -9,7 +9,7 @@ import UserAvatar, { UserAvatarNullUpload } from "@/app/(settings)/profile/Avata
 interface ClassificationOption {
     id: number;
     text: string;
-};
+}
 
 const planetClassificationOptions: ClassificationOption[] = [
     { id: 1, text: 'No dips at all' },
@@ -29,10 +29,10 @@ const roverImgClassificationOptions: ClassificationOption[] = [
 
 interface ClassificationFormProps {
     anomalyType: string;
-    anomalyId: string;
+    anomalyId: string;  // This should be the ID of the anomaly
     missionNumber: number;
     assetMentioned: string;
-};
+}
 
 const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, anomalyId, missionNumber, assetMentioned }) => {
     const supabase = useSupabaseClient();
@@ -112,7 +112,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     author: session?.user?.id,
                     content,
                     media: [uploads, assetMentioned],
-                    anomaly: activePlanet?.id || anomalyId,
+                    anomaly: anomalyId,  // Use the anomalyId passed as a prop
                     classificationtype: anomalyType,
                     classificationConfiguration,
                 })
@@ -211,34 +211,20 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                 <label className="flex gap-1 items-center cursor-pointer">
                                     <input type="file" className="hidden" onChange={addMedia} />
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.125 1.125 0 001.589 1.589L13.65 7.18m1.117-.428a1.125 1.125 0 00-1.6-1.6l-7.692 7.692" />
                                     </svg>
-                                    <span className="hidden md:block">Media</span>
+                                    <span>Upload Image</span>
                                 </label>
-                                {isUploading && (
-                                    <div className="text-center ml-4">
-                                        <p>Uploading...</p>
-                                    </div>
-                                )}
                             </div>
-                            {uploads.length > 0 && (
-                                <div className="flex gap-2 mb-4">
-                                    {uploads.map((upload, index) => (
-                                        <img key={index} src={upload} className="w-auto h-48 rounded-md" alt={`Upload ${index}`} />
-                                    ))}
-                                </div>
-                            )}
+                            <button
+                                onClick={createPost}
+                                disabled={isUploading || !content || !anomalyId}
+                                className="w-full py-2 px-4 bg-blue-500 text-white rounded-md"
+                            >
+                                {isUploading ? 'Uploading...' : 'Submit'}
+                            </button>
                         </>
                     )}
-                </div>
-                <div className="flex flex-col gap-2 w-1/3">
-                    <button
-                        onClick={createPost}
-                        disabled={!content || Object.keys(selectedOptions).length === 0}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md"
-                    >
-                        Submit Classification
-                    </button>
                 </div>
             </div>
         </div>

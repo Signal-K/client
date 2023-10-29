@@ -8,8 +8,7 @@ import { TelescopeClassification } from "@/app/(structures)/Telescopes/Transitin
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ProgressBar from "../(missions)/ProgressBar";
 import DeployRooversInitial from "../roovers/deployAndReturn";
-import Compass from "@/Classifications/RoverContent/RoverData";
-import { MineralDeposit } from "@/app/(inventory)/items/MineralDeposits";
+import GeneratedStarterPlanet from "@/app/(anomalies)/(planets)/generated";
 
 interface Mission {
   id: number;
@@ -40,16 +39,12 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
           <TelescopeClassification anomalyid={activePlanet?.id || getRandomPlanetId()} />
         );
       case 1370104:
-        return (
-            <DeployRooversInitial />
-        );
-      case 1370105:
-        return (
-          <MineralDeposit />
-        );
+        return <DeployRooversInitial />;
       case 1370106:
         return (
-          <Compass windspeed={50} direction={50} />
+          <div>
+            <GeneratedStarterPlanet />
+          </div>
         );
       default:
         return <div>Welcome message...</div>;
@@ -73,16 +68,16 @@ const OnboardingWindow = () => {
   const [steps, setSteps] = useState<Mission[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false); // New state for dropdown
 
-  const missionIds = [1370102, 1370103, 1370104, 1370105, 1370106];
+  const missionIds = [1370102, 1370103, 1370104, 1370106]; // Exclude 1370105 from the missionIds
 
   useEffect(() => {
     const fetchMissionsData = async () => {
       const response = await fetch("/api/gameplay/missions");
       const data: Mission[] = await response.json();
 
-      // Filter out the relevant missions
-      const filteredSteps = data.filter((mission) =>
-        missionIds.includes(mission.id)
+      // Filter out the relevant missions, excluding 1370105
+      const filteredSteps = data.filter(
+        (mission) => missionIds.includes(mission.id)
       );
 
       setSteps(filteredSteps);
@@ -162,7 +157,7 @@ const OnboardingWindow = () => {
 
       {/* Right Panel */}
       <div
-        className={`md:w-2/3 w-full flex flex-col justify-center p-10  overflow-hidden`} // // bg-[url('https://images.unsplash.com/photo-1462726625343-6a2ab0b9f020?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-repeat bg-cover bg-center
+        className={`md:w-2/3 w-full flex flex-col justify-center p-10 overflow-y-auto h-screen`} 
         style={{ backgroundPosition: "center" }}
       >
         <div className="flex-grow flex flex-col justify-between">

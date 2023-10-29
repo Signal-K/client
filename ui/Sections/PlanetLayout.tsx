@@ -11,11 +11,9 @@ import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import NavMenu from "@/app/(layout)/menu";
 import { PostCard } from "@/app/(create)/cards/PostCard";
-
-interface PlanetLayoutProps {
-  children: ReactNode;
-};
-
+import { MainContentProps } from "@/types/Layout/Globals";
+import { PlanetLayoutProps } from "@/types/Layout/Globals";
+ 
 export default function PlanetLayout({ children }: { children: React.ReactNode }) {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -199,11 +197,6 @@ export default function PlanetLayout({ children }: { children: React.ReactNode }
     </>
   );
 }
-
-interface MainContentProps {
-    children: ReactNode;
-    backgroundImage?: string;
-};
 
 export function MainContent({ children, backgroundImage }: MainContentProps) {
     return (
