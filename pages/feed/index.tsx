@@ -23,6 +23,8 @@ export default function Home() {
       <Layout>
         {/* {userId} */}
         {/* <CreatePostForm planetId2={68} /> */}
+        <iframe src="https://observablehq.com/d/464f8a61b073bb4d" width='100%' height='100%' />
+        <iframe src="https://deepnote.com/@star-sailors/Step-by-step-50ad3984-69a9-496e-a121-efb59231e7e9" width='100%' height='100%' />
         <ClassificationFeed />
       </Layout>
         // <CoreLayout>
