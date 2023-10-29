@@ -535,3 +535,101 @@ export function BasePlanetData ({ planetId }) { // Repurpose/rename syntax for g
     </div>
   )
 }
+
+export function EditableBasePlanetData({ planetId }) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const [basePlanetData, setBasePlanetData] = useState(null);
+  const [editedData, setEditedData] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    const fetchPlanetData = async () => {
+      if (!planetId || !planetId.id) {
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('basePlanets')
+          .select('*') // Fetch all columns
+          .eq('id', planetId.id);
+
+        if (error) {
+          console.error('Error fetching planet data:', error.message);
+          return;
+        }
+
+        setBasePlanetData(data[0]);
+      } catch (error) {
+        console.error('Error fetching planet data:', error.message);
+      }
+    };
+
+    fetchPlanetData();
+  }, [session, planetId]);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setEditedData({ ...basePlanetData }); // Copy the original data for editing
+  };
+
+  const handleSaveClick = async () => {
+    try {
+      // Update the row in the 'basePlanets' table
+      const { error } = await supabase
+        .from('basePlanets')
+        .update(editedData)
+        .eq('id', planetId.id);
+
+      if (error) {
+        console.error('Error updating planet data:', error.message);
+        return;
+      }
+
+      // Update local state and exit edit mode
+      setBasePlanetData(editedData);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating planet data:', error.message);
+    }
+  };
+
+  const handleChange = (e) => {
+    // Update the edited data when input values change
+    setEditedData({ ...editedData, [e.target.name]: e.target.value });
+  };
+
+  if (!basePlanetData) {
+    return <p>Loading...</p>;
+  }
+
+  return (
+    <div>
+      {isEditing ? (
+        <>
+          {Object.keys(editedData).map((key) => (
+            <div key={key}>
+              <label>{key}:</label>
+              <input
+                type="text"
+                name={key}
+                value={editedData[key]}
+                onChange={handleChange}
+              />
+            </div>
+          ))}
+          <button onClick={handleSaveClick}>Save</button>
+        </>
+      ) : (
+        // View mode: Display current data and edit button
+        <>
+          <p>ID: {basePlanetData.id}</p>
+          <p>Temperature: {basePlanetData.temperature}</p>
+          <button onClick={handleEditClick}>Edit</button>
+        </>
+      )}
+    </div>
+  );
+}
