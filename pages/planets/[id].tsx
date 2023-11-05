@@ -54,7 +54,7 @@ export default function PlanetIdPage () {
                     <BasePlanetData planetId={{ id: id as string }} />
                     <EditableBasePlanetData planetId={{ id: id as string }} />
                     <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                    <ClassificationFeedForIndividualPlanet planetId={id} />
+                    <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
                 </div>
             </div>
         );
@@ -71,7 +71,7 @@ export default function PlanetIdPage () {
                     <BasePlanetData planetId={{ id: id as string }} />
                     <EditableBasePlanetData planetId={{ id: id as string }} />
                     <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                    <ClassificationFeedForIndividualPlanet planetId={id} />
+                    <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
             </div>
         </div>
       );                    
