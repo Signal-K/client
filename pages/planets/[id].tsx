@@ -7,6 +7,7 @@ import { DesktopSidebar } from "../../components/Section/Sidebar";
 import { ClassificationFeedForIndividualPlanet } from "../../components/Content/ClassificationFeed";
 import { ActivateButton } from "../../components/Content/Planets/PlanetData/ContentPlaceholder";
 import PostFormCardAnomalyTag from "../../components/Content/Classify/AnomalyPostFormCard";
+import Navbar from "../../components/Section/Navbar";
 
 export default function PlanetIdPage () {
     const router = useRouter();
@@ -52,7 +53,7 @@ export default function PlanetIdPage () {
                 </div>
                 <div className="w-2/6 bg-gray-50 overflow-y-auto z-">
                     <BasePlanetData planetId={{ id: id as string }} />
-                    <EditableBasePlanetData planetId={{ id: id as string }} />
+                    {/* <EditableBasePlanetData planetId={{ id: id as string }} /> */}
                     <PostFormCardAnomalyTag planetId={id} onPost={null} />
                     <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
                 </div>
@@ -61,18 +62,19 @@ export default function PlanetIdPage () {
     }
 
     return (
-        // <Layout>
-        <div className="flex h-screen">
-            <div className="w-3/6 overflow-y-auto mr-30 z-40">
-                    {/* <br /><ActivateButton /> */}
-                    <IndividualBasePlanetDesktop id={id as string} />
+        <>
+            <Navbar />
+            <div className="flex h-screen">
+                <div className="w-3/6 overflow-y-auto mr-30 z-40">
+                        {/* <br /><ActivateButton /> */}
+                        <IndividualBasePlanetDesktop id={id as string} />
+                    </div>
+                    <div className="w-3/6 bg-gray-50 overflow-y-auto z-">
+                        <BasePlanetData planetId={{ id: id as string }} />
+                        <PostFormCardAnomalyTag planetId={id} onPost={null} />
+                        <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
                 </div>
-                <div className="w-3/6 bg-gray-50 overflow-y-auto z-">
-                    <BasePlanetData planetId={{ id: id as string }} />
-                    <EditableBasePlanetData planetId={{ id: id as string }} />
-                    <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                    <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
             </div>
-        </div>
+        </>
       );                    
 };

@@ -527,13 +527,6 @@ export function BasePlanetData ({ planetId }) { // Repurpose/rename syntax for g
 
   return (
     <div>
-      <p>ID: {basePlanetData.id}</p>
-      <p>Temperature: {basePlanetData.temperature}</p>
-      {/* <ActivateButton planetIdDeepnote={basePlanetData.deepnote} /> */}
-      {/* <ContentPlaceholder planetIdDeepnote='https://embed.deepnote.com/f8de697b-ba49-4014-b2b2-fe5f4cc3c026/3c7a3d159d33438fae3b08ca3e5aa88e/9a872bcf31674fcf8f46c75daf205168?height=564.1875' /> 
-      <iframe src="https://observablehq.com/d/464f8a61b073bb4d" width='100%' height='100%' />
-        <iframe src="https://deepnote.com/@star-sailors/Step-by-step-50ad3984-69a9-496e-a121-efb59231e7e9" width='100%' height='100%' />
-      */}
       <center><iframe src={basePlanetData.deepnote} height='659' width='80%' /></center>
     </div>
   )

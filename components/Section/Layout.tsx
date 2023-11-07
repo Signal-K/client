@@ -27,7 +27,7 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
   return (
     <>
         <main className="h-max pb-10 grow pt-6">
-          {/* <Navbar /> */}
+          <Navbar />
           {children}
         </main>
       {isMobile && (
