@@ -1,5 +1,5 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CoreLayout from "../../components/Core/Layout";
 import Layout from "../../components/Section/Layout";
 import CardForum from "../../components/Content/DiscussCard";
@@ -16,22 +16,31 @@ export default function Home() {
       const { error } = await supabase.auth.signOut() 
     }
 
-    const userId = session?.user?.id;
-
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+        const checkIsMobile = () => {
+          setIsMobile(window.innerWidth <= 768);
+        };
+        checkIsMobile();
+        window.addEventListener("resize", checkIsMobile);
+        return () => {
+          window.removeEventListener("resize", checkIsMobile);
+        };
+      }
+    }, []);
+  
     if (session) {
-    return (
-      <Layout>
-        {/* {userId} */}
-        {/* <CreatePostForm planetId2={68} /> */}
-        <ClassificationFeed />
-      </Layout>
-        // <CoreLayout>
-      )
+      const customMaxWidth = isMobile ? "100%" : "85%";
+  
+      return (
+        <Layout>
+          <ClassificationFeed custommaxWidth={customMaxWidth} />
+        </Layout>
+      );
     }
 
     return (
-            // <CoreLayout>
-              <Layout>Hello</Layout>
-            // </CoreLayout>
-    )
+        <Layout>Hello</Layout>
+    );
 }

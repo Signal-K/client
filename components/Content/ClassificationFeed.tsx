@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient, SupabaseClient } from "@supabase/auth-helpers-react";
 import CardForum from "./DiscussCard";
 
-export default function ClassificationFeed() {
+export default function ClassificationFeed({ custommaxWidth = '85%' }) {
     const supabase: SupabaseClient = useSupabaseClient();
     const session = useSession();
 
@@ -54,7 +54,7 @@ export default function ClassificationFeed() {
     }
 
     return (
-        <div className="flex flex-col items-center gap-4 py-2" style={{ maxWidth: '100%', margin: 'auto' }}>
+        <div className="flex flex-col items-center gap-4 py-5" style={{ maxWidth: custommaxWidth, margin: 'auto' }}>
             {posts.map((post) => (
                 <CardForum key={post.id} {...post} />
             ))}
