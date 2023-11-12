@@ -69,10 +69,12 @@ export default function PlanetIdPage () {
                         {/* <br /><ActivateButton /> */}
                         <IndividualBasePlanetDesktop id={id as string} />
                     </div>
-                    <div className="w-3/6 bg-gray-50 overflow-y-auto z-">
-                        <BasePlanetData planetId={{ id: id as string }} />
-                        <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                        <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
+                    <div className="w-3/6 bg-gray-50 overflow-y-auto">
+                        <div className="py-3">
+                            <BasePlanetData planetId={{ id: id as string }} />
+                            <PostFormCardAnomalyTag planetId={id} onPost={null} />
+                            <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
+                        </div>
                 </div>
             </div>
         </>

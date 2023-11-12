@@ -84,7 +84,8 @@ export function ClassificationFeedForIndividualPlanet(planetId) {
     try {
       const postsResponse = await supabase
         .from("classifications")
-        .select("*")
+        // .select("id, content, created_at, author, anomaly, basePlanets, profiles(id, avatar_url, full_name, username)")
+        .select("id, created_at, content, anomaly, profiles(id, avatar_url, full_name, username)")
         .eq('anomaly', planetId.planetId.id)
         .order('created_at', { ascending: false });
   

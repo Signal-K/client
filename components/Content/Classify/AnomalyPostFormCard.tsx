@@ -60,8 +60,8 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
 
     // Frontend output
     return (
-        <>
-            <div className="flex gap-2 mx-5 mt-5">
+        <div style={{ width: '83%', margin: 'auto' }}>
+            <div className="flex gap-2 mx-5 mt-5 pb-3">
                 {/* <div>
                     <img src={avatar_url} width='60px' height='60px' />
                 </div> */}
@@ -75,7 +75,7 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
                     <button onClick={createPost} className="text-black px-2 py-1 rounded-md">Share</button>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 
