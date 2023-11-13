@@ -1,6 +1,7 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { ClimbingBoxLoader } from "react-spinners";
 
 export default function PostFormCardAnomalyTag({ onPost, planetId }) {
     const supabase = useSupabaseClient();
@@ -9,9 +10,9 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
     const [content, setContent] = useState('');
     const profile = session?.user?.id;
     const [avatar_url, setAvatarUrl] = useState(null);
-    /* const [uploads, setUploads] = useState([]);
+    const [uploads, setUploads] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
-    const [userExperience, setUserExperience] = useState();
+    /* const [userExperience, setUserExperience] = useState();
     const [hasRequiredItem, setHasRequiredItem] = useState(false); */
 
     const router = useRouter();
@@ -28,7 +29,7 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
             .insert({
                 author: profile,
                 content,
-                // media: uploads
+                media: uploads,
                 // planets2: planetId,   
                 anomaly: planetId, // Set this to multiple anomaly types/foreign key options            
             }).then(response => {
@@ -57,6 +58,26 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
     }, [session]); */
 
     // Function to add media to the publication
+    async function addMedia ( e ) {
+        const files = e.target.files;
+        if (files.length > 0) {
+            setIsUploading(true);
+            for (const file of files) {
+                const fileName = Date.now() + session?.user?.id + file.name;
+                const result = await supabase.storage
+                    .from('media')
+                    .upload(fileName, file);
+                
+                if (result.data) {
+                    const url = process.env.NEXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/media/' + result.data.path;
+                    setUploads(prevUploads => [...prevUploads, url]);
+                } else {
+                    console.log(result);
+                }
+            }
+            setIsUploading(false);
+        };
+    };
 
     // Frontend output
     return (
@@ -71,6 +92,30 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
                     className="grow p-3 h-24 rounded-xl"
                     placeholder={`What do you think about this planet candidate, ${profile}?`}
                 />
+                {isUploading && (
+                    <div><ClimbingBoxLoader /></div>
+                )}
+                {isUploading && (
+                    <div className="flex gap-2 mt-4">
+                        {uploads.map(upload => (
+                            <div className=""><img src={upload} className="w-auto h-48 rounded-md" /></div>
+                        ))}
+                    </div>
+                )}
+                <div className="flex gap-5 items-center mt-2">
+                    <div>
+                        <label className="flex gap-1">
+                            <input type="file" className="hidden" onChange={addMedia} />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                            </svg>
+                            <span className="hidden md:block">Media</span>
+                        </label>
+                    </div>
+                    <div className="grow text-right">
+                        <button onClick={createPost} className="bg-socialBlue text-white px-6 py-1 rounded-md">Share</button>
+                    </div>
+                </div>
                 <div className="text-center">
                     <button onClick={createPost} className="text-black px-2 py-1 rounded-md">Share</button>
                 </div>
@@ -119,7 +164,7 @@ export function PostFormCardAnomalyTagOldSchema({ onPost, planetId }) {
                 }
             });
             
-            // .then (update user experience/currency)
+            // .then (update user experience/currency)                                                                        
     }
 
     /* Get user avatar & other data

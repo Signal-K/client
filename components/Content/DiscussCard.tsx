@@ -7,6 +7,7 @@ import { getMetaData } from "../../lib/helper/str.helper";
 import { Megaphone, MessagesSquare, Share2 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { useSession } from "@supabase/auth-helpers-react";
 
 type TProps = {
   id: number;
@@ -17,6 +18,7 @@ type TProps = {
     avatar_url: string;
     username: string;
   };
+  media: string[];
   planets2?: string;
   comments?: Comment[];
   _count: {
@@ -60,6 +62,7 @@ const CardForum: React.FC<TProps> = ({
   profiles,
   planets2,
   comments,
+  media,
   _count,
 }) => {
   const [reason, setReason] = useState("");
@@ -67,6 +70,12 @@ const CardForum: React.FC<TProps> = ({
   const [response, setResponse] = useState({
     message: "",
   });
+
+  const session = useSession();
+
+  useEffect(() => {
+    console.log(media);
+  }, [session]);
 
   const [showComments, setShowComments] = useState(false);
 
@@ -145,6 +154,15 @@ const CardForum: React.FC<TProps> = ({
           <p className="mt-1 break-all max-w-full">
             {content}
           </p>
+          <div>
+            {media?.length > 0 && (
+              <div className="flex gap-4">
+                {media?.length > 0 && media.map(media => (
+                  <div key={media} className="rounded-md overflow-hidden"><img src={media} /></div>
+                ))}
+              </div>
+            )}
+          </div>
         </CardContent>
         <CardFooter className="p-0 flex-col items-start pb-2">
           <Separator className="mb-2" />
