@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { CreateFirstBaseClassification } from '../../_[archive]/Classifications/ClassificationForm';
-import CreateBaseClassification from '../../_[archive]/Classifications/ClassificationForm';
+// import { CreateFirstBaseClassification } from '../../_[archive]/Classifications/ClassificationForm';
 import { useActivePlanet } from '@/context/ActivePlanet';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import ClassificationForm from '../../(create)/(classifications)/PostForm';
@@ -21,7 +20,7 @@ export const TransitingTelescopeClassifyPlanet: React.FC = () => {
                 <li>Assess the Shape: A sharp, symmetrical dip is typical of a planet transit. Asymmetrical or irregular shapes might suggest other phenomena.</li>
             </ul>
             <p>Use these criteria to decide if the lightcurve reveals a legitimate planet. Write a post and click share when you're ready to submit your findings. Happy exploring!</p>
-            <CreateFirstBaseClassification assetMentioned={imageUrl} />
+            {/* <CreateFirstBaseClassification assetMentioned={imageUrl} /> */}
         </div>
     );
 };
