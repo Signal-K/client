@@ -31,7 +31,7 @@ export default function Home() {
     }, []);
   
     if (session) {
-      const customMaxWidth = isMobile ? "100%" : "85%";
+      const customMaxWidth = isMobile ? "100%" : "70%";
   
       return (
         <Layout>

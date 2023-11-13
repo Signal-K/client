@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient, SupabaseClient } from "@supabase/auth-helpers-react";
-import CardForum from "./DiscussCard";
+import CardForum, { CommentItem } from "./DiscussCard";
 
 export default function ClassificationFeed({ custommaxWidth = '85%' }) {
     const supabase: SupabaseClient = useSupabaseClient();
@@ -54,11 +54,18 @@ export default function ClassificationFeed({ custommaxWidth = '85%' }) {
     }
 
     return (
-        <div className="flex flex-col items-center gap-4 py-5" style={{ maxWidth: custommaxWidth, margin: 'auto' }}>
-            {posts.map((post) => (
-                <CardForum key={post.id} {...post} />
-            ))}
-        </div>
+      <ul
+        aria-label="Nested user feed"
+        role="feed"
+        className="relative flex flex-col gap-12 py-12 pl-8 before:absolute before:top-0 before:left-8 before:h-full before:-translate-x-1/2 after:absolute after:top-6 after:left-8 after:bottom-6 after:-translate-x-1/2"
+        style={{ maxWidth: custommaxWidth, margin: 'auto' }}
+      >
+        {posts.map((post) => (
+          <li key={post.id} role="article" className="relative pl-8">
+            <CardForum {...post} />
+          </li>
+        ))}
+      </ul>
     );
 };
 
