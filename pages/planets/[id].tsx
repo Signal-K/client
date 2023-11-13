@@ -59,14 +59,35 @@ export default function PlanetIdPage () {
                 </div>
             </div>
         );
-    }
+    };
+
+    // Two panel layout for desktop devices, with orbitals
+    if (!isMobile && !id && router) {
+        return (
+            <>
+                <Navbar />
+                <div className="flex h-screen">
+                    <div className="w-3/6 overflow-y-auto mr-30 z-40">
+                        {/* <br /><ActivateButton /> */}
+                        <IndividualBasePlanetDesktop id={id as string} />
+                    </div>
+                    <div className="w-3/6 bg-gray-50 overflow-y-auto">
+                        <div className="py-3">
+                            <BasePlanetData planetId={{ id: id as string }} />
+                            <PostFormCardAnomalyTag planetId={id} onPost={null} />
+                            <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    };
 
     return (
         <>
             <Navbar />
             <div className="flex h-screen">
                 <div className="w-3/6 overflow-y-auto mr-30 z-40">
-                        {/* <br /><ActivateButton /> */}
                         <IndividualBasePlanetDesktop id={id as string} />
                     </div>
                     <div className="w-3/6 bg-gray-50 overflow-y-auto">

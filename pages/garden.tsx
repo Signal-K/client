@@ -7,7 +7,7 @@ import Navbar from "../components/Section/Navbar";
 export default function GardenPage() {
     return (
         <LayoutNoNav>
-            <Navbar />
+            {/* <Navbar /> */}
             <Garden />
         </LayoutNoNav>
     )

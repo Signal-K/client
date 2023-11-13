@@ -248,6 +248,75 @@ export default function IndividualBasePlanet({ id }: { id: string }) {
 };
 
 export function IndividualBasePlanetDesktop({ id }: { id: string }) {
+  const router = useRouter();
+  const [screenWidth, setScreenWidth] = useState<number>(0);
+
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const [planetData, setPlanetData] = useState(null);
+  // const [planetPosts, setPlanetPosts] = useState([]);
+  const { id: planetId } = router.query;
+
+  const [sectors, setPlanetSectors] = useState([]);
+
+  const getPlanetData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("basePlanets")
+        .select("*")
+        .eq("id", planetId)
+        .single();
+
+      if (data) {
+        setPlanetData(data);
+      }
+
+      if (error) {
+        throw error;
+      }
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
+  if (!planetData) {
+    return <div>Loading...</div>;
+  }
+
+  const { content, avatar_url, type, deepnote, cover } = planetData;
+
+  return (
+    <div className="h-screen relative">
+      {/* Background Styles */}
+      <style jsx global>
+        {`
+      body {
+        background: url('/garden.png') center/cover;
+        );
+      }
+      @media only screen and (max-width: 1000px) {
+        body {
+          background: url('/void.png') center/cover;
+        }
+      }
+      @media only screen and (max-width: 767px) {
+          .planet-heading {
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 10px;
+          }
+    `}
+      </style>
+      <div className="bg-cover bg-center h-screen flex items-center justify-center relative">
+        <div className="underline"></div>
+      </div>
+    </div>
+  );
+}
+
+export function IndividualBasePlanetDesktopTwoPanel({ id }: { id: string }) {
     const router = useRouter();
   
     const supabase = useSupabaseClient();
