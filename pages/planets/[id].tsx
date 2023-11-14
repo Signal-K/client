@@ -1,7 +1,7 @@
 import IndividualPlanet from "../../components/Content/Planets/IndividualPlanet";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import IndividualBasePlanet, { BasePlanetData, EditableBasePlanetData, IndividualBasePlanetDesktop } from "../../components/Content/Planets/Base/IndividualBasePlanet";
+import IndividualBasePlanet, { BasePlanetData, EditableBasePlanetData, IndividualBasePlanetDesktop, IndividualBasePlanetDesktopTwoPanel } from "../../components/Content/Planets/Base/IndividualBasePlanet";
 import Layout, { LayoutNoNav } from "../../components/Section/Layout";
 import { DesktopSidebar } from "../../components/Section/Sidebar";
 import { ClassificationFeedForIndividualPlanet } from "../../components/Content/ClassificationFeed";
@@ -69,7 +69,7 @@ export default function PlanetIdPage () {
                 <div className="flex h-screen">
                     <div className="w-3/6 overflow-y-auto mr-30 z-40">
                         {/* <br /><ActivateButton /> */}
-                        <IndividualBasePlanetDesktop id={id as string} />
+                        <IndividualBasePlanetDesktopTwoPanel id={id as string} />
                     </div>
                     <div className="w-3/6 bg-gray-50 overflow-y-auto">
                         <div className="py-3">
@@ -87,16 +87,12 @@ export default function PlanetIdPage () {
         <>
             <Navbar />
             <div className="flex h-screen">
-                <div className="w-3/6 overflow-y-auto mr-30 z-40">
-                        <IndividualBasePlanetDesktop id={id as string} />
-                    </div>
-                    <div className="w-3/6 bg-gray-50 overflow-y-auto">
-                        <div className="py-3">
+            <IndividualBasePlanetDesktop id={id as string} />
+                        {/* <div className="py-3">
                             <BasePlanetData planetId={{ id: id as string }} />
                             <PostFormCardAnomalyTag planetId={id} onPost={null} />
                             <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
-                        </div>
-                </div>
+                        </div> */}
             </div>
         </>
       );                    
