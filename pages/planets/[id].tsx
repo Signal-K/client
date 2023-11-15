@@ -87,13 +87,12 @@ export default function PlanetIdPage () {
         <>
             <Navbar />
             <div className="flex h-screen">
-            <IndividualBasePlanetDesktop id={id as string} />
-                        {/* <div className="py-3">
-                            <BasePlanetData planetId={{ id: id as string }} />
-                            <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                            <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
-                        </div> */}
+                <IndividualBasePlanetDesktop id={id as string} />
+            </div>
+            <div className="bg-gray-100 py-5">
+                <PostFormCardAnomalyTag planetId={id} onPost={null} />
+                <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
             </div>
         </>
-      );                    
+    );                    
 };
