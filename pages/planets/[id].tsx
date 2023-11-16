@@ -86,12 +86,12 @@ export default function PlanetIdPage () {
     return (
         <>
             <Navbar />
-            <div className="flex h-screen">
+            <div className="h-screen">
                 <IndividualBasePlanetDesktop id={id as string} />
             </div>
             <div className="bg-gray-100 py-5">
                 <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
+                <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} backgroundColorSet="bg-blue-200" />
             </div>
         </>
     );                    

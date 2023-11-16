@@ -335,7 +335,7 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
       return <div>Loading...</div>;
     }
   
-    const { content, avatar_url, type, deepnote, cover } = planetData;
+    const { content, avatar_url, type, deepnote, cover, ticId } = planetData;
   
     async function checkUserInventory() {
       if (!session || !planetId) {
@@ -380,7 +380,7 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
   //   }
   
     return (
-        <div className="h-screen relative">
+      <div className="flex-col justify-center">
           {/* Background Styles */}
           <style jsx global>
             {`
@@ -401,38 +401,42 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
                 margin-bottom: 10px;
               }
         `}
-          </style>
-          <div className="bg-cover bg-center h-screen flex items-center justify-center relative">  
-              {/* {index === 0 && (
-                <img
-                  src="https://github.com/Signal-K/client/blob/CPW-8/public/assets/Inventory/Items/GoldenTelescopeLevel1noBg.png?raw=true"
-                  alt="Telescope Icon"
-                  className="w-12 h-12 absolute top-8 left-12 transform -translate-x-1/2 -translate-y-1/2"
-                />
-              )}
-              {index === 1 && (
-                <img
-                  src="https://github.com/Signal-K/client/blob/FCDB-21/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png?raw=true"
-                  alt="Telescope Icon"
-                  className="w-12 h-12 absolute bottom-14 right-4 transform -translate-x-1/2 -translate-y-1/2"
-                />
-              )}
-              {index === 2 && (
-                <img
-                  src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/69/Kepler22.png"
-                  alt="Telescope Icon"
-                  className="w-12 h-12 absolute bottom-0.6 left-80 transform"
-                />
-              )} */}
+        </style>
+          <div className="h-screen flex flex-col items-center justify-center relative">
+            <h1 className="mt-2 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-200">
+              {content}
+            </h1>
   
             <img
               src={avatar_url}
               alt="Planet Image"
-              className={`w-6/12 h-6/12 sm:w-4/11 sm:h-4/11 object-contain z-20`}
+              className={`w-4/12 h-4/12 sm:w-4/11 sm:h-4/11 object-contain z-20`}
               style={{
                 zIndex: 20,
               }}
             />
+            <div className="w-[1199.01px] h-[63.75px] justify-start items-start gap-[81.50px] inline-flex">
+<div className="flex-col justify-start items-start gap-[4.75px] inline-flex">
+<div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] tracking-[3.48px]">GALAXY</div>
+<div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">Shroomulon</div>
+</div>
+<div className="flex-col justify-start items-start gap-[4.75px] inline-flex">
+<div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Diameter</div>
+<div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">56,780 km</div>
+</div>
+<div className="flex-col justify-start items-start gap-[4.75px] inline-flex">
+<div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Anomaly type</div>
+<div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{type}</div>
+</div>
+<div className="flex-col justify-start items-start gap-[4.75px] inline-flex">
+<div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Avg Temperature</div>
+<div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">10°C to 260°C</div>
+</div>
+<div className="flex-col justify-start items-start gap-[4.75px] inline-flex">
+<div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">TIC ID</div>
+<div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{ticId}</div>
+</div>
+</div>
           </div>
         </div>
     );

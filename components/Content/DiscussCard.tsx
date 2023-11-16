@@ -21,6 +21,7 @@ type TProps = {
   media: string[];
   planets2?: string;
   comments?: Comment[];
+  backgroundColor: string;
   _count: {
     comments: number;
   };
@@ -63,12 +64,13 @@ const CardForum: React.FC<TProps> = ({
   comments,
   media,
   _count,
+  backgroundColor,
 }) => {
   return (
     <>
       <Link href={`/profile/${profiles?.username}`}>
         <CardTitle className={`p-4 pb-0 group ${!profiles && "cursor-pointer"}`}>
-          <div className="flex items-start gap-4">
+          <div className={`flex items-start gap-4 ${backgroundColor}`}>
             <div className="flex items-center space-x-2">
               <Avatar className="rounded-md">
                 <AvatarImage src={"https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/avatars/" + profiles?.avatar_url ?? ""} />

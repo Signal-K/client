@@ -69,7 +69,7 @@ export default function ClassificationFeed({ custommaxWidth = '85%' }) {
     );
 };
 
-export function ClassificationFeedForIndividualPlanet(planetId) {
+export function ClassificationFeedForIndividualPlanet(planetId, backgroundColorSet) {
   const supabase: SupabaseClient = useSupabaseClient();
   const session = useSession();
 
@@ -134,7 +134,7 @@ export function ClassificationFeedForIndividualPlanet(planetId) {
       <div className="flex flex-col items-center gap-4 py-2" style={{ maxWidth: '100%', margin: 'auto' }}>
           {posts.map((post) => (
               <>
-                <CardForum key={post.id} {...post} />
+                <CardForum key={post.id} {...post} backgroundColor={backgroundColorSet} />
                 <p>{post.planetId}</p>
               </>
           ))}
