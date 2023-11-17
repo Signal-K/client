@@ -81,7 +81,7 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
 
     // Frontend output
     return (
-        <div style={{ width: '83%', margin: 'auto' }} >
+        <div style={{ width: '83%', margin: 'auto' }} className="">
             <div className="flex gap-2 mx-5 mt-5 pb-3">
                 {/* <div>
                     <img src={avatar_url} width='60px' height='60px' />
@@ -89,7 +89,7 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
                 <textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="grow p-3 h-24 rounded-xl"
+                    className="grow p-3 h-24 rounded-xl bg-gray-100"
                     placeholder={`What do you think about this planet candidate, ${profile}?`}
                 />
                 {isUploading && (

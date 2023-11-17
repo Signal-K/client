@@ -4,10 +4,12 @@ import { useRouter } from "next/router";
 import IndividualBasePlanet, { BasePlanetData, EditableBasePlanetData, IndividualBasePlanetDesktop, IndividualBasePlanetDesktopTwoPanel } from "../../components/Content/Planets/Base/IndividualBasePlanet";
 import Layout, { LayoutNoNav } from "../../components/Section/Layout";
 import { DesktopSidebar } from "../../components/Section/Sidebar";
-import { ClassificationFeedForIndividualPlanet } from "../../components/Content/ClassificationFeed";
+import ClassificationFeed, { ClassificationFeedForIndividualPlanet } from "../../components/Content/ClassificationFeed";
 import { ActivateButton } from "../../components/Content/Planets/PlanetData/ContentPlaceholder";
 import PostFormCardAnomalyTag from "../../components/Content/Classify/AnomalyPostFormCard";
 import Navbar from "../../components/Section/Navbar";
+import IndividualBasePlanetGrid from "../../components/Content/Planets/PlanetData/ContentGrid";
+import { CreateBar } from "../../components/Core/BottomBar";
 
 export default function PlanetIdPage () {
     const router = useRouter();
@@ -89,10 +91,18 @@ export default function PlanetIdPage () {
             <div className="h-screen">
                 <IndividualBasePlanetDesktop id={id as string} />
             </div>
-            <div className="bg-gray-100 py-5">
-                <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} backgroundColorSet="bg-blue-200" />
+            <div className="bg-white py-5">
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <PostFormCardAnomalyTag planetId={id} onPost={null} />
+                        <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} backgroundColorSet="bg-blue-200" />
+                    </div>
+                    <div className="">
+                        {/* <ClassificationFeed /> */}
+                    </div>
+                </div>
             </div>
+            <CreateBar />
         </>
     );                    
 };
