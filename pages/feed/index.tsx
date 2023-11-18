@@ -35,7 +35,9 @@ export default function Home() {
   
       return (
         <Layout>
-          <ClassificationFeed custommaxWidth={customMaxWidth} />
+          <div className="py-10">
+            <ClassificationFeed custommaxWidth={customMaxWidth} />
+          </div>
         </Layout>
       );
     }

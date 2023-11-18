@@ -406,7 +406,11 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
             <h1 className="text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-2 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-400">
               {content}
             </h1>
-  
+            <div className="w-[1169.62px] h-[735.77px] left-[415px] top-[343px] absolute">
+              <div className="w-[608px] h-[576px] left-[405px] top-[108px] absolute justify-center items-center inline-flex" />
+              <img className="w-[147.59px] h-[150.77px] left-0 top-[285px] absolute" src="https://github.com/Signal-K/client/blob/FCDB-21/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png?raw=true" />
+              <img className="w-[150px] h-[150px] left-[927px] top-[229.63px] absolute origin-top-left rotate-[-86.76deg]" src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/69/Kepler22.png" />
+            </div>
             <img
               src={avatar_url}
               alt="Planet Image"

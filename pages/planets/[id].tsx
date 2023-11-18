@@ -98,9 +98,10 @@ export default function PlanetIdPage () {
                         <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} backgroundColorSet="bg-blue-200" />
                     </div>
                     <div className="">
-                        {/* <ClassificationFeed /> */}
+                        <BasePlanetData planetId={{ id: id as string }} />
                     </div>
                 </div>
+                <img src={`https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planetsss/${id}/topography.jpeg`} alt="Topography" />
             </div>
             <CreateBar />
         </>

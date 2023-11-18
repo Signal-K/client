@@ -131,7 +131,7 @@ export function ClassificationFeedForIndividualPlanet(planetId, backgroundColorS
   }  
 
   return (
-      <div className="flex flex-col items-center gap-4 py-2" style={{ maxWidth: '100%', margin: 'auto' }}>
+      <div className="flex flex-col items-center gap-4 py-5" style={{ maxWidth: '100%', margin: 'auto' }}>
           {posts.map((post) => (
               <>
                 <CardForum key={post.id} {...post} backgroundColor={backgroundColorSet} />
