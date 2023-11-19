@@ -14,6 +14,11 @@ import { CreateBar } from "../../components/Core/BottomBar";
 export default function PlanetIdPage () {
     const router = useRouter();
     const { id } = router.query;
+    const [activeView, setActiveView] = useState('home');
+
+    const handleTabClick = (view) => {
+        setActiveView(view);
+    };
 
     const [isMobile, setIsMobile] = useState(false);
 
@@ -87,23 +92,43 @@ export default function PlanetIdPage () {
 
     return (
         <>
-            <Navbar />
-            <div className="h-screen">
-                <IndividualBasePlanetDesktop id={id as string} />
-            </div>
-            <div className="bg-white py-5">
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                        <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} backgroundColorSet="bg-blue-200" />
-                    </div>
-                    <div className="">
-                        <BasePlanetData planetId={{ id: id as string }} />
-                    </div>
+          <Navbar />
+          <div className="h-screen">
+            <IndividualBasePlanetDesktop id={id as string} />
+          </div>
+          <div className="bg-white py-5">
+            {activeView === 'home' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <PostFormCardAnomalyTag planetId={id} onPost={null} />
+                  <ClassificationFeedForIndividualPlanet
+                    planetId={{ id: id as string }}
+                    backgroundColorSet="bg-blue-200"
+                  />
                 </div>
-                <img src={`https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planetsss/${id}/topography.jpeg`} alt="Topography" />
-            </div>
-            <CreateBar />
+                <div className="">
+                  <BasePlanetData planetId={{ id: id as string }} />
+                </div>
+              </div>
+            )}
+            {activeView === 'wallet' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <ClassificationFeedForIndividualPlanet
+                    planetId={{ id: id as string }}
+                    backgroundColorSet="bg-blue-200"
+                  />
+                </div>
+                <div className="">
+                  <img
+                    src={`https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planetsss/${id}/topography.jpeg`}
+                    alt="Topography"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          <CreateBar onTabClick={handleTabClick} />
         </>
-    );                    
-};
+      );
+    };

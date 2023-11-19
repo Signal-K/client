@@ -730,7 +730,7 @@ export function BasePlanetData ({ planetId }) { // Repurpose/rename syntax for g
 
   return (
     <div>
-      <center><iframe src={basePlanetData.deepnote} height='659' width='80%' /></center>
+      <center><iframe src={basePlanetData.deepnote} height='1200' width='80%' /></center>
     </div>
   )
 }
