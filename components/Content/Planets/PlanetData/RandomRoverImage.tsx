@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Card from "../../../Card";
+import { RoverContentPostForm } from "../../CreatePostForm";
 
 interface RoverImageCardProps {
     roverImage: {
@@ -78,13 +79,26 @@ export default function RoverImageGallery() {
     const randomDate = Math.floor(Math.random() * 1000) + 1; // Allow the user to insert a custom date, set date based on current date + user actions?
     const selectedRover = 'perseverance';
     const [content, setContent] = useState('');
+    const [imageUrl, setImageUrl] = useState('');
     const [metadata, setMetadata] = useState('');
 
-    const handleMetadataChange = (newMetadata) => {
+    const handleMetadataChange = (newMetadata, newImageUrl) => {
         setMetadata(newMetadata);
+        setImageUrl(newImageUrl);
     };
 
-    const handlePostSubmit = async () => {
+    return (
+        <div className="py-20">
+            <pre>{imageUrl}</pre>
+            <RoverImage date='91' rover={selectedRover} onImageMetadataChange={handleMetadataChange} />
+            <RoverContentPostForm metadata={metadata} imageLink={imageUrl} />               
+        </div>
+    );
+};
+
+/*
+
+const handlePostSubmit = async () => {
         if (content) {
             const user = session?.user?.id;
             if (user) {
@@ -109,10 +123,4 @@ export default function RoverImageGallery() {
         };
     }
 
-    return (
-        <div className="py-10">
-            <RoverImage date='91' rover={selectedRover} onImageMetadataChange={handleMetadataChange} />
-            <pre>{metadata}</pre>
-        </div>
-    );
-};
+*/
