@@ -38,23 +38,55 @@ export default function CreateBasePlanetSector() {
     const createSector = async () => {
         if (session) {
             fetchUserPlanet();
+    
+            // Array of available resources
+            const resources = ["Silicates", "Alloy", "Iron", "Fuel", "Water", "Coal"];
+    
+            // Randomly choose a resource
+            const chosenResource = resources[Math.floor(Math.random() * resources.length)];
+    
+            // Get the corresponding row from inventoryITEMS
+            let depositRowId;
+            if (chosenResource === "Coal") {
+                depositRowId = 11; // Row ID for Coal
+            } else if (chosenResource === "Silicates") {
+                depositRowId = 13; // Row ID for Silicates
+            } else {
+                // You can add similar conditions for other resources if needed
+                // depositRowId = 1; // Default to a row ID (you may want to adjust this)
+                depositRowId = 13;
+            }
+    
+            // Fetch the corresponding row from inventoryITEMS
+            const { data: depositData, error: depositError } = await supabase
+                .from('inventoryITEMS')
+                .select('name, icon_url')
+                .eq('id', depositRowId)
+                .single();
+    
+            if (depositError) {
+                console.error(depositError);
+                return;
+            }
+    
+            // Set the deposit and coverUrl based on the chosen resource
             const response = await supabase.from('basePlanetSectors').upsert([
                 {
                     anomaly: userPlanet,
                     owner: session?.user?.id,
-                    deposit: "Iron", // Start off with Iron as a default resource
-                    coverUrl: "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00090/ids/edr/browse/edl/EBE_0090_0674952393_193ECM_N0040048EDLC00090_0030LUJ01_1200.jpg", // Do we set this to be a supabase storage asset in prod?
+                    deposit: depositData?.name || "Unknown Resource",
+                    coverUrl: depositData?.icon_url || "https://example.com/default-image.jpg",
                     explored: false,
                 },
             ]);
-
+    
             if (response.error) {
                 console.error(response.error);
             } else {
-                
-            };
-        };
-    };
+                // Handle success if needed
+            }
+        }
+    };    
 
     return (
         <div>
