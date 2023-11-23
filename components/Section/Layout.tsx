@@ -28,7 +28,9 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
     <>
         <main className="h-max pb-10 grow pt-6">
           <Navbar />
-          {children}
+          <div className="py-12">
+            {children}
+          </div>
         </main>
       {isMobile && (
         <div className="md:hidden overflow-y-auto h-screen p-4">
