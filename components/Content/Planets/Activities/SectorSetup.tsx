@@ -39,43 +39,28 @@ export default function CreateBasePlanetSector() {
         if (session) {
             fetchUserPlanet();
     
-            // Array of available resources
-            const resources = ["Silicates", "Alloy", "Iron", "Fuel", "Water", "Coal"];
+            // Map resource names to corresponding inventoryITEMS ids
+            const resourceToIdMap = {
+                "Silicates": 13,
+                "Alloy": 12,
+                "Iron": 11,
+                "Fuel": 10,
+                "Water": 9,
+                "Coal": 11,
+            };
     
-            // Randomly choose a resource
-            const chosenResource = resources[Math.floor(Math.random() * resources.length)];
+            // Choose between Silicates and Coal for testing
+            const depositResource = Math.random() < 0.5 ? "Silicates" : "Coal";
     
-            // Get the corresponding row from inventoryITEMS
-            let depositRowId;
-            if (chosenResource === "Coal") {
-                depositRowId = 11; // Row ID for Coal
-            } else if (chosenResource === "Silicates") {
-                depositRowId = 13; // Row ID for Silicates
-            } else {
-                // You can add similar conditions for other resources if needed
-                // depositRowId = 1; // Default to a row ID (you may want to adjust this)
-                depositRowId = 13;
-            }
+            // Get the corresponding id from the map
+            const depositRowId = resourceToIdMap[depositResource];
     
-            // Fetch the corresponding row from inventoryITEMS
-            const { data: depositData, error: depositError } = await supabase
-                .from('inventoryITEMS')
-                .select('name, icon_url')
-                .eq('id', depositRowId)
-                .single();
-    
-            if (depositError) {
-                console.error(depositError);
-                return;
-            }
-    
-            // Set the deposit and coverUrl based on the chosen resource
             const response = await supabase.from('basePlanetSectors').upsert([
                 {
                     anomaly: userPlanet,
                     owner: session?.user?.id,
-                    deposit: depositData?.name || "Unknown Resource",
-                    coverUrl: depositData?.icon_url || "https://example.com/default-image.jpg",
+                    deposit: depositRowId, // Use the id instead of the resource name
+                    coverUrl: "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00090/ids/edr/browse/edl/EBE_0090_0674952393_193ECM_N0040048EDLC00090_0030LUJ01_1200.jpg",
                     explored: false,
                 },
             ]);
@@ -83,10 +68,10 @@ export default function CreateBasePlanetSector() {
             if (response.error) {
                 console.error(response.error);
             } else {
-                // Handle success if needed
+                // Handle success
             }
         }
-    };    
+    };       
 
     return (
         <div>

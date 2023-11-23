@@ -5,9 +5,17 @@ import Card from "../../../Card";
 import RoverImageGallery, { RoverImage, RoverImageNoHandle } from "../PlanetData/RandomRoverImage";
 import axios from "axios";
 import { RoverContentPostForm } from "../../CreatePostForm";
-import StructureComponent from "../Activities/StructureCreate";
 
-// Rover image data -> place inside BasePlanetSector
+export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
+  const router = useRouter();
+  const { id: sectorId } = router.query;
+
+  const supabase = useSupabaseClient();
+
+  const [planetData, setPlanetData] = useState(null);
+  const [sectorData, setSectorData] = useState(null);
+
+  // Rover image data
     // useEffect(() => {
     //     // const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?sol=${date}&api_key=${apiKey}`;
     //     const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/opportunity/photos?sol=181&api_key=${apiKey}`;
@@ -34,115 +42,80 @@ import StructureComponent from "../Activities/StructureCreate";
     //         });
     // }, [session]);
 
-export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
-    const router = useRouter();
-    const { id: sectorId } = router.query;
-  
-    const supabase = useSupabaseClient();
-  
-    const [planetData, setPlanetData] = useState(null);
-    const [sectorData, setSectorData] = useState(null);
-    const [depositData, setDepositData] = useState(null);
-  
-    const getPlanetData = async () => {
-      if (!sectorData) {
-        return null;
-      }
-  
-      try {
-        const { data, error } = await supabase
-          .from("basePlanets")
-          .select("*")
-          .eq("id", sectorData.id)
-          .single();
-  
-        if (data) {
-          setPlanetData(data);
-        }
-  
-        if (error) {
-          throw error;
-        }
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-  
-    const getSectorData = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("basePlanetSectors")
-          .select("*")
-          .eq("id", sectorId)
-          .single();
-  
-        if (data) {
-          setSectorData(data);
-        }
-  
-        if (error) {
-          throw error;
-        }
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-  
-    const getDepositData = async () => {
-      if (!sectorData || !sectorData.deposit) {
-        return null;
-        console.log('Fuck, nothing detected');
-      }
-  
-      try {
-        const { data, error } = await supabase
-          .from("inventoryITEMS")
-          .select("*")
-          .eq("id", sectorData.deposit)
-          .single();
-  
-        if (data) {
-          setDepositData(data);
-        }
-
-        console.log(sectorData);
-  
-        if (error) {
-          throw error;
-        }
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-  
-    useEffect(() => {
-      const fetchData = async () => {
-        if (sectorId) {
-          await getSectorData();
-          await getPlanetData();
-          await getDepositData();
-        }
-      };
-  
-      fetchData();
-    }, [sectorId]);
-  
-    if (!sectorData || !depositData) {
-      return <div>Loading...</div>;
+  const getPlanetData = async () => {
+    if (!sectorData) {
+      return null;
     }
-  
-    const {
-      id,
-      created_at,
-      anomaly,
-      owner,
-      deposit,
-      coverUrl,
-      exploration_start_data,
-      explored,
-    } = sectorData;
-    const { content } = planetData || {};
-    const { name, icon_url } = depositData;
+
+    try {
+      const { data, error } = await supabase
+        .from("basePlanets")
+        .select("*")
+        .eq("id", sectorData.id)
+        .single();
+
+      if (data) {
+        setPlanetData(data);
+      };
+
+      console.log(data);
+
+      if (error) {
+        throw error;
+      };
+    } catch (error) {
+      console.error(error.message);
+    };
+  };
+
+  const getSectorData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("basePlanetSectors")
+        .select("*")
+        .eq("id", sectorId)
+        .single();
+
+      if (data) {
+        setSectorData(data);
+      }
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (sectorId) {
+        await getSectorData();
+        await getPlanetData();
+      };
+    };
+
+    fetchData();
+  }, [sectorId]);
+
+  if (!sectorData) {
+    return (
+        <div>Loading...</div>
+    );
+  };
+
+  const {
+    id,
+    created_at,
+    anomaly,
+    owner,
+    deposit,
+    coverUrl,
+    exploration_start_data,
+    explored,
+  } = sectorData;
+  const { content } = planetData || {};
 
     // const [imageUrl, setImageUrl] = useState('');
     // const [metadata, setMetadata] = useState('');
@@ -215,22 +188,6 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
               </div>
             </div>
           </div>
-          <div className="flex flex-col items-center justify-start gap-4">
-            <StructureComponent />
-          {/* <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">
-            Mineral deposit
-          </div>
-          <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">
-            {name}
-          </div>
-          {icon_url && (
-            <img
-              src={icon_url}
-              alt={`Icon for ${name}`}
-              className="w-16 h-16 object-contain"
-            />
-          )} */}
-        </div>
           {/* {deposit && typeof deposit === "string" ? (
                 <div>{deposit}</div>
             ) : (
