@@ -36,9 +36,9 @@ export default function Home() {
   
       return (
         <Layout>
-          <div className="py-10">
+          {/* <div className="py-10">
             <HomePlanetStats />
-          </div>
+          </div> */}
           <div className="py-10">
             <ClassificationFeed custommaxWidth={customMaxWidth} />
           </div>

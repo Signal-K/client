@@ -1,4 +1,57 @@
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React from "react";
+import styles from '../../../styles/Home.module.css';
+
+interface CustomMediaProps {
+    src: string;
+    alt: string;
+    metadata: {
+      title: string;
+      description: string;
+    };
+};
+
+const CustomMediaRenderer: React.FC<CustomMediaProps> = ({
+    src,
+    alt,
+    metadata,
+  }) => {
+    return (
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        <img
+          src={src}
+          alt={alt}
+          style={{
+            objectFit: "contain",
+            width: "100%",
+            height: "100%",
+            zIndex: 1,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
+            opacity: 0,
+            transition: "opacity 0.3s ease-in-out",
+            cursor: "pointer",
+            zIndex: 2,
+          }}
+        >
+          <div style={{ fontWeight: "bold" }}>{metadata.title}</div>
+          <div>{metadata.description}</div>
+        </div>
+      </div>
+    );
+};
 
 export function InventoryMenu() {
     return (
@@ -121,6 +174,36 @@ export function UserBackpackInventory() {
         </div>
     </div>
 </div>
+    );
+};
+
+// This will show the items of "tool" type that you own that you can equip
+export function OwnedToolItems() {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    // Item configuration -> will pull from supabase later
+    const customMediaProps = {
+        src: "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/avatars/8b09080f-1306-4ca7-b3b4-b284f047669e.png",
+        alt: "Description of your image",
+        metadata: {
+          title: "Image Title",
+          description: "Description of the image",
+        },
+    };
+
+    return (
+        <>
+            <div className={styles.gameplayBoxGrid}>
+                <div className={styles.gameplayBox} key="">
+                    <CustomMediaRenderer {...customMediaProps} />
+                    <h3>Name of object</h3>
+                    <div className={styles.smallMargin}>
+                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Button</button>
+                    </div>
+                </div>
+            </div>
+        </>
     );
 };
 
