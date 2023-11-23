@@ -69,6 +69,62 @@ export default function ClassificationFeed({ custommaxWidth = '85%' }) {
     );
 };
 
+export function MultiClassificationFeed({ custommaxWidth = '85%' }) {
+  const supabase: SupabaseClient = useSupabaseClient();
+  const session = useSession();
+
+  const [posts, setPosts] = useState([]);
+  const [planetPosts, setPlanetPosts] = useState([]);
+
+  useEffect(() => {
+      fetchPosts();
+  }, []);
+
+  useEffect(() => {
+      if (planetPosts.length > 0) {
+          console.log("Comments: ", planetPosts.flatMap((post) => post.comments));
+      }
+  }, []);
+
+  async function fetchPosts() {
+      const postsResponse = await supabase
+          .from("posts_duplicates")
+          .select(
+              "id, content, created_at, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)"
+          )
+          .order('created_at', { ascending: false });
+
+      const roverImagePostsResponse = await supabase
+          .from("contentROVERIMAGES")
+          .select("id, content, created_at")
+          .order('created_at', { ascending: false });
+
+      const combinedPosts = [...postsResponse.data, ...roverImagePostsResponse.data];
+
+      const sortedPosts = combinedPosts.sort((a: { created_at: string }, b: { created_at: string }) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      setPosts(sortedPosts);
+  }
+
+  return (
+      <ul
+          aria-label="Nested user feed"
+          role="feed"
+          className="relative flex flex-col gap-12 py-12 pl-8 before:absolute before:top-0 before:left-8 before:h-full before:-translate-x-1/2 after:absolute after:top-6 after:left-8 after:bottom-6 after:-translate-x-1/2"
+          style={{ maxWidth: custommaxWidth, margin: 'auto' }}
+      >
+          {posts.map((post) => (
+              <li key={post.id} role="article" className="relative pl-8">
+                  <CardForum {...post} />
+              </li>
+          ))}
+      </ul>
+  );
+}
+
+
 export function ClassificationFeedForIndividualPlanet(planetId, backgroundColorSet) {
   const supabase: SupabaseClient = useSupabaseClient();
   const session = useSession();
