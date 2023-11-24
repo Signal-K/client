@@ -1,5 +1,5 @@
 import React from "react";
-import InventoryItemsGroup, { InventoryMenu, OwnedToolItems, SelectedItem, UserBackpackInventory } from "../../components/Content/Inventory/ItemGroup";
+import InventoryItemsGroup, { EquippedToolItems, InventoryMenu, OwnedToolItems, SelectedItem, UserBackpackInventory } from "../../components/Content/Inventory/ItemGroup";
 import Layout, { InventoryLayout } from "../../components/Section/Layout";
 
 export default function Inventory() {
@@ -10,6 +10,7 @@ export default function Inventory() {
           <div className="col-span-4 px-2"><UserBackpackInventory /></div> */}
           <OwnedToolItems />
         </div>
+        <EquippedToolItems />
       </InventoryLayout>
     );
 };  

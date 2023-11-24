@@ -1,5 +1,5 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import React from "react";
+import React, { useState } from "react";
 import styles from '../../../styles/Home.module.css';
 
 interface CustomMediaProps {
@@ -17,14 +17,14 @@ const CustomMediaRenderer: React.FC<CustomMediaProps> = ({
     metadata,
   }) => {
     return (
-      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <div style={{ position: "relative", width: "64", height: "64" }}>
         <img
           src={src}
           alt={alt}
           style={{
             objectFit: "contain",
-            width: "100%",
-            height: "100%",
+            width: "64",
+            height: "64",
             zIndex: 1,
           }}
         />
@@ -53,32 +53,43 @@ const CustomMediaRenderer: React.FC<CustomMediaProps> = ({
     );
 };
 
-export function InventoryMenu() {
+export function InventoryMenu({ setActiveTab }) {
+    const tabs = [
+        { label: 'CONSUMABLES', id: 'consumables' },
+        { label: 'WEAPONS', id: 'weapons' },
+        { label: 'SPACE SUITS', id: 'spaceSuits' },
+        { label: 'RESOURCES', id: 'resources' },
+        { label: 'SPACE CRAFT', id: 'spaceCraft' },
+        { label: 'CRAFTING', id: 'crafting' },
+        { label: 'BUILDINGS', id: 'buildings' },
+    ];
+
+    const [activeTab, setActiveTabInternal] = useState('consumables');
+
+    const handleTabClick = (tabId) => {
+      setActiveTabInternal(tabId);
+      setActiveTab(tabId);
+    };
+
     return (
-    <div className="w-[1749px] h-[97px] p-5 justify-start items-center gap-[30px] inline-flex">
-    <div className="px-5 py-3.5 bg-black bg-opacity-5 rounded-[10px] flex-col justify-center items-start gap-[4.75px] inline-flex">
-        <div className="text-center text-black text-2xl font-medium font-['Inter'] uppercase tracking-[3.84px]">CONSUMABLES</div>
-    </div>
-    <div className="px-5 py-3.5 flex-col justify-center items-center gap-[4.75px] inline-flex">
-        <div className="text-center text-black text-2xl font-medium font-['Inter'] uppercase tracking-[3.84px]">wEAPONS</div>
-    </div>
-    <div className="px-5 py-3.5 flex-col justify-center items-center gap-[4.75px] inline-flex">
-        <div className="text-center text-black text-2xl font-medium font-['Inter'] uppercase tracking-[3.84px]">sPACE SUITS</div>
-    </div>
-    <div className="px-5 py-3.5 flex-col justify-center items-center gap-[4.75px] inline-flex">
-        <div className="text-center text-black text-2xl font-medium font-['Inter'] uppercase tracking-[3.84px]">rESOURCES</div>
-    </div>
-    <div className="px-5 py-3.5 flex-col justify-center items-center gap-[4.75px] inline-flex">
-        <div className="text-center text-black text-2xl font-medium font-['Inter'] uppercase tracking-[3.84px]">sPACE cRAFT</div>
-    </div>
-    <div className="px-5 py-3.5 flex-col justify-center items-center gap-[4.75px] inline-flex">
-        <div className="text-center text-black text-2xl font-medium font-['Inter'] uppercase tracking-[3.84px]">cRAFTING</div>
-    </div>
-    <div className="px-5 py-3.5 flex-col justify-center items-center gap-[4.75px] inline-flex">
-        <div className="text-center text-black text-2xl font-medium font-['Inter'] uppercase tracking-[3.84px]">bUILDINGS</div>
-    </div>
-</div>
-    );
+        <div className="w-[1749px] h-[97px] p-5 justify-start items-center gap-[30px] inline-flex">
+          {tabs.map((tab) => (
+            <div
+              key={tab.id}
+              onClick={() => handleTabClick(tab.id)}
+              className={`px-5 py-3.5 ${
+                activeTab === tab.id
+                  ? 'bg-black bg-opacity-5 rounded-[10px]'
+                  : 'bg-opacity-0'
+              } flex-col justify-center items-center gap-[4.75px] inline-flex cursor-pointer`}
+            >
+              <div className="text-center text-black text-2xl font-medium font-['Inter'] uppercase tracking-[3.84px]">
+                {tab.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
 };
 
 export function SelectedItem() {
@@ -206,6 +217,41 @@ export function OwnedToolItems() {
         </>
     );
 };
+
+export function EquippedToolItems() {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const customMediaProps = {
+        src: "https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/avatars/8b09080f-1306-4ca7-b3b4-b284f047669e.png",
+        alt: "Description of your image",
+        metadata: {
+          title: "Image Title",
+          description: "Description of the image",
+        },
+    };
+
+    return (
+        <div style={{ display: "flex", flexDirection: "column" }}>
+            <h2 className={`${styles.npGapTop}`}>Equipped tools</h2>
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                }}
+            >
+                <div style={{ outline: "1px solid grey", borderRadius: 16 }}>
+                    <CustomMediaRenderer {...customMediaProps} />
+                </div>
+                <div style={{ outline: "1px solid grey", borderRadius: 16, marginLeft: 8 }}>
+                    <CustomMediaRenderer {...customMediaProps} />
+                </div>
+            </div>
+        </div>
+    )
+}
 
 export default function InventoryItemsGroup() {
   return (

@@ -46,6 +46,7 @@ export default Layout;
 
 export const InventoryLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [activeTab, setActiveTab] = useState('consumables')
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -64,7 +65,7 @@ export const InventoryLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
     <>
       <main className="h-max pb-10 grow pt-6">
         <Navbar />
-        <div className="py-5"><center><div className="py-12"><InventoryMenu /></div></center></div>
+        <div className="py-5"><center><div className="py-12"><InventoryMenu setActiveTab={setActiveTab} /></div></center></div>
         <div className="py-12">
           {children}
         </div>
