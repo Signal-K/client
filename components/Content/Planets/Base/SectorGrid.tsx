@@ -1,13 +1,54 @@
+import { useSession } from "@supabase/auth-helpers-react";
 import { ReactNode } from "react";
 
 interface ImageGridProps {
     imageUrl: string;
 };
 
+// This set of components is only really required as long as we don't have sectors already saved -> once they are, we'll need to replace them (see SectorSetup.tsx)
+export function ImagesGrid ({ imageUrls }) {
+    return (
+        <div className="grid grid-cols-4 gap-2 p-4">
+        {imageUrls.map((imageUrl, index) => (
+          <div
+            key={index}
+            className="relative overflow-hidden bg-center bg-cover"
+            style={{
+              backgroundImage: `url(${imageUrl})`,
+              paddingBottom: '100%',
+              backgroundPosition: `-${(index % 4) * 25}% -${Math.floor(index / 4) * 25}%`,
+            }}
+          ></div>
+        ))}
+      </div>
+    );
+};
+
 export function ImageGrid ({ imageUrl }) {
+    const session = useSession();
+
+    if (session) {
+        return (
+            <div className="grid grid-cols-4 gap-2 p-4">
+      {Array.from({ length: 8 }).map((_, index) => (
+        <div
+          key={index}
+          className="relative overflow-hidden bg-center bg-cover"
+          style={{
+            backgroundImage: `url(${imageUrl})`,
+            paddingBottom: '100%',
+            backgroundPosition: `-${(index % 4) * 25}% -${Math.floor(index / 4) * 25}%`,
+          }}
+        ></div>
+      ))}
+    </div>
+        );
+    };
+
+    // Hexagons are the way forward, however right now I just can't get the styling right, so we'll go back to the squares for now ^^
     return (
         <div className="grid grid-cols-4 p-4">
-      {Array.from({ length: 8 }).map((_, index) => (
+      {Array.from({ length: 4 }).map((_, index) => (
         <div
           key={index}
           className="relative overflow-hidden bg-center bg-cover hexagon"

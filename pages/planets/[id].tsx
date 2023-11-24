@@ -10,6 +10,7 @@ import PostFormCardAnomalyTag from "../../components/Content/Classify/AnomalyPos
 import Navbar from "../../components/Section/Navbar";
 import IndividualBasePlanetGrid from "../../components/Content/Planets/PlanetData/ContentGrid";
 import { CreateBar } from "../../components/Core/BottomBar";
+import RoverImageGallery from "../../components/Content/Planets/PlanetData/RandomRoverImage";
 
 export default function PlanetIdPage () {
     const router = useRouter();
@@ -124,6 +125,7 @@ export default function PlanetIdPage () {
                     src={`https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planetsss/${id}/topography.jpeg`}
                     alt="Topography"
                   />
+                  <RoverImageGallery />
                 </div>
               </div>
             )}

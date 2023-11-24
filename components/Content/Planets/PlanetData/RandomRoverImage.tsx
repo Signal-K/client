@@ -90,7 +90,7 @@ export default function RoverImageGallery() {
     return (
         <div className="py-20">
             <pre>{imageUrl}</pre>
-            <RoverImage date='91' rover={selectedRover} onImageMetadataChange={handleMetadataChange} />
+            <RoverImage date='721' rover={selectedRover} onImageMetadataChange={handleMetadataChange} />
             <RoverContentPostForm metadata={metadata} imageLink={imageUrl} />               
         </div>
     );
