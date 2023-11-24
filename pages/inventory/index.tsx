@@ -1,14 +1,13 @@
 import React from "react";
 import InventoryItemsGroup, { InventoryMenu, UserBackpackInventory } from "../../components/Content/Inventory/ItemGroup";
-import Layout from "../../components/Section/Layout";
+import Layout, { InventoryLayout } from "../../components/Section/Layout";
 
 export default function Inventory() {
     return (
-        <Layout>
-            <div className="py-10 px-10">
-                <InventoryMenu />
-                <UserBackpackInventory />
-            </div>
-        </Layout>
-    )
-}
+      <InventoryLayout>
+        <div className="grid grid-cols-3 gap-4 px-5">
+            <div><UserBackpackInventory /></div>
+        </div>
+      </InventoryLayout>
+    );
+};  

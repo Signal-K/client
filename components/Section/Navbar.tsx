@@ -133,7 +133,7 @@ export default function Navbar() {
             </Transition>
           </Popover>
 
-          <a href="/explore" className="text-sm font-semibold leading-6 text-gray-900">
+          <a href="/inventory" className="text-sm font-semibold leading-6 text-gray-900"> {/* Was originally /explore */}
             Inventory
           </a>
           <a href="/feed" className="text-sm font-semibold leading-6 text-gray-900">
