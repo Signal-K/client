@@ -28,6 +28,40 @@ export function InventoryMenu() {
     );
 };
 
+export function SelectedItem() {
+    return (
+        <div className="w-[235px] h-[792px] px-2.5 py-5 bg-black bg-opacity-40 rounded-[15px] flex-col justify-start items-center gap-2.5 inline-flex">
+    <div className="h-[267px] relative">
+        <div className="w-[215px] h-12 left-0 top-0 absolute justify-center items-center inline-flex">
+            <div className="grow shrink basis-0 px-5 flex-col justify-center items-center gap-[4.75px] inline-flex">
+                <div className="self-stretch text-center text-emerald-300 text-xl font-bold font-['Inter'] uppercase tracking-[3.20px]">Selected item</div>
+            </div>
+        </div>
+        <div className="w-[215px] h-[215px] px-2.5 py-5 left-0 top-[52px] absolute justify-center items-start inline-flex">
+            <div className="w-[175px] h-[175px] bg-white bg-opacity-20 rounded-[15px] justify-center items-center gap-2.5 flex">
+                <div className="text-center text-white text-base font-bold font-['Inter'] uppercase tracking-[2.56px]">IMAGE</div>
+            </div>
+        </div>
+    </div>
+    <div className="self-stretch grow shrink basis-0 flex-col justify-start items-center gap-4 flex">
+        <div className="self-stretch h-9 py-1.5 flex-col justify-center items-center gap-[4.75px] flex">
+            <div className="self-stretch text-center text-white text-xl font-medium font-['Inter'] uppercase tracking-[3.20px]">iTEM sTATS</div>
+        </div>
+        <div className="h-[105px] relative">
+            <div className="w-[215px] h-[52px] px-4 py-3.5 left-0 top-0 absolute border-b border-neutral-400 justify-between items-center inline-flex">
+                <div className="text-center text-white text-xl font-medium font-['Inter'] uppercase tracking-[3.20px]">quantity:</div>
+                <div className="grow shrink basis-0 text-right text-emerald-300 text-xl font-medium font-['Inter'] uppercase tracking-[3.20px]">4</div>
+            </div>
+            <div className="w-[215px] h-[52px] px-4 py-3.5 left-0 top-[53px] absolute border-b border-neutral-400 justify-between items-center inline-flex">
+                <div className="text-center text-white text-xl font-medium font-['Inter'] uppercase tracking-[3.20px]">Rarity:</div>
+                <div className="grow shrink basis-0 text-right text-purple-500 text-xl font-medium font-['Inter'] uppercase tracking-[3.20px]">epic</div>
+            </div>
+        </div>
+    </div>
+</div>
+    );
+};
+
 export function UserBackpackInventory() {
     return (
         <div className="w-[472px] h-[792px] px-5 pt-5 pb-1.5 bg-black bg-opacity-40 rounded-[15px] flex-col justify-start items-center gap-7 inline-flex">

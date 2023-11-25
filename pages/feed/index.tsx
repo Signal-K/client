@@ -5,6 +5,7 @@ import Layout from "../../components/Section/Layout";
 import CardForum from "../../components/Content/DiscussCard";
 import ClassificationFeed from "../../components/Content/ClassificationFeed";
 import CreatePostForm from "../../components/Content/CreatePostForm";
+import HomePlanetStats from "../../components/Blocks/HomePlanetStats";
 
 export default function Home() {
     const session = useSession();
@@ -35,6 +36,9 @@ export default function Home() {
   
       return (
         <Layout>
+          <div className="py-10">
+            <HomePlanetStats />
+          </div>
           <div className="py-10">
             <ClassificationFeed custommaxWidth={customMaxWidth} />
           </div>
