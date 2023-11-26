@@ -31,6 +31,7 @@ export default function GatherResourcesPage() {
             <div className="p-5">
                 <h1 className="text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-2 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-400">Your planet</h1>
                 <pre>You've currently got one planet in your inventory (as we're only exploring base planets for now). Here's the latest rover image set.</pre>
+                <h2 className="text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-2 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-400">Your owned sectors (of planet)</h2>
                 <CreateBasePlanetSector />
                 {/* <ImageGrid imageUrl='https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00116/ids/edr/browse/ncam/NLF_0116_0677245872_058ECM_N0041250NCAM02116_01_195J01_1200.jpg' /> */}
                 <ImagesGrid imageUrls={sectorImageUrls} />

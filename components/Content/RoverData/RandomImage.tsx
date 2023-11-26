@@ -76,7 +76,7 @@ export function RoverGallerySingle({ inventoryPlanetId }) {
                 setRoverImage('No images found for the given date and rover.');
                 setMetadata('No image available.');
                 setImageMetadata('');
-            }
+            } 
         } catch (error) {
             console.error(error);
             setRoverImage('An error occurred while fetching the image.');
