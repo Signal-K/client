@@ -1,12 +1,7 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
-import CoreLayout from "../../components/Core/Layout";
 import Layout from "../../components/Section/Layout";
-import CardForum from "../../components/Content/DiscussCard";
 import ClassificationFeed, { ClassificationFeedDemo } from "../../components/Content/ClassificationFeed";
-import CreatePostForm from "../../components/Content/CreatePostForm";
-import HomePlanetStats from "../../components/Blocks/HomePlanetStats";
-import DetectedAnomaliesBlock, { CurrentSilfur, MobilePlanetTest } from "../../components/Blocks/DetectedAnomalies";
 
 export default function Home() {
     const session = useSession();

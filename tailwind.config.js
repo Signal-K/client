@@ -16,6 +16,10 @@ module.exports = {
       },
     },
     extend: {
+      spacing: {
+        '2/3': '66.666667%',
+        '3/4': '75%',
+      },
       height: {
         screen: ["100vh", "100dvh"],
       },
@@ -74,6 +78,9 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
+    aspectRatio: {
+      '1': '1',
+    },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate")], 
 };
