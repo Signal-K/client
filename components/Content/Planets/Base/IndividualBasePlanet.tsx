@@ -341,25 +341,8 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
       if (!session || !planetId) {
         return;
       }
-  
-      const { data, error } = await supabase
-        .from("inventoryPLANETS")
-        .select()
-        .eq("planet_id", planetId)
-        .eq("owner_id", session?.user?.id);
-  
-      if (error) {
-        console.error("Error checking user inventory:", error);
-        return;
-      }
-  
-      if (data.length > 0) {
-        setHasPlanetInInventory(true);
-        setInventoryPlanetId(data[0].id);
-      }
-    }
-  
-  //   async function fetchSectorsForPlanet() {
+
+        //   async function fetchSectorsForPlanet() {
   //     try {
   //       const { data, error } = await supabase
   //         .from("basePlanetsSECTORS")
@@ -378,6 +361,24 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
   //       console.error(error);
   //     }
   //   }
+  
+      const { data, error } = await supabase
+        .from("inventoryPLANETS")
+        .select()
+        .eq("planet_id", planetId)
+        .eq("owner_id", session?.user?.id);
+  
+      if (error) {
+        console.error("Error checking user inventory:", error);
+        return;
+      }
+  
+      if (data.length > 0) {
+        setHasPlanetInInventory(true);
+        setInventoryPlanetId(data[0].id);
+      }
+    }
+
   
     return (
       <div className="flex-col justify-center">
@@ -420,31 +421,31 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
               }} 
             />
             <div className="flex items-start gap-8">
-  <div className="flex flex-col items-center justify-start gap-4">
-    <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] tracking-[3.48px]">Mass</div>
-    <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{mass} mE</div>
-  </div>
+              <div className="flex flex-col items-center justify-start gap-4">
+                <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] tracking-[3.48px]">Mass</div>
+                <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{mass} mE</div>
+              </div>
 
-  <div className="flex flex-col items-center justify-start gap-4">
-    <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Semi-Major Axis</div>
-    <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{smaxis} AU</div>
-  </div>
+              <div className="flex flex-col items-center justify-start gap-4">
+                <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Semi-Major Axis</div>
+                <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{smaxis} AU</div>
+              </div>
 
-  <div className="flex flex-col items-center justify-start gap-4">
-    <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Anomaly type</div>
-    <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{type}?</div>
-  </div>
+              <div className="flex flex-col items-center justify-start gap-4">
+                <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Anomaly type</div>
+                <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{type}?</div>
+              </div>
 
-  <div className="flex flex-col items-center justify-start gap-4">
-    <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Eq. Temperature</div>
-    <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{temperatureEq}°C</div>
-  </div>
+              <div className="flex flex-col items-center justify-start gap-4">
+                <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Eq. Temperature</div>
+                <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{temperatureEq}°C</div>
+              </div>
 
-  <div className="flex flex-col items-center justify-start gap-4">
-    <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">TIC ID</div>
-    <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{ticId}</div>
-  </div>
-</div>
+              <div className="flex flex-col items-center justify-start gap-4">
+                <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">TIC ID</div>
+                <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">{ticId}</div>
+              </div>
+            </div>
           </div>
         </div>
     );

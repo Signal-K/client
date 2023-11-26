@@ -32,7 +32,7 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
                 media: uploads,
                 // planets2: planetId,   
                 anomaly: planetId, // Set this to multiple anomaly types/foreign key options            
-            }).then(response => {
+            }).then(response => { 
                 if (!response.error) {
                   alert(`Post ${content} created`);
                   setContent('');

@@ -58,7 +58,7 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
           </button>
     
           {isCalloutOpen && (
-            <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+            <div className="origin-top-right absolute right-0 mt-2 w-72 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
               <div className="py-1">
                 {structures.map((structure) => (
                   <div
@@ -67,8 +67,8 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
                     onClick={() => handleStructureClick(structure)}
                   >
                     <div className="flex items-center space-x-2">
-                      <img src={structure.icon_url} alt={structure.name} className="w-6 h-6" />
-                      <span>{structure.name}</span>
+                      <img src={structure.icon_url} alt={structure.name} className="w-9 h-9" />
+                      <span className="font-bold">{structure.name}</span>
                     </div>
                     <span className="text-gray-500">{structure.description}</span>
                   </div>
