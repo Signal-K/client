@@ -94,7 +94,7 @@ export default function PlanetIdPage () {
 
     return (
         <>
-          {/* <Navbar /> */}
+          <Navbar />
           <div className="h-screen">
             <IndividualBasePlanetDesktop id={id as string} />
           </div>
@@ -106,8 +106,7 @@ export default function PlanetIdPage () {
                   <ClassificationFeedForIndividualPlanet
                     planetId={{ id: id as string }}
                     backgroundColorSet="bg-blue-200"
-                  /><div className="mx-20">
-                  <div className="px-20 ml-20"><StructureComponent /></div></div>
+                  />
                 </div>
                 <div className="">
                   <BasePlanetData planetId={{ id: id as string }} />

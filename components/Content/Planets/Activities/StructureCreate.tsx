@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface Structure {
     id: number;
@@ -10,13 +10,14 @@ interface Structure {
 
 interface StructureSelectionProps {
     onStructureSelected: (structure: Structure) => void;
+    planetSectorId: number;
 };
 
-const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSelected }) => {
+const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSelected, planetSectorId }) => {
     const supabase = useSupabaseClient();
+    const session = useSession();
 
     const [structures, setStructures] = useState<Structure[]>([]);
-    
     const [isCalloutOpen, setIsCalloutOpen] = useState(false);
 
     const fetchStructures = async () => {
@@ -28,14 +29,41 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
 
             if (data) {
                 setStructures(data);
-            };
+            }
 
             if (error) {
                 console.error(error.message);
-            };
+            }
         } catch (error) {
             console.error(error.message);
-        };
+        }
+    };
+
+    const createInventoryUserEntry = async (structure: Structure) => {
+        if (session && planetSectorId) {
+            try {
+                const { data, error } = await supabase
+                    .from('inventoryUSERS')
+                    .upsert([
+                        {
+                            item: structure.id,
+                            owner: session.user.id,
+                            quantity: 1, // You can adjust the quantity as needed
+                            planetSector: planetSectorId,
+                        },
+                    ]);
+
+                if (data) {
+                    console.log('Inventory user entry created:', data);
+                }
+
+                if (error) {
+                    console.error(error.message);
+                }
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
     };
 
     useEffect(() => {
@@ -44,6 +72,7 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
 
     const handleStructureClick = (structure: Structure) => {
         onStructureSelected(structure);
+        createInventoryUserEntry(structure);
         setIsCalloutOpen(false);
     };
 
@@ -67,7 +96,7 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
                     onClick={() => handleStructureClick(structure)}
                   >
                     <div className="flex items-center space-x-2">
-                      <img src={structure.icon_url} alt={structure.name} className="w-9 h-9" />
+                      <img src={structure.icon_url} alt={structure.name} className="w-8 h-8" />
                       <span className="font-bold">{structure.name}</span>
                     </div>
                     <span className="text-gray-500">{structure.description}</span>
@@ -80,14 +109,14 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
     );
 };
 
-export default function StructureComponent () {
+export default function StructureComponent({ sectorId }) {
     const handleStructureSelected = (structure) => {
         console.log('Selected structure: ', structure);
     };
 
     return (
         <div>
-            <StructureSelection onStructureSelected={handleStructureSelected} />
+            <StructureSelection onStructureSelected={handleStructureSelected} planetSectorId={sectorId} />
         </div>
     );
 };

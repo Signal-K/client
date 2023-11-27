@@ -5,6 +5,7 @@ import Card from "../../../Card";
 import RoverImageGallery, { RoverImage, RoverImageNoHandle } from "../PlanetData/RandomRoverImage";
 import axios from "axios";
 import { RoverContentPostForm } from "../../CreatePostForm";
+import StructureComponent from "../Activities/StructureCreate";
 
 export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
   const router = useRouter();
@@ -198,6 +199,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
       <div>
         <Card noPadding={false}>
           <RoverImageNoHandle date='853' rover='opportunity' sectorNo={id} />
+          <StructureComponent sectorId={sectorid} />
           {/* {imageUrl ? (
             <>
                 <img src={imageUrl} alt="Rover image" />
