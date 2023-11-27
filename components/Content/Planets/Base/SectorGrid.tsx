@@ -1,5 +1,35 @@
 import { ReactNode } from "react";
 
+interface ImageGridProps {
+    imageUrl: string;
+};
+
+export function ImageGrid ({ imageUrl }) {
+    return (
+        <div className="grid grid-cols-4 p-4">
+      {Array.from({ length: 8 }).map((_, index) => (
+        <div
+          key={index}
+          className="relative overflow-hidden bg-center bg-cover hexagon"
+          style={{
+            backgroundImage: `url(${imageUrl})`,
+            paddingBottom: '100%',
+            backgroundPosition: `-${(index % 4) * 25}% -${Math.floor(index / 4) * 25}%`,
+            transform: 'scale(0.6)',
+          }}
+        ></div>
+      ))}
+      <style jsx>
+        {`
+          .hexagon {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+          }
+        `}
+      </style>
+    </div>
+    );
+}
+
 const HexagonClip: React.FC = () => (
   <svg className="clip-svg">
     <defs>
