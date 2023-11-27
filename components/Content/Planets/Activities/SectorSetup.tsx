@@ -92,4 +92,20 @@ export function UserOwnedSectorGrid() {
 
         fetchUserSectorImages();
     }, [session, supabase]);
-}
+
+    return (
+        <div className="grid grid-cols-4 gap-2 p-4">
+            {imageUrls.map((imageUrl, index) => (
+                <div
+                    key={index}
+                    className="relative overflow-hidden bg-center bg-cover"
+                    style={{
+                        backgroundImage: `url(${imageUrl})`,
+                        paddingBottom: '100%',
+                        backgroundPosition: `-${(index % 4) * 25}% -${Math.floor(index / 4) * 25}%`,
+                    }}
+                ></div>
+            ))}
+        </div>
+    );
+};

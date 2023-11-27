@@ -299,14 +299,14 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
   
         if (data) {
           setPlanetData(data);
-        }
+        };
   
         if (error) {
           throw error;
-        }
+        };
       } catch (error: any) {
         console.error(error.message);
-      }
+      };
     };
   
     async function fetchPostsForPlanet(planetId) {
