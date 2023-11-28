@@ -9,7 +9,7 @@ export default function ClassificationFeed({ custommaxWidth = '85%' }) {
     const [posts, setPosts] = useState([]);
     // const [profile, setProfile] = useState(null);
     const [planetPosts, setPlanetPosts] = useState([]);
-
+ 
     useEffect(() => {
         fetchPosts();
       }, []);  
