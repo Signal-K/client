@@ -120,3 +120,69 @@ export default function StructureComponent({ sectorId }) {
         </div>
     );
 };
+
+interface PlacedStructuresProps {
+    sectorId: number;
+  }
+  
+  interface PlacedStructure {
+    id: number;
+    name: string;
+    description: string;
+    icon_url: string;
+  }
+  
+export const PlacedStructures: React.FC<PlacedStructuresProps> = ({ sectorId }) => {
+    const supabase = useSupabaseClient();
+    const [placedStructures, setPlacedStructures] = useState<PlacedStructure[]>([]);
+  
+    useEffect(() => {
+      const fetchPlacedStructures = async () => {
+        try {
+          const { data: userItems, error: userItemsError } = await supabase
+            .from('inventoryUSERS')
+            .select('item')
+            .eq('planetSector', sectorId);
+  
+          if (userItemsError) {
+            console.error(userItemsError.message);
+            return;
+          }
+  
+          const itemIds = userItems?.map((item) => item.item) || [];
+  
+          const { data: structureItems, error: structureItemsError } = await supabase
+            .from('inventoryITEMS')
+            .select('id, name, description, icon_url')
+            .in('id', itemIds)
+            .eq('ItemCategory', 'Structure');
+  
+          if (structureItemsError) {
+            console.error(structureItemsError.message);
+            return;
+          }
+  
+          setPlacedStructures(structureItems || []);
+        } catch (error) {
+          console.error(error.message);
+        }
+      };
+  
+      fetchPlacedStructures();
+    }, [supabase, sectorId]);
+  
+    return (
+      <div>
+        <h2>Structures Placed on Sector {sectorId}</h2>
+        <div>
+          {placedStructures.map((structure) => (
+            <div key={structure.id}>
+              <img src={structure.icon_url} alt={structure.name} />
+              <p>{structure.name}</p>
+              <p>{structure.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+};
