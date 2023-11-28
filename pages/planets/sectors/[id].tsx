@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "../../../components/Section/Layout";
+import BasePlanetSector from "../../../components/Content/Planets/Base/IndividualBasePlanetSector";
 
 export default function SectorPage () {
     const router = useRouter();
@@ -27,7 +28,9 @@ export default function SectorPage () {
 
     return (
         <Layout>
-            <div></div>
+            <div className="h-screen py-10">
+                <BasePlanetSector id={id as string} />
+            </div>
         </Layout>
     );
 };
