@@ -43,6 +43,17 @@ export default function CreatePostForm ( { planetId2 } ) { // category_id
                 content: postContent,
                 media: uploads,
                 planets2: planetId2,
+            }).then(async response => {
+                if (!response.error) {
+                    await supabase.from('inventoryPLANETS').insert([
+                        {
+                            planet_id: planetId2,
+                            owner_id: session?.user?.id,
+                        },
+                    ]);
+
+                    setPostContent('');
+                }
             })
     };
 
