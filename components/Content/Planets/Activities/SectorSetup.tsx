@@ -1,4 +1,5 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 export default function CreateBasePlanetSector() {
@@ -66,7 +67,7 @@ export function UserOwnedSectorGrid() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const [imageUrls, setImageUrls] = useState([]);
+    const [sectorData, setSectorData] = useState([]);
 
     useEffect(() => {
         const fetchUserSectorImages = async () => {
@@ -74,11 +75,11 @@ export function UserOwnedSectorGrid() {
                 try {
                     const { data, error } = await supabase
                         .from("basePlanetSectors")
-                        .select('coverUrl')
+                        .select('id, coverUrl')
                         .eq('owner', session?.user?.id);
 
                     if (data) {
-                        setImageUrls(data.map((item) => item.coverUrl));
+                        setSectorData(data);
                     };
 
                     if (error) {
@@ -95,16 +96,16 @@ export function UserOwnedSectorGrid() {
 
     return (
         <div className="grid grid-cols-4 gap-2 p-4">
-            {imageUrls.map((imageUrl, index) => (
-                <div
-                    key={index}
+            {sectorData.map((item) => (
+                <Link href={`/planets/sectors/${item.id}`}><div
+                    key={item.id}
                     className="relative overflow-hidden bg-center bg-cover"
                     style={{
-                        backgroundImage: `url(${imageUrl})`,
+                        backgroundImage: `url(${item.coverUrl})`,
                         paddingBottom: '100%',
-                        backgroundPosition: `-${(index % 4) * 25}% -${Math.floor(index / 4) * 25}%`,
+                        // backgroundPosition: `-${(index % 4) * 25}% -${Math.floor(index / 4) * 25}%`,
                     }}
-                ></div>
+                ></div></Link>
             ))}
         </div>
     );

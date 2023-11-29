@@ -29,7 +29,7 @@ export default function SectorPage () {
     return (
         <Layout>
             <div className="h-screen py-10">
-                <BasePlanetSector id={id as string} />
+                <BasePlanetSector sectorid={id as string} />
             </div>
         </Layout>
     );
