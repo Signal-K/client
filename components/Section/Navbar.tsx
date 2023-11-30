@@ -20,7 +20,7 @@ import { AiFillCloseCircle } from 'react-icons/ai';
 import { CgProfile } from 'react-icons/cg';
 import { BiLogIn } from 'react-icons/bi';
 
-const UserMenuItems = ({
+export const UserMenuItems = ({
   user,
   setMobileMenuOpen,
 }: {
@@ -125,7 +125,7 @@ const UserMenuItems = ({
   );
 };
 
-const UserDropdownMenu = ({ user } : { user: string }) => {
+export const UserDropdownMenu = ({ user } : { user: string }) => {
   const session = useSession();
   const supabase = useSupabaseClient();
   const [profile, setProfile] = useState<any>(null);
