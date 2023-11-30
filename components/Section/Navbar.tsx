@@ -17,12 +17,14 @@ import { MdOutlineSpaceDashboard } from 'react-icons/md';
 import { TfiDashboard } from 'react-icons/tfi';
 import { HiBars3 } from 'react-icons/hi2';
 import { AiFillCloseCircle } from 'react-icons/ai';
+import { CgProfile } from 'react-icons/cg';
+import { BiLogIn } from 'react-icons/bi';
 
 const UserMenuItems = ({
   user,
   setMobileMenuOpen,
 }: {
-  user?: { isAdmin: boolean }; // Adjust the type based on your actual user structure
+  user?: string; // Adjust the type based on your actual user structure
   setMobileMenuOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const path = window.location.pathname;
@@ -42,7 +44,7 @@ const UserMenuItems = ({
       >
         {path === '/' || path === '/admin' ? (
           <li>
-            <Link href='/demo-app'>
+            <Link href='/demo-app' legacyBehavior>
               <a className='flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-yellow-500'>
                 <MdOutlineSpaceDashboard size='1.1rem' />
                 AI Scheduler (Demo App)
@@ -51,7 +53,7 @@ const UserMenuItems = ({
           </li>
         ) : null}
         <li>
-        <Link href='/account'>
+        <Link href='/account' legacyBehavior>
             <a
               onClick={handleMobileMenuClick}
               className='flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-yellow-500'
@@ -78,14 +80,13 @@ const UserMenuItems = ({
           </Link>
         </li>
       </ul>
-      {!!user?.isAdmin && (
         <ul
           className={`flex flex-col gap-5 border-b border-stroke py-4 dark:border-strokedark ${
             path === '/admin' ? 'px-6' : 'sm:px-6'
           }`}
         >
           <li className='flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-yellow-500'>
-          <Link href='/admin'>
+          <Link href='/admin' legacyBehavior>
               <a
                 onClick={handleMobileMenuClick}
                 className='flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-yellow-500'
@@ -96,7 +97,6 @@ const UserMenuItems = ({
             </Link>
           </li>
         </ul>
-      )}
       <button
         className={`flex items-center gap-3.5 py-4 text-sm font-medium duration-300 ease-in-out hover:text-yellow-500 ${
           path === '/admin' ? 'px-6' : 'sm:px-6'
@@ -126,13 +126,75 @@ const UserMenuItems = ({
 };
 
 const UserDropdownMenu = ({ user } : { user: string }) => {
-  const supabase = useSupabaseClient();
   const session = useSession();
+  const supabase = useSupabaseClient();
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {    
+    supabase
+      .from("profiles")
+      .select()
+      .eq("id", session?.user?.id)
+      .then((result) => {
+        if (result.data) {
+          setProfile(result.data[0]);
+        }
+    });
+  }, [session]);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+
+  useEffect(() => {
+    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+      if (!dropdownOpen || keyCode !== 27) return;
+      setDropdownOpen(false);
+    };
+    document.addEventListener('keydown', keyHandler);
+    return () => document.removeEventListener('keydown', keyHandler);
+  });
+
+  return (
+    <div className='relative'>
+      <button
+        ref={trigger}
+        onClick={toggleDropdown}
+        className='flex items-center gap-4 duration-300 ease-in-out text-gray-900 hover:text-yellow-500'
+      >
+        <span className='hidden text-right lg:block'>
+          <span className='block text-sm font-medium dark:text-white'>{profile?.username}</span>
+        </span>
+        <CgProfile size='1.1rem' className='ml-1 mt-[0.1rem] dark:text-white' />
+        <svg
+          className={`hidden fill-current dark:fill-white sm:block ${dropdownOpen ? 'rotate-180' : ''}`}
+          width='12'
+          height='8'
+          viewBox='0 0 12 8'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          <path
+            fillRule='evenodd'
+            clipRule='evenodd'
+            d='M0.410765 0.910734C0.736202 0.585297 1.26384 0.585297 1.58928 0.910734L6.00002 5.32148L10.4108 0.910734C10.7362 0.585297 11.2638 0.585297 11.5893 0.910734C11.9147 1.23617 11.9147 1.76381 11.5893 2.08924L6.58928 7.08924C6.26384 7.41468 5.7362 7.41468 5.41077 7.08924L0.410765 2.08924C0.0853277 1.76381 0.0853277 1.23617 0.410765 0.910734Z'
+            fill=''
+          />
+        </svg>
+      </button>
+
+      {/* <!-- Dropdown --> */}
+      <div
+        ref={dropdown}
+        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark dark:text-white ${
+          dropdownOpen === true ? 'block' : 'hidden'
+        }`}
+      >
+        <UserMenuItems user={session?.user?.id} setMobileMenuOpen={toggleDropdown} />
+      </div>
+    </div>
+  );
 }
 
 const navigation = [
@@ -155,10 +217,26 @@ const NavLogo = () => (
 );
 
 export default function Navigation() {
+  const session = useSession();
+  const supabase = useSupabaseClient();
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {    
+    supabase
+      .from("profiles")
+      .select()
+      .eq("id", session?.user?.id)
+      .then((result) => {
+        if (result.data) {
+          setProfile(result.data[0]);
+        }
+    });
+  }, [session]);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   return  (
-    <header className='absolute inset-x-0 top-0 z-50 shadow sticky bg-white bg-opacity-50 backdrop-blur-lg backdrop-filter dark:border-strokedark dark:bg-boxdark-2'>
+    <header className='absolute inset-x-0 top-0 z-50 shadow sticky backdrop-blur-lg bg-opacity-40 backdrop-filter dark:border-strokedark dark:bg-boxdark-2'>
       <nav
         className='flex items-center justify-between p-6 lg:px-8'
         aria-label='Global'
@@ -193,7 +271,18 @@ export default function Navigation() {
           <ul className='flex justify-center items-center gap-2 sm:gap-4'>
             {/* <DarkModeSwitcher /> */}
           </ul>
-
+          <a
+              href={!session ? '/login' : '/account'}
+              className='text-sm font-semibold leading-6 ml-4'
+            >
+              {/* <div className='flex items-center duration-300 ease-in-out text-gray-900 hover:text-yellow-500 dark:text-white'>
+                Log in <BiLogIn size='1.1rem' className='ml-1 mt-[0.1rem]' />
+              </div> */}
+            </a>
+          {/* ) : ( */}
+            <div className='ml-4'>
+              <UserDropdownMenu user={session?.user?.id} />
+            </div>
           {/* {isUserLoading ? null : !user ? (
             <a
               href={!user ? '/login' : '/account'}
@@ -262,8 +351,8 @@ export default function Navigation() {
         </Dialog.Panel>
       </Dialog>
     </header>
-  )
-}
+  );
+};
 
 const products = [
   { name: 'Your planets', description: '', href: '/garden', icon: ChartPieIcon },

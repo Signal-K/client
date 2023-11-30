@@ -94,7 +94,7 @@ export default function PlanetIdPage () {
     return (
         <>
           <Navbar />
-          <div className="h-screen">
+          <div className="h-screen py-4">
             <IndividualBasePlanetDesktop id={id as string} />
           </div>
           <div className="bg-white py-5">
