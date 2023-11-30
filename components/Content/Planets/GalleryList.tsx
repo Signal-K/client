@@ -93,7 +93,7 @@ export default function PlanetGallery() {
 
 export const Garden: React.FC = () => {
   return (
-    <div style={{ backgroundImage: `url('/bg.jpg')` }} className="bg-cover bg-center h-screen flex items-center justify-center relative">
+    <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-screen flex items-center justify-center relative">
       <PlanetGallery />
     </div>
   );

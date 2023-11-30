@@ -15,7 +15,7 @@ interface GardenProps {
 
 const Garden: React.FC<GardenProps> = ({ anomalies }) => {
  return (
-    <div style={{ backgroundImage: `url('/bg.jpg')` }} className="bg-cover bg-center h-screen w-screen flex items-center justify-center relative">
+    <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-screen w-screen flex items-center justify-center relative">
    {/* <button className="p-2 bg-blue-500 text-white">Add Anomaly</button> */}
    {/* <PlanetGalleryIndexComp /> */}
      {anomalies.map((anomaly) => (
