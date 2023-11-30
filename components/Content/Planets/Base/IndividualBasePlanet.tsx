@@ -201,7 +201,7 @@ export default function IndividualBasePlanet({ id }: { id: string }) {
             )}
             {index === 1 && (
               <img
-                src="https://github.com/Signal-K/client/blob/FCDB-21/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png?raw=true"
+                src="https://raw.githubusercontent.com/Signal-K/client/main/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png"
                 alt="Telescope Icon"
                 className="w-12 h-12 absolute top-8 right-4 transform -translate-x-1/2 -translate-y-1/2"
               />
@@ -408,7 +408,7 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
             </h1>
             <div className="w-[1169.62px] h-[735.77px] left-[415px] top-[343px] absolute">
               <div className="w-[608px] h-[576px] left-[405px] top-[108px] absolute justify-center items-center inline-flex" />
-              <img className="w-[147.59px] h-[150.77px] left-0 top-[285px] absolute" src="https://github.com/Signal-K/client/blob/FCDB-21/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png?raw=true" />
+              <img className="w-[147.59px] h-[150.77px] left-0 top-[285px] absolute" src="https://github.com/Signal-K/client/blob/main/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png?raw=true" />
               <img className="w-[150px] h-[150px] left-[927px] top-[229.63px] absolute origin-top-left rotate-[-86.76deg]" src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/69/Kepler22.png" />
             </div>
             <img
@@ -648,7 +648,7 @@ export function IndividualBasePlanetDesktopTwoPanel({ id }: { id: string }) {
               )}
               {index === 1 && (
                 <img
-                  src="https://github.com/Signal-K/client/blob/FCDB-21/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png?raw=true"
+                  src="https://github.com/Signal-K/client/blob/main/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png?raw=true"
                   alt="Telescope Icon"
                   className="w-12 h-12 absolute bottom-14 right-4 transform -translate-x-1/2 -translate-y-1/2"
                 />
