@@ -1,7 +1,7 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
 import CoreLayout from "../components/Core/Layout";
-import Layout from "../components/Section/Layout";
+import Layout, { LandingLayout } from "../components/Section/Layout";
 import CardForum from "../components/Content/DiscussCard";
 import { useRouter } from "next/router";
 import Login from "./login";
@@ -43,7 +43,7 @@ export function PublicLanding () {
             >
               <NavLogo />
               <span className='ml-2 text-sm font-semibold leading-6 dark:text-white'>
-                Your Saas
+                Star Sailors
               </span>
             </a>
           </div>
@@ -72,9 +72,10 @@ export function PublicLanding () {
             {/* <!-- Dark Mode Toggler --> */}
             <div className='flex items-center gap-3 2xsm:gap-7'>
               <ul className='flex justify-center items-center gap-2 2xsm:gap-4'>
-                {/* <DarkModeSwitcher /> */}Dark Mode Switcher
+                {/* <DarkModeSwitcher />Dark Mode Switcher */}
               </ul>
-              <UserDropdownMenu user={session?.user?.id} />
+              {session && (
+              <UserDropdownMenu user={session?.user?.id} />)}
               {/* {isUserLoading ? null : !user ? (
                 <Link to='/login'>
                   <div className='flex justify-end items-center duration-300 ease-in-out text-gray-900 hover:text-yellow-500 dark:text-white'>
@@ -97,7 +98,7 @@ export function PublicLanding () {
           <Dialog.Panel className='fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 dark:bg-boxdark dark:text-white'>
             <div className='flex items-center justify-between'>
               <a href='/' className='-m-1.5 p-1.5'>
-                <span className='sr-only'>Your SaaS</span>
+                <span className='sr-only'>Star Sailors</span>
                 <NavLogo />
               </a>
               <button
@@ -167,15 +168,14 @@ export function PublicLanding () {
               }}
             />
           </div>
-          <div className='py-24 sm:py-32'>
+          <div className='py-4 sm:py-32'>
             <div className='mx-auto max-w-8xl px-6 lg:px-8'>
               <div className='lg:mb-18 mx-auto max-w-3xl text-center'>
                 <h1 className='text-4xl font-bold text-gray-900 sm:text-6xl dark:text-white'>
-                  Some <span className='italic'>cool</span> words about your
-                  product
+                  <span className='italic'>Star Sailors</span>
                 </h1>
                 <p className='mt-6 mx-auto max-w-2xl text-lg leading-8 text-gray-600 dark:text-white'>
-                  With some more exciting words about your product!
+                  One-liner about Star Sailors
                 </p>
                 <div className='mt-10 flex items-center justify-center gap-x-6'>
                   <a
@@ -213,7 +213,7 @@ export function PublicLanding () {
                 <defs>
                   <path id='a' d='M.06.5h272v190H.06z' />
                 </defs>
-                <g fill-rule='evenodd'>
+                <g fillRule='evenodd'>
                   <path
                     className='dark:fill-white'
                     fill='#545454'
@@ -281,11 +281,10 @@ export function PublicLanding () {
         <div id='modules' className='mx-auto mt-48 max-w-7xl px-6 lg:px-8'>
           <div className='mx-auto max-w-2xl text-center'>
             <p className='mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl dark:text-white'>
-              The <span className='text-yellow-500'>Best</span> modules
+              <span className='text-yellow-500'>Gameplay</span> 
             </p>
             <p className='mt-6 text-lg leading-8 text-gray-600 dark:text-white'>
-              Don't work harder.
-              <br /> Work smarter.
+              Explore the cosmos & catalogue discoveries in different scientific disciplines
             </p>
           </div>
           <div className='mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl'>
@@ -439,35 +438,25 @@ export default function Home() {
 
     const userId = session?.user?.id;
 
-    useEffect(() => {
-        if (session) {
-            router.push('/feed');
-        }
-    }, [session, router]);
+    // useEffect(() => {
+    //     if (session) {
+    //         router.push('/feed');
+    //     }
+    // }, [session, router]);
 
     if (session) {
     return (
-      <Layout>
+      <LandingLayout>
         {/* {userId} */}
         <div className="flex flex-col gap-4">
-          
+          <PublicLanding />
         </div>
-      </Layout>
+      </LandingLayout>
         // <CoreLayout>
       )
     }
 
     return (
-      <div className="grid grid-cols-2 h-screen-navbar">
-        <div className="bg-teal border-r">
-          <div className="p-4">
-            <div className="mx-auto tablet:mx-0">
-              <div className="grid grid-cols-1 content-grid home-hero">
-                <h1 className="text-4xl font-bold">Test</h1>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PublicLanding />
     );
 };

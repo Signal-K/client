@@ -29,13 +29,13 @@ export const modules = [
         href: '/garden',
     },
     {
-        name: 'Planet Hunters',
+        name: 'Planet Huners',
         description: 'Employ simple data-science tools to discover real planets and add them to your collection',
         icon: '🪐',
         href: '/garden',
     },
     {
-        name: 'Planet Hunters',
+        name: 'Planet Hters',
         description: 'Employ simple data-science tools to discover real planets and add them to your collection',
         icon: '🪐',
         href: '/garden',
