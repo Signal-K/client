@@ -444,17 +444,17 @@ export default function Home() {
     //     }
     // }, [session, router]);
 
-    if (session) {
-    return (
-      <LandingLayout>
-        {/* {userId} */}
-        <div className="flex flex-col gap-4">
-          <PublicLanding />
-        </div>
-      </LandingLayout>
-        // <CoreLayout>
-      )
-    }
+    // if (session) {
+    // return (
+    //   <LandingLayout>
+    //     {/* {userId} */}
+    //     <div className="flex flex-col gap-4">
+    //       <PublicLanding />
+    //     </div>
+    //   </LandingLayout>
+    //     // <CoreLayout>
+    //   )
+    // }
 
     return (
       <PublicLanding />
