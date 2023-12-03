@@ -126,7 +126,7 @@ export default function CreatePostForm ( { planetId2 } ) { // category_id
 
 // Look into methods to engage resource gathering with the lightcurves, make it a scrollable feed with planet content, show how the curves lead into the rover. 
 
-export function RoverContentPostForm( { metadata, imageLink } ) {
+export function RoverContentPostForm( { metadata, imageLink, sector } ) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -142,6 +142,7 @@ export function RoverContentPostForm( { metadata, imageLink } ) {
                 imageLink: imageLink,
                 content: postContent,
                 media: media,
+                sector: sector,
             },);
     };
 
@@ -158,6 +159,7 @@ export function RoverContentPostForm( { metadata, imageLink } ) {
                         // basePlanet: '1',
                         content: postContent,
                         media: null, // See slack comms
+                        sector: sector,
                     },
                 ]);
 
@@ -172,9 +174,9 @@ export function RoverContentPostForm( { metadata, imageLink } ) {
 
     return (
         <div className="flex gap-2">
-            <Avatar>
+            {/* <Avatar>
                 <AvatarFallback>{session?.user?.id}</AvatarFallback>
-            </Avatar>
+            </Avatar> */}
             <textarea value={postContent} onChange={e => setPostContent(e.target.value)} className="grow p-3 h-24 rounded-xl" placeholder={"What do you think about this image"} />
             <div className="text-center">
                 <button onClick={handlePostSubmit} className="text-black px-2 py-1 rounded-md">Share</button>

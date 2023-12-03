@@ -2,7 +2,9 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import Card from "../../../Card";
-import RoverImageGallery, { RoverImage } from "../PlanetData/RandomRoverImage";
+import RoverImageGallery, { RoverImage, RoverImageNoHandle } from "../PlanetData/RandomRoverImage";
+import axios from "axios";
+import { RoverContentPostForm } from "../../CreatePostForm";
 
 export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
   const router = useRouter();
@@ -13,6 +15,33 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
 
   const [sectorData, setSectorData] = useState(null);
   const [planetData, setPlanetData] = useState(null);
+
+  // Rover image data
+    // useEffect(() => {
+    //     // const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?sol=${date}&api_key=${apiKey}`;
+    //     const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/opportunity/photos?sol=181&api_key=${apiKey}`;
+
+    //     axios.get(apiUrl)
+    //         .then((response) => {
+    //             if (response.data.photos && response.data.photos.length > 0) {
+    //                 const firstImageMetadata = response.data.photos[0];
+    //                 // setImageUrl(firstImageMetadata.img_src || '');
+    //                 const firstImage = response.data.photos[0].img_src;
+    //                 setImageUrl(firstImage);
+    //                 const metadataText = JSON.stringify(firstImageMetadata, null, 2);
+    //                 setImageMetadata(metadataText);
+    //                 setMetadata(metadataText)
+    //             } else {
+    //                 setImageUrl('No images found for the given date & rover.');
+    //                 setImageMetadata('No images found for the given date & rover' + JSON.stringify(response));
+    //             }
+    //         })
+    //         .catch((error) => {
+    //             setImageUrl('An error occurred while fetching the image');
+    //             setImageMetadata('Error fetching image');
+    //             console.error(error);
+    //         });
+    // }, [session]);
 
   const getPlanetData = async () => {
     if (!sectorData) {
@@ -166,8 +195,15 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
       </Card>
       <div>
         <Card noPadding={false}>
-          {/* <RoverImageGallery /> */}
-          <RoverImage date='853' rover='opportunity' onImageMetadataChange={null} />
+          <RoverImageNoHandle date='853' rover='opportunity' sectorNo={id} />
+          {/* {imageUrl ? (
+            <>
+                <img src={imageUrl} alt="Rover image" />
+                <RoverContentPostForm metadata={metadata} imageLink={imageUrl} sector={id} />
+            </>
+          ) : (
+            <p>Loading...</p>
+          )} */}
         </Card>
       </div>
     </>

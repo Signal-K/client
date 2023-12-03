@@ -68,7 +68,7 @@ export const RoverImage = ({ date, rover, onImageMetadataChange }) => {
             {imageUrl ? (
                 <>
                     <img src={imageUrl} alt="Rover image" />
-                    <RoverContentPostForm metadata={metadata} imageLink={imageUrl} />
+                    {/* <RoverContentPostForm metadata={metadata} imageLink={imageUrl} /> */}
                     {/* <pre>{imageUrl}</pre> */}
                 </>
             ) : (
@@ -78,7 +78,7 @@ export const RoverImage = ({ date, rover, onImageMetadataChange }) => {
     );
 };
 
-export const RoverImageNoHandle = ({ date, rover, onImageMetadataChange }) => {
+export const RoverImageNoHandle = ({ date, rover, sectorNo }) => {
     const [imageUrl, setImageUrl] = useState('');
     const apiKey = 'iT0FQTZKpvadCGPzerqXdO5F4b62arNBOP0dtkXE';
 
@@ -98,7 +98,6 @@ export const RoverImageNoHandle = ({ date, rover, onImageMetadataChange }) => {
                     const metadataText = JSON.stringify(firstImageMetadata, null, 2);
                     setImageMetadata(metadataText);
                     setMetadata(metadataText)
-                    onImageMetadataChange(metadataText);
                 } else {
                     setImageUrl('No images found for the given date & rover.');
                     setImageMetadata('No images found for the given date & rover' + JSON.stringify(response));
@@ -109,18 +108,14 @@ export const RoverImageNoHandle = ({ date, rover, onImageMetadataChange }) => {
                 setImageMetadata('Error fetching image');
                 console.error(error);
             });
-    }, [date, rover, onImageMetadataChange]);
+    }, [date, rover]);
 
     return (
         <div>
-            {/* <h2>Your Rover Photo</h2>
-            <p>Date: {date}</p>
-            <p>Rover model: {rover}</p> */}
             {imageUrl ? (
                 <>
                     <img src={imageUrl} alt="Rover image" />
-                    <RoverContentPostForm metadata={metadata} imageLink={imageUrl} />
-                    {/* <pre>{imageUrl}</pre> */}
+                    <RoverContentPostForm metadata={metadata} imageLink={imageUrl} sector={sectorNo}/>
                 </>
             ) : (
                 <p>Loading...</p> 
@@ -151,7 +146,7 @@ export default function RoverImageGallery() {
             <div className="">
                 <pre>{imageUrl}</pre>
                 <RoverImage date='721' rover={selectedRover} onImageMetadataChange={handleMetadataChange} />
-                <RoverContentPostForm metadata={metadata} imageLink={imageUrl} />               
+                {/* <RoverContentPostForm metadata={metadata} imageLink={imageUrl} />                */}
             </div>
         </Card>
     );
