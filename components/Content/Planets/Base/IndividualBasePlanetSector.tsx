@@ -47,6 +47,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
     if (!sectorData) {
       return null;
     }
+
     try {
       const { data, error } = await supabase
         .from("basePlanets")
@@ -56,16 +57,16 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
 
       if (data) {
         setPlanetData(data);
-      }
+      };
 
       console.log(data);
 
       if (error) {
         throw error;
-      }
+      };
     } catch (error) {
       console.error(error.message);
-    }
+    };
   };
 
   const getSectorData = async () => {
@@ -93,7 +94,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
       if (sectorId) {
         await getSectorData();
         await getPlanetData();
-      }
+      };
     };
 
     fetchData();

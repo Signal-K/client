@@ -142,6 +142,9 @@ export default function Navbar() {
           <a href="/profile" className="text-sm font-semibold leading-6 text-gray-900">
             Profile
           </a>
+          <a href="/sections" className="text-sm font-semibold leading-6 text-gray-900">
+            Homebase
+          </a>
         </Popover.Group>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
             <Link href="/profile">
