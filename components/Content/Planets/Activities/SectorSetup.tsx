@@ -44,6 +44,7 @@ export default function CreateBasePlanetSector() {
                     owner: session?.user?.id,
                     deposit: "Iron", // Start off with Iron as a default resource
                     coverUrl: "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00090/ids/edr/browse/edl/EBE_0090_0674952393_193ECM_N0040048EDLC00090_0030LUJ01_1200.jpg", // Do we set this to be a supabase storage asset in prod?
+                    explored: false,
                 },
             ]);
 

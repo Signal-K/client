@@ -417,7 +417,7 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
               className={`w-4/12 h-4/12 sm:w-4/11 sm:h-4/11 object-contain z-20`}
               style={{
                 zIndex: 20,
-              }}
+              }} 
             />
             <div className="flex items-start gap-8">
   <div className="flex flex-col items-center justify-start gap-4">

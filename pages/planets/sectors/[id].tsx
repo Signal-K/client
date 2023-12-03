@@ -32,5 +32,5 @@ export default function SectorPage () {
                 <BasePlanetSector sectorid={id as string} />
             </div>
         </Layout>
-    );
+    ); 
 };

@@ -73,7 +73,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
     return <div>Loading...</div>;
   }
 
-  const { id, anomaly, owner, deposit, coverUrl } = sectorData;
+  const { id, created_at, anomaly, owner, deposit, coverUrl, exploration_start_data, explored } = sectorData;
   const { content } = planetData || {};
 
   // I think that sectors will have posts attributed to them via contentPLANETSECTORS -> following the IndividualBasePlanet.tsx fetch functions
@@ -99,7 +99,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
                     Planet
                     </div>
                     <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">
-                    {planetData?.content}
+                        {planetData?.content || "Unknown"}, Sector {id}
                     </div>
                 </div>
 
@@ -117,16 +117,16 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
                     Exploration status
                     </div>
                     <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">
-                    ?
+                    {explored ? "Explored" : "Not Explored"}
                     </div>
                 </div>
 
                 <div className="flex flex-col items-center justify-start gap-4">
                     <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">
-                    Eq. Temperature
+                    Init date
                     </div>
                     <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">
-                    °C
+                    {created_at && new Date(created_at).toLocaleDateString('en-GB')}
                     </div>
                 </div>
                 </div>
