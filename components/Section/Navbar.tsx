@@ -29,10 +29,27 @@ export const UserMenuItems = ({
   setMobileMenuOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const router = useRouter();
+  
+  const supabase = useSupabaseClient();
 
   const handleMobileMenuClick = () => {
     if (setMobileMenuOpen) {
       setMobileMenuOpen(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        // Handle error
+        console.error('Error signing out:', error.message);
+      } else {
+        // Redirect or perform other actions after successful sign out
+        router.push('/'); // Example: Redirect to the home page
+      }
+    } catch (error) {
+      console.error('Error signing out:', error.message);
     }
   };
 
@@ -99,6 +116,7 @@ export const UserMenuItems = ({
         </li>
       </ul>
       <button
+        onClick={handleLogout}
         className={`flex items-center gap-3.5 py-4 text-sm font-medium duration-300 ease-in-out hover:text-yellow-500 ${
           router.pathname === '/admin' ? 'px-6' : 'sm:px-6'
         }`}
