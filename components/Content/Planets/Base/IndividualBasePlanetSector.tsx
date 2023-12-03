@@ -5,6 +5,7 @@ import Card from "../../../Card";
 import RoverImageGallery, { RoverImage, RoverImageNoHandle } from "../PlanetData/RandomRoverImage";
 import axios from "axios";
 import { RoverContentPostForm } from "../../CreatePostForm";
+import StructureComponent from "../Activities/StructureCreate";
 
 // Rover image data -> place inside BasePlanetSector
     // useEffect(() => {
@@ -215,7 +216,8 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
             </div>
           </div>
           <div className="flex flex-col items-center justify-start gap-4">
-          <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">
+            <StructureComponent />
+          {/* <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">
             Mineral deposit
           </div>
           <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">
@@ -227,7 +229,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
               alt={`Icon for ${name}`}
               className="w-16 h-16 object-contain"
             />
-          )}
+          )} */}
         </div>
           {/* {deposit && typeof deposit === "string" ? (
                 <div>{deposit}</div>
