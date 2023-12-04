@@ -98,7 +98,7 @@ export function UserOwnedSectorGrid() {
     return (
         <div className="grid grid-cols-4 gap-2 p-4">
             {sectorData.map((item) => (
-                <Link href={`/planets/sectors/${item.id}`}><div
+                <Link href={`/planets/sector/${item.id}`}><div
                     key={item.id}
                     className="relative overflow-hidden bg-center bg-cover"
                     style={{

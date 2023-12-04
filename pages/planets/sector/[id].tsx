@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "../../../components/Section/Layout";
-import BasePlanetSectors from "../../../components/Content/Planets/Base/BasePlanetAllSectors";
+import BasePlanetSector from "../../../components/Content/Planets/Base/IndividualBasePlanetSector";
 
-export default function PlanetSectors() {
+export default function SectorPage () {
     const router = useRouter();
     const { id } = router.query;
 
@@ -29,8 +29,8 @@ export default function PlanetSectors() {
     return (
         <Layout>
             <div className="h-screen py-10">
-                <BasePlanetSectors planetId={id as string} />
+                <BasePlanetSector sectorid={id as string} />
             </div>
         </Layout>
-    );
+    ); 
 };

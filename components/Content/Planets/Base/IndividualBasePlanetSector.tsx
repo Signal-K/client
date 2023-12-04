@@ -11,10 +11,9 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
   const { id: sectorId } = router.query;
 
   const supabase = useSupabaseClient();
-  const session = useSession();
 
-  const [sectorData, setSectorData] = useState(null);
   const [planetData, setPlanetData] = useState(null);
+  const [sectorData, setSectorData] = useState(null);
 
   // Rover image data
     // useEffect(() => {
@@ -101,8 +100,10 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
   }, [sectorId]);
 
   if (!sectorData) {
-    return <div>Loading...</div>;
-  }
+    return (
+        <div>Loading...</div>
+    );
+  };
 
   const {
     id,
