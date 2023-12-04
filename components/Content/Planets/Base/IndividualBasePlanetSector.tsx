@@ -2,6 +2,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import Card from "../../../Card";
+import RoverImageGallery from "../PlanetData/RandomRoverImage";
 
 export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
   const router = useRouter();
@@ -138,7 +139,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
             )} */}
     </div></Card>
     <div>
-        Cointent
+        <RoverImageGallery />
     </div>
     </>
   );
