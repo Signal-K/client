@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Card from "../Card";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { FactionPostForm } from "../Content/CreatePostForm";
 
 export default function HomebaseSelector({ factionId }) {
     const supabase = useSupabaseClient();
@@ -43,7 +44,7 @@ export default function HomebaseSelector({ factionId }) {
         fetchData();
     }, [session, factionId]);
 
-    const { content, coverUrl } = planetData || {};
+    const { id, content, coverUrl } = planetData || {};
 
     return (
         <>
@@ -56,14 +57,14 @@ export default function HomebaseSelector({ factionId }) {
                     }}
                 >
                     <div className="h-[80vh] flex flex-col items-center justify-center relative">
-                        <h1 className="text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-[-50px] mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-400">
-                            {content}
+                        <h1 className="text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-[-50px] mb-4 text-4xl font-extrabold leading-none tracking-tight text-red-900 md:text-5xl lg:text-6xl text-red-400">
+                            {content} | Miners Faction {/* Change name dynamically, later based from table/db */}
                         </h1>
                     </div>
                 </div>
             </Card>
             <div className="h-grow px-10">
-                
+                <FactionPostForm factionId={factionId} planetId={id} />
             </div>
         </>
     );

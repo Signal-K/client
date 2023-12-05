@@ -64,7 +64,6 @@ export default function Homebase() {
     return (
         <Layout>
             <HomebaseSelector factionId={userData.factions} />
-            
         </Layout>
     );
 };

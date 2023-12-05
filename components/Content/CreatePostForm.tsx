@@ -184,3 +184,56 @@ export function RoverContentPostForm( { metadata, imageLink, sector } ) {
         </div>
     );
 };
+
+export function FactionPostForm( { factionId, planetId } ) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [postContent, setPostContent] = useState('');
+    const [media, setMedia] = useState([]);
+
+    function createFactionPost() {
+        supabase
+            .from('posts_duplicates')
+            .insert({
+                author: session?.user?.id,
+                content: postContent,
+                media: media,
+                anomaly: planetId,
+                faction: factionId,
+            },
+        );
+    };
+
+    const handlePostSubmit = async () => {
+        if (postContent && session) {
+            const user = session?.user?.id;
+            if (user) {
+                const response = await supabase.from('posts_duplicates').upsert([
+                    {
+                        author: user,
+                        content: postContent,
+                        media: media,
+                        anomaly: planetId,
+                        faction: factionId,
+                    },
+                ]);
+
+                if (response.error) {
+                    console.error(response.error);
+                } else {
+                    setPostContent('');
+                };
+            };
+        };
+    };
+
+    return (
+        <div className="flex gap-2">
+        <textarea value={postContent} onChange={e => setPostContent(e.target.value)} className="grow p-3 h-24 rounded-xl" placeholder={"What do you think about this image"} />
+        <div className="text-center">
+            <button onClick={handlePostSubmit} className="text-black px-2 py-1 rounded-md">Share</button>
+        </div>
+    </div>
+    );
+};
