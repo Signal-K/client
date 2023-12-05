@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Login from "../../../pages/login";
-import { GardenSidebar } from "../../Section/Sidebar";
+// import { GardenSidebar } from "../../Section/Sidebar";
 
 interface Planet {
   id: string;
@@ -28,12 +28,13 @@ export function PlanetGalleryCard({ planet, position }: Props) {
 }
 
 function ArchivedPlanetGalleryCard({ planet, position }: Props) {
-  const { id, content, cover } = planet;
+  // const { id, content, cover } = planet;
+  const { id, content } = planet;
 
   return (
     <Link legacyBehavior href={`https://starprotocol-og3j6xuus-gizmotronn.vercel.app/tests/planets/${id}`}>
       <a style={{ position: "absolute", top: position.top, left: position.left }}>
-        <img src={cover} className="w-1/2" />
+        {/* <img src={cover} className="w-1/2" /> */}
       </a>
     </Link>
   );
@@ -175,7 +176,7 @@ export const Garden: React.FC = () => {
   return (
     <>
       <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-screen flex items-center justify-center relative">
-        <GardenSidebar />
+        {/* <GardenSidebar /> */}
         <PlanetGallery />
       </div>
     </>
@@ -186,7 +187,7 @@ export const ArchivedGarden: React.FC = () => {
   return (
     <>
       <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-screen flex items-center justify-center relative">
-        <GardenSidebar />
+        {/* <GardenSidebar /> */}
         <ArchivedPlanetGallery />
       </div>
     </>
