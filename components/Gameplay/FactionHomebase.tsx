@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Card from "../Card";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { FactionPostForm } from "../Content/CreatePostForm";
+import { FactionFeed } from "../Content/ClassificationFeed";
 
 export default function HomebaseSelector({ factionId }) {
     const supabase = useSupabaseClient();
@@ -65,6 +66,7 @@ export default function HomebaseSelector({ factionId }) {
             </Card>
             <div className="h-grow px-10">
                 <FactionPostForm factionId={factionId} planetId={id} />
+                <FactionFeed factionId={factionId} />
             </div>
         </>
     );
