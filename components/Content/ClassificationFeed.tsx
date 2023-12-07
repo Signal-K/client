@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient, SupabaseClient } from "@supabase/auth-helpers-react";
-import CardForum, { CommentItem } from "./DiscussCard";
+import CardForum, { CommentItem, RoverContentCard } from "./DiscussCard";
 
 export default function ClassificationFeed({ custommaxWidth = '85%' }) {
     const supabase: SupabaseClient = useSupabaseClient();
@@ -130,7 +130,7 @@ export function FactionFeed({ custommaxWidth = '85%', factionId }) {
     >
       {posts.map((post) => (
         <li key={post.id} role="article" className="relative pl-8">
-          <CardForum {...post} />
+          <RoverContentCard {...post} />
         </li>
       ))}
     </ul>

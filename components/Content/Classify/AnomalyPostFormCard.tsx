@@ -44,7 +44,7 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
             });
             
             // .then (update user experience/currency)
-    }
+    } 
 
     /* Get user avatar & other data
     useEffect(() => {
@@ -73,8 +73,8 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
                     setUploads(prevUploads => [...prevUploads, url]);
                 } else {
                     console.log(result);
-                }
-            }
+                };
+            };
             setIsUploading(false);
         };
     };

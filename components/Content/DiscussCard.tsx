@@ -139,13 +139,43 @@ const CardForum: React.FC<TProps> = ({
 
 export default CardForum;
 
-export function RoverContentCard() {
+export function RoverContentCard({
+  id, content, created_at, profiles, media
+}) {
+  console.log(media);
+
   return (
     <div className="bg-gray-100 h-screen flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-md max-w-md">
         <div className="flex items-center justify-between mb-4">
-          
+          <div className="flex items-center space-x-2">
+            <Avatar>
+              <AvatarImage src={"https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/avatars/" + profiles?.avatar_url ?? ""} />
+              <AvatarFallback className="rounded-md">{profiles?.username}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-gray-800 font-semibold">{profiles.username}</p>
+              <p className="text-gray-500 text-sm">{getMetaData(created_at)}</p>
+            </div>
+          </div>
+          <div className="text-gray-500 cursor-pointer">
+            <button className="hover:bg-gray-50 rounded-full p-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="7" r="1" />
+                <circle cx="12" cy="12" r="1" />
+                <circle cx="12" cy="17" r="1" />
+              </svg>
+            </button>
+          </div>
         </div>
+        <div className="mb-4">
+          <p className="text-gray-800">{content}</p>
+        </div>
+        {media?.length > 0 && (
+          <div className="mb-4">
+            <div key={media}><img src={media} className="w-full h-48 object-cover rounded-md" /></div>
+          </div>
+        )} {/* Comment/action section */}
       </div>
     </div>
   )
