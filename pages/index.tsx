@@ -2,7 +2,6 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
 import CoreLayout from "../components/Core/Layout";
 import Layout from "../components/Section/Layout";
-import CardForum from "../components/Content/DiscussCard";
 import { useRouter } from "next/router";
 import Login from "./login";
 
@@ -23,12 +22,6 @@ export default function Home() {
     }
 
     const userId = session?.user?.id;
-
-    useEffect(() => {
-        if (session) {
-            router.push('/feed');
-        }
-    }, [session, router]);
 
     if (session) {
     return (
