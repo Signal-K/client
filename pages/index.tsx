@@ -7,6 +7,7 @@ import Login from "./login";
 
 import styles from '../styles/Landing.module.css';
 import { Metadata } from "next";
+import FileUpload from "../components/Content/FileUpload";
 
 export const metadata: Metadata = {
   title: "Star Sailors"
@@ -28,7 +29,7 @@ export default function Home() {
       <Layout>
         {/* {userId} */}
         <div className="flex flex-col gap-4">
-          
+          <FileUpload />
         </div>
       </Layout>
         // <CoreLayout>

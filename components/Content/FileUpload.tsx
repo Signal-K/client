@@ -12,32 +12,71 @@ export default function FileUpload() {
   const [uris, setUris] = useState<string[]>([]);
 
   const { mutateAsync: upload } = useStorageUpload();
-  const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
-      const _uris = await upload({ data: acceptedFiles });
-      setUris(_uris);
-    },
-    [upload],
-  );
 
-  const { getRootProps, getInputProps } = useDropzone({ onDrop });
-
-  const uploadAndAddToSupabase = async (files: File[]) => {
+  const uploadAndAddToSupabase = useCallback(async (files: File[]) => {
     try {
       const uris = await upload({ data: files });
-      setUris(uris);
 
       // Add URIs to Supabase table
-      for (const uri of uris) {
-        supabase.from('files')
-          .insert({
-            filename: uri
-          });
+      const { error, data } = await supabase.from('comments').insert(uris.map(uri => ({ content: uri })));
+
+      if (error) {
+        console.error("Error inserting data into Supabase:", error.message);
+        return;
       }
+
+      console.log("Data inserted successfully:", data);
+
+      setUris(uris);
     } catch (error) {
       console.error("Error uploading files and adding to Supabase:", error);
     }
-  };
+  }, [upload, supabase]);
+
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    await uploadAndAddToSupabase(acceptedFiles);
+  }, [uploadAndAddToSupabase]);
+
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+
+  /*
+    function createPost() {
+    supabase
+      .from('posts_duplicates')
+      .insert({
+        author: session?.user?.id,
+        content,
+        media: uploads,
+        planets2: planetId2,
+      })
+      .then(async response => {
+        if (!response.error) {
+          // Increment the user's experience locally
+          setUserExperience(userExperience + 1);
+  
+          // Update the user's experience in the database
+          await supabase.from('profiles').update({
+            experience: userExperience + 1,
+          }).eq('id', session?.user?.id);
+  
+          // Add a copy of the planet to the user's inventory
+          await supabase.from('inventoryPLANETS').insert([
+            {
+              planet_id: planetId2,
+              owner_id: session?.user?.id,
+            },
+          ]);
+  
+          alert(`Post ${content} created`);
+          setContent('');
+          setUploads([]);
+          if (onPost) {
+            onPost();
+          }
+        }
+      });
+  }  
+  */
 
   const fetchAndRenderFromSupabase = async () => {
     try {
