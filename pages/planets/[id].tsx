@@ -39,21 +39,40 @@ export default function PlanetIdPage () {
         );
     };
 
+    // For testing/archiving of old layout
+    if (isMobile && !id && !router) {
+        return (
+            <div className="flex h-screen">
+                <div className="w-1/6 bg-gray-50">
+                    <DesktopSidebar />
+                </div>
+                <div className="w-3/6 overflow-y-auto mr-30 z-40">
+                    {/* <br /><ActivateButton /> */}
+                    <IndividualBasePlanetDesktop id={id as string} />
+                </div>
+                <div className="w-2/6 bg-gray-50 overflow-y-auto z-">
+                    <BasePlanetData planetId={{ id: id as string }} />
+                    <EditableBasePlanetData planetId={{ id: id as string }} />
+                    <PostFormCardAnomalyTag planetId={id} onPost={null} />
+                    <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
+                </div>
+            </div>
+        );
+    }
+
     return (
+        // <Layout>
         <div className="flex h-screen">
-            <div className="w-1/6 bg-gray-50">
-                <DesktopSidebar />
-            </div>
             <div className="w-3/6 overflow-y-auto mr-30 z-40">
-                {/* <br /><ActivateButton /> */}
-                <IndividualBasePlanetDesktop id={id as string} />
-            </div>
-            <div className="w-2/6 bg-gray-50 overflow-y-auto z-">
-                <BasePlanetData planetId={{ id: id as string }} />
-                {/* <EditableBasePlanetData planetId={{ id: id as string }} /> */}
-                <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                <ClassificationFeedForIndividualPlanet planetId={id} />
+                    {/* <br /><ActivateButton /> */}
+                    <IndividualBasePlanetDesktop id={id as string} />
+                </div>
+                <div className="w-3/6 bg-gray-50 overflow-y-auto z-">
+                    <BasePlanetData planetId={{ id: id as string }} />
+                    <EditableBasePlanetData planetId={{ id: id as string }} />
+                    <PostFormCardAnomalyTag planetId={id} onPost={null} />
+                    <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
             </div>
         </div>
-      );
+      );                    
 };
