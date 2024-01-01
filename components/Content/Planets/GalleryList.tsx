@@ -7,7 +7,7 @@ import { GardenSidebar } from "../../Section/Sidebar";
 interface Planet {
   id: string;
   content: string;
-  cover: string;
+  avatar_url: string;
 }
 
 interface Props {
@@ -16,12 +16,12 @@ interface Props {
 }
 
 export function PlanetGalleryCard({ planet, position }: Props) {
-  const { id, content, cover } = planet;
+  const { id, content, avatar_url } = planet;
 
   return (
     <Link legacyBehavior href={`/planets/${id}`}>
       <a style={{ position: "absolute", top: position.top, left: position.left }}>
-        <img src={cover} className="w-1/2" />
+        <img src={avatar_url} className="w-1/2" />
       </a>
     </Link>
   );

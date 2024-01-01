@@ -50,11 +50,10 @@ export default function IndividualPlanet({ id }: { id: string }) {
     if (planetId) {
       getPlanetData();
       fetchPostsForPlanet(id);
-      // fetchSectorsForPlanet(inventoryPlanetId);
-      fetchSectorsForPlanetTest();
+      fetchSectorsForPlanet();
       checkUserInventory();
     }
-  });
+  }, [session]);
 
   const getPlanetData = async () => {
     try {
@@ -126,29 +125,13 @@ export default function IndividualPlanet({ id }: { id: string }) {
     };
   };
 
-  async function fetchSectorsForPlanet(planetId: string) {
+  async function fetchSectorsForPlanet() {
     try {
       const { data, error } = await supabase
       .from('planetsssSECTORS')
       .select('*')
-      .eq('planetId', inventoryPlanetId);
 
-    if (error) {
-      console.error('Error fetching sectors data:', error.message);
-      return;
-    };
-
-    setSectors(data);
-    } catch (error) {
-      console.error(error);
-    };
-  };
-
-  async function fetchSectorsForPlanetTest() {
-    try {
-      const { data, error } = await supabase
-      .from('planetsssSECTORS')
-      .select('*')
+      setSectors(data);
 
     if (error) {
       console.error('Error fetching sectors data:', error.message);
@@ -239,7 +222,7 @@ export default function IndividualPlanet({ id }: { id: string }) {
         {hasPlanetInInventory && (<>
             <p>{inventoryPlanetId}</p>
             <RoverGallerySingle inventoryPlanetId={inventoryPlanetId} />
-             {/* <PlanetSector sectors={sectors} />  */}
+             <PlanetSector sectors={sectors} />
           </>)}
       </div>
     </LayoutNoNav>
