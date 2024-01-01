@@ -26,13 +26,10 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <>
-      <div className="hidden md:flex relative items-start">
-        <DesktopSidebar />
-        <main className="h-max pb-10 grow ml-64 pt-6">
-          {/* <Navbar /> */}
+        <main className="h-max pb-10 grow pt-6">
+          <Navbar />
           {children}
         </main>
-      </div>
       {isMobile && (
         <div className="md:hidden overflow-y-auto h-screen p-4">
           <main className="h-max pb-10 grow">{children}</main>
@@ -45,7 +42,7 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
 export default Layout;
 
-export const GardenLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+export const LayoutWithSidebar: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -64,10 +61,13 @@ export const GardenLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <>
-        <main className="grow pt-6">
-          {/* <DesktopSidebar /> */}
+      <div className="hidden md:flex relative items-start">
+        <DesktopSidebar />
+        <main className="h-max pb-10 grow ml-64 pt-6">
+          {/* <Navbar /> */}
           {children}
         </main>
+      </div>
       {isMobile && (
         <div className="md:hidden overflow-y-auto h-screen p-4">
           <main className="h-max pb-10 grow">{children}</main>
