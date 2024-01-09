@@ -60,8 +60,8 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <header className="bg-white">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+    <header className="bg-white fixed w-full top-0 z-50">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8 border-b border-gray-300" aria-label="Global">
         <div className="flex lg:flex-1">
             <a href="/feed" className="text-sm font-bold leading-6 text-gray-900">
                 Star Sailors
@@ -133,7 +133,7 @@ export default function Navbar() {
             </Transition>
           </Popover>
 
-          <a href="/explore" className="text-sm font-semibold leading-6 text-gray-900">
+          <a href="/inventory" className="text-sm font-semibold leading-6 text-gray-900"> {/* Was originally /explore */}
             Inventory
           </a>
           <a href="/feed" className="text-sm font-semibold leading-6 text-gray-900">

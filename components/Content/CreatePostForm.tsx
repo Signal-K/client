@@ -125,3 +125,62 @@ export default function CreatePostForm ( { planetId2 } ) { // category_id
 }
 
 // Look into methods to engage resource gathering with the lightcurves, make it a scrollable feed with planet content, show how the curves lead into the rover. 
+
+export function RoverContentPostForm( { metadata, imageLink, sector } ) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [postContent, setPostContent] = useState('');
+    const [media, setMedia] = useState([]);
+
+    function createRoverClassification() {
+        supabase
+            .from('contentROVERIMAGES')
+            .insert({
+                author: session?.user?.id,
+                metadata: metadata,
+                imageLink: imageLink,
+                content: postContent,
+                media: media,
+                sector: sector,
+            },);
+    };
+
+    const handlePostSubmit = async () => {
+        if (postContent) {
+            const user = session?.user?.id;
+            if (user) {
+                const response = await supabase.from('contentROVERIMAGES').upsert([
+                    {
+                        author: user,
+                        metadata: metadata,
+                        imageLink: imageLink,
+                        // planet: '1', // Change this when upserting in planets/[id].tsx
+                        // basePlanet: '1',
+                        content: postContent,
+                        media: null, // See slack comms
+                        sector: sector,
+                    },
+                ]);
+
+                if (response.error) {
+                    console.error(response.error);
+                } else {
+                    setPostContent('');
+                }
+            }
+        };
+    }
+
+    return (
+        <div className="flex gap-2">
+            {/* <Avatar>
+                <AvatarFallback>{session?.user?.id}</AvatarFallback>
+            </Avatar> */}
+            <textarea value={postContent} onChange={e => setPostContent(e.target.value)} className="grow p-3 h-24 rounded-xl" placeholder={"What do you think about this image"} />
+            <div className="text-center">
+                <button onClick={handlePostSubmit} className="text-black px-2 py-1 rounded-md">Share</button>
+            </div>
+        </div>
+    );
+};

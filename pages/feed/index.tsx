@@ -1,10 +1,7 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import React, { useState } from "react";
-import CoreLayout from "../../components/Core/Layout";
+import React, { useEffect, useState } from "react";
 import Layout from "../../components/Section/Layout";
-import CardForum from "../../components/Content/DiscussCard";
-import ClassificationFeed from "../../components/Content/ClassificationFeed";
-import CreatePostForm from "../../components/Content/CreatePostForm";
+import ClassificationFeed, { ClassificationFeedDemo } from "../../components/Content/ClassificationFeed";
 
 export default function Home() {
     const session = useSession();
@@ -16,22 +13,36 @@ export default function Home() {
       const { error } = await supabase.auth.signOut() 
     }
 
-    const userId = session?.user?.id;
-
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+        const checkIsMobile = () => {
+          setIsMobile(window.innerWidth <= 768);
+        };
+        checkIsMobile();
+        window.addEventListener("resize", checkIsMobile);
+        return () => {
+          window.removeEventListener("resize", checkIsMobile);
+        };
+      }
+    }, []);
+  
     if (session) {
-    return (
-      <Layout>
-        {/* {userId} */}
-        {/* <CreatePostForm planetId2={68} /> */}
-        <ClassificationFeed />
-      </Layout>
-        // <CoreLayout>
-      )
+      const customMaxWidth = isMobile ? "100%" : "70%";
+  
+      return (
+        <Layout>
+          {/* <div className="py-10">
+            <HomePlanetStats />
+          </div> */}
+          <div className="py-10">
+            <ClassificationFeed custommaxWidth={customMaxWidth} />
+          </div>
+        </Layout>
+      );
     }
 
     return (
-            // <CoreLayout>
-              <Layout>Hello</Layout>
-            // </CoreLayout>
-    )
+        <Layout>Hello</Layout>
+    );
 }
