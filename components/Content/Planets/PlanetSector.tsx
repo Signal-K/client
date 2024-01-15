@@ -1,6 +1,6 @@
 import React from "react";
 
-interface Sector {
+interface Sector { 
     id: number;
     metadata: string;
 };

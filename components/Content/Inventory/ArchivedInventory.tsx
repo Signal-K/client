@@ -1,7 +1,7 @@
 import React from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Layout from "../../Section/Layout";
-import OwnedPlanetsList from "../Planets/UserOwnedPlanets"; // Potentially this should be in a lists component dir
+import OwnedPlanetsList from "../Archive/UserOwnedPlanets"; // Potentially this should be in a lists component dir
 import OwnedItemsList from "./UserOwnedItems";
 import MySpaceships from "./Vehicles/MySpaceships";
 

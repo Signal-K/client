@@ -14,7 +14,7 @@ enum SidebarLink {
   Visit,
 }
 
-export default function IndividualPlanet({ id }: { id: string }) {
+export default function IndividualPlanet({ id }: { id: string }) { // Appears to be from `CPW-8` branch
   const router = useRouter();
 
   const supabase = useSupabaseClient();
@@ -222,7 +222,7 @@ export default function IndividualPlanet({ id }: { id: string }) {
         {hasPlanetInInventory && (<>
             <p>{inventoryPlanetId}</p>
             <RoverGallerySingle inventoryPlanetId={inventoryPlanetId} />
-             <PlanetSector sectors={sectors} />
+            <PlanetSector sectors={sectors} />
           </>)}
       </div>
     </LayoutNoNav>

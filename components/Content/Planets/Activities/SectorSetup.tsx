@@ -14,7 +14,7 @@ export default function CreateBasePlanetSector() {
             return;
         };
 
-        try {
+        try { 
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
