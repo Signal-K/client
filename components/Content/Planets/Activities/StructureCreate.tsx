@@ -5,7 +5,7 @@ interface Structure {
     id: number;
     name: string;
     description: string;
-    icon_url: string;
+    icon_url: string; 
 };
 
 interface StructureSelectionProps {

@@ -1,9 +1,9 @@
 import React from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Layout from "../../Section/Layout";
-import OwnedPlanetsList from "../Archive/UserOwnedPlanets"; // Potentially this should be in a lists component dir
-import OwnedItemsList from "./UserOwnedItems";
-import MySpaceships from "./Vehicles/MySpaceships";
+import OwnedPlanetsList from "./UserOwnedPlanets"; // Potentially this should be in a lists component dir
+import OwnedItemsList from "../Inventory/UserOwnedItems";
+import MySpaceships from "../Inventory/Vehicles/MySpaceships";
 
 export default function V1Inventory() { // Inventory items for v1 of public schema, see notes below
     const supabase = useSupabaseClient();
