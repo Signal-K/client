@@ -57,11 +57,11 @@ export default function ClassificationFeed({ custommaxWidth = '85%' }) {
       <ul
         aria-label="Nested user feed"
         role="feed"
-        className="relative flex flex-col gap-12 py-12 pl-8 before:absolute before:top-0 before:left-8 before:h-full before:-translate-x-1/2 after:absolute after:top-6 after:left-8 after:bottom-6 after:-translate-x-1/2"
+        className="relative flex flex-col gap-12 py-12 before:absolute before:top-0 before:left-8 before:h-full before:-translate-x-1/2 after:absolute after:top-6 after:left-8 after:bottom-6 after:-translate-x-1/2"
         style={{ maxWidth: custommaxWidth, margin: 'auto' }}
       >
         {posts.map((post) => (
-          <li key={post.id} role="article" className="relative pl-8">
+          <li key={post.id} role="article" className="relative px-4">
             <CardForum {...post} />
           </li>
         ))}
@@ -129,7 +129,7 @@ export function FactionFeed({ custommaxWidth = '85%', factionId }) {
       style={{ maxWidth: custommaxWidth, margin: 'auto' }}
     >
       {posts.map((post) => (
-        <li key={post.id} role="article" className="relative pl-8">
+        <li key={post.id} role="article" className="relative">
           <RoverContentCard {...post} />
         </li>
       ))}
@@ -180,11 +180,11 @@ export function MultiClassificationFeed({ custommaxWidth = '85%' }) {
       <ul
           aria-label="Nested user feed"
           role="feed"
-          className="relative flex flex-col gap-12 py-12 pl-8 before:absolute before:top-0 before:left-8 before:h-full before:-translate-x-1/2 after:absolute after:top-6 after:left-8 after:bottom-6 after:-translate-x-1/2"
+          className="relative flex flex-col gap-12 py-12 before:absolute before:top-0 before:left-8 before:h-full before:-translate-x-1/2 after:absolute after:top-6 after:left-8 after:bottom-6 after:-translate-x-1/2"
           style={{ maxWidth: custommaxWidth, margin: 'auto' }}
       >
           {posts.map((post) => (
-              <li key={post.id} role="article" className="relative pl-8">
+              <li key={post.id} role="article" className="relative">
                   <CardForum {...post} />
               </li>
           ))}

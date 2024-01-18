@@ -48,7 +48,7 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
                         {
                             item: structure.id,
                             owner: session.user.id,
-                            quantity: 1, // You can adjust the quantity as needed
+                            quantity: 1,
                             planetSector: planetSectorId,
                         },
                     ]);
@@ -77,7 +77,7 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
     };
 
     return (
-        <div className="relative inline-block text-left">
+        <center><div className="relative inline-block text-center pl-10">
           <button
             type="button"
             className="px-4 py-2 text-white bg-blue-500 rounded-md focus:outline-none hover:bg-blue-600"
@@ -95,7 +95,7 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
                     className="flex items-center justify-between px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     onClick={() => handleStructureClick(structure)}
                   >
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 pl-8">
                       <img src={structure.icon_url} alt={structure.name} className="w-8 h-8" />
                       <span className="font-bold">{structure.name}</span>
                     </div>
@@ -105,7 +105,7 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
               </div>
             </div>
           )}
-        </div>
+        </div></center>
     );
 };
 
