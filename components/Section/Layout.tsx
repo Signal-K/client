@@ -1,7 +1,7 @@
 import Sidebar, { DesktopSidebar } from "./Sidebar";
 import Navbar from "./Navbar";
 import React, { ReactNode, useEffect, useState } from "react";
-import Bottombar from "../Core/BottomBar";
+import Bottombar, { CreateBar } from "../Core/BottomBar";
 import { InventoryMenu } from "../Content/Inventory/ItemGroup";
 
 interface DashboardLayoutProps {
@@ -10,6 +10,11 @@ interface DashboardLayoutProps {
 
 const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [activeView, setActiveView] = useState('home');
+
+    const handleTabClick = (view) => {
+        setActiveView(view);
+    };
 
   useEffect(() => {     // Check if window is defined before accessing it
     if (typeof window !== "undefined") {
@@ -35,7 +40,7 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
       {isMobile && (
         <div className="md:hidden overflow-y-auto h-screen p-4">
           <main className="h-max pb-10 grow">{children}</main>
-          <Bottombar />
+          <CreateBar onTabClick={handleTabClick} />
         </div>
       )}
     </>

@@ -1,87 +1,94 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function CreateBasePlanetSector() {
     const supabase = useSupabaseClient();
-  const session = useSession();
-
-  const [userPlanet, setUserPlanet] = useState(null);
-
-  // Get the planet that the user owns
-  useEffect(() => {
-    const fetchUserPlanet = async () => {
-      if (!session) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session?.user?.id)
-          .single();
-
-        if (data) {
-          setUserPlanet(data.location);
+    const session = useSession();
+    const [userPlanet, setUserPlanet] = useState(null);
+  
+    useEffect(() => {
+      const fetchUserPlanet = async () => {
+        if (!session) return;
+  
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session?.user?.id)
+            .single();
+  
+          if (data) {
+            setUserPlanet(data.location);
+          }
+  
+          if (error) {
+            throw error;
+          }
+        } catch (error) {
+          console.error(error.message);
         }
-
-        if (error) {
-          throw error;
+      };
+  
+      fetchUserPlanet();
+    }, [session, supabase]);
+  
+    const createSector = async () => {
+      if (session) {
+        try {
+          // Map resource names to corresponding inventoryITEMS ids
+          const resourceToIdMap = {
+            "Coal": 11,
+            "Silicates": 13,
+            "Iron": 15,
+            "Alloy": 17,
+            "Fuel": 18,
+            "Copper": 19,
+            "Chromium": 20,
+            "Nickel": 16,
+            "Water": 21,
+          };
+  
+          // Randomly choose a mineral from the resourceToIdMap
+          const minerals = Object.keys(resourceToIdMap);
+          const randomMineral = minerals[Math.floor(Math.random() * minerals.length)];
+          
+          // Get the corresponding id from the map
+          const depositRowId = resourceToIdMap[randomMineral];
+  
+          const response = await supabase.from('basePlanetSectors').upsert([
+            {
+              anomaly: userPlanet,
+              owner: session?.user?.id,
+              deposit: depositRowId, // Use the id instead of the resource name
+              coverUrl: "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00090/ids/edr/browse/edl/EBE_0090_0674952393_193ECM_N0040048EDLC00090_0030LUJ01_1200.jpg",
+              explored: false,
+            },
+          ]);
+  
+          if (response.error) {
+            console.error(response.error);
+          } else {
+            // Handle success
+          }
+        } catch (error) {
+          console.error("Error creating sector:", error.message);
         }
-      } catch (error) {
-        console.error(error.message);
       }
     };
-
-    fetchUserPlanet();
-  }, [session, supabase]);
-
-  const createSector = async () => {
-    if (session) {
-      // Map resource names to corresponding inventoryITEMS ids
-      const resourceToIdMap = {
-        "Silicates": 13,
-        "Alloy": 12,
-        "Iron": 11,
-        "Fuel": 10,
-        "Water": 9,
-        "Coal": 11,
-      };
-
-      // Choose between Silicates and Coal for testing
-      const depositResource = Math.random() < 0.5 ? "Silicates" : "Coal";
-
-      // Get the corresponding id from the map
-      const depositRowId = resourceToIdMap[depositResource];
-
-      const response = await supabase.from('basePlanetSectors').upsert([
-        {
-          anomaly: userPlanet,
-          owner: session?.user?.id,
-          deposit: depositRowId, // Use the id instead of the resource name
-          coverUrl: "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00090/ids/edr/browse/edl/EBE_0090_0674952393_193ECM_N0040048EDLC00090_0030LUJ01_1200.jpg",
-          explored: false,
-        },
-      ]);
-
-      if (response.error) {
-        console.error(response.error);
-      } else {
-        // Handle success
-      }
-    }
-  };
-
-  return (
-    <div className="mt-4">
-      <button
-        onClick={createSector}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Create Sector
-      </button>
-    </div>
-  );
-};
+  
+    return (
+      <div className="mt-4">
+        <button
+          onClick={createSector}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Create Sector
+        </button>
+      </div>
+    );
+};  
 
 export function UserOwnedSectorGrid() {
     const supabase = useSupabaseClient();
@@ -129,6 +136,32 @@ export function UserOwnedSectorGrid() {
         ))}
       </div>
     );
+};
+
+const NasaRoverImage = ({ date, rover, onImageMetadataChange, onCreateSector }) => {
+    const [imageUrl, setImageUrl] = useState('');
+    const apiKey = 'iT0FQTZKpvadCGPzerqXdO5F4b62arNBOP0dtkXE';
+
+    useEffect(() => {
+        const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?sol=${date}&api_key=${apiKey}`;
+
+        axios.get(apiUrl)
+            .then((response) => {
+                if (response.data.photos && response.data.photos.length > 0) {
+                    const firstImage = response.data.photos[0].img_src;
+                    setImageUrl(firstImage);
+                    onImageMetadataChange(response.data.photos[0]);
+                    onCreateSector(firstImage);
+                } else {
+                    console.error('No images found for the given date & rover:', date, rover);
+                }
+            })
+            .catch((error) => {
+                console.error('Error fetching image:', error);
+            });
+    }, [date, rover, onImageMetadataChange, onCreateSector]);
+
+    return imageUrl ? <img src={imageUrl} alt="Rover image" /> : <p>Loading...</p>;
 };
 
 export function AllSectors() {
