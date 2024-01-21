@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import axios from "axios";
 
 interface Structure {
     id: number;
@@ -70,9 +71,40 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
         fetchStructures();
     }, [supabase]);
 
-    const handleStructureClick = (structure: Structure) => {
+    const handleStructureClick = async (structure: Structure) => {
+      try {
+        if (!session) {
+          console.error("User session not available!");
+          return;
+        };
+
+        const payload = {
+          user_id: session?.user?.id,
+          structure_id: structure.id,
+        };
+
+        console.log(payload);
+
+        const response = await fetch("http://127.0.0.1:5000/craft_structure", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error! Status: ${response.status}`)
+        };
+
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error(error.message);
+      };
+
         onStructureSelected(structure);
-        createInventoryUserEntry(structure);
+        // createInventoryUserEntry(structure);
         setIsCalloutOpen(false);
     };
 
@@ -174,6 +206,7 @@ export const PlacedStructures: React.FC<PlacedStructuresProps> = ({ sectorId }) 
     return (
       <div>
         <h2>Structures Placed on Sector {sectorId}</h2>
+        <CraftButton />
         <div>
           {placedStructures.map((structure) => (
             <div key={structure.id}>
@@ -185,4 +218,55 @@ export const PlacedStructures: React.FC<PlacedStructuresProps> = ({ sectorId }) 
         </div>
       </div>
     );
+};
+
+const CraftButton = () => {
+  const handleClick = async () => {
+    try {
+      const payload = JSON.stringify({
+        user_id: "cebdc7a2-d8af-45b3-b37f-80f328ff54d6",
+        structure_id: 14
+      });
+
+      const response = await fetch('http://127.0.0.1:5000/craft_structure', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: payload
+      });
+
+      const data = await response.json();
+      console.log('Response from Flask:', data);
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  };
+
+  return (
+    <button onClick={handleClick}>
+      Craft Structure
+    </button>
+  );
+};
+
+const ItemListFetcher = () => {
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:5000/items');
+        console.log('Items:', response.data);
+      } catch (error) {
+        console.error('Error fetching items:', error.message);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
+  return (
+    <div>
+      Fetching items...
+    </div>
+  );
 };
