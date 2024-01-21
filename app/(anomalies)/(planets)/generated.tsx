@@ -1,7 +1,10 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { Card } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 
 interface Classification {
     id: number;
@@ -139,8 +142,72 @@ const GeneratedStarterPlanet: React.FC = () => {
                     Now, it's time to travel to your planet, where your adventure truly begins. Get ready to
                     explore, discover, and make your mark!
                 </p>
+                <AddMissionsAndItems />
             </div>
         </Card>
+    );
+};
+
+const AddMissionsAndItems: React.FC = () => {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+    const { activePlanet } = useActivePlanet();
+    const router = useRouter();
+
+    const handleAddMissionsAndItems = async () => {
+        if (!session || !activePlanet) return;
+
+        const userId = session.user.id;
+        const anomalyId = activePlanet.id;
+
+        // Define missions and items to add
+        const missionsToAdd = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 17, 18];
+        const itemsToAdd = [11, 12, 13, 14, 15, 16, 19, 22, 23, 26, 28, 29, 30, 32];
+
+        try {
+            // Insert missions
+            const { error: missionError } = await supabase
+                .from("missions")
+                .insert(missionsToAdd.map(missionId => ({
+                    user: userId,
+                    mission: missionId,
+                    time_of_completion: null, // Set this to null or current timestamp if needed
+                    rewarded_items: [], // Add items if any
+                })));
+
+            if (missionError) throw missionError;
+
+            // Insert items into inventory
+            const { error: inventoryError } = await supabase
+                .from("inventory")
+                .insert(itemsToAdd.map(itemId => ({
+                    item: itemId,
+                    owner: userId,
+                    quantity: 1, // Default quantity, adjust as needed
+                    time_of_deploy: new Date(), // Set current timestamp or as needed
+                    anomaly: anomalyId,
+                    parentItem: null // Set if applicable
+                })));
+
+            if (inventoryError) throw inventoryError;
+
+            // Redirect to /scenes/v1
+            router.push("/scenes/v1");
+
+        } catch (error: any) {
+            console.error("Error adding missions or inventory items:", error.message);
+        }
+    };
+
+    return (
+        <div className="text-center">
+            <button
+                onClick={handleAddMissionsAndItems}
+                className="bg-blue-500 text-white py-2 px-4 rounded"
+            >
+                Add Missions and Items
+            </button>
+        </div>
     );
 };
 
@@ -161,7 +228,7 @@ function DropletIcon(props: any) {
             <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
         </svg>
     );
-}
+};
 
 function LeafIcon(props: any) {
     return (
@@ -181,7 +248,7 @@ function LeafIcon(props: any) {
             <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
         </svg>
     );
-}
+};
 
 function TelescopeIcon(props: any) {
     return (
@@ -206,6 +273,6 @@ function TelescopeIcon(props: any) {
             <circle cx="12" cy="13" r="2" />
         </svg>
     );
-}
+};
 
 export default GeneratedStarterPlanet;

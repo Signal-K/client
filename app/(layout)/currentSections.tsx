@@ -13,7 +13,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
 // import NavigationMenu from "./navigation/pogo-menu";
 
-export function Panels() {
+export function Panels() { 
   const supabase = useSupabaseClient();
   const session = useSession();
 
