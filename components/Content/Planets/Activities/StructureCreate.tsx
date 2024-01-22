@@ -73,39 +73,32 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
 
     const handleStructureClick = async (structure: Structure) => {
       try {
-        if (!session) {
-          console.error("User session not available!");
-          return;
-        };
-
-        const payload = {
+        const payload = JSON.stringify({
           user_id: session?.user?.id,
           structure_id: structure.id,
-        };
-
-        console.log(payload);
-
-        const response = await fetch("http://127.0.0.1:5000/craft_structure", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP Error! Status: ${response.status}`)
-        };
-
+  
+        const response = await fetch('http://127.0.0.1:5000/craft_structure', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: payload
+        });
+  
         const data = await response.json();
-        console.log(data);
-      } catch (error) {
-        console.error(error.message);
-      };
+        console.log('Response from Flask:', data);
 
-        onStructureSelected(structure);
-        // createInventoryUserEntry(structure);
-        setIsCalloutOpen(false);
+        if (data.status === 'proceed') { // If the status is 'proceed', call createInventoryUserEntry
+          createInventoryUserEntry(structure);
+        }
+      } catch (error) {
+        console.error('Error:', error.message);
+      }
+    
+      onStructureSelected(structure);
+      // createInventoryUserEntry(structure)
+      setIsCalloutOpen(false);
     };
 
     return (

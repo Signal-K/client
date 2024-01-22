@@ -49,6 +49,8 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
 export default Layout;
 
+
+
 export const InventoryLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [activeTab, setActiveTab] = useState('consumables')
