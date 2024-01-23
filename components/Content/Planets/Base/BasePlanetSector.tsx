@@ -260,12 +260,11 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
       </Card>
       <div>
         <Card noPadding={false}>
+          <PlacedStructures sectorId={Number(sectorid)} />
           <AddResourceToInventory resource={deposit} />
           <p>{deposit}</p>
-          <SectorStructures />
           <RoverImageNoHandle date='853' rover='opportunity' sectorNo={id} />
           <StructureComponent sectorId={sectorid} />
-          <PlacedStructures sectorId={Number(sectorid)} />
           {/* {imageUrl ? (
             <>
                 <img src={imageUrl} alt="Rover image" />

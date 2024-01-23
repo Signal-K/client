@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import axios from "axios";
+import Link from "next/link";
 
 interface Structure {
     id: number;
@@ -157,7 +158,7 @@ interface PlacedStructuresProps {
     icon_url: string;
   }
   
-export const PlacedStructures: React.FC<PlacedStructuresProps> = ({ sectorId }) => {
+  export const PlacedStructures: React.FC<PlacedStructuresProps> = ({ sectorId }) => {
     const supabase = useSupabaseClient();
     const [placedStructures, setPlacedStructures] = useState<PlacedStructure[]>([]);
   
@@ -197,15 +198,17 @@ export const PlacedStructures: React.FC<PlacedStructuresProps> = ({ sectorId }) 
     }, [supabase, sectorId]);
   
     return (
-      <div>
-        <h2>Structures Placed on Sector {sectorId}</h2>
-        <CraftButton />
-        <div>
+      <div className="flex flex-col items-center justify-center p-4 md:space-y-0 md:flex-row md:space-x-4">
+        <div className="grid gap-4 w-full max-w-sm md:max-w-none md:grid-cols-3">
           {placedStructures.map((structure) => (
-            <div key={structure.id}>
-              <img src={structure.icon_url} alt={structure.name} />
-              <p>{structure.name}</p>
-              <p>{structure.description}</p>
+            <div key={structure.id} className="flex flex-col items-center justify-center space-y-2">
+              <div className="flex items-center justify-center w-20 h-20 rounded-full border-2 border-gray-100 border-dashed dark:border-gray-800">
+                <img src={structure.icon_url} alt={structure.name} className="w-10 h-10 text-gray-200 dark:text-gray-800 translate-y-1" />
+              </div>
+              <span className="text-sm font-medium">{structure.name}</span>
+              <Link className="text-sm underline" href="#">
+                View More
+              </Link>
             </div>
           ))}
         </div>
