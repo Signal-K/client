@@ -1,1 +1,0 @@
-CREATE POLICY "Logged in users can upload photos 1ps738_0" ON storage.objects FOR INSERT TO public WITH CHECK (bucket_id = 'media' && auth.uid() != null); /* Also applies to 'photos'/'media' bucket(s) */
