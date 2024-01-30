@@ -1,7 +1,7 @@
 import Sidebar, { DesktopSidebar } from "./Sidebar";
 import Navbar from "./Navbar";
 import React, { ReactNode, useEffect, useState } from "react";
-import Bottombar, { CreateBar } from "../Core/BottomBar";
+import Bottombar from "../Core/BottomBar";
 import { InventoryMenu } from "../Content/Inventory/ItemGroup";
 
 interface DashboardLayoutProps {
@@ -10,11 +10,6 @@ interface DashboardLayoutProps {
 
 const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
-  const [activeView, setActiveView] = useState('home');
-
-    const handleTabClick = (view) => {
-        setActiveView(view);
-    };
 
   useEffect(() => {     // Check if window is defined before accessing it
     if (typeof window !== "undefined") {
@@ -40,7 +35,7 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
       {isMobile && (
         <div className="md:hidden overflow-y-auto h-screen p-4">
           <main className="h-max pb-10 grow">{children}</main>
-          <CreateBar onTabClick={handleTabClick} />
+          <Bottombar />
         </div>
       )}
     </>
@@ -49,7 +44,38 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
 export default Layout;
 
+export const LandingLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+  const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {     // Check if window is defined before accessing it
+    if (typeof window !== "undefined") {
+      const checkIsMobile = () => {
+        setIsMobile(window.innerWidth <= 768);
+      };
+      checkIsMobile();
+      window.addEventListener("resize", checkIsMobile);
+      return () => {
+        window.removeEventListener("resize", checkIsMobile);
+      };
+    }
+  }, []);
+
+  return (
+    <>
+        <main className="h-max pb-10 grow pt-6">
+          <div className="py-12">
+            {children}
+          </div>
+        </main>
+      {isMobile && (
+        <div className="md:hidden overflow-y-auto h-screen p-4">
+          <main className="h-max pb-10 grow">{children}</main>
+          {/* <Bottombar /> */}
+        </div>
+      )}
+    </>
+  );
+};
 
 export const InventoryLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
@@ -72,7 +98,7 @@ export const InventoryLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
     <>
       <main className="h-max pb-10 grow pt-6">
         <Navbar />
-        <div className="py-5"><center><div className="py-12"><InventoryMenu setActiveTab={setActiveTab} /></div></center></div>
+        <div className="py-8"><center><div className="py-12"><InventoryMenu setActiveTab={setActiveTab} /></div></center></div>
         <div className="py-12">
           {children}
         </div>
