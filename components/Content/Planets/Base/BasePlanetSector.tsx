@@ -19,30 +19,30 @@ const AddResourceToInventory = ({ resource }) => {
     setIsAdding(true);
     try {
       // Check if the user already has this resource in their inventory
-      const { data: existingResource, error } = await supabase
-        .from('inventoryUSERS')
-        .select('*')
-        .eq('owner', session?.user?.id)
-        .eq('item', resource.id)
-        .single();
+      // const { data: existingResource, error } = await supabase
+      //   .from('inventoryUSERS')
+      //   .select('*')
+      //   .eq('owner', session?.user?.id)
+      //   .eq('item', resource)
+      //   .single();
 
-      if (error) {
-        throw error;
-      }
+      // if (error) {
+      //   throw error;
+      // }
 
       let quantity = 1;
 
       // If the user already has this resource, increment the quantity
-      if (existingResource) {
-        quantity = existingResource.quantity + 1;
-      }
+      // if (existingResource) {
+      //   quantity = existingResource.quantity + 1;
+      // }
 
       // Add the resource to the user's inventory
       const { error: insertError } = await supabase
         .from('inventoryUSERS')
         .upsert({
           owner: session?.user?.id,
-          item: resource.id,
+          item: resource,//.id,
           quantity,
         });
 
