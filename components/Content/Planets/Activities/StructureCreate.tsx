@@ -76,10 +76,11 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
       try {
         const payload = JSON.stringify({
           user_id: session?.user?.id,
+          sector_id: planetSectorId,
           structure_id: structure.id,
         });
   
-        const response = await fetch('http://127.0.0.1:5000/craft_structure', {
+        const response = await fetch('https://papyrus-production.up.railway.app/craft_structure', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -90,9 +91,9 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
         const data = await response.json();
         console.log('Response from Flask:', data);
 
-        if (data.status === 'proceed') { // If the status is 'proceed', call createInventoryUserEntry
-          createInventoryUserEntry(structure);
-        }
+        // if (data.status === 'proceed') { // If the status is 'proceed', call createInventoryUserEntry
+        //   createInventoryUserEntry(structure);
+        // }
       } catch (error) {
         console.error('Error:', error.message);
       }

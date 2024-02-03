@@ -1,1 +1,101 @@
-if(!self.define){let e,s={};const a=(a,n)=>(a=new URL(a+".js",n).href,s[a]||new Promise((s=>{if("document"in self){const e=document.createElement("script");e.src=a,e.onload=s,document.head.appendChild(e)}else e=a,importScripts(a),s()})).then((()=>{let e=s[a];if(!e)throw new Error(`Module ${a} didn’t register its module`);return e})));self.define=(n,i)=>{const c=e||("document"in self?document.currentScript.src:"")||location.href;if(s[c])return;let r={};const t=e=>a(e,c),d={module:{uri:c},exports:r,require:t};s[c]=Promise.all(n.map((e=>d[e]||t(e)))).then((e=>(i(...e),r)))}}define(["./workbox-9b4d2a02"],(function(e){"use strict";importScripts(),self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"/1ST FRAME.PNG",revision:"d58a0d7f732a9d042e3c4bd7367eb6c0"},{url:"/Galaxy/Kepler-22.png",revision:"8c68482bef78544b76768a58e34fd68f"},{url:"/Galaxy/Kepler-69.png",revision:"a92b5d6670738d9886c0de48ac18efd4"},{url:"/Galaxy/Kepler22.png",revision:"2f960a7e3c2d7c4ccb421d2c856c86bf"},{url:"/Galaxy/Kepler69.png",revision:"ecf684e62353887af8e33f749129c47c"},{url:"/Galaxy/LocalCluster/localClusterMapBg.png",revision:"1acae99e74e8459b31f8728c846b0340"},{url:"/Galaxy/Purple Planet.png",revision:"0e1c4939f518edd433bd5ac0656919fa"},{url:"/Galaxy/TOI 700.png",revision:"0350f345dd61606de4e728a05d35ae93"},{url:"/Galaxy/Trappist.png",revision:"c7face5ade6f23ebb81280b46780cd43"},{url:"/Quiz/img1.png",revision:"4b75fa24cc04f2310d52aec312ac7de9"},{url:"/Quiz/img2.png",revision:"f7808f7976191df453fc38dbf3fb5884"},{url:"/Quiz/img3.png",revision:"d58a68e7513db8db8df88f5803caff04"},{url:"/Quiz/img4.png",revision:"6219ca977467694018a291e4835ac72a"},{url:"/_next/static/TDqasJBMkqZHu_87WbA7L/_buildManifest.js",revision:"ac75760a88fdd99b65162d3451ab7fa0"},{url:"/_next/static/TDqasJBMkqZHu_87WbA7L/_ssgManifest.js",revision:"b6652df95db52feb4daf4eca35380933"},{url:"/_next/static/chunks/121-0ea0281a2a56b83c.js",revision:"0ea0281a2a56b83c"},{url:"/_next/static/chunks/130-d984e3c01b1f2bc4.js",revision:"d984e3c01b1f2bc4"},{url:"/_next/static/chunks/176-d657b9fb14ffdb50.js",revision:"d657b9fb14ffdb50"},{url:"/_next/static/chunks/217.404237d1a9925efa.js",revision:"404237d1a9925efa"},{url:"/_next/static/chunks/26.efadb96b5e431790.js",revision:"efadb96b5e431790"},{url:"/_next/static/chunks/260-7827066984c8a5c2.js",revision:"7827066984c8a5c2"},{url:"/_next/static/chunks/2e3a845b-fae1f83b1104d679.js",revision:"fae1f83b1104d679"},{url:"/_next/static/chunks/408-37d7eb0bddf48425.js",revision:"37d7eb0bddf48425"},{url:"/_next/static/chunks/451-0b6935ede9741d5d.js",revision:"0b6935ede9741d5d"},{url:"/_next/static/chunks/586-153e17bfc56a60b0.js",revision:"153e17bfc56a60b0"},{url:"/_next/static/chunks/6a4d9673-2a398cf3b5fe6d23.js",revision:"2a398cf3b5fe6d23"},{url:"/_next/static/chunks/737a5600-781682cb279020d5.js",revision:"781682cb279020d5"},{url:"/_next/static/chunks/8-7e7e3ff68aa8de4d.js",revision:"7e7e3ff68aa8de4d"},{url:"/_next/static/chunks/857.fdb0ac481100a052.js",revision:"fdb0ac481100a052"},{url:"/_next/static/chunks/894-bbdb125b68a690f9.js",revision:"bbdb125b68a690f9"},{url:"/_next/static/chunks/90cba634-620e4ed651dc07ac.js",revision:"620e4ed651dc07ac"},{url:"/_next/static/chunks/970-2341e69ee6cbb749.js",revision:"2341e69ee6cbb749"},{url:"/_next/static/chunks/fea29d9f-72a8dfb81624bb60.js",revision:"72a8dfb81624bb60"},{url:"/_next/static/chunks/framework-4556c45dd113b893.js",revision:"4556c45dd113b893"},{url:"/_next/static/chunks/main-f4a995a4abb1f81e.js",revision:"f4a995a4abb1f81e"},{url:"/_next/static/chunks/pages/_app-6e90fb3fcc37de74.js",revision:"6e90fb3fcc37de74"},{url:"/_next/static/chunks/pages/_error-fff888d589ca3500.js",revision:"fff888d589ca3500"},{url:"/_next/static/chunks/pages/archive/planetGarden-efaa54d257287df7.js",revision:"efaa54d257287df7"},{url:"/_next/static/chunks/pages/auto-2a4cd2c7eec6630d.js",revision:"2a4cd2c7eec6630d"},{url:"/_next/static/chunks/pages/explore-ce7d304ce093e3e4.js",revision:"ce7d304ce093e3e4"},{url:"/_next/static/chunks/pages/factions-8a1125e9dc600601.js",revision:"8a1125e9dc600601"},{url:"/_next/static/chunks/pages/feed-6782415508033b8e.js",revision:"6782415508033b8e"},{url:"/_next/static/chunks/pages/feed/fullFeed-2ee70f723f09fca5.js",revision:"2ee70f723f09fca5"},{url:"/_next/static/chunks/pages/garden-2000f8df3c115c00.js",revision:"2000f8df3c115c00"},{url:"/_next/static/chunks/pages/gather-48472a71edc7c129.js",revision:"48472a71edc7c129"},{url:"/_next/static/chunks/pages/index-fc48410e3aa3fce3.js",revision:"fc48410e3aa3fce3"},{url:"/_next/static/chunks/pages/inventory-6ed36d6771bb6897.js",revision:"6ed36d6771bb6897"},{url:"/_next/static/chunks/pages/login-dbb9cbc9b966b043.js",revision:"dbb9cbc9b966b043"},{url:"/_next/static/chunks/pages/onboarding/select-3bd9d942f56cd3e8.js",revision:"3bd9d942f56cd3e8"},{url:"/_next/static/chunks/pages/planets/%5Bid%5D-99c2c02cf6d60dc8.js",revision:"99c2c02cf6d60dc8"},{url:"/_next/static/chunks/pages/planets/map-2e1b04f7b5bec299.js",revision:"2e1b04f7b5bec299"},{url:"/_next/static/chunks/pages/planets/sector/%5Bid%5D-cad46baf76c9ded9.js",revision:"cad46baf76c9ded9"},{url:"/_next/static/chunks/pages/planets/sectors/%5Bid%5D-f4d691efe6788b9a.js",revision:"f4d691efe6788b9a"},{url:"/_next/static/chunks/pages/tests/placeholder-31f8fa5446d3b2ec.js",revision:"31f8fa5446d3b2ec"},{url:"/_next/static/chunks/polyfills-c67a75d1b6f99dc8.js",revision:"837c0df77fd5009c9e46d446188ecfd0"},{url:"/_next/static/chunks/webpack-8c645bc80defbcdb.js",revision:"8c645bc80defbcdb"},{url:"/_next/static/css/2a5baf0e62908ad7.css",revision:"2a5baf0e62908ad7"},{url:"/_next/static/css/746992f36fdcc04f.css",revision:"746992f36fdcc04f"},{url:"/assets/Inventory/FactionBase/Homebase.framework.js",revision:"38f9f3abd6514c4c71ebcb384f393c5f"},{url:"/assets/Inventory/FactionBase/Homebase.loader.js",revision:"b7650c6dbd10c680dc0affc1b3e2c2e1"},{url:"/assets/Inventory/FactionBase/Homebase.wasm",revision:"e242f6a5d1b0d479fbda673328350d8f"},{url:"/assets/Inventory/FactionBase/factionCover.jpg",revision:"998fb34d0f46991c9ab4e22b56bec2a4"},{url:"/assets/Inventory/Items/AeroCameraLevel1.png",revision:"b0095b88572678b14b751164bdafec8a"},{url:"/assets/Inventory/Items/AeroCameraLevel1NoBg.png",revision:"d92db950b319ff898b4b3b028998ee23"},{url:"/assets/Inventory/Items/Coal.png",revision:"f2c12cb628c5f1befb00934ef590eed9"},{url:"/assets/Inventory/Items/GoldenTelescopeLevel1Original.jpg",revision:"4ed335ca5ad7579441fcae7d4c311435"},{url:"/assets/Inventory/Items/GoldenTelescopeLevel1noBg.png",revision:"fe61acf446aa92820168b915e1d64e3b"},{url:"/assets/Inventory/Items/Silicates1.png",revision:"57aeda36fe8e660f9e7e388aa9cae035"},{url:"/assets/Inventory/Planets/Dump/65Binned.png",revision:"384b67f48a661347251312232e9ebf85"},{url:"/assets/Inventory/Planets/Dump/65Cover.png",revision:"fa14b14d9ffb751661fc22adfc3d8b7c"},{url:"/assets/Inventory/Planets/Dump/65Phase.png",revision:"f66e7998c7e7b89ca58a8073de29bb95"},{url:"/assets/Inventory/Planets/Dump/66Cover.png",revision:"9b53b2ac283656684d5ea5a00a8d94f5"},{url:"/assets/Inventory/Planets/Planet59.png",revision:"428c91489994b502f47f529fbbe1747c"},{url:"/assets/Inventory/Planets/Planet63.png",revision:"d05e92b091ce34dd2a405f3c403b7698"},{url:"/assets/Inventory/Planets/Planet64.png",revision:"bc43db3cae98d2907e439596807805fa"},{url:"/assets/Inventory/Structures/Telescope.png",revision:"d2142a6fb24edb6ed6f40638e895068f"},{url:"/assets/Inventory/Structures/TelescopeReceiverStruct.png",revision:"6cf3fb4e2f292ccfc356d28b05dccff0"},{url:"/assets/Onboarding/Missions/Crucible/CrucibleGif.webp",revision:"e86425b7abb107c6a8934b77d5130631"},{url:"/assets/Onboarding/Missions/Crucible/CrucibleImage1.png",revision:"0000a3fca273b34662387215e2b9038b"},{url:"/assets/Onboarding/Missions/Crucible/CrucibleImage2.png",revision:"2fdeaf5d0cbd2aabe96a9735ca76272a"},{url:"/assets/Onboarding/Missions/Crucible/CrucibleImage3.png",revision:"dcd55aab5f70f29b13f65a5005bad2a1"},{url:"/assets/Onboarding/Missions/Emergence/EmergenceImage1.png",revision:"05738c37105a229f6dc67e3f95e9076d"},{url:"/assets/Onboarding/Missions/Emergence/EmergenceImage2.png",revision:"1687d7ef021d977dba7c13dde60a40d9"},{url:"/assets/Onboarding/Missions/Emergence/EmergenceImage3.png",revision:"bcce9d5b4cd6cc5505d1490e3305db65"},{url:"/assets/Onboarding/Missions/Emergence/EmergenceImage4.png",revision:"e05fd92c25df01e070cfc22b3bf89e9c"},{url:"/assets/Onboarding/Missions/Emergence/EmergenceImage5.png",revision:"35d9a1b812a520dfc243680c8ae09fad"},{url:"/assets/Onboarding/Missions/Emergence/TALONOVA (5)_clipdrop-enhance.png",revision:"b59102a0a7655c275cdc689bfb71f476"},{url:"/assets/Onboarding/Missions/Emergence/cartographer.png",revision:"bc0bd32c00672651498e4ac27f6ec911"},{url:"/assets/Onboarding/Missions/Emergence/cartographer.svg",revision:"67a1cbec05d00c226cd86b0a981f8dac"},{url:"/assets/Onboarding/Missions/Emergence/guardian.png",revision:"c4cb1a5d06f4ecf36d16ceb5c92f87d8"},{url:"/assets/Onboarding/Missions/Emergence/guardian.svg",revision:"b4759ba8ab3a66362c97209aa84b013e"},{url:"/assets/Onboarding/Missions/Emergence/navigator.png",revision:"43ef8636fca24a9469c7c5f22296d6af"},{url:"/assets/Onboarding/Missions/Emergence/navigator.svg",revision:"3f6467f410d7818933af8bb513a38fe3"},{url:"/assets/Onboarding/Missions/Navigate/NavigateImage1.png",revision:"9b53b2ac283656684d5ea5a00a8d94f5"},{url:"/assets/Onboarding/Missions/Navigate/NavigateImage2.png",revision:"0beb47aeb676517fd8ba8ba594b08656"},{url:"/assets/Onboarding/Missions/Navigate/NavigateImage3.png",revision:"5ac7701589b2c66636ad0b539a195bb6"},{url:"/assets/Onboarding/Missions/Navigate/ab936_kepler_view_of_a_ringed_planet_saturncore_in_outer_space__bb9ae32e-743a-4893-bebf-31f89ed21559.png",revision:"449a146738f989296326fcb4c8a0871f"},{url:"/assets/Onboarding/Missions/Silfur/GameItem1.png",revision:"5bd91fa3d1247aca7dc3cb29282a2fc9"},{url:"/assets/Onboarding/Missions/Silfur/GameItem2.png",revision:"9132028c444969591293e9ff14000252"},{url:"/assets/Onboarding/Missions/Silfur/GameItem3.png",revision:"d9d7495c85a1a4968ecc0fef2ba9ab64"},{url:"/assets/Onboarding/Missions/Silfur/SilfurImage1.png",revision:"449a146738f989296326fcb4c8a0871f"},{url:"/assets/Onboarding/Missions/Silfur/SolarShip1.png",revision:"972e5ba346bcfdc104ecfb4565435c0d"},{url:"/assets/Onboarding/Missions/Silfur/SolarShip2.png",revision:"00fa05cae65591850cd47f8df207a5f6"},{url:"/assets/Onboarding/Missions/Silfur/SolarShip3.png",revision:"74bf7d8b62b8b8ce829c45e353e819cb"},{url:"/assets/Videos/StarSailors.mp4",revision:"964530f6aa16760e7ad991883687d016"},{url:"/assets/audio/Instrumental 02; Inventory.mp3",revision:"12e840bd86f49a17ad237e77cff0b980"},{url:"/assets/audio/Instrumental 04; Search and ecounter aliens-01.mp3",revision:"b4eec1a6d61d18387afce77193373941"},{url:"/assets/audio/Instrumental 05 v.6; boss fight.mp3",revision:"8db9a25951f264a4fbe96a696705f804"},{url:"/assets/audio/Instrumental 07; Ice Planet.mp3",revision:"271df8ef17f2dc2583f213595d9e3d81"},{url:"/assets/audio/Instrumental 08; Barren Planet.mp3",revision:"eb7f1c4896252caed2663da7cf40110b"},{url:"/assets/audio/WakeUp.mp3",revision:"4a2c4aa351cea6e2e62bddbe725794a2"},{url:"/assets/governance/create-campaign.svg",revision:"92fae8f2cb6b37cecc9ce80b354c2515"},{url:"/assets/governance/dashboard.svg",revision:"425136cabf1268448f4dc30050a57d1f"},{url:"/assets/governance/index.js",revision:"0a36dba0270b19f892c43ab9d1f0a0d0"},{url:"/assets/governance/loader.svg",revision:"cb52755f9481e2ff042f69965d2c4af2"},{url:"/assets/governance/logo.svg",revision:"99ccad604dcd23b6eb2f101b5be75621"},{url:"/assets/governance/logout.svg",revision:"8be60034697e86ecd82ec2b79d8989cb"},{url:"/assets/governance/menu.svg",revision:"4cbd18e603c2b58b51913f4639b117ab"},{url:"/assets/governance/money.svg",revision:"348871c574b7b53be8c0318922739e64"},{url:"/assets/governance/payment.svg",revision:"152bd0ba0de79487413f7fcdf3a3e94c"},{url:"/assets/governance/profile.svg",revision:"0224ed39e2fba2ec3a85927d0d487bef"},{url:"/assets/governance/search.svg",revision:"ae4658b76254be18f67b73d13bbc7dc5"},{url:"/assets/governance/sun.svg",revision:"1ecb735a4ab2a96f6769b14c9a67dd43"},{url:"/assets/governance/thirdweb.png",revision:"c8e414d6283af465d19b1c8aecf5c1c0"},{url:"/assets/governance/type.svg",revision:"981852f067e76af079dddcd70ff82d7b"},{url:"/assets/governance/withdraw.svg",revision:"0df4d8bdd68c4ebd8a9a6e42b41fcd7d"},{url:"/assets/ui/planet.svg",revision:"bae860bca8726a7ee58eaaa701f30c5e"},{url:"/bg.jpg",revision:"cda18efc33651be959ebb1be98377909"},{url:"/eagle.png",revision:"a61eb8f346bc8d7c2de60be16dad6733"},{url:"/eagle.svg",revision:"7f771bc7a48239c3cdb8b77afcd8c5e9"},{url:"/favicon.ico",revision:"2483625e322b353626b172cc06960f01"},{url:"/garden.png",revision:"bb8aa472d66f8dfa7dd56dee985c8d4e"},{url:"/home.svg",revision:"546ba68136ed21133d03e0f3cd167f9e"},{url:"/manifest.json",revision:"37b9fb7e1eaff61240e36d268277954e"},{url:"/nano.png",revision:"2fbaef4d09c07b175e644881aa8b9372"},{url:"/out0.png",revision:"4b24a573657e70d0799e743d86439756"},{url:"/planet.svg",revision:"e1e69e2676b03d06e2e34c2ecd9eac93"},{url:"/rover.svg",revision:"61143d0da3adec08b3325962b6198ee4"},{url:"/satellite.svg",revision:"a48e3337b7aa672558c7bce79c41e171"},{url:"/thirdweb.svg",revision:"075df596cf30f53ea22bbb1cddfbba73"},{url:"/vercel.svg",revision:"4b4f1876502eb6721764637fe5c41702"},{url:"/void.png",revision:"b9f373c52f059d988f61472f2a0337f7"}],{ignoreURLParametersMatching:[]}),e.cleanupOutdatedCaches(),e.registerRoute("/",new e.NetworkFirst({cacheName:"start-url",plugins:[{cacheWillUpdate:async({request:e,response:s,event:a,state:n})=>s&&"opaqueredirect"===s.type?new Response(s.body,{status:200,statusText:"OK",headers:s.headers}):s}]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,new e.CacheFirst({cacheName:"google-fonts-webfonts",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:31536e3})]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:googleapis)\.com\/.*/i,new e.StaleWhileRevalidate({cacheName:"google-fonts-stylesheets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,new e.StaleWhileRevalidate({cacheName:"static-font-assets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,new e.StaleWhileRevalidate({cacheName:"static-image-assets",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/image\?url=.+$/i,new e.StaleWhileRevalidate({cacheName:"next-image",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp3|wav|ogg)$/i,new e.CacheFirst({cacheName:"static-audio-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp4)$/i,new e.CacheFirst({cacheName:"static-video-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:js)$/i,new e.StaleWhileRevalidate({cacheName:"static-js-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:css|less)$/i,new e.StaleWhileRevalidate({cacheName:"static-style-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/data\/.+\/.+\.json$/i,new e.StaleWhileRevalidate({cacheName:"next-data",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:json|xml|csv)$/i,new e.NetworkFirst({cacheName:"static-data-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute((({url:e})=>{if(!(self.origin===e.origin))return!1;const s=e.pathname;return!s.startsWith("/api/auth/")&&!!s.startsWith("/api/")}),new e.NetworkFirst({cacheName:"apis",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:16,maxAgeSeconds:86400})]}),"GET"),e.registerRoute((({url:e})=>{if(!(self.origin===e.origin))return!1;return!e.pathname.startsWith("/api/")}),new e.NetworkFirst({cacheName:"others",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute((({url:e})=>!(self.origin===e.origin)),new e.NetworkFirst({cacheName:"cross-origin",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:3600})]}),"GET")}));
+/**
+ * Copyright 2018 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// If the loader is already loaded, just stop.
+if (!self.define) {
+  let registry = {};
+
+  // Used for `eval` and `importScripts` where we can't get script URL by other means.
+  // In both cases, it's safe to use a global var because those functions are synchronous.
+  let nextDefineUri;
+
+  const singleRequire = (uri, parentUri) => {
+    uri = new URL(uri + ".js", parentUri).href;
+    return registry[uri] || (
+      
+        new Promise(resolve => {
+          if ("document" in self) {
+            const script = document.createElement("script");
+            script.src = uri;
+            script.onload = resolve;
+            document.head.appendChild(script);
+          } else {
+            nextDefineUri = uri;
+            importScripts(uri);
+            resolve();
+          }
+        })
+      
+      .then(() => {
+        let promise = registry[uri];
+        if (!promise) {
+          throw new Error(`Module ${uri} didn’t register its module`);
+        }
+        return promise;
+      })
+    );
+  };
+
+  self.define = (depsNames, factory) => {
+    const uri = nextDefineUri || ("document" in self ? document.currentScript.src : "") || location.href;
+    if (registry[uri]) {
+      // Module is already loading or loaded.
+      return;
+    }
+    let exports = {};
+    const require = depUri => singleRequire(depUri, uri);
+    const specialDeps = {
+      module: { uri },
+      exports,
+      require
+    };
+    registry[uri] = Promise.all(depsNames.map(
+      depName => specialDeps[depName] || require(depName)
+    )).then(deps => {
+      factory(...deps);
+      return exports;
+    });
+  };
+}
+define(['./workbox-bd7e3b9b'], (function (workbox) { 'use strict';
+
+  importScripts();
+  self.skipWaiting();
+  workbox.clientsClaim();
+  workbox.registerRoute("/", new workbox.NetworkFirst({
+    "cacheName": "start-url",
+    plugins: [{
+      cacheWillUpdate: async ({
+        request,
+        response,
+        event,
+        state
+      }) => {
+        if (response && response.type === 'opaqueredirect') {
+          return new Response(response.body, {
+            status: 200,
+            statusText: 'OK',
+            headers: response.headers
+          });
+        }
+        return response;
+      }
+    }]
+  }), 'GET');
+  workbox.registerRoute(/.*/i, new workbox.NetworkOnly({
+    "cacheName": "dev",
+    plugins: []
+  }), 'GET');
+
+}));
+//# sourceMappingURL=sw.js.map

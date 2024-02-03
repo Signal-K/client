@@ -6,7 +6,9 @@ import RoverImageGallery, { RoverImage, RoverImageNoHandle } from "../PlanetData
 import axios from "axios";
 import { RoverContentPostForm } from "../../CreatePostForm";
 import StructureComponent, { PlacedStructures } from "../Activities/StructureCreate";
-import SectorStructures from "../Sectors/SectorStructures";
+import SectorItems from "../Sectors/SectorStructures";
+import { SectorStructureOwned } from "../../Inventory/UserOwnedItems";
+// import SectorStructures from "../Sectors/SectorStructures";
 
 const AddResourceToInventory = ({ resource }) => {
   const supabase = useSupabaseClient();
@@ -262,6 +264,8 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
         <Card noPadding={false}>
           <PlacedStructures sectorId={Number(sectorid)} />
           <AddResourceToInventory resource={deposit} />
+          {/* <SectorItems planetSectorId={sectorid} /> */}
+          <SectorStructureOwned sectorid={sectorid} />
           <p>{deposit}</p>
           <RoverImageNoHandle date='853' rover='opportunity' sectorNo={id} />
           <StructureComponent sectorId={sectorid} />

@@ -1,6 +1,61 @@
 import Link from "next/link"
+import React, { useState, useEffect } from 'react';
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
-export default function SectorStructures() {
+const SectorItems: React.FC= ( planetSectorId ) => {
+
+  const supabase = useSupabaseClient();
+  const [items, setItems] = useState<any[]>([]); // Change the type as per your data structure
+
+  useEffect(() => {
+    const fetchSectorItems = async () => {
+      try {
+        // Fetch items belonging to the sector from your database
+        const { data, error } = await supabase
+          .from('inventoryUSERS')
+          .select('*')
+          .eq('sector', planetSectorId);
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          setItems(data);
+        }
+      } catch (error) {
+        console.error('Error fetching sector items:', error.message);
+      }
+    };
+
+    fetchSectorItems();
+  }, [supabase, planetSectorId]);
+
+  return (
+    <div>
+      <h2>Sector Items</h2>
+      <ul>
+        {items.map((item) => (
+          <li key={item.id}><p>{item}</p></li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default SectorItems;
+
+export function SectorItemStructures(planetAndSectorId) {
+  const supabase = useSupabaseClient();
+  // Add discriminator to prevent users who don't own that sector/perms
+  const [sectorItems, setSectorItems] = useState([]);
+
+  useEffect(() => {
+
+  })
+}
+
+export function SectorStructuresList() {
   return (
     <div className="flex flex-col min-h-screen items-center justify-center p-4 space-y-4 md:space-y-0 md:flex-row md:space-x-4">
       <div className="grid gap-4 w-full max-w-sm md:max-w-none md:grid-cols-3">
