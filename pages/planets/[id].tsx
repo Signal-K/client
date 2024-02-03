@@ -12,6 +12,7 @@ import IndividualBasePlanetGrid from "../../components/Content/Planets/PlanetDat
 import { CreateBar } from "../../components/Core/BottomBar";
 import RoverImageGallery from "../../components/Content/Planets/PlanetData/RandomRoverImage";
 import StructureComponent from "../../components/Content/Planets/Activities/StructureCreate";
+import { TopographicMap } from "../../components/Content/Planets/PlanetData/topographic-map";
 
 export default function PlanetIdPage () {
     const router = useRouter();
@@ -79,6 +80,7 @@ export default function PlanetIdPage () {
                     <div className="w-3/6 overflow-y-auto mr-30 z-40">
                         {/* <br /><ActivateButton /> */}
                         <IndividualBasePlanetDesktopTwoPanel id={id as string} />
+                        {/* <TopographicMap /> */}
                     </div>
                     <div className="w-3/6 bg-gray-50 overflow-y-auto">
                         <div className="py-3">
@@ -96,9 +98,10 @@ export default function PlanetIdPage () {
         <>
           <Navbar />
           <div className="h-screen py-4">
-            <IndividualBasePlanetDesktop id={id as string} />
+            {/* <IndividualBasePlanetDesktop id={id as string} /> */}
+            <TopographicMap />
           </div>
-          <div className="bg-white py-5">
+          {/* <div className="bg-white py-5">
             {activeView === 'home' && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -130,7 +133,7 @@ export default function PlanetIdPage () {
                 </div>
               </div>
             )}
-          </div>
+          </div> */}
           <CreateBar onTabClick={handleTabClick} />
         </>
       );
