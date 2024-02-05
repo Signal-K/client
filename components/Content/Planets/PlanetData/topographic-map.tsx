@@ -78,9 +78,9 @@ export function TopographicMap() {
           <button className="justify-self-start self-center">
             <img
               alt="Structure 4"
-              className="w-12 h-12"
+              className="w-32 h-32"
               height="50"
-              src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png"
+              src="/assets/Inventory/Structures/TelescopeReceiver.png"
               style={{
                 aspectRatio: "50/50",
                 objectFit: "cover",
@@ -91,9 +91,9 @@ export function TopographicMap() {
           <button className="justify-self-center self-center">
             <img
               alt="Structure 5"
-              className="w-48 h-48"
+              className="w-96 h-96"
               height="50"
-              src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png"
+              src="/Galaxy/Mars.png"
               style={{
                 aspectRatio: "50/50",
                 objectFit: "cover",
@@ -153,7 +153,51 @@ export function TopographicMap() {
               width="50"
             />
           </button>
-</div>
+          {/* <div className="h-screen flex flex-col items-center justify-center relative">
+            <h1 className="text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-2 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-400">
+              Test
+            </h1>
+            <div className="w-[1169.62px] h-[735.77px] left-[415px] top-[343px] absolute">
+              <div className="w-[608px] h-[576px] left-[405px] top-[108px] absolute justify-center items-center inline-flex" />
+              <img className="w-[147.59px] h-[150.77px] left-0 top-[285px] absolute" src="https://github.com/Signal-K/client/blob/main/public/assets/Inventory/Items/AeroCameraLevel1NoBg.png?raw=true" />
+              <img className="w-[150px] h-[150px] left-[927px] top-[229.63px] absolute origin-top-left rotate-[-86.76deg]" src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/69/Kepler22.png" />
+            </div>
+            <img
+              src='https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/69/Kepler22.png'
+              alt="Planet Image"
+              className={`w-4/12 h-4/12 sm:w-4/11 sm:h-4/11 object-contain z-20`}
+              style={{
+                zIndex: 20,
+              }} 
+            />
+            <div className="flex items-start gap-8">
+              <div className="flex flex-col items-center justify-start gap-4">
+                <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] tracking-[3.48px]">Mass</div>
+                <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']"> mE</div>
+              </div>
+
+              <div className="flex flex-col items-center justify-start gap-4">
+                <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Semi-Major Axis</div>
+                <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']"> AU</div>
+              </div>
+
+              <div className="flex flex-col items-center justify-start gap-4">
+                <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Anomaly type</div>
+                <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">?</div>
+              </div>
+
+              <div className="flex flex-col items-center justify-start gap-4">
+                <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">Eq. Temperature</div>
+                <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">°C</div>
+              </div>
+
+              <div className="flex flex-col items-center justify-start gap-4">
+                <div className="text-center text-slate-300 text-opacity-70 text-[21.73px] font-medium font-['Inter'] uppercase tracking-[3.48px]">TIC ID</div>
+                <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']"></div>
+              </div>
+            </div>
+          </div> */}
+        </div>
         </div>
         <div className="absolute top-0 left-0 right-0 mx-auto mt-8 text-center">
           <h1 className="text-4xl font-bold">MYCELIUM</h1>

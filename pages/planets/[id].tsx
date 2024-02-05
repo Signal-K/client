@@ -9,7 +9,7 @@ import { ActivateButton } from "../../components/Content/Planets/PlanetData/Cont
 import PostFormCardAnomalyTag from "../../components/Content/Classify/AnomalyPostFormCard";
 import Navbar from "../../components/Section/Navbar";
 import IndividualBasePlanetGrid from "../../components/Content/Planets/PlanetData/ContentGrid";
-import { CreateBar } from "../../components/Core/BottomBar";
+import { CreateBar, CreateMenuBar } from "../../components/Core/BottomBar";
 import RoverImageGallery from "../../components/Content/Planets/PlanetData/RandomRoverImage";
 import StructureComponent from "../../components/Content/Planets/Activities/StructureCreate";
 import { TopographicMap } from "../../components/Content/Planets/PlanetData/topographic-map";
@@ -134,7 +134,8 @@ export default function PlanetIdPage () {
               </div>
             )}
           </div> */}
-          <CreateBar onTabClick={handleTabClick} />
+          {/* <CreateBar onTabClick={handleTabClick} /> */}
+          <CreateMenuBar />
         </>
       );
     };
