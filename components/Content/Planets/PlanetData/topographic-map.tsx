@@ -24,7 +24,7 @@ export function TopographicMap() {
         `}
       </style>
       <div className="relative text-white h-screen w-full overflow-hidden">
-        <img
+        {/* <img
           alt="Planet Mycelium"
           className="object-cover h-full w-full"
           height="1080"
@@ -34,10 +34,10 @@ export function TopographicMap() {
             objectFit: "cover",
           }}
           width="1920"
-        />
+        /> */}
         <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-8">
           <button className="justify-self-start self-start">
-            <img
+            {/* <img
               alt="Structure 1"
               className="w-12 h-12"
               height="50"
@@ -47,14 +47,14 @@ export function TopographicMap() {
                 objectFit: "cover",
               }}
               width="50"
-            />
+            /> */}
           </button>
           <button className="justify-self-center self-start">
             <img
               alt="Structure 2"
-              className="w-12 h-12"
+              className="w-24 h-24"
               height="50"
-              src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png"
+              src="/assets/Inventory/Structures/Telescope2.png"
               style={{
                 aspectRatio: "50/50",
                 objectFit: "cover",
@@ -63,7 +63,7 @@ export function TopographicMap() {
             />
           </button>
           <button className="justify-self-end self-start">
-            <img
+            {/* <img
               alt="Structure 3"
               className="w-12 h-12"
               height="50"
@@ -73,7 +73,7 @@ export function TopographicMap() {
                 objectFit: "cover",
               }}
               width="50"
-            />
+            /> */}
           </button>
           <button className="justify-self-start self-center">
             <img
@@ -102,7 +102,7 @@ export function TopographicMap() {
             />
           </button>
           <button className="justify-self-end self-center">
-            <img
+            {/* <img
               alt="Structure 6"
               className="w-12 h-12"
               height="50"
@@ -112,10 +112,10 @@ export function TopographicMap() {
                 objectFit: "cover",
               }}
               width="50"
-            />
+            /> */}
           </button>
           <button className="justify-self-start self-end">
-            <img
+            {/* <img
               alt="Structure 7"
               className="w-12 h-12"
               height="50"
@@ -125,10 +125,10 @@ export function TopographicMap() {
                 objectFit: "cover",
               }}
               width="50"
-            />
+            /> */}
           </button>
           <button className="justify-self-center self-end">
-            <img
+            {/* <img
               alt="Structure 8"
               className="w-12 h-12"
               height="50"
@@ -137,11 +137,11 @@ export function TopographicMap() {
                 aspectRatio: "50/50",
                 objectFit: "cover",
               }}
-              width="50"
-            />
+              width="50" 
+            /> */}
           </button>
           <button className="justify-self-end self-end">
-            <img
+            {/* <img
               alt="Structure 9"
               className="w-12 h-12"
               height="50"
@@ -151,7 +151,7 @@ export function TopographicMap() {
                 objectFit: "cover",
               }}
               width="50"
-            />
+            /> */}
           </button>
           {/* <div className="h-screen flex flex-col items-center justify-center relative">
             <h1 className="text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-2 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-400">
