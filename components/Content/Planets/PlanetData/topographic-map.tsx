@@ -8,17 +8,28 @@ export function TopographicMap() {
           body {
             background: url('https://cdn.cloud.scenario.com/assets/W-75HHaTTKCFP_P51OMQVA?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9XLTc1SEhhVFRLQ0ZQX1A1MU9NUVZBP3A9MTAwKiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcxMDQ2MDc5OX19fV19&Key-Pair-Id=K36FIAB9LE2OLR&Signature=uKevl4LFfDomkvnHRbSQEjUjm5GC4eeTxD4xq-gGmt55GtBDaWe2HmcOcPDhh-2j9HqRKjBQXSjEJJMikk5wnxTMiYobp0l9K-M9WSnj-t6RPQVUpLzfy7foMSMwoMhGbsZ-pDDbyX9IMu-Q0yJKSEWhGsKXCmxv26UyV4qIMevDZvSbr3b8cFg6z90oliOi3DwROTswg9BHbk-iMTGm3vNgck4UIA5jerWXvojzH7y~zSHCtD2A4bkLv-eDOGyB3I~8LrfIDnE6bDgxbEgl2f1QRQl0N2HpDD6liXhgAZHmHGYjGFZv1ill4bHFKr5Ti7qQELGR1hax3sm9-he9tQ__') center/cover;
           }
-          @media only screen and (max-width: 1000px) {
-            body {
-              background: url('/void.png') center/cover;
-            }
-          }
+          
           @media only screen and (max-width: 767px) {
             .planet-heading {
               color: white;
               font-size: 24px;
               text-align: center;
               margin-bottom: 10px;
+            }
+          }
+
+          @media only screen and (max-width: 767px) {
+            .planet-heading {
+              color: white;
+              font-size: 24px;
+              text-align: center;
+              margin-bottom: 10px;
+            }
+
+            /* Adjusted image size for mobile */
+            .topographic-image {
+              max-width: 90%;
+              height: auto;
             }
           }
         `}
@@ -91,7 +102,7 @@ export function TopographicMap() {
           <button className="justify-self-center self-center">
             <img
               alt="Structure 5"
-              className="w-96 h-96"
+              className="w-96 h-96 topographic-image"
               height="50"
               src="/Galaxy/Mars.png"
               style={{
@@ -199,7 +210,7 @@ export function TopographicMap() {
           </div> */}
         </div>
         </div>
-        <div className="absolute top-0 left-0 right-0 mx-auto mt-8 text-center">
+        {/* <div className="absolute top-0 left-0 right-0 mx-auto mt-8 text-center">
           <h1 className="text-4xl font-bold">MYCELIUM</h1>
         </div>
         <div className="absolute bottom-0 left-0 right-0 mx-auto mb-8 text-center space-x-4">
@@ -208,7 +219,7 @@ export function TopographicMap() {
           <span className="text-sm">DAY LENGTH 12 Earth hours</span>
           <span className="text-sm">AVG TEMPERATURE 10°C to 28°C</span>
           <span className="text-sm">CLIMATE Psilocybin</span>
-        </div>
+        </div> */}
       </div>
   )
 }

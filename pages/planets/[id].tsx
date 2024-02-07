@@ -13,14 +13,23 @@ import { CreateBar, CreateMenuBar } from "../../components/Core/BottomBar";
 import RoverImageGallery from "../../components/Content/Planets/PlanetData/RandomRoverImage";
 import StructureComponent from "../../components/Content/Planets/Activities/StructureCreate";
 import { TopographicMap } from "../../components/Content/Planets/PlanetData/topographic-map";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function PlanetIdPage () {
     const router = useRouter();
     const { id } = router.query;
     const [activeView, setActiveView] = useState('home');
 
-    const handleTabClick = (view) => {
-        setActiveView(view);
+    const supabase = useSupabaseClient();
+
+    const [showUpdates, setShowUpdates] = useState(false);
+
+    const handleUpdatesClick = () => {
+      setShowUpdates(true);
+    };
+  
+    const handleCloseUpdates = () => {
+      setShowUpdates(false);
     };
 
     const [isMobile, setIsMobile] = useState(false);
@@ -42,57 +51,33 @@ export default function PlanetIdPage () {
         return null;
     };
 
-    if (isMobile) {
-        return (
-            <LayoutNoNav>
-                <IndividualBasePlanet id={id as string} />
-            </LayoutNoNav>
-        );
+    // Planet sector data:
+  const [sectorData, setSectorData] = useState([]);
+
+  useEffect(() => {
+    const fetchSectorsByPlanetId = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("basePlanetSectors")
+          .select("*")
+          .eq("anomaly", 2); // Assuming "anomaly" is the field representing the planet ID
+
+        if (data) {
+          setSectorData(data);
+        }
+
+        if (error) {
+          throw error;
+        }
+      } catch (error) {
+        console.error("Error fetching sectors:", error.message);
+      }
     };
 
-    // For testing/archiving of old layout
-    if (isMobile && !id && !router) {
-        return (
-            <div className="flex h-screen">
-                <div className="w-1/6 bg-gray-50">
-                    <DesktopSidebar />
-                </div>
-                <div className="w-3/6 overflow-y-auto mr-30 z-40">
-                    {/* <br /><ActivateButton /> */}
-                    <IndividualBasePlanetDesktop id={id as string} />
-                </div>
-                <div className="w-2/6 bg-gray-50 overflow-y-auto z-">
-                    <BasePlanetData planetId={{ id: id as string }} />
-                    {/* <EditableBasePlanetData planetId={{ id: id as string }} /> */}
-                    <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                    <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
-                </div>
-            </div>
-        );
-    };
-
-    // Two panel layout for desktop devices, with orbitals
-    if (!isMobile && !id && router) {
-        return (
-            <>
-                <Navbar />
-                <div className="flex h-screen">
-                    <div className="w-3/6 overflow-y-auto mr-30 z-40">
-                        {/* <br /><ActivateButton /> */}
-                        <IndividualBasePlanetDesktopTwoPanel id={id as string} />
-                        {/* <TopographicMap /> */}
-                    </div>
-                    <div className="w-3/6 bg-gray-50 overflow-y-auto">
-                        <div className="py-3">
-                            <BasePlanetData planetId={{ id: id as string }} />
-                            <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                            <ClassificationFeedForIndividualPlanet planetId={{ id: id as string }} />
-                        </div>
-                    </div>
-                </div>
-            </>
-        );
-    };
+    if (supabase) {
+      fetchSectorsByPlanetId();
+    }
+  }, [supabase]);
 
     return (
         <>
@@ -133,9 +118,41 @@ export default function PlanetIdPage () {
                 </div>
               </div>
             )}
-          </div> */}
-          {/* <CreateBar onTabClick={handleTabClick} /> */}
-          <CreateMenuBar />
+          </div>  */}
+          <CreateMenuBar onUpdatesClick={handleUpdatesClick} />
+          <h1>Sectors on Planet</h1>
+      <div className="grid grid-cols-4 gap-4">
+        {sectorData.map((sector) => (
+          <div key={sector.id}>
+            {/* Display sector details here */}
+            <p>Sector ID: {sector.id}</p>
+            <p>Owner: {sector.owner}</p>
+            {/* Add more details as needed */}
+          </div>
+        ))}
+      </div>
+          {showUpdates && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+        <div className="bg-white rounded-lg md:w-4/6 lg:w-3/6 xl:w-2/6 p-4">
+          <button onClick={handleCloseUpdates} className="absolute top-0 right-0 m-2 text-gray-600 hover:text-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+            <PostFormCardAnomalyTag planetId={id} onPost={null} />
+                  <ClassificationFeedForIndividualPlanet
+                    planetId={{ id: id as string }}
+                    backgroundColorSet="bg-blue-200"
+                  />
+                  <center><button onClick={handleCloseUpdates} className="flex items-center justify-center p-3">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span className="bg-yellow-500 text-white text-xs px-1 ml-1 rounded">Back</span>
+        </button></center>
+          </div>
+        </div>
+      )}
         </>
       );
     };

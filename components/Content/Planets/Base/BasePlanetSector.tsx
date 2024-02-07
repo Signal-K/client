@@ -157,7 +157,6 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
     const fetchData = async () => {
       if (sectorId) {
         await getSectorData();
-        await getPlanetData();
       };
     };
 
@@ -204,7 +203,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
         >
           <div className="h-[80vh] flex flex-col items-center justify-center relative">
             <h1 className="text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-[-50px] mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-400">
-              Planet {planetData?.content}, Sector {id}
+              Planet {sectorData?.anomaly}, Sector {id}
             </h1>
             <div className="w-full flex items-center justify-center">
               <img
