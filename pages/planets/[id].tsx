@@ -1,7 +1,7 @@
 import IndividualPlanet from "../../components/Content/Planets/IndividualPlanet";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import IndividualBasePlanet, { BasePlanetData, EditableBasePlanetData, IndividualBasePlanetDesktop, IndividualBasePlanetDesktopTwoPanel } from "../../components/Content/Planets/Base/IndividualBasePlanet";
+import { IndividualBasePlanetDesktop } from "../../components/Content/Planets/Base/IndividualBasePlanet";
 import Layout, { LayoutNoNav } from "../../components/Section/Layout";
 import { DesktopSidebar } from "../../components/Section/Sidebar";
 import ClassificationFeed, { ClassificationFeedForIndividualPlanet } from "../../components/Content/ClassificationFeed";
@@ -12,7 +12,7 @@ import IndividualBasePlanetGrid from "../../components/Content/Planets/PlanetDat
 import { CreateBar, CreateMenuBar } from "../../components/Core/BottomBar";
 import RoverImageGallery from "../../components/Content/Planets/PlanetData/RandomRoverImage";
 import StructureComponent from "../../components/Content/Planets/Activities/StructureCreate";
-import { TopographicMap } from "../../components/Content/Planets/PlanetData/topographic-map";
+import { TopograhicBasePlanet } from "../../components/Content/Planets/PlanetData/topographic-map";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function PlanetIdPage () {
@@ -51,40 +51,40 @@ export default function PlanetIdPage () {
         return null;
     };
 
-    // Planet sector data:
-  const [sectorData, setSectorData] = useState([]);
+  //   // Planet sector data:
+  // const [sectorData, setSectorData] = useState([]);
 
-  useEffect(() => {
-    const fetchSectorsByPlanetId = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("basePlanetSectors")
-          .select("*")
-          .eq("anomaly", 2); // Assuming "anomaly" is the field representing the planet ID
+  // useEffect(() => {
+  //   const fetchSectorsByPlanetId = async () => {
+  //     try {
+  //       const { data, error } = await supabase
+  //         .from("basePlanetSectors")
+  //         .select("*")
+  //         .eq("anomaly", 2); // Assuming "anomaly" is the field representing the planet ID
 
-        if (data) {
-          setSectorData(data);
-        }
+  //       if (data) {
+  //         setSectorData(data);
+  //       }
 
-        if (error) {
-          throw error;
-        }
-      } catch (error) {
-        console.error("Error fetching sectors:", error.message);
-      }
-    };
+  //       if (error) {
+  //         throw error;
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching sectors:", error.message);
+  //     }
+  //   };
 
-    if (supabase) {
-      fetchSectorsByPlanetId();
-    }
-  }, [supabase]);
+  //   if (supabase) {
+  //     fetchSectorsByPlanetId();
+  //   }
+  // }, [supabase]);
 
     return (
         <>
           <Navbar />
           <div className="h-screen py-4">
-            {/* <IndividualBasePlanetDesktop id={id as string} /> */}
-            <TopographicMap />
+            <IndividualBasePlanetDesktop id={id as string} />
+            {/* <TopograhicBasePlanet id={id as string} /> */}
           </div>
           {/* <div className="bg-white py-5">
             {activeView === 'home' && (
@@ -120,17 +120,6 @@ export default function PlanetIdPage () {
             )}
           </div>  */}
           <CreateMenuBar onUpdatesClick={handleUpdatesClick} />
-          <h1>Sectors on Planet</h1>
-      <div className="grid grid-cols-4 gap-4">
-        {sectorData.map((sector) => (
-          <div key={sector.id}>
-            {/* Display sector details here */}
-            <p>Sector ID: {sector.id}</p>
-            <p>Owner: {sector.owner}</p>
-            {/* Add more details as needed */}
-          </div>
-        ))}
-      </div>
           {showUpdates && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
         <div className="bg-white rounded-lg md:w-4/6 lg:w-3/6 xl:w-2/6 p-4">

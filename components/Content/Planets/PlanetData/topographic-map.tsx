@@ -1,6 +1,93 @@
-import React from "react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 
-export function TopographicMap() {
+export function TopograhicBasePlanet({ id }: { id: string }) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const router = useRouter();
+
+  const [planetData, setPlanetData] = useState(null);
+  const [planetPosts, setPlanetPosts] = useState([]);
+  const { id: planetId } = router.query;
+  const [hasPlanetInInventory, setHasPlanetInInventory] = useState(false);
+  const [inventoryPlanetId, setInventoryPlanetId] = useState<string | null>(
+    null
+  );
+  const [sectors, setSectors] = useState([]);
+
+  if (!planetData) {
+    return <div>Loading...</div>;
+  }
+
+  const getPlanetData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("basePlanets")
+        .select("*")
+        .eq("id", planetId)
+        .single();
+
+      if (data) {
+        setPlanetData(data);
+      }
+
+      if (error) {
+        throw error;
+      }
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
+  const { content, avatar_url, type, deepnote, cover } = planetData;
+
+  async function fetchPostsForPlanet(planetId: string) {
+    try {
+      const { data: postsData, error: postsError } = await supabase
+        .from("posts_duplicates")
+        .select(
+          "id, content, created_at, media, profiles(id, avatar_url, username)"
+        )
+        .eq("planets2", planetId)
+        .order("created_at");
+  
+      if (postsData) {
+        setPlanetPosts(postsData);
+      }
+  
+      if (postsError) {
+        throw postsError;
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error.message);
+    }
+  }
+  
+
+  async function checkUserInventory() {
+    if (!session || !planetId) {
+      return;
+    };
+
+    const { data, error } = await supabase
+      .from("inventoryPLANETS")
+      .select()
+      .eq("planet_id", planetId)
+      .eq("owner_id", session?.user?.id);
+
+    if (error) {
+      console.error("Error checking user inventory:", error);
+      return;
+    };
+
+    if (data.length > 0) {
+      setHasPlanetInInventory(true);
+      setInventoryPlanetId(data[0].id);
+    };
+  };
+
   return (
 <div className="flex-col justify-center">
       <style jsx global>
@@ -223,3 +310,7 @@ export function TopographicMap() {
       </div>
   )
 }
+function eq(arg0: string, planetId: any) {
+  throw new Error("Function not implemented.");
+}
+
