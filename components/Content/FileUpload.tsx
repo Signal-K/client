@@ -1,4 +1,4 @@
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ConnectWallet, useStorageUpload, MediaRenderer } from "@thirdweb-dev/react";
 import { NextPage } from "next";
 import { useCallback, useEffect, useState } from "react";
@@ -9,6 +9,8 @@ const IPFS_GATEWAY = "https://d4b4e2e663a6efce5f7f8310426ba24a.ipfscdn.io/ipfs/"
 
 export default function FileUpload() {
   const supabase = useSupabaseClient();
+  const session = useSession();
+
   const [uris, setUris] = useState<string[]>([]);
 
   const { mutateAsync: upload } = useStorageUpload();
@@ -18,7 +20,7 @@ export default function FileUpload() {
       const uris = await upload({ data: files });
 
       // Add URIs to Supabase table
-      const { error, data } = await supabase.from('comments').insert(uris.map(uri => ({ content: uri })));
+      const { error, data } = await supabase.from('comments').insert(uris.map(uri => ({ content: uri, author: session?.user?.id })));
 
       if (error) {
         console.error("Error inserting data into Supabase:", error.message);
@@ -33,9 +35,36 @@ export default function FileUpload() {
     }
   }, [upload, supabase]);
 
+  const fetchAndRenderFromSupabase = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from("comments")
+        .select("content")
+        .gte("id", 23)
+        .lt("id", 29)
+        .eq("author", session?.user?.id);
+
+      if (error) {
+        console.error("Error fetching files from Supabase:", error.message);
+        return;
+      }
+      
+      if (data) {
+        const urisFromSupabase = data.map((row: any) => row.content);
+        setUris(urisFromSupabase);
+      }
+    } catch (error: any) {
+      console.error("Error fetching files from Supabase:", error.message);
+    }
+  }, [session?.user?.id, supabase]);
+
+  useEffect(() => {
+    fetchAndRenderFromSupabase();
+  }, [fetchAndRenderFromSupabase]);
+
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     await uploadAndAddToSupabase(acceptedFiles);
-  }, [uploadAndAddToSupabase]);
+  }, []);
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
@@ -77,22 +106,6 @@ export default function FileUpload() {
       });
   }  
   */
-
-  const fetchAndRenderFromSupabase = async () => {
-    try {
-      const { data, error } = await supabase.from("files").select("file_url");
-      if (error) {
-        console.error("Error fetching files from Supabase:", error.message);
-        return;
-      }
-      if (data) {
-        const urisFromSupabase = data.map((row: any) => row.file_url);
-        setUris(urisFromSupabase);
-      }
-    } catch (error: any) {
-      console.error("Error fetching files from Supabase:", error.message);
-    }
-  };
 
   useEffect(() => {
     fetchAndRenderFromSupabase();
