@@ -70,7 +70,7 @@ const OwnedItemsList: React.FC = () => {
                     <img src={item.icon_url} alt={item.name} className="w-full h-auto" />
                     </div>
                     <p className="text-gray-600">Quantity: {ownedItem?.quantity}</p>
-                    <p className="text-gray-600">Location: {ownedItem?.location}</p>
+                    <p className="text-gray-600">Location: {ownedItem?.sector}</p> {/* Was ?.location */}
                 </li>
                 );
             })}
@@ -150,7 +150,7 @@ export const SectorStructureOwned: React.FC<{ sectorid: string }> = ({ sectorid 
                     <img src={item.icon_url} alt={item.name} className="w-full h-auto" />
                     </div>
                     <p className="text-gray-600">Quantity: {ownedItem?.quantity}</p>
-                    <p className="text-gray-600">Location: {ownedItem?.location}</p>
+                    <p className="text-gray-600">Location: {ownedItem?.sector}</p>
                 </li>
                 );
             })}

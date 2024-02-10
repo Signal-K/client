@@ -162,7 +162,7 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
               <style jsx global>
                 {`
                   body {
-                    background: url('https://cdn.cloud.scenario.com/assets/W-75HHaTTKCFP_P51OMQVA?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9XLTc1SEhhVFRLQ0ZQX1A1MU9NUVZBP3A9MTAwKiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcxMDQ2MDc5OX19fV19&Key-Pair-Id=K36FIAB9LE2OLR&Signature=uKevl4LFfDomkvnHRbSQEjUjm5GC4eeTxD4xq-gGmt55GtBDaWe2HmcOcPDhh-2j9HqRKjBQXSjEJJMikk5wnxTMiYobp0l9K-M9WSnj-t6RPQVUpLzfy7foMSMwoMhGbsZ-pDDbyX9IMu-Q0yJKSEWhGsKXCmxv26UyV4qIMevDZvSbr3b8cFg6z90oliOi3DwROTswg9BHbk-iMTGm3vNgck4UIA5jerWXvojzH7y~zSHCtD2A4bkLv-eDOGyB3I~8LrfIDnE6bDgxbEgl2f1QRQl0N2HpDD6liXhgAZHmHGYjGFZv1ill4bHFKr5Ti7qQELGR1hax3sm9-he9tQ__') center/cover;
+                    background: url('/assets/Inventory/Planets/PlanetBg.png') center/cover;
                   }
                   
                   @media only screen and (max-width: 767px) {
@@ -418,9 +418,9 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
     <Link legacyBehavior key={sector.id} href={`/planets/sector/${sector.id}`}>
       <a className="sector-link">
         <div className="sector-square">
-          {sector.coverUrl && (
+          {/* {sector.coverUrl && (
             <img src={sector.coverUrl} alt="Sector Cover" className="sector-cover" />
-          )}
+          )} */}
         </div>
       </a>
     </Link>
@@ -444,7 +444,7 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
         .sector-square {
           width: 100px;
           height: 100px;
-          border: 1px solid black;
+          border: 1px solid white;
         }
       `}</style>
                 </div>

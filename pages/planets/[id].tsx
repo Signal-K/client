@@ -1,18 +1,10 @@
-import IndividualPlanet from "../../components/Content/Planets/IndividualPlanet";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { IndividualBasePlanetDesktop } from "../../components/Content/Planets/Base/IndividualBasePlanet";
-import Layout, { LayoutNoNav } from "../../components/Section/Layout";
-import { DesktopSidebar } from "../../components/Section/Sidebar";
-import ClassificationFeed, { ClassificationFeedForIndividualPlanet } from "../../components/Content/ClassificationFeed";
-import { ActivateButton } from "../../components/Content/Planets/PlanetData/ContentPlaceholder";
+import { ClassificationFeedForIndividualPlanet } from "../../components/Content/ClassificationFeed";
 import PostFormCardAnomalyTag from "../../components/Content/Classify/AnomalyPostFormCard";
 import Navbar from "../../components/Section/Navbar";
-import IndividualBasePlanetGrid from "../../components/Content/Planets/PlanetData/ContentGrid";
 import { CreateBar, CreateMenuBar } from "../../components/Core/BottomBar";
-import RoverImageGallery from "../../components/Content/Planets/PlanetData/RandomRoverImage";
-import StructureComponent from "../../components/Content/Planets/Activities/StructureCreate";
-import { TopograhicBasePlanet } from "../../components/Content/Planets/PlanetData/topographic-map";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function PlanetIdPage () {
@@ -51,74 +43,12 @@ export default function PlanetIdPage () {
         return null;
     };
 
-  //   // Planet sector data:
-  // const [sectorData, setSectorData] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchSectorsByPlanetId = async () => {
-  //     try {
-  //       const { data, error } = await supabase
-  //         .from("basePlanetSectors")
-  //         .select("*")
-  //         .eq("anomaly", 2); // Assuming "anomaly" is the field representing the planet ID
-
-  //       if (data) {
-  //         setSectorData(data);
-  //       }
-
-  //       if (error) {
-  //         throw error;
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching sectors:", error.message);
-  //     }
-  //   };
-
-  //   if (supabase) {
-  //     fetchSectorsByPlanetId();
-  //   }
-  // }, [supabase]);
-
     return (
         <>
           <Navbar />
           <div className="h-screen py-4">
             <IndividualBasePlanetDesktop id={id as string} />
-            {/* <TopograhicBasePlanet id={id as string} /> */}
           </div>
-          {/* <div className="bg-white py-5">
-            {activeView === 'home' && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <PostFormCardAnomalyTag planetId={id} onPost={null} />
-                  <ClassificationFeedForIndividualPlanet
-                    planetId={{ id: id as string }}
-                    backgroundColorSet="bg-blue-200"
-                  />
-                </div>
-                <div className="">
-                  <BasePlanetData planetId={{ id: id as string }} />
-                </div>
-              </div>
-            )}
-            {activeView === 'wallet' && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <ClassificationFeedForIndividualPlanet
-                    planetId={{ id: id as string }}
-                    backgroundColorSet="bg-blue-200"
-                  />
-                </div>
-                <div className="">
-                  <img
-                    src={`https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planetsss/${id}/topography.jpeg`}
-                    alt="Topography"
-                  />
-                  <RoverImageGallery />
-                </div>
-              </div>
-            )}
-          </div>  */}
           <CreateMenuBar onUpdatesClick={handleUpdatesClick} />
           {showUpdates && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
