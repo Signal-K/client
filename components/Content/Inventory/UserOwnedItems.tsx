@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import Link from "next/link";
 
 const OwnedItemsList: React.FC = () => {
     const supabase = useSupabaseClient();
@@ -150,7 +151,7 @@ export const SectorStructureOwned: React.FC<{ sectorid: string }> = ({ sectorid 
                     <img src={item.icon_url} alt={item.name} className="w-full h-auto" />
                     </div>
                     <p className="text-gray-600">Quantity: {ownedItem?.quantity}</p>
-                    <p className="text-gray-600">Location: {ownedItem?.sector}</p>
+                    <p className="text-gray-600">On planet: {ownedItem?.sector}</p>
                 </li>
                 );
             })}

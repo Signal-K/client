@@ -1,16 +1,12 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import Card from "../../../Card";
 import RoverImageGallery, { RoverImage, RoverImageNoHandle } from "../PlanetData/RandomRoverImage";
-import axios from "axios";
-import { RoverContentPostForm } from "../../CreatePostForm";
 import StructureComponent, { PlacedStructures } from "../Activities/StructureCreate";
-import SectorItems from "../Sectors/SectorStructures";
 import { SectorStructureOwned } from "../../Inventory/UserOwnedItems";
 // import SectorStructures from "../Sectors/SectorStructures";
 
-const AddResourceToInventory = ({ resource }) => {
+const AddResourceToInventory = ({ resource, sectorId }) => {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [isAdding, setIsAdding] = useState(false);
@@ -44,6 +40,7 @@ const AddResourceToInventory = ({ resource }) => {
           owner: session?.user?.id,
           item: resource,//.id,
           quantity,
+          sector: sectorId,
         });
 
       if (insertError) {
@@ -223,13 +220,14 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
             <h1 className="text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-[-50px] mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-400">
               Planet {sectorData?.anomaly}, Sector {id}
             </h1>
-            <div className="w-full flex items-center justify-center">
-              {/* <img
-                src={coverUrl}
-                alt="Rover sector image"
-                className="w-3/12 h-3/12 sm:w-4/11 sm:h-4/11 object-contain z-20 p-10 mb-2"
+            <div className="w-full flex items-center justify-center mb-20 py-10">
+              <img
+                // src={coverUrl}
+                // alt="Rover sector image"
+                className="w-10/12 h-10/12 sm:w-4/11 sm:h-4/11 object-contain z-30 p-10 mb-2"
                 style={{ zIndex: 20 }}
-              /> */}
+              />
+              <PlacedStructures sectorId={Number(sectorid)} />
             </div>
             <div className="flex items-start gap-8 mt-20">
               <div className="flex flex-col items-center justify-start gap-4">
@@ -277,8 +275,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
             )} */}
         </div>
       <div>
-          <PlacedStructures sectorId={Number(sectorid)} />
-          <AddResourceToInventory resource={deposit} />
+          <AddResourceToInventory resource={deposit} sectorId={sectorId} />
           {/* <SectorItems planetSectorId={sectorid} /> */}
           <SectorStructureOwned sectorid={sectorid} />
           <p>{deposit}</p>
