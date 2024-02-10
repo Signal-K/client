@@ -98,7 +98,7 @@ export const SectorStructureOwned: React.FC<{ sectorid: string }> = ({ sectorid 
                 const { data: ownedItemsData, error: ownedItemsError } = await supabase
                     .from('inventoryUSERS')
                     .select('*')
-                    .eq("sector", sectorid);
+                    .eq("planetSector" || 'sector', sectorid);
         
                 if (ownedItemsError) {
                     throw ownedItemsError;

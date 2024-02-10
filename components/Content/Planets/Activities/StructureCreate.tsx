@@ -159,13 +159,25 @@ interface PlacedStructuresProps {
     icon_url: string;
   }
   
-  export const PlacedStructures: React.FC<PlacedStructuresProps> = ({ sectorId }) => {
+export const PlacedStructures = ({ sectorId }) => {
     const supabase = useSupabaseClient();
-    const [placedStructures, setPlacedStructures] = useState<PlacedStructure[]>([]);
+    const [placedStructures, setPlacedStructures] = useState([]);
   
     useEffect(() => {
       const fetchPlacedStructures = async () => {
         try {
+          // Fetch all structure items from inventoryITEMS table
+          const { data: structureItems, error: structureItemsError } = await supabase
+            .from('inventoryITEMS')
+            .select('id, name, description, icon_url')
+            .eq('ItemCategory', 'Structure');
+  
+          if (structureItemsError) {
+            console.error(structureItemsError.message);
+            return;
+          }
+  
+          // Fetch user items for the specified sector from inventoryUSERS table
           const { data: userItems, error: userItemsError } = await supabase
             .from('inventoryUSERS')
             .select('item')
@@ -176,20 +188,13 @@ interface PlacedStructuresProps {
             return;
           }
   
-          const itemIds = userItems?.map((item) => item.item) || [];
+          // Filter structure items based on user items present in the sector
+          const placedStructuresData = structureItems.map((structure) => ({
+            ...structure,
+            present: userItems.some((item) => item.item === structure.id)
+          }));
   
-          const { data: structureItems, error: structureItemsError } = await supabase
-            .from('inventoryITEMS')
-            .select('id, name, description, icon_url')
-            .in('id', itemIds)
-            .eq('ItemCategory', 'Structure');
-  
-          if (structureItemsError) {
-            console.error(structureItemsError.message);
-            return;
-          }
-  
-          setPlacedStructures(structureItems || []);
+          setPlacedStructures(placedStructuresData);
         } catch (error) {
           console.error(error.message);
         }
@@ -198,24 +203,35 @@ interface PlacedStructuresProps {
       fetchPlacedStructures();
     }, [supabase, sectorId]);
   
+    const handleStructureClick = (structureId) => {
+      // Logic to handle structure click based on structureId
+      console.log(`Clicked structure with ID ${structureId}`);
+    };
+  
     return (
-      <div className="flex flex-col items-center justify-center p-4 md:space-y-0 md:flex-row md:space-x-4">
-        <div className="grid gap-4 w-full max-w-sm md:max-w-none md:grid-cols-3">
-          {placedStructures.map((structure) => (
-            <div key={structure.id} className="flex flex-col items-center justify-center space-y-2">
-              <div className="flex items-center justify-center w-20 h-20 rounded-full border-2 border-gray-100 border-dashed dark:border-gray-800">
+      <div className="grid gap-4 w-full max-w-sm md:max-w-none md:grid-cols-3">
+        {placedStructures.map((structure) => (
+          <div key={structure.id} className="flex flex-col items-center justify-center space-y-2">
+            <div className="flex items-center justify-center w-20 h-20 rounded-full border-2 border-gray-100 border-dashed dark:border-gray-800">
+              {structure.present ? (
                 <img src={structure.icon_url} alt={structure.name} className="w-10 h-10 text-gray-200 dark:text-gray-800 translate-y-1" />
-              </div>
-              <span className="text-sm font-medium">{structure.name}</span>
-              <Link className="text-sm underline" href="#">
-                View More
-              </Link>
+              ) : (
+                <span>{structure.name}</span>
+              )}
             </div>
-          ))}
-        </div>
+            <span className="text-sm font-medium">{structure.name}</span>
+            {structure.present && (
+              <Link legacyBehavior href="#" passHref>
+              <a className="text-sm underline" onClick={() => handleStructureClick(structure.id)}>
+                View More
+              </a>
+            </Link>
+            )}
+          </div>
+        ))}
       </div>
     );
-};
+  };
 
 const CraftButton = () => {
   const handleClick = async () => {

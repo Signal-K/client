@@ -4,8 +4,7 @@ import React, { useEffect, useState } from "react";
 import RoverImageGallery, { RoverImage, RoverImageNoHandle } from "../PlanetData/RandomRoverImage";
 import StructureComponent, { PlacedStructures } from "../Activities/StructureCreate";
 import { SectorStructureOwned } from "../../Inventory/UserOwnedItems";
-import { CreateMenuBar, SectorCircularMenu } from "../../../Core/BottomBar";
-// import SectorStructures from "../Sectors/SectorStructures";
+// import { CreateMenuBar, SectorCircularMenu } from "../../../Core/BottomBar";
 
 const AddResourceToInventory = ({ resource, sectorId }) => {
   const supabase = useSupabaseClient();
@@ -77,58 +76,26 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
 
   const [planetData, setPlanetData] = useState(null);
   const [sectorData, setSectorData] = useState(null);
+  const [depositItem, setDepositItem] = useState(null);
 
-  // Rover image data
-    // useEffect(() => {
-    //     // const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?sol=${date}&api_key=${apiKey}`;
-    //     const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/opportunity/photos?sol=181&api_key=${apiKey}`;
-
-    //     axios.get(apiUrl)
-    //         .then((response) => {
-    //             if (response.data.photos && response.data.photos.length > 0) {
-    //                 const firstImageMetadata = response.data.photos[0];
-    //                 // setImageUrl(firstImageMetadata.img_src || '');
-    //                 const firstImage = response.data.photos[0].img_src;
-    //                 setImageUrl(firstImage);
-    //                 const metadataText = JSON.stringify(firstImageMetadata, null, 2);
-    //                 setImageMetadata(metadataText);
-    //                 setMetadata(metadataText)
-    //             } else {
-    //                 setImageUrl('No images found for the given date & rover.');
-    //                 setImageMetadata('No images found for the given date & rover' + JSON.stringify(response));
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             setImageUrl('An error occurred while fetching the image');
-    //             setImageMetadata('Error fetching image');
-    //             console.error(error);
-    //         });
-    // }, [session]);
-
-  const getPlanetData = async () => {
-    if (!sectorData) {
-      return null;
-    }
-
+  const fetchDepositItem = async (depositId) => {
     try {
       const { data, error } = await supabase
-        .from("basePlanets")
-        .select("*")
-        .eq("id", sectorData.id)
+        .from("inventoryITEMS")
+        .select("name")
+        .eq("id", depositId)
         .single();
 
       if (data) {
-        setPlanetData(data);
-      };
-
-      console.log(data);
+        setDepositItem(data.name);
+      }
 
       if (error) {
         throw error;
-      };
+      }
     } catch (error) {
       console.error(error.message);
-    };
+    }
   };
 
   const getSectorData = async () => {
@@ -141,6 +108,9 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
 
       if (data) {
         setSectorData(data);
+        if (data.deposit) {
+          await fetchDepositItem(data.deposit);
+        };
       }
 
       if (error) {
@@ -221,7 +191,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
             <h1 className="mb-10 text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-[-50px] mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-400">
               Planet {sectorData?.anomaly}, Sector {id}
             </h1><br /><br /><br />
-            <SectorCircularMenu />
+            {/* <SectorCircularMenu /> */}
             <div className="w-full flex items-center justify-center mb-20 py-10">
               <img
                 // src={coverUrl}
@@ -246,7 +216,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
                   Mineral deposit
                 </div>
                 <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">
-                  {deposit}
+                  {depositItem || "Unknown"}
                 </div>
               </div>
 
@@ -281,7 +251,6 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
           <AddResourceToInventory resource={deposit} sectorId={sectorId} />
           {/* <SectorItems planetSectorId={sectorid} /> */}
           <SectorStructureOwned sectorid={sectorid} />
-          <p>{deposit}</p>
           <RoverImageNoHandle date='853' rover='opportunity' sectorNo={id} />
           <StructureComponent sectorId={sectorid} />
           {/* {imageUrl ? (

@@ -65,13 +65,13 @@ export const UserMenuItems = ({
             <Link href='/demo-app' passHref legacyBehavior>
               <a className='flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-yellow-500'>
                 <MdOutlineSpaceDashboard size='1.1rem' />
-                AI Scheduler (Demo App)
+                Dashboard
               </a>
             </Link>
           </li>
         ) : null}
         <li>
-          <Link href='/account' passHref legacyBehavior>
+          <Link href='https://supabase.com/dashboard/project/qwbufbmxkjfaikoloudl' passHref legacyBehavior>
             <a
               onClick={handleMobileMenuClick}
               className='flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-yellow-500'
@@ -93,7 +93,7 @@ export const UserMenuItems = ({
                 fill=''
               />
             </svg>
-            Account Settings
+            Backend
           </a>
           </Link>
         </li>
@@ -226,9 +226,9 @@ const navigation = [
   {
     name: 'Gather', href: '/gather'
   },
-  {
-    name: 'Inventory', href: '/inventory' // I think we should probably have a page for building as well, maybe even feed, faction, but I want to see a 4-pronged approach for now
-  },
+  // {
+  //   name: 'Inventory', href: '/inventory' // I think we should probably have a page for building as well, maybe even feed, faction, but I want to see a 4-pronged approach for now
+  // },
 ];
 
 const NavLogo = () => (
