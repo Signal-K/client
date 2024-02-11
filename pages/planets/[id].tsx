@@ -6,6 +6,7 @@ import PostFormCardAnomalyTag from "../../components/Content/Classify/AnomalyPos
 import Navbar from "../../components/Section/Navbar";
 import { CreateBar, CreateMenuBar } from "../../components/Core/BottomBar";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import ContentPlaceholder from "../../components/Content/Planets/PlanetData/ContentPlaceholder";
 
 export default function PlanetIdPage () {
     const router = useRouter();
@@ -15,10 +16,15 @@ export default function PlanetIdPage () {
     const supabase = useSupabaseClient();
 
     const [showUpdates, setShowUpdates] = useState(false);
+    const [showSecondItem, setShowSecondItem] = useState(false);
 
     const handleUpdatesClick = () => {
       setShowUpdates(true);
     };
+
+    const handleSecondButtonClick = () => {
+      setShowSecondItem(true);
+    }
   
     const handleCloseUpdates = () => {
       setShowUpdates(false);
@@ -49,7 +55,7 @@ export default function PlanetIdPage () {
           <div className="h-screen py-4">
             <IndividualBasePlanetDesktop id={id as string} />
           </div>
-          <CreateMenuBar onUpdatesClick={handleUpdatesClick} />
+          <CreateMenuBar onUpdatesClick={handleUpdatesClick} onSecondButtonClick={handleSecondButtonClick} />
           {showUpdates && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
         <div className="bg-white rounded-lg md:w-4/6 lg:w-3/6 xl:w-2/6 p-4">
@@ -71,6 +77,9 @@ export default function PlanetIdPage () {
         </button></center>
           </div>
         </div>
+      )}
+      {showSecondItem && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center"><ContentPlaceholder /></div>
       )}
         </>
       );

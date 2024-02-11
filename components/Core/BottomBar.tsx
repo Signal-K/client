@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
+import { BuildingIcon, CarIcon, RocketIcon, CpuIcon, MessageSquareDashedIcon } from "lucide-react";
+import { CircleMenu, CircleMenuItem, TooltipPlacement} from 'react-circular-menu';
+import { useState } from "react";
+
+import { ClassificationFeedForIndividualPlanet } from "../Content/ClassificationFeed";
+import ContentPlaceholder from "../Content/Planets/PlanetData/ContentPlaceholder";
+
 const bottombarLinks = [
   {
     imgURL: "/home.svg",
@@ -215,7 +222,7 @@ export const CreateBar = ({ onTabClick }) => {
   );
 };
 
-export const CreateMenuBar = ({ onUpdatesClick }) => {
+export const CreateMenuBar = ({ onUpdatesClick, onSecondButtonClick }) => {
   return (
     <ul className="fixed bottom-5 left-1/2 transform -translate-x-1/2 flex justify-center space-x-4 bg-gray-200 rounded-full p-2 shadow-lg">
       <li className="flex flex-col items-center justify-center">
@@ -228,7 +235,7 @@ export const CreateMenuBar = ({ onUpdatesClick }) => {
         </a>
       </li>
       <li className="flex flex-col items-center justify-center">
-        <a className="flex flex-col items-center justify-center p-1">
+        <a onClick={onSecondButtonClick} className="flex flex-col items-center justify-center p-1">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -256,4 +263,57 @@ export const CreateMenuBar = ({ onUpdatesClick }) => {
       </li>      
     </ul>
   );
+};
+
+export const SectorCircularMenu = (props) => {
+  const [activeComponent, setActiveComponent] = useState(null);
+
+  const handleItemClick = (itemName) => {
+    // Set the active component based on the clicked item
+    switch (itemName) {
+      case 'Email':
+        setActiveComponent('ClassificationFeedForIndividualPlanet');
+        break;
+      case 'Help':
+        setActiveComponent('ContentPlaceholder');
+        break;
+      case 'Location':
+        // Set active component for other items if needed
+        break;
+      case 'Info':
+        // Set active component for other items if needed
+        break;
+      default:
+        setActiveComponent(null);
+    }
+  };
+
+  return (<>
+    <CircleMenu
+      startAngle={-90}
+      rotationAngle={360}
+      itemSize={2}
+      radius={5}
+      rotationAngleInclusive={false}
+    >
+      <CircleMenuItem
+        onClick={() => alert("Clicked the item")}
+        tooltip="Email"
+        tooltipPlacement={TooltipPlacement.Right}
+      >
+        <BuildingIcon />
+      </CircleMenuItem>
+      <CircleMenuItem tooltip="Help">
+        <MessageSquareDashedIcon />
+      </CircleMenuItem>
+      <CircleMenuItem tooltip="Location">
+        <CarIcon />
+      </CircleMenuItem>
+      <CircleMenuItem tooltip="Info">
+        <RocketIcon />
+      </CircleMenuItem>
+    </CircleMenu>
+
+    {activeComponent === 'ContentPlaceholder' && <ContentPlaceholder />}</>
+  );;
 };

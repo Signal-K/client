@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import RoverImageGallery, { RoverImage, RoverImageNoHandle } from "../PlanetData/RandomRoverImage";
 import StructureComponent, { PlacedStructures } from "../Activities/StructureCreate";
 import { SectorStructureOwned } from "../../Inventory/UserOwnedItems";
+import { CreateMenuBar, SectorCircularMenu } from "../../../Core/BottomBar";
 // import SectorStructures from "../Sectors/SectorStructures";
 
 const AddResourceToInventory = ({ resource, sectorId }) => {
@@ -217,9 +218,10 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
                 `}
               </style>
           <div className="h-[80vh] flex flex-col items-center justify-center relative">
-            <h1 className="text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-[-50px] mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-400">
+            <h1 className="mb-10 text-center text-slate-300 text-opacity-100 font-['Inter'] tracking-[3.48px] mt-[-50px] mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white text-gray-400">
               Planet {sectorData?.anomaly}, Sector {id}
-            </h1>
+            </h1><br /><br /><br />
+            <SectorCircularMenu />
             <div className="w-full flex items-center justify-center mb-20 py-10">
               <img
                 // src={coverUrl}
@@ -265,6 +267,7 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
                   {created_at &&
                     new Date(created_at).toLocaleDateString("en-GB")}
                 </div>
+                {/* <CreateMenuBar onUpdatesClick={null} /> */}
               </div>
             </div>
           </div>
