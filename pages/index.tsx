@@ -17,6 +17,7 @@ import { HiBars3 } from 'react-icons/hi2';
 import { BiLogIn } from 'react-icons/bi';
 import { footerNavigation, modules, navigation } from "../components/Public/LandingContent";
 import { UserDropdownMenu, UserMenuItems } from "../components/Section/Navbar";
+import { GardenDashboard } from "../@/components/garden-dashboard";
 
 export const metadata: Metadata = {
   title: "Star Sailors"
@@ -29,6 +30,14 @@ export function PublicLanding () {
   );
   
   const session = useSession();
+
+  if (session) {
+    return (
+      <Layout>
+        <GardenDashboard />
+      </Layout>
+    );
+  };
 
   return (
     <div className="bg-white dark:text-white dark:bg-boxdark-2">

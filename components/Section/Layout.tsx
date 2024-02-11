@@ -26,12 +26,14 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <>
-        <main className="h-max pb-10 grow pt-6">
-          <Navbar />
-          <div className="py-12">
-            {children}
-          </div>
-        </main>
+        {!isMobile && (
+          <main className="h-max pb-10 grow pt-6">
+            <Navbar />
+            <div className="py-12">
+              {children}
+            </div>
+          </main>
+        )}
       {isMobile && (
         <div className="md:hidden overflow-y-auto h-screen p-4">
           <main className="h-max pb-10 grow">{children}</main>
