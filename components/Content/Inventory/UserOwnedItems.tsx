@@ -28,7 +28,8 @@ const OwnedItemsList: React.FC = () => {
             const { data: itemDetailsData, error: itemDetailsError } = await supabase
               .from('inventoryITEMS')
               .select('*')
-              .in('id', itemIds);
+              .in('id', itemIds)
+              .gt('id', 10);
   
             if (itemDetailsError) {
               throw itemDetailsError;
@@ -56,26 +57,30 @@ const OwnedItemsList: React.FC = () => {
       const y = centerY + radius * Math.sin(angle);
       return { x, y };
     };
-  
+    const radius = 150;
+
     return (
-      <div className="relative w-80 h-80 flex flex-col items-center justify-center">
+      <div className="relative w-80 h-80 flex items-center justify-center">
         {itemDetails.map((item, index) => {
-          const { x, y } = calculatePosition(index, itemDetails.length);
+          const angle = (index / itemDetails.length) * 2 * Math.PI;
+          const x = Math.cos(angle) * radius;
+          const y = Math.sin(angle) * radius;
+    
           return (
             <div
               key={item.id}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
-              style={{ top: `${y}px`, left: `${x}px` }}
+              className="absolute flex flex-col items-center justify-center"
+              style={{ top: `calc(50% - ${y}px)`, left: `calc(50% + ${x}px)` }}
             >
               <div className="w-20 h-20 rounded-full overflow-hidden mb-2">
                 <img src={item.icon_url} alt={item.name} className="w-full h-full object-cover" />
               </div>
-              <p className="text-sm">{item.name}</p>
+              <p className="text-xs text-center">{item.name}</p>
             </div>
           );
         })}
       </div>
-      );
+    );    
   };
 
 export default OwnedItemsList;
@@ -155,5 +160,5 @@ export const SectorStructureOwned: React.FC<{ sectorid: string }> = ({ sectorid 
             })}
         </ul>
       </div>
-    )
-}
+    );
+};
