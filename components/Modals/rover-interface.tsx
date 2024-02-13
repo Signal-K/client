@@ -769,4 +769,4 @@ function ZoomOutIcon(props) {
       <line x1="8" x2="14" y1="11" y2="11" />
     </svg>
   )
-}
+};
