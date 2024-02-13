@@ -1,5 +1,6 @@
 import { CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/react/20/solid';
 import React, { useState } from 'react';
+import LightcurveGenerator from './PopulatePlanetData';
 
 export default function ContentPlaceholder(planetIdDeepnote) {
   return (

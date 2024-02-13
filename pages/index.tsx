@@ -65,7 +65,7 @@ export function PublicLanding () {
             >
               <span className='sr-only'>Open main menu</span>
               <HiBars3 className='h-6 w-6' aria-hidden='true' />
-            </button>
+            </button> 
           </div>
           <div className='hidden lg:flex lg:gap-x-12'>
             {navigation.map((item) => (

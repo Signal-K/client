@@ -1,9 +1,7 @@
 import Link from "next/link"
 import { Button } from "./ui/button"
-import { DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem, DropdownMenuContent, DropdownMenu } from "./ui/dropdown-menu";
 import { CardTitle, CardHeader, CardContent, Card } from "./ui/card";
 import { QuickLook } from "../../components/quick-look";
-import { UserMenuItems } from "../../components/Section/Navbar";
 import OwnedItemsList from "../../components/Content/Inventory/UserOwnedItems";
 import { MenuIcon } from "lucide-react";
 
