@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
-const LightcurveGenerator = () => {
+const LightcurveGenerator = ({ planetId }: { planetId: string }) => {
+    const supabase = useSupabaseClient();
+
+    const [planetData, setPlanetData] = useState(null);
     const [ticId, setTicId] = useState('');
     const [imageURL, setImageUrl] = useState('');
 
@@ -17,8 +21,9 @@ const LightcurveGenerator = () => {
             setImageUrl(url);
         } catch (error) {
             console.error(error.message);
-        }
+        };
     };
+    
 
     return (
         <div>

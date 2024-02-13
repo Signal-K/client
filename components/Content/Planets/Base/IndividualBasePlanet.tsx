@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import ContentPlaceholder, { ActivateButton } from "../PlanetData/ContentPlaceholder";
 import Link from "next/link";
+import { LightkurveBaseGraph } from "../PlanetData/ContentPlaceholder";
 
 export function IndividualBasePlanetDesktop({ id }: { id: string }) {
   const router = useRouter();
@@ -21,6 +22,17 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
   
     const [screenWidth, setScreenWidth] = useState<number>(0);
     const [showSidebar, setShowSidebar] = useState<boolean>(true);
+
+    // For handling selection of specific structures and then displaying content
+    const [selectedStructure, setSelectedStructure] = useState(null);
+
+    const handleStructureClick = (structureName) => {
+      setSelectedStructure(structureName);
+    };
+  
+    const handleClosePopup = () => {
+      setSelectedStructure(null);
+    };
   
     useEffect(() => {
       const handleResize = () => {
@@ -264,18 +276,16 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
                       width="50"
                     /> */}
                   </button>
-                  <button className="justify-self-center self-start">
+                  <button
+                    className="justify-self-center self-start"
+                    onClick={() => handleStructureClick("Structure 2")}
+                  >
                     <img
                       alt="Structure 2"
                       className="w-24 h-24"
-                      height="50"
                       src="/assets/Inventory/Structures/Telescope2.png"
-                      style={{
-                        aspectRatio: "50/50",
-                        objectFit: "cover",
-                      }}
-                      width="50"
                     />
+                    <div className="text-center text-white text-opacity-90 text-[27.17px] font-medium font-['Inter']">View planet light curves</div>
                   </button>
                   <button className="justify-self-end self-start">
                     {/* <img
@@ -412,6 +422,19 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
                       </div>
                     </div>
                   </div> */}
+                  {selectedStructure && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-xl z-50">
+            <button
+              className="absolute top-4 right-4 text-gray-600"
+              onClick={handleClosePopup}
+            >
+              Close
+            </button>
+            <LightkurveBaseGraph planetId={selectedStructure} />
+          </div>
+        </div>
+      )}
                 </div>
                 <div className="grid-container mb-24">
   {sectors.map((sector) => (

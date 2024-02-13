@@ -57,8 +57,8 @@ export default function CreatePostForm ( { planetId2 } ) { // category_id
                     ]);
 
                     setPostContent('');
-                }
-            })
+                };
+            });
     };
 
     useEffect(() => {
