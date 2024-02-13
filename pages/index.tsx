@@ -73,6 +73,15 @@ export function PublicLanding() {
     );
   };
 
+  // if (session?.user?.id === 'cebdc7a2-d8af-45b3-b37f-80f328ff54d6' && isTabletOrMobile) {
+  //   return (
+  //     <LayoutNoNav>
+  //       <Navigation />
+  //       <iframe src="https://deta.space/?horizon=sj38ZfjmeF" height='2532px' width='100%' />
+  //     </LayoutNoNav>
+  //   );
+  // };
+
   if (session && profile?.location) {
     return (
       <LayoutNoNav>
@@ -81,7 +90,7 @@ export function PublicLanding() {
            <style jsx global>
              {`
                body {
-                 background: url('https://cdn.cloud.scenario.com/assets/Js2W4fMaSpKGSlVJ-tJEGQ?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9KczJXNGZNYVNwS0dTbFZKLXRKRUdRP3A9MTAwKiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcxMTA2NTU5OX19fV19&Key-Pair-Id=K36FIAB9LE2OLR&Signature=NnOW-bDa-nTqj52gMD9J6p-hsJgQI-naOWJlmenVNg1h3pIoHfbMGw6AZb7Nre2KDIrf~VT9n-ONDY988JWJ1qkQwr4-dr9AL~2iwR6ozPB1AgqSyVTaVCiQtMUBrPgrThLAtJI1Bf-JnbZrGKxUfFyAAAM-84OVd~noSyqF82X-katF5gXn3WMHMNnyc19QxinqfN4n~F73v1hSh6wXmWHdmnMKI44jXunPC2DzAHHyKAGTVLM2~uCA9Nyy6ao556FNr0BzIZB2SsTrEFSsY8TmfZDpZoNcN0GM~Vztsucf~0Uwk0hmwtgNofiLP631fsjuVKnLNCwc~c0K6ucV6Q__') center/cover;
+                 background: url('https://cdn.cloud.scenario.com/assets-transform/FKed9FEBQ1mNn0i1QB1tBw?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy10cmFuc2Zvcm0vRktlZDlGRUJRMW1ObjBpMVFCMXRCdz9wPTEwMCoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MTI1MzQzOTl9fX1dfQ__&Key-Pair-Id=K36FIAB9LE2OLR&Signature=JUKjqO~M456dmof52LL6FHiL2-~WE0ua7LKdmRXEw0n4CILx7A2FuI-PfLN8NMFpXJmQFGpBM30WHKN9C-gaCfZoBDOIue8Ffk8-J8cv5DU0u1qiu7bClXCGIRZK5YC6UjMc68bqlqV-QyvdS0yauG90WzkOQsv2vNSxpeguNW1vBX3z8xxN1G1uG1WmMhMVrtr9PuPZ6Lb1CtuxrXEpA4O5ONdOCKWPuIhSkA7OIKNSmqvhm8~KUxilj0eW8gi4jIztiZZIZHGQasSnSkXStKKCnnm-oIccP1GHzv7H33Rgxkg1Bj~LIoJARdmLAS84HQAenvXW-TD-VsaHr0XBqg__') center/cover;
                }
                
                @media only screen and (max-width: 767px) {
