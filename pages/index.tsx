@@ -22,6 +22,7 @@ import Navigation, {
 import { GardenDashboard } from "../components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
 import UponSignupModal from "../components/Modals/UponSignup";
+import PlanetCharacter from "../components/Content/Assets/PlanetCharacter";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -56,7 +57,7 @@ export function PublicLanding() {
            <style jsx global>
              {`
                body {
-                 background: url('https://cdn.cloud.scenario.com/assets/Js2W4fMaSpKGSlVJ-tJEGQ?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9KczJXNGZNYVNwS0dTbFZKLXRKRUdRP3A9MTAwKiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcxMTA2NTU5OX19fV19&Key-Pair-Id=K36FIAB9LE2OLR&Signature=NnOW-bDa-nTqj52gMD9J6p-hsJgQI-naOWJlmenVNg1h3pIoHfbMGw6AZb7Nre2KDIrf~VT9n-ONDY988JWJ1qkQwr4-dr9AL~2iwR6ozPB1AgqSyVTaVCiQtMUBrPgrThLAtJI1Bf-JnbZrGKxUfFyAAAM-84OVd~noSyqF82X-katF5gXn3WMHMNnyc19QxinqfN4n~F73v1hSh6wXmWHdmnMKI44jXunPC2DzAHHyKAGTVLM2~uCA9Nyy6ao556FNr0BzIZB2SsTrEFSsY8TmfZDpZoNcN0GM~Vztsucf~0Uwk0hmwtgNofiLP631fsjuVKnLNCwc~c0K6ucV6Q__') center/cover;
+                 background: url('garden.png') center/cover;
                }
                
                @media only screen and (max-width: 767px) {
@@ -117,7 +118,8 @@ export function PublicLanding() {
 </div>
 <div className="chat chat-start">
   <div className="chat-bubble">A dust storm is brewing on your home planet, time to investigate.</div>
-</div></div>
+</div>
+<PlanetCharacter /></div>
 {isDesktopOrLaptop && ( <UponSignupModal /> )}
            </div>
            <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
