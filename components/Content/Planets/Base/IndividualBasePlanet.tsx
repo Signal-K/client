@@ -27,8 +27,8 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
     const [selectedStructure, setSelectedStructure] = useState(null);
 
     const handleStructureClick = (structureName) => {
-      setSelectedStructure(structureName);
-    };
+      setSelectedStructure(planetId); // Set selectedStructure to planetId
+    };    
   
     const handleClosePopup = () => {
       setSelectedStructure(null);
@@ -431,7 +431,12 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
             >
               Close
             </button>
-            <LightkurveBaseGraph planetId={selectedStructure} />
+            {!planetData?.lightkurve && (
+              <LightkurveBaseGraph planetId={{ planetId: id }} />
+            )}
+            {planetData?.lightkurve && (
+              <img src={planetData?.lightkurve} />
+            )}
           </div>
         </div>
       )}

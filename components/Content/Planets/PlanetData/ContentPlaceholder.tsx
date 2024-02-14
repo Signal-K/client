@@ -86,10 +86,16 @@ export function ActivateButton(planetIdDeepnote) {
     );
 }
 
-export function LightkurveBaseGraph(planetId) {
+export function LightkurveBaseGraph({ planetId }: { planetId: { planetId: string } }) {
   const supabase = useSupabaseClient();
-
   const [planetData, setPlanetData] = useState(null);
+
+  // Extract the planetId from the object
+  const extractedPlanetId = planetId.planetId;
+
+  useEffect(() => {
+    console.log("planetId:", extractedPlanetId); // Check the value of extractedPlanetId
+  }, [extractedPlanetId]);
 
 // const { content, avatar_url, type, deepnote, cover, temperatureEq, smaxis, mass } = planetData;
 
@@ -104,7 +110,7 @@ export function LightkurveBaseGraph(planetId) {
 
       <div className="text-gray-700">
         <div className="pt-10">
-          <LightcurveGenerator planetId={planetId} />
+          <LightcurveGenerator planetId={extractedPlanetId} />
         </div>
       </div>
       </div>
