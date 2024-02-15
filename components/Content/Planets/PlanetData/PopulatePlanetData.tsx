@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
@@ -9,11 +9,37 @@ const LightcurveGenerator = ({ planetId }: { planetId: string }) => {
     const [ticId, setTicId] = useState('');
     const [imageURL, setImageUrl] = useState('');
 
+    useEffect(() => {
+        // Fetch the planet data from the basePlanets table
+        const fetchPlanetData = async () => {
+          try {
+            const { data, error } = await supabase
+              .from('basePlanets')
+              .select('ticId')
+              .eq('id', parseInt(planetId))
+              .single();
+    
+            if (error) {
+              throw error;
+            }
+    
+            if (data) {
+              // Set the fetched ticId as the default value in the form
+              setTicId(data.ticId);
+            }
+          } catch (error) {
+            console.error('Error fetching planet data:', error.message);
+          }
+        };
+    
+        fetchPlanetData();
+      }, [planetId, supabase]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
     
         try {
-            const response = await axios.post('http://127.0.0.1:5000/generate_lightcurve_image', {
+            const response = await axios.post('https://papyrus-production.up.railway.app/generate_lightcurve_image', {
                 tic_id: ticId,
             }, { responseType: 'arraybuffer' });
             const blob = new Blob([response.data], { type: 'image/png' });
@@ -53,7 +79,7 @@ const LightcurveGenerator = ({ planetId }: { planetId: string }) => {
           <form onSubmit={handleSubmit}>
             <label>
               Enter TIC ID:
-              <input type="text" value={ticId} onChange={(e) => setTicId(e.target.value)} />
+              <input type="text" value={ticId} onChange={(e) => setTicId(e.target.value)} readOnly/>
             </label>
             <button type="submit">Generate Lightcurve Image</button>
           </form>
