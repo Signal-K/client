@@ -22,6 +22,7 @@ import Navigation, {
 import { GardenDashboard } from "../components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
 import UponSignupModal from "../components/Modals/UponSignup";
+import { OnboardingWindows } from "../components/Gameplay/onboarding";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -90,7 +91,7 @@ export function PublicLanding() {
            <style jsx global>
              {`
                body {
-                 background: url('https://cdn.cloud.scenario.com/assets-transform/FKed9FEBQ1mNn0i1QB1tBw?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy10cmFuc2Zvcm0vRktlZDlGRUJRMW1ObjBpMVFCMXRCdz9wPTEwMCoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MTI1MzQzOTl9fX1dfQ__&Key-Pair-Id=K36FIAB9LE2OLR&Signature=JUKjqO~M456dmof52LL6FHiL2-~WE0ua7LKdmRXEw0n4CILx7A2FuI-PfLN8NMFpXJmQFGpBM30WHKN9C-gaCfZoBDOIue8Ffk8-J8cv5DU0u1qiu7bClXCGIRZK5YC6UjMc68bqlqV-QyvdS0yauG90WzkOQsv2vNSxpeguNW1vBX3z8xxN1G1uG1WmMhMVrtr9PuPZ6Lb1CtuxrXEpA4O5ONdOCKWPuIhSkA7OIKNSmqvhm8~KUxilj0eW8gi4jIztiZZIZHGQasSnSkXStKKCnnm-oIccP1GHzv7H33Rgxkg1Bj~LIoJARdmLAS84HQAenvXW-TD-VsaHr0XBqg__') center/cover;
+                 background: url('Ice.png') center/cover;
                }
                
                @media only screen and (max-width: 767px) {
@@ -141,19 +142,7 @@ export function PublicLanding() {
                )}
              </div>
            </div>
-           <div className="chat-container">
-           <div className="mx-20 mt-20">
-           <div className="chat chat-start mt-20 justify-left mt-20">
-  <div className="chat-bubble">You need to pick a planet!</div>
-</div>
-<div className="chat chat-end">
-  <div className="chat-bubble">You've got 5 new deposits to explore</div>
-</div>
-<div className="chat chat-start">
-  <div className="chat-bubble">A dust storm is brewing on your home planet, time to investigate.</div>
-</div></div>
-{isDesktopOrLaptop && ( <UponSignupModal /> )}
-           </div>
+                <OnboardingWindows />
            <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
              {/* Content here */}
            </div>
