@@ -1,8 +1,14 @@
+import { useState } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 
 export function OnboardingWindows() {
   const session = useSession();
+  const [expandedSection, setExpandedSection] = useState(null);
+
+  const toggleSection = (section) => {
+    setExpandedSection((prevSection) => (prevSection === section ? null : section));
+  };
 
   return (
     <div className="w-full">
@@ -57,92 +63,73 @@ export function OnboardingWindows() {
                 className="flex items-center space-x-2 font-medium rounded-md bg-gray-100 px-3 py-2.5 transition-colors hover:bg-gray-200 dark:hover:bg-gray-50"
                 href="#"
               >
-                <SettingsIcon className="w-4 h-4" />
-                Settings
+                <SectorsIcon className="w-4 h-4" />
+                Sectors
+              </Link>
+              <Link
+                className="flex items-center space-x-2 font-medium rounded-md bg-gray-100 px-3 py-2.5 transition-colors hover:bg-gray-200 dark:hover:bg-gray-50"
+                href="#"
+              >
+                <StructuresIcon className="w-4 h-4" />
+                Structures
               </Link>
             </nav>
           </div>
-          {/* <div className="flex flex-col gap-4 col-span-12 lg:col-span-9">
+          <div className="flex flex-col gap-4 col-span-12 lg:col-span-9">
             <div className="grid gap-4">
               <div className="rounded-xl border aspect-video overflow-hidden">
                 <span className="object-cover w-full h-full rounded-md bg-muted" />
               </div>
               <div className="grid gap-4 grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
-                <div className="rounded-xl border aspect-image overflow-hidden">
-                  <img
-                    alt="Image"
-                    className="object-cover w-full h-full"
-                    height="600"
-                    src="/placeholder.svg"
-                    style={{
-                      aspectRatio: "800/600",
-                      objectFit: "cover",
-                    }}
-                    width="800"
-                  />
-                </div>
-                <div className="rounded-xl border aspect-image overflow-hidden">
-                  <img
-                    alt="Image"
-                    className="object-cover w-full h-full"
-                    height="600"
-                    src="/placeholder.svg"
-                    style={{
-                      aspectRatio: "800/600",
-                      objectFit: "cover",
-                    }}
-                    width="800"
-                  />
-                </div>
-                <div className="rounded-xl border aspect-image overflow-hidden">
-                  <img
-                    alt="Image"
-                    className="object-cover w-full h-full"
-                    height="600"
-                    src="/placeholder.svg"
-                    style={{
-                      aspectRatio: "800/600",
-                      objectFit: "cover",
-                    }}
-                    width="800"
-                  />
-                </div>
+                {Array.from({ length: 6 }, (_, index) => (
+                  <div
+                    key={index}
+                    className={`rounded-xl border aspect-image overflow-hidden cursor-pointer ${
+                      expandedSection === index ? "col-span-2" : "col-span-1"
+                    }`}
+                    onClick={() => toggleSection(index)}
+                  >
+                    {expandedSection === index && (
+                      <>
+                        <img
+                          alt="Image"
+                          className="object-cover w-full h-full"
+                          height="600"
+                          src="/placeholder.svg"
+                          style={{
+                            aspectRatio: "800/600",
+                            objectFit: "cover",
+                          }}
+                          width="800"
+                        />
+                        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+                          <p className="text-white font-bold text-lg">Expanded Section {index + 1}</p>
+                        </div>
+                      </>
+                    )}
+                    {!expandedSection && (
+                      <img
+                        alt="Image"
+                        className="object-cover w-full h-full"
+                        height="600"
+                        src="/placeholder.svg"
+                        style={{
+                          aspectRatio: "800/600",
+                          objectFit: "cover",
+                        }}
+                        width="800"
+                      />
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="grid gap-4">
-              <div className="rounded-xl border aspect-image overflow-hidden">
-                <img
-                  alt="Image"
-                  className="object-cover w-full h-full"
-                  height="600"
-                  src="/placeholder.svg"
-                  style={{
-                    aspectRatio: "800/600",
-                    objectFit: "cover",
-                  }}
-                  width="800"
-                />
-              </div>
-              <div className="rounded-xl border aspect-image overflow-hidden">
-                <img
-                  alt="Image"
-                  className="object-cover w-full h-full"
-                  height="600"
-                  src="/placeholder.svg"
-                  style={{
-                    aspectRatio: "800/600",
-                    objectFit: "cover",
-                  }}
-                  width="800"
-                />
-              </div>
-            </div>
-          </div> */}
+          </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
 function HomeIcon(props) {
   return (
@@ -161,9 +148,8 @@ function HomeIcon(props) {
       <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
       <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
-  )
+  );
 }
-
 
 function GoalIcon(props) {
   return (
@@ -183,9 +169,8 @@ function GoalIcon(props) {
       <path d="M20.55 10.23A9 9 0 1 1 8 4.94" />
       <path d="M8 10a5 5 0 1 0 8.9 2.02" />
     </svg>
-  )
+  );
 }
-
 
 function WarehouseIcon(props) {
   return (
@@ -206,9 +191,8 @@ function WarehouseIcon(props) {
       <path d="M6 14h12" />
       <rect width="12" height="12" x="6" y="10" />
     </svg>
-  )
+  );
 }
-
 
 function BotIcon(props) {
   return (
@@ -231,11 +215,10 @@ function BotIcon(props) {
       <path d="M15 13v2" />
       <path d="M9 13v2" />
     </svg>
-  )
+  );
 }
 
-
-function SettingsIcon(props) {
+function SectorsIcon(props) {
   return (
     <svg
       {...props}
@@ -249,8 +232,28 @@ function SettingsIcon(props) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-      <circle cx="12" cy="12" r="3" />
+      <path d="M21 3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h18z" />
+      <path d="M10 9h4v6h-4z" />
+      <path d="M7 13h10" />
     </svg>
-  )
+  );
 }
+
+function StructuresIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 4a1 1 0 0 1 1 1v12a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1zM18 4a1 1 0 0 1 1 1v12a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1zM6 4a1 1 0 0 1 1 1v12a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1z" />
+    </svg>
+  );
+};

@@ -91,7 +91,7 @@ export function PublicLanding() {
            <style jsx global>
              {`
                body {
-                 background: url('Ice.png') center/cover;
+                 background: url('Waterdrop.jpg') center/cover;
                }
                
                @media only screen and (max-width: 767px) {
