@@ -14,5 +14,7 @@ function CreatePlanetSectorComponent ({ planetId }) {
 
         // Generate random mineral deposits - will later be set in db
         const depsitCount = Math.floor(Math.random() * 5);
-    }
-}
+    };
+};
+
+// Appears to be the starting point for a function...

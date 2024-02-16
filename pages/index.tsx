@@ -8,6 +8,7 @@ import Login from "./login";
 
 import styles from '../styles/Landing.module.css';
 import { Metadata } from "next";
+import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 
 // Imports for new landing (public-facing)
 import { Dialog } from "@headlessui/react";

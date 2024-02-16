@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Star Sailors</string>
+    <string name="title_activity_main">Star Sailors</string>
+    <string name="package_name">space.starsailors.app</string>
+    <string name="custom_url_scheme">space.starsailors.app</string>
+</resources>

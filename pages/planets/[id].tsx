@@ -11,6 +11,7 @@ import Navbar from "../../components/Section/Navbar";
 import IndividualBasePlanetGrid from "../../components/Content/Planets/PlanetData/ContentGrid";
 import { CreateBar } from "../../components/Core/BottomBar";
 import RoverImageGallery from "../../components/Content/Planets/PlanetData/RandomRoverImage";
+import StructureComponent from "../../components/Content/Planets/Activities/StructureCreate";
 
 export default function PlanetIdPage () {
     const router = useRouter();
