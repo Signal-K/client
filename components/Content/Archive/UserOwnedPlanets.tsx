@@ -13,7 +13,7 @@ interface Planet {
     avatar_url: string;
 };
 
-const OwnedPlanetsList: React.FC = () => {
+const OwnedPlanetsList: React.FC = () => { 
     const supabase = useSupabaseClient();
     const session = useSession();
     

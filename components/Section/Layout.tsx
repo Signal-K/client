@@ -2,7 +2,6 @@ import Sidebar, { DesktopSidebar } from "./Sidebar";
 import Navbar from "./Navbar";
 import React, { ReactNode, useEffect, useState } from "react";
 import Bottombar from "../Core/BottomBar";
-import { InventoryMenu } from "../Content/Inventory/ItemGroup";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -100,7 +99,6 @@ export const InventoryLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
     <>
       <main className="h-max pb-10 grow pt-6">
         <Navbar />
-        <div className="py-8"><center><div className="py-12"><InventoryMenu setActiveTab={setActiveTab} /></div></center></div>
         <div className="py-12">
           {children}
         </div>

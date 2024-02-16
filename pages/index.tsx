@@ -1,6 +1,5 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
-import CoreLayout from "../components/Core/Layout";
 import Layout, { LandingLayout } from "../components/Section/Layout";
 import CardForum from "../components/Content/DiscussCard";
 import { useRouter } from "next/router";

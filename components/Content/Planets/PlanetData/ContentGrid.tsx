@@ -9,4 +9,4 @@ export default function IndividualBasePlanetGrid(planetId) {
             <div><ClassificationFeedForIndividualPlanet planetId={{ id: planetId as string }} /> </div>
         </div>
     );
-};
+}; 

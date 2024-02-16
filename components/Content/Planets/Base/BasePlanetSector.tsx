@@ -2,7 +2,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import RoverImageGallery, { RoverImage, RoverImageNoHandle } from "../PlanetData/RandomRoverImage";
-import StructureComponent, { PlacedStructures } from "../Activities/StructureCreate";
+import StructureComponent, { PlacedStructures } from "../Sectors/StructureCreate";
 import { SectorStructureOwned } from "../../Inventory/UserOwnedItems";
 // import { CreateMenuBar, SectorCircularMenu } from "../../../Core/BottomBar";
 
