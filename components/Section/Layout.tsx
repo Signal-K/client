@@ -4,7 +4,7 @@ import Bottombar from "../Core/BottomBar";
 
 interface DashboardLayoutProps {
   children: ReactNode;
-}
+}; 
 
 const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);

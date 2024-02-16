@@ -1,7 +1,7 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Section/Layout";
-import ClassificationFeed, { ClassificationFeedDemo } from "../../components/Content/ClassificationFeed";
+import ClassificationFeed from "../../components/Content/ClassificationFeed";
 import Login from "../login";
 
 export default function Home() {

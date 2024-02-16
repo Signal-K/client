@@ -173,7 +173,7 @@ export function RoverContentCard({
         </div>
         {media?.length > 0 && (
           <div className="mb-4">
-            <div key={media}><img src={media} className="w-full h-48 object-cover rounded-md" /></div>
+            <div key={media}><img src={media} className="w-full h-48 object-cover rounded-md" /></div> 
           </div>
         )} {/* Comment/action section */}
       </div>
