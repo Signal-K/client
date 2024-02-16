@@ -1,151 +1,96 @@
 import { useState } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
 import Link from "next/link";
+import { InventoryBlock } from "../dashboard-logs";
 
 export function OnboardingWindows() {
   const session = useSession();
-  const [expandedSection, setExpandedSection] = useState(null);
-
-  const toggleSection = (section) => {
-    setExpandedSection((prevSection) => (prevSection === section ? null : section));
-  };
 
   return (
     <div className="w-full">
       <div className="container px-4 md:px-6">
-        <div className="grid max-w-6xl grid-cols-12 items-start gap-4 min-h-[calc(100vh-1px)] py-6 mx-auto">
-          <div className="space-y-4 col-span-12 lg:col-span-3">
-            <div className="flex items-center space-x-3">
-              <div className="h-8 w-8 overflow-hidden rounded-xl">
-                <img
-                  alt="Avatar"
-                  className="rounded-full aspect-square"
-                  height="32"
-                  src="/placeholder.svg"
-                  width="32"
-                />
+        <div className="grid max-w-6xl grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start min-h-[calc(100vh-1px)] py-6 mx-auto">
+          {Array.from({ length: 6 }, (_, index) => (
+            <div key={index} className="collapse bg-base-200">
+              <input type="radio" name="my-accordion-1" id={`accordion-${index}`} />
+              <div className="collapse-title text-xl font-medium flex items-center space-x-2">
+                {getAccordionIcon(index)}
+                <span>{getAccordionTitle(index)}</span>
               </div>
-              <div className="space-y-0.5">
-                <h1 className="text-xl font-bold tracking-wide">Welcome, Citizen!</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400">ID: {session?.user?.id}</p>
+              <div className="collapse-content">
+                {getAccordionContent(index)}
               </div>
             </div>
-            <nav className="space-y-2 grid grid-cols-3 md:grid-cols-1 lg:grid-cols-3 gap-4">
-              <Link
-                className="flex items-center space-x-2 font-medium rounded-md bg-gray-100 px-3 py-2.5 transition-colors hover:bg-gray-200 dark:hover:bg-gray-50"
-                href="#"
-              >
-                <HomeIcon className="w-4 h-4" />
-                Home
-              </Link>
-              <Link
-                className="flex items-center space-x-2 font-medium rounded-md bg-gray-100 px-3 py-2.5 transition-colors hover:bg-gray-200 dark:hover:bg-gray-50"
-                href="#"
-              >
-                <GoalIcon className="w-4 h-4" />
-                Missions
-              </Link>
-              <Link
-                className="flex items-center space-x-2 font-medium rounded-md bg-gray-100 px-3 py-2.5 transition-colors hover:bg-gray-200 dark:hover:bg-gray-50"
-                href="#"
-              >
-                <WarehouseIcon className="w-4 h-4" />
-                Inventory
-              </Link>
-              <Link
-                className="flex items-center space-x-2 font-medium rounded-md bg-gray-100 px-3 py-2.5 transition-colors hover:bg-gray-200 dark:hover:bg-gray-50"
-                href="#"
-              >
-                <BotIcon className="w-4 h-4" />
-                Automations
-              </Link>
-              <Link
-                className="flex items-center space-x-2 font-medium rounded-md bg-gray-100 px-3 py-2.5 transition-colors hover:bg-gray-200 dark:hover:bg-gray-50"
-                href="#"
-              >
-                <SectorsIcon className="w-4 h-4" />
-                Sectors
-              </Link>
-              <Link
-                className="flex items-center space-x-2 font-medium rounded-md bg-gray-100 px-3 py-2.5 transition-colors hover:bg-gray-200 dark:hover:bg-gray-50"
-                href="#"
-              >
-                <StructuresIcon className="w-4 h-4" />
-                Structures
-              </Link>
-            </nav>
-          </div>
-          <div className="flex flex-col gap-4 col-span-12 lg:col-span-9">
-            <div className="grid gap-4">
-              <div className="rounded-xl border aspect-video overflow-hidden">
-                <span className="object-cover w-full h-full rounded-md bg-muted" />
-              </div>
-              <div className="grid gap-4 grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
-                {Array.from({ length: 6 }, (_, index) => (
-                  <div
-                    key={index}
-                    className={`rounded-xl border aspect-image overflow-hidden cursor-pointer ${
-                      expandedSection === index ? "col-span-2" : "col-span-1"
-                    }`}
-                    onClick={() => toggleSection(index)}
-                  >
-                    {expandedSection === index && (
-                      <>
-                        <img
-                          alt="Image"
-                          className="object-cover w-full h-full"
-                          height="600"
-                          src="/placeholder.svg"
-                          style={{
-                            aspectRatio: "800/600",
-                            objectFit: "cover",
-                          }}
-                          width="800"
-                        />
-                        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
-                          <p className="text-white font-bold text-lg">Expanded Section {index + 1}</p>
-                        </div>
-                      </>
-                    )}
-                    {!expandedSection && (
-                      <img
-                        alt="Image"
-                        className="object-cover w-full h-full"
-                        height="600"
-                        src="/placeholder.svg"
-                        style={{
-                          aspectRatio: "800/600",
-                          objectFit: "cover",
-                        }}
-                        width="800"
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
+function getAccordionIcon(index) {
+  switch (index) {
+    case 0:
+      return <HomeIcon className="w-6 h-6" />;
+    case 1:
+      return <GoalIcon className="w-6 h-6" />;
+    case 2:
+      return <WarehouseIcon className="w-6 h-6" />;
+    case 3:
+      return <BotIcon className="w-6 h-6" />;
+    case 4:
+      return <SettingsIcon className="w-6 h-6" />;
+    case 5:
+      return <SectorsIcon className="w-6 h-6" />;
+    default:
+      return null;
+  }
+}
+
+function getAccordionTitle(index) {
+  switch (index) {
+    case 0:
+      return "Section 1 Title";
+    case 1:
+      return "Section 2 Title";
+    case 2:
+      return "Inventory";
+    case 3:
+      return "Section 4 Title";
+    case 4:
+      return "Section 5 Title";
+    case 5:
+      return "Section 6 Title";
+    default:
+      return null;
+  }
+}
+
+function getAccordionContent(index) {
+  switch (index) {
+    case 0:
+      return <p>Content for Section 1</p>;
+    case 1:
+      return <p>Content for Section 2</p>;
+    case 2:
+      return (
+        <InventoryBlock />
+      );
+    case 3:
+      return <p>Content for Section 4</p>;
+    case 4:
+      return <p>Content for Section 5</p>;
+    case 5:
+      return <p>Content for Section 6</p>;
+    default:
+      return null;
+  }
+}
+
 function HomeIcon(props) {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
       <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
   );
@@ -153,18 +98,7 @@ function HomeIcon(props) {
 
 function GoalIcon(props) {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 13V2l8 4-8 4" />
       <path d="M20.55 10.23A9 9 0 1 1 8 4.94" />
       <path d="M8 10a5 5 0 1 0 8.9 2.02" />
@@ -174,18 +108,7 @@ function GoalIcon(props) {
 
 function WarehouseIcon(props) {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z" />
       <path d="M6 18h12" />
       <path d="M6 14h12" />
@@ -196,18 +119,7 @@ function WarehouseIcon(props) {
 
 function BotIcon(props) {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 8V4H8" />
       <rect width="16" height="12" x="4" y="8" rx="2" />
       <path d="M2 14h2" />
@@ -218,42 +130,21 @@ function BotIcon(props) {
   );
 }
 
-function SectorsIcon(props) {
+function SettingsIcon(props) {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21 3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h18z" />
-      <path d="M10 9h4v6h-4z" />
-      <path d="M7 13h10" />
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
 
-function StructuresIcon(props) {
+function SectorsIcon(props) {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 4a1 1 0 0 1 1 1v12a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1zM18 4a1 1 0 0 1 1 1v12a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1zM6 4a1 1 0 0 1 1 1v12a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1z" />
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="16" />
+      <line x1="8" y1="12" x2="16" y2="12" />
     </svg>
   );
-};
+}
