@@ -50,17 +50,17 @@ const OwnedItemsList: React.FC = () => {
     // Function to calculate the position of each item around the circle
     const calculatePosition = (index: number, totalItems: number) => {
       const angle = (index / totalItems) * 360;
-      const radius = 125; // Adjust as needed
-      const centerX = 175; // Adjust as needed
+      const radius = 15; // Adjust as needed
+      const centerX = 15; // Adjust as needed
       const centerY = 175; // Adjust as needed
       const x = centerX + radius * Math.cos(angle);
       const y = centerY + radius * Math.sin(angle);
       return { x, y };
     };
-    const radius = 150;
+    const radius = 100;
 
     return (
-      <div className="relative w-80 h-80 flex items-center justify-center">
+      <div className="relative w-80 h-80 flex -mx-20">
         {itemDetails.map((item, index) => {
           const angle = (index / itemDetails.length) * 2 * Math.PI;
           const x = Math.cos(angle) * radius;

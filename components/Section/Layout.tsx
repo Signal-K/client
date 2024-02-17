@@ -44,39 +44,6 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
 export default Layout;
 
-export const LandingLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {     // Check if window is defined before accessing it
-    if (typeof window !== "undefined") {
-      const checkIsMobile = () => {
-        setIsMobile(window.innerWidth <= 768);
-      };
-      checkIsMobile();
-      window.addEventListener("resize", checkIsMobile);
-      return () => {
-        window.removeEventListener("resize", checkIsMobile);
-      };
-    }
-  }, []);
-
-  return (
-    <>
-        <main className="h-max pb-10 grow pt-6">
-          <div className="py-12">
-            {children}
-          </div>
-        </main>
-      {isMobile && (
-        <div className="md:hidden overflow-y-auto h-screen p-4">
-          <main className="h-max pb-10 grow">{children}</main>
-          {/* <Bottombar /> */}
-        </div>
-      )}
-    </>
-  );
-};
-
 export const InventoryLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [activeTab, setActiveTab] = useState('consumables')
@@ -133,11 +100,11 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
       <main className="h-max pb-10 grow overflow-y-auto">
         {children}
       </main>
-      {isMobile && (
+      {/* {isMobile && (
         <div className="w-full md:hidden fixed bottom-0 left-0 z-50">
           <Bottombar />
         </div>
-      )}
+      )} */}
     </div>
   );
 };

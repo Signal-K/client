@@ -1,22 +1,18 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
-import Layout, { LandingLayout } from "../components/Section/Layout";
-import CardForum from "../components/Content/DiscussCard";
+import Layout, { LayoutNoNav } from "../components/Section/Layout";
 import { useRouter } from "next/router";
-import Login from "./login";
 
-import styles from '../styles/Landing.module.css';
 import { Metadata } from "next";
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 
 // Imports for new landing (public-facing)
 import { Dialog } from "@headlessui/react";
 import { AiFillCloseCircle } from 'react-icons/ai';
 import { HiBars3 } from 'react-icons/hi2';
-import { BiLogIn } from 'react-icons/bi';
 import { footerNavigation, modules, navigation } from "../components/Public/LandingContent";
 import { UserDropdownMenu, UserMenuItems } from "../components/Section/Navbar";
 import { GardenDashboard } from "../@/components/garden-dashboard";
+import FeedOverlay from "../components/Overlays/1-Feed";
 
 export const metadata: Metadata = {
   title: "Star Sailors"
@@ -30,11 +26,46 @@ export function PublicLanding () {
   
   const session = useSession();
 
+  // Component context
+  const [showFeedOverlay, setShowFeedOverlay] = useState(false);
+  const handleOpenFeedOverlay = () => {
+    setShowFeedOverlay(true);
+  };
+
   if (session) {
     return (
-      <Layout>
-        <GardenDashboard />
-      </Layout>
+      <LayoutNoNav>
+            <div className="flex-col justify-center">
+                    <style jsx global>
+                {`
+                  body {
+                    background: url('/assets/Onboarding/Bg.png') center/cover;
+                  }
+                  
+                  @media only screen and (max-width: 767px) {
+                    .planet-heading {
+                      color: white;
+                      font-size: 24px;
+                      text-align: center;
+                      margin-bottom: 10px;
+                    }
+                  }
+                `}
+              </style>
+        <button onClick={handleOpenFeedOverlay} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+          Open Feed
+        </button>
+        <div className="mt-20">
+          {showFeedOverlay &&
+            <>
+              <div className="mt-20">
+                <FeedOverlay onClose={() => setShowFeedOverlay(false)} />
+              </div>
+            </>
+          }
+        </div>
+        </div>
+      </LayoutNoNav>
     );
   };
 
@@ -446,24 +477,6 @@ export default function Home() {
     }
 
     const userId = session?.user?.id;
-
-    // useEffect(() => {
-    //     if (session) {
-    //         router.push('/feed');
-    //     }
-    // }, [session, router]);
-
-    // if (session) {
-    // return (
-    //   <LandingLayout>
-    //     {/* {userId} */}
-    //     <div className="flex flex-col gap-4">
-    //       <PublicLanding />
-    //     </div>
-    //   </LandingLayout>
-    //     // <CoreLayout>
-    //   )
-    // }
 
     return (
       <PublicLanding />
