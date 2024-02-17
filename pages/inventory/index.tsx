@@ -1,12 +1,11 @@
 import React from "react";
-import InventoryItemsGroup, { EquippedToolItems, InventoryMenu, OwnedToolItems, SelectedItem, UserBackpackInventory } from "../../components/Content/Inventory/ItemGroup";
 import Layout, { InventoryLayout } from "../../components/Section/Layout";
 
 export default function Inventory() {
     return (
       <InventoryLayout>
         <div className="grid grid-cols-6 gap-2 px-5">
-          <div className="col-span-2 px-5"><SelectedItem /></div>
+          {/* <div className="col-span-2 px-5"><SelectedItem /></div> */}
           <div className="col-span-4 px-2"><div className="w-[526px] h-[664px] px-[31px] py-[17px] bg-neutral-700 justify-center items-center gap-[46px] inline-flex">
     <div className="h-[630px] justify-between items-center flex">
         <div className="p-3 flex-col justify-center items-center gap-2.5 inline-flex">
@@ -63,9 +62,9 @@ export default function Inventory() {
         </div>
     </div>
 </div></div>
-          <OwnedToolItems />
+          {/* <OwnedToolItems /> */}
         </div>
-        <EquippedToolItems />
+        {/* <EquippedToolItems /> */}
       </InventoryLayout>
     );
 };  

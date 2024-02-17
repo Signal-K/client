@@ -6,7 +6,7 @@ interface Spaceship {
     name: string;
     image: string;
     hp: number;
-    speed: number;
+    speed: number; 
     attack: number;
     state: string;
     current_planet: string;
