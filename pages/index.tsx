@@ -10,9 +10,11 @@ import { Dialog } from "@headlessui/react";
 import { AiFillCloseCircle } from 'react-icons/ai';
 import { HiBars3 } from 'react-icons/hi2';
 import { footerNavigation, modules, navigation } from "../components/Public/LandingContent";
-import { UserDropdownMenu, UserMenuItems } from "../components/Section/Navbar";
+import Navigation, { UserDropdownMenu, UserMenuItems } from "../components/Section/Navbar";
 import { GardenDashboard } from "../@/components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
+import Link from "next/link";
+import { Garden } from "../components/Content/Planets/GalleryList";
 
 export const metadata: Metadata = {
   title: "Star Sailors"
@@ -31,15 +33,20 @@ export function PublicLanding () {
   const handleOpenFeedOverlay = () => {
     setShowFeedOverlay(true);
   };
+  const [showGalaxy, setShowGalaxy] = useState(false);
+  const handleOpenGalaxy = () => {
+    setShowGalaxy(true);
+  };
 
   if (session) {
     return (
       <LayoutNoNav>
+        <Navigation />
             <div className="flex-col justify-center">
                     <style jsx global>
                 {`
                   body {
-                    background: url('/assets/Onboarding/Bg.png') center/cover;
+                    background: url('https://cdn.cloud.scenario.com/assets/BSXy5zJiRPOpGcXtRag4iw?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9CU1h5NXpKaVJQT3BHY1h0UmFnNGl3P3A9MTAwKiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcxMTA2NTU5OX19fV19&Key-Pair-Id=K36FIAB9LE2OLR&Signature=UDVMN9uYrYFPsb797q2-gwxWdVAxesYZ2ReYqaoOiv37SGTJZ24JEIDzBfK-gU0TtWx8-r3a75eiBaoIdC~KImfEOQD8wEhGrFCy9ZyvEwtltfFUUFHX46bkXgc61V~8FN7Qgowa143JQW5uEmVaUc1BYw7m1Ys6Xh1ad8DzY2tWEQ3Su6VJxzdOmfsTfA8f8drHxGPi5xn6sUuGzDLwDastQD942B7~2I405eqZ~iesFG-OeyrxCGXkeDgTV5DEusipkh69NXLH3Cai11pWUS2e3Md5pbLGq-Ax5ZOUoJeyVpxpNMYX6k5KAwo22bgmoeONKBpROJIdv7dojPpVBA__') center/cover;
                   }
                   
                   @media only screen and (max-width: 767px) {
@@ -52,9 +59,50 @@ export function PublicLanding () {
                   }
                 `}
               </style>
-        <button onClick={handleOpenFeedOverlay} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-          Open Feed
-        </button>
+        <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
+                  <button className="justify-self-start self-start">
+                  </button>
+                  <Link href="/planets/2" legacyBehavior><button
+                    className="justify-self-center self-start"
+                  >
+                    <img
+                      alt="Structure 2"
+                      className="w-48 h-48"
+                      src="https://github.com/Signal-K/client/blob/initialClassification/public/assets/Inventory/Planets/Europa.png?raw=true"
+                    />
+                  </button></Link>
+                  <button className="justify-self-end self-start">
+                  </button>
+                  <button className="justify-self-start self-center">
+                    <img
+                      alt="Structure 4"
+                      className="w-32 h-32"
+                      height="50"
+                      src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png"
+                      style={{
+                        aspectRatio: "50/50",
+                        objectFit: "cover",
+                      }}
+                      width="50"
+                    />
+                  </button>
+                  <button className="justify-self-center self-center">
+                  </button>
+                  <button className="justify-self-end self-center">
+                  </button>
+                  <button className="justify-self-start self-end">
+                  </button>
+                  <button className="justify-self-center self-end">
+                  <button onClick={handleOpenFeedOverlay} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+                    Open Feed
+                  </button>
+                  <button onClick={handleOpenGalaxy} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+                    Open Galaxy
+                  </button>
+                  </button>
+                  <button className="justify-self-end self-end">
+                  </button>
+                </div>
         <div className="mt-20">
           {showFeedOverlay &&
             <>
@@ -63,6 +111,15 @@ export function PublicLanding () {
               </div>
             </>
           }
+          <div className="mt-20">
+          {showGalaxy &&
+            <>
+              <div className="mt-20">
+                <Garden onClose={() => setShowFeedOverlay(false)} />
+              </div>
+            </>
+          }
+          </div>
         </div>
         </div>
       </LayoutNoNav>

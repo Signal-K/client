@@ -69,7 +69,7 @@ const OwnedItemsList: React.FC = () => {
           return (
             <div
               key={item.id}
-              className="absolute flex flex-col items-center justify-center"
+              className="absolute flex flex-col items-center justify-center -mx-10 pb-3"
               style={{ top: `calc(50% - ${y}px)`, left: `calc(50% + ${x}px)` }}
             >
               <div className="w-20 h-20 rounded-full overflow-hidden mb-2">

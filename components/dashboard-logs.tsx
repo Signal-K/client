@@ -1,5 +1,22 @@
+import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { CardTitle, CardHeader, CardContent, Card } from "../@/components/ui/card";
 import OwnedItemsList from "./Content/Inventory/UserOwnedItems";
+
+export function InventoryBlock() {
+  return (
+    <Card>
+        <CardHeader className="flex flex-row items-center gap-4">
+          <ShoppingBagIcon className="w-8 h-8" />
+          <CardTitle>Inventory</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 mx-20 mb-6 -mt-12">
+            <OwnedItemsList />
+          </div>
+        </CardContent>
+      </Card>
+  );
+};
 
 export function DashboardLogs() {
   return (

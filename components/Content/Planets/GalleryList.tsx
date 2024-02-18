@@ -105,7 +105,85 @@ export default function PlanetGallery() {
       ))}
     </>
   );
-}
+};
+
+const PlanetGalleryWithSectors: React.FC = () => {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const [planets, setPlanets] = useState<Planet[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    getPlanets();
+  }, [session]);
+
+  const getPlanets = async (): Promise<void> => {
+    try {
+      let query = supabase
+        .from('basePlanets')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(200);
+
+      const { data, error } = await query;
+
+      if (data != null) {
+        setPlanets(data);
+      }
+
+      if (error) {
+        throw error;
+      }
+
+      setLoading(false);
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
+  if (!session) {
+    return <Login />;
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {planets.map((planet) => (
+        <Link legacyBehavior key={planet.id} href={`/planets/${planet.id}`}>
+          <a className="sector-link">
+            <div className="sector-square" style={{ backgroundImage: `url(${planet.avatar_url})` }} />
+          </a>
+        </Link>
+      ))}
+      <style jsx>{`
+        .grid-container {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          grid-auto-rows: 1fr;
+          gap: 10px;
+          margin-top: 20px;
+          position: absolute;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1;
+        }
+
+        .sector-square {
+          width: 100px;
+          height: 100px;
+          border: 1px solid white;
+          background-size: cover;
+          background-position: center;
+        }
+      `}</style>
+    </div>
+  );
+};
+
 
 export function ArchivedPlanetGallery() {
   const supabase = useSupabaseClient();
@@ -172,14 +250,38 @@ export function ArchivedPlanetGallery() {
   );
 }
 
-export const Garden: React.FC = () => {
+interface GardenProps {
+  onClose: () => void;
+}
+
+export const Garden: React.FC<GardenProps> = ({ onClose }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Open the overlay when it mounts
+  useEffect(() => {
+    setIsOpen(true);
+  }, []);
+
+  // Close the overlay when the close button is clicked
+  const handleClose = () => {
+    setIsOpen(false);
+    setTimeout(() => onClose(), 300); // Call onClose after the animation completes (300ms)
+  };
+
   return (
-    <>
-      <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-screen flex items-center justify-center relative">
-        {/* <GardenSidebar /> */}
-        <PlanetGallery />
+    <div className={`fixed inset-x-0 bottom-0 flex justify-center transition-transform duration-300 ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}>
+      <div className="bg-cover bg-center w-full sm:max-w-screen-lg sm:w-full max-h-96vh overflow-y-auto shadow-lg relative rounded-t-3xl">
+        <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-96vh flex items-center justify-center relative rounded-t-3xl">
+          <button
+            onClick={handleClose}
+            className="absolute top-4 right-4 px-4 py-2 bg-gray-200 text-gray-800 rounded"
+          >
+            Close
+          </button>
+          <PlanetGalleryWithSectors />
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

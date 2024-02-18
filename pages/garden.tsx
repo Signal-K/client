@@ -8,7 +8,9 @@ export default function GardenPage() {
     return (
         <LayoutNoNav>
             {/* <Navbar /> */}
-            <Garden />
+            <Garden onClose={function (): void {
+                throw new Error("Function not implemented.");
+            } } />
         </LayoutNoNav>
     )
 }

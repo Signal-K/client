@@ -5,7 +5,7 @@ import ContentPlaceholder, { ActivateButton } from "../PlanetData/ContentPlaceho
 import Link from "next/link";
 import { LightkurveBaseGraph } from "../PlanetData/ContentPlaceholder";
 
-export function IndividualBasePlanetDesktop({ id }: { id: string }) {
+export function IndividualBasePlanetDesktop({ id }: { id: string }) { 
   const router = useRouter();
   
     const supabase = useSupabaseClient();
