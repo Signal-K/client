@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import { InventoryBlock } from "../dashboard-logs";
+import { ItemsVerticalList } from "../Content/Inventory/UserOwnedItems";
+import { UserOwnedSectorGrid } from "../Content/Planets/Sectors/SectorSetup";
 
 export function OnboardingWindows() {
   const session = useSession();
@@ -9,7 +11,7 @@ export function OnboardingWindows() {
   return (
     <div className="w-full">
       <div className="container px-4 md:px-6">
-        <div className="grid max-w-6xl grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start min-h-[calc(100vh-1px)] py-6 mx-auto">
+        <div className="grid max-w-6xl grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start min-h-[calc(10vh-1px)] py-6 mx-auto">
           {Array.from({ length: 6 }, (_, index) => (
             <div key={index} className="collapse bg-base-200">
               <input type="radio" name="my-accordion-1" id={`accordion-${index}`} />
@@ -23,10 +25,15 @@ export function OnboardingWindows() {
             </div>
           ))}
         </div>
+        <style jsx>{`
+          .grid-cols-3 > *:nth-child(n+4) {
+            margin-top: calc(-1.5 * var(--accordion-collapsed-height));
+          }
+        `}</style>
       </div>
     </div>
-  );
-}
+  );  
+};
 
 function getAccordionIcon(index) {
   switch (index) {
@@ -50,17 +57,17 @@ function getAccordionIcon(index) {
 function getAccordionTitle(index) {
   switch (index) {
     case 0:
-      return "Section 1 Title";
+      return "Home";
     case 1:
-      return "Section 2 Title";
+      return "Missions";
     case 2:
       return "Inventory";
     case 3:
-      return "Section 4 Title";
+      return "Automations";
     case 4:
-      return "Section 5 Title";
+      return "Sectors";
     case 5:
-      return "Section 6 Title";
+      return "Structures";
     default:
       return null;
   }
@@ -74,14 +81,16 @@ function getAccordionContent(index) {
       return <p>Content for Section 2</p>;
     case 2:
       return (
-        <InventoryBlock />
+        <ItemsVerticalList />
       );
     case 3:
       return <p>Content for Section 4</p>;
     case 4:
-      return <p>Content for Section 5</p>;
+      return (
+        <UserOwnedSectorGrid />
+      );
     case 5:
-      return <p>Content for Section 6</p>;
+      return <p>A component that will show all the structures the user has created (along with a popup to use them)</p>;
     default:
       return null;
   }
