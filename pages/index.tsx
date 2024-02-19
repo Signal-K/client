@@ -23,6 +23,7 @@ import { GardenDashboard } from "../components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
 import UponSignupModal from "../components/Modals/UponSignup";
 import { OnboardingWindows } from "../components/Gameplay/onboarding";
+import PlanetCharacter, { RoverCharacter } from "../components/Content/Assets/PlanetCharacter";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -85,96 +86,100 @@ export function PublicLanding() {
 
   // if (session && profile?.location) {
     if (session) {
-    return (
-      <LayoutNoNav>
-         <Navigation />
-         <div className="flex-col justify-center mt-10">
-           <style jsx global>
-             {`
-               body {
-                 background: url('satellite.jpg') center/cover;
-               }
-               
-               @media only screen and (max-width: 767px) {
-                 .planet-heading {
-                   color: white;
-                   font-size: 24px;
-                   text-align: center;
-                   margin-bottom: 10px;
-                 }
-               }
-             `}
-           </style>
-           <style jsx global>
-{`
- .chat {
-    margin-top: 40px; /* Adjust this value to move the chat bubbles down */
- }
-
- .chat-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* This centers the chat bubbles horizontally */
-    justify-content: center; /* This centers the chat bubbles vertically */
- }
-
- /* Additional styles for responsiveness or other adjustments */
- @media only screen and (max-width: 767px) {
-    .chat {
-      margin-top: 20px; /* Adjust for smaller screens if necessary */
-    }
- }
-`}
-</style>
-
-           <div className="image-container mx-3 absolute top-0 left-1/2 transform -translate-x-1/2 mt-10 mb-10">
-             <div className="flex justify-center items-center flex-row mt-20">
-               {isDesktopOrLaptop && (
-                 <>
-                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png" alt="Planet 1" className="responsive-image h-12 w-12 mx-10" />
-                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/Group%201000002854.png" alt="Planet 2" className="responsive-image h-12 w-12" />
-                 </>
-               )}
-               {isTabletOrMobile && (
-                 <>
-                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png" alt="Planet 1" className="responsive-image h-12 w-12 mx-10" />
-                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/Group%201000002854.png" alt="Planet 2" className="responsive-image h-12 w-12" />
-                 </>
-               )}
-             </div>
-           </div>
-                <OnboardingWindows />
-           <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
-             {/* Content here */}
-           </div>
-           <div className="mt-20">
-             {showFeedOverlay && (
-               <>
-                 <div className="mt-20">
-                   <FeedOverlay onClose={() => setShowFeedOverlay(false)} />
-                 </div>
-               </>
-             )}
-           </div>
-         </div>
-         {/* Menu Button */}
-         {!showFeedOverlay && (
-          <button
-  onClick={handleOpenFeedOverlay}
-  className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-2 text-white rounded"
->
-  <a
-    href="#_"
-    className="inline-flex overflow-hidden text-white rounded group"
-  >
-<img src='/Galaxy/Kepler-22.png' height='100' width='100' />
-  </a>
-</button>
-         )}
-      </LayoutNoNav>
-     );
-     
-     
+      return (
+        <LayoutNoNav>
+          <Navigation />
+          <div className="flex-col justify-center mt-10">
+            <style jsx global>
+              {`
+                body {
+                  background: url('satellite.jpg') center/cover;
+                }
+      
+                @media only screen and (max-width: 767px) {
+                  .planet-heading {
+                    color: white;
+                    font-size: 24px;
+                    text-align: center;
+                    margin-bottom: 10px;
+                  }
+                }
+              `}
+            </style>
+            <style jsx global>
+              {`
+                .chat {
+                  margin-top: 40px; /* Adjust this value to move the chat bubbles down */
+                }
+      
+                .chat-container {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center; /* This centers the chat bubbles horizontally */
+                  justify-content: center; /* This centers the chat bubbles vertically */
+                }
+      
+                /* Additional styles for responsiveness or other adjustments */
+                @media only screen and (max-width: 767px) {
+                  .chat {
+                    margin-top: 20px; /* Adjust for smaller screens if necessary */
+                  }
+                }
+              `}
+            </style>
+      
+            <div className="image-container mx-3 absolute top-0 left-1/2 transform -translate-x-1/2 mt-10 mb-10">
+              <div className="flex justify-center items-center flex-row mt-20">
+                {isDesktopOrLaptop && (
+                  <>
+                    <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png" alt="Planet 1" className="responsive-image h-12 w-12 mx-10" />
+                    <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/Group%201000002854.png" alt="Planet 2" className="responsive-image h-12 w-12" />
+                  </>
+                )}
+                {isTabletOrMobile && (
+                  <>
+                    <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png" alt="Planet 1" className="responsive-image h-12 w-12 mx-10" />
+                    <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/Group%201000002854.png" alt="Planet 2" className="responsive-image h-12 w-12" />
+                  </>
+                )}
+              </div>
+            </div>
+            <OnboardingWindows />
+            
+            <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 mb-10">
+              <div className="flex justify-center">
+                <PlanetCharacter />
+                <RoverCharacter />
+              </div>
+            </div>
+            
+            <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
+              {/* Content here */}
+            </div>
+            <div className="mt-20">
+              {showFeedOverlay && (
+                <>
+                  <div className="mt-20">
+                    <FeedOverlay onClose={() => setShowFeedOverlay(false)} />
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+          
+          {/* Menu Button */}
+          {!showFeedOverlay && (
+            <button
+              onClick={handleOpenFeedOverlay}
+              className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-2 text-white rounded"
+            >
+              <a href="#_" className="inline-flex overflow-hidden text-white rounded group">
+                <img src='/Galaxy/Kepler-22.png' height='100' width='100' />
+              </a>
+            </button>
+          )}
+        </LayoutNoNav>
+      );      
   };
 
   return (
