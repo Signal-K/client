@@ -253,14 +253,6 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
           <SectorStructureOwned sectorid={sectorid} />
           <RoverImageNoHandle date='853' rover='opportunity' sectorNo={id} />
           <StructureComponent sectorId={sectorid} />
-          {/* {imageUrl ? (
-            <>
-                <img src={imageUrl} alt="Rover image" />
-                <RoverContentPostForm metadata={metadata} imageLink={imageUrl} sector={id} />
-            </>
-          ) : (
-            <p>Loading...</p>
-          )} */}
       </div>
     </>
   );

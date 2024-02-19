@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { IndividualBasePlanetDesktop } from "../../components/Content/Planets/Base/IndividualBasePlanet";
 import { ClassificationFeedForIndividualPlanet } from "../../components/Content/ClassificationFeed";
 import PostFormCardAnomalyTag from "../../components/Content/Classify/AnomalyPostFormCard";
-import Navbar from "../../components/Section/Navbar";
+import Navbar from "../../components/Core/Section/Navbar";
 import { CreateBar, CreateMenuBar } from "../../components/Core/BottomBar";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import ContentPlaceholder from "../../components/Content/Planets/PlanetData/ContentPlaceholder";

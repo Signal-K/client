@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Layout from "../../../components/Section/Layout";
+import Layout from "../../../components/Core/Section/Layout";
 import BasePlanetSectors from "../../../components/Content/Planets/Base/BasePlanetAllSectors";
 
 export default function PlanetSectors() {

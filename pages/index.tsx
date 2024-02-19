@@ -1,6 +1,6 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
-import Layout, { LayoutNoNav } from "../components/Section/Layout";
+import Layout, { LayoutNoNav } from "../components/Core/Section/Layout";
 import { useRouter } from "next/router";
 import { useMediaQuery } from 'react-responsive';
 
@@ -14,15 +14,13 @@ import {
   footerNavigation,
   modules,
   navigation,
-} from "../components/Public/LandingContent";
+} from "../components/Info/LandingContent";
 import Navigation, {
   UserDropdownMenu,
   UserMenuItems,
-} from "../components/Section/Navbar";
+} from "../components/Core/Section/Navbar";
 import { GardenDashboard } from "../components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
-import Link from "next/link";
-import { AppWindowIcon, MenuIcon } from "lucide-react";
 import UponSignupModal from "../components/Modals/UponSignup";
 
 export const metadata: Metadata = {
@@ -154,9 +152,9 @@ export function PublicLanding() {
                    xmlns="http://www.w3.org/2000/svg"
                  >
                    <path
-                     stroke-linecap="round"
+                     strokeLinecap="round"
                      strokeLinejoin="round"
-                     stroke-width="2"
+                     strokeWidth="2"
                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                    ></path>
                  </svg>
