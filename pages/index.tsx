@@ -120,7 +120,7 @@ export function PublicLanding() {
 <div className="chat chat-start">
   <div className="chat-bubble">A dust storm is brewing on your home planet, time to investigate.</div>
 </div></div>
-<UponSignupModal />
+{isDesktopOrLaptop && ( <UponSignupModal /> )}
            </div>
            <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
              {/* Content here */}
@@ -155,7 +155,7 @@ export function PublicLanding() {
                  >
                    <path
                      stroke-linecap="round"
-                     stroke-linejoin="round"
+                     strokeLinejoin="round"
                      stroke-width="2"
                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                    ></path>
