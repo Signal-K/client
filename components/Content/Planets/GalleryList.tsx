@@ -143,14 +143,47 @@ const PlanetGalleryWithSectors: React.FC = () => {
 
   if (!session) {
     return <Login />;
-  }
+  };
 
   if (loading) {
     return <div>Loading...</div>;
-  }
+  };
+
+  const hexagonStyle = {
+    width: '100px',
+    height: '115px', // Adjust this value to control the height of the hexagon
+    borderBottom: 'solid 2px white',
+    borderTop: 'solid 2px white',
+    position: 'relative',
+    cursor: 'pointer',
+  };
+
+  const hexagonBeforeStyle = {
+    content: '""',
+    position: 'absolute',
+    top: '-1px',
+    left: 0,
+    width: 0,
+    height: 0,
+    borderLeft: '50px solid transparent',
+    borderRight: '50px solid transparent',
+    borderBottom: 'solid 86.6px white', // Adjust this value to control the shape of the hexagon
+  };
+
+  const hexagonAfterStyle = {
+    content: '""',
+    position: 'absolute',
+    bottom: '-1px',
+    left: 0,
+    width: 0,
+    height: 0,
+    borderLeft: '50px solid transparent',
+    borderRight: '50px solid transparent',
+    borderTop: 'solid 86.6px white', // Adjust this value to control the shape of the hexagon
+  };
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-3 gap-4 mb-5 mt-5">
       {planets.map((planet) => (
         <Link legacyBehavior key={planet.id} href={`/planets/${planet.id}`}>
           <a className="sector-link">

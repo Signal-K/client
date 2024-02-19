@@ -24,13 +24,13 @@ const FeedOverlay: React.FC<FeedOverlayProps> = ({ onClose }) => {
       <div className="bg-gradient-to-b from-gray-100 via-gray-200 to-blue-100 w-full sm:max-w-screen-lg sm:w-full max-h-60vh overflow-y-auto shadow-lg relative rounded-t-3xl">
         <div className="p-4">
           <h2 className="text-2xl font-bold">Feed Overlay</h2>
-          <button
+          <GardenDashboard />
+          <center><button
             onClick={handleClose}
             className="mt-2 px-4 py-2 bg-gray-200 text-gray-800 rounded"
           >
             Close
-          </button>
-          <GardenDashboard />
+          </button></center>
         </div>
       </div>
     </div>
