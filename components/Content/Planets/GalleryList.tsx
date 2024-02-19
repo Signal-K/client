@@ -149,45 +149,13 @@ const PlanetGalleryWithSectors: React.FC = () => {
     return <div>Loading...</div>;
   };
 
-  const hexagonStyle = {
-    width: '100px',
-    height: '115px', // Adjust this value to control the height of the hexagon
-    borderBottom: 'solid 2px white',
-    borderTop: 'solid 2px white',
-    position: 'relative',
-    cursor: 'pointer',
-  };
-
-  const hexagonBeforeStyle = {
-    content: '""',
-    position: 'absolute',
-    top: '-1px',
-    left: 0,
-    width: 0,
-    height: 0,
-    borderLeft: '50px solid transparent',
-    borderRight: '50px solid transparent',
-    borderBottom: 'solid 86.6px white', // Adjust this value to control the shape of the hexagon
-  };
-
-  const hexagonAfterStyle = {
-    content: '""',
-    position: 'absolute',
-    bottom: '-1px',
-    left: 0,
-    width: 0,
-    height: 0,
-    borderLeft: '50px solid transparent',
-    borderRight: '50px solid transparent',
-    borderTop: 'solid 86.6px white', // Adjust this value to control the shape of the hexagon
-  };
-
   return (
     <div className="grid grid-cols-3 gap-4 mb-5 mt-5">
       {planets.map((planet) => (
         <Link legacyBehavior key={planet.id} href={`/planets/${planet.id}`}>
           <a className="sector-link">
-            <div className="sector-square" style={{ backgroundImage: `url(${planet.avatar_url})` }} />
+            {/* <div className="sector-hexagon" style={{ backgroundImage: `url(${planet.avatar_url})` }} /> */}
+            <img className="h-12 w-12 mask mask-hexagon" src={planet?.avatar_url} />
           </a>
         </Link>
       ))}
@@ -205,16 +173,46 @@ const PlanetGalleryWithSectors: React.FC = () => {
           z-index: 1;
         }
 
-        .sector-square {
+        .sector-hexagon {
           width: 100px;
-          height: 100px;
-          border: 1px solid white;
+          height: 115px;
           background-size: cover;
+          border: 1px solid white;
           background-position: center;
+          margin: 5px;
+          clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+         }
+         .hexagon {
+          position: relative;
+          width: 300px;
+          height: 173.2px;
+          background-color: #007BFF;
+          margin: 86.6px 0;
+        }
+        
+        .hexagon::before {
+          content: "";
+          position: absolute;
+          width: 0;
+          border-left: 150px solid transparent;
+          border-right: 150px solid transparent;
+          bottom: 100%;
+          border-bottom: 86.6px solid #007BFF;
+        }
+        
+        .hexagon::after {
+          content: "";
+          position: absolute;
+          width: 0;
+          border-left: 150px solid transparent;
+          border-right: 150px solid transparent;
+          top: 100%;
+          width: 0;
+          border-top: 86.6px solid #007BFF;
         }
       `}</style>
     </div>
-  );
+ );
 };
 
 
@@ -311,6 +309,19 @@ export const Garden: React.FC<GardenProps> = ({ onClose }) => {
           >
             Close
           </button>
+          <PlanetGalleryWithSectors />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const GardenBar: React.FC = () => {
+
+  return (
+    <div className={`fixed inset-x-0 bottom-0 flex justify-center transition-transform duration-300`}>
+      <div className="bg-cover bg-center w-full sm:max-w-screen-lg sm:w-full max-h-96vh overflow-y-auto shadow-lg relative rounded-t-3xl">
+        <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-96vh flex items-center justify-center relative rounded-t-3xl">
           <PlanetGalleryWithSectors />
         </div>
       </div>
