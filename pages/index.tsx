@@ -24,6 +24,7 @@ import FeedOverlay from "../components/Overlays/1-Feed";
 import UponSignupModal from "../components/Modals/UponSignup";
 import { MinimalAccordion, OnboardingWindows } from "../components/Gameplay/onboarding";
 import PlanetCharacter, { RoverCharacter } from "../components/Content/Assets/PlanetCharacter";
+import { Garden } from "../components/Content/Planets/GalleryList";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -105,6 +106,8 @@ export function PublicLanding() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  const [showGalaxy, setShowGalaxy] = useState(true);
 
 
   // if (session && !profile?.location) {
@@ -204,17 +207,22 @@ export function PublicLanding() {
             </div>
           </div>
           
-          {/* Menu Button */}
-          {!showFeedOverlay && (
-            <button
-              onClick={handleOpenFeedOverlay}
-              className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-2 text-white rounded"
-            >
-              <a href="#_" className="inline-flex overflow-hidden text-white rounded group">
-                <img src='/Galaxy/Kepler-22.png' height='100' width='100' />
-              </a>
-            </button>
-          )}
+{/* Menu Button */}
+{!showFeedOverlay && (
+  <button
+    onClick={handleOpenFeedOverlay}
+    className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-2 text-white rounded"
+  >
+    <a href="#_" className="inline-flex overflow-hidden text-white rounded group">
+      <img src='/Galaxy/Kepler-22.png' height='100' width='100' />
+    </a>
+  </button>
+)}
+
+<div className="mt-10">
+  <Garden onClose={() => setShowGalaxy(false)} />
+</div>
+
         </LayoutNoNav>
       );      
   };
