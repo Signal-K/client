@@ -1,9 +1,9 @@
-import { Button } from "../ui/Button";
-import { Checkbox } from "../ui/checkbox";
+import { Button } from "../Core/ui/Button";
+import { Checkbox } from "../Core/ui/checkbox";
 // import { ResponsiveLine } from "@nivo/line";
-import { Input } from "../ui/input";
+import { Input } from "../Core/ui/input";
 
-import { Textarea } from "../ui/TextArea";
+import { Textarea } from "../Core/ui/TextArea";
 
 export function RoverInterface() {
   return (

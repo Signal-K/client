@@ -1,8 +1,8 @@
 import Navbar from "./Navbar";
 import React, { ReactNode, useEffect, useState } from "react";
-import Bottombar from "../Core/BottomBar";
+import Bottombar from "../BottomBar";
 import { useMediaQuery } from "react-responsive";
-import FeedOverlay from "../Overlays/1-Feed";
+import FeedOverlay from "../../Overlays/1-Feed";
 
 interface DashboardLayoutProps {
   children: ReactNode;

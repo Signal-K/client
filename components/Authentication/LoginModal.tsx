@@ -1,7 +1,7 @@
 import { ReactNode, useEffect } from 'react';
 // import { useHistory } from 'react-router-dom';
 import Link from 'next/link';
-import Layout from '../../components/Section/Layout';
+import Layout from '../Core/Section/Layout';
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router';

@@ -3,7 +3,7 @@ import { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
-import { checkCurrentActiveUrl } from "../../lib/helper/str.helper";
+import { checkCurrentActiveUrl } from "../../../lib/helper/str.helper";
 
 type TProps = {
   url: string;

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Button } from "./ui/addons/button"
+import { Button } from "./Core/ui/addons/button"
 import { DashboardLogs, InventoryBlock } from "./dashboard-logs";
 import { useState } from "react";
 import { Garden } from "./Content/Planets/GalleryList";
@@ -15,7 +15,6 @@ export function GardenDashboard() {
       <div className="flex-1 flex flex-col items-center justify-center text-center">
         <div className="grid gap-4 p-4">
         </div>
-        {/* <QuickLook /> */}
         {/* <DashboardLogs /> */}
         <InventoryBlock />
         <Button onClick={handleOpenGalaxy} className="mt-4 px-4 py-2 rounded">

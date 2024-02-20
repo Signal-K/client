@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Card from "../Card";
+import Card from "../Core/Card";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { FactionPostForm } from "../Content/CreatePostForm";
 import { FactionFeed } from "../Content/ClassificationFeed";

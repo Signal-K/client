@@ -1,8 +1,8 @@
-import { AvatarFallback, Avatar, AvatarImage } from "../ui/Avatar";
-import { Button } from "../ui/Button";
+import { AvatarFallback, Avatar, AvatarImage } from "../Core/ui/Avatar";
+import { Button } from "../Core/ui/Button";
 import { Card, CardContent, CardFooter, CardTitle } from "./PostCard";
 import { Separator } from "@radix-ui/react-separator";
-import { useToast } from "../ui/use-toast";
+import { useToast } from "../Core/ui/use-toast";
 import { getMetaData } from "../../lib/helper/str.helper";
 import { Megaphone, MessagesSquare, Share2 } from "lucide-react";
 import Link from "next/link";

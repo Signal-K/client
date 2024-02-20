@@ -1,16 +1,16 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Button } from "../ui/Button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/Card";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "../ui/Form";
-import { Textarea } from "../ui/TextArea";
-import { useToast } from "../ui/use-toast";
+import { Button } from "../Core/ui/Button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../Core/ui/Card";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "../Core/ui/Form";
+import { Textarea } from "../Core/ui/TextArea";
+import { useToast } from "../Core/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VenetianMask } from "lucide-react";
 import React, { useContext, useEffect, useState} from "react";
 import { useForm } from "react-hook-form";
 import { UserContext } from "../../context/UserContext";
 import { useRouter } from "next/router";
-import { Avatar, AvatarFallback } from "../ui/Avatar";
+import { Avatar, AvatarFallback } from "../Core/ui/Avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
 // -----------
