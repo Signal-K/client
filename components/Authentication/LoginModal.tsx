@@ -51,7 +51,7 @@ export default function LoginPage() {
         <br />
         <span className='text-sm font-medium text-gray-900 dark:text-gray-900'>
           Don't have an account yet?{' '}
-          <Link href='/signup' className='underline'>
+          <Link href='/login/register' className='underline'>
             go to signup
           </Link>
           .

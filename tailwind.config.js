@@ -19,6 +19,7 @@ module.exports = {
       spacing: {
         '2/3': '66.666667%',
         '3/4': '75%',
+        '13': '5.25rem',
       },
       height: {
         screen: ["100vh", "100dvh"],
@@ -82,5 +83,6 @@ module.exports = {
       '1': '1',
     },
   },
+  
   plugins: [require("daisyui")],
 };

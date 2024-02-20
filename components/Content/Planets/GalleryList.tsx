@@ -154,8 +154,7 @@ const PlanetGalleryWithSectors: React.FC = () => {
       {planets.map((planet) => (
         <Link legacyBehavior key={planet.id} href={`/planets/${planet.id}`}>
           <a className="sector-link">
-            {/* <div className="sector-hexagon" style={{ backgroundImage: `url(${planet.avatar_url})` }} /> */}
-            <img className="h-12 w-12 mask mask-hexagon" src={planet?.avatar_url} />
+            <img className="h-13 w-13 mask mask-hexagon" src={planet?.avatar_url} />
           </a>
         </Link>
       ))}

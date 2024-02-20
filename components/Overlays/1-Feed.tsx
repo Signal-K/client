@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { GardenDashboard } from '../../@/components/garden-dashboard';
+import { Button } from '../../@/components/ui/button';
 
 interface FeedOverlayProps {
   onClose: () => void;
@@ -21,16 +22,10 @@ const FeedOverlay: React.FC<FeedOverlayProps> = ({ onClose }) => {
 
   return (
     <div className={`fixed inset-x-0 bottom-0 flex justify-center transition-transform duration-300 ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}>
-      <div className="bg-gradient-to-b from-gray-100 via-gray-200 to-blue-100 w-full sm:max-w-screen-lg sm:w-full max-h-60vh overflow-y-auto shadow-lg relative rounded-t-3xl">
+      <div className="bg-gradient-to-b from-gray-100 via-blue-200 to-green-100 w-full sm:max-w-screen-lg sm:w-full max-h-60vh overflow-y-auto shadow-lg relative rounded-t-3xl">
         <div className="p-4">
-          <h2 className="text-2xl font-bold">Feed Overlay</h2>
           <GardenDashboard />
-          <center><button
-            onClick={handleClose}
-            className="mt-2 px-4 py-2 bg-gray-200 text-gray-800 rounded"
-          >
-            Close
-          </button></center>
+          <center><Button className=' className="w-full mb-10"' onClick={handleClose}>Close</Button></center>
         </div>
       </div>
     </div>

@@ -23,7 +23,6 @@ import { GardenDashboard } from "../@/components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
 import Link from "next/link";
 import { AppWindowIcon, MenuIcon } from "lucide-react";
-import { Garden, GardenBar } from "../components/Content/Planets/GalleryList";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -135,39 +134,7 @@ export function PublicLanding() {
            </div>
          </div>
          {/* Menu Button */}
-         <div className="fixed bottom-0 left-0 w-screen bg-gray-900">
- <GardenBar />
-</div>
-
-<button
- onClick={handleOpenFeedOverlay}
- className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-2 text-white rounded mb-8 mt-10"
->
- <a
-    href="#_"
-    className="inline-flex overflow-hidden text-white bg-gray-900 rounded group"
- >
-    <span className="px-3.5 py-2 text-white bg-purple-500 group-hover:bg-purple-600 flex items-center justify-center">
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-        ></path>
-      </svg>
-    </span>
-    <span className="pl-4 pr-5 py-2.5">Menu</span>
- </a>
-</button>
-
-         {/* {!showFeedOverlay && (
+         {!showFeedOverlay && (
            <button
              onClick={handleOpenFeedOverlay}
              className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-2 text-white rounded"
@@ -195,7 +162,7 @@ export function PublicLanding() {
                <span className="pl-4 pr-5 py-2.5">Menu</span>
              </a>
            </button>
-         )} */}
+         )}
       </LayoutNoNav>
      );
      
