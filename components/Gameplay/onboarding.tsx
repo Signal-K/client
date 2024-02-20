@@ -1,17 +1,21 @@
 import { useState } from "react";
-import { useSession } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import { InventoryBlock } from "../dashboard-logs";
 import { ItemsVerticalList } from "../Content/Inventory/UserOwnedItems";
 import { UserOwnedSectorGrid } from "../Content/Planets/Sectors/SectorSetup";
+import { useMediaQuery } from "react-responsive";
 
 export function OnboardingWindows() {
   const session = useSession();
 
+  const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
+  const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' });
+
   return (
     <div className="w-full">
       <div className="container px-4 md:px-6">
-        <div className="grid max-w-6xl grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start min-h-[calc(10vh-1px)] py-6 mx-auto">
+        <div className={`grid max-w-6xl ${isTabletOrMobile ? 'grid-cols-1' : 'grid-cols-3 md:grid-cols-2 lg:grid-cols-3'} gap-4 items-start min-h-[calc(10vh-1px)] py-6 mx-auto`}>
           {Array.from({ length: 6 }, (_, index) => (
             <div key={index} className="collapse bg-base-200">
               <input type="radio" name="my-accordion-1" id={`accordion-${index}`} />
@@ -32,7 +36,7 @@ export function OnboardingWindows() {
         `}</style>
       </div>
     </div>
-  );  
+  );
 };
 
 function getAccordionIcon(index) {
