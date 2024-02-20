@@ -46,7 +46,7 @@ export default function PlanetIdPage () {
     }, []);
 
     if (!id) {
-        return null;
+        return null; 
     };
 
     return (

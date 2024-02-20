@@ -2,6 +2,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
 import Layout, { LayoutNoNav } from "../components/Section/Layout";
 import { useRouter } from "next/router";
+import { useMediaQuery } from 'react-responsive';
 
 import { Metadata } from "next";
 
@@ -45,68 +46,127 @@ export function PublicLanding() {
     setShowFeedOverlay(true);
   };
 
+  const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
+  const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' });
+
   if (session) {
     return (
       <LayoutNoNav>
-        <Navigation />
-        <div className="flex-col justify-center">
-          <style jsx global>
-            {`
-                  body {
-                    background: url('https://cdn.cloud.scenario.com/assets/BSXy5zJiRPOpGcXtRag4iw?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9CU1h5NXpKaVJQT3BHY1h0UmFnNGl3P3A9MTAwKiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcxMTA2NTU5OX19fV19&Key-Pair-Id=K36FIAB9LE2OLR&Signature=UDVMN9uYrYFPsb797q2-gwxWdVAxesYZ2ReYqaoOiv37SGTJZ24JEIDzBfK-gU0TtWx8-r3a75eiBaoIdC~KImfEOQD8wEhGrFCy9ZyvEwtltfFUUFHX46bkXgc61V~8FN7Qgowa143JQW5uEmVaUc1BYw7m1Ys6Xh1ad8DzY2tWEQ3Su6VJxzdOmfsTfA8f8drHxGPi5xn6sUuGzDLwDastQD942B7~2I405eqZ~iesFG-OeyrxCGXkeDgTV5DEusipkh69NXLH3Cai11pWUS2e3Md5pbLGq-Ax5ZOUoJeyVpxpNMYX6k5KAwo22bgmoeONKBpROJIdv7dojPpVBA__') center/cover;
-                  }
-                  
-                  @media only screen and (max-width: 767px) {
-                    .planet-heading {
-                      color: white;
-                      font-size: 24px;
-                      text-align: center;
-                      margin-bottom: 10px;
-                    }
-                  }
-                `}
-          </style>
-          <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
-            <button
-              onClick={handleOpenFeedOverlay}
-              className="mt-4 px-4 py-2text-white rounded -mb-20"
-            >
-              <a
-                href="#_"
-                className="inline-flex overflow-hidden text-white bg-gray-900 rounded group"
-              >
-                <span className="px-3.5 py-2 text-white bg-purple-500 group-hover:bg-purple-600 flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                    ></path>
-                  </svg>
-                </span>
-                <span className="pl-4 pr-5 py-2.5">Menu</span>
-              </a>
-            </button>
-          </div>
-          <div className="mt-20">
-            {showFeedOverlay && (
-              <>
-                <div className="mt-20">
-                  <FeedOverlay onClose={() => setShowFeedOverlay(false)} />
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+         <Navigation />
+         <div className="flex-col justify-center mt-10">
+           <style jsx global>
+             {`
+               body {
+                 background: url('https://cdn.cloud.scenario.com/assets/Js2W4fMaSpKGSlVJ-tJEGQ?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9KczJXNGZNYVNwS0dTbFZKLXRKRUdRP3A9MTAwKiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcxMTA2NTU5OX19fV19&Key-Pair-Id=K36FIAB9LE2OLR&Signature=NnOW-bDa-nTqj52gMD9J6p-hsJgQI-naOWJlmenVNg1h3pIoHfbMGw6AZb7Nre2KDIrf~VT9n-ONDY988JWJ1qkQwr4-dr9AL~2iwR6ozPB1AgqSyVTaVCiQtMUBrPgrThLAtJI1Bf-JnbZrGKxUfFyAAAM-84OVd~noSyqF82X-katF5gXn3WMHMNnyc19QxinqfN4n~F73v1hSh6wXmWHdmnMKI44jXunPC2DzAHHyKAGTVLM2~uCA9Nyy6ao556FNr0BzIZB2SsTrEFSsY8TmfZDpZoNcN0GM~Vztsucf~0Uwk0hmwtgNofiLP631fsjuVKnLNCwc~c0K6ucV6Q__') center/cover;
+               }
+               
+               @media only screen and (max-width: 767px) {
+                 .planet-heading {
+                   color: white;
+                   font-size: 24px;
+                   text-align: center;
+                   margin-bottom: 10px;
+                 }
+               }
+             `}
+           </style>
+           <style jsx global>
+{`
+ .chat {
+    margin-top: 40px; /* Adjust this value to move the chat bubbles down */
+ }
+
+ .chat-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* This centers the chat bubbles horizontally */
+    justify-content: center; /* This centers the chat bubbles vertically */
+ }
+
+ /* Additional styles for responsiveness or other adjustments */
+ @media only screen and (max-width: 767px) {
+    .chat {
+      margin-top: 20px; /* Adjust for smaller screens if necessary */
+    }
+ }
+`}
+</style>
+
+           <div className="image-container mx-3 absolute top-0 left-1/2 transform -translate-x-1/2 mt-10 mb-10">
+             <div className="flex justify-center items-center flex-row mt-20">
+               {isDesktopOrLaptop && (
+                 <>
+                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png" alt="Planet 1" className="responsive-image h-12 w-12 mx-10" />
+                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/Group%201000002854.png" alt="Planet 2" className="responsive-image h-12 w-12" />
+                 </>
+               )}
+               {isTabletOrMobile && (
+                 <>
+                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png" alt="Planet 1" className="responsive-image h-12 w-12 mx-10" />
+                   <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/Group%201000002854.png" alt="Planet 2" className="responsive-image h-12 w-12" />
+                 </>
+               )}
+             </div>
+           </div>
+           <div className="chat-container">
+           <div className="mx-20 mt-20">
+           <div className="chat chat-start mt-20 justify-left mt-20">
+  <div className="chat-bubble">You need to pick a planet!</div>
+</div>
+<div className="chat chat-end">
+  <div className="chat-bubble">You've got 5 new deposits to explore</div>
+</div>
+<div className="chat chat-start">
+  <div className="chat-bubble">A dust storm is brewing on your home planet, <br /> time to investigate.</div>
+</div></div>
+           </div>
+           <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
+             {/* Content here */}
+           </div>
+           <div className="mt-20">
+             {showFeedOverlay && (
+               <>
+                 <div className="mt-20">
+                   <FeedOverlay onClose={() => setShowFeedOverlay(false)} />
+                 </div>
+               </>
+             )}
+           </div>
+         </div>
+         {/* Menu Button */}
+         {!showFeedOverlay && (
+           <button
+             onClick={handleOpenFeedOverlay}
+             className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-2 text-white rounded"
+           >
+             <a
+               href="#_"
+               className="inline-flex overflow-hidden text-white bg-gray-900 rounded group"
+             >
+               <span className="px-3.5 py-2 text-white bg-purple-500 group-hover:bg-purple-600 flex items-center justify-center">
+                 <svg
+                   className="w-5 h-5"
+                   fill="none"
+                   stroke="currentColor"
+                   viewBox="0 0 24 24"
+                   xmlns="http://www.w3.org/2000/svg"
+                 >
+                   <path
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     stroke-width="2"
+                     d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                   ></path>
+                 </svg>
+               </span>
+               <span className="pl-4 pr-5 py-2.5">Menu</span>
+             </a>
+           </button>
+         )}
       </LayoutNoNav>
-    );
+     );
+     
+     
   };
 
   return (

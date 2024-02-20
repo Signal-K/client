@@ -6,7 +6,7 @@ import Layout, { LayoutNoNav } from "../../components/Section/Layout";
 export default function GardenPage() {
     return (
         <LayoutNoNav>
-            <Garden />
+            {/* <Garden /> */}I think I can
         </LayoutNoNav>
     )
 }
