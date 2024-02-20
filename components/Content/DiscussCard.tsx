@@ -36,23 +36,6 @@ interface Comment {
     avatar_url: string;
     username: string;
   };
-}
-
-export const CommentItem: React.FC<Comment> = ({ id, content, created_at, profiles }) => {
-  return (
-    <div className="ml-2 my-3">
-      <div className="flex items-center mb-2">
-        <Avatar className="rounded-full">
-          <AvatarImage src={"https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/avatars/" + profiles?.avatar_url ?? ""} />
-          <AvatarFallback>Test</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-wrap items-center ml-2">
-          <div className="font-bold">{profiles?.username}</div>
-        </div>
-      </div>
-      <div className="my-3 text-sm">{content}</div>
-    </div>
-  );
 };
 
 const CardForum: React.FC<TProps> = ({
@@ -107,31 +90,6 @@ const CardForum: React.FC<TProps> = ({
       </CardContent>
       <CardFooter className="p-0 flex-col items-start pb-2">
         <Separator className="mb-2" />
-        {/* <div className="space-x-2 px-4 py-2">
-          {comments && (
-            <Button onClick={toggleComments} variant="outline" size="default" className="space-x-2">
-              <MessagesSquare className="w-5 aspect-square" />
-            </Button>
-          )}
-          <Button variant="outline" size="icon">
-            <Share2 className="w-5 aspect-square" />
-          </Button>
-          <Button
-            onClick={toggleComments}
-            variant="destructive"
-            size="icon"
-          >
-            <Megaphone className="w-5 aspect-square" />
-          </Button>
-        </div>
-        {showComments && comments && comments.length > 0 && (
-          <CardContent className="p-4 pt-2">
-            <h3 className="text-lg font-semibold mb-2">Comments</h3>
-            {comments.map((comment) => (
-              <CommentItem key={comment.id} {...comment} />
-            ))}
-          </CardContent>
-        )} */}
       </CardFooter>
     </>
   );
@@ -175,7 +133,7 @@ export function RoverContentCard({
           <div className="mb-4">
             <div key={media}><img src={media} className="w-full h-48 object-cover rounded-md" /></div> 
           </div>
-        )} {/* Comment/action section */}
+        )}
       </div>
     </div>
   )
