@@ -69,6 +69,44 @@ export function PublicLanding() {
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' });
 
+  // Character queries
+  const [characterPosition, setCharacterPosition] = useState<{ rover: { x: number; y: number }; planet: { x: number; y: number } }>(() => {
+    // Initial position for the characters
+    return { rover: { x: 0, y: 0 }, planet: { x: 0, y: 0 } };
+  });
+
+  useEffect(() => {
+    // Calculate initial position for the characters after component mount
+    const calculatePosition = () => {
+      const minX = -window.innerWidth / 2 + 100; // Adjust 100 to your desired margin
+      const maxX = window.innerWidth / 2 - 100; // Adjust 100 to your desired margin
+      const minY = -window.innerHeight / 2 + 100; // Adjust 100 to your desired margin
+      const maxY = window.innerHeight / 2 - 100; // Adjust 100 to your desired margin
+
+      const randomX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+      const randomY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+
+      setCharacterPosition({
+        rover: { x: randomX, y: randomY },
+        planet: { x: randomX, y: randomY }, // You can adjust this to have different positions for rover and planet
+      });
+    };
+
+    calculatePosition();
+
+    // Recalculate position when window size changes
+    const handleResize = () => {
+      calculatePosition();
+    };
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+
   // if (session && !profile?.location) {
   //   return (
   //     <p>Location</p>
@@ -90,7 +128,8 @@ export function PublicLanding() {
         <LayoutNoNav>
           <Navigation />
           <div className="flex-col justify-center mt-10">
-            <style jsx global>
+            {isTabletOrMobile && (
+              <style jsx global>
               {`
                 body {
                   background: url('satellite.jpg') center/cover;
@@ -106,27 +145,25 @@ export function PublicLanding() {
                 }
               `}
             </style>
-            <style jsx global>
+            )}
+{isDesktopOrLaptop && (
+              <style jsx global>
               {`
-                .chat {
-                  margin-top: 40px; /* Adjust this value to move the chat bubbles down */
+                body {
+                  background: url('Waterdrop.jpg') center/cover;
                 }
       
-                .chat-container {
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center; /* This centers the chat bubbles horizontally */
-                  justify-content: center; /* This centers the chat bubbles vertically */
-                }
-      
-                /* Additional styles for responsiveness or other adjustments */
                 @media only screen and (max-width: 767px) {
-                  .chat {
-                    margin-top: 20px; /* Adjust for smaller screens if necessary */
+                  .planet-heading {
+                    color: white;
+                    font-size: 24px;
+                    text-align: center;
+                    margin-bottom: 10px;
                   }
                 }
               `}
             </style>
+            )}
       
             <div className="image-container mx-3 absolute top-0 left-1/2 transform -translate-x-1/2 mt-10 mb-10">
               <div className="flex justify-center items-center flex-row mt-20">
@@ -146,12 +183,12 @@ export function PublicLanding() {
             </div>
             <OnboardingWindows />
             
-            <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 mb-10">
-              <div className="flex justify-center">
-                <PlanetCharacter />
-                <RoverCharacter />
-              </div>
-            </div>
+            <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 mb-20">
+        <div className="flex justify-center">
+          <PlanetCharacter position={characterPosition.planet} />
+          <RoverCharacter position={characterPosition.rover} />
+        </div>
+      </div>
             
             <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
               {/* Content here */}
