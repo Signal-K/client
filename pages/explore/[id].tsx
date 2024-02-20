@@ -1,19 +1,19 @@
-// import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/router";
 import React from "react";
-import { RoverMobileTest } from "../../components/Modals/rover-mobile-test";
-import { RoverInterface, RoverInterfaceDark } from "../../components/Modals/rover-interface";
-import Layout from "../../components/Section/Layout";
 import Navigation from "../../components/Section/Navbar";
+import RoverExploreDesktop from "../../components/Content/RoverData/RoverExplore";
 
-export default function Explore() {
-    // const supabase = useSupabaseClient();
-    // const session = useSession();
+export default function ExplorePlanet () {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const router = useRouter();
+    const { id } = router.query;
 
     return (
-        // <RoverMobileTest />
-        // <RoverInterface />
         <>
-        <style jsx global>
+                    <style jsx global>
              {`
                body {
                  background: url('garden.png') center/cover;
@@ -31,8 +31,8 @@ export default function Explore() {
            </style>
             <Navigation />
             <div className="">
-                <RoverInterfaceDark />
+                <RoverExploreDesktop id={id as string} />
             </div>
         </>
-    );
+    )
 };

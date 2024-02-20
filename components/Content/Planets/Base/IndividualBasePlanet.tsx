@@ -8,31 +8,31 @@ import { LightkurveBaseGraph } from "../PlanetData/ContentPlaceholder";
 export function IndividualBasePlanetDesktop({ id }: { id: string }) { 
   const router = useRouter();
   
-    const supabase = useSupabaseClient();
-    const session = useSession();
-  
-    const [planetData, setPlanetData] = useState(null);
-    const [planetPosts, setPlanetPosts] = useState([]);
-    const { id: planetId } = router.query;
-    const [hasPlanetInInventory, setHasPlanetInInventory] = useState(false);
-    const [inventoryPlanetId, setInventoryPlanetId] = useState<string | null>(
-      null
-    );
-    const [sectors, setSectors] = useState([]);
-  
-    const [screenWidth, setScreenWidth] = useState<number>(0);
-    const [showSidebar, setShowSidebar] = useState<boolean>(true);
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-    // For handling selection of specific structures and then displaying content
-    const [selectedStructure, setSelectedStructure] = useState(null);
+  const [planetData, setPlanetData] = useState(null);
+  const [planetPosts, setPlanetPosts] = useState([]);
+  const { id: planetId } = router.query;
+  const [hasPlanetInInventory, setHasPlanetInInventory] = useState(false);
+  const [inventoryPlanetId, setInventoryPlanetId] = useState<string | null>(
+    null
+  ); 
+  const [sectors, setSectors] = useState([]);
 
-    const handleStructureClick = (structureName) => {
-      setSelectedStructure(planetId); // Set selectedStructure to planetId
-    };    
-  
-    const handleClosePopup = () => {
-      setSelectedStructure(null);
-    };
+  const [screenWidth, setScreenWidth] = useState<number>(0);
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
+
+  // For handling selection of specific structures and then displaying content
+  const [selectedStructure, setSelectedStructure] = useState(null);
+
+  const handleStructureClick = (structureName) => {
+    setSelectedStructure(planetId); // Set selectedStructure to planetId
+  };    
+
+  const handleClosePopup = () => {
+    setSelectedStructure(null);
+  };
   
     useEffect(() => {
       const handleResize = () => {
