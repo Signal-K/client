@@ -23,6 +23,7 @@ import { GardenDashboard } from "../@/components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
 import Link from "next/link";
 import { AppWindowIcon, MenuIcon } from "lucide-react";
+import UponSignupModal from "../components/Modals/UponSignup";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -117,8 +118,9 @@ export function PublicLanding() {
   <div className="chat-bubble">You've got 5 new deposits to explore</div>
 </div>
 <div className="chat chat-start">
-  <div className="chat-bubble">A dust storm is brewing on your home planet, <br /> time to investigate.</div>
+  <div className="chat-bubble">A dust storm is brewing on your home planet, time to investigate.</div>
 </div></div>
+<UponSignupModal />
            </div>
            <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
              {/* Content here */}

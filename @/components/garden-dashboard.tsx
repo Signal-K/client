@@ -21,10 +21,10 @@ export function GardenDashboard() {
         <Button onClick={handleOpenGalaxy} className="mt-4 px-4 py-2 rounded">
             Visit a planet
         </Button>
-        <div className="mt-20 mb-4">
+        <div className="mt-10">
           {showGalaxy &&
             <>
-              <div className="mt-20">
+              <div className="mt-10">
                 <Garden onClose={() => setShowGalaxy(false)} />
               </div>
             </>
