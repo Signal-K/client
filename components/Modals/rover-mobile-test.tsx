@@ -1,5 +1,5 @@
-import { Button } from "../Core/ui/Button";
-import { Checkbox } from "../Core/ui/checkbox";
+import { Button } from "../_Core/ui/Button";
+import { Checkbox } from "../_Core/ui/checkbox";
 import { Line } from "react-chartjs-2";
 
 export function RoverMobileTest() {

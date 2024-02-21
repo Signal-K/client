@@ -1,5 +1,5 @@
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
-import { CardTitle, CardHeader, CardContent, Card } from "./Core/ui/addons/card";
+import { CardTitle, CardHeader, CardContent, Card } from "./_Core/ui/addons/card";
 import OwnedItemsList from "./Content/Inventory/UserOwnedItems";
 
 export function InventoryBlock() {

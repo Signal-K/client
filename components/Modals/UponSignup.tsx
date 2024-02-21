@@ -3,7 +3,7 @@
  * @see https://v0.dev/t/bOg9oEOPYfV
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import { Button } from "../Core/ui/Button"
+import { Button } from "../_Core/ui/Button"
 
 export default function UponSignupModal() {
   return (

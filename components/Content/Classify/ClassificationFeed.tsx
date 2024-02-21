@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient, SupabaseClient } from "@supabase/auth-helpers-react";
-import CardForum from "./DiscussCard";
+import CardForum from "../../_Core/ui/Content/DiscussCard";
 
 export function ClassificationFeedForIndividualPlanet(planetId, backgroundColorSet) {
   const supabase: SupabaseClient = useSupabaseClient();

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Button } from "./Core/ui/addons/button"
+import { Button } from "./_Core/ui/addons/button"
 import { DashboardLogs, InventoryBlock } from "./dashboard-logs";
 import { useState } from "react";
 import { Garden } from "./Content/Planets/GalleryList";

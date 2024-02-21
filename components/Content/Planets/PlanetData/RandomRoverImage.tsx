@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import Card from "../../../Core/Card";
-import { RoverContentPostForm } from "../../CreatePostForm";
+import Card from "../../../_Core/ui/Content/Card";
+import { RoverContentPostForm } from "../../Classify/CreatePostForm";
 
 interface RoverImageCardProps {
     roverImage: {

@@ -1,6 +1,6 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
-import Layout, { LayoutNoNav } from "../components/Core/Section/Layout";
+import Layout, { LayoutNoNav } from "../components/_Core/Section/Layout";
 import { useRouter } from "next/router";
 import { useMediaQuery } from 'react-responsive';
 
@@ -18,7 +18,7 @@ import {
 import Navigation, {
   UserDropdownMenu,
   UserMenuItems,
-} from "../components/Core/Section/Navbar";
+} from "../components/_Core/Section/Navbar";
 import { GardenDashboard } from "../components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
 import UponSignupModal from "../components/Modals/UponSignup";

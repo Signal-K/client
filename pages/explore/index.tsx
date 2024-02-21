@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import { RoverMobileTest } from "../../components/Modals/rover-mobile-test";
 import { RoverInterface, RoverInterfaceDark } from "../../components/Modals/rover-interface";
-import Layout from "../../components/Core/Section/Layout";
-import Navigation from "../../components/Core/Section/Navbar";
+import Layout from "../../components/_Core/Section/Layout";
+import Navigation from "../../components/_Core/Section/Navbar";
 import FeedOverlay from "../../components/Overlays/1-Feed";
 
 export default function Explore() {

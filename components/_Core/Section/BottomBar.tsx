@@ -5,8 +5,8 @@ import { BuildingIcon, CarIcon, RocketIcon, CpuIcon, MessageSquareDashedIcon } f
 import { CircleMenu, CircleMenuItem, TooltipPlacement} from 'react-circular-menu';
 import { useState } from "react";
 
-import { ClassificationFeedForIndividualPlanet } from "../Content/ClassificationFeed";
-import ContentPlaceholder from "../Content/Planets/PlanetData/ContentPlaceholder";
+import { ClassificationFeedForIndividualPlanet } from "../../Content/Classify/ClassificationFeed";
+import ContentPlaceholder from "../../Content/Planets/PlanetData/ContentPlaceholder";
 
 const bottombarLinks = [
   {

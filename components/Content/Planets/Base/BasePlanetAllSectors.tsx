@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import Card from "../../../Core/Card";
+import Card from "../../../_Core/ui/Content/Card";
 
 export default function BasePlanetSectors({ planetId }: { planetId: string }) {
     const router = useRouter();
