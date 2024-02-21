@@ -1,6 +1,8 @@
 import Navbar from "./Navbar";
 import React, { ReactNode, useEffect, useState } from "react";
 import Bottombar from "../Core/BottomBar";
+import { useMediaQuery } from "react-responsive";
+import FeedOverlay from "../Overlays/1-Feed";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -8,6 +10,11 @@ interface DashboardLayoutProps {
 
 const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
+
+  const [showFeedOverlay, setShowFeedOverlay] = useState(false);
+  const handleOpenFeedOverlay = () => {
+    setShowFeedOverlay(true);
+  };
 
   useEffect(() => {     // Check if window is defined before accessing it
     if (typeof window !== "undefined") {
@@ -38,6 +45,44 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
           <Bottombar />
         </div>
       )}
+      <div className="mt-20">
+             {showFeedOverlay && (
+               <>
+                 <div className="mt-20">
+                   <FeedOverlay onClose={() => setShowFeedOverlay(false)} />
+                 </div>
+               </>
+             )}
+           </div>
+      {!showFeedOverlay && (
+           <button
+             onClick={handleOpenFeedOverlay}
+             className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-2 text-white rounded"
+           >
+             <a
+               href="#_"
+               className="inline-flex overflow-hidden text-white bg-gray-900 rounded group"
+             >
+               <span className="px-3.5 py-2 text-white bg-purple-500 group-hover:bg-purple-600 flex items-center justify-center">
+                 <svg
+                   className="w-5 h-5"
+                   fill="none"
+                   stroke="currentColor"
+                   viewBox="0 0 24 24"
+                   xmlns="http://www.w3.org/2000/svg"
+                 >
+                   <path
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     stroke-width="2"
+                     d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                   ></path>
+                 </svg>
+               </span>
+               <span className="pl-4 pr-5 py-2.5">Menu</span>
+             </a>
+           </button>
+         )}
     </>
   );
 };

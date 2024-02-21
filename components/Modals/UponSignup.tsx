@@ -9,10 +9,10 @@ export default function UponSignupModal() {
   return (
     <div className="relative w-full max-w-2xl p-4 rounded-lg border border-gray-100 shadow-lg md:p-8 dark:border-gray-800 bg-gray-200 mt-10">
       <div className="absolute top-4 right-4">
-        <Button size="icon" variant="outline">
+        {/* <Button size="icon" variant="outline">
           <XIcon className="w-4 h-4" />
           <span className="sr-only">Close</span>
-        </Button>
+        </Button> */}
       </div>
       <div className="space-y-4 text-center">
         <div className="space-y-2">
@@ -41,9 +41,9 @@ export default function UponSignupModal() {
             </p>
           </div>
         </div>
-        <Button className="mx-auto" size="lg" variant="outline">
+        {/* <Button className="mx-auto" size="lg" variant="outline">
           Close Guide
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
