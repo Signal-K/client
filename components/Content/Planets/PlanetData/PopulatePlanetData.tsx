@@ -58,7 +58,7 @@ const LightcurveGenerator = ({ planetId }: { planetId: string }) => {
                 const imageURL = process.env.NEXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/planetsss/' + result.data.path;
     
                 // Update the 'lightkurve' column in the 'basePlanets' table with the image URL
-                console.log("planetId:", planetId); // Check the value of planetId
+                console.log("planetId:", planetId); // Check the value  of planetId
                 await supabase
                     .from('basePlanets')
                     .update({ lightkurve: imageURL })
