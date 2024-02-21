@@ -22,7 +22,7 @@ import Navigation, {
 import { GardenDashboard } from "../components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
 import UponSignupModal from "../components/Modals/UponSignup";
-import { OnboardingWindows } from "../components/Gameplay/onboarding";
+import { MinimalAccordion, OnboardingWindows } from "../components/Gameplay/onboarding";
 import PlanetCharacter, { RoverCharacter } from "../components/Content/Assets/PlanetCharacter";
 
 export const metadata: Metadata = {
@@ -126,7 +126,7 @@ export function PublicLanding() {
     if (session) {
       return (
         <LayoutNoNav>
-          <Navigation />
+          {isDesktopOrLaptop && ( <Navigation /> )}
           <div className="flex-col justify-center mt-10">
             {isTabletOrMobile && (
               <style jsx global>
@@ -181,7 +181,7 @@ export function PublicLanding() {
                 )}
               </div>
             </div>
-            <OnboardingWindows />
+            {isDesktopOrLaptop && (<OnboardingWindows />)}
             
             <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 mb-20">
         <div className="flex justify-center">

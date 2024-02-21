@@ -140,6 +140,9 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
     }
   }, []);
 
+  const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
+  const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' });
+
   return (
     <div className="flex relative items-start h-screen overflow-hidden">
       <main className="h-max pb-10 grow overflow-y-auto">
