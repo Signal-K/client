@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { IndividualBasePlanetDesktop } from "../../components/Content/Planets/Base/IndividualBasePlanet";
+import { IndividualBasePlanetDesktop } from "../../components/Content/[id]/IndividualBasePlanet";
 import { ClassificationFeedForIndividualPlanet } from "../../components/Content/Classify/ClassificationFeed";
 import PostFormCardAnomalyTag from "../../components/Content/Classify/AnomalyPostFormCard";
 import Navbar from "../../components/_Core/Section/Navbar";
