@@ -1,8 +1,8 @@
 import Link from "next/link"
-import { Button } from "./ui/button"
-import { DashboardLogs, InventoryBlock } from "../../components/dashboard-logs";
+import { Button } from "./ui/addons/button"
+import { DashboardLogs, InventoryBlock } from "./dashboard-logs";
 import { useState } from "react";
-import { Garden } from "../../components/Content/Planets/GalleryList";
+import { Garden } from "./Content/Planets/GalleryList";
 
 export function GardenDashboard() {
   const [showGalaxy, setShowGalaxy] = useState(false);

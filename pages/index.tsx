@@ -19,7 +19,7 @@ import Navigation, {
   UserDropdownMenu,
   UserMenuItems,
 } from "../components/Section/Navbar";
-import { GardenDashboard } from "../@/components/garden-dashboard";
+import { GardenDashboard } from "../components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
 import Link from "next/link";
 import { AppWindowIcon, MenuIcon } from "lucide-react";

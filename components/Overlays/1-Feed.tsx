@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { GardenDashboard } from '../../@/components/garden-dashboard';
-import { Button } from '../../@/components/ui/button';
+import { GardenDashboard } from '../garden-dashboard';
+import { Button } from '../ui/addons/button';
 import { useMediaQuery } from 'react-responsive';
 import Link from 'next/link';
 

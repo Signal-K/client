@@ -1,4 +1,4 @@
-import { CardDescription, CardHeader, CardContent, Card, CardTitle } from "../@/components/ui/card"
+import { CardDescription, CardHeader, CardContent, Card, CardTitle } from "./ui/addons/card"
 import { Button } from "./ui/Button"
 
 export function QuickLook() {
