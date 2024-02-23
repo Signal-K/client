@@ -14,7 +14,7 @@ import {
   footerNavigation,
   modules,
   navigation,
-} from "../components/Info/LandingContent";
+} from "../components/_Core/Section/Info/LandingContent";
 import Navigation, {
   UserDropdownMenu,
   UserMenuItems,
