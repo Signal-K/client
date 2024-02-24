@@ -29,7 +29,7 @@ export default function CreateBasePlanetSector() {
                 }
             } catch (error) {
                 console.error(error.message);
-            }
+            };
         };
 
         fetchUserPlanet();

@@ -157,7 +157,7 @@ export const UserDropdownMenu = ({ user } : { user: string }) => {
       .then((result) => {
         if (result.data) {
           setProfile(result.data[0]);
-        }
+        };
     });
   }, [session]);
 

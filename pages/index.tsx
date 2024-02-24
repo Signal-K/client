@@ -37,7 +37,25 @@ export function PublicLanding() {
     />
   );
 
+  // User data config
   const session = useSession();
+  const supabase = useSupabaseClient();
+  const [profile, setProfile] = useState<any>(null);
+  useEffect(() => {
+    supabase.from("profiles")
+      .select()
+      .eq("id", session?.user?.id)
+      .then((result) => {
+        if (result.data) {
+          setProfile(result.data[0]);
+        };
+      });
+  }, [session, supabase]);
+  useEffect(() => {
+    if (profile) {
+      console.log(profile.location ?? "Location not available");
+    };
+  }, [profile]);
 
   // Component context
   const [showFeedOverlay, setShowFeedOverlay] = useState(false);
@@ -45,10 +63,17 @@ export function PublicLanding() {
     setShowFeedOverlay(true);
   };
 
+  // Screen size parameters
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' });
 
-  if (session) {
+  if (session && !profile?.location) {
+    return (
+      <p>Location</p>
+    );
+  };
+
+  if (session && profile?.location) {
     return (
       <LayoutNoNav>
          <Navigation />
