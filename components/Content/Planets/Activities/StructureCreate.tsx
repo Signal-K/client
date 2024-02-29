@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import axios from "axios";
+import Link from "next/link";
 
 interface Structure {
     id: number;
@@ -48,7 +50,7 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
                         {
                             item: structure.id,
                             owner: session.user.id,
-                            quantity: 1, // You can adjust the quantity as needed
+                            quantity: 1,
                             planetSector: planetSectorId,
                         },
                     ]);
@@ -70,14 +72,39 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
         fetchStructures();
     }, [supabase]);
 
-    const handleStructureClick = (structure: Structure) => {
-        onStructureSelected(structure);
-        createInventoryUserEntry(structure);
-        setIsCalloutOpen(false);
+    const handleStructureClick = async (structure: Structure) => {
+      try {
+        const payload = JSON.stringify({
+          user_id: session?.user?.id,
+          sector_id: planetSectorId,
+          structure_id: structure.id,
+        });
+  
+        const response = await fetch('https://papyrus-production.up.railway.app/craft_structure', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: payload
+        });
+  
+        const data = await response.json();
+        console.log('Response from Flask:', data);
+
+        // if (data.status === 'proceed') { // If the status is 'proceed', call createInventoryUserEntry
+        //   createInventoryUserEntry(structure);
+        // }
+      } catch (error) {
+        console.error('Error:', error.message);
+      }
+    
+      onStructureSelected(structure);
+      // createInventoryUserEntry(structure)
+      setIsCalloutOpen(false);
     };
 
     return (
-        <div className="relative inline-block text-left">
+        <center><div className="relative inline-block text-center pl-10">
           <button
             type="button"
             className="px-4 py-2 text-white bg-blue-500 rounded-md focus:outline-none hover:bg-blue-600"
@@ -95,7 +122,7 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
                     className="flex items-center justify-between px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     onClick={() => handleStructureClick(structure)}
                   >
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 pl-8">
                       <img src={structure.icon_url} alt={structure.name} className="w-8 h-8" />
                       <span className="font-bold">{structure.name}</span>
                     </div>
@@ -105,7 +132,7 @@ const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSele
               </div>
             </div>
           )}
-        </div>
+        </div></center>
     );
 };
 
@@ -132,7 +159,7 @@ interface PlacedStructuresProps {
     icon_url: string;
   }
   
-export const PlacedStructures: React.FC<PlacedStructuresProps> = ({ sectorId }) => {
+  export const PlacedStructures: React.FC<PlacedStructuresProps> = ({ sectorId }) => {
     const supabase = useSupabaseClient();
     const [placedStructures, setPlacedStructures] = useState<PlacedStructure[]>([]);
   
@@ -172,17 +199,71 @@ export const PlacedStructures: React.FC<PlacedStructuresProps> = ({ sectorId }) 
     }, [supabase, sectorId]);
   
     return (
-      <div>
-        <h2>Structures Placed on Sector {sectorId}</h2>
-        <div>
+      <div className="flex flex-col items-center justify-center p-4 md:space-y-0 md:flex-row md:space-x-4">
+        <div className="grid gap-4 w-full max-w-sm md:max-w-none md:grid-cols-3">
           {placedStructures.map((structure) => (
-            <div key={structure.id}>
-              <img src={structure.icon_url} alt={structure.name} />
-              <p>{structure.name}</p>
-              <p>{structure.description}</p>
+            <div key={structure.id} className="flex flex-col items-center justify-center space-y-2">
+              <div className="flex items-center justify-center w-20 h-20 rounded-full border-2 border-gray-100 border-dashed dark:border-gray-800">
+                <img src={structure.icon_url} alt={structure.name} className="w-10 h-10 text-gray-200 dark:text-gray-800 translate-y-1" />
+              </div>
+              <span className="text-sm font-medium">{structure.name}</span>
+              <Link className="text-sm underline" href="#">
+                View More
+              </Link>
             </div>
           ))}
         </div>
       </div>
     );
+};
+
+const CraftButton = () => {
+  const handleClick = async () => {
+    try {
+      const payload = JSON.stringify({
+        user_id: "cebdc7a2-d8af-45b3-b37f-80f328ff54d6",
+        structure_id: 14
+      });
+
+      const response = await fetch('http://127.0.0.1:5000/craft_structure', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: payload
+      });
+
+      const data = await response.json();
+      console.log('Response from Flask:', data);
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  };
+
+  return (
+    <button onClick={handleClick}>
+      Craft Structure
+    </button>
+  );
+};
+
+const ItemListFetcher = () => {
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:5000/items');
+        console.log('Items:', response.data);
+      } catch (error) {
+        console.error('Error fetching items:', error.message);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
+  return (
+    <div>
+      Fetching items...
+    </div>
+  );
 };

@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 
 export default function ContentPlaceholder(planetIdDeepnote) {
   return (
-      <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg z-50">
+    <center>
+      <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-xl z-50 mt-10">
         <p className="text-base font-semibold leading-7 text-indigo-600">Planet type</p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Planet name</h1>
         <p className="mt-6 text-xl leading-8 text-gray-700">
@@ -42,6 +43,7 @@ export default function ContentPlaceholder(planetIdDeepnote) {
           </p>
         </div>
       </div>
+      </center>
   );
 };
 
