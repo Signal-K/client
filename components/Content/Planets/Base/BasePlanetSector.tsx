@@ -6,6 +6,70 @@ import RoverImageGallery, { RoverImage, RoverImageNoHandle } from "../PlanetData
 import axios from "axios";
 import { RoverContentPostForm } from "../../CreatePostForm";
 import StructureComponent, { PlacedStructures } from "../Activities/StructureCreate";
+import SectorItems from "../Sectors/SectorStructures";
+import { SectorStructureOwned } from "../../Inventory/UserOwnedItems";
+// import SectorStructures from "../Sectors/SectorStructures";
+
+const AddResourceToInventory = ({ resource }) => {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddResource = async () => {
+    setIsAdding(true);
+    try {
+      // Check if the user already has this resource in their inventory
+      const { data: existingResource, error } = await supabase
+        .from('inventoryUSERS')
+        .select('*')
+        .eq('owner', session?.user?.id)
+        .eq('item', resource.id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      let quantity = 1;
+
+      // If the user already has this resource, increment the quantity
+      if (existingResource) {
+        quantity = existingResource.quantity + 1;
+      }
+
+      // Add the resource to the user's inventory
+      const { error: insertError } = await supabase
+        .from('inventoryUSERS')
+        .upsert({
+          owner: session?.user?.id,
+          item: resource.id,
+          quantity,
+        });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      // Resource added successfully
+      alert(`${resource.name} added to your inventory!`);
+    } catch (error) {
+      console.error('Error adding resource to inventory:', error.message);
+      // Show error message or handle error appropriately
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleAddResource}
+      disabled={isAdding}
+      className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${isAdding ? 'cursor-not-allowed' : ''}`}
+    >
+      {isAdding ? 'Adding...' : 'Add to Inventory'}
+    </button>
+  );
+};
 
 export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
   const router = useRouter();
@@ -198,9 +262,13 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
       </Card>
       <div>
         <Card noPadding={false}>
+          <PlacedStructures sectorId={Number(sectorid)} />
+          <AddResourceToInventory resource={deposit} />
+          {/* <SectorItems planetSectorId={sectorid} /> */}
+          <SectorStructureOwned sectorid={sectorid} />
+          <p>{deposit}</p>
           <RoverImageNoHandle date='853' rover='opportunity' sectorNo={id} />
           <StructureComponent sectorId={sectorid} />
-          <PlacedStructures sectorId={Number(sectorid)} />
           {/* {imageUrl ? (
             <>
                 <img src={imageUrl} alt="Rover image" />
