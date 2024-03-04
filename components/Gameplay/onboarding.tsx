@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import { InventoryBlock } from "../dashboard-logs";
@@ -12,32 +12,42 @@ export function OnboardingWindows() {
 
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' });
+  const [accordionState, setAccordionState] = useState(Array(6).fill(isDesktopOrLaptop));
 
-  return (
-    <div className="w-full">
+  useEffect(() => {
+    if (isDesktopOrLaptop) {
+        setAccordionState(Array(6).fill(true)); // Open all accordions on desktop
+    } else {
+        setAccordionState(Array(6).fill(false)); // Close all accordions on mobile/tablet
+    }
+}, [isDesktopOrLaptop]);
+
+const toggleAccordion = (index) => {
+  const newAccordionState = [...accordionState];
+  newAccordionState[index] = !newAccordionState[index];
+  setAccordionState(newAccordionState);
+};
+
+return (
+  <div className="w-full">
       <div className="container px-4 md:px-6">
-        <div className={`grid max-w-6xl ${isTabletOrMobile ? 'grid-cols-1' : 'grid-cols-3 md:grid-cols-2 lg:grid-cols-3'} gap-4 items-start min-h-[calc(10vh-1px)] py-6 mx-auto`}>
-          {Array.from({ length: 6 }, (_, index) => (
-            <div key={index} className="collapse bg-base-200">
-              <input type="radio" name="my-accordion-1" id={`accordion-${index}`} />
-              <div className="collapse-title text-xl font-medium flex items-center space-x-2">
-                {getAccordionIcon(index)}
-                <span>{getAccordionTitle(index)}</span>
-              </div>
-              <div className="collapse-content">
-                {getAccordionContent(index)}
-              </div>
-            </div>
-          ))}
-        </div>
-        <style jsx>{`
-          .grid-cols-3 > *:nth-child(n+4) {
-            margin-top: calc(-1.5 * var(--accordion-collapsed-height));
-          }
-        `}</style>
+          <div className={`grid max-w-6xl ${isTabletOrMobile ? 'grid-cols-1' : 'grid-cols-3 md:grid-cols-2 lg:grid-cols-3'} gap-4 items-start min-h-[calc(10vh-1px)] py-6 mx-auto`}>
+              {Array.from({ length: 6 }, (_, index) => (
+                  <div key={index} className="collapse bg-base-200">
+                      <input type="checkbox" name={`accordion-${index}`} id={`accordion-${index}`} checked={accordionState[index]} onChange={() => toggleAccordion(index)} />
+                      <div className="collapse-title text-xl font-medium flex items-center space-x-2">
+                          {getAccordionIcon(index)}
+                          <span>{getAccordionTitle(index)}</span>
+                      </div>
+                      <div className="collapse-content">
+                          {getAccordionContent(index)}
+                      </div>
+                  </div>
+              ))}
+          </div>
       </div>
-    </div>
-  );
+  </div>
+);
 };
 
 function getAccordionIcon(index) {
@@ -83,7 +93,46 @@ function getAccordionContent(index) {
     case 0:
       return <p>Content for Section 1</p>;
     case 1:
-      return <p>Content for Section 2</p>;
+      return <p><svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="100" fill="#aaa" />
+  
+      <rect x="30" y="20" width="140" height="30" fill="#0049B7" />
+      <rect x="30" y="60" width="40" height="20" fill="#0049B7" />
+      <rect x="100" y="60" width="20" height="20" fill="#0049B7" />
+      <rect x="160" y="60" width="10" height="20" fill="#0049B7" />
+  
+      <circle cx="60" cy="40" r="15" fill="#0049B7" />
+  
+      <path
+          d="M140,100
+             h20
+             v-10
+             h-20
+             v10
+             z
+             m10,0
+             l10,10
+             l10-10
+             l-10-10
+             l-10,10
+             z
+             m20,20
+             h-20
+             l-10,10
+             l-10-10
+             h-20
+             l-10,20
+             h70
+             l-10-20
+             z
+             m10-10
+             l-20-20
+             l20-20
+             l20,20
+             l-20,20
+             z"
+          fill="#aaa" />
+  </svg></p>;
     case 2:
       return (
         <ItemsVerticalList />

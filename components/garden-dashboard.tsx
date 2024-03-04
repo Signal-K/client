@@ -24,7 +24,9 @@ export function GardenDashboard() {
           {showGalaxy &&
             <>
               <div className="mt-10">
-                <Garden onClose={() => setShowGalaxy(false)} />
+                <><Garden onClose={() => setShowGalaxy(false)} />
+                
+</>
               </div>
             </>
           }

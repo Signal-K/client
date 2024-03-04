@@ -223,6 +223,11 @@ export const PlacedStructures = ({ sectorId }) => {
             {structure.present && (
               <Link legacyBehavior href="#" passHref>
               <a className="text-sm underline" onClick={() => handleStructureClick(structure.id)}>
+              {structure.id === 22 && (
+        <div className="iframe-container">
+          <iframe src={`/explore/${sectorId}`} title="Explore" className="iframe-class" />
+        </div>
+      )}
                 View More
               </a>
             </Link>
