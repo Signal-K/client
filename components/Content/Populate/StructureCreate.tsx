@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import axios from "axios";
 import Link from "next/link";
+import { LightkurveBaseGraph } from "../Planets/PlanetData/ContentPlaceholder";
 
 interface Structure {
     id: number;
@@ -162,9 +163,61 @@ interface PlacedStructuresProps {
 export const PlacedStructures = ({ sectorId }) => {
     const supabase = useSupabaseClient();
     const [placedStructures, setPlacedStructures] = useState([]);
+    const [usingStructure, setUsingStructure] = useState(null);
+
+    // Planet data
+    const [planetData, setPlanetData] = useState(null);
+
+    useEffect(() => {
+      if (sectorId) {
+        getPlanetData();
+      };
+    }, [sectorId]);
+
+    const getPlanetData = async () => {
+      try {
+        const { data, error } = await supabase
+            .from('basePlanetSectors')
+            .select('anomaly')
+            .eq("id", sectorId);
+
+        if (data) {
+            setPlanetId(data);
+        }
+
+        if (error) {
+            throw error;
+        }
+    } catch (error) {
+        console.error(error.message);
+    }
+      try {
+        const { data, error } = await supabase
+          .from("basePlanets")
+          .select("*")
+          .eq("id", planetId)
+          .single();
+  
+        if (data) {
+          setPlanetData(data);
+        };
+  
+        if (error) {
+          throw error;
+        };
+      } catch (error: any) {
+        console.error(error.message);
+      };
+    };
+
+    const [planetId, setPlanetId] = useState(null);
+    const handleClosePopup = () => {
+      setUsingStructure(null);
+    };
   
     useEffect(() => {
       const fetchPlacedStructures = async () => {
+        console.log('Planet id', planetId)
         try {
           // Fetch all structure items from inventoryITEMS table
           const { data: structureItems, error: structureItemsError } = await supabase
@@ -225,10 +278,33 @@ export const PlacedStructures = ({ sectorId }) => {
               <a className="text-sm underline" onClick={() => handleStructureClick(structure.id)}>
               {structure.id === 22 && (
         <div className="iframe-container">
-          <iframe src={`/explore/${sectorId}`} title="Explore" className="iframe-class" />
+          {/* <iframe src={`/explore/${sectorId}`} title="Explore" className="iframe-class" /> */}
         </div>
       )}
-                View More
+              {structure.id === 12 && (
+          <div className="iframe-container">
+                       <button
+                    className="justify-self-center self-start"
+                    onClick={() => setUsingStructure(14)}
+                  >View More
+                  </button>
+                  {usingStructure === 14 && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-xl z-50">
+            {!planetData?.lightkurve && (
+              <><LightkurveBaseGraph planetId={{ planetId: planetId }} />
+            <button onClick={handleClosePopup}>Close</button></>
+            )}
+            {planetData?.lightkurve && (
+              <><img src={planetData?.lightkurve} />
+              <button onClick={handleClosePopup}>Close</button></>
+            )}
+          </div>
+        </div>
+      )}
+        </div>
+        )}
+                {/* View More */}
               </a>
             </Link>
             )}
