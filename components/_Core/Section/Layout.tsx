@@ -3,6 +3,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import Bottombar from "./BottomBar";
 import { useMediaQuery } from "react-responsive";
 import FeedOverlay from "../../Overlays/1-Feed";
+import { Garden } from "../../Content/Planets/GalleryList";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -142,17 +143,61 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' });
+  const [showGalaxy, setShowGalaxy] = useState(true);
 
   return (
     <div className="flex relative items-start h-screen overflow-hidden">
+      {isTabletOrMobile && (
+        <style jsx global>
+          {`
+            body {
+              background: url('satellite.jpg') center/cover;
+            }
+
+            @media only screen and (max-width: 767px) {
+              .planet-heading {
+                color: white;
+                font-size: 24px;
+                text-align: center;
+                margin-bottom: 10px;
+              }
+            }
+          `}
+        </style>
+      )}
+      {isDesktopOrLaptop && (
+        <style jsx global>
+          {`
+            body {
+              background: url('Waterdrop.jpg') center/cover;
+            }
+
+            @media only screen and (max-width: 767px) {
+              .planet-heading {
+                color: white;
+                font-size: 24px;
+                text-align: center;
+                margin-bottom: 10px;
+              }
+            }
+          `}
+        </style>
+      )}
+
       <main className="h-max pb-10 grow overflow-y-auto">
-        {children}
-      </main>
-      {/* {isMobile && (
-        <div className="w-full md:hidden fixed bottom-0 left-0 z-50">
-          <Bottombar />
+        {/* Content container */}
+        <div className="p-5">
+          {children}
         </div>
-      )} */}
+
+        {/* Margin top class ensures 30px padding above the Garden component */}
+        <div className="mt-10 relative z-0">
+          {/* Garden component */}
+          <div className="fixed bottom-0 left-0 w-full">
+            <Garden onClose={() => setShowGalaxy(false)} />
+          </div>
+        </div>
+      </main>
     </div>
   );
 };

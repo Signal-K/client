@@ -302,12 +302,12 @@ export const Garden: React.FC<GardenProps> = ({ onClose }) => {
     <div className={`fixed inset-x-0 bottom-0 flex justify-center transition-transform duration-300 ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}>
       <div className="bg-cover bg-center w-full sm:max-w-screen-lg sm:w-full max-h-96vh overflow-y-auto shadow-lg relative rounded-t-3xl">
         <div style={{ backgroundImage: `url('/garden.png')` }} className="bg-cover bg-center h-96vh flex items-center justify-center relative rounded-t-3xl">
-          <button
+          {/* <button
             onClick={handleClose}
             className="absolute top-4 right-4 px-4 py-2 bg-gray-200 text-gray-800 rounded"
           >
             Close
-          </button>
+          </button> */}
           <PlanetGalleryWithSectors />
         </div>
       </div>

@@ -131,42 +131,7 @@ export function PublicLanding() {
         <LayoutNoNav>
           {isDesktopOrLaptop && ( <Navigation /> )}
           <div className="flex-col justify-center mt-10">
-            {isTabletOrMobile && (
-              <style jsx global>
-              {`
-                body {
-                  background: url('satellite.jpg') center/cover;
-                }
-      
-                @media only screen and (max-width: 767px) {
-                  .planet-heading {
-                    color: white;
-                    font-size: 24px;
-                    text-align: center;
-                    margin-bottom: 10px;
-                  }
-                }
-              `}
-            </style>
-            )}
-{isDesktopOrLaptop && (
-              <style jsx global>
-              {`
-                body {
-                  background: url('Waterdrop.jpg') center/cover;
-                }
-      
-                @media only screen and (max-width: 767px) {
-                  .planet-heading {
-                    color: white;
-                    font-size: 24px;
-                    text-align: center;
-                    margin-bottom: 10px;
-                  }
-                }
-              `}
-            </style>
-            )}
+
       
             <div className="image-container mx-3 absolute top-0 left-1/2 transform -translate-x-1/2 mt-10 mb-10">
               <div className="flex justify-center items-center flex-row mt-20">
@@ -192,10 +157,7 @@ export function PublicLanding() {
           <RoverCharacter position={characterPosition.rover} />
         </div>
       </div>
-            
-            <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
-              {/* Content here */}
-            </div>
+          
             <div className="mt-20">
               {showFeedOverlay && (
                 <>
@@ -208,20 +170,22 @@ export function PublicLanding() {
           </div>
           
 {/* Menu Button */}
-{!showFeedOverlay && (
-  <button
-    onClick={handleOpenFeedOverlay}
-    className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-2 text-white rounded"
-  >
-    <a href="#_" className="inline-flex overflow-hidden text-white rounded group">
-      <img src='/Galaxy/Kepler-22.png' height='100' width='100' />
-    </a>
-  </button>
-)}
-
-<div className="mt-10">
-  <Garden onClose={() => setShowGalaxy(false)} />
+<div className="mb-10">
+  {!showFeedOverlay && (
+    <button
+      onClick={handleOpenFeedOverlay}
+      className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-20 my-20 text-white rounded z-10"
+    >
+      <a href="#_" className="inline-flex overflow-hidden text-white rounded group">
+        <img src='/Galaxy/Kepler-22.png' height='100' width='100' />
+      </a>
+    </button>
+  )}
 </div>
+
+{/* <div className="mt-10 relative z-0">
+  <Garden onClose={() => setShowGalaxy(false)} />
+</div> */}
 
         </LayoutNoNav>
       );      
