@@ -60,12 +60,6 @@ export function PublicLanding() {
     };
   }, [profile]);
 
-  // Component context
-  const [showFeedOverlay, setShowFeedOverlay] = useState(false);
-  const handleOpenFeedOverlay = () => {
-    setShowFeedOverlay(true);
-  };
-
   // Screen size parameters
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' });
@@ -150,38 +144,16 @@ export function PublicLanding() {
               </div>
             </div>
             {isDesktopOrLaptop && (<OnboardingWindows />)}
-            
+            </div>
             <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 mb-20">
         <div className="flex justify-center">
           <PlanetCharacter position={characterPosition.planet} />
           <RoverCharacter position={characterPosition.rover} />
         </div>
       </div>
+      
           
-            <div className="mt-20">
-              {showFeedOverlay && (
-                <>
-                  <div className="mt-20">
-                    <FeedOverlay onClose={() => setShowFeedOverlay(false)} />
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-          
-{/* Menu Button */}
-<div className="mb-10">
-  {!showFeedOverlay && (
-    <button
-      onClick={handleOpenFeedOverlay}
-      className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-20 my-20 text-white rounded z-10"
-    >
-      <a href="#_" className="inline-flex overflow-hidden text-white rounded group">
-        <img src='/Galaxy/Kepler-22.png' height='100' width='100' />
-      </a>
-    </button>
-  )}
-</div>
+
 
 {/* <div className="mt-10 relative z-0">
   <Garden onClose={() => setShowGalaxy(false)} />

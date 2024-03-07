@@ -122,8 +122,8 @@ const PlanetGalleryWithSectors: React.FC = () => {
       let query = supabase
         .from('basePlanets')
         .select('*')
-        .order('created_at', { ascending: false })
-        .limit(200);
+        .order('created_at', { ascending: true })
+        .limit(3); // Set this to be owned planets
 
       const { data, error } = await query;
 
