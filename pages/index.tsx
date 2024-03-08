@@ -25,6 +25,7 @@ import UponSignupModal from "../components/Modals/UponSignup";
 import { MinimalAccordion, OnboardingWindows } from "../components/Gameplay/onboarding";
 import PlanetCharacter, { RoverCharacter } from "../components/Content/Assets/PlanetCharacter";
 import { Garden } from "../components/Content/Planets/GalleryList";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -308,11 +309,11 @@ export function PublicLanding() {
                   <span className="italic">Star Sailors</span>
                 </h1>
                 <p className="mt-6 mx-auto max-w-2xl text-lg leading-8 text-gray-600 dark:text-white">
-                  One-liner about Star Sailors
+                  Star Sailors V2 is currently under development, please go to v1
                 </p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
                   <a
-                    href="/login"
+                    href="https://starprotocol-og3j6xuus-gizmotronn.vercel.app"
                     className="rounded-md px-3.5 py-2.5 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-200 hover:ring-2 hover:ring-yellow-300 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-white"
                   >
                     Get Started <span aria-hidden="true">→</span>
@@ -321,13 +322,13 @@ export function PublicLanding() {
               </div>
               <div className="mt-14 flow-root sm:mt-14 ">
                 <div className="-m-2 rounded-xl  lg:-m-4 lg:rounded-2xl lg:p-4">
-                  <img
+                  <Link href="/login"><img
                     src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/garden.png"
                     alt="App screenshot"
                     width={2432}
                     height={1442}
                     className="rounded-md shadow-2xl ring-1 ring-gray-900/10"
-                  />
+                  /></Link>
                 </div>
               </div>
             </div>
@@ -573,4 +574,4 @@ export default function Home() {
   const userId = session?.user?.id;
 
   return <PublicLanding />;
-}
+};
