@@ -152,6 +152,15 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <div className="flex relative items-start h-screen overflow-hidden">
+      {/* <div className="absolute top-4 right-4 px-20 py-20">
+      <img
+        className="rounded-full w-32 h-32 z-50"
+        src="https://cdn.cloud.scenario.com/assets-transform/KO7W80GhRPab0kOWPFsFIw?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy10cmFuc2Zvcm0vS083VzgwR2hSUGFiMGtPV1BGc0ZJdz9wPTEwMCoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MTQ1MjE1OTl9fX1dfQ__&Key-Pair-Id=K36FIAB9LE2OLR&Signature=fUmRKK~sb9XaklxuXfXmzRd4YUzATcKtCcXSpu7glOyLJkhX1p9HIVts7hys4DJiDaj1YYK42r5S0mWVRCvUuT29hoDESp0NTHf6pYBAqXwXSt-bHk1nwsqlGObpB5H-EbSwhKAIDwyR1a4WgA9PpHky-h2lcH9pdu6Ec3twrpQKebDwHUgTwtlltUrRSaH1O6lRdm312oEvQmTWE7815HgKgknfZwGny5OiBnVhr7od~rOhwDbbdAhZnwD5GRjNgZUjeDQQQ5IIsRuqm2Lmoq2LjCkfQIQAi8skSrwq67PQsDnuxwbfmvbtiK0wFVyFrWIxIJOgYXB1SJonxNPcNA__"
+        alt="image description"
+        height='20px'
+        width='20px'
+      />
+    </div> */}
       {isTabletOrMobile && (
         <style jsx global>
           {`
@@ -191,6 +200,7 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
 
       <main className="h-max pb-10 grow overflow-y-auto">
         {/* Content container */}
+        
         <div className="p-5">
           {children}
         </div>
