@@ -126,8 +126,6 @@ export function PublicLanding() {
         <LayoutNoNav>
           {isDesktopOrLaptop && ( <Navigation /> )}
           <div className="flex-col justify-center mt-10">
-
-      
             <div className="image-container mx-3 absolute top-0 left-1/2 transform -translate-x-1/2 mt-10 mb-10">
               <div className="flex justify-center items-center flex-row mt-20">
                 {isDesktopOrLaptop && (
@@ -152,14 +150,6 @@ export function PublicLanding() {
           <RoverCharacter position={characterPosition.rover} />
         </div>
       </div>
-      
-          
-
-
-{/* <div className="mt-10 relative z-0">
-  <Garden onClose={() => setShowGalaxy(false)} />
-</div> */}
-
         </LayoutNoNav>
       );      
   };

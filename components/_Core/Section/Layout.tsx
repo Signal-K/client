@@ -146,9 +146,13 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [showGalaxy, setShowGalaxy] = useState(true);
   const [showFeedOverlay, setShowFeedOverlay] = useState(false);
   const handleOpenFeedOverlay = () => {
+    setShowGalaxy(false);
     setShowFeedOverlay(true);
-    setShowGalaxy(false)
   };
+  const handleCloseFeedOverlay = () => {
+    setShowGalaxy(true);
+    setShowFeedOverlay(false);
+  }
 
   return (
     <div className="flex relative items-start h-screen overflow-hidden">
@@ -197,22 +201,28 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
           `}
         </style>
       )}
+<main className="h-max pb-10 grow overflow-y-auto">
+    <div className="p-5">
+        {children}
+    </div>
+    <div className="mt-10 relative z-0">
+        <div className="fixed bottom-10 left-0 w-full">
+            {showGalaxy && (
+                <div className="z-40">
+                    <Garden onClose={() => setShowGalaxy(false)} />
+                </div>
+            )}
 
-      <main className="h-max pb-10 grow overflow-y-auto">
-        {/* Content container */}
-        
-        <div className="p-5">
-          {children}
+            {/* FeedOverlay section */}
+            {showFeedOverlay && (
+                <div className="fixed bottom-0 left-0 w-full z-50 mt-20">
+                    <FeedOverlay onClose={() => handleCloseFeedOverlay()} />
+                </div>
+            )}
         </div>
+    </div>
+</main>
 
-        {/* Margin top class ensures 30px padding above the Garden component */}
-        <div className="mt-10 relative z-0">
-          {/* Garden component */}
-          <div className="fixed bottom-10 left-0 w-full">
-            <Garden onClose={() => setShowGalaxy(false)} />
-          </div>
-        </div>
-      </main>
       {isMobile && (
         <div className="md:hidden overflow-y-auto h-screen p-4">
           <main className="h-max pb-10 grow">{children}</main>
@@ -220,7 +230,7 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
               {showFeedOverlay && (
                 <>
                   <div className="mt-20">
-                    <FeedOverlay onClose={() => setShowFeedOverlay(false)} />
+                    <FeedOverlay onClose={() => handleCloseFeedOverlay()} />
                   </div>
                 </>
               )}
@@ -233,7 +243,7 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
       onClick={handleOpenFeedOverlay}
       className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-20 my-20 text-white rounded z-10"
     >
-      <a href="#_" className="inline-flex overflow-hidden text-white rounded group">
+      <a className="inline-flex overflow-hidden text-white rounded group">
         <img src='/Galaxy/Kepler-22.png' height='100' width='100' />
       </a>
     </button>
