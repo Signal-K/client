@@ -127,7 +127,7 @@ export function PublicLanding() {
           {isDesktopOrLaptop && ( <Navigation /> )}
           <div className="flex-col justify-center mt-10">
             <div className="image-container mx-3 absolute top-0 left-1/2 transform -translate-x-1/2 mt-10 mb-10">
-              <div className="flex justify-center items-center flex-row mt-20">
+              {/* <div className="flex justify-center items-center flex-row mt-20">
                 {isDesktopOrLaptop && (
                   <>
                     <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/TOI%20700.png" alt="Planet 1" className="responsive-image h-12 w-12 mx-10" />
@@ -140,7 +140,7 @@ export function PublicLanding() {
                     <img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/71/Group%201000002854.png" alt="Planet 2" className="responsive-image h-12 w-12" />
                   </>
                 )}
-              </div>
+              </div> */}
             </div>
             {isDesktopOrLaptop && (<OnboardingWindows />)}
             </div>
