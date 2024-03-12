@@ -26,6 +26,7 @@ import { MinimalAccordion, OnboardingWindows } from "../components/Gameplay/onbo
 import PlanetCharacter, { RoverCharacter } from "../components/Content/Assets/PlanetCharacter";
 import { Garden } from "../components/Content/Planets/GalleryList";
 import Link from "next/link";
+import { AllSectors } from "../components/Content/Planets/Sectors/SectorSetup";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -145,9 +146,10 @@ export function PublicLanding() {
             {isDesktopOrLaptop && (<OnboardingWindows />)}
             </div>
             <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 mb-20">
-        <div className="flex justify-center">
+        <div className="flex justify-center mb-20">
           <PlanetCharacter position={characterPosition.planet} />
           <RoverCharacter position={characterPosition.rover} />
+          <AllSectors />
         </div>
       </div>
         </LayoutNoNav>
