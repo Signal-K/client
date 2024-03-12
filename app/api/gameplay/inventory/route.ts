@@ -41,6 +41,19 @@ const inventoryItems: InventoryItem[] = [
   { id: 32, name: 'Camera Receiver', description: 'Keep track of all the photos your anomalies have taken', cost: 1, icon_url: '', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '11': 1 } },
 ];
 
+// Function to filter items by category and return their IDs and types
+function getItemsByCategories(categories: string[]): { id: number; type: string }[] {
+  return inventoryItems
+    .filter(item => categories.includes(item.ItemCategory))
+    .map(item => ({ id: item.id, type: item.ItemCategory }));
+}
+
+// Example usage
+const filteredItems = getItemsByCategories(['Automaton', 'Structure', 'Minerals']);
+
 export async function GET(req: NextRequest) {
-  return NextResponse.json(inventoryItems);
-};
+  return NextResponse.json({
+    inventoryItems,
+    filteredItems,
+  });
+}
