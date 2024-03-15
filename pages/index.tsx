@@ -22,8 +22,6 @@ import Navigation, {
 import { GardenDashboard } from "../components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
 import UponSignupModal from "../components/Modals/UponSignup";
-import { Globe } from "../components/Content/Planets/PlanetGlobe";
-import { GlobeDemo } from "../components/Content/Planets/PlanetGlobeTest";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -113,7 +111,6 @@ export function PublicLanding() {
            <div className="mx-20 mt-20">
            <div className="chat chat-start mt-20 justify-left mt-20">
   <div className="chat-bubble">You need to pick a planet!</div>
-  <GlobeDemo />
 </div>
 <div className="chat chat-end">
   <div className="chat-bubble">You've got 5 new deposits to explore</div>
