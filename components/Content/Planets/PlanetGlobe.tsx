@@ -291,7 +291,7 @@ export function hexToRgb(hex: string) {
         b: parseInt(result[3], 16),
       }
     : null;
-}
+};
 
 export function genRandomNumbers(min: number, max: number, count: number) {
   const arr = [];

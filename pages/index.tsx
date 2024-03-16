@@ -27,6 +27,7 @@ import PlanetCharacter, { RoverCharacter } from "../components/Content/Assets/Pl
 import { Garden } from "../components/Content/Planets/GalleryList";
 import Link from "next/link";
 import { AllSectors } from "../components/Content/Planets/Sectors/SectorSetup";
+import { GlobeDemo } from "../components/Content/Planets/PlanetGlobeTest";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -145,12 +146,13 @@ export function PublicLanding() {
             </div>
             {isDesktopOrLaptop && (<OnboardingWindows />)}
             </div>
+            <GlobeDemo />
             <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 mb-20">
-        <div className="flex justify-center mb-20">
+        {/* <div className="flex justify-center mb-20">
           <PlanetCharacter position={characterPosition.planet} />
           <RoverCharacter position={characterPosition.rover} />
           <AllSectors />
-        </div>
+        </div> */}
       </div>
         </LayoutNoNav>
       );      

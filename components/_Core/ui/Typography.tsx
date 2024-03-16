@@ -47,12 +47,12 @@ function Title(props: TitleProps) {
     const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements
 
     return (
-        <HeadingTag
-            className={`${styles.title} ${styles[`h${level}`]} ${className}`}
-            style={style}
-        >
+        // <HeadingTag
+        //     className={`${styles.title} ${styles[`h${level}`]} ${className}`}
+        //     style={style}
+        // >
             {children}
-        </HeadingTag>
+        // </HeadingTag>
     )
 }
 

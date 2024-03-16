@@ -55,7 +55,7 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
                </>
              )}
            </div>
-      {!showFeedOverlay && (
+      {/* {!showFeedOverlay && (
            <button
              onClick={handleOpenFeedOverlay}
              className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-2 text-white rounded"
@@ -83,7 +83,7 @@ const Layout: React.FC<DashboardLayoutProps> = ({ children }) => {
                <span className="pl-4 pr-5 py-2.5">Menu</span>
              </a>
            </button>
-         )}
+         )} */}
     </>
   );
 };
@@ -169,7 +169,7 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
         <style jsx global>
           {`
             body {
-              background: url('https://cdn.cloud.scenario.com/assets-transform/KO7W80GhRPab0kOWPFsFIw?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy10cmFuc2Zvcm0vS083VzgwR2hSUGFiMGtPV1BGc0ZJdz9wPTEwMCoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MTQ1MjE1OTl9fX1dfQ__&Key-Pair-Id=K36FIAB9LE2OLR&Signature=fUmRKK~sb9XaklxuXfXmzRd4YUzATcKtCcXSpu7glOyLJkhX1p9HIVts7hys4DJiDaj1YYK42r5S0mWVRCvUuT29hoDESp0NTHf6pYBAqXwXSt-bHk1nwsqlGObpB5H-EbSwhKAIDwyR1a4WgA9PpHky-h2lcH9pdu6Ec3twrpQKebDwHUgTwtlltUrRSaH1O6lRdm312oEvQmTWE7815HgKgknfZwGny5OiBnVhr7od~rOhwDbbdAhZnwD5GRjNgZUjeDQQQ5IIsRuqm2Lmoq2LjCkfQIQAi8skSrwq67PQsDnuxwbfmvbtiK0wFVyFrWIxIJOgYXB1SJonxNPcNA__') center/cover;
+              background: url('https://cdn.cloud.scenario.com/assets-transform/f2GojSNuSNeJW-jCIkjM3Q?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy10cmFuc2Zvcm0vZjJHb2pTTnVTTmVKVy1qQ0lrak0zUT9wPTEwMCoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MTQ1MjE1OTl9fX1dfQ__&Key-Pair-Id=K36FIAB9LE2OLR&Signature=MHFmmlACBuvKi6HTrMy3e3pabvel0rp9Ms683Wz34NOdc8TBMI8neT~m48if9-STXsR1C2i2PQMdmjO05qi7p~IqlqMhB5aGbILSzj4mp1NQ6zLxdAmtFAtLv-dlFl11fugAHAX1rrL~wc1NVxxdr5o~9Ti9lnTnhb1V9-bKTHLiCLgXQ5VZHtrEUnZJ8E0FIfc-ACfAnp9~yqiwkhCGsHJhfjXHnsfdINSIGMEuncf~PI~tW6foq0EtEjq5J8IdupNud7CQIm8Ssh11AZl-Oqf~TUejSKxtS66mO1tUhfTDn4otwUrUiwAy-5tuOtDN4TKPo5Pv~AR3hCrK1vjdDQ__') center/cover;
             }
 
             @media only screen and (max-width: 767px) {
@@ -238,7 +238,7 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
           </div>
       )}
 <div className="mb-10"><div>
-  {!showFeedOverlay && (
+  {/* {!showFeedOverlay && (
     <button
       onClick={handleOpenFeedOverlay}
       className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-20 my-20 text-white rounded z-10"
@@ -247,7 +247,7 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
         <img src='/Galaxy/Kepler-22.png' height='100' width='100' />
       </a>
     </button>
-  )}
+  )} */}
 </div>{showGalaxy && (
           <Garden onClose={() => setShowGalaxy(false)} />)}
         </div>
