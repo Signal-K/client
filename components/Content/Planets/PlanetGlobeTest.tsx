@@ -28,7 +28,7 @@ export function GlobeDemo() {
     maxRings: 9,
     initialPosition: { lat: 22.3193, lng: 114.1694 },
     autoRotate: true,
-    autoRotateSpeed: 0.23,
+    autoRotateSpeed: 0.03,
   };
   const colors = ["#06b6d4", "06b6d4", "#6366f1"];
   const sampleArcs = [
@@ -412,11 +412,9 @@ export function GlobeDemo() {
           className="div"
         >
           <h2 className="text-center text-xl md:text-4xl font-bold text-black dark:text-white">
-            We sell soap worldwide
+            
           </h2>
           <p className="text-center text-base md:text-lg font-normal text-neutral-700 dark:text-neutral-200 max-w-md mt-2 mx-auto">
-            This globe is interactive and customizable. Have fun with it, and
-            don&apos;t forget to share it. :)
           </p>
         </motion.div>
         <div className="absolute w-full bottom-0 inset-x-0 h-40 bg-gradient-to-b pointer-events-none select-none from-transparent z-40" />
