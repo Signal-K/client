@@ -144,15 +144,16 @@ export function PublicLanding() {
                 )}
               </div> */}
             </div>
+            <GlobeDemo />
             {isDesktopOrLaptop && (<OnboardingWindows />)}
             </div>
-            <GlobeDemo />
             <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 mb-20">
-        {/* <div className="flex justify-center mb-20">
-          <PlanetCharacter position={characterPosition.planet} />
-          <RoverCharacter position={characterPosition.rover} />
-          <AllSectors />
-        </div> */}
+        <div className="flex justify-center mb-20">
+          {/* <PlanetCharacter position={characterPosition.planet} /> */}
+          {/* <RoverCharacter position={characterPosition.rover} /> */}
+
+          {/* <AllSectors /> */}
+        </div>
       </div>
         </LayoutNoNav>
       );      
