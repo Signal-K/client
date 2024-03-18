@@ -19,14 +19,9 @@ import Navigation, {
   UserDropdownMenu,
   UserMenuItems,
 } from "../components/_Core/Section/Navbar";
-import { GardenDashboard } from "../components/garden-dashboard";
-import FeedOverlay from "../components/Overlays/1-Feed";
-import UponSignupModal from "../components/Modals/UponSignup";
 import { MinimalAccordion, OnboardingWindows } from "../components/Gameplay/onboarding";
 import PlanetCharacter, { RoverCharacter } from "../components/Content/Assets/PlanetCharacter";
-import { Garden } from "../components/Content/Planets/GalleryList";
 import Link from "next/link";
-import { AllSectors } from "../components/Content/Planets/Sectors/SectorSetup";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -149,7 +144,6 @@ export function PublicLanding() {
         <div className="flex justify-center mb-20">
           <PlanetCharacter position={characterPosition.planet} />
           <RoverCharacter position={characterPosition.rover} />
-          <AllSectors />
         </div>
       </div>
         </LayoutNoNav>
