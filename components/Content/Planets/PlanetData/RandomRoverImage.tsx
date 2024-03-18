@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import Card from "../../../Card";
-import { RoverContentPostForm } from "../../CreatePostForm";
+import Card from "../../../_Core/ui/Content/Card";
+import { RoverContentPostForm } from "../../Classify/CreatePostForm";
 
 interface RoverImageCardProps {
     roverImage: {
@@ -11,20 +11,6 @@ interface RoverImageCardProps {
         image: string;
         planets2: string;
     };
-};
-
-function RoverImageCard({ roverImage }: RoverImageCardProps) {
-    const { id, content, image, planets2 } = roverImage;
-
-    return (
-        <div className="col-md-4 mb-4">
-            <Card noPadding={false}>
-                <div style={{ width: "100%", height: "200px", overflow: "hidden" }}>
-                    <img src={image} alt="Rover image" className="w-100 h-auto" />
-                </div>
-            </Card>
-        </div>
-    );
 };
 
 export const RoverImage = ({ date, rover, onImageMetadataChange }) => {
@@ -151,32 +137,3 @@ export default function RoverImageGallery() {
         </Card>
     );
 };
-
-/*
-
-const handlePostSubmit = async () => {
-        if (content) {
-            const user = session?.user?.id;
-            if (user) {
-                const response = await supabase.from('contentROVERIMAGES').upsert([
-                    {
-                        author: user,
-                        metadata: metadata,
-                        imageLink: RoverImage,
-                        // planet: '1', // Change this when upserting in planets/[id].tsx
-                        // basePlanet: '1',
-                        content: content,
-                        media: null, // See slack comms
-                    },
-                ]);
-
-                if (response.error) {
-                    console.error(response.error);
-                } else {
-                    setContent('');
-                }
-            }
-        };
-    }
-
-*/

@@ -1,8 +1,7 @@
 import React from "react";
-// import Garden from "../components/Gameplay/Garden";
 import { Garden } from "../components/Content/Planets/GalleryList";
-import Layout, { LayoutNoNav } from "../components/Section/Layout";
-import Navbar from "../components/Section/Navbar";
+import Layout, { LayoutNoNav } from "../components/_Core/Section/Layout";
+import Navbar from "../components/_Core/Section/Navbar";
 
 export default function GardenPage() {
     return (
@@ -12,5 +11,5 @@ export default function GardenPage() {
                 throw new Error("Function not implemented.");
             } } />
         </LayoutNoNav>
-    )
-}
+    );
+};

@@ -2,7 +2,7 @@ import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 import React, { useEffect } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router'; // Import the useRouter hook
-import Layout from '../../components/Section/Layout';
+import Layout from '../../components/_Core/Section/Layout';
 import LoginPage from '../../components/Authentication/LoginModal';
 
 const Register = () => {

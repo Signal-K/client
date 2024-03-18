@@ -1,8 +1,8 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import React from "react";
-import Navigation from "../../components/Section/Navbar";
-import RoverExploreDesktop from "../../components/Content/RoverData/RoverExplore";
+import Navigation from "../../components/_Core/Section/Navbar";
+import RoverExploreDesktop from "../../components/Gameplay/Explore/RoverExplore";
 
 export default function ExplorePlanet () {
     const supabase = useSupabaseClient();

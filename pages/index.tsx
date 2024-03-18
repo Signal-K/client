@@ -1,6 +1,6 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
-import Layout, { LayoutNoNav } from "../components/Section/Layout";
+import Layout, { LayoutNoNav } from "../components/_Core/Section/Layout";
 import { useRouter } from "next/router";
 import { useMediaQuery } from 'react-responsive';
 
@@ -14,15 +14,13 @@ import {
   footerNavigation,
   modules,
   navigation,
-} from "../components/Public/LandingContent";
+} from "../components/_Core/Section/Info/LandingContent";
 import Navigation, {
   UserDropdownMenu,
   UserMenuItems,
-} from "../components/Section/Navbar";
-import { GardenDashboard } from "../@/components/garden-dashboard";
+} from "../components/_Core/Section/Navbar";
+import { GardenDashboard } from "../components/garden-dashboard";
 import FeedOverlay from "../components/Overlays/1-Feed";
-import Link from "next/link";
-import { AppWindowIcon, MenuIcon } from "lucide-react";
 import UponSignupModal from "../components/Modals/UponSignup";
 
 export const metadata: Metadata = {
@@ -120,7 +118,7 @@ export function PublicLanding() {
 <div className="chat chat-start">
   <div className="chat-bubble">A dust storm is brewing on your home planet, time to investigate.</div>
 </div></div>
-<UponSignupModal />
+{isDesktopOrLaptop && ( <UponSignupModal /> )}
            </div>
            <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-40 my-12">
              {/* Content here */}
@@ -154,9 +152,9 @@ export function PublicLanding() {
                    xmlns="http://www.w3.org/2000/svg"
                  >
                    <path
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     stroke-width="2"
+                     strokeLinecap="round"
+                     strokeLinejoin="round"
+                     strokeWidth="2"
                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                    ></path>
                  </svg>

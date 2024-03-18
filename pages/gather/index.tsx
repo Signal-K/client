@@ -2,23 +2,12 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
 import React from "react";
 import Link from "next/link";
-import Layout from "../../components/Section/Layout";
+import Layout from "../../components/_Core/Section/Layout";
 import CreateBasePlanetSector, { AllSectors, UserOwnedSectorGrid } from "../../components/Content/Planets/Sectors/SectorSetup";
 
 export default function GatherResourcesPage() {
     const supabase = useSupabaseClient();
     const session = useSession();
-
-    const sectorImageUrls = [
-        'https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00090/ids/edr/browse/edl/EBE_0090_0674952393_193ECM_N0040048EDLC00090_0030LUJ01_1200.jpg',
-        'https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00088/ids/edr/browse/ncam/NLF_0088_0674754382_784ECM_N0040048NCAM00503_01_295J01_1200.jpg',
-        'https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00898/ids/edr/browse/ncam/NLF_0898_0746644503_691ECM_N0440830NCAM00501_01_295J01_1200.jpg',
-        'https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00452/ids/edr/browse/ncam/NLG_0452_0707069810_116ECM_N0260000NCAM00521_00_2I4J01_1200.jpg',
-        'https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00142/ids/edr/browse/ncam/NLE_0142_0679544984_506ECM_N0051812NCAM00208_04_0LLJ01_1200.jpg',
-        'https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00014/ids/edr/browse/ncam/NLM_0014_0668187567_632ECM_N0030074AUT_04096_00_2LLJ01_1200.jpg',
-        'https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00214/ids/edr/browse/ncam/NLF_0214_0685920377_855ECM_N0072050NCAM00514_01_295J01_1200.jpg',
-        'https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00721/ids/edr/browse/ncam/NLF_0721_0730956964_909ECM_N0345120NCAM15721_01_195J01_1200.jpg',
-    ];
 
     if (!session) {
         return (

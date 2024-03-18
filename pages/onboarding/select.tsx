@@ -1,8 +1,7 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useState } from "react";
-import Layout from "../../components/Section/Layout";
-import SelectYourBasePlanet from "../../components/Content/Planets/Base/SelectYourPlanet";
-import ClassificationFeed from "../../components/Content/ClassificationFeed";
+import Layout from "../../components/_Core/Section/Layout";
+import SelectYourBasePlanet from "../../components/Gameplay/SelectYourPlanet";
 
 export default function Home() {
     const session = useSession();
@@ -27,4 +26,4 @@ export default function Home() {
     return (
         <Layout>Hello</Layout>
     );
-};
+}; 
