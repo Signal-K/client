@@ -126,21 +126,6 @@ export const InventoryLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
 };
 
 export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const checkIsMobile = () => {
-        setIsMobile(window.innerWidth <= 768);
-      };
-      checkIsMobile();
-      window.addEventListener("resize", checkIsMobile);
-      return () => {
-        window.removeEventListener("resize", checkIsMobile);
-      };
-    }
-  }, []);
-
   const isDesktopOrLaptop = useMediaQuery({ query: '(min-width: 1224px)' });
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' });
   const [showGalaxy, setShowGalaxy] = useState(true);
@@ -214,29 +199,14 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
             )}
 
             {/* FeedOverlay section */}
-            {showFeedOverlay && (
+            {/* {showFeedOverlay && (
                 <div className="fixed bottom-0 left-0 w-full z-50 mt-20">
                     <FeedOverlay onClose={() => handleCloseFeedOverlay()} />
                 </div>
-            )}
+            )} */}
         </div>
     </div>
 </main>
-
-      {isMobile && (
-        <div className="md:hidden overflow-y-auto h-screen p-4">
-          <main className="h-max pb-10 grow">{children}</main>
-          <div className="mt-20">
-              {showFeedOverlay && (
-                <>
-                  <div className="mt-20">
-                    <FeedOverlay onClose={() => handleCloseFeedOverlay()} />
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-      )}
 <div className="mb-10"><div>
   {!showFeedOverlay && (
     <button
