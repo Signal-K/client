@@ -12,7 +12,8 @@ import { CreateStructureWithItemRequirementinfo, PlacedStructureSingle } from "@
 import MiningStationPlaceable, { MeteorologyToolPlaceable } from "@/components/Gameplay/Inventory/Structures/Mining";
 import PlanetCloudData from "@/components/Content/Anomalies/CloudList";
 import { MeteorologyToolModal, MeteorologyToolModalPlaceable } from "@/components/Gameplay/Inventory/Structures/Terrestrial";
-import { AUSM } from "@/components/Gameplay/Inventory/Structures/Automatons";
+import { CameraAutomatonModule } from "@/components/Gameplay/Inventory/Structures/Automatons/Modules";
+import { AUSM } from "@/components/Gameplay/Inventory/Structures/Automatons/Automatons";
 
 interface OwnedItem {
     id: string;
@@ -65,6 +66,9 @@ export default function MissionGroupTwo() {
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         <AUSM itemId={31} />
+                    </Card>
+                    <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <CameraAutomatonModule />
                     </Card>
                 </Carousel>
             </div>

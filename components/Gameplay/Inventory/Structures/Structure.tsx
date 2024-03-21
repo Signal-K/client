@@ -11,7 +11,8 @@ import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTele
 import { AnomalyStructureModal } from "../Automatons/Automaton";
 import { MiningStructureModal } from "./Mining";
 import { MeteorologyToolModal } from "./Terrestrial";
-import { AutomatonUpgradeStructureModal } from "./Automatons";
+import { AutomatonUpgradeStructureModal } from "./Automatons/Automatons";
+import { CameraAutomatonModule } from "./Automatons/Modules";
 
 interface OwnedItem {
     id: string;
@@ -146,6 +147,13 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
                     onClose={closeModal}
                     ownedItem={ownedItem}
                     structure={structure}
+                />
+            )}
+            {structure.id === 28 && (
+                <CameraAutomatonModule
+                    // onClose={closeModal}
+                    // ownedItem={ownedItem}
+                    // structure={structure}
                 />
             )}
         </div>
