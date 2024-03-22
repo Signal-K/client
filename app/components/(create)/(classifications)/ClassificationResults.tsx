@@ -19,18 +19,10 @@ export const ClassificationResult: React.FC<ClassificationResultProps> = ({ clas
     );
 };
 
-interface ClassificationOutputProps {
-    configuration: {
-        [key: string]: boolean;
-    };
-}
-
-// Create a mapping between terrain types and mineral/item IDs
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet';
 
-// Create a mapping between terrain types and mineral/item IDs
 const terrainToMineralsMap: { [key: string]: string[] } = {
     'Dried-up water channels': ['21', '13', '15'],
     'Pebbles/medium-sized rocks': ['13', '15', '16'],
@@ -42,47 +34,51 @@ const terrainToMineralsMap: { [key: string]: string[] } = {
 
 interface ClassificationOutputProps {
     configuration: { [key: string]: boolean };
-};
+}
 
 export const ClassificationOutput: React.FC<ClassificationOutputProps> = ({ configuration }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
-    
     const { activePlanet } = useActivePlanet();
 
-    // Get selected terrain types
-    const selectedTerrainTypes = Object.keys(configuration).filter(key => configuration[key]);
+    const [selectedMinerals, setSelectedMinerals] = useState<string[]>([]);
+    const hasInserted = useRef(false); // Track whether minerals have been inserted
 
-    // Get minerals based on selected terrain types
-    const selectedMinerals = selectedTerrainTypes.reduce<string[]>((acc, terrain) => {
-        const minerals = terrainToMineralsMap[terrain] || [];
-        return acc.concat(minerals);
-    }, []);
+    useEffect(() => {
+        // Get selected terrain types
+        const selectedTerrainTypes = Object.keys(configuration).filter(key => configuration[key]);
 
-    // Calculate mineral quantities
-    const mineralQuantities: { [mineralId: string]: number } = selectedMinerals.reduce((acc, mineralId) => {
-        acc[mineralId] = (acc[mineralId] || 0) + 1;
-        return acc;
-    }, {} as { [mineralId: string]: number });
+        // Get minerals based on selected terrain types
+        const minerals = selectedTerrainTypes.reduce<string[]>((acc, terrain) => {
+            const terrainMinerals = terrainToMineralsMap[terrain] || [];
+            return acc.concat(terrainMinerals);
+        }, []);
 
-    // Insert entries into mineralDeposits table
+        // Remove duplicates and pick 3 random unique minerals
+        const uniqueMinerals = Array.from(new Set(minerals));
+        const selectedUniqueMinerals = uniqueMinerals.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+        setSelectedMinerals(selectedUniqueMinerals);
+    }, [configuration]);
+
     const insertMineralDeposits = async () => {
-        if (session && activePlanet) {
+        if (session && activePlanet && selectedMinerals.length > 0 && !hasInserted.current) {
+            hasInserted.current = true; // Set flag to prevent duplicate insertions
             try {
-                // Prepare deposits with properly formatted mineralconfiguration
-                const deposits = Object.entries(mineralQuantities).map(([mineralId, count]) => ({
+                // Prepare deposits
+                const deposits = selectedMinerals.map(mineralId => ({
                     anomaly: activePlanet.id,
                     owner: session.user.id,
                     mineralconfiguration: {
                         mineral: mineralId,
-                        quantity: 7 * count // Quantity = 7 times the number of mentions
+                        quantity: 7 // Fixed quantity for each mineral
                     }
                 }));
-    
+
                 const { data, error } = await supabase
                     .from('mineralDeposits')
                     .insert(deposits);
-    
+
                 if (error) {
                     console.error("Error inserting mineral deposits:", error.message);
                 } else {
@@ -93,12 +89,12 @@ export const ClassificationOutput: React.FC<ClassificationOutputProps> = ({ conf
             }
         }
     };
-    
 
-    // Run insertion after component mounts or when configuration changes
     useEffect(() => {
-        insertMineralDeposits();
-    }, [configuration]);
+        if (selectedMinerals.length > 0) {
+            insertMineralDeposits();
+        }
+    }, [selectedMinerals, session, activePlanet]);
 
     return (
         <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-[#2C4F64]/30 text-white rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
@@ -107,7 +103,7 @@ export const ClassificationOutput: React.FC<ClassificationOutputProps> = ({ conf
             <div className="flex flex-col gap-2">
                 <h3 className="font-semibold">Selected Terrain Types:</h3>
                 <ul>
-                    {selectedTerrainTypes.map((terrain, index) => (
+                    {Object.keys(configuration).filter(key => configuration[key]).map((terrain, index) => (
                         <li key={index}>{terrain}</li>
                     ))}
                 </ul>

@@ -11,18 +11,6 @@ interface AnomalyClassificationProps {
 };
 
 export function AnomalyRoverPhoto() {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
-
-    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
-    const [imageUrl, setImageUrl] = useState<string>('');
-
-    const [loading, setLoading] = useState<boolean>(true);
-
-    const resourceList = ["11", "13", "15", "16", "17", "19", "20", "21"];
-    
     return (
         <div>
             <RoverPhoto />

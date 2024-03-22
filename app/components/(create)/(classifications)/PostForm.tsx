@@ -434,9 +434,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                 >
                                     Submit
                                 </button>
-                                {classificationOutput && (
-                                    <ClassificationOutput configuration={classificationOutput} />
-                                )}
                             </>
                     </div>
                 </div>

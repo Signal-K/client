@@ -119,7 +119,7 @@ export const RooverFromAppeears: React.FC = () => {
                 console.error("Error establishing mining settlement: ", error);
                 alert("Failed to establish the mining settlement.");
             }
-        }
+        };
     };
 
     return (
@@ -219,14 +219,14 @@ export const RoverPhoto: React.FC = () => {
             if (photos.length > 0) {
                 setRovers([{ id: Date.now(), avatar_url: photos[0] }]);
                 setRoverConfig(response.data);
-                saveImageFromRover(photos[0]); // Save the image once fetched
+                saveImageFromRover(photos[0]);
             } else {
                 setRovers([{ id: Date.now(), avatar_url: "No images found" }]);
-            }
+            };
         } catch (error) {
             console.error("Error fetching rover images from NASA:", error);
             setRovers([{ id: Date.now(), avatar_url: "An error occurred while fetching the images." }]);
-        }
+        };
     };
 
     // Save the image from the rover to the anomalies table
@@ -251,19 +251,19 @@ export const RoverPhoto: React.FC = () => {
                 if (error) {
                     console.error("Error inserting anomaly:", error.message);
                     throw error;
-                }
+                };
 
                 setImagesCollected(true);
-                setRovers(data); // Update rovers state with saved data
+                setRovers(data);
             } catch (error) {
                 console.error("Error saving rover image:", error);
                 alert("Failed to collect and classify the images from your rover.");
-            }
-        }
+            };
+        };
     };
 
     useEffect(() => {
-        fetchMarsImages(); // Trigger image fetching on component mount
+        fetchMarsImages(); 
     }, [supabase]);
 
     return (

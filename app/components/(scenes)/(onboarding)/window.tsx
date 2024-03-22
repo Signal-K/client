@@ -270,7 +270,7 @@ const OnboardingWindow = () => {
       {/* Bottom Navigation (Mobile) */}
       {currentStep && (
         <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-2 md:hidden z-20">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between mt-5 items-center">
             <button
               onClick={handleBack}
               disabled={currentStep === steps[0]?.id}
@@ -278,12 +278,12 @@ const OnboardingWindow = () => {
             >
               Back
             </button>
-            <ProgressBar
+            {/* <ProgressBar
               currentStepIndex={steps.findIndex(
                 (step) => step.id === currentStep
               )}
               totalSteps={steps.length}
-            />
+            /> */}
             <button
               onClick={handleNext}
               disabled={currentStep === steps[steps.length - 1]?.id}
