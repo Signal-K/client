@@ -122,21 +122,6 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
         </div>
     </div>
 </main>
-<div className="mb-10"><div>
-  {!showFeedOverlay && (
-    <button
-      onClick={handleOpenFeedOverlay}
-      className="fixed bottom-2 left-1/2 transform -translate-x-1/2 mt-4 px-4 py-20 my-20 text-white rounded z-10"
-    >
-      <a className="inline-flex overflow-hidden text-white rounded group">
-        <img src='/Galaxy/Kepler-22.png' height='100' width='100' />
-      </a>
-    </button>
-  )}
-</div>{showGalaxy && (
-          <Garden onClose={() => setShowGalaxy(false)} />)}
-        </div>
-      )
-    </div>
+</div>
   );
 };

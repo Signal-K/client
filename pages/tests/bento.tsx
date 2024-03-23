@@ -3,6 +3,8 @@ import { BentoGridThirdDemo } from "../../components/Content/Visuals/Bento";
 
 export default function BentoTestPage() {
     return (
-        <BentoGridThirdDemo />
-    )
-}
+        <div className="mt-8">
+            <BentoGridThirdDemo />
+        </div>
+    );
+};
