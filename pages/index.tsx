@@ -22,7 +22,7 @@ import Navigation, {
 import { MinimalAccordion, OnboardingWindows } from "../components/Gameplay/onboarding";
 import PlanetCharacter, { RoverCharacter } from "../components/Content/Assets/PlanetCharacter";
 import Link from "next/link";
-import { BentoGridThirdDemo } from "../components/Content/Visuals/Bento";
+import { BentoGridMobileDemo, BentoGridThirdDemo } from "../components/Content/Visuals/Bento";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -123,7 +123,8 @@ export function PublicLanding() {
         <LayoutNoNav>
           {isDesktopOrLaptop && ( <Navigation /> )}
           <div className="pt-10">
-            <BentoGridThirdDemo />
+            {isDesktopOrLaptop && ( <BentoGridThirdDemo /> )};
+            {isTabletOrMobile && ( <BentoGridMobileDemo /> )};
           </div>
         </LayoutNoNav>
       );      
