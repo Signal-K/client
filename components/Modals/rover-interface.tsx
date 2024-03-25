@@ -466,6 +466,122 @@ export function RoverInterfaceDark() {
   );
 };
 
+export function RoverInterfaceDarkMobile() {
+  return (
+    <div className="bg-black bg-opacity-70 text-white min-h-screen p-4 md:p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-6 border border-white p-4">
+          <div className="text-4xl font-bold">Planet Name</div>
+          <div>
+            <div className="font-semibold">ROVER #1 (Allow user to customise name)</div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div>MISSION DAY</div>
+                <div>SOL #3039</div>
+                <div>Time: 2:36 pm</div>
+              </div>
+              <div>
+                <div>SUNRISE</div>
+                <div>6:37 am</div>
+                <div>SUNSET</div>
+                <div>6:35 pm</div>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <div>PRESSURE</div>
+              <div className="flex items-center">
+                <GaugeIcon className="text-green-500" />
+                <span>827 Pa</span>
+              </div>
+            </div>
+            <div>
+              <div>OXYGEN</div>
+              <div className="flex items-center">
+                <FuelIcon className="text-green-500" />
+                <span>0.24%</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div>TEMPERATURE</div>
+            <div className="flex items-center">
+              <ThermometerIcon className="text-red-500" />
+              <span>-29.16 °C</span>
+            </div>
+          </div>
+          <div>
+            <div>ATMOSPHERE</div>
+            <div>Moderate sunny</div>
+          </div>
+          <div>
+            <div>ROVER STATUS</div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div>CELL</div>
+                <div>65.25</div>
+              </div>
+              <div>
+                <div>GAS PRESS</div>
+                <div>12.48</div>
+              </div>
+            </div>
+            <div>
+              <div>MODE</div>
+              <div>DRV</div>
+            </div>
+          </div>
+          <div>
+            <div>SPEED</div>
+            <div>118 km/hour</div>
+          </div>
+        </div>
+        <div className="col-span-1 space-y-6 border border-white p-4">
+          <div className="text-xl font-semibold">CAMERA CONTROL PANEL</div>
+          <div>
+            <video
+              className="w-full h-auto"
+              height="300"
+              src="/assets/Surface.mp4"
+              style={{
+                aspectRatio: "350/300",
+                objectFit: "cover",
+              }}
+              width="350"
+              autoPlay
+              loop
+              muted
+            />
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="flex space-x-2">
+              <Button variant="ghost">Coordinates</Button>
+              <Button variant="ghost">Angle</Button>
+              <Button variant="ghost">Information</Button>
+            </div>
+            <div className="flex space-x-2">
+              <ZoomInIcon className="text-white" />
+              <ZoomOutIcon className="text-white" />
+              <CameraIcon className="text-white" />
+            </div>
+          </div>
+          <div>
+            <Textarea placeholder="Write a command" />
+            <div className="flex justify-between items-center">
+              <Button>SEND COMMAND</Button>
+              <div className="flex space-x-2">
+                <Button variant="ghost">DIAGNOSTICS</Button>
+                <Button variant="ghost">SELF-REPAIR</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function AntennaIcon(props) {
   return (
     <svg

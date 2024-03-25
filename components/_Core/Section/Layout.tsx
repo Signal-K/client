@@ -60,7 +60,7 @@ export const LayoutNoNav: React.FC<DashboardLayoutProps> = ({ children }) => {
         <style jsx global>
           {`
             body {
-              background: url('https://cdn.cloud.scenario.com/assets-transform/KO7W80GhRPab0kOWPFsFIw?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy10cmFuc2Zvcm0vS083VzgwR2hSUGFiMGtPV1BGc0ZJdz9wPTEwMCoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MTQ1MjE1OTl9fX1dfQ__&Key-Pair-Id=K36FIAB9LE2OLR&Signature=fUmRKK~sb9XaklxuXfXmzRd4YUzATcKtCcXSpu7glOyLJkhX1p9HIVts7hys4DJiDaj1YYK42r5S0mWVRCvUuT29hoDESp0NTHf6pYBAqXwXSt-bHk1nwsqlGObpB5H-EbSwhKAIDwyR1a4WgA9PpHky-h2lcH9pdu6Ec3twrpQKebDwHUgTwtlltUrRSaH1O6lRdm312oEvQmTWE7815HgKgknfZwGny5OiBnVhr7od~rOhwDbbdAhZnwD5GRjNgZUjeDQQQ5IIsRuqm2Lmoq2LjCkfQIQAi8skSrwq67PQsDnuxwbfmvbtiK0wFVyFrWIxIJOgYXB1SJonxNPcNA__') center/cover;
+              background: url('https://cdn.cloud.scenario.com/assets/asset_J8Mo3eYBJWMjdC8wSQQ15edx?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9hc3NldF9KOE1vM2VZQkpXTWpkQzh3U1FRMTVlZHg~cD0xMDAqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzE0NTIxNTk5fX19XX0_&Key-Pair-Id=K36FIAB9LE2OLR&Signature=ERw02sLK6d6yXD0YC6USsU8GckSYAn61zS8Wkn4v7zi9bQuF303LROIwETSCGLu8cL8ICi9sL6urbsKBCgy7R75pzGSYWGlz5sK9kIlrjEVBEk--1IOb6RckcuYGF8hDFzxziZubJ828j3CMAuYD3EV7PdNb0NmtTIlVBDVQUQyyY5t3IJ2hMJhkixjBIpTPFnnBzZbiNVK-BWaNlskb4d-~E9W8AOH8nN1hz7JGvJzKBun96cLGL-jq-fr1esT7ehdDuO0aYqad6mLXHrSHoPb1ZTXg4VjB5zRiAvQ2w6O8s1w8azsMBD4aTe0QmRepBopiHjS8-dYZp~olGkGd7Q__&format=jpeg') center/cover;
             }
 
             @media only screen and (max-width: 767px) {

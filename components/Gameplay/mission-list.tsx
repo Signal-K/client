@@ -3,59 +3,44 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 
 export function MissionList() {
+  const missions = [
+    { name: "Pick your home planet", completed: true },
+    { name: "Build your first rover", completed: false },
+    { name: "Collect your first resources", completed: false },
+    { name: "Build your first structure", completed: false },
+    { name: "Make your first classification", completed: false },
+  ];
+
   return (
-<>
+    <>
       <CardHeader>
         <CardTitle>To-Do List</CardTitle>
         <CardDescription>Manage your daily tasks</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 overflow-y-auto max-h-[480px] pr-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Link href="#">
-              <LinkIcon className="w-5 h-5 text-gray-500 hover:text-gray-900 dark:hover:text-gray-50" />
-            </Link>
-            <p className="line-through text-gray-500 dark:text-gray-400">Finish the design mockups</p>
+        {missions.map((mission, index) => (
+          <div key={index} className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Link href="#">
+                <LinkIcon
+                  className={`w-5 h-5 text-gray-500 ${
+                    mission.completed ? "line-through" : ""
+                  } hover:text-gray-900 dark:hover:text-gray-50`}
+                />
+              </Link>
+              <p
+                className={`${
+                  mission.completed ? "line-through text-gray-500 dark:text-gray-400" : ""
+                }`}
+              >
+                {mission.name}
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Link href="#">
-              <LinkIcon className="w-5 h-5 text-gray-500 hover:text-gray-900 dark:hover:text-gray-50" />
-            </Link>
-            <p>Attend the team meeting</p>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Link href="#">
-              <LinkIcon className="w-5 h-5 text-gray-500 hover:text-gray-900 dark:hover:text-gray-50" />
-            </Link>
-            <p>Buy groceries</p>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Link href="#">
-              <LinkIcon className="w-5 h-5 text-gray-500 hover:text-gray-900 dark:hover:text-gray-50" />
-            </Link>
-            <p>Call mom</p>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Link href="#">
-              <LinkIcon className="w-5 h-5 text-gray-500 hover:text-gray-900 dark:hover:text-gray-50" />
-            </Link>
-            <p>Clean the house</p>
-          </div>
-        </div>
-      </CardContent>
-      {/* <CardFooter className="flex justify-end">
-        <Button size="sm">Add Task</Button>
-      </CardFooter> */}
-</>
-  )
+        ))}
+        </CardContent>
+      </>
+  );
 }
 
 function LinkIcon(props) {

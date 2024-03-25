@@ -326,16 +326,6 @@ const mobileItems = [
       className: "md:col-span-2",
       icon: <IconTableColumn className="h-4 w-4 text-neutral-500" />,
     },
-  
-    {
-      title: "",
-      description: (
-        null
-      ),
-      header: <SkeletonFive />,
-      className: "md:col-span-1",
-      // icon: <IconBoxAlignRightFilled className="h-4 w-4 text-neutral-500" />,
-    },
   ];
 
 
