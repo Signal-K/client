@@ -97,22 +97,26 @@ export const ItemsVerticalList: React.FC = () => {
   const supabase = useSupabaseClient();
   const [ownedItems, setOwnedItems] = useState([]);
   const [itemDetails, setItemDetails] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
-    const fetchOwnedItemsAndDetails = async () => {
-      if (!session) return;
+    if (!session || !supabase) {
+      return;
+    }
 
+    const fetchOwnedItemsAndDetails = async () => {
       try {
+        setIsLoading(true);
         const userId = session.user.id;
 
         // Fetch owned items from the database
         const { data: ownedItemsData, error: ownedItemsError } = await supabase
-          .from('inventoryUSERS')
-          .select('*')
-          .eq('owner', userId)
-          .gt('id', 20)
+          .from("inventoryUSERS")
+          .select("*")
+          .eq("owner", userId)
+          .gt("id", 20)
           .limit(6)
-          .order('id', { ascending: false});
+          .order("id", { ascending: false });
 
         if (ownedItemsError) {
           throw ownedItemsError;
@@ -126,20 +130,20 @@ export const ItemsVerticalList: React.FC = () => {
 
           // Fetch details of owned items based on item IDs
           const { data: itemDetailsData, error: itemDetailsError } = await supabase
-            .from('inventoryITEMS')
-            .select('*')
-            .in('id', itemIds);
+            .from("inventoryITEMS")
+            .select("*")
+            .in("id", itemIds);
 
           if (itemDetailsError) {
             throw itemDetailsError;
           }
 
-          if (itemDetailsData) {
-            setItemDetails(itemDetailsData);
-          }
+          setItemDetails(itemDetailsData);
         }
       } catch (error) {
-        console.error('Error fetching owned items and details:', error);
+        console.error("Error fetching owned items and details:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -148,15 +152,19 @@ export const ItemsVerticalList: React.FC = () => {
 
   // Combine owned items with their details
   const combinedItems = ownedItems.map(ownedItem => {
-    // Find the matching item detail based on item ID
     const itemDetail = itemDetails.find(detail => detail.id === ownedItem.item);
-
     return {
       ...ownedItem,
       ...itemDetail,
     };
   });
 
+  // If the component is loading, you can display a loading indicator or message
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Render the list of items
   return (
     <div className="w-full">
       {combinedItems.map(item => (
