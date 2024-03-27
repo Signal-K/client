@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "../../../lib/uitls";
 import { RocketIcon } from "lucide-react";
 import { BentoGrid } from "../ui/bento-grid";
-import { InventoryOneList, InventoryTwoList } from "../../_Skeleton/InventoryBlocks";
+import { InventoryOneList, InventoryTwoList, OwnedStructuresFullList } from "../../_Skeleton/InventoryBlocks";
 
 export default function BlockGrid() {
     return (
@@ -68,7 +68,7 @@ const items = [
         className: "md:col-span-1",
     },
     {
-        title: "Inventory list 2", // Rover Temperature Control Panel"
+        title: "Inventory list 2",
         description: (
             <span className="text-sm">
                 
@@ -76,6 +76,17 @@ const items = [
         ),
         icon: RocketIcon,
         header: <InventoryTwoList />,
+        className: "md:col-span-1",
+    },
+    {
+        title: "Your owned structures",
+        description: (
+            <span className="text-sm">
+                
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <OwnedStructuresFullList />,
         className: "md:col-span-1",
     },
 ];

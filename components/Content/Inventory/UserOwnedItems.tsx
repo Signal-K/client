@@ -175,7 +175,7 @@ export const ItemsVerticalList: React.FC = () => {
             </div>
             <p className="text-sm">{item.name}</p>
           </div>
-          <p className="text-sm">x{item.quantity}</p>
+          <p className="text-sm">{item.quantity}</p>
         </div>
       ))}
     </div>
