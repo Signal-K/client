@@ -1,5 +1,5 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import OwnedItemsList, { ItemsVerticalList } from "../Content/Inventory/UserOwnedItems";
+import OwnedItemsList, { ItemsVerticalList, SectorStructureOwned } from "../Content/Inventory/UserOwnedItems";
 import { useEffect, useState } from "react";
 
 const SectorStructureOwnedAllSectorsOneUser: React.FC<{}> = () => {
@@ -94,7 +94,7 @@ export const InventoryTwoList = () => {
 
 export const OwnedStructuresFullList = () => {
     return (
-        // <SectorStructureOwned />
-        <SectorStructureOwnedAllSectorsOneUser />
+        <SectorStructureOwned sectorid="18" />
+        // <SectorStructureOwnedAllSectorsOneUser />
     );
 };

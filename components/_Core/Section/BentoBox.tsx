@@ -87,6 +87,6 @@ const items = [
         ),
         icon: RocketIcon,
         header: <OwnedStructuresFullList />,
-        className: "md:col-span-1",
+        className: "md:col-span-2 h-[150%]"
     },
 ];

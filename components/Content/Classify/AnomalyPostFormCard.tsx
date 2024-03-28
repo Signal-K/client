@@ -6,7 +6,7 @@ import { ClimbingBoxLoader } from "react-spinners";
 export default function PostFormCardAnomalyTag({ onPost, planetId }) {
     const supabase = useSupabaseClient();
     const session = useSession();
-
+ 
     const [content, setContent] = useState('');
     const profile = session?.user?.id;
     const [avatar_url, setAvatarUrl] = useState(null);
