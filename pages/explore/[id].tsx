@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import Navigation from "../../components/_Core/Section/Navbar";
 import RoverExploreDesktop from "../../components/Gameplay/Explore/RoverExplore";
+import { RoverInterfaceDark } from "../../components/Modals/rover-interface";
 
 export default function ExplorePlanet () {
     const supabase = useSupabaseClient();
@@ -31,7 +32,8 @@ export default function ExplorePlanet () {
            </style>
             <Navigation />
             <div className="">
-                <RoverExploreDesktop id={id as string} />
+                {/* <RoverExploreDesktop id={id as string} /> */}
+                <RoverInterfaceDark />
             </div>
         </>
     );

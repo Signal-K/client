@@ -18,7 +18,7 @@ const SectorStructureOwnedAllSectorsOneUser: React.FC<{}> = () => {
                 const { data: ownedItemsData, error: ownedItemsError } = await supabase
                     .from('inventoryUSERS')
                     .select('*')
-                    .eq("id", session?.user?.id);
+                    .eq("owner", session?.user?.id);
         
                 if (ownedItemsError) {
                     throw ownedItemsError;
@@ -71,7 +71,7 @@ const SectorStructureOwnedAllSectorsOneUser: React.FC<{}> = () => {
                     <img src={item.icon_url} alt={item.name} className="w-full h-auto" />
                     </div>
                     <p className="text-gray-600">Quantity: {ownedItem?.quantity}</p>
-                    <p className="text-gray-600">On planet (id): {ownedItem?.sector}</p>
+                    <p className="text-gray-600">On sector (id): {ownedItem?.sector}</p>
                 </li>
                 );
             })}
@@ -94,7 +94,7 @@ export const InventoryTwoList = () => {
 
 export const OwnedStructuresFullList = () => {
     return (
-        <SectorStructureOwned sectorid="18" />
-        // <SectorStructureOwnedAllSectorsOneUser />
+        // <SectorStructureOwned sectorid="18" />
+        <SectorStructureOwnedAllSectorsOneUser />
     );
 };

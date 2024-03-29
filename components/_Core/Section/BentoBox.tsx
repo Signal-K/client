@@ -1,12 +1,13 @@
 import React from "react";
 import { cn } from "../../../lib/uitls";
 import { RocketIcon } from "lucide-react";
-import { BentoGrid } from "../ui/bento-grid";
+import { BentoGrid, BentoGridTest } from "../ui/bento-grid";
 import { InventoryOneList, InventoryTwoList, OwnedStructuresFullList } from "../../_Skeleton/InventoryBlocks";
+import { ClassificationForPlanetFormBlock } from "../../_Skeleton/ClassificationBlocks";
 
 export default function BlockGrid() {
     return (
-        <BentoGrid className="max-w-4xl mx-auto md:auto-rows-[20rem]">
+        <BentoGridTest className="max-w-4xl mx-auto md:auto-rows-[20rem]">
             {items.map((item, i) => (
                 <BentoBoxItem
                     key={i}
@@ -16,7 +17,7 @@ export default function BlockGrid() {
                     className={cn("[&>p:text-lg]", item.className)}
                 />
             ))}
-        </BentoGrid>
+        </BentoGridTest>
     );
 };
 
@@ -65,7 +66,7 @@ const items = [
         ),
         icon: RocketIcon,
         header: <InventoryOneList />,
-        className: "md:col-span-1",
+        className: "md:col-span-1 h-[100%]",
     },
     {
         title: "Inventory list 2",
@@ -76,13 +77,24 @@ const items = [
         ),
         icon: RocketIcon,
         header: <InventoryTwoList />,
-        className: "md:col-span-1",
+        className: "md:col-span-1 h-[100%]",
+    },
+    {
+        title: "Post form card",
+        description: (
+            <span className="text-sm">
+                
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <ClassificationForPlanetFormBlock />,
+        className: "md:col-span-1 h-[100%]",
     },
     {
         title: "Your owned structures",
         description: (
             <span className="text-sm">
-                
+                You're able to view all structures you own, on any sector and any planet, in this block
             </span>
         ),
         icon: RocketIcon,

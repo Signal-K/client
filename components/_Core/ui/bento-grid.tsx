@@ -19,6 +19,25 @@ export const BentoGrid = ({
   );
 };
 
+export const BentoGridTest = ({
+  className,
+  children,
+}: {
+  className?: string;
+  children?: React.ReactNode;
+}) => {
+  return (
+    <div
+      className={cn(
+        "grid md:auto-rows-[18rem] grid-cols-1 md:grid-cols-4 gap-4 w-full", // px-10
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+};
+
 export const BentoGridItem = ({
   className,
   title,

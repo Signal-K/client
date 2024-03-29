@@ -37,6 +37,7 @@ export default function PlanetIdPage () {
         const checkIsMobile = () => {
             setIsMobile(window.innerWidth <= 768);
         };
+        console.log(router.query, "protect");
         checkIsMobile();
         window.addEventListener("resize", checkIsMobile);
         return () => {

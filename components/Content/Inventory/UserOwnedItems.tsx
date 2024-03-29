@@ -251,7 +251,7 @@ export const SectorStructureOwned: React.FC<{ sectorid: string }> = ({ sectorid 
                     <img src={item.icon_url} alt={item.name} className="w-full h-auto" />
                     </div>
                     <p className="text-gray-600">Quantity: {ownedItem?.quantity}</p>
-                    <p className="text-gray-600">On planet (id): {ownedItem?.sector}</p>
+                    <p className="text-gray-600">On sector (id): {ownedItem?.sector}</p>
                 </li>
                 );
             })}
