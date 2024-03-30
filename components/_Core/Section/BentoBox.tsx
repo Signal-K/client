@@ -7,7 +7,7 @@ import { ClassificationForPlanetFormBlock } from "../../_Skeleton/Classification
 
 export default function BlockGrid() {
     return (
-        <BentoGridTest className="max-w-4xl mx-auto md:auto-rows-[20rem]">
+        <BentoGridTest className="max-w-7xl mx-auto md:auto-rows-[20rem]">
             {items.map((item, i) => (
                 <BentoBoxItem
                     key={i}
@@ -66,7 +66,7 @@ const items = [
         ),
         icon: RocketIcon,
         header: <InventoryOneList />,
-        className: "md:col-span-1 h-[100%]",
+        className: "md:col-span-1 row-span-1",
     },
     {
         title: "Inventory list 2",
@@ -77,7 +77,7 @@ const items = [
         ),
         icon: RocketIcon,
         header: <InventoryTwoList />,
-        className: "md:col-span-1 h-[100%]",
+        className: "md:col-span-1 row-span-1",
     },
     {
         title: "Post form card",
@@ -88,7 +88,7 @@ const items = [
         ),
         icon: RocketIcon,
         header: <ClassificationForPlanetFormBlock />,
-        className: "md:col-span-1 h-[100%]",
+        className: "md:col-span-1 row-span-1",
     },
     {
         title: "Your owned structures",
@@ -99,6 +99,17 @@ const items = [
         ),
         icon: RocketIcon,
         header: <OwnedStructuresFullList />,
-        className: "md:col-span-2 h-[150%]"
+        className: "md:col-span-2 row-span-2"
+    },
+    {
+        title: "Posts for a planet/all planets",
+        description: (
+            <span className="text-sm">
+                This block allows you to view posts for a specific anomaly (currently planets), however there is also a global feed that takes every post/comment & vote/metadata
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <ClassificationForPlanetFormBlock />,
+        className: "md:col-span-2 row-span-1"
     },
 ];
