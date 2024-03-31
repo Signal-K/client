@@ -101,7 +101,7 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
   
     if (!planetData) {
       return <div>Loading...</div>;
-    }
+    };
   
     const { content, avatar_url, type, deepnote, cover, ticId, temperatureEq, smaxis, mass } = planetData;
   

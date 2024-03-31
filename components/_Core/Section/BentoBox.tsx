@@ -4,6 +4,7 @@ import { RocketIcon } from "lucide-react";
 import { BentoGrid, BentoGridTest } from "../ui/bento-grid";
 import { InventoryOneList, InventoryTwoList, OwnedStructuresFullList } from "../../_Skeleton/InventoryBlocks";
 import { ClassificationForPlanetFormBlock } from "../../_Skeleton/ClassificationBlocks";
+import { ContentPlaceholderBlockTest, PlanetStatBlock } from "../../_Skeleton/PlanetDataBlocks";
 
 export default function BlockGrid() {
     return (
@@ -91,6 +92,17 @@ const items = [
         className: "md:col-span-1 row-span-1",
     },
     {
+        title: "Content placeholder test",
+        description: (
+            <span className="text-sm">
+                
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <ContentPlaceholderBlockTest />,
+        className: "md:col-span-1 row-span-1",
+    },
+    {
         title: "Your owned structures",
         description: (
             <span className="text-sm">
@@ -111,5 +123,16 @@ const items = [
         icon: RocketIcon,
         header: <ClassificationForPlanetFormBlock />,
         className: "md:col-span-2 row-span-1"
+    },
+    {
+        title: "Data/stat display for an anomaly ",
+        description: (
+            <span className="text-sm">
+                In this case, we're looking at a planet in the `basePlanets` table
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <PlanetStatBlock />,
+        className: "md:col-span-4 row-span-1"
     },
 ];
