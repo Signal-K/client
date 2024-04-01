@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 
-const OwnedItemsList: React.FC = () => {
+const OwnedItemsList: React.FC = () => { 
     const supabase = useSupabaseClient();
     const session = useSession();
   
@@ -94,53 +94,80 @@ interface InventoryItem {
 
 export const ItemsVerticalList: React.FC = () => {
   const session = useSession();
-  const [itemDetails, setItemDetails] = useState<InventoryItem[]>([]);
   const supabase = useSupabaseClient();
+  const [ownedItems, setOwnedItems] = useState([]);
+  const [itemDetails, setItemDetails] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
-    const fetchOwnedItems = async () => {
-      try {
-        if (!session) return;
+    if (!session || !supabase) {
+      return;
+    }
 
-        const user = session.user.id;
+    const fetchOwnedItemsAndDetails = async () => {
+      try {
+        setIsLoading(true);
+        const userId = session.user.id;
+
         // Fetch owned items from the database
         const { data: ownedItemsData, error: ownedItemsError } = await supabase
-          .from('inventoryUSERS')
-          .select('*')
-          .eq('owner', user)
-          .gt('id', 20);
+          .from("inventoryUSERS")
+          .select("*")
+          .eq("owner", userId)
+          .gt("id", 20)
+          .limit(6)
+          .order("id", { ascending: false });
 
         if (ownedItemsError) {
           throw ownedItemsError;
         }
 
         if (ownedItemsData) {
+          setOwnedItems(ownedItemsData);
+
+          // Extract item IDs from owned items
           const itemIds = ownedItemsData.map(item => item.item);
-          // Fetch details of owned items
+
+          // Fetch details of owned items based on item IDs
           const { data: itemDetailsData, error: itemDetailsError } = await supabase
-            .from('inventoryITEMS')
-            .select('*')
-            .in('id', itemIds);
+            .from("inventoryITEMS")
+            .select("*")
+            .in("id", itemIds);
 
           if (itemDetailsError) {
             throw itemDetailsError;
           }
 
-          if (itemDetailsData) {
-            setItemDetails(itemDetailsData);
-          }
+          setItemDetails(itemDetailsData);
         }
       } catch (error) {
-        console.error('Error fetching owned items:', error.message);
+        console.error("Error fetching owned items and details:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchOwnedItems();
-  }, [session]);
+    fetchOwnedItemsAndDetails();
+  }, [session, supabase]);
 
+  // Combine owned items with their details
+  const combinedItems = ownedItems.map(ownedItem => {
+    const itemDetail = itemDetails.find(detail => detail.id === ownedItem.item);
+    return {
+      ...ownedItem,
+      ...itemDetail,
+    };
+  });
+
+  // If the component is loading, you can display a loading indicator or message
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Render the list of items
   return (
     <div className="w-full">
-      {itemDetails.map(item => (
+      {combinedItems.map(item => (
         <div key={item.id} className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 rounded-full overflow-hidden">
@@ -148,7 +175,7 @@ export const ItemsVerticalList: React.FC = () => {
             </div>
             <p className="text-sm">{item.name}</p>
           </div>
-          <p className="text-sm">x{item.quantity}</p>
+          <p className="text-sm">{item.quantity}</p>
         </div>
       ))}
     </div>
@@ -224,7 +251,7 @@ export const SectorStructureOwned: React.FC<{ sectorid: string }> = ({ sectorid 
                     <img src={item.icon_url} alt={item.name} className="w-full h-auto" />
                     </div>
                     <p className="text-gray-600">Quantity: {ownedItem?.quantity}</p>
-                    <p className="text-gray-600">On planet: {ownedItem?.sector}</p>
+                    <p className="text-gray-600">On sector (id): {ownedItem?.sector}</p>
                 </li>
                 );
             })}
