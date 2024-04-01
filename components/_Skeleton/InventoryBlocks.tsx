@@ -67,9 +67,9 @@ const SectorStructureOwnedAllSectorsOneUser: React.FC<{}> = () => {
                 return (
                 <li key={item.id} className="bg-white shadow-md p-4 rounded-md">
                     <h3 className="text-lg font-medium mb-2">{item.name}</h3>
-                    <div className="mb-2">
-                    <img src={item.icon_url} alt={item.name} className="w-full h-auto" />
-                    </div>
+                    {/* <div className="mb-2">
+                        <img src={item.icon_url} alt={item.name} className="w-full h-auto" />
+                    </div> */}
                     <p className="text-gray-600">Quantity: {ownedItem?.quantity}</p>
                     <p className="text-gray-600">On sector (id): {ownedItem?.sector}</p>
                 </li>

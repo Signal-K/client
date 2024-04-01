@@ -4,7 +4,7 @@ import { RocketIcon } from "lucide-react";
 import { BentoGrid, BentoGridTest } from "../ui/bento-grid";
 import { InventoryOneList, InventoryTwoList, OwnedStructuresFullList } from "../../_Skeleton/InventoryBlocks";
 import { ClassificationForPlanetFormBlock } from "../../_Skeleton/ClassificationBlocks";
-import { ContentPlaceholderBlockTest, PlanetStatBlock } from "../../_Skeleton/PlanetDataBlocks";
+import { ContentPlaceholderBlockTest, PlanetStatBlock, SectorsInsidePlanetBlock } from "../../_Skeleton/PlanetDataBlocks";
 
 export default function BlockGrid() {
     return (
@@ -122,6 +122,17 @@ const items = [
         ),
         icon: RocketIcon,
         header: <ClassificationForPlanetFormBlock />,
+        className: "md:col-span-2 row-span-1"
+    },
+    {
+        title: "All sectors that you own",
+        description: (
+            <span className="text-sm">
+                No discriminator for a specific anomaly/planet
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <SectorsInsidePlanetBlock />,
         className: "md:col-span-2 row-span-1"
     },
     {
