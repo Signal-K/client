@@ -1,14 +1,14 @@
 "use client";
 import { cn } from "../../../lib/uitls";
 import React from "react";
-// import { BentoGrid, BentoGridItem } from "../../_Core/ui/bento-grid";
-// import {
-//   IconBoxAlignRightFilled,
-//   IconClipboardCopy,
-//   IconFileBroken,
-//   IconSignature,
-//   IconTableColumn,
-// } from "@tabler/icons-react";
+import { BentoGrid, BentoGridItem } from "../../_Core/ui/bento-grid";
+import {
+  IconBoxAlignRightFilled,
+  IconClipboardCopy,
+  IconFileBroken,
+  IconSignature,
+  IconTableColumn,
+} from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ItemsVerticalList } from "../Inventory/UserOwnedItems";
@@ -32,19 +32,19 @@ export function BentoGridThirdDemo() {
 }
 
 export function BentoGridMobileDemo() {
-    return ( <></>
-        // <BentoGrid className="max-w-4xl mx-auto md:auto-rows-[20rem]">
-        //   {mobileItems.map((item, i) => (
-        //     <BentoGridItem
-        //       key={i}
-        //       title={item.title}
-        //       description={item.description}
-        //       header={item.header}
-        //       className={cn("[&>p:text-lg]", item.className)}
-        //       icon={item.icon}
-        //     />
-        //   ))}
-        // </BentoGrid>
+    return ( 
+        <BentoGrid className="max-w-4xl mx-auto md:auto-rows-[20rem]">
+          {mobileItems.map((item, i) => (
+            <BentoGridItem
+              key={i}
+              title={item.title}
+              description={item.description}
+              header={item.header}
+              className={cn("[&>p:text-lg]", item.className)}
+              icon={item.icon}
+            />
+          ))}
+        </BentoGrid>
     );
 }
 
@@ -315,7 +315,7 @@ const mobileItems = [
       ),
       header: <SkeletonOne />,
       className: "md:col-span-1",
-    //   icon: <IconClipboardCopy className="h-4 w-4 text-neutral-500" />,
+      icon: <IconClipboardCopy className="h-4 w-4 text-neutral-500" />,
     },
     {
       title: "",
@@ -324,7 +324,7 @@ const mobileItems = [
       ),
       header: <SkeletonFour />,
       className: "md:col-span-2",
-    //   icon: <IconTableColumn className="h-4 w-4 text-neutral-500" />,
+      icon: <IconTableColumn className="h-4 w-4 text-neutral-500" />,
     },
   ];
 

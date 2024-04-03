@@ -43,6 +43,7 @@
     "@supabase/auth-ui-react": "^0.2.6",
     "@supabase/supabase-js": "^2.13.1",
     "@supabase/ui": "^0.36.5",
+    "@tabler/icons-react": "^3.2.0",
     "@types/js-cookie": "^3.0.3",
     "@types/rc-slider": "^9.3.1",
     "@types/rc-tooltip": "^3.7.7",
