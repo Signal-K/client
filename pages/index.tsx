@@ -101,22 +101,6 @@ export function PublicLanding() {
 
   const [showGalaxy, setShowGalaxy] = useState(true);
 
-
-  // if (session && !profile?.location) {
-  //   return (
-  //     <p>Location</p>
-  //   );
-  // };
-
-  // if (session?.user?.id === 'cebdc7a2-d8af-45b3-b37f-80f328ff54d6' && isTabletOrMobile) {
-  //   return (
-  //     <LayoutNoNav>
-  //       <Navigation />
-  //       <iframe src="https://deta.space/?horizon=sj38ZfjmeF" height='2532px' width='100%' />
-  //     </LayoutNoNav>
-  //   );
-  // };
-
   // if (session && profile?.location) {
     if (session) {
       return (

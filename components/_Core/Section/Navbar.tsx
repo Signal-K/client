@@ -300,7 +300,7 @@ export default function Navigation() {
             </a>
           {/* ) : ( */}
             <div className='ml-4'>
-              <UserDropdownMenu user={session?.user?.id} />
+              <UserDropdownMenu user={session?.user?.id || ''} />
             </div>
           {/* {isUserLoading ? null : !user ? (
             <a

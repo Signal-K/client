@@ -2,12 +2,25 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import OwnedItemsList, { ItemsVerticalList, SectorStructureOwned } from "../Content/Inventory/UserOwnedItems";
 import { useEffect, useState } from "react";
 
+interface OwnedItem {
+    id: string;
+    item: string;
+    quantity: number;
+    sector: string;
+};
+
+interface ItemDetail {
+    id: string;
+    name: string; // Adjust this according to the actual properties in your 'inventoryITEMS' table
+    // Add other properties if available
+};
+
 const SectorStructureOwnedAllSectorsOneUser: React.FC<{}> = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
     
-    const [ownedItems, setOwnedItems] = useState([]);
-    const [itemDetails, setItemDetails] = useState([]);
+    const [ownedItems, setOwnedItems] = useState<OwnedItem[]>([]);
+    const [itemDetails, setItemDetails] = useState<ItemDetail[]>([]);
     // Add support for moving items/entities between planets
 
     useEffect(() => {

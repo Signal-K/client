@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     "components/PostFormCard.jsx",
-    "constants/contracts.ts",
+    "context/constants/contracts.ts",
     "pages/posts.tsx/index.jsx",
     "components/Lens/Utterances.jsx",
     "components/Lens/Utterances.jsx",
