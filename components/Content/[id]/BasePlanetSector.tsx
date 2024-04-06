@@ -6,6 +6,10 @@ import StructureComponent, { PlacedStructures } from "../Populate/StructureCreat
 import { SectorStructureOwned } from "../Inventory/UserOwnedItems";
 // import { CreateMenuBar, SectorCircularMenu } from "../../../Core/BottomBar";
 
+interface PlanetData {
+  content?: string; // Define the properties of planetData
+};
+
 const AddResourceToInventory = ({ resource, sectorId }) => {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -74,8 +78,8 @@ export default function BasePlanetSector({ sectorid }: { sectorid: string }) {
 
   const supabase = useSupabaseClient();
 
-  const [planetData, setPlanetData] = useState(null);
-  const [sectorData, setSectorData] = useState(null);
+  const [planetData, setPlanetData] = useState<PlanetData | null>(null);
+  const [sectorData, setSectorData] = useState<{ anomaly?: string, id: string, created_at: string, owner: string, deposit: string, coverUrl: string, exploration_start_data: string, explored: boolean } | null>(null);
   const [depositItem, setDepositItem] = useState(null);
 
   const fetchDepositItem = async (depositId) => {

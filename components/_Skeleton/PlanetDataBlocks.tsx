@@ -22,6 +22,11 @@ interface PlanetData {
     mass: number;
 };
 
+interface Sector {
+    id: string;
+    // Add other properties according to the actual structure of your 'basePlanetSectors' table
+};
+
 export const PlanetStatBlock = () => {
     const supabase = useSupabaseClient();
     
@@ -88,7 +93,7 @@ export const SectorsInsidePlanetBlock = () => {
 
     const planetId = "2";
     const userId = session?.user?.id;
-    const [sectors, setSectors] = useState([]);
+    const [sectors, setSectors] = useState<Sector[]>([]); // Define the type as Sector[]
 
     useEffect(() => {
         fetchSectorsForPlanet();
@@ -117,7 +122,7 @@ export const SectorsInsidePlanetBlock = () => {
     return (
         <><div className="grid-container mb-24">
               {sectors.map((sector) => (
-                <Link legacyBehavior key={sector.id} href={`/planets/sector/${sector.id}`}>
+                <Link key={sector.id} href={`/planets/sector/${sector.id}`}>
                 <a className="sector-link">
                     <div className="sector-square">
                     {/* {sector.coverUrl && (

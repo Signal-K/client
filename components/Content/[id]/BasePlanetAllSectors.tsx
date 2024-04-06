@@ -3,6 +3,10 @@ import { useRouter } from "next/router";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import Card from "../../_Core/ui/Content/Card";
 
+interface Sector {
+  // Define the properties of a sector
+};
+
 export default function BasePlanetSectors({ planetId }: { planetId: string }) {
     const router = useRouter();
     const { id: planetid } = router?.query;
@@ -10,7 +14,7 @@ export default function BasePlanetSectors({ planetId }: { planetId: string }) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const [sectorsData, setSectorsData] = useState(null);
+    const [sectorsData, setSectorsData] = useState<Sector[] | null>(null);
 
     const getPlanetSectors = async () => {
         if (!planetId) {
