@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactNode } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 
@@ -8,6 +8,8 @@ interface OwnedPlanet {
 };
 
 interface Planet {
+    cover: string | undefined;
+    content: ReactNode;
     id: number;
     name: string;
     avatar_url: string;
@@ -17,8 +19,8 @@ const OwnedPlanetsList: React.FC = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
     
-    const [ownedPlanets, setOwnedPlanets] = useState([]);
-    const [planetDetails, setPlanetDetails] = useState([]);
+    const [ownedPlanets, setOwnedPlanets] = useState<OwnedPlanet[]>([]);
+    const [planetDetails, setPlanetDetails] = useState<Planet[]>([]);
 
     useEffect(() => {
         async function fetchOwnedPlanets() {
@@ -78,7 +80,7 @@ const OwnedPlanetsList: React.FC = () => {
                 <li key={planet.id} className="bg-white shadow-md p-4 rounded-md">
                   <h3 className="text-lg font-medium mb-2">{planet.content}</h3>
                   <div className="mb-2">
-                    <img src={planet.cover} alt={planet.content} className="w-full h-auto" />
+                    <img src={planet.cover} className="w-full h-auto" /> {/* alt={planet.content} */}
                   </div>
                   {/* Add additional planet details here */}
                 </li></Link>

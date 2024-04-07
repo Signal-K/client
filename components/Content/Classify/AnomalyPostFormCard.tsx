@@ -10,7 +10,30 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
     const [content, setContent] = useState('');
     const profile = session?.user?.id;
     const [avatar_url, setAvatarUrl] = useState(null);
-    const [uploads, setUploads] = useState([]);
+    const [uploads, setUploads] = useState<string[]>([]); // Define the type as an array of strings
+
+    // Function to add media to the publication
+    async function addMedia(e: React.ChangeEvent<HTMLInputElement>) {
+        const files = Array.from(e.target.files ?? []);
+        if (files.length > 0) {
+            setIsUploading(true);
+            for (const file of files) {
+                const fileName = Date.now() + (session?.user?.id ?? '') + file.name; // Handle the possibility of session.user.id being undefined
+                const result = await supabase.storage
+                    .from('media')
+                    .upload(fileName, file);
+                
+                if (result.data) {
+                    const url = process.env.NEXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/media/' + result.data.path;
+                    setUploads(prevUploads => [...prevUploads, url]);
+                } else {
+                    console.log(result);
+                }
+            }
+            setIsUploading(false);
+        };
+    };
+
     const [isUploading, setIsUploading] = useState(false);
     /* const [userExperience, setUserExperience] = useState();
     const [hasRequiredItem, setHasRequiredItem] = useState(false); */
@@ -58,26 +81,6 @@ export default function PostFormCardAnomalyTag({ onPost, planetId }) {
     }, [session]); */
 
     // Function to add media to the publication
-    async function addMedia ( e ) {
-        const files = e.target.files;
-        if (files.length > 0) {
-            setIsUploading(true);
-            for (const file of files) {
-                const fileName = Date.now() + session?.user?.id + file.name;
-                const result = await supabase.storage
-                    .from('media')
-                    .upload(fileName, file);
-                
-                if (result.data) {
-                    const url = process.env.NEXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/media/' + result.data.path;
-                    setUploads(prevUploads => [...prevUploads, url]);
-                } else {
-                    console.log(result);
-                };
-            };
-            setIsUploading(false);
-        };
-    };
 
     // Frontend output
     return (

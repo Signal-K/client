@@ -10,24 +10,26 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
   const supabase = useSupabaseClient();
   const session = useSession();
 
-  const [planetData, setPlanetData] = useState(null);
-  const [planetPosts, setPlanetPosts] = useState([]);
+  const [planetData, setPlanetData] = useState<{ content: string; avatar_url: string; type: string; deepnote: string; cover: string; ticId: string; temperatureEq: string; smaxis: string; mass: string; lightkurve?: string } | null>(null);
+  const [planetPosts, setPlanetPosts] = useState<any[]>([]);
   const { id: planetId } = router.query;
   const [hasPlanetInInventory, setHasPlanetInInventory] = useState(false);
   const [inventoryPlanetId, setInventoryPlanetId] = useState<string | null>(
     null
   ); 
-  const [sectors, setSectors] = useState([]);
+  const [sectors, setSectors] = useState<any[]>([]);
 
   const [screenWidth, setScreenWidth] = useState<number>(0);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
   // For handling selection of specific structures and then displaying content
-  const [selectedStructure, setSelectedStructure] = useState(null);
+  const [selectedStructure, setSelectedStructure] = useState<string | null>(null);
 
-  const handleStructureClick = (structureName) => {
-    setSelectedStructure(planetId); // Set selectedStructure to planetId
-  };    
+  const handleStructureClick = (structureName: string) => {
+    if (typeof planetId === 'string') {
+      setSelectedStructure(planetId); // Set selectedStructure to planetId
+    }
+  };  
 
   const handleClosePopup = () => {
     setSelectedStructure(null);
