@@ -2,12 +2,19 @@ import React, { useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 
+interface InventoryItem {
+  id: number;
+  name: string;
+  icon_url: string;
+  quantity: number;
+}
+
 const OwnedItemsList: React.FC = () => { 
     const supabase = useSupabaseClient();
     const session = useSession();
   
-    const [itemDetails, setItemDetails] = useState([]);
-  
+    const [itemDetails, setItemDetails] = useState<InventoryItem[]>([]); // Provide type InventoryItem[]
+
     useEffect(() => {
       const fetchOwnedItems = async () => {
         try {
@@ -95,9 +102,10 @@ interface InventoryItem {
 export const ItemsVerticalList: React.FC = () => {
   const session = useSession();
   const supabase = useSupabaseClient();
-  const [ownedItems, setOwnedItems] = useState([]);
-  const [itemDetails, setItemDetails] = useState([]);
+  const [ownedItems, setOwnedItems] = useState<InventoryItem[]>([]);
+  const [itemDetails, setItemDetails] = useState<InventoryItem[]>([]);  
   const [isLoading, setIsLoading] = useState(true); // Loading state
+  const userId = session?.user?.id;
 
   useEffect(() => {
     if (!session || !supabase) {
@@ -111,35 +119,36 @@ export const ItemsVerticalList: React.FC = () => {
 
         // Fetch owned items from the database
         const { data: ownedItemsData, error: ownedItemsError } = await supabase
-          .from("inventoryUSERS")
-          .select("*")
-          .eq("owner", userId)
-          .gt("id", 20)
-          .limit(6)
-          .order("id", { ascending: false });
+            .from("inventoryUSERS")
+            .select("*")
+            .eq("owner", userId)
+            .gt("id", 20)
+            .limit(6)
+            .order("id", { ascending: false });
 
         if (ownedItemsError) {
-          throw ownedItemsError;
+            throw ownedItemsError;
         }
 
         if (ownedItemsData) {
-          setOwnedItems(ownedItemsData);
+            setOwnedItems(ownedItemsData);
 
-          // Extract item IDs from owned items
-          const itemIds = ownedItemsData.map(item => item.item);
+            // Extract item IDs from owned items
+            const itemIds = ownedItemsData.map(item => item.item);
 
-          // Fetch details of owned items based on item IDs
-          const { data: itemDetailsData, error: itemDetailsError } = await supabase
-            .from("inventoryITEMS")
-            .select("*")
-            .in("id", itemIds);
+            // Fetch details of owned items based on item IDs
+            const { data: itemDetailsData, error: itemDetailsError } = await supabase
+                .from("inventoryITEMS")
+                .select("*")
+                .in("id", itemIds);
 
-          if (itemDetailsError) {
-            throw itemDetailsError;
-          }
+            if (itemDetailsError) {
+                throw itemDetailsError;
+            }
 
-          setItemDetails(itemDetailsData);
-        }
+            if (itemDetailsData) {
+                setItemDetails(itemDetailsData);
+            }}
       } catch (error) {
         console.error("Error fetching owned items and details:", error);
       } finally {
@@ -186,8 +195,8 @@ export const SectorStructureOwned: React.FC<{ sectorid: string }> = ({ sectorid 
     const supabase = useSupabaseClient();
     const session = useSession();
     
-    const [ownedItems, setOwnedItems] = useState([]);
-    const [itemDetails, setItemDetails] = useState([]);
+    const [ownedItems, setOwnedItems] = useState<InventoryItem[]>([]);
+    const [itemDetails, setItemDetails] = useState<InventoryItem[]>([]);
     // Add support for moving items/entities between planets
 
     useEffect(() => {
