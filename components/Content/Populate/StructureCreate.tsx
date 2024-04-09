@@ -5,10 +5,25 @@ import Link from "next/link";
 import { LightkurveBaseGraph } from "../Planets/PlanetData/ContentPlaceholder";
 
 interface Structure {
-    id: number;
-    name: string;
-    description: string;
-    icon_url: string; 
+  id: number;
+  name: string;
+  description: string;
+  icon_url: string;
+};
+
+interface PlacedStructure extends Structure {
+  present: boolean;
+};
+
+interface PlanetData {
+  anomaly: any[]; // Update the type of 'anomaly' as needed
+  lightkurve: any;
+};
+
+interface CraftStructurePayload {
+  user_id: string;
+  sector_id: number;
+  structure_id: number;
 };
 
 interface StructureSelectionProps {
@@ -162,11 +177,11 @@ interface PlacedStructuresProps {
   
 export const PlacedStructures = ({ sectorId }) => {
     const supabase = useSupabaseClient();
-    const [placedStructures, setPlacedStructures] = useState([]);
-    const [usingStructure, setUsingStructure] = useState(null);
+    const [placedStructures, setPlacedStructures] = useState<PlacedStructure[]>([]);
+    const [usingStructure, setUsingStructure] = useState<number | null>(null);
 
     // Planet data
-    const [planetData, setPlanetData] = useState(null);
+    const [planetData, setPlanetData] = useState<PlanetData | null>(null);
 
     useEffect(() => {
       if (sectorId) {
@@ -178,39 +193,24 @@ export const PlacedStructures = ({ sectorId }) => {
       try {
         const { data, error } = await supabase
             .from('basePlanetSectors')
-            .select('anomaly')
+            .select('id')
             .eq("id", sectorId);
-
-        if (data) {
-            setPlanetId(data);
+    
+        if (data && data.length > 0) {
+            // Extract the id from the data array
+            const sectorId = data[0].id;
+            setPlanetId(sectorId);
         }
-
+    
         if (error) {
             throw error;
         }
     } catch (error) {
         console.error(error.message);
     }
-      try {
-        const { data, error } = await supabase
-          .from("basePlanets")
-          .select("*")
-          .eq("id", planetId)
-          .single();
-  
-        if (data) {
-          setPlanetData(data);
-        };
-  
-        if (error) {
-          throw error;
-        };
-      } catch (error: any) {
-        console.error(error.message);
-      };
-    };
+  }    
 
-    const [planetId, setPlanetId] = useState(null);
+    const [planetId, setPlanetId] = useState<string>('');
     const handleClosePopup = () => {
       setUsingStructure(null);
     };

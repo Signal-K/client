@@ -3,6 +3,11 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+interface SectorData {
+  id: number;
+  coverUrl: string;
+};
+
 export default function CreateBasePlanetSector() {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -127,7 +132,7 @@ export function UserOwnedSectorGrid() {
     const supabase = useSupabaseClient();
     const session = useSession();
   
-    const [sectorData, setSectorData] = useState([]);
+    const [sectorData, setSectorData] = useState<SectorData[]>([]);
   
     useEffect(() => {
       const fetchUserSectorImages = async () => {
@@ -175,7 +180,7 @@ export function AllSectors() {
     const supabase = useSupabaseClient();
   const session = useSession();
 
-  const [sectorData, setSectorData] = useState([]);
+  const [sectorData, setSectorData] = useState<SectorData[]>([]);
 
   useEffect(() => {
     const fetchSectorContent = async () => {

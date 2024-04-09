@@ -4,8 +4,6 @@ import Layout, { LayoutNoNav } from "../components/_Core/Section/Layout";
 import { useRouter } from "next/router";
 import { useMediaQuery } from 'react-responsive';
 
-import { Metadata } from "next";
-
 // Imports for new landing (public-facing)
 import { Dialog } from "@headlessui/react";
 import { AiFillCloseCircle } from "react-icons/ai";
@@ -23,10 +21,6 @@ import { MinimalAccordion, OnboardingWindows } from "../components/Gameplay/onbo
 import PlanetCharacter, { RoverCharacter } from "../components/Content/Assets/PlanetCharacter";
 import Link from "next/link";
 import { BentoGridMobileDemo, BentoGridThirdDemo } from "../components/Content/Visuals/Bento";
-
-export const metadata: Metadata = {
-  title: "Star Sailors",
-};
 
 export function PublicLanding() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -159,7 +153,7 @@ export function PublicLanding() {
               <ul className="flex justify-center items-center gap-2 2xsm:gap-4">
                 {/* <DarkModeSwitcher />Dark Mode Switcher */}
               </ul>
-              {session && <UserDropdownMenu user={session?.user?.id} />}
+              {/* {session && <UserDropdownMenu user={session?.user?.id} />} */}
               {/* {isUserLoading ? null : !user ? (
                 <Link to='/login'>
                   <div className='flex justify-end items-center duration-300 ease-in-out text-gray-900 hover:text-yellow-500 dark:text-white'>
@@ -218,7 +212,7 @@ export function PublicLanding() {
                   ) : (
                     <UserMenuItems user={user} />
                   )} */}
-                  <UserMenuItems user={session?.user?.id} />
+                  {/* <UserMenuItems user={session?.user?.id} /> */}
                 </div>
               </div>
             </div>

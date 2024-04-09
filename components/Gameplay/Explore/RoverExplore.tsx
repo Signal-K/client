@@ -9,12 +9,18 @@ import { Checkbox } from "../../_Core/ui/checkbox";
 import { Input } from "../../_Core/ui/input";
 import { Textarea } from "../../_Core/ui/TextArea";
 
+interface PlanetData {
+  // Define the properties of PlanetData
+  content: string;
+  // Add other properties as needed
+};
+
 export default function RoverExploreDesktop({ id }: { id: string }) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
     const router = useRouter();
-    const [planetData, setPlanetData] = useState(null);
+    const [planetData, setPlanetData] = useState<PlanetData | null>(null);
     const { id: planetId } = router.query;
 
     useEffect(() => {

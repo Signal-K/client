@@ -38,9 +38,10 @@ export const BentoBoxItem = ({
         <div
             className={cn(
                 "row-span-1 rounded-xl group/bento hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-4 dark:bg-black dark:border-white/[0.2] bg-white border border-transparent justify-between flex flex-col space-y-4",
-                className
+                typeof className === 'string' ? className : '' // Convert className to string
             )}
         >
+            {title}
             {header}
             <RocketIcon />
             {/* <div className="group-hover/bento:translate-x-2 transition duration-200">
@@ -55,6 +56,7 @@ export const BentoBoxItem = ({
         </div>
     );
 };
+
 
 // Items
 const items = [
@@ -125,7 +127,7 @@ const items = [
         className: "md:col-span-2 row-span-1"
     },
     {
-        title: "All sectors that you own",
+        title: "All sectors that you own (for all planets)",
         description: (
             <span className="text-sm">
                 No discriminator for a specific anomaly/planet

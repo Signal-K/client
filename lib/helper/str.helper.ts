@@ -1,4 +1,20 @@
-import { ReadonlyURLSearchParams } from "next/navigation";
+// import { ReadonlyURLSearchParams } from "next/navigation";
+
+// Define the ReadonlyURLSearchParams type
+interface ReadonlyURLSearchParams {
+  get(name: string): string | null;
+  getAll(name: string): string[];
+  entries(): IterableIterator<[string, string]>;
+  keys(): IterableIterator<string>;
+  values(): IterableIterator<string>;
+  has(name: string): boolean;
+  [Symbol.iterator](): IterableIterator<[string, string]>;
+  forEach(
+    callbackfn: (value: string, key: string, parent: URLSearchParams) => void,
+    thisArg?: any
+  ): void;
+  toString(): string;
+}
 
 /**
  * Generates a random string of the specified length.

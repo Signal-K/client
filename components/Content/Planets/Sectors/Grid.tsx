@@ -2,10 +2,15 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+interface Sector {
+    id: number;
+    name: string;
+}
+
 export default function PublicSectorsGrid() {
     const supabase = useSupabaseClient();
 
-    const [sectors, setSectors] = useState([]);
+    const [sectors, setSectors] = useState<Sector[]>([]);
 
     async function fetchSectors() {
         try {
