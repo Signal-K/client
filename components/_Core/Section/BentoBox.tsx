@@ -4,7 +4,8 @@ import { RocketIcon } from "lucide-react";
 import { BentoGrid, BentoGridTest } from "../ui/bento-grid";
 import { InventoryOneList, InventoryTwoList, OwnedStructuresFullList } from "../../_Skeleton/InventoryBlocks";
 import { ClassificationForPlanetFormBlock } from "../../_Skeleton/ClassificationBlocks";
-import { ContentPlaceholderBlockTest, PlanetStatBlock, SectorsInsidePlanetBlock } from "../../_Skeleton/PlanetDataBlocks";
+import { ContentPlaceholderBlockTest, PlanetStatBlock, SectorsInsidePlanetBlock, StructuresOnPlanetBlock } from "../../_Skeleton/PlanetDataBlocks";
+import { SectorRoverImageClassificationBlock } from "../../_Skeleton/SectorDataBlocks";
 
 export default function BlockGrid() {
     return (
@@ -135,6 +136,28 @@ const items = [
         ),
         icon: RocketIcon,
         header: <SectorsInsidePlanetBlock />,
+        className: "md:col-span-1 row-span-1"
+    },
+    {
+        title: "All structures that you own on a particular planet",
+        description: (
+            <span className="text-sm">
+                Currently set to planetId "2"
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <StructuresOnPlanetBlock />,
+        className: "md:col-span-1 row-span-1"
+    },
+    {
+        title: "Create a post/classification about what's going on in the rover image",
+        description: (
+            <span className="text-sm">
+                Randomly generated image, classification is for sector 18
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <SectorRoverImageClassificationBlock />,
         className: "md:col-span-2 row-span-1"
     },
     {
