@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { RoverContentPostForm } from "../Content/Classify/CreatePostForm"
 import axios from "axios";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export const SectorRoverImageClassificationBlock = () => {
     const [imageUrl, setImageUrl] = useState('');
@@ -40,3 +41,52 @@ export const SectorRoverImageClassificationBlock = () => {
         <><RoverContentPostForm  metadata={metadata} imageLink={imageUrl} sector="18" /><img src={imageUrl} className="h-[20%]" /></>
     );
 };
+
+interface PlanetData {
+    content?: string; // Define the properties of planetData
+};
+
+export const AddResourceToInventoryBlock = () => {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+    
+    const resource = 10;
+    const quantity = 1;
+    const sectorId = 18;
+
+    const [isAdding, setIsAdding] = useState(false);
+
+    const handleAddResource = async () => {
+        setIsAdding(true);
+        try {
+          const { error: insertError } = await supabase
+            .from('inventoryUSERS')
+            .upsert({
+              owner: session?.user?.id,
+              item: resource,//.id,
+              quantity,
+              sector: sectorId,
+            });
+    
+          if (insertError) {
+            throw insertError;
+          };
+        //   alert(`${resource.name} added to your inventory!`);
+        } catch (error) {
+          console.error('Error adding resource to inventory:', error.message);
+        } finally {
+          setIsAdding(false);
+        };
+    };
+
+    return (
+        <button
+            onClick={handleAddResource}
+            disabled={isAdding}
+            className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${isAdding ? 'cursor-not-allowed' : ''}`}
+        >
+            {isAdding ? 'Adding...' : 'Add to Inventory'}
+        </button>
+    );
+};
+

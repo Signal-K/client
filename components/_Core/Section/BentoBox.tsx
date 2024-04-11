@@ -5,7 +5,7 @@ import { BentoGrid, BentoGridTest } from "../ui/bento-grid";
 import { InventoryOneList, InventoryTwoList, OwnedStructuresFullList } from "../../_Skeleton/InventoryBlocks";
 import { ClassificationForPlanetFormBlock } from "../../_Skeleton/ClassificationBlocks";
 import { ContentPlaceholderBlockTest, PlanetStatBlock, SectorsInsidePlanetBlock, StructuresOnPlanetBlock } from "../../_Skeleton/PlanetDataBlocks";
-import { SectorRoverImageClassificationBlock } from "../../_Skeleton/SectorDataBlocks";
+import { AddResourceToInventoryBlock, SectorRoverImageClassificationBlock } from "../../_Skeleton/SectorDataBlocks";
 
 export default function BlockGrid() {
     return (
@@ -158,6 +158,17 @@ const items = [
         ),
         icon: RocketIcon,
         header: <SectorRoverImageClassificationBlock />,
+        className: "md:col-span-2 row-span-1"
+    },
+    {
+        title: "Add a resource from a sector to your inventory",
+        description: (
+            <span className="text-sm">
+                Currently doesn't update the sector value
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <AddResourceToInventoryBlock />,
         className: "md:col-span-2 row-span-1"
     },
     {

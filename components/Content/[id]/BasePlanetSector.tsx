@@ -12,7 +12,7 @@ interface PlanetData {
 
 const AddResourceToInventory = ({ resource, sectorId }) => {
   const supabase = useSupabaseClient();
-  const session = useSession();
+  const session = useSession();;
   const [isAdding, setIsAdding] = useState(false);
 
   const handleAddResource = async () => {
@@ -52,7 +52,7 @@ const AddResourceToInventory = ({ resource, sectorId }) => {
       }
 
       // Resource added successfully
-      alert(`${resource.name} added to your inventory!`);
+      alert(`${resource.name} added to your inventory!`); // should this perhaps be `resource?.name`?
     } catch (error) {
       console.error('Error adding resource to inventory:', error.message);
       // Show error message or handle error appropriately
