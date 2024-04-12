@@ -93,17 +93,9 @@ export function LightkurveBaseGraph({ planetId }: { planetId: { planetId: string
   // Extract the planetId from the object
   const extractedPlanetId = planetId.planetId;
 
-  useEffect(() => {
-    console.log("planetId:", extractedPlanetId); // Check the value of extractedPlanetId
-  }, [extractedPlanetId]);
-
-// const { content, avatar_url, type, deepnote, cover, temperatureEq, smaxis, mass } = planetData;
-
   return (
     <center>
       <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-xl z-50 mt-10">
-      {/* <p className="text-base font-semibold leading-7 text-indigo-600">Planet type: {type}</p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Planet name: {content}</h1> */}
       <p className="mt-6 text-xl leading-8 text-gray-700">
         Brief summaary: owner, sectors, etc
       </p>

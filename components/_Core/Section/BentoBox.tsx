@@ -6,6 +6,7 @@ import { InventoryOneList, InventoryTwoList, OwnedStructuresFullList } from "../
 import { ClassificationForPlanetFormBlock } from "../../_Skeleton/ClassificationBlocks";
 import { ContentPlaceholderBlockTest, PlanetStatBlock, SectorsInsidePlanetBlock, StructuresOnPlanetBlock } from "../../_Skeleton/PlanetDataBlocks";
 import { AddResourceToInventoryBlock, SectorRoverImageClassificationBlock } from "../../_Skeleton/SectorDataBlocks";
+import { LightcurveBaseGraph } from "../../_Skeleton/ClassificationDataBlocks";
 
 export default function BlockGrid() {
     return (
@@ -169,7 +170,18 @@ const items = [
         ),
         icon: RocketIcon,
         header: <AddResourceToInventoryBlock />,
-        className: "md:col-span-2 row-span-1"
+        className: "md:col-span-1 row-span-1"
+    },
+    {
+        title: "Get the tic id from a planet/classification data point and generate a lightcurve using the API. Currently used by the telescope structure",
+        description: (
+            <span className="text-sm">
+                Currently only has the function to generate
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <LightcurveBaseGraph />,
+        className: "md:col-span-1 row-span-1"
     },
     {
         title: "Data/stat display for an anomaly ",
