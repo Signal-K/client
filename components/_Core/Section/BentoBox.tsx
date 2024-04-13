@@ -7,6 +7,8 @@ import { ClassificationForPlanetFormBlock } from "../../_Skeleton/Classification
 import { ContentPlaceholderBlockTest, PlanetStatBlock, SectorsInsidePlanetBlock, StructuresOnPlanetBlock } from "../../_Skeleton/PlanetDataBlocks";
 import { AddResourceToInventoryBlock, SectorRoverImageClassificationBlock } from "../../_Skeleton/SectorDataBlocks";
 import { LightcurveBaseGraph } from "../../_Skeleton/ClassificationDataBlocks";
+import { ItemListFromFlaskBlock } from "../../_Skeleton/ItemBlocks";
+import { CreateStructureBlock } from "../../_Skeleton/StructureBlocks";
 
 export default function BlockGrid() {
     return (
@@ -181,6 +183,28 @@ const items = [
         ),
         icon: RocketIcon,
         header: <LightcurveBaseGraph />,
+        className: "md:col-span-1 row-span-1"
+    },
+    {
+        title: "Get a list of all items in the database/crafting recipes via the API (not currently functional)",
+        description: (
+            <span className="text-sm">
+                Currently not working as it is assuming flask is running locally
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <ItemListFromFlaskBlock />,
+        className: "md:col-span-1 row-span-1"
+    },
+    {
+        title: "Create a structure via flask on a specific sector, which checks the crafting & other requirements/performs specific [population] actions (not currently functional)",
+        description: (
+            <span className="text-sm">
+                Currently not working as the flask link has become deprecated
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <CreateStructureBlock />,
         className: "md:col-span-1 row-span-1"
     },
     {

@@ -31,7 +31,7 @@ interface StructureSelectionProps {
     planetSectorId: number;
 };
 
-const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSelected, planetSectorId }) => {
+export const StructureSelection: React.FC<StructureSelectionProps> = ({ onStructureSelected, planetSectorId }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
