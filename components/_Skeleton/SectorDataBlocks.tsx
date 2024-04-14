@@ -90,3 +90,5 @@ export const AddResourceToInventoryBlock = () => {
     );
 };
 
+// A function to show every single sector for a specific planet -> [planets/sectors route]
+// A function to show every sector -> <AllSectors />
