@@ -1,6 +1,6 @@
 import { CardTitle, CardDescription, CardHeader, CardContent, CardFooter, Card } from "../ui/card";
 import Link from "next/link";
-import { Button } from "../ui/button";
+import { Button } from "../ui/button"; 
 
 export function MissionList() {
   const missions = [
