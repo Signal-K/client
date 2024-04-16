@@ -565,5 +565,6 @@ export function Navbar() {
         </Dialog.Panel>
       </Dialog>
     </header>
-  )
-}
+  );
+};
+
