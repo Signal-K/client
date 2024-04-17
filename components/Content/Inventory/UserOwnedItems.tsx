@@ -81,9 +81,79 @@ const OwnedItemsList: React.FC = () => {
         })}
       </div>
     );    
-  };
+};
 
 export default OwnedItemsList;
+
+interface InventoryItem {
+  id: number;
+  name: string;
+  icon_url: string;
+  quantity: number;
+}
+
+export const ItemsVerticalList: React.FC = () => {
+  const session = useSession();
+  const [itemDetails, setItemDetails] = useState<InventoryItem[]>([]);
+  const supabase = useSupabaseClient();
+
+  useEffect(() => {
+    const fetchOwnedItems = async () => {
+      try {
+        if (!session) return;
+
+        const user = session.user.id;
+        // Fetch owned items from the database
+        const { data: ownedItemsData, error: ownedItemsError } = await supabase
+          .from('inventoryUSERS')
+          .select('*')
+          .eq('owner', user)
+          .gt('id', 20);
+
+        if (ownedItemsError) {
+          throw ownedItemsError;
+        }
+
+        if (ownedItemsData) {
+          const itemIds = ownedItemsData.map(item => item.item);
+          // Fetch details of owned items
+          const { data: itemDetailsData, error: itemDetailsError } = await supabase
+            .from('inventoryITEMS')
+            .select('*')
+            .in('id', itemIds);
+
+          if (itemDetailsError) {
+            throw itemDetailsError;
+          }
+
+          if (itemDetailsData) {
+            setItemDetails(itemDetailsData);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching owned items:', error.message);
+      }
+    };
+
+    fetchOwnedItems();
+  }, [session]);
+
+  return (
+    <div className="w-full">
+      {itemDetails.map(item => (
+        <div key={item.id} className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-2">
+            <div className="w-10 h-10 rounded-full overflow-hidden">
+              <img src={item.icon_url} alt={item.name} className="w-full h-full object-cover" />
+            </div>
+            <p className="text-sm">{item.name}</p>
+          </div>
+          <p className="text-sm">x{item.quantity}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export const SectorStructureOwned: React.FC<{ sectorid: string }> = ({ sectorid }) => {
     const supabase = useSupabaseClient();

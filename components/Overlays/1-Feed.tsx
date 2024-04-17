@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { GardenDashboard } from '../garden-dashboard';
+import { GalaxyOverlay, GardenDashboard } from '../garden-dashboard';
 import { Button } from '../_Core/ui/addons/button';
 import { useMediaQuery } from 'react-responsive';
 import Link from 'next/link';
+import { OnboardingWindows } from '../Gameplay/onboarding';
 
 interface FeedOverlayProps {
   onClose: () => void;
@@ -51,7 +52,9 @@ const FeedOverlay: React.FC<FeedOverlayProps> = ({ onClose }) => {
     </a>
   </li></Link>
 </ul></center>)}
-          <GardenDashboard />
+          {/* <GardenDashboard /> */}
+          {isTabletOrMobile && (<OnboardingWindows />)}
+          <GalaxyOverlay />
           <center><Button className=' className="w-full mb-10"' onClick={handleClose}>Close</Button></center>
         </div>
       </div>

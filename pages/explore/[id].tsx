@@ -13,7 +13,7 @@ export default function ExplorePlanet () {
 
     return (
         <>
-                    <style jsx global>
+<style jsx global>
              {`
                body {
                  background: url('garden.png') center/cover;
@@ -34,5 +34,5 @@ export default function ExplorePlanet () {
                 <RoverExploreDesktop id={id as string} />
             </div>
         </>
-    )
+    );
 };

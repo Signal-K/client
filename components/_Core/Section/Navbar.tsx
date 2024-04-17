@@ -157,7 +157,7 @@ export const UserDropdownMenu = ({ user } : { user: string }) => {
       .then((result) => {
         if (result.data) {
           setProfile(result.data[0]);
-        }
+        };
     });
   }, [session]);
 
@@ -221,7 +221,7 @@ const navigation = [
     name: 'Home', href: '/' // Was originally labelled as "Star Sailors" but I've decided that we'll provide that context via the logo
   },
   {
-    name: 'Explore', href: '/garden'
+    name: 'Explore', href: '/explore'
   },
   {
     name: 'Gather', href: '/gather'
