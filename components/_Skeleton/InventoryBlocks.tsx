@@ -111,3 +111,104 @@ export const OwnedStructuresFullList = () => {
         <SectorStructureOwnedAllSectorsOneUser />
     );
 };
+
+interface StructureItem {
+    id: bigint;
+    name: string;
+    description: string;
+    // Add more properties as needed
+}
+
+interface SectorItem {
+    id: bigint;
+    // Add more properties as needed
+}
+
+interface PlanetData {
+    id: bigint;
+    // Add more properties as needed
+}
+
+interface PlanetStructuresAndItems {
+    planetStructures: StructureItem[];
+    planetItems: StructureItem[];
+    sectorStructures: StructureItem[];
+    sectorItems: StructureItem[];
+}
+
+export const StructuresAndItemsComponent: React.FC = () => {
+    const supabase = useSupabaseClient();
+    let [planetId, setPlanetId] = useState<string | null>(null);
+    let [sectorId, setSectorId] = useState<string | null>(null);
+    const [structuresAndItems, setStructuresAndItems] = useState<PlanetStructuresAndItems | null>(null);
+
+    const fetchStructuresAndItems = async () => {
+        try {
+            if (!planetId) {
+                throw new Error("Please provide a planetId");
+            }
+
+            const fetchedStructuresAndItems: PlanetStructuresAndItems = {
+                planetStructures: [],
+                planetItems: [],
+                sectorStructures: [],
+                sectorItems: [],
+            };
+
+            if (sectorId) {
+                const { data: sectorData, error: sectorError } = await supabase
+                    .from("basePlanetSectors")
+                    .select("anomaly")
+                    .eq("id", sectorId)
+                    .single();
+
+                if (sectorError || !sectorData) {
+                    throw new Error("Error fetching sector data");
+                }
+
+                planetId = sectorData.anomaly.toString();
+            }
+
+            const { data: planetData, error: planetError } = await supabase
+                .from("basePlanets")
+                .select("*")
+                .eq("id", Number(planetId))
+                .single();
+
+            if (planetError) {
+                throw new Error("Error fetching planet data");
+            }
+
+            setStructuresAndItems(fetchedStructuresAndItems);
+        } catch (error) {
+            console.error("Error fetching structures and items:", error);
+        }
+    };
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        fetchStructuresAndItems();
+    };
+
+    // Render the form to input planetId and sectorId
+    return (
+        <form onSubmit={handleSubmit}>
+            <label>
+                Planet ID:
+                <input type="number" value={planetId ?? ''} onChange={(e) => setPlanetId(e.target.value)} />
+            </label>
+            <label>
+                Sector ID:
+                <input type="number" value={sectorId ?? ''} onChange={(e) => setSectorId(e.target.value)} />
+            </label>
+            <button type="submit">Fetch Structures and Items</button>
+
+            {/* Render the structures and items data */}
+            {structuresAndItems && (
+                <div>
+                    {/* Render structures and items here */}
+                </div>
+            )}
+        </form>
+    );
+};

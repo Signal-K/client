@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "../../../lib/uitls";
 import { RocketIcon } from "lucide-react";
 import { BentoGrid, BentoGridTest } from "../ui/bento-grid";
-import { InventoryOneList, InventoryTwoList, OwnedStructuresFullList } from "../../_Skeleton/InventoryBlocks";
+import { InventoryOneList, InventoryTwoList, OwnedStructuresFullList, StructuresAndItemsComponent } from "../../_Skeleton/InventoryBlocks";
 import { ClassificationForPlanetFormBlock } from "../../_Skeleton/ClassificationBlocks";
 import { ContentPlaceholderBlockTest, PlanetStatBlock, SectorsInsidePlanetBlock, StructuresOnPlanetBlock } from "../../_Skeleton/PlanetDataBlocks";
 import { AddResourceToInventoryBlock, SectorRoverImageClassificationBlock } from "../../_Skeleton/SectorDataBlocks";
@@ -205,6 +205,17 @@ const items = [
         ),
         icon: RocketIcon,
         header: <CreateStructureBlock />,
+        className: "md:col-span-1 row-span-1"
+    },
+    {
+        title: "Get a list of structures/items across a specific planet and all sectors relative",
+        description: (
+            <span className="text-sm">
+                It should result in a single react component that you input a planet id and a structure id, click a button, and it then responds with a text element with that context
+            </span>
+        ),
+        icon: RocketIcon,
+        header: <StructuresAndItemsComponent />,
         className: "md:col-span-1 row-span-1"
     },
     {
