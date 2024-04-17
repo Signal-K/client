@@ -135,18 +135,16 @@ export function IndividualBasePlanetDesktop({ id }: { id: string }) {
                   .eq('owner', session?.user?.id);// session?.user?.id);
           
                 if (error) {
-                  console.assert('Error fetching sectors data:', error.message);
+                  console.assert('Error fetching sectors data: ', error.message);
                   return;
-                }
+                };
 
-                console.assert(session?.user?.id + 'Hello');
-                console.log(data);
-          
+                // console.log(data);
                 setSectors(data);
               } catch (error) {
                 console.error(error);
-              }
-            }
+              };
+            };
 
       return (
         <div className="flex-col justify-center">
