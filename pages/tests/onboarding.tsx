@@ -4,11 +4,11 @@ import Layout from "../../components/_Core/Section/Layout";
 export default function OnboardingTest() {
 
     return (
-        <Layout>
+        <>
             <style jsx global>
           {`
             body {
-              background: url('') center/cover;
+              background: url('/') center/cover;
               background-attachment: fixed;
             }
 
@@ -23,6 +23,6 @@ export default function OnboardingTest() {
           `}
         </style>
             <PickYourPlanet />
-        </Layout>
+        </>
     );
 };

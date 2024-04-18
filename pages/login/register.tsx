@@ -13,7 +13,7 @@ const Register = () => {
     useEffect(() => {
         // Check if the user is logged in and then redirect
         if (session) {
-            router.push('/');
+            router.push('/tests/onboarding');
         }
     }, [session, router]);
 
