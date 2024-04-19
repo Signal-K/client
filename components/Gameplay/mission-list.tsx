@@ -1,15 +1,58 @@
 import { CardTitle, CardDescription, CardHeader, CardContent, CardFooter, Card } from "../ui/card";
 import Link from "next/link";
 import { Button } from "../ui/button"; 
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useEffect, useState } from "react";
 
 export function MissionList() {
-  const missions = [
-    { name: "Pick your home planet", completed: true },
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const [profileData, setProfileData] = useState<{ location: any } | null>(null); // Set initial state with the correct type
+  const [missions, setMissions] = useState([
+    { name: "Pick your home planet", completed: false },
     { name: "Build your first rover", completed: false },
     { name: "Collect your first resources", completed: false },
     { name: "Build your first structure", completed: false },
     { name: "Make your first classification", completed: false },
-  ];
+  ]);
+
+  useEffect(() => {
+    async function fetchProfileData() {
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("location")
+          .eq("id", session?.user?.id)
+          .single();
+
+        if (error) {
+          throw error;
+        };
+
+        if (data) {
+          setProfileData(data);
+        };
+      } catch (error) {
+        console.error("Error fetching profile data:", error.message);
+      };
+    };
+
+    if (session) {
+      fetchProfileData();
+    };
+  }, [supabase, session]);
+
+  useEffect(() => {
+    // Update the first mission's completion status based on profile location
+    if (profileData) {
+      const { location } = profileData;
+      setMissions((prevMissions) => {
+        const updatedMissions = [...prevMissions];
+        updatedMissions[0].completed = [1, 2, 3, 4, 5, 6].includes(location);
+        return updatedMissions;
+      });
+    };
+  }, [profileData]);
 
   return (
     <>
@@ -21,13 +64,11 @@ export function MissionList() {
         {missions.map((mission, index) => (
           <div key={index} className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Link href="#">
-                <LinkIcon
-                  className={`w-5 h-5 text-gray-500 ${
-                    mission.completed ? "line-through" : ""
-                  } hover:text-gray-900 dark:hover:text-gray-50`}
-                />
-              </Link>
+              <LinkIcon
+                className={`w-5 h-5 text-gray-500 ${
+                  mission.completed ? "line-through" : ""
+                } hover:text-gray-900 dark:hover:text-gray-50`}
+              />
               <p
                 className={`${
                   mission.completed ? "line-through text-gray-500 dark:text-gray-400" : ""
@@ -38,8 +79,8 @@ export function MissionList() {
             </div>
           </div>
         ))}
-        </CardContent>
-      </>
+      </CardContent>
+    </>
   );
 }
 

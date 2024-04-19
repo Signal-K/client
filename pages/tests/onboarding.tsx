@@ -1,4 +1,5 @@
 import { PickYourPlanet } from "../../components/Gameplay/Chapter 1/onboarding";
+import { MissionList } from "../../components/Gameplay/mission-list";
 import Layout from "../../components/_Core/Section/Layout";
 
 export default function OnboardingTest() {
@@ -23,6 +24,7 @@ export default function OnboardingTest() {
           `}
         </style>
             <PickYourPlanet />
+            <MissionList />
         </>
     );
 };
