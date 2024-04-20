@@ -93,6 +93,8 @@ export function ViewRovers() {
     const session = useSession();
 
     const [userRovers, setUserRovers] = useState<any[]>([]);
+    const [roverDetails, setRoverDetails] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true); // Loading state
 
     useEffect(() => {
         getRovers();
@@ -104,57 +106,67 @@ export function ViewRovers() {
                 console.log("User session not available");
                 return;
             }
-    
+
+            setIsLoading(true);
+
             const { data: userRovers, error: userRoversError } = await supabase
                 .from("inventoryUSERS")
                 .select("*")
                 .eq("owner", session.user.id)
                 .eq("item", 23 || 24); // Adjust this condition as needed
-    
+
             if (userRoversError) {
                 throw userRoversError;
             }
-    
+
             if (userRovers && userRovers.length > 0) {
-                // Extract item IDs from userRovers
-                const itemIds = userRovers.map(rover => rover.item);
-    
-                // Fetch details of items from inventoryITEMS table
-                const { data: items, error: itemsError } = await supabase
+                setUserRovers(userRovers);
+                const roverIds = userRovers.map(item => item.item);
+                const { data, error } = await supabase
                     .from("inventoryITEMS")
                     .select("*")
-                    .in("id", itemIds);
-    
-                if (itemsError) {
-                    throw itemsError;
-                }
-    
-                // Merge item details with userRovers
-                const mergedRovers = userRovers.map(rover => {
-                    const item = items.find(item => item.id === rover.item);
-                    return { ...rover, item };
-                });
-    
-                setUserRovers(mergedRovers);
-                console.log('Test', mergedRovers);
+                    .in("id", roverIds);
+
+                if (data) {
+                    setRoverDetails(data);
+                };
             } else {
                 setUserRovers([]);
             }
         } catch (error) {
             console.error("Error fetching rovers:", error.message);
-        }
+        } finally {
+            setIsLoading(false);
+        };
     };
-    
 
+    const combinedRovers = userRovers.map(userRover => {
+        const roverDetail = roverDetails.find(detail => detail.id === userRover.item);
+        return {
+            ...userRover,
+            ...roverDetail,
+        };
+    });
+
+    // If the component is loading, you can display a loading indicator or message
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    // Render the list of rovers
     return (
-        <div className="grid grid-cols-3 gap-4">
-            {userRovers.map(rover => (
-                <div key={rover.id} className="border p-4">
-                    <img src={rover.icon_url} alt={rover.name} className="h-24 mx-auto mb-2" />
-                    <p>ID: {rover.id}</p>
-                    <p>Name: {rover.name}</p>
+        <div className="w-full mt-5">
+            Your rovers:
+            {combinedRovers.map(rover => (
+                <div key={rover.id} className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                        <div className="w-10 h-10 rounded-full overflow-hidden">
+                            <img src={rover.icon_url} alt={rover.name} className="w-full h-full object-cover" />
+                        </div>
+                        <p className="text-sm">{rover.name}</p>
+                    </div>
                 </div>
             ))}
         </div>
     );
-};
+}
