@@ -61,7 +61,7 @@ export function MissionList() {
     <>
       <CardHeader>
         <CardTitle>To-Do List</CardTitle>
-        <CardDescription>Manage your daily tasks</CardDescription>
+        <CardDescription>Missions to become a Star Sailor</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 overflow-y-auto max-h-[480px] pr-4">
         {missions.map((mission, index) => (

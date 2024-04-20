@@ -86,4 +86,75 @@ export default function BuildFirstRover() {
             )}
         </div>
     );
-}
+};
+
+export function ViewRovers() {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [userRovers, setUserRovers] = useState<any[]>([]);
+
+    useEffect(() => {
+        getRovers();
+    }, [session]);
+
+    async function getRovers() {
+        try {
+            if (!session || !session.user || !session.user.id) {
+                console.log("User session not available");
+                return;
+            }
+    
+            const { data: userRovers, error: userRoversError } = await supabase
+                .from("inventoryUSERS")
+                .select("*")
+                .eq("owner", session.user.id)
+                .eq("item", 23 || 24); // Adjust this condition as needed
+    
+            if (userRoversError) {
+                throw userRoversError;
+            }
+    
+            if (userRovers && userRovers.length > 0) {
+                // Extract item IDs from userRovers
+                const itemIds = userRovers.map(rover => rover.item);
+    
+                // Fetch details of items from inventoryITEMS table
+                const { data: items, error: itemsError } = await supabase
+                    .from("inventoryITEMS")
+                    .select("*")
+                    .in("id", itemIds);
+    
+                if (itemsError) {
+                    throw itemsError;
+                }
+    
+                // Merge item details with userRovers
+                const mergedRovers = userRovers.map(rover => {
+                    const item = items.find(item => item.id === rover.item);
+                    return { ...rover, item };
+                });
+    
+                setUserRovers(mergedRovers);
+                console.log('Test', mergedRovers);
+            } else {
+                setUserRovers([]);
+            }
+        } catch (error) {
+            console.error("Error fetching rovers:", error.message);
+        }
+    };
+    
+
+    return (
+        <div className="grid grid-cols-3 gap-4">
+            {userRovers.map(rover => (
+                <div key={rover.id} className="border p-4">
+                    <img src={rover.icon_url} alt={rover.name} className="h-24 mx-auto mb-2" />
+                    <p>ID: {rover.id}</p>
+                    <p>Name: {rover.name}</p>
+                </div>
+            ))}
+        </div>
+    );
+};
