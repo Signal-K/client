@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 export function MissionList() {
   const supabase = useSupabaseClient();
   const session = useSession();
-  const [profileData, setProfileData] = useState<{ location: any } | null>(null); // Set initial state with the correct type
+  const [profileData, setProfileData] = useState<{ location: any } | null>(null);
   const [missions, setMissions] = useState([
     { name: "Pick your home planet", completed: false },
     { name: "Build your first rover", completed: false },
@@ -43,12 +43,15 @@ export function MissionList() {
   }, [supabase, session]);
 
   useEffect(() => {
-    // Update the first mission's completion status based on profile location
+    // Update missions based on profile location and rover creation
     if (profileData) {
       const { location } = profileData;
       setMissions((prevMissions) => {
         const updatedMissions = [...prevMissions];
+        // Update mission 1 based on location
         updatedMissions[0].completed = [1, 2, 3, 4, 5, 6].includes(location);
+        // Update mission 2 based on rover creation
+        updatedMissions[1].completed = prevMissions[1].completed || (location && location !== 0); // Assuming location 0 indicates no rover created
         return updatedMissions;
       });
     };
