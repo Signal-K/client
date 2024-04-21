@@ -105,7 +105,7 @@ export function ViewRovers() {
             if (!session || !session.user || !session.user.id) {
                 console.log("User session not available");
                 return;
-            }
+            };
 
             setIsLoading(true);
 
@@ -117,7 +117,7 @@ export function ViewRovers() {
 
             if (userRoversError) {
                 throw userRoversError;
-            }
+            };
 
             if (userRovers && userRovers.length > 0) {
                 setUserRovers(userRovers);
@@ -132,7 +132,7 @@ export function ViewRovers() {
                 };
             } else {
                 setUserRovers([]);
-            }
+            };
         } catch (error) {
             console.error("Error fetching rovers:", error.message);
         } finally {
@@ -151,7 +151,7 @@ export function ViewRovers() {
     // If the component is loading, you can display a loading indicator or message
     if (isLoading) {
         return <div>Loading...</div>;
-    }
+    };
 
     // Render the list of rovers
     return (
@@ -169,4 +169,4 @@ export function ViewRovers() {
             ))}
         </div>
     );
-}
+};
