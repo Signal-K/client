@@ -7,8 +7,7 @@ export default function CollectItemFromSector() {
     const session = useSession();
 
     const [userSectors, setUserSectors] = useState<any[]>([]);
-    const [selectedSector, setSelectedSector] = useState<any>(null);
-    const [selectedRover, setSelectedRover] = useState<any>(null);
+    const [selectedSectorId, setSelectedSectorId] = useState<string>('');
     const [timeOfDeploy, setTimeOfDeploy] = useState<Date | null>(null);
     const [isDeployed, setIsDeployed] = useState<boolean>(false);
     const [reward, setReward] = useState<number>(0);
@@ -36,27 +35,54 @@ export default function CollectItemFromSector() {
         }
     };
 
-    const handleSectorSelect = (sector: any) => {
-        setSelectedSector(sector);
+    const handleSectorSelect = (sectorId: string) => {
+        setSelectedSectorId(sectorId);
     };
 
-    const handleRoverSelect = (rover: any) => {
-        setSelectedRover(rover);
-    };
+    const deployRover = async () => {
+        if (!selectedSectorId) {
+            console.error("Please select a sector before deploying a rover.");
+            return;
+        }
 
-    const deployRover = () => {
-        // Set the time of deployment to the current time
-        setTimeOfDeploy(new Date());
-        setIsDeployed(true);
+        // Check if the user owns the selected sector
+        const ownedSector = userSectors.find(sector => sector.id === selectedSectorId);
+        if (!ownedSector) {
+            console.error("You don't own the selected sector.");
+            return;
+        };
+
+        try {
+            // Update inventoryUSERS table
+            const { data, error } = await supabase
+                .from("inventoryUSERS")
+                .update({
+                    planetSector: selectedSectorId,
+                    time_of_deploy: new Date().toISOString()
+                })
+                .eq("owner", session?.user?.id);
+
+            if (error) {
+                throw error;
+            }
+
+            // Set deployment status
+            setTimeOfDeploy(new Date());
+            setIsDeployed(true);
+        } catch (error) {
+            console.error("Error deploying rover:", error.message);
+        };
+
+        // Update this so that it can pull already deployed rovers
     };
 
     const calculateReward = () => {
-        // Calculate the time difference between the current time and the time of deployment
+        // Calculate the reward based on deployment time
         if (timeOfDeploy) {
             const currentTime = new Date();
             const timeDifference = currentTime.getTime() - timeOfDeploy.getTime();
             // Convert milliseconds to hours
-            const hoursDeployed = timeDifference / (1000 * 60 * 60);
+            const hoursDeployed = timeDifference / (1000 * 60 ); // * 60 -> for one hour/item
             // For now, let's say 1 item per hour
             setReward(Math.min(Math.floor(hoursDeployed), 6));
         }
@@ -74,21 +100,19 @@ export default function CollectItemFromSector() {
             <h2>User Sectors</h2>
             <ul>
                 {userSectors.map(sector => (
-                    <li key={sector.id} onClick={() => handleSectorSelect(sector)}>
+                    <li key={sector.id} onClick={() => handleSectorSelect(sector.id)}>
                         {sector.id} - {sector.name} - {sector.deposit}
                     </li>
                 ))}
             </ul>
             <h2>Selected Sector</h2>
-            {selectedSector && (
+            {selectedSectorId && (
                 <div>
-                    <p>ID: {selectedSector.id}</p>
-                    <p>Name: {selectedSector.name}</p>
-                    <p>Deposit: {selectedSector.deposit}</p>
+                    <p>ID: {selectedSectorId}</p>
+                    {/* Display other sector details if needed */}
                 </div>
             )}
             <h2>Deploy Rover</h2>
-            <ViewRovers onRoverSelect={handleRoverSelect} />
             <button onClick={deployRover}>Deploy Rover</button>
             <h2>Reward</h2>
             {isDeployed && (

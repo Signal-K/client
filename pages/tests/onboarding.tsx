@@ -1,5 +1,6 @@
 import BuildFirstRover, { ViewRovers } from "../../components/Gameplay/Automatons/BuildRover";
 import { PickYourPlanet } from "../../components/Gameplay/Chapter 1/onboarding";
+import CollectItemFromSector from "../../components/Gameplay/Explore/CollectItem";
 import { MissionList } from "../../components/Gameplay/mission-list";
 import Layout from "../../components/_Core/Section/Layout";
 
@@ -24,10 +25,11 @@ export default function OnboardingTest() {
             }
           `}
         </style>
-            <PickYourPlanet />
-            <BuildFirstRover />
-            <ViewRovers />
-            <MissionList />
+            {/* <PickYourPlanet /> */}
+            {/* <BuildFirstRover /> */}
+            {/* <ViewRovers /> */}
+            <CollectItemFromSector />
+            {/* <MissionList /> */}
         </>
     );
 };

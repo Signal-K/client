@@ -88,7 +88,7 @@ export default function BuildFirstRover() {
     );
 };
 
-export function ViewRovers() {
+export function ViewRovers({ onRoverSelect }: { onRoverSelect?: (rover: any) => void }) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -165,8 +165,12 @@ export function ViewRovers() {
                         </div>
                         <p className="text-sm">{rover.name}</p>
                     </div>
+                    {onRoverSelect && (
+                        <button onClick={() => onRoverSelect(rover)}>Select</button>
+                    )}
                 </div>
             ))}
         </div>
     );
 };
+;
