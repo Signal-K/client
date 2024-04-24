@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
+import { Analytics } from "@vercel/analytics/react"
 
 // Styling imports
 import '../styles/globals.css';
@@ -61,6 +62,7 @@ function MyApp({ Component, pageProps }) {
       initialSession={pageProps.initialSession}
 >
             <Component {...pageProps} />
+            <Analytics />
     </SessionContextProvider>
     </>
   );
