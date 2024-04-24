@@ -2,7 +2,7 @@ import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 import React, { useEffect } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router'; // Import the useRouter hook
-import Layout from '../../components/_Core/Section/Layout';
+import { SpareLayout } from '../../components/_Core/Section/Layout';
 import LoginPage from '../../components/Authentication/LoginModal';
 
 const Register = () => {
@@ -20,9 +20,9 @@ const Register = () => {
     return (
         <div className='container' style={{ padding: '50px 0 100px 0' }}>
             {!session ? (
-                <Layout><div className='w-80%'><Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme='dark' /></div></Layout>
+                <SpareLayout><div className='w-80%'><Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme='dark' /></div></SpareLayout>
             ) : (
-                <Layout>Logged in</Layout>
+                <SpareLayout>Logged in</SpareLayout>
             )}
         </div>
     );

@@ -1,6 +1,6 @@
 import React from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import Layout from "../../_Core/Section/Layout";
+import { SpareLayout } from "../../_Core/Section/Layout";
 import OwnedPlanetsList from "./UserOwnedPlanets"; // Potentially this should be in a lists component dir
 import OwnedItemsList from "../Inventory/UserOwnedItems";
 import MySpaceships from "../../Gameplay/Vehicles/MySpaceships";
@@ -10,11 +10,11 @@ export default function V1Inventory() { // Inventory items for v1 of public sche
     const session = useSession();
 
     return (
-        <Layout>
+        <SpareLayout>
             <OwnedPlanetsList />
             <OwnedItemsList />
             <MySpaceships />
-        </Layout>
+        </SpareLayout>
     );
 };
 

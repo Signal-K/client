@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Layout from "../../../components/_Core/Section/Layout";
+import { SpareLayout } from "../../../components/_Core/Section/Layout";
 import BasePlanetSectors from "../../../components/Content/[id]/BasePlanetAllSectors";
 
 export default function PlanetSectors() {
@@ -27,10 +27,10 @@ export default function PlanetSectors() {
     };
 
     return (
-        <Layout>
+        <SpareLayout>
             <div className="h-screen py-10">
                 <BasePlanetSectors planetId={id as string} />
             </div>
-        </Layout>
+        </SpareLayout>
     );
 };

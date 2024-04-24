@@ -1,6 +1,6 @@
 import React from "react";
 import { Garden } from "../components/Content/Planets/GalleryList";
-import Layout, { LayoutNoNav } from "../components/_Core/Section/Layout";
+import { LayoutNoNav } from "../components/_Core/Section/Layout";
 import Navbar from "../components/_Core/Section/Navbar";
 
 export default function GardenPage() {

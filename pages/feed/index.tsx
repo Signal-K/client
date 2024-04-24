@@ -1,6 +1,6 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
-import Layout from "../../components/_Core/Section/Layout";
+import { SpareLayout } from "../../components/_Core/Section/Layout";
 // import ClassificationFeed from "../../components/Content/ClassificationFeed";
 import Login from "../login";
 
@@ -32,18 +32,18 @@ export default function Home() {
       const customMaxWidth = isMobile ? "100%" : "70%";
   
       return (
-        <Layout>
+        <SpareLayout>
           {/* <div className="py-10">
             <HomePlanetStats />
           </div> */}
           <div className="py-10">
             {/* <ClassificationFeed custommaxWidth={customMaxWidth} /> */}
           </div>
-        </Layout>
+        </SpareLayout>
       );
     }
 
     return (
-        <Layout><Login /></Layout>
+        <SpareLayout><Login /></SpareLayout>
     );
 }

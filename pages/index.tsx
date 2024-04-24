@@ -5,6 +5,7 @@ import { useMediaQuery } from 'react-responsive';
 
 import { Metadata } from "next";
 import PublicLanding from "../components/_Core/LandingContent";
+import Layout from "../components/_Core/Section/Layout";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -15,11 +16,13 @@ export default function Home() {
   const supabase = useSupabaseClient();
   const router = useRouter();
 
-  // if (session) {
-  //   return (
-  //     <></>
-  //   );
-  // };
+  if (session) {
+    return (
+      <Layout>
+        <p>Run into the shadows</p>
+      </Layout>
+    );
+  };
 
   return (
     <PublicLanding />
