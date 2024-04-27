@@ -6,10 +6,9 @@ import ProfileCardModal from "@/app/components/(settings)/profile/form";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { FirstTelescopeClassification } from "@/app/components/(structures)/Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import ProgressBar from "../(missions)/ProgressBar";
-import DeployRooversInitial from "../roovers/deployAndReturn";
+import DeployRooversInitial from "../../roovers/deployAndReturn";
 import { Header } from "@/app/components/sections/header";
-import GeneratedStarterPlanet from "../../(anomalies)/(planets)/generated";
+import GeneratedStarterPlanet from "../../../(anomalies)/(planets)/generated";
 
 interface Mission {
   id: number;
