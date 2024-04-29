@@ -1,6 +1,0 @@
-{
-    "jira-plugin.workingProject": "",
-    "liveServer.settings.port": 5501,
-    "solidity.defaultCompiler": "localFile",
-    "solidity.compileUsingRemoteVersion": "v0.8.11+commit.d7f03943"
-}
