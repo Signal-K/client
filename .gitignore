@@ -6,6 +6,10 @@
 .pnp.js
 .env
 
+#galaxy
+#/galaxy
+#./galaxy
+
 # testing
 /coverage
 .env

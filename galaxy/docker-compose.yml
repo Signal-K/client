@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+ web:
+    build: .
+    ports:
+      - "5001:5000"
+    environment:
+      - SUPABASE_URL=https://qwbufbmxkjfaikoloudl.supabase.co
+      - SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3YnVmYm14a2pmYWlrb2xvdWRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk5NDE3NTksImV4cCI6MTk4NTUxNzc1OX0.RNz5bvsVwLvfYpZtUjy0vBPcho53_VS2AIVzT8Fm-lk
