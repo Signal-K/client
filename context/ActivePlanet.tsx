@@ -48,7 +48,7 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
         }
       } catch (error: any) {
         console.error("Error fetching data: ", error.message);
-      }
+      };
     };
 
     fetchPlanetData();

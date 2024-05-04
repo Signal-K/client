@@ -4,6 +4,8 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
 
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, RadioGroup, Radio} from "@nextui-org/react";
+import CreateBaseClassification from "@/components/Content/ClassificationForm";
+import { useProfileContext } from "@/context/UserProfile";
 
 interface OwnedItem {
     id: string;
@@ -54,6 +56,8 @@ const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structur
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
+    const { userProfile } = useProfileContext();
+
     const [activeModules, setActiveModules] = useState<string[]>([]);
     const [inactiveModules, setInactiveModules] = useState<string[]>([]);
     const [isOpen, setIsOpen] = useState(false);
@@ -131,8 +135,8 @@ const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structur
                         <div className="bg-indigo-500">
                             <ModalHeader>{structure.name}</ModalHeader>
                             <ModalBody>
-                                <p>
-                                </p>
+                                {/* {userProfile && ( <CreateBaseClassification /> )} Add structure argument */}
+                                <CreateBaseClassification />
                                 <div>
                                     {inactiveModules.map(moduleId => (
                                         <div key={moduleId} className="flex items-center justify-between mb-2">
