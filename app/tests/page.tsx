@@ -24,9 +24,9 @@ export default function PageLayout() {
             {/* <Panels /> */}
             {/* <ClassificationsFeed /> */}
             {/* <SpaceGamePage /> */}
-            {/* <ProfileCardModal /> */}
-            <SandpackBox />
-            <PythonSandpackTest />
+            <ProfileCardModal />
+            {/* <SandpackBox />
+            <PythonSandpackTest /> */}
         {/* </Layout> */}
         </>
     );

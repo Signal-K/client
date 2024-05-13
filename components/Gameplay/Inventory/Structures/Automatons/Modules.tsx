@@ -242,7 +242,7 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
         } else {
           setHasCameraStation(false);
         }
-      } catch (error) {
+      } catch (error) { 
         console.error("Error fetching camera station:", error);
       }
     }

@@ -8,7 +8,7 @@ interface ProfileCardModalProps {
     avatarUrl: string | undefined;
 }
 
-export default function ProfileCardModal() {
+export default function ProfileCardModal() { 
     const supabase = useSupabaseClient();
     const session = useSession();
 
