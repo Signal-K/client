@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { PlanetLayout } from "@/ui/Sections/PlanetLayout";
 import { useMediaQuery } from "react-responsive";
+import { useSession } from "@supabase/auth-helpers-react";
 
 interface LayoutProps {
     children: ReactNode;
@@ -11,6 +12,14 @@ const Layout: React.FC<LayoutProps> = ({ children, bg }) => {
     const isDesktop = useMediaQuery({ query: "(min-width: 1224px)" });
     const isMobile = useMediaQuery({ query: "(max-width: 1224px)" });
 
+    const session = useSession();
+
+    if (!session) {
+        return (
+            <p>Please log in</p>
+        );
+    };
+    
     return (
         <div>
             {/* {bg && ( */}
