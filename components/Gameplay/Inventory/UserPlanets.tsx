@@ -3,7 +3,7 @@ import { useEffect, useState, useRef, Fragment, createContext } from "react";
 import { Dialog, Transition } from '@headlessui/react';
 import { Header, CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { PlacedStructureSingle } from "./Structure";
+import { AllStructures, PlacedStructureSingle } from "./Structure";
 
 import { Button } from "@/ui/button";
 import RoverSingle from "./Automation";
@@ -59,6 +59,7 @@ interface UserAutomaton {
 };
 
 // View structures, planet info & automatons
+
 const UserPlanetPage = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -109,22 +110,27 @@ const UserPlanetPage = () => {
     return (
         <>
             {activePlanet && (<Header planetName={activePlanet.content} /> )}
-            <div className="w-full">
-                <div className="mx-auto max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+            <div className="flex flex-col justify-end min-h-screen">
+                <div className="mx-auto w-full max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4 my-10">
                     {Array.from({ length: 64 }, (_, index) => {
-                        const isBlock36or37 = index + 1 === 36 || index + 1 === 37;
-                        const isBlock51or54 = index + 1 === 51 || index + 1 === 54;
-                        const isCombinedBlock = isBlock36or37 && index + 1 === 36;
-                        const isBlock19or20or21 = index + 1 === 19 || index + 1 === 20 || index + 1 === 21;
-    
+                        const isBlock51or54 = index + 1 === 43 || index + 1 === 47;
+                        const isCombinedBlock = index + 1 === 21;
+                        const isBlock19 = index + 1 === 19;
+
                         return (
-                            <div key={`block-${index}`} className={`flex items-center justify-center p-6 border border-gray-200 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
+                            <div key={`block-${index}`} className={`flex items-center justify-center p-6 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
                                 {isCombinedBlock && activePlanet && <UserPlanets userPlanet={activePlanet} />}
-                                {/* {isBlock19or20or21 && activePlanet && userStructures.map((structure, structureIndex) => {
+                                {isBlock19 && activePlanet && userStructures.map((structure, structureIndex) => {
                                     if (structureIndex === 0) {
-                                        return <PlacedStructureSingle key={structure.id} UserStructure={structure} />;
+                                        // return <PlacedStructureSingle key={structure.id} structure={structure} ownedItem={structure} />;
+                                        return (
+                                            <div className=""><AllStructures /></div>
+                                        );
                                     }
-                                })} */}
+                                })}
+                                {isBlock19 && activePlanet && (
+                                    <div className=""><AllStructures /></div>
+                                )}
                                 {isBlock51or54 && roverData.length > 0 && roverData.map((rover, roverIndex) => {
                                     if (roverIndex === 0 && roverData.length >= 2) return <p>Null</p>; // Skip rendering the first rover if there are two or more items
                                     return (

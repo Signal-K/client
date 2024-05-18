@@ -66,8 +66,8 @@ const RoverSingle: React.FC<RoverSingleProps> = ({ userAutomaton }) => {
     return (
         <div className="flex flex-col items-center justify-center">
             <button onClick={handleOpenDialog}>
-                <img src={roverInfo.icon_url} alt="Rover" className="w-8 h-8 mb-2" />
-                <p className="text-center">Type: {roverInfo.name}</p>
+                <img src={roverInfo.icon_url} alt="Rover" className="w-32 h-32 mb-2" />
+                {/* <p className="text-center">Type: {roverInfo.name}</p> */}
             </button>
             <SingleAutomatonDialogue
                 open={dialogOpen}
