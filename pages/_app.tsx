@@ -7,6 +7,7 @@ import { useState } from "react";
 import Head from "next/head";
 import { ActivePlanetProvider } from "@/context/ActivePlanet";
 import {NextUIProvider} from "@nextui-org/system";
+import { InventoryProvider } from "@/context/InventoryContext";
 
 export default function StarSailors ({ Component, pageProps }: AppProps) {
   const [supabaseClient] = useState(() => createBrowserSupabaseClient());
@@ -53,9 +54,11 @@ export default function StarSailors ({ Component, pageProps }: AppProps) {
       </Head>
       <SessionContextProvider supabaseClient={supabaseClient} initialSession={pageProps.initialSession}>
         <ActivePlanetProvider>
-          <NextUIProvider>
-            <Component {...pageProps} />
-          </NextUIProvider>
+          <InventoryProvider>
+            <NextUIProvider>
+              <Component {...pageProps} />
+            </NextUIProvider>
+          </InventoryProvider>
         </ActivePlanetProvider>
       </SessionContextProvider>
     </>
