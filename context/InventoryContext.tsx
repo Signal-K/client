@@ -23,7 +23,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchInventoryItems = async () => {
       try {
-        const response = await fetch('/api/inventory-items');
+        const response = await fetch('/api/gameplay/inventory');
         const items: InventoryItem[] = await response.json();
         const itemsDictionary = items.reduce((acc, item) => {
           acc[item.id] = item;
