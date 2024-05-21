@@ -36,7 +36,7 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
 
         // Fetch user planet
         const { data: planet, error: planetError } = await supabase
-          .from("basePlanets")
+          .from("anomalies")
           .select("*")
           .eq("id", profile.location)
           .single();

@@ -71,10 +71,10 @@ const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structur
     const getActiveModules = async () => {
         try {
             const { data, error } = await supabase
-                .from('inventoryUSERS')
+                .from('inventory')
                 .select('item')
                 .eq('owner', session?.user?.id)
-                .eq('basePlanet', activePlanet?.id)
+                .eq('anomaly', activePlanet?.id)
                 .in('item', [14, 29]);
     
             if (error) {

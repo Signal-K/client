@@ -17,7 +17,7 @@ export default function () {
     return (
         <Layout bg={false}>
             <div className="p-5">
-                <UserItems />
+                {/* <UserItems /> */}
                 {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
                 <RoverControlPanel /> */}
                 {activePlanet?.id}
