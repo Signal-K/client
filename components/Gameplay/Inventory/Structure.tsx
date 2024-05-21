@@ -14,12 +14,16 @@ interface OwnedItem {
     sector: string;
 };
 
-export interface UserStructure {
-    id: string;
-    item: number;
+interface UserStructure {
+    id: number;
+    item: number; // Assuming this should be a number
     name: string;
-    icon_url: string;
     description: string;
+    cost: number;
+    icon_url: string;
+    ItemCategory: string;
+    parentItem: number | null;
+    itemLevel: number;
     // Function (what is executed upon click)
 };
 
@@ -45,7 +49,7 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
         <div className="flex flex-col items-center justify-center">
             <img src={structure.icon_url} alt={structure.name} className="w-14 h-14 mb-2" />
             <p>{ownedItem.id}</p>
-            {structure.id == "12" && (
+            {structure.id == 12 && (
                 <TelescopeReceiverStructureModal ownedItem={ownedItem} structure={structure} />
             )}
         </div>
@@ -101,7 +105,7 @@ const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structur
     const handleModuleClick = async (moduleId: string) => {
         try {
             const { data, error } = await supabase
-                .from('inventoryUSERS')
+                .from('inventory')
                 .upsert([
                     {
                         item: moduleId,
@@ -109,7 +113,7 @@ const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structur
                         quantity: 1,
                         time_of_deploy: new Date().toISOString,
                         notes: "Structure",
-                        basePlanet: activePlanet?.id,
+                        anomaly: activePlanet?.id,
                     },
                 ]);
 
@@ -178,12 +182,13 @@ export const AllStructures: React.FC<{}> = () => {
         async function fetchData() {
             if (session && activePlanet) {
                 try {
+                    // Fetch owned items from supabase
                     const { data: ownedItemsData, error: ownedItemsError } = await supabase
-                        .from('inventoryUSERS')
+                        .from('inventory')
                         .select('*')
-                        .eq("owner", session.user.id)
-                        .eq("basePlanet", activePlanet.id)
-                        .eq("notes", "Structure");
+                        .eq('owner', session.user.id)
+                        .eq('anomaly', activePlanet.id)
+                        .eq('notes', 'Structure');
 
                     if (ownedItemsError) {
                         throw ownedItemsError;
@@ -191,28 +196,32 @@ export const AllStructures: React.FC<{}> = () => {
 
                     if (ownedItemsData) {
                         const itemIds = ownedItemsData.map(item => item.item);
-                        const { data: itemDetailsData, error: itemDetailsError } = await supabase
-                            .from('inventoryITEMS')
-                            .select('*')
-                            .in('id', itemIds)
-                            .eq('ItemCategory', 'Structure');
-
-                        if (itemDetailsError) {
-                            throw itemDetailsError;
+                        
+                        // Fetch item details from the Next.js API
+                        const response = await fetch('/api/gameplay/inventory');
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch item details from the API');
                         }
+                        const itemDetailsData: UserStructure[] = await response.json();
 
                         if (itemDetailsData) {
-                            const structuresData: { ownedItem: OwnedItem; structure: UserStructure }[] = itemDetailsData.map(itemDetail => {
-                                const ownedItem = ownedItemsData.find(ownedItem => ownedItem.item === itemDetail.id);
-                                const structure: UserStructure = {
-                                    id: itemDetail.id,
-                                    item: itemDetail.id,
-                                    name: itemDetail.name,
-                                    icon_url: itemDetail.icon_url,
-                                    description: itemDetail.description
-                                };
-                                return { ownedItem: ownedItem || { id: "", item: "", quantity: 0, sector: "" }, structure };
-                            });
+                            const structuresData: { ownedItem: OwnedItem; structure: UserStructure }[] = itemDetailsData
+                                .filter(itemDetail => itemDetail.ItemCategory === 'Structure' && itemIds.includes(itemDetail.id))
+                                .map(itemDetail => {
+                                    const ownedItem = ownedItemsData.find(ownedItem => ownedItem.item === itemDetail.id);
+                                    const structure: UserStructure = {
+                                        id: itemDetail.id,
+                                        item: itemDetail.id,
+                                        name: itemDetail.name,
+                                        icon_url: itemDetail.icon_url,
+                                        description: itemDetail.description,
+                                        cost: itemDetail.cost,
+                                        ItemCategory: itemDetail.ItemCategory,
+                                        parentItem: itemDetail.parentItem,
+                                        itemLevel: itemDetail.itemLevel,
+                                    };
+                                    return { ownedItem: ownedItem || { id: '', item: '', quantity: 0, sector: '' }, structure };
+                                });
                             setUserStructures(structuresData);
                         }
                     }
@@ -238,55 +247,44 @@ export const AllStructures: React.FC<{}> = () => {
 };
 
 // Create structures
-export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSelected }) => { // <StructureSingleProps> = ({ userStructure }) => { /#/ -> activeSectorId
+export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSelected }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
 
     const [structures, setStructures] = useState<UserStructure[]>([]);
-    const [activeSector, setActiveSector] = useState<Number>();
+    const [activeSector, setActiveSector] = useState<number | undefined>();
     const [isCalloutOpen, setIsCalloutOpen] = useState(false);
 
     const fetchStructures = async () => {
         try {
-            const { data, error } = await supabase
-                .from('inventoryITEMS')
-                .select('id, name, description, icon_url')
-                .eq('ItemCategory', 'Structure');
-
-            if (data) {
-                const structuredData: UserStructure[] = data.map((item: any) => ({
-                    id: item.id,
-                    item: item.item,
-                    name: item.name,
-                    icon_url: item.icon_url,
-                    description: item.description,
-                }));
-                setStructures(structuredData);
-            };
-
-            if (error) {
-                console.error(error.message);
+            const response = await fetch('/api/gameplay/inventory');
+            if (!response.ok) {
+                throw new Error('Failed to fetch item details from the API');
             }
+            const data: UserStructure[] = await response.json();
+
+            const structuredData: UserStructure[] = data.filter(item => item.ItemCategory === 'Structure');
+            setStructures(structuredData);
         } catch (error: any) {
-            console.error(error.message);
+            console.error('Error fetching structures:', error.message);
         }
     };
-    
-    const fetchUserSector = async () => { // Temporary function to determine where to put the structure. We haven't got this determined yet from a narrative standpoint
+
+    const fetchUserSector = async () => {
         try {
-            if (activePlanet?.id) { // Ensure activePlanet?.id is valid
+            if (activePlanet?.id) {
                 const { data, error } = await supabase
                     .from("basePlanetSectors")
                     .select('id')
-                    .eq("anomaly", activePlanet.id) // Use activePlanet.id directly
+                    .eq("anomaly", activePlanet.id)
                     .eq('owner', session?.user?.id)
                     .limit(1);
-    
+
                 if (data && data.length > 0) {
                     setActiveSector(data[0].id);
                 }
-    
+
                 if (error) {
                     console.error(error.message);
                 }
@@ -298,73 +296,69 @@ export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSel
 
     useEffect(() => {
         if (session) {
-            fetchUserSector();
             fetchStructures();
-            console.log(activeSector);
-        };
+        }
     }, [session, supabase]);
 
     const handleStructureClick = async (structure: UserStructure) => {
-        if (session && activeSector == 50) {
-                try {
+        if (session && activeSector === 50) {
+            try {
                 const payload = JSON.stringify({
                     user_id: session?.user?.id,
-                    sector_id: activeSector,
                     structure_id: structure.id,
                 });
 
                 const response = await fetch('http://papyrus-production.up.railway.app/craft_structure', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json' // Ideally this should also send a log request to supabase
+                        'Content-Type': 'application/json',
                     },
                     body: payload,
                 });
 
                 const data = await response.json();
-                console.log('Response from Flask upon attempt to create structure entry: ', data);
+                console.log('Response from Flask upon attempt to create structure entry:', data);
 
                 if (data.status === 'proceed') {
                     createInventoryUserEntry(structure);
-                };
+                }
             } catch (error: any) {
-                console.error('Error: ', error.message);
-            };
+                console.error('Error:', error.message);
+            }
         }
 
-        createInventoryUserEntry(structure); // Since initially we aren't going through papyrus api
+        createInventoryUserEntry(structure);
         onStructureSelected(structure);
         setIsCalloutOpen(false);
     };
 
     const createInventoryUserEntry = async (structure: UserStructure) => {
-        if (session && activeSector && activePlanet?.id) {
+        if (session && activePlanet?.id) {
             try {
                 const { data, error } = await supabase
-                    .from('inventoryUSERS')
+                    .from('inventory')
                     .upsert([
                         {
                             item: structure.id,
                             owner: session?.user?.id,
                             quantity: 1,
-                            planetSector: activeSector,
-                            time_of_deploy: new Date().toISOString,
+                            time_of_deploy: new Date().toISOString(),
                             notes: "Structure",
-                            basePlanet: activePlanet.id,
+                            anomaly: activePlanet.id,
                         },
                     ]);
 
                 if (data) {
-                    console.log('Inventory user entry created: ', data);
-                };
+                    console.log('Inventory user entry created:', data);
+                }
 
                 if (error) {
                     console.log(error.message);
-                };
+                }
             } catch (error: any) {
                 console.log(error);
-            };
-        };
+            }
+        }
     };
 
     return (

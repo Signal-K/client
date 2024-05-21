@@ -20,7 +20,6 @@ export default function () {
                 {/* <UserItems /> */}
                 {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
                 <RoverControlPanel /> */}
-                {activePlanet?.id}
                 <AllStructures />
                 {/* <AllAutomatons /> */}
                 <CreateStructure onStructureSelected={handleStructureSelected} activeSectorId={0} />
