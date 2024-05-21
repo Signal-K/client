@@ -75,7 +75,7 @@ const UserPlanetPage = () => {
         const fetchRoverData = async () => {
             try {
                 const { data, error } = await supabase
-                    .from("inventoryUSERS")
+                    .from("inventory")
                     .select("*")
                     .eq("item", 23 || 22 || 18)
                     .eq("owner", session?.user?.id)

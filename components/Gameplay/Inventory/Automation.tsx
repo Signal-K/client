@@ -17,43 +17,32 @@ export interface UserAutomaton {
     item: number;
 };
 
-const RoverSingle: React.FC<RoverSingleProps> = ({ userAutomaton }) => {
-    const supabase = useSupabaseClient();
-    const session = useSession();
 
+const RoverSingle: React.FC<RoverSingleProps> = ({ userAutomaton }) => {
     const [roverInfo, setRoverInfo] = useState<any>(null);
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
     const cancelButtonRef = useRef(null);
-    const [selectedSectorId, setSelectedSectorId] = useState<string>('');
-    const [deployedRover, setDeployedRover] = useState<any>(null);
-    const [reward, setReward] = useState<number>(0);
-    const [userSectors, setUserSectors] = useState<any[]>([]);
 
     useEffect(() => {
         const fetchRoverInfo = async () => {
             try {
-                const { data, error } = await supabase
-                    .from("inventoryITEMS")
-                    .select("icon_url, name")
-                    .eq("id", userAutomaton.item)
-                    .single();
-
-                if (error) throw error;
-
-                if (data) {
-                    setRoverInfo(data);
+                const response = await fetch(`/api/gameplay/inventory?item=${userAutomaton.item}`);
+                if (!response.ok) {
+                    throw new Error(`Error fetching rover info: ${response.status} ${response.statusText}`);
                 }
+                const data = await response.json();
+                setRoverInfo(data);
             } catch (error: any) {
                 console.error("Error fetching rover info:", error.message);
             }
         };
 
         fetchRoverInfo();
-    }, [supabase, userAutomaton.item]);
+    }, [userAutomaton.item]);
 
     if (!roverInfo) {
         return <p>Loading rover info...</p>;
-    };
+    }
 
     const handleOpenDialog = () => {
         setDialogOpen(true);
@@ -66,21 +55,14 @@ const RoverSingle: React.FC<RoverSingleProps> = ({ userAutomaton }) => {
     return (
         <div className="flex flex-col items-center justify-center">
             <button onClick={handleOpenDialog}>
-                <img src={roverInfo.icon_url} alt="Rover" className="w-32 h-32 mb-2" />
-                {/* <p className="text-center">Type: {roverInfo.name}</p> */}
+                <img src={roverInfo.icon_url} alt={roverInfo.name} className="w-32 h-32 mb-2" />
+                <p className="text-center">Type: {roverInfo.id}</p>
             </button>
             <SingleAutomatonDialogue
                 open={dialogOpen}
                 onClose={handleCloseDialog}
                 userAutomaton={userAutomaton}
                 roverInfo={roverInfo}
-                deployedRover={deployedRover}
-                setDeployedRover={setDeployedRover}
-                reward={reward}
-                setReward={setReward}
-                selectedSectorId={selectedSectorId}
-                setSelectedSectorId={setSelectedSectorId}
-                userSectors={userSectors}
             />
         </div>
     );
@@ -89,43 +71,46 @@ const RoverSingle: React.FC<RoverSingleProps> = ({ userAutomaton }) => {
 export default RoverSingle;
 
 export function AllAutomatons () {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-  const { activePlanet } = useActivePlanet();
+    const supabase = useSupabaseClient();
+    const session = useSession();
+    const { activePlanet } = useActivePlanet();
 
-  const [roverInfo, setRoverInfo] = useState<any>(null); // We then need to fetch the data from `inventoryITEMS` table for the details of each item e.g. its name, icon, etc
-  const [userAutomatons, setUserAutomatons] = useState<any[]>([]);
+    const [userAutomatons, setUserAutomatons] = useState<any[]>([]);
 
-  const fetchAlUserRovers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("inventoryUSERS")
-        .select("id, item, notes, time_of_deploy, basePlanet, planetSector, owner")
-        .eq("owner", session?.user?.id)
-        .eq("item", 23)
-        .eq("basePlanet", activePlanet?.id)
+    const fetchAllUserRovers = async () => {
+        try {
+            const { data, error } = await supabase
+                .from("inventory")
+                .select("id, item, notes, time_of_deploy, basePlanet, planetSector, owner")
+                .eq("owner", session?.user?.id)
+                .eq("item", 23)
+                .eq("basePlanet", activePlanet?.id);
 
-      if (data) {
-        setUserAutomatons(data);
-      };
-    } catch (error) {
-      console.error(error)
-    }
-  }
+            if (data) {
+                setUserAutomatons(data);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-  useEffect(() => {
-    fetchAlUserRovers();
-  })
+    useEffect(() => {
+        fetchAllUserRovers();
+    }, [session, supabase, activePlanet]);
 
-  return (
-    <>{userAutomatons}</>
-  );
+    return (
+        <>{userAutomatons}</>
+    );
 };
 
-function SingleAutomatonDialogue({ open, onClose, userAutomaton, roverInfo, deployedRover, setDeployedRover, reward, setReward, selectedSectorId, setSelectedSectorId, userSectors }: { open: boolean; onClose: () => void; userAutomaton: UserAutomaton; roverInfo: any; deployedRover: any; setDeployedRover: React.Dispatch<any>; reward: number; setReward: React.Dispatch<number>; selectedSectorId: string; setSelectedSectorId: React.Dispatch<string>; userSectors: any[]; }) {
+function SingleAutomatonDialogue({ open, onClose, userAutomaton, roverInfo }: { open: boolean; onClose: () => void; userAutomaton: UserAutomaton; roverInfo: any; }) {
     const supabase = useSupabaseClient();
     const session = useSession();
     const cancelButtonRef = useRef(null);
+    const [selectedSectorId, setSelectedSectorId] = useState<string>('');
+    const [deployedRover, setDeployedRover] = useState<any>(null);
+    const [reward, setReward] = useState<number>(0);
+    const [userSectors, setUserSectors] = useState<any[]>([]);
 
     const handleSectorSelect = (sectorId: string) => {
         setSelectedSectorId(sectorId);
@@ -146,7 +131,7 @@ function SingleAutomatonDialogue({ open, onClose, userAutomaton, roverInfo, depl
 
             // Deploy the rover
             const { data, error } = await supabase
-                .from("inventoryUSERS")
+                .from("inventory")
                 .update({
                     planetSector: selectedSectorId,
                     time_of_deploy: new Date().toISOString()
@@ -179,9 +164,9 @@ function SingleAutomatonDialogue({ open, onClose, userAutomaton, roverInfo, depl
                 // Calculate reward
                 const reward = 1; // Fixed reward of 1 item
 
-                // Create a new entry in inventoryUSERS for the reward item
+                // Create a new entry in inventory for the reward item
                 const { data: rewardData, error: rewardError } = await supabase
-                    .from("inventoryUSERS")
+                    .from("inventory")
                     .insert([
                         {
                             owner: session?.user?.id,
@@ -197,7 +182,7 @@ function SingleAutomatonDialogue({ open, onClose, userAutomaton, roverInfo, depl
 
                 // Clear the timestamp value for the deployed rover
                 const { error } = await supabase
-                    .from("inventoryUSERS")
+                    .from("inventory")
                     .update({
                         time_of_deploy: null
                     })
@@ -223,54 +208,54 @@ function SingleAutomatonDialogue({ open, onClose, userAutomaton, roverInfo, depl
     if (!deployedRover) { // This should actually be if the rover is deployed, however as we're having issues with managing the state...
         return (
             <Transition.Root show={open} as={Fragment}>
-            <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" initialFocus={cancelButtonRef} onClose={onClose}>
-                <div className="flex items-center justify-center min-h-screen">
-                    <Transition.Child
-                        as={Fragment}
-                        enter="ease-out duration-300"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="ease-in duration-200"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                    >
-                        <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
-                    </Transition.Child>
+                <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" initialFocus={cancelButtonRef} onClose={onClose}>
+                    <div className="flex items-center justify-center min-h-screen">
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0"
+                            enterTo="opacity-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
+                        >
+                            <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+                        </Transition.Child>
 
-                    <Transition.Child
-                        as={Fragment}
-                        enter="ease-out duration-300"
-                        enterFrom="opacity-0 scale-95"
-                        enterTo="opacity-100 scale-100"
-                        leave="ease-in duration-200"
-                        leaveFrom="opacity-100 scale-100"
-                        leaveTo="opacity-0 scale-95"
-                    >
-                        <div className="relative max-w-lg w-full bg-white rounded-lg shadow-lg">
-                            <Dialog.Panel className="p-4">
-                                <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                                    <div className="sm:flex sm:items-start">
-                                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                            <img src={roverInfo.icon_url} height={64} width={64} alt="Rover" />
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 scale-95"
+                            enterTo="opacity-100 scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 scale-100"
+                            leaveTo="opacity-0 scale-95"
+                        >
+                            <div className="relative max-w-lg w-full bg-white rounded-lg shadow-lg">
+                                <Dialog.Panel className="p-4">
+                                    <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                                        <div className="sm:flex sm:items-start">
+                                            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                                <img src={roverInfo.icon_url} height={64} width={64} alt="Rover" />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                {/* <AutomatonControlPanel /> */}
-                                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                    <button
-                                        type="button"
-                                        className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
-                                        onClick={onClose}
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </Dialog.Panel>
-                        </div>
-                    </Transition.Child>
-                </div>
-            </Dialog>
-        </Transition.Root>
+                                    {/* <AutomatonControlPanel /> */}
+                                    <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                        <button
+                                            type="button"
+                                            className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+                                            onClick={onClose}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </div>
+                        </Transition.Child>
+                    </div>
+                </Dialog>
+            </Transition.Root>
         );
     };
 

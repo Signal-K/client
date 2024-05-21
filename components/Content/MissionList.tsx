@@ -59,7 +59,7 @@ export default function MissionList() {
                 if (!session?.user?.id) return;
 
                 const { data: userItems, error: userItemsError } = await supabase
-                    .from("inventoryUSERS")
+                    .from("inventory")
                     .select("*")
                     .eq("owner", session.user.id)
                     .eq("notes", "first rover created by user");
