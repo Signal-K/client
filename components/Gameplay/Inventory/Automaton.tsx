@@ -1,5 +1,17 @@
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useEffect, useState } from "react";
+
+interface Automaton {
+    id: number;
+    owner: string;
+    item: number;
+    quantity: number;
+    anomaly: string;
+    notes: string;
+    icon_url: string;
+    name: string;
+};
 
 export function CreateAutomaton() {
     const supabase = useSupabaseClient();
@@ -55,6 +67,92 @@ export function CreateAutomaton() {
         <>
             Create a new automaton
             <button onClick={handleCreateAutomaton}>Create Automaton</button>
+        </>
+    );
+};
+
+export function SingleAutomaton() {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const { activePlanet } = useActivePlanet();
+    const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
+
+    async function fetchAutomatonData() {
+        if (!activePlanet?.id || !session?.user?.id) {
+            console.error('activePlanet or session.user.id is undefined');
+            return;
+        }
+
+        try {
+            const { data, error } = await supabase
+                .from('inventory')
+                .select("*")
+                .eq("owner", session.user.id)
+                .eq("item", 23)
+                .eq("anomaly", activePlanet.id)
+                .limit(1);
+
+            if (error) {
+                console.error('Error fetching automaton data:', error);
+                return;
+            }
+
+            if (data) {
+                setUserAutomaton(data[0] || null); // Assuming data is an array
+            }
+        } catch (error) {
+            console.error('Error fetching automaton data:', error);
+        }
+    }
+
+    useEffect(() => {
+        fetchAutomatonData();
+    }, [session, activePlanet]);
+
+    return (
+        <>
+            {userAutomaton ? (
+                <p>{userAutomaton.id}</p>
+            ) : (
+                <p>No automaton found</p>
+            )}
+        </>
+    )
+}
+
+// Create a function that looks at the user's inventory, and for all rows where the inventory item type is listed as "Automaton" on the `inventory` route (e.g. item 23), show the item image, name, and id (in the `inventory` table). So there should be a component that fetches all the matching records, and then a component that shows each of the automatons/rovers (i.e. one component (a single) for every automaton/rover)
+export function AllAutomatons() {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [automatons, setAutomatons] = useState<Automaton[]>([]);
+
+    useEffect(() => {
+        const fetchAutomatons = async () => {
+            const { data, error } = await supabase.from('inventory').select('*').eq('owner', session?.user?.id).eq('item', 23);
+            if (error) {
+                console.error('Error fetching automatons', error);
+                return;
+            }
+
+            if (data) {
+                setAutomatons(data);
+            };
+        };
+
+        fetchAutomatons();
+    }, [session]);
+
+    return (
+        <>
+            {automatons.map((automaton) => (
+                <div key={automaton.id}>
+                    <img src={automaton.icon_url} alt={automaton.name} />
+                    <div>{automaton.name}</div>
+                    <div>{automaton.id}</div>
+                </div>
+            ))}
         </>
     );
 };
