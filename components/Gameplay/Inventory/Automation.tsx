@@ -17,7 +17,6 @@ export interface UserAutomaton {
     item: number;
 };
 
-
 const RoverSingle: React.FC<RoverSingleProps> = ({ userAutomaton }) => {
     const [roverInfo, setRoverInfo] = useState<any>(null);
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);

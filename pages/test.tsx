@@ -1,5 +1,6 @@
 // import { AutomatonControlPanel, RoverControlPanel } from "@/components/Gameplay/Inventory/Automation";
 import { AllAutomatons } from "@/components/Gameplay/Inventory/Automation";
+import { CreateAutomaton } from "@/components/Gameplay/Inventory/Automaton";
 import { AllStructures, CreateStructure } from "@/components/Gameplay/Inventory/Structure";
 import UserItems from "@/components/Gameplay/Inventory/UserInventory";
 import Layout from "@/components/Layout";
@@ -21,6 +22,7 @@ export default function () {
                 {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
                 <RoverControlPanel /> */}
                 <AllStructures />
+                <CreateAutomaton />
                 {/* <AllAutomatons /> */}
                 <CreateStructure onStructureSelected={handleStructureSelected} activeSectorId={0} />
             </div>
