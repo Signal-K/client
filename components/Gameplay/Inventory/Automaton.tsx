@@ -11,6 +11,7 @@ interface Automaton {
     notes: string;
     icon_url: string;
     name: string;
+    time_of_deploy: string;
 };
 
 export function CreateAutomaton() {
@@ -78,17 +79,6 @@ export function CreateAutomaton() {
     return null;
 };
 
-interface Automaton {
-    id: number;
-    owner: string;
-    item: number;
-    quantity: number;
-    anomaly: string;
-    notes: string;
-    icon_url: string;
-    name: string;
-};
-
 export function SingleAutomaton() {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -96,6 +86,7 @@ export function SingleAutomaton() {
     const { activePlanet } = useActivePlanet();
     const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
     const [automatonInfo, setAutomatonInfo] = useState<any>(null); // Initialize automatonInfo with type 'any'
+    const [rewardTotal, setRewardTotal] = useState<number>(0);
 
     async function fetchAutomatonData() {
         if (!session?.user?.id) {
@@ -108,33 +99,31 @@ export function SingleAutomaton() {
             return;
         };
 
-        if (activePlanet) {
-            try {
-                const { data, error } = await supabase
-                    .from('inventory')
-                    .select("*")
-                    .eq("owner", session.user.id)
-                    .eq("item", 23)
-                    .eq("anomaly", activePlanet.id)
-                    .limit(1);
+        try {
+            const { data, error } = await supabase
+                .from('inventory')
+                .select("*")
+                .eq("owner", session.user.id)
+                .eq("item", 23)
+                .eq("anomaly", activePlanet.id)
+                .limit(1);
 
-                if (error) {
-                    console.error('Error fetching automaton data:', error);
-                    return;
-                };
-
-                if (data) {
-                    setUserAutomaton(data[0] || null); // Assuming data is an array
-                };
-            } catch (error) {
+            if (error) {
                 console.error('Error fetching automaton data:', error);
+                return;
             };
+
+            if (data) {
+                setUserAutomaton(data[0] || null); // Assuming data is an array
+            };
+        } catch (error) {
+            console.error('Error fetching automaton data:', error);
         };
     };
 
     const fetchRoverInfo = async () => {
         try {
-            const response = await fetch(`/api/gameplay/inventory?item=${userAutomaton?.item}`);
+            const response = await fetch(`/api/gameplay/inventory`);
             if (!response.ok) {
                 throw new Error(`Error fetching rover info: ${response.status} ${response.statusText}`);
             }
@@ -145,7 +134,7 @@ export function SingleAutomaton() {
         }
     };
 
-    async function deployAutomaton() { // Now we just need to come up with a method to measure the time and distribute the reward
+    async function deployAutomaton() {
         if (userAutomaton != null) {
             const { data, error } = await supabase
                 .from('inventory')
@@ -160,6 +149,45 @@ export function SingleAutomaton() {
             console.log('Automaton deployed', data);
         };
     };
+
+    async function claimRewards() {
+        if (userAutomaton?.time_of_deploy) {
+            const deployTime = new Date(userAutomaton.time_of_deploy).getTime();
+            const currentTime = new Date().getTime();
+            const timeDifference = (currentTime - deployTime) / 1000 / 60; // Difference in minutes
+            const rewardTotal = Math.floor(timeDifference);
+
+            if (rewardTotal > 0) {
+                const { error: insertError } = await supabase.from('inventory').insert([
+                    {
+                        owner: session?.user?.id,
+                        item: 11,
+                        quantity: rewardTotal,
+                        anomaly: activePlanet?.id,
+                        notes: "Reward from automaton",
+                    },
+                ]);
+
+                if (insertError) {
+                    console.error('Error inserting reward', insertError);
+                    return;
+                }
+
+                const { error: updateError } = await supabase
+                    .from('inventory')
+                    .update({ time_of_deploy: null })
+                    .eq('id', userAutomaton.id);
+
+                if (updateError) {
+                    console.error('Error updating automaton', updateError);
+                    return;
+                }
+
+                setRewardTotal(rewardTotal);
+                console.log(`Rewards claimed: ${rewardTotal}`);
+            }
+        }
+    }
 
     useEffect(() => {
         fetchAutomatonData();
@@ -183,6 +211,9 @@ export function SingleAutomaton() {
                         </>
                     )}
                     <button onClick={deployAutomaton}>Deploy automaton</button>
+                    {userAutomaton.time_of_deploy && (
+                        <button onClick={claimRewards}>Claim Rewards</button>
+                    )}
                 </>
             ) : (
                 <p>No automaton found</p>
@@ -190,6 +221,7 @@ export function SingleAutomaton() {
         </>
     )
 };
+
 
 // Create a function that looks at the user's inventory, and for all rows where the inventory item type is listed as "Automaton" on the `inventory` route (e.g. item 23), show the item image, name, and id (in the `inventory` table). So there should be a component that fetches all the matching records, and then a component that shows each of the automatons/rovers (i.e. one component (a single) for every automaton/rover)
 export function AllAutomatons() {
