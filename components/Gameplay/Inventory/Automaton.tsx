@@ -19,6 +19,8 @@ export function CreateAutomaton() {
 
     const { activePlanet } = useActivePlanet();
 
+    const [already, setAlready] = useState(false);
+
     // Create a function that will create a new automaton (from the `inventory` api route, create from id "23"). only if they don't currently have a rover/automaton. So search through `inventory` for any rows with `owner` == `session?.user?.id`, and `item` == 23. If there is no record, show a button allowing them to create an automaton. Additionally, we have to search through the inventory to make sure they have a rover construction structure (id 22). So only allow them to create an automaton/rover if they don't have id == 23, and they do have id == 22.
     const handleCreateAutomaton = async () => {
         // Check if the user has an automaton already
@@ -30,6 +32,7 @@ export function CreateAutomaton() {
 
         if (automatonData && automatonData.length > 0) {
             console.log('User already has an automaton');
+            setAlready(true);
             return;
         }
 
@@ -63,12 +66,27 @@ export function CreateAutomaton() {
         console.log('Automaton created', createdAutomatonData);
     };
     
-    return (
-        <>
-            Create a new automaton
-            <button onClick={handleCreateAutomaton}>Create Automaton</button>
-        </>
-    );
+    if (!already) {
+        return (
+            <>
+                Create a new automaton
+                <button onClick={handleCreateAutomaton}>Create Automaton</button>
+            </>
+        );
+    };
+
+    return null;
+};
+
+interface Automaton {
+    id: number;
+    owner: string;
+    item: number;
+    quantity: number;
+    anomaly: string;
+    notes: string;
+    icon_url: string;
+    name: string;
 };
 
 export function SingleAutomaton() {
@@ -77,49 +95,101 @@ export function SingleAutomaton() {
 
     const { activePlanet } = useActivePlanet();
     const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
+    const [automatonInfo, setAutomatonInfo] = useState<any>(null); // Initialize automatonInfo with type 'any'
 
     async function fetchAutomatonData() {
-        if (!activePlanet?.id || !session?.user?.id) {
-            console.error('activePlanet or session.user.id is undefined');
+        if (!session?.user?.id) {
+            console.error('session.user.id is undefined');
             return;
-        }
+        };
 
+        if (!activePlanet?.id) {
+            console.error('activePlanet is undefined');
+            return;
+        };
+
+        if (activePlanet) {
+            try {
+                const { data, error } = await supabase
+                    .from('inventory')
+                    .select("*")
+                    .eq("owner", session.user.id)
+                    .eq("item", 23)
+                    .eq("anomaly", activePlanet.id)
+                    .limit(1);
+
+                if (error) {
+                    console.error('Error fetching automaton data:', error);
+                    return;
+                };
+
+                if (data) {
+                    setUserAutomaton(data[0] || null); // Assuming data is an array
+                };
+            } catch (error) {
+                console.error('Error fetching automaton data:', error);
+            };
+        };
+    };
+
+    const fetchRoverInfo = async () => {
         try {
+            const response = await fetch(`/api/gameplay/inventory?item=${userAutomaton?.item}`);
+            if (!response.ok) {
+                throw new Error(`Error fetching rover info: ${response.status} ${response.statusText}`);
+            }
+            const data = await response.json();
+            setAutomatonInfo(data.find((item: any) => item.id === userAutomaton?.item));
+        } catch (error: any) {
+            console.error("Error fetching rover info:", error.message);
+        }
+    };
+
+    async function deployAutomaton() { // Now we just need to come up with a method to measure the time and distribute the reward
+        if (userAutomaton != null) {
             const { data, error } = await supabase
                 .from('inventory')
-                .select("*")
-                .eq("owner", session.user.id)
-                .eq("item", 23)
-                .eq("anomaly", activePlanet.id)
-                .limit(1);
+                .update({ time_of_deploy: new Date().toISOString() })
+                .eq('id', userAutomaton.id);
 
             if (error) {
-                console.error('Error fetching automaton data:', error);
+                console.error('Error deploying automaton:', error);
                 return;
             }
 
-            if (data) {
-                setUserAutomaton(data[0] || null); // Assuming data is an array
-            }
-        } catch (error) {
-            console.error('Error fetching automaton data:', error);
-        }
-    }
+            console.log('Automaton deployed', data);
+        };
+    };
 
     useEffect(() => {
         fetchAutomatonData();
     }, [session, activePlanet]);
 
+    useEffect(() => {
+        if (userAutomaton) {
+            fetchRoverInfo();
+        }
+    }, [userAutomaton]);
+
     return (
         <>
             {userAutomaton ? (
-                <p>{userAutomaton.id}</p>
+                <>
+                    <p>{userAutomaton.id}</p>
+                    {automatonInfo && (
+                        <>
+                            <img src={automatonInfo.icon_url} alt={automatonInfo.name} className="w-32 h-32 mb-2" />
+                            <p>{automatonInfo.name}</p>
+                        </>
+                    )}
+                    <button onClick={deployAutomaton}>Deploy automaton</button>
+                </>
             ) : (
                 <p>No automaton found</p>
             )}
         </>
     )
-}
+};
 
 // Create a function that looks at the user's inventory, and for all rows where the inventory item type is listed as "Automaton" on the `inventory` route (e.g. item 23), show the item image, name, and id (in the `inventory` table). So there should be a component that fetches all the matching records, and then a component that shows each of the automatons/rovers (i.e. one component (a single) for every automaton/rover)
 export function AllAutomatons() {

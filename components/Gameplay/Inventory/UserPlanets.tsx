@@ -6,7 +6,6 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { AllStructures, PlacedStructureSingle } from "./Structure";
 
 import { Button } from "@/ui/button";
-import RoverSingle from "./Automation";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -135,7 +134,7 @@ const UserPlanetPage = () => {
                                     if (roverIndex === 0 && roverData.length >= 2) return <p>Null</p>; // Skip rendering the first rover if there are two or more items
                                     return (
                                         <>
-                                            <RoverSingle key={roverIndex} userAutomaton={rover} />
+                                            {/* <RoverSingle key={roverIndex} userAutomaton={rover} /> */}
                                         </>
                                     );
                                 })}

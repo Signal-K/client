@@ -1,5 +1,3 @@
-// import { AutomatonControlPanel, RoverControlPanel } from "@/components/Gameplay/Inventory/Automation";
-import { AllAutomatons } from "@/components/Gameplay/Inventory/Automation";
 import { CreateAutomaton, SingleAutomaton } from "@/components/Gameplay/Inventory/Automaton";
 import { AllStructures, CreateStructure } from "@/components/Gameplay/Inventory/Structure";
 import UserItems from "@/components/Gameplay/Inventory/UserInventory";
