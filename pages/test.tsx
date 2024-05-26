@@ -1,5 +1,5 @@
 import { AllAutomatons, CreateAutomaton, SingleAutomaton } from "@/components/Gameplay/Inventory/Automaton";
-import { AllStructures, CreateStructure } from "@/components/Gameplay/Inventory/Structure";
+import { AllStructures, CreateStructure } from "@/components/Gameplay/Inventory/Structures/Structure";
 import UserItems from "@/components/Gameplay/Inventory/UserInventory";
 import Layout from "@/components/Layout";
 import { useActivePlanet } from "@/context/ActivePlanet";

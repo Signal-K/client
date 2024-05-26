@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, RadioGroup, Radio} from "@nextui-org/react";
 import CreateBaseClassification from "@/components/Content/ClassificationForm";
 import { useProfileContext } from "@/context/UserProfile";
+import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "./Telescopes";
 
 interface OwnedItem {
     id: string;
@@ -29,19 +30,11 @@ interface UserStructure {
 
 interface PlacedStructureSingleProps {
     UserStructure: UserStructure;
-}
+};
 
 interface StructureSelectProps {
     onStructureSelected: (structure: UserStructure) => void;
     activeSectorId: number;
-};
-
-// View a single structure
-interface OwnedItem {
-    id: string;
-    item: string;
-    quantity: number;
-    sector: string;
 };
 
 export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: UserStructure }> = ({ ownedItem, structure }) => {
@@ -65,159 +58,13 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
             {structure.id === 14 && (
                 <TransitingTelescopeStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
             )}
+            {structure.id == 24 && (
+                <SurveyorStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
+            )}
             {/* Add more conditionals here for other structure IDs and their respective modals */}
         </div>
     );
 };
-
-interface TransitingTelescopeStructureModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    ownedItem: OwnedItem;
-    structure: UserStructure;
-}
-
-export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
-    const [isActionDone, setIsActionDone] = useState(false);
-
-    const handleActionClick = () => {
-        // Implement action logic here
-        setIsActionDone(true);
-    };
-
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold">{structure.name}</h2>
-                    <button className="btn btn-square btn-outline" onClick={onClose}>
-                        ✕
-                    </button>
-                </div>
-                <div className="flex flex-col items-center mt-4">
-                    <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
-                    <p>ID: {ownedItem.id}</p>
-                    <p>Description: {structure.description}</p>
-                    <div className="mt-4">
-                        <CreateBaseClassification />
-                        <button className="btn btn-primary" onClick={handleActionClick}>
-                            Perform Action
-                        </button>
-                        {isActionDone && <p className="mt-2 text-green-500">Action Completed</p>}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-
-interface TelescopeReceiverStructureModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    ownedItem: OwnedItem;
-    structure: UserStructure;
-}
-
-export const TelescopeReceiverStructureModal: React.FC<TelescopeReceiverStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-    const { activePlanet } = useActivePlanet();
-
-    const [activeModules, setActiveModules] = useState<string[]>([]);
-    const [inactiveModules, setInactiveModules] = useState<string[]>([]);
-
-    useEffect(() => {
-        if (session && activePlanet && isOpen) {
-            getActiveModules();
-        }
-    }, [session, activePlanet, isOpen]);
-
-    const getActiveModules = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('inventory')
-                .select('item')
-                .eq('owner', session?.user?.id)
-                .eq('anomaly', activePlanet?.id)
-                .in('item', [14, 29]);
-
-            if (error) {
-                throw error;
-            }
-
-            const activeModuleIds = data.map((module: any) => String(module.item));
-            setActiveModules(activeModuleIds);
-            setInactiveModules(["14", "29"].filter(id => !activeModuleIds.includes(id)));
-        } catch (error: any) {
-            console.error('Error fetching active telescope modules:', error.message);
-        }
-    };
-
-    const handleModuleClick = async (moduleId: string) => {
-        try {
-            const { data, error } = await supabase
-                .from('inventory')
-                .upsert([
-                    {
-                        item: moduleId,
-                        owner: session?.user?.id,
-                        quantity: 1,
-                        time_of_deploy: new Date().toISOString(),
-                        notes: "Structure",
-                        anomaly: activePlanet?.id,
-                    },
-                ]);
-
-            if (error) {
-                throw error;
-            }
-
-            console.log('Module created successfully:', data);
-            // Refresh active modules after creating the new module
-            getActiveModules();
-        } catch (error: any) {
-            console.error('Error creating module:', error.message);
-        }
-    };
-
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold">{structure.name}</h2>
-                    <button className="btn btn-square btn-outline" onClick={onClose}>
-                        ✕
-                    </button>
-                </div>
-                <div className="flex flex-col items-center mt-4">
-                    <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
-                    <p>ID: {ownedItem.id}</p>
-                    <p>Description: {structure.description}</p>
-                    <div>
-                        {inactiveModules.map(moduleId => (
-                            <div key={moduleId} className="flex items-center justify-between mb-2">
-                                <span>Module {moduleId}</span>
-                                <button className="btn btn-primary" onClick={() => handleModuleClick(moduleId)}>Create</button>
-                            </div>
-                        ))}
-                        {activeModules.map(moduleId => (
-                            <div key={moduleId} className="flex items-center justify-between mb-2">
-                                <span>Module {moduleId}</span>
-                                <span>Unlocked</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
 
 export const AllStructures: React.FC<{}> = () => {
     const supabase = useSupabaseClient();

@@ -3,7 +3,7 @@ import { useEffect, useState, useRef, Fragment, createContext } from "react";
 import { Dialog, Transition } from '@headlessui/react';
 import { Header, CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { AllStructures, PlacedStructureSingle } from "./Structure";
+import { AllStructures, PlacedStructureSingle } from "./Structures/Structure";
 
 import { Button } from "@/ui/button";
 import { AllAutomatons } from "./Automaton";
