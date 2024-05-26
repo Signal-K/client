@@ -165,7 +165,7 @@ export function SingleAutomaton() {
                         item: 11,
                         quantity: rewardTotal,
                         anomaly: activePlanet?.id,
-                        notes: "Reward from automaton",
+                        notes: `Reward from automaton ID: ${userAutomaton.id}`,
                     },
                 ]);
 
