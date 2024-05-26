@@ -45,32 +45,95 @@ interface OwnedItem {
 };
 
 export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: UserStructure }> = ({ ownedItem, structure }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
     return (
         <div className="flex flex-col items-center justify-center">
-            <img src={structure.icon_url} alt={structure.name} className="w-14 h-14 mb-2" />
+            <img src={structure.icon_url} alt={structure.name} className="w-14 h-14 mb-2 cursor-pointer" onClick={openModal} />
             <p>{ownedItem.id}</p>
-            {structure.id == 12 && (
-                <TelescopeReceiverStructureModal ownedItem={ownedItem} structure={structure} />
+            {structure.id === 12 && (
+                <TelescopeReceiverStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
             )}
+            {structure.id === 14 && (
+                <TransitingTelescopeStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
+            )}
+            {/* Add more conditionals here for other structure IDs and their respective modals */}
         </div>
     );
 };
 
-const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structure: UserStructure }> = ({ ownedItem, structure }) => {
+interface TransitingTelescopeStructureModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    ownedItem: OwnedItem;
+    structure: UserStructure;
+}
+
+export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
+    const [isActionDone, setIsActionDone] = useState(false);
+
+    const handleActionClick = () => {
+        // Implement action logic here
+        setIsActionDone(true);
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
+                <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-bold">{structure.name}</h2>
+                    <button className="btn btn-square btn-outline" onClick={onClose}>
+                        ✕
+                    </button>
+                </div>
+                <div className="flex flex-col items-center mt-4">
+                    <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
+                    <p>ID: {ownedItem.id}</p>
+                    <p>Description: {structure.description}</p>
+                    <div className="mt-4">
+                        <CreateBaseClassification />
+                        <button className="btn btn-primary" onClick={handleActionClick}>
+                            Perform Action
+                        </button>
+                        {isActionDone && <p className="mt-2 text-green-500">Action Completed</p>}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
+interface TelescopeReceiverStructureModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    ownedItem: OwnedItem;
+    structure: UserStructure;
+}
+
+export const TelescopeReceiverStructureModal: React.FC<TelescopeReceiverStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
-    const { userProfile } = useProfileContext();
 
     const [activeModules, setActiveModules] = useState<string[]>([]);
     const [inactiveModules, setInactiveModules] = useState<string[]>([]);
-    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-        if (session && activePlanet) {
+        if (session && activePlanet && isOpen) {
             getActiveModules();
-        };
-    }, [session, activePlanet]);
+        }
+    }, [session, activePlanet, isOpen]);
 
     const getActiveModules = async () => {
         try {
@@ -80,27 +143,18 @@ const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structur
                 .eq('owner', session?.user?.id)
                 .eq('anomaly', activePlanet?.id)
                 .in('item', [14, 29]);
-    
+
             if (error) {
                 throw error;
             }
-    
-            const activeModuleIds = data.map((module: any) => String(module.item)); 
+
+            const activeModuleIds = data.map((module: any) => String(module.item));
             setActiveModules(activeModuleIds);
-            setInactiveModules(["14", "29"].filter(id => !activeModuleIds.includes(id))); 
+            setInactiveModules(["14", "29"].filter(id => !activeModuleIds.includes(id)));
         } catch (error: any) {
             console.error('Error fetching active telescope modules:', error.message);
-        };
-    };    
-
-    const handleClose = () => {
-        setIsOpen(false);
+        }
     };
-
-    const handleOpen = () => {
-        setIsOpen(true);
-    };
-
 
     const handleModuleClick = async (moduleId: string) => {
         try {
@@ -111,7 +165,7 @@ const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structur
                         item: moduleId,
                         owner: session?.user?.id,
                         quantity: 1,
-                        time_of_deploy: new Date().toISOString,
+                        time_of_deploy: new Date().toISOString(),
                         notes: "Structure",
                         anomaly: activePlanet?.id,
                     },
@@ -129,47 +183,41 @@ const TelescopeReceiverStructureModal: React.FC<{ ownedItem: OwnedItem; structur
         }
     };
 
+    if (!isOpen) return null;
+
     return (
-        <div className="flex flex-col gap-2">
-            <Button onClick={handleOpen} className="max-w-fit">
-                Open Modal
-            </Button>
-            <Modal isOpen={isOpen} placement="bottom-center" onClose={handleClose}>
-                    <ModalContent>
-                        <div className="bg-indigo-500">
-                            <ModalHeader>{structure.name}</ModalHeader>
-                            <ModalBody>
-                                {/* {userProfile && ( <CreateBaseClassification /> )} Add structure argument */}
-                                <CreateBaseClassification />
-                                <div>
-                                    {inactiveModules.map(moduleId => (
-                                        <div key={moduleId} className="flex items-center justify-between mb-2">
-                                            <span>Module {moduleId}</span>
-                                            <Button color="primary" onClick={() => handleModuleClick(moduleId)}>Create</Button>
-                                        </div>
-                                    ))}
-                                    {activeModules.map(moduleId => (
-                                        <div key={moduleId} className="flex items-center justify-between mb-2">
-                                            <span>Module {moduleId}</span>
-                                            <span>Unlocked</span>
-                                        </div>
-                                    ))}
-                                </div>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button color="danger" variant="light" onClick={handleClose}>
-                                Close
-                            </Button>
-                            <Button color="primary" onClick={handleClose}>
-                                Action
-                            </Button>
-                        </ModalFooter>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
+                <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-bold">{structure.name}</h2>
+                    <button className="btn btn-square btn-outline" onClick={onClose}>
+                        ✕
+                    </button>
+                </div>
+                <div className="flex flex-col items-center mt-4">
+                    <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
+                    <p>ID: {ownedItem.id}</p>
+                    <p>Description: {structure.description}</p>
+                    <div>
+                        {inactiveModules.map(moduleId => (
+                            <div key={moduleId} className="flex items-center justify-between mb-2">
+                                <span>Module {moduleId}</span>
+                                <button className="btn btn-primary" onClick={() => handleModuleClick(moduleId)}>Create</button>
+                            </div>
+                        ))}
+                        {activeModules.map(moduleId => (
+                            <div key={moduleId} className="flex items-center justify-between mb-2">
+                                <span>Module {moduleId}</span>
+                                <span>Unlocked</span>
+                            </div>
+                        ))}
                     </div>
-                </ModalContent>
-            </Modal>
+                </div>
+            </div>
         </div>
     );
 };
+
 
 export const AllStructures: React.FC<{}> = () => {
     const supabase = useSupabaseClient();
@@ -196,7 +244,7 @@ export const AllStructures: React.FC<{}> = () => {
 
                     if (ownedItemsData) {
                         const itemIds = ownedItemsData.map(item => item.item);
-                        
+
                         // Fetch item details from the Next.js API
                         const response = await fetch('/api/gameplay/inventory');
                         if (!response.ok) {
@@ -245,6 +293,7 @@ export const AllStructures: React.FC<{}> = () => {
         </div>
     );
 };
+
 
 // Create structures
 export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSelected }) => {
