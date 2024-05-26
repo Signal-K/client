@@ -1,4 +1,4 @@
-import { CreateAutomaton, SingleAutomaton } from "@/components/Gameplay/Inventory/Automaton";
+import { AllAutomatons, CreateAutomaton, SingleAutomaton } from "@/components/Gameplay/Inventory/Automaton";
 import { AllStructures, CreateStructure } from "@/components/Gameplay/Inventory/Structure";
 import UserItems from "@/components/Gameplay/Inventory/UserInventory";
 import Layout from "@/components/Layout";
@@ -22,7 +22,8 @@ export default function () {
                 <AllStructures />
                 <CreateAutomaton />
                 {/* <AllAutomatons /> */}
-                <SingleAutomaton />
+                {/* <SingleAutomaton /> */}
+                <AllAutomatons />
                 {/* <AllAutomatons /> */}
                 <CreateStructure onStructureSelected={handleStructureSelected} activeSectorId={0} />
             </div>

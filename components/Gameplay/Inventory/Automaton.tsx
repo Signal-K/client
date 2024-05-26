@@ -87,6 +87,7 @@ export function SingleAutomaton() {
     const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
     const [automatonInfo, setAutomatonInfo] = useState<any>(null); // Initialize automatonInfo with type 'any'
     const [rewardTotal, setRewardTotal] = useState<number>(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     async function fetchAutomatonData() {
         if (!session?.user?.id) {
@@ -203,58 +204,223 @@ export function SingleAutomaton() {
         <>
             {userAutomaton ? (
                 <>
-                    <p>{userAutomaton.id}</p>
-                    {automatonInfo && (
-                        <>
-                            <img src={automatonInfo.icon_url} alt={automatonInfo.name} className="w-32 h-32 mb-2" />
-                            <p>{automatonInfo.name}</p>
-                        </>
-                    )}
-                    <button onClick={deployAutomaton}>Deploy automaton</button>
-                    {userAutomaton.time_of_deploy && (
-                        <button onClick={claimRewards}>Claim Rewards</button>
+                    <img
+                        src={automatonInfo?.icon_url}
+                        alt={automatonInfo?.name}
+                        className="w-32 h-32 mb-2 cursor-pointer"
+                        onClick={() => setIsModalOpen(true)}
+                    />
+                    {isModalOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                            <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
+                                <div className="flex justify-between items-center">
+                                    <h2 className="text-xl font-bold">Automaton Details</h2>
+                                    <button
+                                        className="btn btn-square btn-outline"
+                                        onClick={() => setIsModalOpen(false)}
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                                <div className="flex flex-col items-center mt-4">
+                                    <img src={automatonInfo?.icon_url} alt={automatonInfo?.name} className="w-32 h-32 mb-2" />
+                                    <p>ID: {userAutomaton.id}</p>
+                                    <p>Status: {userAutomaton.notes}</p>
+                                    <div className="mt-4 flex space-x-4">
+                                        <button className="btn btn-primary" onClick={deployAutomaton}>
+                                            Deploy Automaton
+                                        </button>
+                                        {userAutomaton.time_of_deploy && (
+                                            <button className="btn btn-secondary" onClick={claimRewards}>
+                                                Claim Rewards
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </>
             ) : (
                 <p>No automaton found</p>
             )}
         </>
-    )
+    );
 };
 
-
-// Create a function that looks at the user's inventory, and for all rows where the inventory item type is listed as "Automaton" on the `inventory` route (e.g. item 23), show the item image, name, and id (in the `inventory` table). So there should be a component that fetches all the matching records, and then a component that shows each of the automatons/rovers (i.e. one component (a single) for every automaton/rover)
 export function AllAutomatons() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const [automatons, setAutomatons] = useState<Automaton[]>([]);
+    const { activePlanet } = useActivePlanet();
+    const [userAutomatons, setUserAutomatons] = useState<Automaton[]>([]);
+    const [selectedAutomaton, setSelectedAutomaton] = useState<Automaton | null>(null);
+    const [automatonInfo, setAutomatonInfo] = useState<any>(null); // Initialize automatonInfo with type 'any'
+    const [rewardTotal, setRewardTotal] = useState<number>(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    useEffect(() => {
-        const fetchAutomatons = async () => {
-            const { data, error } = await supabase.from('inventory').select('*').eq('owner', session?.user?.id).eq('item', 23);
+    async function fetchAutomatonsData() {
+        if (!session?.user?.id) {
+            console.error('session.user.id is undefined');
+            return;
+        }
+
+        if (!activePlanet?.id) {
+            console.error('activePlanet is undefined');
+            return;
+        }
+
+        try {
+            const { data, error } = await supabase
+                .from('inventory')
+                .select("*")
+                .eq("owner", session.user.id)
+                .eq("item", 23)
+                .eq("anomaly", activePlanet.id);
+
             if (error) {
-                console.error('Error fetching automatons', error);
+                console.error('Error fetching automatons data:', error);
                 return;
             }
 
             if (data) {
-                setAutomatons(data);
-            };
-        };
+                setUserAutomatons(data); // Assuming data is an array of automatons
+            }
+        } catch (error) {
+            console.error('Error fetching automatons data:', error);
+        }
+    }
 
-        fetchAutomatons();
-    }, [session]);
+    const fetchRoverInfo = async (automaton: Automaton) => {
+        try {
+            const response = await fetch(`/api/gameplay/inventory`);
+            if (!response.ok) {
+                throw new Error(`Error fetching rover info: ${response.status} ${response.statusText}`);
+            }
+            const data = await response.json();
+            setAutomatonInfo(data.find((item: any) => item.id === automaton.item));
+        } catch (error: any) {
+            console.error("Error fetching rover info:", error.message);
+        }
+    };
+
+    async function deployAutomaton() {
+        if (selectedAutomaton != null) {
+            const { data, error } = await supabase
+                .from('inventory')
+                .update({ time_of_deploy: new Date().toISOString() })
+                .eq('id', selectedAutomaton.id);
+
+            if (error) {
+                console.error('Error deploying automaton:', error);
+                return;
+            }
+
+            console.log('Automaton deployed', data);
+        }
+    }
+
+    async function claimRewards() {
+        if (selectedAutomaton?.time_of_deploy) {
+            const deployTime = new Date(selectedAutomaton.time_of_deploy).getTime();
+            const currentTime = new Date().getTime();
+            const timeDifference = (currentTime - deployTime) / 1000 / 60; // Difference in minutes
+            const rewardTotal = Math.floor(timeDifference);
+
+            if (rewardTotal > 0) {
+                const { error: insertError } = await supabase.from('inventory').insert([
+                    {
+                        owner: session?.user?.id,
+                        item: 11,
+                        quantity: rewardTotal,
+                        anomaly: activePlanet?.id,
+                        notes: "Reward from automaton",
+                    },
+                ]);
+
+                if (insertError) {
+                    console.error('Error inserting reward', insertError);
+                    return;
+                }
+
+                const { error: updateError } = await supabase
+                    .from('inventory')
+                    .update({ time_of_deploy: null })
+                    .eq('id', selectedAutomaton.id);
+
+                if (updateError) {
+                    console.error('Error updating automaton', updateError);
+                    return;
+                }
+
+                setRewardTotal(rewardTotal);
+                console.log(`Rewards claimed: ${rewardTotal}`);
+            }
+        }
+    }
+
+    useEffect(() => {
+        fetchAutomatonsData();
+    }, [session, activePlanet]);
+
+    useEffect(() => {
+        if (selectedAutomaton) {
+            fetchRoverInfo(selectedAutomaton);
+        }
+    }, [selectedAutomaton]);
 
     return (
         <>
-            {automatons.map((automaton) => (
-                <div key={automaton.id}>
-                    <img src={automaton.icon_url} alt={automaton.name} />
-                    <div>{automaton.name}</div>
-                    <div>{automaton.id}</div>
+            {userAutomatons.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {userAutomatons.map((automaton) => (
+                        <div key={automaton.id} className="cursor-pointer" onClick={() => {
+                            setSelectedAutomaton(automaton);
+                            setIsModalOpen(true);
+                        }}>
+                            <img src={automatonInfo?.icon_url} alt={automatonInfo?.name} className="w-32 h-32 mb-2" />
+                        </div>
+                    ))}
                 </div>
-            ))}
+            ) : (
+                <p>No automatons found</p>
+            )}
+            {isModalOpen && selectedAutomaton && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-bold">Automaton Details</h2>
+                            <button
+                                className="btn btn-square btn-outline"
+                                onClick={() => setIsModalOpen(false)}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <div className="flex flex-col items-center mt-4">
+                            {automatonInfo?.icon_url ? (
+                                <img src={automatonInfo?.icon_url} alt={automatonInfo?.name} className="w-32 h-32 mb-2" />
+                            ) : (
+                                <div className="w-32 h-32 mb-2 bg-gray-200 flex items-center justify-center">
+                                    <span>No Image</span>
+                                </div>
+                            )}
+                            <p>ID: {selectedAutomaton.id}</p>
+                            <p>Status: {selectedAutomaton.notes}</p>
+                            <div className="mt-4 flex space-x-4">
+                                <button className="btn btn-primary" onClick={deployAutomaton}>
+                                    Deploy Automaton
+                                </button>
+                                {selectedAutomaton.time_of_deploy && (
+                                    <button className="btn btn-secondary" onClick={claimRewards}>
+                                        Claim Rewards
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };

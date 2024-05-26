@@ -6,6 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { AllStructures, PlacedStructureSingle } from "./Structure";
 
 import { Button } from "@/ui/button";
+import { AllAutomatons } from "./Automaton";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -138,6 +139,7 @@ const UserPlanetPage = () => {
                                         </>
                                     );
                                 })}
+                                <AllAutomatons />
                                 {!isCombinedBlock && !isBlock51or54 && null}
                             </div>
                         );
