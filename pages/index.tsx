@@ -9,13 +9,23 @@ import { useSession } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import { Header } from "@/ui/Sections/PlanetLayout";
 import PublicLanding from "@/components/Sections/Public";
+import { useActivePlanet } from "@/context/ActivePlanet";
 
 export default function Home() {
   const session = useSession();
+  const { activePlanet } = useActivePlanet();
 
   if (!session) {
     return (
       <PublicLanding />
+    );
+  };
+
+  if (!activePlanet) {
+    return (
+      <Link href="/onboarding"><button className="btn">
+        Set your location
+      </button></Link>
     );
   };
 
