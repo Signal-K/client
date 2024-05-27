@@ -8,15 +8,14 @@ import UserPlanetPage from "@/components/Gameplay/Inventory/UserPlanets";
 import { useSession } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import { Header } from "@/ui/Sections/PlanetLayout";
-import { useRouter } from "next/router";
+import PublicLanding from "@/components/Sections/Public";
 
 export default function Home() {
   const session = useSession();
-  const router = useRouter();
 
   if (!session) {
     return (
-      router.push('/auth')
+      <PublicLanding />
     );
   };
 
