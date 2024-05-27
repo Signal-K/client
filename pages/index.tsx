@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import Layout from "@/components/Layout";
@@ -6,16 +8,15 @@ import UserPlanetPage from "@/components/Gameplay/Inventory/UserPlanets";
 import { useSession } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import { Header } from "@/ui/Sections/PlanetLayout";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const session = useSession();
+  const router = useRouter();
 
   if (!session) {
     return (
-      <Layout bg={true}>
-        <Header planetName="Test" />
-        <Link href="/auth"> Please sign in </Link>
-      </Layout>
+      router.push('/auth')
     );
   };
 

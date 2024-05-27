@@ -7,7 +7,6 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 export default function () {
     // const { activePlanet, activeSector } = useActivePlanet();
     const { activePlanet } = useActivePlanet();
-    
 
     const handleStructureSelected = (structure: any) => {
         console.log('Selected structure: ', structure);

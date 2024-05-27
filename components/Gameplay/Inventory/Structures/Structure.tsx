@@ -59,7 +59,7 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
                 <TransitingTelescopeStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
             )}
             {structure.id == 24 && (
-                <SurveyorStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
+                <SurveyorStructureModal isOpen={isModalOpen} ownedItem={ownedItem} structure={structure} onClose={closeModal} />
             )}
             {/* Add more conditionals here for other structure IDs and their respective modals */}
         </div>
