@@ -1,4 +1,4 @@
-import { AllAutomatons, CreateAutomaton, SingleAutomaton } from "@/components/Gameplay/Inventory/Automaton";
+import { AllAutomatons, CreateAutomaton, SingleAutomaton } from "@/components/Gameplay/Inventory/Automatons/Automaton";
 import { AllStructures, CreateStructure } from "@/components/Gameplay/Inventory/Structures/Structure";
 import UserItems from "@/components/Gameplay/Inventory/UserInventory";
 import Layout from "@/components/Layout";

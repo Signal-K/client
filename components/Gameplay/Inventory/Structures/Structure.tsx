@@ -7,6 +7,7 @@ import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDis
 import CreateBaseClassification from "@/components/Content/ClassificationForm";
 import { useProfileContext } from "@/context/UserProfile";
 import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "./Telescopes";
+import { AnomalyStrucutreModal } from "../Automatons/Automaton";
 
 interface OwnedItem {
     id: string;
@@ -61,7 +62,9 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
             {structure.id == 24 && (
                 <SurveyorStructureModal isOpen={isModalOpen} ownedItem={ownedItem} structure={structure} onClose={closeModal} />
             )}
-            {/* Add more conditionals here for other structure IDs and their respective modals */}
+            {structure.id === 22 && (
+                <AnomalyStrucutreModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
+            )}
         </div>
     );
 };
@@ -151,6 +154,8 @@ export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSel
     const [structures, setStructures] = useState<UserStructure[]>([]);
     const [activeSector, setActiveSector] = useState<number | undefined>();
     const [isCalloutOpen, setIsCalloutOpen] = useState(false);
+    const [userInventory, setUserInventory] = useState<OwnedItem[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const fetchStructures = async () => {
         try {
@@ -159,7 +164,6 @@ export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSel
                 throw new Error('Failed to fetch item details from the API');
             }
             const data: UserStructure[] = await response.json();
-
             const structuredData: UserStructure[] = data.filter(item => item.ItemCategory === 'Structure');
             setStructures(structuredData);
         } catch (error: any) {
@@ -167,36 +171,54 @@ export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSel
         }
     };
 
-    const fetchUserSector = async () => {
+    const fetchUserInventory = async () => {
         try {
-            if (activePlanet?.id) {
+            if (session?.user?.id && activePlanet?.id) {
                 const { data, error } = await supabase
-                    .from("basePlanetSectors")
-                    .select('id')
-                    .eq("anomaly", activePlanet.id)
-                    .eq('owner', session?.user?.id)
-                    .limit(1);
-
-                if (data && data.length > 0) {
-                    setActiveSector(data[0].id);
-                }
+                    .from('inventory')
+                    .select('*')
+                    .eq('owner', session.user.id)
+                    .eq('anomaly', activePlanet.id);
 
                 if (error) {
-                    console.error(error.message);
+                    throw error;
                 }
+
+                setUserInventory(data || []);
             }
         } catch (error: any) {
-            console.log(error.message);
+            console.error('Error fetching user inventory:', error.message);
         }
     };
 
     useEffect(() => {
         if (session) {
             fetchStructures();
+            fetchUserInventory();
         }
     }, [session, supabase]);
 
     const handleStructureClick = async (structure: UserStructure) => {
+        setErrorMessage(null); // Reset error message
+
+        console.log('User Inventory:', userInventory);
+        console.log('Checking structure:', structure);
+
+        const structureExists = userInventory.some(item => item.item === structure.id.toString());
+
+        if (structureExists) {
+            setErrorMessage("You already have this structure here.");
+            return;
+        }
+
+        if (structure.id === 14 || structure.id === 24) {
+            const prerequisiteStructure = userInventory.some(item => Number(item.item) === 12);
+            if (!prerequisiteStructure) {
+                setErrorMessage("You need to have structure 12 to create this structure.");
+                return;
+            }
+        }
+
         if (session && activeSector === 50) {
             try {
                 const payload = JSON.stringify({
@@ -216,14 +238,20 @@ export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSel
                 console.log('Response from Flask upon attempt to create structure entry:', data);
 
                 if (data.status === 'proceed') {
-                    createInventoryUserEntry(structure);
+                    await createInventoryUserEntry(structure);
+                } else {
+                    setErrorMessage(data.message || "Unable to create structure.");
+                    return;
                 }
             } catch (error: any) {
                 console.error('Error:', error.message);
+                setErrorMessage("An error occurred while creating the structure.");
+                return;
             }
+        } else {
+            await createInventoryUserEntry(structure);
         }
-
-        createInventoryUserEntry(structure);
+        
         onStructureSelected(structure);
         setIsCalloutOpen(false);
     };
@@ -244,15 +272,16 @@ export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSel
                         },
                     ]);
 
-                if (data) {
-                    console.log('Inventory user entry created:', data);
+                if (error) {
+                    throw error;
                 }
 
-                if (error) {
-                    console.log(error.message);
-                }
+                console.log('Inventory user entry created:', data);
+                // Refetch the user inventory after creating a structure
+                fetchUserInventory();
             } catch (error: any) {
-                console.log(error);
+                console.log(error.message);
+                setErrorMessage("An error occurred while creating the inventory entry.");
             }
         }
     };
@@ -290,6 +319,11 @@ export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSel
                     )}
                 </div>
             </center>
+            {errorMessage && (
+                <div className="absolute top-0 left-0 right-0 mt-4 mx-auto w-1/2 bg-red-500 text-white p-4 rounded-md">
+                    {errorMessage}
+                </div>
+            )}
         </>
     );
 };

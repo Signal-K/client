@@ -6,7 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { AllStructures, PlacedStructureSingle } from "./Structures/Structure";
 
 import { Button } from "@/ui/button";
-import { AllAutomatons } from "./Automaton";
+import { AllAutomatons } from "./Automatons/Automaton";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;

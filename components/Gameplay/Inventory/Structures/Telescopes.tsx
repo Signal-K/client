@@ -60,7 +60,7 @@ interface TransitingTelescopeStructureModalProps {
     onClose: () => void;
     ownedItem: OwnedItem;
     structure: UserStructure;
-}
+};
 
 export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
     const [isActionDone, setIsActionDone] = useState(false);
