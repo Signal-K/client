@@ -425,9 +425,9 @@ export function AllAutomatons() {
                 setRewardTotal(rewardQuantity);
                 console.log(`Rewards claimed: ${rewardQuantity}`);
                 setSelectedAutomaton({ ...selectedAutomaton, time_of_deploy: '' });
-            }
-        }
-    }
+            };
+        };
+    };
 
     useEffect(() => {
         fetchAutomatonsData();
@@ -436,7 +436,7 @@ export function AllAutomatons() {
     useEffect(() => {
         if (selectedAutomaton) {
             fetchRoverInfo(selectedAutomaton);
-        }
+        };
     }, [selectedAutomaton]);
 
     return (

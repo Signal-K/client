@@ -3,7 +3,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useProfileContext } from "@/context/UserProfile";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
-export default function CreateBaseClassification() {
+export default function CreateBaseClassification(assetMentioned: any) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -25,6 +25,7 @@ export default function CreateBaseClassification() {
                 author: session?.user?.id,
                 content,
                 media: uploads,
+                // asset: assetMentioned,
                 anomaly: activePlanet?.id,
                 // sector: activePlanet?.id.randomSector... ; possibly include the structure so we know where it came from (or maybe classification type?)
             }).then(response => {

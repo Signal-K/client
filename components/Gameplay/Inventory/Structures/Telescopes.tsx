@@ -64,6 +64,7 @@ interface TransitingTelescopeStructureModalProps {
 
 export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
     const [isActionDone, setIsActionDone] = useState(false);
+    const {activePlanet} = useActivePlanet();
 
     const handleActionClick = () => {
         // Implement action logic here
@@ -71,6 +72,8 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
     };
 
     if (!isOpen) return null;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${activePlanet?.id}/activePlanet.png`;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -86,7 +89,8 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
                     <p>ID: {ownedItem.id}</p>
                     <p>Description: {structure.description}</p>
                     <div className="mt-4">
-                        <CreateBaseClassification />
+                    <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} />
+                        <CreateBaseClassification assetMentioned={imageUrl} />
                         <button className="btn btn-primary" onClick={handleActionClick}>
                             Perform Action
                         </button>
