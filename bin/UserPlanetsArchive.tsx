@@ -3,9 +3,10 @@ import { useEffect, useState, useRef, Fragment, createContext } from "react";
 import { Dialog, Transition } from '@headlessui/react';
 import { Header, CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { AllStructures } from "@/components/Gameplay/Inventory/Structures/Structure";
 
 import { Button } from "@/ui/button";
-import { AllAutomatons } from "./Automatons/Automaton";
+import { AllAutomatons } from "./Automation";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -64,37 +65,88 @@ const UserPlanetPage = () => {
     const session = useSession();
     const { activePlanet } = useActivePlanet();
 
-    return (
-        <div className="mx-12">
-            {/* Desktop Layout */}
-            <div className="hidden md:grid md:grid-cols-5 md:gap-4 md:relative md:min-h-screen">
-                <div>01</div>
-                <div>02</div>
-                <div className="md:col-span-3 md:flex md:flex-col md:justify-end md:pb-10">
-                    <AllAutomatons />
-                </div>
-                <div>04</div>
-                <div>05</div>
-                <div>06</div>
-                <div>07</div>
-                <div>08</div>
-            </div>
+    const [loading, setLoading] = useState<boolean>(true);
+    const [userStructures, setUserStructures] = useState<UserStructure[]>([]);
+    const [userPlanet, setUserPlanet] = useState<UserPlanetData | null>(null);
+    const [roverData, setRoverData] = useState<UserAutomaton[]>([]);
 
-            {/* Mobile Layout */}
-            <div className="grid grid-cols-3 gap-4 md:hidden relative min-h-screen">
-                <div>01</div>
-                <div>02</div>
-                <div>03</div>
-                <div>04</div>
-                <div>05</div>
-                <div>06</div>
-                <div>07</div>
-                <div>08</div>
-                <div className="col-span-3 flex justify-center items-end pb-5">
-                    <AllAutomatons />
+    // For rovers -> collect users' automatons
+    useEffect(() => {
+        const fetchRoverData = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from("inventory")
+                    .select("*")
+                    .eq("item", 23 || 22 || 18)
+                    .eq("owner", session?.user?.id)
+                    // .eq("basePlanet", activePlanet?.id)
+                    .limit(2);
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    setRoverData(data);
+                }
+            } catch (error: any) {
+                console.error("Error fetching rover data:", error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (session) {
+            fetchRoverData();
+        }
+    }, [supabase, session]);
+
+    if (!session) {
+        return <p>Loading session...</p>;
+    };
+
+    if (loading) {
+        return <p>Loading data...</p>;
+    };
+
+    return (
+        <>
+            {activePlanet && (<Header planetName={activePlanet.content} /> )}
+            <div className="flex flex-col justify-end min-h-screen">
+                <div className="mx-auto w-full max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4 my-10">
+                    {Array.from({ length: 64 }, (_, index) => {
+                        const isBlock51or54 = index + 1 === 43 || index + 1 === 47;
+                        const isCombinedBlock = index + 1 === 21;
+                        const isBlock19 = index + 1 === 19;
+
+                        return (
+                            <div key={`block-${index}`} className={`flex items-center justify-center p-6 dark:border-gray-800 ${isCombinedBlock ? "grid-area: block36 block37" : ""}`}>
+                                {isCombinedBlock && activePlanet && <UserPlanets userPlanet={activePlanet} />}
+                                {isBlock19 && activePlanet && userStructures.map((structure, structureIndex) => {
+                                    if (structureIndex === 0) {
+                                        // return <PlacedStructureSingle key={structure.id} structure={structure} ownedItem={structure} />;
+                                        return (
+                                            <div className=""><AllStructures /></div>
+                                        );
+                                    }
+                                })}
+                                {isBlock19 && activePlanet && (
+                                    <div className=""><AllStructures /></div>
+                                )}
+                                {isBlock51or54 && roverData.length > 0 && roverData.map((rover, roverIndex) => {
+                                    if (roverIndex === 0 && roverData.length >= 2) return <p>Null</p>; // Skip rendering the first rover if there are two or more items
+                                    return (
+                                        <>
+                                            {/* <RoverSingle key={roverIndex} userAutomaton={rover} /> */}
+                                        </>
+                                    );
+                                })}
+                                <AllAutomatons />
+                                {!isCombinedBlock && !isBlock51or54 && null}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
