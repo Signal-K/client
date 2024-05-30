@@ -7,7 +7,6 @@ import MissionList from "@/components/Content/MissionList";
 import UserPlanetPage from "@/components/Gameplay/Inventory/UserPlanets";
 import { useSession } from "@supabase/auth-helpers-react";
 import Link from "next/link";
-import { Header } from "@/ui/Sections/PlanetLayout";
 import PublicLanding from "@/components/Sections/Public";
 import { useActivePlanet } from "@/context/ActivePlanet";
 

@@ -1,28 +1,15 @@
+"use client";
+
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { Button } from "@/ui/button";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
+import Slideover from "../Panels/Anomalies";
 
 interface PlanetLayoutProps {
   children: ReactNode;
 };
 
 export function PlanetLayout({ children }: PlanetLayoutProps) {
-  const { activePlanet } = useActivePlanet();
-
-  return (
-      <>
-          <Header planetName={activePlanet?.content} />
-          <div className="my-8"><MainContent>{children}</MainContent></div>
-          <Footer />
-      </>
-  );
-};
-
-interface HeaderProps {
-  planetName: any;
-};
-
-export function Header({ planetName }: HeaderProps) {
   const { activePlanet, setActivePlanet, updatePlanetLocation } = useActivePlanet();
 
   const handleLeftArrowClick = () => {
@@ -41,8 +28,19 @@ export function Header({ planetName }: HeaderProps) {
 
   const activePlanetId = activePlanet?.id ? parseInt(activePlanet.id) : undefined;
 
+  const [showSlideover, setShowSlideover] = useState(false);
+
+    const handleOpenSlideover = () => {
+        setShowSlideover(true);
+    };
+
+    const handleCloseSlideover = () => {
+        setShowSlideover(false);
+    };
+
   return (
-    <header className="left-0 right-0 z-50 flex h-16 w-full items-center justify-between bg-white/80 px-4 shadow-sm backdrop-blur-md dark:bg-gray-950/80 dark:text-gray-50">
+      <>
+              <header className="left-0 right-0 z-50 flex h-16 w-full items-center justify-between bg-white/80 px-4 shadow-sm backdrop-blur-md dark:bg-gray-950/80 dark:text-gray-50">
         <div className="flex items-center gap-4">
             <Button 
               className="rounded-full p-2" 
@@ -58,7 +56,7 @@ export function Header({ planetName }: HeaderProps) {
             <div className="inline-block rounded-lg bg-gray-100/80 px-3 py-1 text-sm backdrop-blur-md dark:bg-gray-800/80">
                 Home
             </div>
-            <h1 className="text-lg font-semibold">{planetName}</h1>
+            <h1 className="text-lg font-semibold">{activePlanet?.content}</h1>
         </div>
         <div className="flex items-center gap-4">
             <Button 
@@ -70,13 +68,23 @@ export function Header({ planetName }: HeaderProps) {
             >
                 <ArrowRightIcon className="h-5 w-5" />
             </Button>
-            <Button className="rounded-full p-2" size="icon" variant="outline">
-                <BookOpenIcon className="h-5 w-5" /> {/* Upon click - open <MissionList /> component */}
-            </Button>
+            <Button 
+                  className="rounded-full p-2" 
+                  size="icon" 
+                  variant="outline" 
+                  onClick={handleOpenSlideover} 
+                >
+                    <BookOpenIcon className="h-5 w-5" />
+                </Button>
         </div>
     </header>
+    {showSlideover && <Slideover onClose={handleCloseSlideover} />}
+          <div className="my-8"><MainContent>{children}</MainContent></div>
+          <Footer />
+      </>
   );
 };
+
 
 interface MainContentProps {
     children: ReactNode;
