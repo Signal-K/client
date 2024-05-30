@@ -122,7 +122,60 @@ export default function MissionList() {
             </CardContent>
         </>
     );
-}
+};
+
+export function MissionOverlay() {
+    const [activeMission, setActiveMission] = useState(1)
+
+    function updateMission() {
+        setActiveMission(activeMission + 1);
+    };
+
+    function resetMissions() { // Purely a test function
+        setActiveMission(1);
+    };
+
+    return (
+        <div className="mx-0">
+            <CardHeader>
+                <CardTitle>Your missions</CardTitle>
+                <CardDescription>These will be separated into groups</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 overflow-y-auto max-h-[480px] pr-4">
+                {activeMission == 1 && ( 
+                    <div className="flex min-h-full flex-col justify-center p-2">
+                        <p>Hello there 1</p>  {/* Divide these into sections, the idea being that each has to be completed before going onto the next */}
+                        <button onClick={updateMission}>Update Mission</button>
+                    </div>
+                )}
+                {activeMission == 2 && (
+                    <div className="flex min-h-full flex-col justify-center p-2"> 
+                        <p>Hello there 2</p> {/* No scrollbar, but you'd still swipe/scroll between them */}
+                        <button onClick={updateMission}>Update Mission</button>
+                    </div>
+                )}
+                {activeMission == 3 && ( // Add a swipey/scroll animation when updateMission() is called?
+                    <div className="flex min-h-full flex-col justify-center p-2">
+                        <p>Hello there 3</p>
+                        <button onClick={updateMission}>Update Mission</button>
+                    </div>
+                )}
+                {activeMission == 4 && ( 
+                    <div className="flex min-h-full flex-col justify-center p-2">
+                        <p>Hello there 4</p>
+                        <button onClick={updateMission}>Update Mission</button>
+                    </div>
+                )}
+                {activeMission == 5 && ( 
+                    <div className="flex min-h-full flex-col justify-center p-2">
+                        <p>Hello there 5</p>
+                        <button onClick={resetMissions}>Update Mission</button>
+                    </div>
+                )}
+            </CardContent>
+        </div>
+    );
+};
 
 function LinkIcon(props: any) {
     return (

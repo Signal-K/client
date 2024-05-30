@@ -8,7 +8,7 @@ export default function CreateBaseClassification(assetMentioned: any) {
     const session = useSession();
 
     const [content, setContent] = useState("");
-    const [uploads, setUploads] = useState<string[]>([]); // Explicitly define the type as string[]
+    const [uploads, setUploads] = useState<string[]>([]);
     const { activePlanet } = useActivePlanet();
     const { userProfile } = useProfileContext(); 
     
