@@ -12,7 +12,7 @@ export function PlanetLayout({ children }: PlanetLayoutProps) {
   return (
       <>
           <Header planetName={activePlanet?.content} />
-          <MainContent>{children}</MainContent>
+          <div className="my-8"><MainContent>{children}</MainContent></div>
           <Footer />
       </>
   );

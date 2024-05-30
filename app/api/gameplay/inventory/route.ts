@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface Recipe {
   [key: string]: number;
@@ -35,6 +35,6 @@ const inventoryItems: InventoryItem[] = [
   { id: 25, name: 'Empty', description: '', cost: 1, icon_url: '', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
 ];
 
-export default (req: NextApiRequest, res: NextApiResponse) => {
-  res.status(200).json(inventoryItems);
-};
+export async function GET(req: NextRequest) {
+  return NextResponse.json(inventoryItems);
+}

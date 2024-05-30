@@ -15,7 +15,7 @@ export default function () {
         console.log('Selected structure: ', structure);
     };
 
-    if (!activePlanet) {
+    if (activePlanet) {
         return (
             <Layout bg={false}>
                 <div className="p-5">
