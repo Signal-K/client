@@ -1,6 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 
 // For the control panel
 import { Button } from "@/ui/button";

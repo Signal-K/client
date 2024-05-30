@@ -1,6 +1,8 @@
-import React, { useEffect } from "react";
+"use client";
+
+import { useEffect } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import LoginPage from "@/auth/LoginModal";
 
 const Login = () => {
@@ -10,7 +12,7 @@ const Login = () => {
     useEffect(() => {
         if (session) {
             router.push('/');
-        };
+        }
     }, [session, router]);
 
     return (

@@ -1,6 +1,8 @@
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+"use client";
+
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Auth } from "@supabase/auth-ui-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const Register = () => {
@@ -11,7 +13,7 @@ const Register = () => {
     useEffect(() => {
         if (session) {
             router.push('/');
-        };
+        }
     }, [session, router]);
 
     return (

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+"use client"
+
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 export const RoverImageNoHandle = ({ date, rover, className }: { date: string; rover: string; className: string; }) => { // sectorNo }: { date: string; rover: string; sectorNo: string;}) => {

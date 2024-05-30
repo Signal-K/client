@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+"use client"
+
+import { useEffect, useState } from "react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useProfileContext } from "@/context/UserProfile";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
@@ -16,7 +18,7 @@ export default function CreateBaseClassification(assetMentioned: any) {
 
     useEffect(() => {
         console.log("Don't you feel", userProfile);
-    }, [session])
+    }, [session]);
 
     async function createPost() {
         supabase

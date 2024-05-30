@@ -1,3 +1,5 @@
+"use client"
+
 import { useInventory } from "@/context/InventoryContext";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";

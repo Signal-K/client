@@ -1,3 +1,5 @@
+"use client"
+
 import MissionList, { MissionOverlay } from "@/components/Content/MissionList";
 import { AllAutomatons, CreateAutomaton, SingleAutomaton } from "@/components/Gameplay/Inventory/Automatons/Automaton";
 import { AllStructures, CreateStructure } from "@/components/Gameplay/Inventory/Structures/Structure";

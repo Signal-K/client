@@ -1,4 +1,6 @@
-import React, { createContext, useState, useEffect, ReactNode, useContext, Dispatch, SetStateAction } from "react";
+"use client";
+
+import { createContext, useState, useEffect, ReactNode, useContext, Dispatch, SetStateAction } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 
 interface UserProfile {

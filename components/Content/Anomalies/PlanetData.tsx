@@ -1,6 +1,8 @@
+"use client"
+
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 type PlanetDataType = {
     id: string;

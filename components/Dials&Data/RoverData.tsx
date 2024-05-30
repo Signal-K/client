@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Compass = ({ windspeed, direction }: { windspeed: number, direction: number }) => {
     // Calculate rotation angle for the needle based on direction
     const rotationAngle = direction % 360;

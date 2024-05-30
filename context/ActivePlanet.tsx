@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+"use client";
+
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { UserPlanetData } from '@/components/Gameplay/Inventory/UserPlanets';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 

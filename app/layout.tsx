@@ -1,19 +1,19 @@
-import "@/styles/globals.css";
-import type { AppProps } from "next/app";
+"use client";
 
-import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import "@/styles/globals.css";
+import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs"; // Updated import
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useState } from "react";
 import Head from "next/head";
 import { ActivePlanetProvider } from "@/context/ActivePlanet";
-import {NextUIProvider} from "@nextui-org/system";
+import dynamic from 'next/dynamic';
 import { InventoryProvider } from "@/context/InventoryContext";
 
-export default function StarSailors ({ Component, pageProps }: AppProps) {
-  const [supabaseClient] = useState(() => createBrowserSupabaseClient());
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const [supabaseClient] = useState(() => createPagesBrowserClient()); // Updated function
 
   return (
-    <>
+    <html lang="en">
       <Head>
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>Star Sailors</title>
@@ -52,15 +52,15 @@ export default function StarSailors ({ Component, pageProps }: AppProps) {
           sizes="1668x2224"
         />
       </Head>
-      <SessionContextProvider supabaseClient={supabaseClient} initialSession={pageProps.initialSession}>
-        <ActivePlanetProvider>
-          <InventoryProvider>
-            <NextUIProvider>
-              <Component {...pageProps} />
-            </NextUIProvider>
-          </InventoryProvider>
-        </ActivePlanetProvider>
-      </SessionContextProvider>
-    </>
+      <body>
+        <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
+          <ActivePlanetProvider>
+            <InventoryProvider>
+                {children}
+            </InventoryProvider>
+          </ActivePlanetProvider>
+        </SessionContextProvider>
+      </body>
+    </html>
   );
-};
+}

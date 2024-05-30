@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+"use client";
+
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface InventoryItem {
   id: number;

@@ -1,7 +1,9 @@
+"use client";
+
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Onboarding() {
     const supabase = useSupabaseClient();
@@ -66,4 +68,4 @@ export default function Onboarding() {
             </button>
         </div>
     );
-};
+}

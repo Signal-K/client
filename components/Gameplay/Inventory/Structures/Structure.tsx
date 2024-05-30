@@ -1,9 +1,10 @@
+"use client"
+
 // A component to show the structures on the user's active planet
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, RadioGroup, Radio} from "@nextui-org/react";
 import CreateBaseClassification from "@/components/Content/ClassificationForm";
 import { useProfileContext } from "@/context/UserProfile";
 import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "./Telescopes";
