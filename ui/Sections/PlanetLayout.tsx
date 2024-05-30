@@ -23,13 +23,34 @@ interface HeaderProps {
 };
 
 export function Header({ planetName }: HeaderProps) {
-  return ( // Make taller, glassy effect
-    <header className="fixed top-0 left-0 right-0 z-50 flex h-16 w-full items-center justify-between bg-white/80 px-4 shadow-sm backdrop-blur-md dark:bg-gray-950/80 dark:text-gray-50">
+  const { activePlanet, setActivePlanet, updatePlanetLocation } = useActivePlanet();
+
+  const handleLeftArrowClick = () => {
+    if (activePlanet?.id && parseInt(activePlanet.id) > 1) {
+      const newId = parseInt(activePlanet.id) - 1;
+      updatePlanetLocation(newId);
+    }
+  };
+
+  const handleRightArrowClick = () => {
+    if (activePlanet?.id && parseInt(activePlanet.id) < 6) {
+      const newId = parseInt(activePlanet.id) + 1;
+      updatePlanetLocation(newId);
+    }
+  };
+
+  const activePlanetId = activePlanet?.id ? parseInt(activePlanet.id) : undefined;
+
+  return (
+    <header className="left-0 right-0 z-50 flex h-16 w-full items-center justify-between bg-white/80 px-4 shadow-sm backdrop-blur-md dark:bg-gray-950/80 dark:text-gray-50">
         <div className="flex items-center gap-4">
-            <Button className="rounded-full p-2" size="icon" variant="outline">
-                <CompassIcon className="h-5 w-5" />
-            </Button>
-            <Button className="rounded-full p-2" size="icon" variant="outline">
+            <Button 
+              className="rounded-full p-2" 
+              size="icon" 
+              variant="outline" 
+              onClick={handleLeftArrowClick} 
+              style={{ visibility: activePlanetId === 1 ? 'hidden' : 'visible' }}
+            >
                 <ArrowLeftIcon className="h-5 w-5" />
             </Button>
         </div>
@@ -39,8 +60,14 @@ export function Header({ planetName }: HeaderProps) {
             </div>
             <h1 className="text-lg font-semibold">{planetName}</h1>
         </div>
-        <div className="flex items-center gap-4 relative">
-            <Button className="rounded-full p-2" size="icon" variant="outline">
+        <div className="flex items-center gap-4">
+            <Button 
+              className="rounded-full p-2" 
+              size="icon" 
+              variant="outline" 
+              onClick={handleRightArrowClick} 
+              style={{ visibility: activePlanetId === 6 ? 'hidden' : 'visible' }}
+            >
                 <ArrowRightIcon className="h-5 w-5" />
             </Button>
             <Button className="rounded-full p-2" size="icon" variant="outline">
@@ -50,7 +77,6 @@ export function Header({ planetName }: HeaderProps) {
     </header>
   );
 };
-
 
 interface MainContentProps {
     children: ReactNode;

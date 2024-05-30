@@ -8,12 +8,14 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 interface ActivePlanetContextValue {
   activePlanet: UserPlanetData | null;
   setActivePlanet: (planet: UserPlanetData | null) => void;
+  updatePlanetLocation: (newLocation: number) => void;
 }
 
 // Create the context 
 const ActivePlanetContext = createContext<ActivePlanetContextValue>({
   activePlanet: null,
-  setActivePlanet: () => {} // Provide a default empty function
+  setActivePlanet: () => {}, // Provide a default empty function
+  updatePlanetLocation: () => {}, // Provide a default empty function
 });
 
 // Create a provider component
@@ -50,14 +52,43 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
         }
       } catch (error: any) {
         console.error("Error fetching data: ", error.message);
-      };
+      }
     };
 
     fetchPlanetData();
   }, [session, supabase]);
 
+  const updatePlanetLocation = async (newLocation: number) => {
+    if (!session) return;
+
+    try {
+      // Update the location in the profiles table
+      const { error } = await supabase
+        .from('profiles')
+        .update({ location: newLocation })
+        .eq('id', session.user.id);
+
+      if (error) throw error;
+
+      // Fetch the new planet data
+      const { data: planet, error: planetError } = await supabase
+        .from("anomalies")
+        .select("*")
+        .eq("id", newLocation)
+        .single();
+
+      if (planetError) throw planetError;
+
+      if (planet) {
+        setActivePlanet(planet);
+      }
+    } catch (error: any) {
+      console.error("Error updating planet location: ", error.message);
+    }
+  };
+
   return (
-    <ActivePlanetContext.Provider value={{ activePlanet, setActivePlanet }}>
+    <ActivePlanetContext.Provider value={{ activePlanet, setActivePlanet, updatePlanetLocation }}>
       {children}
     </ActivePlanetContext.Provider>
   );

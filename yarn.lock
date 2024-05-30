@@ -2251,10 +2251,10 @@ d3-time@^1.0.11:
   resolved "https://registry.yarnpkg.com/d3-time/-/d3-time-1.1.0.tgz#b1e19d307dae9c900b7e5b25ffc5dcc249a8a0f1"
   integrity sha512-Xh0isrZ5rPYYdqhAVk8VLnMEidhz5aP7htAADH6MfzgmmicPkTo8LhkLxci61/lCB7n7UmE3bN0leRt+qvkLxA==
 
-daisyui@^4.10.2:
-  version "4.10.2"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.10.2.tgz#c0e072b94ccaa0326d1fdec26e8dc163ac070561"
-  integrity sha512-eCWS1W/JPyxW9IvlgW5m0R6rp9ZhRsBTW37rvEUthckkjsV04u8XipV519OoccSA46ixhSJa3q7XLI1WUFtRCA==
+daisyui@^4.11.1:
+  version "4.11.1"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.11.1.tgz#9216de97107bffe2b7c6e4dfa28dbe7147e89e9d"
+  integrity sha512-obT9CUbQdW6eoHwSeT5VwaRrWlwrM4OT5qlfdJ0oQlSIEYhwnEl2+L2fwu5PioLbitwuMdYC2X8I1cyy8Pf6LQ==
   dependencies:
     css-selector-tokenizer "^0.8"
     culori "^3"
