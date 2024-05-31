@@ -3,11 +3,12 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState, useRef, Fragment, createContext } from "react";
 import { Dialog, Transition } from '@headlessui/react';
-import { Header, CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
+import { CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
 import { useActivePlanet } from "@/context/ActivePlanet";
 
 import { Button } from "@/ui/button";
 import { AllAutomatons } from "./Automatons/Automaton";
+import { AllStructures } from "./Structures/Structure";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -62,31 +63,31 @@ interface UserAutomaton {
 // View structures, planet info & automatons
 
 const UserPlanetPage = () => {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-    const { activePlanet } = useActivePlanet();
-
     return (
         <div className="mx-12">
             {/* Desktop Layout */}
             <div className="hidden md:grid md:grid-cols-5 md:gap-4 md:relative md:min-h-screen">
-                <div>01</div>
-                <div>02</div>
+                <div className="hidden md:flex justify-center items-center">01</div>
+                <div className="md:col-span-3 md:flex md:flex-col md:justify-end md:pb-10">
+                    <AllStructures />
+                </div>
+                <div className="hidden md:flex justify-center items-center">03</div>
+                <div className="hidden md:flex justify-center items-center">04</div>
+                <div className="hidden md:flex justify-center items-center">05</div>
                 <div className="md:col-span-3 md:flex md:flex-col md:justify-end md:pb-10">
                     <AllAutomatons />
                 </div>
-                <div>04</div>
-                <div>05</div>
-                <div>06</div>
-                <div>07</div>
-                <div>08</div>
+                <div className="hidden md:flex justify-center items-center">07</div>
+                <div className="hidden md:flex justify-center items-center">08</div>
             </div>
 
             {/* Mobile Layout */}
             <div className="grid grid-cols-3 gap-4 md:hidden relative min-h-screen">
                 <div>01</div>
                 <div>02</div>
-                <div>03</div>
+                <div className="col-span-3 flex justify-center items-end pb-5">
+                    <AllStructures />
+                </div>
                 <div>04</div>
                 <div>05</div>
                 <div>06</div>
@@ -98,6 +99,7 @@ const UserPlanetPage = () => {
             </div>
         </div>
     );
+
 };
 
 export default UserPlanetPage;

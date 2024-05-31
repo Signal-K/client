@@ -39,7 +39,7 @@ interface StructureSelectProps {
     activeSectorId: number;
 };
 
-export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: UserStructure }> = ({ ownedItem, structure }) => {
+export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: UserStructure; style: any; }> = ({ ownedItem, structure, style }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const openModal = () => {
@@ -70,7 +70,7 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
     );
 };
 
-export const AllStructures: React.FC<{}> = () => {
+export const AllStructures = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
@@ -133,12 +133,30 @@ export const AllStructures: React.FC<{}> = () => {
         fetchData();
     }, [session, activePlanet, supabase]);
 
+    // Function to generate random positions
+    const getRandomPosition = () => {
+        const maxPosition = 80; // Adjust as needed
+        const minPosition = 20; // Adjust as needed
+        const randomPosition = Math.floor(Math.random() * (maxPosition - minPosition + 1) + minPosition);
+        return `${randomPosition}%`;
+    };
+
     return (
-        <div className="bg-gray-100 p-4">
+        <div className="p-4 relative">
             <h2 className="text-2xl font-semibold mb-4">Your Structures</h2>
             <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                {userStructures.map(({ ownedItem, structure }) => (
-                    <PlacedStructureSingle key={structure.id} ownedItem={ownedItem} structure={structure} />
+                {userStructures.map(({ ownedItem, structure }, index) => (
+                    <PlacedStructureSingle
+                        key={structure.id}
+                        ownedItem={ownedItem}
+                        structure={structure}
+                        style={{
+                            position: 'absolute',
+                            top: getRandomPosition(),
+                            left: getRandomPosition(),
+                            transform: `translate(-50%, -50%)`, // Adjust as needed
+                        }}
+                    />
                 ))}
             </div>
         </div>
