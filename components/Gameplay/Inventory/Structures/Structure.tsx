@@ -15,6 +15,7 @@ interface OwnedItem {
     item: string;
     quantity: number;
     sector: string;
+    anomaly: number;
 };
 
 interface UserStructure {
@@ -53,7 +54,7 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
     return (
         <div className="flex flex-col items-center justify-center">
             <img src={structure.icon_url} alt={structure.name} className="w-14 h-14 mb-2 cursor-pointer" onClick={openModal} />
-            <p>{ownedItem.id}</p>
+            <p>{ownedItem.id} {ownedItem.anomaly}</p>
             {structure.id === 12 && (
                 <TelescopeReceiverStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
             )}

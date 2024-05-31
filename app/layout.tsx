@@ -3,14 +3,22 @@
 import "@/styles/globals.css";
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs"; // Updated import
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Head from "next/head";
-import { ActivePlanetProvider } from "@/context/ActivePlanet";
+import { ActivePlanetProvider, useActivePlanet } from "@/context/ActivePlanet";
 import dynamic from 'next/dynamic';
 import { InventoryProvider } from "@/context/InventoryContext";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [supabaseClient] = useState(() => createPagesBrowserClient()); // Updated function
+
+  const { activePlanet } = useActivePlanet();
+
+  if (activePlanet) {
+    useEffect(() => {
+      console.log("Active Planet: ", activePlanet);
+    }, [activePlanet]);
+  }
 
   return (
     <html lang="en">

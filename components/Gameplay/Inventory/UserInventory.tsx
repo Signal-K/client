@@ -29,7 +29,7 @@ export default function UserItems() {
                 .from("inventory")
                 .select("*")
                 .eq("owner", session.user.id);
-
+ 
             if (error) {
                 throw error;
             }
