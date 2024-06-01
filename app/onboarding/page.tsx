@@ -16,7 +16,7 @@ export default function Onboarding() {
     useEffect(() => {
         if (activePlanet && activePlanet.id && session) {
             router.push("/");
-        }
+        };
     }, [activePlanet, session, router]);
 
     const handleAssignLocation = async () => {

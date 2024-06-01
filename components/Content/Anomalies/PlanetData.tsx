@@ -69,3 +69,24 @@ export default function PlanetData() {
         </div>
     );
 };
+
+type Planet = {
+    id: string;
+    type: string;
+    avatar_url: string;
+    content: string;
+};
+
+type PlanetCardProps = {
+    planet: Planet;
+};
+  
+export function PlanetCard({ planet }: PlanetCardProps) {
+    return (
+        <button className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center">
+            <img className="h-32 w-32 rounded-full" src={planet.avatar_url} alt={planet.type} />
+            <h3 className="mt-4 text-lg font-semibold">{planet.type}</h3>
+      </button>
+    );
+};
+  

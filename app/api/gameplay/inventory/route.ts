@@ -37,4 +37,4 @@ const inventoryItems: InventoryItem[] = [
 
 export async function GET(req: NextRequest) {
   return NextResponse.json(inventoryItems);
-}
+};
