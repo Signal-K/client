@@ -5,6 +5,7 @@ import { AllAutomatons, CreateAutomaton, SingleAutomaton } from "@/components/Ga
 import { AllStructures, CreateStructure } from "@/components/Gameplay/Inventory/Structures/Structure";
 import UserItems from "@/components/Gameplay/Inventory/UserInventory";
 import Layout from "@/components/Layout";
+import PickYourPlanet from "@/components/Onboarding";
 import { useActivePlanet } from "@/context/ActivePlanet";
 
 export default function () {
@@ -19,22 +20,26 @@ export default function () {
         return (
             <Layout bg={false}>
                 <div className="p-5">
+                    {/* <PickYourPlanet /> */}
                     {/* <UserItems /> */}
                     {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
                     <RoverControlPanel /> */}
-                    <AllStructures />
-                    <CreateAutomaton />
+                    {/* <AllStructures /> */}
+                    {/* <CreateAutomaton /> */}
                     {/* <AllAutomatons /> */}
                     {/* <SingleAutomaton /> */}
                     <AllAutomatons />
                     {/* <AllAutomatons /> */}
-                    <CreateStructure onStructureSelected={handleStructureSelected} activeSectorId={0} />
+                    {/* <CreateStructure onStructureSelected={handleStructureSelected} activeSectorId={0} /> */}
                 </div>
             </Layout>
         );
     };
 
     return (
-        <MissionOverlay />
+        <>
+            <MissionOverlay />
+            {/* <PickYourPlanet /> */}
+        </>
     );
 };

@@ -1,14 +1,16 @@
 "use client"
 
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { CloudIcon, FireExtinguisherIcon, GlassWaterIcon, GlobeIcon, SquareIcon } from "@/ui/icons/PlanetTypes";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type PlanetDataType = {
     id: string;
     Configuration: string;
     type: string;
-    [key: string]: any; // Adjust according to the actual structure of your `anomalies` table
+    [key: string]: any;
 };
 
 export default function PlanetData() {
@@ -69,24 +71,57 @@ export default function PlanetData() {
         </div>
     );
 };
+  
 
 type Planet = {
     id: string;
     type: string;
     avatar_url: string;
     content: string;
-};
-
-type PlanetCardProps = {
-    planet: Planet;
-};
+  };
   
-export function PlanetCard({ planet }: PlanetCardProps) {
+  type PlanetCardProps = {
+    planet: Planet;
+    onSelect: () => void; // Add onSelect prop
+  };
+  
+  export function PlanetCard({ planet, onSelect }: PlanetCardProps) {
+    const getIcon = (type: string) => {
+      switch (type) {
+        case 'Terrestrial Planet':
+          return <GlobeIcon className="h-3 w-3" />;
+        case 'Gaseous Planet':
+          return <CloudIcon className="h-3 w-3" />;
+        case 'Ocean Terrestrial Planet':
+        case 'Ocean Planet':
+          return <GlassWaterIcon className="h-3 w-3" />;
+        case 'Volcanic Planet':
+          return <FireExtinguisherIcon className="h-3 w-3" />;
+        case 'Asteroid':
+          return <SquareIcon className="h-3 w-3" />;
+        default:
+          return <GlobeIcon className="h-3 w-3" />;
+      }
+    };
+  
     return (
-        <button className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center">
-            <img className="h-32 w-32 rounded-full" src={planet.avatar_url} alt={planet.type} />
-            <h3 className="mt-4 text-lg font-semibold">{planet.type}</h3>
-      </button>
+      <div className="relative group grid [grid-template-areas:stack] overflow-hidden rounded-lg" onClick={onSelect}>
+        <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
+          <span className="sr-only">View</span>
+        </Link>
+        <img
+          src={planet.avatar_url || "/placeholder.svg"}
+          alt={planet.type}
+          className="[grid-area:stack] object-cover w-full aspect-square"
+        />
+        <div className="flex-1 [grid-area:stack] bg-black/70 group-hover:opacity-90 transition-opacity text-white p-4 lg:p-6 justify-end flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold tracking-tight">{planet.type}</h3>
+            {getIcon(planet.type)}
+          </div>
+          <p className="text-sm leading-normal">{planet.content}</p>
+        </div>
+      </div>
     );
-};
+  }
   

@@ -13,58 +13,64 @@ type Planet = {
   content: string;
 };
 
-export function PickYourPlanet() {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-
-  const router = useRouter();
+type PickYourPlanetProps = {
+    onPlanetSelect: (planetId: string) => void;
+  };
   
-  const { activePlanet, setActivePlanet } = useActivePlanet();
-  const [planetList, setPlanetList] = useState<Planet[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  async function fetchPlanets() {
-    if (!activePlanet) {
-      try {
-        setLoading(true);
-        const { data: planetsData, error: planetsError } = await supabase
-          .from("anomalies")
-          .select("*");
-        
-        if (planetsData) {
-          setPlanetList(planetsData);
+  export default function PickYourPlanet({ onPlanetSelect }: PickYourPlanetProps) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+  
+    const router = useRouter();
+    
+    const { activePlanet, setActivePlanet } = useActivePlanet();
+    const [planetList, setPlanetList] = useState<Planet[]>([]);
+    const [loading, setLoading] = useState(false);
+  
+    async function fetchPlanets() {
+      if (!activePlanet) {
+        try {
+          setLoading(true);
+          const { data: planetsData, error: planetsError } = await supabase
+            .from("anomalies")
+            .select("*");
+          
+          if (planetsData) {
+            setPlanetList(planetsData);
+          }
+  
+          if (planetsError) {
+            console.error("Error fetching planets: ", planetsError);
+          }
+        } catch (error: any) {
+          console.log("Error fetching planets data: ", error);
+        } finally {
+          setLoading(false);
         }
-
-        if (planetsError) {
-          console.error("Error fetching planets; try: ", planetsError);
-        }
-      } catch (error: any) {
-        console.log("Error fetching planets data; catch: ", error);
-      } finally {
-        setLoading(false);
       }
     }
-  }
-
-  useEffect(() => {
-    fetchPlanets();
-  }, [session]);
-
-  if (activePlanet) {
-    router.push('/');
-  }
-
-  return (
-    <div className="container mx-auto p-4">
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {planetList.map((planet) => (
-            <PlanetCard key={planet.id} planet={planet} />
-          ))}
+  
+    useEffect(() => {
+      fetchPlanets();
+    }, [session]);
+  
+    if (activePlanet) {
+      router.push('/');
+    }
+  
+    return (
+      <section className="w-full py-12 md:py-24 lg:py-32">
+        <div className="container grid gap-6 md:gap-8 px-4 md:px-6">
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+              {planetList.map((planet) => (
+                <PlanetCard key={planet.id} planet={planet} onSelect={() => onPlanetSelect(planet.id)} />
+              ))}
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  );
-}
+      </section>
+    );
+  }
