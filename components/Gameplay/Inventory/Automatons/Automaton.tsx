@@ -93,7 +93,6 @@ export function CreateAutomaton() {
     );
 };
 
-
 interface OwnedItem {
     id: string;
     item: string;
@@ -119,10 +118,9 @@ interface AnomalyStructureModalProps {
     onClose: () => void;
     ownedItem: OwnedItem;
     structure: UserStructure;
-}
+};
 
-
-export const AnomalyStrucutreModal: React.FC<AnomalyStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
+export const AnomalyStructureModal: React.FC<AnomalyStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
     const [isActionDone, setIsActionDone] = useState(false);
 
     const handleActionClick = () => {

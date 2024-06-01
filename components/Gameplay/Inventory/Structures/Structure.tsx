@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import CreateBaseClassification from "@/components/Content/ClassificationForm";
 import { useProfileContext } from "@/context/UserProfile";
 import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "./Telescopes";
-import { AnomalyStrucutreModal } from "../Automatons/Automaton";
+import { AnomalyStructureModal } from "../Automatons/Automaton";
 
 interface OwnedItem {
     id: string;
@@ -29,10 +29,6 @@ interface UserStructure {
     parentItem: number | null;
     itemLevel: number;
     // Function (what is executed upon click)
-};
-
-interface PlacedStructureSingleProps {
-    UserStructure: UserStructure;
 };
 
 interface StructureSelectProps {
@@ -65,7 +61,7 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
                 <SurveyorStructureModal isOpen={isModalOpen} ownedItem={ownedItem} structure={structure} onClose={closeModal} />
             )}
             {structure.id === 22 && (
-                <AnomalyStrucutreModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
+                <AnomalyStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
             )}
         </div>
     );
@@ -163,7 +159,6 @@ export const AllStructures = () => {
         </div>
     );
 };
-
 
 // Create structures
 export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSelected }) => {

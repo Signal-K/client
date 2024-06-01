@@ -51,15 +51,6 @@ const ActivePlanetContext = createContext<ActivePlanetContextValue>({
     setActivePlanet: () => {} // Provide a default empty function
 });
 
-interface UserAutomaton {
-    id: string;
-};
-
-interface UserAutomaton {
-    id: string;
-    item: number; // Add the 'item' property
-};
-
 // View structures, planet info & automatons
 
 const UserPlanetPage = () => {
