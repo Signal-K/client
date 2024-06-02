@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet';
 import { useProfileContext } from '@/context/UserProfile';
-import ReactHtmlParser from 'react-html-parser';
 
 // Simple serialization function for demonstration purposes
 function serializeRichText(richText: string): string {
@@ -52,20 +51,20 @@ export const CreateBaseClassification: React.FC<CreateBaseClassificationProps> =
 
   async function addMedia(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
-    if (files?.length > 0 && session) {
-      setIsUploading(true);
-      for (const file of files) {
-        const fileName = `${Date.now()}${session.user.id}${file.name}`;
-        const { data, error } = await supabase.storage.from('media').upload(fileName, file);
+    if (files && files.length > 0 && session) {
+        setIsUploading(true);
+        for (const file of Array.from(files)) {
+            const fileName = `${Date.now()}${session.user.id}${file.name}`;
+            const { data, error } = await supabase.storage.from('media').upload(fileName, file);
 
-        if (data) {
-          const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
-          setUploads(prevUploads => [...prevUploads, url]);
-        } else {
-          console.error(error);
+            if (data) {
+                const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
+                setUploads(prevUploads => [...prevUploads, url]);
+            } else {
+                console.error(error);
+            }
         }
-      }
-      setIsUploading(false);
+        setIsUploading(false);
     }
   }
 

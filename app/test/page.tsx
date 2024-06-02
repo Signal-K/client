@@ -1,5 +1,6 @@
 "use client"
 
+import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import CreateBaseClassification from "@/Classifications/ClassificationForm";
 import MissionList, { MissionOverlay } from "@/components/Content/MissionList";
 import { OverlayModal } from "@/components/Dials&Data/OverlayModal";
@@ -24,7 +25,8 @@ export default function () {
                 <div className="p-5">
                     {/* <PickYourPlanet /> */}
                     {/* <UserItems /> */}
-                    <CreateBaseClassification />
+                    <CreateBaseClassification assetMentioned={1} />
+                    <ClassificationsFeed />
                     {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
                     <RoverControlPanel /> */}
                     {/* <AllStructures /> */}
