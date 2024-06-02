@@ -5,7 +5,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 
-import CreateBaseClassification from "@/components/Content/ClassificationForm";
+import CreateBaseClassification from "@/Classifications/ClassificationForm";
 import { useProfileContext } from "@/context/UserProfile";
 import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "./Telescopes";
 import { AnomalyStructureModal } from "../Automatons/Automaton";

@@ -5,7 +5,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 
-import CreateBaseClassification from "@/components/Content/ClassificationForm";
+import CreateBaseClassification from "@/Classifications/ClassificationForm";
 import { useProfileContext } from "@/context/UserProfile";
 import PlanetData from "@/components/Content/Anomalies/PlanetData";
 
@@ -77,7 +77,8 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${activePlanet?.id}/activePlanet.png`;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        // <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <>
             <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
                 <div className="flex justify-between items-center">
                     <h2 className="text-xl font-bold">{structure.name}</h2>
@@ -99,7 +100,8 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
                     </div>
                 </div>
             </div>
-        </div>
+        </>
+        // {/* </div> */}
     );
 };
 
