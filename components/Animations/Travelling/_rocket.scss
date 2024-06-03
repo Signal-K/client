@@ -5,71 +5,69 @@ $darkgrey: #554842;
 $red: #f01a19;
 $darkred: #a75248;
 
-// Kudos to https://codepen.io/eva_trostlos for the amazing CSS rocket
 .rocket {
   position: absolute;
-  width: 80px;
-  left: calc(50% - 60px);
+  width: 13.33px; // Reduced by 3x
+  left: calc(50% - 20px); // Adjusted for new width
   transition: bottom linear 0.5s;
   z-index: 2;
 
   &__body {
-    width: 80px;
-    left: calc(50% - 50px);
+    width: 26.67px; // Reduced by 3x
+    left: calc(50% - 16.67px); // Adjusted for new width
     animation: bounce 0.5s infinite;
 
     &:before {
       content: '';
       position: absolute;
-      left: calc(50% - 24px);
-      width: 48px;
-      height: 13px;
+      left: calc(50% - 8px); // Reduced by 3x
+      width: 16px; // Reduced by 3x
+      height: 4.33px; // Reduced by 3x
       background-color: $darkgrey;
-      bottom: -13px;
+      bottom: -4.33px; // Reduced by 3x
       border-bottom-right-radius: 60%;
       border-bottom-left-radius: 60%;
     }
 
     &__main {
       background-color: $lightgrey;
-      height: 180px;
-      left: calc(50% - 50px);
+      height: 60px; // Reduced by 3x
+      left: calc(50% - 16.67px); // Adjusted for new width
       border-top-right-radius: 100%;
       border-top-left-radius: 100%;
       border-bottom-left-radius: 50%;
       border-bottom-right-radius: 50%;
-      border-top: 5px solid $white;
+      border-top: 1.67px solid $white; // Reduced by 3x
     }
 
     &__window {
       position: absolute;
-      width: 50px;
-      height: 50px;
+      width: 16.67px; // Reduced by 3x
+      height: 16.67px; // Reduced by 3x
       border-radius: 100%;
       background-color: $darkred;
-      left: calc(50% - 25px);
-      top: 50px;
-      border: 5px solid $midgrey;
+      left: calc(50% - 8.33px); // Reduced by 3x
+      top: 16.67px; // Reduced by 3x
       box-sizing: border-box;
     }
 
     &__fin {
       position: absolute;
       z-index: -100;
-      height: 55px;
-      width: 50px;
+      height: 18.33px; // Reduced by 3x
+      width: 16.67px; // Reduced by 3x
       background-color: $darkred;
 
       &__left {
-        left: -30px;
-        top: calc(100% - 55px);
+        left: -10px; // Reduced by 3x
+        top: calc(100% - 18.33px); // Reduced by 3x
         border-top-left-radius: 80%;
         border-bottom-left-radius: 20%;
       }
 
       &__right {
-        right: -30px;
-        top: calc(100% - 55px);
+        right: -10px; // Reduced by 3x
+        top: calc(100% - 18.33px); // Reduced by 3x
         border-top-right-radius: 80%;
         border-bottom-right-radius: 20%;
       }
@@ -79,88 +77,88 @@ $darkred: #a75248;
   &__exhaust {
     &__flame {
       position: absolute;
-      width: 28px;
+      width: 9.33px; // Reduced by 3x
       background: linear-gradient(to bottom, transparent 10%, $white 100%);
-      height: 150px;
-      left: calc(50% - 14px);
+      height: 50px; // Reduced by 3x
+      left: calc(50% - 4.67px); // Reduced by 3x
       animation: exhaust 0.2s infinite;
     }
 
     &__fumes {
       li {
-        width: 60px;
-        height: 60px;
+        width: 20px; // Reduced by 3x
+        height: 20px; // Reduced by 3x
         background-color: $white;
         list-style: none;
         position: absolute;
         border-radius: 100%;
 
         &:first-child {
-          width: 200px;
-          height: 200px;
-          top: 300px;
+          width: 66.67px; // Reduced by 3x
+          height: 66.67px; // Reduced by 3x
+          top: 100px; // Reduced by 3x
           animation: fumes 5s infinite;
         }
 
         &:nth-child(2) {
-          width: 150px;
-          height: 150px;
-          left: -120px;
-          top: 260px;
+          width: 50px; // Reduced by 3x
+          height: 50px; // Reduced by 3x
+          left: -40px; // Reduced by 3x
+          top: 86.67px; // Reduced by 3x
           animation: fumes 3.2s infinite;
         }
 
         &:nth-child(3) {
-          width: 120px;
-          height: 120px;
-          left: -40px;
-          top: 330px;
+          width: 40px; // Reduced by 3x
+          height: 40px; // Reduced by 3x
+          left: -13.33px; // Reduced by 3x
+          top: 110px; // Reduced by 3x
           animation: fumes 3s 1s infinite;
         }
 
         &:nth-child(4) {
-          width: 100px;
-          height: 100px;
-          left: -170px;
+          width: 33.33px; // Reduced by 3x
+          height: 33.33px; // Reduced by 3x
+          left: -56.67px; // Reduced by 3x
           animation: fumes 4s 2s infinite;
-          top: 380px;
+          top: 126.67px; // Reduced by 3x
         }
 
         &:nth-child(5) {
-          width: 130px;
-          height: 130px;
-          left: -120px;
-          top: 350px;
+          width: 43.33px; // Reduced by 3x
+          height: 43.33px; // Reduced by 3x
+          left: -40px; // Reduced by 3x
+          top: 116.67px; // Reduced by 3x
           animation: fumes 5s infinite;
         }
 
         &:nth-child(6) {
-          width: 200px;
-          height: 200px;
-          left: -60px;
-          top: 280px;
+          width: 66.67px; // Reduced by 3x
+          height: 66.67px; // Reduced by 3x
+          left: -20px; // Reduced by 3x
+          top: 93.33px; // Reduced by 3x
           animation: fumes2 10s infinite;
         }
 
         &:nth-child(7) {
-          width: 100px;
-          height: 100px;
-          left: -100px;
-          top: 320px;
+          width: 33.33px; // Reduced by 3x
+          height: 33.33px; // Reduced by 3x
+          left: -33.33px; // Reduced by 3x
+          top: 106.67px; // Reduced by 3x
         }
 
         &:nth-child(8) {
-          width: 110px;
-          height: 110px;
-          left: 70px;
-          top: 340px;
+          width: 36.67px; // Reduced by 3x
+          height: 36.67px; // Reduced by 3x
+          left: 23.33px; // Reduced by 3x
+          top: 113.33px; // Reduced by 3x
         }
 
         &:nth-child(9) {
-          width: 90px;
-          height: 90px;
-          left: 150px;
-          top: 380px;
+          width: 30px; // Reduced by 3x
+          height: 30px; // Reduced by 3x
+          left: 50px; // Reduced by 3x
+          top: 126.67px; // Reduced by 3x
           animation: fumes 20s infinite;
         }
       }
@@ -188,72 +186,72 @@ $darkred: #a75248;
     }
 
     &:before {
-      width: 10px;
-      height: 2px;
+      width: 3.33px; // Reduced by 3x
+      height: 0.67px; // Reduced by 3x
       border-radius: 50%;
     }
 
     &:after {
-      height: 8px;
-      width: 2px;
-      left: 4px;
-      top: -3px;
+      height: 2.67px; // Reduced by 3x
+      width: 0.67px; // Reduced by 3x
+      left: 1.33px; // Reduced by 3x
+      top: -1px; // Reduced by 3x
     }
 
     &:first-child {
-      top: -30px;
-      left: -210px;
+      top: -10px; // Reduced by 3x
+      left: -70px; // Reduced by 3x
       animation: twinkle 0.4s infinite;
     }
 
     &:nth-child(2) {
       top: 0;
-      left: 60px;
+      left: 20px; // Reduced by 3x
       animation: twinkle 0.5s infinite;
 
       &:before {
-        height: 1px;
-        width: 5px;
+        height: 0.33px; // Reduced by 3x
+        width: 1.67px; // Reduced by 3x
       }
       &:after {
-        width: 1px;
-        height: 5px;
-        top: -2px;
-        left: 2px;
+        width: 0.33px; // Reduced by 3x
+        height: 1.67px; // Reduced by 3x
+        top: -0.67px; // Reduced by 3x
+        left: 0.67px; // Reduced by 3x
       }
     }
 
     &:nth-child(3) {
-      left: 120px;
-      top: 220px;
+      left: 40px; // Reduced by 3x
+      top: 73.33px; // Reduced by 3x
       animation: twinkle 1s infinite;
     }
 
     &:nth-child(4) {
-      left: -100px;
-      top: 200px;
+      left: -33.33px; // Reduced by 3x
+      top: 66.67px; // Reduced by 3x
       animation: twinkle 0.5s ease infinite;
     }
 
     &:nth-child(5) {
-      left: 170px;
-      top: 100px;
+      left: 56.67px; // Reduced by 3x
+      top: 33.33px; // Reduced by 3x
       animation: twinkle 0.4s ease infinite;
     }
 
     &:nth-child(6) {
-      top: 87px;
-      left: -79px;
+      top: 29px; // Reduced by 3x
+      left: -26.33px; // Reduced by 3x
       animation: twinkle 0.2s infinite;
       &:before {
-        height: 1px;
-        width: 5px;
+        height: 0.33px; // Reduced by 3x
+        width: 1.67px; // Reduced by 3x
       }
       &:after {
-        width: 1px;
-        height: 5px;
-        top: -2px;
-        left: 2px;
+        width: 0.33px; // Reduced by 3x
+        height: 1.67px; // Reduced by 3x
+        top: -0.67px; // Reduced by 3x
+        left: 0.67px; // Reduced by 3x
       }
     }
   }
@@ -278,7 +276,7 @@ $darkred: #a75248;
     transform: translate3d(0px, 0px, 0);
   }
   50% {
-    transform: translate3d(0px, -4px, 0);
+    transform: translate3d(0px, -1.33px); // Reduced by 3x
   }
   100% {
     transform: translate3d(0px, 0px, 0);

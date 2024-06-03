@@ -29,7 +29,7 @@ export default function () {
             <Layout bg={false}>
                 <div className="p-5">
                     <Sidebar />
-                    {/* <PickYourPlanet /> 
+                    <PickYourPlanet onPlanetSelect={() => {}} />
                     {/* <UserItems /> 
                     <SkillTreeComp /> 
                     {/* <CreateBaseClassification assetMentioned={1} /> 
@@ -50,6 +50,7 @@ export default function () {
     return (
         <>
             <MissionOverlay />
+            <Sidebar />
             {/* <PickYourPlanet /> */}
         </>
     );

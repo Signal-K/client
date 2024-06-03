@@ -105,14 +105,14 @@ type Planet = {
     };
   
     return (
-      <div className="relative group grid [grid-template-areas:stack] overflow-hidden rounded-lg" onClick={onSelect}>
+      <div className="relative group grid [grid-template-areas:stack] overflow-hidden rounded-lg max-w-xl mx-auto" onClick={onSelect}>
         <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
           <span className="sr-only">View</span>
         </Link>
         <img
           src={planet.avatar_url || "/placeholder.svg"}
           alt={planet.type}
-          className="[grid-area:stack] object-cover w-full aspect-square"
+          className="[grid-area:stack] object-cover w-32 h-32"
         />
         <div className="flex-1 [grid-area:stack] bg-black/70 group-hover:opacity-90 transition-opacity text-white p-4 lg:p-6 justify-end flex flex-col gap-2">
           <div className="flex items-center justify-between">
@@ -123,5 +123,4 @@ type Planet = {
         </div>
       </div>
     );
-  }
-  
+};
