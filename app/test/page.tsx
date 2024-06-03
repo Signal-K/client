@@ -27,7 +27,7 @@ export default function () {
                     {/* <PickYourPlanet /> */}
                     {/* <UserItems /> */}
                     <SkillTreeComp />
-                    <CreateBaseClassification assetMentioned={1} />
+                    {/* <CreateBaseClassification assetMentioned={1} /> */}
                     <ClassificationsFeed />
                     {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
                     <RoverControlPanel /> */}

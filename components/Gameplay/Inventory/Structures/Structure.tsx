@@ -342,3 +342,148 @@ export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSel
         </>
     );
 };
+
+// Check for existence of structures/entities in `inventory` table:
+interface CheckInventoryProps {
+    itemId: number;
+};
+
+interface CheckInventoryProps {
+    itemId: number;
+}
+
+export const CheckInventory: React.FC<CheckInventoryProps> = ({ itemId }) => {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+    const { activePlanet } = useActivePlanet();
+
+    const [ownedItem, setOwnedItem] = useState<OwnedItem | null>(null);
+    const [structure, setStructure] = useState<UserStructure | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    async function fetchData() {
+        if (session && activePlanet) {
+            try {
+                // Fetch owned items from supabase
+                const { data: ownedItemsData, error: ownedItemsError } = await supabase
+                    .from('inventory')
+                    .select('*')
+                    .eq('owner', session.user.id)
+                    .eq('anomaly', activePlanet.id)
+                    .eq('item', itemId);
+
+                if (ownedItemsError) {
+                    throw ownedItemsError;
+                }
+
+                if (ownedItemsData && ownedItemsData.length > 0) {
+                    const ownedItem = ownedItemsData[0];
+
+                    // Fetch item details from the Next.js API
+                    const response = await fetch('/api/gameplay/inventory');
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch item details from the API');
+                    }
+                    const itemDetailsData: UserStructure[] = await response.json();
+
+                    if (itemDetailsData) {
+                        const structure = itemDetailsData.find(itemDetail => itemDetail.id === itemId);
+
+                        if (structure) {
+                            setOwnedItem(ownedItem);
+                            setStructure(structure);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            };
+        };
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [session, activePlanet, itemId, supabase]);
+
+    const handleStructureClick = async (structure: UserStructure) => {
+        setErrorMessage(null); // Reset error message
+
+        if (session && activePlanet) {
+            try {
+                createInventoryUserEntry(structure);
+            } catch (error: any) {
+                console.error('Error:', error.message);
+                setErrorMessage("An error occurred while creating the structure.");
+                return;
+            }
+        }
+    };
+
+    const createInventoryUserEntry = async (structure: UserStructure) => {
+        if (session && activePlanet?.id) {
+            try {
+                const { data, error } = await supabase
+                    .from('inventory')
+                    .upsert([
+                        {
+                            item: structure.id,
+                            owner: session?.user?.id,
+                            quantity: 1,
+                            time_of_deploy: new Date().toISOString(),
+                            notes: "Structure",
+                            anomaly: activePlanet.id,
+                        },
+                    ]);
+
+                if (error) {
+                    throw error;
+                }
+
+                console.log('Inventory user entry created:', data);
+                // Refetch the user inventory after creating a structure
+                fetchData();
+            } catch (error: any) {
+                console.log(error.message);
+                setErrorMessage("An error occurred while creating the inventory entry.");
+            }
+        }
+    };
+
+    if (!ownedItem || !structure) {
+        return (
+            <div>
+                <button
+                    onClick={async () => {
+                        const response = await fetch('/api/gameplay/inventory');
+                        const itemDetailsData: UserStructure[] = await response.json();
+                        const structure = itemDetailsData.find(itemDetail => itemDetail.id === itemId);
+                        if (structure) {
+                            await handleStructureClick(structure);
+                        }
+                    }}
+                    className="px-4 py-2 text-white bg-green-500 rounded-md focus:outline-none hover:bg-green-600"
+                >
+                    Create Structure
+                </button>
+                {errorMessage && (
+                    <div className="mt-4 bg-red-500 text-white p-4 rounded-md">
+                        {errorMessage}
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <PlacedStructureSingle
+            ownedItem={ownedItem}
+            structure={structure}
+            style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: `translate(-50%, -50%)`, // Adjust as needed
+            }}
+        />
+    );
+};
