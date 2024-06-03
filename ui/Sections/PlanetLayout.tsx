@@ -3,14 +3,15 @@
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { Button } from "@/ui/button";
 import { ReactNode, useState } from "react";
-import Slideover from "../Panels/Anomalies";
+import { Slidebar } from "../Panels/Anomalies";
 
 interface PlanetLayoutProps {
   children: ReactNode;
 };
 
-export function PlanetLayout({ children }: PlanetLayoutProps) {
+export function PlanetLayout({ children }: { children: React.ReactNode }) {
   const { activePlanet, setActivePlanet, updatePlanetLocation } = useActivePlanet();
+  const [showSidebar, setShowSidebar] = useState(false);
 
   const handleLeftArrowClick = () => {
     if (activePlanet?.id && parseInt(activePlanet.id) > 1) {
@@ -28,64 +29,57 @@ export function PlanetLayout({ children }: PlanetLayoutProps) {
 
   const activePlanetId = activePlanet?.id ? parseInt(activePlanet.id) : undefined;
 
-  const [showSlideover, setShowSlideover] = useState(false);
-
-    const handleOpenSlideover = () => {
-        setShowSlideover(true);
-    };
-
-    const handleCloseSlideover = () => {
-        setShowSlideover(false);
-    };
+  const handleOpenSlideover = () => {
+    setShowSidebar(true);
+  };
 
   return (
-      <>
-              <header className="left-0 right-0 z-50 flex h-16 w-full items-center justify-between bg-white/80 px-4 shadow-sm backdrop-blur-md dark:bg-gray-950/80 dark:text-gray-50">
+    <>
+      <header className="left-0 right-0 z-50 flex h-16 w-full items-center justify-between bg-white/80 px-4 shadow-sm backdrop-blur-md dark:bg-gray-950/80 dark:text-gray-50">
         <div className="flex items-center gap-4">
-            <Button 
-              className="rounded-full p-2" 
-              size="icon" 
-              variant="outline" 
-              onClick={handleLeftArrowClick} 
-              style={{ visibility: activePlanetId === 1 ? 'hidden' : 'visible' }}
-            >
-                <ArrowLeftIcon className="h-5 w-5" />
-            </Button>
+          <Button
+            className="rounded-full p-2"
+            size="icon"
+            variant="outline"
+            onClick={handleLeftArrowClick}
+            style={{ visibility: activePlanetId === 1 ? 'hidden' : 'visible' }}
+          >
+            <ArrowLeftIcon className="h-5 w-5" />
+          </Button>
         </div>
         <div className="flex flex-col items-center">
-            <div className="inline-block rounded-lg bg-gray-100/80 px-3 py-1 text-sm backdrop-blur-md dark:bg-gray-800/80">
-                Home
-            </div>
-            <h1 className="text-lg font-semibold">{activePlanet?.content}</h1>
+          <div className="inline-block rounded-lg bg-gray-100/80 px-3 py-1 text-sm backdrop-blur-md dark:bg-gray-800/80">
+            Home
+          </div>
+          <h1 className="text-lg font-semibold">{activePlanet?.content}</h1>
         </div>
         <div className="flex items-center gap-4">
-            <Button 
-              className="rounded-full p-2" 
-              size="icon" 
-              variant="outline" 
-              onClick={handleRightArrowClick} 
-              style={{ visibility: activePlanetId === 6 ? 'hidden' : 'visible' }}
-            >
-                <ArrowRightIcon className="h-5 w-5" />
-            </Button>
-            <Button 
-                  className="rounded-full p-2" 
-                  size="icon" 
-                  variant="outline" 
-                  onClick={handleOpenSlideover} 
-                >
-                    <BookOpenIcon className="h-5 w-5" />
-                </Button>
+          <Button
+            className="rounded-full p-2"
+            size="icon"
+            variant="outline"
+            onClick={handleRightArrowClick}
+            style={{ visibility: activePlanetId === 6 ? 'hidden' : 'visible' }}
+          >
+            <ArrowRightIcon className="h-5 w-5" />
+          </Button>
+          <Button
+            className="rounded-full p-2"
+            size="icon"
+            variant="outline"
+            onClick={handleOpenSlideover}
+          >
+            <BookOpenIcon className="h-5 w-5" />
+          </Button>
         </div>
-    </header>
-          <div className="my-8">
-            <MainContent>
-              {children}
-              {showSlideover && <Slideover onClose={handleCloseSlideover} showSlideover={false} />}
-            </MainContent>
-          </div>
-          {/* <Footer /> */}
-      </>
+      </header>
+      <div className="my-8">
+        <Slidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+        <MainContent>
+          {children}
+        </MainContent>
+      </div>
+    </>
   );
 };
 

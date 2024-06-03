@@ -1,6 +1,5 @@
 "use client"
 
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState, useRef, Fragment, createContext } from "react";
 import { Dialog, Transition } from '@headlessui/react';
 import { CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
