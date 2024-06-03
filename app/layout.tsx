@@ -1,7 +1,7 @@
 "use client";
 
 import "@/styles/globals.css";
-import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs"; // Updated import
+import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 import Head from "next/head";

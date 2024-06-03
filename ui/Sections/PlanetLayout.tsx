@@ -78,13 +78,16 @@ export function PlanetLayout({ children }: PlanetLayoutProps) {
                 </Button>
         </div>
     </header>
-    {showSlideover && <Slideover onClose={handleCloseSlideover} />}
-          <div className="my-8"><MainContent>{children}</MainContent></div>
-          <Footer />
+          <div className="my-8">
+            <MainContent>
+              {children}
+              {showSlideover && <Slideover onClose={handleCloseSlideover} showSlideover={false} />}
+            </MainContent>
+          </div>
+          {/* <Footer /> */}
       </>
   );
 };
-
 
 interface MainContentProps {
     children: ReactNode;
