@@ -9,8 +9,12 @@ interface PlanetLayoutProps {
   children: ReactNode;
 };
 
-export function PlanetLayout({ children }: { children: React.ReactNode }) {
-  const { activePlanet, setActivePlanet, updatePlanetLocation } = useActivePlanet();
+interface PlanetLayoutProps {
+  children: React.ReactNode;
+}
+
+export function PlanetLayout({ children }: PlanetLayoutProps) {
+  const { activePlanet, updatePlanetLocation } = useActivePlanet();
   const [showSidebar, setShowSidebar] = useState(false);
 
   const handleLeftArrowClick = () => {
@@ -30,7 +34,7 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
   const activePlanetId = activePlanet?.id ? parseInt(activePlanet.id) : undefined;
 
   const handleOpenSlideover = () => {
-    setShowSidebar(true);
+    setShowSidebar(!showSidebar);
   };
 
   return (
@@ -74,14 +78,15 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <div className="my-8">
-        <Slidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
         <MainContent>
           {children}
         </MainContent>
       </div>
+      {showSidebar && <Slidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />}
     </>
   );
-};
+}
+
 
 interface MainContentProps {
     children: ReactNode;

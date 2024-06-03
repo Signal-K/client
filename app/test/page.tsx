@@ -2,6 +2,7 @@
 
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import CreateBaseClassification from "@/Classifications/ClassificationForm";
+import LaunchPad from "@/components/Animations/Travelling/Launchpad";
 import MissionList, { MissionOverlay } from "@/components/Content/MissionList";
 import { OverlayModal } from "@/components/Dials&Data/OverlayModal";
 import { AllAutomatons, CreateAutomaton, SingleAutomaton } from "@/components/Gameplay/Inventory/Automatons/Automaton";
@@ -11,7 +12,7 @@ import UserItems from "@/components/Gameplay/Inventory/UserInventory";
 import Layout from "@/components/Layout";
 import PickYourPlanet from "@/components/Onboarding";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { Slidebar } from "@/ui/Panels/Anomalies";
+import Sidebar, { Slidebar } from "@/ui/Panels/Anomalies";
 import { useState } from "react";
 
 export default function () {
@@ -27,6 +28,7 @@ export default function () {
         return (
             <Layout bg={false}>
                 <div className="p-5">
+                    <Sidebar />
                     {/* <PickYourPlanet /> 
                     {/* <UserItems /> 
                     <SkillTreeComp /> 

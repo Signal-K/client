@@ -51,7 +51,6 @@ const ActivePlanetContext = createContext<ActivePlanetContextValue>({
 });
 
 // View structures, planet info & automatons
-
 const UserPlanetPage = () => {
     return (
         <div className="mx-12">
