@@ -2,7 +2,7 @@
 
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import CreateBaseClassification from "@/Classifications/ClassificationForm";
-import FillInProfile, { Profile, UserProfileData } from "@/auth/UserProfileFields";
+import { ProfileCard } from "@/auth/UserProfileFields";
 import LaunchPad from "@/components/Animations/Travelling/Launchpad";
 import MissionList, { MissionOverlay } from "@/components/Content/MissionList";
 import { OverlayModal } from "@/components/Dials&Data/OverlayModal";
@@ -24,9 +24,7 @@ export default function () {
             <Layout bg={false}>
                 <div className="p-5">
                     <PickYourPlanet onPlanetSelect={() => {}} />
-                    {/* <FillInProfile /> */}
-                    {/* <UserProfileData /> */}
-                    <Profile />
+                    <ProfileCard />
                     <SkillTreeComp />
                     <div className='p-1'>
                         <LaunchPad />
