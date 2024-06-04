@@ -1,7 +1,8 @@
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useProfileContext } from "@/context/UserProfile";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { SetStateAction, useEffect, useState } from "react";
 
 interface UserProfile {
     username: string;
@@ -245,3 +246,105 @@ export function UserProfileData() {
         </div>
     );
 }
+
+export const Profile = () => {
+    const supabase = useSupabaseClient();    
+    const session = useSession();
+
+        const [profile, setProfile] = useState({
+          id: '',
+          username: '',
+          full_name: '',
+          avatar_url: '',
+          location: '',
+        });
+        const router = useRouter();
+      
+        useEffect(() => {
+          const fetchProfile = async () => {
+            if (session) {
+              // Fetch the user's profile based on session.user.id
+              const { data, error } = await supabase
+                .from('profiles')
+                .select('id, username, full_name, avatar_url, location')
+                .eq('id', session.user.id)
+                .single();
+              if (error) {
+                console.error('Error fetching profile:', error.message);
+              } else {
+                setProfile(data || {});
+              }
+            }
+          };
+      
+          fetchProfile();
+        }, [session]);
+      
+        const handleFieldChange = (e: { target: { name: any; value: any; }; }) => {
+          const { name, value } = e.target;
+          setProfile((prevProfile) => ({
+            ...prevProfile,
+            [name]: value,
+          }));
+        };
+      
+        const saveProfile = async () => {
+          try {
+            // Update the user's profile in the database
+            const { error } = await supabase
+              .from('profiles')
+              .update(profile)
+              .eq('id', session?.user?.id);
+            if (error) {
+              throw error;
+            }
+          } catch (error: any) {
+            console.error('Error updating profile:', error.message);
+          }
+        };
+      
+        return (
+          <div>
+            <h1>Edit Profile</h1>
+            <form onSubmit={saveProfile}>
+              <label>
+                Username:
+                <input
+                  type="text"
+                  name="username"
+                  value={profile.username}
+                  onChange={handleFieldChange}
+                />
+              </label>
+              <label>
+                Full Name:
+                <input
+                  type="text"
+                  name="full_name"
+                  value={profile.full_name}
+                  onChange={handleFieldChange}
+                />
+              </label>
+              <label>
+                Avatar URL:
+                <input
+                  type="text"
+                  name="avatar_url"
+                  value={profile.avatar_url}
+                  onChange={handleFieldChange}
+                />
+              </label>
+              <label>
+                Location:
+                <input
+                  type="text"
+                  name="location"
+                  value={profile.location}
+                  disabled // Location is not editable
+                />
+              </label>
+              <button type="submit">Save</button>
+            </form>
+          </div>
+        );
+      };

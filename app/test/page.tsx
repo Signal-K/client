@@ -2,7 +2,7 @@
 
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import CreateBaseClassification from "@/Classifications/ClassificationForm";
-import FillInProfile, { UserProfileData } from "@/auth/UserProfileFields";
+import FillInProfile, { Profile, UserProfileData } from "@/auth/UserProfileFields";
 import LaunchPad from "@/components/Animations/Travelling/Launchpad";
 import MissionList, { MissionOverlay } from "@/components/Content/MissionList";
 import { OverlayModal } from "@/components/Dials&Data/OverlayModal";
@@ -11,11 +11,13 @@ import Layout from "@/components/Layout";
 import PickYourPlanet from "@/components/Onboarding";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import Sidebar, { Slidebar } from "@/ui/Panels/Anomalies";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function () {
     // const { activePlanet, activeSector } = useActivePlanet();
     const { activePlanet } = useActivePlanet();
+
+
 
     if (activePlanet) {
         return (
@@ -23,7 +25,8 @@ export default function () {
                 <div className="p-5">
                     <PickYourPlanet onPlanetSelect={() => {}} />
                     {/* <FillInProfile /> */}
-                    <UserProfileData />
+                    {/* <UserProfileData /> */}
+                    <Profile />
                     <SkillTreeComp />
                     <div className='p-1'>
                         <LaunchPad />
