@@ -6,9 +6,11 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 interface UserProfile {
     username: string;
     full_name: string;
+    location: number;
+    id: string;
     avatar_url: string;
     faction: string;
-}
+};
 
 type UserProfileContextType = {
     userProfile: UserProfile | null;
