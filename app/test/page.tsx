@@ -19,17 +19,13 @@ export default function () {
     // const { activePlanet, activeSector } = useActivePlanet();
     const { activePlanet } = useActivePlanet();
 
-    const handleStructureSelected = (structure: any) => {
-        console.log('Selected structure: ', structure);
-    };
-
-
     if (activePlanet) {
         return (
             <Layout bg={false}>
                 <div className="p-5">
-                    <Sidebar />
                     <PickYourPlanet onPlanetSelect={() => {}} />
+                    <Sidebar />
+                    
                     {/* <UserItems /> 
                     <SkillTreeComp /> 
                     {/* <CreateBaseClassification assetMentioned={1} /> 
