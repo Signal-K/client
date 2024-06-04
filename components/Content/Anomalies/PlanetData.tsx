@@ -40,6 +40,7 @@ export default function PlanetData() {
             }
 
             setPlanetData(planetInfo);
+            console.log(planetData);
         } catch (error: any) {
             console.error("Error fetching anomaly-planet data:", error);
             setError(error.message);
@@ -51,11 +52,11 @@ export default function PlanetData() {
     useEffect(() => {
         if (session) {
             getPlanetData();
-        }
-    }, [session, activePlanet]);
+        };
+    }, [session]);
 
     return (
-        <div className="p-4 bg-gray-100 rounded-md">
+        <div className="p-4 rounded-md">
             {loading && <p>Loading...</p>}
             {error && <p className="text-red-500">Error: {error}</p>}
             {planetData ? (
@@ -105,22 +106,23 @@ type Planet = {
     };
   
     return (
-      <div className="relative group grid [grid-template-areas:stack] overflow-hidden rounded-lg max-w-xl mx-auto" onClick={onSelect}>
+      <div className="relative group grid [grid-template-areas:stack] overflow-hidden rounded-lg" onClick={onSelect}>
         <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
           <span className="sr-only">View</span>
         </Link>
         <img
           src={planet.avatar_url || "/placeholder.svg"}
           alt={planet.type}
-          className="[grid-area:stack] object-cover w-32 h-32"
+          className="[grid-area:stack] object-cover w-full aspect-square"
         />
-        <div className="flex-1 [grid-area:stack] bg-black/70 group-hover:opacity-90 transition-opacity text-white p-4 lg:p-6 justify-end flex flex-col gap-2">
+        <div className="flex-1 [grid-area:stack] bg-black/40 group-hover:opacity-90 transition-opacity text-white p-4 lg:p-6 justify-end flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold tracking-tight">{planet.type}</h3>
+            <h3 className="font-semibold tracking-tight">{planet.type} - {planet.id}</h3>
             {getIcon(planet.type)}
           </div>
           <p className="text-sm leading-normal">{planet.content}</p>
         </div>
       </div>
     );
-};
+  }
+  
