@@ -3,7 +3,6 @@
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { Button } from "@/ui/button";
 import { ReactNode, useState } from "react";
-import { Slidebar } from "../Panels/Anomalies";
 
 interface PlanetLayoutProps {
   children: ReactNode;
@@ -82,7 +81,6 @@ export function PlanetLayout({ children }: PlanetLayoutProps) {
           {children}
         </MainContent>
       </div>
-      {showSidebar && <Slidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />}
     </>
   );
 }
