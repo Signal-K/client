@@ -10,7 +10,7 @@ import SkillTreeComp from "@/components/Gameplay/Inventory/Structures/TechTree";
 import Layout from "@/components/Layout";
 import PickYourPlanet from "@/components/Onboarding";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import Sidebar, { Slidebar } from "@/ui/Panels/Anomalies";
+// import Sidebar, { Slidebar } from "@/ui/Panels/Anomalies";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 
@@ -23,36 +23,19 @@ export default function () {
         const { error } = await supabase.auth.signOut()
     };
 
-    if (activePlanet) {
-        return (
-            <Layout bg={false}>
-                <div className="p-5">
-                    <PickYourPlanet onPlanetSelect={() => {}} />
-                    <ProfileCard />
-                    <SkillTreeComp />
-                    <div className='p-1'>
-                        <LaunchPad />
-                        <button onClick={signoutUser}>Sign out</button>
-                    </div>
-
-                    
-                </div>
-            </Layout>
-        );
-    };
-
     return (
-        <>
-            <MissionOverlay />
-            <Sidebar />
-            <PickYourPlanet onPlanetSelect={() => {}} />
-            {/* <PickYourPlanet /> */}
+        <Layout bg={false}>
+            <div className="p-5">
+                <PickYourPlanet onPlanetSelect={() => {}} />
+                <ProfileCard />
+                <SkillTreeComp />
+                <div className='p-1'>
+                    <LaunchPad />
+                    <button onClick={signoutUser}>Sign out</button>
+                </div>
 
-            {/* <CreateBaseClassification assetMentioned={1} /> Look into these...
-                    <ClassificationsFeed /> 
-                    {/* <div className="my-4 mb-6 px-3"><AutomatonControlPanel /></div>
-                    <RoverControlPanel /> 
-                    {/* <OverlayModal title="Hello" imageUrl="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/planets/avatars/Base6.png" content="Mars" isOpen={true} onClose={() => {}} button1Text="Button 1" button2Text="Button 2" button1Action={() => {}} button2Action={() => {}} />  */}
-        </>
+                
+            </div>
+        </Layout>
     );
 };
