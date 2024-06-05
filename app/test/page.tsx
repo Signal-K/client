@@ -11,13 +11,17 @@ import Layout from "@/components/Layout";
 import PickYourPlanet from "@/components/Onboarding";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import Sidebar, { Slidebar } from "@/ui/Panels/Anomalies";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 
 export default function () {
     // const { activePlanet, activeSector } = useActivePlanet();
     const { activePlanet } = useActivePlanet();
+    const supabase = useSupabaseClient();
 
-
+    async function signoutUser() {
+        const { error } = await supabase.auth.signOut()
+    };
 
     if (activePlanet) {
         return (
@@ -28,6 +32,7 @@ export default function () {
                     <SkillTreeComp />
                     <div className='p-1'>
                         <LaunchPad />
+                        <button onClick={signoutUser}>Sign out</button>
                     </div>
 
                     
