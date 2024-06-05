@@ -1,29 +1,18 @@
+version: '3.6'
 services:
-  flaskapp:
-    container_name: flaskapp
-    image: flaskapp:1.0.0
+  landing:
     build:
-      context: ./galaxy
-      dockerfile: flask.dockerfile
-    ports:
-      - 4000:4000
+      context: "./"
+      dockerfile: Dockerfile.dev
+    networks:
+      - ship
     environment:
-      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@db:5432/postgres
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
-    depends_on:
-      - db
-
-  db:
-    container_name: starsailors_db
-    image: postgres:13
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    ports:
-      - 5432:5432
+      APP_ENV: development
     volumes:
-      - pgdata:/var/ib/postgresql/data
+      - "./src:/app/src"
+    ports:
+      - "3000:3000"
 
-volumes:
-  pgdata: {}
+networks:
+  ship:
+    name: ship_network
