@@ -8,6 +8,7 @@ import MissionList, { MissionOverlay } from "@/components/Content/MissionList";
 import { OverlayModal } from "@/components/Dials&Data/OverlayModal";
 import CompletedMissionGroups from "@/components/Gameplay/CompletedMissions";
 import SkillTreeComp from "@/components/Gameplay/Inventory/Structures/TechTree";
+import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
 import Layout from "@/components/Layout";
 import PickYourPlanet from "@/components/Onboarding";
 import { useActivePlanet } from "@/context/ActivePlanet";
@@ -28,12 +29,13 @@ export default function () {
             <div className="p-5">
                 <PickYourPlanet onPlanetSelect={() => {}} />
                 <ProfileCard />
-                <SkillTreeComp />
-                <div className='p-1'>
+                {/* <SkillTreeComp /> */}
+                <div className='p-1'> {/* Going to planet component group */}
                     <LaunchPad />
-                    <button onClick={signoutUser}>Sign out</button>
+                    <GoToYourPlanet />
                 </div>
                 <CompletedMissionGroups />
+                <button onClick={signoutUser}>Sign out</button>
             </div>
         </Layout>
     );
