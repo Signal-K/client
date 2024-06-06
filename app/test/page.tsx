@@ -7,6 +7,7 @@ import LaunchPad from "@/components/Animations/Travelling/Launchpad";
 import MissionList, { MissionOverlay } from "@/components/Content/MissionList";
 import { OverlayModal } from "@/components/Dials&Data/OverlayModal";
 import CompletedMissionGroups from "@/components/Gameplay/CompletedMissions";
+import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
 import { AllAutomatons } from "@/components/Gameplay/Inventory/Automatons/Automaton";
 import UserItemsUndeployed from "@/components/Gameplay/Inventory/InactiveItems";
 import { AllStructures } from "@/components/Gameplay/Inventory/Structures/Structure";
@@ -42,6 +43,7 @@ export default function () {
                 </div>
                 <AllStructures />
                 <AllAutomatons />
+                <CraftStructure structureId={12} /><br /><br /><br /><br />
                 <CompletedMissionGroups />
                 <button onClick={signoutUser}>Sign out</button>
             </div>
