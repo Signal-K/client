@@ -7,6 +7,7 @@ import LaunchPad from "@/components/Animations/Travelling/Launchpad";
 import MissionList, { MissionOverlay } from "@/components/Content/MissionList";
 import { OverlayModal } from "@/components/Dials&Data/OverlayModal";
 import CompletedMissionGroups from "@/components/Gameplay/CompletedMissions";
+import UserItemsUndeployed from "@/components/Gameplay/Inventory/InactiveItems";
 import SkillTreeComp from "@/components/Gameplay/Inventory/Structures/TechTree";
 import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
 import Layout from "@/components/Layout";
@@ -33,6 +34,9 @@ export default function () {
                 <div className='p-1'> {/* Going to planet component group */}
                     <LaunchPad />
                     <GoToYourPlanet />
+                </div>
+                <div className="p-5"> {/* Helper items/components */}
+                    <UserItemsUndeployed />
                 </div>
                 <CompletedMissionGroups />
                 <button onClick={signoutUser}>Sign out</button>
