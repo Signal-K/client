@@ -7,6 +7,7 @@ import LaunchPad from "@/components/Animations/Travelling/Launchpad";
 import MissionList, { MissionOverlay } from "@/components/Content/MissionList";
 import { OverlayModal } from "@/components/Dials&Data/OverlayModal";
 import CompletedMissionGroups from "@/components/Gameplay/CompletedMissions";
+import { AllAutomatons } from "@/components/Gameplay/Inventory/Automatons/Automaton";
 import UserItemsUndeployed from "@/components/Gameplay/Inventory/InactiveItems";
 import { AllStructures } from "@/components/Gameplay/Inventory/Structures/Structure";
 import SkillTreeComp from "@/components/Gameplay/Inventory/Structures/TechTree";
@@ -40,6 +41,7 @@ export default function () {
                     <UserItemsUndeployed />
                 </div>
                 <AllStructures />
+                <AllAutomatons />
                 <CompletedMissionGroups />
                 <button onClick={signoutUser}>Sign out</button>
             </div>
