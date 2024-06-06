@@ -2,6 +2,7 @@
 
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { time } from "console";
 import { useEffect, useState } from "react";
 
 interface Automaton {
@@ -23,6 +24,59 @@ export function CreateAutomaton() {
 
     const [already, setAlready] = useState(false);
 
+    const inventoryData = {
+      item: 13,
+      owner: session?.user?.id,
+      quantity: 3,
+      notes: "Created upon the completion of mission 5",
+      parentItem: null, // Set this to be the first rover that is built here/through this component
+      time_of_deploy: new Date().toISOString(),
+      anomaly: activePlanet?.id,
+    };
+    const inventoryData2 = {
+      item: 16,
+      owner: session?.user?.id,
+      quantity: 2,
+      notes: "Created upon the completion of mission 5",
+      parentItem: null, // Set this to be the first rover that is built here/through this component
+      time_of_deploy: new Date().toISOString(),
+      anomaly: activePlanet?.id,
+    };
+
+    const handleMissionComplete = async () => {
+      try {
+        const missionData = {
+          user: session?.user?.id,
+          time_of_completion: new Date().toISOString(),
+          mission: 5,
+          configuration: null,
+          rewarded_items: [13]//, 13, 13, 16, 16],
+        };
+
+        const { data: newMission, error: newMissionError } = await supabase
+          .from("missions")
+          .insert([missionData]);
+      
+        if (newMissionError) {
+            throw newMissionError;
+        };
+
+        const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
+          .from("inventory")
+          .insert([inventoryData, inventoryData2]);
+
+        if (inventoryData) {
+          console.log('Inventory updated', newInventoryEntry);
+        }
+
+        if (newInventoryEntryError) {
+          throw newInventoryEntryError;
+        };
+      } catch (error: any) {
+        console.error("Error handling mission completion:", error.message);
+      };
+    };
+
     const handleCreateAutomaton = async () => {
         try {
             // Check if the user has an automaton already
@@ -31,6 +85,7 @@ export function CreateAutomaton() {
                 .select('id')
                 .eq('owner', session?.user?.id)
                 .eq('item', 23);
+
                 
             if (automatonError) {
                 throw new Error('Error checking for existing automaton');
@@ -67,9 +122,11 @@ export function CreateAutomaton() {
                         item: 23,
                         quantity: 1,
                         anomaly: activePlanet?.id,
-                        notes: `First Rover Created By User using Vehicle Structure ${structureData[0].id}`,
+                        notes: `First Rover Created By User using Vehicle Structure ${structureData[0].id}. For mission 5`,
                     }
                 ]);
+
+                handleMissionComplete();
 
             if (createdAutomatonError) {
                 throw new Error('Error creating automaton');

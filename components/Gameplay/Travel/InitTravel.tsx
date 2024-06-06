@@ -28,7 +28,7 @@ export default function GoToYourPlanet() {
             }
         } catch (error: any) {
             console.error("Error handling planet selection:", error.message);
-        }
+        };
     };
 
     return (

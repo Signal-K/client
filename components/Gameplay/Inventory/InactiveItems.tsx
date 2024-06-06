@@ -1,5 +1,3 @@
-"use client";
-
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
@@ -13,18 +11,13 @@ interface InventoryEntry {
     parentItem: number | null;
     time_of_deploy: string;
     anomaly: string | null;
-};
+}
 
 export default function UserItemsUndeployed() {
     const supabase = useSupabaseClient();
     const session = useSession();
-
     const { activePlanet } = useActivePlanet();
-
     const [inventoryItems, setInventoryItems] = useState<InventoryEntry[] | null>(null);
-
-    // What items are Structures?
-    // 22, 24, 12, 14 -> Currently
 
     const fetchInventoryItems = async () => {
         try {
@@ -35,20 +28,20 @@ export default function UserItemsUndeployed() {
                     .eq('owner', session?.user.id)
                     .in('item', [12, 14, 22, 24])
                     .is('anomaly', null);
-  
+
                 if (error) {
-                throw error;
+                    throw error;
                 };
-  
+
                 if (data) {
-                setInventoryItems(data);
+                    setInventoryItems(data);
                 };
             };
         } catch (error: any) {
-          console.error('Error fetching inventory items:', error.message);
+            console.error('Error fetching inventory items:', error.message);
         };
     };
-    
+
     const deployStructure = async (itemId: number) => {
         try {
             if (session && activePlanet) {
@@ -57,13 +50,14 @@ export default function UserItemsUndeployed() {
                     .update({ anomaly: activePlanet.id })
                     .eq('id', itemId)
                     .single();
-    
+
                 if (error) {
                     throw error;
                 };
-    
+
+                handleMissionComplete();
+
                 if (data) {
-                    // If needed, update state to reflect the changes
                     setInventoryItems(prevItems => {
                         if (prevItems) {
                             return prevItems.map(item => {
@@ -82,7 +76,29 @@ export default function UserItemsUndeployed() {
         } catch (error: any) {
             console.error('Error deploying structure:', error.message);
         };
-    };    
+    };
+
+    const handleMissionComplete = async () => {
+        try {
+            const missionData = {
+                user: session?.user?.id,
+                time_of_completion: new Date().toISOString(),
+                mission: 4,
+                configuration: null,
+                rewarded_items: [23],
+            };
+
+            const { data: newMission, error: newMissionError } = await supabase
+                .from("missions")
+                .insert([missionData]);
+
+            if (newMissionError) {
+                throw newMissionError;
+            };
+        } catch (error: any) {
+            console.error("Error handling mission completion:", error.message);
+        };
+    };
 
     useEffect(() => {
         fetchInventoryItems();
