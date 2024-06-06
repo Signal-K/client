@@ -226,6 +226,32 @@ export function AllAutomatons() {
   const [rewardTotal, setRewardTotal] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  async function handleMissionComplete() {
+    try {
+        const missionData = {
+            user: session?.user?.id,
+            time_of_completion: new Date().toISOString(),
+            mission: 6,
+            configuration: null,
+            rewarded_items: [13, 13, 15],
+        };
+
+        // Insert mission data into missions table
+        const { data: newMission, error: newMissionError } = await supabase
+            .from("missions")
+            .insert([missionData]);
+
+        if (newMissionError) {
+            throw new Error('Error inserting mission data: ' + newMissionError.message);
+        }
+
+        console.log('Mission completed and data inserted', newMission);
+    } catch (error: any) {
+        console.error("Error handling mission completion:", error.message);
+        throw error;
+    }
+}
+
   async function fetchAutomatonsData() {
     if (!session?.user?.id) {
       console.error('session.user.id is undefined');
@@ -301,45 +327,115 @@ export function AllAutomatons() {
     }
   }
 
-  async function claimRewards() {
-    if (selectedAutomaton?.time_of_deploy) {
-      const deployTime = new Date(selectedAutomaton.time_of_deploy).getTime();
-      const currentTime = new Date().getTime();
-      const timeDifference = (currentTime - deployTime) / 1000 / 60; // Difference in minutes
-      const rewardQuantity = Math.floor(timeDifference);
+  const [userItems, setUserItems] = useState<InventoryItem[]>([]);
 
-      if (rewardQuantity > 0) {
-        const { error: insertError } = await supabase.from('inventory').insert([
-          {
-            owner: session?.user?.id,
-            item: 11,
-            quantity: rewardQuantity,
-            anomaly: activePlanet?.id,
-            notes: `Reward from automaton ID: ${selectedAutomaton.id}`,
-          },
-        ]);
-
-        if (insertError) {
-          console.error('Error inserting reward', insertError);
-          return;
-        }
-
-        const { error: updateError } = await supabase
-          .from('inventory')
-          .update({ time_of_deploy: '' })
-          .eq('id', selectedAutomaton.id);
-
-        if (updateError) {
-          console.error('Error updating automaton', updateError);
-          return;
-        }
-
-        setRewardTotal(rewardQuantity);
-        console.log(`Rewards claimed: ${rewardQuantity}`);
-        setSelectedAutomaton({ ...selectedAutomaton, time_of_deploy: '' });
-      };
+  async function fetchUserItems() {
+    if (!session) {
+      return null;
     };
-  };
+
+    try {
+      const { data, error } = await supabase
+          .from("inventory")
+          .select("*")
+          .in("item", [17, 18, 19, 20, 21]) // [11, 13, 15, 16, 17, 18, 19, 20, 21]) // Use 'in' instead of 'eq'
+          .eq("owner", session.user.id);
+
+      if (error) {
+          throw error;
+      }
+
+      setUserItems(data || []); // Set data or empty array if data is null
+  } catch (error: any) {
+      console.error("Error fetching user items:", error.message);
+  }
+  }
+
+  async function claimRewards() {
+    try {
+      fetchUserItems();
+      if (selectedAutomaton?.time_of_deploy) {
+        const deployTime = new Date(selectedAutomaton.time_of_deploy).getTime();
+        const currentTime = new Date().getTime();
+        const timeDifference = (currentTime - deployTime) / 1000 / 60; // Difference in minutes
+        const rewardQuantity = Math.floor(timeDifference);
+  
+        const inventoryData = {
+          item: 13,
+          owner: session?.user?.id,
+          quantity: 2,
+          notes: "Created upon the deployment of the user's first automaton, for mission 6",
+          parentItem: selectedAutomaton?.id,
+          time_of_deploy: new Date().toISOString(),
+          anomaly: activePlanet?.id,
+      };
+
+      const inventoryData2 = {
+          item: 15,
+          owner: session?.user?.id,
+          quantity: 1,
+          notes: "Created upon the deployment of the user's first automaton, for mission 6",
+          parentItem: selectedAutomaton?.id,
+          time_of_deploy: new Date().toISOString(),
+          anomaly: activePlanet?.id,
+      };
+
+      // Insert rewards into inventory
+      // if (!userItems) {
+        const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
+        .from("inventory")
+        .insert([inventoryData, inventoryData2]);
+
+    if (newInventoryEntryError) {
+        throw new Error('Error inserting rewards into inventory: ' + newInventoryEntryError.message);
+    // }
+
+    console.log('Inventory updated', newInventoryEntry); }
+      await handleMissionComplete();
+      console.log("Rewards claimed successfully.");
+        
+        if (rewardQuantity > 0) {
+          const { data: insertData, error: insertError } = await supabase.from('inventory').insert([
+            {
+              owner: session?.user?.id,
+              item: 11,
+              quantity: rewardQuantity,
+              anomaly: activePlanet?.id,
+              notes: `Reward from automaton ID: ${selectedAutomaton.id}`,
+            },
+          ]);
+  
+          if (insertError) {
+            console.error('Error inserting reward', insertError);
+            return;
+          }
+  
+          console.log('Rewards inserted', insertData);
+  
+          const { data: updateData, error: updateError } = await supabase
+            .from('inventory')
+            .update({ time_of_deploy: null }) // Update time_of_deploy to null
+            .eq('id', selectedAutomaton.id);
+  
+          if (updateError) {
+            console.error('Error updating automaton', updateError);
+            return;
+          }
+  
+          console.log('Automaton updated', updateData);
+  
+          setRewardTotal(rewardQuantity);
+          console.log(`Rewards claimed: ${rewardQuantity}`);
+  
+          handleMissionComplete();
+          // setSelectedAutomaton((prevAutomaton) => ({ ...prevAutomaton, time_of_deploy: null }));
+        }
+      }
+    } catch (error: any) {
+      console.error("Error claiming rewards:", error.message);
+    }
+  }
+  
 
   return (
     <>
@@ -541,7 +637,6 @@ export function SingleAutomaton() {
           };
 
           // Insert rewards into inventory
-
           if (!userItems) {
             const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
             .from("inventory")
@@ -551,12 +646,8 @@ export function SingleAutomaton() {
             throw new Error('Error inserting rewards into inventory: ' + newInventoryEntryError.message);
         }
 
-        console.log('Inventory updated', newInventoryEntry);
-
-        // Handle mission completion
-        await handleMissionComplete();
-          }
-
+        console.log('Inventory updated', newInventoryEntry); }
+          await handleMissionComplete();
           console.log("Rewards claimed successfully.");
       } catch (error: any) {
           console.error("Error claiming rewards:", error.message);
