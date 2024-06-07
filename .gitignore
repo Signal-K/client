@@ -6,10 +6,16 @@
 .pnp.js
 .env
 
+#galaxy
+#/galaxy
+#./galaxy
+
 # testing
 /coverage
 .env
 .venv
+/galaxy/.venv
+galaxy/.venv
 /.venv
 venv
 /venv
