@@ -18,6 +18,15 @@ interface OwnedItem {
     anomaly: number;
 };
 
+interface OwnedTelescope14 {
+    id: string;
+    item: string;
+    quantity: number;
+    sector: string;
+    anomaly: number;
+    notes: string;
+};
+
 interface UserStructure {
     id: number;
     item: number; // Assuming this should be a number
@@ -83,7 +92,7 @@ export const AllStructures = () => {
                         .select('*')
                         .eq('owner', session.user.id)
                         .eq('anomaly', activePlanet.id)
-                        // .eq('notes', 'Structure');
+                        .eq('notes', 'Structure');
 
                     if (ownedItemsError) {
                         throw ownedItemsError;

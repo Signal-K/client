@@ -5,7 +5,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 
-import CreateBaseClassification from "@/Classifications/ClassificationForm";
+import CreateBaseClassification, { CreateFirstBaseClassification } from "@/Classifications/ClassificationForm";
 import { useProfileContext } from "@/context/UserProfile";
 import PlanetData from "@/components/Content/Anomalies/PlanetData";
 
@@ -14,6 +14,7 @@ interface OwnedItem {
     item: string;
     quantity: number;
     sector: string;
+    notes?: string;
 };
 
 interface UserStructure {
@@ -66,6 +67,7 @@ interface TransitingTelescopeStructureModalProps {
 export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
     const [isActionDone, setIsActionDone] = useState(false);
     const {activePlanet} = useActivePlanet();
+    const session = useSession();
 
     const handleActionClick = () => {
         // Implement action logic here
@@ -89,13 +91,15 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
                 <div className="flex flex-col items-center mt-4">
                     <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
                     <p>ID: {ownedItem.id}</p>
+                    <p>{ownedItem.notes}</p>
                     <p>Description: {structure.description}</p>
                     <div className="mt-4">
                     <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} />
+                    {ownedItem.notes === "Created by crafting 14 for mission 7" ? (
+                        <CreateFirstBaseClassification assetMentioned={imageUrl} />
+                    ) : (
                         <CreateBaseClassification assetMentioned={imageUrl} />
-                        <button className="btn btn-primary" onClick={handleActionClick}>
-                            Perform Action
-                        </button>
+                    )}
                         {isActionDone && <p className="mt-2 text-green-500">Action Completed</p>}
                     </div>
                 </div>

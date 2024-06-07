@@ -11,6 +11,25 @@ export default function CraftStructure({ structureId }: { structureId: number })
     const [recipeItems, setRecipeItems] = useState<string[]>([]);
     const [craftable, setCraftable] = useState(false);
     const [userInventory, setUserInventory] = useState<any[]>([]);
+    const [createdInventoryId, setCreatedInventoryId] = useState<number | null>(null);
+
+    const missionData = {
+        user: session?.user?.id,
+        time_of_completion: new Date().toISOString(),
+        mission: 7,
+        configuration: null,
+        rewarded_items: [13],
+    };
+
+    const inventoryData = {
+        item: missionData.rewarded_items[0],
+        owner: session?.user?.id,
+        quantity: 1,
+        notes: "Created upon the completion of mission 7",
+        parentItem: null,
+        time_of_deploy: new Date().toISOString(),
+        anomaly: activePlanet?.id,
+    };
 
     useEffect(() => {
         async function fetchRecipe() {
@@ -54,6 +73,22 @@ export default function CraftStructure({ structureId }: { structureId: number })
         fetchRecipe();
     }, [structureId, userInventory]);
 
+    const handleMissionComplete = async () => {
+        try {
+            const { data: newMission, error: newMissionError } = await supabase
+                .from("missions")
+                .insert([missionData]);
+
+            const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
+                .from("inventory")
+                .insert([inventoryData]);
+        } catch (error: any) {
+            console.error(error);
+        };
+    };
+
+    const [structureTableId, setSTID] = useState(0);
+
     const craftStructure = async () => {
         if (session && activePlanet?.id && craftable) {
             try {
@@ -65,25 +100,30 @@ export default function CraftStructure({ structureId }: { structureId: number })
                             owner: session?.user?.id,
                             quantity: 1,
                             time_of_deploy: new Date().toISOString(),
-                            notes: `Created by crafting ${structureId}`,
+                            notes: `Created by crafting ${structureId} for mission 7`,
                             anomaly: activePlanet.id,
                         },
                     ]);
-
+    
                 if (error) {
                     throw error;
                 }
-
-                console.log('Inventory user entry created:', data);
+    
+                handleMissionComplete();
+    
+                // Wait for the newly created row to be fetched
+                await fetchNewlyCreatedRow();
+    
+                // Now that we have the correct structureTableId, update the notes
+                await updateNotes();
+    
                 // Refetch the user inventory after creating a structure
                 fetchUserInventory();
             } catch (error: any) {
                 console.log(error.message);
-                // Here you should define the setErrorMessage function
-                // and use it to set an error message for the user
             }
         }
-    };
+    };    
 
     const fetchUserInventory = async () => {
         try {
@@ -102,7 +142,37 @@ export default function CraftStructure({ structureId }: { structureId: number })
             }
         } catch (error: any) {
             console.error('Error fetching user inventory:', error.message);
-        }
+        };
+    };
+
+    const fetchNewlyCreatedRow = async () => {
+        try {
+            const { data, error } = await supabase
+                .from("inventory")
+                .select("*")
+                .eq("owner", session?.user?.id)
+                .eq("item", structureId)
+                .eq("anomaly", activePlanet?.id);
+            
+            if (error) {
+                throw error;
+            };
+
+            setSTID(data[0].id);
+        } catch (error: any) {
+            console.log(error);
+        };
+    };
+
+    const updateNotes = async () => {
+        try {
+            const { data, error } = await supabase
+                .from("inventory")
+                .update({ notes: `Created by crafting ${structureTableId}` })
+                .eq("id", structureTableId);
+        } catch (error) {
+            console.log(error);
+        };
     };
 
     useEffect(() => {
@@ -122,4 +192,4 @@ export default function CraftStructure({ structureId }: { structureId: number })
             )}
         </div>
     );
-}
+};

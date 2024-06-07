@@ -105,6 +105,191 @@ export default function CreateBaseClassification(assetMentioned: any) {
     );
 };
 
+export function CreateFirstBaseClassification(assetMentioned: any) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+    const [content, setContent] = useState<string>("");
+    const [uploads, setUploads] = useState<string[]>([]);
+    const { activePlanet } = useActivePlanet();
+    const { userProfile } = useProfileContext(); 
+    const [isUploading, setIsUploading] = useState(false);
+
+    useEffect(() => {
+        console.log("Don't you feel", userProfile);
+    }, [session]);
+
+    async function createPost() {
+        // const editorState = $getRoot() //.serializeToJSON();
+        // const content = $generateHtmlFromNodes(editorState);
+
+        supabase
+            .from("classifications")
+            .insert({
+                author: session?.user?.id,
+                content,
+                media: uploads,
+                anomaly: activePlanet?.id,
+            }).then(response => {
+                if (!response.error) {
+                    alert(`Post created`);
+                    setContent('');
+                };
+            });
+
+        handleMissionComplete();
+    };
+
+    const missionData = {
+        user: session?.user?.id,
+        time_of_completion: new Date().toISOString(),
+        mission: 8,
+        configuration: null,
+        rewarded_items: [13, 13, 13, 16],
+    };
+
+    const inventoryData = {
+        item: missionData.rewarded_items[0],
+        owner: session?.user?.id,
+        quantity: 1,
+        notes: "Created upon the completion of mission 8",
+        parentItem: null,
+        time_of_deploy: new Date().toISOString(),
+        anomaly: activePlanet?.id,
+    };
+    const inventoryData2 = {
+        item: missionData.rewarded_items[1],
+        owner: session?.user?.id,
+        quantity: 1,
+        notes: "Created upon the completion of mission 8",
+        parentItem: null,
+        time_of_deploy: new Date().toISOString(),
+        anomaly: activePlanet?.id,
+    };
+    const inventoryData3 = {
+        item: missionData.rewarded_items[2],
+        owner: session?.user?.id,
+        quantity: 1,
+        notes: "Created upon the completion of mission 8",
+        parentItem: null,
+        time_of_deploy: new Date().toISOString(),
+        anomaly: activePlanet?.id,
+    };
+    const inventoryData4 = {
+        item: missionData.rewarded_items[3],
+        owner: session?.user?.id,
+        quantity: 1,
+        notes: "Created upon the completion of mission 8",
+        parentItem: null,
+        time_of_deploy: new Date().toISOString(),
+        anomaly: activePlanet?.id,
+    };
+
+    const handleMissionComplete = async () => {
+        try {
+            const { data: newMission, error: newMissionError } = await supabase
+                .from("missions")
+                .insert([missionData]);
+
+            const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
+                .from("inventory")
+                .insert([inventoryData, inventoryData2, inventoryData3, inventoryData4]);
+        } catch (error: any) {
+            console.error(error);
+        };
+    };
+
+    async function addMedia(e: any) {
+        const files = e.target.files;
+        if (files.length > 0 && session) {
+            setIsUploading(true);
+            for (const file of files) {
+                const fileName = Date.now() + session.user.id + file.name;
+                const result = await supabase.storage
+                    .from("media")
+                    .upload(fileName, file);
+
+                if (result.data) {
+                    const url = process.env.NEXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/media' + result.data.path;
+                    setUploads(prevUploads => [...prevUploads, url]);
+                } else {
+                    console.log(result);
+                };
+            };
+            setIsUploading(false);
+        };
+    };
+
+    return (
+        <>
+            <div className="flex gap-2">
+                <img src={userProfile?.avatar_url} width='60px' height='60px' />
+            </div>
+            <textarea 
+                value={content} 
+                onChange={e => setContent(e.target.value)} 
+                className="grow p-3 h-24 rounded-xl" 
+                placeholder={"What do you think about this anomaly/planet"} 
+            />
+            {isUploading && (
+                <div className="text-center">
+                    <p>Uploading...</p>
+                </div>
+            )}
+            {uploads.length > 0 && (
+                <div className="flex gap-2 mt-4">
+                    {uploads.map((upload, index) => (
+                        <div key={index} className="">
+                            <img src={upload} className="w-auto h-48 rounded-md" alt={`Upload ${index}`} />
+                        </div>
+                    ))}
+                </div>
+            )}
+            <button 
+                onClick={createPost} 
+                className="text-black px-2 py-1 rounded-md bg-blue-500 hover:bg-blue-600"
+            >
+                Share
+            </button>
+        </>
+    );
+    
+
+    // return (
+    //     <div className="w-5/6 mx-auto">
+    //         <div className="flex gap-2 mx-5 mt-5 pb-3">
+    //             <div>
+    //                 <img src={userProfile?.avatar_url} width='60px' height='60px' />
+    //             </div>
+    //             <div className="grow p-3 rounded-xl bg-gray-100">
+    //                 <Editor content={content} setContent={setContent} />
+    //             </div>
+    //         </div>
+    //         {isUploading && (
+    //             <div className="text-center">
+    //                 <p>Uploading...</p>
+    //             </div>
+    //         )}
+    //         <div className="flex gap-2 mt-4">
+    //             {uploads.map(upload => (
+    //                 <div key={upload} className="w-auto h-48">
+    //                     <img src={upload} className="w-auto h-48 rounded-md" />
+    //                 </div>
+    //             ))}
+    //         </div>
+    //         <div className="text-center mt-4">
+    //             <label className="flex gap-1 items-center cursor-pointer">
+    //                 <input type="file" className="hidden" onChange={addMedia} />
+    //                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+    //                     <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+    //                 </svg>
+    //                 <span className="hidden md:block">Media</span>
+    //             </label>
+    //             <button onClick={createPost} className="text-black px-2 py-1 rounded-md bg-blue-500 hover:bg-blue-600">Share</button>
+    //         </div>
+    //     </div>
+    // );
+};
+
 const theme = ExampleTheme;
 
 function onError(error: any) {

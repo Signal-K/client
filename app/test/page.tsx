@@ -2,6 +2,7 @@
 
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import CreateBaseClassification from "@/Classifications/ClassificationForm";
+import FirstClassification from "@/Classifications/FirstClassification";
 import { ProfileCard } from "@/auth/UserProfileFields";
 import LaunchPad from "@/components/Animations/Travelling/Launchpad";
 import MissionList, { MissionOverlay } from "@/components/Content/MissionList";
@@ -43,8 +44,9 @@ export default function () {
                 </div>
                 <AllStructures />
                 <AllAutomatons />
-                <CraftStructure structureId={12} /><br /><br /><br /><br />
-                <CompletedMissionGroups />
+                <CraftStructure structureId={14} /><br /><br /><br /><br />
+                <center><FirstClassification /></center>
+                {/* <CompletedMissionGroups /> */}
                 <button onClick={signoutUser}>Sign out</button>
             </div>
         </Layout>
