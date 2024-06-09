@@ -92,7 +92,7 @@ export const AllStructures = () => {
                         .select('*')
                         .eq('owner', session.user.id)
                         .eq('anomaly', activePlanet.id)
-                        .eq('notes', 'Structure');
+                        // .eq('notes', 'Structure');
 
                     if (ownedItemsError) {
                         throw ownedItemsError;

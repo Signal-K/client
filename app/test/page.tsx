@@ -5,6 +5,7 @@ import CreateBaseClassification from "@/Classifications/ClassificationForm";
 import FirstClassification from "@/Classifications/FirstClassification";
 import { ProfileCard } from "@/auth/UserProfileFields";
 import LaunchPad from "@/components/Animations/Travelling/Launchpad";
+import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
 import MissionList, { MissionOverlay } from "@/components/Content/MissionList";
 import { OverlayModal } from "@/components/Dials&Data/OverlayModal";
 import CompletedMissionGroups from "@/components/Gameplay/CompletedMissions";
@@ -46,6 +47,7 @@ export default function () {
                 <AllAutomatons />
                 <CraftStructure structureId={14} /><br /><br /><br /><br />
                 <center><FirstClassification /></center>
+                <UserAnomaliesComponent />
                 {/* <CompletedMissionGroups /> */}
                 <button onClick={signoutUser}>Sign out</button>
             </div>

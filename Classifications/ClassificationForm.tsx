@@ -15,6 +15,7 @@ import ToolbarPlugin from "@/ui/Content/ToolbarPlugin";
 import TreeViewPlugin from "@/ui/Content/TreeViewPlugin";
 import ExampleTheme from "@/ui/Content/ExampleTheme";
 import { $generateHtmlFromNodes } from '@lexical/html';
+import { useUserAnomalies } from "@/context/UserAnomalies";
 
 export default function CreateBaseClassification(assetMentioned: any) {
     const supabase = useSupabaseClient();
@@ -25,28 +26,79 @@ export default function CreateBaseClassification(assetMentioned: any) {
     const { userProfile } = useProfileContext(); 
     const [isUploading, setIsUploading] = useState(false);
 
+    // const { userAnomalies, fetchUserAnomalies } = useUserAnomalies();
+    const [userAnomalies, setUserAnomalies] = useState<number[]>([]);
+
     useEffect(() => {
-        console.log("Don't you feel", userProfile);
+        const fetchUserAnomalies = async () => {
+            if (!session) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('user_anomalies')
+                    .select('anomaly_id')
+                    .eq('user_id', session.user.id);
+
+                if (error) throw error;
+
+                setUserAnomalies(data.map((anomaly: any) => anomaly.anomaly_id));
+            } catch (error: any) {
+                console.error("Error fetching user anomalies: ", error.message);
+            }
+        };
+
+        fetchUserAnomalies();
     }, [session]);
 
+    const newAnomalyData = {
+        user_id: session?.user?.id,
+        anomaly_id: activePlanet?.id,
+    };
+
     async function createPost() {
+        if (!activePlanet?.id) {
+            console.error("Active planet ID is undefined");
+            return;
+        }
+
         const editorState = $getRoot() //.serializeToJSON();
         // const content = $generateHtmlFromNodes(editorState);
 
-        supabase
+        const { data: classification, error } = await supabase
             .from("classifications")
             .insert({
                 author: session?.user?.id,
                 content,
                 media: uploads,
-                anomaly: activePlanet?.id,
-            }).then(response => {
-                if (!response.error) {
-                    alert(`Post created`);
-                    setContent('');
-                };
-            });
-    };
+                anomaly: activePlanet.id,
+            })
+            .single();
+
+        if (error) {
+            console.error("Error creating classification: ", error.message);
+            return;
+        }
+
+        supabase.from("user_anomalies").insert([newAnomalyData]);
+
+        // if (!userAnomalies.includes(activePlanet.id)) {
+        //     const { error: userAnomalyError } = await supabase
+        //         .from("user_anomalies")
+        //         .insert({
+        //             user_id: session?.user?.id,
+        //             anomaly_id: activePlanet.id,
+        //             ownership_date: new Date().toISOString(),
+        //         });
+
+        //     if (userAnomalyError) {
+        //         console.error("Error adding user anomaly: ", userAnomalyError.message);
+        //         return;
+        //     }
+        // }
+
+        alert(`Post created`);
+        setContent('');
+    }
 
     async function addMedia(e: any) {
         const files = e.target.files;
@@ -105,7 +157,7 @@ export default function CreateBaseClassification(assetMentioned: any) {
     );
 };
 
-export function CreateFirstBaseClassification(assetMentioned: any) {
+export function CreateFirstBaseClassification(assetMentioned: any) { // FIRST MISSION GROUP COMPONENT
     const supabase = useSupabaseClient();
     const session = useSession();
     const [content, setContent] = useState<string>("");
@@ -184,11 +236,20 @@ export function CreateFirstBaseClassification(assetMentioned: any) {
         anomaly: activePlanet?.id,
     };
 
+    const newAnomalyData = {
+        user_id: session?.user?.id,
+        anomaly_id: activePlanet?.id,
+    };
+
     const handleMissionComplete = async () => {
         try {
             const { data: newMission, error: newMissionError } = await supabase
                 .from("missions")
                 .insert([missionData]);
+
+            const { data: newAnomaly, error: newAnomalyError } = await supabase
+                .from("user_anomalies")
+                .insert([newAnomalyData]);
 
             const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
                 .from("inventory")

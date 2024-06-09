@@ -59,7 +59,7 @@ export function ProfileCard() {
     const fetchMissions = async () => {
       const res = await fetch('/api/gameplay/missions');
       const data = await res.json();
-      setMissions(data);
+      setMissions(data); 
     };
 
     fetchProfile();
@@ -192,4 +192,4 @@ export function ProfileCard() {
       </div>
     </div>
   );
-}
+};

@@ -8,6 +8,7 @@ import Head from "next/head";
 import { ActivePlanetProvider, useActivePlanet } from "@/context/ActivePlanet";
 import dynamic from 'next/dynamic';
 import { InventoryProvider } from "@/context/InventoryContext";
+import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [supabaseClient] = useState(() => createPagesBrowserClient()); // Updated function
@@ -63,9 +64,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
           <ActivePlanetProvider>
-            <InventoryProvider>
-                {children}
-            </InventoryProvider>
+            <UserAnomaliesProvider>
+              <InventoryProvider>
+                  {children}
+              </InventoryProvider>
+            </UserAnomaliesProvider>
           </ActivePlanetProvider>
         </SessionContextProvider>
       </body>

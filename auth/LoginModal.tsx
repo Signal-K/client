@@ -18,7 +18,7 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div> 
     );
 };
 

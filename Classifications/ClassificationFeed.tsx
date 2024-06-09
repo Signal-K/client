@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import ReactHtmlParser from 'react-html-parser';
 
-interface Classification {
+interface Classification { 
   id: number;
   content: string;
   author: string;
   media: string[];
   anomaly: number;
-}
+};
 
 const ClassificationsFeed: React.FC = () => {
   const supabase = useSupabaseClient();
