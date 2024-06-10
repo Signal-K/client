@@ -5,6 +5,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Layout from "@/components/Layout";
 import { DeleteMineralsAtEndOfMission } from "@/components/Gameplay/Inventory/Counters";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { AllAutomatons, SingleAutomaton, SingleAutomatonCraftItem } from "@/components/Gameplay/Inventory/Automatons/Automaton";
 
 export default function MissionGroupTwo() {
     const supabase = useSupabaseClient();
@@ -14,6 +15,7 @@ export default function MissionGroupTwo() {
         <Layout bg={false}>
             <div className="p-5">
                 <DeleteMineralsAtEndOfMission />
+                <SingleAutomatonCraftItem craftItemId={30} />
             </div>
         </Layout>
     );

@@ -161,6 +161,35 @@ export function CreateAutomaton() {
     );
 };
 
+interface Recipe {
+  [key: string]: number;
+}
+
+interface InventoryItem {
+  id: number;
+  name: string;
+  description: string;
+  cost: number;
+  icon_url: string;
+  ItemCategory: string;
+  parentItem: number | null;
+  itemLevel: number;
+  recipe?: Recipe;
+}
+
+interface UserItem {
+  id: number;
+  item: number;
+  owner: string;
+  quantity: number;
+  notes: string;
+  anomaly: string;
+}
+
+interface ActivePlanet {
+  id: string;
+}
+
 interface OwnedItem {
     id: string;
     item: string;
@@ -408,7 +437,7 @@ export function AllAutomatons() {
           if (insertError) {
             console.error('Error inserting reward', insertError);
             return;
-          }
+          };
   
           console.log('Rewards inserted', insertData);
   
@@ -500,6 +529,7 @@ export function SingleAutomaton() {
     const { activePlanet } = useActivePlanet();
     const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
     const [automatonInfo, setAutomatonInfo] = useState<any>(null); // Initialize automatonInfo with type 'any'
+
     const [rewardTotal, setRewardTotal] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -541,12 +571,12 @@ export function SingleAutomaton() {
             const response = await fetch(`/api/gameplay/inventory`);
             if (!response.ok) {
                 throw new Error(`Error fetching rover info: ${response.status} ${response.statusText}`);
-            }
+            };
             const data = await response.json();
             setAutomatonInfo(data.find((item: any) => item.id === userAutomaton?.item));
         } catch (error: any) {
             console.error("Error fetching rover info:", error.message);
-        }
+        };
     };
 
     async function deployAutomaton() {
@@ -711,4 +741,317 @@ export function SingleAutomaton() {
             )}
         </>
     );
+};
+
+export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number }) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const { activePlanet } = useActivePlanet();
+  const [userItems, setUserItems] = useState<UserItem[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
+  const [automatonInfo, setAutomatonInfo] = useState<any>(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [rewardTotal, setRewardTotal] = useState<number>(0);
+
+  const [requiredResources, setRequiredResources] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchUserItems() {
+      if (!session) return;
+
+      try {
+        const { data, error } = await supabase
+          .from("inventory")
+          .select("*")
+          .eq("owner", session.user.id);
+
+        if (error) {
+          throw error;
+        }
+
+        setUserItems(data || []);
+      } catch (error: any) {
+        console.error("Error fetching user items:", error.message);
+      }
+    }
+
+    async function fetchInventoryItems() {
+      try {
+        const response = await fetch("/api/gameplay/inventory");
+        if (!response.ok) {
+          throw new Error(`Error fetching inventory items: ${response.status} ${response.statusText}`);
+        }
+        const data: InventoryItem[] = await response.json();
+        setInventoryItems(data);
+      } catch (error: any) {
+        console.error("Error fetching inventory items:", error.message);
+      }
+    }
+
+    fetchUserItems();
+    fetchInventoryItems();
+  }, [session, supabase]);
+
+  useEffect(() => {
+    fetchAutomatonData();
+    fetchRoverInfo();
+    const checkRequiredResources = () => {
+      const craftItem = inventoryItems.find(item => item.id === craftItemId);
+      if (!craftItem?.recipe) return;
+
+      const missingResources: string[] = [];
+      for (const [resourceId, requiredQuantity] of Object.entries(craftItem.recipe)) {
+        const userResource = userItems.find(item => item.item === parseInt(resourceId));
+        const userQuantity = userResource ? userResource.quantity : 0;
+
+        if (userQuantity < requiredQuantity) {
+          const resourceItem = inventoryItems.find(item => item.id === parseInt(resourceId));
+          const missingQuantity = requiredQuantity - userQuantity;
+          if (resourceItem) {
+            missingResources.push(`You need to collect ${missingQuantity} ${resourceItem.name} to build ${craftItem.name}`);
+          }
+        }
+      }
+
+      setRequiredResources(missingResources);
+    };
+
+    checkRequiredResources();
+  }, [inventoryItems, userItems, craftItemId]);
+
+  const handleCraftStructure = async () => {
+    if (requiredResources.length > 0) {
+      alert("You don't have enough resources to craft this structure.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Update user's inventory to reflect the resource usage
+      const craftItem = inventoryItems.find(item => item.id === craftItemId);
+      if (!craftItem?.recipe) return;
+
+      for (const [resourceId, requiredQuantity] of Object.entries(craftItem.recipe)) {
+        const userResource = userItems.find(item => item.item === parseInt(resourceId));
+        if (userResource) {
+          const newQuantity = userResource.quantity - requiredQuantity;
+
+          if (newQuantity > 0) {
+            const { error } = await supabase
+              .from("inventory")
+              .update({ quantity: newQuantity })
+              .eq("id", userResource.id);
+            if (error) throw error;
+          } else {
+            const { error } = await supabase
+              .from("inventory")
+              .delete()
+              .eq("id", userResource.id);
+            if (error) throw error;
+          }
+        }
+      }
+
+      // Add the new structure to the user's inventory
+      const { error } = await supabase
+        .from("inventory")
+        .insert([{ item: craftItemId, owner: session?.user.id, quantity: 1, anomaly: activePlanet?.id }]);
+      if (error) throw error;
+
+      alert("Structure crafted successfully!");
+    } catch (error: any) {
+      console.error("Error crafting structure:", error.message);
+      alert("Failed to craft structure. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  async function fetchAutomatonData() {
+    if (!session?.user?.id) {
+      console.error('You are not logged in or do not have a defined session');
+      return;
+    };
+
+    if (!activePlanet?.id) {
+      console.error('Active planet is not defined');
+      return;
+    };
+
+    try {
+      const { data, error } = await supabase
+        .from("inventory")
+        .select("*")
+        .eq("owner", session.user.id)
+        .eq("item", 23)
+        .eq("anomaly", activePlanet.id)
+        .limit(1);
+
+      if (error) {
+        console.error('Error fetching automaton data:', error);
+        return;
+      };
+
+      if (data) {
+        setUserAutomaton(data[0] || null);
+      };
+    } catch (error: any) {
+      console.error('Error fetching automaton data:', error);
+    };
+  };
+
+  const fetchRoverInfo = async () => {
+    try {
+      const response = await fetch(`/api/gameplay/inventory`);
+      if (!response.ok) {
+        throw new Error(`Error fetching rover info: ${response.status} ${response.statusText}`);
+      };
+      const data = await response.json();
+      setAutomatonInfo(data.find((item: any) => item.id === userAutomaton?.item));
+    } catch (error: any) {
+      console.error("Error fetching rover info:", error.message);
+    };
+  };
+
+  async function deployAutomaton() {
+    if (userAutomaton != null) {
+      const { data, error } = await supabase
+        .from('inventory')
+        .update({ time_of_deploy: new Date().toISOString() })
+        .eq('id', userAutomaton.id);
+
+      if (error) {
+        console.error('Error deploying automaton:', error);
+        return;
+      }
+
+      console.log('Automaton deployed', data);
+    };
+  };
+  
+  async function claimRewards() {
+    try {
+      if (userAutomaton?.time_of_deploy) {
+        const deployTime = new Date(userAutomaton.time_of_deploy).getTime();
+        const currentTime = new Date().getTime();
+        const timeDifference = (currentTime - deployTime) / 1000 / 60;
+        const rewardQuantity = Math.floor(timeDifference);
+
+        if (rewardQuantity > 0) {
+          const { data: insertData, error: insertError } = await supabase.from('inventory').insert([
+            {
+              owner: session?.user?.id,
+              item: 11,
+              quantity: rewardQuantity,
+              anomaly: activePlanet?.id,
+              notes: `Reward from automaton id: ${userAutomaton.id}`,
+            },
+          ]);
+
+          if (insertError) {
+            console.error('Error inserting reward', insertError);
+            return;
+          };
+
+          console.log('Rewards inserted', insertData);
+  
+          const { data: updateData, error: updateError } = await supabase
+            .from('inventory')
+            .update({ time_of_deploy: null })
+            .eq('id', userAutomaton.id);
+  
+          if (updateError) {
+            console.error('Error updating automaton', updateError);
+            return;
+          };
+  
+          console.log('Automaton updated', updateData);
+  
+          setRewardTotal(rewardQuantity);
+          console.log(`Rewards claimed: ${rewardQuantity}`);
+        };
+      } 
+    } catch (error: any) {
+      console.error("Error claiming rewards:", error.message);
+    };
+  };
+
+  return (
+    <>
+      {userAutomaton ? (
+        <>
+          <img
+            src={automatonInfo?.icon_url}
+            alt={automatonInfo?.name}
+            className="w-32 h-32 mb-2 cursor-pointer"
+            onClick={() => setIsModalOpen(true)}
+          />
+        </>
+      ) : (
+        <p>No automatons found</p>
+      )}
+
+      {isModalOpen && userAutomaton && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold">Automaton Details</h2>
+              <button
+                className="btn btn-square btn-outline"
+                onClick={() => setIsModalOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex flex-col items-center mt-4">
+              {automatonInfo[userAutomaton.id]?.icon_url ? (
+                <img src={automatonInfo[userAutomaton.id]?.icon_url} alt={automatonInfo[userAutomaton.id]?.name} className="w-32 h-32 mb-2" />
+              ) : (
+                <div className="w-32 h-32 mb-2 bg-gray-200 flex items-center justify-center">
+                  <span>No Image</span>
+                </div>
+              )}
+              <p>ID: {userAutomaton.id}</p>
+              <p>Status: {userAutomaton.notes}</p>
+              <div>
+            {requiredResources.length > 0 ? (
+              <div>
+                <h3>Missing Resources:</h3>
+                <ul>
+                  {requiredResources.map((msg, index) => (
+                    <li key={index}>{msg}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <button
+                onClick={handleCraftStructure}
+                disabled={loading}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:opacity-50"
+              >
+                {loading ? "Crafting..." : "Craft Structure"}
+              </button>
+          )}
+      </div>
+              <div className="mt-4 flex space-x-4">
+                <button className="btn btn-primary" onClick={deployAutomaton}>
+                  Deploy Automaton
+                </button>
+                {userAutomaton.time_of_deploy && (
+                  <button className="btn btn-secondary" onClick={claimRewards}>
+                    Claim Rewards
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 };

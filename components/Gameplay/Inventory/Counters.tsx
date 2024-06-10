@@ -193,7 +193,7 @@ export function DeleteMineralsAtEndOfMission() {
       >
         {loading ? "Cleaning..." : "Clean Minerals"}
       </button>
-      {userItems.map((userItem) => {
+      {/* {userItems.map((userItem) => {
         const itemDetails = inventoryItems[userItem.item];
         if (!itemDetails) return null;
 
@@ -208,7 +208,7 @@ export function DeleteMineralsAtEndOfMission() {
             )}
           </div>
         );
-      })}
+      })} */}
     </div>
     );
 };
