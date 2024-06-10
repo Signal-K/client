@@ -6,7 +6,7 @@ import { CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/S
 import { useActivePlanet } from "@/context/ActivePlanet";
 
 import { Button } from "@/ui/button";
-import { AllAutomatons } from "./Automatons/Automaton";
+import { AllAutomatons, SingleAutomaton } from "./Automatons/Automaton";
 import { AllStructures } from "./Structures/Structure";
 
 interface ActivePlanetContextValue {
@@ -56,20 +56,21 @@ const UserPlanetPage = () => {
         <div className="mx-12">
             {/* Desktop Layout */}
             <div className="hidden md:grid md:grid-cols-5 md:gap-4 md:relative md:min-h-screen">
-                <div className="hidden md:flex justify-center items-center">01</div>
-                <div className="hidden md:flex justify-center items-center">02</div>
+                <div className="hidden md:flex justify-center items-center"></div>
+                <div className="hidden md:flex justify-center items-center"></div>
                 <div className="hidden md:flex justify-center items-center">
                     <AllStructures />
                 </div>
-                <div className="hidden md:flex justify-center items-center">05</div>
-                <div className="hidden md:flex justify-center items-center">06</div>
-                <div className="hidden md:flex justify-center items-center">07</div>
-                <div className="hidden md:flex justify-center items-center">08</div>
+                <div className="hidden md:flex justify-center items-center"></div>
+                <div className="hidden md:flex justify-center items-center"></div>
+                <div className="hidden md:flex justify-center items-center"></div>
+                <div className="hidden md:flex justify-center items-center"></div>
                 <div className="hidden md:flex justify-center items-center">
-                    <AllAutomatons />
+                    {/* <AllAutomatons /> */}
+                    <SingleAutomaton />
                 </div>
-                <div className="hidden md:flex justify-center items-center">10</div>
-                <div className="hidden md:flex justify-center items-center">11</div>
+                <div className="hidden md:flex justify-center items-center"></div>
+                <div className="hidden md:flex justify-center items-center"></div>
             </div>
 
             {/* Mobile Layout */}

@@ -87,6 +87,26 @@ export default function CraftStructure({ structureId }: { structureId: number })
         };
     };
 
+    const [userTelescopeId, setUserTelescopeId] = useState(0);
+    const fetchUserTelescope = async () => {
+        try {
+            const { data, error } = await supabase
+                .from("inventory")
+                .select("*")
+                .eq("owner", session?.user?.id)
+                .eq("item", 12)
+                .eq("anomaly", activePlanet?.id);
+            
+            if (error) {
+                throw error;
+            };
+
+            setUserTelescopeId(data[0].id);
+        } catch (error: any) {
+            console.log(error);
+        };
+    }
+
     const [structureTableId, setSTID] = useState(0);
 
     const craftStructure = async () => {
@@ -100,6 +120,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
                             owner: session?.user?.id,
                             quantity: 1,
                             time_of_deploy: new Date().toISOString(),
+                            parentItem: userTelescopeId,
                             notes: `Created by crafting ${structureId} for mission 7`,
                             anomaly: activePlanet.id,
                         },
@@ -177,6 +198,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
 
     useEffect(() => {
         fetchUserInventory();
+        fetchUserTelescope();
     }, [session, activePlanet]);
 
     return (

@@ -688,7 +688,7 @@ export function SingleAutomaton() {
                                     </button>
                                 </div>
                                 <div className="flex flex-col items-center mt-4">
-                                    <img src={automatonInfo?.icon_url} alt={automatonInfo?.name} className="w-32 h-32 mb-2" />
+                                    <img src={automatonInfo?.icon_url} alt={automatonInfo?.name} className="w-1 h-1 mb-2 cursor-pointer shadow-lg" />
                                     <p>ID: {userAutomaton.id}</p>
                                     <p>Status: {userAutomaton.notes}</p>
                                     <div className="mt-4 flex space-x-4">

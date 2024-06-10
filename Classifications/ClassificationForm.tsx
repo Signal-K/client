@@ -77,7 +77,7 @@ export default function CreateBaseClassification(assetMentioned: any) {
         if (error) {
             console.error("Error creating classification: ", error.message);
             return;
-        }
+        };
 
         supabase.from("user_anomalies").insert([newAnomalyData]);
 

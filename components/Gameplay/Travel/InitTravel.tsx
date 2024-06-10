@@ -17,11 +17,25 @@ export default function GoToYourPlanet() {
                 mission: 3,
                 configuration: null,
                 rewarded_items: [activePlanet?.id],
-            };            
+            };
+            
+            const inventoryData = {
+                item: 12,
+                owner: session?.user?.id,
+                quantity: 1,
+                notes: `Reward for completing mission 3`,
+                parentItem: null,
+                time_of_deploy: new Date().toISOString(),
+                anomaly: activePlanet?.id,
+            };
 
             const { data: newMission, error: missionError } = await supabase
                 .from("missions")
                 .insert([missionData]);
+
+            const { error: inventoryError } = await supabase
+                .from('inventory')
+                .insert([inventoryData]);
 
             if (missionError) {
                 throw missionError;
