@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 // A component to show the structures on the user's active planet
 import { useActivePlanet } from "@/context/ActivePlanet";
@@ -66,8 +66,7 @@ interface TransitingTelescopeStructureModalProps {
 
 export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
     const [isActionDone, setIsActionDone] = useState(false);
-    const {activePlanet} = useActivePlanet();
-    const session = useSession();
+    const { activePlanet } = useActivePlanet();
 
     const handleActionClick = () => {
         // Implement action logic here

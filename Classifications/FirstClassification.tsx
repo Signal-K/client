@@ -93,13 +93,13 @@ const AllStructures = () => {
                                     return { ownedItem: ownedItem || { id: '', item: '', quantity: 0, sector: '' }, structure };
                                 });
                             setUserStructures(structuresData);
-                        }
-                    }
+                        };
+                    };
                 } catch (error) {
                     console.error('Error fetching data:', error);
-                }
-            }
-        }
+                };
+            };
+        };
 
         fetchData();
     }, [session, activePlanet, supabase]);
