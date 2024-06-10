@@ -796,12 +796,15 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
     fetchInventoryItems();
   }, [session, supabase]);
 
+  const [craftableItem, setCraftableItem] = useState<InventoryItem | null>(null);
+
   useEffect(() => {
     fetchAutomatonData();
     fetchRoverInfo();
     const checkRequiredResources = () => {
       const craftItem = inventoryItems.find(item => item.id === craftItemId);
       if (!craftItem?.recipe) return;
+      setCraftableItem(craftItem);
 
       const missingResources: string[] = [];
       for (const [resourceId, requiredQuantity] of Object.entries(craftItem.recipe)) {
@@ -1009,15 +1012,15 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
               </button>
             </div>
             <div className="flex flex-col items-center mt-4">
-              {automatonInfo[userAutomaton.id]?.icon_url ? (
-                <img src={automatonInfo[userAutomaton.id]?.icon_url} alt={automatonInfo[userAutomaton.id]?.name} className="w-32 h-32 mb-2" />
+              {automatonInfo?.icon_url ? (
+                <img src={automatonInfo?.icon_url} alt={automatonInfo[userAutomaton.id]?.name} className="w-32 h-32 mb-2" />
               ) : (
                 <div className="w-32 h-32 mb-2 bg-gray-200 flex items-center justify-center">
                   <span>No Image</span>
                 </div>
               )}
               <p>ID: {userAutomaton.id}</p>
-              <p>Status: {userAutomaton.notes}</p>
+              <p>Status: your aim is to craft {craftableItem?.name}</p>
               <div>
             {requiredResources.length > 0 ? (
               <div>
