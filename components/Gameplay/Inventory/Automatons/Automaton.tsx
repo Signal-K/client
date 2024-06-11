@@ -175,7 +175,7 @@ interface InventoryItem {
   parentItem: number | null;
   itemLevel: number;
   recipe?: Recipe;
-}
+};
 
 interface UserItem {
   id: number;
@@ -184,7 +184,7 @@ interface UserItem {
   quantity: number;
   notes: string;
   anomaly: string;
-}
+};
 
 interface ActivePlanet {
   id: string;
@@ -748,6 +748,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
   const session = useSession();
 
   const { activePlanet } = useActivePlanet();
+
   const [userItems, setUserItems] = useState<UserItem[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
@@ -771,26 +772,26 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
 
         if (error) {
           throw error;
-        }
+        };
 
         setUserItems(data || []);
       } catch (error: any) {
         console.error("Error fetching user items:", error.message);
-      }
-    }
+      };
+    };
 
     async function fetchInventoryItems() {
       try {
         const response = await fetch("/api/gameplay/inventory");
         if (!response.ok) {
           throw new Error(`Error fetching inventory items: ${response.status} ${response.statusText}`);
-        }
+        };
         const data: InventoryItem[] = await response.json();
         setInventoryItems(data);
       } catch (error: any) {
         console.error("Error fetching inventory items:", error.message);
-      }
-    }
+      };
+    };
 
     fetchUserItems();
     fetchInventoryItems();
@@ -856,9 +857,9 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
               .delete()
               .eq("id", userResource.id);
             if (error) throw error;
-          }
-        }
-      }
+          };
+        };
+      };
 
       // Add the new structure to the user's inventory
       const { error } = await supabase
@@ -872,7 +873,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
       alert("Failed to craft structure. Please try again.");
     } finally {
       setLoading(false);
-    }
+    };
   };
 
   async function fetchAutomatonData() {

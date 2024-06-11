@@ -8,7 +8,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { AllAutomatons, SingleAutomaton, SingleAutomatonCraftItem } from "@/components/Gameplay/Inventory/Automatons/Automaton";
 
 import { Card, Carousel } from "@material-tailwind/react";
-import { PlacedStructureSingle } from "@/components/Gameplay/Inventory/Structures/Structure";
+import { CreateStructureWithItemRequirementinfo, PlacedStructureSingle } from "@/components/Gameplay/Inventory/Structures/Structure";
 import MiningStationPlaceable from "@/components/Gameplay/Inventory/Structures/Mining";
 
 interface OwnedItem {
@@ -44,7 +44,11 @@ export default function MissionGroupTwo() {
                         <SingleAutomatonCraftItem craftItemId={30} />
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
-                        <MiningStationPlaceable target={11} />
+                        <MiningStationPlaceable /> {/*  target={11} />  */}
+                    </Card>
+                    <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        {/* <SingleAutomatonCraftItem craftItemId={26} /> */}
+                        <CreateStructureWithItemRequirementinfo craftingItemId={26} />
                     </Card>
                 </Carousel>
             </div>

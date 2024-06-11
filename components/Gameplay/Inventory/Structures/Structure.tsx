@@ -19,6 +19,22 @@ interface OwnedItem {
     anomaly: number;
 };
 
+interface Recipe {
+    [key: string]: number;
+}
+
+interface InventoryItem {
+    id: number;
+    name: string;
+    description: string;
+    cost: number;
+    icon_url: string;
+    ItemCategory: string;
+    parentItem: number | null;
+    itemLevel: number;
+    recipe?: Recipe;
+  };
+
 interface OwnedTelescope14 {
     id: string;
     item: string;
@@ -44,6 +60,15 @@ interface UserStructure {
 interface StructureSelectProps {
     onStructureSelected: (structure: UserStructure) => void;
     activeSectorId: number;
+};
+
+interface UserItem {
+    id: number;
+    item: number;
+    owner: string;
+    quantity: number;
+    notes: string;
+    anomaly: string;
 };
 
 export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: UserStructure; style: any; }> = ({ ownedItem, structure, style }) => {
@@ -352,6 +377,146 @@ export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSel
                 </div>
             )}
         </>
+    );
+};
+
+export function CreateStructureWithItemRequirementinfo({ craftingItemId }: { craftingItemId: number }) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const { activePlanet } = useActivePlanet();
+
+    const [userItems, setUserItems] = useState<UserItem[]>([]);
+    const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+    const [requiredResources, setRequiredResources] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        async function fetchUserItems() {
+            if (!session) {
+                return;
+            };
+
+            try {
+                const { data, error } = await supabase
+                    .from("inventory")
+                    .select("*")
+                    .eq("owner", session.user.id);
+
+                setUserItems(data || []);
+            } catch (error: any) {
+                console.error("Error fetching user items: ", error.message);
+            };
+        };
+
+        async function fetchInventoryItems() {
+            try {
+                const response = await fetch("/api/gameplay/inventory");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch inventory items from the API");
+                };
+
+                const data = await response.json();
+                setInventoryItems(data);
+            } catch (error: any) {
+                console.error("Error fetching inventory items: ", error.message);
+            };
+        };
+
+        fetchUserItems();
+        fetchInventoryItems();
+    }, [session, supabase]);
+
+    const [craftableItem, setCraftableItem] = useState<InventoryItem | null>(null);
+
+    type Recipe = Record<string, number>;
+
+    const handleCraftStructure = async () => {
+        setLoading(true);
+    
+        try {
+            const craftItem = inventoryItems.find(item => item.id === craftingItemId);
+            if (!craftItem) {
+                return;
+            };
+    
+            let canCraft = true;
+    
+            // Check if user has all the required resources
+            const recipe: Recipe = craftItem.recipe || {}; // Ensure recipe is defined
+            for (const [resourceId, requiredQuantity] of Object.entries(recipe)) {
+                const userResource = userItems.find(item => item.item === parseInt(resourceId));
+                if (!userResource || userResource.quantity < requiredQuantity) {
+                    canCraft = false;
+                    break; // Exit loop early if any resource is missing
+                }
+            }
+    
+            if (!canCraft) {
+                alert("You do not have the required resources to craft this item.");
+                return;
+            }
+    
+            // Deduct required resources from user's inventory
+            for (const [resourceId, requiredQuantity] of Object.entries(recipe)) {
+                const userResource = userItems.find(item => item.item === parseInt(resourceId));
+                if (userResource) {
+                    const newQuantity = userResource.quantity - requiredQuantity;
+                    if (newQuantity > 0) {
+                        const { error } = await supabase
+                            .from("inventory")
+                            .update({ quantity: newQuantity })
+                            .eq("id", userResource.id);
+    
+                        if (error) throw error;
+                    } else {
+                        const { error } = await supabase
+                            .from("inventory")
+                            .delete()
+                            .eq("id", userResource.id);
+                        if (error) throw error;
+                    }
+                }
+            }
+    
+            // Add crafted item to user's inventory
+            const { error } = await supabase
+                .from("inventory")
+                .insert([{ item: craftItem.id, owner: session?.user.id, quantity: 1, anomaly: activePlanet?.id }]);
+    
+            if (error) {
+                throw error;
+            };
+    
+            alert("Item crafted successfully!");
+        } catch (error: any) {
+            console.error("Error crafting item: ", error.message);
+            alert("An error occurred while crafting the item.");
+        } finally {
+            setLoading(false);
+        };
+    };
+    
+
+    return (
+        <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
+            <p>Status: your aim is to craft {craftableItem?.name}</p>
+            <div>
+                <h3>Missing Resources:</h3>
+                <ul>
+                    {requiredResources.map((msg, index) => (
+                        <li key={index}>{msg}</li>
+                    ))}
+                </ul>
+            </div>
+            <button
+                onClick={handleCraftStructure}
+                disabled={loading}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:opacity-50"
+            >
+                {loading ? "Crafting..." : "Craft Structure"}
+            </button>
+        </div>
     );
 };
 
