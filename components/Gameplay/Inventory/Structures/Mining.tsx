@@ -12,7 +12,7 @@ interface OwnedItem {
     quantity: number;
     sector: string;
     notes?: string;
-};
+}
 
 interface UserStructure {
     id: number;
@@ -24,16 +24,16 @@ interface UserStructure {
     ItemCategory: string;
     parentItem: number | null;
     itemLevel: number;   
-};
+}
 
 interface MiningStructureModalProps {
     isOpen: boolean;
     onClose: () => void;
     ownedItem: OwnedItem;
     structure: UserStructure;
-};
+}
 
-export default function MiningStationPlaceable () {
+export default function MiningStationPlaceable() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -46,20 +46,37 @@ export default function MiningStationPlaceable () {
             try {
                 const { data: ownedItemsData, error: ownedItemsError } = await supabase
                     .from("inventory")
-                    .select("owner")
+                    .select("id, item, quantity, sector, notes")
                     .eq("anomaly", activePlanet.id)
                     .eq("item", 30);
 
                 if (ownedItemsError) {
                     throw ownedItemsError;
-                };
+                }
 
-                setUserStructure(ownedItemsData[0]);
+                if (ownedItemsData && ownedItemsData.length > 0) {
+                    const ownedItem = ownedItemsData[0];  // Assuming only one item is fetched
+
+                    const { data: structureData, error: structureError } = await supabase
+                        .from("user_structures")
+                        .select("*")
+                        .eq("item", ownedItem.item)
+                        .limit(1);
+
+                    if (structureError) {
+                        throw structureError;
+                    }
+
+                    if (structureData && structureData.length > 0) {
+                        const structure = structureData[0];
+                        setUserStructure([{ ownedItem, structure }]);
+                    }
+                }
             } catch (error: any) {
-                return null;
-            };
-        };
-    };
+                console.error(error);
+            }
+        }
+    }
 
     useEffect(() => {
         fetchData();
@@ -67,7 +84,15 @@ export default function MiningStationPlaceable () {
 
     return (
         <>
-            {/* Fetch <MiningStructureModal /> using the ownedItem/structure of the .lim 1 item 30 in your inventory */}
+            {/* Render <MiningStructureModal /> using the ownedItem/structure of the first item in the state */}
+            {userStructure.length > 0 && (
+                <MiningStructureModal
+                    isOpen={true}
+                    onClose={() => {}}
+                    ownedItem={userStructure[0].ownedItem}
+                    structure={userStructure[0].structure}
+                />
+            )};
         </>
     )
 }
@@ -77,124 +102,125 @@ export const MiningStructureModal: React.FC<MiningStructureModalProps> = ({ isOp
 
     if (!isOpen) {
         return null;
-    };
+    }
 
     return (
-        <>
-    <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <div className="bg-gray-100 p-6 rounded-xl grid grid-cols-2 gap-6">
-            <div className="flex items-center gap-3">
-              <GemIcon className="w-7 h-7 text-indigo-500" />
-              <span className="font-medium">Crystals</span>
-              <div className="text-right text-lg font-medium">250</div>
+        <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <div className="bg-gray-100 p-6 rounded-xl grid grid-cols-2 gap-6">
+                        <div className="flex items-center gap-3">
+                            <GemIcon className="w-7 h-7 text-indigo-500" />
+                            <span className="font-medium">Crystals</span>
+                            <div className="text-right text-lg font-medium">250</div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <CuboidIcon className="w-7 h-7 text-amber-500" />
+                            <span className="font-medium">Metals</span>
+                            <div className="text-right text-lg font-medium">500</div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <LeafIcon className="w-7 h-7 text-green-500" />
+                            <span className="font-medium">Organics</span>
+                            <div className="text-right text-lg font-medium">100</div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <BoltIcon className="w-7 h-7 text-yellow-500" />
+                            <span className="font-medium">Energy</span>
+                            <div className="text-right text-lg font-medium">75</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div className="bg-gray-100 p-6 rounded-xl grid grid-cols-2 gap-6">
+                        <div className="flex items-center gap-3">
+                            <GemIcon className="w-7 h-7 text-indigo-500" />
+                            <span className="font-medium">Crystals</span>
+                            <div className="text-right text-lg font-medium">150</div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <CuboidIcon className="w-7 h-7 text-amber-500" />
+                            <span className="font-medium">Metals</span>
+                            <div className="text-right text-lg font-medium">300</div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <LeafIcon className="w-7 h-7 text-green-500" />
+                            <span className="font-medium">Organics</span>
+                            <div className="text-right text-lg font-medium">75</div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <BoltIcon className="w-7 h-7 text-yellow-500" />
+                            <span className="font-medium">Energy</span>
+                            <div className="text-right text-lg font-medium">50</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div className="flex items-center gap-3">
-              <CuboidIcon className="w-7 h-7 text-amber-500" />
-              <span className="font-medium">Metals</span>
-              <div className="text-right text-lg font-medium">500</div>
+            <div className="mt-8 bg-gray-100 p-6 rounded-xl grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="flex items-center gap-3">
+                    <GaugeIcon className="w-7 h-7 text-blue-500" />
+                    <span className="font-medium">Production Rate</span>
+                    <div className="text-right text-lg font-medium">25 units/hr</div>
+                </div>
+                <div className="flex items-center gap-3">
+                    <CuboidIcon className="w-7 h-7 text-amber-500" />
+                    <span className="font-medium">Storage Capacity</span>
+                    <div className="text-right text-lg font-medium">1000 units</div>
+                </div>
+                <div className="flex items-center gap-3">
+                    <WrenchIcon className="w-7 h-7 text-gray-500" />
+                    <span className="font-medium">Equipment Level</span>
+                    <div className="text-right text-lg font-medium">3</div>
+                </div>
+                <div className="flex items-center gap-3">
+                    <PinIcon className="w-7 h-7 text-indigo-500" />
+                    <span className="font-medium">Tech Level</span>
+                    <div className="text-right text-lg font-medium">2</div>
+                </div>
             </div>
-            <div className="flex items-center gap-3">
-              <LeafIcon className="w-7 h-7 text-green-500" />
-              <span className="font-medium">Organics</span>
-              <div className="text-right text-lg font-medium">100</div>
+            <div className="mt-8 bg-gray-100 p-6 rounded-xl grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center gap-3">
+                        <DrillIcon className="w-7 h-7 text-amber-500" />
+                        <span className="font-medium">Mining Drill</span>
+                    </div>
+                    <Button size="sm" variant="outline">
+                        Upgrade
+                    </Button>
+                </div>
+                <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center gap-3">
+                        <CombineIcon className="w-7 h-7 text-gray-500" />
+                        <span className="font-medium">Conveyor Belt</span>
+                    </div>
+                    <Button size="sm" variant="outline">
+                        Upgrade
+                    </Button>
+                </div>
+                <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center gap-3">
+                        {/* <TruckIcon className="w-7 h-7 text-blue-500" /> */}
+                        <span className="font-medium">Transport Truck</span>
+                    </div>
+                    <Button size="sm" variant="outline">
+                        Upgrade
+                    </Button>
+                </div>
+                <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center gap-3">
+                        {/* <BuildingIcon className="w-7 h-7 text-indigo-500" /> */}
+                        <span className="font-medium">Storage Facility</span>
+                    </div>
+                    <Button size="sm" variant="outline">
+                        Upgrade
+                    </Button>
+                </div>
             </div>
-            <div className="flex items-center gap-3">
-              <BoltIcon className="w-7 h-7 text-yellow-500" />
-              <span className="font-medium">Energy</span>
-              <div className="text-right text-lg font-medium">75</div>
-            </div>
-          </div>
+            <Button size="lg" className="mt-8" onClick={onClose}>
+                Close
+            </Button>
         </div>
-        <div>
-          <div className="bg-gray-100 p-6 rounded-xl grid grid-cols-2 gap-6">
-            <div className="flex items-center gap-3">
-              <GemIcon className="w-7 h-7 text-indigo-500" />
-              <span className="font-medium">Crystals</span>
-              <div className="text-right text-lg font-medium">150</div>
-            </div>
-            <div className="flex items-center gap-3">
-              <CuboidIcon className="w-7 h-7 text-amber-500" />
-              <span className="font-medium">Metals</span>
-              <div className="text-right text-lg font-medium">300</div>
-            </div>
-            <div className="flex items-center gap-3">
-              <LeafIcon className="w-7 h-7 text-green-500" />
-              <span className="font-medium">Organics</span>
-              <div className="text-right text-lg font-medium">75</div>
-            </div>
-            <div className="flex items-center gap-3">
-              <BoltIcon className="w-7 h-7 text-yellow-500" />
-              <span className="font-medium">Energy</span>
-              <div className="text-right text-lg font-medium">50</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="mt-8 bg-gray-100 p-6 rounded-xl grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div className="flex items-center gap-3">
-          <GaugeIcon className="w-7 h-7 text-blue-500" />
-          <span className="font-medium">Production Rate</span>
-          <div className="text-right text-lg font-medium">25 units/hr</div>
-        </div>
-        <div className="flex items-center gap-3">
-          <CuboidIcon className="w-7 h-7 text-amber-500" />
-          <span className="font-medium">Storage Capacity</span>
-          <div className="text-right text-lg font-medium">1000 units</div>
-        </div>
-        <div className="flex items-center gap-3">
-          <WrenchIcon className="w-7 h-7 text-gray-500" />
-          <span className="font-medium">Equipment Level</span>
-          <div className="text-right text-lg font-medium">3</div>
-        </div>
-        <div className="flex items-center gap-3">
-          <PinIcon className="w-7 h-7 text-indigo-500" />
-          <span className="font-medium">Tech Level</span>
-          <div className="text-right text-lg font-medium">2</div>
-        </div>
-      </div>
-      <div className="mt-8 bg-gray-100 p-6 rounded-xl grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex items-center gap-3">
-            <DrillIcon className="w-7 h-7 text-amber-500" />
-            <span className="font-medium">Mining Drill</span>
-          </div>
-          <Button size="sm" variant="outline">
-            Upgrade
-          </Button>
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex items-center gap-3">
-            <CombineIcon className="w-7 h-7 text-gray-500" />
-            <span className="font-medium">Conveyor Belt</span>
-          </div>
-          <Button size="sm" variant="outline">
-            Upgrade
-          </Button>
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex items-center gap-3">
-            <CpuIcon className="w-7 h-7 text-indigo-500" />
-            <span className="font-medium">Processing Unit</span>
-          </div>
-          <Button size="sm" variant="outline">
-            Upgrade
-          </Button>
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex items-center gap-3">
-            <BatteryIcon className="w-7 h-7 text-yellow-500" />
-            <span className="font-medium">Power Generator</span>
-          </div>
-          <Button size="sm" variant="outline">
-            Upgrade
-          </Button>
-        </div>
-      </div>
-    </div>
-        </>
-    )
+    );
 };
 
 function BatteryIcon(props: any) {
