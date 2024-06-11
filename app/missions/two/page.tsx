@@ -9,6 +9,7 @@ import { AllAutomatons, SingleAutomaton, SingleAutomatonCraftItem } from "@/comp
 
 import { Card, Carousel } from "@material-tailwind/react";
 import { PlacedStructureSingle } from "@/components/Gameplay/Inventory/Structures/Structure";
+import MiningStationPlaceable from "@/components/Gameplay/Inventory/Structures/Mining";
 
 interface OwnedItem {
     id: string;
@@ -32,69 +33,6 @@ interface UserStructure {
 };
 
 export default function MissionGroupTwo() {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
-
-    const [userStructures, setUserStructures] = useState<{ ownedItem: OwnedItem; structure: UserStructure }[]>([]);
-
-    useEffect(() => {
-        async function fetchData() {
-            if (session && activePlanet) {
-                try {
-                    // Fetch owned items from supabase
-                    const { data: ownedItemsData, error: ownedItemsError } = await supabase
-                        .from('inventory')
-                        .select('*')
-                        .eq('owner', session.user.id)
-                        .eq('anomaly', activePlanet.id)
-                        .eq()
-
-                    if (ownedItemsError) {
-                        throw ownedItemsError;
-                    }
-
-                    if (ownedItemsData) {
-                        const itemIds = ownedItemsData.map(item => item.item);
-
-                        // Fetch item details from the Next.js API
-                        const response = await fetch('/api/gameplay/inventory');
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch item details from the API');
-                        }
-                        const itemDetailsData: UserStructure[] = await response.json();
-
-                        if (itemDetailsData) {
-                            const structuresData: { ownedItem: OwnedItem; structure: UserStructure }[] = itemDetailsData
-                                .filter(itemDetail => itemDetail.ItemCategory === 'Structure' && itemIds.includes(itemDetail.id))
-                                .map(itemDetail => {
-                                    const ownedItem = ownedItemsData.find(ownedItem => ownedItem.item === itemDetail.id);
-                                    const structure: UserStructure = {
-                                        id: itemDetail.id,
-                                        item: itemDetail.id,
-                                        name: itemDetail.name,
-                                        icon_url: itemDetail.icon_url,
-                                        description: itemDetail.description,
-                                        cost: itemDetail.cost,
-                                        ItemCategory: itemDetail.ItemCategory,
-                                        parentItem: itemDetail.parentItem,
-                                        itemLevel: itemDetail.itemLevel,
-                                    };
-                                    return { ownedItem: ownedItem || { id: '', item: '', quantity: 0, sector: '' }, structure };
-                                });
-                            setUserStructures(structuresData);
-                        };
-                    };
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                };
-            };
-        };
-
-        fetchData();
-    }, [session, activePlanet, supabase]);
-
     return (
         <Layout bg={false}>
             <div className="flex justify-center items-center p-5">
@@ -106,11 +44,7 @@ export default function MissionGroupTwo() {
                         <SingleAutomatonCraftItem craftItemId={30} />
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
-                        <PlacedStructureSingle
-                            key={structure.id}
-                            ownedItem={ownedItem}
-
-                        />
+                        <MiningStationPlaceable target={11} />
                     </Card>
                 </Carousel>
             </div>

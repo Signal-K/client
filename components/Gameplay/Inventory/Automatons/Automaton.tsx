@@ -931,7 +931,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
       if (error) {
         console.error('Error deploying automaton:', error);
         return;
-      }
+      };
 
       console.log('Automaton deployed', data);
     };
@@ -961,7 +961,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
             return;
           };
 
-          console.log('Rewards inserted', insertData);
+          console.log('Rewards inserted: ', insertData);
   
           const { data: updateData, error: updateError } = await supabase
             .from('inventory')
