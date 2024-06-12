@@ -9,7 +9,7 @@ import CreateBaseClassification, { CreateFirstBaseClassification } from "@/Class
 import { useProfileContext } from "@/context/UserProfile";
 import PlanetData from "@/components/Content/Anomalies/PlanetData";
 
-interface OwnedItem {
+interface OwnedItem { 
     id: string;
     item: string;
     quantity: number;
@@ -19,7 +19,7 @@ interface OwnedItem {
 
 interface UserStructure {
     id: number;
-    item: number; // Assuming this should be a number
+    item: number; 
     name: string;
     description: string;
     cost: number;
@@ -75,7 +75,7 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
 
     if (!isOpen) return null;
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${activePlanet?.id}/activePlanet.png`;
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiAnomalies/${activePlanet?.id}/ActivePlanet.png`;
 
     return (
         // <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

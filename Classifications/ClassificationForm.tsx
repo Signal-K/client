@@ -179,7 +179,7 @@ export function CreateFirstBaseClassification(assetMentioned: any) { // FIRST MI
             .insert({
                 author: session?.user?.id,
                 content,
-                media: uploads,
+                media: [uploads, assetMentioned],
                 anomaly: activePlanet?.id,
             }).then(response => {
                 if (!response.error) {

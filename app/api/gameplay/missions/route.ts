@@ -26,6 +26,7 @@ const missions: Mission[] = [
     { id: 9, name: "Collect resources part 2", description: "Collect resources to build your mining station", rewards: []},
     { id: 10, name: "Build mining station", description: "By doing this you can now collect omega resources", rewards: []},
     { id: 11, name: "Collect resources from station", description: "You can now build your cloud-spotting telescope!", rewards: []},
+    { id: 12, name: "Build Meteorology tool", description: "You can now classify clouds on your planet!", rewards: []},
 ];
 
 export async function GET(req: NextRequest) {
