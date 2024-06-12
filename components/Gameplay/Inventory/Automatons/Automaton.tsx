@@ -878,12 +878,12 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
 
   async function fetchAutomatonData() {
     if (!session?.user?.id) {
-      console.error('You are not logged in or do not have a defined session');
+      // console.error('You are not logged in or do not have a defined session');
       return;
     };
 
     if (!activePlanet?.id) {
-      console.error('Active planet is not defined');
+      // console.error('Active planet is not defined');
       return;
     };
 

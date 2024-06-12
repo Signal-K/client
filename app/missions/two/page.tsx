@@ -9,7 +9,9 @@ import { AllAutomatons, SingleAutomaton, SingleAutomatonCraftItem } from "@/comp
 
 import { Card, Carousel } from "@material-tailwind/react";
 import { CreateStructureWithItemRequirementinfo, PlacedStructureSingle } from "@/components/Gameplay/Inventory/Structures/Structure";
-import MiningStationPlaceable from "@/components/Gameplay/Inventory/Structures/Mining";
+import MiningStationPlaceable, { MeteorologyToolPlaceable } from "@/components/Gameplay/Inventory/Structures/Mining";
+import PlanetCloudData from "@/components/Content/Anomalies/CloudList";
+import { MeteorologyToolModal, MeteorologyToolModalPlaceable } from "@/components/Gameplay/Inventory/Structures/Terrestrial";
 
 interface OwnedItem {
     id: string;
@@ -49,6 +51,10 @@ export default function MissionGroupTwo() {
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         {/* <SingleAutomatonCraftItem craftItemId={26} /> */}
                         <CreateStructureWithItemRequirementinfo craftingItemId={26} />
+                    </Card>
+                    <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        {/* <MeteorologyToolModalPlaceable /> */}
+                        <MeteorologyToolPlaceable />
                     </Card>
                 </Carousel>
             </div>

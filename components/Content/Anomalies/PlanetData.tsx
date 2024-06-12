@@ -124,5 +124,4 @@ type Planet = {
         </div>
       </div>
     );
-  }
-  
+};

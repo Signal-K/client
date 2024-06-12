@@ -27,21 +27,22 @@ export default function PickYourPlanet({ onPlanetSelect }: PickYourPlanetProps) 
       setLoading(true);
       const { data: planetsData, error: planetsError } = await supabase
         .from("anomalies")
-        .select("*");
+        .select("*")
+        .eq("anomalytype", "planet");
 
       if (planetsData) {
         setPlanetList(planetsData);
-      }
+      };
 
       if (planetsError) {
         console.error("Error fetching planets: ", planetsError);
-      }
+      };
     } catch (error: any) {
       console.log("Error fetching planets data: ", error);
     } finally {
       setLoading(false);
-    }
-  }
+    };
+  };
 
   const handlePlanetSelect = async (planetId: string) => {
     try {

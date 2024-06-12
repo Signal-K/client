@@ -10,6 +10,7 @@ import { useProfileContext } from "@/context/UserProfile";
 import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "./Telescopes";
 import { AnomalyStructureModal } from "../Automatons/Automaton";
 import { MiningStructureModal } from "./Mining";
+import { MeteorologyToolModal } from "./Terrestrial";
 
 interface OwnedItem {
     id: string;
@@ -99,6 +100,9 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
             )}
             {structure.id === 30 && (
                 <MiningStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
+            )}
+            {structure.id === 26 && (
+                <MeteorologyToolModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
             )}
         </div>
     );
