@@ -5,6 +5,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 
 import { Button } from "@/components/ui/button";
+import { CreateCloudClassification, CreateFirstBaseClassification, CreateFirstMeteorologyClassification } from "@/Classifications/ClassificationForm";
 
 interface OwnedItem {
     id: string;
@@ -152,6 +153,11 @@ const [hasRequiredResources, setHasRequiredResources] = useState<boolean>(false)
       }
   }
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+//   const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiCloud/${activePlanet?.id}/cloud.png`;
+const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiAnomalies/${activePlanet?.id}/cloud.png`;
+  http://127.0.0.1:54321/storage/v1/object/public/citiAnomalies/2/cloud.png
+
   useEffect(() => {
       fetchData();
   }, [session, activePlanet, supabase]);
@@ -162,29 +168,9 @@ const [hasRequiredResources, setHasRequiredResources] = useState<boolean>(false)
         <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                  <div className="bg-gray-100 p-6 rounded-xl grid grid-cols-2 gap-6">
-                    <span className="font-medium">On planet</span>
-                      <div className="flex items-center gap-3">
-                          <GemIcon className="w-7 h-7 text-indigo-500" />
-                          <span className="font-medium">Coal</span>
-                          <div className="text-right text-lg font-medium">250</div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                          <CuboidIcon className="w-7 h-7 text-amber-500" />
-                          <span className="font-medium">Silicon</span>
-                          <div className="text-right text-lg font-medium">500</div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                          <LeafIcon className="w-7 h-7 text-green-500" />
-                          <span className="font-medium">Organics</span>
-                          <div className="text-right text-lg font-medium">100</div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                          <BoltIcon className="w-7 h-7 text-yellow-500" />
-                          <span className="font-medium">Energy</span>
-                          <div className="text-right text-lg font-medium">75</div>
-                      </div>
-                  </div>
+                <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} />
+                {/* <CreateCloudClassification assetMentioned={imageUrl} /> */}
+                <CreateFirstMeteorologyClassification assetMentioned={imageUrl} />
               </div>
               <div>
                   <div className="bg-gray-100 p-6 rounded-xl grid grid-cols-2 gap-6">
@@ -212,73 +198,7 @@ const [hasRequiredResources, setHasRequiredResources] = useState<boolean>(false)
                   </div>
               </div>
           </div>
-          <div className="mt-8 bg-gray-100 p-6 rounded-xl grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="flex items-center gap-3">
-                  <GaugeIcon className="w-7 h-7 text-blue-500" />
-                  <span className="font-medium">Production Rate</span>
-                  <div className="text-right text-lg font-medium">25 units/hr</div>
-              </div>
-              <div className="flex items-center gap-3">
-                  <CuboidIcon className="w-7 h-7 text-amber-500" />
-                  <span className="font-medium">Storage Capacity</span>
-                  <div className="text-right text-lg font-medium">1000 units</div>
-              </div>
-              <div className="flex items-center gap-3">
-                  <WrenchIcon className="w-7 h-7 text-gray-500" />
-                  <span className="font-medium">Equipment Level</span>
-                  <div className="text-right text-lg font-medium">3</div>
-              </div>
-              <div className="flex items-center gap-3">
-                  <PinIcon className="w-7 h-7 text-indigo-500" />
-                  <span className="font-medium">Tech Level</span>
-                  <div className="text-right text-lg font-medium">2</div>
-              </div>
-          </div>
-          <div className="mt-8 bg-gray-100 p-6 rounded-xl grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="flex flex-col items-center gap-3">
-                  <div className="flex items-center gap-3">
-                      <DrillIcon className="w-7 h-7 text-amber-500" />
-                      <span className="font-medium">Mining Drill</span>
-                  </div>
-                  <Button size="sm" variant="outline">
-                      Upgrade
-                  </Button>
-              </div>
-              <div className="flex flex-col items-center gap-3">
-                  <div className="flex items-center gap-3">
-                      <CombineIcon className="w-7 h-7 text-gray-500" />
-                      <span className="font-medium">Conveyor Belt</span>
-                  </div>
-                  <Button onClick={activateStation} disabled={loading || !!userStructure[0].ownedItem.time_of_deploy} size="sm" variant="outline">
-                    {userStructure[0].ownedItem.time_of_deploy ? 'Station Active' : 'Activate Station'}
-                  </Button>
-              </div>
-              <div className="flex flex-col items-center gap-3">
-                  <div className="flex items-center gap-3">
-                      {/* <TruckIcon className="w-7 h-7 text-blue-500" /> */}
-                      <span className="font-medium">Transport Truck</span>
-                  </div>
-                  <Button size="sm" variant="outline">
-                      Upgrade
-                  </Button>
-              </div>
-              <div className="flex flex-col items-center gap-3">
-                  <div className="flex items-center gap-3">
-                      {/* <BuildingIcon className="w-7 h-7 text-indigo-500" /> */}
-                      <span className="font-medium">Storage Facility</span>
-                  </div>
-                  <Button onClick={claimRewards} disabled={loading} size="sm" variant="outline">
-                      Collect rewards
-                  </Button>
-              </div>
-          </div>
         </div>
-                      //     <MiningStructureModal
-                      //     isOpen={true}
-                      //     onClose={() => {}}
-                      //     ownedItem={userStructure[0].ownedItem}
-                      //     structure={userStructure[0].structure}
-                      // />
       )}
     </>
   );
