@@ -57,12 +57,15 @@ export default function MissionGroupTwo() {
                         {/* <MeteorologyToolModalPlaceable /> */}
                         <MeteorologyToolPlaceable />
                     </Card>
-                    {/* <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                    <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         <MiningStationPlaceable />
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <CreateStructureWithItemRequirementinfo craftingItemId={31} />
+                    </Card>
+                    <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         <AUSM itemId={31} />
-                    </Card> */}
+                    </Card>
                 </Carousel>
             </div>
         </Layout>

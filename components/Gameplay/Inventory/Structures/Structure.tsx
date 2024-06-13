@@ -92,6 +92,7 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
                 className="w-14 h-14 mb-2 cursor-pointer"
                 onClick={openModal}
             />
+            <p>{structure.name}</p>
             {structure.id === 12 && (
                 <TelescopeReceiverStructureModal
                     isOpen={isModalOpen}
