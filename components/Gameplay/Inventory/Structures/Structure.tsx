@@ -11,6 +11,7 @@ import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTele
 import { AnomalyStructureModal } from "../Automatons/Automaton";
 import { MiningStructureModal } from "./Mining";
 import { MeteorologyToolModal } from "./Terrestrial";
+import { AutomatonUpgradeStructureModal } from "./Automatons";
 
 interface OwnedItem {
     id: string;
@@ -18,6 +19,15 @@ interface OwnedItem {
     quantity: number;
     sector: string;
     anomaly: number;
+};
+
+interface UserItem {
+    id: number;
+    item: number;
+    owner: string;
+    notes: string;
+    quantity: number;
+    anomaly: string;
 };
 
 interface Recipe {
@@ -63,15 +73,6 @@ interface StructureSelectProps {
     activeSectorId: number;
 };
 
-interface UserItem {
-    id: number;
-    item: number;
-    owner: string;
-    quantity: number;
-    notes: string;
-    anomaly: string;
-};
-
 export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: UserStructure; style: any; }> = ({ ownedItem, structure, style }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -84,25 +85,67 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
     };
 
     return (
-        <div className="flex flex-col items-center justify-center">
-            <img src={structure.icon_url} alt={structure.name} className="w-14 h-14 mb-2 cursor-pointer" onClick={openModal} />
+        <div className="flex flex-col items-center justify-center" style={style}>
+            <img
+                src={structure.icon_url}
+                alt={structure.name}
+                className="w-14 h-14 mb-2 cursor-pointer"
+                onClick={openModal}
+            />
             {structure.id === 12 && (
-                <TelescopeReceiverStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
+                <TelescopeReceiverStructureModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    ownedItem={ownedItem}
+                    structure={structure}
+                />
             )}
             {structure.id === 14 && (
-                <TransitingTelescopeStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
+                <TransitingTelescopeStructureModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    ownedItem={ownedItem}
+                    structure={structure}
+                />
             )}
-            {structure.id == 24 && (
-                <SurveyorStructureModal isOpen={isModalOpen} ownedItem={ownedItem} structure={structure} onClose={closeModal} />
+            {structure.id === 24 && (
+                <SurveyorStructureModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    ownedItem={ownedItem}
+                    structure={structure}
+                />
             )}
             {structure.id === 22 && (
-                <AnomalyStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
+                <AnomalyStructureModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    ownedItem={ownedItem}
+                    structure={structure}
+                />
             )}
             {structure.id === 30 && (
-                <MiningStructureModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
+                <MiningStructureModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    ownedItem={ownedItem}
+                    structure={structure}
+                />
             )}
             {structure.id === 26 && (
-                <MeteorologyToolModal isOpen={isModalOpen} onClose={closeModal} ownedItem={ownedItem} structure={structure} />
+                <MeteorologyToolModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    ownedItem={ownedItem}
+                    structure={structure}
+                />
+            )}
+            {structure.id === 31 && (
+                <AutomatonUpgradeStructureModal
+                    onClose={closeModal}
+                    ownedItem={ownedItem}
+                    structure={structure}
+                />
             )}
         </div>
     );
@@ -524,11 +567,6 @@ export function CreateStructureWithItemRequirementinfo({ craftingItemId }: { cra
     );
 };
 
-// Check for existence of structures/entities in `inventory` table:
-interface CheckInventoryProps {
-    itemId: number;
-};
-
 interface CheckInventoryProps {
     itemId: number;
 }
@@ -663,7 +701,7 @@ export const CheckInventory: React.FC<CheckInventoryProps> = ({ itemId }) => {
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
-                transform: `translate(-50%, -50%)`, // Adjust as needed
+                transform: `translate(-50%, -50%)`,
             }}
         />
     );

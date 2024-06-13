@@ -44,78 +44,6 @@ export function MeteorologyToolPlaceable() {
   
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function activateStation() {
-    if (userStructure != null) {
-      const { data, error } = await supabase
-        .from("inventory")
-        .update({ time_of_deploy: new Date().toISOString() })
-        .eq('id', userStructure[0]?.ownedItem.id);
-
-      if (error) {
-        console.error('Error activating station: ', error);
-        return;
-      };
-
-      console.log('Mining station activated: ', data);
-
-      // Update the state to reflect the new time_of_deploy
-      setUserStructure(prevState => {
-        const updatedState = [...prevState];
-        updatedState[0].ownedItem.time_of_deploy = new Date().toISOString();
-        return updatedState;
-      });
-    };
-  };
-
-  async function claimRewards() {
-    try {
-        if (userStructure.length > 0 && userStructure[0]?.ownedItem?.time_of_deploy) {
-            const deployTime = new Date(userStructure[0].ownedItem.time_of_deploy).getTime();
-            const currentTime = new Date().getTime();
-            const timeDifference = currentTime - deployTime;
-            const rewardQuantity = Math.floor(timeDifference / 1000) * 2; // Convert milliseconds to seconds
-
-            if (rewardQuantity > 0) {
-                const { data: insertData, error: insertError } = await supabase
-                    .from("inventory")
-                    .insert([
-                        {
-                            owner: session?.user.id,
-                            item: 11, // Assuming the item ID for rewards is 11
-                            quantity: rewardQuantity,
-                            anomaly: activePlanet?.id,
-                            notes: `Reward from mining station id: ${userStructure[0].ownedItem?.id}`,
-                        },
-                    ]);
-
-                if (insertError) {
-                    throw insertError;
-                }
-
-                console.log('Rewards inserted: ', insertData);
-
-                const { data: updateData, error: updateError } = await supabase
-                    .from('inventory')
-                    .update({ time_of_deploy: null })
-                    .eq('id', userStructure[0].ownedItem.id);
-
-                if (updateError) {
-                    throw updateError;
-                }
-
-                console.log('Station deactivated: ', updateData);
-            } else {
-                console.log('No rewards to claim.');
-            };
-        };
-    } catch (error: any) {
-        console.error('Error claiming rewards: ', error.message);
-    };
-};
-
-const [requiredResourcesQuantity, setRequiredResourcesQuantity] = useState<number | null>(null);
-const [hasRequiredResources, setHasRequiredResources] = useState<boolean>(false);
-
   async function fetchData() {
       if (session && activePlanet) {
           try {
@@ -123,6 +51,7 @@ const [hasRequiredResources, setHasRequiredResources] = useState<boolean>(false)
                   .from("inventory")
                   .select("id, item, quantity, notes, time_of_deploy")
                   .eq("anomaly", activePlanet.id)
+                  .eq("owner", session?.user?.id)
                   .eq("item", 26);
 
               if (ownedItemsError) {
