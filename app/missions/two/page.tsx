@@ -11,9 +11,9 @@ import { Card, Carousel } from "@material-tailwind/react";
 import { CreateStructureWithItemRequirementinfo, PlacedStructureSingle } from "@/components/Gameplay/Inventory/Structures/Structure";
 import MiningStationPlaceable, { MeteorologyToolPlaceable } from "@/components/Gameplay/Inventory/Structures/Mining";
 import PlanetCloudData from "@/components/Content/Anomalies/CloudList";
-import { MeteorologyToolModal, MeteorologyToolModalPlaceable } from "@/components/Gameplay/Inventory/Structures/Terrestrial";
 import { CameraAutomatonModule } from "@/components/Gameplay/Inventory/Structures/Automatons/Modules";
 import { AUSM } from "@/components/Gameplay/Inventory/Structures/Automatons/Automatons";
+import { SurveyorStructureModal } from "@/components/Gameplay/Inventory/Structures/Telescopes/Telescopes";
 
 interface OwnedItem {
     id: string;
@@ -69,6 +69,12 @@ export default function MissionGroupTwo() {
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         <CameraAutomatonModule />
+                    </Card>
+                    <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <CreateStructureWithItemRequirementinfo craftingItemId={24} />
+                    </Card>
+                    <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <SurveyorStructureModal />
                     </Card>
                 </Carousel>
             </div>

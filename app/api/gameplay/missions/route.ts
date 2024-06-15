@@ -27,6 +27,15 @@ const missions: Mission[] = [
     { id: 10, name: "Build mining station", description: "By doing this you can now collect omega resources", rewards: []},
     { id: 11, name: "Collect resources from station", description: "You can now build your cloud-spotting telescope!", rewards: []},
     { id: 12, name: "Build Meteorology tool", description: "You can now classify clouds on your planet!", rewards: []},
+    { id: 13, name: "Create cloud classification", description: "You can now classify clouds on your planet!", rewards: []},
+    { id: 14, name: "Collect resources for camera module", description: "You can now classify clouds on your planet!", rewards: []},
+    { id: 15, name: "Craft camera module", description: "You can now classify clouds on your planet!", rewards: []},
+    { id: 16, name: "Craft camera receiver station", description: "You can now classify clouds on your planet!", rewards: []},
+    { id: 17, name: "Collect a photo", description: "You can now classify clouds on your planet!", rewards: []},
+    { id: 18, name: "Make classification of photo", description: "You can now classify clouds on your planet!", rewards: []},
+    { id: 19, name: "Go mining for surveyor parts", description: "You can now classify clouds on your planet!", rewards: []},
+    { id: 20, name: "Build surveyor structure", description: "You can now classify clouds on your planet!", rewards: []},
+    { id: 21, name: "Make surveyor classification", description: "You can now classify clouds on your planet!", rewards: []},
 ];
 
 export async function GET(req: NextRequest) {

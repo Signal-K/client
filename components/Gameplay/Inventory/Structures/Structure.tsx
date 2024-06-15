@@ -7,10 +7,10 @@ import { useEffect, useState } from "react";
 
 import CreateBaseClassification from "@/Classifications/ClassificationForm";
 import { useProfileContext } from "@/context/UserProfile";
-import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "./Telescopes";
+import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "./Telescopes/Telescopes";
 import { AnomalyStructureModal } from "../Automatons/Automaton";
 import { MiningStructureModal } from "./Mining";
-import { MeteorologyToolModal } from "./Terrestrial";
+import { MeteorologyToolModal } from "./Telescopes/Terrestrial";
 import { AutomatonUpgradeStructureModal } from "./Automatons/Automatons";
 import { CameraAutomatonModule } from "./Automatons/Modules";
 
@@ -110,14 +110,14 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
                     structure={structure}
                 />
             )}
-            {structure.id === 24 && (
+            {/* {structure.id === 24 && (
                 <SurveyorStructureModal
                     isOpen={isModalOpen}
                     onClose={closeModal}
                     ownedItem={ownedItem}
                     structure={structure}
                 />
-            )}
+            )} */}
             {structure.id === 22 && (
                 <AnomalyStructureModal
                     isOpen={isModalOpen}

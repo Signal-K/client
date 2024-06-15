@@ -333,7 +333,7 @@ export const CameraReceiverStation: React.FC = () => {
                   {userImages.map(({ avatar_url, id }, index) => (
                       <div key={index} className="text-center">
                           Your images
-                          <img src={avatar_url} alt={`Mars Rover ${index}`} className="w-full h-auto rounded-lg" />
+                          <img src={avatar_url} alt={`Mars Rover ${index}`} className="rounded-lg" />
                           <p>This is your image!</p>
                           <RoverClassificationFromItem32 roverId={id} />
                       </div>

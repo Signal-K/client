@@ -30,29 +30,142 @@ interface UserStructure {
     // Function (what is executed upon click)
 };
 
-export const SurveyorStructureModal: React.FC<TransitingTelescopeStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
+export const SurveyorStructureModal: React.FC = () => {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+    const { activePlanet } = useActivePlanet();
     const [isActionDone, setIsActionDone] = useState(false);
+    const [configuration, setConfiguration] = useState<any>(null);
+    const [hasRequiredItem, setHasRequiredItem] = useState<boolean>(false);
+    const [gravity, setGravity] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const handleActionClick = () => {
-        // Implement action logic here
-        setIsActionDone(true);
+    useEffect(() => {
+        if (!activePlanet || !session?.user) return;
+
+        async function checkUserItemAndFetchConfiguration() {
+            try {
+                // Check if the user owns the required item
+                const { data: inventoryData, error: inventoryError } = await supabase
+                    .from('inventory')
+                    .select('*')
+                    .eq('item', 24)
+                    .eq('owner', session?.user.id)
+                    .single();
+
+                if (inventoryError) {
+                    throw inventoryError;
+                }
+
+                if (inventoryData) {
+                    setHasRequiredItem(true);
+
+                    // Fetch configuration data if the user owns the required item
+                    const { data: configData, error: configError } = await supabase
+                        .from('anomalies')
+                        .select('*')
+                        .eq('id', activePlanet?.id)
+                        .single();
+
+                    if (configError) {
+                        throw configError;
+                    }
+
+                    if (configData) {
+                        setConfiguration(configData.configuration);
+                    }
+                }
+            } catch (error: any) {
+                console.error('Error:', error.message);
+            }
+        }
+
+        checkUserItemAndFetchConfiguration();
+    }, [activePlanet, session, supabase]);
+
+    const handleGravityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setGravity(e.target.value);
     };
 
-    if (!isOpen) return null;
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!configuration || !session?.user) return;
+
+        const updatedConfiguration = { ...configuration, gravity: parseFloat(gravity) };
+        const content = JSON.stringify(updatedConfiguration);
+
+        setLoading(true);
+
+        try {
+            const { error } = await supabase
+                .from('classifications')
+                .insert([
+                    {
+                        content: content,
+                        author: session.user.id,
+                        anomaly: activePlanet?.id,
+                        classificationtype: 'gravity'
+                    }
+                ]);
+
+            if (error) {
+                throw error;
+            }
+
+            alert('Gravity value saved successfully!');
+            setGravity('');
+        } catch (error: any) {
+            console.error('Error saving gravity value:', error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!hasRequiredItem) {
+        return <p>Need to craft this item</p>;
+    }
+
+    if (!configuration) {
+        return <p>Loading configuration...</p>;
+    }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold">{structure.name}</h2>
-                    <button className="btn btn-square btn-outline" onClick={onClose}>
-                        ✕
-                    </button>
-                </div>
-                <div className="flex flex-col items-center mt-4">
-                    <PlanetData /> {/* This should actually search for the data where the structure is located, not the user's active planet */}
-                </div>
+        <div className="max-w-md mx-auto bg-white rounded-lg p-4 shadow-lg">
+            <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold">{configuration.ticId}</h2>
+                <button className="btn btn-square btn-outline" onClick={() => setIsActionDone(true)}>
+                    ✕
+                </button>
             </div>
+            <div className="flex flex-col items-center mt-4">
+                <p>Mass: {configuration.mass}</p>
+                <p>Radius: {configuration.radius}</p>
+                <p>Semi-Major Axis: {configuration.smaxis}</p>
+                <p>Orbital Period: {configuration.orbital_period}</p>
+                <p>Equilibrium Temperature: {configuration.temperatureEq}</p>
+                {/* Add other fields as needed */}
+            </div>
+            <form onSubmit={handleSubmit} className="mt-4">
+                <div className="tooltip" data-tip="Please enter the gravity value">
+                    <label htmlFor="gravity" className="block text-sm font-medium text-gray-700">Gravity</label>
+                    <input
+                        type="number"
+                        id="gravity"
+                        name="gravity"
+                        value={gravity}
+                        onChange={handleGravityChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                        required
+                    />
+                </div>
+                <button
+                    type="submit"
+                    className="mt-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                    disabled={loading}
+                >
+                    {loading ? 'Saving...' : 'Save Gravity'}
+                </button>
+            </form>
         </div>
     );
 };
