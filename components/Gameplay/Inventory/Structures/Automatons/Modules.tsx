@@ -15,7 +15,7 @@ import {
 import { AllAutomatons } from "../../Automatons/Automaton";
 import CraftStructure from "../../Actions/CraftStructure";
 import axios from "axios";
-import RoverClassificationFromItem32 from "@/Classifications/RoverContent/RoverImageClassification";
+import { RoverClassificationFromItem32 } from "@/Classifications/RoverContent/RoverImageClassification";
 
 interface InventoryItem {
   id: number;
@@ -154,192 +154,192 @@ export const CameraAutomatonModule: React.FC = () => {
 };
 
 export const CameraReceiverStation: React.FC = () => {
-    const supabase = useSupabaseClient();
-    const session = useSession();
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-    const { activePlanet } = useActivePlanet();
+  const { activePlanet } = useActivePlanet();
 
-    const [cameraModule, setCameraModule] = useState<OwnedItem | null>(null);
-    const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
-    const [hasCameraStation, setHasCameraStation] = useState(false);
-    const [rovers, setRovers] = useState<string[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [roverConfig, setRoverConfig] = useState<any>(null);
-    const [userImages, setUserImages] = useState<string[]>([]);
+  const [cameraModule, setCameraModule] = useState<OwnedItem | null>(null);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const [hasCameraStation, setHasCameraStation] = useState(false);
+  const [rovers, setRovers] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [roverConfig, setRoverConfig] = useState<any>(null);
+  const [userImages, setUserImages] = useState<{ avatar_url: string, id: number }[]>([]);
 
-    useEffect(() => {
-        fetchInventoryItems();
-        fetchUserModule();
-        fetchCameraStation();
-    }, [session, activePlanet]);
+  useEffect(() => {
+      fetchInventoryItems();
+      fetchUserModule();
+      fetchCameraStation();
+  }, [session, activePlanet]);
 
-    useEffect(() => {
-        fetchImages();
-        fetchPhotosOnUserPlanet();
-    }, [supabase]);
+  useEffect(() => {
+      fetchImages();
+      fetchPhotosOnUserPlanet();
+  }, [supabase]);
 
-    async function fetchInventoryItems() {
-        try {
-            const response = await fetch("/api/gameplay/inventory");
-            if (!response.ok) {
-                throw new Error("Failed to fetch inventory items from the API");
-            }
-            const data: InventoryItem[] = await response.json();
-            setInventoryItems(data);
-        } catch (error) {
-            console.error("Error fetching inventory items:", error);
-        }
-    }
+  async function fetchInventoryItems() {
+      try {
+          const response = await fetch("/api/gameplay/inventory");
+          if (!response.ok) {
+              throw new Error("Failed to fetch inventory items from the API");
+          }
+          const data: InventoryItem[] = await response.json();
+          setInventoryItems(data);
+      } catch (error) {
+          console.error("Error fetching inventory items:", error);
+      }
+  }
 
-    async function fetchUserModule() {
-        if (session && activePlanet) {
-            try {
-                const { data, error } = await supabase
-                    .from("inventory")
-                    .select("*")
-                    .eq("owner", session.user.id)
-                    .eq("anomaly", activePlanet.id)
-                    .eq("item", 28);
+  async function fetchUserModule() {
+      if (session && activePlanet) {
+          try {
+              const { data, error } = await supabase
+                  .from("inventory")
+                  .select("*")
+                  .eq("owner", session.user.id)
+                  .eq("anomaly", activePlanet.id)
+                  .eq("item", 28);
 
-                if (error) {
-                    throw error;
-                }
+              if (error) {
+                  throw error;
+              }
 
-                if (data && data.length > 0) {
-                    setCameraModule(data[0]);
-                }
-            } catch (error) {
-                console.error("Error fetching user module:", error);
-            }
-        }
-    }
+              if (data && data.length > 0) {
+                  setCameraModule(data[0]);
+              }
+          } catch (error) {
+              console.error("Error fetching user module:", error);
+          }
+      }
+  }
 
-    async function fetchCameraStation() {
-        if (session && activePlanet) {
-            try {
-                const { data, error } = await supabase
-                    .from("inventory")
-                    .select("*")
-                    .eq("owner", session.user.id)
-                    .eq("anomaly", activePlanet.id)
-                    .eq("item", 32);
+  async function fetchCameraStation() {
+      if (session && activePlanet) {
+          try {
+              const { data, error } = await supabase
+                  .from("inventory")
+                  .select("*")
+                  .eq("owner", session.user.id)
+                  .eq("anomaly", activePlanet.id)
+                  .eq("item", 32);
 
-                if (data && data.length > 0) {
-                    setHasCameraStation(true);
-                } else {
-                    setHasCameraStation(false);
-                }
-            } catch (error) {
-                console.error("Error fetching camera station:", error);
-            }
-        }
-    }
+              if (data && data.length > 0) {
+                  setHasCameraStation(true);
+              } else {
+                  setHasCameraStation(false);
+              }
+          } catch (error) {
+              console.error("Error fetching camera station:", error);
+          }
+      }
+  }
 
-    const fetchImages = async () => {
-        const randomDate = Math.floor(Math.random() * 1000) + 1;
-        const selectedRover = 'perseverance';
-        const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${selectedRover}/photos?sol=${randomDate}&api_key=iT0FQTZKpvadCGPzerqXdO5F4b62arNBOP0dtkXE`;
+  const fetchImages = async () => {
+      const randomDate = Math.floor(Math.random() * 1000) + 1;
+      const selectedRover = 'perseverance';
+      const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${selectedRover}/photos?sol=${randomDate}&api_key=iT0FQTZKpvadCGPzerqXdO5F4b62arNBOP0dtkXE`;
 
-        try {
-            const response = await axios.get(apiUrl);
-            if (response.data.photos && response.data.photos.length > 0) {
-                setRovers([response.data.photos[0].img_src]);
-                setRoverConfig(response.data);
-            } else {
-                setRovers(['No images found for the given date and rover.']);
-            }
-        } catch (error) {
-            console.error(error);
-            setRovers(['An error occurred while fetching the image.']);
-        }
+      try {
+          const response = await axios.get(apiUrl);
+          if (response.data.photos && response.data.photos.length > 0) {
+              setRovers([response.data.photos[0].img_src]);
+              setRoverConfig(response.data);
+          } else {
+              setRovers(['No images found for the given date and rover.']);
+          }
+      } catch (error) {
+          console.error(error);
+          setRovers(['An error occurred while fetching the image.']);
+      }
 
-        setLoading(false);
-    };
+      setLoading(false);
+  };
 
-    async function fetchPhotosOnUserPlanet() {
-        if (session && activePlanet) {
-            try {
-                const { data, error } = await supabase
-                    .from("anomalies")
-                    .select("*")
-                    .eq("parentAnomaly", String(activePlanet.id))
-                    .eq("anomalytype", "roverImg");
+  async function fetchPhotosOnUserPlanet() {
+      if (session && activePlanet) {
+          try {
+              const { data, error } = await supabase
+                  .from("anomalies")
+                  .select("*")
+                  .eq("parentAnomaly", String(activePlanet.id))
+                  .eq("anomalytype", "roverImg");
 
-                if (error) {
-                    throw error;
-                }
+              if (error) {
+                  throw error;
+              }
 
-                if (data && data.length > 0) {
-                    setUserImages(data.map((rover: any) => rover.avatar_url));
-                }
-            } catch (error) {
-                console.error("Error fetching user photos:", error);
-            }
-        }
-    }
+              if (data && data.length > 0) {
+                  setUserImages(data.map((rover: any) => ({ avatar_url: rover.avatar_url, id: rover.id })));
+              }
+          } catch (error) {
+              console.error("Error fetching user photos:", error);
+          }
+      }
+  }
 
-    const handleCollectImage = async (image: string) => {
-        if (session && activePlanet) {
-            try {
-                const { data, error } = await supabase
-                    .from("anomalies")
-                    .insert({
-                        id: "9",
-                        content: `Rover image by ${session.user.id}`,
-                        anomalytype: 'roverImg',
-                        avatar_url: image,
-                        configuration: roverConfig,
-                        parentAnomaly: String(activePlanet.id),
-                        created_at: new Date()
-                    });
+  const handleCollectImage = async (image: string) => {
+      if (session && activePlanet) {
+          try {
+              const { data, error } = await supabase
+                  .from("anomalies")
+                  .insert({
+                      id: "9",
+                      content: `Rover image by ${session.user.id}`,
+                      anomalytype: 'roverImg',
+                      avatar_url: image,
+                      configuration: roverConfig,
+                      parentAnomaly: String(activePlanet.id),
+                      created_at: new Date()
+                  });
 
-                if (error) {
-                    throw error;
-                }
+              if (error) {
+                  throw error;
+              }
 
-                alert("Image collected successfully!");
-            } catch (error) {
-                console.error("Error collecting image:", error);
-                alert("Failed to collect the image.");
-            }
-        }
-    };
+              alert("Image collected successfully!");
+          } catch (error) {
+              console.error("Error collecting image:", error);
+              alert("Failed to collect the image.");
+          }
+      }
+  };
 
-    if (!hasCameraStation && cameraModule === null) {
-        return (
-            <>You need to collect the required items to do this, hehe</>
-        );
-    };
+  if (!hasCameraStation && cameraModule === null) {
+      return (
+          <>You need to collect the required items to do this, hehe</>
+      );
+  }
 
-    return (
-        <div className="container mx-auto p-6 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-semibold mb-4 text-center">Camera Receiver Station</h2>
-            {loading ? (
-                <p className="text-center">Loading...</p>
-            ) : (
-                <div className="grid grid-cols-1 gap-4">
-                    {rovers.map((rover, index) => (
-                        <div key={index} className="text-center">
-                            Fetched images
-                            <img src={rover} alt={`Mars Rover ${index}`} className="w-full h-auto rounded-lg" />
-                            <button
-                                onClick={() => handleCollectImage(rover)}
-                                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
-                            >
-                                Collect this image
-                            </button>
-                        </div>
-                    ))}
-                    {userImages.map((rover, index) => (
-                        <div key={index} className="text-center">
-                            Your images
-                            <img src={rover} alt={`Mars Rover ${index}`} className="w-full h-auto rounded-lg" />
-                            <p>This is your image!</p>
-                            <RoverClassificationFromItem32 />
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
+  return (
+      <div className="container mx-auto p-6 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold mb-4 text-center">Camera Receiver Station</h2>
+          {loading ? (
+              <p className="text-center">Loading...</p>
+          ) : (
+              <div className="grid grid-cols-1 gap-4">
+                  {rovers.map((rover, index) => (
+                      <div key={index} className="text-center">
+                          Fetched images
+                          <img src={rover} alt={`Mars Rover ${index}`} className="w-full h-auto rounded-lg" />
+                          <button
+                              onClick={() => handleCollectImage(rover)}
+                              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
+                          >
+                              Collect this image
+                          </button>
+                      </div>
+                  ))}
+                  {userImages.map(({ avatar_url, id }, index) => (
+                      <div key={index} className="text-center">
+                          Your images
+                          <img src={avatar_url} alt={`Mars Rover ${index}`} className="w-full h-auto rounded-lg" />
+                          <p>This is your image!</p>
+                          <RoverClassificationFromItem32 roverId={id} />
+                      </div>
+                  ))}
+              </div>
+          )}
+      </div>
+  );
 };

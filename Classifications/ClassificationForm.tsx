@@ -212,7 +212,8 @@ export function CreateCloudClassification(assetMentioned: any) {
                 author: session?.user?.id,
                 content,
                 media: uploads,
-                anomaly: 1 // ########
+                anomaly: 1,
+                // anomaly: activePlanet // ########
             })
             .single();
 
