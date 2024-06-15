@@ -424,20 +424,35 @@ export function AllAutomatons() {
       console.log("Rewards claimed successfully.");
         
         if (rewardQuantity > 0) {
-          const { data: insertData, error: insertError } = await supabase.from('inventory').insert([
-            {
-              owner: session?.user?.id,
-              item: 11,
-              quantity: rewardQuantity,
-              anomaly: activePlanet?.id,
-              notes: `Reward from automaton ID: ${selectedAutomaton.id}`,
-            },
-          ]);
-  
-          if (insertError) {
-            console.error('Error inserting reward', insertError);
-            return;
+          const itemValues = [11, 13, 15, 16, 17, 18, 19, 20, 21];
+
+          const getRandomItem = () => {
+              return itemValues[Math.floor(Math.random() * itemValues.length)];
           };
+          
+          const { data: insertData, error: insertError } = await supabase.from('inventory').insert([
+              {
+                  owner: session?.user?.id,
+                  item: getRandomItem(),
+                  quantity: rewardQuantity,
+                  anomaly: activePlanet?.id,
+                  notes: `Reward from automaton ID: ${selectedAutomaton.id}`,
+              },
+              {
+                  owner: session?.user?.id,
+                  item: getRandomItem(),
+                  quantity: rewardQuantity,
+                  anomaly: activePlanet?.id,
+                  notes: `Reward from automaton ID: ${selectedAutomaton.id}`,
+              }
+          ]);
+          
+          if (insertError) {
+              console.error('Error inserting inventory items:', insertError);
+          } else {
+              console.log('Inventory items inserted successfully:', insertData);
+          }
+          
   
           console.log('Rewards inserted', insertData);
   
@@ -510,7 +525,7 @@ export function AllAutomatons() {
                 </button>
                 {selectedAutomaton.time_of_deploy && (
                   <button className="btn btn-secondary" onClick={claimRewards}>
-                    Claim Rewards
+                    Claim Reward
                   </button>
                 )}
               </div>
@@ -727,7 +742,7 @@ export function SingleAutomaton() {
                                         </button>
                                         {userAutomaton.time_of_deploy && (
                                             <button className="btn btn-secondary" onClick={claimRewards}>
-                                                Claim Rewards
+                                                Claim Rewards!
                                             </button>
                                         )}
                                     </div>
@@ -746,7 +761,6 @@ export function SingleAutomaton() {
 export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number }) {
   const supabase = useSupabaseClient();
   const session = useSession();
-
   const { activePlanet } = useActivePlanet();
 
   const [userItems, setUserItems] = useState<UserItem[]>([]);
@@ -939,22 +953,40 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
   };
   
   async function claimRewards() {
+    console.log('Claim Rewards button clicked');
     try {
       if (userAutomaton?.time_of_deploy) {
+        console.log('Automaton has a deploy time');
         const deployTime = new Date(userAutomaton.time_of_deploy).getTime();
         const currentTime = new Date().getTime();
         const timeDifference = (currentTime - deployTime) / 1000 / 60;
         const rewardQuantity = Math.floor(timeDifference);
 
+        console.log('Time difference:', timeDifference);
+        console.log('Reward quantity:', rewardQuantity);
+
         if (rewardQuantity > 0) {
+          console.log('Reward quantity is greater than 0');
+          const itemValues = [11, 13, 15, 16, 17, 18, 19, 20, 21];
+          const getRandomItem = () => {
+            return itemValues[Math.floor(Math.random() * itemValues.length)];
+          };
+
           const { data: insertData, error: insertError } = await supabase.from('inventory').insert([
+            {
+              owner: session?.user?.id,
+              item: getRandomItem(),
+              quantity: rewardQuantity,
+              anomaly: activePlanet?.id,
+              notes: `Reward from automaton id: ${userAutomaton.id}`,
+            },
             {
               owner: session?.user?.id,
               item: 11,
               quantity: rewardQuantity,
               anomaly: activePlanet?.id,
               notes: `Reward from automaton id: ${userAutomaton.id}`,
-            },
+            }
           ]);
 
           if (insertError) {
@@ -978,11 +1010,15 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
   
           setRewardTotal(rewardQuantity);
           console.log(`Rewards claimed: ${rewardQuantity}`);
-        };
-      } 
+        } else {
+          console.log('Reward quantity is 0 or less, no rewards to claim');
+        }
+      } else {
+        console.log('No deploy time found for automaton');
+      }
     } catch (error: any) {
       console.error("Error claiming rewards:", error.message);
-    };
+    }
   };
 
   return (
@@ -1048,7 +1084,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
                 </button>
                 {userAutomaton.time_of_deploy && (
                   <button className="btn btn-secondary" onClick={claimRewards}>
-                    Claim Rewards
+                    Claim Reward
                   </button>
                 )}
               </div>
@@ -1058,4 +1094,4 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
       )}
     </>
   );
-};
+}
