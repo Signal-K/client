@@ -133,7 +133,11 @@ const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiAnomalies/${active
   );
 };
 
-export default function MiningStationPlaceable() {
+interface MiningStationPlaceableProps {
+  missionId: number;
+}
+
+const MiningStationPlaceable: React.FC<MiningStationPlaceableProps> = ({ missionId }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -186,6 +190,21 @@ export default function MiningStationPlaceable() {
                               notes: `Reward from mining station id: ${userStructure[0].ownedItem?.id}`,
                           },
                       ]);
+
+                      
+                        const missionData = {
+                          user: session?.user?.id,
+                          time_of_completion: new Date().toISOString(),
+                          mission: missionId,
+                      };
+                    
+                      const { error: missionError } = await supabase
+                        .from('missions')
+                        .insert([missionData]);
+                        
+                        if (missionError) {
+                          throw missionError;
+                        };
   
                   if (insertError) {
                       throw insertError;
@@ -383,6 +402,8 @@ export default function MiningStationPlaceable() {
       </>
     );
 };
+
+export default MiningStationPlaceable;
 
 export const MiningStructureModal: React.FC<MiningStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
     const { activePlanet } = useActivePlanet();

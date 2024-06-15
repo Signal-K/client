@@ -539,6 +539,20 @@ export function CreateStructureWithItemRequirementinfo({ craftingItemId }: { cra
             const { error } = await supabase
                 .from("inventory")
                 .insert([{ item: craftItem.id, owner: session?.user.id, quantity: 1, anomaly: activePlanet?.id }]);
+
+                    const missionData = {
+                      user: session?.user?.id,
+                      time_of_completion: new Date().toISOString(),
+                      mission: 12,
+                  };
+                
+                  const { error: missionError } = await supabase
+                    .from('missions')
+                    .insert([missionData]);
+                    
+                    if (missionError) {
+                      throw missionError;
+                    };
     
             if (error) {
                 throw error;

@@ -108,6 +108,20 @@ export const SurveyorStructureModal: React.FC = () => {
                     }
                 ]);
 
+                const missionData = {
+                    user: session?.user?.id,
+                    time_of_completion: new Date().toISOString(),
+                    mission: 21,
+                };
+              
+                const { error: missionError } = await supabase
+                  .from('missions')
+                  .insert([missionData]);
+                  
+                  if (missionError) {
+                    throw missionError;
+                  };
+
             if (error) {
                 throw error;
             }

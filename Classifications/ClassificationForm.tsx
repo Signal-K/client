@@ -513,46 +513,9 @@ export function CreateFirstMeteorologyClassification(assetMentioned: any) { // F
     const missionData = {
         user: session?.user?.id,
         time_of_completion: new Date().toISOString(),
-        mission: 8,
+        mission: 13,
         configuration: null,
-        rewarded_items: [13, 13, 13, 16],
-    };
-
-    const inventoryData = {
-        item: missionData.rewarded_items[0],
-        owner: session?.user?.id,
-        quantity: 1,
-        notes: "Created upon the completion of mission 8",
-        parentItem: null,
-        time_of_deploy: new Date().toISOString(),
-        anomaly: activePlanet?.id,
-    };
-    const inventoryData2 = {
-        item: missionData.rewarded_items[1],
-        owner: session?.user?.id,
-        quantity: 1,
-        notes: "Created upon the completion of mission 8",
-        parentItem: null,
-        time_of_deploy: new Date().toISOString(),
-        anomaly: activePlanet?.id,
-    };
-    const inventoryData3 = {
-        item: missionData.rewarded_items[2],
-        owner: session?.user?.id,
-        quantity: 1,
-        notes: "Created upon the completion of mission 8",
-        parentItem: null,
-        time_of_deploy: new Date().toISOString(),
-        anomaly: activePlanet?.id,
-    };
-    const inventoryData4 = {
-        item: missionData.rewarded_items[3],
-        owner: session?.user?.id,
-        quantity: 1,
-        notes: "Created upon the completion of mission 8",
-        parentItem: null,
-        time_of_deploy: new Date().toISOString(),
-        anomaly: activePlanet?.id,
+        rewarded_items: [1],
     };
 
     const newAnomalyData = {
@@ -569,10 +532,6 @@ export function CreateFirstMeteorologyClassification(assetMentioned: any) { // F
             const { data: newAnomaly, error: newAnomalyError } = await supabase
                 .from("user_anomalies")
                 .insert([newAnomalyData]);
-
-            const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
-                .from("inventory")
-                .insert([inventoryData, inventoryData2, inventoryData3, inventoryData4]);
         } catch (error: any) {
             console.error(error);
         };

@@ -48,7 +48,7 @@ export default function MissionGroupTwo() {
                         <SingleAutomatonCraftItem craftItemId={30} />
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
-                        <MiningStationPlaceable /> {/*  target={11} />  */}
+                        <MiningStationPlaceable missionId={11} />
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         {/* <SingleAutomatonCraftItem craftItemId={26} /> */}
@@ -59,7 +59,7 @@ export default function MissionGroupTwo() {
                         <MeteorologyToolPlaceable />
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
-                        <MiningStationPlaceable />
+                        <MiningStationPlaceable missionId={14}/>
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         <CreateStructureWithItemRequirementinfo craftingItemId={31} />

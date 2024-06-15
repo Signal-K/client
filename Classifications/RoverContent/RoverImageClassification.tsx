@@ -38,6 +38,20 @@ export const RoverClassificationFromItem32: React.FC<RoverClassificationFromItem
             content: content,
           })
           .single();
+
+          const missionData = {
+            user: session?.user?.id,
+            time_of_completion: new Date().toISOString(),
+            mission: 18,
+        };
+      
+        const { error: missionError } = await supabase
+          .from('missions')
+          .insert([missionData]);
+          
+          if (missionError) {
+            throw missionError;
+          };
   
         if (error) {
           throw error;

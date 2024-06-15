@@ -85,7 +85,7 @@ export function ProfileCard() {
       if (profileError) {
         throw profileError;
       }
-
+ 
       // Mark mission 2 as complete
       const missionId = 2;
       const mission = missions.find(m => m.id === missionId);

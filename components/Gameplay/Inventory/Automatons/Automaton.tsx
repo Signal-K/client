@@ -854,6 +854,22 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
       const craftItem = inventoryItems.find(item => item.id === craftItemId);
       if (!craftItem?.recipe) return;
 
+      if (craftItemId === 30) {
+        const missionData = {
+          user: session?.user?.id,
+          time_of_completion: new Date().toISOString(),
+          mission: 9,
+      };
+    
+      const { error: missionError } = await supabase
+        .from('missions')
+        .insert([missionData]);
+        
+        if (missionError) {
+          throw missionError;
+        };
+      };
+
       for (const [resourceId, requiredQuantity] of Object.entries(craftItem.recipe)) {
         const userResource = userItems.find(item => item.item === parseInt(resourceId));
         if (userResource) {

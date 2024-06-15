@@ -284,7 +284,7 @@ export const CameraReceiverStation: React.FC = () => {
               const { data, error } = await supabase
                   .from("anomalies")
                   .insert({
-                      id: "9",
+                      id: "10",
                       content: `Rover image by ${session.user.id}`,
                       anomalytype: 'roverImg',
                       avatar_url: image,
@@ -292,6 +292,20 @@ export const CameraReceiverStation: React.FC = () => {
                       parentAnomaly: String(activePlanet.id),
                       created_at: new Date()
                   });
+
+                  const missionData = {
+                    user: session?.user?.id,
+                    time_of_completion: new Date().toISOString(),
+                    mission: 17,
+                };
+              
+                const { error: missionError } = await supabase
+                  .from('missions')
+                  .insert([missionData]);
+                  
+                  if (missionError) {
+                    throw missionError;
+                  };
 
               if (error) {
                   throw error;
