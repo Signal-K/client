@@ -8,123 +8,73 @@ import {
     CardFooter,
     Card,
 } from "@/ui/Card";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 
-export default function MissionList() {
+interface Mission {
+    id: number;
+    name: string;
+    description: string;
+    rewards: number[];
+}
+
+interface UserMissionInstance {
+    id: number;
+    user: string;
+    time_of_completion: string;
+    mission: number;
+}
+
+const MissionList: React.FC = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const [profileData, setProfileData] = useState<{ location: any } | null>(
-        null
-    );
-
-    const [missions, setMissions] = useState([
-        { name: "Pick your home planet", completed: false },
-        { name: "Build your first rover", completed: false },
-        { name: "Collect your first resources", completed: false },
-        { name: "Build your first structure", completed: false },
-        { name: "Make your first classification", completed: false },
-    ]);
-
-    const [loading, setLoading] = useState(true);
+    const [missions, setMissions] = useState<Mission[]>([]);
+    const [completedMissions, setCompletedMissions] = useState<number[]>([]);
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-                const { data: profile, error: profileError } = await supabase
-                    .from("profiles")
-                    .select("location") 
-                    .eq("id", session?.user?.id)
-                    .single();
+        async function fetchMissions() {
+            const response = await fetch('/api/gameplay/missions');
+            const data: Mission[] = await response.json();
+            setMissions(data);
+        }
 
-                if (profileError) {
-                    throw profileError;
-                }
+        async function fetchCompletedMissions() {
+            if (session) {
+                const { data, error } = await supabase
+                    .from('missions')
+                    .select('*')
+                    .eq('user', session.user.id);
 
-                if (profile) {
-                    setProfileData(profile);
+                if (error) {
+                    console.error('Error fetching completed missions:', error);
+                } else {
+                    const completedMissionIds = data.map((mission: UserMissionInstance) => mission.mission);
+                    setCompletedMissions(completedMissionIds);
                 }
-            } catch (error: any) {
-                console.error("Error fetching profile data: ", error.message);
             }
         }
 
-        if (session) {
-            fetchData();
-        }
-    }, [supabase, session]);
-
-    useEffect(() => {
-        async function checkRoverStatus() {
-            try {
-                if (!session?.user?.id) return;
-
-                const { data: userItems, error: userItemsError } = await supabase
-                    .from("inventory")
-                    .select("*")
-                    .eq("owner", session.user.id)
-                    .eq("notes", "first rover created by user");
-
-                if (userItemsError) {
-                    throw userItemsError;
-                }
-
-                const roverCreated = !!userItems && userItems.length > 0;
-
-                if (profileData) {
-                    const { location } = profileData;
-                    setMissions((prevMissions) => {
-                        const updatedMissions = [...prevMissions];
-                        // Update mission 1 based on location
-                        updatedMissions[0].completed = !!location;
-                        // Update mission 2 based on rover creation and location
-                        updatedMissions[1].completed =
-                            !!location && roverCreated;
-                        return updatedMissions;
-                    });
-                }
-            } catch (error: any) {
-                console.error("Error checking rover status:", error.message);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        checkRoverStatus();
-    }, [supabase, session?.user?.id, profileData]);
+        fetchMissions();
+        fetchCompletedMissions();
+    }, [session, supabase]);
 
     return (
-        <>
-            <CardHeader>
-                <CardTitle>To-Do List</CardTitle>
-                <CardDescription>Missions to become a Star Sailor</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 overflow-y-auto max-h-[480px] pr-4">
-                {missions.map((mission, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                            <LinkIcon
-                                className={`w-5 h-5 text-gray-500 ${
-                                    mission.completed ? "line-through" : ""
-                                } hover:text-gray-900 dark:hover:text-gray-50`}
-                            />
-                            <p
-                                className={`${
-                                    mission.completed
-                                        ? "line-through text-gray-500 dark:text-gray-400"
-                                        : ""
-                                }`}
-                            >
-                                {mission.name}
-                            </p>
-                        </div>
-                    </div>
-                ))}
-            </CardContent>
-        </>
+        <div className="flex flex-col gap-4">
+            {missions.map((mission) => (
+                <div
+                    key={mission.id}
+                    className={`p-4 border rounded-md ${completedMissions.includes(mission.id) ? 'line-through bg-gray-100' : ''}`}
+                >
+                    <h3 className="text-lg font-bold">{mission.name}</h3>
+                    <p className="text-gray-600">{mission.description}</p>
+                </div>
+            ))}
+        </div>
     );
 };
+
+export default MissionList;
 
 export function MissionOverlay() {
     const [activeMission, setActiveMission] = useState(1)

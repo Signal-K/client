@@ -1,40 +1,56 @@
-"use client";
+"use client"
 
-import FirstClassification from "@/Classifications/FirstClassification";
+import React from "react";
+import Layout from "@/components/Layout";
+
+import { Card, Carousel } from "@material-tailwind/react";
+import PickYourPlanet from "@/components/Onboarding";
 import { ProfileCard } from "@/auth/UserProfileFields";
 import LaunchPad from "@/components/Animations/Travelling/Launchpad";
-import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
-import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
-import { AllAutomatons } from "@/components/Gameplay/Inventory/Automatons/Automaton";
+import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
 import UserItemsUndeployed from "@/components/Gameplay/Inventory/InactiveItems";
 import { AllStructures } from "@/components/Gameplay/Inventory/Structures/Structure";
-import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
-import Layout from "@/components/Layout";
-import PickYourPlanet from "@/components/Onboarding";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { AllAutomatons } from "@/components/Gameplay/Inventory/Automatons/Automaton";
+import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
+import FirstClassification from "@/Classifications/FirstClassification";
+import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
 
-export default function FirstMissionGroupPage() {
-    const supabase = useSupabaseClient();
-
+export default function MissionGroupOne() {
     return (
         <Layout bg={false}>
-            <div className="p-5">
-                <PickYourPlanet onPlanetSelect={() => {}} />
-                <ProfileCard />
-                {/* <SkillTreeComp /> */}
-                <div className='p-1'> {/* Going to planet component group */}
-                    <LaunchPad />
-                    <GoToYourPlanet />
-                </div>
-                <div className="p-5"> {/* Helper items/components */}
-                    <UserItemsUndeployed />
-                </div>
-                <AllStructures />
-                <AllAutomatons />
-                <CraftStructure structureId={14} /><br /><br /><br /><br />
-                <center><FirstClassification /></center>
-                <UserAnomaliesComponent />
-                {/* <CompletedMissionGroups /> */}
+            <div className="flex justify-center items-center p-5">
+                <Carousel className="rounded-xl " placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                    <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <center><PickYourPlanet onPlanetSelect={() => {}}></PickYourPlanet></center>
+                    </Card>
+                    <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <center><ProfileCard /></center>
+                    </Card>
+                    <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <center>
+                            <LaunchPad />
+                            <GoToYourPlanet />
+                        </center>
+                    </Card>
+                    <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <center><UserItemsUndeployed /></center>
+                    </Card>
+                    <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <center><AllStructures /></center>
+                    </Card>
+                    <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <center><AllAutomatons /></center>
+                    </Card>
+                    <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <center><CraftStructure structureId={14} /></center>
+                    </Card>
+                    <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <center><FirstClassification /></center>
+                    </Card>
+                    <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
+                        <center><UserAnomaliesComponent /></center>
+                    </Card>
+                </Carousel>
             </div>
         </Layout>
     )
