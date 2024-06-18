@@ -36,7 +36,7 @@ export default function MissionGroupOne() {
                         <center><UserItemsUndeployed /></center>
                     </Card>
                     <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
-                        <center><AllStructures /></center>
+                        <center><AllStructures /></center> {/* Edit this to say "Your structures, on your home planet" */}
                     </Card>
                     <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         <center><AllAutomatons /></center>

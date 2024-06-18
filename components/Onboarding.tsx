@@ -28,6 +28,7 @@ export default function PickYourPlanet({ onPlanetSelect }: PickYourPlanetProps) 
       const { data: planetsData, error: planetsError } = await supabase
         .from("anomalies")
         .select("*")
+        .order("id", { ascending: false })
         .eq("anomalytype", "planet");
 
       if (planetsData) {
@@ -53,7 +54,7 @@ export default function PickYourPlanet({ onPlanetSelect }: PickYourPlanetProps) 
       const missionData = {
         user: session?.user?.id,
         time_of_completion: new Date().toISOString(),
-        mission: 1, // Assuming mission 1 for picking a planet
+        mission: 1,
         configuration: null,
         rewarded_items: null
       };
@@ -68,7 +69,7 @@ export default function PickYourPlanet({ onPlanetSelect }: PickYourPlanetProps) 
 
       // Create new entry in the inventory table
       const inventoryData = {
-        item: 29, // Assuming reward item ID for picking a planet is 29
+        item: 29,
         owner: session?.user?.id,
         quantity: 1,
         notes: "Created upon the completion of mission 1",
