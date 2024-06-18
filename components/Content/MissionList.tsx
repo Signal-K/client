@@ -28,53 +28,53 @@ interface UserMissionInstance {
 const MissionList: React.FC = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
-
+  
     const [missions, setMissions] = useState<Mission[]>([]);
     const [completedMissions, setCompletedMissions] = useState<number[]>([]);
-
+  
     useEffect(() => {
-        async function fetchMissions() {
-            const response = await fetch('/api/gameplay/missions');
-            const data: Mission[] = await response.json();
-            setMissions(data);
+      async function fetchMissions() {
+        const response = await fetch('/api/gameplay/missions');
+        const data: Mission[] = await response.json();
+        setMissions(data);
+      }
+  
+      async function fetchCompletedMissions() {
+        if (session) {
+          const { data, error } = await supabase
+            .from('missions')
+            .select('*')
+            .eq('user', session.user.id);
+  
+          if (error) {
+            console.error('Error fetching completed missions:', error);
+          } else {
+            const completedMissionIds = data.map((mission: UserMissionInstance) => mission.mission);
+            setCompletedMissions(completedMissionIds);
+          }
         }
-
-        async function fetchCompletedMissions() {
-            if (session) {
-                const { data, error } = await supabase
-                    .from('missions')
-                    .select('*')
-                    .eq('user', session.user.id);
-
-                if (error) {
-                    console.error('Error fetching completed missions:', error);
-                } else {
-                    const completedMissionIds = data.map((mission: UserMissionInstance) => mission.mission);
-                    setCompletedMissions(completedMissionIds);
-                }
-            }
-        }
-
-        fetchMissions();
-        fetchCompletedMissions();
+      }
+  
+      fetchMissions();
+      fetchCompletedMissions();
     }, [session, supabase]);
-
+  
     return (
-        <div className="flex flex-col gap-4">
-            {missions.map((mission) => (
-                <div
-                    key={mission.id}
-                    className={`p-4 border rounded-md ${completedMissions.includes(mission.id) ? 'line-through bg-gray-100' : ''}`}
-                >
-                    <h3 className="text-lg font-bold">{mission.name}</h3>
-                    <p className="text-gray-600">{mission.description}</p>
-                </div>
-            ))}
-        </div>
+      <div className="flex flex-col gap-4">
+        {missions.map((mission) => (
+          <div
+            key={mission.id}
+            className={`p-4 border rounded-md ${completedMissions.includes(mission.id) ? 'line-through bg-gray-100' : ''}`}
+          >
+            <h3 className="text-lg font-bold">{mission.name}</h3>
+            <p className="text-gray-600">{mission.description}</p>
+          </div>
+        ))}
+      </div>
     );
-};
-
-export default MissionList;
+  };
+  
+  export default MissionList;
 
 export function MissionOverlay() {
     const [activeMission, setActiveMission] = useState(1)

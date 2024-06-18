@@ -1,7 +1,10 @@
 "use client";
 
+import MissionList from "@/components/Content/MissionList";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { Button } from "@/ui/button";
+import { PaintRollerIcon } from "lucide-react";
+import Link from "next/link";
 import { ReactNode, useState } from "react";
 
 interface PlanetLayoutProps {
@@ -12,7 +15,7 @@ interface PlanetLayoutProps {
   children: React.ReactNode;
 }
 
-export function PlanetLayout({ children }: PlanetLayoutProps) {
+export function PlanetLayout({ children }: { children: React.ReactNode }) {
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
   const [showSidebar, setShowSidebar] = useState(false);
 
@@ -36,6 +39,12 @@ export function PlanetLayout({ children }: PlanetLayoutProps) {
     setShowSidebar(!showSidebar);
   };
 
+  const handleCloseSlideover = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).id === 'overlay') {
+      setShowSidebar(false);
+    }
+  };
+
   return (
     <>
       <header className="left-0 right-0 z-50 flex h-16 w-full items-center justify-between bg-white/80 px-4 shadow-sm backdrop-blur-md dark:bg-gray-950/80 dark:text-gray-50">
@@ -49,23 +58,6 @@ export function PlanetLayout({ children }: PlanetLayoutProps) {
           >
             <ArrowLeftIcon className="h-5 w-5" />
           </Button>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="inline-block rounded-lg bg-gray-100/80 px-3 py-1 text-sm backdrop-blur-md dark:bg-gray-800/80">
-            Home
-          </div>
-          <h1 className="text-lg font-semibold">{activePlanet?.content}</h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <Button
-            className="rounded-full p-2"
-            size="icon"
-            variant="outline"
-            onClick={handleRightArrowClick}
-            style={{ visibility: activePlanetId === 6 ? 'hidden' : 'visible' }}
-          >
-            <ArrowRightIcon className="h-5 w-5" />
-          </Button>
           <Button
             className="rounded-full p-2"
             size="icon"
@@ -75,16 +67,54 @@ export function PlanetLayout({ children }: PlanetLayoutProps) {
             <BookOpenIcon className="h-5 w-5" />
           </Button>
         </div>
+        <div className="flex flex-col items-center">
+          <div className="inline-block rounded-lg bg-gray-100/80 px-3 py-1 text-sm backdrop-blur-md dark:bg-gray-800/80">
+            Home
+          </div>
+          <h1 className="text-lg font-semibold">{activePlanet?.content}</h1>
+        </div>
+        <div className="flex items-center gap-4">
+          <Link href="/missions/one">
+            <Button className="rounded-full p-2" size="icon" variant="outline">
+              <PaintRollerIcon className="h-5 w-5" />
+            </Button>
+          </Link>
+          <Button
+            className="rounded-full p-2"
+            size="icon"
+            variant="outline"
+            onClick={handleRightArrowClick}
+            style={{ visibility: activePlanetId === 6 ? 'hidden' : 'visible' }}
+          >
+            <ArrowRightIcon className="h-5 w-5" />
+          </Button>
+        </div>
       </header>
       <div className="my-8">
-        <MainContent>
-          {children}
-        </MainContent>
+        <MainContent>{children}</MainContent>
       </div>
+      {showSidebar && (
+        <div
+          id="overlay"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={handleCloseSlideover}
+        >
+          <div className="relative bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800" onClick={(e) => e.stopPropagation()}>
+            <Button
+              className="absolute top-2 right-2 rounded-full p-2"
+              size="icon"
+              variant="outline"
+              onClick={handleOpenSlideover}
+            >
+              <ArrowLeftIcon className="h-5 w-5" />
+            </Button>
+            <MissionList />
+          </div>
+        </div>
+      )}
     </>
   );
-}
-
+};
 
 interface MainContentProps {
     children: ReactNode;
