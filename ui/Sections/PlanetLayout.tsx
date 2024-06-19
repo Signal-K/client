@@ -3,37 +3,43 @@
 import MissionList from "@/components/Content/MissionList";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { Button } from "@/ui/button";
-import { PaintRollerIcon } from "lucide-react";
+import { PaintRollerIcon, ArrowRightIcon as LucideArrowRightIcon, ArrowLeftIcon as LucideArrowLeftIcon, BookOpenIcon as LucideBookOpenIcon } from "lucide-react";
 import Link from "next/link";
 import { ReactNode, useState } from "react";
+import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
 
 interface PlanetLayoutProps {
   children: ReactNode;
-};
-
-interface PlanetLayoutProps {
-  children: React.ReactNode;
 }
 
 export function PlanetLayout({ children }: { children: React.ReactNode }) {
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
   const [showSidebar, setShowSidebar] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   const handleLeftArrowClick = () => {
     if (activePlanet?.id && parseInt(activePlanet.id) > 1) {
       const newId = parseInt(activePlanet.id) - 1;
-      updatePlanetLocation(newId);
+      setShowAnimation(true);
+      setTimeout(() => {
+        updatePlanetLocation(newId);
+        setShowAnimation(false);
+      }, 2000); // Adjust the duration as per the animation time
     }
   };
 
   const handleRightArrowClick = () => {
     if (activePlanet?.id && parseInt(activePlanet.id) < 6) {
       const newId = parseInt(activePlanet.id) + 1;
-      updatePlanetLocation(newId);
+      setShowAnimation(true);
+      setTimeout(() => {
+        updatePlanetLocation(newId);
+        setShowAnimation(false);
+      }, 2000); // Adjust the duration as per the animation time
     }
   };
 
-  const activePlanetId = activePlanet?.id ? parseInt(activePlanet.id) : undefined;
+  const activePlanetId = activePlanet?.id ? parseInt(activePlanet.id) : null;
 
   const handleOpenSlideover = () => {
     setShowSidebar(!showSidebar);
@@ -56,7 +62,7 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
             onClick={handleLeftArrowClick}
             style={{ visibility: activePlanetId === 1 ? 'hidden' : 'visible' }}
           >
-            <ArrowLeftIcon className="h-5 w-5" />
+            <LucideArrowLeftIcon className="h-5 w-5" />
           </Button>
           <Button
             className="rounded-full p-2"
@@ -64,7 +70,7 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
             variant="outline"
             onClick={handleOpenSlideover}
           >
-            <BookOpenIcon className="h-5 w-5" />
+            <LucideBookOpenIcon className="h-5 w-5" />
           </Button>
         </div>
         <div className="flex flex-col items-center">
@@ -86,12 +92,16 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
             onClick={handleRightArrowClick}
             style={{ visibility: activePlanetId === 6 ? 'hidden' : 'visible' }}
           >
-            <ArrowRightIcon className="h-5 w-5" />
+            <LucideArrowRightIcon className="h-5 w-5" />
           </Button>
         </div>
       </header>
       <div className="my-8">
-        <MainContent>{children}</MainContent>
+        {showAnimation && activePlanetId !== null ? (
+          <GoToYourPlanet planetId={activePlanetId} />
+        ) : (
+          <MainContent>{children}</MainContent>
+        )}
       </div>
       {showSidebar && (
         <div
@@ -106,7 +116,7 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
               variant="outline"
               onClick={handleOpenSlideover}
             >
-              <ArrowLeftIcon className="h-5 w-5" />
+              <LucideArrowLeftIcon className="h-5 w-5" />
             </Button>
             <MissionList />
           </div>

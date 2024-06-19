@@ -14,8 +14,11 @@ import { AllAutomatons } from "@/components/Gameplay/Inventory/Automatons/Automa
 import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
 import FirstClassification from "@/Classifications/FirstClassification";
 import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
+import { useActivePlanet } from "@/context/ActivePlanet";
 
 export default function MissionGroupOne() {
+    const { activePlanet } = useActivePlanet();
+
     return (
         <Layout bg={false}>
             <div className="flex justify-center items-center p-5">
@@ -28,8 +31,7 @@ export default function MissionGroupOne() {
                     </Card>
                     <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         <center>
-                            <LaunchPad />
-                            <GoToYourPlanet />
+                        {activePlanet && <GoToYourPlanet planetId={parseInt(activePlanet.id)} />}
                         </center>
                     </Card>
                     <Card placeholder="flex justify-center items-center w-full h-full p-5 rounded-xl bg-gray-100 shadow-lg" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
