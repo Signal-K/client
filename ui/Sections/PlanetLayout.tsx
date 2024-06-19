@@ -96,13 +96,29 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
           </Button>
         </div>
       </header>
-      <div className="my-8">
-        {showAnimation && activePlanetId !== null ? (
-          <GoToYourPlanet planetId={activePlanetId} />
-        ) : (
+      {showAnimation && activePlanetId !== null ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-lg p-6 dark:bg-gray-950">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] animate-spaceship">
+              <img
+                src="https://i.pinimg.com/originals/f7/be/aa/f7beaa7787bd55e9ac54135566d6af97.gif"
+                width={200}
+                height={200}
+                alt="Spaceship"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="text-center space-y-4">
+              <h3 className="text-2xl font-bold">Transitioning...</h3>
+              <p className="text-gray-500 dark:text-gray-400">Hold on tight, we're about to jump to hyperspace!</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="my-8">
           <MainContent>{children}</MainContent>
-        )}
-      </div>
+        </div>
+      )}
       {showSidebar && (
         <div
           id="overlay"
@@ -125,6 +141,7 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
     </>
   );
 };
+
 
 interface MainContentProps {
     children: ReactNode;
