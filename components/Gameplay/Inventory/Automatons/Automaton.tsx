@@ -856,9 +856,19 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
 
       if (craftItemId === 30) {
         const missionData = {
-          user: session?.user?.id,
+          user: session?.user?.id, 
           time_of_completion: new Date().toISOString(),
           mission: 9,
+      };
+
+      const inventoryData = {
+        item: 13,
+        owner: session?.user?.id,
+        quantity: 1,
+        notes: `Reward for completing mission 9`,
+        parentItem: null,
+        time_of_deploy: new Date().toISOString(),
+        anomaly: activePlanet?.id,
       };
     
       const { error: missionError } = await supabase
@@ -868,6 +878,13 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
         if (missionError) {
           throw missionError;
         };
+
+        const { error: inventoryError } = await supabase
+        .from('inventory')
+        .insert([inventoryData]);
+      if (inventoryError) {
+        throw inventoryError;
+      }
       };
 
       for (const [resourceId, requiredQuantity] of Object.entries(craftItem.recipe)) {
