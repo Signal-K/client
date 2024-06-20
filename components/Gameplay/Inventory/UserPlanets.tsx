@@ -14,6 +14,10 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ProfileCard } from "@/auth/UserProfileFields";
 import GoToYourPlanet from "../Travel/InitTravel";
 import UserItemsUndeployed from "./InactiveItems";
+import { Card } from "@/ui/Card";
+import CraftStructure from "./Actions/CraftStructure";
+import FirstClassification from "@/Classifications/FirstClassification";
+import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -51,56 +55,12 @@ export interface UserPlanetData {
     lightkurve: string;
 };
 
-const ActivePlanetContext = createContext<ActivePlanetContextValue>({
-    activePlanet: null,
-    setActivePlanet: () => {} // Provide a default empty function
-});
-
 // View structures, planet info & automatons
 const UserPlanetPage = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const { activePlanet } = useActivePlanet();
-
-    if (!activePlanet) {
-        return (
-            <div className="mx-12">
-                {/* Desktop Layout */}
-                <div className="hidden md:grid md:grid-cols-3 md:gap-4 md:relative md:min-h-screen">
-                    <div className="hidden md:flex justify-center items-center"></div>
-                    <div className="hidden md:flex justify-center items-center">
-                        <PickYourPlanet onPlanetSelect={() => {}}/>
-                    </div>
-                    <div className="hidden md:flex justify-center items-center"></div>
-                    <div className="hidden md:flex justify-center items-center"></div>
-                    <div className="hidden md:flex justify-center items-center"></div>
-                    <div className="hidden md:flex justify-center items-center"></div>
-                    <div className="hidden md:flex justify-center items-center"></div>
-                    <div className="hidden md:flex justify-center items-center">
-                    </div>
-                    <div className="hidden md:flex justify-center items-center"></div>
-                    <div className="hidden md:flex justify-center items-center"></div>
-                </div>
-
-                {/* Mobile Layout */}
-                <div className="grid grid-cols-3 gap-4 md:hidden relative min-h-screen">
-                    <div>01</div>
-                    <div>02</div>
-                    <div className="col-span-3 flex justify-center items-end pb-5">
-                        <PickYourPlanet onPlanetSelect={() => {}}/>
-                    </div>
-                    <div>04</div>
-                    <div>05</div>
-                    <div>06</div>
-                    <div>07</div>
-                    <div>08</div>
-                    <div className="col-span-3 flex justify-center items-end pb-5">
-                    </div>
-                </div>
-            </div>
-        );
-    };
+    const { activePlanet } = useActivePlanet() || {};
 
     const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
 
@@ -117,7 +77,7 @@ const UserPlanetPage = () => {
                     if (error) {
                         console.error('Error fetching missions:', error.message);
                         return;
-                    };
+                    }
 
                     const missionStatusMap = new Map(); // Create a map of mission completion statuses
                     data.forEach((mission) => {
@@ -134,53 +94,66 @@ const UserPlanetPage = () => {
         fetchMissionCompletionStatus();
     }, [session, supabase]);
 
-    if (missionCompletionStatus.has(21)) {
-        return (
-            <>If you've completed all of the first two groups of missions, you can continue with the general flow (or maybe just the first mission group, and we extend the tooltips beyond that)</>
-        );
+    const renderContent = () => {
+        if (!missionCompletionStatus.has(1)) {
+            return <PickYourPlanet onPlanetSelect={() => {}} />;
+        } else if (!missionCompletionStatus.has(2)) {
+            return <ProfileCard />;
+        } else if (!missionCompletionStatus.has(3)) {
+            return <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />;
+        } else if (!missionCompletionStatus.has(4) || !missionCompletionStatus.has(5)) {
+            return (
+                <>
+                    <UserItemsUndeployed />
+                    <AllStructures />
+                </>
+            );
+        } else {
+            return (
+                <>
+                    <AllStructures />
+                    {!missionCompletionStatus.has(7) && (
+                        <center><CraftStructure structureId={14} /></center>
+                    )}
+                    {!missionCompletionStatus.has(8) && missionCompletionStatus.has(7) && (
+                        <></>
+                    )}
+                    {missionCompletionStatus.has(8) && (
+                        <center><UserAnomaliesComponent /></center>
+                    )}
+                </>
+            );
+        }
     };
+    
+
+    const renderAutomatonContent = () => {
+        if (!missionCompletionStatus.has(6)) {
+            return (
+                <>No automatons</>
+            )
+        } else {
+            return <AllAutomatons />;
+        }
+    }
 
     return (
         <div className="mx-12">
             {/* Desktop Layout */}
             <div className="hidden md:grid md:grid-cols-5 md:grid-rows-4 md:gap-4 md:relative md:min-h-screen">
-                <div className="hidden md:flex justify-center items-center">
-                </div>
+                <div className="hidden md:flex justify-center items-center"></div>
                 <div className="hidden md:flex justify-center items-center col-span-3">
-                    {/* Conditional rendering based on mission completion */}
-                    {!missionCompletionStatus.has(1) && (
-                        <PickYourPlanet onPlanetSelect={() => {}}/>
-                    )}
-                    {!activePlanet && (
-                        <PickYourPlanet onPlanetSelect={() => {}}/>
-                    )}
-                    {!missionCompletionStatus.has(2) && (
-                        <ProfileCard />
-                    )}
-                    {!missionCompletionStatus.has(3) && (
-                        <GoToYourPlanet planetId={parseInt(activePlanet.id)} />
-                    )}
-                    {!missionCompletionStatus.has(4) && (
-                        <>
-                            <UserItemsUndeployed />
-                            <AllStructures />
-                        </>
-                    )}
+                    {renderContent()}
                 </div>
-                <div className="hidden md:flex justify-center items-center">
-                    4
-                </div>
+                <div className="hidden md:flex justify-center items-center">4</div>
                 <div className="hidden md:flex justify-center items-center">5</div>
                 <div className="hidden md:flex justify-center items-center">6</div>
                 <div className="hidden md:flex justify-center items-center">7</div>
-                <div className="hidden md:flex justify-center items-center">
-                    {/* <SingleAutomaton /> */}
-                </div>
                 <div className="hidden md:flex justify-center items-center">8</div>
                 <div className="hidden md:flex justify-center items-center">9</div>
                 <div className="hidden md:flex justify-center items-center">10</div>
                 <div className="hidden md:flex justify-center items-center">11</div>
-                <div className="hidden md:flex justify-center items-center">12</div>
+                <div className="hidden md:flex justify-center items-center">{renderAutomatonContent()}</div>
                 <div className="hidden md:flex justify-center items-center">13</div>
                 <div className="hidden md:flex justify-center items-center">14</div>
                 <div className="hidden md:flex justify-center items-center">15</div>
@@ -196,24 +169,26 @@ const UserPlanetPage = () => {
             </div>
 
             {/* Mobile Layout */}
-            <div className="grid grid-cols-3 grid-rows-3 gap-4 md:hidden relative min-h-screen">
-                <div>01</div>
-                <div>02</div>
-                <div>03</div>
-                <div>04</div>
-                <div className="col-span-3 flex justify-center items-end pb-5">
-                    <AllStructures />
+            <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
+                <div className="grid grid-cols-1 grid-rows-auto gap-4">
+                    <div>01</div>
+                    <div>02</div>
+                    <div>03</div>
+                    <div>04</div>
+                    <div className="col-span-1 flex justify-center items-end pb-5">
+                        {renderContent()}
+                    </div>
+                    <div>05</div>
+                    <div>06</div>
+                    <div>07</div>
+                    <div>08</div>
+                    <div className="col-span-1 flex justify-center items-end pb-5">
+                        {renderAutomatonContent()}
+                    </div>
+                    <div>09</div>
+                    <div>10</div>
+                    <div>11</div>
                 </div>
-                <div>05</div>
-                <div>06</div>
-                <div>07</div>
-                <div>08</div>
-                <div className="col-span-3 flex justify-center items-end pb-5">
-                    <AllAutomatons />
-                </div>
-                <div>09</div>
-                <div>10</div>
-                <div>11</div>
             </div>
         </div>
     );

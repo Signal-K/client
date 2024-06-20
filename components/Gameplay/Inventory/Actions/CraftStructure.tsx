@@ -112,32 +112,47 @@ export default function CraftStructure({ structureId }: { structureId: number })
     const craftStructure = async () => {
         if (session && activePlanet?.id && craftable) {
             try {
+                // Fetch the parent item first to ensure it exists
+                const { data: parentData, error: parentError } = await supabase
+                    .from('inventory')
+                    .select('id')
+                    .eq('owner', session?.user?.id)
+                    .eq('item', 12) // Assuming 12 is the ID for the telescope
+                    .eq('anomaly', activePlanet?.id);
+
+                if (parentError || !parentData || parentData.length === 0) {
+                    throw new Error('Parent item does not exist');
+                }
+
+                const parentItemId = parentData[0].id;
+
                 const { data, error } = await supabase
                     .from('inventory')
-                    .upsert([
+                    .insert([
                         {
                             item: structureId,
                             owner: session?.user?.id,
                             quantity: 1,
                             time_of_deploy: new Date().toISOString(),
-                            parentItem: userTelescopeId,
+                            parentItem: parentItemId,
                             notes: `Created by crafting ${structureId} for mission 7`,
                             anomaly: activePlanet.id,
                         },
-                    ]);
-    
+                    ])
+                    .select();
+
                 if (error) {
                     throw error;
                 }
-    
+
                 handleMissionComplete();
-    
+
                 // Wait for the newly created row to be fetched
                 await fetchNewlyCreatedRow();
-    
+
                 // Now that we have the correct structureTableId, update the notes
                 await updateNotes();
-    
+
                 // Refetch the user inventory after creating a structure
                 fetchUserInventory();
             } catch (error: any) {

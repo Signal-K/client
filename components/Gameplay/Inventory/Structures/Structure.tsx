@@ -86,14 +86,15 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
     };
 
     return (
-        <div className="flex flex-col items-center justify-center" style={style}>
+        <div className={`flex flex-col items-center justify-center p-4 ${style}`}>
             <img
                 src={structure.icon_url}
                 alt={structure.name}
-                className="w-14 h-14 mb-2 cursor-pointer"
+                className="w-16 h-16 mb-2 cursor-pointer"
                 onClick={openModal}
             />
-            <p>{structure.name}</p>
+            <p className="text-center text-sm font-medium">{structure.name}</p>
+
             {structure.id === 12 && (
                 <TelescopeReceiverStructureModal
                     isOpen={isModalOpen}
@@ -110,14 +111,6 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
                     structure={structure}
                 />
             )}
-            {/* {structure.id === 24 && (
-                <SurveyorStructureModal
-                    isOpen={isModalOpen}
-                    onClose={closeModal}
-                    ownedItem={ownedItem}
-                    structure={structure}
-                />
-            )} */}
             {structure.id === 22 && (
                 <AnomalyStructureModal
                     isOpen={isModalOpen}
@@ -144,6 +137,7 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
             )}
             {structure.id === 31 && (
                 <AutomatonUpgradeStructureModal
+                    // No isOpen prop expected here based on the error message
                     onClose={closeModal}
                     ownedItem={ownedItem}
                     structure={structure}
@@ -151,14 +145,14 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
             )}
             {structure.id === 28 && (
                 <CameraAutomatonModule
-                    // onClose={closeModal}
-                    // ownedItem={ownedItem}
-                    // structure={structure}
+                    // If this component does not handle modal states directly, ensure it's implemented elsewhere
+                    // If needed, you can pass other necessary props here
                 />
             )}
         </div>
     );
 };
+
 
 export const AllStructures = () => {
     const supabase = useSupabaseClient();

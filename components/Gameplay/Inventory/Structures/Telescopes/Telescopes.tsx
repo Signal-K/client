@@ -205,33 +205,31 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiAnomalies/${activePlanet?.id}/ActivePlanet.png`;
 
     return (
-        // <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <>
-            <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold">{structure.name}</h2>
-                    <button className="btn btn-square btn-outline" onClick={onClose}>
-                        ✕
-                    </button>
-                </div>
-                <div className="flex flex-col items-center mt-4">
-                    <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
-                    <p>ID: {ownedItem.id}</p>
-                    <p>{ownedItem.notes}</p>
-                    <p>Description: {structure.description}</p>
-                    <div className="mt-4">
-                    <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} />
-                    {ownedItem.notes === "Created by crafting 14 for mission 7" ? (
-                        <CreateFirstBaseClassification assetMentioned={imageUrl} />
-                    ) : (
-                        <CreateBaseClassification assetMentioned={imageUrl} />
-                    )}
-                        {isActionDone && <p className="mt-2 text-green-500">Action Completed</p>}
-                    </div>
-                </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold">{structure.name}</h2>
+              <button className="btn btn-square btn-outline" onClick={onClose}>
+                ✕
+              </button>
             </div>
-        </>
-        // {/* </div> */}
+            <div className="flex flex-col items-center mt-4">
+              <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
+              <p>ID: {ownedItem.id}</p>
+              <p>{ownedItem.notes}</p>
+              <p>Description: {structure.description}</p>
+              <div className="mt-4">
+                <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} />
+                {ownedItem.notes === 'Created by crafting 14 for mission 7' ? (
+                  <CreateFirstBaseClassification assetMentioned={imageUrl} />
+                ) : (
+                  <CreateBaseClassification assetMentioned={imageUrl} />
+                )}
+                {isActionDone && <p className="mt-2 text-green-500">Action Completed</p>}
+              </div>
+            </div>
+          </div>
+        </div>
     );
 };
 

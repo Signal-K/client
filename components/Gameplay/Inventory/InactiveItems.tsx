@@ -106,7 +106,7 @@ export default function UserItemsUndeployed() {
 
     return (
         <div className="p-5">
-            <h2>Undeployed Items</h2>
+            <h2 className="text-2xl font-semibold mb-4">Undeployed Structures</h2>
             <div className="grid grid-cols-4 gap-4">
                 {inventoryItems?.map((item) => (
                     <div key={item.id} className="border p-2">
