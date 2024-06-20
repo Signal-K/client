@@ -86,8 +86,7 @@ export default function PickYourPlanet({ onPlanetSelect }: PickYourPlanetProps) 
         throw inventoryError;
       }
 
-      // Callback to parent component if needed
-      onPlanetSelect(planetId);
+      onPlanetSelect(planetId); // Callback to parent component if needed
     } catch (error: any) {
       console.error("Error handling planet selection:", error.message);
     }
@@ -113,4 +112,4 @@ export default function PickYourPlanet({ onPlanetSelect }: PickYourPlanetProps) 
       </div>
     </section>
   );
-}
+};

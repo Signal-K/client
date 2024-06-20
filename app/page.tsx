@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Inter } from "next/font/google";
-import Layout from "@/components/Layout";
+import Layout, { LayoutNoPlanet } from "@/components/Layout";
 import MissionList from "@/components/Content/MissionList";
 import UserPlanetPage from "@/components/Gameplay/Inventory/UserPlanets";
 import { useSession } from "@supabase/auth-helpers-react";
@@ -22,9 +22,9 @@ export default function Home() {
 
   if (!activePlanet) {
     return (
-      <Link href="/onboarding"><button className="btn">
-        Set your location
-      </button></Link>
+      <LayoutNoPlanet bg={true}>
+        <UserPlanetPage />
+      </LayoutNoPlanet>
     );
   };
 
