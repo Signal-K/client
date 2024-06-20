@@ -13,6 +13,7 @@ import PickYourPlanet from "@/components/Onboarding";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ProfileCard } from "@/auth/UserProfileFields";
 import GoToYourPlanet from "../Travel/InitTravel";
+import UserItemsUndeployed from "./InactiveItems";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -62,165 +63,6 @@ const UserPlanetPage = () => {
 
     const { activePlanet } = useActivePlanet();
 
-    const [hasCompletedMission2, setHasCompletedMission2] = useState(false);
-    const [hasCompletedMission3, setHasCompletedMission3] = useState(false);
-    const [hasCompletedMission4, setHasCompletedMission4] = useState(false);
-    const [hasCompletedMission5, setHasCompletedMission5] = useState(false);
-    const [hasCompletedMission6, setHasCompletedMission6] = useState(false);
-    const [hasCompletedMission7, setHasCompletedMission7] = useState(false);
-    const [hasCompletedMission8, setHasCompletedMission8] = useState(false);
-    const [hasCompletedMission9, setHasCompletedMission9] = useState(false);
-    const [hasCompletedMission10, setHasCompletedMission10] = useState(false);
-    const [hasCompletedMission11, setHasCompletedMission11] = useState(false);
-    const [hasCompletedMission12, setHasCompletedMission12] = useState(false);
-    const [hasCompletedMission13, setHasCompletedMission13] = useState(false);
-    const [hasCompletedMission14, setHasCompletedMission14] = useState(false);
-    const [hasCompletedMission15, setHasCompletedMission15] = useState(false);
-    const [hasCompletedMission16, setHasCompletedMission16] = useState(false);
-    const [hasCompletedMission17, setHasCompletedMission17] = useState(false);
-    const [hasCompletedMission18, setHasCompletedMission18] = useState(false);
-    
-      
-      useEffect(() => {
-        const checkMissionCompletion = async () => {
-          if (session) {
-            const { data, error } = await supabase
-              .from('missions')
-              .select('mission')
-              .eq('user', session.user.id)
-              .eq('mission', 2);
-    
-            if (error) {
-              console.error('Error checking mission completion:', error);
-            } else {
-              setHasCompletedMission2(data.length > 0);
-            }
-          }
-        };
-    
-        checkMissionCompletion();
-      }, [session, supabase]);
-
-      useEffect(() => {
-        const checkMissionCompletion = async () => {
-          if (session) {
-            const { data, error } = await supabase
-              .from('missions')
-              .select('mission')
-              .eq('user', session.user.id)
-              .eq('mission', 3);
-    
-            if (error) {
-              console.error('Error checking mission completion:', error);
-            } else {
-              setHasCompletedMission3(data.length > 0);
-            }
-          }
-        };
-    
-        checkMissionCompletion();
-      }, [session, supabase]);
-
-      useEffect(() => {
-        const checkMissionCompletion = async () => {
-          if (session) {
-            const { data, error } = await supabase
-              .from('missions')
-              .select('mission')
-              .eq('user', session.user.id)
-              .eq('mission', 4);
-    
-            if (error) {
-              console.error('Error checking mission completion:', error);
-            } else {
-              setHasCompletedMission4(data.length > 0);
-            }
-          }
-        };
-    
-        checkMissionCompletion();
-      }, [session, supabase]);
-
-      useEffect(() => {
-        const checkMissionCompletion = async () => {
-          if (session) {
-            const { data, error } = await supabase
-              .from('missions')
-              .select('mission')
-              .eq('user', session.user.id)
-              .eq('mission', 5);
-    
-            if (error) {
-              console.error('Error checking mission completion:', error);
-            } else {
-              setHasCompletedMission5(data.length > 0);
-            }
-          }
-        };
-    
-        checkMissionCompletion();
-      }, [session, supabase]);
-
-      useEffect(() => {
-        const checkMissionCompletion = async () => {
-          if (session) {
-            const { data, error } = await supabase
-              .from('missions')
-              .select('mission')
-              .eq('user', session.user.id)
-              .eq('mission', 6);
-    
-            if (error) {
-              console.error('Error checking mission completion:', error);
-            } else {
-              setHasCompletedMission6(data.length > 0);
-            }
-          }
-        };
-    
-        checkMissionCompletion();
-      }, [session, supabase]);
-
-      useEffect(() => {
-        const checkMissionCompletion = async () => {
-          if (session) {
-            const { data, error } = await supabase
-              .from('missions')
-              .select('mission')
-              .eq('user', session.user.id)
-              .eq('mission', 7);
-    
-            if (error) {
-              console.error('Error checking mission completion:', error);
-            } else {
-              setHasCompletedMission7(data.length > 0);
-            }
-          }
-        };
-    
-        checkMissionCompletion();
-      }, [session, supabase]);
-
-    useEffect(() => {
-        const checkMissionCompletion = async () => {
-          if (session) {
-            const { data, error } = await supabase
-              .from('missions')
-              .select('mission')
-              .eq('user', session.user.id)
-              .eq('mission', 8);
-    
-            if (error) {
-              console.error('Error checking mission completion:', error);
-            } else {
-              setHasCompletedMission8(data.length > 0);
-            }
-          }
-        };
-    
-        checkMissionCompletion();
-      }, [session, supabase]);
-
     if (!activePlanet) {
         return (
             <div className="mx-12">
@@ -260,19 +102,69 @@ const UserPlanetPage = () => {
         );
     };
 
+    const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
+
+    // Effect to fetch all mission completion statuses for the user
+    useEffect(() => {
+        const fetchMissionCompletionStatus = async () => {
+            if (session) {
+                try {
+                    const { data, error } = await supabase
+                        .from('missions')
+                        .select('mission')
+                        .eq('user', session.user.id);
+
+                    if (error) {
+                        console.error('Error fetching missions:', error.message);
+                        return;
+                    };
+
+                    const missionStatusMap = new Map(); // Create a map of mission completion statuses
+                    data.forEach((mission) => {
+                        missionStatusMap.set(mission.mission, true);
+                    });
+
+                    setMissionCompletionStatus(missionStatusMap);
+                } catch (error: any) {
+                    console.error('Error fetching mission completion status:', error.message);
+                }
+            }
+        };
+
+        fetchMissionCompletionStatus();
+    }, [session, supabase]);
+
+    if (missionCompletionStatus.has(21)) {
+        return (
+            <>If you've completed all of the first two groups of missions, you can continue with the general flow (or maybe just the first mission group, and we extend the tooltips beyond that)</>
+        );
+    };
+
     return (
         <div className="mx-12">
             {/* Desktop Layout */}
             <div className="hidden md:grid md:grid-cols-5 md:grid-rows-4 md:gap-4 md:relative md:min-h-screen">
                 <div className="hidden md:flex justify-center items-center">
-                    
                 </div>
                 <div className="hidden md:flex justify-center items-center col-span-3">
-                    {!hasCompletedMission2 && (
+                    {/* Conditional rendering based on mission completion */}
+                    {!missionCompletionStatus.has(1) && (
+                        <PickYourPlanet onPlanetSelect={() => {}}/>
+                    )}
+                    {!activePlanet && (
+                        <PickYourPlanet onPlanetSelect={() => {}}/>
+                    )}
+                    {!missionCompletionStatus.has(2) && (
                         <ProfileCard />
                     )}
-                    {!hasCompletedMission3 && hasCompletedMission2 && (
+                    {!missionCompletionStatus.has(3) && (
                         <GoToYourPlanet planetId={parseInt(activePlanet.id)} />
+                    )}
+                    {!missionCompletionStatus.has(4) && (
+                        <>
+                            <UserItemsUndeployed />
+                            <AllStructures />
+                        </>
                     )}
                 </div>
                 <div className="hidden md:flex justify-center items-center">
@@ -282,7 +174,7 @@ const UserPlanetPage = () => {
                 <div className="hidden md:flex justify-center items-center">6</div>
                 <div className="hidden md:flex justify-center items-center">7</div>
                 <div className="hidden md:flex justify-center items-center">
-                    <SingleAutomaton />
+                    {/* <SingleAutomaton /> */}
                 </div>
                 <div className="hidden md:flex justify-center items-center">8</div>
                 <div className="hidden md:flex justify-center items-center">9</div>

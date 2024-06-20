@@ -20,14 +20,6 @@ export default function Home() {
     );
   };
 
-  if (!activePlanet) {
-    return (
-      <LayoutNoPlanet bg={true}>
-        <UserPlanetPage />
-      </LayoutNoPlanet>
-    );
-  };
-
   return (
     <Layout bg={true}>
       <UserPlanetPage />
