@@ -17,17 +17,6 @@ interface Automaton {
     time_of_deploy: string;
 };
 
-interface InventoryItem {
-  id: number;
-  item: number;
-  owner: string;
-  quantity: number;
-  notes: string;
-  parentItem: number | null;
-  time_of_deploy: string;
-  anomaly: string | null;
-};
-
 export function CreateAutomaton() {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -185,10 +174,6 @@ interface UserItem {
   notes: string;
   anomaly: string;
 };
-
-interface ActivePlanet {
-  id: string;
-}
 
 interface OwnedItem {
     id: string;
@@ -538,224 +523,249 @@ export function AllAutomatons() {
 };
 
 export function SingleAutomaton() {
-    const supabase = useSupabaseClient();
-    const session = useSession();
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-    const { activePlanet } = useActivePlanet();
-    const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
-    const [automatonInfo, setAutomatonInfo] = useState<any>(null); // Initialize automatonInfo with type 'any'
+  const { activePlanet } = useActivePlanet();
+  const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
+  const [automatonInfo, setAutomatonInfo] = useState<any>(null);
+  const [rewardTotal, setRewardTotal] = useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<number>(11); // Default to Coal
+  const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
 
-    const [rewardTotal, setRewardTotal] = useState<number>(0);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const items = [
+      { id: 11, name: 'Coal' },
+      { id: 13, name: 'Silicon' },
+      { id: 15, name: 'Iron' },
+      { id: 16, name: 'Nickel' },
+      { id: 17, name: 'Alloy' },
+      { id: 18, name: 'Fuel' },
+      { id: 19, name: 'Copper' },
+      { id: 20, name: 'Chromium' },
+      { id: 21, name: 'Water' },
+  ];
 
-    async function fetchAutomatonData() {
-        if (!session?.user?.id) {
-            console.error('session.user.id is undefined');
-            return;
-        };
+  useEffect(() => {
+      const fetchMissionCompletionStatus = async () => {
+          if (session) {
+              try {
+                  const { data, error } = await supabase
+                      .from('missions')
+                      .select('mission')
+                      .eq('user', session.user.id);
 
-        if (!activePlanet?.id) {
-            console.error('activePlanet is undefined');
-            return;
-        };
+                  if (error) {
+                      console.error('Error fetching missions:', error.message);
+                      return;
+                  }
 
-        try {
-            const { data, error } = await supabase
-                .from('inventory')
-                .select("*")
-                .eq("owner", session.user.id)
-                .eq("item", 23)
-                .eq("anomaly", activePlanet.id)
-                .limit(1);
+                  const missionStatusMap = new Map();
+                  data.forEach((mission) => {
+                      missionStatusMap.set(mission.mission, true);
+                  });
 
-            if (error) {
-                console.error('Error fetching automaton data:', error);
-                return;
-            };
-
-            if (data) {
-                setUserAutomaton(data[0] || null); // Assuming data is an array
-            };
-        } catch (error) {
-            console.error('Error fetching automaton data:', error);
-        };
-    };
-
-    const fetchRoverInfo = async () => {
-        try {
-            const response = await fetch(`/api/gameplay/inventory`);
-            if (!response.ok) {
-                throw new Error(`Error fetching rover info: ${response.status} ${response.statusText}`);
-            };
-            const data = await response.json();
-            setAutomatonInfo(data.find((item: any) => item.id === userAutomaton?.item));
-        } catch (error: any) {
-            console.error("Error fetching rover info:", error.message);
-        };
-    };
-
-    async function deployAutomaton() {
-        if (userAutomaton != null) {
-            const { data, error } = await supabase
-                .from('inventory')
-                .update({ time_of_deploy: new Date().toISOString() })
-                .eq('id', userAutomaton.id);
-
-            if (error) {
-                console.error('Error deploying automaton:', error);
-                return;
-            }
-
-            console.log('Automaton deployed', data);
-        };
-    };
-
-    const [userItems, setUserItems] = useState<InventoryItem[]>([]);
-    async function fetchUserItems() {
-      if (!session) {
-        return null;
+                  setMissionCompletionStatus(missionStatusMap);
+              } catch (error: any) {
+                  console.error('Error fetching mission completion status:', error.message);
+              }
+          }
       };
 
+      fetchMissionCompletionStatus();
+  }, [session, supabase]);
+
+  async function fetchAutomatonData() {
       try {
-        const { data, error } = await supabase
-            .from("inventory")
-            .select("*")
-            .in("item", [17, 18, 19, 20, 21]) // [11, 13, 15, 16, 17, 18, 19, 20, 21]) // Use 'in' instead of 'eq'
-            .eq("owner", session.user.id);
+          const { data, error } = await supabase
+              .from('inventory')
+              .select("*")
+              .eq("owner", session?.user.id)
+              .eq("item", 23)
+              .eq("anomaly", activePlanet?.id)
+              .limit(1);
 
-        if (error) {
-            throw error;
-        }
-
-        setUserItems(data || []); // Set data or empty array if data is null
-    } catch (error: any) {
-        console.error("Error fetching user items:", error.message);
-    }
-    }
-
-    async function handleMissionComplete() {
-      try {
-          const missionData = {
-              user: session?.user?.id,
-              time_of_completion: new Date().toISOString(),
-              mission: 6,
-              configuration: null,
-              rewarded_items: [13, 13, 15],
+          if (error) {
+              console.error('Error fetching automaton data:', error);
+              return;
           };
 
-          // Insert mission data into missions table
-          const { data: newMission, error: newMissionError } = await supabase
-              .from("missions")
-              .insert([missionData]);
+          if (data) {
+              setUserAutomaton(data[0] || null);
+          };
+      } catch (error) {
+          console.error('Error fetching automaton data:', error);
+      };
+  };
 
-          if (newMissionError) {
-              throw new Error('Error inserting mission data: ' + newMissionError.message);
+  const fetchRoverInfo = async () => {
+      try {
+          const response = await fetch(`/api/gameplay/inventory`);
+          if (!response.ok) {
+              throw new Error(`Error fetching rover info: ${response.status} ${response.statusText}`);
+          };
+          const data = await response.json();
+          setAutomatonInfo(data.find((item: any) => item.id === userAutomaton?.item));
+      } catch (error: any) {
+          console.error("Error fetching rover info:", error.message);
+      };
+  };
+
+  async function deployAutomaton() {
+      if (userAutomaton != null) {
+          const { data, error } = await supabase
+              .from('inventory')
+              .update({ time_of_deploy: new Date().toISOString() })
+              .eq('id', userAutomaton.id);
+
+          if (error) {
+              console.error('Error deploying automaton:', error);
+              return;
           }
 
-          console.log('Mission completed and data inserted', newMission);
-      } catch (error: any) {
-          console.error("Error handling mission completion:", error.message);
-          throw error;
-      }
-  }
+          console.log('Automaton deployed', data);
+      };
+  };
 
-    async function claimRewards() {
+  async function claimRewards() {
+      console.log('Claim Rewards button clicked');
       try {
-          const inventoryData = {
-              item: 13,
-              owner: session?.user?.id,
-              quantity: 2,
-              notes: "Created upon the deployment of the user's first automaton, for mission 6",
-              parentItem: userAutomaton?.id,
-              time_of_deploy: new Date().toISOString(),
-              anomaly: activePlanet?.id,
-          };
+          if (userAutomaton?.time_of_deploy) {
+              console.log('Automaton has a deploy time');
+              const deployTime = new Date(userAutomaton.time_of_deploy).getTime();
+              const currentTime = new Date().getTime();
+              const timeDifference = (currentTime - deployTime) / 1000 / 60;
+              const rewardQuantity = Math.floor(timeDifference);
 
-          const inventoryData2 = {
-              item: 15,
-              owner: session?.user?.id,
-              quantity: 1,
-              notes: "Created upon the deployment of the user's first automaton, for mission 6",
-              parentItem: userAutomaton?.id,
-              time_of_deploy: new Date().toISOString(),
-              anomaly: activePlanet?.id,
-          };
+              console.log('Time difference:', timeDifference);
+              console.log('Reward quantity:', rewardQuantity);
 
-          // Insert rewards into inventory
-          if (!userItems) {
-            const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
-            .from("inventory")
-            .insert([inventoryData, inventoryData2]);
+              if (rewardQuantity > 0) {
+                  console.log('Reward quantity is greater than 0');
 
-        if (newInventoryEntryError) {
-            throw new Error('Error inserting rewards into inventory: ' + newInventoryEntryError.message);
-        }
+                  const { data: insertData, error: insertError } = await supabase.from('inventory').insert([
+                      {
+                          owner: session?.user?.id,
+                          item: selectedItem,
+                          quantity: rewardQuantity,
+                          anomaly: activePlanet?.id,
+                          notes: `Reward from automaton id: ${userAutomaton.id}`,
+                      },
+                  ]);
 
-        console.log('Inventory updated', newInventoryEntry); }
-          await handleMissionComplete();
-          console.log("Rewards claimed successfully.");
+                  if (insertError) {
+                      console.error('Error inserting reward', insertError);
+                      return;
+                  };
+
+                  console.log('Rewards inserted: ', insertData);
+
+                  const { data: updateData, error: updateError } = await supabase
+                      .from('inventory')
+                      .update({ time_of_deploy: null })
+                      .eq('id', userAutomaton.id);
+
+                  if (updateError) {
+                      console.error('Error updating automaton', updateError);
+                      return;
+                  };
+
+                  console.log('Automaton updated', updateData);
+
+                  setRewardTotal(rewardQuantity);
+                  console.log(`Rewards claimed: ${rewardQuantity}`);
+              } else {
+                  console.log('Reward quantity is 0 or less, no rewards to claim');
+              }
+          } else {
+              console.log('No deploy time found for automaton');
+          }
       } catch (error: any) {
           console.error("Error claiming rewards:", error.message);
       }
-  }
+  };
 
+  useEffect(() => {
+      fetchAutomatonData();
+  }, [session, activePlanet]);
 
-    useEffect(() => {
-        fetchAutomatonData();
-    }, [session, activePlanet]);
+  useEffect(() => {
+      if (userAutomaton) {
+          fetchRoverInfo();
+      }
+  }, [userAutomaton]);
 
-    useEffect(() => {
-        if (userAutomaton) {
-            fetchRoverInfo();
-        }
-    }, [userAutomaton]);
+  const getAvailableItems = () => {
+      if (missionCompletionStatus.has(21)) {
+          return items;
+      } else if (missionCompletionStatus.has(8)) {
+          return items.filter(item => [11, 13, 15, 16].includes(item.id));
+      } else {
+          return items.filter(item => item.id === 11);
+      }
+  };
 
-    return (
-        <>
-            {userAutomaton ? (
-                <>
-                    <img
-                        src={automatonInfo?.icon_url}
-                        alt={automatonInfo?.name}
-                        className="w-32 h-32 mb-2 cursor-pointer"
-                        onClick={() => setIsModalOpen(true)}
-                    />
-                    {isModalOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                            <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
-                                <div className="flex justify-between items-center">
-                                    <h2 className="text-xl font-bold">Automaton Details</h2>
-                                    <button
-                                        className="btn btn-square btn-outline"
-                                        onClick={() => setIsModalOpen(false)}
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-                                <div className="flex flex-col items-center mt-4">
-                                    <img src={automatonInfo?.icon_url} alt={automatonInfo?.name} className="w-1 h-1 mb-2 cursor-pointer shadow-lg" />
-                                    <p>ID: {userAutomaton.id}</p>
-                                    <p>Status: {userAutomaton.notes}</p>
-                                    <div className="mt-4 flex space-x-4">
-                                        <button className="btn btn-primary" onClick={deployAutomaton}>
-                                            Deploy Automaton
-                                        </button>
-                                        {userAutomaton.time_of_deploy && (
-                                            <button className="btn btn-secondary" onClick={claimRewards}>
-                                                Claim Rewards!
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </>
-            ) : (
-                <p>No automaton found</p>
-            )}
-        </>
-    );
+  return (
+      <>
+          {userAutomaton ? (
+              <>
+                  <img
+                      src={automatonInfo?.icon_url}
+                      alt={automatonInfo?.name}
+                      className="w-32 h-32 mb-2 cursor-pointer"
+                      onClick={() => setIsModalOpen(true)}
+                  />
+                  {isModalOpen && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                          <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
+                              <div className="flex justify-between items-center">
+                                  <h2 className="text-xl font-bold">Automaton Details</h2>
+                                  <button
+                                      className="btn btn-square btn-outline"
+                                      onClick={() => setIsModalOpen(false)}
+                                  >
+                                      ✕
+                                  </button>
+                              </div>
+                              <div className="flex flex-col items-center mt-4">
+                                  <img src={automatonInfo?.icon_url} alt={automatonInfo?.name} className="w-1 h-1 mb-2 cursor-pointer shadow-lg" />
+                                  <p>ID: {userAutomaton.id}</p>
+                                  <p>Status: {userAutomaton.notes}</p>
+                                  <div className="mt-4">
+                                      <label htmlFor="item-select">Select Item to Mine:</label>
+                                      <select
+                                          id="item-select"
+                                          className="form-select mt-2"
+                                          value={selectedItem}
+                                          onChange={(e) => setSelectedItem(Number(e.target.value))}
+                                      >
+                                          {getAvailableItems().map(item => (
+                                              <option key={item.id} value={item.id}>
+                                                  {item.name}
+                                              </option>
+                                          ))}
+                                      </select>
+                                  </div>
+                                  <div className="mt-4 flex space-x-4">
+                                      <button className="btn btn-primary" onClick={deployAutomaton}>
+                                          Deploy Automaton
+                                      </button>
+                                      {userAutomaton.time_of_deploy && (
+                                          <button className="btn btn-secondary" onClick={claimRewards}>
+                                              Claim Rewards!
+                                          </button>
+                                      )}
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  )}
+              </>
+          ) : (
+              <p>No automaton found</p>
+          )}
+      </>
+  );
 };
 
 export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number }) {

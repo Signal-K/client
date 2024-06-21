@@ -98,6 +98,7 @@ const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiAnomalies/${active
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} />
+                <img src='http://127.0.0.1:54321/storage/v1/object/sign/avatars/1.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzLzEucG5nIiwiaWF0IjoxNzE4OTI3NzY3LCJleHAiOjE3MTk1MzI1Njd9.L6h_gjtTp7epJc6Kg9--xjsEdeUdrGuAb9tq39RLy2o&t=2024-06-20T23%3A56%3A07.051Z' alt={`Active Planet ${activePlanet?.id}`} />
                 {/* <CreateCloudClassification assetMentioned={imageUrl} /> */}
                 <CreateFirstMeteorologyClassification assetMentioned={imageUrl} />
               </div>
