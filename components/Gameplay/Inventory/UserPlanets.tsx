@@ -79,7 +79,7 @@ const UserPlanetPage = () => {
                         return;
                     }
 
-                    const missionStatusMap = new Map(); // Create a map of mission completion statuses
+                    const missionStatusMap = new Map();
                     data.forEach((mission) => {
                         missionStatusMap.set(mission.mission, true);
                     });
@@ -118,59 +118,51 @@ const UserPlanetPage = () => {
                     {!missionCompletionStatus.has(8) && missionCompletionStatus.has(7) && (
                         <></>
                     )}
-                    {missionCompletionStatus.has(8) && (
+                    {/* {missionCompletionStatus.has(8) && (
                         <center><UserAnomaliesComponent /></center>
-                    )}
+                    )} */}
                 </>
             );
         }
     };
-    
 
     const renderAutomatonContent = () => {
         if (!missionCompletionStatus.has(6)) {
-            return (
-                <>No automatons</>
-            )
+            return <>No automatons</>;
         } else {
             return <AllAutomatons />;
         }
-    }
+    };
 
     return (
         <div className="mx-12">
             {/* Desktop Layout */}
-            <div className="hidden md:grid md:grid-cols-5 md:grid-rows-4 md:gap-4 md:relative md:min-h-screen">
-                <div className="hidden md:flex justify-center items-center"></div>
-                <div className="hidden md:flex justify-center items-center col-span-3">
+            <div className="hidden md:grid md:grid-cols-5 md:grid-rows-3 md:gap-4 md:relative md:h-full">
+                <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12"> 
                     {renderContent()}
                 </div>
-                <div className="hidden md:flex justify-center items-center">4</div>
-                <div className="hidden md:flex justify-center items-center">5</div>
-                <div className="hidden md:flex justify-center items-center">6</div>
-                <div className="hidden md:flex justify-center items-center">{renderAutomatonContent()}</div>
-                <div className="hidden md:flex justify-center items-center"><SingleAutomaton /></div>
-                <div className="hidden md:flex justify-center items-center">14</div>
+                <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center"></div> 
+                <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12 mb-12"> 
+                    {renderAutomatonContent()}
+                </div>
             </div>
 
             {/* Mobile Layout */}
             <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
-                <div className="grid grid-cols-1 grid-rows-auto gap-4">
-                    <div>01</div>
-                    <div>02</div>
-                    <div>04</div>
-                    <div className="col-span-1 flex justify-center items-end pb-5">
-                        {renderContent()}
-                    </div>
-                    <div>05</div>
-                    <div>08</div>
-                    <div className="col-span-1 flex justify-center items-end pb-5">
-                        {renderAutomatonContent()}
-                    </div>
-                    <div>09</div>
-                    <div>10</div>
-                    <div>11</div>
+                <div>01</div>
+                <div>02</div>
+                <div>04</div>
+                <div className="col-span-1 flex justify-center items-end pb-5">
+                    {renderContent()}
                 </div>
+                <div>05</div>
+                <div>08</div>
+                <div className="col-span-1 flex justify-center items-end pb-5">
+                    {renderAutomatonContent()}
+                </div>
+                <div>09</div>
+                <div>10</div>
+                <div>11</div>
             </div>
         </div>
     );

@@ -11,7 +11,7 @@ const Login = () => {
 
     useEffect(() => {
         if (session) {
-            router.push('/missions/one');
+            router.push('/');
         }
     }, [session, router]);
 
