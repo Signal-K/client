@@ -127,8 +127,11 @@ const UserPlanetPage = () => {
     };
 
     const renderAutomatonContent = () => {
-        if (!missionCompletionStatus.has(6)) {
+        if (!missionCompletionStatus.has(4)) {
             return <>No automatons</>;
+        } 
+        else         if (missionCompletionStatus.has(9)) {
+            return <><SingleAutomaton /></>;
         } else {
             return <AllAutomatons />;
         }

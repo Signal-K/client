@@ -142,7 +142,6 @@ export function CreateAutomaton() {
         <>
             {!already && (
                 <div>
-                    Create a new automaton
                     <button onClick={handleCreateAutomaton}>Create Automaton</button>
                 </div>
             )}
