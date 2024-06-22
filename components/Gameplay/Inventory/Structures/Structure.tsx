@@ -9,10 +9,10 @@ import CreateBaseClassification from "@/Classifications/ClassificationForm";
 import { useProfileContext } from "@/context/UserProfile";
 import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "./Telescopes/Telescopes";
 import { AnomalyStructureModal } from "../Automatons/Automaton";
-import { MiningStructureModal } from "./Mining";
+import MiningStationPlaceable from "./Mining";
 import { MeteorologyToolModal } from "./Telescopes/Terrestrial";
 import { AutomatonUpgradeStructureModal } from "./Automatons/Automatons";
-import { CameraAutomatonModule } from "./Automatons/Modules";
+import { CameraAutomatonModule, CameraReceiverStation } from "./Automatons/Modules";
 
 interface OwnedItem {
     id: string;
@@ -120,11 +120,12 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
                 />
             )}
             {structure.id === 30 && (
-                <MiningStructureModal
+                <MiningStationPlaceable
                     isOpen={isModalOpen}
                     onClose={closeModal}
                     ownedItem={ownedItem}
                     structure={structure}
+                    missionId={15}
                 />
             )}
             {structure.id === 26 && (
@@ -137,7 +138,7 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
             )}
             {structure.id === 31 && (
                 <AutomatonUpgradeStructureModal
-                    // No isOpen prop expected here based on the error message
+                    isOpen={isModalOpen}
                     onClose={closeModal}
                     ownedItem={ownedItem}
                     structure={structure}
@@ -147,6 +148,22 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
                 <CameraAutomatonModule
                     // If this component does not handle modal states directly, ensure it's implemented elsewhere
                     // If needed, you can pass other necessary props here
+                />
+            )}
+            {structure.id === 32 && (
+                <CameraReceiverStation
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    ownedItem={ownedItem}
+                    structure={structure}
+                />
+            )}
+            {structure.id === 24 && (
+                <SurveyorStructureModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    ownedItem={ownedItem}
+                    structure={structure}
                 />
             )}
         </div>
@@ -260,192 +277,6 @@ export const AllStructures = () => {
                 )}
             </div>
         </div>
-    );
-};
-
-// Create structures
-export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSelected }) => {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-    const { activePlanet } = useActivePlanet();
-
-    const [structures, setStructures] = useState<UserStructure[]>([]);
-    const [activeSector, setActiveSector] = useState<number | undefined>();
-    const [isCalloutOpen, setIsCalloutOpen] = useState(false);
-    const [userInventory, setUserInventory] = useState<OwnedItem[]>([]);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-    const fetchStructures = async () => {
-        try {
-            const response = await fetch('/api/gameplay/inventory');
-            if (!response.ok) {
-                throw new Error('Failed to fetch item details from the API');
-            }
-            const data: UserStructure[] = await response.json();
-            const structuredData: UserStructure[] = data.filter(item => item.ItemCategory === 'Structure');
-            setStructures(structuredData);
-        } catch (error: any) {
-            console.error('Error fetching structures:', error.message);
-        }
-    };
-
-    const fetchUserInventory = async () => {
-        try {
-            if (session?.user?.id && activePlanet?.id) {
-                const { data, error } = await supabase
-                    .from('inventory')
-                    .select('*')
-                    .eq('owner', session.user.id)
-                    .eq('anomaly', activePlanet.id);
-
-                if (error) {
-                    throw error;
-                }
-
-                setUserInventory(data || []);
-            }
-        } catch (error: any) {
-            console.error('Error fetching user inventory:', error.message);
-        }
-    };
-
-    useEffect(() => {
-        if (session) {
-            fetchStructures();
-            fetchUserInventory();
-        }
-    }, [session, supabase]);
-
-    const handleStructureClick = async (structure: UserStructure) => {
-        setErrorMessage(null); // Reset error message
-
-        console.log('User Inventory:', userInventory);
-        console.log('Checking structure:', structure);
-
-        // Check if the structure already exists for the user in the current anomaly
-        const structureExistsInAnomaly = userInventory.some(
-            item => Number(item.item) === structure.id && Number(item.anomaly) === Number(activePlanet?.id)
-        );
-
-        if (structureExistsInAnomaly) {
-            setErrorMessage("You already have this structure in the current anomaly.");
-            return;
-        }
-
-        if (structure.id === 14 || structure.id === 24) {
-            const prerequisiteStructure = userInventory.some(item => Number(item.item) === 12);
-            if (!prerequisiteStructure) {
-                setErrorMessage("You need to have structure 12 to create this structure.");
-                return;
-            }
-        }
-
-        if (session && activeSector === 50) {
-            try {
-                const payload = JSON.stringify({
-                    user_id: session?.user?.id,
-                    structure_id: structure.id,
-                });
-
-                const response = await fetch('http://papyrus-production.up.railway.app/craft_structure', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: payload,
-                });
-
-                const data = await response.json();
-                console.log('Response from Flask upon attempt to create structure entry:', data);
-
-                if (data.status === 'proceed') {
-                    await createInventoryUserEntry(structure);
-                } else {
-                    setErrorMessage(data.message || "Unable to create structure.");
-                    return;
-                }
-            } catch (error: any) {
-                console.error('Error:', error.message);
-                setErrorMessage("An error occurred while creating the structure.");
-                return;
-            }
-        } else {
-            await createInventoryUserEntry(structure);
-        }
-        
-        onStructureSelected(structure);
-        setIsCalloutOpen(false);
-    };
-
-    const createInventoryUserEntry = async (structure: UserStructure) => {
-        if (session && activePlanet?.id) {
-            try {
-                const { data, error } = await supabase
-                    .from('inventory')
-                    .upsert([
-                        {
-                            item: structure.id,
-                            owner: session?.user?.id,
-                            quantity: 1,
-                            time_of_deploy: new Date().toISOString(),
-                            notes: "Structure",
-                            anomaly: activePlanet.id,
-                        },
-                    ]);
-
-                if (error) {
-                    throw error;
-                }
-
-                console.log('Inventory user entry created:', data);
-                // Refetch the user inventory after creating a structure
-                fetchUserInventory();
-            } catch (error: any) {
-                console.log(error.message);
-                setErrorMessage("An error occurred while creating the inventory entry.");
-            }
-        }
-    };
-
-    return (
-        <>
-            <center>
-                <div className="relative inline-block text-center pl-10">
-                    <button
-                        type="button"
-                        className="px-4 py-2 text-white bg-blue-500 rounded-md focus:outline-none hover:bg-blue-600"
-                        onClick={() => setIsCalloutOpen(!isCalloutOpen)}
-                    >
-                        Build structure
-                    </button>
-
-                    {isCalloutOpen && (
-                        <div className="origin-top-right absolute right-0 mt-2 w-72 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                            <div className="py-1">
-                                {structures.map((structure) => (
-                                    <div
-                                        key={structure.id}
-                                        className="flex items-center justify-between px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                        onClick={() => handleStructureClick(structure)}
-                                    >
-                                        <div className="flex items-center space-x-2 pl-8">
-                                            <img src={structure.icon_url} alt={structure.name} className="w-8 h-8" />
-                                            <span className="font-bold">{structure.name}</span>
-                                        </div>
-                                        <span className="text-gray-500">{structure.description}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </center>
-            {errorMessage && (
-                <div className="absolute top-0 left-0 right-0 mt-4 mx-auto w-1/2 bg-red-500 text-white p-4 rounded-md">
-                    {errorMessage}
-                </div>
-            )}
-        </>
     );
 };
 

@@ -110,7 +110,7 @@ export default function UserItemsUndeployed() {
             <div className="grid grid-cols-4 gap-4">
                 {inventoryItems?.map((item) => (
                     <div key={item.id} className="border p-2">
-                        <img src={`https://raw.githubusercontent.com/Signal-K/client/initialClassification/public/assets/Inventory/Structures/Telescope2.png`} alt="Item icon" className="w-16 h-16" />
+                        {/* <img src={`https://raw.githubusercontent.com/Signal-K/client/initialClassification/public/assets/Inventory/Structures/Telescope2.png`} alt="Item icon" className="w-16 h-16" /> */}
                         <p>{item.id}</p>
                         <p>{item.item}</p>
                         <p>{item.quantity}</p>

@@ -63,6 +63,17 @@ export default function CraftStructure({ structureId }: { structureId: number })
                         }
                     }
                 }
+
+                // Additional check for structureId 32
+                if (structureId === 32) {
+                    const hasRequiredItem = userInventory.some(
+                        (item) => item.item === 28 && item.quantity > 0 && item.anomaly === activePlanet?.id
+                    );
+                    if (!hasRequiredItem) {
+                        isCraftable = false;
+                    }
+                }
+
                 setRecipeItems(items);
                 setCraftable(isCraftable);
             } catch (error: any) {
@@ -71,7 +82,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
         }
 
         fetchRecipe();
-    }, [structureId, userInventory]);
+    }, [structureId, userInventory, activePlanet]);
 
     const handleMissionComplete = async () => {
         try {

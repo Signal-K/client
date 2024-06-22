@@ -41,14 +41,13 @@ interface UserStructure {
 }
 
 interface AutomatonUpgradeStructureModalProps {
+  isOpen: boolean;
   onClose: () => void;
   ownedItem: MyOwnedItem;
   structure: UserStructure;
 }
 
-export const AutomatonUpgradeStructureModal: React.FC<
-  AutomatonUpgradeStructureModalProps
-> = ({ onClose, ownedItem, structure }) => {
+export const AutomatonUpgradeStructureModal: React.FC<AutomatonUpgradeStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
   const [isActionDone, setIsActionDone] = useState(false);
   const { activePlanet } = useActivePlanet();
 
@@ -60,156 +59,164 @@ export const AutomatonUpgradeStructureModal: React.FC<
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiAnomalies/${activePlanet?.id}/ActivePlanet.png`;
 
+  if (!isOpen) return null;
+
   return (
-    <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">{structure.name}</h2>
-        <button className="btn btn-square btn-outline" onClick={onClose}>
-          ✕
-        </button>
-      </div>
-      <div className="flex flex-col items-center mt-4">
-        <img
-          src={structure.icon_url}
-          alt={structure.name}
-          className="w-32 h-32 mb-2"
-        />
-        <p>ID: {ownedItem.id}</p>
-        <p>{ownedItem.notes}</p>
-        <p>Description: {structure.description}</p>
-        <div className="mt-4">
-          <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} />
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold">{structure.name}</h2>
+          <button className="btn btn-square btn-outline" onClick={onClose}>
+            ✕
+          </button>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              className="bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-200"
-              variant="outline"
-            >
-              Upgrade Vehicle
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
-            <div className="flex flex-col gap-6">
-              <div className="flex items-center justify-between">
-                <DialogTitle className="text-2xl font-bold">
-                  Upgrade Vehicle
-                </DialogTitle>
-                <div>
-                  <XIcon className="h-6 w-6 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" />
+        <div className="flex flex-col items-center mt-4">
+          <img
+            src={structure.icon_url}
+            alt={structure.name}
+            className="w-32 h-32 mb-2"
+          />
+          <p>ID: {ownedItem.id}</p>
+          <p>{ownedItem.notes}</p>
+          <p>Description: {structure.description}</p>
+          <div className="mt-4">
+            <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} />
+          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                className="bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-200"
+                variant="outline"
+              >
+                Upgrade Vehicle
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px]">
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between">
+                  <DialogTitle className="text-2xl font-bold">
+                    Upgrade Vehicle
+                  </DialogTitle>
+                  <button onClick={onClose}>
+                    <XIcon className="h-6 w-6 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" />
+                  </button>
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <GaugeIcon className="h-6 w-6 text-blue-500" />
-                    <div>
-                      <p className="text-sm font-medium">Speed</p>
-                      <p className="text-lg font-bold">120 mph</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <GaugeIcon className="h-6 w-6 text-blue-500" />
+                      <div>
+                        <p className="text-sm font-medium">Speed</p>
+                        <p className="text-lg font-bold">120 mph</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <TruckIcon className="h-6 w-6 text-orange-500" />
+                      <div>
+                        <p className="text-sm font-medium">Storage</p>
+                        <p className="text-lg font-bold">500 lbs</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <TruckIcon className="h-6 w-6 text-orange-500" />
-                    <div>
-                      <p className="text-sm font-medium">Storage</p>
-                      <p className="text-lg font-bold">500 lbs</p>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <BoltIcon className="h-6 w-6 text-yellow-500" />
+                      <div>
+                        <p className="text-sm font-medium">Engine</p>
+                        <p className="text-lg font-bold">V8</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CogIcon className="h-6 w-6 text-green-500" />
+                      <div>
+                        <p className="text-sm font-medium">Modules</p>
+                        <p className="text-lg font-bold">3</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <BoltIcon className="h-6 w-6 text-yellow-500" />
-                    <div>
-                      <p className="text-sm font-medium">Engine</p>
-                      <p className="text-lg font-bold">V8</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm font-medium">Speed</p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        className="rounded-full bg-gray-100 text-blue-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700"
+                        size="icon"
+                        variant="ghost"
+                      >
+                        <PlusIcon className="h-4 w-4" />
+                      </Button>
+                      <p className="text-lg font-bold">+20 mph</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <CogIcon className="h-6 w-6 text-green-500" />
-                    <div>
-                      <p className="text-sm font-medium">Modules</p>
-                      <p className="text-lg font-bold">3</p>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm font-medium">Storage</p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        className="rounded-full bg-gray-100 text-orange-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-orange-400 dark:hover:bg-gray-700"
+                        size="icon"
+                        variant="ghost"
+                      >
+                        <PlusIcon className="h-4 w-4" />
+                      </Button>
+                      <p className="text-lg font-bold">+100 lbs</p>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <p className="text-sm font-medium">Speed</p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      className="rounded-full bg-gray-100 text-blue-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700"
-                      size="icon"
-                      variant="ghost"
-                    >
-                      <PlusIcon className="h-4 w-4" />
-                    </Button>
-                    <p className="text-lg font-bold">+20 mph</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm font-medium">Engine</p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        className="rounded-full bg-gray-100 text-yellow-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-yellow-400 dark:hover:bg-gray-700"
+                        size="icon"
+                        variant="ghost"
+                      >
+                        <PlusIcon className="h-4 w-4" />
+                      </Button>
+                      <p className="text-lg font-bold">V12</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm font-medium">Modules</p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        className="rounded-full bg-gray-100 text-green-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-green-400 dark:hover:bg-gray-700"
+                        size="icon"
+                        variant="ghost"
+                      >
+                        <PlusIcon className="h-4 w-4" />
+                      </Button>
+                      <p className="text-lg font-bold">+1</p>
+                    </div>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <p className="text-sm font-medium">Storage</p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      className="rounded-full bg-gray-100 text-orange-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-orange-400 dark:hover:bg-gray-700"
-                      size="icon"
-                      variant="ghost"
-                    >
-                      <PlusIcon className="h-4 w-4" />
-                    </Button>
-                    <p className="text-lg font-bold">+100 lbs</p>
-                  </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    className="bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-200"
+                    variant="outline"
+                    onClick={onClose}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-400 dark:text-gray-900 dark:hover:bg-blue-500"
+                    variant="outline"
+                    onClick={handleActionClick}
+                  >
+                    Upgrade
+                  </Button>
                 </div>
+                {/* <CreateStructureWithItemRequirementinfo craftingItemId={28} /> */}
+                <CraftStructure structureId={28} />
+                <p>Your modules</p>
+                <AllAutomatonModules />
+                <p>Your automatons</p>
+                <AllAutomatons />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <p className="text-sm font-medium">Engine</p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      className="rounded-full bg-gray-100 text-yellow-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-yellow-400 dark:hover:bg-gray-700"
-                      size="icon"
-                      variant="ghost"
-                    >
-                      <PlusIcon className="h-4 w-4" />
-                    </Button>
-                    <p className="text-lg font-bold">V12</p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <p className="text-sm font-medium">Modules</p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      className="rounded-full bg-gray-100 text-green-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-green-400 dark:hover:bg-gray-700"
-                      size="icon"
-                      variant="ghost"
-                    >
-                      <PlusIcon className="h-4 w-4" />
-                    </Button>
-                    <p className="text-lg font-bold">+1</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  className="bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-200"
-                  variant="outline"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-400 dark:text-gray-900 dark:hover:bg-blue-500"
-                  variant="outline"
-                >
-                  Upgrade
-                </Button>
-              </div>
-              {/* <CreateStructureWithItemRequirementinfo craftingItemId={28} /> */}
-              <CraftStructure structureId={28} />
-              <AllAutomatonModules />
-              <AllAutomatons />
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
     </div>
   );
@@ -217,100 +224,6 @@ export const AutomatonUpgradeStructureModal: React.FC<
 
 interface CheckInventoryProps {
   itemId: number;
-}
-
-export const AUSM: React.FC<CheckInventoryProps> = ({ itemId }) => {
-  if (itemId !== 31) return null;
-
-  const supabase = useSupabaseClient();
-  const session = useSession();
-  const { activePlanet } = useActivePlanet();
-
-  const [ownedItem, setOwnedItem] = useState<MyOwnedItem | null>(null);
-  const [structure, setStructure] = useState<UserStructure | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  async function fetchData() {
-    if (session && activePlanet) {
-      try {
-        const { data: ownedItemsData, error: ownedItemsError } = await supabase
-          .from("inventory")
-          .select("*")
-          .eq("owner", session.user.id)
-          .eq("anomaly", activePlanet.id)
-          .eq("item", itemId);
-
-        if (ownedItemsError) {
-          throw ownedItemsError;
-        }
-
-        if (ownedItemsData && ownedItemsData.length > 0) {
-          const ownedItem = ownedItemsData[0];
-
-          // Fetch item details from the Next.js API
-          const response = await fetch("/api/gameplay/inventory");
-          if (!response.ok) {
-            throw new Error("Failed to fetch item details from the API");
-          }
-          const itemDetailsData: UserStructure[] = await response.json();
-
-          if (itemDetailsData) {
-            const structure = itemDetailsData.find(
-              (itemDetail) => itemDetail.id === itemId
-            );
-
-            if (structure) {
-              setOwnedItem(ownedItem);
-              setStructure(structure);
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    }
-  }
-
-  useEffect(() => {
-    fetchData();
-  }, [session, activePlanet, itemId, supabase]);
-
-  if (!ownedItem || !structure) {
-    return (
-      <div>
-        <button
-          onClick={async () => {
-            const response = await fetch("/api/gameplay/inventory");
-            const itemDetailsData: UserStructure[] = await response.json();
-            const structure = itemDetailsData.find(
-              (itemDetail) => itemDetail.id === itemId
-            );
-          }}
-          className="px-4 py-2 text-white bg-green-500 rounded-md focus:outline-none hover:bg-green-600"
-        >
-          Create Structure
-        </button>
-        {errorMessage && (
-          <div className="mt-4 bg-red-500 text-white p-4 rounded-md">
-            {errorMessage}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <PlacedStructureSingle
-      ownedItem={ownedItem}
-      structure={structure}
-      style={{
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-      }}
-    />
-  );
 };
 
 interface OwnedItem {
@@ -343,12 +256,11 @@ const AllAutomatonModules: React.FC = () => {
       if (session && activePlanet) {
         try {
           // Fetch owned items from supabase
-          const { data: ownedItemsData, error: ownedItemsError } =
-            await supabase
-              .from("inventory")
-              .select("*")
-              .eq("owner", session.user.id)
-              .eq("anomaly", activePlanet.id);
+          const { data: ownedItemsData, error: ownedItemsError } = await supabase
+            .from("inventory")
+            .select("*")
+            .eq("owner", session.user.id)
+            .eq("anomaly", activePlanet.id);
 
           if (ownedItemsError) {
             throw ownedItemsError;
@@ -416,8 +328,8 @@ const AllAutomatonModules: React.FC = () => {
       <h2 className="text-2xl font-semibold mb-4 text-center">
         Your Automaton Modules
       </h2>
-      <div className="relative grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {userStructures.map(({ ownedItem, structure }, index) => (
+      <div className="relative grid gap-4 max-h-96">
+        {userStructures.map(({ ownedItem, structure }) => (
           <PlacedStructureSingle
             key={structure.id}
             ownedItem={ownedItem}

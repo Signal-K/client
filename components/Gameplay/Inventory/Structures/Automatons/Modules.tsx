@@ -58,7 +58,7 @@ export const CameraAutomatonModule: React.FC = () => {
     }
   }
 
-  async function fetchUserModule() {
+  async function fetchUserModule() { 
     if (session && activePlanet) {
       try {
         const { data, error } = await supabase
@@ -134,7 +134,7 @@ export const CameraAutomatonModule: React.FC = () => {
           {hasCameraStation ? (
             <>
                 <p>You has a camera station and can now collect photos!</p>
-                <CameraReceiverStation />
+                {/* <CameraReceiverStation /> */}
             </>
           ) : (
             <>
@@ -154,10 +154,16 @@ export const CameraAutomatonModule: React.FC = () => {
   );
 };
 
-export const CameraReceiverStation: React.FC = () => {
+interface CameraReceiverStationProps {
+  isOpen: boolean;
+  onClose: () => void;
+  ownedItem: any;
+  structure: any;
+}
+
+export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ isOpen, onClose, ownedItem, structure }) => {
   const supabase = useSupabaseClient();
   const session = useSession();
-
   const { activePlanet } = useActivePlanet();
 
   const [cameraModule, setCameraModule] = useState<OwnedItem | null>(null);
@@ -169,192 +175,205 @@ export const CameraReceiverStation: React.FC = () => {
   const [userImages, setUserImages] = useState<{ avatar_url: string, id: number }[]>([]);
 
   useEffect(() => {
+    if (isOpen) {
       fetchInventoryItems();
       fetchUserModule();
       fetchCameraStation();
-  }, [session, activePlanet]);
+    }
+  }, [session, activePlanet, isOpen]);
 
   useEffect(() => {
+    if (isOpen) {
       fetchImages();
       fetchPhotosOnUserPlanet();
-  }, [supabase]);
+    }
+  }, [supabase, isOpen]);
 
   async function fetchInventoryItems() {
-      try {
-          const response = await fetch("/api/gameplay/inventory");
-          if (!response.ok) {
-              throw new Error("Failed to fetch inventory items from the API");
-          }
-          const data: InventoryItem[] = await response.json();
-          setInventoryItems(data);
-      } catch (error) {
-          console.error("Error fetching inventory items:", error);
+    try {
+      const response = await fetch("/api/gameplay/inventory");
+      if (!response.ok) {
+        throw new Error("Failed to fetch inventory items from the API");
       }
+      const data: InventoryItem[] = await response.json();
+      setInventoryItems(data);
+    } catch (error) {
+      console.error("Error fetching inventory items:", error);
+    }
   }
 
   async function fetchUserModule() {
-      if (session && activePlanet) {
-          try {
-              const { data, error } = await supabase
-                  .from("inventory")
-                  .select("*")
-                  .eq("owner", session.user.id)
-                  .eq("anomaly", activePlanet.id)
-                  .eq("item", 28);
+    if (session && activePlanet) {
+      try {
+        const { data, error } = await supabase
+          .from("inventory")
+          .select("*")
+          .eq("owner", session.user.id)
+          .eq("anomaly", activePlanet.id)
+          .eq("item", 28);
 
-              if (error) {
-                  throw error;
-              }
+        if (error) {
+          throw error;
+        }
 
-              if (data && data.length > 0) {
-                  setCameraModule(data[0]);
-              }
-          } catch (error) {
-              console.error("Error fetching user module:", error);
-          }
+        if (data && data.length > 0) {
+          setCameraModule(data[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching user module:", error);
       }
+    }
   }
 
   async function fetchCameraStation() {
-      if (session && activePlanet) {
-          try {
-              const { data, error } = await supabase
-                  .from("inventory")
-                  .select("*")
-                  .eq("owner", session.user.id)
-                  .eq("anomaly", activePlanet.id)
-                  .eq("item", 32);
+    if (session && activePlanet) {
+      try {
+        const { data, error } = await supabase
+          .from("inventory")
+          .select("*")
+          .eq("owner", session.user.id)
+          .eq("anomaly", activePlanet.id)
+          .eq("item", 32);
 
-              if (data && data.length > 0) {
-                  setHasCameraStation(true);
-              } else {
-                  setHasCameraStation(false);
-              }
-          } catch (error) {
-              console.error("Error fetching camera station:", error);
-          }
+        if (data && data.length > 0) {
+          setHasCameraStation(true);
+        } else {
+          setHasCameraStation(false);
+        }
+      } catch (error) {
+        console.error("Error fetching camera station:", error);
       }
+    }
   }
 
   const fetchImages = async () => {
-      const randomDate = Math.floor(Math.random() * 1000) + 1;
-      const selectedRover = 'perseverance';
-      const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${selectedRover}/photos?sol=${randomDate}&api_key=iT0FQTZKpvadCGPzerqXdO5F4b62arNBOP0dtkXE`;
+    const randomDate = Math.floor(Math.random() * 1000) + 1;
+    const selectedRover = 'perseverance';
+    const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${selectedRover}/photos?sol=${randomDate}&api_key=iT0FQTZKpvadCGPzerqXdO5F4b62arNBOP0dtkXE`;
 
-      try {
-          const response = await axios.get(apiUrl);
-          if (response.data.photos && response.data.photos.length > 0) {
-              setRovers([response.data.photos[0].img_src]);
-              setRoverConfig(response.data);
-          } else {
-              setRovers(['No images found for the given date and rover.']);
-          }
-      } catch (error) {
-          console.error(error);
-          setRovers(['An error occurred while fetching the image.']);
+    try {
+      const response = await axios.get(apiUrl);
+      if (response.data.photos && response.data.photos.length > 0) {
+        setRovers([response.data.photos[0].img_src]);
+        setRoverConfig(response.data);
+      } else {
+        setRovers(['No images found for the given date and rover.']);
       }
+    } catch (error) {
+      console.error(error);
+      setRovers(['An error occurred while fetching the image.']);
+    }
 
-      setLoading(false);
+    setLoading(false);
   };
 
   async function fetchPhotosOnUserPlanet() {
-      if (session && activePlanet) {
-          try {
-              const { data, error } = await supabase
-                  .from("anomalies")
-                  .select("*")
-                  .eq("parentAnomaly", String(activePlanet.id))
-                  .eq("anomalytype", "roverImg");
+    if (session && activePlanet) {
+      try {
+        const { data, error } = await supabase
+          .from("anomalies")
+          .select("*")
+          .eq("parentAnomaly", String(activePlanet.id))
+          .eq("anomalytype", "roverImg");
 
-              if (error) {
-                  throw error;
-              }
+        if (error) {
+          throw error;
+        }
 
-              if (data && data.length > 0) {
-                  setUserImages(data.map((rover: any) => ({ avatar_url: rover.avatar_url, id: rover.id })));
-              }
-          } catch (error) {
-              console.error("Error fetching user photos:", error);
-          }
+        if (data && data.length > 0) {
+          setUserImages(data.map((rover: any) => ({ avatar_url: rover.avatar_url, id: rover.id })));
+        }
+      } catch (error) {
+        console.error("Error fetching user photos:", error);
       }
+    }
   }
 
   const handleCollectImage = async (image: string) => {
-      if (session && activePlanet) {
-          try {
-              const { data, error } = await supabase
-                  .from("anomalies")
-                  .insert({
-                      id: "10",
-                      content: `Rover image by ${session.user.id}`,
-                      anomalytype: 'roverImg',
-                      avatar_url: image,
-                      configuration: roverConfig,
-                      parentAnomaly: String(activePlanet.id),
-                      created_at: new Date()
-                  });
+    if (session && activePlanet) {
+      try {
+        const { data, error } = await supabase
+          .from("anomalies")
+          .insert({
+            id: "11",
+            content: `Rover image by ${session.user.id}`,
+            anomalytype: 'roverImg',
+            avatar_url: image,
+            configuration: roverConfig,
+            parentAnomaly: String(activePlanet.id),
+            created_at: new Date()
+          });
 
-                  const missionData = {
-                    user: session?.user?.id,
-                    time_of_completion: new Date().toISOString(),
-                    mission: 17,
-                };
-              
-                const { error: missionError } = await supabase
-                  .from('missions')
-                  .insert([missionData]);
-                  
-                  if (missionError) {
-                    throw missionError;
-                  };
+        const missionData = {
+          user: session?.user?.id,
+          time_of_completion: new Date().toISOString(),
+          mission: 17,
+        };
 
-              if (error) {
-                  throw error;
-              }
+        const { error: missionError } = await supabase
+          .from('missions')
+          .insert([missionData]);
 
-              alert("Image collected successfully!");
-          } catch (error) {
-              console.error("Error collecting image:", error);
-              alert("Failed to collect the image.");
-          }
+        if (missionError) {
+          throw missionError;
+        };
+
+        if (error) {
+          throw error;
+        }
+
+        alert("Image collected successfully!");
+      } catch (error) {
+        console.error("Error collecting image:", error);
+        alert("Failed to collect the image.");
       }
+    }
   };
 
+  if (!isOpen) return null;
+
   if (!hasCameraStation && cameraModule === null) {
-      return (
-          <>You need to collect the required items to do this, hehe</>
-      );
+    return (
+      <>You need to collect the required items to do this, hehe</>
+    );
   }
 
   return (
-      <div className="container mx-auto p-6 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold mb-4 text-center">Camera Receiver Station</h2>
-          {loading ? (
-              <p className="text-center">Loading...</p>
-          ) : (
-              <div className="grid grid-cols-1 gap-4">
-                  {rovers.map((rover, index) => (
-                      <div key={index} className="text-center">
-                          Fetched images
-                          <img src={rover} alt={`Mars Rover ${index}`} className="w-full h-auto rounded-lg" />
-                          <button
-                              onClick={() => handleCollectImage(rover)}
-                              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
-                          >
-                              Collect this image
-                          </button>
-                      </div>
-                  ))}
-                  {userImages.map(({ avatar_url, id }, index) => (
-                      <div key={index} className="text-center">
-                          Your images
-                          <img src={avatar_url} alt={`Mars Rover ${index}`} className="rounded-lg" />
-                          <p>This is your image!</p>
-                          <RoverClassificationFromItem32 roverId={id} />
-                      </div>
-                  ))}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-auto shadow-lg">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold">Camera Receiver Station</h2>
+          <button className="btn btn-square btn-outline" onClick={onClose}>
+            ✕
+          </button>
+        </div>
+        {loading ? (
+          <p className="text-center">Loading...</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-4">
+            {rovers.map((rover, index) => (
+              <div key={index} className="text-center">
+                <h3 className="font-semibold mb-2">Fetched images</h3>
+                <img src={rover} alt={`Mars Rover ${index}`} className="w-full h-auto rounded-lg mb-2" />
+                <button
+                  onClick={() => handleCollectImage(rover)}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
+                >
+                  Collect this image
+                </button>
               </div>
-          )}
+            ))}
+            {userImages.map(({ avatar_url, id }, index) => (
+              <div key={index} className="text-center">
+                <h3 className="font-semibold mb-2">Your images</h3>
+                <img src={avatar_url} alt={`Mars Rover ${index}`} className="rounded-lg mb-2" />
+                <p>This is your image!</p>
+                <RoverClassificationFromItem32 roverId={id} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+    </div>
   );
 };

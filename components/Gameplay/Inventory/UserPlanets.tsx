@@ -6,7 +6,7 @@ import { CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/S
 import { useActivePlanet } from "@/context/ActivePlanet";
 
 import { Button } from "@/ui/button";
-import { AllAutomatons, SingleAutomaton } from "./Automatons/Automaton";
+import { AllAutomatons, SingleAutomaton, SingleAutomatonCraftItem } from "./Automatons/Automaton";
 import { AllStructures } from "./Structures/Structure";
 import Link from "next/link";
 import PickYourPlanet from "@/components/Onboarding";
@@ -18,6 +18,7 @@ import { Card } from "@/ui/Card";
 import CraftStructure from "./Actions/CraftStructure";
 import FirstClassification from "@/Classifications/FirstClassification";
 import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
+import { DeleteMineralsAtEndOfMission } from "./Counters";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -59,12 +60,10 @@ export interface UserPlanetData {
 const UserPlanetPage = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
-
     const { activePlanet } = useActivePlanet() || {};
-
     const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
+    const [userInventory, setUserInventory] = useState(new Set());
 
-    // Effect to fetch all mission completion statuses for the user
     useEffect(() => {
         const fetchMissionCompletionStatus = async () => {
             if (session) {
@@ -91,8 +90,31 @@ const UserPlanetPage = () => {
             }
         };
 
+        const fetchUserInventory = async () => {
+            if (session && activePlanet) {
+                try {
+                    const { data, error } = await supabase
+                        .from('inventory')
+                        .select('item')
+                        .eq('owner', session.user.id)
+                        .eq('anomaly', activePlanet.id);
+
+                    if (error) {
+                        console.error('Error fetching user inventory:', error.message);
+                        return;
+                    }
+
+                    const inventorySet = new Set(data.map((item) => item.item));
+                    setUserInventory(inventorySet);
+                } catch (error: any) {
+                    console.error('Error fetching user inventory:', error.message);
+                }
+            }
+        };
+
         fetchMissionCompletionStatus();
-    }, [session, supabase]);
+        fetchUserInventory();
+    }, [session, supabase, activePlanet]);
 
     const renderContent = () => {
         if (!missionCompletionStatus.has(1)) {
@@ -118,9 +140,6 @@ const UserPlanetPage = () => {
                     {!missionCompletionStatus.has(8) && missionCompletionStatus.has(7) && (
                         <></>
                     )}
-                    {/* {missionCompletionStatus.has(8) && (
-                        <center><UserAnomaliesComponent /></center>
-                    )} */}
                 </>
             );
         }
@@ -129,11 +148,28 @@ const UserPlanetPage = () => {
     const renderAutomatonContent = () => {
         if (!missionCompletionStatus.has(4)) {
             return <>No automatons</>;
-        } 
-        else         if (missionCompletionStatus.has(9)) {
+        } else if (missionCompletionStatus.has(9)) {
             return <><SingleAutomaton /></>;
+        } else if (missionCompletionStatus.has(8)) {
+            return <SingleAutomatonCraftItem craftItemId={30} />;
         } else {
             return <AllAutomatons />;
+        }
+    };
+
+    const renderUtilitiesContext = () => {
+        if (missionCompletionStatus.has(8)) {
+            return (
+                <>
+                    <DeleteMineralsAtEndOfMission />
+                    {!userInventory.has(26) && <CraftStructure structureId={26} />}
+                    {!userInventory.has(31) && <CraftStructure structureId={31} />}
+                    {!userInventory.has(24) && <CraftStructure structureId={24} />}
+                    {!userInventory.has(32) && <CraftStructure structureId={32} />}
+                </>
+            );
+        } else {
+            return null;
         }
     };
 
@@ -144,7 +180,7 @@ const UserPlanetPage = () => {
                 <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12"> 
                     {renderContent()}
                 </div>
-                <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center"><CraftStructure structureId={32} /></div> 
+                <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">{renderUtilitiesContext()}</div> 
                 <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12 mb-12"> 
                     {renderAutomatonContent()}
                 </div>
