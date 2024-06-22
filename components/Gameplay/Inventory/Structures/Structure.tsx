@@ -322,10 +322,13 @@ export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSel
         console.log('User Inventory:', userInventory);
         console.log('Checking structure:', structure);
 
-        const structureExists = userInventory.some(item => item.item === structure.id.toString());
+        // Check if the structure already exists for the user in the current anomaly
+        const structureExistsInAnomaly = userInventory.some(
+            item => Number(item.item) === structure.id && Number(item.anomaly) === Number(activePlanet?.id)
+        );
 
-        if (structureExists) {
-            setErrorMessage("You already have this structure here.");
+        if (structureExistsInAnomaly) {
+            setErrorMessage("You already have this structure in the current anomaly.");
             return;
         }
 
@@ -449,7 +452,6 @@ export const CreateStructure: React.FC<StructureSelectProps> = ({ onStructureSel
 export function CreateStructureWithItemRequirementinfo({ craftingItemId }: { craftingItemId: number }) {
     const supabase = useSupabaseClient();
     const session = useSession();
-
     const { activePlanet } = useActivePlanet();
 
     const [userItems, setUserItems] = useState<UserItem[]>([]);
@@ -461,7 +463,7 @@ export function CreateStructureWithItemRequirementinfo({ craftingItemId }: { cra
         async function fetchUserItems() {
             if (!session) {
                 return;
-            };
+            }
 
             try {
                 const { data, error } = await supabase
@@ -469,25 +471,29 @@ export function CreateStructureWithItemRequirementinfo({ craftingItemId }: { cra
                     .select("*")
                     .eq("owner", session.user.id);
 
+                if (error) {
+                    throw error;
+                }
+
                 setUserItems(data || []);
             } catch (error: any) {
                 console.error("Error fetching user items: ", error.message);
-            };
-        };
+            }
+        }
 
         async function fetchInventoryItems() {
             try {
                 const response = await fetch("/api/gameplay/inventory");
                 if (!response.ok) {
                     throw new Error("Failed to fetch inventory items from the API");
-                };
+                }
 
                 const data = await response.json();
                 setInventoryItems(data);
             } catch (error: any) {
                 console.error("Error fetching inventory items: ", error.message);
-            };
-        };
+            }
+        }
 
         fetchUserItems();
         fetchInventoryItems();
@@ -499,15 +505,15 @@ export function CreateStructureWithItemRequirementinfo({ craftingItemId }: { cra
 
     const handleCraftStructure = async () => {
         setLoading(true);
-    
+
         try {
             const craftItem = inventoryItems.find(item => item.id === craftingItemId);
             if (!craftItem) {
                 return;
-            };
-    
+            }
+
             let canCraft = true;
-    
+
             // Check if user has all the required resources
             const recipe: Recipe = craftItem.recipe || {}; // Ensure recipe is defined
             for (const [resourceId, requiredQuantity] of Object.entries(recipe)) {
@@ -517,12 +523,22 @@ export function CreateStructureWithItemRequirementinfo({ craftingItemId }: { cra
                     break; // Exit loop early if any resource is missing
                 }
             }
-    
+
             if (!canCraft) {
                 alert("You do not have the required resources to craft this item.");
                 return;
             }
-    
+
+            // Check if the structure already exists for the user in the current anomaly
+            const structureExistsInAnomaly = userItems.some(
+                item => Number(item.item) === craftingItemId && Number(item.anomaly) === Number(activePlanet?.id)
+            );
+
+            if (structureExistsInAnomaly) {
+                alert("You already have this structure in the current anomaly.");
+                return;
+            }
+
             // Deduct required resources from user's inventory
             for (const [resourceId, requiredQuantity] of Object.entries(recipe)) {
                 const userResource = userItems.find(item => item.item === parseInt(resourceId));
@@ -533,7 +549,7 @@ export function CreateStructureWithItemRequirementinfo({ craftingItemId }: { cra
                             .from("inventory")
                             .update({ quantity: newQuantity })
                             .eq("id", userResource.id);
-    
+
                         if (error) throw error;
                     } else {
                         const { error } = await supabase
@@ -544,39 +560,38 @@ export function CreateStructureWithItemRequirementinfo({ craftingItemId }: { cra
                     }
                 }
             }
-    
+
             // Add crafted item to user's inventory
             const { error } = await supabase
                 .from("inventory")
                 .insert([{ item: craftItem.id, owner: session?.user.id, quantity: 1, anomaly: activePlanet?.id }]);
 
-                    const missionData = {
-                      user: session?.user?.id,
-                      time_of_completion: new Date().toISOString(),
-                      mission: 12,
-                  };
-                
-                  const { error: missionError } = await supabase
-                    .from('missions')
-                    .insert([missionData]);
-                    
-                    if (missionError) {
-                      throw missionError;
-                    };
-    
+            const missionData = {
+                user: session?.user?.id,
+                time_of_completion: new Date().toISOString(),
+                mission: 12,
+            };
+
+            const { error: missionError } = await supabase
+                .from('missions')
+                .insert([missionData]);
+
+            if (missionError) {
+                throw missionError;
+            }
+
             if (error) {
                 throw error;
-            };
-    
+            }
+
             alert("Item crafted successfully!");
         } catch (error: any) {
             console.error("Error crafting item: ", error.message);
             alert("An error occurred while crafting the item.");
         } finally {
             setLoading(false);
-        };
+        }
     };
-    
 
     return (
         <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg max-w-4xl mx-auto">
