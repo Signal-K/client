@@ -227,7 +227,7 @@ export const AllStructures = () => {
 
     return (
         <div className="p-4 relative">
-            <h2 className="text-2xl font-semibold mb-4">Your Structures</h2>
+            <h2 className="text-2xl font-semibold mb-4">Structures on your planet</h2>
             <div className="relative">
                 <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
                     {userStructures.slice(currentIndex, currentIndex + itemsPerPage).map(({ ownedItem, structure }, index) => (

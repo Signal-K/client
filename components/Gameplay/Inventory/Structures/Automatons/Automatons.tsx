@@ -203,7 +203,8 @@ export const AutomatonUpgradeStructureModal: React.FC<
                   Upgrade
                 </Button>
               </div>
-              <CreateStructureWithItemRequirementinfo craftingItemId={28} />
+              {/* <CreateStructureWithItemRequirementinfo craftingItemId={28} /> */}
+              <CraftStructure structureId={28} />
               <AllAutomatonModules />
               <AllAutomatons />
             </div>

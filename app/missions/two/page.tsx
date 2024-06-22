@@ -13,6 +13,7 @@ import { AUSM } from "@/components/Gameplay/Inventory/Structures/Automatons/Auto
 import { SurveyorStructureModal } from "@/components/Gameplay/Inventory/Structures/Telescopes/Telescopes";
 import MissionList from "@/components/Content/MissionList";
 import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
+import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
 
 export default function MissionGroupTwo() {
     return (
@@ -33,7 +34,8 @@ export default function MissionGroupTwo() {
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         {/* <SingleAutomatonCraftItem craftItemId={26} /> */}
-                        <CreateStructureWithItemRequirementinfo craftingItemId={26} />
+                        {/* <CreateStructureWithItemRequirementinfo craftingItemId={26} /> */}
+                        <CraftStructure structureId={26} />
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         {/* <MeteorologyToolModalPlaceable /> */}
@@ -43,7 +45,8 @@ export default function MissionGroupTwo() {
                         <MiningStationPlaceable missionId={14}/>
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
-                        <CreateStructureWithItemRequirementinfo craftingItemId={31} />
+                        {/* <CreateStructureWithItemRequirementinfo craftingItemId={31} /> */}
+                        <CraftStructure structureId={31} />
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         <AUSM itemId={31} />
@@ -52,7 +55,8 @@ export default function MissionGroupTwo() {
                         <CameraAutomatonModule />
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
-                        <CreateStructureWithItemRequirementinfo craftingItemId={24} />
+                        {/* <CreateStructureWithItemRequirementinfo craftingItemId={24} /> */}
+                        <CraftStructure structureId={24} />
                     </Card>
                     <Card placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
                         <SurveyorStructureModal />

@@ -142,7 +142,8 @@ export const CameraAutomatonModule: React.FC = () => {
                 You need to craft a camera station to be able to receive your
                 photos
               </p>
-              <CreateStructureWithItemRequirementinfo craftingItemId={32} />
+              {/* <CreateStructureWithItemRequirementinfo craftingItemId={32} /> */}
+              <CraftStructure structureId={32} />
             </>
           )}
         </div>

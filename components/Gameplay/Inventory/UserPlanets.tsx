@@ -144,7 +144,7 @@ const UserPlanetPage = () => {
                 <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12"> 
                     {renderContent()}
                 </div>
-                <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center"></div> 
+                <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center"><CraftStructure structureId={32} /></div> 
                 <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12 mb-12"> 
                     {renderAutomatonContent()}
                 </div>

@@ -196,7 +196,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
 
             setSTID(data[0].id);
         } catch (error: any) {
-            console.log(error);
+            console.log(error); 
         };
     };
 
