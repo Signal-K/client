@@ -33,6 +33,7 @@ export default function PlanetData() {
                 .from("anomalies")
                 .select("*")
                 .eq("id", activePlanet.id)
+                .order("id", { ascending: true })
                 .single();
 
             if (planetError) {
@@ -86,42 +87,42 @@ type Planet = {
     onSelect: () => void; // Add onSelect prop
   };
   
-  export function PlanetCard({ planet, onSelect }: PlanetCardProps) {
-    const getIcon = (type: string) => {
-      switch (type) {
-        case 'Terrestrial Planet':
-          return <GlobeIcon className="h-3 w-3" />;
-        case 'Gaseous Planet':
-          return <CloudIcon className="h-3 w-3" />;
-        case 'Ocean Terrestrial Planet':
-        case 'Ocean Planet':
-          return <GlassWaterIcon className="h-3 w-3" />;
-        case 'Volcanic Planet':
-          return <FireExtinguisherIcon className="h-3 w-3" />;
-        case 'Asteroid':
-          return <SquareIcon className="h-3 w-3" />;
-        default:
-          return <GlobeIcon className="h-3 w-3" />;
-      }
-    };
-  
-    return (
-      <div className="relative group grid [grid-template-areas:stack] overflow-hidden rounded-lg" onClick={onSelect}>
-        <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
-          <span className="sr-only">View</span>
-        </Link>
-        <img
-          src={planet.avatar_url || "/placeholder.svg"}
-          alt={planet.type}
-          className="[grid-area:stack] object-cover w-full aspect-square"
-        />
-        <div className="flex-1 [grid-area:stack] bg-black/40 group-hover:opacity-90 transition-opacity text-white p-4 lg:p-6 justify-end flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold tracking-tight">{planet.type} - {planet.id}</h3>
-            {getIcon(planet.type)}
-          </div>
-          <p className="text-sm leading-normal">{planet.content}</p>
+export function PlanetCard({ planet, onSelect }: PlanetCardProps) {
+  const getIcon = (type: string) => {
+    switch (type) {
+      case 'Terrestrial Planet':
+        return <GlobeIcon className="h-4 w-4" />;
+      case 'Gaseous Planet':
+        return <CloudIcon className="h-4 w-4" />;
+      case 'Ocean Terrestrial Planet':
+      case 'Ocean Planet':
+        return <GlassWaterIcon className="h-4 w-4" />;
+      case 'Volcanic Planet':
+        return <FireExtinguisherIcon className="h-4 w-4" />;
+      case 'Asteroid':
+        return <SquareIcon className="h-4 w-4" />;
+      default:
+        return <GlobeIcon className="h-4 w-4" />;
+    }
+  };
+
+  return (
+    <div className="relative group grid [grid-template-areas:stack] overflow-hidden rounded-lg aspect-square" onClick={onSelect}>
+      <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
+        <span className="sr-only">View</span>
+      </Link>
+      <img
+        src={planet.avatar_url || "/placeholder.svg"}
+        alt={planet.type}
+        className="[grid-area:stack] object-cover w-full h-full"
+      />
+      <div className="flex-1 [grid-area:stack] bg-black/40 group-hover:opacity-90 transition-opacity text-white p-2 flex flex-col justify-end">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-semibold">{planet.type} - {planet.id}</h3>
+          {getIcon(planet.type)}
         </div>
+        <p className="text-xs">{planet.content}</p>
       </div>
-    );
+    </div>
+  );
 };

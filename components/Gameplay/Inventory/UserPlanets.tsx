@@ -64,148 +64,160 @@ const UserPlanetPage = () => {
     const { activePlanet } = useActivePlanet() || {};
     const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
     const [userInventory, setUserInventory] = useState(new Set());
-
+  
     useEffect(() => {
-        const fetchMissionCompletionStatus = async () => {
-            if (session) {
-                try {
-                    const { data, error } = await supabase
-                        .from('missions')
-                        .select('mission')
-                        .eq('user', session.user.id);
-
-                    if (error) {
-                        console.error('Error fetching missions:', error.message);
-                        return;
-                    }
-
-                    const missionStatusMap = new Map();
-                    data.forEach((mission) => {
-                        missionStatusMap.set(mission.mission, true);
-                    });
-
-                    setMissionCompletionStatus(missionStatusMap);
-                } catch (error: any) {
-                    console.error('Error fetching mission completion status:', error.message);
-                }
+      const fetchMissionCompletionStatus = async () => {
+        if (session) {
+          try {
+            const { data, error } = await supabase
+              .from('missions')
+              .select('mission')
+              .eq('user', session.user.id);
+  
+            if (error) {
+              console.error('Error fetching missions:', error.message);
+              return;
             }
-        };
-
-        const fetchUserInventory = async () => {
-            if (session && activePlanet) {
-                try {
-                    const { data, error } = await supabase
-                        .from('inventory')
-                        .select('item')
-                        .eq('owner', session.user.id)
-                        .eq('anomaly', activePlanet.id);
-
-                    if (error) {
-                        console.error('Error fetching user inventory:', error.message);
-                        return;
-                    }
-
-                    const inventorySet = new Set(data.map((item) => item.item));
-                    setUserInventory(inventorySet);
-                } catch (error: any) {
-                    console.error('Error fetching user inventory:', error.message);
-                }
+  
+            const missionStatusMap = new Map();
+            data.forEach((mission) => {
+              missionStatusMap.set(mission.mission, true);
+            });
+  
+            setMissionCompletionStatus(missionStatusMap);
+          } catch (error: any) {
+            console.error('Error fetching mission completion status:', error.message);
+          }
+        }
+      };
+  
+      const fetchUserInventory = async () => {
+        if (session && activePlanet) {
+          try {
+            const { data, error } = await supabase
+              .from('inventory')
+              .select('item')
+              .eq('owner', session.user.id)
+              .eq('anomaly', activePlanet.id);
+  
+            if (error) {
+              console.error('Error fetching user inventory:', error.message);
+              return;
             }
-        };
-
-        fetchMissionCompletionStatus();
-        fetchUserInventory();
+  
+            const inventorySet = new Set(data.map((item) => item.item));
+            setUserInventory(inventorySet);
+          } catch (error: any) {
+            console.error('Error fetching user inventory:', error.message);
+          }
+        }
+      };
+  
+      fetchMissionCompletionStatus();
+      fetchUserInventory();
     }, [session, supabase, activePlanet]);
-
+  
     const renderContent = () => {
-        if (!missionCompletionStatus.has(1)) {
-            return <PickYourPlanet onPlanetSelect={() => {}} />;
-        } else if (!missionCompletionStatus.has(2)) {
-            return <ProfileCard />;
-        } else if (!missionCompletionStatus.has(3)) {
-            return <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />;
-        } else if (!missionCompletionStatus.has(4) || !missionCompletionStatus.has(5)) {
-            return (
-                <>
-                    <UserItemsUndeployed />
-                    <AllStructures />
-                </>
-            );
-        } else {
-            return (
-                <>
-                    <AllStructures />
-                    {!missionCompletionStatus.has(7) && (
-                        <center><CraftStructure structureId={14} /></center>
-                    )}
-                    {!missionCompletionStatus.has(8) && missionCompletionStatus.has(7) && (
-                        <></>
-                    )}
-                </>
-            );
-        }
+      if (!missionCompletionStatus.has(1)) {
+        return <PickYourPlanet onPlanetSelect={() => {}} />;
+      } else if (!missionCompletionStatus.has(2)) {
+        return <ProfileCard />;
+      } else if (!missionCompletionStatus.has(3)) {
+        return <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />;
+      } else if (!missionCompletionStatus.has(4) || !missionCompletionStatus.has(5)) {
+        return (
+          <>
+            <UserItemsUndeployed />
+            <AllStructures />
+          </>
+        );
+      } else {
+        return (
+          <>
+            <AllStructures />
+            {!missionCompletionStatus.has(7) && (
+              <center><CraftStructure structureId={14} /></center>
+            )}
+            {!missionCompletionStatus.has(8) && missionCompletionStatus.has(7) && (
+              <></>
+            )}
+          </>
+        );
+      }
     };
-
+  
     const renderAutomatonContent = () => {
-        if (!missionCompletionStatus.has(4)) {
-            return <>No automatons</>;
-        } else if (missionCompletionStatus.has(9)) {
-            return <><SingleAutomaton /></>;
-        } else if (missionCompletionStatus.has(8)) {
-            return <SingleAutomatonCraftItem craftItemId={30} />;
-        } else {
-            return <AllAutomatons />;
-        }
+      if (!missionCompletionStatus.has(4)) {
+        return <>No automatons</>;
+      } else if (missionCompletionStatus.has(9)) {
+        return <><SingleAutomaton /></>;
+      } else if (missionCompletionStatus.has(8)) {
+        return <SingleAutomatonCraftItem craftItemId={30} />;
+      } else {
+        return <AllAutomatons />;
+      }
     };
 
+    if (!activePlanet) {
+        return (
+            <div className="mx-12">
+                <PickYourPlanet onPlanetSelect={() => {}} />
+            </div>
+        );
+    };
+
+    if (!missionCompletionStatus.has(1)) {
+        return (
+            <div className="mx-12">
+                <PickYourPlanet onPlanetSelect={() => {}} />
+            </div>
+        );
+    };
+  
     const renderUtilitiesContext = () => {
-        if (missionCompletionStatus.has(8)) {
-            return (
-                <>
-                    <DeleteMineralsAtEndOfMission />
-                    {!userInventory.has(26) && <CraftStructure structureId={26} />}
-                    {!userInventory.has(31) && <CraftStructure structureId={31} />}
-                    {!userInventory.has(24) && <CraftStructure structureId={24} />}
-                    {!userInventory.has(32) && <CraftStructure structureId={32} />}
-                </>
-            );
-        } else {
-            return null;
-        }
+      if (missionCompletionStatus.has(8)) {
+        return (
+          <>
+            <DeleteMineralsAtEndOfMission />
+            {!userInventory.has(26) && <CraftStructure structureId={26} />}
+            {!userInventory.has(31) && <CraftStructure structureId={31} />}
+            {!userInventory.has(24) && <CraftStructure structureId={24} />}
+            {!userInventory.has(32) && <CraftStructure structureId={32} />}
+          </>
+        );
+      } else {
+        return null;
+      }
     };
-
+  
     return (
-        <div className="mx-12">
-            {/* Desktop Layout */}
-            <div className="hidden md:grid md:grid-cols-5 md:grid-rows-3 md:gap-4 md:relative md:h-full">
-                <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12"> 
-                    {renderContent()}
-                </div>
-                <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">{renderUtilitiesContext()}</div> 
-                <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12 mb-12"> 
-                    {renderAutomatonContent()}
-                </div>
-            </div>
-
-            {/* Mobile Layout */}
-            <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
-                <div>01</div>
-                <div>02</div>
-                <div>04</div>
-                <div className="col-span-1 flex justify-center items-end pb-5">
-                    {renderContent()}
-                </div>
-                <div>05</div>
-                <div>08</div>
-                <div className="col-span-1 flex justify-center items-end pb-5">
-                    {renderAutomatonContent()}
-                </div>
-                <div>09</div>
-                <div>10</div>
-                <div>11</div>
-            </div>
+      <div className="mx-12">
+        {/* Desktop Layout */}
+        <div className="hidden md:grid md:grid-cols-5 md:grid-rows-3 md:gap-4 md:relative md:h-full">
+          <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12"> 
+            {renderContent()}
+          </div>
+          <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">{renderUtilitiesContext()}</div> 
+          <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-2 mb-12"> 
+            {renderAutomatonContent()}
+          </div>
         </div>
+  
+        {/* Mobile Layout */}
+        <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
+          <div></div>
+          <div className="col-span-1 flex justify-center items-end pb-5">
+            {renderContent()}
+          </div>
+          <div>{renderUtilitiesContext() }</div>
+          <div></div>
+          <div className="col-span-1 flex justify-center items-end pb-5">
+            {renderAutomatonContent()}
+          </div>
+          <div></div>
+        </div>
+      </div>
     );
-};
+};  
 
 export default UserPlanetPage;
