@@ -67,11 +67,6 @@ interface UserStructure {
     // Function (what is executed upon click)
 };
 
-interface StructureSelectProps {
-    onStructureSelected: (structure: UserStructure) => void;
-    activeSectorId: number;
-};
-
 export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: UserStructure; style: any; }> = ({ ownedItem, structure, style }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 

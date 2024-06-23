@@ -33,72 +33,6 @@ interface MeteorologyToolModalProps {
     structure: UserStructure;
 };
 
-export function MeteorologyToolModalPlaceable() {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-    const { activePlanet } = useActivePlanet();
-    const [userStructures, setUserStructures] = useState<{ ownedItem: OwnedItem; structure: UserStructure }[]>([]);
-    const [loading, setLoading] = useState(false);
-
-    async function fetchData() {
-        if (!session || !activePlanet) return;
-
-        setLoading(true);
-
-        try {
-            const { data: ownedItemsData, error: ownedItemsError } = await supabase
-                .from("inventory")
-                .select("id, item, quantity, notes, anomaly")
-                .eq("anomaly", activePlanet.id)
-                .eq("item", 26)
-                .eq("owner", session.user.id);
-
-            if (ownedItemsError) throw ownedItemsError;
-
-            if (ownedItemsData && ownedItemsData.length > 0) {
-                const ownedItem: OwnedItem = ownedItemsData[0];
-
-                const { data: structureData, error: structureError } = await supabase
-                    .from("inventory")
-                    .select("*")
-                    .eq("id", ownedItem.item)
-                    .limit(1);
-
-                if (structureError) throw structureError;
-
-                if (structureData && structureData.length > 0) {
-                    const structure = structureData[0];
-                    setUserStructures([{ ownedItem, structure }]);
-                    console.log(ownedItem)
-                    console.log(structure)
-                }
-            }
-        } catch (error: any) {
-            console.error("Error fetching data:", error);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    useEffect(() => {
-        fetchData();
-    }, [session, activePlanet]);
-
-    return (
-        <>
-            {userStructures.length > 0 && (
-                <MeteorologyToolModal 
-                    isOpen={true} 
-                    onClose={() => setUserStructures([])} 
-                    ownedItem={userStructures[0].ownedItem} 
-                    structure={userStructures[0].structure} 
-                />
-            )}
-        </>
-    );
-}
-
-
 export const MeteorologyToolModal: React.FC<MeteorologyToolModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
     const { activePlanet } = useActivePlanet();
     const [isActionDone, setIsActionDone] = useState(false);
@@ -180,8 +114,7 @@ function BatteryIcon(props: any) {
         <line x1="22" x2="22" y1="11" y2="13" />
       </svg>
     )
-  }
-  
+  };
   
   function BoltIcon(props: any) {
     return (

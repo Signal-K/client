@@ -20,6 +20,7 @@ import FirstClassification from "@/Classifications/FirstClassification";
 import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
 import { DeleteMineralsAtEndOfMission } from "./Counters";
 import ExampleComponent from "./Structures/structure-borderline";
+import TravelBuddy from "@/components/Utilities/TravelBuddy";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -61,9 +62,21 @@ export interface UserPlanetData {
 const UserPlanetPage = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
+    
     const { activePlanet } = useActivePlanet() || {};
+    
     const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
     const [userInventory, setUserInventory] = useState(new Set());
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
   
     useEffect(() => {
       const fetchMissionCompletionStatus = async () => {
@@ -175,7 +188,13 @@ const UserPlanetPage = () => {
     };
   
     const renderUtilitiesContext = () => {
-      if (missionCompletionStatus.has(8)) {
+      if (missionCompletionStatus.has(21)) {
+        return (
+          <>
+            <TravelBuddy isOpen={isModalOpen} onClose={closeModal} />
+          </>
+        )
+      } else  if (missionCompletionStatus.has(8)) {
         return (
           <>
             <DeleteMineralsAtEndOfMission />
@@ -185,7 +204,7 @@ const UserPlanetPage = () => {
             {!userInventory.has(32) && <CraftStructure structureId={32} />}
           </>
         );
-      } else {
+      }else {
         return null;
       }
     };
