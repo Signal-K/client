@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import ReactHtmlParser from 'react-html-parser';
@@ -5,7 +7,7 @@ import ReactHtmlParser from 'react-html-parser';
 interface Classification { 
   id: number;
   content: string;
-  author: string;
+  author: string; 
   media: string[];
   anomaly: number;
 };
@@ -28,7 +30,7 @@ const ClassificationsFeed: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [supabase]);
 
   return (
     <div>
@@ -36,7 +38,7 @@ const ClassificationsFeed: React.FC = () => {
         <div key={post.id} className="card">
           <h3>{post.author}</h3>
           <p>{post.anomaly}</p>
-          {post.media.map((url, index) => (
+          {Array.isArray(post.media) && post.media.map((url, index) => (
             <img key={index} src={url} alt="" />
           ))}
           {ReactHtmlParser(post.content)} {/* Directly render the parsed HTML */}

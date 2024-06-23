@@ -7,15 +7,18 @@ import { PaintRollerIcon, ArrowRightIcon as LucideArrowRightIcon, ArrowLeftIcon 
 import Link from "next/link";
 import { ReactNode, useState } from "react";
 import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
+import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 
 interface PlanetLayoutProps {
   children: ReactNode;
-}
+};
 
 export function PlanetLayout({ children }: { children: React.ReactNode }) {
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
   const [showSidebar, setShowSidebar] = useState(false);
+  const [showFeed, setShowFeed] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [showClassificationsFeed, setShowClassificationsFeed] = useState(false);
 
   const handleLeftArrowClick = () => {
     if (activePlanet?.id && parseInt(activePlanet.id) > 1) {
@@ -24,7 +27,7 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
       setTimeout(() => {
         updatePlanetLocation(newId);
         setShowAnimation(false);
-      }, 2000); // Adjust the duration as per the animation time
+      }, 2000);
     }
   };
 
@@ -35,11 +38,21 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
       setTimeout(() => {
         updatePlanetLocation(newId);
         setShowAnimation(false);
-      }, 2000); // Adjust the duration as per the animation time
+      }, 2000);
     }
   };
 
   const activePlanetId = activePlanet?.id ? parseInt(activePlanet.id) : null;
+
+  const handleOpenFeed = () => {
+    setShowFeed(!showFeed);
+  };
+
+  const handleCloseFeed = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).id === 'overlay') {
+      setShowFeed(false);
+    }
+  };
 
   const handleOpenSlideover = () => {
     setShowSidebar(!showSidebar);
@@ -48,6 +61,18 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
   const handleCloseSlideover = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).id === 'overlay') {
       setShowSidebar(false);
+    }
+  };
+
+  const handleOpenClassificationsFeed = () => {
+    setShowClassificationsFeed(true);
+    document.body.style.overflow = 'hidden'; // Disable body scroll
+  };
+
+  const handleCloseClassificationsFeed = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).id === 'overlay' || (e.target as HTMLElement).id === 'close-btn') {
+      setShowClassificationsFeed(false);
+      document.body.style.overflow = 'auto'; // Enable body scroll
     }
   };
 
@@ -80,11 +105,14 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
           <h1 className="text-lg font-semibold">{activePlanet?.content}</h1>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/missions/one">
-            <Button className="rounded-full p-2" size="icon" variant="outline">
-              <PaintRollerIcon className="h-5 w-5" />
-            </Button>
-          </Link>
+          <Button
+            className="rounded-full p-2"
+            size="icon"
+            variant="outline"
+            onClick={handleOpenClassificationsFeed}
+          >
+            <PaintRollerIcon className="h-5 w-5" />
+          </Button>
           <Button
             className="rounded-full p-2"
             size="icon"
@@ -138,10 +166,32 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       )}
+      {showClassificationsFeed && (
+        <div
+          id="overlay"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={handleCloseClassificationsFeed}
+        >
+          <div
+            className="relative w-4/5 max-w-4xl h-4/5 bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800 overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Button
+              id="close-btn"
+              className="absolute top-2 right-2 rounded-full p-2"
+              size="icon"
+              variant="outline"
+              onClick={handleCloseClassificationsFeed}
+            >
+              ✕
+            </Button>
+            <ClassificationsFeed />
+          </div>
+        </div>
+      )}
     </>
   );
 };
-
 
 interface MainContentProps {
     children: ReactNode;

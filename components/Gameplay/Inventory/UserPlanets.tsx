@@ -191,7 +191,7 @@ const UserPlanetPage = () => {
       if (missionCompletionStatus.has(21)) {
         return (
           <>
-            <TravelBuddy isOpen={isModalOpen} onClose={closeModal} />
+            <TravelBuddy />
           </>
         )
       } else  if (missionCompletionStatus.has(8)) {
