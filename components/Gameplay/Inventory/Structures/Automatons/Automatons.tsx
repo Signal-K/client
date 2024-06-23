@@ -107,14 +107,14 @@ export const AutomatonUpgradeStructureModal: React.FC<AutomatonUpgradeStructureM
                       <GaugeIcon className="h-6 w-6 text-blue-500" />
                       <div>
                         <p className="text-sm font-medium">Speed</p>
-                        <p className="text-lg font-bold">120 mph</p>
+                        <p className="text-lg font-bold">120 kph</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <TruckIcon className="h-6 w-6 text-orange-500" />
                       <div>
                         <p className="text-sm font-medium">Storage</p>
-                        <p className="text-lg font-bold">500 lbs</p>
+                        <p className="text-lg font-bold">500 kgs</p>
                       </div>
                     </div>
                   </div>
@@ -146,7 +146,7 @@ export const AutomatonUpgradeStructureModal: React.FC<AutomatonUpgradeStructureM
                       >
                         <PlusIcon className="h-4 w-4" />
                       </Button>
-                      <p className="text-lg font-bold">+20 mph</p>
+                      <p className="text-lg font-bold">+20 kph</p>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -159,7 +159,7 @@ export const AutomatonUpgradeStructureModal: React.FC<AutomatonUpgradeStructureM
                       >
                         <PlusIcon className="h-4 w-4" />
                       </Button>
-                      <p className="text-lg font-bold">+100 lbs</p>
+                      <p className="text-lg font-bold">+100 kgs</p>
                     </div>
                   </div>
                 </div>

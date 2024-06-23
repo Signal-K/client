@@ -19,7 +19,7 @@ import CraftStructure from "./Actions/CraftStructure";
 import FirstClassification from "@/Classifications/FirstClassification";
 import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
 import { DeleteMineralsAtEndOfMission } from "./Counters";
-import ExampleComponent from "@/components/structure-borderline";
+import ExampleComponent from "./Structures/structure-borderline";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -163,7 +163,6 @@ const UserPlanetPage = () => {
             return (
                 <>
                     <DeleteMineralsAtEndOfMission />
-                    <ExampleComponent />
                     {!userInventory.has(26) && <CraftStructure structureId={26} />}
                     {!userInventory.has(31) && <CraftStructure structureId={31} />}
                     {!userInventory.has(24) && <CraftStructure structureId={24} />}

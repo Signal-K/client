@@ -295,7 +295,7 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
         const { data, error } = await supabase
           .from("anomalies")
           .insert({
-            id: "11",
+            id: "12",
             content: `Rover image by ${session.user.id}`,
             anomalytype: 'roverImg',
             avatar_url: image,
@@ -367,7 +367,7 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
               <div key={index} className="text-center">
                 <h3 className="font-semibold mb-2">Your images</h3>
                 <img src={avatar_url} alt={`Mars Rover ${index}`} className="rounded-lg mb-2" />
-                <p>This is your image!</p>
+                <p>What do you see?</p>
                 <RoverClassificationFromItem32 roverId={id} />
               </div>
             ))}

@@ -8,6 +8,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
+    const [structureName, setStructureName] = useState<string>("");
     const [recipeItems, setRecipeItems] = useState<string[]>([]);
     const [craftable, setCraftable] = useState(false);
     const [userInventory, setUserInventory] = useState<any[]>([]);
@@ -44,6 +45,8 @@ export default function CraftStructure({ structureId }: { structureId: number })
                 if (!structure || !structure.recipe) {
                     throw new Error("Structure or recipe not found.");
                 }
+
+                setStructureName(structure.name);
 
                 const items: string[] = [];
                 let isCraftable = true;
@@ -95,7 +98,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
                 .insert([inventoryData]);
         } catch (error: any) {
             console.error(error);
-        };
+        }
     };
 
     const [userTelescopeId, setUserTelescopeId] = useState(0);
@@ -107,15 +110,15 @@ export default function CraftStructure({ structureId }: { structureId: number })
                 .eq("owner", session?.user?.id)
                 .eq("item", 12)
                 .eq("anomaly", activePlanet?.id);
-            
+
             if (error) {
                 throw error;
-            };
+            }
 
             setUserTelescopeId(data[0].id);
         } catch (error: any) {
             console.log(error);
-        };
+        }
     }
 
     const [structureTableId, setSTID] = useState(0);
@@ -170,7 +173,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
                 console.log(error.message);
             }
         }
-    };    
+    }
 
     const fetchUserInventory = async () => {
         try {
@@ -189,7 +192,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
             }
         } catch (error: any) {
             console.error('Error fetching user inventory:', error.message);
-        };
+        }
     };
 
     const fetchNewlyCreatedRow = async () => {
@@ -200,15 +203,15 @@ export default function CraftStructure({ structureId }: { structureId: number })
                 .eq("owner", session?.user?.id)
                 .eq("item", structureId)
                 .eq("anomaly", activePlanet?.id);
-            
+
             if (error) {
                 throw error;
-            };
+            }
 
             setSTID(data[0].id);
         } catch (error: any) {
-            console.log(error); 
-        };
+            console.log(error);
+        }
     };
 
     const updateNotes = async () => {
@@ -219,7 +222,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
                 .eq("id", structureTableId);
         } catch (error) {
             console.log(error);
-        };
+        }
     };
 
     useEffect(() => {
@@ -229,7 +232,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
 
     return (
         <div>
-            <h2>Recipe for Structure {structureId}</h2>
+            <h2>Recipe for {structureName}</h2>
             <ul>
                 {recipeItems.map((item, index) => (
                     <li key={index}>{item}</li>
@@ -240,4 +243,4 @@ export default function CraftStructure({ structureId }: { structureId: number })
             )}
         </div>
     );
-};
+}
