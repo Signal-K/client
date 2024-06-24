@@ -21,6 +21,7 @@ import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies
 import { DeleteMineralsAtEndOfMission } from "./Counters";
 import ExampleComponent from "./Structures/structure-borderline";
 import TravelBuddy from "@/components/Utilities/TravelBuddy";
+import SpacecraftButton from "./Structures/Vehicles/Spacecraft";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -162,6 +163,11 @@ const UserPlanetPage = () => {
     const renderAutomatonContent = () => {
       if (!missionCompletionStatus.has(4)) {
         return <>No automatons</>;
+      } else if (missionCompletionStatus.has(21)) {
+        return <>
+          <AllAutomatons />
+          <SpacecraftButton />
+        </>
       } else if (missionCompletionStatus.has(9)) {
         return <><SingleAutomaton /></>;
       } else if (missionCompletionStatus.has(8)) {
