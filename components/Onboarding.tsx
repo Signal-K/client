@@ -121,6 +121,69 @@ export const PlanetGrid: React.FC = () => {
   const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const { activePlanet, setActivePlanet, updatePlanetLocation } = useActivePlanet();
+
+  const handlePlanetSelect = async (planetId: number) => {
+    try {
+      // Fetch the full details of the selected planet
+      const { data: planetData, error: planetError } = await supabase
+        .from('anomalies')
+        .select('*')
+        .eq('id', planetId)
+        .single();
+
+      if (planetError) {
+        throw planetError;
+      }
+
+      if (!planetData) {
+        throw new Error('Planet data not found');
+      }
+
+      await updatePlanetLocation(planetData);
+
+      const missionData = {
+        user: session?.user?.id,
+        time_of_completion: new Date().toISOString(),
+        mission: 1,
+        configuration: null,
+        rewarded_items: null,
+      };
+
+      const { data: newMission, error: missionError } = await supabase
+        .from("missions")
+        .insert([missionData]);
+
+      if (missionError) {
+        throw missionError;
+      }
+
+      const inventoryData = {
+        item: 29,
+        owner: session?.user?.id,
+        quantity: 1,
+        notes: "Created upon the completion of mission 1",
+        parentItem: null,
+        time_of_deploy: new Date().toISOString(),
+        anomaly: planetData.id,
+      };
+
+      const { data: newInventoryEntry, error: inventoryError } = await supabase
+        .from("inventory")
+        .insert([inventoryData]);
+
+      if (inventoryError) {
+        throw inventoryError;
+      }
+
+      setActivePlanet(planetData); // Update the active planet in the context
+
+    } catch (error: any) {
+      console.error("Error handling planet selection:", error.message);
+    }
+  };
 
   useEffect(() => {
     const fetchAnomalies = async () => {
@@ -139,7 +202,7 @@ export const PlanetGrid: React.FC = () => {
     };
 
     fetchAnomalies();
-  }, []);
+  }, [supabase]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -148,14 +211,17 @@ export const PlanetGrid: React.FC = () => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-2">
       {anomalies.map((anomaly) => (
-        <div key={anomaly.id} className="flex justify-center items-center p-1">
+        <div
+          key={anomaly.id}
+          className="flex justify-center items-center p-1 cursor-pointer"
+          onClick={() => handlePlanetSelect(anomaly.id)}
+        >
           <img src={anomaly.avatar_url} alt={`Planet ${anomaly.id}`} className="w-24 h-24 object-cover" />
         </div>
       ))}
     </div>
   );
 };
-
 
 interface SectionProps {
   background: string;
@@ -169,6 +235,8 @@ const Section: React.FC<SectionProps> = ({ background, children }) => (
       backgroundImage: background,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
+      height: '100%',
+      width: '100%',
     }}
   >
     {children}
@@ -183,9 +251,9 @@ interface ResponsiveLayoutProps {
 
 export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ leftContent, middleContent, rightContent }) => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen h-screen w-screen">
       {/* Desktop Layout */}
-      <div className="hidden md:grid md:grid-cols-12 md:gap-4 md:h-full">
+      <div className="hidden md:flex md:flex-row h-full w-full">
         <div className="w-1/3 h-full">
           <Section background="url('https://images.unsplash.com/photo-1554050857-c84a8abdb5e2?q=80&w=3027&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')">
             {leftContent}
