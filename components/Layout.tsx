@@ -29,11 +29,11 @@ export default function Layout({ children }: LayoutProps) {
     return (
         <div
             className="min-h-screen flex flex-col"
-            style={{
-                backgroundImage: `url(${(backgroundImages as any)[planetId]})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-            }}            
+            // style={{
+            //     backgroundImage: `url(${(backgroundImages as any)[planetId]})`,
+            //     backgroundSize: "cover",
+            //     backgroundPosition: "center",
+            // }}            
         >
             <PlanetLayout>
                 {children}

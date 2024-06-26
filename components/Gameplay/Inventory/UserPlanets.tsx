@@ -9,7 +9,7 @@ import { Button } from "@/ui/button";
 import { AllAutomatons, SingleAutomaton, SingleAutomatonCraftItem } from "./Automatons/Automaton";
 import { AllStructures } from "./Structures/Structure";
 import Link from "next/link";
-import PickYourPlanet from "@/components/Onboarding";
+import PickYourPlanet, { PlanetGrid, ResponsiveLayout } from "@/components/Onboarding";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ProfileCard } from "@/auth/UserProfileFields";
 import GoToYourPlanet from "../Travel/InitTravel";
@@ -179,16 +179,18 @@ const UserPlanetPage = () => {
 
     if (!activePlanet) {
         return (
-            <div className="mx-12">
-                <PickYourPlanet onPlanetSelect={() => {}} />
+            <div className="">
+                {/* <PickYourPlanet onPlanetSelect={() => {}} /> */}
+                <ResponsiveLayout leftContent={<AllAutomatons />} middleContent={<PlanetGrid />} rightContent={<AllAutomatons />} />
             </div>
         );
     };
 
     if (!missionCompletionStatus.has(1)) {
         return (
-            <div className="mx-12">
-                <PickYourPlanet onPlanetSelect={() => {}} />
+            <div className="">
+                {/* <PickYourPlanet onPlanetSelect={() => {}} /> */}
+                
             </div>
         );
     };

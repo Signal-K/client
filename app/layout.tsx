@@ -11,7 +11,7 @@ import { InventoryProvider } from "@/context/InventoryContext";
 import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const [supabaseClient] = useState(() => createPagesBrowserClient()); // Updated function
+  const [supabaseClient] = useState(() => createPagesBrowserClient());
 
   const { activePlanet } = useActivePlanet();
 

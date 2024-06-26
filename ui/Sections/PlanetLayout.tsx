@@ -5,23 +5,58 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { Button } from "@/ui/button";
 import { PaintRollerIcon, ArrowRightIcon as LucideArrowRightIcon, ArrowLeftIcon as LucideArrowLeftIcon, BookOpenIcon as LucideBookOpenIcon } from "lucide-react";
 import Link from "next/link";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface PlanetLayoutProps {
   children: ReactNode;
 };
 
 export function PlanetLayout({ children }: { children: React.ReactNode }) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
+
   const [showSidebar, setShowSidebar] = useState(false);
   const [showFeed, setShowFeed] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
   const [showClassificationsFeed, setShowClassificationsFeed] = useState(false);
+  const [canChangePlanet, setCanChangePlanet] = useState(false);
+
+  useEffect(() => {
+    const checkInventory = async () => {
+      const { data, error } = await supabase
+        .from('inventory')
+        .select('*')
+        .eq('owner', session?.user.id);
+
+      if (error) {
+        console.error('Error fetching inventory:', error);
+        return;
+      }
+
+      if (data) {
+        const hasSpacecraft = data.some(
+          (item) => item.item === 29 && item.anomaly === activePlanet?.id
+        );
+        const hasLaunchpad = data.some(
+          (item) => item.item === 33 && item.anomaly && item.time_of_deploy
+        );
+
+        setCanChangePlanet(hasSpacecraft && hasLaunchpad);
+      }
+    };
+
+    if (session?.user.id && activePlanet?.id) {
+      checkInventory();
+    }
+  }, [session?.user.id, activePlanet?.id]);
 
   const handleLeftArrowClick = () => {
-    if (activePlanet?.id && parseInt(activePlanet.id) > 1) {
+    if (canChangePlanet && activePlanet?.id && parseInt(activePlanet.id) > 1) {
       const newId = parseInt(activePlanet.id) - 1;
       setShowAnimation(true);
       setTimeout(() => {
@@ -32,7 +67,7 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
   };
 
   const handleRightArrowClick = () => {
-    if (activePlanet?.id && parseInt(activePlanet.id) < 6) {
+    if (canChangePlanet && activePlanet?.id && parseInt(activePlanet.id) < 6) {
       const newId = parseInt(activePlanet.id) + 1;
       setShowAnimation(true);
       setTimeout(() => {
@@ -196,7 +231,7 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
 interface MainContentProps {
     children: ReactNode;
     backgroundImage?: string;
-}
+};
 
 export function MainContent({ children, backgroundImage }: MainContentProps) {
     return (
@@ -204,7 +239,7 @@ export function MainContent({ children, backgroundImage }: MainContentProps) {
             {children}
         </main>
     );
-}
+};
 
 export function Footer() {
     return (
