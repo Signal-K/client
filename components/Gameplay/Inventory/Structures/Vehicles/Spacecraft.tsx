@@ -3,13 +3,17 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { CreateStructureWithItemRequirementinfo } from "../Structure";
+import CraftStructure from "../../Actions/CraftStructure";
+import LaunchpadButton from "./Launchpad";
+import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
 
 interface SpacecraftModalProps {
     isOpen: boolean;
     onClose: () => void;
 };
 
-const SpaceccraftModal: React.FC<SpacecraftModalProps> = ({ isOpen, onClose }) => {
+const SpaceceraftModal: React.FC<SpacecraftModalProps> = ({ isOpen, onClose }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -28,6 +32,31 @@ const SpaceccraftModal: React.FC<SpacecraftModalProps> = ({ isOpen, onClose }) =
 
                 if (data) {
                     setUserSpaceship(data[0]);
+                };
+
+                fetchLaunchpad();
+            } catch (error: any) {
+                console.error("Error fetching user spacecraft: ", error.message);
+            };
+        };
+    };
+
+    const [hasLaunchpad, setHasLaunchpad] = useState(false);
+    const [launchpad, setLaunchpad] = useState();
+
+    async function fetchLaunchpad() { // typically the launchpad should craft the spaceship, but since the user already starts with a spaceship....hmm
+        if (session && activePlanet) {
+            try {
+                const { data, error } = await supabase
+                    .from("inventory")
+                    .select("*")
+                    .eq("owner", session.user.id)
+                    .eq("anomaly", activePlanet.id)
+                    .eq("item", 33)
+
+                if (data) {
+                    setLaunchpad(data[0]);
+                    setHasLaunchpad(true);
                 }
             } catch (error: any) {
                 console.error("Error fetching user spacecraft: ", error.message);
@@ -55,6 +84,14 @@ const SpaceccraftModal: React.FC<SpacecraftModalProps> = ({ isOpen, onClose }) =
                             <div>
                                 You can now visit other planets
                             </div>
+                            {hasLaunchpad ? (
+                                <>
+                                    <LaunchpadButton />
+                                    <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />
+                                </>
+                            ) : (
+                                <CraftStructure structureId={33} />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -79,7 +116,7 @@ const SpacecraftButton: React.FC = () => {
             <button onClick={handleOpen} className="flex items-center space-x-2 p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600">
                 <span>Spacecraft</span>
             </button>
-            <SpaceccraftModal isOpen={isOpen} onClose={handleClose} />
+            <SpaceceraftModal isOpen={isOpen} onClose={handleClose} />
         </div>
     );
 };

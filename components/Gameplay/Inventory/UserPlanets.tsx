@@ -68,6 +68,7 @@ const UserPlanetPage = () => {
     
     const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
     const [userInventory, setUserInventory] = useState(new Set());
+    const [userUtilityStructures, setUserUtilityStructures] = useState(new Set());
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -123,13 +124,37 @@ const UserPlanetPage = () => {
             setUserInventory(inventorySet);
           } catch (error: any) {
             console.error('Error fetching user inventory:', error.message);
-          }
-        }
+          };
+        };
       };
   
       fetchMissionCompletionStatus();
       fetchUserInventory();
+      fetchUserUtilityStructures();
     }, [session, supabase, activePlanet]);
+
+    async function fetchUserUtilityStructures() {
+      if (session && activePlanet) {
+        try {
+          const { data, error } = await supabase
+            .from("inventory")
+            .select("item")
+            .eq("owner", session.user.id)
+            .eq("anomaly", activePlanet.id)
+            .eq("item", 33) // Update this to use the `/gameplay/inventory` api `route.ts`
+
+          if (error) {
+            console.error("Error fetching user utility structures: ", error.message);
+            return;
+          };
+
+          const utilityStructureSet = new Set(data.map((item) => item.item));
+          setUserUtilityStructures(utilityStructureSet);
+        } catch (error: any) {
+          console.error("Error fetching user utility structures: ", error.message);
+        };
+      };
+    };
   
     const renderContent = () => {
       if (!missionCompletionStatus.has(1)) {
@@ -198,7 +223,7 @@ const UserPlanetPage = () => {
     const renderUtilitiesContext = () => {
       if (missionCompletionStatus.has(21)) {
         return (
-          <>
+          <> {/* Show launchpad here maybe? */}
             <TravelBuddy />
           </>
         )

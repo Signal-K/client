@@ -11,6 +11,7 @@ import MiningStationPlaceable from "./Mining";
 import { MeteorologyToolModal } from "./Telescopes/Terrestrial";
 import { AutomatonUpgradeStructureModal } from "./Automatons/Automatons";
 import { CameraAutomatonModule, CameraReceiverStation } from "./Automatons/Modules";
+import LaunchpadButton from "./Vehicles/Launchpad";
 
 interface OwnedItem {
     id: string;
@@ -158,6 +159,9 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
                     ownedItem={ownedItem}
                     structure={structure}
                 />
+            )}
+            {structure.id === 33 && (
+                <LaunchpadButton />
             )}
         </div>
     );
