@@ -225,7 +225,7 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
 
     if (!isOpen) return null;
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiAnomalies/${activePlanet?.id}/ActivePlanet.png`;
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${activePlanet?.id}/phased.png`;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -238,7 +238,7 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
             </div>
             <div className="flex flex-col items-center mt-4">
               <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
-              <img src="http://127.0.0.1:54321/storage/v1/object/sign/avatars/download.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2Rvd25sb2FkLnBuZyIsImlhdCI6MTcxODkyNzMzOCwiZXhwIjoxNzE5NTMyMTM4fQ.9PvBRH7829oTleom8vHIUJ5g7u1lPjY74QEkvNrW0TM&t=2024-06-20T23%3A48%3A58.462Z" className="w-32 h-32 mb-2" />
+              {/* <img src="http://127.0.0.1:54321/storage/v1/object/sign/avatars/download.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2Rvd25sb2FkLnBuZyIsImlhdCI6MTcxODkyNzMzOCwiZXhwIjoxNzE5NTMyMTM4fQ.9PvBRH7829oTleom8vHIUJ5g7u1lPjY74QEkvNrW0TM&t=2024-06-20T23%3A48%3A58.462Z" className="w-32 h-32 mb-2" /> */}
               <p>ID: {ownedItem.id}</p>
               <p>{ownedItem.notes}</p>
               <p>Description: {structure.description}</p>

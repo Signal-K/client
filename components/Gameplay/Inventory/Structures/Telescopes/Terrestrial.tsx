@@ -34,13 +34,52 @@ interface MeteorologyToolModalProps {
 };
 
 export const MeteorologyToolModal: React.FC<MeteorologyToolModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
+    const supabase = useSupabaseClient();
+  
     const { activePlanet } = useActivePlanet();
     const [isActionDone, setIsActionDone] = useState(false);
 
     if (!isOpen) return null;
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = "http://127.0.0.1:54321/storage/v1/object/sign/avatars/1.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzLzEucG5nIiwiaWF0IjoxNzE5MDc3Mjk3LCJleHAiOjE3MTk2ODIwOTd9.xvqjHtq2BwXJNIFWGwWoYuHx7nHMm2B7qBo98imSyDQ&t=2024-06-22T17%3A28%3A17.058Z";
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+      if (isOpen && activePlanet?.id) {
+          const fetchRandomImage = async () => {
+              try {
+                  const { data, error } = await supabase.storage
+                      .from('anomalies')
+                      .list(`${activePlanet.id}/clouds`, {
+                          limit: 100,
+                      });
+
+                  if (error) {
+                      console.error('Error fetching image list:', error);
+                      return;
+                  }
+
+                  if (data && data.length > 0) {
+                      const randomFile = data[Math.floor(Math.random() * data.length)];
+                      const { data: publicUrlData, error: publicUrlError } = supabase.storage
+                          .from('anomalies')
+                          .getPublicUrl(`${activePlanet.id}/clouds/${randomFile.name}`);
+                      
+                      if (publicUrlError) {
+                          console.error('Error getting public URL:', publicUrlError);
+                          return;
+                      }
+
+                      setImageUrl(publicUrlData.publicUrl);
+                  }
+              } catch (error) {
+                  console.error('Error fetching random image:', error);
+              }
+          };
+
+          fetchRandomImage();
+      }
+  }, [isOpen, activePlanet?.id]);
     //   const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiCloud/${activePlanet?.id}/cloud.png`;
     //   const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiAnomalies/${activePlanet?.id}/cloud.png`;
 
