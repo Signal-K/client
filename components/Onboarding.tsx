@@ -152,9 +152,25 @@ export const PlanetGrid: React.FC = () => {
         rewarded_items: null,
       };
 
+      const missionData2 = {
+        user: session?.user?.id,
+        time_of_completion: new Date().toISOString(),
+        mission: 3,
+        configuration: null,
+        rewarded_items: null,
+      };
+
+      const missionData3 = {
+        user: session?.user?.id,
+        time_of_completion: new Date().toISOString(),
+        mission: 2,
+        configuration: null,
+        rewarded_items: null,
+      };
+
       const { data: newMission, error: missionError } = await supabase
         .from("missions")
-        .insert([missionData]);
+        .insert([missionData, missionData2, missionData3]);
 
       if (missionError) {
         throw missionError;
@@ -170,9 +186,29 @@ export const PlanetGrid: React.FC = () => {
         anomaly: planetData.id,
       };
 
+      const inventoryDataForMission2 = {
+        item: 22,
+        owner: session?.user?.id,
+        quantity: 1,
+        notes: `Reward for completing mission 2`,
+        parentItem: null,
+        time_of_deploy: new Date().toISOString(),
+        anomaly: null,
+      };
+
+      const inventoryDataForMission3 = {
+        item: 12,
+        owner: session?.user?.id,
+        quantity: 1,
+        notes: `Reward for completing mission 3`,
+        parentItem: null,
+        time_of_deploy: new Date().toISOString(),
+        anomaly: planetData?.id,
+      };
+
       const { data: newInventoryEntry, error: inventoryError } = await supabase
         .from("inventory")
-        .insert([inventoryData]);
+        .insert([inventoryData, inventoryDataForMission2, inventoryDataForMission3]);
 
       if (inventoryError) {
         throw inventoryError;

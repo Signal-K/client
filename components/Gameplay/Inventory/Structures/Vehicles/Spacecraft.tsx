@@ -13,7 +13,7 @@ interface SpacecraftModalProps {
     onClose: () => void;
 };
 
-const SpaceceraftModal: React.FC<SpacecraftModalProps> = ({ isOpen, onClose }) => {
+export const SpaceceraftModal: React.FC<SpacecraftModalProps> = ({ isOpen, onClose }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -82,16 +82,16 @@ const SpaceceraftModal: React.FC<SpacecraftModalProps> = ({ isOpen, onClose }) =
                         <p></p>
                         <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg max-w-4xl mx-auto mt-4">
                             <div>
-                                You can now visit other planets
+                            <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />
                             </div>
-                            {hasLaunchpad ? (
+                            {/* {hasLaunchpad ? (
                                 <>
                                     <LaunchpadButton />
                                     <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />
                                 </>
                             ) : (
                                 <CraftStructure structureId={33} />
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>

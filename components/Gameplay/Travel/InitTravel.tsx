@@ -121,23 +121,16 @@ export default function GoToYourPlanet({ planetId }: GoToYourPlanetProps) {
       >
         {pageState === 1 ? (
           <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md mx-4 space-y-4 dark:bg-gray-950">
-            <h2 className="text-2xl font-bold">Mission 3</h2>
-            <p className="text-gray-500 dark:text-gray-400">
-              Land on your planet for the first time
-            </p>
+            <img src="" />
             {hasCompletedMission3 ? (
               <Button disabled>You have already completed this mission</Button>
             ) : (
-              <Button onClick={handleTransition}>Go to your planet</Button>
+              <Button onClick={handleTransition}>Land</Button>
             )}
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md mx-4 space-y-4 dark:bg-gray-950">
-            <h2 className="text-2xl font-bold">Spacecraft landed</h2>
-            <p className="text-gray-500 dark:text-gray-400">
-              Now you've landed, go to the next mission!
-            </p>
-            <Button onClick={handleTransition}>Transition</Button>
+            <Button onClick={handleTransition}>Next</Button>
           </div>
         )}
       </div>

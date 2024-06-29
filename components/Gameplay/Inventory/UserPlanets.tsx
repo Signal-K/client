@@ -23,6 +23,7 @@ import ExampleComponent from "./Structures/structure-borderline";
 import TravelBuddy from "@/components/Utilities/TravelBuddy";
 import SpacecraftButton from "./Structures/Vehicles/Spacecraft";
 import { SidebarLayout } from "@/app/layout";
+import TutorialText from "@/components/Tutorial/TextBlocks";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -72,7 +73,6 @@ const UserPlanetPage = () => {
     const [userUtilityStructures, setUserUtilityStructures] = useState(new Set());
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     const openModal = () => {
         setIsModalOpen(true);
     };
@@ -162,17 +162,32 @@ const UserPlanetPage = () => {
         return (
           <PlanetGrid />
         );
-      } else if (!missionCompletionStatus.has(2)) {
-        return <ProfileCard />;
-      } else if (!missionCompletionStatus.has(3)) {
-        return <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />;
-      } else if (!missionCompletionStatus.has(4) || !missionCompletionStatus.has(5)) {
+      // } else if (!missionCompletionStatus.has(2)) {
+      //   // return <ProfileCard />;
+      //   return (
+      //     <>
+      //       <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />
+      //       {/* <SpacecraftButton /> */}
+      //     </>
+      //   );
+      // } else if (!missionCompletionStatus.has(3)) {
+      //   return (
+      //     <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />
+      //     // <SpacecraftButton />
+      //   );
+      } else if (!missionCompletionStatus.has(4)) {
         return (
           <>
             <UserItemsUndeployed />
             <AllStructures />
           </>
         );
+      } else if (!missionCompletionStatus.has(5)) {
+        return (
+          <>
+            <AllStructures />
+          </>
+        )
       } else {
         return (
           <>
@@ -245,12 +260,15 @@ const UserPlanetPage = () => {
       }
     };
 
+
+    
+
     const interactablesContentContainer = () => {
       if (session) {
         return (
           <>
-            <div className="hidden md:grid md:grid-cols-5 md:grid-rows-3 md:gap-4 md:relative md:h-full">
-              <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12"> 
+            <div className="hidden md:grid md:grid-cols-1 md:grid-rows-3 md:gap-4 md:relative md:h-full">
+              <div className="md:row-span-1 md:col-span-8 md:flex md:items-center md:justify-center p-4"> 
                 {renderContent()}
               </div>
               <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">{renderUtilitiesContext()}</div> 
@@ -272,11 +290,10 @@ const UserPlanetPage = () => {
         );
       };
     };
-  
-    return (
-      <SidebarLayout leftContent={<p>Tutorial content</p>} middleContent={interactablesContentContainer()} />
+
+    /* return (
       // <div className="mx-12">
-      //   {/* Desktop Layout */}
+      //   {/* Desktop Layout 
       //   <div className="hidden md:grid md:grid-cols-5 md:grid-rows-3 md:gap-4 md:relative md:h-full">
       //     <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12"> 
       //       {renderContent()}
@@ -287,7 +304,7 @@ const UserPlanetPage = () => {
       //     </div>
       //   </div>
   
-      //   {/* Mobile Layout */}
+      //   {/* Mobile Layout 
       //   <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
       //     <div></div>
       //     <div className="col-span-1 flex justify-center items-end pb-5">
@@ -301,6 +318,10 @@ const UserPlanetPage = () => {
       //     <div></div>
       //   </div>
       // </div>
+    // ) */
+
+    return (
+      <SidebarLayout leftContent={<><TutorialText /></>} middleContent={interactablesContentContainer()} />
     );
 };  
 

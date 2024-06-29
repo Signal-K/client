@@ -120,11 +120,11 @@ export const SidebarLayout: React.FC<ResponsiveLayoutProps> = ({
       {/* Desktop layout */}
       <div className="hidden md:flex md:flex-row h-full w-full">
         <div className="w-1/3 h-full">
-          <Section background="url('https://images.unsplash.com/photo-1554050857-c84a8abdb5e2?q=80&w=3027&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')">
+          <Section background="url('https://cdn.cloud.scenario.com/assets/asset_W9ntQkasoZdEWHBKki2aczui?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9hc3NldF9XOW50UWthc29aZEVXSEJLa2kyYWN6dWk~cD0xMDAqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzIwMzk2Nzk5fX19XX0_&Key-Pair-Id=K36FIAB9LE2OLR&Signature=fg079eZKhY1JGCnYCFvczY3QNzQEDUFGsVoyl1S8jMK563Gq9x7uC~2y-BLouaKeXpUMZ~3koWD7XT8yhNTgFgZ3K9jNiZTyLW-HoCeyUxo~ZiR6tjDqSXbFsgAt7OY1A9E6oo5ENTPG7z0kseEQ6~hcpki9h~LmlT2mMl9cakFvIsvXfsOystd5tZK-deaQw-werQiQBO7pmXrv5jAoviMOQlivWrS5AqQ~Pxf1Y6UVAnumSCGazVJ9~neSYWq1ZSMT-u9NKcvb5cRqXClcuRfILmc18Cv5BkY3j0kXLTXTOHjSxPGMGwOmwJ-fwd4YrK5sesuNgK6rnMWgL38aAQ__')">
             {leftContent}
           </Section>
         </div>
-        <div className="w-2/3 h-full">
+        <div className="w-2/3 h-full py-8">
           <Section background="url('https://cdn.cloud.scenario.com/assets/asset_un7QCUWx8HnH4bKqtjYs9XFs?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9hc3NldF91bjdRQ1VXeDhIbkg0YktxdGpZczlYRnM~cD0xMDAqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzIwMzk2Nzk5fX19XX0_&Key-Pair-Id=K36FIAB9LE2OLR&Signature=rN0zru~9DMAHya9Vmw~NySElneuz43yi~~X1g-rYjusvuAv98fAZc78cL11SCtWZuVYfTg1es0h4LCvnGA8fWlug~UTKboDT4grVIMRL~o0UhVkDY3ZYEji8dzjSaUjewSHCOfMpJ3gSwXBxGOYV2EnBCan0z8sZPETQCNAqV-n6y2GndbkL~VOx2iSdDKQFO27sh-XQ7xsOZ8XFoD6iuOHILnLBNuFqng8Ak8pzPyQeU2Y51uA2WJbnUCRwv2vSJ4F~g1ATsthjhWs3OWiyr0x8EDxA483QYcTcOvB5Wdc8u0pyuewjqUtf9qNgn1Qn1GWCD3HfHLe~-adEZFok9Q__')">
             {middleContent}
           </Section>
@@ -134,11 +134,11 @@ export const SidebarLayout: React.FC<ResponsiveLayoutProps> = ({
       {/* Mobile layout */}      
       <div className="md:hidden flex flex-col min-h-screen h-screen relative">
         <div className="h-1/4">
-          <Section background="url('https://images.unsplash.com/photo-1554050857-c84a8abdb5e2?q=80&w=3027&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')">
+          <Section background="url('https://cdn.cloud.scenario.com/assets/asset_W9ntQkasoZdEWHBKki2aczui?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9hc3NldF9XOW50UWthc29aZEVXSEJLa2kyYWN6dWk~cD0xMDAqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzIwMzk2Nzk5fX19XX0_&Key-Pair-Id=K36FIAB9LE2OLR&Signature=fg079eZKhY1JGCnYCFvczY3QNzQEDUFGsVoyl1S8jMK563Gq9x7uC~2y-BLouaKeXpUMZ~3koWD7XT8yhNTgFgZ3K9jNiZTyLW-HoCeyUxo~ZiR6tjDqSXbFsgAt7OY1A9E6oo5ENTPG7z0kseEQ6~hcpki9h~LmlT2mMl9cakFvIsvXfsOystd5tZK-deaQw-werQiQBO7pmXrv5jAoviMOQlivWrS5AqQ~Pxf1Y6UVAnumSCGazVJ9~neSYWq1ZSMT-u9NKcvb5cRqXClcuRfILmc18Cv5BkY3j0kXLTXTOHjSxPGMGwOmwJ-fwd4YrK5sesuNgK6rnMWgL38aAQ__')">
             {leftContent}
           </Section>
         </div>
-        <div className="h-3/4">
+        <div className="h-3/4 py-4">
           <Section background="url('https://cdn.cloud.scenario.com/assets/asset_g3k2hJwrN9TZGwzvA9tMwnSi?p=100&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9hc3NldF9nM2syaEp3ck45VFpHd3p2QTl0TXduU2k~cD0xMDAqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzIwMzk2Nzk5fX19XX0_&Key-Pair-Id=K36FIAB9LE2OLR&Signature=Him5jIqdVzqb8Hua3qLfpxBg9PPuTx9lfyqSHP7C2xzaGpe2psRTYZqpW8noslbKZ8ghlhFi4ETYpGcLLnHuY71LDSZTOcvQWOWd-F4ePaj4bekU3H-ai08rwGPVeEAxJZzkFuEeY8BjR9UPt3yReXDRU19JMfP0KfMTmsputxPs5aq1aftz8aQhLfQVkHobgTOkCZ7lSf3YkoF4zKSDYFEKHthO5AwvwYQcvHZebhmzfQwnESX7LrroPoV1AKYw5yNq~jkItS3ic5KdjHMVepJFDYMgyGRWFli~zhKLoCmiOgwnOcEcjq87WAhH1lq9zMwiYr09WuUCuvi6Y5gKLw__')">
             {middleContent}
           </Section>
