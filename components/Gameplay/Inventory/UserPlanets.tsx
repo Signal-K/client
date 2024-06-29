@@ -22,6 +22,7 @@ import { DeleteMineralsAtEndOfMission } from "./Counters";
 import ExampleComponent from "./Structures/structure-borderline";
 import TravelBuddy from "@/components/Utilities/TravelBuddy";
 import SpacecraftButton from "./Structures/Vehicles/Spacecraft";
+import { SidebarLayout } from "@/app/layout";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -158,7 +159,9 @@ const UserPlanetPage = () => {
   
     const renderContent = () => {
       if (!missionCompletionStatus.has(1)) {
-        return <PickYourPlanet onPlanetSelect={() => {}} />;
+        return (
+          <PlanetGrid />
+        );
       } else if (!missionCompletionStatus.has(2)) {
         return <ProfileCard />;
       } else if (!missionCompletionStatus.has(3)) {
@@ -202,23 +205,23 @@ const UserPlanetPage = () => {
       }
     };
 
-    if (!activePlanet) {
-        return (
-            <div className="">
-                {/* <PickYourPlanet onPlanetSelect={() => {}} /> */}
-                <ResponsiveLayout leftContent={<AllAutomatons />} middleContent={<PlanetGrid />} rightContent={<AllAutomatons />} />
-            </div>
-        );
-    };
+    // if (!activePlanet) {
+    //     return (
+    //         <div className="">
+    //             {/* <PickYourPlanet onPlanetSelect={() => {}} /> */}
+    //             <ResponsiveLayout leftContent={<AllAutomatons />} middleContent={<PlanetGrid />} rightContent={<AllAutomatons />} />
+    //         </div>
+    //     );
+    // };
 
-    if (!missionCompletionStatus.has(1)) {
-        return (
-            <div className="">
-                {/* <PickYourPlanet onPlanetSelect={() => {}} /> */}
+    // if (!missionCompletionStatus.has(1)) {
+    //     return (
+    //         <div className="">
+    //             {/* <PickYourPlanet onPlanetSelect={() => {}} /> */}
                 
-            </div>
-        );
-    };
+    //         </div>
+    //     );
+    // };
   
     const renderUtilitiesContext = () => {
       if (missionCompletionStatus.has(21)) {
@@ -241,34 +244,63 @@ const UserPlanetPage = () => {
         return null;
       }
     };
+
+    const interactablesContentContainer = () => {
+      if (session) {
+        return (
+          <>
+            <div className="hidden md:grid md:grid-cols-5 md:grid-rows-3 md:gap-4 md:relative md:h-full">
+              <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12"> 
+                {renderContent()}
+              </div>
+              <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">{renderUtilitiesContext()}</div> 
+              <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-2 mb-12"> 
+                {renderAutomatonContent()}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
+              <div className="col-span-1 flex justify-center items-end pb-5">
+                {renderContent()}
+              </div>
+              {/* <div>{renderUtilitiesContext() }</div> */}
+              <div className="col-span-1 flex justify-center items-end pb-5">
+                {renderAutomatonContent()}
+              </div>
+            </div>
+          </>
+        );
+      };
+    };
   
     return (
-      <div className="mx-12">
-        {/* Desktop Layout */}
-        <div className="hidden md:grid md:grid-cols-5 md:grid-rows-3 md:gap-4 md:relative md:h-full">
-          <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12"> 
-            {renderContent()}
-          </div>
-          <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">{renderUtilitiesContext()}</div> 
-          <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-2 mb-12"> 
-            {renderAutomatonContent()}
-          </div>
-        </div>
+      <SidebarLayout leftContent={<p>Tutorial content</p>} middleContent={interactablesContentContainer()} />
+      // <div className="mx-12">
+      //   {/* Desktop Layout */}
+      //   <div className="hidden md:grid md:grid-cols-5 md:grid-rows-3 md:gap-4 md:relative md:h-full">
+      //     <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12"> 
+      //       {renderContent()}
+      //     </div>
+      //     <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">{renderUtilitiesContext()}</div> 
+      //     <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-2 mb-12"> 
+      //       {renderAutomatonContent()}
+      //     </div>
+      //   </div>
   
-        {/* Mobile Layout */}
-        <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
-          <div></div>
-          <div className="col-span-1 flex justify-center items-end pb-5">
-            {renderContent()}
-          </div>
-          <div>{renderUtilitiesContext() }</div>
-          <div></div>
-          <div className="col-span-1 flex justify-center items-end pb-5">
-            {renderAutomatonContent()}
-          </div>
-          <div></div>
-        </div>
-      </div>
+      //   {/* Mobile Layout */}
+      //   <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
+      //     <div></div>
+      //     <div className="col-span-1 flex justify-center items-end pb-5">
+      //       {renderContent()}
+      //     </div>
+      //     <div>{renderUtilitiesContext() }</div>
+      //     <div></div>
+      //     <div className="col-span-1 flex justify-center items-end pb-5">
+      //       {renderAutomatonContent()}
+      //     </div>
+      //     <div></div>
+      //   </div>
+      // </div>
     );
 };  
 

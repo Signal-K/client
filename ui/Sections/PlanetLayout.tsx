@@ -24,39 +24,40 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
   const [showFeed, setShowFeed] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
   const [showClassificationsFeed, setShowClassificationsFeed] = useState(false);
-  const [canChangePlanet, setCanChangePlanet] = useState(false);
+  // const [canChangePlanet, setCanChangePlanet] = useState(false);
 
-  useEffect(() => {
-    const checkInventory = async () => {
-      const { data, error } = await supabase
-        .from('inventory')
-        .select('*')
-        .eq('owner', session?.user.id);
+  // useEffect(() => {
+  //   const checkInventory = async () => {
+  //     const { data, error } = await supabase
+  //       .from('inventory')
+  //       .select('*')
+  //       .eq('owner', session?.user.id);
 
-      if (error) {
-        console.error('Error fetching inventory:', error);
-        return;
-      }
+  //     if (error) {
+  //       console.error('Error fetching inventory:', error);
+  //       return;
+  //     }
 
-      if (data) {
-        const hasSpacecraft = data.some(
-          (item) => item.item === 29 && item.anomaly === activePlanet?.id
-        );
-        const hasLaunchpad = data.some(
-          (item) => item.item === 33 && item.anomaly && item.time_of_deploy
-        );
+  //     if (data) {
+  //       const hasSpacecraft = data.some(
+  //         (item) => item.item === 29 && item.anomaly === activePlanet?.id
+  //       );
+  //       const hasLaunchpad = data.some(
+  //         (item) => item.item === 33 && item.anomaly && item.time_of_deploy
+  //       );
 
-        setCanChangePlanet(hasSpacecraft && hasLaunchpad);
-      }
-    };
+  //       setCanChangePlanet(hasSpacecraft && hasLaunchpad);
+  //     }
+  //   };
 
-    if (session?.user.id && activePlanet?.id) {
-      checkInventory();
-    }
-  }, [session?.user.id, activePlanet?.id]);
+  //   if (session?.user.id && activePlanet?.id) {
+  //     checkInventory();
+  //   }
+  // }, [session?.user.id, activePlanet?.id]);
 
   const handleLeftArrowClick = () => {
-    if (canChangePlanet && activePlanet?.id && parseInt(activePlanet.id) > 1) {
+    // if (canChangePlanet && activePlanet?.id && parseInt(activePlanet.id) > 1) {
+    if (activePlanet?.id && parseInt(activePlanet.id) > 1) {
       const newId = parseInt(activePlanet.id) - 1;
       setShowAnimation(true);
       setTimeout(() => {
@@ -67,7 +68,8 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
   };
 
   const handleRightArrowClick = () => {
-    if (canChangePlanet && activePlanet?.id && parseInt(activePlanet.id) < 6) {
+    // if (canChangePlanet && activePlanet?.id && parseInt(activePlanet.id) < 6) {
+    if (activePlanet?.id && parseInt(activePlanet.id) < 6) {
       const newId = parseInt(activePlanet.id) + 1;
       setShowAnimation(true);
       setTimeout(() => {

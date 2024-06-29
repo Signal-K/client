@@ -247,7 +247,7 @@ interface ResponsiveLayoutProps {
   leftContent: React.ReactNode;
   middleContent: React.ReactNode;
   rightContent: React.ReactNode;
-}
+};
 
 export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ leftContent, middleContent, rightContent }) => {
   return (
