@@ -1,24 +1,16 @@
 "use client"
 
 import { useEffect, useState, useRef, Fragment, createContext } from "react";
-import { Dialog, Transition } from '@headlessui/react';
-import { CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
 import { useActivePlanet } from "@/context/ActivePlanet";
 
-import { Button } from "@/components/ui/button";
 import { AllAutomatons, SingleAutomaton, SingleAutomatonCraftItem } from "./Automatons/Automaton";
 import { AllStructures } from "./Structures/Structure";
-import Link from "next/link";
 import PickYourPlanet, { PlanetGrid, ResponsiveLayout } from "@/components/Onboarding";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ProfileCard } from "@/auth/UserProfileFields";
-import GoToYourPlanet from "../Travel/InitTravel";
 import UserItemsUndeployed from "./InactiveItems";
-import { Card } from "@/components/ui/card";
 import CraftStructure from "./Actions/CraftStructure";
-import FirstClassification from "@/Classifications/FirstClassification";
 import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
-import { DeleteMineralsAtEndOfMission } from "./Counters";
 import ExampleComponent from "./Structures/structure-borderline";
 import TravelBuddy from "@/components/Utilities/TravelBuddy";
 import SpacecraftButton from "./Structures/Vehicles/Spacecraft";
@@ -244,24 +236,26 @@ const UserPlanetPage = () => {
           <> {/* Show launchpad here maybe? */}
             <TravelBuddy />
           </>
-        )
-      } else  if (missionCompletionStatus.has(8)) {
+        );
+      } else if (missionCompletionStatus.has(8)) {
         return (
           <>
-            <DeleteMineralsAtEndOfMission />
             {!userInventory.has(26) && <CraftStructure structureId={26} />}
+          </>
+        );
+      } else  if (missionCompletionStatus.has(8) && userInventory.has(26)) {
+        return (
+          <>
+            {/* <DeleteMineralsAtEndOfMission /> */}
             {!userInventory.has(31) && <CraftStructure structureId={31} />}
             {!userInventory.has(24) && <CraftStructure structureId={24} />}
             {!userInventory.has(32) && <CraftStructure structureId={32} />}
           </>
         );
-      }else {
+      } else {
         return null;
       }
-    };
-
-
-    
+    };    
 
     const interactablesContentContainer = () => {
       if (session) {

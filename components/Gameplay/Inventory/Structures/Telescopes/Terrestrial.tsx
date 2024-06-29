@@ -34,41 +34,36 @@ interface MeteorologyToolModalProps {
 };
 
 export const MeteorologyToolModal: React.FC<MeteorologyToolModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
-    const supabase = useSupabaseClient();
-  
-    const { activePlanet } = useActivePlanet();
-    const [isActionDone, setIsActionDone] = useState(false);
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-    if (!isOpen) return null;
+  const { activePlanet } = useActivePlanet();
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isActionDone, setIsActionDone] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
       if (isOpen && activePlanet?.id) {
           const fetchRandomImage = async () => {
               try {
-                  const { data, error } = await supabase.storage
+                  const { data, error: listError } = await supabase.storage
                       .from('anomalies')
                       .list(`${activePlanet.id}/clouds`, {
                           limit: 100,
                       });
 
-                  if (error) {
-                      console.error('Error fetching image list:', error);
+                      console.log("PRINTING IMAGE OF CLOud")
+
+                  if (listError) {
+                      console.error('Error fetching image list:', listError);
                       return;
                   }
 
                   if (data && data.length > 0) {
                       const randomFile = data[Math.floor(Math.random() * data.length)];
-                      const { data: publicUrlData, error: publicUrlError } = supabase.storage
+                      const { data: publicUrlData } = supabase.storage
                           .from('anomalies')
                           .getPublicUrl(`${activePlanet.id}/clouds/${randomFile.name}`);
-                      
-                      if (publicUrlError) {
-                          console.error('Error getting public URL:', publicUrlError);
-                          return;
-                      }
 
                       setImageUrl(publicUrlData.publicUrl);
                   }
@@ -79,60 +74,60 @@ export const MeteorologyToolModal: React.FC<MeteorologyToolModalProps> = ({ isOp
 
           fetchRandomImage();
       }
-  }, [isOpen, activePlanet?.id]);
-    //   const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiCloud/${activePlanet?.id}/cloud.png`;
-    //   const imageUrl = `${supabaseUrl}/storage/v1/object/public/citiAnomalies/${activePlanet?.id}/cloud.png`;
+  }, [session]);
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg p-4 w-full max-w-lg mx-auto shadow-lg">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold">{structure.name}</h2>
-                    <button className="btn btn-square btn-outline" onClick={onClose}>
-                        ✕
-                    </button>
-                </div>
-                <div className="flex flex-col items-center mt-4">
-                    <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
-                    <p>ID: {ownedItem.id}</p>
-                    <p>Description: {structure.description}</p>
-                    <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg max-w-4xl mx-auto mt-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div>
-                                <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} className="mb-4" />
-                                <CreateFirstMeteorologyClassification assetMentioned={imageUrl} />
-                            </div>
-                            <div>
-                                <div className="bg-gray-100 p-6 rounded-xl grid grid-cols-2 gap-6">
-                                    <span className="font-medium col-span-2">In Production</span>
-                                    <div className="flex items-center gap-3">
-                                        <GemIcon className="w-7 h-7 text-indigo-500" />
-                                        <span className="font-medium">Coal</span>
-                                        <div className="text-right text-lg font-medium">0</div>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <CuboidIcon className="w-7 h-7 text-amber-500" />
-                                        <span className="font-medium">Silicon</span>
-                                        <div className="text-right text-lg font-medium">0</div>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <LeafIcon className="w-7 h-7 text-green-500" />
-                                        <span className="font-medium">Organics</span>
-                                        <div className="text-right text-lg font-medium">0</div>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <BoltIcon className="w-7 h-7 text-yellow-500" />
-                                        <span className="font-medium">Energy</span>
-                                        <div className="text-right text-lg font-medium">0</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+  if (!isOpen) return null;
+
+  return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-4 w-full max-w-lg mx-auto shadow-lg">
+              <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-bold">{structure.name}</h2>
+                  <button className="btn btn-square btn-outline" onClick={onClose}>
+                      ✕
+                  </button>
+              </div>
+              <div className="flex flex-col items-center mt-4">
+                  <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
+                  <p>ID: {ownedItem.id}</p>
+                  <p>Description: {structure.description}</p>
+                  <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg max-w-4xl mx-auto mt-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div>
+                              <img src={imageUrl ?? ''} alt={`Active Planet ${activePlanet?.id}`} className="mb-4" />
+                              <CreateFirstMeteorologyClassification assetMentioned={imageUrl ?? ''} />
+                          </div>
+                          <div>
+                              <div className="bg-gray-100 p-6 rounded-xl grid grid-cols-2 gap-6">
+                                  <span className="font-medium col-span-2">In Production</span>
+                                  <div className="flex items-center gap-3">
+                                      <GemIcon className="w-7 h-7 text-indigo-500" />
+                                      <span className="font-medium">Coal</span>
+                                      <div className="text-right text-lg font-medium">0</div>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                      <CuboidIcon className="w-7 h-7 text-amber-500" />
+                                      <span className="font-medium">Silicon</span>
+                                      <div className="text-right text-lg font-medium">0</div>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                      <LeafIcon className="w-7 h-7 text-green-500" />
+                                      <span className="font-medium">Organics</span>
+                                      <div className="text-right text-lg font-medium">0</div>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                      <BoltIcon className="w-7 h-7 text-yellow-500" />
+                                      <span className="font-medium">Energy</span>
+                                      <div className="text-right text-lg font-medium">0</div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  );
 };
 
 function BatteryIcon(props: any) {

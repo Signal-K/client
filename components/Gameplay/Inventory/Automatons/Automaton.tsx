@@ -370,7 +370,7 @@ export function AllAutomatons() {
       if (selectedAutomaton?.time_of_deploy) {
         const deployTime = new Date(selectedAutomaton.time_of_deploy).getTime();
         const currentTime = new Date().getTime();
-        const timeDifference = (currentTime - deployTime) / 1000 / 60; // Difference in minutes
+        const timeDifference = (currentTime - deployTime) / 1000 / 60 / 4; // Difference in minutes
         const rewardQuantity = Math.floor(timeDifference);
   
         const inventoryData = {
@@ -485,7 +485,7 @@ export function AllAutomatons() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">Automaton Details</h2>
+              <h2 className="text-xl font-bold">Your Automaton</h2>
               <button
                 className="btn btn-square btn-outline"
                 onClick={() => setIsModalOpen(false)}
@@ -501,8 +501,9 @@ export function AllAutomatons() {
                   <span>No Image</span>
                 </div>
               )}
-              <p>ID: {selectedAutomaton.id}</p>
-              <p>Status: {selectedAutomaton.notes}</p>
+              {/* <p>ID: {selectedAutomaton.id}</p> */}
+              {/* <p>Status: {selectedAutomaton.notes}</p> */}
+              <p>Click the deploy button to mine some resources! Wait 15 seconds and you'll be able to collect them</p>
               <div className="mt-4 flex space-x-4">
                 <button className="btn btn-primary" onClick={deployAutomaton}>
                   Deploy Automaton

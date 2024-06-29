@@ -171,9 +171,9 @@ export default function CraftStructure({ structureId }: { structureId: number })
                 fetchUserInventory();
             } catch (error: any) {
                 console.log(error.message);
-            }
-        }
-    }
+            };
+        };
+    };
 
     const fetchUserInventory = async () => {
         try {
@@ -186,13 +186,13 @@ export default function CraftStructure({ structureId }: { structureId: number })
 
                 if (error) {
                     throw error;
-                }
+                };
 
                 setUserInventory(data || []);
-            }
+            };
         } catch (error: any) {
             console.error('Error fetching user inventory:', error.message);
-        }
+        };
     };
 
     const fetchNewlyCreatedRow = async () => {
@@ -206,12 +206,12 @@ export default function CraftStructure({ structureId }: { structureId: number })
 
             if (error) {
                 throw error;
-            }
+            };
 
             setSTID(data[0].id);
         } catch (error: any) {
             console.log(error);
-        }
+        };
     };
 
     const updateNotes = async () => {
@@ -222,7 +222,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
                 .eq("id", structureTableId);
         } catch (error) {
             console.log(error);
-        }
+        };
     };
 
     useEffect(() => {
@@ -239,7 +239,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
                 ))}
             </ul>
             {craftable && (
-                <button onClick={craftStructure}>Craft Structure</button>
+                <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-4 rounded shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-200 py-2" onClick={craftStructure}>Craft Structure</button>
             )}
         </div>
     );

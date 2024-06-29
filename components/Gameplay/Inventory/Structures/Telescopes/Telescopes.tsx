@@ -239,9 +239,9 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
             <div className="flex flex-col items-center mt-4">
               <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
               {/* <img src="http://127.0.0.1:54321/storage/v1/object/sign/avatars/download.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2Rvd25sb2FkLnBuZyIsImlhdCI6MTcxODkyNzMzOCwiZXhwIjoxNzE5NTMyMTM4fQ.9PvBRH7829oTleom8vHIUJ5g7u1lPjY74QEkvNrW0TM&t=2024-06-20T23%3A48%3A58.462Z" className="w-32 h-32 mb-2" /> */}
-              <p>ID: {ownedItem.id}</p>
+              {/* <p>ID: {ownedItem.id}</p>
               <p>{ownedItem.notes}</p>
-              <p>Description: {structure.description}</p>
+              <p>Description: {structure.description}</p> */}
               <div className="mt-4">
                 <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} />
                 {ownedItem.notes === 'Created by crafting 14 for mission 7' ? (

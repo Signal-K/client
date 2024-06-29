@@ -155,21 +155,35 @@ export default function TutorialText() {
                     <br />
                     <p>Please note you'll need to refresh the tab/page to continue</p>
                 </div>
-            )
+            );
         } else if (!missionCompletionStatus.has(5)) {
             return (
                 <div>
                     <p>Click on the Vehicle Structure to build your first automaton rover. These little critters explore the planet for you and collect resources! You'll need to collect some resources to build your first telescope, so click this button to build your first one!</p>
                 </div>
-            )
+            );
         } else if (!missionCompletionStatus.has(6)) {
             return (
                 <div>
-                    <p>You've built your first rover, nicely done!</p>
+                    <p>You've built your first rover, nicely done!  He has found a mineral deposit already! Click on his picture to send him out to collect the resources</p>
                 </div>
-            )
+            );
         } else if (!missionCompletionStatus.has(7)) {
-
+            return (
+                <div>
+                    <p>
+                        You can now upgrade your existing telescope to receive transit information, allowing you to discover different planets and validate your own. Click the "Craft Structure" button to complete the upgrade using the resources you just collected
+                    </p>
+                </div>
+            );
+        } else if (!missionCompletionStatus.has(8)) {
+            return (
+                <div>
+                    <p>
+                        Great work. Now that your telescope has been upgraded, you can click on the new module (the "Transiting Telescope") which will show you some data it's collected about your home planet. We'll walk you through the process of validating its existence as a planet in real life
+                    </p>
+                </div>
+            );
         } else if (missionCompletionStatus.has(21)) {
             return (
                 <>You've done it!</>
