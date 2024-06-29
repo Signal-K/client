@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { Button } from "@/ui/button";
+import { Button } from "@/components/ui/button";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface GoToYourPlanetProps {

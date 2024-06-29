@@ -2,7 +2,7 @@
 
 import MissionList from "@/components/Content/MissionList";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { Button } from "@/ui/button";
+import { Button } from "@/components/ui/button";
 import { PaintRollerIcon, ArrowRightIcon as LucideArrowRightIcon, ArrowLeftIcon as LucideArrowLeftIcon, BookOpenIcon as LucideBookOpenIcon } from "lucide-react";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";

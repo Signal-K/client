@@ -5,7 +5,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { CompassIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from "@/ui/Sections/PlanetLayout";
 import { useActivePlanet } from "@/context/ActivePlanet";
 
-import { Button } from "@/ui/button";
+import { Button } from "@/components/ui/button";
 import { AllAutomatons, SingleAutomaton, SingleAutomatonCraftItem } from "./Automatons/Automaton";
 import { AllStructures } from "./Structures/Structure";
 import Link from "next/link";
@@ -14,7 +14,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ProfileCard } from "@/auth/UserProfileFields";
 import GoToYourPlanet from "../Travel/InitTravel";
 import UserItemsUndeployed from "./InactiveItems";
-import { Card } from "@/ui/Card";
+import { Card } from "@/components/ui/card";
 import CraftStructure from "./Actions/CraftStructure";
 import FirstClassification from "@/Classifications/FirstClassification";
 import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
