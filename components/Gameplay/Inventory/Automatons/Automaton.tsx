@@ -1099,9 +1099,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
               {automatonInfo?.icon_url ? (
                 <img src={automatonInfo?.icon_url} alt={automatonInfo[userAutomaton.id]?.name} className="w-32 h-32 mb-2" />
               ) : (
-                <div className="w-32 h-32 mb-2 bg-gray-200 flex items-center justify-center">
-                  <span>No Image</span>
-                </div>
+                <img src="https://cdn.cloud.scenario.com/assets-transform/asset_W72syfLV9NsePvDbLFVZqFmB?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy10cmFuc2Zvcm0vYXNzZXRfVzcyc3lmTFY5TnNlUHZEYkxGVlpxRm1CPyoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MjAzOTY3OTl9fX1dfQ__&Key-Pair-Id=K36FIAB9LE2OLR&Signature=sJ2~g6W7RbC~kJIIYYgsNvzDAN9cbpNXmgw2GVvnssd0IOHFomHN9wD-1Bq44D~R2gF0XNDTxxpAm4A5ihJO4JP8wyATDhbPTw1Z5YnPpJi6pbShtDKvTziVkDIxgecfMCRCy-5ew83fHUITLT~cWerjT6dayUoEHMwXYh0OWJUOCzRXk6sEBe0pbsS89y78s8HURYmE4ZjXFAlFj-ZfpT3Cmq3CyhsElgirrt3CiK3K5LnuW55EKdlnjf7~vsqDKX4WTVgmtVo-so7ByJjP3MHX3WVzTOQmm~UjGRALkfDSOjiyvtZatpjzx20TXFUStn87xe1NZdbRti5ZWlwhwQ__&quality=80&width=1024" alt={automatonInfo[userAutomaton.id]?.name} className="w-32 h-32 mb-2" />
               )}
               {/* <p>ID: {userAutomaton.id}</p> */}
               {/* <p>Status: your aim is to craft {craftableItem?.name}</p> */}

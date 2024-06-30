@@ -16,7 +16,6 @@ import { AllStructures } from "@/components/Gameplay/Inventory/Structures/Struct
 import SkillTreeComp from "@/components/Gameplay/Inventory/Structures/TechTree";
 import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
 import Layout from "@/components/Layout";
-import PickYourPlanet from "@/components/Onboarding";
 import { useActivePlanet } from "@/context/ActivePlanet";
 // import Sidebar, { Slidebar } from "@/ui/Panels/Anomalies";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";

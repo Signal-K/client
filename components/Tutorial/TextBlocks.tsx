@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -208,14 +209,49 @@ export default function TutorialText() {
                     </p>
                 </div>
             )
-        } else if (!missionCompletionStatus.has(14)) {
+        } else if (!missionCompletionStatus.has(14) && !userInventory.has(28)) {
             return (
                 <div>
                     <p>
-                        Click on your meteorology tool (you may ck on the arrows next to your structure to see it) and tell us what you think of the cloud. For now, just describe the shape and colours you see. There's no wrong answers!
+                        If you'd like, you can upgrade your rovers so they can return pictures of their journeys for you. You can even write little posts about them and share the photos so others can see what your rovers are discovering (note: these photos are REAL pictures from the Mars Rovers). Craft a "Camera module" for your rovers to get started
                     </p>
                 </div>
             )
+        } else if (!missionCompletionStatus.has(18) && userInventory.has(28) && !userInventory.has(32)) {
+            return (
+                <div>
+                    <p>
+                        Great work - now your rovers can take pictures. But they can't send their awesome discoveries to you, and you can't write any posts. Create a Camera Receiver station now to fix this
+                    </p>
+                </div>
+            )
+        } else if (!missionCompletionStatus.has(18) && userInventory.has(32)) {
+            return (
+                <div>
+                    <p>
+                        Your rovers have been busy, they've already sent you a few photos to look at! Click on the camera station in your structures, and collect an image that looks interesting. Once you've done this, if you'd like, you can write a post about it!
+                    </p>
+                </div>
+            )
+        } else if (missionCompletionStatus.has(18)) {
+            return (
+                <div>
+                    <p>
+                        You've now finished the tutorial (for the first pre-release). Continue mining, exploring and feel free to click the arrow buttons at the top of the page to jump to other planets and begin your journey there. We're releasing weekly updates and would love to hear your thoughts. Tell us what you think here:
+                    </p>
+                    <div className="bg-white">
+                        <TellUsWhatYouThinkClassification />
+                    </div>
+                </div>
+            )
+        // } else if (!missionCompletionStatus.has(20)) {
+            // return (
+            //     <div>
+            //         <p>
+            //             You can go back into your telescope or meteorology tool anytime and make more classifications, but you can also now create a surveyor module. Using this module, you can help astronomers determine properties for the planet like its gravity!
+            //         </p>
+            //     </div>
+            // )
         } else if (missionCompletionStatus.has(21)) {
             return (
                 <>You've done it!</>

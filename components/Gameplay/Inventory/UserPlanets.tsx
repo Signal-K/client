@@ -16,6 +16,7 @@ import TravelBuddy from "@/components/Utilities/TravelBuddy";
 import SpacecraftButton from "./Structures/Vehicles/Spacecraft";
 import { SidebarLayout } from "@/app/layout";
 import TutorialText from "@/components/Tutorial/TextBlocks";
+import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
 
 interface ActivePlanetContextValue {
   activePlanet: UserPlanetData | null;
@@ -206,26 +207,36 @@ const UserPlanetPage = () => {
           {!userInventory.has(26) && <CraftStructure structureId={30} />}
         </>
       );
+    } else  if (missionCompletionStatus.has(13)) {
+      return (
+        <>
+          {/* <DeleteMineralsAtEndOfMission /> */}
+          {/* {!userInventory.has(31) && <CraftStructure structureId={31} />}
+          {/* {!userInventory.has(24) && <CraftStructure structureId={24} />}
+          {!userInventory.has(32) && <CraftStructure structureId={32} />} */}
+          {!userInventory.has(28) && <CraftStructure structureId={28} />}
+          {!userInventory.has(32) && <CraftStructure structureId={32} />}
+        </>
+      );
     } else if (missionCompletionStatus.has(8) && userInventory.has(30)) {
       return (
         <>
           {!userInventory.has(26) && <CraftStructure structureId={26} />}
         </>
       );
-    } else  if (missionCompletionStatus.has(8) && userInventory.has(26)) {
+    } else if (missionCompletionStatus.has(18)) {
       return (
         <>
-          {/* <DeleteMineralsAtEndOfMission /> */}
-          {!userInventory.has(31) && <CraftStructure structureId={31} />}
-          {!userInventory.has(24) && <CraftStructure structureId={24} />}
-          {!userInventory.has(32) && <CraftStructure structureId={32} />}
+          <div>
+            <TellUsWhatYouThinkClassification />
+          </div>
         </>
       );
     } else {
       return (
         <>
           {!userInventory.has(31) && <CraftStructure structureId={31} />}
-          {!userInventory.has(24) && <CraftStructure structureId={24} />}
+          {/* {!userInventory.has(24) && <CraftStructure structureId={24} />} */}
           {!userInventory.has(32) && <CraftStructure structureId={32} />}
         </>
       );

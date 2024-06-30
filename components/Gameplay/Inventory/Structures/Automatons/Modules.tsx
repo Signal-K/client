@@ -16,6 +16,7 @@ import { AllAutomatons } from "../../Automatons/Automaton";
 import CraftStructure from "../../Actions/CraftStructure";
 import axios from "axios";
 import { RoverClassificationFromItem32 } from "@/Classifications/RoverContent/RoverImageClassification";
+import { useRefresh } from "@/context/RefreshState";
 
 interface InventoryItem {
   id: number;
@@ -173,6 +174,7 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
   const [loading, setLoading] = useState(true);
   const [roverConfig, setRoverConfig] = useState<any>(null);
   const [userImages, setUserImages] = useState<{ avatar_url: string, id: number }[]>([]);
+  const [showUserImages, setShowUserImages] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -323,6 +325,7 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
         }
 
         alert("Image collected successfully!");
+        useRefresh();
       } catch (error) {
         console.error("Error collecting image:", error);
         alert("Failed to collect the image.");
@@ -350,28 +353,47 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
         {loading ? (
           <p className="text-center">Loading...</p>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {rovers.map((rover, index) => (
-              <div key={index} className="text-center">
-                <h3 className="font-semibold mb-2">Fetched images</h3>
-                <img src={rover} alt={`Mars Rover ${index}`} className="w-full h-auto rounded-lg mb-2" />
+          <>
+            {!showUserImages ? (
+              <div className="grid grid-cols-1 gap-4">
+                {rovers.map((rover, index) => (
+                  <div key={index} className="text-center">
+                    <h3 className="font-semibold mb-2">Fetched images</h3>
+                    <img src={rover} alt={`Mars Rover ${index}`} className="w-full h-auto rounded-lg mb-2" />
+                    <button
+                      onClick={() => handleCollectImage(rover)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
+                    >
+                      Collect this image
+                    </button>
+                  </div>
+                ))}
                 <button
-                  onClick={() => handleCollectImage(rover)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
+                  onClick={() => setShowUserImages(true)}
+                  className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-700"
                 >
-                  Collect this image
+                  View my images and create a post
                 </button>
               </div>
-            ))}
-            {userImages.map(({ avatar_url, id }, index) => (
-              <div key={index} className="text-center">
-                <h3 className="font-semibold mb-2">Your images</h3>
-                <img src={avatar_url} alt={`Mars Rover ${index}`} className="rounded-lg mb-2" />
-                <p>What do you see?</p>
-                <RoverClassificationFromItem32 roverId={id} />
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {userImages.map(({ avatar_url, id }, index) => (
+                  <div key={index} className="text-center">
+                    <h3 className="font-semibold mb-2">Your images</h3>
+                    <img src={avatar_url} alt={`Mars Rover ${index}`} className="rounded-lg mb-2" />
+                    <p>What do you see?</p>
+                    <RoverClassificationFromItem32 roverId={id} />
+                  </div>
+                ))}
+                <button
+                  onClick={() => setShowUserImages(false)}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-700"
+                >
+                  Back to fetched images
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     </div>
