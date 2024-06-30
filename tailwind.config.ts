@@ -15,6 +15,18 @@ module.exports = withMT({
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      colors: {
+        nord: {
+          surface: '#81A1C1',
+          frost: '#2E3440',
+          'nord-1': '#2E3440',
+          'nord-2': '#2E3440',
+          'nord-3': '#2E3440',
+          'nord-4': '#2E3440',
+          'nord-5': '#2E3440',
+          'nord-6': '#2E3440',
+        },
+      },
     },
   },
   plugins: [

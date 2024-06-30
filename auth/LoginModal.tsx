@@ -37,12 +37,12 @@ export default function LoginPage() {
         <AuthPage>
             <Auth supabaseClient={supabase} theme='light' />
             <br />
-            <span className='text-sm font-medium text-gray-900 dark:text-gray-900'>
+            {/* <span className='text-sm font-medium text-gray-900 dark:text-gray-900'>
                 Don't have an account yet?{' '}
                 <Link href='/login/register' className='underline'>
                     go to signup
                 </Link>.
-            </span>
+            </span> */}
         <br />
         </AuthPage>
     );
