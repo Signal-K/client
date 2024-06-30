@@ -294,10 +294,11 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
   const handleCollectImage = async (image: string) => {
     if (session && activePlanet) {
       try {
+        const randomId = Math.floor(Math.random() * 1000000); // Generate a random ID
         const { data, error } = await supabase
           .from("anomalies")
           .insert({
-            id: "12",
+            id: randomId, // Use the generated random ID
             content: `Rover image by ${session.user.id}`,
             anomalytype: 'roverImg',
             avatar_url: image,
@@ -305,33 +306,34 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
             parentAnomaly: String(activePlanet.id),
             created_at: new Date()
           });
-
+  
         const missionData = {
           user: session?.user?.id,
           time_of_completion: new Date().toISOString(),
           mission: 17,
         };
-
+  
         const { error: missionError } = await supabase
           .from('missions')
           .insert([missionData]);
-
+  
         if (missionError) {
           throw missionError;
-        };
-
+        }
+  
         if (error) {
           throw error;
         }
-
+  
         alert("Image collected successfully!");
-        useRefresh();
+        window.location.reload(); // Refresh the page
       } catch (error) {
         console.error("Error collecting image:", error);
         alert("Failed to collect the image.");
       }
     }
   };
+  
 
   if (!isOpen) return null;
 

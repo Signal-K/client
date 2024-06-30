@@ -630,7 +630,7 @@ export function SingleAutomaton() {
               console.log('Automaton has a deploy time');
               const deployTime = new Date(userAutomaton.time_of_deploy).getTime();
               const currentTime = new Date().getTime();
-              const timeDifference = (currentTime - deployTime) / 1000 / 60;
+              const timeDifference = (currentTime - deployTime) / 1000 / 60 / 5;
               const rewardQuantity = Math.floor(timeDifference);
 
               console.log('Time difference:', timeDifference);
@@ -1000,7 +1000,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
         console.log('Automaton has a deploy time');
         const deployTime = new Date(userAutomaton.time_of_deploy).getTime();
         const currentTime = new Date().getTime();
-        const timeDifference = (currentTime - deployTime) / 1000 / 60;
+        const timeDifference = (currentTime - deployTime) / 1000 / 60 / 5;
         const rewardQuantity = Math.floor(timeDifference);
 
         console.log('Time difference:', timeDifference);
@@ -1054,6 +1054,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
 
           // Call the triggerRefresh function to refresh the automaton list
           refresh.triggerRefresh(); // Call the refresh function to update the automaton list
+          useRefresh();
 
           // Close the modal after claiming rewards
           setIsModalOpen(false); 

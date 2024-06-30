@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
+import RefreshPageButton from "../RefreshState";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -189,7 +190,7 @@ export default function TutorialText() {
             return (
                 <div>
                     <p>
-                        So it's up to you what you'd like to do next. Later on, your telescope will be able to collect data from other far away planets and you'll be able to make more classifications, so if you're just here to discover planets you've got everything you need. If you'd like, click on one of the arrow keys at the top of the screen to fly to another planet and begin building another base there - you can always return here, anytime! If you'd like to discover more things here, like clouds and wildlife, you'll need to dig up some more resources, quickly. Fortunately, there's a tool for that - the mining station! Get your automaton to collect some more coal and you'll be able to build a new mining station.
+                        So it's up to you what you'd like to do next. Later on, your telescope will be able to collect data from other far away planets and you'll be able to make more classifications, so if you're just here to discover planets you've got everything you need. If you'd like, click on one of the arrow keys at the top of the screen to fly to another planet and begin building another base there - you can always return here, anytime! If you'd like to discover more things here, like clouds and wildlife, you'll need to dig up some more resources, quickly. Fortunately, there's a tool for that - the mining station! Get your automaton to collect some more coal and you'll be able to build a new mining station. Click on it and activate it to mine some more coal. The mining station works a lot faster so you will only have to keep it turned on for a couple of seconds! Once you've done that, you'll be able to create a Meteorology tool that will allow you to classify cloud data from your planet! Please note that you may need to click the "Update" button for subsequent missions
                     </p>
                 </div>
             )
@@ -239,7 +240,7 @@ export default function TutorialText() {
                     <p>
                         You've now finished the tutorial (for the first pre-release). Continue mining, exploring and feel free to click the arrow buttons at the top of the page to jump to other planets and begin your journey there. We're releasing weekly updates and would love to hear your thoughts. Tell us what you think here:
                     </p>
-                    <div className="bg-white">
+                    <div className="bg-gray-400">
                         <TellUsWhatYouThinkClassification />
                     </div>
                 </div>
@@ -271,6 +272,7 @@ export default function TutorialText() {
                 <br />
                 <br />
                 <br />
+                <RefreshPageButton />
                 {/* (Please remember you may have to refresh the page if things don't change quickly. This is to reduce load on our servers while we are in these early stages) */}
             </div>
         </div>

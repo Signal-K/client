@@ -645,12 +645,9 @@ export function TellUsWhatYouThinkClassification(assetMentioned: any) { // FIRST
 
     const [content, setContent] = useState<string>("");
     const { activePlanet } = useActivePlanet();
-    const { userProfile } = useProfileContext(); 
+    const { userProfile } = useProfileContext();
 
     async function createPost() {
-        // const editorState = $getRoot() //.serializeToJSON();
-        // const content = $generateHtmlFromNodes(editorState);
-
         supabase
             .from("classifications")
             .insert({
@@ -662,26 +659,26 @@ export function TellUsWhatYouThinkClassification(assetMentioned: any) { // FIRST
                     alert(`Post created, come back soon!`);
                     setContent('');
                 };
-            });            
-    };
+            });
+    }
 
     return (
         <>
             {/* <div className="flex gap-2">
                 <img src={userProfile?.avatar_url} width='60px' height='60px' />
             </div> */}
-            <textarea 
-                value={content} 
-                onChange={e => setContent(e.target.value)} 
-                className="grow p-3 h-24 rounded-xl" 
+            <textarea
+                value={content}
+                onChange={e => setContent(e.target.value)}
+                className="grow p-3 h-24 rounded-xl bg-white text-black" // Tailwind classes for background and text color
                 placeholder={"Tell us what you think"}  //  - we're constantly adding new content and gameplay, so please come back soon. We're excited to hear what you think
             />
-            <button 
-                onClick={createPost} 
-                className="text-black px-2 py-1 rounded-md bg-blue-500 hover:bg-blue-600"
+            <button
+                onClick={createPost}
+                className="text-white px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600"
             >
                 Share
             </button>
         </>
     );
-};
+}
