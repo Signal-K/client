@@ -5,6 +5,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
 import RefreshPageButton from "../RefreshState";
+import Link from "next/link";
 
 interface ActivePlanetContextValue {
     activePlanet: UserPlanetData | null;
@@ -273,6 +274,7 @@ export default function TutorialText() {
                 <br />
                 <br />
                 <RefreshPageButton />
+                <Link href="https://starprotocol-5dyxe5lo4-gizmotronn.vercel.app/">Go to V1 of Star Sailors (not supported, will need new account)</Link>
                 {/* (Please remember you may have to refresh the page if things don't change quickly. This is to reduce load on our servers while we are in these early stages) */}
             </div>
         </div>
