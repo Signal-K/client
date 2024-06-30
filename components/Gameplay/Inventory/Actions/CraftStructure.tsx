@@ -118,9 +118,10 @@ export default function CraftStructure({ structureId }: { structureId: number })
             setUserTelescopeId(data[0].id);
         } catch (error: any) {
             console.log(error);
-        }
-    }
+        };
+    };
 
+    const [notes, setNotes] = useState('');
     const [structureTableId, setSTID] = useState(0);
 
     const craftStructure = async () => {
@@ -136,9 +137,29 @@ export default function CraftStructure({ structureId }: { structureId: number })
 
                 if (parentError || !parentData || parentData.length === 0) {
                     throw new Error('Parent item does not exist');
-                }
+                };
 
                 const parentItemId = parentData[0].id;
+
+                if (structureId == 14) {
+                    setNotes(`Created by crafting ${structureId} for mission 7`,)
+                };
+
+                if (structureId == 30) {
+                    const missionData = {
+                        user: session?.user?.id,
+                        time_of_completion: new Date().toISOString(),
+                        mission: 10,
+                    };
+
+
+                    const { error: missionError } = await supabase
+                        .from('missions')
+                        .insert([missionData]);
+                    if (missionError) {
+                        throw missionError;
+                    };
+                };
 
                 const { data, error } = await supabase
                     .from('inventory')
@@ -149,7 +170,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
                             quantity: 1,
                             time_of_deploy: new Date().toISOString(),
                             parentItem: parentItemId,
-                            notes: `Created by crafting ${structureId} for mission 7`,
+                            notes: notes,
                             anomaly: activePlanet.id,
                         },
                     ])
@@ -157,7 +178,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
 
                 if (error) {
                     throw error;
-                }
+                };
 
                 handleMissionComplete();
 
@@ -243,4 +264,4 @@ export default function CraftStructure({ structureId }: { structureId: number })
             )}
         </div>
     );
-}
+};

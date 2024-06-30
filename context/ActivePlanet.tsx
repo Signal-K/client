@@ -59,33 +59,34 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, [session, supabase]);
 
   const updatePlanetLocation = async (newLocation: number) => {
-    if (!session) return;
+      if (!session) return;
 
     try {
-      // Update the location in the profiles table
-      const { error } = await supabase
-        .from('profiles')
-        .update({ location: newLocation })
-        .eq('id', session.user.id);
+        // Update the location in the profiles table
+        const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ location: newLocation })
+            .eq('id', session.user.id);
 
-      if (error) throw error;
+        if (updateError) throw updateError;
 
-      // Fetch the new planet data
-      const { data: planet, error: planetError } = await supabase
-        .from("anomalies")
-        .select("*")
-        .eq("id", newLocation)
-        .single();
+        // Fetch the new planet data
+        const { data: planet, error: planetError } = await supabase
+            .from("anomalies")
+            .select("*")
+            .eq("id", newLocation)
+            .single();
 
-      if (planetError) throw planetError;
+        if (planetError) throw planetError;
 
-      if (planet) {
-        setActivePlanet(planet);
-      }
+        if (planet) {
+            setActivePlanet(planet);
+        }
     } catch (error: any) {
-      console.error("Error updating planet location: ", error.message);
+        console.error("Error updating planet location: ", error.message);
     }
   };
+
 
   return (
     <ActivePlanetContext.Provider value={{ activePlanet, setActivePlanet, updatePlanetLocation }}>

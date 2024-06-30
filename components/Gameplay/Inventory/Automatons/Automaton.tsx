@@ -2,7 +2,6 @@
 
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { time } from "console";
 import { useEffect, useState } from "react";
 
 interface Automaton {
@@ -497,9 +496,7 @@ export function AllAutomatons() {
               {automatonInfo[selectedAutomaton.id]?.icon_url ? (
                 <img src={automatonInfo[selectedAutomaton.id]?.icon_url} alt={automatonInfo[selectedAutomaton.id]?.name} className="w-32 h-32 mb-2" />
               ) : (
-                <div className="w-32 h-32 mb-2 bg-gray-200 flex items-center justify-center">
-                  <span>No Image</span>
-                </div>
+                <img src="https://cdn.cloud.scenario.com/assets-transform/asset_W72syfLV9NsePvDbLFVZqFmB?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy10cmFuc2Zvcm0vYXNzZXRfVzcyc3lmTFY5TnNlUHZEYkxGVlpxRm1CPyoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MjAzOTY3OTl9fX1dfQ__&Key-Pair-Id=K36FIAB9LE2OLR&Signature=sJ2~g6W7RbC~kJIIYYgsNvzDAN9cbpNXmgw2GVvnssd0IOHFomHN9wD-1Bq44D~R2gF0XNDTxxpAm4A5ihJO4JP8wyATDhbPTw1Z5YnPpJi6pbShtDKvTziVkDIxgecfMCRCy-5ew83fHUITLT~cWerjT6dayUoEHMwXYh0OWJUOCzRXk6sEBe0pbsS89y78s8HURYmE4ZjXFAlFj-ZfpT3Cmq3CyhsElgirrt3CiK3K5LnuW55EKdlnjf7~vsqDKX4WTVgmtVo-so7ByJjP3MHX3WVzTOQmm~UjGRALkfDSOjiyvtZatpjzx20TXFUStn87xe1NZdbRti5ZWlwhwQ__&quality=80&width=1024" className="w-32 h-32 mb-2" />
               )}
               {/* <p>ID: {selectedAutomaton.id}</p> */}
               {/* <p>Status: {selectedAutomaton.notes}</p> */}
@@ -719,7 +716,7 @@ export function SingleAutomaton() {
                       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                           <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
                               <div className="flex justify-between items-center">
-                                  <h2 className="text-xl font-bold">Automaton Details</h2>
+                                  <h2 className="text-xl font-bold">Your rover</h2>
                                   <button
                                       className="btn btn-square btn-outline"
                                       onClick={() => setIsModalOpen(false)}
@@ -729,8 +726,8 @@ export function SingleAutomaton() {
                               </div>
                               <div className="flex flex-col items-center mt-4">
                                   <img src={automatonInfo?.icon_url} alt={automatonInfo?.name} className="w-1 h-1 mb-2 cursor-pointer shadow-lg" />
-                                  <p>ID: {userAutomaton.id}</p>
-                                  <p>Status: {userAutomaton.notes}</p>
+                                  {/* <p>ID: {userAutomaton.id}</p> */}
+                                  {/* <p>Status: {userAutomaton.notes}</p> */}
                                   <div className="mt-4">
                                       <label htmlFor="item-select">Select Item to Mine:</label>
                                       <select
@@ -1083,7 +1080,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">Automaton Details</h2>
+              <h2 className="text-xl font-bold">Your rover</h2>
               <button
                 className="btn btn-square btn-outline"
                 onClick={() => setIsModalOpen(false)}
@@ -1099,17 +1096,17 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
                   <span>No Image</span>
                 </div>
               )}
-              <p>ID: {userAutomaton.id}</p>
-              <p>Status: your aim is to craft {craftableItem?.name}</p>
+              {/* <p>ID: {userAutomaton.id}</p> */}
+              {/* <p>Status: your aim is to craft {craftableItem?.name}</p> */}
               <div>
             {requiredResources.length > 0 ? (
               <div>
-                <h3>Missing Resources:</h3>
+                {/* <h3>Missing Resources:</h3>
                 <ul>
                   {requiredResources.map((msg, index) => (
                     <li key={index}>{msg}</li>
                   ))}
-                </ul>
+                </ul> */}
               </div>
             ) : (
               <button

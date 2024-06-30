@@ -177,17 +177,17 @@ const MiningStationPlaceable: React.FC<MiningStructureModalProps> = ({ isOpen, o
                               <div className="grid grid-cols-2 gap-6">
                                   <div className="flex items-center gap-3">
                                       <GemIcon className="w-7 h-7 text-indigo-500" />
-                                      <span className="font-medium">Coal</span>
+                                      <span className="font-medium">Resources left</span>
                                       <div className="text-right text-lg font-medium">250</div>
                                   </div>
                                   <div className="flex items-center gap-3">
                                       <CuboidIcon className="w-7 h-7 text-amber-500" />
-                                      <span className="font-medium">Silicon</span>
+                                      <span className="font-medium">Power</span>
                                       <div className="text-right text-lg font-medium">500</div>
                                   </div>
                                   <div className="flex items-center gap-3">
                                       <LeafIcon className="w-7 h-7 text-green-500" />
-                                      <span className="font-medium">Organics</span>
+                                      <span className="font-medium">Energy rating</span>
                                       <div className="text-right text-lg font-medium">100</div>
                                   </div>
                                   <div className="flex items-center gap-3">
@@ -196,7 +196,7 @@ const MiningStationPlaceable: React.FC<MiningStructureModalProps> = ({ isOpen, o
                                       <div className="text-right text-lg font-medium">75</div>
                                   </div>
                               </div>
-                              <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+                              {/* <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-6">
                                   <div className="flex items-center gap-3">
                                       <GaugeIcon className="w-7 h-7 text-blue-500" />
                                       <span className="font-medium">Production Rate</span>
@@ -217,7 +217,7 @@ const MiningStationPlaceable: React.FC<MiningStructureModalProps> = ({ isOpen, o
                                       <span className="font-medium">Tech Level</span>
                                       <div className="text-right text-lg font-medium">2</div>
                                   </div>
-                              </div>
+                              </div> */}
                               <div className="mt-8 flex justify-end gap-4">
                                   <button onClick={activateStation} className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600">Activate</button>
                                   <button onClick={claimRewards} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Claim Rewards</button>

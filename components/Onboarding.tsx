@@ -127,99 +127,101 @@ export const PlanetGrid: React.FC = () => {
 
   const handlePlanetSelect = async (planetId: number) => {
     try {
-      // Fetch the full details of the selected planet
-      const { data: planetData, error: planetError } = await supabase
-        .from('anomalies')
-        .select('*')
-        .eq('id', planetId)
-        .single();
+        // Fetch the full details of the selected planet
+        const { data: planetData, error: planetError } = await supabase
+            .from('anomalies')
+            .select('*')
+            .eq('id', planetId)
+            .single();
 
-      if (planetError) {
-        throw planetError;
-      }
+        if (planetError) {
+            throw planetError;
+        }
 
-      if (!planetData) {
-        throw new Error('Planet data not found');
-      }
+        if (!planetData) {
+            throw new Error('Planet data not found');
+        }
 
-      await updatePlanetLocation(planetData);
+        // Update planet location with the planet id, not the whole object
+        await updatePlanetLocation(planetId);
 
-      const missionData = {
-        user: session?.user?.id,
-        time_of_completion: new Date().toISOString(),
-        mission: 1,
-        configuration: null,
-        rewarded_items: null,
-      };
+        const missionData = {
+            user: session?.user?.id,
+            time_of_completion: new Date().toISOString(),
+            mission: 1,
+            configuration: null,
+            rewarded_items: null,
+        };
 
-      const missionData2 = {
-        user: session?.user?.id,
-        time_of_completion: new Date().toISOString(),
-        mission: 3,
-        configuration: null,
-        rewarded_items: null,
-      };
+        const missionData2 = {
+            user: session?.user?.id,
+            time_of_completion: new Date().toISOString(),
+            mission: 3,
+            configuration: null,
+            rewarded_items: null,
+        };
 
-      const missionData3 = {
-        user: session?.user?.id,
-        time_of_completion: new Date().toISOString(),
-        mission: 2,
-        configuration: null,
-        rewarded_items: null,
-      };
+        const missionData3 = {
+            user: session?.user?.id,
+            time_of_completion: new Date().toISOString(),
+            mission: 2,
+            configuration: null,
+            rewarded_items: null,
+        };
 
-      const { data: newMission, error: missionError } = await supabase
-        .from("missions")
-        .insert([missionData, missionData2, missionData3]);
+        const { data: newMission, error: missionError } = await supabase
+            .from("missions")
+            .insert([missionData, missionData2, missionData3]);
 
-      if (missionError) {
-        throw missionError;
-      }
+        if (missionError) {
+            throw missionError;
+        }
 
-      const inventoryData = {
-        item: 29,
-        owner: session?.user?.id,
-        quantity: 1,
-        notes: "Created upon the completion of mission 1",
-        parentItem: null,
-        time_of_deploy: new Date().toISOString(),
-        anomaly: planetData.id,
-      };
+        const inventoryData = {
+            item: 29,
+            owner: session?.user?.id,
+            quantity: 1,
+            notes: "Created upon the completion of mission 1",
+            parentItem: null,
+            time_of_deploy: new Date().toISOString(),
+            anomaly: planetData.id,
+        };
 
-      const inventoryDataForMission2 = {
-        item: 22,
-        owner: session?.user?.id,
-        quantity: 1,
-        notes: `Reward for completing mission 2`,
-        parentItem: null,
-        time_of_deploy: new Date().toISOString(),
-        anomaly: null,
-      };
+        const inventoryDataForMission2 = {
+            item: 22,
+            owner: session?.user?.id,
+            quantity: 1,
+            notes: `Reward for completing mission 2`,
+            parentItem: null,
+            time_of_deploy: new Date().toISOString(),
+            anomaly: null,
+        };
 
-      const inventoryDataForMission3 = {
-        item: 12,
-        owner: session?.user?.id,
-        quantity: 1,
-        notes: `Reward for completing mission 3`,
-        parentItem: null,
-        time_of_deploy: new Date().toISOString(),
-        anomaly: planetData?.id,
-      };
+        const inventoryDataForMission3 = {
+            item: 12,
+            owner: session?.user?.id,
+            quantity: 1,
+            notes: `Reward for completing mission 3`,
+            parentItem: null,
+            time_of_deploy: new Date().toISOString(),
+            anomaly: planetData?.id,
+        };
 
-      const { data: newInventoryEntry, error: inventoryError } = await supabase
-        .from("inventory")
-        .insert([inventoryData, inventoryDataForMission2, inventoryDataForMission3]);
+        const { data: newInventoryEntry, error: inventoryError } = await supabase
+            .from("inventory")
+            .insert([inventoryData, inventoryDataForMission2, inventoryDataForMission3]);
 
-      if (inventoryError) {
-        throw inventoryError;
-      }
+        if (inventoryError) {
+            throw inventoryError;
+        }
 
-      setActivePlanet(planetData); // Update the active planet in the context
+        setActivePlanet(planetData); // Update the active planet in the context
 
     } catch (error: any) {
-      console.error("Error handling planet selection:", error.message);
+        console.error("Error handling planet selection:", error.message);
     }
-  };
+};
+
 
   useEffect(() => {
     const fetchAnomalies = async () => {

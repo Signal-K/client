@@ -184,6 +184,22 @@ export default function TutorialText() {
                     </p>
                 </div>
             );
+        } else if (!missionCompletionStatus.has(10)) {
+            return (
+                <div>
+                    <p>
+                        So it's up to you what you'd like to do next. Later on, your telescope will be able to collect data from other far away planets and you'll be able to make more classifications, so if you're just here to discover planets you've got everything you need. If you'd like, click on one of the arrow keys at the top of the screen to fly to another planet and begin building another base there - you can always return here, anytime! If you'd like to discover more things here, like clouds and wildlife, you'll need to dig up some more resources, quickly. Fortunately, there's a tool for that - the mining station! Get your automaton to collect some more coal and you'll be able to build a new mining station.
+                    </p>
+                </div>
+            )
+        } else if (!missionCompletionStatus.has(11)) {
+            return (
+                <div>
+                    <p>
+
+                    </p>
+                </div>
+            )
         } else if (missionCompletionStatus.has(21)) {
             return (
                 <>You've done it!</>

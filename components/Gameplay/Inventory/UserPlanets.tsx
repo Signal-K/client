@@ -18,305 +18,270 @@ import { SidebarLayout } from "@/app/layout";
 import TutorialText from "@/components/Tutorial/TextBlocks";
 
 interface ActivePlanetContextValue {
-    activePlanet: UserPlanetData | null;
-    setActivePlanet: (planet: UserPlanetData | null) => void;
+  activePlanet: UserPlanetData | null;
+  setActivePlanet: (planet: UserPlanetData | null) => void;
 };
 
 export interface UserStructure {
-    id: string;
-    item: number;
-    name: string;
-    icon_url: string;
-    description: string;
-    // Function (what is executed upon click)
+  id: string;
+  item: number;
+  name: string;
+  icon_url: string;
+  description: string;
+  // Function (what is executed upon click)
 };
 
 export interface UserPlanetData {
-    id: string;
-    content: string;
-    ticId: string;
-    type: string;
-    radius: number;
-    mass: number;
-    density: number;
-    gravity: number;
-    temperatureEq: number;
-    temperature: number;
-    smaxis: number;
-    orbital_period: number;
-    classification_status: string;
-    avatar_url: string;
-    created_at: string;
-    deepnote: string;
-    starSystems: number;
-    Faction: number;
-    lightkurve: string;
+  id: string;
+  content: string;
+  ticId: string;
+  type: string;
+  radius: number;
+  mass: number;
+  density: number;
+  gravity: number;
+  temperatureEq: number;
+  temperature: number;
+  smaxis: number;
+  orbital_period: number;
+  classification_status: string;
+  avatar_url: string;
+  created_at: string;
+  deepnote: string;
+  starSystems: number;
+  Faction: number;
+  lightkurve: string;
 };
 
 // View structures, planet info & automatons
 const UserPlanetPage = () => {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-    
-    const { activePlanet } = useActivePlanet() || {};
-    
-    const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
-    const [userInventory, setUserInventory] = useState(new Set());
-    const [userUtilityStructures, setUserUtilityStructures] = useState(new Set());
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  
+  const { activePlanet } = useActivePlanet() || {};
+  
+  const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
+  const [userInventory, setUserInventory] = useState(new Set());
+  const [userUtilityStructures, setUserUtilityStructures] = useState(new Set());
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => {
+      setIsModalOpen(true);
+  };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
-  
-    useEffect(() => {
-      const fetchMissionCompletionStatus = async () => {
-        if (session) {
-          try {
-            const { data, error } = await supabase
-              .from('missions')
-              .select('mission')
-              .eq('user', session.user.id);
-  
-            if (error) {
-              console.error('Error fetching missions:', error.message);
-              return;
-            }
-  
-            const missionStatusMap = new Map();
-            data.forEach((mission) => {
-              missionStatusMap.set(mission.mission, true);
-            });
-  
-            setMissionCompletionStatus(missionStatusMap);
-          } catch (error: any) {
-            console.error('Error fetching mission completion status:', error.message);
-          }
+  const closeModal = () => {
+      setIsModalOpen(false);
+  };
+
+  const fetchMissionCompletionStatus = async () => {
+    if (session) {
+      try {
+        const { data, error } = await supabase
+          .from('missions')
+          .select('mission')
+          .eq('user', session.user.id);
+
+        if (error) {
+          console.error('Error fetching missions:', error.message);
+          return;
         }
+
+        const missionStatusMap = new Map();
+        data.forEach((mission) => {
+          missionStatusMap.set(mission.mission, true);
+        });
+
+        setMissionCompletionStatus(missionStatusMap);
+      } catch (error: any) {
+        console.error('Error fetching mission completion status:', error.message);
+      }
+    }
+  };
+
+  const fetchUserInventory = async () => {
+    if (session && activePlanet) {
+      try {
+        const { data, error } = await supabase
+          .from('inventory')
+          .select('item')
+          .eq('owner', session.user.id)
+          .eq('anomaly', activePlanet.id);
+
+        if (error) {
+          console.error('Error fetching user inventory:', error.message);
+          return;
+        }
+
+        const inventorySet = new Set(data.map((item) => item.item));
+        setUserInventory(inventorySet);
+      } catch (error: any) {
+        console.error('Error fetching user inventory:', error.message);
       };
-  
-      const fetchUserInventory = async () => {
-        if (session && activePlanet) {
-          try {
-            const { data, error } = await supabase
-              .from('inventory')
-              .select('item')
-              .eq('owner', session.user.id)
-              .eq('anomaly', activePlanet.id);
-  
-            if (error) {
-              console.error('Error fetching user inventory:', error.message);
-              return;
-            }
-  
-            const inventorySet = new Set(data.map((item) => item.item));
-            setUserInventory(inventorySet);
-          } catch (error: any) {
-            console.error('Error fetching user inventory:', error.message);
-          };
-        };
-      };
-  
-      fetchMissionCompletionStatus();
-      fetchUserInventory();
-      fetchUserUtilityStructures();
-    }, [session, supabase, activePlanet]);
+    };
+  };
 
-    async function fetchUserUtilityStructures() {
-      if (session && activePlanet) {
-        try {
-          const { data, error } = await supabase
-            .from("inventory")
-            .select("item")
-            .eq("owner", session.user.id)
-            .eq("anomaly", activePlanet.id)
-            .eq("item", 33) // Update this to use the `/gameplay/inventory` api `route.ts`
+  async function fetchUserUtilityStructures() {
+    if (session && activePlanet) {
+      try {
+        const { data, error } = await supabase
+          .from("inventory")
+          .select("item")
+          .eq("owner", session.user.id)
+          .eq("anomaly", activePlanet.id)
+          .eq("item", 33) // Update this to use the `/gameplay/inventory` api `route.ts`
 
-          if (error) {
-            console.error("Error fetching user utility structures: ", error.message);
-            return;
-          };
-
-          const utilityStructureSet = new Set(data.map((item) => item.item));
-          setUserUtilityStructures(utilityStructureSet);
-        } catch (error: any) {
+        if (error) {
           console.error("Error fetching user utility structures: ", error.message);
+          return;
         };
+
+        const utilityStructureSet = new Set(data.map((item) => item.item));
+        setUserUtilityStructures(utilityStructureSet);
+      } catch (error: any) {
+        console.error("Error fetching user utility structures: ", error.message);
       };
     };
-  
-    const renderContent = () => {
-      if (!missionCompletionStatus.has(1)) {
-        return (
-          <PlanetGrid />
-        );
-      // } else if (!missionCompletionStatus.has(2)) {
-      //   // return <ProfileCard />;
-      //   return (
-      //     <>
-      //       <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />
-      //       {/* <SpacecraftButton /> */}
-      //     </>
-      //   );
-      // } else if (!missionCompletionStatus.has(3)) {
-      //   return (
-      //     <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />
-      //     // <SpacecraftButton />
-      //   );
-      } else if (!missionCompletionStatus.has(4)) {
-        return (
-          <>
-            <UserItemsUndeployed />
-            <AllStructures />
-          </>
-        );
-      } else if (!missionCompletionStatus.has(5)) {
-        return (
-          <>
-            <AllStructures />
-          </>
-        )
-      } else {
-        return (
-          <>
-            <AllStructures />
-            {!missionCompletionStatus.has(7) && (
-              <center><CraftStructure structureId={14} /></center>
-            )}
-            {!missionCompletionStatus.has(8) && missionCompletionStatus.has(7) && (
-              <></>
-            )}
-          </>
-        );
-      }
-    };
-  
-    const renderAutomatonContent = () => {
-      if (!missionCompletionStatus.has(4)) {
-        return <>No automatons</>;
-      } else if (missionCompletionStatus.has(21)) {
-        return <>
-          <AllAutomatons />
-          <SpacecraftButton />
+  };
+
+  useEffect(() => {
+    fetchMissionCompletionStatus();
+    fetchUserInventory();
+    fetchUserUtilityStructures();
+
+    const interval = setInterval(() => {
+      fetchMissionCompletionStatus();
+    }, 150000);
+
+    return () => clearInterval(interval); // Cleanup the interval on component unmount
+  }, [session, supabase, activePlanet]);
+
+  const renderContent = () => {
+    if (!missionCompletionStatus.has(1)) {
+      return (
+        <PlanetGrid />
+      );
+    // } else if (!missionCompletionStatus.has(2)) {
+    //   // return <ProfileCard />;
+    //   return (
+    //     <>
+    //       <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />
+    //       {/* <SpacecraftButton /> */}
+    //     </>
+    //   );
+    // } else if (!missionCompletionStatus.has(3)) {
+    //   return (
+    //     <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />
+    //     // <SpacecraftButton />
+    //   );
+    } else if (!missionCompletionStatus.has(4)) {
+      return (
+        <>
+          <UserItemsUndeployed />
+          <AllStructures />
         </>
-      } else if (missionCompletionStatus.has(9)) {
-        return <><SingleAutomaton /></>;
-      } else if (missionCompletionStatus.has(8)) {
-        return <SingleAutomatonCraftItem craftItemId={30} />;
-      } else {
-        return <AllAutomatons />;
-      }
-    };
+      );
+    } else if (!missionCompletionStatus.has(5)) {
+      return (
+        <>
+          <AllStructures />
+        </>
+      )
+    } else {
+      return (
+        <>
+          <AllStructures />
+          {!missionCompletionStatus.has(7) && (
+            <center><CraftStructure structureId={14} /></center>
+          )}
+          {!missionCompletionStatus.has(8) && missionCompletionStatus.has(7) && (
+            <></>
+          )}
+        </>
+      );
+    }
+  };
 
-    // if (!activePlanet) {
-    //     return (
-    //         <div className="">
-    //             {/* <PickYourPlanet onPlanetSelect={() => {}} /> */}
-    //             <ResponsiveLayout leftContent={<AllAutomatons />} middleContent={<PlanetGrid />} rightContent={<AllAutomatons />} />
-    //         </div>
-    //     );
-    // };
+  const renderAutomatonContent = () => {
+    if (!missionCompletionStatus.has(4)) {
+      return <>No automatons</>;
+    } else if (missionCompletionStatus.has(21)) {
+      return <>
+        <AllAutomatons />
+        <SpacecraftButton />
+      </>
+    } else if (missionCompletionStatus.has(9)) {
+      return <><SingleAutomaton /></>;
+    } else if (missionCompletionStatus.has(8)) {
+      return <SingleAutomatonCraftItem craftItemId={30} />;
+    } else {
+      return <AllAutomatons />;
+    }
+  };
 
-    // if (!missionCompletionStatus.has(1)) {
-    //     return (
-    //         <div className="">
-    //             {/* <PickYourPlanet onPlanetSelect={() => {}} /> */}
-                
-    //         </div>
-    //     );
-    // };
-  
-    const renderUtilitiesContext = () => {
-      if (missionCompletionStatus.has(21)) {
-        return (
-          <> {/* Show launchpad here maybe? */}
-            <TravelBuddy />
-          </>
-        );
-      } else if (missionCompletionStatus.has(8)) {
-        return (
-          <>
-            {!userInventory.has(26) && <CraftStructure structureId={26} />}
-          </>
-        );
-      } else  if (missionCompletionStatus.has(8) && userInventory.has(26)) {
-        return (
-          <>
-            {/* <DeleteMineralsAtEndOfMission /> */}
-            {!userInventory.has(31) && <CraftStructure structureId={31} />}
-            {!userInventory.has(24) && <CraftStructure structureId={24} />}
-            {!userInventory.has(32) && <CraftStructure structureId={32} />}
-          </>
-        );
-      } else {
-        return null;
-      }
-    };    
+  const renderUtilitiesContext = () => {
+    if (missionCompletionStatus.has(21)) {
+      return (
+        <> {/* Show launchpad here maybe? */}
+          <TravelBuddy />
+        </>
+      );
+    } else if (missionCompletionStatus.has(8) && !userInventory.has(30)) {
+      return (
+        <>
+          {!userInventory.has(26) && <CraftStructure structureId={30} />}
+        </>
+      );
+    } else if (missionCompletionStatus.has(8) && userInventory.has(30)) {
+      return (
+        <>
+          {!userInventory.has(26) && <CraftStructure structureId={26} />}
+        </>
+      );
+    } else  if (missionCompletionStatus.has(8) && userInventory.has(26)) {
+      return (
+        <>
+          {/* <DeleteMineralsAtEndOfMission /> */}
+          {!userInventory.has(31) && <CraftStructure structureId={31} />}
+          {!userInventory.has(24) && <CraftStructure structureId={24} />}
+          {!userInventory.has(32) && <CraftStructure structureId={32} />}
+        </>
+      );
+    } else {
+      return null;
+    }
+  };
 
-    const interactablesContentContainer = () => {
-      if (session) {
-        return (
-          <>
-            <div className="hidden md:grid md:grid-cols-1 md:grid-rows-3 md:gap-4 md:relative md:h-full">
-              <div className="md:row-span-1 md:col-span-8 md:flex md:items-center md:justify-center p-4"> 
-                {renderContent()}
-              </div>
-              <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">{renderUtilitiesContext()}</div> 
-              <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-2 mb-12"> 
-                {renderAutomatonContent()}
-              </div>
+  const interactablesContentContainer = () => {
+    if (session) {
+      return (
+        <>
+          <div className="hidden md:grid md:grid-cols-1 md:grid-rows-3 md:gap-4 md:relative md:h-full">
+            <div className="md:row-span-1 md:col-span-8 md:flex md:items-center md:justify-center p-4"> 
+              {renderContent()}
             </div>
-
-            <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
-              <div className="col-span-1 flex justify-center items-end pb-5">
-                {renderContent()}
-              </div>
-              {/* <div>{renderUtilitiesContext() }</div> */}
-              <div className="col-span-1 flex justify-center items-end pb-5">
-                {renderAutomatonContent()}
-              </div>
+            <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">{renderUtilitiesContext()}</div> 
+            <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-2 mb-12"> 
+              {renderAutomatonContent()}
             </div>
-          </>
-        );
-      };
+          </div>
+
+          <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
+            <div className="col-span-1 flex justify-center items-end pb-5">
+              {renderContent()}
+            </div>
+            {/* <div>{renderUtilitiesContext() }</div> */}
+            <div className="col-span-1 flex justify-center items-end pb-5">
+              {renderAutomatonContent()}
+            </div>
+          </div>
+        </>
+      );
     };
+  };
 
-    /* return (
-      // <div className="mx-12">
-      //   {/* Desktop Layout 
-      //   <div className="hidden md:grid md:grid-cols-5 md:grid-rows-3 md:gap-4 md:relative md:h-full">
-      //     <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-12"> 
-      //       {renderContent()}
-      //     </div>
-      //     <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">{renderUtilitiesContext()}</div> 
-      //     <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-2 mb-12"> 
-      //       {renderAutomatonContent()}
-      //     </div>
-      //   </div>
-  
-      //   {/* Mobile Layout 
-      //   <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
-      //     <div></div>
-      //     <div className="col-span-1 flex justify-center items-end pb-5">
-      //       {renderContent()}
-      //     </div>
-      //     <div>{renderUtilitiesContext() }</div>
-      //     <div></div>
-      //     <div className="col-span-1 flex justify-center items-end pb-5">
-      //       {renderAutomatonContent()}
-      //     </div>
-      //     <div></div>
-      //   </div>
-      // </div>
-    // ) */
-
-    return (
-      <SidebarLayout leftContent={<><TutorialText /></>} middleContent={interactablesContentContainer()} />
-    );
+  return (
+    <SidebarLayout leftContent={<><TutorialText /></>} middleContent={interactablesContentContainer()} />
+  );
 };  
 
 export default UserPlanetPage;

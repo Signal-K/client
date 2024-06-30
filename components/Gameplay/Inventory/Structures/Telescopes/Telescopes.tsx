@@ -244,11 +244,12 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
               <p>Description: {structure.description}</p> */}
               <div className="mt-4">
                 <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} />
-                {ownedItem.notes === 'Created by crafting 14 for mission 7' ? (
+                <CreateFirstBaseClassification assetMentioned={imageUrl} />
+                {/* {ownedItem.notes === 'Created by crafting 14 for mission 7' ? (
                   <CreateFirstBaseClassification assetMentioned={imageUrl} />
                 ) : (
                   <CreateBaseClassification assetMentioned={imageUrl} />
-                )}
+                )} */}
                 {isActionDone && <p className="mt-2 text-green-500">Action Completed</p>}
               </div>
             </div>
