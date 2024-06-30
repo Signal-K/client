@@ -147,6 +147,8 @@ const MiningStationPlaceable: React.FC<MiningStructureModalProps> = ({ isOpen, o
                   }
 
                   console.log('Station deactivated: ', updateData);
+                  // useRefresh
+                  // onClose();
               } else {
                   console.log('No rewards to claim.');
               }

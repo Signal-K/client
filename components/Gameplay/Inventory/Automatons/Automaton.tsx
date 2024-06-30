@@ -3,6 +3,7 @@
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
+import { useRefresh } from "@/context/RefreshState";
 
 interface Automaton {
     id: number;
@@ -16,7 +17,11 @@ interface Automaton {
     time_of_deploy: string;
 };
 
-export function CreateAutomaton() {
+interface CreateAutomatonProps {
+    onSuccess: () => void; // New prop to handle success
+}
+
+export function CreateAutomaton({ onSuccess }: CreateAutomatonProps) {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
@@ -24,68 +29,65 @@ export function CreateAutomaton() {
     const [already, setAlready] = useState(false);
 
     const inventoryData = {
-      item: 13,
-      owner: session?.user?.id,
-      quantity: 3,
-      notes: "Created upon the completion of mission 5",
-      parentItem: null, // Set this to be the first rover that is built here/through this component
-      time_of_deploy: new Date().toISOString(),
-      anomaly: activePlanet?.id,
+        item: 13,
+        owner: session?.user?.id,
+        quantity: 3,
+        notes: "Created upon the completion of mission 5",
+        parentItem: null,
+        time_of_deploy: new Date().toISOString(),
+        anomaly: activePlanet?.id,
     };
+
     const inventoryData2 = {
-      item: 16,
-      owner: session?.user?.id,
-      quantity: 2,
-      notes: "Created upon the completion of mission 5",
-      parentItem: null, // Set this to be the first rover that is built here/through this component
-      time_of_deploy: new Date().toISOString(),
-      anomaly: activePlanet?.id,
+        item: 16,
+        owner: session?.user?.id,
+        quantity: 2,
+        notes: "Created upon the completion of mission 5",
+        parentItem: null,
+        time_of_deploy: new Date().toISOString(),
+        anomaly: activePlanet?.id,
     };
 
     const handleMissionComplete = async () => {
-      try {
-        const missionData = {
-          user: session?.user?.id,
-          time_of_completion: new Date().toISOString(),
-          mission: 5,
-          configuration: null,
-          rewarded_items: [13]//, 13, 13, 16, 16],
+        try {
+            const missionData = {
+                user: session?.user?.id,
+                time_of_completion: new Date().toISOString(),
+                mission: 5,
+                configuration: null,
+                rewarded_items: [13], // Update with rewarded items
+            };
+
+            const { data: newMission, error: newMissionError } = await supabase
+                .from('missions')
+                .insert([missionData]);
+
+            if (newMissionError) {
+                throw newMissionError;
+            };
+
+            const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
+                .from('inventory')
+                .insert([inventoryData, inventoryData2]);
+
+            if (newInventoryEntryError) {
+                throw newInventoryEntryError;
+            };
+
+            console.log('Inventory updated', newInventoryEntry);
+        } catch (error: any) {
+            console.error("Error handling mission completion:", error.message);
         };
-
-        const { data: newMission, error: newMissionError } = await supabase
-          .from("missions")
-          .insert([missionData]);
-      
-        if (newMissionError) {
-            throw newMissionError;
-        };
-
-        const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
-          .from("inventory")
-          .insert([inventoryData, inventoryData2]);
-
-        if (inventoryData) {
-          console.log('Inventory updated', newInventoryEntry);
-        }
-
-        if (newInventoryEntryError) {
-          throw newInventoryEntryError;
-        };
-      } catch (error: any) {
-        console.error("Error handling mission completion:", error.message);
-      };
     };
 
     const handleCreateAutomaton = async () => {
         try {
-            // Check if the user has an automaton already
             const { data: automatonData, error: automatonError } = await supabase
                 .from('inventory')
                 .select('id')
                 .eq('owner', session?.user?.id)
                 .eq('item', 23);
 
-                
             if (automatonError) {
                 throw new Error('Error checking for existing automaton');
             }
@@ -96,7 +98,6 @@ export function CreateAutomaton() {
                 return;
             }
 
-            // Check if the user has a rover construction structure
             const { data: structureData, error: structureError } = await supabase
                 .from('inventory')
                 .select('*')
@@ -112,7 +113,6 @@ export function CreateAutomaton() {
                 return;
             }
 
-            // Create the automaton
             const { data: createdAutomatonData, error: createdAutomatonError } = await supabase
                 .from('inventory')
                 .insert([
@@ -125,13 +125,14 @@ export function CreateAutomaton() {
                     }
                 ]);
 
-                handleMissionComplete();
-
             if (createdAutomatonError) {
                 throw new Error('Error creating automaton');
             }
 
             console.log('Automaton created', createdAutomatonData);
+
+            await handleMissionComplete();
+            onSuccess(); // Call the onSuccess function to trigger the refresh
         } catch (error: any) {
             console.error(error.message);
         }
@@ -204,7 +205,6 @@ export const AnomalyStructureModal: React.FC<AnomalyStructureModalProps> = ({ is
     const [isActionDone, setIsActionDone] = useState(false);
 
     const handleActionClick = () => {
-        // Implement action logic here
         setIsActionDone(true);
     };
 
@@ -220,7 +220,7 @@ export const AnomalyStructureModal: React.FC<AnomalyStructureModalProps> = ({ is
                     </button>
                 </div>
                 <div className="flex flex-col items-center mt-4">
-                    <CreateAutomaton />
+                    <CreateAutomaton onSuccess={handleActionClick} />
                 </div>
             </div>
         </div>
@@ -365,104 +365,103 @@ export function AllAutomatons() {
 
   async function claimRewards() {
     try {
-      fetchUserItems();
-      if (selectedAutomaton?.time_of_deploy) {
-        const deployTime = new Date(selectedAutomaton.time_of_deploy).getTime();
-        const currentTime = new Date().getTime();
-        const timeDifference = (currentTime - deployTime) / 1000 / 60 / 4; // Difference in minutes
-        const rewardQuantity = Math.floor(timeDifference);
-  
-        const inventoryData = {
-          item: 13,
-          owner: session?.user?.id,
-          quantity: 2,
-          notes: "Created upon the deployment of the user's first automaton, for mission 6",
-          parentItem: selectedAutomaton?.id,
-          time_of_deploy: new Date().toISOString(),
-          anomaly: activePlanet?.id,
-      };
+        fetchUserItems();  // You might want to await this if it has async effects
+        if (selectedAutomaton?.time_of_deploy) {
+            const deployTime = new Date(selectedAutomaton.time_of_deploy).getTime();
+            const currentTime = new Date().getTime();
+            const timeDifference = (currentTime - deployTime) / 1000 / 60 / 4; // Difference in minutes
+            const rewardQuantity = Math.floor(timeDifference);
 
-      const inventoryData2 = {
-          item: 15,
-          owner: session?.user?.id,
-          quantity: 1,
-          notes: "Created upon the deployment of the user's first automaton, for mission 6",
-          parentItem: selectedAutomaton?.id,
-          time_of_deploy: new Date().toISOString(),
-          anomaly: activePlanet?.id,
-      };
+            const inventoryData = {
+                item: 13,
+                owner: session?.user?.id,
+                quantity: 2,
+                notes: "Created upon the deployment of the user's first automaton, for mission 6",
+                parentItem: selectedAutomaton?.id,
+                time_of_deploy: new Date().toISOString(),
+                anomaly: activePlanet?.id,
+            };
 
-      // Insert rewards into inventory
-      // if (!userItems) {
-        const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
-        .from("inventory")
-        .insert([inventoryData, inventoryData2]);
+            const inventoryData2 = {
+                item: 15,
+                owner: session?.user?.id,
+                quantity: 1,
+                notes: "Created upon the deployment of the user's first automaton, for mission 6",
+                parentItem: selectedAutomaton?.id,
+                time_of_deploy: new Date().toISOString(),
+                anomaly: activePlanet?.id,
+            };
 
-    if (newInventoryEntryError) {
-        throw new Error('Error inserting rewards into inventory: ' + newInventoryEntryError.message);
-    // }
+            const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
+                .from("inventory")
+                .insert([inventoryData, inventoryData2]);
 
-    console.log('Inventory updated', newInventoryEntry); }
-      await handleMissionComplete();
-      console.log("Rewards claimed successfully.");
-        
-        if (rewardQuantity > 0) {
-          const itemValues = [11, 13, 15, 16, 17, 18, 19, 20, 21];
+            if (newInventoryEntryError) {
+                throw new Error('Error inserting rewards into inventory: ' + newInventoryEntryError.message);
+            }
 
-          const getRandomItem = () => {
-              return itemValues[Math.floor(Math.random() * itemValues.length)];
-          };
-          
-          const { data: insertData, error: insertError } = await supabase.from('inventory').insert([
-              {
-                  owner: session?.user?.id,
-                  item: getRandomItem(),
-                  quantity: rewardQuantity,
-                  anomaly: activePlanet?.id,
-                  notes: `Reward from automaton ID: ${selectedAutomaton.id}`,
-              },
-              {
-                  owner: session?.user?.id,
-                  item: getRandomItem(),
-                  quantity: rewardQuantity,
-                  anomaly: activePlanet?.id,
-                  notes: `Reward from automaton ID: ${selectedAutomaton.id}`,
-              }
-          ]);
-          
-          if (insertError) {
-              console.error('Error inserting inventory items:', insertError);
-          } else {
-              console.log('Inventory items inserted successfully:', insertData);
-          }
-          
-  
-          console.log('Rewards inserted', insertData);
-  
-          const { data: updateData, error: updateError } = await supabase
-            .from('inventory')
-            .update({ time_of_deploy: null }) // Update time_of_deploy to null
-            .eq('id', selectedAutomaton.id);
-  
-          if (updateError) {
-            console.error('Error updating automaton', updateError);
-            return;
-          }
-  
-          console.log('Automaton updated', updateData);
-  
-          setRewardTotal(rewardQuantity);
-          console.log(`Rewards claimed: ${rewardQuantity}`);
-  
-          handleMissionComplete();
-          // setSelectedAutomaton((prevAutomaton) => ({ ...prevAutomaton, time_of_deploy: null }));
+            console.log('Inventory updated', newInventoryEntry);
+
+            await handleMissionComplete();
+            console.log("Rewards claimed successfully.");
+
+            if (rewardQuantity > 0) {
+                const itemValues = [11, 13, 15, 16, 17, 18, 19, 20, 21];
+
+                const getRandomItem = () => {
+                    return itemValues[Math.floor(Math.random() * itemValues.length)];
+                };
+
+                const { data: insertData, error: insertError } = await supabase.from('inventory').insert([
+                    {
+                        owner: session?.user?.id,
+                        item: getRandomItem(),
+                        quantity: rewardQuantity,
+                        anomaly: activePlanet?.id,
+                        notes: `Reward from automaton ID: ${selectedAutomaton.id}`,
+                    },
+                    {
+                        owner: session?.user?.id,
+                        item: getRandomItem(),
+                        quantity: rewardQuantity,
+                        anomaly: activePlanet?.id,
+                        notes: `Reward from automaton ID: ${selectedAutomaton.id}`,
+                    }
+                ]);
+
+                if (insertError) {
+                    console.error('Error inserting inventory items:', insertError);
+                } else {
+                    console.log('Inventory items inserted successfully:', insertData);
+                }
+
+                console.log('Rewards inserted', insertData);
+
+                const { data: updateData, error: updateError } = await supabase
+                    .from('inventory')
+                    .update({ time_of_deploy: null }) // Update time_of_deploy to null
+                    .eq('id', selectedAutomaton.id);
+
+                if (updateError) {
+                    console.error('Error updating automaton', updateError);
+                    return;
+                }
+
+                console.log('Automaton updated', updateData);
+
+                setRewardTotal(rewardQuantity);
+                console.log(`Rewards claimed: ${rewardQuantity}`);
+
+                // Call the triggerRefresh function to refresh the automaton list
+                useRefresh();
+            }
         }
-      }
+        setIsModalOpen(false); // Close the modal when rewards are claimed
     } catch (error: any) {
-      console.error("Error claiming rewards:", error.message);
+        console.error("Error claiming rewards:", error.message);
     }
-  }
-  
+}
+
 
   return (
     <>
@@ -671,6 +670,7 @@ export function SingleAutomaton() {
 
                   setRewardTotal(rewardQuantity);
                   console.log(`Rewards claimed: ${rewardQuantity}`);
+                  useRefresh();
               } else {
                   console.log('Reward quantity is 0 or less, no rewards to claim');
               }
@@ -769,6 +769,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
   const supabase = useSupabaseClient();
   const session = useSession();
   const { activePlanet } = useActivePlanet();
+  const refresh = useRefresh(); // Initialize useRefresh hook
 
   const [userItems, setUserItems] = useState<UserItem[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
@@ -1050,6 +1051,12 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
   
           setRewardTotal(rewardQuantity);
           console.log(`Rewards claimed: ${rewardQuantity}`);
+
+          // Call the triggerRefresh function to refresh the automaton list
+          refresh.triggerRefresh(); // Call the refresh function to update the automaton list
+
+          // Close the modal after claiming rewards
+          setIsModalOpen(false); 
         } else {
           console.log('Reward quantity is 0 or less, no rewards to claim');
         }
@@ -1134,4 +1141,4 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
       )}
     </>
   );
-}
+};

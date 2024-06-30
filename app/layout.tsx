@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic';
 import { InventoryProvider } from "@/context/InventoryContext";
 import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 import { bgImage, backgroundImages } from "@/constants/backgrounds";
+import { RefreshProvider } from "@/context/RefreshState";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [supabaseClient] = useState(() => createPagesBrowserClient());
@@ -65,13 +66,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
           <ActivePlanetProvider>
-            <UserAnomaliesProvider>
-              <InventoryProvider>
-                <FrontendLayout bg={true}>
-                  {children}
-                </FrontendLayout>
-              </InventoryProvider>
-            </UserAnomaliesProvider>
+            <RefreshProvider>
+              <UserAnomaliesProvider>
+                <InventoryProvider>
+                  <FrontendLayout bg={true}>
+                    {children}
+                  </FrontendLayout>
+                </InventoryProvider>
+              </UserAnomaliesProvider>
+            </RefreshProvider>
           </ActivePlanetProvider>
         </SessionContextProvider>
       </body>

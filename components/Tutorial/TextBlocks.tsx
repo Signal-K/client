@@ -192,11 +192,27 @@ export default function TutorialText() {
                     </p>
                 </div>
             )
-        } else if (!missionCompletionStatus.has(11)) {
+        } else if (!userInventory.has(26)) {
             return (
                 <div>
                     <p>
-
+                        Your new mining station has found a mineral deposit again! Click on it and activate it to mine some more coal. The mining station works a lot faster so you will only have to keep it turned on for a couple of seconds! Once you've done that, you'll be able to create a Meteorology tool that will allow you to classify cloud data from your planet!
+                    </p>
+                </div>
+            )
+        } else if (userInventory.has(26) && !missionCompletionStatus.has(13)) {
+            return (
+                <div>
+                    <p>
+                        Click on your meteorology tool (you may have to click on the arrows next to your structure to see it) and tell us what you think of the cloud. For now, just describe the shape and colours you see. There's no wrong answers!
+                    </p>
+                </div>
+            )
+        } else if (!missionCompletionStatus.has(14)) {
+            return (
+                <div>
+                    <p>
+                        Click on your meteorology tool (you may ck on the arrows next to your structure to see it) and tell us what you think of the cloud. For now, just describe the shape and colours you see. There's no wrong answers!
                     </p>
                 </div>
             )
@@ -215,6 +231,11 @@ export default function TutorialText() {
         <div className="px-4 py-4 rounded-lg shadow-lg">
             <div className="text-white bg-opacity-30 bg-black p-4 rounded-lg font-sans tracking-wide leading-relaxed">
                 {renderTextualInformation()}
+                <br />
+                <br />
+                <br />
+                <br />
+                {/* (Please remember you may have to refresh the page if things don't change quickly. This is to reduce load on our servers while we are in these early stages) */}
             </div>
         </div>
     );

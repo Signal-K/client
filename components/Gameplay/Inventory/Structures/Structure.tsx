@@ -5,6 +5,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 
+import { useRefresh } from "@/context/RefreshState";
 import { SurveyorStructureModal, TelescopeReceiverStructureModal, TransitingTelescopeStructureModal } from "./Telescopes/Telescopes";
 import { AnomalyStructureModal } from "../Automatons/Automaton";
 import MiningStationPlaceable from "./Mining";
@@ -168,113 +169,114 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
 };
 
 export const AllStructures = () => {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-    const { activePlanet } = useActivePlanet();
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const { activePlanet } = useActivePlanet();
+  const { refresh } = useRefresh(); // Use the refresh state from context
 
-    const [userStructures, setUserStructures] = useState<{ ownedItem: OwnedItem; structure: UserStructure }[]>([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const itemsPerPage = 4; // Number of structures to show at a time
+  const [userStructures, setUserStructures] = useState<{ ownedItem: OwnedItem; structure: UserStructure }[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const itemsPerPage = 4; // Number of structures to show at a time
 
-    useEffect(() => {
-        async function fetchData() {
-            if (session && activePlanet) {
-                try {
-                    const { data: ownedItemsData, error: ownedItemsError } = await supabase
-                        .from('inventory')
-                        .select('*')
-                        .eq('owner', session.user.id)
-                        .eq('anomaly', activePlanet.id);
+  useEffect(() => {
+    async function fetchData() {
+      if (session && activePlanet) {
+        try {
+          const { data: ownedItemsData, error: ownedItemsError } = await supabase
+            .from('inventory')
+            .select('*')
+            .eq('owner', session.user.id)
+            .eq('anomaly', activePlanet.id);
 
-                    if (ownedItemsError) {
-                        throw ownedItemsError;
-                    }
+          if (ownedItemsError) {
+            throw ownedItemsError;
+          }
 
-                    if (ownedItemsData) {
-                        const itemIds = ownedItemsData.map(item => item.item);
+          if (ownedItemsData) {
+            const itemIds = ownedItemsData.map(item => item.item);
 
-                        const response = await fetch('/api/gameplay/inventory');
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch item details from the API');
-                        }
-                        const itemDetailsData: UserStructure[] = await response.json();
-
-                        if (itemDetailsData) {
-                            const structuresData: { ownedItem: OwnedItem; structure: UserStructure }[] = itemDetailsData
-                                .filter(itemDetail => itemDetail.ItemCategory === 'Structure' && itemIds.includes(itemDetail.id))
-                                .map(itemDetail => {
-                                    const ownedItem = ownedItemsData.find(ownedItem => ownedItem.item === itemDetail.id);
-                                    const structure: UserStructure = {
-                                        id: itemDetail.id,
-                                        item: itemDetail.id,
-                                        name: itemDetail.name,
-                                        icon_url: itemDetail.icon_url,
-                                        description: itemDetail.description,
-                                        cost: itemDetail.cost,
-                                        ItemCategory: itemDetail.ItemCategory,
-                                        parentItem: itemDetail.parentItem,
-                                        itemLevel: itemDetail.itemLevel,
-                                    };
-                                    return { ownedItem: ownedItem || { id: '', item: '', quantity: 0, sector: '' }, structure };
-                                });
-                            setUserStructures(structuresData);
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                }
+            const response = await fetch('/api/gameplay/inventory');
+            if (!response.ok) {
+              throw new Error('Failed to fetch item details from the API');
             }
+            const itemDetailsData: UserStructure[] = await response.json();
+
+            if (itemDetailsData) {
+              const structuresData: { ownedItem: OwnedItem; structure: UserStructure }[] = itemDetailsData
+                .filter(itemDetail => itemDetail.ItemCategory === 'Structure' && itemIds.includes(itemDetail.id))
+                .map(itemDetail => {
+                  const ownedItem = ownedItemsData.find(ownedItem => ownedItem.item === itemDetail.id);
+                  const structure: UserStructure = {
+                    id: itemDetail.id,
+                    item: itemDetail.id,
+                    name: itemDetail.name,
+                    icon_url: itemDetail.icon_url,
+                    description: itemDetail.description,
+                    cost: itemDetail.cost,
+                    ItemCategory: itemDetail.ItemCategory,
+                    parentItem: itemDetail.parentItem,
+                    itemLevel: itemDetail.itemLevel,
+                  };
+                  return { ownedItem: ownedItem || { id: '', item: '', quantity: 0, sector: '' }, structure };
+                });
+              setUserStructures(structuresData);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching data:', error);
         }
+      }
+    }
 
-        fetchData();
-    }, [session, activePlanet, supabase]);
+    fetchData();
+  }, [session, activePlanet, supabase, refresh]); // Add refresh as a dependency
 
-    // Function to handle previous button click
-    const handlePrevious = () => {
-        setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-    };
+  // Function to handle previous button click
+  const handlePrevious = () => {
+    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+  };
 
-    // Function to handle next button click
-    const handleNext = () => {
-        setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, userStructures.length - itemsPerPage));
-    };
+  // Function to handle next button click
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, userStructures.length - itemsPerPage));
+  };
 
-    return (
-        <div className="p-4 relative">
-            <h2 className="text-2xl font-semibold mb-4">Structures on your planet</h2>
-            <div className="relative">
-                <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
-                    {userStructures.slice(currentIndex, currentIndex + itemsPerPage).map(({ ownedItem, structure }, index) => (
-                        <PlacedStructureSingle
-                            key={structure.id}
-                            ownedItem={ownedItem}
-                            structure={structure}
-                            style={{
-                                position: 'relative',
-                                transform: `translate(-50%, -50%)`,
-                            }}
-                        />
-                    ))}
-                </div>
-                {currentIndex > 0 && (
-                    <button
-                        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-500 text-white p-2 rounded-full"
-                        onClick={handlePrevious}
-                    >
-                        &#8592;
-                    </button>
-                )}
-                {currentIndex + itemsPerPage < userStructures.length && (
-                    <button
-                        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-500 text-white p-2 rounded-full"
-                        onClick={handleNext}
-                    >
-                        &#8594;
-                    </button>
-                )}
-            </div>
+  return (
+    <div className="p-4 relative">
+      <h2 className="text-2xl font-semibold mb-4">Structures on your planet</h2>
+      <div className="relative">
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+          {userStructures.slice(currentIndex, currentIndex + itemsPerPage).map(({ ownedItem, structure }, index) => (
+            <PlacedStructureSingle
+              key={structure.id}
+              ownedItem={ownedItem}
+              structure={structure}
+              style={{
+                position: 'relative',
+                transform: `translate(-50%, -50%)`,
+              }}
+            />
+          ))}
         </div>
-    );
+        {currentIndex > 0 && (
+          <button
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-500 text-white p-2 rounded-full"
+            onClick={handlePrevious}
+          >
+            &#8592;
+          </button>
+        )}
+        {currentIndex + itemsPerPage < userStructures.length && (
+          <button
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-500 text-white p-2 rounded-full"
+            onClick={handleNext}
+          >
+            &#8594;
+          </button>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export function CreateStructureWithItemRequirementinfo({ craftingItemId }: { craftingItemId: number }) {

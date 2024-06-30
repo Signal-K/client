@@ -4,11 +4,11 @@ import { useEffect, useState, useRef, Fragment, createContext } from "react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 
 import { AllAutomatons, SingleAutomaton, SingleAutomatonCraftItem } from "./Automatons/Automaton";
-import { AllStructures } from "./Structures/Structure";
-import PickYourPlanet, { PlanetGrid, ResponsiveLayout } from "@/components/Onboarding";
+import { PlanetGrid, ResponsiveLayout } from "@/components/Onboarding";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ProfileCard } from "@/auth/UserProfileFields";
 import UserItemsUndeployed from "./InactiveItems";
+import { AllStructures } from "./Structures/Structure";
 import CraftStructure from "./Actions/CraftStructure";
 import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies";
 import ExampleComponent from "./Structures/structure-borderline";
@@ -147,32 +147,11 @@ const UserPlanetPage = () => {
     fetchMissionCompletionStatus();
     fetchUserInventory();
     fetchUserUtilityStructures();
-
-    const interval = setInterval(() => {
-      fetchMissionCompletionStatus();
-    }, 150000);
-
-    return () => clearInterval(interval); // Cleanup the interval on component unmount
   }, [session, supabase, activePlanet]);
 
   const renderContent = () => {
     if (!missionCompletionStatus.has(1)) {
-      return (
-        <PlanetGrid />
-      );
-    // } else if (!missionCompletionStatus.has(2)) {
-    //   // return <ProfileCard />;
-    //   return (
-    //     <>
-    //       <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />
-    //       {/* <SpacecraftButton /> */}
-    //     </>
-    //   );
-    // } else if (!missionCompletionStatus.has(3)) {
-    //   return (
-    //     <GoToYourPlanet planetId={activePlanet ? parseInt(activePlanet.id) : 0} />
-    //     // <SpacecraftButton />
-    //   );
+      return <PlanetGrid />;
     } else if (!missionCompletionStatus.has(4)) {
       return (
         <>
@@ -181,11 +160,7 @@ const UserPlanetPage = () => {
         </>
       );
     } else if (!missionCompletionStatus.has(5)) {
-      return (
-        <>
-          <AllStructures />
-        </>
-      )
+      return <AllStructures />;
     } else {
       return (
         <>
@@ -207,7 +182,7 @@ const UserPlanetPage = () => {
     } else if (missionCompletionStatus.has(21)) {
       return <>
         <AllAutomatons />
-        <SpacecraftButton />
+        {/* <SpacecraftButton /> */}
       </>
     } else if (missionCompletionStatus.has(9)) {
       return <><SingleAutomaton /></>;
@@ -247,8 +222,14 @@ const UserPlanetPage = () => {
         </>
       );
     } else {
-      return null;
-    }
+      return (
+        <>
+          {!userInventory.has(31) && <CraftStructure structureId={31} />}
+          {!userInventory.has(24) && <CraftStructure structureId={24} />}
+          {!userInventory.has(32) && <CraftStructure structureId={32} />}
+        </>
+      );
+    };
   };
 
   const interactablesContentContainer = () => {

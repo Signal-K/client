@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { useRefresh } from "@/context/RefreshState";
 
 export default function CraftStructure({ structureId }: { structureId: number }) {
     const supabase = useSupabaseClient();
@@ -181,6 +182,7 @@ export default function CraftStructure({ structureId }: { structureId: number })
                 };
 
                 handleMissionComplete();
+                useRefresh();
 
                 // Wait for the newly created row to be fetched
                 await fetchNewlyCreatedRow();

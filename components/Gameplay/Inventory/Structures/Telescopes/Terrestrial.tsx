@@ -92,12 +92,13 @@ export const MeteorologyToolModal: React.FC<MeteorologyToolModalProps> = ({ isOp
                   <p>ID: {ownedItem.id}</p>
                   <p>Description: {structure.description}</p>
                   <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg max-w-4xl mx-auto mt-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          <div>
+                  <div>
                               <img src={imageUrl ?? ''} alt={`Active Planet ${activePlanet?.id}`} className="mb-4" />
                               <CreateFirstMeteorologyClassification assetMentioned={imageUrl ?? ''} />
                           </div>
-                          <div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                          {/* <div>
                               <div className="bg-gray-100 p-6 rounded-xl grid grid-cols-2 gap-6">
                                   <span className="font-medium col-span-2">In Production</span>
                                   <div className="flex items-center gap-3">
@@ -121,7 +122,7 @@ export const MeteorologyToolModal: React.FC<MeteorologyToolModalProps> = ({ isOp
                                       <div className="text-right text-lg font-medium">0</div>
                                   </div>
                               </div>
-                          </div>
+                          </div> */}
                       </div>
                   </div>
               </div>

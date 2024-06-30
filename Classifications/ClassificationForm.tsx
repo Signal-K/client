@@ -16,6 +16,7 @@ import TreeViewPlugin from "@/ui/Content/TreeViewPlugin";
 import ExampleTheme from "@/ui/Content/ExampleTheme";
 import { $generateHtmlFromNodes } from '@lexical/html';
 import { useUserAnomalies } from "@/context/UserAnomalies";
+import { useRefresh } from "@/context/RefreshState";
 
 export default function CreateBaseClassification(assetMentioned: any) {
     const supabase = useSupabaseClient();
@@ -311,8 +312,7 @@ export function CreateFirstBaseClassification(assetMentioned: any) { // FIRST MI
                     alert(`Post created`);
                     setContent('');
                 };
-            });
-
+            });            
         handleMissionComplete();
     };
 
@@ -379,6 +379,8 @@ export function CreateFirstBaseClassification(assetMentioned: any) { // FIRST MI
             const { data: newInventoryEntry, error: newInventoryEntryError } = await supabase
                 .from("inventory")
                 .insert([inventoryData, inventoryData2, inventoryData3, inventoryData4]);
+
+            useRefresh();
         } catch (error: any) {
             console.error(error);
         };
