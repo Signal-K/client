@@ -765,6 +765,24 @@ export function SingleAutomaton() {
   );
 };
 
+interface UserItem {
+  id: number;
+  item: number;
+  quantity: number;
+}
+
+interface InventoryItem {
+  id: number;
+  name: string;
+  description: string;
+  cost: number;
+  icon_url: string;
+  ItemCategory: string;
+  parentItem: number | null;
+  itemLevel: number;
+  recipe?: { [key: string]: number };
+}
+
 export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number }) {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -784,35 +802,6 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
   const [requiredResources, setRequiredResources] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchMissionCompletionStatus = async () => {
-        if (session) {
-            try {
-                const { data, error } = await supabase
-                    .from('missions')
-                    .select('mission')
-                    .eq('user', session.user.id);
-
-                if (error) {
-                    console.error('Error fetching missions:', error.message);
-                    return;
-                }
-
-                const missionStatusMap = new Map();
-                data.forEach((mission) => {
-                    missionStatusMap.set(mission.mission, true);
-                });
-
-                setMissionCompletionStatus(missionStatusMap);
-            } catch (error: any) {
-                console.error('Error fetching mission completion status:', error.message);
-            }
-        }
-    };
-
-    fetchMissionCompletionStatus();
-}, [session, supabase]);
-
   const items = [
     { id: 11, name: 'Coal' },
     { id: 13, name: 'Silicon' },
@@ -823,7 +812,36 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
     { id: 19, name: 'Copper' },
     { id: 20, name: 'Chromium' },
     { id: 21, name: 'Water' },
-];
+  ];
+
+  useEffect(() => {
+    const fetchMissionCompletionStatus = async () => {
+      if (session) {
+        try {
+          const { data, error } = await supabase
+            .from('missions')
+            .select('mission')
+            .eq('user', session.user.id);
+
+          if (error) {
+            console.error('Error fetching missions:', error.message);
+            return;
+          }
+
+          const missionStatusMap = new Map();
+          data.forEach((mission) => {
+            missionStatusMap.set(mission.mission, true);
+          });
+
+          setMissionCompletionStatus(missionStatusMap);
+        } catch (error: any) {
+          console.error('Error fetching mission completion status:', error.message);
+        }
+      }
+    };
+
+    fetchMissionCompletionStatus();
+  }, [session, supabase]);
 
   useEffect(() => {
     async function fetchUserItems() {
@@ -837,26 +855,26 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
 
         if (error) {
           throw error;
-        };
+        }
 
         setUserItems(data || []);
       } catch (error: any) {
         console.error("Error fetching user items:", error.message);
-      };
-    };
+      }
+    }
 
     async function fetchInventoryItems() {
       try {
         const response = await fetch("/api/gameplay/inventory");
         if (!response.ok) {
           throw new Error(`Error fetching inventory items: ${response.status} ${response.statusText}`);
-        };
+        }
         const data: InventoryItem[] = await response.json();
         setInventoryItems(data);
       } catch (error: any) {
         console.error("Error fetching inventory items:", error.message);
-      };
-    };
+      }
+    }
 
     fetchUserItems();
     fetchInventoryItems();
@@ -881,7 +899,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
           const resourceItem = inventoryItems.find(item => item.id === parseInt(resourceId));
           const missingQuantity = requiredQuantity - userQuantity;
           if (resourceItem) {
-            missingResources.push(`You need to collect ${missingQuantity} ${resourceItem.name} to build ${craftItem.name}`);
+            missingResources.push(`${resourceItem.name}: ${missingQuantity} more needed`);
           }
         }
       }
@@ -907,36 +925,36 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
 
       if (craftItemId === 30) {
         const missionData = {
-          user: session?.user?.id, 
+          user: session?.user?.id,
           time_of_completion: new Date().toISOString(),
           mission: 9,
-      };
-
-      const inventoryData = {
-        item: 13,
-        owner: session?.user?.id,
-        quantity: 1,
-        notes: `Reward for completing mission 9`,
-        parentItem: null,
-        time_of_deploy: new Date().toISOString(),
-        anomaly: activePlanet?.id,
-      };
-    
-      const { error: missionError } = await supabase
-        .from('missions')
-        .insert([missionData]);
-        
-        if (missionError) {
-          throw missionError;
         };
 
+        const inventoryData = {
+          item: 13,
+          owner: session?.user?.id,
+          quantity: 1,
+          notes: `Reward for completing mission 9`,
+          parentItem: null,
+          time_of_deploy: new Date().toISOString(),
+          anomaly: activePlanet?.id,
+        };
+
+        const { error: missionError } = await supabase
+          .from('missions')
+          .insert([missionData]);
+
+        if (missionError) {
+          throw missionError;
+        }
+
         const { error: inventoryError } = await supabase
-        .from('inventory')
-        .insert([inventoryData]);
-      if (inventoryError) {
-        throw inventoryError;
+          .from('inventory')
+          .insert([inventoryData]);
+        if (inventoryError) {
+          throw inventoryError;
+        }
       }
-      };
 
       for (const [resourceId, requiredQuantity] of Object.entries(craftItem.recipe)) {
         const userResource = userItems.find(item => item.item === parseInt(resourceId));
@@ -955,9 +973,9 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
               .delete()
               .eq("id", userResource.id);
             if (error) throw error;
-          };
-        };
-      };
+          }
+        }
+      }
 
       // Add the new structure to the user's inventory
       const { error } = await supabase
@@ -971,19 +989,19 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
       alert("Failed to craft structure. Please try again.");
     } finally {
       setLoading(false);
-    };
+    }
   };
 
   async function fetchAutomatonData() {
     if (!session?.user?.id) {
       // console.error('You are not logged in or do not have a defined session');
       return;
-    };
+    }
 
     if (!activePlanet?.id) {
       // console.error('Active planet is not defined');
       return;
-    };
+    }
 
     try {
       const { data, error } = await supabase
@@ -997,215 +1015,66 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
       if (error) {
         console.error('Error fetching automaton data:', error);
         return;
-      };
+      }
 
       if (data) {
         setUserAutomaton(data[0] || null);
-      };
+      }
     } catch (error: any) {
       console.error('Error fetching automaton data:', error);
-    };
-  };
+    }
+  }
 
   const fetchRoverInfo = async () => {
     try {
       const response = await fetch(`/api/gameplay/inventory`);
       if (!response.ok) {
         throw new Error(`Error fetching rover info: ${response.status} ${response.statusText}`);
-      };
-      const data = await response.json();
-      setAutomatonInfo(data.find((item: any) => item.id === userAutomaton?.item));
-    } catch (error: any) {
-      console.error("Error fetching rover info:", error.message);
-    };
-  };
-
-  async function deployAutomaton() {
-    if (userAutomaton != null) {
-      const { data, error } = await supabase
-        .from('inventory')
-        .update({ time_of_deploy: new Date().toISOString() })
-        .eq('id', userAutomaton.id);
-
-      if (error) {
-        console.error('Error deploying automaton:', error);
-        return;
-      };
-
-      console.log('Automaton deployed', data);
-    };
-  };
-  
-  async function claimRewards() {
-    console.log('Claim Rewards button clicked');
-    try {
-      if (userAutomaton?.time_of_deploy) {
-        console.log('Automaton has a deploy time');
-        const deployTime = new Date(userAutomaton.time_of_deploy).getTime();
-        const currentTime = new Date().getTime();
-        const timeDifference = (currentTime - deployTime) / 1000 / 60 / 5;
-        const rewardQuantity = Math.floor(timeDifference);
-
-        console.log('Time difference:', timeDifference);
-        console.log('Reward quantity:', rewardQuantity);
-
-        if (rewardQuantity > 0) {
-          console.log('Reward quantity is greater than 0');
-          const itemValues = [11, 13, 15, 16, 17, 18, 19, 20, 21];
-          const getRandomItem = () => {
-            return itemValues[Math.floor(Math.random() * itemValues.length)];
-          };
-
-          const { data: insertData, error: insertError } = await supabase.from('inventory').insert([
-            {
-              owner: session?.user?.id,
-              item: selectedItem,
-              quantity: rewardQuantity,
-              anomaly: activePlanet?.id,
-              notes: `Reward from automaton id: ${userAutomaton.id}`,
-            },
-            {
-              owner: session?.user?.id,
-              item: 11,
-              quantity: rewardQuantity,
-              anomaly: activePlanet?.id,
-              notes: `Reward from automaton id: ${userAutomaton.id}`,
-            }
-          ]);
-
-          if (insertError) {
-            console.error('Error inserting reward', insertError);
-            return;
-          };
-
-          console.log('Rewards inserted: ', insertData);
-  
-          const { data: updateData, error: updateError } = await supabase
-            .from('inventory')
-            .update({ time_of_deploy: null })
-            .eq('id', userAutomaton.id);
-  
-          if (updateError) {
-            console.error('Error updating automaton', updateError);
-            return;
-          };
-  
-          console.log('Automaton updated', updateData);
-  
-          setRewardTotal(rewardQuantity);
-          console.log(`Rewards claimed: ${rewardQuantity}`);
-
-          // Call the triggerRefresh function to refresh the automaton list
-          refresh.triggerRefresh(); // Call the refresh function to update the automaton list
-          useRefresh();
-
-          // Close the modal after claiming rewards
-          setIsModalOpen(false); 
-        } else {
-          console.log('Reward quantity is 0 or less, no rewards to claim');
-        }
-      } else {
-        console.log('No deploy time found for automaton');
       }
+      const data = await response.json();
+      setAutomatonInfo(data);
     } catch (error: any) {
-      console.error("Error claiming rewards:", error.message);
-    }
-  };
-
-  const getAvailableItems = () => {
-    if (missionCompletionStatus.has(17)) {
-        return items;
-    } else if (missionCompletionStatus.has(8)) {
-        return items.filter(item => [11, 13, 15, 16].includes(item.id));
-    } else {
-        return items.filter(item => item.id === 11);
+      console.error('Error fetching rover info:', error);
     }
   };
 
   return (
-    <>
-      {userAutomaton ? (
+    <div>
+      {craftableItem && (
         <>
-          <img
-            src={automatonInfo?.icon_url}
-            alt={automatonInfo?.name}
-            className="w-32 h-32 mb-2 cursor-pointer"
-            onClick={() => setIsModalOpen(true)}
-          />
-        </>
-      ) : (
-        <p>No automatons found</p>
-      )}
+          <h2>{craftableItem.name}</h2>
+          <p>{craftableItem.description}</p>
+          <p>Required Resources:</p>
+          <ul>
+            {Object.entries(craftableItem.recipe || {}).map(([resourceId, quantity]) => {
+              const resourceItem = inventoryItems.find(item => item.id === parseInt(resourceId));
+              const userResource = userItems.find(item => item.item === parseInt(resourceId));
+              const userQuantity = userResource ? userResource.quantity : 0;
 
-      {isModalOpen && userAutomaton && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">Your rover</h2>
-              <button
-                className="btn btn-square btn-outline"
-                onClick={() => setIsModalOpen(false)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="flex flex-col items-center mt-4">
-              {automatonInfo?.icon_url ? (
-                <img src={automatonInfo?.icon_url} alt={automatonInfo[userAutomaton.id]?.name} className="w-32 h-32 mb-2" />
-              ) : (
-                <img src="https://cdn.cloud.scenario.com/assets-transform/asset_W72syfLV9NsePvDbLFVZqFmB?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy10cmFuc2Zvcm0vYXNzZXRfVzcyc3lmTFY5TnNlUHZEYkxGVlpxRm1CPyoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MjAzOTY3OTl9fX1dfQ__&Key-Pair-Id=K36FIAB9LE2OLR&Signature=sJ2~g6W7RbC~kJIIYYgsNvzDAN9cbpNXmgw2GVvnssd0IOHFomHN9wD-1Bq44D~R2gF0XNDTxxpAm4A5ihJO4JP8wyATDhbPTw1Z5YnPpJi6pbShtDKvTziVkDIxgecfMCRCy-5ew83fHUITLT~cWerjT6dayUoEHMwXYh0OWJUOCzRXk6sEBe0pbsS89y78s8HURYmE4ZjXFAlFj-ZfpT3Cmq3CyhsElgirrt3CiK3K5LnuW55EKdlnjf7~vsqDKX4WTVgmtVo-so7ByJjP3MHX3WVzTOQmm~UjGRALkfDSOjiyvtZatpjzx20TXFUStn87xe1NZdbRti5ZWlwhwQ__&quality=80&width=1024" alt={automatonInfo[userAutomaton.id]?.name} className="w-32 h-32 mb-2" />
-              )}
-              {/* <p>ID: {userAutomaton.id}</p> */}
-              {/* <p>Status: your aim is to craft {craftableItem?.name}</p> */}
-              <div>
-            {requiredResources.length > 0 ? (
-              <div>
-                {/* <h3>Missing Resources:</h3>
-                <ul>
-                  {requiredResources.map((msg, index) => (
-                    <li key={index}>{msg}</li>
-                  ))}
-                </ul> */}
-              </div>
+              return (
+                <li key={resourceId}>
+                  {resourceItem?.name}: {userQuantity}/{quantity}
+                </li>
+              );
+            })}
+          </ul>
+
+          {requiredResources.length > 0 ? (
+            <>
+              <p>You need more resources to craft this item:</p>
+              <ul>
+                {requiredResources.map((message, index) => (
+                  <li key={index}>{message}</li>
+                ))}
+              </ul>
+            </>
             ) : (
-              <button
-                onClick={handleCraftStructure}
-                disabled={loading}
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:opacity-50"
-              >
-                {loading ? "Crafting..." : "Craft Structure"}
+              <button onClick={handleCraftStructure} disabled={loading}>
+                {loading ? 'Crafting...' : 'Craft Structure'}
               </button>
           )}
-      </div>
-      <div className="mt-4">
-                                      <label htmlFor="item-select">Select Item to Mine:</label>
-                                      <select
-                                          id="item-select"
-                                          className="form-select mt-2"
-                                          value={selectedItem}
-                                          onChange={(e) => setSelectedItem(Number(e.target.value))}
-                                      >
-                                          {getAvailableItems().map(item => (
-                                              <option key={item.id} value={item.id}>
-                                                  {item.name}
-                                              </option>
-                                          ))}
-                                      </select>
-                                  </div>
-              <div className="mt-4 flex space-x-4">
-                <button className="btn btn-primary" onClick={deployAutomaton}>
-                  Deploy Automaton
-                </button>
-                {userAutomaton.time_of_deploy && (
-                  <button className="btn btn-secondary" onClick={claimRewards}>
-                    Claim Reward
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        </>
       )}
-    </>
+    </div>
   );
-};
+}
