@@ -11,6 +11,8 @@ import { InventoryProvider } from "@/context/InventoryContext";
 import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 import { bgImage, backgroundImages } from "@/constants/backgrounds";
 import { RefreshProvider } from "@/context/RefreshState";
+import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
+// import { CreateStructureWithItemRequirementinfo } from "@/components/Gameplay/Inventory/Structures/Structure";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [supabaseClient] = useState(() => createPagesBrowserClient());
@@ -281,6 +283,7 @@ function FrontendLayout({ children }: LayoutProps) {
       }}
     >
       {children}
+      {/* <CreateStructureWithItemRequirementinfo craftingItemId={30} /> */}
     </div>
   );
 };
