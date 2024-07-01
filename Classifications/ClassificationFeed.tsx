@@ -49,8 +49,6 @@ const ClassificationsFeed: React.FC = () => {
   );
 };
 
-export default ClassificationsFeed;
-
 type ClassificationFeedForIndividualPlanetProps = {
   planetId: { planetId: { id: number } };
 };

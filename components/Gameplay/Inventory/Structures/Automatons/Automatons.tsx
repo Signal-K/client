@@ -222,25 +222,13 @@ export const AutomatonUpgradeStructureModal: React.FC<AutomatonUpgradeStructureM
   );
 };
 
-interface CheckInventoryProps {
-  itemId: number;
-};
-
 interface OwnedItem {
   id: string;
   item: string;
   quantity: number;
   sector: string;
   anomaly: number;
-}
-
-interface CameraOwnedItem {
-  id: string;
-  item: string;
-  description: number;
-  sector: string;
-  anomaly: number;
-}
+};
 
 const AllAutomatonModules: React.FC = () => {
   const supabase = useSupabaseClient();

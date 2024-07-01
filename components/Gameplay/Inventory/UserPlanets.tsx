@@ -184,16 +184,26 @@ const UserPlanetPage = () => {
       return <>
         <AllAutomatons />
         {/* <SpacecraftButton /> */}
-      </>
+      </>;
     } else if (missionCompletionStatus.has(9)) {
-      return <><SingleAutomaton /></>;
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <SingleAutomaton />
+          {/* <SpacecraftButton /> */}
+        </div>
+      );
     } else if (missionCompletionStatus.has(8)) {
-      return <SingleAutomatonCraftItem craftItemId={30} />;
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <SingleAutomatonCraftItem craftItemId={30} />
+          {/* <SpacecraftButton /> */}
+        </div>
+      );
     } else {
       return <AllAutomatons />;
     }
   };
-
+  
   const renderUtilitiesContext = () => {
     if (missionCompletionStatus.has(21)) {
       return (

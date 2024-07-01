@@ -19,7 +19,7 @@ interface Automaton {
 
 interface CreateAutomatonProps {
     onSuccess: () => void; // New prop to handle success
-}
+};
 
 export function CreateAutomaton({ onSuccess }: CreateAutomatonProps) {
     const supabase = useSupabaseClient();
@@ -778,9 +778,52 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rewardTotal, setRewardTotal] = useState<number>(0);
+  const [selectedItem, setSelectedItem] = useState<number>(11);
+  const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
 
   const [requiredResources, setRequiredResources] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchMissionCompletionStatus = async () => {
+        if (session) {
+            try {
+                const { data, error } = await supabase
+                    .from('missions')
+                    .select('mission')
+                    .eq('user', session.user.id);
+
+                if (error) {
+                    console.error('Error fetching missions:', error.message);
+                    return;
+                }
+
+                const missionStatusMap = new Map();
+                data.forEach((mission) => {
+                    missionStatusMap.set(mission.mission, true);
+                });
+
+                setMissionCompletionStatus(missionStatusMap);
+            } catch (error: any) {
+                console.error('Error fetching mission completion status:', error.message);
+            }
+        }
+    };
+
+    fetchMissionCompletionStatus();
+}, [session, supabase]);
+
+  const items = [
+    { id: 11, name: 'Coal' },
+    { id: 13, name: 'Silicon' },
+    { id: 15, name: 'Iron' },
+    { id: 16, name: 'Nickel' },
+    { id: 17, name: 'Alloy' },
+    { id: 18, name: 'Fuel' },
+    { id: 19, name: 'Copper' },
+    { id: 20, name: 'Chromium' },
+    { id: 21, name: 'Water' },
+];
 
   useEffect(() => {
     async function fetchUserItems() {
@@ -1016,7 +1059,7 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
           const { data: insertData, error: insertError } = await supabase.from('inventory').insert([
             {
               owner: session?.user?.id,
-              item: getRandomItem(),
+              item: selectedItem,
               quantity: rewardQuantity,
               anomaly: activePlanet?.id,
               notes: `Reward from automaton id: ${userAutomaton.id}`,
@@ -1066,6 +1109,16 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
       }
     } catch (error: any) {
       console.error("Error claiming rewards:", error.message);
+    }
+  };
+
+  const getAvailableItems = () => {
+    if (missionCompletionStatus.has(17)) {
+        return items;
+    } else if (missionCompletionStatus.has(8)) {
+        return items.filter(item => [11, 13, 15, 16].includes(item.id));
+    } else {
+        return items.filter(item => item.id === 11);
     }
   };
 
@@ -1124,6 +1177,21 @@ export function SingleAutomatonCraftItem({ craftItemId }: { craftItemId: number 
               </button>
           )}
       </div>
+      <div className="mt-4">
+                                      <label htmlFor="item-select">Select Item to Mine:</label>
+                                      <select
+                                          id="item-select"
+                                          className="form-select mt-2"
+                                          value={selectedItem}
+                                          onChange={(e) => setSelectedItem(Number(e.target.value))}
+                                      >
+                                          {getAvailableItems().map(item => (
+                                              <option key={item.id} value={item.id}>
+                                                  {item.name}
+                                              </option>
+                                          ))}
+                                      </select>
+                                  </div>
               <div className="mt-4 flex space-x-4">
                 <button className="btn btn-primary" onClick={deployAutomaton}>
                   Deploy Automaton
