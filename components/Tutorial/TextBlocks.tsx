@@ -271,10 +271,10 @@ export default function TutorialText() {
                 {renderTextualInformation()}
                 <br />
                 <br />
-                <br />
-                <br />
-                <RefreshPageButton />
-                <Link href="https://starprotocol-5dyxe5lo4-gizmotronn.vercel.app/">Go to V1 of Star Sailors (not supported, will need new account)</Link>
+                {/* <RefreshPageButton /> */}
+                <Link href="https://starprotocol-5dyxe5lo4-gizmotronn.vercel.app/" className="hidden lg:block">
+                    Go to V1 of Star Sailors (not supported, will need new account)
+                </Link>
                 {/* (Please remember you may have to refresh the page if things don't change quickly. This is to reduce load on our servers while we are in these early stages) */}
             </div>
         </div>

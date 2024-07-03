@@ -176,7 +176,7 @@ export const AllStructures = () => {
 
   const [userStructures, setUserStructures] = useState<{ ownedItem: OwnedItem; structure: UserStructure }[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 4; // Number of structures to show at a time
+  const itemsPerPage = 3; // Number of structures to show at a time
 
   useEffect(() => {
     async function fetchData() {
@@ -207,15 +207,15 @@ export const AllStructures = () => {
                 .map(itemDetail => {
                   const ownedItem = ownedItemsData.find(ownedItem => ownedItem.item === itemDetail.id);
                   const structure: UserStructure = {
-                    id: itemDetail.id,
-                    item: itemDetail.id,
-                    name: itemDetail.name,
-                    icon_url: itemDetail.icon_url,
-                    description: itemDetail.description,
-                    cost: itemDetail.cost,
-                    ItemCategory: itemDetail.ItemCategory,
-                    parentItem: itemDetail.parentItem,
-                    itemLevel: itemDetail.itemLevel,
+                      id: itemDetail.id,
+                      name: itemDetail.name,
+                      icon_url: itemDetail.icon_url,
+                      description: itemDetail.description,
+                      cost: itemDetail.cost,
+                      ItemCategory: itemDetail.ItemCategory,
+                      parentItem: itemDetail.parentItem,
+                      itemLevel: itemDetail.itemLevel,
+                      item: 0
                   };
                   return { ownedItem: ownedItem || { id: '', item: '', quantity: 0, sector: '' }, structure };
                 });
@@ -233,19 +233,19 @@ export const AllStructures = () => {
 
   // Function to handle previous button click
   const handlePrevious = () => {
-    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+    setCurrentIndex((prevIndex) => Math.max(prevIndex - itemsPerPage, 0));
   };
 
   // Function to handle next button click
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, userStructures.length - itemsPerPage));
+    setCurrentIndex((prevIndex) => Math.min(prevIndex + itemsPerPage, userStructures.length - itemsPerPage));
   };
 
   return (
     <div className="p-4 relative">
       <h2 className="text-2xl font-semibold mb-4">Structures on your planet</h2>
       <div className="relative">
-        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+        <div className="grid gap-4 grid-cols-3 md:grid-cols-3">
           {userStructures.slice(currentIndex, currentIndex + itemsPerPage).map(({ ownedItem, structure }, index) => (
             <PlacedStructureSingle
               key={structure.id}

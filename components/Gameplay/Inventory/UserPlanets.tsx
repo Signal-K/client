@@ -18,11 +18,6 @@ import { SidebarLayout } from "@/app/layout";
 import TutorialText from "@/components/Tutorial/TextBlocks";
 import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
 
-interface ActivePlanetContextValue {
-  activePlanet: UserPlanetData | null;
-  setActivePlanet: (planet: UserPlanetData | null) => void;
-};
-
 export interface UserStructure {
   id: string;
   item: number;
@@ -258,28 +253,30 @@ const UserPlanetPage = () => {
       return (
         <>
           <div className="hidden md:grid md:grid-cols-1 md:grid-rows-3 md:gap-4 md:relative md:h-full">
-            <div className="md:row-span-1 md:col-span-8 md:flex md:items-center md:justify-center p-4"> 
+            <div className="md:row-span-1 md:col-span-8 md:flex md:items-center md:justify-center">
               {renderContent()}
             </div>
-            <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">{renderUtilitiesContext()}</div> 
-            <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-2 mb-12"> 
+            <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center">
+              {renderUtilitiesContext()}
+            </div>
+            <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-2 mb-12">
               {renderAutomatonContent()}
             </div>
           </div>
-
-          <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen">
-            <div className="col-span-1 flex justify-center items-end pb-5">
+  
+          {/* Mobile content */}
+          <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen py-10 mt-10">
+            <div className="col-span-1 flex justify-center items-start mt-10 py-12">
               {renderContent()}
             </div>
-            {/* <div>{renderUtilitiesContext() }</div> */}
-            <div className="col-span-1 flex justify-center items-end pb-5">
+            <div className="col-span-2 flex justify-center">
               {renderAutomatonContent()}
             </div>
           </div>
         </>
       );
-    };
-  };
+    }
+  };  
 
   return (
     <SidebarLayout leftContent={<><TutorialText /></>} middleContent={interactablesContentContainer()} />

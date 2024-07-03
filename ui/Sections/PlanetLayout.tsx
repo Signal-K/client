@@ -222,7 +222,7 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
             >
               ✕
             </Button>
-            <ClassificationsFeed />
+            {/* <ClassificationsFeed /> */}
           </div>
         </div>
       )}
