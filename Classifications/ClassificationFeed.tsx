@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient, SupabaseClient } from "@supabase/auth-helpers-react";
 import CardForum, { Profile, TProps } from "./ClassificationCard";
-import ReactHtmlParser from 'react-html-parser';
+// import ReactHtmlParser from 'react-html-parser';
 
 interface Classification { 
   id: number;
@@ -42,7 +42,7 @@ const ClassificationsFeed: React.FC = () => {
           {Array.isArray(post.media) && post.media.map((url, index) => (
             <img key={index} src={url} alt="" />
           ))}
-          {ReactHtmlParser(post.content)} {/* Directly render the parsed HTML */}
+          {/* {ReactHtmlParser(post.content)} Directly render the parsed HTML */}
         </div>
       ))}
     </div>

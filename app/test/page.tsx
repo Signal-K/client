@@ -13,7 +13,6 @@ import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructu
 import { AllAutomatons } from "@/components/Gameplay/Inventory/Automatons/Automaton";
 import UserItemsUndeployed from "@/components/Gameplay/Inventory/InactiveItems";
 import { AllStructures } from "@/components/Gameplay/Inventory/Structures/Structure";
-import SkillTreeComp from "@/components/Gameplay/Inventory/Structures/TechTree";
 import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
 import Layout from "@/components/Layout";
 import { useActivePlanet } from "@/context/ActivePlanet";
