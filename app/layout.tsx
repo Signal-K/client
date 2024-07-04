@@ -12,6 +12,7 @@ import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 import { bgImage, backgroundImages } from "@/constants/backgrounds";
 import { RefreshProvider } from "@/context/RefreshState";
 import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
+import { MissionProvider } from "@/context/MissionContext";
 // import { CreateStructureWithItemRequirementinfo } from "@/components/Gameplay/Inventory/Structures/Structure";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -68,15 +69,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
           <ActivePlanetProvider>
-            <RefreshProvider>
-              <UserAnomaliesProvider>
-                <InventoryProvider>
-                  <FrontendLayout bg={true}>
-                    {children}
-                  </FrontendLayout>
-                </InventoryProvider>
-              </UserAnomaliesProvider>
-            </RefreshProvider>
+            <MissionProvider>
+              <RefreshProvider>
+                <UserAnomaliesProvider>
+                  <InventoryProvider>
+                    <FrontendLayout bg={true}>
+                      {children}
+                    </FrontendLayout>
+                  </InventoryProvider>
+                </UserAnomaliesProvider>
+              </RefreshProvider>
+            </MissionProvider>
           </ActivePlanetProvider>
         </SessionContextProvider>
       </body>
