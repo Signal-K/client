@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { StoreContext, useContext, observer } from './Mobx';
 
-const Home = observer(() => {
+const Zoodex = observer(() => {
   const store = useContext(StoreContext)
   return ( 
     <>
@@ -37,4 +37,4 @@ const Home = observer(() => {
 });
 
 
-export default Home;
+export default Zoodex;

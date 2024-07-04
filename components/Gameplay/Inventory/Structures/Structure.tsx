@@ -47,15 +47,6 @@ interface InventoryItem {
     recipe?: Recipe;
   };
 
-interface OwnedTelescope14 {
-    id: string;
-    item: string;
-    quantity: number;
-    sector: string;
-    anomaly: number;
-    notes: string;
-};
-
 interface UserStructure {
     id: number;
     item: number; // Assuming this should be a number
