@@ -5,12 +5,14 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useRefresh } from "@/context/RefreshState";
 import { useRouter } from "next/navigation";
+import { useMissions } from "@/context/MissionContext"; // Import the useMissions hook
 
 const CraftStructure = ({ structureId }: { structureId: number }) => {
   const supabase = useSupabaseClient();
   const session = useSession();
   const { activePlanet } = useActivePlanet();
   const { triggerRefresh } = useRefresh();
+  const { missions } = useMissions(); // Access the missions from the context
   const [structureName, setStructureName] = useState<string>("");
   const [recipeItems, setRecipeItems] = useState<string[]>([]);
   const [craftable, setCraftable] = useState(false);
@@ -21,6 +23,7 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
   const [structureTableId, setSTID] = useState(0);
   const router = useRouter();
 
+  // Mission Data Initialization
   const missionData = {
     user: session?.user?.id,
     time_of_completion: new Date().toISOString(),
@@ -40,6 +43,9 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
   };
 
   useEffect(() => {
+    // If no missions are available, skip further processing
+    if (missions.length === 0) return;
+
     async function fetchRecipe() {
       try {
         const response = await fetch(`/api/gameplay/inventory`);
@@ -92,7 +98,7 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
     }
 
     fetchRecipe();
-  }, [structureId, userInventory, activePlanet]);
+  }, [structureId, userInventory, activePlanet, missions]);
 
   const handleMissionComplete = async () => {
     try {
@@ -131,7 +137,7 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
         throw error;
       }
 
-      setUserTelescopeId(data[0].id);
+      setUserTelescopeId(data[0]?.id || 0);
     } catch (error: any) {
       console.log(error);
     }
@@ -190,11 +196,10 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
           throw insertError;
         }
 
-
         handleMissionComplete();
         await fetchNewlyCreatedRow();
         await updateNotes();
-        useRefresh()
+        triggerRefresh();
         router.refresh();
         fetchUserInventory(); // Refetch the user inventory after creating a structure
       } catch (error: any) {
@@ -236,7 +241,7 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
         throw error;
       }
 
-      setSTID(data[0].id);
+      setSTID(data[0]?.id || 0);
     } catch (error: any) {
       console.log(error);
     }
@@ -258,27 +263,33 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
   };
 
   useEffect(() => {
+    if (missions.length === 0) return;  // If no missions are available, skip further processing
+
     fetchUserInventory();
     fetchUserTelescope();
-  }, [session, activePlanet]);
+  }, [session, activePlanet, missions]);
 
   return (
-    <div>
-      <h2>Recipe for {structureName}</h2>
-      <ul>
-        {recipeItems.map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
-      {craftable && (
-        <button
-          className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-4 rounded shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-200 py-2"
-          onClick={craftStructure}
-        >
-          Craft Structure
-        </button>
+    <>
+      {missions.length > 0 && (  // Check if there are missions before rendering the component
+        <div>
+          <h2>Recipe for {structureName}</h2>
+          <ul>
+            {recipeItems.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+          {craftable && (
+            <button
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-4 rounded shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-200 py-2"
+              onClick={craftStructure}
+            >
+              Craft Structure
+            </button>
+          )}
+        </div>
       )}
-    </div>
+    </>
   );
 };
 

@@ -92,7 +92,7 @@ interface LayoutProps {
   bg: any;
 };
 
-interface ResponsiveLayoutProps {
+interface ResponsiveLayoutProps { 
   leftContent: React.ReactNode;
   middleContent: React.ReactNode;
   // rightContent: React.ReactNode;

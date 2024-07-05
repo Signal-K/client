@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
- 
+import { useMissions } from '@/context/MissionContext';  
 import { Button } from "@/components/ui/button";
 import { CreateCloudClassification, CreateFirstBaseClassification, CreateFirstMeteorologyClassification } from "@/Classifications/ClassificationForm";
 
@@ -35,205 +35,256 @@ interface MiningStructureModalProps {
     missionId: number;
 };
 
+interface MiningStructureModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  ownedItem: OwnedItem;
+  structure: UserStructure;
+}
+
+interface MiningStructureModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  ownedItem: OwnedItem;
+  structure: UserStructure;
+}
+
 const MiningStationPlaceable: React.FC<MiningStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
   const supabase = useSupabaseClient();
   const session = useSession();
   const { activePlanet } = useActivePlanet();
+  const { missions } = useMissions();  // Get missions from the MissionContext
 
   const [userStructure, setUserStructure] = useState<{ ownedItem: OwnedItem; structure: UserStructure; id: number; time_of_deploy?: string }[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [requiredResourcesQuantity, setRequiredResourcesQuantity] = useState<number | null>(null);
-  const [hasRequiredResources, setHasRequiredResources] = useState<boolean>(false);
+  const [selectedItem, setSelectedItem] = useState<number>(11);  // Default to Coal
+  const [availableItems, setAvailableItems] = useState<{ id: number, name: string }[]>([]);
 
   useEffect(() => {
-      if (session && activePlanet && isOpen) {
-          fetchData();
-      }
+    if (session && activePlanet && isOpen) {
+      fetchData();
+    }
   }, [session, activePlanet, isOpen]);
 
+  useEffect(() => {
+    if (missions.length > 0) {
+      updateAvailableItems();
+    }
+  }, [missions]);
+
   const fetchData = async () => {
-      if (session && activePlanet) {
-          try {
-              const { data: ownedItemsData, error: ownedItemsError } = await supabase
-                  .from("inventory")
-                  .select("id, item, quantity, notes, time_of_deploy")
-                  .eq("anomaly", activePlanet.id)
-                  .eq("item", 30);
+    if (session && activePlanet) {
+      try {
+        const { data: ownedItemsData, error: ownedItemsError } = await supabase
+          .from('inventory')
+          .select('id, item, quantity, notes, time_of_deploy')
+          .eq('anomaly', activePlanet.id)
+          .eq('item', 30);
 
-              if (ownedItemsError) {
-                  throw ownedItemsError;
-              }
+        if (ownedItemsError) {
+          throw ownedItemsError;
+        }
 
-              if (ownedItemsData && ownedItemsData.length > 0) {
-                  const ownedItem = ownedItemsData[0];
+        if (ownedItemsData && ownedItemsData.length > 0) {
+          const ownedItem = ownedItemsData[0];
 
-                  const { data: structureData, error: structureError } = await supabase
-                      .from("inventory")
-                      .select("*")
-                      .eq("item", ownedItem.item)
-                      .limit(1);
+          const { data: structureData, error: structureError } = await supabase
+            .from('inventory')
+            .select('*')
+            .eq('item', ownedItem.item)
+            .limit(1);
 
-                  if (structureError) {
-                      throw structureError;
-                  }
-
-                  if (structureData && structureData.length > 0) {
-                      const structure = structureData[0];
-                      setUserStructure([{ ownedItem, structure, id: structure.id }]);
-                  }
-              }
-          } catch (error: any) {
-              console.error(error);
+          if (structureError) {
+            throw structureError;
           }
+
+          if (structureData && structureData.length > 0) {
+            const structure = structureData[0];
+            setUserStructure([{ ownedItem, structure, id: structure.id }]);
+          }
+        }
+      } catch (error: any) {
+        console.error(error);
       }
+    }
+  };
+
+  const updateAvailableItems = () => {
+    const itemOptions = [
+      { id: 11, name: 'Coal' },
+      { id: 13, name: 'Silicon' },
+      { id: 15, name: 'Iron' },
+      { id: 16, name: 'Nickel' },
+      { id: 17, name: 'Alloy' },
+      { id: 18, name: 'Fuel' },
+      { id: 19, name: 'Copper' },
+      { id: 20, name: 'Chromium' },
+      { id: 21, name: 'Water' },
+    ];
+
+    let itemsToShow = itemOptions.filter(item => {
+      if (missions.find(m => m.id === 21)?.completed) {
+        return true;  // All items available if mission 21 is completed
+      } else if (missions.find(m => m.id === 8)?.completed) {
+        return [11, 13, 15, 16].includes(item.id);  // Items available for mission 8 completion
+      } else {
+        return item.id === 11;  // Default to only Coal
+      }
+    });
+
+    setAvailableItems(itemsToShow);
   };
 
   const activateStation = async () => {
-      if (userStructure.length > 0) {
-          const { data, error } = await supabase
-              .from("inventory")
-              .update({ time_of_deploy: new Date().toISOString() })
-              .eq('id', userStructure[0]?.ownedItem.id);
+    if (userStructure.length > 0) {
+      try {
+        const { data, error } = await supabase
+          .from('inventory')
+          .update({ time_of_deploy: new Date().toISOString() })
+          .eq('id', userStructure[0]?.ownedItem.id);
 
-          if (error) {
-              console.error('Error activating station: ', error);
-              return;
-          }
+        if (error) {
+          throw error;
+        }
 
-          console.log('Mining station activated: ', data);
+        console.log('Mining station activated: ', data);
 
-          setUserStructure(prevState => {
-              const updatedState = [...prevState];
-              updatedState[0].ownedItem.time_of_deploy = new Date().toISOString();
-              return updatedState;
-          });
+        setUserStructure(prevState => {
+          const updatedState = [...prevState];
+          updatedState[0].ownedItem.time_of_deploy = new Date().toISOString();
+          return updatedState;
+        });
+      } catch (error: any) {
+        console.error('Error activating station:', error.message);
       }
+    }
   };
 
   const claimRewards = async () => {
-      try {
-          if (userStructure.length > 0 && userStructure[0]?.ownedItem?.time_of_deploy) {
-              const deployTime = new Date(userStructure[0].ownedItem.time_of_deploy).getTime();
-              const currentTime = new Date().getTime();
-              const timeDifference = currentTime - deployTime;
-              const rewardQuantity = Math.floor(timeDifference / 1000) * 2;
+    try {
+      if (userStructure.length > 0 && userStructure[0]?.ownedItem?.time_of_deploy) {
+        const deployTime = new Date(userStructure[0].ownedItem.time_of_deploy).getTime();
+        const currentTime = new Date().getTime();
+        const timeDifference = (currentTime - deployTime) / 1000;  // Difference in seconds
+        const rewardQuantity = Math.floor(timeDifference / 15) * 2;  // 15 seconds per item
 
-              if (rewardQuantity > 0) {
-                  const { data: insertData, error: insertError } = await supabase
-                      .from("inventory")
-                      .insert([
-                          {
-                              owner: session?.user.id,
-                              item: 11,
-                              quantity: rewardQuantity,
-                              anomaly: activePlanet?.id,
-                              notes: `Reward from mining station id: ${userStructure[0].ownedItem?.id}`,
-                          },
-                      ]);
+        if (rewardQuantity > 0) {
+          const { data: insertData, error: insertError } = await supabase.from('inventory').insert([
+            {
+              owner: session?.user?.id,
+              item: selectedItem,
+              quantity: rewardQuantity,
+              anomaly: activePlanet?.id,
+              notes: `Reward from mining station id: ${userStructure[0].ownedItem?.id}`,
+            },
+          ]);
 
-                  if (insertError) {
-                      throw insertError;
-                  }
-
-                  console.log('Rewards inserted: ', insertData);
-
-                  const { data: updateData, error: updateError } = await supabase
-                      .from('inventory')
-                      .update({ time_of_deploy: null })
-                      .eq('id', userStructure[0].ownedItem.id);
-
-                  if (updateError) {
-                      throw updateError;
-                  }
-
-                  console.log('Station deactivated: ', updateData);
-                  // useRefresh
-                  // onClose();
-              } else {
-                  console.log('No rewards to claim.');
-              }
+          if (insertError) {
+            throw insertError;
           }
-      } catch (error: any) {
-          console.error('Error claiming rewards: ', error.message);
+
+          console.log('Rewards inserted: ', insertData);
+
+          const { data: updateData, error: updateError } = await supabase
+            .from('inventory')
+            .update({ time_of_deploy: null })
+            .eq('id', userStructure[0].ownedItem.id);
+
+          if (updateError) {
+            throw updateError;
+          }
+
+          console.log('Station deactivated: ', updateData);
+          // useRefresh
+          // onClose();
+        } else {
+          console.log('No rewards to claim.');
+        }
       }
+    } catch (error: any) {
+      console.error('Error claiming rewards:', error.message);
+    }
   };
 
   if (!isOpen) return null;
 
   return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-4 w-full max-w-lg mx-auto shadow-lg">
-              <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold">{structure.name}</h2>
-                  <button className="btn btn-square btn-outline" onClick={onClose}>
-                      ✕
-                  </button>
-              </div>
-              <div className="flex flex-col items-center mt-4">
-                  <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
-                  <p>ID: {ownedItem.id}</p>
-                  <p>Description: {structure.description}</p>
-                  <div className="mt-4 w-full">
-                      {userStructure.length > 0 && (
-                          <div className="bg-gray-100 p-6 rounded-xl w-full">
-                              <div className="grid grid-cols-2 gap-6">
-                                  <div className="flex items-center gap-3">
-                                      <GemIcon className="w-7 h-7 text-indigo-500" />
-                                      <span className="font-medium">Resources left</span>
-                                      <div className="text-right text-lg font-medium">250</div>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                      <CuboidIcon className="w-7 h-7 text-amber-500" />
-                                      <span className="font-medium">Power</span>
-                                      <div className="text-right text-lg font-medium">500</div>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                      <LeafIcon className="w-7 h-7 text-green-500" />
-                                      <span className="font-medium">Energy rating</span>
-                                      <div className="text-right text-lg font-medium">100</div>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                      <BoltIcon className="w-7 h-7 text-yellow-500" />
-                                      <span className="font-medium">Energy</span>
-                                      <div className="text-right text-lg font-medium">75</div>
-                                  </div>
-                              </div>
-                              {/* <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-6">
-                                  <div className="flex items-center gap-3">
-                                      <GaugeIcon className="w-7 h-7 text-blue-500" />
-                                      <span className="font-medium">Production Rate</span>
-                                      <div className="text-right text-lg font-medium">25 units/hr</div>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                      <CuboidIcon className="w-7 h-7 text-amber-500" />
-                                      <span className="font-medium">Storage Capacity</span>
-                                      <div className="text-right text-lg font-medium">1000 units</div>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                      <WrenchIcon className="w-7 h-7 text-gray-500" />
-                                      <span className="font-medium">Equipment Level</span>
-                                      <div className="text-right text-lg font-medium">3</div>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                      <PinIcon className="w-7 h-7 text-indigo-500" />
-                                      <span className="font-medium">Tech Level</span>
-                                      <div className="text-right text-lg font-medium">2</div>
-                                  </div>
-                              </div> */}
-                              <div className="mt-8 flex justify-end gap-4">
-                                  <button onClick={activateStation} className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600">Activate</button>
-                                  <button onClick={claimRewards} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Claim Rewards</button>
-                              </div>
-                          </div>
-                      )}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg p-4 w-full max-w-lg mx-auto shadow-lg">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold">{structure.name}</h2>
+          <button className="btn btn-square btn-outline" onClick={onClose}>
+            ✕
+          </button>
+        </div>
+        <div className="flex flex-col items-center mt-4">
+          <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
+          <p>ID: {ownedItem.id}</p>
+          <p>Description: {structure.description}</p>
+          <div className="mt-4 w-full">
+            {userStructure.length > 0 && (
+              <>
+                <div className="mb-4">
+                  <label htmlFor="item-select" className="block text-sm font-medium text-gray-700">Select Item</label>
+                  <select
+                    id="item-select"
+                    className="form-select mt-2 block w-full"
+                    value={selectedItem}
+                    onChange={(e) => setSelectedItem(Number(e.target.value))}
+                  >
+                    {availableItems.map((item) => (
+                      <option key={item.id} value={item.id}>{item.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="bg-gray-100 p-6 rounded-xl w-full">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="flex items-center gap-3">
+                      <GemIcon className="w-7 h-7 text-indigo-500" />
+                      <span className="font-medium">Resources left</span>
+                      <div className="text-right text-lg font-medium">250</div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <CuboidIcon className="w-7 h-7 text-amber-500" />
+                      <span className="font-medium">Power</span>
+                      <div className="text-right text-lg font-medium">500</div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <LeafIcon className="w-7 h-7 text-green-500" />
+                      <span className="font-medium">Energy rating</span>
+                      <div className="text-right text-lg font-medium">100</div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <BoltIcon className="w-7 h-7 text-yellow-500" />
+                      <span className="font-medium">Energy</span>
+                      <div className="text-right text-lg font-medium">75</div>
+                    </div>
                   </div>
-              </div>
+                  <div className="mt-8 flex justify-end gap-4">
+                    <button
+                      onClick={activateStation}
+                      className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600"
+                    >
+                      Activate
+                    </button>
+                    <button
+                      onClick={claimRewards}
+                      className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                    >
+                      Claim Rewards
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
+        </div>
       </div>
+    </div>
   );
 };
 
 export default MiningStationPlaceable;
+
 
 function BatteryIcon(props: any) {
     return (

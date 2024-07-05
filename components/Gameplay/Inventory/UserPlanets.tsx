@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef, Fragment, createContext } from "react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 
-import { AllAutomatons, SingleAutomaton, SingleAutomatonCraftItem } from "./Automatons/Automaton";
+import { AllAutomatons, SingleAutomaton } from "./Automatons/Automaton";
+import SingleAutomatonCraftItem from "./Automatons/AutomatonCrafting";
 import { PlanetGrid, ResponsiveLayout } from "@/components/Onboarding";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ProfileCard } from "@/auth/UserProfileFields";
@@ -190,7 +191,7 @@ const UserPlanetPage = () => {
     } else if (missionCompletionStatus.has(8)) {
       return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <SingleAutomatonCraftItem craftItemId={30} />
+          <SingleAutomaton structureId={30} />
           {/* <SpacecraftButton /> */}
         </div>
       );
