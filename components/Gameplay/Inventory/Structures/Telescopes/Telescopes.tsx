@@ -215,58 +215,51 @@ interface TransitingTelescopeStructureModalProps {
 };
 
 export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStructureModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
-    const [isActionDone, setIsActionDone] = useState(false);
-    const { activePlanet } = useActivePlanet();
+  const [isActionDone, setIsActionDone] = useState(false);
+  const { activePlanet } = useActivePlanet();
 
-    const handleActionClick = () => {
-        // Implement action logic here
-        setIsActionDone(true);
-    };
+  const handleActionClick = () => {
+      // Implement action logic here
+      setIsActionDone(true);
+  };
 
-    if (!isOpen) return null;
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${activePlanet?.id}/phased.png`;
+  if (!isOpen) return null;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${activePlanet?.id}/phased.png`;
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-4 w-full max-w-md mx-auto shadow-lg">
-          <button className="btn btn-square btn-outline" onClick={onClose}>
-                ✕
+  return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg w-full max-w-lg mx-auto shadow-lg overflow-hidden">
+              <button className="absolute top-2 right-2 btn btn-square btn-outline" onClick={onClose}>
+                  ✕
               </button>
-            <div className="flex justify-between items-center">
-              {/* <h2 className="text-xl font-bold">{structure.name}</h2> */}
-            </div>
-            <div className="flex flex-col items-center mt-4">
-              <img src={structure.icon_url} alt={structure.name} className="w-24 h-24 mb-2" />
-              {/* <img src="http://127.0.0.1:54321/storage/v1/object/sign/avatars/download.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2Rvd25sb2FkLnBuZyIsImlhdCI6MTcxODkyNzMzOCwiZXhwIjoxNzE5NTMyMTM4fQ.9PvBRH7829oTleom8vHIUJ5g7u1lPjY74QEkvNrW0TM&t=2024-06-20T23%3A48%3A58.462Z" className="w-32 h-32 mb-2" /> */}
-              {/* <p>ID: {ownedItem.id}</p>
-              <p>{ownedItem.notes}</p>
-              <p>Description: {structure.description}</p> */}
-              <div className="mt-4">
-                <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} />
-                <p>
-Your mission is to analyze the phase-folded lightcurve of your home planet. Look closely at the pattern of dips and variations in brightness. This information helps determine if the planet is real.
+              <div className="p-4 max-h-[80vh] overflow-y-auto">
+                  <div className="flex flex-col items-center">
+                      <img src={structure.icon_url} alt={structure.name} className="w-24 h-24 mb-2" />
+                      <div className="mt-4">
+                          <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} className="w-full h-auto mb-4" />
+                          <p>
+                              Your mission is to analyze the phase-folded lightcurve of your home planet. Look closely at the pattern of dips and variations in brightness. This information helps determine if the planet is real.
 
-Here are some tips for classifying: <br />
+                              Here are some tips for classifying: <br />
 
-Look for Regular Dips: These dips often indicate a planet passing in front of its star. The regularity can confirm its orbit. <br />
+                              Look for Regular Dips: These dips often indicate a planet passing in front of its star. The regularity can confirm its orbit. <br />
 
-Assess the Shape: A sharp, symmetrical dip is typical of a planet transit. Asymmetrical or irregular shapes might suggest other phenomena. <br />
+                              Assess the Shape: A sharp, symmetrical dip is typical of a planet transit. Asymmetrical or irregular shapes might suggest other phenomena. <br />
 
-Use these criteria to decide if the lightcurve reveals a legitimate planet. Write a post and click share when you're ready to submit your findings. Happy exploring!</p> <br />
-                <CreateFirstBaseClassification assetMentioned={imageUrl} />
-                {/* {ownedItem.notes === 'Created by crafting 14 for mission 7' ? (
-                  <CreateFirstBaseClassification assetMentioned={imageUrl} />
-                ) : (
-                  <CreateBaseClassification assetMentioned={imageUrl} />
-                )} */}
-                {isActionDone && <p className="mt-2 text-green-500">Action Completed</p>}
+                              Use these criteria to decide if the lightcurve reveals a legitimate planet. Write a post and click share when you're ready to submit your findings. Happy exploring!
+                          </p>
+                          <br />
+                          <CreateFirstBaseClassification assetMentioned={imageUrl} />
+                          {isActionDone && <p className="mt-2 text-green-500">Action Completed</p>}
+                      </div>
+                  </div>
               </div>
-            </div>
           </div>
-        </div>
-    );
+      </div>
+  );
 };
+
 
 interface TelescopeReceiverStructureModalProps {
     isOpen: boolean;

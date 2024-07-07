@@ -36,7 +36,6 @@ interface MeteorologyToolModalProps {
 export const MeteorologyToolModal: React.FC<MeteorologyToolModalProps> = ({ isOpen, onClose, ownedItem, structure }) => {
   const supabase = useSupabaseClient();
   const session = useSession();
-
   const { activePlanet } = useActivePlanet();
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -52,7 +51,7 @@ export const MeteorologyToolModal: React.FC<MeteorologyToolModalProps> = ({ isOp
                           limit: 100,
                       });
 
-                      console.log("PRINTING IMAGE OF CLOud")
+                      console.log("PRINTING IMAGE OF CLOUD")
 
                   if (listError) {
                       console.error('Error fetching image list:', listError);
@@ -80,49 +79,24 @@ export const MeteorologyToolModal: React.FC<MeteorologyToolModalProps> = ({ isOp
 
   return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-4 w-full max-w-lg mx-auto shadow-lg">
-              <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold">{structure.name}</h2>
-                  <button className="btn btn-square btn-outline" onClick={onClose}>
-                      ✕
-                  </button>
-              </div>
-              <div className="flex flex-col items-center mt-4">
-                  <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
-                  <p>ID: {ownedItem.id}</p>
-                  <p>Description: {structure.description}</p>
-                  <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg max-w-4xl mx-auto mt-4">
-                  <div>
-                              <img src={imageUrl ?? ''} alt={`Active Planet ${activePlanet?.id}`} className="mb-4" />
-                              <CreateFirstMeteorologyClassification assetMentioned={imageUrl ?? ''} />
-                          </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-                          {/* <div>
-                              <div className="bg-gray-100 p-6 rounded-xl grid grid-cols-2 gap-6">
-                                  <span className="font-medium col-span-2">In Production</span>
-                                  <div className="flex items-center gap-3">
-                                      <GemIcon className="w-7 h-7 text-indigo-500" />
-                                      <span className="font-medium">Coal</span>
-                                      <div className="text-right text-lg font-medium">0</div>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                      <CuboidIcon className="w-7 h-7 text-amber-500" />
-                                      <span className="font-medium">Silicon</span>
-                                      <div className="text-right text-lg font-medium">0</div>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                      <LeafIcon className="w-7 h-7 text-green-500" />
-                                      <span className="font-medium">Organics</span>
-                                      <div className="text-right text-lg font-medium">0</div>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                      <BoltIcon className="w-7 h-7 text-yellow-500" />
-                                      <span className="font-medium">Energy</span>
-                                      <div className="text-right text-lg font-medium">0</div>
-                                  </div>
-                              </div>
-                          </div> */}
+          <div className="bg-white rounded-lg p-4 w-full max-w-lg mx-auto shadow-lg overflow-hidden">
+              <div className="relative p-4 max-h-[80vh] overflow-y-auto">
+                  <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-xl font-bold">{structure.name}</h2>
+                      <button className="btn btn-square btn-outline absolute top-2 right-2" onClick={onClose}>
+                          ✕
+                      </button>
+                  </div>
+                  <div className="flex flex-col items-center mt-4">
+                      <img src={structure.icon_url} alt={structure.name} className="w-32 h-32 mb-2" />
+                      <p>ID: {ownedItem.id}</p>
+                      <p>Description: {structure.description}</p>
+                      <div className="bg-white text-gray-900 p-8 rounded-xl shadow-lg max-w-4xl mx-auto mt-4">
+                        <div>
+                          <p>This is an image of some cloud aurorae from your planet</p>
+                          <img src={imageUrl ?? ''} alt={`Active Planet ${activePlanet?.id}`} className="mb-4" />
+                          <CreateFirstMeteorologyClassification assetMentioned={imageUrl ?? ''} />
+                        </div>
                       </div>
                   </div>
               </div>
@@ -130,6 +104,7 @@ export const MeteorologyToolModal: React.FC<MeteorologyToolModalProps> = ({ isOp
       </div>
   );
 };
+
 
 function BatteryIcon(props: any) {
     return (

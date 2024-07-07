@@ -9,10 +9,6 @@ export default function PageLayout() {
     const session = useSession();
     const router = useRouter();
 
-    if (!session) {
-        router.push('/auth')
-    };
-
     return (
         // <SidebarLayout leftContent={<div></div>} middleContent={<Panels />} />
         <>

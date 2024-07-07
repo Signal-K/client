@@ -43,8 +43,7 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
   };
 
   useEffect(() => {
-    // If no missions are available, skip further processing
-    if (missions.length === 0) return;
+    if (!missions || missions.length === 0) return;
 
     async function fetchRecipe() {
       try {
@@ -68,7 +67,6 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
           const itemName = inventoryItems.find((item: { id: number }) => item.id === parseInt(itemId, 10))?.name;
           if (itemName) {
             items.push(`${quantity} ${itemName}`);
-            // Check if the user has enough of each required item
             const userItem = userInventory.find((item: { item: number; quantity: number }) =>
               item.item === parseInt(itemId, 10) &&
               item.quantity >= quantity
@@ -118,7 +116,7 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
         throw newInventoryEntryError;
       }
 
-      triggerRefresh(); // Refresh after completing the mission
+      triggerRefresh();
     } catch (error: any) {
       console.error(error);
     }
@@ -143,6 +141,24 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
     }
   };
 
+  const unlockMission10IfNeeded = async () => {
+    const mission10Unlocked = missions.some((mission) => mission.id === 10);
+    if (!mission10Unlocked) {
+      const missionData = {
+        user: session?.user?.id,
+        time_of_completion: null,
+        mission: 10,
+      };
+
+      const { error: missionError } = await supabase
+        .from('missions')
+        .insert([missionData]);
+      if (missionError) {
+        throw missionError;
+      }
+    }
+  };
+
   const craftStructure = async () => {
     if (session && activePlanet?.id && craftable) {
       try {
@@ -159,11 +175,64 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
 
         const parentItemId = parentData[0].id;
 
-        if (structureId == 14) {
+        if (structureId === 14) {
           setNotes(`Created by crafting ${structureId} for mission 7`);
+        };
+
+        if (structureId === 26) {
+          await unlockMission10IfNeeded();
+
+          const missionData = {
+            user: session?.user?.id,
+            time_of_completion: new Date().toISOString(),
+            mission: 12,
+          };
+
+          const { error: missionError } = await supabase
+            .from('missions')
+            .insert([missionData]);
+          if (missionError) {
+            throw missionError;
+          }
         }
 
-        if (structureId == 30) {
+        if (structureId === 28) {
+          await unlockMission10IfNeeded();
+
+          const missionData = {
+            user: session?.user?.id,
+            time_of_completion: new Date().toISOString(),
+            mission: 15,
+          };
+
+          const { error: missionError } = await supabase
+            .from('missions')
+            .insert([missionData]);
+          if (missionError) {
+            throw missionError;
+          }
+        }
+
+        if (structureId === 32) {
+          await unlockMission10IfNeeded();
+
+          const missionData = {
+            user: session?.user?.id,
+            time_of_completion: new Date().toISOString(),
+            mission: 16,
+          };
+
+          const { error: missionError } = await supabase
+            .from('missions')
+            .insert([missionData]);
+          if (missionError) {
+            throw missionError;
+          }
+        }
+
+        if (structureId === 30) {
+          await unlockMission10IfNeeded();
+
           const missionData = {
             user: session?.user?.id,
             time_of_completion: new Date().toISOString(),
@@ -201,7 +270,7 @@ const CraftStructure = ({ structureId }: { structureId: number }) => {
         await updateNotes();
         triggerRefresh();
         router.refresh();
-        fetchUserInventory(); // Refetch the user inventory after creating a structure
+        fetchUserInventory();
       } catch (error: any) {
         console.log(error.message);
       }

@@ -4,7 +4,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 import { useRefresh } from "@/context/RefreshState";
-import SingleAutomatonCraftItem from "./AutomatonCrafting";
+import  SingleAutomatonCraftItem, { StructureInformationForAutomaton } from "./AutomatonCrafting";
 
 interface Automaton {
     id: number;
@@ -743,8 +743,13 @@ export function SingleAutomaton({ structureId }: SingleAutomatonProps) {
                             {/* <p>ID: {userAutomaton.id}</p> */}
                             {/* <p>Status: {userAutomaton.notes}</p> */}
                             {structureId && (
-                              <SingleAutomatonCraftItem craftItemId={structureId || 0} onClose={() => setIsModalOpen(false)} />
-
+                              <>
+                                <p>You need to craft this structure to continue. Here's a bit of info on what it is, and what you need to collect to build it:</p>
+                                <SingleAutomatonCraftItem craftItemId={structureId || 0} onClose={() => setIsModalOpen(false)} />
+                              </>
+                            )}
+                            {!structureId && (
+                              <StructureInformationForAutomaton />
                             )}
                             <br />
                             <div className="mt-4">

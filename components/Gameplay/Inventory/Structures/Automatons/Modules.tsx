@@ -306,25 +306,25 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
             parentAnomaly: String(activePlanet.id),
             created_at: new Date()
           });
-  
+
         const missionData = {
           user: session?.user?.id,
           time_of_completion: new Date().toISOString(),
           mission: 17,
         };
-  
+
         const { error: missionError } = await supabase
           .from('missions')
           .insert([missionData]);
-  
+
         if (missionError) {
           throw missionError;
         }
-  
+
         if (error) {
           throw error;
         }
-  
+
         alert("Image collected successfully!");
         window.location.reload(); // Refresh the page
       } catch (error) {
@@ -333,70 +333,81 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
       }
     }
   };
-  
 
   if (!isOpen) return null;
 
   if (!hasCameraStation && cameraModule === null) {
     return (
-      <>You need to collect the required items to do this, hehe</>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-auto shadow-lg">
+          <p>You need to collect the required items to do this, hehe</p>
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-700 mt-4"
+          >
+            Close
+          </button>
+        </div>
+      </div>
     );
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-auto shadow-lg">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">Camera Receiver Station</h2>
-          <button className="btn btn-square btn-outline" onClick={onClose}>
-            ✕
-          </button>
+      <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-lg mx-auto shadow-lg overflow-hidden">
+        <div className="relative p-6 max-h-[80vh] overflow-y-auto">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">Camera Receiver Station</h2>
+            <button className="btn btn-square btn-outline absolute top-2 right-2" onClick={onClose}>
+              ✕
+            </button>
+          </div>
+          {loading ? (
+            <p className="text-center">Loading...</p>
+          ) : (
+            <>
+              {!showUserImages ? (
+                <div className="grid grid-cols-1 gap-4">
+                  {rovers.map((rover, index) => (
+                    <div key={index} className="text-center">
+                      <h3 className="font-semibold mb-2">Fetched images</h3>
+                      <img src={rover} alt={`Mars Rover ${index}`} className="w-full h-auto rounded-lg mb-2" />
+                      <button
+                        onClick={() => handleCollectImage(rover)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
+                      >
+                        Collect this image
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => setShowUserImages(true)}
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-700 mt-4"
+                  >
+                    View my images and create a post
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4">
+                  {userImages.map(({ avatar_url, id }, index) => (
+                    <div key={index} className="text-center">
+                      <h3 className="font-semibold mb-2">Your images</h3>
+                      <img src={avatar_url} alt={`Mars Rover ${index}`} className="rounded-lg mb-2" />
+                      <p>What do you see?</p>
+                      <RoverClassificationFromItem32 roverId={id} />
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => setShowUserImages(false)}
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-700 mt-4"
+                  >
+                    Back to fetched images
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
-        {loading ? (
-          <p className="text-center">Loading...</p>
-        ) : (
-          <>
-            {!showUserImages ? (
-              <div className="grid grid-cols-1 gap-4">
-                {rovers.map((rover, index) => (
-                  <div key={index} className="text-center">
-                    <h3 className="font-semibold mb-2">Fetched images</h3>
-                    <img src={rover} alt={`Mars Rover ${index}`} className="w-full h-auto rounded-lg mb-2" />
-                    <button
-                      onClick={() => handleCollectImage(rover)}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
-                    >
-                      Collect this image
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={() => setShowUserImages(true)}
-                  className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-700"
-                >
-                  View my images and create a post
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {userImages.map(({ avatar_url, id }, index) => (
-                  <div key={index} className="text-center">
-                    <h3 className="font-semibold mb-2">Your images</h3>
-                    <img src={avatar_url} alt={`Mars Rover ${index}`} className="rounded-lg mb-2" />
-                    <p>What do you see?</p>
-                    <RoverClassificationFromItem32 roverId={id} />
-                  </div>
-                ))}
-                <button
-                  onClick={() => setShowUserImages(false)}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-700"
-                >
-                  Back to fetched images
-                </button>
-              </div>
-            )}
-          </>
-        )}
       </div>
     </div>
   );

@@ -92,7 +92,7 @@ export const SidebarLayout: React.FC<ResponsiveLayoutProps> = ({
             <div className="relative flex-1 overflow-hidden bg-primary-foreground transition-all duration-300">
               <div className="absolute top-4 right-4 z-10">
                 <Button variant="ghost" size="icon" onClick={() => openModal('section1')}>
-                  <MaximizeIcon className="h-6 w-6" />
+                  <MaximizeIcon className="h-6 w-6" /> 
                 </Button>
               </div>
               <div className="flex h-full items-center justify-center p-8">

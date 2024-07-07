@@ -51,7 +51,6 @@ export default function TutorialText() {
 
     const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
     const [userInventory, setUserInventory] = useState(new Set());
-    const [userUtilityStructures, setUserUtilityStructures] = useState(new Set());
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => {
@@ -62,80 +61,56 @@ export default function TutorialText() {
         setIsModalOpen(false);
     };
 
-    // async function fetchUserUtilityStructures() {
-    //     if (session && activePlanet) {
-    //       try {
-    //         const { data, error } = await supabase
-    //           .from("inventory")
-    //           .select("item")
-    //           .eq("owner", session.user.id)
-    //           .eq("anomaly", activePlanet.id)
-    //           .eq("item", 33)
-  
-    //         if (error) {
-    //           console.error("Error fetching user utility structures: ", error.message);
-    //           return;
-    //         };
-  
-    //         const utilityStructureSet = new Set(data.map((item) => item.item));
-    //         setUserUtilityStructures(utilityStructureSet);
-    //       } catch (error: any) {
-    //         console.error("Error fetching user utility structures: ", error.message);
-    //       };
-    //     };
-    // };
-
     useEffect(() => {
         const fetchMissionCompletionStatus = async () => {
-          if (session) {
-            try {
-              const { data, error } = await supabase
-                .from('missions')
-                .select('mission')
-                .eq('user', session.user.id);
-    
-              if (error) {
-                console.error('Error fetching missions:', error.message);
-                return;
-              }
-    
-              const missionStatusMap = new Map();
-              data.forEach((mission) => {
-                missionStatusMap.set(mission.mission, true);
-              });
-    
-              setMissionCompletionStatus(missionStatusMap);
-            } catch (error: any) {
-              console.error('Error fetching mission completion status:', error.message);
+            if (session) {
+                try {
+                    const { data, error } = await supabase
+                        .from('missions')
+                        .select('mission')
+                        .eq('user', session.user.id);
+
+                    if (error) {
+                        console.error('Error fetching missions:', error.message);
+                        return;
+                    }
+
+                    const missionStatusMap = new Map();
+                    data.forEach((mission) => {
+                        missionStatusMap.set(mission.mission, true);
+                    });
+
+                    setMissionCompletionStatus(missionStatusMap);
+                } catch (error: any) {
+                    console.error('Error fetching mission completion status:', error.message);
+                }
             }
-          }
         };
-    
+
         const fetchUserInventory = async () => {
-          if (session && activePlanet) {
-            try {
-              const { data, error } = await supabase
-                .from('inventory')
-                .select('item')
-                .eq('owner', session.user.id)
-                .eq('anomaly', activePlanet.id);
-    
-              if (error) {
-                console.error('Error fetching user inventory:', error.message);
-                return;
-              }
-    
-              const inventorySet = new Set(data.map((item) => item.item));
-              setUserInventory(inventorySet);
-            } catch (error: any) {
-              console.error('Error fetching user inventory:', error.message);
+            if (session && activePlanet) {
+                try {
+                    const { data, error } = await supabase
+                        .from('inventory')
+                        .select('item')
+                        .eq('owner', session.user.id)
+                        .eq('anomaly', activePlanet.id);
+
+                    if (error) {
+                        console.error('Error fetching user inventory:', error.message);
+                        return;
+                    }
+
+                    const inventorySet = new Set(data.map((item) => item.item));
+                    setUserInventory(inventorySet);
+                } catch (error: any) {
+                    console.error('Error fetching user inventory:', error.message);
+                };
             };
-          };
         };
-    
+
         fetchMissionCompletionStatus();
         fetchUserInventory();
-        // fetchUserUtilityStructures();
     }, [session, supabase, activePlanet]);
 
     const renderTextualInformation = () => {
@@ -143,14 +118,6 @@ export default function TutorialText() {
             return (
                 <p>Start your journey here. Choose a planet (by clicking on it) that you think looks fun and interesting. You'll start building your base and discovering the planet as you go, and you'll be able to visit other planets later</p>
             );
-        // } else if (!missionCompletionStatus.has(2)) {
-        //     return (
-        //         <p>Mission 2 (Profile) - we're moving this</p>
-        //     );
-        // } else if (!missionCompletionStatus.has(3)) {
-        //     return (
-        //         <p>Start exploring your planet: Click on your spacecraft here and pilot it to your new home. You'll then be able to start building and exploring your surroundings</p>
-        //     );
         } else if (!missionCompletionStatus.has(4)) {
             return (
                 <div>
@@ -246,14 +213,6 @@ export default function TutorialText() {
                     </div>
                 </div>
             )
-        // } else if (!missionCompletionStatus.has(20)) {
-            // return (
-            //     <div>
-            //         <p>
-            //             You can go back into your telescope or meteorology tool anytime and make more classifications, but you can also now create a surveyor module. Using this module, you can help astronomers determine properties for the planet like its gravity!
-            //         </p>
-            //     </div>
-            // )
         } else if (missionCompletionStatus.has(21)) {
             return (
                 <>You've done it!</>
@@ -266,7 +225,7 @@ export default function TutorialText() {
     };
 
     return (
-        <div className="px-4 py-4 rounded-lg shadow-lg">
+        <div className="px-4 py-4 rounded-lg shadow-lg max-h-screen overflow-y-auto">
             <div className="text-white bg-opacity-30 bg-black p-4 rounded-lg font-sans tracking-wide leading-relaxed">
                 {renderTextualInformation()}
                 <br />
@@ -275,8 +234,7 @@ export default function TutorialText() {
                 <Link href="https://starprotocol-5dyxe5lo4-gizmotronn.vercel.app/" className="hidden lg:block">
                     Go to V1 of Star Sailors (not supported, will need new account)
                 </Link>
-                {/* (Please remember you may have to refresh the page if things don't change quickly. This is to reduce load on our servers while we are in these early stages) */}
             </div>
         </div>
     );
-};
+}
