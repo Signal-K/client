@@ -1,16 +1,22 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
-import { useSession, useSupabaseClient, SupabaseClient } from "@supabase/auth-helpers-react";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import CardForum, { Profile, TProps } from "./ClassificationCard";
-// import ReactHtmlParser from 'react-html-parser';
 
-interface Classification { 
+interface Classification {
+  classificationConfiguration: any;
   id: number;
   content: string;
-  author: string; 
+  author: string;
   media: string[];
   anomaly: number;
+  created_at: string;
+  classificationtype: any;
+  profiles: Profile;
+  anomalies: {
+    avatar_url: string;
+    anomalytype: string;
+  };
+  classificationCount: number;
 };
 
 const ClassificationsFeed: React.FC = () => {
@@ -19,14 +25,66 @@ const ClassificationsFeed: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data, error } = await supabase
-       .from('classifications')
-       .select('*');
-      
-      if (error) {
-        console.error('Error loading classifications:', error.message);
-      } else {
-        setPosts(data || []);
+      try {
+        // Fetch classifications with profiles and anomalies data
+        const { data, error } = await supabase
+          .from('classifications')
+          .select(`
+            id,
+            created_at,
+            content,
+            author,
+            anomaly,
+            media,
+            classificationtype,
+            classificationConfiguration,
+            profiles (
+              id,
+              avatar_url,
+              username
+            ),
+            anomalies (
+              avatar_url,
+              anomalytype
+            )
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        // Process the fetched data
+        const processedData = await Promise.all(
+          (data || []).map(async (classification: any) => {
+            // Get the count of classifications for this anomaly
+            const { data: anomalyData, error: anomalyError } = await supabase
+              .from('anomalies')
+              .select('avatar_url')
+              .eq('id', classification.anomaly)
+              .single();
+
+            if (anomalyError) {
+              throw new Error(anomalyError.message);
+            }
+
+            const classificationCount = data.filter((c: any) => c.anomaly === classification.anomaly).length;
+
+            return {
+              ...classification,
+              anomalies: {
+                avatar_url: anomalyData?.avatar_url || '/default-anomaly-avatar.png',
+                anomalytype: classification.anomalies.anomalytype
+              },
+              classificationCount
+            };
+          })
+        );
+
+        setPosts(processedData);
+
+      } catch (error) {
+        console.error('Error loading classifications:', error instanceof Error ? error.message : 'Unknown error');
       }
     };
 
@@ -34,80 +92,23 @@ const ClassificationsFeed: React.FC = () => {
   }, [supabase]);
 
   return (
-    <div>
+    <div className="flex flex-col items-center gap-4 py-5 space-y-4" style={{ maxWidth: "100%", margin: "auto" }}>
       {posts.map((post) => (
-        <div key={post.id} className="card">
-          <h3>{post.author}</h3>
-          <p>{post.anomaly}</p>
-          {Array.isArray(post.media) && post.media.map((url, index) => (
-            <img key={index} src={url} alt="" />
-          ))}
-          {/* {ReactHtmlParser(post.content)} Directly render the parsed HTML */}
-        </div>
+        <CardForum
+          id={post.id}
+          content={post.content}
+          created_at={post.created_at}
+          profiles={post.profiles}
+          media={post.media}
+          anomaly={post.anomaly}
+          classificationtype={post.classificationtype}
+          anomalies={post.anomalies}
+          classificationCount={post.classificationCount}
+          classificationConfiguration={post.classificationConfiguration} 
+        />      
       ))}
     </div>
   );
 };
 
-type ClassificationFeedForIndividualPlanetProps = {
-  planetId: { planetId: { id: number } };
-};
-
-export function ClassificationFeedForIndividualPlanet({
-  planetId,
-}: ClassificationFeedForIndividualPlanetProps) {
-  const supabase: SupabaseClient = useSupabaseClient();
-  const session = useSession();
-
-  const [posts, setPosts] = useState<TProps[]>([]);
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  async function fetchPosts() {
-    try {
-      const postsResponse = await supabase
-        .from("classifications")
-        .select("id, created_at, content, anomaly, media, profiles(id, avatar_url, full_name, username)")
-        .eq("anomaly", planetId.planetId.id)
-        .order("created_at", { ascending: false });
-
-      if (postsResponse.error || !postsResponse.data) {
-        console.error("Error fetching posts:", postsResponse.error);
-        return;
-      }
-
-      // Adjust the data format to match TProps type
-      const formattedPosts = postsResponse.data.map((post: any) => ({
-        id: post.id,
-        created_at: post.created_at,
-        content: post.content,
-        anomaly: post.anomaly,
-        media: post.media,
-        profiles: post.profiles[0], // Assuming profiles is an array and we need the first item
-      }));
-
-      setPosts(formattedPosts);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Error fetching posts:", error.message);
-      } else {
-        console.error("Unknown error fetching posts");
-      }
-    }
-  }
-
-  return (
-    <div className="flex flex-col items-center gap-4 py-5" style={{ maxWidth: "100%", margin: "auto" }}>
-      {posts.map((post) => (
-        <React.Fragment key={post.id}>
-          <CardForum {...post} />
-          <p>{post.anomaly}</p>
-        </React.Fragment>
-      ))}
-    </div>
-  );
-}
-
-export default ClassificationFeedForIndividualPlanet;
+export default ClassificationsFeed;

@@ -26,7 +26,9 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "daisyui": "^4.11.1",
+    "date-fns": "^3.6.0",
     "framer-motion": "^11.1.9",
+    "html2canvas": "^1.4.1",
     "lexical": "^0.15.0",
     "lucide-react": "^0.394.0",
     "mobx": "^6.13.0",
@@ -37,6 +39,7 @@
     "react-dom": "^18.3.1",
     "react-image-file-resizer": "^0.4.8",
     "sass": "^1.77.4",
+    "swiper": "^11.1.4",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7"
   },

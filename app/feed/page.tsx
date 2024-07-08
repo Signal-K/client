@@ -7,7 +7,7 @@ export default function FeedTestPage() {
     return (
         <div>
             
-            <ClassificationFeedForIndividualPlanet planetId={{ planetId: { id: 5 } }} />
+            {/* <ClassificationFeedForIndividualPlanet planetId={{ planetId: { id: 5 } }} /> */}
         </div>
     );
 }

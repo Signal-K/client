@@ -9,54 +9,23 @@ import { ReactNode, useEffect, useState } from "react";
 import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import NavMenu from "@/app/(layout)/menu";
 
 interface PlanetLayoutProps {
   children: ReactNode;
 };
 
-export function PlanetLayout({ children }: { children: React.ReactNode }) {
+export default function PlanetLayout({ children }: { children: React.ReactNode }) {
   const supabase = useSupabaseClient();
   const session = useSession();
-
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
-
+  
   const [showSidebar, setShowSidebar] = useState(false);
   const [showFeed, setShowFeed] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
   const [showClassificationsFeed, setShowClassificationsFeed] = useState(false);
-  // const [canChangePlanet, setCanChangePlanet] = useState(false);
-
-  // useEffect(() => {
-  //   const checkInventory = async () => {
-  //     const { data, error } = await supabase
-  //       .from('inventory')
-  //       .select('*')
-  //       .eq('owner', session?.user.id);
-
-  //     if (error) {
-  //       console.error('Error fetching inventory:', error);
-  //       return;
-  //     }
-
-  //     if (data) {
-  //       const hasSpacecraft = data.some(
-  //         (item) => item.item === 29 && item.anomaly === activePlanet?.id
-  //       );
-  //       const hasLaunchpad = data.some(
-  //         (item) => item.item === 33 && item.anomaly && item.time_of_deploy
-  //       );
-
-  //       setCanChangePlanet(hasSpacecraft && hasLaunchpad);
-  //     }
-  //   };
-
-  //   if (session?.user.id && activePlanet?.id) {
-  //     checkInventory();
-  //   }
-  // }, [session?.user.id, activePlanet?.id]);
 
   const handleLeftArrowClick = () => {
-    // if (canChangePlanet && activePlanet?.id && parseInt(activePlanet.id) > 1) {
     if (activePlanet?.id && parseInt(activePlanet.id) > 1) {
       const newId = parseInt(activePlanet.id) - 1;
       setShowAnimation(true);
@@ -68,7 +37,6 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
   };
 
   const handleRightArrowClick = () => {
-    // if (canChangePlanet && activePlanet?.id && parseInt(activePlanet.id) < 6) {
     if (activePlanet?.id && parseInt(activePlanet.id) < 6) {
       const newId = parseInt(activePlanet.id) + 1;
       setShowAnimation(true);
@@ -137,7 +105,8 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
         </div>
         <div className="flex flex-col items-center">
           <div className="inline-block rounded-lg bg-gray-100/80 px-3 py-1 text-sm backdrop-blur-md dark:bg-gray-800/80">
-            Home
+            {/* Home */}
+            <NavMenu onMyDiscoveriesClick={handleOpenClassificationsFeed} />
           </div>
           <h1 className="text-lg font-semibold">{activePlanet?.content}</h1>
         </div>
@@ -199,7 +168,7 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
             >
               <LucideArrowLeftIcon className="h-5 w-5" />
             </Button>
-            <MissionList />
+            <ClassificationsFeed />
           </div>
         </div>
       )}
@@ -210,7 +179,7 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
           onClick={handleCloseClassificationsFeed}
         >
           <div
-            className="relative w-4/5 max-w-4xl h-4/5 bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800 overflow-y-auto"
+            className="relative w-4/5 max-w-4xl h-4/5 bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800 overflow-y-auto" // Added overflow-y-auto for scrolling
             onClick={(e) => e.stopPropagation()}
           >
             <Button
@@ -222,13 +191,13 @@ export function PlanetLayout({ children }: { children: React.ReactNode }) {
             >
               ✕
             </Button>
-            {/* <ClassificationsFeed /> */}
+            <ClassificationsFeed />
           </div>
         </div>
       )}
     </>
   );
-};
+}
 
 interface MainContentProps {
     children: ReactNode;
