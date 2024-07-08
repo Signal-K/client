@@ -10,11 +10,12 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { RooverFromAppeears } from "@/app/(anomalies)/(data)/Mars-Photos";
 
 interface RoverData {
   photos: string[];
   resourceSites: { name: string; deposits: string[] }[];
-};
+}
 
 interface InventoryItem {
   id: number;
@@ -73,13 +74,11 @@ export default function DeployRooversInitial() {
         if (error) {
           console.error("Error fetching inventory items: ", error);
           return;
-        };
+        }
 
         if (data && data.length > 0) {
-          // Entry exists
           console.log(`Rover already in inventory with ID: ${data[0].id}`);
         } else {
-          // No entry found, create one
           const { error: insertError } = await supabase
             .from("inventory")
             .insert(newRoverToInventoryData);
@@ -88,16 +87,16 @@ export default function DeployRooversInitial() {
             console.error("Error creating rover in inventory: ", insertError);
           } else {
             console.log("New rover added to inventory.");
-          };
-        };
+          }
+        }
       } catch (error) {
-        console.error('Unexpected error: ', error);
-      };
+        console.error("Unexpected error: ", error);
+      }
     };
 
     if (session?.user?.id) {
       fetchInventoryItems();
-    };
+    }
   }, [session, supabase, newRoverToInventoryData]);
 
   return (
@@ -159,6 +158,7 @@ export default function DeployRooversInitial() {
                     ))}
                   </ul>
                 </div>
+                <RooverFromAppeears />
               </>
             )}
             <Button
