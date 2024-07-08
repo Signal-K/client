@@ -11,6 +11,7 @@ import { PlanetGrid } from "@/components/Onboarding";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
+import NavigationMenu from "./navigation/pogo-menu";
 
   export function Panels() {
     const [isMiddleHovered, setIsMiddleHovered] = useState(false);
@@ -148,7 +149,7 @@ import { TellUsWhatYouThinkClassification } from "@/Classifications/Classificati
       return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <SingleAutomaton />
-        </div>
+        </div> 
       );
     } else if (missionCompletionStatus.has(8)) {
       return (
@@ -253,6 +254,7 @@ import { TellUsWhatYouThinkClassification } from "@/Classifications/Classificati
               <div className="flex h-full items-center justify-center p-8">
                 <div className="space-y-4 text-center">
                     {renderAutomatonContent()}
+                    <NavigationMenu />
                 </div>
               </div>
             </div>
