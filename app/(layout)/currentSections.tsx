@@ -13,7 +13,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
 import NavigationMenu from "./navigation/pogo-menu";
 
-  export function Panels() {
+export function Panels() {
     const [isMiddleHovered, setIsMiddleHovered] = useState(false);
     const [maximizedSection, setMaximizedSection] = useState<null | string>(null);
 
@@ -44,9 +44,9 @@ import NavigationMenu from "./navigation/pogo-menu";
           .eq('user', session.user.id);
 
         if (error) {
-          console.error('Error fetching missions:', error.message);
+          console.error('Error fetching missions: ', error.message);
           return;
-        }
+        };
 
         const missionStatusMap = new Map();
         data.forEach((mission) => {
@@ -56,8 +56,8 @@ import NavigationMenu from "./navigation/pogo-menu";
         setMissionCompletionStatus(missionStatusMap);
       } catch (error: any) {
         console.error('Error fetching mission completion status:', error.message);
-      }
-    }
+      };
+    };
   };
 
   const fetchUserInventory = async () => {

@@ -5,14 +5,14 @@ interface UserMissionInstance {
     user: string;
     time_of_completion: string;
     mission: number;
-}
+};
 
 interface Mission {
     id: number;
     name: string;
     description: string;
     rewards: number[]; // Array of reward item IDs
-}
+};
 
 const missions: Mission[] = [
     { id: 1, name: "Pick planet", description: "Select your starting planet", rewards: [29] }, // Possibly the user should get something, but really they're already getting a planet, so... | After further consideration for the order of missions, I think that giving the spaceship and then the rover will be a good option

@@ -5,7 +5,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 
 import { AllAutomatons, SingleAutomaton } from "./Automatons/Automaton";
 import SingleAutomatonCraftItem from "./Automatons/AutomatonCrafting";
-import { PlanetGrid, ResponsiveLayout } from "@/components/Onboarding";
+import { PlanetGrid } from "@/components/Onboarding";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { ProfileCard } from "@/auth/UserProfileFields";
 import UserItemsUndeployed from "./InactiveItems";
