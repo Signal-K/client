@@ -14,13 +14,13 @@ import { TellUsWhatYouThinkClassification } from "@/Classifications/Classificati
 import NavigationMenu from "./navigation/pogo-menu";
 
 export function Panels() {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const { activePlanet } = useActivePlanet() || {};
+
     const [isMiddleHovered, setIsMiddleHovered] = useState(false);
     const [maximizedSection, setMaximizedSection] = useState<null | string>(null);
-
-    const supabase = useSupabaseClient();
-    const session = useSession();
-  
-  const { activePlanet } = useActivePlanet() || {};
   
   const [missionCompletionStatus, setMissionCompletionStatus] = useState(new Map());
   const [userInventory, setUserInventory] = useState(new Set());

@@ -36,7 +36,5 @@ export default function FirstScene() {
         };
     };
 
-    const renderContent = () => {
-        
-    }
+    // If activePlanet = planet.type, show planet type here
 }
