@@ -15,7 +15,8 @@ import UserAnomaliesComponent from "@/components/Content/Anomalies/YourAnomalies
 import ExampleComponent from "./Structures/structure-borderline";
 import TravelBuddy from "@/components/Utilities/TravelBuddy";
 import SpacecraftButton from "./Structures/Vehicles/Spacecraft";
-import { SidebarLayout } from "@/app/layout";
+// import { SidebarLayout } from "@/app/layout";
+import { SidebarLayout } from "@/app/(layout)/sectionStructure";
 import TutorialText from "@/components/Tutorial/TextBlocks";
 import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
 

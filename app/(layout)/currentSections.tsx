@@ -11,7 +11,7 @@ import { PlanetGrid } from "@/components/Onboarding";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
-import NavigationMenu from "./navigation/pogo-menu";
+// import NavigationMenu from "./navigation/pogo-menu";
 
 export function Panels() {
   const supabase = useSupabaseClient();
@@ -254,7 +254,7 @@ export function Panels() {
               <div className="flex h-full items-center justify-center p-8">
                 <div className="space-y-4 text-center">
                     {renderAutomatonContent()}
-                    <NavigationMenu />
+                    {/* <NavigationMenu /> */}
                 </div>
               </div>
             </div>

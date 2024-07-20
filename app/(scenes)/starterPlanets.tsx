@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import PlanetGrid from "./(missions)/(navigating)/PlanetSelector";
 
 export default function FirstScene() {
     const supabase = useSupabaseClient();
@@ -37,4 +38,8 @@ export default function FirstScene() {
     };
 
     // If activePlanet = planet.type, show planet type here
-}
+
+    return (
+        <PlanetGrid />
+    );
+};

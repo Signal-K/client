@@ -8,7 +8,7 @@ import { SingleAutomaton } from "@/components/Gameplay/Inventory/Automatons/Auto
 import SingleAutomatonCraftItem from "@/components/Gameplay/Inventory/Automatons/AutomatonCrafting";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import NavigationMenu from "../(layout)/navigation/pogo-menu";
+// import NavigationMenu from "../(layout)/navigation/pogo-menu";
 
 export default function BuildPanels() {
     const supabase = useSupabaseClient();

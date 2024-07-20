@@ -51,7 +51,7 @@ const PlanetGrid: React.FC = () => {
             const missionData = {
                 user: session?.user?.id,
                 time_of_completion: new Date().toISOString(),
-                mission: 1,
+                mission: 101,
                 configuration: null,
                 rewarded_items: null,
             };
@@ -68,7 +68,7 @@ const PlanetGrid: React.FC = () => {
                 item: 29,
                 owner: session?.user?.id,
                 quantity: 1,
-                notes: "Created upon the completion of mission 1",
+                notes: "Created upon the completion of mission 101; selecting new planet",
                 parentItem: null,
                 time_of_deploy: new Date().toISOString(),
                 anomaly: planetData.id,
