@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import CardForum, { Profile, TProps } from "./ClassificationCard";
 
-interface Classification {
+interface Classification { 
   classificationConfiguration: any;
   id: number;
   content: string;

@@ -1,26 +1,26 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
-import Link from "next/link";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Card } from '@/components/ui/card';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from "@/components/ui/button";
-import { useActivePlanet } from '@/context/ActivePlanet';
+import { Carousel } from 'react-responsive-carousel';
 import Modal from '../(classifications)/DataModal';
+import { useActivePlanet } from '@/context/ActivePlanet';
 
 export function PostCard() {
   const { activePlanet, classifications } = useActivePlanet();
-  const [showData, setShowData] = useState(true);
-  const [showClassifications, setShowClassifications] = useState(true);
   const [selectedClassification, setSelectedClassification] = useState<any | null>(null);
-
-  const toggleData = () => setShowData(!showData);
-  const toggleClassifications = () => setShowClassifications(!showClassifications);
-  const openModal = (classification: any) => setSelectedClassification(classification);
-  const closeModal = () => setSelectedClassification(null);
 
   const lightcurveClassifications = classifications.filter(
     c => c.classificationtype === 'lightcurve'
   );
+
+  const openModal = (classification: any) => {
+    console.log("Opening modal with classification:", classification);
+    setSelectedClassification(classification);
+  };
+  const closeModal = () => setSelectedClassification(null);
+
+  console.log("Lightcurve Classifications:", lightcurveClassifications);
 
   return (
     <Card className="max-w-md w-full mx-auto rounded-2xl overflow-hidden" style={{ height: '70vh' }}>
@@ -40,12 +40,6 @@ export function PostCard() {
             style={{ aspectRatio: '4 / 1' }}
           />
         )}
-        <div className="absolute top-4 left-4 bg-background/50 px-3 py-1 rounded-md text-sm font-medium">
-          Mission Status: Ongoing
-        </div>
-        <div className="absolute bottom-4 right-4 bg-background/50 px-3 py-1 rounded-md text-sm font-medium">
-          70% Complete
-        </div>
       </div>
       <div className="grid grid-cols-2 gap-4 p-4 overflow-y-auto" style={{ maxHeight: 'calc(70vh - 25%)' }}>
         {/* Atmosphere Panel */}
@@ -119,6 +113,17 @@ export function PostCard() {
         <Modal isOpen={true} onRequestClose={closeModal}>
           <div className="p-4">
             <h2 className="text-xl font-bold mb-4">Classification Details</h2>
+            <Carousel showThumbs={false} infiniteLoop={true} dynamicHeight={true}>
+              {selectedClassification.media.map((url: string, index: number) => (
+                <div key={index} className="mb-4">
+                  <img
+                    src={url}
+                    alt={`Lightcurve ${index}`}
+                    className="w-full object-cover"
+                  />
+                </div>
+              ))}
+            </Carousel>
             <pre>{JSON.stringify(selectedClassification, null, 2)}</pre>
             <Button onClick={closeModal} className="mt-4">Close</Button>
           </div>
@@ -147,24 +152,4 @@ function ShareIcon(props: any) {
       <line x1="12" x2="12" y1="2" y2="15" />
     </svg>
   );
-}
-
-function XIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  );
-}
+};
