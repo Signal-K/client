@@ -24,4 +24,4 @@ const starterMissions: StarterMission[] = [
 
 export async function GET(req: NextRequest) {
     return NextResponse.json(starterMissions);
-}
+};

@@ -5,6 +5,8 @@ import { Panels } from "../(layout)/sectionStructure"
 import { SidebarLayout } from "../(layout)/sectionStructure";
 import { useRouter } from "next/navigation";
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
+import SpaceGamePage from "../(scenes)/(spaceship)/spaceship";
+import Layout from "@/components/Layout";
 
 export default function PageLayout() {
     const session = useSession();
@@ -12,9 +14,10 @@ export default function PageLayout() {
 
     return (
         // <SidebarLayout leftContent={<div></div>} middleContent={<Panels />} />
-        <>
+        <Layout bg="true">
             {/* <Panels /> */}
-            <ClassificationsFeed />
-        </>
+            {/* <ClassificationsFeed /> */}
+            <SpaceGamePage />
+        </Layout>
     );
 };

@@ -7,6 +7,7 @@ import { Landing } from "@/components/landing";
 import { Panels } from "./(layout)/currentSections";
 import { useEffect, useState } from "react";
 import FirstScene from "./(scenes)/starterPlanets";
+import LoginPage from "./auth/LoginModal";
 
 export default function Home() {
   const supabase = useSupabaseClient();
@@ -45,7 +46,7 @@ export default function Home() {
 
   if (!session) {
     return (
-      <Landing />
+      <LoginPage />
     );
   };
 
