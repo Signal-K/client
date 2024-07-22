@@ -1,35 +1,39 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { UserPlanetData } from '@/components/Gameplay/Inventory/UserPlanets';
+import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { UserPlanetData } from '@/components/Gameplay/Inventory/UserPlanets';
 
 // Define the type for the context value
 interface ActivePlanetContextValue {
-  activePlanet: UserPlanetData | null;
-  setActivePlanet: (planet: UserPlanetData | null) => void;
+  activePlanet: any | null;
+  setActivePlanet: (planet: any | null) => void;
   updatePlanetLocation: (newLocation: number) => void;
+  classifications: any[];
+  setClassifications: (classifications: any[]) => void;
 }
 
-// Create the context 
+// Create the context
 const ActivePlanetContext = createContext<ActivePlanetContextValue>({
   activePlanet: null,
-  setActivePlanet: () => {}, // Provide a default empty function
-  updatePlanetLocation: () => {}, // Provide a default empty function
+  setActivePlanet: () => {},
+  updatePlanetLocation: () => {},
+  classifications: [],
+  setClassifications: () => {},
 });
 
 // Create a provider component
 export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const supabase = useSupabaseClient();
   const session = useSession();
-  const [activePlanet, setActivePlanet] = useState<UserPlanetData | null>(null);
+  const [activePlanet, setActivePlanet] = useState<any | null>(null);
+  const [classifications, setClassifications] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchPlanetData = async () => {
       if (!session) return;
 
       try {
-        // Fetch user profile
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("location")
@@ -38,7 +42,6 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
 
         if (profileError) throw profileError;
 
-        // Fetch user planet
         const { data: planet, error: planetError } = await supabase
           .from("anomalies")
           .select("*")
@@ -49,6 +52,17 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
 
         if (planet) {
           setActivePlanet(planet);
+
+          const { data: classificationsData, error: classificationsError } = await supabase
+            .from('classifications')
+            .select('*')
+            .eq('author', session.user.id)
+            .eq('anomaly', planet.id)
+            .eq('classificationtype', 'lightcurve');
+
+          if (classificationsError) throw classificationsError;
+
+          setClassifications(classificationsData);
         }
       } catch (error: any) {
         console.error("Error fetching data: ", error.message);
@@ -59,37 +73,45 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, [session, supabase]);
 
   const updatePlanetLocation = async (newLocation: number) => {
-      if (!session) return;
+    if (!session) return;
 
     try {
-        // Update the location in the profiles table
-        const { error: updateError } = await supabase
-            .from('profiles')
-            .update({ location: newLocation })
-            .eq('id', session.user.id);
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ location: newLocation })
+        .eq('id', session.user.id);
 
-        if (updateError) throw updateError;
+      if (updateError) throw updateError;
 
-        // Fetch the new planet data
-        const { data: planet, error: planetError } = await supabase
-            .from("anomalies")
-            .select("*")
-            .eq("id", newLocation)
-            .single();
+      const { data: planet, error: planetError } = await supabase
+        .from("anomalies")
+        .select("*")
+        .eq("id", newLocation)
+        .single();
 
-        if (planetError) throw planetError;
+      if (planetError) throw planetError;
 
-        if (planet) {
-            setActivePlanet(planet);
-        }
+      if (planet) {
+        setActivePlanet(planet);
+
+        const { data: classificationsData, error: classificationsError } = await supabase
+          .from('classifications')
+          .select('*')
+          .eq('author', session.user.id)
+          .eq('anomaly', planet.id)
+          .eq('classificationtype', 'lightcurve');
+
+        if (classificationsError) throw classificationsError;
+
+        setClassifications(classificationsData);
+      }
     } catch (error: any) {
-        console.error("Error updating planet location: ", error.message);
+      console.error("Error updating planet location: ", error.message);
     }
   };
 
-
   return (
-    <ActivePlanetContext.Provider value={{ activePlanet, setActivePlanet, updatePlanetLocation }}>
+    <ActivePlanetContext.Provider value={{ activePlanet, setActivePlanet, updatePlanetLocation, classifications, setClassifications }}>
       {children}
     </ActivePlanetContext.Provider>
   );

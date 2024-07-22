@@ -10,6 +10,7 @@ import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import NavMenu from "@/app/(layout)/menu";
+import { PostCard } from "@/app/(create)/cards/PostCard";
 
 interface PlanetLayoutProps {
   children: ReactNode;
@@ -168,7 +169,7 @@ export default function PlanetLayout({ children }: { children: React.ReactNode }
             >
               <LucideArrowLeftIcon className="h-5 w-5" />
             </Button>
-            <ClassificationsFeed />
+            <PostCard /> {/* <ClassificationsFeed /> */}
           </div>
         </div>
       )}
@@ -191,7 +192,7 @@ export default function PlanetLayout({ children }: { children: React.ReactNode }
             >
               ✕
             </Button>
-            <ClassificationsFeed />
+            <PostCard />
           </div>
         </div>
       )}
