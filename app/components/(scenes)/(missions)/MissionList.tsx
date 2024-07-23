@@ -25,7 +25,8 @@ export default function MissionLog() {
   const [showCompleted, setShowCompleted] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [openGroups, setOpenGroups] = useState<string[]>([]);
-  const [activeMissionComponent, setActiveMissionComponent] = useState<React.ReactNode | null>(null);
+  const [activeMissionComponent, setActiveMissionComponent] =
+    useState<React.ReactNode | null>(null);
 
   const pastelColors = [
     "text-pink-300",
@@ -43,24 +44,29 @@ export default function MissionLog() {
   useEffect(() => {
     const fetchMissions = async () => {
       try {
-        const { data: completedMissionData, error: missionError } = await supabase
-          .from("missions")
-          .select("mission")
-          .eq("user", session?.user.id);
+        const { data: completedMissionData, error: missionError } =
+          await supabase
+            .from("missions")
+            .select("mission")
+            .eq("user", session?.user.id);
 
-        const completedMissionIds = completedMissionData?.map((entry) => entry.mission);
+        const completedMissionIds = completedMissionData?.map(
+          (entry) => entry.mission
+        );
 
         const missionResponse = await fetch("/api/gameplay/missions");
         let missionData: Mission[] = await missionResponse.json();
 
-        missionData = missionData.filter((mission) => mission.id < 1 || mission.id > 100);
+        missionData = missionData.filter(
+          (mission) => mission.id < 1 || mission.id > 100
+        );
 
         const completedMissions = missionData.filter((mission) =>
           completedMissionIds?.includes(mission.id)
         );
 
-        const incompleteMissions = missionData.filter((mission) =>
-          !completedMissionIds?.includes(mission.id)
+        const incompleteMissions = missionData.filter(
+          (mission) => !completedMissionIds?.includes(mission.id)
         );
 
         setCompletedMissions(completedMissions);
@@ -68,10 +74,9 @@ export default function MissionLog() {
 
         const initialOpenGroups = Object.keys(
           missionData.reduce((groups, mission) => {
-            const key = [
-              mission.chapter,
-              mission.classificationModule,
-            ].filter(Boolean).join("-");
+            const key = [mission.chapter, mission.classificationModule]
+              .filter(Boolean)
+              .join("-");
             if (!groups[key]) {
               groups[key] = [];
             }
@@ -89,34 +94,40 @@ export default function MissionLog() {
     fetchMissions();
   }, [session, supabase]);
 
-  const groupedIncompleteMissions = incompleteMissions.reduce((groups, mission) => {
-    const key = [
-      mission.chapter,
-      mission.classificationModule,
-    ].filter(Boolean).join("-");
-    if (!groups[key]) {
-      groups[key] = [];
-    }
-    groups[key].push(mission);
-    return groups;
-  }, {} as Record<string, Mission[]>);
+  const groupedIncompleteMissions = incompleteMissions.reduce(
+    (groups, mission) => {
+      const key = [mission.chapter, mission.classificationModule]
+        .filter(Boolean)
+        .join("-");
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+      groups[key].push(mission);
+      return groups;
+    },
+    {} as Record<string, Mission[]>
+  );
 
-  const groupedCompletedMissions = completedMissions.reduce((groups, mission) => {
-    const key = [
-      mission.chapter,
-      mission.classificationModule,
-    ].filter(Boolean).join("-");
-    if (!groups[key]) {
-      groups[key] = [];
-    }
-    groups[key].push(mission);
-    return groups;
-  }, {} as Record<string, Mission[]>);
+  const groupedCompletedMissions = completedMissions.reduce(
+    (groups, mission) => {
+      const key = [mission.chapter, mission.classificationModule]
+        .filter(Boolean)
+        .join("-");
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+      groups[key].push(mission);
+      return groups;
+    },
+    {} as Record<string, Mission[]>
+  );
 
   const toggleGroup = (groupKey: string) => {
-    setOpenGroups(openGroups.includes(groupKey)
-      ? openGroups.filter((key) => key !== groupKey)
-      : [...openGroups, groupKey]);
+    setOpenGroups(
+      openGroups.includes(groupKey)
+        ? openGroups.filter((key) => key !== groupKey)
+        : [...openGroups, groupKey]
+    );
   };
 
   const handleMissionClick = (mission: Mission) => {
@@ -127,14 +138,16 @@ export default function MissionLog() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="items-center">
       <div
-        className="w-full max-w-lg p-6 bg-white rounded-xl shadow-lg overflow-y-auto"
+        className="w-full max-w-lg p-6 rounded-xl shadow-lg overflow-y-auto"
         style={{ maxHeight: "90vh" }}
       >
         {showCompleted && (
           <div className="mb-4">
-            <h2 className={`text-lg font-bold ${getRandomColor()} mb-2`}>Active Missions</h2>
+            <h2 className={`text-lg font-bold ${getRandomColor()} mb-2`}>
+              Active Missions
+            </h2>
           </div>
         )}
 
@@ -155,13 +168,17 @@ export default function MissionLog() {
                     {groupedIncompleteMissions[groupKey].map((mission) => (
                       <li
                         key={mission.id}
-                        className="bg-white p-3 rounded-md shadow-md cursor-pointer"
+                        className="p-3 rounded-md shadow-md cursor-pointer"
                         onClick={() => handleMissionClick(mission)}
                       >
                         <div className="flex-1">
                           <p className="font-medium text-lg">{mission.name}</p>
                           <p
-                            className={`text-sm ${missionComponents[mission.id] ? "text-blue-500" : "text-gray-500"}`}
+                            className={`text-sm ${
+                              missionComponents[mission.id]
+                                ? "text-blue-500"
+                                : "text-gray-500"
+                            }`}
                           >
                             {mission.description}
                           </p>
@@ -193,15 +210,24 @@ export default function MissionLog() {
                 const colorClass = getRandomColor();
                 return (
                   <div key={groupKey} className="w-full">
-                    <h3 className={`font-semibold text-xl ${colorClass} shadow-lg`}>
+                    <h3
+                      className={`font-semibold text-xl ${colorClass} shadow-lg`}
+                    >
                       {groupKey.replace("-", " - ")}
                     </h3>
                     <ul className="space-y-2 mt-2">
                       {groupedCompletedMissions[groupKey].map((mission) => (
-                        <li key={mission.id} className="bg-gray-100 p-3 rounded-md shadow-md">
+                        <li
+                          key={mission.id}
+                          className="p-3 rounded-md shadow-md"
+                        >
                           <div className="flex-1">
-                            <p className="font-medium text-lg">{mission.name}</p>
-                            <p className="text-sm text-gray-500">{mission.description}</p>
+                            <p className="font-medium text-lg">
+                              {mission.name}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {mission.description}
+                            </p>
                           </div>
                         </li>
                       ))}
@@ -221,7 +247,7 @@ export default function MissionLog() {
       </div>
     </div>
   );
-}
+};
 
 const missionComponents: Record<number, React.ReactElement> = {
   1372002: <MineralDepositsNoAction />,

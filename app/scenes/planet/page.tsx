@@ -8,27 +8,16 @@ import StructuresOnPlanet, { ActiveMissionStructures, StarterMissionStructures }
 import { InventoryStructureItem } from "@/types/Items";
 import ChapterOneIntroduction from "@/app/components/(scenes)/chapters/one/ChapterOneIntro";
 import ChooseClassificationStarter from "@/app/components/(scenes)/chapters/one/ChooseClassifications";
+import MissionLog from "@/app/components/(scenes)/(missions)/MissionList";
 
 export default function PlanetViewPage() {
     const { activePlanet } = useActivePlanet();
     const session = useSession();
     const supabase = useSupabaseClient();
 
-    const [orbitalStructures, setOrbitalStructures] = useState<InventoryStructureItem[]>([]);
-    const [atmosphereStructures, setAtmosphereStructures] = useState<InventoryStructureItem[]>([]);
-    const [surfaceStructures, setSurfaceStructures] = useState<InventoryStructureItem[]>([]);
     const [hasMission1370201, setHasMission1370201] = useState(false);
-    const [hasChosenFirstClassification, setHasChosenFirstClassification] = useState(false); // 1370203
+    const [hasChosenFirstClassification, setHasChosenFirstClassification] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-
-    const handleStructuresFetch = useCallback(
-        (orbital: InventoryStructureItem[], atmosphere: InventoryStructureItem[], surface: InventoryStructureItem[]) => {
-            setOrbitalStructures(orbital);
-            setAtmosphereStructures(atmosphere);
-            setSurfaceStructures(surface);
-        },
-        [],
-    );
 
     useEffect(() => {
         const checkMission = async () => {
@@ -75,12 +64,10 @@ export default function PlanetViewPage() {
         checkFirstClassificationStatus();
     }, [session?.user, supabase]);
 
-    // If loading, return nothing or a loading spinner
     if (isLoading) {
         return <p>Loading...</p>;
     }
 
-    // If user does not have mission 1370201, return an empty <p> tag
     if (!hasMission1370201) {
         return (
             <PlanetViewLayout>
@@ -99,7 +86,32 @@ export default function PlanetViewPage() {
         );
     };
 
-    // If user has mission 1370201, return the full component content (aka they have initialised chapter 1)
+    return (
+        <div className="relative min-h-screen">
+            <PlanetStructures />
+            <div className="hidden lg:block lg:absolute lg:bottom-0 lg:right-0 lg:w-1/3 lg:h-1/3 lg:max-h-[30vh] lg:bg-white lg:z-50">
+                <MissionLog />
+            </div>
+        </div>
+    );
+};
+
+function PlanetStructures() {
+    const { activePlanet } = useActivePlanet();
+
+    const [orbitalStructures, setOrbitalStructures] = useState<InventoryStructureItem[]>([]);
+    const [atmosphereStructures, setAtmosphereStructures] = useState<InventoryStructureItem[]>([]);
+    const [surfaceStructures, setSurfaceStructures] = useState<InventoryStructureItem[]>([]);
+
+    const handleStructuresFetch = useCallback(
+        (orbital: InventoryStructureItem[], atmosphere: InventoryStructureItem[], surface: InventoryStructureItem[]) => {
+            setOrbitalStructures(orbital);
+            setAtmosphereStructures(atmosphere);
+            setSurfaceStructures(surface);
+        },
+        [],
+    );
+
     return (
         <PlanetViewLayout>
             <div className="w-full">
@@ -113,9 +125,12 @@ export default function PlanetViewPage() {
             <div className="w-full">
                 Surface structures
             </div>
-            <div className="h-full">
-                {/* <StarterMissionStructures /> */}
+            <div className="relative flex-1">
                 <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
+                {/* Container for MissionLog */}
+                {/* <div className="absolute bottom-0 right-0 w-full sm:w-1/3 sm:h-1/3 max-h-[30vh]">
+                    <MissionLog />
+                </div> */}
             </div>
         </PlanetViewLayout>
     );

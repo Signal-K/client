@@ -11,14 +11,13 @@ interface PlanetViewLayoutProps {
 
 const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
     const [expandedSection, setExpandedSection] = useState<number | null>(null);
-    const [clickCounts, setClickCounts] = useState<number[]>([0, 0, 0]); // Track clicks for each section
+    const [clickCounts, setClickCounts] = useState<number[]>([0, 0, 0]);
 
     const handleExpand = (index: number) => {
         const updatedClicks = [...clickCounts];
         updatedClicks[index] += 1;
         setClickCounts(updatedClicks);
 
-        // Expand the section if clicked twice
         if (updatedClicks[index] >= 200000) {
             setExpandedSection(index);
         }
@@ -26,10 +25,9 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
 
     const handleClose = () => {
         setExpandedSection(null);
-        setClickCounts([0, 0, 0]); // Reset click counts when closed
+        setClickCounts([0, 0, 0]);
     };
 
-    // General background style for all sections
     const containerStyle: CSSProperties = {
         backgroundImage: `url(${Essendonitis})`,
         backgroundSize: expandedSection === null ? "cover" : "150%",
@@ -40,7 +38,7 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
             : expandedSection === 2
             ? "center bottom"
             : "center",
-        transition: "background-size 0.5s ease, background-position 0.5s ease", 
+        transition: "background-size 0.5s ease, background-position 0.5s ease",
         flex: 1,
     };
 
