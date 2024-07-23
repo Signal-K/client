@@ -1,29 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from "@/components/ui/button";
 import { Carousel } from 'react-responsive-carousel';
 import Modal from '../(classifications)/DataModal';
 import { useActivePlanet } from '@/context/ActivePlanet';
+import { useSession } from '@supabase/auth-helpers-react';
+
+interface Classification {
+  anomaly: string;
+  classificationtype: string | null;
+  author: string;
+  media: string[];
+}
 
 export function PostCard() {
   const { activePlanet, classifications } = useActivePlanet();
-  const [selectedClassification, setSelectedClassification] = useState<any | null>(null);
+  const session = useSession();
+  const [selectedClassification, setSelectedClassification] = useState<Classification | null>(null);
+  const [completeness, setCompleteness] = useState({ overallCount: 0, userCount: 0, classificationTypes: {} });
+
+  useEffect(() => {
+    const calculateCompleteness = (classifications: Classification[], activePlanetId: string, userId: string) => {
+      const requiredTypes = ['lightcurve', 'zoodex', 'roverPhoto', 'marsCloud'];
+      let overallCount = 0;
+      let userCount = 0;
+      let classificationTypes: { [key: string]: { overall: boolean, user: boolean } } = {};
+      let otherClassificationsOverall = 0;
+      let otherClassificationsUser = 0;
+
+      requiredTypes.forEach(type => {
+        classificationTypes[type] = {
+          overall: classifications.some(c => c.anomaly === activePlanetId && c.classificationtype === type),
+          user: classifications.some(c => c.anomaly === activePlanetId && c.classificationtype === type && c.author === userId)
+        };
+        if (classificationTypes[type].overall) overallCount++;
+        if (classificationTypes[type].user) userCount++;
+      });
+
+      classifications.forEach(c => {
+        if (c.anomaly === activePlanetId && !requiredTypes.includes(c.classificationtype || '')) {
+          otherClassificationsOverall++;
+          if (c.author === userId) otherClassificationsUser++;
+        }
+      });
+
+      overallCount += otherClassificationsOverall > 0 ? 1 : 0;
+      userCount += otherClassificationsUser > 0 ? 1 : 0;
+
+      classificationTypes['other'] = {
+        overall: otherClassificationsOverall > 0,
+        user: otherClassificationsUser > 0
+      };
+
+      return { overallCount, userCount, classificationTypes };
+    };
+
+    if (activePlanet && classifications.length > 0 && session?.user) {
+      const completeness = calculateCompleteness(classifications, activePlanet.id, session.user.id);
+      setCompleteness(completeness);
+    }
+  }, [classifications, activePlanet, session]);
 
   const lightcurveClassifications = classifications.filter(
-    c => c.classificationtype === 'lightcurve'
+    (c: Classification) => c.classificationtype === 'lightcurve'
   );
 
-  const openModal = (classification: any) => {
+  const openModal = (classification: Classification) => {
     console.log("Opening modal with classification:", classification);
     setSelectedClassification(classification);
   };
   const closeModal = () => setSelectedClassification(null);
 
-  console.log("Lightcurve Classifications:", lightcurveClassifications);
-
   return (
-    <Card className="max-w-md w-full mx-auto rounded-2xl overflow-hidden" style={{ height: '70vh' }}>
+    <Card className="max-w-md w-full mx-auto rounded-2xl overflow-hidden" style={{ height: '80vh' }}>
       <div className="relative">
         {activePlanet && activePlanet.avatar_url ? (
           <img
@@ -41,7 +91,7 @@ export function PostCard() {
           />
         )}
       </div>
-      <div className="grid grid-cols-2 gap-4 p-4 overflow-y-auto" style={{ maxHeight: 'calc(70vh - 25%)' }}>
+      <div className="grid grid-cols-2 gap-4 p-4 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 25%)' }}>
         {/* Atmosphere Panel */}
         <div className="relative">
           {lightcurveClassifications.length > 0 ? (
@@ -111,7 +161,7 @@ export function PostCard() {
       </div>
       {selectedClassification && (
         <Modal isOpen={true} onRequestClose={closeModal}>
-          <div className="p-4">
+          <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 50px)' }}>
             <h2 className="text-xl font-bold mb-4">Classification Details</h2>
             <Carousel showThumbs={false} infiniteLoop={true} dynamicHeight={true}>
               {selectedClassification.media.map((url: string, index: number) => (
@@ -125,6 +175,11 @@ export function PostCard() {
               ))}
             </Carousel>
             <pre>{JSON.stringify(selectedClassification, null, 2)}</pre>
+            <div className="p-4">
+        <h3 className="text-lg font-bold">Completeness</h3>
+        <p>Overall Classification Types: {completeness.overallCount} / 5</p>
+        <p>User Classification Types: {completeness.userCount} / 5</p>
+      </div>
             <Button onClick={closeModal} className="mt-4">Close</Button>
           </div>
         </Modal>
