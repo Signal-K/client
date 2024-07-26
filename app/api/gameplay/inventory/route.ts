@@ -40,6 +40,9 @@ const inventoryItems: InventoryItem[] = [
   { id: 26, name: 'Meteorology Tool', description: 'Collect cloud info', cost: 1, icon_url: '/28.png', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '11': 1} }, // Could be updated to be linked to 12?
   { id: 32, name: 'Camera Receiver', description: 'Keep track of all the photos your anomalies have taken', cost: 1, icon_url: '/camerars.png', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '11': 1 } },
   { id: 33, name: 'Launchpad', description: 'You can now refuel and launch spacecraft from here!', cost: 1, icon_url: '', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '15': 1 } }, // Update to be called "VehicleStructure"
+  { id: 101, name: 'Telescope', description: 'gain an understanding of the overall behaviour and makeup of the planet you have selected', cost: 1, icon_url: '', ItemCategory: 'Structure', parentItem: null, itemLevel: 1},
+  { id: 102, name: 'Zoodex', description: 'populate your planet with some animals to gain an understanding of animal behaviour on your planet and aide local research back home', cost: 1, icon_url: '', ItemCategory: 'Structure', parentItem: null, itemLevel: 1},
+  { id: 103, name: 'Discovery Module', description: 'populate your planet with low-level content e.g. mining deposits, weather cycle behaviour etc (need to word this better)', cost: 1, icon_url: '', ItemCategory: 'Structure', parentItem: null, itemLevel: 1},
 ];
 
 export async function GET(req: NextRequest) {

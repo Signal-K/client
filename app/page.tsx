@@ -63,9 +63,10 @@ export default function Home() {
 
   return (
     <Layout bg={true}>
-      {/* {renderContent()} */} {/* I'm temporarily disabling this because when we do pushes at the moment we don't have enough narrative content for this to be sufficient */}
+      {renderContent()} 
+      {/* I'm temporarily disabling this because when we do pushes at the moment we don't have enough narrative content for this to be sufficient */}
       {/* <UserPlanetPage /> */}
-      <Panels /> {/* Show this for certain mission sets' status */}
+      {/* <Panels /> Show this for certain mission sets' status */}
     </Layout>
   );
 }; 
