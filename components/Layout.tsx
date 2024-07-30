@@ -44,9 +44,9 @@ export function OnboardingLayout({ children }: LayoutProps) {
                 backgroundPosition: "center",
             }}            
         >
-            <PlanetLayout>
+            {/* <PlanetLayout> */}
                 {children}
-            </PlanetLayout>
+            {/* </PlanetLayout> */}
         </div>
     );
 };
