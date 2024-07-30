@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -469,10 +468,10 @@ export function PostCard() {
           <Card className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
               <div className="flex items-center space-x-3">
-                <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
+                {/* <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
                   <AvatarImage src={mockData.profile.avatar} alt={mockData.profile.name} />
                   <AvatarFallback>{mockData.profile.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+                </Avatar> */}
                 <div>
                   <p className="font-semibold text-base sm:text-lg text-primary">{mockData.profile.name}</p>
                   <p className="text-xs sm:text-sm text-muted-foreground">{mockData.profile.role}</p>
@@ -500,10 +499,10 @@ export function PostCard() {
       >
         <div className="relative group">
           <div className="flex items-center cursor-pointer">
-            <Avatar>
+            {/* <Avatar>
               <AvatarImage src={mockData.profile.avatar} />
               <AvatarFallback>{mockData.profile.name.charAt(0)}</AvatarFallback>
-            </Avatar>
+            </Avatar> */}
             <div className="ml-2">
               <p className="font-medium text-primary">{mockData.profile.name}</p>
               <p className="text-sm text-muted-foreground">{mockData.profile.role}</p>
