@@ -6,8 +6,8 @@ import { PlacedStructureSingle } from "./Single";
 import { OwnedItem, UserStructure } from "./StructureModal";
 
 interface AllStructuresProps {
-    itemsPerPage: number;
-}
+  itemsPerPage: number;
+};
 
 CREATE A BUTTON THAT POPULATES THE PLANET WITH THE STRUCTURES, POINT, IMPROVE TUTORIAL INSIDE THE STRUCTURES, POST CARD, SHARE (AND CREATE TICKET IN JIRA FOR THIS, MENTION OLD TICKETS)
 

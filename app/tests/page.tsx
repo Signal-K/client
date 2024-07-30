@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import SpaceGamePage from "../(scenes)/(spaceship)/spaceship";
 import Layout from "@/components/Layout";
+import OnboardingWindow from "../(scenes)/(onboarding)/window";
 
 export default function PageLayout() {
     const session = useSession();
@@ -17,7 +18,8 @@ export default function PageLayout() {
         <Layout bg="true">
             {/* <Panels /> */}
             {/* <ClassificationsFeed /> */}
-            <SpaceGamePage />
+            {/* <SpaceGamePage /> */}
+            <OnboardingWindow />
         </Layout>
     );
 };
