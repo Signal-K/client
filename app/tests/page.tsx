@@ -10,6 +10,8 @@ import Layout from "@/components/Layout";
 import OnboardingWindow from "../(scenes)/(onboarding)/window";
 import { ProfileCard } from "../auth/UserProfileFields";
 import ProfileCardModal from "../(settings)/profile/form";
+import SandpackBox from "../(anomalies)/(editor)/Sandbox";
+import PythonSandpackTest from "../(anomalies)/(editor)/Python";
 
 export default function PageLayout() {
     const session = useSession();
@@ -22,7 +24,9 @@ export default function PageLayout() {
             {/* <Panels /> */}
             {/* <ClassificationsFeed /> */}
             {/* <SpaceGamePage /> */}
-            <ProfileCardModal />
+            {/* <ProfileCardModal /> */}
+            <SandpackBox />
+            <PythonSandpackTest />
         {/* </Layout> */}
         </>
     );
