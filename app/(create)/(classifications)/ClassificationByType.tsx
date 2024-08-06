@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from "@/components/ui/button";
 import { useActivePlanet } from '@/context/ActivePlanet';
 import { Card } from '@/components/ui/card';
@@ -160,13 +161,13 @@ export function PostCard() {
               style={{ aspectRatio: '4 / 1' }}
             />
           )}
-          {/* <Avatar className="w-24 h-24 absolute top-4 left-4 border-4 border-white">
+          <Avatar className="w-24 h-24 absolute top-4 left-4 border-4 border-white">
             <AvatarImage
               src={activePlanet && activePlanet.avatar_url ? activePlanet.avatar_url : "/placeholder.svg"}
               alt="Avatar"
             />
             <AvatarFallback>AV</AvatarFallback>
-          </Avatar> */}
+          </Avatar>
           <Button
             variant="secondary"
             className="absolute top-4 right-4 bg-opacity-75 bg-black text-white"

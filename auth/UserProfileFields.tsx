@@ -11,21 +11,21 @@ interface UserProfile {
   id: string;
   avatar_url: string;
   faction: string;
-};
+}
 
 interface User {
   id: string;
   username: string;
   full_name: string;
   location: number;
-};
+}
 
 interface Mission {
   id: number;
   name: string;
   description: string;
   rewards: number[];
-};
+}
 
 export function ProfileCard() {
   const supabase = useSupabaseClient();
@@ -130,6 +130,7 @@ export function ProfileCard() {
   return (
     <div className="flex items-center h-screen w-full justify-center">
       <div className="max-w-xs">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8">Step 2: Fill in your profile</h1>
         <div className="bg-white shadow-xl rounded-lg py-3">
           <div className="photo-wrapper p-2">
             <img className="w-32 h-32 rounded-full mx-auto" src={profile.avatar_url} alt={profile.username} />

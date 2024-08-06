@@ -1,14 +1,12 @@
 "use client"
 
-import Layout, { OnboardingLayout } from "@/components/Layout";
+import Layout from "@/components/Layout";
 import UserPlanetPage from "@/components/Gameplay/Inventory/UserPlanets";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Landing } from "@/components/landing";
 import { Panels } from "./(layout)/currentSections";
 import { useEffect, useState } from "react";
 import FirstScene from "./(scenes)/starterPlanets";
-import LoginPage from "./auth/LoginModal";
-import OnboardingWindow from "./(scenes)/(onboarding)/window";
 
 export default function Home() {
   const supabase = useSupabaseClient();
@@ -47,39 +45,28 @@ export default function Home() {
 
   if (!session) {
     return (
-      <LoginPage />
+      <Landing />
     );
   };
 
   const renderContent = () => {
     if (missionCompletionStatus.has(101)) {
       return (
-        <Layout bg={true}>
-          <Panels />
-        </Layout>
+        <Panels />
       );
-    } else if (!missionCompletionStatus.has(100)) {
+    } else if (!missionCompletionStatus.has(101)) {
       return (
-        <OnboardingLayout bg={true}>
-          <OnboardingWindow />
-        </OnboardingLayout>
-      )
-    } else if (!missionCompletionStatus.has(101) && missionCompletionStatus.has(100)) {
-      return (
-        <OnboardingLayout bg={true}>
-          <FirstScene />
-        </OnboardingLayout>
+        <FirstScene />
       );
     };
   };
 
   return (
-    <>
-      {renderContent()} 
-      {/* I'm temporarily disabling this because when we do pushes at the moment we don't have enough narrative content for this to be sufficient */}
+    <Layout bg={true}>
+      {/* {renderContent()} */} {/* I'm temporarily disabling this because when we do pushes at the moment we don't have enough narrative content for this to be sufficient */}
       {/* <UserPlanetPage /> */}
-      {/* <Panels /> Show this for certain mission sets' status */}
-    </>
+      <Panels /> {/* Show this for certain mission sets' status */}
+    </Layout>
   );
 }; 
 
