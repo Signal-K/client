@@ -40,6 +40,8 @@ export default function FirstScene() {
     // If activePlanet = planet.type, show planet type here
 
     return (
-        <PlanetGrid />
+        <div className="">
+            <PlanetGrid />
+        </div>
     );
 };

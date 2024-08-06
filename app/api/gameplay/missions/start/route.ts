@@ -15,6 +15,9 @@ interface StarterMission {
 
 const starterMissions: StarterMission[] = [
     {
+        id: 100, name: "Populate your planet", description: ""
+    },
+    {
         id: 101, name: "Pick your planet", description: "Choose a planet that you'd like to settle on"
     },
     {
@@ -24,4 +27,4 @@ const starterMissions: StarterMission[] = [
 
 export async function GET(req: NextRequest) {
     return NextResponse.json(starterMissions);
-}
+};

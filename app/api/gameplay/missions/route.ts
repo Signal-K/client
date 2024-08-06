@@ -36,6 +36,7 @@ const missions: Mission[] = [
     { id: 19, name: "Go mining for surveyor parts", description: "You can now classify clouds on your planet!", rewards: []}, // Not included
     { id: 20, name: "Build surveyor structure", description: "You can now classify clouds on your planet!", rewards: []}, // Not included
     { id: 21, name: "Make surveyor classification", description: "You can now classify clouds on your planet!", rewards: []},
+    { id: 100, name: "Populate your planet", description: "", rewards: []},
 ];
 
 export async function GET(req: NextRequest) {
