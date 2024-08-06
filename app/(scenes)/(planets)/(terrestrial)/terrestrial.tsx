@@ -48,47 +48,13 @@ export default function TerrestrialPlanet() {
             );
         } else { // I'm sure there will be other conditionals....
             return (
-                <>
-                    <MyStructures />
-                </>
+                <MyStructures />
             );
-        };
-    };
-
-    const renderAutomatonContent = () => {
-        if (!missionCompletionStatus.has(101)) {
-            return (
-                <></>
-            );
-        } else {
-            return (
-                <p>User's automaton on that planet (created when user picks their planet)</p>
-            ); // There's not going to be any automaton content for the first chapter, right? Just a focal point (arrow) for them to collect the energy to life off next step
         };
     };
 
     return (
-        <>
-            {/* Desktop layout */}
-            <div className="hidden md:grid md:grid-cols-1 md:grid-rows-3 md:gap-4 md:relative md:h-full">
-                <div className="md:row-span-1 md:col-span-8 md:flex md:items-center md:justify-center">
-                    {renderStructureContent()}
-                </div>
-                <div className="md:row-span-1 md:col-span-5 md:flex md:items-center md:justify-center p-2 mb-12">
-                    {renderAutomatonContent()}
-                </div>
-            </div>
-
-            {/* Mobile layout */}
-            <div className="grid grid-cols-1 grid-rows-auto gap-4 md:hidden relative min-h-screen py-10 mt-10">
-                <div className="col-span-1 flex justify-center items-start mt-10 py-12">
-                    {renderStructureContent()}
-                </div>
-                <div className="col-span-2 flex justify-center">
-                    {renderAutomatonContent()}
-                </div>
-            </div>
-        </>
+        <></>
     );
 };
 

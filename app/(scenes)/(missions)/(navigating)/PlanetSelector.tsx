@@ -27,7 +27,7 @@ const PlanetGrid: React.FC = () => {
         }
         setLoading(false);
     };
- 
+
     const handlePlanetSelect = async (planetId: number) => {
         try {
           // Fetch the full details of the selected planet
