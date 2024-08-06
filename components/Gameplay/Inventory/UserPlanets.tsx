@@ -7,7 +7,7 @@ import { AllAutomatons, SingleAutomaton } from "./Automatons/Automaton";
 import SingleAutomatonCraftItem from "./Automatons/AutomatonCrafting";
 import { PlanetGrid } from "@/components/Onboarding";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { ProfileCard } from "@/auth/UserProfileFields";
+import { ProfileCard } from "@/app/auth/UserProfileFields";
 import UserItemsUndeployed from "./InactiveItems";
 import { AllStructures } from "./Structures/Structure";
 import CraftStructure from "./Actions/CraftStructure";
