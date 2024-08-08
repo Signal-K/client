@@ -6,7 +6,7 @@ import UserAvatar from "./Avatar";
 
 interface ProfileCardModalProps {
     avatarUrl: string | undefined;
-}
+};
 
 export default function ProfileCardModal() { 
     const supabase = useSupabaseClient();

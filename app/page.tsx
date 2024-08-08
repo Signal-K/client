@@ -63,7 +63,7 @@ export default function Home() {
         <OnboardingLayout bg={true}>
           <OnboardingWindow />
         </OnboardingLayout>
-      )
+      );
     } else if (!missionCompletionStatus.has(101) && missionCompletionStatus.has(100)) {
       return (
         <OnboardingLayout bg={true}>

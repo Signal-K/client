@@ -7,7 +7,7 @@ interface UserAvatarProps {
     url?: string;
     size: number;
     onUpload: (event: React.ChangeEvent<HTMLInputElement>, filePath: string) => void;
-}
+};
 
 export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
     const supabase = useSupabaseClient();
@@ -37,7 +37,7 @@ export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
 
     async function uploadAvatar(event: React.ChangeEvent<HTMLInputElement>) {
         try {
-            setUploading(true);
+            setUploading(true); 
 
             if (!event.target.files || event.target.files.length === 0) {
                 throw new Error("You must select an image to upload");
