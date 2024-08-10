@@ -40,7 +40,7 @@ const missions: Mission[] = [
 
 
 
-    { id: 1370101, name: "Create your account", description: "Create an account to start playing Star Sailors", rewards: []}, // ID: "Mission Group 01, Item 01" - 13 = M, 7 = G
+    // { id: 1370101, name: "Create your account", description: "Create an account to start playing Star Sailors", rewards: []}, // ID: "Mission Group 01, Item 01" - 13 = M, 7 = G
     { id: 1370102, name: "Create your profile", description: "Fill in your profile so that your discoveries can be credited", rewards: []},
     { id: 1370103, name: "Discover your first planet", description: "Use the first graphs provided to you to confirm the validity of an exoplanet candidate", rewards: []}, // Update description so the user understands they'll be visiting/based on this planet after the onboarding
     { id: 1370104, name: 'Initial animal classification', description: 'Update this row', rewards: []},

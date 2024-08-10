@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import ProfileCardModal from "@/app/(settings)/profile/form";
+// import { useMission } from "@/context/MissionContext";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface Mission {
   id: number;
@@ -43,15 +45,19 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
 };
 
 const OnboardingWindow = () => {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  // const { missions, fetchMissions } = useMission();
   const [currentStep, setCurrentStep] = useState(1);
   const [steps, setSteps] = useState<Mission[]>([]);
+  const missionCheckedRef = useRef(false);  // Use ref to track mission check
 
   useEffect(() => {
-    const fetchMissions = async () => {
+    const fetchMissionsData = async () => {
       const response = await fetch("/api/gameplay/missions");
       const data: Mission[] = await response.json();
 
-      // Filter missions with ID starting with "137"
       const filteredSteps = data.filter((mission) =>
         mission.id.toString().startsWith("13701")
       );
@@ -59,7 +65,7 @@ const OnboardingWindow = () => {
       setSteps(filteredSteps);
     };
 
-    fetchMissions();
+    fetchMissionsData();
   }, []);
 
   const handleNext = () => {
