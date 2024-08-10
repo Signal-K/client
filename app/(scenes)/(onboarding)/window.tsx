@@ -1,37 +1,66 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion"; 
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import ProfileCardModal from "@/app/(settings)/profile/form";
 
-const steps = [
-  { id: 1, title: "Your details", description: "Provide an email and password" },
-  { id: 2, title: "Verify your email", description: "Enter your verification code" },
-  { id: 3, title: "Invite your team", description: "Start collaborating with your team" },
-  { id: 4, title: "Welcome to Star Sailors!", description: "Get up and running in 3 minutes" },
-];
+interface Mission {
+  id: number;
+  name: string;
+  description: string;
+  rewards: number[];
+}
 
-const OnboardingStep = ({ step }: { step: number }) => {
-  switch (step) {
-    case 1:
-      return (
-        <div>
-          <ProfileCardModal />
-        </div>
-      );
-    case 2:
-      return <div>Verify your email form...</div>;
-    case 3:
-      return <div>Invite your team form...</div>;
-    case 4:
-      return <div>Welcome message...</div>;
-    default:
-      return null;
-  }
+interface OnboardingStepProps {
+  title: string;
+  description: string;
+  step: number;
+}
+
+const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
+  const renderComponentForStep = () => {
+    switch (step) {
+      case 1:
+        return <div>First step: Introduction content...</div>;
+      case 2:
+        return <ProfileCardModal />;
+      case 3:
+        return <div>Third step: Verify your email form...</div>;
+      case 4:
+        return <div>Fourth step: Invite your team form...</div>;
+      default:
+        return <div>Welcome message...</div>;
+    }
+  };
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4">{title}</h2>
+      <p className="text-base mb-8">{description}</p>
+      {renderComponentForStep()}
+    </div>
+  );
 };
 
 const OnboardingWindow = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [steps, setSteps] = useState<Mission[]>([]);
+
+  useEffect(() => {
+    const fetchMissions = async () => {
+      const response = await fetch("/api/gameplay/missions");
+      const data: Mission[] = await response.json();
+
+      // Filter missions with ID starting with "137"
+      const filteredSteps = data.filter((mission) =>
+        mission.id.toString().startsWith("13701")
+      );
+
+      setSteps(filteredSteps);
+    };
+
+    fetchMissions();
+  }, []);
 
   const handleNext = () => {
     if (currentStep < steps.length) {
@@ -46,8 +75,12 @@ const OnboardingWindow = () => {
   };
 
   const handleStepClick = (stepId: number) => {
-    setCurrentStep(stepId);
+    const stepNumber = parseInt(stepId.toString().slice(-2), 10);
+    setCurrentStep(stepNumber);
   };
+
+  const currentMission = steps[currentStep - 1] || { id: 0, name: "", description: "" };
+  const currentStepNumber = parseInt(currentMission.id.toString().slice(-2), 10) || 1;
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
@@ -57,10 +90,14 @@ const OnboardingWindow = () => {
           {steps.map((step) => (
             <div
               key={step.id}
-              className={`p-4 rounded-lg cursor-pointer ${currentStep === step.id ? 'bg-white shadow-md' : 'bg-gray-200'}`}
+              className={`p-4 rounded-lg cursor-pointer ${
+                currentStepNumber === parseInt(step.id.toString().slice(-2), 10)
+                  ? "bg-white shadow-md"
+                  : "bg-gray-200"
+              }`}
               onClick={() => handleStepClick(step.id)}
             >
-              <h2 className="font-bold">{step.title}</h2>
+              <h2 className="font-bold">{step.name}</h2>
               <p className="text-sm">{step.description}</p>
             </div>
           ))}
@@ -75,7 +112,11 @@ const OnboardingWindow = () => {
           transition={{ duration: 0.5 }}
           className="space-y-4"
         >
-          <OnboardingStep step={currentStep} />
+          <OnboardingStep
+            title={currentMission.name}
+            description={currentMission.description}
+            step={currentStepNumber}
+          />
           <div className="flex justify-between">
             <button
               onClick={handleBack}
@@ -89,18 +130,18 @@ const OnboardingWindow = () => {
               disabled={currentStep === steps.length}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg"
             >
-              {currentStep === steps.length ? 'Finish' : 'Next'}
+              {currentStep === steps.length ? "Finish" : "Next"}
             </button>
           </div>
           <div className="mt-4">
             <div className="h-2 bg-gray-200 rounded-full">
               <div
                 className="h-full bg-blue-500 rounded-full transition-all"
-                style={{ width: `${(currentStep / steps.length) * 100}%` }}
+                style={{ width: `${(currentStepNumber / steps.length) * 100}%` }}
               ></div>
             </div>
             <p className="text-right text-sm mt-2">
-              Step {currentStep} of {steps.length}
+              Step {currentStepNumber} of {steps.length}
             </p>
           </div>
         </motion.div>
