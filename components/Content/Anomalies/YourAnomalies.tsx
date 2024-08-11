@@ -10,7 +10,7 @@ const UserAnomaliesComponent = () => {
 
   return (
     <div>
-      <h2>User Anomalies</h2>
+      <h2>User Anomalies</h2> 
       <ul>
         {userAnomalies.map(anomaly => (
           <li key={anomaly.id}>Anomaly ID: {anomaly.anomaly_id}, Owned since: {anomaly.ownership_date}</li>

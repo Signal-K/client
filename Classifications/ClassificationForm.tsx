@@ -48,15 +48,15 @@ export default function CreateBaseClassification(assetMentioned: any) {
                 setUserAnomalies(data.map((anomaly: any) => anomaly.anomaly_id));
             } catch (error: any) {
                 console.error("Error fetching user anomalies: ", error.message);
-            }
+            };
         };
 
         fetchUserAnomalies();
     }, [session]);
 
     const newAnomalyData = {
-        user_id: session?.user?.id,
-        anomaly_id: activePlanet?.id,
+      user_id: session?.user?.id,
+      anomaly_id: activePlanet?.id,
     };
 
     async function createPost() {
@@ -310,7 +310,6 @@ export function CreateFirstBaseClassification({ assetMentioned }: { assetMention
   const { userProfile } = useProfileContext();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: boolean }>({});
-  const [showPostForm, setShowPostForm] = useState(false);
 
   useEffect(() => {
     console.log("Don't you feel", userProfile);

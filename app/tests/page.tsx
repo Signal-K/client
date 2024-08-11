@@ -6,7 +6,7 @@ import { SidebarLayout } from "../(layout)/sectionStructure";
 import { useRouter } from "next/navigation";
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import SpaceGamePage from "../(scenes)/(spaceship)/spaceship";
-import Layout from "@/components/Layout";
+import Layout, { OnboardingLayout } from "@/components/Layout";
 import OnboardingWindow from "../(scenes)/(onboarding)/window";
 import { ProfileCard } from "../auth/UserProfileFields";
 import ProfileCardModal from "../(settings)/profile/form";
@@ -24,7 +24,9 @@ export default function PageLayout() {
             {/* <Panels /> */}
             {/* <ClassificationsFeed /> */}
             {/* <SpaceGamePage /> */}
-            <ProfileCardModal />
+            <OnboardingLayout bg={true}>
+          <OnboardingWindow />
+        </OnboardingLayout>
             {/* <SandpackBox />
             <PythonSandpackTest /> */}
         {/* </Layout> */}

@@ -64,13 +64,19 @@ export default function Home() {
           <OnboardingWindow />
         </OnboardingLayout>
       );
-    } else if (!missionCompletionStatus.has(101) && missionCompletionStatus.has(100)) {
+    // } else if (!missionCompletionStatus.has(101) && missionCompletionStatus.has(100)) {
+    //   return (
+    //     <OnboardingLayout bg={true}>
+    //       <FirstScene />
+    //     </OnboardingLayout>
+    //   );
+    } else if (!missionCompletionStatus.has(101)) {
       return (
-        <OnboardingLayout bg={true}>
-          <FirstScene />
-        </OnboardingLayout>
-      );
-    };
+        <Layout bg={true}>
+          <Panels />
+        </Layout>
+      )
+    }
   };
 
   return (
