@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ProfileCardModal from "@/app/(settings)/profile/form";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { TelescopeClassification } from "@/app/(structures)/Telescopes/Transiting";
 
 interface Mission {
   id: number;
@@ -23,7 +24,9 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
       case 1370102:
         return <ProfileCardModal />;
       case 1370103:
-        return <div>Discover your first planet content...</div>;
+        return (
+          <TelescopeClassification />
+        )
       case 1370104:
         return <div>Initial animal classification content...</div>;
       case 1370105:

@@ -218,11 +218,6 @@ export const TransitingTelescopeStructureModal: React.FC<TransitingTelescopeStru
   const [isActionDone, setIsActionDone] = useState(false);
   const { activePlanet } = useActivePlanet();
 
-  const handleActionClick = () => {
-      // Implement action logic here
-      setIsActionDone(true);
-  };
-
   if (!isOpen) return null;
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${activePlanet?.id}/phased.png`;

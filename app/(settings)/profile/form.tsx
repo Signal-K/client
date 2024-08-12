@@ -6,7 +6,7 @@ import UserAvatar from "./Avatar";
 
 export default function ProfileCardModal() {
     const supabase = useSupabaseClient();
-    const session = useSession();
+    const session = useSession(); 
 
     const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState<string | undefined>(undefined);

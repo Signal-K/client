@@ -2,6 +2,8 @@ import React from 'react';
 import { CreateFirstBaseClassification, CreateCloudClassification, CreateFirstMeteorologyClassification } from '@/Classifications/ClassificationForm';
 import CreateBaseClassification from '@/Classifications/ClassificationForm';
 import { useActivePlanet } from '@/context/ActivePlanet';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import ClassificationForm from '@/app/(create)/(classifications)/PostForm';
 
 // Define the `TransitingTelescopeClassifyPlanet` component
 export const TransitingTelescopeClassifyPlanet: React.FC = () => {
@@ -60,6 +62,27 @@ export const TransitingTelescopeTutorial: React.FC = () => {
         <div className="flex flex-col items-center">
             <p>Learn how to use the telescope and classify lightcurves.</p>
             {/* Replace with actual tutorial content */}
+        </div>
+    );
+};
+
+// For the onboarding mission - please re-asses after
+export const TelescopeClassification: React.FC = () => {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const { activePlanet } = useActivePlanet();
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${activePlanet?.id}/phased.png`;
+
+    return (
+        <div className="bg-white rounded-lg w-full max-w-lg mx-auto shadow-lg overflow-hidden">
+            <div className="flex flex-col items-center">
+            {/* <img src={structure.icon_url} alt={structure.name} className="w-24 h-24 mb-2" /> */}
+                <img src='https://github.com/Signal-K/client/blob/initialClassification/public/assets/Inventory/Structures/TelescopeReceiver.png?raw=true' alt='telescope' className="w-24 h-24 mb-2" /> {/* Structure 101 */}
+                <ClassificationForm anomalyType='planet' missionNumber={1370103} />
+            </div>
         </div>
     );
 };

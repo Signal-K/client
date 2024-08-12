@@ -288,12 +288,6 @@ interface ClassificationOption {
   text: string;
 }
 
-
-interface ClassificationOption {
-  id: number;
-  text: string;
-}
-
 const classificationOptions: ClassificationOption[] = [
   { id: 1, text: 'No dips at all' },
   { id: 2, text: 'Repeating dips' },
