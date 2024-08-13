@@ -21,9 +21,10 @@ const classificationOptions: ClassificationOption[] = [
 interface ClassificationFormProps {
     anomalyType: string;
     missionNumber: number;
+    assetMentioned: string;
 };
 
-const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, missionNumber }) => {
+const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, missionNumber, assetMentioned }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -98,7 +99,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, mi
                 .insert({
                     author: session?.user?.id,
                     content,
-                    media: [uploads],
+                    media: [uploads, assetMentioned],
                     anomaly: activePlanet?.id,
                     classificationtype: 'lightcurve',
                     classificationConfiguration,
