@@ -94,3 +94,48 @@ export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
         </div>
     );
 }
+
+interface UserAvatarPropsNullUpload {
+    url: string | null;
+    size: number;
+}
+
+export function UserAvatarNullUpload({ url, size }: UserAvatarProps) {
+    const supabase = useSupabaseClient();
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (url) {
+            downloadImage(url);
+        }
+    }, [url]);
+
+    async function downloadImage(path: string) {
+        try {
+            const { data, error } = await supabase.storage.from("avatars").download(path);
+            if (error) {
+                throw error;
+            }
+
+            const url = URL.createObjectURL(data);
+            setAvatarUrl(url);
+        } catch (error: any) {
+            console.log("Error downloading avatar: ", error.message);
+        }
+    }
+
+    return (
+        <div>
+            {avatarUrl ? (
+                <img
+                    src={avatarUrl}
+                    alt="User Avatar"
+                    className="avatar image"
+                    style={{ height: size, width: size }}
+                />
+            ) : (
+                <div className="avatar no-image" style={{ height: size, width: size }} />
+            )}
+        </div>
+    );
+}

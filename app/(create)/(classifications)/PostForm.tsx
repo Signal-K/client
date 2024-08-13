@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useProfileContext } from "@/context/UserProfile";
+import UserAvatar, { UserAvatarNullUpload } from "@/app/(settings)/profile/Avatar";
 
 interface ClassificationOption {
     id: number;
@@ -23,149 +24,132 @@ interface ClassificationFormProps {
 };
 
 const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, missionNumber }) => {
-    // Take `anomalytype` into account
     const supabase = useSupabaseClient();
     const session = useSession();
 
     const [content, setContent] = useState<string>("");
     const [uploads, setUploads] = useState<string[]>([]);
+    const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [avatar_url, setAvatarUrl] = useState<string | undefined>(undefined);
+    const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: boolean }>({});
 
     const { activePlanet } = useActivePlanet();
     const { userProfile } = useProfileContext();
-    const [userAnomalies, setUserAnomalies] = useState<number[]>([]);
-    const [classificationType, setClassificationType] = useState<string>("");
-    const [selectedOptions, setSelectedOptions] = useState<{ [ key: number ]: boolean }>({});
-
-    const [isUploading, setIsUploading] = useState<boolean>(false);
-
-    const [userProfileContent, setUserProfile] = useState(null);
-    const fetchProfileData = async () => {
-        if (!session) {
-            return null;
-        };
-
-        try {
-            const { data: profileData, error: profileError } = await supabase
-                .from("profiles")
-                .select("username, avatar_url")
-                .eq("id", session?.user?.id)
-        } catch (error: any) {
-            console.error("Error fetching data from user profile via context: ", error);
-        }
-    };
 
     useEffect(() => {
-        const fetchUserAnomalies = async () => {
-            if (!session) {
-                return;
-            };
-
+        const fetchUserProfile = async () => {
+            if (!session) return;
             try {
                 const { data, error } = await supabase
-                    .from("user_anomalies")
-                    .select("anomaly_id")
-                    .eq("user_id", session.user.id);
-
+                    .from("profiles")
+                    .select("username, avatar_url")
+                    .eq("id", session?.user?.id)
+                    .single();
+                if (data) {
+                    setAvatarUrl(data.avatar_url);
+                }
                 if (error) {
-                    throw error;
-                };
-
-                setUserAnomalies(data.map((anomaly: any) => anomaly.anomaly_id))
-            } catch (error: any) {
-                console.error("Error fetching user anomalies:", error.message);
-            };
+                    console.error("Error fetching profile:", error.message);
+                }
+            } catch (error) {
+                console.error("Unexpected error:", error);
+            }
         };
+        fetchUserProfile();
+    }, [session, supabase]);
 
-        // fetchUserAnomalies();
-    }, [session]);
-
-    const newAnomalyData = {
-        user_id: session?.user?.id,
-        anomaly_id: activePlanet?.id,
-    };
-
-    const handleOptionClick = ( optionId: number ) => {
+    const handleOptionClick = (optionId: number) => {
         setSelectedOptions(prev => ({
             ...prev,
             [optionId]: !prev[optionId],
         }));
     };
 
-    const missionData = {
-        user: session?.user?.id,
-        time_of_completion: new Date().toISOString(),
-        mission: missionNumber,
-        configuration: null,
-    };
-
     const handleMissionComplete = async () => {
         try {
-            if (missionNumber != null) {
-                await supabase.from("missions").insert([missionData]);
+            const missionData = {
+                user: session?.user?.id,
+                time_of_completion: new Date().toISOString(),
+                mission: missionNumber,
+                configuration: null,
+            };
+            await supabase.from("missions").insert([missionData]);
+            const newAnomalyData = {
+                user_id: session?.user?.id,
+                anomaly_id: activePlanet?.id,
             };
             await supabase.from("user_anomalies").insert([newAnomalyData]);
         } catch (error: any) {
             console.error(error);
-        };
+        }
     };
 
     const createPost = async () => {
         const classificationConfiguration = Object.fromEntries(
-            Object.entries(selectedOptions).map(([key, value]) => [classificationOptions.find(option => option.id === parseInt(key))?.text || '', value])
+            Object.entries(selectedOptions).map(([key, value]) => [
+                classificationOptions.find(option => option.id === parseInt(key))?.text || '',
+                value
+            ])
         );
 
-        const { error } = await supabase
-        .from("classifications")
-        .insert({
-          author: session?.user?.id,
-          content,
-          media: [uploads,], // assetMentioned?
-          anomaly: activePlanet?.id,
-          classificationtype: 'lightcurve',
-          classificationConfiguration,
-        });
-  
-        if (error) {
-            console.error("Error creating classification:", error.message);
-            alert("Failed to create classification. Please try again.");
-        } else {
-            alert(`Post created`);
-            setContent('');
-            setSelectedOptions({});
-            setUploads([]);
-        };
-  
-        await handleMissionComplete();
+        try {
+            const { error } = await supabase
+                .from("classifications")
+                .insert({
+                    author: session?.user?.id,
+                    content,
+                    media: [uploads],
+                    anomaly: activePlanet?.id,
+                    classificationtype: 'lightcurve',
+                    classificationConfiguration,
+                });
+
+            if (error) {
+                console.error("Error creating classification:", error.message);
+                alert("Failed to create classification. Please try again.");
+            } else {
+                alert(`Post created`);
+                setContent('');
+                setSelectedOptions({});
+                setUploads([]);
+            }
+            await handleMissionComplete();
+        } catch (error) {
+            console.error("Unexpected error:", error);
+        }
     };
 
-    async function addMedia(e: any) {
+    const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
-        if (files.length > 0 && session) {
+        if (files && files.length > 0 && session) {
             setIsUploading(true);
-            for (const file of files) {
-                const fileName = Date.now() + session.user.id + file.name;
-                const result = await supabase.storage
-                    .from("media")
-                    .upload(fileName, file);
+            try {
+                const fileArray = Array.from(files);
+                for (const file of fileArray) {
+                    const fileName = `${Date.now()}-${session.user.id}-${file.name}`;
+                    const { data, error } = await supabase.storage
+                        .from("media")
+                        .upload(fileName, file);
 
-                if (result.data) {
-                    const url = process.env.NEXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public/media/' + result.data.path;
-                    setUploads(prevUploads => [...prevUploads, url]);
-                } else {
-                    console.log(result);
-                };
-            };
-            setIsUploading(false);
-        };
+                    if (error) {
+                        console.error("Upload error:", error.message);
+                    } else if (data) {
+                        const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
+                        setUploads(prevUploads => [...prevUploads, url]);
+                    }
+                }
+            } catch (err) {
+                console.error("Unexpected error during file upload:", err);
+            } finally {
+                setIsUploading(false);
+            }
+        }
     };
 
     return (
-        <div className="p-4 w-full max-w-md mx-auto bg-white rounded-lg">
-            <div className="flex gap-2 mx-5 mt-5 pb-3">
-                <div>
-                    <img src={userProfile?.avatar_url || ''} width='60px' height='60px' />
-                </div>
-                <div className="flex flex-col gap-2 mb-4">
+        <div className="p-4 w-full max-w-4xl bg-white mx-auto rounded-lg">
+            <div className="flex gap-4">
+                <div className="flex flex-col gap-2 w-1/3">
                     {classificationOptions.map(option => (
                         <button
                             key={option.id}
@@ -176,9 +160,56 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, mi
                         </button>
                     ))}
                 </div>
+                <div className="flex flex-col w-2/3">
+                    {Object.keys(selectedOptions).length > 0 && (
+                        <>
+                            <div className="flex gap-4 mb-4">
+                                <UserAvatarNullUpload
+                                    url={avatar_url}
+                                    size={64}
+                                    onUpload={(event, url) => {}}
+                                />
+                                <textarea
+                                    value={content}
+                                    onChange={e => setContent(e.target.value)}
+                                    className="flex-grow p-3 h-24 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 outline-none"
+                                    placeholder={"What do you think about this planet?"}
+                                />
+                            </div>
+                            <div className="flex items-center mb-4">
+                                <label className="flex gap-1 items-center cursor-pointer">
+                                    <input type="file" className="hidden" onChange={addMedia} />
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                                    </svg>
+                                    <span className="hidden md:block">Media</span>
+                                </label>
+                                {isUploading && (
+                                    <div className="text-center ml-4">
+                                        <p>Uploading...</p>
+                                    </div>
+                                )}
+                            </div>
+                            {uploads.length > 0 && (
+                                <div className="flex gap-2 mb-4">
+                                    {uploads.map((upload, index) => (
+                                        <img key={index} src={upload} className="w-auto h-48 rounded-md" alt={`Upload ${index}`} />
+                                    ))}
+                                </div>
+                            )}
+                            <button
+                                onClick={createPost}
+                                className="text-white px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600"
+                            >
+                                Create post
+                            </button>
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
 };
+
 
 export default ClassificationForm;

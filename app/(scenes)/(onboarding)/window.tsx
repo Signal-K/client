@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import ProfileCardModal from "@/app/(settings)/profile/form";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { TelescopeClassification } from "@/app/(structures)/Telescopes/Transiting";
+import { useActivePlanet } from "@/context/ActivePlanet";
 
 interface Mission {
   id: number;
@@ -19,14 +20,21 @@ interface OnboardingStepProps {
 };
 
 const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
+  const { activePlanet } = useActivePlanet();
+  const basePlanetIds = [1, 2, 3, 4, 5, 6];
+
+  const getRandomPlanetId = () => {
+    return basePlanetIds[Math.floor(Math.random() * basePlanetIds.length)];
+  };
+
   const renderComponentForStep = () => {
     switch (step) {
       case 1370102:
         return <ProfileCardModal />;
       case 1370103:
         return (
-          <TelescopeClassification />
-        )
+          <TelescopeClassification anomalyid={activePlanet?.id || getRandomPlanetId()} />
+        );
       case 1370104:
         return <div>Initial animal classification content...</div>;
       case 1370105:
@@ -122,7 +130,7 @@ const OnboardingWindow = () => {
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
       {/* Left Panel */}
-      <div className="md:w-1/3 w-full flex flex-col justify-center bg-gray-100 p-10">
+      <div className="md:w-1/3 w-full flex flex-col justify-center bg-gray-100 p-10 shadow-4xl z-10">
         <div className="space-y-4">
           {steps.map((step) => (
             <div
@@ -139,62 +147,67 @@ const OnboardingWindow = () => {
         </div>
       </div>
       {/* Right Panel */}
-      <div className="md:w-2/3 w-full flex flex-col justify-center p-10 bg-white">
-        {currentStep ? (
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="space-y-4"
-          >
-            <OnboardingStep
-              title={currentMission.name}
-              description={currentMission.description}
-              step={currentStep}
-            />
-            <div className="flex justify-between">
-              <button
-                onClick={handleBack}
-                disabled={currentStep === steps[0]?.id}
-                className="px-4 py-2 bg-gray-300 rounded-lg"
-              >
-                Back
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={currentStep === steps[steps.length - 1]?.id}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-              >
-                {currentStep === steps[steps.length - 1]?.id ? "Finish" : "Next"}
-              </button>
-            </div>
-            <div className="mt-4">
-              <div className="h-2 bg-gray-200 rounded-full">
-                <div
-                  className="h-full bg-blue-500 rounded-full transition-all"
-                  style={{
-                    width: `${((steps.findIndex(
-                      (step) => step.id === currentStep
-                    ) +
-                      1) /
-                      steps.length) *
-                      100}%`,
-                  }}
-                ></div>
+      <div
+        className="md:w-2/3 w-full flex flex-col justify-center p-10 bg-[url('https://st2.depositphotos.com/7104002/10163/v/450/depositphotos_101630402-stock-illustration-rocket-seamless-pattern-in-cartoon.jpg')] bg-repeat bg-cover bg-center overflow-hidden"
+        style={{ backgroundPosition: 'center' }}
+      >
+        <div className="flex-grow flex flex-col justify-between">
+          {currentStep ? (
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-4 relative z-20"
+            >
+              <OnboardingStep
+                title={currentMission.name}
+                description={currentMission.description}
+                step={currentStep}
+              />
+              <div className="flex justify-between">
+                <button
+                  onClick={handleBack}
+                  disabled={currentStep === steps[0]?.id}
+                  className="px-4 py-2 bg-gray-300 rounded-lg"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={currentStep === steps[steps.length - 1]?.id}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                >
+                  {currentStep === steps[steps.length - 1]?.id ? "Finish" : "Next"}
+                </button>
               </div>
-              <p className="text-right text-sm mt-2">
-                Step {steps.findIndex((step) => step.id === currentStep) + 1} of{" "}
-                {steps.length}
-              </p>
+              <div className="mt-4">
+                <div className="h-2 bg-gray-200 rounded-full">
+                  <div
+                    className="h-full bg-blue-500 rounded-full transition-all"
+                    style={{
+                      width: `${((steps.findIndex(
+                        (step) => step.id === currentStep
+                      ) +
+                        1) /
+                        steps.length) *
+                        100}%`,
+                    }}
+                  ></div>
+                </div>
+                <p className="text-right text-sm mt-2">
+                  Step {steps.findIndex((step) => step.id === currentStep) + 1} of{" "}
+                  {steps.length}
+                </p>
+              </div>
+            </motion.div>
+          ) : (
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-4">Onboarding Completed</h2>
+              <p className="text-base">You have completed all onboarding steps.</p>
             </div>
-          </motion.div>
-        ) : (
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">Onboarding Completed</h2>
-            <p className="text-base">You have completed all onboarding steps.</p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

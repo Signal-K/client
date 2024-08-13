@@ -454,9 +454,7 @@ export function CreateFirstBaseClassification({ assetMentioned }: { assetMention
       )}
     </div>
   );
-}
-
-
+};
 
 export function CreateFirstMeteorologyClassification(assetMentioned: any) { // FIRST MISSION GROUP COMPONENT
     const supabase = useSupabaseClient();
