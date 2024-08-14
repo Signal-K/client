@@ -86,11 +86,10 @@ export const TelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid })
                 {/* <img src={structure.icon_url} alt={structure.name} className="w-24 h-24 mb-2" /> */}
                 <img src='https://github.com/Signal-K/client/blob/initialClassification/public/assets/Inventory/Structures/TelescopeReceiver.png?raw=true' alt='telescope' className="w-24 h-24 mb-2" /> {/* Structure 101 */}
                 <div className='relative'>
-                    <div className='absolute inset-0 w-full h-full bg-blue-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-0'></div>
+                <div className='absolute inset-0 w-full h-full bg-blue-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
                     <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} className="relative z-10 w-128 h-128" />
                 </div>
                 <ClassificationForm anomalyType='planet' missionNumber={1370103} assetMentioned={imageUrl} />
-                <p>{anomalyid}</p>
             </div>
         </div>
     );

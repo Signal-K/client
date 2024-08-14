@@ -6,18 +6,19 @@ import ProfileCardModal from "@/app/(settings)/profile/form";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { TelescopeClassification } from "@/app/(structures)/Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import ProgressBar from "../(missions)/ProgressBar";
 
 interface Mission {
   id: number;
   name: string;
   description: string;
-};
+}
 
 interface OnboardingStepProps {
   title: string;
   description: string;
   step: number;
-};
+}
 
 const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
   const { activePlanet } = useActivePlanet();
@@ -148,8 +149,8 @@ const OnboardingWindow = () => {
       </div>
       {/* Right Panel */}
       <div
-        className="md:w-2/3 w-full flex flex-col justify-center p-10 bg-[url('https://st2.depositphotos.com/7104002/10163/v/450/depositphotos_101630402-stock-illustration-rocket-seamless-pattern-in-cartoon.jpg')] bg-repeat bg-cover bg-center overflow-hidden"
-        style={{ backgroundPosition: 'center' }}
+        className="md:w-2/3 w-full flex flex-col justify-center p-10 bg-[url('https://images.unsplash.com/photo-1462726625343-6a2ab0b9f020?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-repeat bg-cover bg-center overflow-hidden"
+        style={{ backgroundPosition: "center" }}
       >
         <div className="flex-grow flex flex-col justify-between">
           {currentStep ? (
@@ -181,25 +182,10 @@ const OnboardingWindow = () => {
                   {currentStep === steps[steps.length - 1]?.id ? "Finish" : "Next"}
                 </button>
               </div>
-              <div className="mt-4">
-                <div className="h-2 bg-gray-200 rounded-full">
-                  <div
-                    className="h-full bg-blue-500 rounded-full transition-all"
-                    style={{
-                      width: `${((steps.findIndex(
-                        (step) => step.id === currentStep
-                      ) +
-                        1) /
-                        steps.length) *
-                        100}%`,
-                    }}
-                  ></div>
-                </div>
-                <p className="text-right text-sm mt-2">
-                  Step {steps.findIndex((step) => step.id === currentStep) + 1} of{" "}
-                  {steps.length}
-                </p>
-              </div>
+              <ProgressBar
+                currentStepIndex={steps.findIndex((step) => step.id === currentStep)}
+                totalSteps={steps.length}
+              />
             </motion.div>
           ) : (
             <div className="text-center">

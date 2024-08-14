@@ -117,7 +117,7 @@ export default function ProfileCardModal() {
     }
 
     return (
-        <form onSubmit={(e) => updateProfile(e as any, avatar_url)} className="form-widget bg-gray-50 p-6 rounded-md shadow-lg max-w-md mx-auto">
+        <form onSubmit={(e) => updateProfile(e as any, avatar_url)} className="form-widget p-6 rounded-md shadow-lg max-w-md mx-auto">
             <h2 className="text-2xl font-bold mb-4 text-red-800">Edit profile</h2>
             <p className="text-red-800 mb-6">Provide details about yourself and any other pertinent information.</p>
             <div className="mb-4">

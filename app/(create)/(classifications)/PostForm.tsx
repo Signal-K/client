@@ -148,7 +148,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, mi
     };
 
     return (
-        <div className="p-4 w-full max-w-4xl bg-white mx-auto rounded-lg">
+        <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-white-900 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-50">
             <div className="flex gap-4">
                 <div className="flex flex-col gap-2 w-1/3">
                     {classificationOptions.map(option => (
