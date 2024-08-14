@@ -62,6 +62,8 @@ const OnboardingWindow = () => {
 
   const [currentStep, setCurrentStep] = useState<number | null>(null);
   const [steps, setSteps] = useState<Mission[]>([]);
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false); // New state for dropdown
+
   const missionIds = [1370102, 1370103, 1370104, 1370105, 1370106];
 
   useEffect(() => {
@@ -120,6 +122,7 @@ const OnboardingWindow = () => {
 
   const handleStepClick = (stepId: number) => {
     setCurrentStep(stepId);
+    setDropdownOpen(false); // Close dropdown on step click
   };
 
   const currentMission = steps.find((step) => step.id === currentStep) || {
@@ -129,9 +132,9 @@ const OnboardingWindow = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      {/* Left Panel */}
-      <div className="md:w-1/3 w-full flex flex-col justify-center bg-gray-100 p-10 shadow-4xl z-10">
+    <div className="relative flex flex-col md:flex-row min-h-screen">
+      {/* Left Panel - Desktop */}
+      <div className="hidden md:flex md:w-1/3 w-full flex-col justify-center bg-gray-100 p-10 shadow-4xl z-10">
         <div className="space-y-4">
           {steps.map((step) => (
             <div
@@ -147,9 +150,10 @@ const OnboardingWindow = () => {
           ))}
         </div>
       </div>
+
       {/* Right Panel */}
       <div
-        className="md:w-2/3 w-full flex flex-col justify-center p-10 bg-[url('https://images.unsplash.com/photo-1462726625343-6a2ab0b9f020?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-repeat bg-cover bg-center overflow-hidden"
+        className={`md:w-2/3 w-full flex flex-col justify-center p-10  overflow-hidden`} // // bg-[url('https://images.unsplash.com/photo-1462726625343-6a2ab0b9f020?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-repeat bg-cover bg-center
         style={{ backgroundPosition: "center" }}
       >
         <div className="flex-grow flex flex-col justify-between">
@@ -194,6 +198,35 @@ const OnboardingWindow = () => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Mobile View - Dropdown Menu */}
+      <div className="md:hidden">
+        <button
+          className="w-full p-4 bg-gray-800 text-white"
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+        >
+          {dropdownOpen ? "Close Menu" : "Select Mission"}
+        </button>
+
+        {dropdownOpen && (
+          <div className="fixed top-0 left-0 w-full h-full bg-gray-100 p-4 shadow-lg z-20 overflow-auto">
+            <div className="space-y-4">
+              {steps.map((step) => (
+                <div
+                  key={step.id}
+                  className={`p-4 rounded-lg cursor-pointer ${
+                    currentStep === step.id ? "bg-white shadow-md" : "bg-gray-200"
+                  }`}
+                  onClick={() => handleStepClick(step.id)}
+                >
+                  <h2 className="font-bold">{step.name}</h2>
+                  <p className="text-sm">{step.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
