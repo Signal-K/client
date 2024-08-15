@@ -7,6 +7,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { TelescopeClassification } from "@/app/(structures)/Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ProgressBar from "../(missions)/ProgressBar";
+import DeployRooversInitial from "../roovers/deployAndReturn";
 
 interface Mission {
   id: number;
@@ -37,7 +38,11 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
           <TelescopeClassification anomalyid={activePlanet?.id || getRandomPlanetId()} />
         );
       case 1370104:
-        return <div>Initial animal classification content...</div>;
+        return (
+          <center>
+            <DeployRooversInitial />
+          </center>
+        );
       case 1370105:
         return <div>Initial rover photos classification content...</div>;
       case 1370106:

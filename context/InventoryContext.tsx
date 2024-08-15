@@ -11,11 +11,11 @@ interface InventoryItem {
   ItemCategory: string;
   parentItem: number | null;
   itemLevel: number;
-}
+};
 
 interface InventoryContextType {
   inventoryItems: { [key: number]: InventoryItem };
-}
+};
 
 const InventoryContext = createContext<InventoryContextType>({ inventoryItems: {} });
 

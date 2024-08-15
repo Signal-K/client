@@ -20,11 +20,12 @@ const classificationOptions: ClassificationOption[] = [
 
 interface ClassificationFormProps {
     anomalyType: string;
+    anomalyId: string;
     missionNumber: number;
     assetMentioned: string;
 };
 
-const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, missionNumber, assetMentioned }) => {
+const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, anomalyId, missionNumber, assetMentioned }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -92,33 +93,53 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, mi
                 value
             ])
         );
-
+    
         try {
-            const { error } = await supabase
+            // Insert the classification into the database
+            const { data: classificationData, error: classificationError } = await supabase
                 .from("classifications")
                 .insert({
                     author: session?.user?.id,
                     content,
                     media: [uploads, assetMentioned],
-                    anomaly: activePlanet?.id,
+                    anomaly: activePlanet?.id || anomalyId,
                     classificationtype: 'lightcurve',
                     classificationConfiguration,
-                });
-
-            if (error) {
-                console.error("Error creating classification:", error.message);
+                })
+                .single();
+    
+            if (classificationError) {
+                console.error("Error creating classification:", classificationError.message);
                 alert("Failed to create classification. Please try again.");
+                return;
             } else {
                 alert(`Post created`);
                 setContent('');
                 setSelectedOptions({});
                 setUploads([]);
             }
+    
+            // If the user doesn't have an active planet, update the profile with the new anomaly ID
+            if (!activePlanet?.id) {
+                const { error: profileUpdateError } = await supabase
+                    .from("profiles")
+                    .update({ location: anomalyId })
+                    .eq("id", session?.user?.id);
+    
+                if (profileUpdateError) {
+                    console.error("Error updating profile with active planet:", profileUpdateError.message);
+                    alert("Failed to update active planet. Please try again.");
+                    return;
+                }
+            }
+    
+            // Complete the mission
             await handleMissionComplete();
         } catch (error) {
             console.error("Unexpected error:", error);
         }
     };
+    
 
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
