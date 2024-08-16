@@ -1,17 +1,14 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface UserAvatarProps {
     url?: string;
     size: number;
-    onUpload: (event: React.ChangeEvent<HTMLInputElement>, filePath: string) => void;
-};
+    onUpload: (filePath: string) => void;
+}
 
 export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
     const supabase = useSupabaseClient();
-
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
 
@@ -27,7 +24,6 @@ export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
             if (error) {
                 throw error;
             }
-
             const url = URL.createObjectURL(data);
             setAvatarUrl(url);
         } catch (error: any) {
@@ -37,24 +33,19 @@ export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
 
     async function uploadAvatar(event: React.ChangeEvent<HTMLInputElement>) {
         try {
-            setUploading(true); 
-
+            setUploading(true);
             if (!event.target.files || event.target.files.length === 0) {
                 throw new Error("You must select an image to upload");
             }
-
             const file = event.target.files[0];
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random()}.${fileExt}`;
             const filePath = `${fileName}`;
-
             const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file);
-
-            if (uploadError) { 
+            if (uploadError) {
                 throw uploadError;
             }
-
-            onUpload(event, filePath);
+            onUpload(filePath);
         } catch (error: any) {
             alert(error.message);
         } finally {
@@ -76,24 +67,20 @@ export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
             )}
 
             <div style={{ width: size }}>
-                <button className="btn bg-red-800 text-white my-2">
-                    {uploading ? 'Uploading...' : 'Upload new avatar'}
-                </button>
-                <input
-                    style={{
-                        visibility: 'hidden',
-                        position: 'absolute',
-                    }}
-                    type="file"
-                    id="single"
-                    accept="image/*"
-                    onChange={uploadAvatar}
-                    disabled={uploading}
-                />
+                <label className="btn bg-red-800 text-white my-2">
+                    {uploading ? "Uploading..." : "Upload new avatar"}
+                    <input
+                        style={{ display: 'none' }}
+                        type="file"
+                        accept="image/*"
+                        onChange={uploadAvatar}
+                        disabled={uploading}
+                    />
+                </label>
             </div>
         </div>
     );
-}
+};
 
 interface UserAvatarPropsNullUpload {
     url: string | null;

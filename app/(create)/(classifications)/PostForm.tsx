@@ -193,11 +193,13 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     {Object.keys(selectedOptions).length > 0 && (
                         <>
                             <div className="flex gap-4 mb-4">
-                                <UserAvatarNullUpload
-                                    url={avatar_url}
-                                    size={64}
-                                    onUpload={(event, url) => {}}
-                                />
+                            <UserAvatarNullUpload
+                                url={avatar_url}
+                                size={64}
+                                onUpload={(filePath: string) => {
+                                    setAvatarUrl(filePath);
+                                }}
+                            />
                                 <textarea
                                     value={content}
                                     onChange={e => setContent(e.target.value)}

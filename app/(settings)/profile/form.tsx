@@ -1,12 +1,10 @@
-"use client";
-
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useState, useEffect } from "react";
 import UserAvatar from "./Avatar";
 
 export default function ProfileCardModal() {
     const supabase = useSupabaseClient();
-    const session = useSession(); 
+    const session = useSession();
 
     const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState<string | undefined>(undefined);
@@ -18,13 +16,11 @@ export default function ProfileCardModal() {
         let ignore = false;
         async function getProfile() {
             setLoading(true);
-
             const { data, error } = await supabase
                 .from("profiles")
                 .select(`username, full_name, avatar_url`)
                 .eq("id", session?.user?.id)
                 .single();
-
             if (!ignore) {
                 if (error) {
                     console.warn(error);
@@ -34,58 +30,15 @@ export default function ProfileCardModal() {
                     setAvatarUrl(data.avatar_url);
                 }
             }
-
             setLoading(false);
         }
-
         getProfile();
-
         return () => {
             ignore = true;
         };
     }, [session, supabase]);
 
-    async function checkAndCreateMission() {
-        try {
-            // Check if mission 1370102 already exists for the user
-            const { data: existingMissions, error: checkError } = await supabase
-                .from("missions")
-                .select("id")
-                .eq("user", session?.user?.id)
-                .eq("mission", 1370102);
-
-            if (checkError) {
-                throw checkError;
-            }
-
-            if (existingMissions.length === 0) {
-                // If the mission doesn't exist, create it
-                const missionData = {
-                    user: session?.user?.id,
-                    time_of_completion: new Date().toISOString(),
-                    mission: 1370102,
-                    configuration: null,
-                    rewarded_items: [], // Add any rewarded items if applicable
-                };
-
-                const { error: missionError } = await supabase
-                    .from("missions")
-                    .insert([missionData]);
-
-                if (missionError) {
-                    throw missionError;
-                }
-
-                console.log('Mission 1370102 created successfully.');
-            } else {
-                console.log('Mission 1370102 already completed.');
-            }
-        } catch (error: any) {
-            console.error('Error checking or creating mission:', error);
-        }
-    }
-
-    async function updateProfile(event: React.ChangeEvent<HTMLInputElement>, avatarUrl: string | undefined) {
+    async function updateProfile(event: React.FormEvent) {
         event.preventDefault();
 
         if (!username || !session?.user?.email) {
@@ -100,7 +53,7 @@ export default function ProfileCardModal() {
             id: session?.user?.id,
             username,
             full_name,
-            avatar_url: avatarUrl,
+            avatar_url,
             updated_at: new Date(),
         };
 
@@ -109,15 +62,50 @@ export default function ProfileCardModal() {
         if (error) {
             alert(error.message);
         } else {
-            setAvatarUrl(avatarUrl);
             await checkAndCreateMission(); // Check and create the mission after updating the profile
         }
 
         setLoading(false);
     }
 
+    async function checkAndCreateMission() {
+        try {
+            const { data: existingMissions, error: checkError } = await supabase
+                .from("missions")
+                .select("id")
+                .eq("user", session?.user?.id)
+                .eq("mission", 1370102);
+
+            if (checkError) {
+                throw checkError;
+            }
+
+            if (existingMissions.length === 0) {
+                const missionData = {
+                    user: session?.user?.id,
+                    time_of_completion: new Date().toISOString(),
+                    mission: 1370102,
+                    configuration: null,
+                    rewarded_items: [], // Add any rewarded items if applicable
+                };
+
+                const { error: missionError } = await supabase.from("missions").insert([missionData]);
+
+                if (missionError) {
+                    throw missionError;
+                }
+
+                console.log('Mission 1370102 created successfully.');
+            } else {
+                console.log('Mission 1370102 already completed.');
+            }
+        } catch (error: any) {
+            console.error('Error checking or creating mission:', error);
+        }
+    }
+
     return (
-        <form onSubmit={(e) => updateProfile(e as any, avatar_url)} className="form-widget p-6 rounded-md shadow-lg max-w-md mx-auto">
+        <form onSubmit={(e) => updateProfile(e)} className="form-widget p-6 rounded-md shadow-lg max-w-md mx-auto">
             <h2 className="text-2xl font-bold mb-4 text-red-800">Edit profile</h2>
             <p className="text-red-800 mb-6">Provide details about yourself and any other pertinent information.</p>
             <div className="mb-4">
@@ -125,9 +113,7 @@ export default function ProfileCardModal() {
                 <UserAvatar
                     url={avatar_url}
                     size={150}
-                    onUpload={(event, url) => {
-                        updateProfile(event as React.ChangeEvent<HTMLInputElement>, url);
-                    }}
+                    onUpload={(url) => setAvatarUrl(url)}
                 />
             </div>
             <div className="mb-4">
@@ -161,10 +147,18 @@ export default function ProfileCardModal() {
                     disabled
                 />
             </div>
-            {error && <p className="text-red-600 mb-4">{error}</p>}
+            {error && (
+                <div className="text-red-500 mb-4">
+                    {error}
+                </div>
+            )}
             <div>
-                <button className="button block primary text-red-800" type="submit" disabled={loading}>
-                    {loading ? "Loading ..." : "Update"}
+                <button
+                    type="submit"
+                    className="block w-full bg-red-800 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    disabled={loading}
+                >
+                    {loading ? "Loading ..." : "Update profile"}
                 </button>
             </div>
         </form>
