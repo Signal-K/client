@@ -287,9 +287,9 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
         }
       } catch (error) {
         console.error("Error fetching user photos:", error);
-      }
-    }
-  }
+      };
+    };
+  };
 
   const handleCollectImage = async (image: string) => {
     if (session && activePlanet) {
@@ -304,7 +304,7 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
             avatar_url: image,
             configuration: roverConfig,
             parentAnomaly: String(activePlanet.id),
-            created_at: new Date()
+            created_at: new Date(),
           });
 
         const missionData = {
@@ -323,15 +323,15 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
 
         if (error) {
           throw error;
-        }
+        };
 
         alert("Image collected successfully!");
         window.location.reload(); // Refresh the page
       } catch (error) {
-        console.error("Error collecting image:", error);
+        console.error("Error collecting image: ", error);
         alert("Failed to collect the image.");
-      }
-    }
+      };
+    };
   };
 
   if (!isOpen) return null;

@@ -3,7 +3,7 @@ import React from "react";
 interface ProgressBarProps {
   currentStepIndex: number;
   totalSteps: number;
-}
+};
 
 const ProgressBar = ({ currentStepIndex, totalSteps }: ProgressBarProps) => {
   const progressPercentage = ((currentStepIndex + 1) / totalSteps) * 100;
