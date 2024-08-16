@@ -6,10 +6,12 @@ import { SidebarLayout } from "../(layout)/sectionStructure";
 import { useRouter } from "next/navigation";
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import SpaceGamePage from "../(scenes)/(spaceship)/spaceship";
-import Layout from "@/components/Layout";
+import Layout, { OnboardingLayout } from "@/components/Layout";
 import OnboardingWindow from "../(scenes)/(onboarding)/window";
 import { ProfileCard } from "../auth/UserProfileFields";
 import ProfileCardModal from "../(settings)/profile/form";
+import SandpackBox from "../(anomalies)/(editor)/Sandbox";
+import PythonSandpackTest from "../(anomalies)/(editor)/Python";
 
 export default function PageLayout() {
     const session = useSession();
@@ -22,7 +24,11 @@ export default function PageLayout() {
             {/* <Panels /> */}
             {/* <ClassificationsFeed /> */}
             {/* <SpaceGamePage /> */}
-            <ProfileCardModal />
+            <OnboardingLayout bg={true}>
+          <OnboardingWindow />
+        </OnboardingLayout>
+            {/* <SandpackBox />
+            <PythonSandpackTest /> */}
         {/* </Layout> */}
         </>
     );

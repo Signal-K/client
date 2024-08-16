@@ -7,7 +7,7 @@ import PlanetGrid from "./(missions)/(navigating)/PlanetSelector";
 
 export default function FirstScene() {
     const supabase = useSupabaseClient();
-    const session = useSession();
+    const session = useSession(); 
 
     const { activePlanet } = useActivePlanet();
     const [completedMissions, setCompletedMissions] = useState(new Map());

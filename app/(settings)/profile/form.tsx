@@ -1,21 +1,18 @@
 "use client";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import React, { useState, useEffect, FormEvent } from "react";
+import React, { useState, useEffect } from "react";
 import UserAvatar from "./Avatar";
-
-interface ProfileCardModalProps {
-    avatarUrl: string | undefined;
-}
 
 export default function ProfileCardModal() {
     const supabase = useSupabaseClient();
-    const session = useSession();
+    const session = useSession(); 
 
     const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState<string | undefined>(undefined);
     const [full_name, setFull_name] = useState<string | undefined>(undefined);
     const [avatar_url, setAvatarUrl] = useState<string | undefined>(undefined);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         let ignore = false;
@@ -48,10 +45,56 @@ export default function ProfileCardModal() {
         };
     }, [session, supabase]);
 
+    async function checkAndCreateMission() {
+        try {
+            // Check if mission 1370102 already exists for the user
+            const { data: existingMissions, error: checkError } = await supabase
+                .from("missions")
+                .select("id")
+                .eq("user", session?.user?.id)
+                .eq("mission", 1370102);
+
+            if (checkError) {
+                throw checkError;
+            }
+
+            if (existingMissions.length === 0) {
+                // If the mission doesn't exist, create it
+                const missionData = {
+                    user: session?.user?.id,
+                    time_of_completion: new Date().toISOString(),
+                    mission: 1370102,
+                    configuration: null,
+                    rewarded_items: [], // Add any rewarded items if applicable
+                };
+
+                const { error: missionError } = await supabase
+                    .from("missions")
+                    .insert([missionData]);
+
+                if (missionError) {
+                    throw missionError;
+                }
+
+                console.log('Mission 1370102 created successfully.');
+            } else {
+                console.log('Mission 1370102 already completed.');
+            }
+        } catch (error: any) {
+            console.error('Error checking or creating mission:', error);
+        }
+    }
+
     async function updateProfile(event: React.ChangeEvent<HTMLInputElement>, avatarUrl: string | undefined) {
         event.preventDefault();
 
+        if (!username || !session?.user?.email) {
+            setError("Username and email are required.");
+            return;
+        }
+
         setLoading(true);
+        setError(null);
 
         const updates = {
             id: session?.user?.id,
@@ -67,12 +110,14 @@ export default function ProfileCardModal() {
             alert(error.message);
         } else {
             setAvatarUrl(avatarUrl);
+            await checkAndCreateMission(); // Check and create the mission after updating the profile
         }
+
         setLoading(false);
     }
 
     return (
-        <form onSubmit={(e) => updateProfile(e as any, avatar_url)} className="form-widget bg-gray-50 p-6 rounded-md shadow-lg max-w-md mx-auto">
+        <form onSubmit={(e) => updateProfile(e as any, avatar_url)} className="form-widget p-6 rounded-md shadow-lg max-w-md mx-auto">
             <h2 className="text-2xl font-bold mb-4 text-red-800">Edit profile</h2>
             <p className="text-red-800 mb-6">Provide details about yourself and any other pertinent information.</p>
             <div className="mb-4">
@@ -89,7 +134,7 @@ export default function ProfileCardModal() {
                 <label htmlFor="full_name" className="block text-sm font-bold text-red-800">Full name</label>
                 <input
                     id="full_name"
-                    type="url"
+                    type="text"
                     className="mt-1 block w-full px-3 py-2 bg-gray-800 text-white rounded-md border border-gray-600 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     value={full_name || ''}
                     onChange={(e) => setFull_name(e.target.value)}
@@ -108,8 +153,15 @@ export default function ProfileCardModal() {
             </div>
             <div className="mb-4">
                 <label htmlFor="email" className="block text-sm font-medium text-red-800">Email: </label>
-                <input className="mt-1 block w-full px-3 py-2 bg-gray-800 text-white rounded-md border border-gray-600 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" id="email" type="text" value={session?.user?.email || ''} disabled />
+                <input
+                    className="mt-1 block w-full px-3 py-2 bg-gray-800 text-white rounded-md border border-gray-600 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    id="email"
+                    type="text"
+                    value={session?.user?.email || ''}
+                    disabled
+                />
             </div>
+            {error && <p className="text-red-600 mb-4">{error}</p>}
             <div>
                 <button className="button block primary text-red-800" type="submit" disabled={loading}>
                     {loading ? "Loading ..." : "Update"}
@@ -117,4 +169,4 @@ export default function ProfileCardModal() {
             </div>
         </form>
     );
-}
+};

@@ -2,6 +2,8 @@ import React from 'react';
 import { CreateFirstBaseClassification, CreateCloudClassification, CreateFirstMeteorologyClassification } from '@/Classifications/ClassificationForm';
 import CreateBaseClassification from '@/Classifications/ClassificationForm';
 import { useActivePlanet } from '@/context/ActivePlanet';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import ClassificationForm from '@/app/(create)/(classifications)/PostForm';
 
 // Define the `TransitingTelescopeClassifyPlanet` component
 export const TransitingTelescopeClassifyPlanet: React.FC = () => {
@@ -62,4 +64,33 @@ export const TransitingTelescopeTutorial: React.FC = () => {
             {/* Replace with actual tutorial content */}
         </div>
     );
+};
+
+interface TelescopeProps {
+    anomalyid: string;
+};
+
+// For the onboarding mission - please re-asses after
+export const TelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid }) => {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const { activePlanet } = useActivePlanet();
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyid || activePlanet?.id}/Binned.png`;
+
+    return (
+        <div className="rounded-lg"> {/* bg-white w-full max-w-lg mx-auto shadow-lg overflow-hidden */}
+            <div className="flex flex-col items-center">
+                {/* <img src={structure.icon_url} alt={structure.name} className="w-24 h-24 mb-2" /> */}
+                <img src='https://github.com/Signal-K/client/blob/initialClassification/public/assets/Inventory/Structures/TelescopeReceiver.png?raw=true' alt='telescope' className="w-24 h-24 mb-2" /> {/* Structure 101 */}
+                <div className='relative'>
+                <div className='absolute inset-0 w-full h-full bg-blue-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
+                    <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} className="relative z-10 w-128 h-128" />
+                </div>
+                <ClassificationForm anomalyId={anomalyid} anomalyType='planet' missionNumber={1370103} assetMentioned={imageUrl} />
+            </div>
+        </div>
+    ); 
 };

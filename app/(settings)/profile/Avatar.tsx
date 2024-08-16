@@ -7,7 +7,7 @@ interface UserAvatarProps {
     url?: string;
     size: number;
     onUpload: (event: React.ChangeEvent<HTMLInputElement>, filePath: string) => void;
-}
+};
 
 export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
     const supabase = useSupabaseClient();
@@ -37,7 +37,7 @@ export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
 
     async function uploadAvatar(event: React.ChangeEvent<HTMLInputElement>) {
         try {
-            setUploading(true);
+            setUploading(true); 
 
             if (!event.target.files || event.target.files.length === 0) {
                 throw new Error("You must select an image to upload");
@@ -50,7 +50,7 @@ export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
 
             const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file);
 
-            if (uploadError) {
+            if (uploadError) { 
                 throw uploadError;
             }
 
@@ -91,6 +91,51 @@ export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
                     disabled={uploading}
                 />
             </div>
+        </div>
+    );
+}
+
+interface UserAvatarPropsNullUpload {
+    url: string | null;
+    size: number;
+}
+
+export function UserAvatarNullUpload({ url, size }: UserAvatarProps) {
+    const supabase = useSupabaseClient();
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (url) {
+            downloadImage(url);
+        }
+    }, [url]);
+
+    async function downloadImage(path: string) {
+        try {
+            const { data, error } = await supabase.storage.from("avatars").download(path);
+            if (error) {
+                throw error;
+            }
+
+            const url = URL.createObjectURL(data);
+            setAvatarUrl(url);
+        } catch (error: any) {
+            console.log("Error downloading avatar: ", error.message);
+        }
+    }
+
+    return (
+        <div>
+            {avatarUrl ? (
+                <img
+                    src={avatarUrl}
+                    alt="User Avatar"
+                    className="avatar image"
+                    style={{ height: size, width: size }}
+                />
+            ) : (
+                <div className="avatar no-image" style={{ height: size, width: size }} />
+            )}
         </div>
     );
 }
