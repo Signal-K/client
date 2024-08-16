@@ -28,7 +28,7 @@ interface InventoryItem {
   parentItem: number | null;
   itemLevel: number;
   recipe?: { [key: string]: number };
-}
+};
 
 interface OwnedItem {
   id: string;
@@ -36,7 +36,7 @@ interface OwnedItem {
   quantity: number;
   sector: string;
   anomaly: number;
-}
+};
 
 export const CameraAutomatonModule: React.FC = () => {
   const supabase = useSupabaseClient();
@@ -56,8 +56,8 @@ export const CameraAutomatonModule: React.FC = () => {
       setInventoryItems(data);
     } catch (error) {
       console.error("Error fetching inventory items:", error);
-    }
-  }
+    };
+  };
 
   async function fetchUserModule() { 
     if (session && activePlanet) {
@@ -78,9 +78,9 @@ export const CameraAutomatonModule: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching user module:", error);
-      }
-    }
-  }
+      };
+    };
+  };
 
   const [hasCameraStation, setHasCameraStation] = useState(false);
 
@@ -241,12 +241,12 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
           setHasCameraStation(true);
         } else {
           setHasCameraStation(false);
-        }
+        };
       } catch (error) { 
         console.error("Error fetching camera station:", error);
-      }
-    }
-  }
+      };
+    };
+  };
 
   const fetchImages = async () => {
     const randomDate = Math.floor(Math.random() * 1000) + 1;
@@ -264,7 +264,7 @@ export const CameraReceiverStation: React.FC<CameraReceiverStationProps> = ({ is
     } catch (error) {
       console.error(error);
       setRovers(['An error occurred while fetching the image.']);
-    }
+    };
 
     setLoading(false);
   };

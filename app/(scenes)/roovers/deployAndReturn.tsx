@@ -39,7 +39,7 @@ export default function DeployRooversInitial() {
     notes: "Created for mission 1370104",
     parentItem: null,
     time_of_deploy: null,
-    anomaly: activePlanet.id,
+    anomaly: activePlanet?.id,
   };
 
   const [isDeployed, setIsDeployed] = useState<boolean>(false);
@@ -71,9 +71,9 @@ export default function DeployRooversInitial() {
           .eq("owner", session?.user?.id);
 
         if (error) {
-          console.error("Error fetching inventory items:", error);
+          console.error("Error fetching inventory items: ", error);
           return;
-        }
+        };
 
         if (data && data.length > 0) {
           // Entry exists
@@ -85,19 +85,19 @@ export default function DeployRooversInitial() {
             .insert(newRoverToInventoryData);
 
           if (insertError) {
-            console.error("Error creating rover in inventory:", insertError);
+            console.error("Error creating rover in inventory: ", insertError);
           } else {
             console.log("New rover added to inventory.");
-          }
-        }
+          };
+        };
       } catch (error) {
-        console.error('Unexpected error:', error);
-      }
+        console.error('Unexpected error: ', error);
+      };
     };
 
     if (session?.user?.id) {
       fetchInventoryItems();
-    }
+    };
   }, [session, supabase, newRoverToInventoryData]);
 
   return (

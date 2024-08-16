@@ -43,6 +43,7 @@ const inventoryItems: InventoryItem[] = [
   { id: 101, name: 'Telescope', description: 'gain an understanding of the overall behaviour and makeup of the planet you have selected', cost: 1, icon_url: 'https://github.com/Signal-K/client/blob/initialClassification/public/assets/Inventory/Structures/TelescopeReceiver.png?raw=true', ItemCategory: 'Structure', parentItem: null, itemLevel: 1},
   { id: 102, name: 'Zoodex', description: 'populate your planet with some animals to gain an understanding of animal behaviour on your planet and aide local research back home', cost: 1, icon_url: '', ItemCategory: 'Structure', parentItem: null, itemLevel: 1},
   { id: 103, name: 'Discovery Module', description: 'populate your planet with low-level content e.g. mining deposits, weather cycle behaviour etc (need to word this better)', cost: 1, icon_url: '', ItemCategory: 'Structure', parentItem: null, itemLevel: 1},
+  { id: 104, name: 'Camera Receiver Station', description: 'Keep track of all the photos your anomalies have taken (WIP)', cost: 1, icon_url: 'https://cdn-icons-png.flaticon.com/512/5169/5169909.png', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '11': 1 } },
 ];
 
 export async function GET(req: NextRequest) {

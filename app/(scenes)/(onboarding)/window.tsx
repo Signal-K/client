@@ -8,6 +8,7 @@ import { TelescopeClassification } from "@/app/(structures)/Telescopes/Transitin
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ProgressBar from "../(missions)/ProgressBar";
 import DeployRooversInitial from "../roovers/deployAndReturn";
+import Compass from "@/Classifications/RoverContent/RoverData";
 
 interface Mission {
   id: number;
@@ -46,7 +47,9 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
       case 1370105:
         return <div>Initial rover photos classification content...</div>;
       case 1370106:
-        return <div>Generated planet content...</div>;
+        return (
+          <Compass windspeed={50} direction={50} />
+        );
       default:
         return <div>Welcome message...</div>;
     }

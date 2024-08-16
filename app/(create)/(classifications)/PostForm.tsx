@@ -182,7 +182,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                         </button>
                     ))}
                 </div>
-                <div className="flex flex-col w-2/3">
+                <div className="flex flex-col gap-2 w-1/3">
                     {Object.keys(selectedOptions).length > 0 && (
                         <>
                             <div className="flex gap-4 mb-4">

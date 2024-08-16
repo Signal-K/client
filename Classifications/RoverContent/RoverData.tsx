@@ -25,7 +25,7 @@ const Compass = ({ windspeed, direction }: { windspeed: number, direction: numbe
                 <div className="absolute w-0.5 h-20 bg-red-500 transform origin-bottom" style={{ left: '50%', top: '50%', transform: `rotate(${rotationAngle}deg) translate(-50%, -100%)` }}></div>
                 <div className="absolute w-2 h-8 bg-green-500 transform origin-bottom" style={{ left: '50%', top: '50%', transform: `translate(-50%, -50%)` }}></div>
             </div>
-            {/* Compass info */}
+            {/* Compass info */} 
             <div className="mt-4 text-white text-center">
                 <div className="font-bold text-lg">Wind Speed</div>
                 <div>{windspeed} m/s</div>

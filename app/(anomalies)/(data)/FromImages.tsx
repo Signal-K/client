@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-
+ 
 import { AnomalyData } from "@/types/AnomalyData";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";

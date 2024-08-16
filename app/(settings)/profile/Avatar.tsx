@@ -50,7 +50,7 @@ export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
 
             const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file);
 
-            if (uploadError) {
+            if (uploadError) { 
                 throw uploadError;
             }
 
