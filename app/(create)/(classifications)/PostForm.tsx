@@ -203,7 +203,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                 <textarea
                                     value={content}
                                     onChange={e => setContent(e.target.value)}
-                                    className="flex-grow p-3 h-24 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 outline-none"
+                                    className="flex-grow p-3 h-24 text-green rounded-xl border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 outline-none"
                                     placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
                                 />
                             </div>

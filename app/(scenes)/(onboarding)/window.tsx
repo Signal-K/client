@@ -9,6 +9,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import ProgressBar from "../(missions)/ProgressBar";
 import DeployRooversInitial from "../roovers/deployAndReturn";
 import Compass from "@/Classifications/RoverContent/RoverData";
+import { MineralDeposit } from "@/app/(inventory)/items/MineralDeposits";
 
 interface Mission {
   id: number;
@@ -40,12 +41,12 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
         );
       case 1370104:
         return (
-          <center>
             <DeployRooversInitial />
-          </center>
         );
       case 1370105:
-        return <div>Initial rover photos classification content...</div>;
+        return (
+          <MineralDeposit />
+        );
       case 1370106:
         return (
           <Compass windspeed={50} direction={50} />

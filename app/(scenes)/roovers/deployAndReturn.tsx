@@ -10,7 +10,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { RooverFromAppeears } from "@/app/(anomalies)/(data)/Mars-Photos";
+import RooverFromAppeears from "@/app/(anomalies)/(data)/Mars-Photos";
 
 interface RoverData {
   photos: string[];
@@ -45,7 +45,6 @@ export default function DeployRooversInitial() {
 
   const [isDeployed, setIsDeployed] = useState<boolean>(false);
   const [roverData, setRoverData] = useState<RoverData | null>(null);
-  const [inventoryItems, setInventoryItems] = useState<{ [key: number]: InventoryItem }>({});
 
   const deployRover = () => {
     console.log("Deploying rover...");
@@ -100,8 +99,8 @@ export default function DeployRooversInitial() {
   }, [session, supabase, newRoverToInventoryData]);
 
   return (
-    <div className="bg-pastel-blue text-gray-700 font-body p-4">
-      <Card className="w-full max-w-md border-gray-300 bg-cyan-50 text-gray-800 rounded-lg">
+    <div className="bg-pastel-blue text-gray-700 font-body p-4 rounded-lg">
+      <Card className="w-full border-gray-300 bg-cyan-50 text-gray-800 rounded-lg">
         <CardHeader>
           <CardTitle className="text-pastel-pink font-heading">
             Mars Rover Control Panel
@@ -131,22 +130,7 @@ export default function DeployRooversInitial() {
                 ))}
               </div>
             ) : (
-              <>
-                <div>
-                  <h3 className="text-lg font-medium">Resource Sites</h3>
-                  <ul className="space-y-2">
-                    {roverData?.resourceSites.map((site, index) => (
-                      <li key={index}>
-                        <div className="font-medium">{site.name}</div>
-                        <div className="text-gray-600">
-                          {site.deposits.join(", ")}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <RooverFromAppeears />
-              </>
+              <RooverFromAppeears />
             )}
             <Button
               className={`w-full ${
