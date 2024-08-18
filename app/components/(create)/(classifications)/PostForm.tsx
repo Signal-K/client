@@ -4,12 +4,12 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useProfileContext } from "@/context/UserProfile";
-import UserAvatar, { UserAvatarNullUpload } from "@/app/(settings)/profile/Avatar";
+import UserAvatar, { UserAvatarNullUpload } from "@/app/components/(settings)/profile/Avatar";
 
 interface ClassificationOption {
     id: number;
     text: string;
-}
+};
 
 const planetClassificationOptions: ClassificationOption[] = [
     { id: 1, text: 'No dips at all' },
@@ -32,7 +32,7 @@ interface ClassificationFormProps {
     anomalyId: string;  // This should be the ID of the anomaly
     missionNumber: number;
     assetMentioned: string;
-}
+};
 
 const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, anomalyId, missionNumber, assetMentioned }) => {
     const supabase = useSupabaseClient();

@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import PlanetGrid from "@/app/(scenes)/(missions)/(navigating)/PlanetSelector";
-import MyStructures from "@/app/(structures)/Structures";
+import PlanetGrid from "@/app/components/_[archive]/(scenes)/(missions)/(navigating)/PlanetSelector";
+import MyStructures from "@/app/components/_[archive]/(structures)/Structures";
 
 export default function TerrestrialPlanet() {
     const supabase = useSupabaseClient();

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import ClassificationForm from "@/app/(create)/(classifications)/PostForm";
-import { MapPinIcon } from "@/app/(inventory)/items/MineralDeposits";
+import ClassificationForm from "../../(create)/(classifications)/PostForm";
+import { MapPinIcon } from "@/app/components/(inventory)/items/MineralDeposits";
 
 export const RooverFromAppeears: React.FC = () => {
     const supabase = useSupabaseClient(); 

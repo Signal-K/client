@@ -11,7 +11,7 @@ interface OwnedItem {
     quantity: number;
     sector: string;
     anomaly: number;
-};
+}; 
 
 interface UserStructure {
     id: number;

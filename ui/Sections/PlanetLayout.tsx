@@ -9,9 +9,9 @@ import { ReactNode, useEffect, useState } from "react";
 import GoToYourPlanet from "@/components/Gameplay/Travel/InitTravel";
 import ClassificationsFeed from "@/Classifications/ClassificationFeed";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import NavMenu from "@/app/(layout)/menu";
-import { PostCard } from "@/app/(create)/cards/PostCard";
+import NavMenu from "@/app/components/_[archive]/(layout)/menu";
 import { MainContentProps } from "@/types/Layout/Globals";
+import { PostCard } from "@/app/components/_[archive]/(create)/(classifications)/ClassificationByType";
 import { PlanetLayoutProps } from "@/types/Layout/Globals";
 import { TellUsWhatYouThinkClassificationBlock } from "@/components/Tutorial/TextBlocks";
  

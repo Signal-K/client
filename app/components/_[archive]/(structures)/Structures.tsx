@@ -10,7 +10,7 @@ import { OwnedItem } from "@/types/Items";
 
 export default function MyStructures() {
     const supabase = useSupabaseClient();
-    const session = useSession();
+    const session = useSession(); 
 
     const { activePlanet } = useActivePlanet();
 

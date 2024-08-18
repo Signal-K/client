@@ -3,7 +3,7 @@
 import { AllStructures } from "@/components/Gameplay/Inventory/Structures/Structure";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import UserStructures from "../../(structures)/StructureModal";
+import UserStructures from "../../components/_[archive]/(structures)/StructureModal";
 import TutorialText from "@/components/Tutorial/TextBlocks";
 import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
 import TravelBuddyButton from "@/components/Utilities/TravelBuddy";
@@ -17,7 +17,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { TellUsWhatYouThinkClassification } from "@/Classifications/ClassificationForm";
 import Layout from "@/components/Layout";
-import DeployRooversInitial from "@/app/(scenes)/roovers/deployAndReturn";
+import DeployRooversInitial from "@/app/components/(scenes)/roovers/deployAndReturn";
 
 export default function Home() {
   const supabase = useSupabaseClient();

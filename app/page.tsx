@@ -4,11 +4,11 @@ import Layout, { OnboardingLayout } from "@/components/Layout";
 import UserPlanetPage from "@/components/Gameplay/Inventory/UserPlanets";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Landing } from "@/components/landing";
-import { Panels } from "./(layout)/currentSections";
+import { Panels } from "./components/_[archive]/(layout)/currentSections";
 import { useEffect, useState } from "react";
-import FirstScene from "./(scenes)/starterPlanets";
+import FirstScene from "./components/_[archive]/(scenes)/starterPlanets";
 import LoginPage from "./auth/LoginModal";
-import OnboardingWindow from "./(scenes)/(onboarding)/window";
+import OnboardingWindow from "./components/(scenes)/(onboarding)/window";
 
 export default function Home() {
   const supabase = useSupabaseClient();

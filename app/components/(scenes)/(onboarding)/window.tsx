@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import ProfileCardModal from "@/app/(settings)/profile/form";
+import ProfileCardModal from "@/app/components/(settings)/profile/form";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { TelescopeClassification } from "@/app/(structures)/Telescopes/Transiting";
+import { TelescopeClassification } from "@/app/components/(structures)/Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ProgressBar from "../(missions)/ProgressBar";
 import DeployRooversInitial from "../roovers/deployAndReturn";
-import GeneratedStarterPlanet from "@/app/(anomalies)/(planets)/generated";
+import GeneratedStarterPlanet from "@/app/components/(anomalies)/(planets)/generated";
 
 interface Mission {
   id: number;

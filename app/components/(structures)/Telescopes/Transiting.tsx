@@ -3,7 +3,7 @@ import { CreateFirstBaseClassification, CreateCloudClassification, CreateFirstMe
 import CreateBaseClassification from '@/Classifications/ClassificationForm';
 import { useActivePlanet } from '@/context/ActivePlanet';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import ClassificationForm from '@/app/(create)/(classifications)/PostForm';
+import ClassificationForm from '../../(create)/(classifications)/PostForm';
 
 // Define the `TransitingTelescopeClassifyPlanet` component
 export const TransitingTelescopeClassifyPlanet: React.FC = () => {

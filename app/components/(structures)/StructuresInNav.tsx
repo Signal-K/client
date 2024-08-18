@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { PlacedStructureSingle } from "./Single";
-import { OwnedItem, UserStructure } from "./StructureModal";
+import { PlacedStructureSingle } from "../_[archive]/(structures)/Single";
+import { OwnedItem, UserStructure } from "../_[archive]/(structures)/StructureModal";
 
 interface AllStructuresProps {
   itemsPerPage: number;
-};
+}; 
 
 // CREATE A BUTTON THAT POPULATES THE PLANET WITH THE STRUCTURES, POINT, IMPROVE TUTORIAL INSIDE THE STRUCTURES, POST CARD, SHARE (AND CREATE TICKET IN JIRA FOR THIS, MENTION OLD TICKETS)
 

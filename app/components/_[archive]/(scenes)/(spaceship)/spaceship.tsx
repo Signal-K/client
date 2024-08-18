@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HomeIcon, PodcastIcon, MagnetIcon, ScissorsIcon, TicketCheckIcon, SettingsIcon } from "lucide-react"; // Importing icons from Lucide
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { AllStructures } from "@/app/(structures)/StructuresInNav";
+import { AllStructures } from "@/app/components/(structures)/StructuresInNav";
 
 interface GamePageProps {
     children: ReactNode;
