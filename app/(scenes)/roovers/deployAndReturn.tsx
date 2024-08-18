@@ -106,7 +106,7 @@ export default function DeployRooversInitial() {
       <Card className="w-full border-gray-300 bg-cyan-50 text-gray-800 rounded-lg">
         <CardHeader>
           <CardTitle className="text-pastel-pink font-heading">
-            Mars Rover Control Panel
+            Rover Control Panel
           </CardTitle>
           <CardDescription className="text-gray-600">
             Deploy and monitor your automated Mars rovers.

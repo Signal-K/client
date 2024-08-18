@@ -67,8 +67,8 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">{title}</h2>
-      <p className="text-base mb-8">{description}</p>
+      <h2 className="text-xl font-bold mb-2 md:mb-4 text-blue-500">{title}</h2>
+      <p className="text-sm md:text-base text-blue-500 mb-4 md:mb-8">{description}</p>
       {renderComponentForStep()}
     </div>
   );
@@ -80,7 +80,7 @@ const OnboardingWindow = () => {
 
   const [currentStep, setCurrentStep] = useState<number | null>(null);
   const [steps, setSteps] = useState<Mission[]>([]);
-  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false); // New state for dropdown
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false); // State for dropdown
 
   const missionIds = [1370102, 1370103, 1370104, 1370106]; // Exclude 1370105 from the missionIds
 
@@ -152,18 +152,18 @@ const OnboardingWindow = () => {
   return (
     <div className="relative flex flex-col md:flex-row min-h-screen">
       {/* Left Panel - Desktop */}
-      <div className="hidden md:flex md:w-1/3 w-full flex-col justify-center bg-gray-100 p-10 shadow-4xl z-10">
+      <div className="hidden md:flex md:w-1/3 w-full flex-col justify-center bg-gray-100 p-4 md:p-10 shadow-4xl z-10">
         <div className="space-y-4">
           {steps.map((step) => (
             <div
               key={step.id}
-              className={`p-4 rounded-lg cursor-pointer ${
+              className={`p-2 md:p-4 rounded-lg cursor-pointer ${
                 currentStep === step.id ? "bg-white shadow-md" : "bg-gray-200"
               }`}
               onClick={() => handleStepClick(step.id)}
             >
-              <h2 className="font-bold">{step.name}</h2>
-              <p className="text-sm">{step.description}</p>
+              <h2 className="text-sm md:text-base font-bold">{step.name}</h2>
+              <p className="text-xs md:text-sm">{step.description}</p>
             </div>
           ))}
         </div>
@@ -171,7 +171,7 @@ const OnboardingWindow = () => {
 
       {/* Right Panel */}
       <div
-        className={`md:w-2/3 w-full flex flex-col justify-center p-10 overflow-y-auto h-screen`} 
+        className={`md:w-2/3 w-full flex flex-col justify-center p-4 md:p-10 h-screen md:overflow-y-auto overflow-hidden`} 
         style={{ backgroundPosition: "center" }}
       >
         <div className="flex-grow flex flex-col justify-between">
@@ -181,7 +181,7 @@ const OnboardingWindow = () => {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
-              className="space-y-4 relative z-20"
+              className="space-y-2 md:space-y-4 relative z-20"
             >
               <OnboardingStep
                 title={currentMission.name}
@@ -192,16 +192,16 @@ const OnboardingWindow = () => {
                 <button
                   onClick={handleBack}
                   disabled={currentStep === steps[0]?.id}
-                  className="px-4 py-2 bg-gray-300 rounded-lg"
+                  className="px-2 py-1 md:px-4 md:py-2 bg-gray-300 rounded-lg"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleNext}
                   disabled={currentStep === steps[steps.length - 1]?.id}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                  className="px-2 py-1 md:px-4 md:py-2 bg-cyan-50 text-white rounded-lg"
                 >
-                  {currentStep === steps[steps.length - 1]?.id ? "Finish" : "Next"}
+                  {currentStep === steps[steps.length - 1]?.id ? "" : "Next"}
                 </button>
               </div>
               <ProgressBar
@@ -211,37 +211,43 @@ const OnboardingWindow = () => {
             </motion.div>
           ) : (
             <div className="text-center">
-              <h2 className="text-2xl font-bold mb-4">Onboarding Completed</h2>
-              <p className="text-base">You have completed all onboarding steps.</p>
+              <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Onboarding Completed</h2>
+              <p className="text-sm md:text-base">You have completed all onboarding steps.</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Mobile View - Dropdown Menu */}
-      <div className="md:hidden">
+      <div className="md:hidden fixed top-0 left-0 w-full bg-gray-100 p-2 z-30">
         <button
-          className="w-full p-4 bg-gray-800 text-white"
+          className="w-full p-2 bg-gray-800 text-white"
           onClick={() => setDropdownOpen(!dropdownOpen)}
         >
           {dropdownOpen ? "Close Menu" : "Select Mission"}
         </button>
 
         {dropdownOpen && (
-          <div className="fixed top-0 left-0 w-full h-full bg-gray-100 p-4 shadow-lg z-20 overflow-auto">
+          <div className="absolute top-12 left-0 w-full bg-gray-100 p-4 shadow-lg z-20 overflow-auto">
             <div className="space-y-4">
               {steps.map((step) => (
                 <div
                   key={step.id}
-                  className={`p-4 rounded-lg cursor-pointer ${
+                  className={`p-2 rounded-lg cursor-pointer ${
                     currentStep === step.id ? "bg-white shadow-md" : "bg-gray-200"
                   }`}
                   onClick={() => handleStepClick(step.id)}
                 >
-                  <h2 className="font-bold">{step.name}</h2>
-                  <p className="text-sm">{step.description}</p>
+                  <h2 className="font-bold text-sm">{step.name}</h2>
+                  <p className="text-xs">{step.description}</p>
                 </div>
               ))}
+              <button
+                onClick={() => setDropdownOpen(false)}
+                className="w-full p-2 bg-gray-800 text-white rounded-lg mt-4"
+              >
+                Close
+              </button>
             </div>
           </div>
         )}
