@@ -165,7 +165,7 @@ const OnboardingWindow = () => {
 
       {/* Right Panel */}
       <div
-        className={`md:w-2/3 w-full flex flex-col justify-center p-10  overflow-hidden`} // // bg-[url('https://images.unsplash.com/photo-1462726625343-6a2ab0b9f020?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-repeat bg-cover bg-center
+        className={`md:w-2/3 w-full flex flex-col justify-center p-10 overflow-y-auto h-screen`} 
         style={{ backgroundPosition: "center" }}
       >
         <div className="flex-grow flex flex-col justify-between">

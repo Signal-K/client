@@ -1,76 +1,40 @@
-import React, { useState } from 'react';
-import Image from 'next/image';
-
-interface ClassificationOption {
-    id: number;
-    text: string;
-    thumbnail: string;
-}
+import React, { useEffect, useState } from "react";
+import ClassificationForm from "@/app/(create)/(classifications)/PostForm";
 
 interface AnimalClassificationProps {
-    imageUrl: string;
-    options: ClassificationOption[];
-    onSubmit: (selectedOption: ClassificationOption | null, comment: string) => void;
+    anomalyType: string;
+    anomalyId: string;
+    missionNumber: number;
+    assetMentioned: string;
 }
 
-const AnimalClassification: React.FC<AnimalClassificationProps> = ({ imageUrl, options, onSubmit }) => {
-    const [selectedOption, setSelectedOption] = useState<ClassificationOption | null>(null);
-    const [comment, setComment] = useState<string>('');
+const AnimalClassification: React.FC<AnimalClassificationProps> = ({ anomalyType, anomalyId, missionNumber, assetMentioned }) => {
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = () => {
-        onSubmit(selectedOption, comment);
-    };
+    useEffect(() => {
+        // Fetch or load any data needed for AnimalClassification if required
+        // Update isLoading and error state based on your logic
+        setIsLoading(false); // Example: once data is loaded
+    }, []);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
-        <div className="max-w-3xl mx-auto p-4">
-            {/* Display the image */}
-            <div className="mb-4">
-                <Image
-                    src={imageUrl}
-                    alt="Animal to classify"
-                    width={1024}
-                    height={768}
-                    className="object-cover rounded-lg"
-                />
-            </div>
-
-            {/* Display classification options */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-                {options.map(option => (
-                    <div
-                        key={option.id}
-                        className={`p-2 border rounded-lg cursor-pointer transition-transform transform hover:scale-105 ${
-                            selectedOption?.id === option.id ? 'border-blue-500' : 'border-gray-300'
-                        }`}
-                        onClick={() => setSelectedOption(option)}
-                    >
-                        <Image
-                            src={option.thumbnail}
-                            alt={option.text}
-                            width={100}
-                            height={100}
-                            className="object-cover rounded-lg"
-                        />
-                        <p className="text-center mt-2">{option.text}</p>
-                    </div>
-                ))}
-            </div>
-
-            {/* Comment input */}
-            <textarea
-                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
-                placeholder="Add any additional comments..."
-                value={comment}
-                onChange={e => setComment(e.target.value)}
+        <div>
+            <h2>Animal Classification</h2>
+            <ClassificationForm
+                anomalyType={anomalyType}
+                anomalyId={anomalyId}
+                missionNumber={missionNumber}
+                assetMentioned={assetMentioned}
             />
-
-            {/* Submit button */}
-            <button
-                onClick={handleSubmit}
-                className="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-                Submit Classification
-            </button>
         </div>
     );
 };

@@ -11,22 +11,6 @@ interface ClassificationOption {
     text: string;
 };
 
-const planetClassificationOptions: ClassificationOption[] = [
-    { id: 1, text: 'No dips at all' },
-    { id: 2, text: 'Repeating dips' }, 
-    { id: 3, text: 'Dips with similar size' },
-    { id: 4, text: 'Dips aligned to one side' },
-];
-
-const roverImgClassificationOptions: ClassificationOption[] = [
-    { id: 1, text: 'Dried-up water channels' },
-    { id: 2, text: 'Pebbles/medium-sized rocks' },
-    { id: 3, text: 'Hills/mountain formations' },
-    { id: 4, text: 'Volcano (dormant/extinct)' },
-    { id: 5, text: 'Mineral deposits' },
-    { id: 6, text: 'Sandy/rocky terrain' },
-];
-
 interface ClassificationFormProps {
     anomalyType: string;
     anomalyId: string;
@@ -37,17 +21,32 @@ interface ClassificationFormProps {
 const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, anomalyId, missionNumber, assetMentioned }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
-
     const [content, setContent] = useState<string>("");
     const [uploads, setUploads] = useState<string[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [avatar_url, setAvatarUrl] = useState<string | undefined>(undefined);
     const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: boolean }>({});
+    const [classificationOptions, setClassificationOptions] = useState<ClassificationOption[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const { activePlanet } = useActivePlanet();
     const { userProfile } = useProfileContext();
 
-    const classificationOptions = anomalyType === "planet" ? planetClassificationOptions : roverImgClassificationOptions;
+    useEffect(() => {
+        const fetchOptions = async () => {
+            setIsLoading(true);
+            try {
+                const response = await fetch(`/api/citizen/zoodex/${anomalyType}`);
+                const data = await response.json();
+                setClassificationOptions(data.options);
+            } catch (error) {
+                console.error("Error fetching classification options:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchOptions();
+    }, [anomalyType]);
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -175,6 +174,10 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
         }
     };
 
+    if (isLoading) {
+        return <div>Loading options...</div>;
+    }
+
     return (
         <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-white-900 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-50">
             <div className="flex gap-4">
@@ -193,13 +196,13 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     {Object.keys(selectedOptions).length > 0 && (
                         <>
                             <div className="flex gap-4 mb-4">
-                            <UserAvatarNullUpload
-                                url={avatar_url}
-                                size={64}
-                                onUpload={(filePath: string) => {
-                                    setAvatarUrl(filePath);
-                                }}
-                            />
+                                <UserAvatarNullUpload
+                                    url={avatar_url}
+                                    size={64}
+                                    onUpload={(filePath: string) => {
+                                        setAvatarUrl(filePath);
+                                    }}
+                                />
                                 <textarea
                                     value={content}
                                     onChange={e => setContent(e.target.value)}
@@ -228,17 +231,14 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                     ))}
                                 </div>
                             )}
+                            <button
+                                onClick={createPost}
+                                className="w-full py-2 px-4 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                            >
+                                Create Post
+                            </button>
                         </>
                     )}
-                </div>
-                <div className="flex flex-col gap-2 w-1/3">
-                    <button
-                        onClick={createPost}
-                        disabled={!content || Object.keys(selectedOptions).length === 0}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md"
-                    >
-                        Submit Classification
-                    </button>
                 </div>
             </div>
         </div>
