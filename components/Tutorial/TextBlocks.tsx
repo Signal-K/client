@@ -238,3 +238,16 @@ export default function TutorialText() {
         </div>
     );
 }
+
+export function TellUsWhatYouThinkClassificationBlock () {
+    return (
+        <div>
+            <p>
+                You've now finished the tutorial (for the first pre-release). Continue mining, exploring and feel free to click the arrow buttons at the top of the page to jump to other planets and begin your journey there. We're releasing weekly updates and would love to hear your thoughts. Tell us what you think here:
+            </p>
+            <div className="bg-gray-400">
+                <TellUsWhatYouThinkClassification />
+            </div>
+        </div>
+    )
+}

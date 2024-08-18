@@ -87,22 +87,19 @@ const GeneratedStarterPlanet: React.FC = () => {
     };
 
     return (
-        <Card className="w-full max-w-md mx-auto p-6 grid gap-6">
+        <Card className="w-full max-w-md mx-auto p-6 grid gap-4">
             <div className="text-center space-y-2">
                 <h2 className="text-2xl font-bold">Postcards from {activePlanet.content}</h2>
                 <p className="text-muted-foreground">Discoveries from your latest expedition</p>
             </div>
-            <div className="relative aspect-square overflow-hidden rounded-lg">
+            <center><div className="justify-center">
                 <img
                     src={getImage()}
                     alt={activePlanet.name}
-                    className="object-cover"
-                    width="400"
-                    height="400"
-                    style={{ aspectRatio: "400/400", objectFit: "cover" }}
+                    className="h-48 w-48 object-cover"  // Added to control the size of the image
                 />
-            </div>
-            <div className="grid gap-4">
+            </div></center>
+            <div className="grid gap-2">
                 <div className="bg-muted rounded-lg p-4 grid gap-2">
                     <h3 className="text-lg font-medium">Discoveries</h3>
                     <ul className="space-y-2 text-sm">
@@ -133,7 +130,7 @@ const GeneratedStarterPlanet: React.FC = () => {
                     </ul>
                 </div>
             </div>
-            <div className="text-center mt-6 p-4 bg-blue-100 rounded-lg">
+            <div className="text-center mt-4 p-4 bg-blue-100 rounded-lg">
                 <h3 className="text-lg font-bold">Congratulations!</h3>
                 <p className="text-sm mt-2">
                     Great job completing the onboarding! You're all set.
@@ -141,6 +138,10 @@ const GeneratedStarterPlanet: React.FC = () => {
                 <p className="text-sm mt-2">
                     Now, it's time to travel to your planet, where your adventure truly begins. Get ready to
                     explore, discover, and make your mark!
+                </p>
+                <p className="text-sm mt-2">
+                    We're still working on the first chapter, but if you'd like, we do have some old gameplay components for you to check out,
+                    and there's plenty more to classify.
                 </p>
                 <AddMissionsAndItems />
             </div>
@@ -161,7 +162,7 @@ const AddMissionsAndItems: React.FC = () => {
         const anomalyId = activePlanet.id;
 
         // Define missions and items to add
-        const missionsToAdd = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 17, 18];
+        const missionsToAdd = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 17, 18, 1370107];
         const itemsToAdd = [11, 12, 13, 14, 15, 16, 19, 22, 23, 26, 28, 29, 30, 32];
 
         try {
@@ -200,12 +201,12 @@ const AddMissionsAndItems: React.FC = () => {
     };
 
     return (
-        <div className="text-center">
+        <div className="text-center mt-6">
             <button
                 onClick={handleAddMissionsAndItems}
                 className="bg-blue-500 text-white py-2 px-4 rounded"
             >
-                Add Missions and Items
+                Head to Star Sailors (old)
             </button>
         </div>
     );

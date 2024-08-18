@@ -13,6 +13,7 @@ import NavMenu from "@/app/(layout)/menu";
 import { PostCard } from "@/app/(create)/cards/PostCard";
 import { MainContentProps } from "@/types/Layout/Globals";
 import { PlanetLayoutProps } from "@/types/Layout/Globals";
+import { TellUsWhatYouThinkClassificationBlock } from "@/components/Tutorial/TextBlocks";
  
 export default function PlanetLayout({ children }: { children: React.ReactNode }) {
   const supabase = useSupabaseClient();
@@ -190,7 +191,7 @@ export default function PlanetLayout({ children }: { children: React.ReactNode }
             >
               ✕
             </Button>
-            <PostCard />
+            <TellUsWhatYouThinkClassificationBlock />
           </div>
         </div>
       )}

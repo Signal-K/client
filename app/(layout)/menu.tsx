@@ -4,7 +4,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ArrowDownIcon } from 'lucide-react';
 
 type NavMenuProps = {
-  onMyDiscoveriesClick: () => void; // Add this prop
+  onMyDiscoveriesClick: () => void;
 };
 
 export default function NavMenu({ onMyDiscoveriesClick }: NavMenuProps) {
@@ -12,7 +12,7 @@ export default function NavMenu({ onMyDiscoveriesClick }: NavMenuProps) {
     <Menu as="div" className="relative inline-block text-left">
       <div>
         <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-          Discoveries
+          Menu & Feedback
           <ArrowDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
         </MenuButton>
       </div>
@@ -31,15 +31,15 @@ export default function NavMenu({ onMyDiscoveriesClick }: NavMenuProps) {
               }}
               className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
             >
-              My discoveries
+              Give feedback
             </a>
           </MenuItem>
           <MenuItem>
             <a
-              href="/tests"
+              href="/"
               className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
             >
-              All discoveries
+              Return home
             </a>
           </MenuItem>
         </div>
