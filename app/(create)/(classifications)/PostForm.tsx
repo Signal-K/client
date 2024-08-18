@@ -13,7 +13,7 @@ interface ClassificationOption {
 
 const planetClassificationOptions: ClassificationOption[] = [
     { id: 1, text: 'No dips at all' },
-    { id: 2, text: 'Repeating dips' },
+    { id: 2, text: 'Repeating dips' }, 
     { id: 3, text: 'Dips with similar size' },
     { id: 4, text: 'Dips aligned to one side' },
 ];

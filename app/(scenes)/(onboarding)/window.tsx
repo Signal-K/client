@@ -10,6 +10,7 @@ import ProgressBar from "../(missions)/ProgressBar";
 import DeployRooversInitial from "../roovers/deployAndReturn";
 import Compass from "@/Classifications/RoverContent/RoverData";
 import { MineralDeposit } from "@/app/(inventory)/items/MineralDeposits";
+import Zoodex from "@/app/(anomalies)/(data)/Zoodex";
 
 interface Mission {
   id: number;
@@ -41,11 +42,13 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
         );
       case 1370104:
         return (
-            <DeployRooversInitial />
+          <DeployRooversInitial />
         );
       case 1370105:
         return (
-          <MineralDeposit />
+          <>
+            <Zoodex />
+          </>
         );
       case 1370106:
         return (
