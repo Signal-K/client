@@ -1,61 +1,65 @@
 import React, { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient, SupabaseClient } from "@supabase/auth-helpers-react";
 import PostModal from "./FeedPostCard";
-import PostFormCard from "../PostFormCard";
-import { UserContext } from "../../context/UserContext";
 
 export default function SocialGraphHomeModal() {
-  const supabase = useSupabaseClient();
+  const supabase: SupabaseClient = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);
   const [profile, setProfile] = useState(null);
   const [planetPosts, setPlanetPosts] = useState([]);
 
+  const a = 0;
+
   useEffect(() => {
     fetchPosts();
-  }, [session?.user?.id]);
+  }, [a]);  
 
   useEffect(() => {
-    if (!session?.user?.id) {
-      return;
+    if (planetPosts.length > 0) {
+      console.log("Comments: ", planetPosts.flatMap((post) => post.comments));
     }
+  }, [a]);
 
-    supabase
-      .from("profiles")
-      .select()
-      .eq("id", session?.user?.id)
-      .then((result) => {
-        if (result.data.length) {
-          setProfile(result.data[0]);
-        }
-      });
-  }, [session?.user?.id]);
+  async function fetchPosts() {
+    const postsResponse = await supabase
+    .from("posts_duplicates")
+    .select(
+      "id, content, created_at, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)"
+    )
+    .limit(10)
+    .order('created_at', { ascending: false });
 
-  function fetchPosts() {
-    supabase
-      .from("posts")
-      .select("id, content, created_at, profiles(id, avatar_url, username)")
-      .order("created_at", { ascending: false })
-      .then((result) => {
-        setPosts(result.data);
-      });
+  const postIds = postsResponse.data?.map((post) => post.id);
+  const commentsResponse = await supabase
+    .from("comments")
+    .select("id, content, created_at, profiles(id, avatar_url, username), post_id") // Add the closing parenthesis for profiles select
+    .in("post_id", postIds)
+    .order("created_at", { ascending: true });
 
-    supabase
-      .from("posts_duplicate")
-      .select(
-        "id, content, created_at, planets2, planetsss(id, temperature), profiles(id, avatar_url, full_name, username)"
-      )
-      .order("created_at", { ascending: false })
-      .then((result) => {
-        setPlanetPosts(result.data);
-      });
+    const commentsByPostId: { [postId: number]: Comment[] } = commentsResponse.data.reduce((acc, comment) => {
+      const postId = comment.post_id;
+      if (!acc[postId]) {
+        acc[postId] = [];
+      }
+      acc[postId].push(comment);
+      return acc;
+    }, {});
+
+    // const postsWithComments: Post[] = postsResponse.data?.map((post) => ({
+    const postsWithComments = postsResponse.data?.map((post) => ({
+      ...post,
+      comments: commentsByPostId[post.id] || [],
+    }));
+
+    setPosts(postsWithComments);
   }
 
   return (
     <div className="container mx-auto py-8">
         {/* <UserContext.Provider value={{profile}}><PostFormCard onPost={fetchPosts()} /></UserContext.Provider><br /> */}
         <div className="flex-grow flex flex-col overflow-hidden">
-        {planetPosts?.map((post) => (
+        {posts?.map((post) => ( // planetPosts??.map
           <PostModal key={post.id} {...post} />
         ))}
       </div>
