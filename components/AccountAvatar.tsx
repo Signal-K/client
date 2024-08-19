@@ -33,7 +33,7 @@ export default function AccountAvatar ({
             };
             const url = URL.createObjectURL(data);
             setAvatarUrl(url);
-        } catch (error) {
+        } catch (error) { 
             console.log('Error downloading image: ', error)
         }
     }

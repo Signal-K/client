@@ -1,6 +1,7 @@
 // Global imports
 import React, { useState } from 'react';
 import { AppProps } from 'next/app';
+import Head from 'next/head';
 
 // Styling imports
 import '../styles/globals.css';
@@ -29,7 +30,26 @@ function MyApp({ Component, pageProps }) {
   const queryClient = new QueryClient();
 
   return (
-    <SessionContextProvider
+    <>
+      <Head>
+        {/* <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.$widget = window.$widget || {};
+              window.WIDGET_SITE_ID = 'aadf2cc9-4de3-42e2-af04-845ccc65785c';
+              (function(w,d){
+                var s = d.createElement('script');
+                s.defer = true;
+                s.src = '//www.widgetscripts.com/embed.js';
+                d.getElementsByTagName('head')[0].appendChild(s);
+              })(window,document);
+            `,
+          }}
+        /> */}
+        {/* <script async data-nf='{"formurl":"https://noteforms.com/forms/user-feedback-rkkndz","emoji":"💬","position":"right","bgcolor":"#3B82F6","width":"500"}' src='https://d29ykaszcd1t1v.cloudfront.net/173eb069-229a-481a-98ad-4a70caf83ee6/widgets/embed-min.js'></script> */}
+      </Head>
+      <SessionContextProvider
       supabaseClient={supabaseClient}
       initialSession={pageProps.initialSession}
     >
@@ -44,10 +64,12 @@ function MyApp({ Component, pageProps }) {
           <ChakraProvider>
             {/* <MoralisProvider initializeOnMount={false}>/> */}
             <Component {...pageProps} />
+            
           </ChakraProvider>
         {/* </ThirdwebProvider> */}
       </QueryClientProvider>
     </SessionContextProvider>
+    </>
   );
 }
 
