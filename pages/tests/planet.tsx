@@ -10,6 +10,9 @@ import html2canvas from "html2canvas";
 import OwnedPlanetsListBlock from "../../components/Blocks/userPlanetsBlock";
 import Link from "next/link";
 import UnityBuildSupabaseMesh from "../../components/Gameplay/Unity/Build/LOD-Mesh";
+import { RoverGallerySingle } from "../../components/Gameplay/Planets/RoverData/RandomImage";
+import CreateSectorComponent from "../../components/Gameplay/Planets/Data/CreatePlanetSector";
+import PlanetSectors from "../../components/Gameplay/Planets/Data/PlanetSectors";
 
 enum SidebarLink {
   Feed,
@@ -38,6 +41,8 @@ export default function PlanetPage({ id }: { id: string }) {
   const planetId = Array.isArray(router.query.id) ? router.query.id[0] : router.query.id;
   const [unityBuild, setUnityBuild] = useState<number | null>(null);
   const [hasPlanetInInventory, setHasPlanetInInventory] = useState(false);
+  const [inventoryPlanetId, setInventoryPlanetId] = useState<string | null>(null);
+  const [sectors, setSectors] = useState([]);  
 
   useEffect(() => {
     if (planetData?.temperature !== undefined) {
@@ -47,6 +52,8 @@ export default function PlanetPage({ id }: { id: string }) {
         setUnityBuild(2);
       }
     }
+
+    fetchSectorsForPlanet(inventoryPlanetId);
   }, [planetData]);
 
   const [profile, setProfile] = useState<any | null>(null);
@@ -288,6 +295,26 @@ export default function PlanetPage({ id }: { id: string }) {
 
     if (data.length > 0) {
       setHasPlanetInInventory(true);
+      setInventoryPlanetId(data[0].id);
+    }
+  }
+
+  async function fetchSectorsForPlanet(planetId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('planetsssSECTORS')
+        .select('*')
+        .eq('planetId', planetId);
+  
+      if (error) {
+        console.error('Error fetching sectors data:', error.message);
+        return;
+      }
+  
+      // Set the fetched sectors data in the 'sectors' state
+      setSectors(data);
+    } catch (error) {
+      console.error('Error fetching sectors data:', error);
     }
   }
 
@@ -325,7 +352,7 @@ export default function PlanetPage({ id }: { id: string }) {
                 >
                   <path d="M10 20a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm7.75-8a8.01 8.01 0 0 0 0-4h-3.82a28.81 28.81 0 0 1 0 4h3.82zm-.82 2h-3.22a14.44 14.44 0 0 1-.95 3.51A8.03 8.03 0 0 0 16.93 14zm-8.85-2h3.84a24.61 24.61 0 0 0 0-4H8.08a24.61 24.61 0 0 0 0 4zm.25 2c.41 2.4 1.13 4 1.67 4s1.26-1.6 1.67-4H8.33zm-6.08-2h3.82a28.81 28.81 0 0 1 0-4H2.25a8.01 8.01 0 0 0 0 4zm.82 2a8.03 8.03 0 0 0 4.17 3.51c-.42-.96-.74-2.16-.95-3.51H3.07zm13.86-8a8.03 8.03 0 0 0-4.17-3.51c.42.96.74 2.16.95 3.51h3.22zm-8.6 0h3.34c-.41-2.4-1.13-4-1.67-4S8.74 3.6 8.33 6zM3.07 6h3.22c.2-1.35.53-2.55.95-3.51A8.03 8.03 0 0 0 3.07 6z" />
                 </svg>{" "}
-                Anomaly temperature: {planetData.temperature}
+                Anomaly temperature: {planetData.temperature} | {inventoryPlanetId}
               </p>
               <p className="pt-2 text-gray-600 text-xs lg:text-sm flex items-center justify-center lg:justify-start">
                 <svg
@@ -515,21 +542,25 @@ export default function PlanetPage({ id }: { id: string }) {
                         <h3 className="text-l font-bold text-gray-800">
                           Binned data
                         </h3>
-                        <img
+                        {planetBinned !== '' && (
+                          <img
                           src={planetBinned}
                           alt="Planet Cover"
                           className="w-full sm:w-auto"
                         />
+                        )}
                       </div>
                       <div>
                         <h3 className="text-l font-bold text-gray-800">
                           Phase folded data
                         </h3>
-                        <img
-                          src={planetPhased}
-                          alt="Planet Cover"
-                          className="w-full sm:w-auto"
-                        />
+                        {planetPhased !== '' && (
+                          <img
+                            src={planetPhased}
+                            alt="Planet Cover"
+                            className="w-full sm:w-auto"
+                          />
+                        )}
                       </div>
                     </div>
                     <br />
@@ -571,6 +602,18 @@ export default function PlanetPage({ id }: { id: string }) {
           )}
           {activeLink === SidebarLink.Demo && (
             <div id="unityContainer" className="mb-30">
+              {hasPlanetInInventory ? (
+                <div>
+                  <p>You have this planet in your inventory.</p><br />
+                  <PlanetSectors sectors={sectors} />
+                  <br /><CreateSectorComponent planetId={inventoryPlanetId} />
+                  <UnityBuildSupabaseMesh planetName={planetData?.content}/> 
+                </div>
+              ) : (
+                <div>
+                  <p>You do not have this planet in your inventory.</p>
+                </div>
+              )}<br />
               {/* <PostCard
                       planetImage={planetCover}
                       time=''
@@ -581,19 +624,8 @@ export default function PlanetPage({ id }: { id: string }) {
                     /><br /> */}
               <Card noPadding={false}>
                 <OwnedPlanetsListBlock />
+                <RoverGallerySingle inventoryPlanetId = {inventoryPlanetId} />
                 {/* <UnityBuildSupabaseMesh planetName={planetData?.content}/>  */}
-                {hasPlanetInInventory ? (
-        // Display the component if the user has the planet in their inventory
-        <div>
-          <p>You have this planet in your inventory.</p>
-          {/* Add your component here */}
-        </div>
-      ) : (
-        // Display a message if the user does not have the planet in their inventory
-        <div>
-          <p>You do not have this planet in your inventory.</p>
-        </div>
-      )}
               </Card>
               {/* <button onClick={handleCaptureClick}>Capture PostCard</button> */}
               {/* <h2 className="text-xl font-bold text-gray-800">Unity build</h2><br /><Card noPadding={false}>

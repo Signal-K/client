@@ -60,3 +60,20 @@ export default function PlanetGalleryCard({ planet }: Props) {
     </div>
   );
 }
+
+export function PlanetGalleryCardGarden({ planet }: Props) {
+  const { id, content, cover, classification_status, difficulty } = planet;
+
+  return (
+    <div className="col-md-4 mb-4">
+        <div style={{ width: "10%", height: "100%", overflow: "hidden" }}>
+          <Card.Img
+            variant="top"
+            src={cover}
+            alt="Planet cover image"
+            className="w-100 h-auto"
+          />
+        </div>
+    </div>
+  );
+}
