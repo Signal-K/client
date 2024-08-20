@@ -22,6 +22,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
     const [username, setUsername] = useState<Profiles['username']>(null);
     const [website, setWebsite] = useState<Profiles['website']>(null); // I believe this is the email field
     const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null);
+    const [address2, setAddress2] = useState<Profiles['address2']>(null);
     const [address, setAddress] = useState<Profiles['address']>(null); // This should be set by the handler eventually (connected address).
     const [images, setImages] = useState([]);
 
@@ -37,21 +38,21 @@ export default function OffchainAccount({ session }: { session: Session}) {
 
     useEffect(() => {
         getProfile();
-        console.log(user.id)
+        console.log(session?.user?.id)
     }, [session]);
 
-    async function getProfile() {
+    async function getProfile () {
         try {
             setLoading(true);
             if (!user) throw new Error('No user authenticated');
             let { data, error, status } = await supabase
                 .from('profiles')
-                .select(`username, website, avatar_url, address`)
+                .select(`username, website, avatar_url, address, address2`)
                 .eq('id', user.id)
                 .single()
 
             if (error && status !== 406) {
-                throw error;
+                throw error; 
             }
 
             if (data) {
@@ -59,9 +60,10 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 setWebsite(data.website);
                 setAvatarUrl(data.avatar_url);
                 setAddress(data.address);
+                setAddress2(data.address2);
             }
         } catch (error) {
-            alert('Error loading your user data');
+            //alert('Error loading your user data');
             console.log(error);
         } finally {
             setLoading(false);
@@ -74,21 +76,22 @@ export default function OffchainAccount({ session }: { session: Session}) {
         avatar_url,
         address,
     } : {
-        username: Profiles['username']
-        website: Profiles['website']
-        avatar_url: Profiles['avatar_url']
-        address: Profiles['address']
+        username: string //Profiles['username']
+        website: string //Profiles['website']
+        avatar_url: string //Profiles['avatar_url']
+        address: string //Profiles['address']
     }) {
         try {
             setLoading(true);
             if (!user) throw new Error('No user authenticated!');
             const updates = {
                 id: user.id,
+                updated_at: new Date().toISOString(),
                 username,
                 website,
                 avatar_url,
                 address,
-                updated_at: new Date().toISOString(),
+                address2,
             }
             let { error } = await supabase.from('profiles').upsert(updates);
             if (error) throw error;
@@ -217,7 +220,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
             setLoading(true);
             if (!user) throw new Error('No user authenticated');
             let { data, error, status } = await supabase
-                .from('planets')
+                .from('planetsss')
                 .select(`id, userId, temperature, radius, ticId`)
                 .eq('userId', username)
                 .single()
@@ -243,7 +246,7 @@ export default function OffchainAccount({ session }: { session: Session}) {
                 url={avatar_url}
                 size={150}
                 onUpload={(url) => {
-                    setAvatarUrl(url)
+                    setAvatarUrl(url) 
                     updateProfile({ username, website, avatar_url: url, address})
                 }}
             />

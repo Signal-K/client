@@ -3,7 +3,7 @@ import Row from "react-bootstrap/Row";
 import Col from 'react-bootstrap/Col';
 import ListGroup from 'react-bootstrap/ListGroup';
 import NextLink from 'next/link';
-import Layout from "../../components/Generator/Layout";
+import Layout from "../../components/Gameplay/Generator/Layout";
 
 export default function GeneratorIndexPage() {
     return (

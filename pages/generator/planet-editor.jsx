@@ -3,12 +3,12 @@ import React, { createRef, useState } from 'react';
 
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import SubPage from "../../components/Generator/Subpage";
+import SubPage from "../../components/Gameplay/Generator/Subpage";
 
-import Controls from "../../components/Generator/Controls";
-import { usePlanetEditorState } from "../../components/Generator/Hooks/use-planet-editor-state";
-import SceneDisplay from "../../components/Generator/Panels/SceneDisplay";
-import PlanetEditorSceneManager from "../../components/Generator/Services/planet-editor-scene";
+import Controls from "../../components/Gameplay/Generator/Controls";
+import { usePlanetEditorState } from "../../components/Gameplay/Generator/Hooks/use-planet-editor-state";
+import SceneDisplay from "../../components/Gameplay/Generator/Panels/SceneDisplay";
+import PlanetEditorSceneManager from "../../components/Gameplay/Generator/Services/planet-editor-scene";
 
 import { useScreenshot } from 'use-react-screenshot';
 
@@ -23,7 +23,7 @@ export default function PlanetEditor () {
 	const getImage = () => takeScreenShot();
 
 	return (
-		<SubPage header='Planet Editor'>
+		<SubPage header=''> {/* Was "Planet Editor" */}
 			<br />
 			<Row style={{ height: '' }}>
 				<Col lg={6} xs={12} className="display">
