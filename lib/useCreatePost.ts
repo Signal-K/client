@@ -1,4 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+export function useCreatePost() {
+  return "Stub"
+}
+
+/*import { useMutation } from "@tanstack/react-query";
 import { useSDK, useStorageUpload } from "@thirdweb-dev/react";
 import { PublicationMainFocus, useCreatePostTypedDataMutation } from "../graphql/generated";
 import useLensUser from "./auth/useLensUser";
@@ -32,7 +36,7 @@ export function useCreatePost() {
     await loginUser();
 
     // 0. Upload the image to IPFS
-    const imageIpfsUrl = (await uploadToIpfs({ data: [image] }))[0];
+    const imageIpfsUrl = (await uploadToIpfs({ data: [image] }))[0]; // Let's upload the other data to IPFS and then return it
 
     console.log("imageIpfsUrl", imageIpfsUrl);
     const postMetadata = {
@@ -122,4 +126,4 @@ export function useCreatePost() {
   }
 
   return useMutation(createPost);
-}
+}*/
