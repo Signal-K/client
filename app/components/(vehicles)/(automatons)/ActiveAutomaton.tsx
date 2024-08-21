@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { MineralDeposit, Automaton } from "@/types/Items";
+import AnomalyUpgrade from "../../(structures)/Config/AutomatonUpgradeBox";
 
 interface ActiveAutomatonForMiningProps {
   deposit: MineralDeposit;
@@ -31,6 +32,7 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
   const [loading, setLoading] = useState(true);
   const [miningInProgress, setMiningInProgress] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isConfiguring, setIsConfiguring] = useState(false); // State to manage configuration view
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,7 +54,7 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
 
         if (automatonError) {
           throw new Error(`Error fetching automaton data: ${automatonError.message}`);
-        }
+        };
 
         setUserAutomaton(automatonData);
 
@@ -115,6 +117,10 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
     }
   };
 
+  const handleConfigureAutomaton = () => {
+    setIsConfiguring(true);
+  };
+
   if (loading) {
     return <div>Loading automaton and inventory data...</div>;
   }
@@ -135,21 +141,33 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
     );
   }
 
+  if (isConfiguring) {
+    return <AnomalyUpgrade />;
+  }
+
   return (
     <div className="p-4 border rounded-lg shadow-md bg-white bg-opacity-90">
       <h2 className="text-xl font-semibold mb-4">Automaton Control</h2>
       <p className="text-sm mb-4">
         Rover ID: {userAutomaton.id} - Ready to collect <strong>{deposit.mineralconfiguration.mineral}</strong>
       </p>
-      <button
-        className={`bg-green-500 text-white px-4 py-2 rounded ${
-          miningInProgress ? "opacity-50 cursor-not-allowed" : ""
-        }`}
-        onClick={handleSendRover}
-        disabled={miningInProgress}
-      >
-        {miningInProgress ? "Mining in progress..." : "Send Rover"}
-      </button>
+      <div className="flex space-x-4">
+        <button
+          className={`bg-green-500 text-white px-4 py-2 rounded ${
+            miningInProgress ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          onClick={handleSendRover}
+          disabled={miningInProgress}
+        >
+          {miningInProgress ? "Mining in progress..." : "Send Rover"}
+        </button>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={handleConfigureAutomaton}
+        >
+          Configure Automaton
+        </button>
+      </div>
     </div>
   );
 };

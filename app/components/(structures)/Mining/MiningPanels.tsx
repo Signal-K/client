@@ -13,9 +13,8 @@ export const SelectMineralPanel: React.FC<CollectMineralPanelProps> = ({ deposit
   const [showAutomatonPanel, setShowAutomatonPanel] = useState(false);
 
   const handleNextStep = () => {
-    // Show the automaton panel when the user clicks "Next step"
     setShowAutomatonPanel(true);
-  };
+  }; 
 
   return (
     <div className="p-4 border rounded-lg shadow-md bg-white bg-opacity-90">
