@@ -2,6 +2,27 @@ interface Recipe {
     [key: string]: number;
 };
 
+export interface MineralDeposit {
+  id: number;
+  anomaly: number | null;
+  owner: string | null;
+  mineralconfiguration: {
+    mineral: string;
+    quantity: number;
+  };
+};
+
+export interface Automaton {
+    id: number;
+    item: number;
+    owner: string;
+    quantity: number;
+    notes: string | null;
+    time_of_deploy: string | null;
+    anomaly: number | null;
+    parentItem: number | null;
+};  
+
 export interface InventoryItem {
     id: number;
     name: string;

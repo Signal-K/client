@@ -8,7 +8,7 @@ interface LayoutProps {
 };
 export function OnboardingLayout({ children }: LayoutProps) {
     const session = useSession();
-
+ 
     return (
         <div
             className="min-h-screen flex flex-col"

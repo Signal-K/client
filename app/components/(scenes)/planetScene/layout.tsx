@@ -2,11 +2,11 @@
 
 import React, { useState, CSSProperties } from "react";
 import { Header } from "../../sections/Header";
-import { Essendonitis, background2, background3, callme } from "@/constants/backgrounds";
+import { Essendonitis, background2, background3, callme, mining } from "@/constants/backgrounds";
 
 interface PlanetViewLayoutProps {
     children: React.ReactNode[];
-}
+};
 
 const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
     const [expandedSection, setExpandedSection] = useState<number | null>(null);
@@ -158,7 +158,14 @@ export const TestLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
 
 export const SceneLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => { // For sample/test scenes, e.g. mining where we need a header but not the additional sections
     return (
-        <div className="min-h-screen flex flex-col">
+        <div
+            className="min-h-screen flex flex-col"
+            style={{
+                backgroundImage: `url(${(mining)})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+            }}            
+        >
             <Header />
             {children}
         </div>

@@ -15,18 +15,7 @@ import { RooverFromAppeears } from "@/app/components/(anomalies)/(data)/Mars-Pho
 interface RoverData {
   photos: string[];
   resourceSites: { name: string; deposits: string[] }[];
-}
-
-interface InventoryItem {
-  id: number;
-  item: number;
-  owner: string;
-  quantity: number;
-  notes: string;
-  parentItem: string | null;
-  time_of_deploy: string | null;
-  anomaly: string;
-}
+};
 
 export default function DeployRooversInitial() {
   const supabase = useSupabaseClient();
@@ -76,7 +65,7 @@ export default function DeployRooversInitial() {
         if (error) {
           console.error("Error fetching inventory items: ", error);
           return;
-        }
+        };
 
         if (data && data.length > 0) {
           console.log(`Rover already in inventory with ID: ${data[0].id}`);
