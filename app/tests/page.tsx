@@ -12,24 +12,15 @@ import { ProfileCard } from "../auth/UserProfileFields";
 import ProfileCardModal from "../(settings)/profile/form";
 import SandpackBox from "../(anomalies)/(editor)/Sandbox";
 import PythonSandpackTest from "../(anomalies)/(editor)/Python";
+import { Cosmos } from "../(scenes)/(onboarding)/captn-cosmos";
 
 export default function PageLayout() {
     const session = useSession();
     const router = useRouter();
 
     return (
-        // <SidebarLayout leftContent={<div></div>} middleContent={<Panels />} />
-        // <Layout bg="true">
         <>
-            {/* <Panels /> */}
-            {/* <ClassificationsFeed /> */}
-            {/* <SpaceGamePage /> */}
-            <OnboardingLayout bg={true}>
-          <OnboardingWindow />
-        </OnboardingLayout>
-            {/* <SandpackBox />
-            <PythonSandpackTest /> */}
-        {/* </Layout> */}
+            <Cosmos />
         </>
     );
 };

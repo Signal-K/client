@@ -9,6 +9,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import ProgressBar from "../(missions)/ProgressBar";
 import DeployRooversInitial from "../roovers/deployAndReturn";
 import GeneratedStarterPlanet from "@/app/(anomalies)/(planets)/generated";
+import { Header } from "@/app/components/sections/header";
 
 interface Mission {
   id: number;
@@ -67,8 +68,10 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-2 md:mb-4 text-blue-500">{title}</h2>
-      <p className="text-sm md:text-base text-blue-500 mb-4 md:mb-8">{description}</p>
+      <div className="block md:hidden">
+        <h2 className="text-xl font-bold mb-2 md:mb-4 text-blue-500">{title}</h2>
+        <p className="text-sm md:text-base text-blue-500 mb-4 md:mb-8">{description}</p>
+      </div>
       {renderComponentForStep()}
     </div>
   );
@@ -152,13 +155,13 @@ const OnboardingWindow = () => {
   return (
     <div className="relative flex flex-col md:flex-row min-h-screen">
       {/* Left Panel - Desktop */}
-      <div className="hidden md:flex md:w-1/3 w-full flex-col justify-center bg-gray-100 p-4 md:p-10 shadow-4xl z-10">
+      <div className="hidden md:flex md:w-1/3 w-full flex-col justify-center p-4 md:p-10 z-10 backdrop-blur-lg bg-white/30">
         <div className="space-y-4">
           {steps.map((step) => (
             <div
               key={step.id}
               className={`p-2 md:p-4 rounded-lg cursor-pointer ${
-                currentStep === step.id ? "bg-white shadow-md" : "bg-gray-200"
+                currentStep === step.id ? "bg-white/50 shadow-md" : "bg-gray-200/50"
               }`}
               onClick={() => handleStepClick(step.id)}
             >
@@ -171,9 +174,13 @@ const OnboardingWindow = () => {
 
       {/* Right Panel */}
       <div
-        className={`md:w-2/3 w-full flex flex-col justify-center p-4 md:p-10 h-screen md:overflow-y-auto overflow-hidden`} 
-        style={{ backgroundPosition: "center" }}
+        className={`md:w-2/3 w-full flex flex-col justify-center md:p-4 h-screen md:overflow-y-auto overflow-hidden bg-gradient-to-b from-transparent via-transparent to-black/30`} 
       >
+        {/* Header Component for Desktop */}
+        <div className="hidden md:block mb-6">
+          <Header />
+        </div>
+
         <div className="flex-grow flex flex-col justify-between">
           {currentStep ? (
             <motion.div
@@ -238,16 +245,10 @@ const OnboardingWindow = () => {
                   }`}
                   onClick={() => handleStepClick(step.id)}
                 >
-                  <h2 className="font-bold text-sm">{step.name}</h2>
+                  <h2 className="text-sm font-bold">{step.name}</h2>
                   <p className="text-xs">{step.description}</p>
                 </div>
               ))}
-              <button
-                onClick={() => setDropdownOpen(false)}
-                className="w-full p-2 bg-gray-800 text-white rounded-lg mt-4"
-              >
-                Close
-              </button>
             </div>
           </div>
         )}

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import PlanetLayout from "@/ui/Sections/PlanetLayout";
-import { backgroundImages, bgImage } from "@/constants/backgrounds";
+import { backgroundImages, bgImage, blur } from "@/constants/backgrounds";
 
 interface LayoutProps {
     children: ReactNode;
@@ -39,14 +39,12 @@ export function OnboardingLayout({ children }: LayoutProps) {
         <div
             className="min-h-screen flex flex-col"
             style={{
-                backgroundImage: `url(${(bgImage)})`,
+                backgroundImage: `url(${(blur)})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
             }}            
         >
-            {/* <PlanetLayout> */}
                 {children}
-            {/* </PlanetLayout> */}
         </div>
     );
 };
