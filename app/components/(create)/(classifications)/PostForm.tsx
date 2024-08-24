@@ -29,7 +29,7 @@ const roverImgClassificationOptions: ClassificationOption[] = [
 
 interface ClassificationFormProps {
     anomalyType: string;
-    anomalyId: string;  // This should be the ID of the anomaly
+    anomalyId: string; 
     missionNumber: number;
     assetMentioned: string;
 };
@@ -112,7 +112,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     author: session?.user?.id,
                     content,
                     media: [uploads, assetMentioned],
-                    anomaly: anomalyId,  // Use the anomalyId passed as a prop
+                    anomaly: anomalyId,  
                     classificationtype: anomalyType,
                     classificationConfiguration,
                 })

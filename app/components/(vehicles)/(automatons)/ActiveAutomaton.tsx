@@ -8,7 +8,7 @@ import AnomalyUpgrade from "../../(structures)/Config/AutomatonUpgradeBox";
 
 interface ActiveAutomatonForMiningProps {
   deposit: MineralDeposit;
-}
+} 
 
 interface InventoryItem {
   id: number;

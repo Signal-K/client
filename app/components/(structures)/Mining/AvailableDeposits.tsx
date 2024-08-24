@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { InventoryItem, MineralDeposit } from "@/types/Items";
+import { InventoryItem, MineralDeposit } from "@/types/Items"; 
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { SelectMineralPanel } from "./MiningPanels";
 

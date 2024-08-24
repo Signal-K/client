@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 type Tab = 'Speed' | 'Power' | 'Capacity';
 
-const AutomatonUpgrade: React.FC = () => {
+const AutomatonUpgrade: React.FC = () => { 
   const [selectedTab, setSelectedTab] = useState<Tab>('Speed');
   const [selectedOption, setSelectedOption] = useState<Record<Tab, number>>({
     Speed: 1,

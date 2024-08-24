@@ -5,7 +5,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../../(create)/(classifications)/PostForm";
 import { MapPinIcon } from "@/app/components/(inventory)/items/MineralDeposits";
 
-export const RooverFromAppeears: React.FC = () => {
+export const RooverFromAppeears: React.FC = () => { 
     const supabase = useSupabaseClient(); 
     const session = useSession();
     const { activePlanet } = useActivePlanet();
