@@ -76,10 +76,9 @@ export const RooverFromAppeears: React.FC = () => {
                 }
     
                 setImagesCollected(true);
-                alert("Images collected and classified successfully!");
+                alert("Images collected successfully!");
                 setIsClassified(true);
     
-                // Make sure to update the rovers state with new anomaly IDs if needed
                 setRovers(data);
     
             } catch (error) {
@@ -88,7 +87,6 @@ export const RooverFromAppeears: React.FC = () => {
             }
         }
     };
-    
 
     const handleEstablishMiningSettlement = async () => {
         if (session && activePlanet) {
@@ -123,12 +121,29 @@ export const RooverFromAppeears: React.FC = () => {
         <div className="grid grid-cols-3 gap-4">
             {rovers.length > 0 ? (
                 rovers.map((rover) => (
-                    <div key={rover.id} className="text-center">
-                        <img
-                            src={rover.avatar_url}
-                            alt={`Mars rover image`}
-                            className="w-full h-auto rounded-md"
-                        />
+                    <div key={rover.id} className="text-center col-span-3">
+                        <div className="mb-4">
+                            <img
+                                src='https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true'
+                                alt='telescope'
+                                className="w-24 h-24 mb-2"
+                            />
+                        </div>
+                        <div className="p-2 max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                            <div className='relative h-64 w-full'>
+                                <img
+                                    src={rover.avatar_url}
+                                    alt={`Mars rover image`}
+                                    className="relative z-10 w-full h-full object-contain"
+                                />
+                            </div>
+                            <ClassificationForm
+                                anomalyId={rover.id.toString()}
+                                anomalyType="roverImg"
+                                missionNumber={1370104}
+                                assetMentioned={rover.avatar_url}
+                            />
+                        </div>
                     </div>
                 ))
             ) : (
@@ -143,19 +158,6 @@ export const RooverFromAppeears: React.FC = () => {
                 >
                     Collect this image
                 </button>
-            )}
-            {imagesCollected && (
-                <div className="mx-3 col-span-3">
-                    {rovers.map((rover, index) => (
-                        <ClassificationForm
-                            key={rover.id}
-                            anomalyId={rover.id.toString()}  // Use the correct anomaly id here
-                            anomalyType="roverImg"
-                            missionNumber={1370104}
-                            assetMentioned={rover.avatar_url}
-                        />
-                    ))}
-                </div>
             )}
             {isClassified && (
                 <div className="col-span-3 mt-4">

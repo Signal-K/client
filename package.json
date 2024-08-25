@@ -37,7 +37,7 @@
     "clsx": "^2.1.1",
     "daisyui": "^4.11.1",
     "date-fns": "^3.6.0",
-    "framer-motion": "^11.1.9",
+    "framer-motion": "^11.3.30",
     "html2canvas": "^1.4.1",
     "lexical": "^0.15.0",
     "lucide-react": "^0.394.0",

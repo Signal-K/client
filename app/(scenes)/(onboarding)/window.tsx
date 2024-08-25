@@ -15,13 +15,13 @@ interface Mission {
   id: number;
   name: string;
   description: string;
-}
+};
 
 interface OnboardingStepProps {
   title: string;
   description: string;
   step: number;
-}
+};
 
 const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
   const { activePlanet } = useActivePlanet();
@@ -83,7 +83,7 @@ const OnboardingWindow = () => {
 
   const [currentStep, setCurrentStep] = useState<number | null>(null);
   const [steps, setSteps] = useState<Mission[]>([]);
-  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false); // State for dropdown
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 
   const missionIds = [1370102, 1370103, 1370104, 1370106]; // Exclude 1370105 from the missionIds
 
@@ -92,14 +92,12 @@ const OnboardingWindow = () => {
       const response = await fetch("/api/gameplay/missions");
       const data: Mission[] = await response.json();
 
-      // Filter out the relevant missions, excluding 1370105
       const filteredSteps = data.filter(
         (mission) => missionIds.includes(mission.id)
       );
 
       setSteps(filteredSteps);
 
-      // Check the user's progress and set the correct step
       const { data: existingMissions, error } = await supabase
         .from("missions")
         .select("mission")
@@ -119,9 +117,9 @@ const OnboardingWindow = () => {
           if (!completedMissions.includes(missionIds[i])) {
             setCurrentStep(missionIds[i]);
             break;
-          }
-        }
-      }
+          };
+        };
+      };
     };
 
     fetchMissionsData();
@@ -153,9 +151,9 @@ const OnboardingWindow = () => {
   };
 
   return (
-    <div className="relative flex flex-col md:flex-row min-h-screen">
+    <div className="relative flex flex-col md:flex-row min-h-screen p-4 md:p-8">
       {/* Left Panel - Desktop */}
-      <div className="hidden md:flex md:w-1/3 w-full flex-col justify-center p-4 md:p-10 z-10 backdrop-blur-lg bg-white/30">
+      <div className="hidden md:flex rounded-xl md:w-1/3 w-full flex-col justify-center p-2 md:p-10 z-10 backdrop-blur-lg bg-white/30">
         <div className="space-y-4">
           {steps.map((step) => (
             <div
@@ -165,8 +163,8 @@ const OnboardingWindow = () => {
               }`}
               onClick={() => handleStepClick(step.id)}
             >
-              <h2 className="text-sm md:text-base font-bold">{step.name}</h2>
-              <p className="text-xs md:text-sm">{step.description}</p>
+              <h2 className="text-sm md:text-base text-yellow-400 font-bold">{step.name}</h2>
+              <p className="text-xs md:text-sm text-yellow-200">{step.description}</p>
             </div>
           ))}
         </div>

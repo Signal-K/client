@@ -102,32 +102,46 @@ export default function DeployRooversInitial() {
   }, [session, supabase, newRoverToInventoryData]);
 
   return (
-    <div className="bg-pastel-blue text-gray-700 font-body p-4 rounded-lg">
-      <Card className="w-full border-gray-300 bg-cyan-50 text-gray-800 rounded-lg">
+    <div className="text-white font-body p-4 rounded-lg">
+      <Card className="w-full border-gray-300 text-white rounded-lg bg-opacity-10">
         <CardHeader>
-          <CardTitle className="text-pastel-pink font-heading">
-            Rover Control Panel
-          </CardTitle>
-          <CardDescription className="text-gray-600">
-            Deploy and monitor your automated Mars rovers.
-          </CardDescription>
+          <div className="flex items-center gap-4">
+            <Avatar className="h-12 w-12 bg-pastel-pink text-white">
+              <AvatarImage
+                src="https://cdn-icons-png.flaticon.com/512/124/124544.png"
+                alt="Astra"
+              />
+              <AvatarFallback>A</AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className="text-pastel-pink font-heading">
+                Cosmos
+              </CardTitle>
+              <CardDescription className="text-white">
+                Deploy and monitor your automated Mars rovers.
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4">
             {dialogueStep === 1 && !isDeployed && (
-              <div className="text-lg font-medium">
+              <div className="relative p-4 bg-[#2C3A4A] bg-opacity-75 border border-[#85DDA2] rounded-md shadow-md text-lg font-medium text-white">
+                <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
                 Now that we've discovered a planet, let's deploy a rover to get a closer look!
               </div>
             )}
             {dialogueStep === 2 && isDeployed && !roverData && (
-              <div className="text-lg font-medium">
-                Whoa! Now let's analyse your rover photos...
+              <div className="relative p-4 bg-[#2C3A4A] bg-opacity-75 border border-[#85DDA2] rounded-md shadow-md text-lg font-medium text-white">
+                <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
+                Whoa! Now let's analyze your rover photos...
               </div>
             )}
             {dialogueStep === 3 && roverData && (
               <>
                 <RooverFromAppeears />
-                <div className="text-lg font-medium mt-4">
+                <div className="relative p-4 bg-[#2C3A4A] bg-opacity-75 border border-[#85DDA2] rounded-md shadow-md text-lg font-medium text-white mt-4">
+                  <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
                   Select from the available options based on what you can see in the photo.
                 </div>
               </>
@@ -139,7 +153,7 @@ export default function DeployRooversInitial() {
                     key={index}
                     className="flex flex-col items-center justify-center gap-2"
                   >
-                    <Avatar className="h-12 w-12 bg-pastel-pink text-gray-800">
+                    <Avatar className="h-12 w-12 bg-pastel-pink text-white">
                       <AvatarImage
                         src="https://cdn-icons-png.flaticon.com/512/124/124544.png"
                         alt={rover}

@@ -92,7 +92,7 @@ export const TelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid })
     const nextLine = () => setLine(prevLine => prevLine + 1);
     const nextPart = () => {
         setPart(2);
-        setLine(1);
+        setLine(1); 
     };
 
     const tutorialContent = (
