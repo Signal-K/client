@@ -10,7 +10,7 @@ interface Classification {
     id: number;
     anomaly: number;
     classificationtype: string;
-};
+}
 
 const GeneratedStarterPlanet: React.FC = () => {
     const supabase = useSupabaseClient();
@@ -40,8 +40,8 @@ const GeneratedStarterPlanet: React.FC = () => {
                 setClassifications(allClassifications || []);
 
                 // Fetch one classification of each type
-                const lightcurve = allClassifications?.find(c => c.classificationtype === "lightcurve") || null;
-                const roverImg = allClassifications?.find(c => c.classificationtype === "roverImg") || null;
+                const lightcurve = allClassifications?.find((c: { classificationtype: string; }) => c.classificationtype === "planet") || null;
+                const roverImg = allClassifications?.find((c: { classificationtype: string; }) => c.classificationtype === "roverImg") || null;
 
                 setOneLightcurve(lightcurve);
                 setOneRoverImg(roverImg);
@@ -73,8 +73,8 @@ const GeneratedStarterPlanet: React.FC = () => {
     };
 
     const getImage = () => {
-        const anomalyId = activePlanet.id; // Adjust this if needed
-        if (totalClassifications > 6 && anomalyTypes > 4) {
+        const anomalyId = activePlanet.id;
+        if (anomalyTypes > 4 && totalClassifications > 6) {
             return getImageUrl(anomalyId, 4);
         }
         if (anomalyTypes > 2 || (anomalyTypes > 1 && totalClassifications > 4)) {
@@ -84,6 +84,40 @@ const GeneratedStarterPlanet: React.FC = () => {
             return getImageUrl(anomalyId, 2);
         }
         return getImageUrl(anomalyId, 1);
+    };
+
+    const renderDiscoveries = () => {
+        if (!oneLightcurve && !oneRoverImg) {
+            return (
+                <li>
+                    <div className="flex items-center gap-2">
+                        <DropletIcon className="w-5 h-5 text-primary" />
+                        <span>No significant discoveries to report</span>
+                    </div>
+                </li>
+            );
+        }
+
+        return (
+            <>
+                {oneLightcurve && (
+                    <li>
+                        <div className="flex items-center gap-2">
+                            <TelescopeIcon className="w-5 h-5 text-primary" />
+                            <span>Discovered light curve patterns in the data</span>
+                        </div>
+                    </li>
+                )}
+                {oneRoverImg && (
+                    <li>
+                        <div className="flex items-center gap-2">
+                            <LeafIcon className="w-5 h-5 text-primary" />
+                            <span>Captured rover images of the surface</span>
+                        </div>
+                    </li>
+                )}
+            </>
+        );
     };
 
     return (
@@ -103,30 +137,7 @@ const GeneratedStarterPlanet: React.FC = () => {
                 <div className="bg-muted rounded-lg p-4 grid gap-2">
                     <h3 className="text-lg font-medium">Discoveries</h3>
                     <ul className="space-y-2 text-sm">
-                        {oneLightcurve && (
-                            <li>
-                                <div className="flex items-center gap-2">
-                                    <TelescopeIcon className="w-5 h-5 text-primary" />
-                                    <span>Discovered light curve patterns in the data</span>
-                                </div>
-                            </li>
-                        )}
-                        {oneRoverImg && (
-                            <li>
-                                <div className="flex items-center gap-2">
-                                    <LeafIcon className="w-5 h-5 text-primary" />
-                                    <span>Captured rover images of the surface</span>
-                                </div>
-                            </li>
-                        )}
-                        {!oneLightcurve && !oneRoverImg && (
-                            <li>
-                                <div className="flex items-center gap-2">
-                                    <DropletIcon className="w-5 h-5 text-primary" />
-                                    <span>No significant discoveries to report</span>
-                                </div>
-                            </li>
-                        )}
+                        {renderDiscoveries()}
                     </ul>
                 </div>
             </div>
