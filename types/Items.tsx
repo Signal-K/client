@@ -1,3 +1,5 @@
+import { CapacityLevel } from "@/app/components/(vehicles)/(automatons)/ActiveAutomaton";
+
 interface Recipe {
     [key: string]: number;
 };
@@ -12,15 +14,20 @@ export interface MineralDeposit {
   };
 };
 
+type SpeedLevel = 1 | 2 | 3;
+
 export interface Automaton {
     id: number;
     item: number;
     owner: string;
     quantity: number;
-    notes: string | null;
     time_of_deploy: string | null;
-    anomaly: number | null;
-    parentItem: number | null;
+    anomaly: number;
+    configuration: {
+      Power: number;
+      Speed: SpeedLevel; 
+      Capacity: CapacityLevel;
+    };
 };  
 
 export interface InventoryItem {

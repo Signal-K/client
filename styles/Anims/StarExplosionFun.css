@@ -1,0 +1,13 @@
+.star-explosion-animation {
+    width: 100px;
+    height: 100px;
+    background: url('/path-to-your-star-animation.gif') no-repeat center center;
+    background-size: cover;
+    animation: explode 1s forwards;
+  }
+  
+  @keyframes explode {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
+  }
+  
