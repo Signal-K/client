@@ -106,7 +106,12 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 value
             ])
         );
-
+    
+        // Add activePlanet.id to classificationConfiguration
+        if (activePlanet?.id) {
+            classificationConfiguration.activePlanet = activePlanet.id;
+        }
+    
         try {
             const { data: classificationData, error: classificationError } = await supabase
                 .from("classifications")
@@ -116,10 +121,10 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     media: [uploads, assetMentioned],
                     anomaly: anomalyId,
                     classificationtype: anomalyType,
-                    classificationConfiguration,
+                    classificationConfiguration, // Include the configuration with activePlanet
                 })
                 .single();
-
+    
             if (classificationError) {
                 console.error("Error creating classification:", classificationError.message);
                 alert("Failed to create classification. Please try again.");
@@ -130,25 +135,26 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 setSelectedOptions({});
                 setUploads([]);
             }
-
+    
             if (!activePlanet?.id) {
                 const { error: profileUpdateError } = await supabase
                     .from("profiles")
                     .update({ location: anomalyId })
                     .eq("id", session?.user?.id);
-
+    
                 if (profileUpdateError) {
                     console.error("Error updating profile with active planet:", profileUpdateError.message);
                     alert("Failed to update active planet. Please try again.");
                     return;
                 }
             }
-
+    
             await handleMissionComplete();
         } catch (error) {
             console.error("Unexpected error:", error);
         }
     };
+    
 
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;

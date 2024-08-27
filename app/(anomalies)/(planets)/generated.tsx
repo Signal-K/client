@@ -10,6 +10,7 @@ interface Classification {
     id: number;
     anomaly: number;
     classificationtype: string;
+    classificationConfiguration?: { activePlanet?: number }; // Updated to include classificationConfiguration
 }
 
 const GeneratedStarterPlanet: React.FC = () => {
@@ -31,17 +32,23 @@ const GeneratedStarterPlanet: React.FC = () => {
                 // Fetch all classifications related to the activePlanet
                 const { data: allClassifications, error: allError } = await supabase
                     .from("classifications")
-                    .select("id, anomaly, classificationtype")
-                    .eq("author", session.user.id)
-                    .eq("anomaly", activePlanet.id);
+                    .select("id, anomaly, classificationtype, classificationConfiguration")
+                    .eq("author", session.user.id);
 
                 if (allError) throw allError;
 
-                setClassifications(allClassifications || []);
+                // Filter classifications by activePlanet.id
+                const filteredClassifications = allClassifications?.filter(
+                    (c: Classification) => 
+                        c.anomaly === activePlanet.id || 
+                        (c.classificationConfiguration?.activePlanet === activePlanet.id)
+                ) || [];
+
+                setClassifications(filteredClassifications);
 
                 // Fetch one classification of each type
-                const lightcurve = allClassifications?.find((c: { classificationtype: string; }) => c.classificationtype === "planet") || null;
-                const roverImg = allClassifications?.find((c: { classificationtype: string; }) => c.classificationtype === "roverImg") || null;
+                const lightcurve = filteredClassifications.find((c: { classificationtype: string; }) => c.classificationtype === "planet") || null;
+                const roverImg = filteredClassifications.find((c: { classificationtype: string; }) => c.classificationtype === "roverImg") || null;
 
                 setOneLightcurve(lightcurve);
                 setOneRoverImg(roverImg);
@@ -146,10 +153,10 @@ const GeneratedStarterPlanet: React.FC = () => {
                 <p className="text-sm mt-2">
                     Great job completing the onboarding! You're all set.
                 </p>
-                <p className="text-sm mt-2">
+                {/* <p className="text-sm mt-2">
                     Now, it's time to travel to your planet, where your adventure truly begins. Get ready to
                     explore, discover, and make your mark!
-                </p>
+                </p> */}
                 <p className="text-sm mt-2">
                     We're still working on the first chapter, but if you'd like, we do have some old gameplay components for you to check out,
                     and there's plenty more to classify.

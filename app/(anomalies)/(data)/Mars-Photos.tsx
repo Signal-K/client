@@ -122,13 +122,13 @@ export const RooverFromAppeears: React.FC = () => {
             {rovers.length > 0 ? (
                 rovers.map((rover) => (
                     <div key={rover.id} className="text-center col-span-3">
-                        <div className="mb-4">
+                        {/* <div className="mb-4">
                             <img
                                 src='https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true'
                                 alt='telescope'
                                 className="w-24 h-24 mb-2"
                             />
-                        </div>
+                        </div> */}
                         <div className="p-2 max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
                             <div className='relative h-64 w-full'>
                                 <img
@@ -137,12 +137,24 @@ export const RooverFromAppeears: React.FC = () => {
                                     className="relative z-10 w-full h-full object-contain"
                                 />
                             </div>
-                            <ClassificationForm
-                                anomalyId={rover.id.toString()}
-                                anomalyType="roverImg"
-                                missionNumber={1370104}
-                                assetMentioned={rover.avatar_url}
-                            />
+
+                            {!imagesCollected && (
+                                <button
+                                    onClick={handleCollectAndClassify}
+                                    className="col-span-3 mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
+                                >
+                                    Collect this image
+                                </button>
+                            )}
+
+                            {imagesCollected && (
+                                <ClassificationForm
+                                    anomalyId={rover.id.toString()}
+                                    anomalyType="roverImg"
+                                    missionNumber={1370104}
+                                    assetMentioned={rover.avatar_url}
+                                />
+                            )}
                         </div>
                     </div>
                 ))
@@ -150,14 +162,6 @@ export const RooverFromAppeears: React.FC = () => {
                 <div className="text-center col-span-3">
                     {rovers[0]?.avatar_url}
                 </div>
-            )}
-            {rovers.length > 0 && !imagesCollected && (
-                <button
-                    onClick={handleCollectAndClassify}
-                    className="col-span-3 mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
-                >
-                    Collect this image
-                </button>
             )}
             {isClassified && (
                 <div className="col-span-3 mt-4">

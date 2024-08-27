@@ -1,6 +1,6 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useState, useEffect } from "react";
-import UserAvatar from "./Avatar";
+import UserAvatar from "./Avatar"; 
 
 export default function ProfileCardModal() {
     const supabase = useSupabaseClient();
@@ -106,10 +106,10 @@ export default function ProfileCardModal() {
 
     return (
         <form onSubmit={(e) => updateProfile(e)} className="form-widget p-6 rounded-md shadow-lg max-w-md mx-auto">
-            <h2 className="text-2xl font-bold mb-4 text-red-800">Edit profile</h2>
-            <p className="text-red-800 mb-6">Provide details about yourself and any other pertinent information.</p>
+            <h2 className="text-2xl font-bold mb-4 text-[#85DDA2]">Edit profile</h2>
+            <p className="text-[#85DDA2] mb-6">Provide details about yourself and any other pertinent information.</p>
             <div className="mb-4">
-                <label htmlFor="avatar" className="block text-sm font-medium text-red-800">Profile avatar</label>
+                <label htmlFor="avatar" className="block text-sm font-medium text-[#85DDA2]">Profile avatar</label>
                 <UserAvatar
                     url={avatar_url}
                     size={150}
@@ -117,7 +117,7 @@ export default function ProfileCardModal() {
                 />
             </div>
             <div className="mb-4">
-                <label htmlFor="full_name" className="block text-sm font-bold text-red-800">Full name</label>
+                <label htmlFor="full_name" className="block text-sm font-bold text-[#85DDA2]">Full name</label>
                 <input
                     id="full_name"
                     type="text"
@@ -127,7 +127,7 @@ export default function ProfileCardModal() {
                 />
             </div>
             <div className="mb-4">
-                <label htmlFor="username" className="block text-sm font-medium text-red-800">Username</label>
+                <label htmlFor="username" className="block text-sm font-medium text-[#85DDA2]">Username</label>
                 <input
                     id="username"
                     type="text"
@@ -138,7 +138,7 @@ export default function ProfileCardModal() {
                 />
             </div>
             <div className="mb-4">
-                <label htmlFor="email" className="block text-sm font-medium text-red-800">Email: </label>
+                <label htmlFor="email" className="block text-sm font-medium text-[#85DDA2]">Email: </label>
                 <input
                     className="mt-1 block w-full px-3 py-2 bg-gray-800 text-white rounded-md border border-gray-600 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     id="email"
@@ -155,7 +155,7 @@ export default function ProfileCardModal() {
             <div>
                 <button
                     type="submit"
-                    className="block w-full bg-red-800 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    className="block w-full bg-[#85DDA2] text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     disabled={loading}
                 >
                     {loading ? "Loading ..." : "Update profile"}

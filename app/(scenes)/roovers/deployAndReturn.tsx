@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
+  CardContent, 
 } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -108,10 +108,9 @@ export default function DeployRooversInitial() {
           <div className="flex items-center gap-4">
             <Avatar className="h-12 w-12 bg-pastel-pink text-white">
               <AvatarImage
-                src="https://cdn-icons-png.flaticon.com/512/124/124544.png"
+                src="/assets/Captn.jpg"
                 alt="Astra"
               />
-              <AvatarFallback>A</AvatarFallback>
             </Avatar>
             <div>
               <CardTitle className="text-pastel-pink font-heading">
@@ -166,9 +165,7 @@ export default function DeployRooversInitial() {
               </div>
             )}
             <Button
-              className={`w-full ${
-                isDeployed ? "bg-pastel-green" : "bg-pastel-pink"
-              } text-gray-800`}
+              className="bg-[#85DDA2]"
               onClick={deployRover}
               disabled={isDeployed}
             >
