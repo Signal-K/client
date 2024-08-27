@@ -4,6 +4,7 @@ import { Menu, MenuButton, MenuItem } from "@headlessui/react";
 import { ArrowDownIcon, LucideArrowLeft, LucideArrowRightSquare, LucideBookOpen, PaintRollerIcon } from "lucide-react";
 import { NavMenuProps } from "@/types/Layout/Menu";
 import { Button } from "../ui/button";
+import { useActivePlanet } from "@/context/ActivePlanet";
 
 function NavMenu({ onClick }: NavMenuProps) {
     return (
@@ -14,6 +15,8 @@ function NavMenu({ onClick }: NavMenuProps) {
 };
 
 export function Header() {
+    const { activePlanet } = useActivePlanet();
+
     return (
         <>
             <header className="left-0 right-0 z-50 flex h-16 w-full items-center justify-between bg-white/10 px-4 shadow-sm backdrop-blur-md dark:bg-gray-950/80 dark:text-gray-50">
@@ -38,8 +41,9 @@ export function Header() {
                     </Button>
                 </div>
                 <div className="flex flex-col items-center">
-                    <div className="inline-block rounded-lg bg-gray-100/80 px-3 py-1 text-sm backdrop-blur-md dark:bg-gray-800/80">
+                    <div className="inline-block rounded-lg text-yellow-500 bg-cyan-100 px-3 py-1 text-sm backdrop-blur-md dark:bg-gray-800/80">
                         <NavMenu onClick={() => {}} />
+                        {activePlanet?.content}
                     </div>
                 </div>
                 <div className="flex items-center gap-4">

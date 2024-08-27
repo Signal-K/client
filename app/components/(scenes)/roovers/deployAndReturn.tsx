@@ -11,7 +11,7 @@ import { Button } from "@/app/components/ui/button";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { RooverFromAppeears } from "@/app/components/(anomalies)/(data)/Mars-Photos";
-
+ 
 interface RoverData {
   photos: string[];
   resourceSites: { name: string; deposits: string[] }[];

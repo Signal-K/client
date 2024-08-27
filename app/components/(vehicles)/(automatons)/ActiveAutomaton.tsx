@@ -8,7 +8,7 @@ import AnomalyUpgrade from "../../(structures)/Config/AutomatonUpgradeBox";
 
 interface ActiveAutomatonForMiningProps {
   deposit: MineralDeposit;
-} 
+}
 
 interface InventoryItem {
   id: number;
@@ -20,7 +20,7 @@ interface InventoryItem {
   parentItem: number | null;
   itemLevel: number;
   recipe?: { [key: string]: number };
-};
+}
 
 export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningProps) {
   const supabase = useSupabaseClient();
@@ -32,7 +32,7 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
   const [loading, setLoading] = useState(true);
   const [miningInProgress, setMiningInProgress] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isConfiguring, setIsConfiguring] = useState(false); // State to manage configuration view
+  const [isConfiguring, setIsConfiguring] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,7 +42,7 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
 
         if (!session?.user?.id || !activePlanet?.id) {
           throw new Error("User session or active planet is not available.");
-        };
+        }
 
         const { data: automatonData, error: automatonError } = await supabase
           .from("inventory")
@@ -54,7 +54,7 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
 
         if (automatonError) {
           throw new Error(`Error fetching automaton data: ${automatonError.message}`);
-        };
+        }
 
         setUserAutomaton(automatonData);
 
@@ -80,34 +80,96 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
       setErrorMessage("No automaton available to perform mining.");
       return;
     }
-
+  
     setMiningInProgress(true);
     setErrorMessage(null);
-
+  
     try {
       const mineralName = deposit.mineralconfiguration.mineral;
       const item = inventoryItems.find(
-        (invItem) => invItem.name.toLowerCase() === mineralName.toLowerCase()
+        (invItem) => invItem.id.toString() === mineralName
       );
-
+  
       if (!item) {
         throw new Error(`No item found in inventory for mineral: ${mineralName}`);
       }
-
-      const { data, error } = await supabase.from("inventory").insert({
-        item: item.id,
-        owner: session?.user?.id,
-        quantity: 1,
-        notes: "Collected by rover",
-        anomaly: activePlanet?.id,
-        parentItem: userAutomaton.id,
-      });
-
-      if (error) {
-        throw new Error(`Error inserting collected mineral: ${error.message}`);
+  
+      // 1. Fetch and update mineral deposit quantity
+      const { data: mineralData, error: mineralError } = await supabase
+        .from("mineralDeposits")
+        .select("mineralconfiguration")
+        .eq("id", deposit.id)
+        .single();
+  
+      if (mineralError || !mineralData) {
+        throw new Error(`Error fetching mineral deposit data: ${mineralError?.message}`);
       }
-
-      console.log("Mineral collected and added to inventory:", data);
+  
+      const mineralConfig = mineralData.mineralconfiguration as { mineral: string; quantity: number };
+      
+      if (mineralConfig.quantity <= 0) {
+        throw new Error(`No quantity left for mineral: ${mineralName}`);
+      }
+  
+      const updatedQuantity = mineralConfig.quantity - 1;
+  
+      const { error: updateMineralError } = await supabase
+        .from("mineralDeposits")
+        .update({
+          mineralconfiguration: {
+            ...mineralConfig,
+            quantity: updatedQuantity
+          }
+        })
+        .eq("id", deposit.id);
+  
+      if (updateMineralError) {
+        throw new Error(`Error updating mineral deposit: ${updateMineralError.message}`);
+      }
+  
+      // 2. Check and update or insert inventory
+      const { data: existingInventory, error: inventoryError } = await supabase
+        .from("inventory")
+        .select("*")
+        .eq("item", item.id)
+        .eq("owner", session?.user?.id)
+        .eq("anomaly", activePlanet?.id)
+        .single();
+  
+      if (inventoryError && inventoryError.code !== 'PGRST116') {
+        throw new Error(`Error fetching inventory data: ${inventoryError.message}`);
+      }
+  
+      if (existingInventory) {
+        const { error: updateInventoryError } = await supabase
+          .from("inventory")
+          .update({
+            quantity: existingInventory.quantity + 1
+          })
+          .eq("id", existingInventory.id);
+  
+        if (updateInventoryError) {
+          throw new Error(`Error updating inventory: ${updateInventoryError.message}`);
+        }
+      } else {
+        const { error: insertInventoryError } = await supabase
+          .from("inventory")
+          .insert({
+            item: item.id,
+            owner: session?.user?.id,
+            quantity: 1,
+            notes: `Created by rover ${userAutomaton.id}`,
+            time_of_deploy: new Date().toISOString(),
+            anomaly: activePlanet?.id,
+            configuration: null
+          });
+  
+        if (insertInventoryError) {
+          throw new Error(`Error inserting inventory: ${insertInventoryError.message}`);
+        }
+      }
+  
+      console.log("Mineral collected and added to inventory.");
       alert(`Successfully collected ${mineralName}!`);
     } catch (error: any) {
       console.error("Error collecting mineral:", error.message);
@@ -115,7 +177,7 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
     } finally {
       setMiningInProgress(false);
     }
-  };
+  };  
 
   const handleConfigureAutomaton = () => {
     setIsConfiguring(true);

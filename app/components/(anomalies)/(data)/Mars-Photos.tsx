@@ -16,7 +16,7 @@ export const RooverFromAppeears: React.FC = () => {
     const [isClassified, setIsClassified] = useState(false);
     const [mineralDeposits, setMineralDeposits] = useState<string[]>([]);
 
-    const resourceList = ["Coal", "Iron", "Nickel", "Alloy", "Copper", "Chromium"];
+    const resourceList = ["11", "15", "16", "17", "19", "20"];
 
     const fetchMarsImages = async () => {
         const randomDate = Math.floor(Math.random() * 1000) + 1;
@@ -49,7 +49,7 @@ export const RooverFromAppeears: React.FC = () => {
             return shuffled.slice(0, 3);
         };
 
-        setMineralDeposits(getRandomMineralDeposits());
+        setMineralDeposits(getRandomMineralDeposits()); 
     }, [isClassified]);
 
     const handleCollectAndClassify = async () => {
