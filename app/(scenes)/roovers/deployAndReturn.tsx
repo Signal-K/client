@@ -145,35 +145,39 @@ export default function DeployRooversInitial() {
                 </div>
               </>
             )}
-            {!isDeployed && (
-              <div className="grid grid-cols-3 gap-4">
-                {["Rover 1"].map((rover, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col items-center justify-center gap-2"
-                  >
-                    <Avatar className="h-12 w-12 bg-pastel-pink text-white">
-                      <AvatarImage
-                        src="https://cdn-icons-png.flaticon.com/512/124/124544.png"
-                        alt={rover}
-                      />
-                      <AvatarFallback>{`R${index + 1}`}</AvatarFallback>
-                    </Avatar>
-                    <div className="text-sm font-medium">{rover}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-            <Button
+{!isDeployed && (
+  <center><div className="grid grid-cols-3 gap-4">
+    {["Rover"].map((rover, index) => (
+      <Button
+        key={index}
+        className="flex flex-col items-center justify-center gap-2 bg-[#85DDA2] h-24 w-24 text-white rounded-lg"
+        onClick={deployRover}
+        disabled={isDeployed}
+      >
+        <Avatar className="h-12 w-12 bg-pastel-pink text-white">
+          <AvatarImage
+            src="https://cdn-icons-png.flaticon.com/512/124/124544.png"
+            alt={rover}
+          />
+          <AvatarFallback>{`R${index + 1}`}</AvatarFallback>
+        </Avatar>
+        {/* <div className="text-sm font-medium">{rover}</div> */}
+        {isDeployed ? "Rover Deployed" : "Deploy Rover"}
+      </Button>
+    ))}
+  </div></center>
+)}
+
+            {/* <Button
               className="bg-[#85DDA2]"
               onClick={deployRover}
               disabled={isDeployed}
             >
-              {isDeployed ? "Rover Deployed" : "Deploy Rover"}
-            </Button>
+              
+            </Button> */}
           </div>
         </CardContent>
       </Card>
-    </div>
+    </div> // Originally titled "Rover 1", but Fred said that was shit
   );
 };

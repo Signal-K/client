@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { Card } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
+import Router from "next/router";
 
 interface Classification {
     id: number;
@@ -171,7 +171,6 @@ const AddMissionsAndItems: React.FC = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
-    const router = useRouter();
 
     const handleAddMissionsAndItems = async () => {
         if (!session || !activePlanet) return;
@@ -209,9 +208,6 @@ const AddMissionsAndItems: React.FC = () => {
                 })));
 
             if (inventoryError) throw inventoryError;
-
-            // Redirect to /scenes/v1
-            router.push("/scenes/v1");
 
         } catch (error: any) {
             console.error("Error adding missions or inventory items:", error.message);

@@ -106,7 +106,7 @@ const OnboardingWindow = () => {
       if (error) {
         console.error("Error fetching missions:", error);
         return;
-      }
+      };
 
       const completedMissions = existingMissions.map((m: any) => m.mission);
 
@@ -163,8 +163,8 @@ const OnboardingWindow = () => {
               }`}
               onClick={() => handleStepClick(step.id)}
             >
-              <h2 className="text-sm md:text-base text-yellow-400 font-bold">{step.name}</h2>
-              <p className="text-xs md:text-sm text-yellow-200">{step.description}</p>
+              <h2 className="text-sm md:text-base text-[#2C3A4A] font-bold">{step.name}</h2>
+              {/* <p className="text-xs md:text-sm text-[#FFA161]">{step.description}</p> */}
             </div>
           ))}
         </div>

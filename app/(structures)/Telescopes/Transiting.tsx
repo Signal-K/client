@@ -177,11 +177,11 @@ export const TelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid })
                         <div className="p-2max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
                             <div className='relative'>
                                 <div className='absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
-                                <img
+                                <div className='bg-white bg-opacity-90'><img
                                     src={imageUrl}
                                     alt={`Active Planet ${activePlanet?.id}`}
                                     className="relative z-10 w-128 h-128 object-contain"
-                                />
+                                /></div>
                             </div>
                             <ClassificationForm anomalyId={anomalyid} anomalyType='planet' missionNumber={1370103} assetMentioned={imageUrl} />
                         </div>
