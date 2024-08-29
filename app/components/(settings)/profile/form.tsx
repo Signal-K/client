@@ -62,7 +62,7 @@ export default function ProfileCardModal() {
         if (error) {
             alert(error.message);
         } else {
-            await checkAndCreateMission(); // Check and create the mission after updating the profile
+            await checkAndCreateMission(); 
         }
 
         setLoading(false);

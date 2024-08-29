@@ -1,26 +1,56 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useSession } from '@supabase/auth-helpers-react';
 
 type Tab = 'Speed' | 'Power' | 'Capacity';
 
 interface AutomatonUpgradeProps {
   onSave: () => void;
-};
+  inventoryId: number;
+}
 
-const AutomatonUpgrade: React.FC<AutomatonUpgradeProps> = ({ onSave }) => {
+const AutomatonUpgrade: React.FC<AutomatonUpgradeProps> = ({ onSave, inventoryId }) => {
   const [selectedTab, setSelectedTab] = useState<Tab>('Speed');
   const [selectedOption, setSelectedOption] = useState<Record<Tab, number>>({
     Speed: 1,
     Power: 1,
     Capacity: 1,
   });
+  const supabase = createClientComponentClient();
+  const session = useSession();
 
   const options: Record<Tab, string[]> = {
     Speed: ['Level 1', 'Level 2', 'Level 3'],
     Power: ['Level 1', 'Level 2', 'Level 3'],
     Capacity: ['Level 1', 'Level 2', 'Level 3'],
   };
+
+  useEffect(() => {
+    const fetchConfiguration = async () => {
+      const { data, error } = await supabase
+        .from('inventory')
+        .select('configuration')
+        .eq('id', inventoryId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching configuration:', error.message);
+        return;
+      }
+
+      if (data?.configuration) {
+        setSelectedOption({
+          Speed: data.configuration.Speed || 1,
+          Power: data.configuration.Power || 1,
+          Capacity: data.configuration.Capacity || 1,
+        });
+      }
+    };
+
+    fetchConfiguration();
+  }, [inventoryId, supabase]);
 
   const handleTabClick = (tab: Tab) => {
     setSelectedTab(tab);
@@ -36,9 +66,24 @@ const AutomatonUpgrade: React.FC<AutomatonUpgradeProps> = ({ onSave }) => {
     });
   };
 
-  const handleSave = () => {
-    console.log('Saved configuration:', selectedOption);
-    onSave();
+  const handleSave = async () => {
+    const newConfiguration = {
+      Speed: selectedOption.Speed,
+      Power: selectedOption.Power,
+      Capacity: selectedOption.Capacity,
+    };
+
+    const { error } = await supabase
+      .from('inventory')
+      .update({ configuration: newConfiguration })
+      .eq('id', inventoryId);
+
+    if (error) {
+      console.error('Error updating configuration:', error.message);
+    } else {
+      console.log('Saved configuration:', newConfiguration);
+      onSave();
+    }
   };
 
   return (
@@ -71,13 +116,13 @@ const AutomatonUpgrade: React.FC<AutomatonUpgradeProps> = ({ onSave }) => {
           <h2 className="text-2xl">{`${selectedTab} ${options[selectedTab][selectedOption[selectedTab] - 1]}`}</h2>
         </div>
         <button
-          onClick={() => handleOptionChange(1)} 
+          onClick={() => handleOptionChange(1)}
           className="px-2 py-1 bg-gray-700 rounded-r-lg"
         >
           →
         </button>
       </div>
-      
+
       <div className="mt-4">
         <button
           className="bg-green-500 text-white px-4 py-2 rounded"

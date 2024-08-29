@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { Card } from "@/app/components/ui/card";  
-import { useRouter } from "next/navigation";
 
 interface Classification {
     id: number;
@@ -40,8 +39,8 @@ const GeneratedStarterPlanet: React.FC = () => {
                 setClassifications(allClassifications || []);
 
                 // Fetch one classification of each type
-                const lightcurve = allClassifications?.find(c => c.classificationtype === "lightcurve") || null;
-                const roverImg = allClassifications?.find(c => c.classificationtype === "roverImg") || null;
+                const lightcurve = allClassifications?.find((c: { classificationtype: string; }) => c.classificationtype === "lightcurve") || null;
+                const roverImg = allClassifications?.find((c: { classificationtype: string; }) => c.classificationtype === "roverImg") || null;
 
                 setOneLightcurve(lightcurve);
                 setOneRoverImg(roverImg);
@@ -153,7 +152,6 @@ const AddMissionsAndItems: React.FC = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
-    const router = useRouter();
 
     const handleAddMissionsAndItems = async () => {
         if (!session || !activePlanet) return;
@@ -184,16 +182,16 @@ const AddMissionsAndItems: React.FC = () => {
                 .insert(itemsToAdd.map(itemId => ({
                     item: itemId,
                     owner: userId,
-                    quantity: 1, // Default quantity, adjust as needed
-                    time_of_deploy: new Date(), // Set current timestamp or as needed
+                    quantity: 1, 
+                    time_of_deploy: new Date(), 
                     anomaly: anomalyId,
-                    parentItem: null // Set if applicable
+                    parentItem: null
                 })));
 
             if (inventoryError) throw inventoryError;
 
             // Redirect to /scenes/v1
-            router.push("/scenes/v1");
+            // router.push("/scenes/v1");
 
         } catch (error: any) {
             console.error("Error adding missions or inventory items:", error.message);

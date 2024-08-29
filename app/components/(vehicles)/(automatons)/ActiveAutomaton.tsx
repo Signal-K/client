@@ -205,7 +205,7 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
   }
 
   if (isConfiguring) {
-    return <AutomatonUpgrade onSave={handleSaveConfiguration} />;
+    return <AutomatonUpgrade inventoryId={userAutomaton.id} onSave={handleSaveConfiguration} />;
   }
 
   return (
