@@ -88,8 +88,7 @@ export const PlacedStructureSingle: React.FC<{ ownedItem: OwnedItem; structure: 
             )}
             {structure.id === 28 && (
                 <CameraAutomatonModule
-                    // If this component does not handle modal states directly, ensure it's implemented elsewhere
-                    // If needed, you can pass other necessary props here
+                    
                 />
             )}
             {structure.id === 32 && (

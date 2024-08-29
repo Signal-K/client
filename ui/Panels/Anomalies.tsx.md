@@ -1,6 +1,6 @@
 import React from 'react';
 import SkillTreeComp from '@/components/Gameplay/Inventory/Structures/TechTree';
-import LaunchPad from '@/components/Animations/Travelling/Launchpad'; // Uncomment if needed
+import LaunchPad from '@/components/Animations/Travelling/Launchpad'; 
 
 interface SlidebarProps {
   showSidebar: boolean;

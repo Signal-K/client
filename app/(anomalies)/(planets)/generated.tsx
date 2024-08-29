@@ -189,8 +189,8 @@ const AddMissionsAndItems: React.FC = () => {
                 .insert(missionsToAdd.map(missionId => ({
                     user: userId,
                     mission: missionId,
-                    time_of_completion: null, // Set this to null or current timestamp if needed
-                    rewarded_items: [], // Add items if any
+                    time_of_completion: null, 
+                    rewarded_items: [], 
                 })));
 
             if (missionError) throw missionError;

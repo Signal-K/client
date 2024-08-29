@@ -8,14 +8,14 @@ export function Cosmos() {
         <div className="flex items-start gap-4 border-b pb-4">
             <img
                 src="/assets/Captn.jpg"
-                alt="Astra Avatar"
+                alt="Cosmos Avatar"
                 className="w-12 h-12 rounded-full bg-muted"
             />
           <div>
-            <h3 className="text-2xl font-bold">Astra, your AI assistant</h3>
+            <h3 className="text-2xl font-bold">Cosmos, your AI assistant</h3>
             <div className="mt-2 rounded border border-muted p-2 text-sm text-muted-foreground">
               <p>
-                Welcome to our game! I'm Astra, your friendly AI companion. I'll be guiding you through the onboarding
+                Welcome to our game! I'm Cosmos, your friendly AI companion. I'll be guiding you through the onboarding
                 process to help you get started.
               </p>
               <p className="mt-2">

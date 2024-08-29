@@ -30,7 +30,7 @@ const roverImgClassificationOptions: ClassificationOption[] = [
 
 interface ClassificationFormProps {
     anomalyType: string;
-    anomalyId: string;  // This should be the ID of the anomaly
+    anomalyId: string;
     missionNumber: number;
     assetMentioned: string;
 }
@@ -44,7 +44,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [avatar_url, setAvatarUrl] = useState<string | undefined>(undefined);
     const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: boolean }>({});
-    const [classificationSubmitted, setClassificationSubmitted] = useState<boolean>(false); // New state
+    const [classificationSubmitted, setClassificationSubmitted] = useState<boolean>(false);
 
     const { activePlanet } = useActivePlanet();
     const { userProfile } = useProfileContext();
@@ -107,7 +107,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             ])
         );
     
-        // Add activePlanet.id to classificationConfiguration
         if (activePlanet?.id) {
             classificationConfiguration.activePlanet = activePlanet.id;
         }
@@ -121,7 +120,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     media: [uploads, assetMentioned],
                     anomaly: anomalyId,
                     classificationtype: anomalyType,
-                    classificationConfiguration, // Include the configuration with activePlanet
+                    classificationConfiguration,
                 })
                 .single();
     
@@ -129,12 +128,12 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 console.error("Error creating classification:", classificationError.message);
                 alert("Failed to create classification. Please try again.");
                 return;
-            } else {
-                setClassificationSubmitted(true); // Set the state to true
-                setContent('');
-                setSelectedOptions({});
-                setUploads([]);
             }
+    
+            setClassificationSubmitted(true);
+            setContent('');
+            setSelectedOptions({});
+            setUploads([]);
     
             if (!activePlanet?.id) {
                 const { error: profileUpdateError } = await supabase
@@ -154,7 +153,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             console.error("Unexpected error:", error);
         }
     };
-    
 
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -184,19 +182,19 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     };
 
     return (
-        <div className="relative p-4 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-[#2E3440] text-white rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+        <div className="relative p-2 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-[#2E3440] text-white rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
             {classificationSubmitted && (
                 <div className="absolute inset-0 flex items-center justify-center bg-[#2E3440] bg-opacity-90 rounded-lg text-center">
-                    <div className="p-4">
+                    <div className="p-2">
                         <p className="text-lg font-semibold">Great job!</p>
                         <p className="mt-2">Now that you've identified a potential planet, you can share your findings with the rest of the space sailors community.</p>
                     </div>
                 </div>
             )}
             <div className={`transition-opacity duration-500 ${classificationSubmitted ? 'opacity-0' : 'opacity-100'}`}>
-                <div className="flex gap-4">
-                    <div className="flex flex-col gap-2 w-1/3">
-                        {classificationOptions.map(option => (
+                <div className="flex gap-2">
+                    <div className="relative flex flex-col gap-2 w-1/3 h-48 overflow-y-auto">
+                        {classificationOptions.map((option, index) => (
                             <button
                                 key={option.id}
                                 onClick={() => handleOptionClick(option.id)}
@@ -205,6 +203,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                 {option.text}
                             </button>
                         ))}
+                        <div className="absolute inset-x-0 bottom-0 flex justify-center items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#81A1C1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
                     </div>
                     <div className="flex flex-col gap-2 w-2/3">
                         {Object.keys(selectedOptions).length > 0 && (
@@ -220,25 +223,25 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                     <textarea
                                         value={content}
                                         onChange={e => setContent(e.target.value)}
-                                        className="flex-grow p-3 h-24 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
-                                        placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
+                                        placeholder="Describe your classification..."
+                                        className="w-full h-32 p-2 rounded-md bg-[#4C566A] focus:outline-none focus:ring-2 focus:ring-[#88C0D0]"
                                     />
                                 </div>
-                                <div className="flex items-center mb-4">
-                                    <label className="flex gap-1 items-center cursor-pointer text-[#88C0D0] hover:text-white">
-                                        <input type="file" className="hidden" onChange={addMedia} />
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-6.5 6.5" />
-                                        </svg>
-                                        <span>Upload Media</span>
-                                    </label>
-                                    {isUploading && <span className="text-[#88C0D0]">Uploading...</span>}
-                                </div>
+                                <label className="flex flex-col items-center p-2 rounded-md bg-[#4C566A] cursor-pointer hover:bg-[#88C0D0]">
+                                    <span>Upload media</span>
+                                    <input
+                                        type="file"
+                                        className="hidden"
+                                        onChange={addMedia}
+                                        multiple
+                                    />
+                                </label>
                                 <button
                                     onClick={createPost}
-                                    className="py-2 px-4 bg-[#88C0D0] text-[#2E3440] rounded-md hover:bg-[#81A1C1]"
+                                    disabled={content.trim() === ""}
+                                    className="p-2 mt-4 rounded-md bg-[#88C0D0] text-[#2E3440] hover:bg-[#81A1C1] disabled:opacity-50"
                                 >
-                                    Submit
+                                    Submit Classification
                                 </button>
                             </>
                         )}
@@ -248,6 +251,5 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
         </div>
     );
 };
-
 
 export default ClassificationForm;

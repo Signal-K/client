@@ -122,7 +122,7 @@ export const RooverFromAppeears: React.FC = () => {
             {rovers.length > 0 ? (
                 rovers.map((rover) => (
                     <div key={rover.id} className="text-center col-span-3">
-                        {/* <div className="mb-4">
+                        {/* <div className="mb-4"> 
                             <img
                                 src='https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true'
                                 alt='telescope'

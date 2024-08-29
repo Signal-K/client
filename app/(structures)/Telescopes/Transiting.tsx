@@ -3,7 +3,7 @@ import { CreateFirstBaseClassification, CreateCloudClassification, CreateFirstMe
 import CreateBaseClassification from '@/Classifications/ClassificationForm';
 import { useActivePlanet } from '@/context/ActivePlanet';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import ClassificationForm from '@/app/(create)/(classifications)/PostForm';
+import ClassificationForm from '@/app/(create)/(classifications)/PostForm'; 
 
 import { Dialog, DialogTrigger, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -100,7 +100,7 @@ export const TelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid })
             <div className="flex items-center">
                 <img
                     src="/assets/Captn.jpg"
-                    alt="Astra Avatar"
+                    alt="Cosmos Avatar"
                     className="w-12 h-12 rounded-full bg-[#303F51]"
                 />
                 <h3 className="text-xl font-bold text-[#85DDA2] mt-2 ml-4">Cosmos</h3>
@@ -134,17 +134,16 @@ export const TelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid })
                             {line === 6 && (
                                 <button onClick={nextPart} className="mt-4 px-4 py-2 bg-[#D689E3] text-white rounded">Continue</button>
                             )}
-                            {part === 1 && (
-                <div className="flex justify-center mt-4 w-full h-64">
-                    {line === 1 && <img src="/assets/Template.png" alt="Step 1" className="max-w-full max-h-full object-contain" />}
-                    {line === 2 && <img src="/assets/Docs/Curves/Step2.png" alt="Step 2" className="max-w-full max-h-full object-contain" />}
-                    {line === 3 && <img src="/assets/Docs/Curves/Step1.png" alt="Step 3" className="max-w-full max-h-full object-contain" />}
-                    {line === 4 && <img src="/assets/Docs/Curves/Step3.png" alt="Step 4" className="max-w-full max-h-full object-contain" />}
-                    {line === 5 && <img src="/assets/Docs/Curves/Step4.png" alt="Step 5" className="max-w-full max-h-full object-contain" />}
-                </div>
-            )}
+                            {line < 6 && (
+                                <div className="flex justify-center mt-4 w-full h-64">
+                                    {line === 1 && <img src="/assets/Template.png" alt="Step 1" className="max-w-full max-h-full object-contain" />}
+                                    {line === 2 && <img src="/assets/Docs/Curves/Step2.png" alt="Step 2" className="max-w-full max-h-full object-contain bg-white" />}
+                                    {line === 3 && <img src="/assets/Docs/Curves/Step1.png" alt="Step 3" className="max-w-full max-h-full object-contain bg-white" />}
+                                    {line === 4 && <img src="/assets/Docs/Curves/Step3.png" alt="Step 4" className="max-w-full max-h-full object-contain bg-white" />}
+                                    {line === 5 && <img src="/assets/Docs/Curves/Step4.png" alt="Step 5" className="max-w-full max-h-full object-contain bg-white" />}
+                                </div>
+                            )}
                         </>
-                        
                     )}
                     {part === 2 && (
                         <>
@@ -157,24 +156,25 @@ export const TelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid })
             </div>
         </div>
     );
+    
 
     return (
         <div className="rounded-lg">
             <div className="flex flex-col items-center">
                 {part === 1 && (
-                    <div className="mb-4">{tutorialContent}</div>
+                    <div className="mb-2">{tutorialContent}</div>
                 )}
                 {part === 2 && (
                     <>
                         {/* {tutorialContent} */}
-                        <div className="mb-4">
+                        <div className="mb-2">
                             <img
                                 src='https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true'
                                 alt='telescope'
                                 className="w-24 h-24 mb-2"
                             />
                         </div>
-                        <div className="p-2max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                        <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
                             <div className='relative'>
                                 <div className='absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
                                 <div className='bg-white bg-opacity-90'><img
