@@ -13,6 +13,7 @@ interface InventoryItem {
   ItemCategory: string;
   parentItem: number | null;
   itemLevel: number;
+  locationType?: string;
   recipe?: Recipe; 
   gif?: string;
 };
@@ -20,7 +21,7 @@ interface InventoryItem {
 // Mock inventory items data
 const inventoryItems: InventoryItem[] = [
   { id: 11, name: 'Coal', description: 'You can burn this to create power', cost: 1, icon_url: '/assets/Items/Coal.png', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1 },
-  { id: 12, name: 'Telescope Signal Receiver', description: 'This tool is used to receive transmissions from your transiting telescope and decode them into readable data. It is also the first component of your main telescope array', cost: 1, icon_url: 'https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/Telescope2.png?raw=true', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '13': 3, '15': 2 } }, // Originally pointed towards 2 alloy
+  { id: 12, name: 'Telescope Signal Receiver', description: 'This tool is used to receive transmissions from your transiting telescope and decode them into readable data. It is also the first component of your main telescope array', cost: 1, icon_url: 'https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/Telescope2.png?raw=true', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '13': 3, '15': 2 }, locationType: 'Surface' }, // Originally pointed towards 2 alloy
   { id: 13, name: 'Silicon', description: '', cost: 1, icon_url: '/assets/Items/Silicon.png', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
   { id: 14, name: 'Transiting Telescope', description: '', cost: 1, icon_url: 'https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true', ItemCategory: 'Structure', parentItem: 12, itemLevel: 1, recipe: { '13': 2, '15': 1 } },
   { id: 15, name: 'Iron', description: 'Test', cost: 1, icon_url: '/assets/Items/Iron.png', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
@@ -36,10 +37,10 @@ const inventoryItems: InventoryItem[] = [
   { id: 25, name: 'Empty', description: '', cost: 1, icon_url: '', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
   { id: 29, name: "Starter Spaceship", description: 'You bravely piloted this spaceship down to your new home', cost: 0, icon_url: '', ItemCategory: 'Vehicles', parentItem: null, itemLevel: 1},
   { id: 30, name: 'Mining station', description: 'Used for mass-mining of resources; requires finding a mineral deposit', cost: 1, icon_url: 'https://cdn-icons-png.flaticon.com/512/1504/1504044.png', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '11': 1 } },
-  { id: 31, name: 'Automaton Upgrade Station', description: 'Add modules to your automatons!', cost: 1, icon_url: '/camerars.png', ItemCategory: 'Structure', parentItem: 22, itemLevel: 1, recipe: { '11': 1 } },
+  { id: 31, name: 'Automaton Upgrade Station', description: 'Add modules to your automatons!', cost: 1, icon_url: '/assets/items/camerars.png', ItemCategory: 'Structure', parentItem: 22, itemLevel: 1, recipe: { '11': 1 } },
   { id: 28, name: 'Camera Module', description: 'Your automatons can now take photos!', cost: 1, icon_url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIO24cgji4a0syb8AtE9A7cSEWBqCfVU89F5OJ9kcB4-WWVs68-sw-uyJg4vmNuzKTHE8&usqp=CAU', ItemCategory: 'AutomatonModule', parentItem: 23, itemLevel: 1, recipe: { '11': 1} },
   { id: 26, name: 'Meteorology Tool', description: 'Collect cloud info', cost: 1, icon_url: 'https://cdn-icons-png.flaticon.com/512/2826/2826342.png', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '11': 1} }, // Could be updated to be linked to 12?
-  { id: 32, name: 'Camera Receiver', description: 'Keep track of all the photos your anomalies have taken', cost: 1, icon_url: 'https://cdn-icons-png.flaticon.com/512/5169/5169909.png', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '11': 1 } },
+  { id: 32, name: 'Camera Receiver', description: 'Keep track of all the photos your anomalies have taken', cost: 1, icon_url: 'https://cdn-icons-png.flaticon.com/512/5169/5169909.png', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '11': 1 }, locationType: 'Orbit' },
   { id: 33, name: 'Launchpad', description: 'You can now refuel and launch spacecraft from here!', cost: 1, icon_url: '', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '15': 1 } }, // Update to be called "VehicleStructure"
   { id: 101, name: 'Telescope', description: 'gain an understanding of the overall behaviour and makeup of the planet you have selected', cost: 1, icon_url: 'https://github.com/Signal-K/client/blob/initialClassification/public/assets/Inventory/Structures/TelescopeReceiver.png?raw=true', ItemCategory: 'Structure', parentItem: null, itemLevel: 1},
   { id: 102, name: 'Zoodex', description: 'populate your planet with some animals to gain an understanding of animal behaviour on your planet and aide local research back home', cost: 1, icon_url: '', ItemCategory: 'Structure', parentItem: null, itemLevel: 1},

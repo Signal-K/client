@@ -43,6 +43,7 @@ export interface InventoryItem {
 };
 
 export interface InventoryStructureItem {
+    itemDetail: any;
     id: number;
     item: number;
     owner: string;
@@ -51,6 +52,7 @@ export interface InventoryStructureItem {
     time_of_deploy: string | null;
     anomaly: number | null;
     parentItem: number | null;
+    locationType: string | null;
 };
 
 export interface StructureItemDetail {
@@ -60,6 +62,7 @@ export interface StructureItemDetail {
     cost: number;
     icon_url: string;
     ItemCategory: string;
+    locationType: string | null;
     parentItem: number | null;
     itemLevel: number;
     recipe?: Record<string, number>;

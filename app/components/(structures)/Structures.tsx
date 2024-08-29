@@ -5,22 +5,25 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 
-export default function StructuresOnPlanet() {
+interface StructuresOnPlanetProps {
+    onStructuresFetch: (
+        orbitalStructures: InventoryStructureItem[],
+        atmosphereStructures: InventoryStructureItem[],
+        surfaceStructures: InventoryStructureItem[]
+    ) => void;
+}
+
+export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
 
-    const [userStructuresOnPlanet, setUserStructuresOnPlanet] = useState<InventoryStructureItem[]>([]);
-    const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
-    const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         async function fetchStructures() {
             if (!session?.user?.id || !activePlanet?.id) {
-                setLoading(false);
                 return;
-            };
-
+            }
+    
             try {
                 const { data: inventoryData, error: inventoryError } = await supabase
                     .from('inventory')
@@ -28,47 +31,47 @@ export default function StructuresOnPlanet() {
                     .eq('owner', session.user.id)
                     .eq('anomaly', activePlanet.id)
                     .not('item', 'is', null);
-
+    
                 if (inventoryError) throw inventoryError;
-
-                setUserStructuresOnPlanet(inventoryData || []);
-
+    
                 // Fetch item details for "Structure" items from the API
                 const response = await fetch('/api/gameplay/inventory');
                 const itemsData: StructureItemDetail[] = await response.json();
-
-                const itemMap = new Map<number, StructureItemDetail>();
-                itemsData.forEach(item => {
-                    if (item.ItemCategory === 'Structure') {
-                        itemMap.set(item.id, item);
+    
+                // Categorize structures based on their locationType
+                const orbitalStructures: InventoryStructureItem[] = [];
+                const atmosphereStructures: InventoryStructureItem[] = [];
+                const surfaceStructures: InventoryStructureItem[] = [];
+    
+                inventoryData?.forEach((structure: InventoryStructureItem) => {
+                    const itemDetail = itemsData.find(item => item.id === structure.item);
+    
+                    // Ensure itemDetail is assigned
+                    if (itemDetail) {
+                        structure.itemDetail = itemDetail; // Assign itemDetail to the structure
+                    }
+    
+                    if (itemDetail?.ItemCategory === 'Structure') {
+                        if (itemDetail.locationType === 'Orbit') {
+                            orbitalStructures.push(structure);
+                        } else if (itemDetail.locationType === 'Atmosphere') {
+                            atmosphereStructures.push(structure);
+                        } else if (itemDetail.locationType === 'Surface') {
+                            surfaceStructures.push(structure);
+                        }
                     }
                 });
-
-                setItemDetails(itemMap);
+    
+                onStructuresFetch(orbitalStructures, atmosphereStructures, surfaceStructures);
+    
             } catch (error) {
                 console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
             }
         }
-
+    
         fetchStructures();
-    }, [session?.user?.id, activePlanet?.id, supabase]);
+    }, [session?.user?.id, activePlanet?.id, supabase, onStructuresFetch]);
+    
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    return (
-        <div className="flex flex-row space-y-4">
-            {userStructuresOnPlanet.map((structure) => {
-                const itemDetail = itemDetails.get(structure.item);
-                return itemDetail ? (
-                    <div key={structure.id} className="flex items-center space-x-4">
-                        <img src={itemDetail.icon_url} alt={itemDetail.name} className="w-16 h-16 object-cover" />
-                    </div>
-                ) : null;
-            })}
-        </div>
-    );
-};
+    return null;
+}
