@@ -1,26 +1,14 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { MineralDeposit, Automaton } from "@/types/Items";
-import AnomalyUpgrade from "../../(structures)/Config/AutomatonUpgradeBox";
+import AutomatonUpgrade from "../../(structures)/Config/AutomatonUpgradeBox";
+import { InventoryItem } from "@/types/Inventory";
+import "../../../../styles/Anims/MiningAnimations.css";
 
 interface ActiveAutomatonForMiningProps {
   deposit: MineralDeposit;
-}
-
-interface InventoryItem {
-  id: number;
-  name: string;
-  description: string;
-  cost: number;
-  icon_url: string;
-  ItemCategory: string;
-  parentItem: number | null;
-  itemLevel: number;
-  recipe?: { [key: string]: number };
-}
+};
 
 export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningProps) {
   const supabase = useSupabaseClient();
@@ -28,6 +16,7 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
   const { activePlanet } = useActivePlanet();
 
   const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
+  const [roverIconUrl, setRoverIconUrl] = useState<string | null>(null);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [miningInProgress, setMiningInProgress] = useState(false);
@@ -48,7 +37,7 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
           .from("inventory")
           .select("*")
           .eq("owner", session.user.id)
-          .eq("item", 23)
+          .eq("item", 23) 
           .eq("anomaly", activePlanet.id)
           .single();
 
@@ -64,6 +53,14 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
         }
         const inventoryData: InventoryItem[] = await inventoryResponse.json();
         setInventoryItems(inventoryData);
+
+        const automatonItem = inventoryData.find(item => item.id === automatonData.item);
+        if (automatonItem) {
+          setRoverIconUrl(automatonItem?.gif ?? null);
+        } else {
+          throw new Error("Rover icon URL not found for the specified item.");
+        }
+
       } catch (error: any) {
         console.error("Error fetching data:", error.message);
         setErrorMessage(error.message);
@@ -80,39 +77,39 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
       setErrorMessage("No automaton available to perform mining.");
       return;
     }
-  
+
     setMiningInProgress(true);
     setErrorMessage(null);
-  
+
     try {
       const mineralName = deposit.mineralconfiguration.mineral;
       const item = inventoryItems.find(
         (invItem) => invItem.id.toString() === mineralName
       );
-  
+
       if (!item) {
         throw new Error(`No item found in inventory for mineral: ${mineralName}`);
       }
-  
+
       // 1. Fetch and update mineral deposit quantity
       const { data: mineralData, error: mineralError } = await supabase
         .from("mineralDeposits")
         .select("mineralconfiguration")
         .eq("id", deposit.id)
         .single();
-  
+
       if (mineralError || !mineralData) {
         throw new Error(`Error fetching mineral deposit data: ${mineralError?.message}`);
       }
-  
+
       const mineralConfig = mineralData.mineralconfiguration as { mineral: string; quantity: number };
-      
+
       if (mineralConfig.quantity <= 0) {
         throw new Error(`No quantity left for mineral: ${mineralName}`);
       }
-  
+
       const updatedQuantity = mineralConfig.quantity - 1;
-  
+
       const { error: updateMineralError } = await supabase
         .from("mineralDeposits")
         .update({
@@ -122,11 +119,11 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
           }
         })
         .eq("id", deposit.id);
-  
+
       if (updateMineralError) {
         throw new Error(`Error updating mineral deposit: ${updateMineralError.message}`);
       }
-  
+
       // 2. Check and update or insert inventory
       const { data: existingInventory, error: inventoryError } = await supabase
         .from("inventory")
@@ -135,11 +132,11 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
         .eq("owner", session?.user?.id)
         .eq("anomaly", activePlanet?.id)
         .single();
-  
+
       if (inventoryError && inventoryError.code !== 'PGRST116') {
         throw new Error(`Error fetching inventory data: ${inventoryError.message}`);
       }
-  
+
       if (existingInventory) {
         const { error: updateInventoryError } = await supabase
           .from("inventory")
@@ -147,7 +144,7 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
             quantity: existingInventory.quantity + 1
           })
           .eq("id", existingInventory.id);
-  
+
         if (updateInventoryError) {
           throw new Error(`Error updating inventory: ${updateInventoryError.message}`);
         }
@@ -163,12 +160,12 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
             anomaly: activePlanet?.id,
             configuration: null
           });
-  
+
         if (insertInventoryError) {
           throw new Error(`Error inserting inventory: ${insertInventoryError.message}`);
         }
       }
-  
+
       console.log("Mineral collected and added to inventory.");
       alert(`Successfully collected ${mineralName}!`);
     } catch (error: any) {
@@ -177,10 +174,14 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
     } finally {
       setMiningInProgress(false);
     }
-  };  
+  };
 
   const handleConfigureAutomaton = () => {
     setIsConfiguring(true);
+  };
+
+  const handleSaveConfiguration = () => {
+    setIsConfiguring(false);
   };
 
   if (loading) {
@@ -204,32 +205,42 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
   }
 
   if (isConfiguring) {
-    return <AnomalyUpgrade />;
+    return <AutomatonUpgrade onSave={handleSaveConfiguration} />;
   }
 
   return (
-    <div className="p-4 border rounded-lg shadow-md bg-white bg-opacity-90">
+    <div className="p-4 border rounded-lg shadow-md bg-white bg-opacity-82 overflow-hidden">
       <h2 className="text-xl font-semibold mb-4">Automaton Control</h2>
       <p className="text-sm mb-4">
         Rover ID: {userAutomaton.id} - Ready to collect <strong>{deposit.mineralconfiguration.mineral}</strong>
       </p>
-      <div className="flex space-x-4">
+      {roverIconUrl && (
+        <div className="relative h-32"> {/* Adjust the height here */}
+          <img
+            src={roverIconUrl}
+            alt="Rover Icon"
+            className="w-32 h-32 absolute"
+            style={{ top: 0, left: 0, animation: "slide 4s infinite alternate ease-in-out", transform: "scaleX(-1)" }}
+          />
+        </div>
+      )}
+      <div className="flex space-x-4 mt-4"> 
         <button
-          className={`bg-green-500 text-white px-4 py-2 rounded ${
+          className={`"block bg-[#85DDA2] text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" ${
             miningInProgress ? "opacity-50 cursor-not-allowed" : ""
           }`}
           onClick={handleSendRover}
           disabled={miningInProgress}
         >
-          {miningInProgress ? "Mining in progress..." : "Send Rover"}
+          {miningInProgress ? "Mining in progress..." : "Deploy Rover"}
         </button>
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="block bg-[#b3ebf2] text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
           onClick={handleConfigureAutomaton}
         >
           Configure Automaton
         </button>
       </div>
     </div>
-  );
+  );  
 };

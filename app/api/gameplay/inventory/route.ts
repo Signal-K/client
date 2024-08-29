@@ -14,6 +14,7 @@ interface InventoryItem {
   parentItem: number | null;
   itemLevel: number;
   recipe?: Recipe; 
+  gif?: string;
 };
 
 // Mock inventory items data
@@ -30,7 +31,7 @@ const inventoryItems: InventoryItem[] = [
   { id: 20, name: 'Chromium', description: '/assets/Items/Chromite.png', cost: 1, icon_url: '', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
   { id: 21, name: 'Water', description: '/assets/Items/Ice.png', cost: 1, icon_url: '', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
   { id: 22, name: 'Vehicle Structure', description: '', cost: 1, icon_url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4grkW7K-6nnJ7JtMVPDM58odIgUG7IEZnd65IqUrV4P9QcgT35SIiz_twqcblIXtfxCA&usqp=CAU', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '17': 4, '18': 2 } },
-  { id: 23, name: 'Rover 1', description: '', cost: 1, icon_url: 'https://static-00.iconduck.com/assets.00/mars-rover-illustration-2048x2048-czfy73zy.png', ItemCategory: 'Automaton', parentItem: 22, itemLevel: 1 }, 
+  { id: 23, name: 'Rover 1', description: '', cost: 1, icon_url: 'https://static-00.iconduck.com/assets.00/mars-rover-illustration-2048x2048-czfy73zy.png', ItemCategory: 'Automaton', parentItem: 22, itemLevel: 1, gif: "/assets/Items/Roover.gif", },  // https://cdn.dribbble.com/users/107759/screenshots/4248752/rover.gif
   { id: 24, name: 'Surveyor', description: 'This tool clips onto your telescope receiver and allows you to unlock complex stats about your anomaly.', cost: 1, icon_url: 'https://cdn.cloud.scenario.com/assets/asset_eTRkeYatYQRQRwrjjAgYA2Pq?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uY2xvdWQuc2NlbmFyaW8uY29tL2Fzc2V0cy9hc3NldF9lVFJrZVlhdFlRUlFSd3JqakFnWUEyUHE~KiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcyMDM5Njc5OX19fV19&Key-Pair-Id=K36FIAB9LE2OLR&Signature=G5z~cUSlmAT2IT-qEQuZVOxQsRe-Q1le4erU8YfKnKe0hfsIq4fjmWArcgikYZLDKY8N0~kgPjf0hPQuHyxpYcDWlhmh1u7esBHffDf~5bR0tqjFcChfY6d1q-OCVvwkPxU9CMOOlxmwDYK3U6049ROnSXXZvmWDM7igl~CPaqILXt0bsNEtL4KWTDAfuBkfq7vDt1Jvy0h0k3z8dQ3XKdsFenqeQozdTp6B-y-7vxEbKcUMOqhEnOW0IXg1Z6egwHBD2dUD2fQhk-jAlQ7CbWeFQ~~h~emfyuFRYT7VMkiv2GICV12SENk2KkBnsB1t3kBONrJiUKlr~ekpsilerw__', ItemCategory: 'Structure', parentItem: 12, itemLevel: 1, recipe: { '13': 1, } },
   { id: 25, name: 'Empty', description: '', cost: 1, icon_url: '', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
   { id: 29, name: "Starter Spaceship", description: 'You bravely piloted this spaceship down to your new home', cost: 0, icon_url: '', ItemCategory: 'Vehicles', parentItem: null, itemLevel: 1},

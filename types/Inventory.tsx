@@ -1,4 +1,6 @@
-interface InventoryItem {
+export interface InventoryItem {
+    owner: string;
+    anomaly: number;
     id: number;
     name: string;
     description: string;
@@ -7,6 +9,7 @@ interface InventoryItem {
     ItemCategory: string;
     parentItem: number | null;
     itemLevel: number;
+    gif?: string;
 };
   
 interface InventoryContextType {

@@ -1,5 +1,5 @@
 "use client";
-
+ 
 import React, { useEffect, useState } from 'react';
 import { useActivePlanet } from '@/context/ActivePlanet';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
@@ -12,16 +12,17 @@ const MineralDeposit: React.FC<MineralDepositProps> = ({ deposit, inventoryItems
   const inventoryItem = getInventoryItem(deposit.mineralconfiguration.mineral);
 
   return (
-    <div className="flex items-center justify-center p-4 border border-gray-300 rounded-md shadow-md">
+    <div className="w-full h-32 bg-gray-50 rounded-md shadow-md flex items-center justify-center">
       {inventoryItem ? (
         <div className="text-center">
-          <img src={inventoryItem.icon_url} alt={inventoryItem.name} className="w-16 h-16 mb-2" />
+          <img src={inventoryItem.icon_url} alt={inventoryItem.name} className="w-16 h-16 mb-2 mx-auto" />
           <h2 className="text-sm font-semibold">{inventoryItem.name}</h2>
           <p className="text-xs">Quantity: {deposit.mineralconfiguration.quantity}</p>
         </div>
       ) : (
-        <div className="w-full h-16 bg-gray-400/80 rounded-md flex items-center justify-center">
-        </div>
+        // <div className="w-full h-full bg-gray-400/80 rounded-md flex items-center justify-center">
+        // </div>
+        <div className='bg-opacity-10'></div>
       )}
     </div>
   );

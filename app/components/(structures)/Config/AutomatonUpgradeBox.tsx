@@ -4,7 +4,11 @@ import React, { useState } from "react";
 
 type Tab = 'Speed' | 'Power' | 'Capacity';
 
-const AutomatonUpgrade: React.FC = () => { 
+interface AutomatonUpgradeProps {
+  onSave: () => void;
+};
+
+const AutomatonUpgrade: React.FC<AutomatonUpgradeProps> = ({ onSave }) => {
   const [selectedTab, setSelectedTab] = useState<Tab>('Speed');
   const [selectedOption, setSelectedOption] = useState<Record<Tab, number>>({
     Speed: 1,
@@ -33,7 +37,8 @@ const AutomatonUpgrade: React.FC = () => {
   };
 
   const handleSave = () => {
-    console.log('Configuration Saved:', selectedOption);
+    console.log('Saved configuration:', selectedOption);
+    onSave();
   };
 
   return (
@@ -66,19 +71,21 @@ const AutomatonUpgrade: React.FC = () => {
           <h2 className="text-2xl">{`${selectedTab} ${options[selectedTab][selectedOption[selectedTab] - 1]}`}</h2>
         </div>
         <button
-          onClick={() => handleOptionChange(1)}
+          onClick={() => handleOptionChange(1)} 
           className="px-2 py-1 bg-gray-700 rounded-r-lg"
         >
           →
         </button>
       </div>
       
-      <button
-        onClick={handleSave}
-        className="mt-auto bg-green-500 text-black py-3 px-10 rounded-lg"
-      >
-        Save Configuration
-      </button>
+      <div className="mt-4">
+        <button
+          className="bg-green-500 text-white px-4 py-2 rounded"
+          onClick={handleSave}
+        >
+          Save Configuration
+        </button>
+      </div>
     </div>
   );
 };
