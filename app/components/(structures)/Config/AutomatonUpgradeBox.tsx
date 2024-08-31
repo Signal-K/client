@@ -125,7 +125,7 @@ const AutomatonUpgrade: React.FC<AutomatonUpgradeProps> = ({ onSave, inventoryId
 
       <div className="mt-4">
         <button
-          className="bg-green-500 text-white px-4 py-2 rounded"
+          className={`block bg-[#85DDA2] text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500}`}
           onClick={handleSave}
         >
           Save Configuration
