@@ -5,7 +5,6 @@ import { MineralDeposit, Automaton } from "@/types/Items";
 import AutomatonUpgrade from "../../(structures)/Config/AutomatonUpgradeBox";
 import { InventoryItem } from "@/types/Inventory";
 import { Battery, MapPin, Rocket, Clock } from 'lucide-react';
-import SimplexNoise from 'simplex-noise';
 
 import "../../../../styles/Anims/MiningAnimations.css";
 import "../../../../styles/Structures/RoverPath.css";

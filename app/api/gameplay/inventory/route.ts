@@ -46,6 +46,12 @@ const inventoryItems: InventoryItem[] = [
   { id: 102, name: 'Zoodex', description: 'populate your planet with some animals to gain an understanding of animal behaviour on your planet and aide local research back home', cost: 1, icon_url: '', ItemCategory: 'Structure', parentItem: null, itemLevel: 1},
   { id: 103, name: 'Discovery Module', description: 'populate your planet with low-level content e.g. mining deposits, weather cycle behaviour etc (need to word this better)', cost: 1, icon_url: '', ItemCategory: 'Structure', parentItem: null, itemLevel: 1},
   { id: 104, name: 'Camera Receiver Station', description: 'Keep track of all the photos your anomalies have taken (WIP)', cost: 1, icon_url: 'https://cdn-icons-png.flaticon.com/512/5169/5169909.png', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '11': 1 } },
+  {
+    id: 3101, name: 'Mining station', description: 'Gives you the ability to mine and view your mineral deposits', cost: 1, icon_url: '/assets/items/MiningStructure.png', ItemCategory: 'Structure', parentItem: 30, itemLevel: 1, locationType: 'Surface'
+  },
+  {
+    id: 3102, name: 'Automaton station', description: 'View, control and upgrade all your automatons and rovers here', cost: 1, icon_url: '/assets/items/AutomatonController.png', ItemCategory: 'Structure', parentItem: 30, itemLevel: 1, locationType: 'Surface'
+  },
 ];
 
 export async function GET(req: NextRequest) {

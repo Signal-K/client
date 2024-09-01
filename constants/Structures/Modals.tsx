@@ -1,6 +1,6 @@
 import {
   TransitingTelescopeClassifyPlanet,
-  TransitingTelescopeSpecialisedGraphs,
+  TransitingTelescopeSpecialisedGraphs, 
   TransitingTelescopeExplorePlanets,
   TransitingTelescopeMyDiscoveries,
   TransitingTelescopeTutorial

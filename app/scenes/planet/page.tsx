@@ -6,6 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import PlanetViewLayout, { TestLayout } from "@/app/components/(scenes)/planetScene/layout";
 import StructuresOnPlanet from "@/app/components/(structures)/Structures";
 import { InventoryStructureItem } from "@/types/Items";
+import ChapterOneIntroduction from "@/app/components/(scenes)/chapters/one/ChapterOneIntro";
 
 export default function PlanetViewPage() {
     const supabase = useSupabaseClient();
@@ -61,8 +62,9 @@ export default function PlanetViewPage() {
                 </div>
                 <StructuresOnPlanet onStructuresFetch={handleStructuresFetch} />
             </div>
-            <div>
+            <div className="bg-white/50 h-full">
                 Automatons
+                <ChapterOneIntroduction />
             </div>
         </PlanetViewLayout>
         // <TestLayout>

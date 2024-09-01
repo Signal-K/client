@@ -78,7 +78,7 @@ export default function ProfileCardModal() {
 
             if (checkError) {
                 throw checkError;
-            }
+            };
 
             if (existingMissions.length === 0) {
                 const missionData = {
@@ -93,16 +93,16 @@ export default function ProfileCardModal() {
 
                 if (missionError) {
                     throw missionError;
-                }
+                };
 
                 console.log('Mission 1370102 created successfully.');
             } else {
                 console.log('Mission 1370102 already completed.');
             }
         } catch (error: any) {
-            console.error('Error checking or creating mission:', error);
-        }
-    }
+            console.error('Error checking or creating mission: ', error);
+        };
+    };
 
     return (
         <form onSubmit={(e) => updateProfile(e)} className="form-widget p-6 rounded-md shadow-lg max-w-md mx-auto">

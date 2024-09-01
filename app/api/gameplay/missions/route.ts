@@ -10,8 +10,8 @@ interface UserMissionInstance {
 interface Mission {
     id: number;
     name: string;
-    description: string;
-    rewards: number[]; // Array of reward item IDs
+    description?: string;
+    rewards?: number[]; // Array of reward item IDs
 };
 
 const missions: Mission[] = [
@@ -48,6 +48,9 @@ const missions: Mission[] = [
     { id: 1370106, name: 'Generated planet', description: "Here's what we know about your planet. Why not visit it?", rewards: []},
     {
         id: 1370107, name: "Activate retro mode", description: "Going back to the first V2.0 beta after finishing onboarding", rewards: [],
+    },
+    {
+        id: 1370201, name: "Initialise chapter 1", 
     },
 ];
 

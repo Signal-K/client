@@ -14,7 +14,7 @@ export default function MiningScene() {
     const { activePlanet } = useActivePlanet();
     const [selectedDeposit, setSelectedDeposit] = useState<null | any>(null); // Adjust type if needed
 
-    const handleSelectDeposit = (deposit: any) => { // Adjust type if needed
+    const handleSelectDeposit = (deposit: any) => {
         setSelectedDeposit(deposit);
     };
 

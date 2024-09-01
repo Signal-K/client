@@ -156,35 +156,30 @@ const AddMissionsAndItems: React.FC = () => {
     const handleAddMissionsAndItems = async () => {
         if (!session || !activePlanet) return;
 
-        const userId = session.user.id;
-        const anomalyId = activePlanet.id;
-
         // Define missions and items to add
         const missionsToAdd = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 17, 18, 1370107];
         const itemsToAdd = [11, 12, 13, 14, 15, 16, 19, 22, 23, 26, 28, 29, 30, 32];
 
         try {
-            // Insert missions
             const { error: missionError } = await supabase
                 .from("missions")
                 .insert(missionsToAdd.map(missionId => ({
-                    user: userId,
+                    user: session?.user?.id,
                     mission: missionId,
-                    time_of_completion: null, // Set this to null or current timestamp if needed
-                    rewarded_items: [], // Add items if any
+                    time_of_completion: null,
+                    rewarded_items: [],
                 })));
 
             if (missionError) throw missionError;
 
-            // Insert items into inventory
             const { error: inventoryError } = await supabase
                 .from("inventory")
                 .insert(itemsToAdd.map(itemId => ({
                     item: itemId,
-                    owner: userId,
+                    owner: session?.user?.id,
                     quantity: 1, 
                     time_of_deploy: new Date(), 
-                    anomaly: anomalyId,
+                    anomaly: activePlanet.id,
                     parentItem: null
                 })));
 
@@ -194,8 +189,8 @@ const AddMissionsAndItems: React.FC = () => {
             // router.push("/scenes/v1");
 
         } catch (error: any) {
-            console.error("Error adding missions or inventory items:", error.message);
-        }
+            console.error("Error adding missions or inventory items: ", error.message);
+        };
     };
 
     return (
