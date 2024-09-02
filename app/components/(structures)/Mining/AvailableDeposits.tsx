@@ -107,6 +107,65 @@ const MineralDeposits: React.FC<{ onSelectDeposit: (deposit: MineralDepositData)
 
 export default MineralDeposits;
 
+export const MineralDepositsNoAction: React.FC = () => {
+  const { activePlanet } = useActivePlanet();
+  const session = useSession();
+  const supabase = useSupabaseClient();
+  const [mineralDeposits, setMineralDeposits] = useState<MineralDepositData[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+
+  useEffect(() => {
+    const fetchMineralDeposits = async () => {
+      if (!activePlanet || !session) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('mineralDeposits')
+          .select('*')
+          .eq('anomaly', activePlanet.id)
+          .eq('owner', session.user.id);
+
+        if (error) throw error;
+
+        setMineralDeposits(data);
+      } catch (error) {
+        console.error('Error fetching mineral deposits:', error);
+      }
+    };
+
+    const loadInventoryItems = async () => {
+      try {
+        const items = await fetchInventoryItems();
+        setInventoryItems(items);
+      } catch (error) {
+        console.error('Error fetching inventory items:', error);
+      }
+    };
+
+    fetchMineralDeposits();
+    loadInventoryItems();
+  }, [activePlanet, session, supabase]);
+
+  const emptySlots = 9 - mineralDeposits.length;
+
+  return (
+    <div>
+      <h1 className="text-xl font-bold mb-4">Mineral Deposits</h1>
+      <div className="grid grid-cols-3 gap-4">
+        {[...mineralDeposits, ...Array(emptySlots).fill(null)].map((deposit, index) => (
+          <div key={index} className="cursor-default">
+            <MineralDeposit 
+              deposit={deposit || { id: index, anomaly: 0, owner: '', mineralconfiguration: { mineral: '', quantity: 0 } }} 
+              inventoryItems={inventoryItems} 
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+
 interface InventoryItem {
   id: number;
   name: string;

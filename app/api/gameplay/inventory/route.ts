@@ -8,11 +8,11 @@ interface InventoryItem {
   id: number;
   name: string;
   description: string;
-  cost: number;
+  cost?: number;
   icon_url: string;
   ItemCategory: string;
-  parentItem: number | null;
-  itemLevel: number;
+  parentItem?: number | null;
+  itemLevel?: number;
   locationType?: string;
   recipe?: Recipe; 
   gif?: string;
@@ -52,6 +52,9 @@ const inventoryItems: InventoryItem[] = [
   {
     id: 3102, name: 'Automaton station', description: 'View, control and upgrade all your automatons and rovers here', cost: 1, icon_url: '/assets/items/AutomatonController.png', ItemCategory: 'Structure', parentItem: 30, itemLevel: 1, locationType: 'Surface'
   },
+  {
+    id: 3103, name: 'Telescope', description: 'Space-based observations & classifications', icon_url: '/assets/Items/TransitingTelescope.png', ItemCategory: 'Structure', locationType: 'Orbital'
+  }
 ];
 
 export async function GET(req: NextRequest) {

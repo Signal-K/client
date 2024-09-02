@@ -4,7 +4,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { MineralDeposit, Automaton } from "@/types/Items";
 import AutomatonUpgrade from "../../(structures)/Config/AutomatonUpgradeBox";
 import { InventoryItem } from "@/types/Inventory";
-import { Battery, MapPin, Rocket, Clock } from 'lucide-react';
+import { Battery, MapPin, Rocket, Clock } from "lucide-react";
 
 import "../../../../styles/Anims/MiningAnimations.css";
 import "../../../../styles/Structures/RoverPath.css";
@@ -12,12 +12,14 @@ import "../../../../styles/Structures/MapHighlight.css";
 
 interface ActiveAutomatonForMiningProps {
   deposit: MineralDeposit;
-};
+}
 
 type SpeedLevel = 1 | 2 | 3;
 export type CapacityLevel = 1 | 2 | 3;
 
-export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningProps) {
+export function ActiveAutomatonForMining({
+  deposit,
+}: ActiveAutomatonForMiningProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
   const { activePlanet } = useActivePlanet();
@@ -45,35 +47,41 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
           .from("inventory")
           .select("*")
           .eq("owner", session.user.id)
-          .eq("item", 23) 
+          .eq("item", 23)
           .eq("anomaly", activePlanet.id)
           .single();
 
         if (automatonError) {
-          throw new Error(`Error fetching automaton data: ${automatonError.message}`);
+          throw new Error(
+            `Error fetching automaton data: ${automatonError.message}`
+          );
         }
 
         const parsedAutomatonData: Automaton = {
           ...automatonData,
-          configuration: automatonData.configuration as Automaton['configuration'], // Ensure proper typing
+          configuration:
+            automatonData.configuration as Automaton["configuration"], // Ensure proper typing
         };
 
         setUserAutomaton(parsedAutomatonData);
 
         const inventoryResponse = await fetch("/api/gameplay/inventory");
         if (!inventoryResponse.ok) {
-          throw new Error(`Error fetching inventory items: ${inventoryResponse.statusText}`);
+          throw new Error(
+            `Error fetching inventory items: ${inventoryResponse.statusText}`
+          );
         }
         const inventoryData: InventoryItem[] = await inventoryResponse.json();
         setInventoryItems(inventoryData);
 
-        const automatonItem = inventoryData.find(item => item.id === automatonData.item);
+        const automatonItem = inventoryData.find(
+          (item) => item.id === automatonData.item
+        );
         if (automatonItem) {
           setRoverIconUrl(automatonItem?.gif ?? null);
         } else {
           throw new Error("Rover icon URL not found for the specified item.");
         }
-
       } catch (error: any) {
         console.error("Error fetching data:", error.message);
         setErrorMessage(error.message);
@@ -90,53 +98,66 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
       setErrorMessage("No automaton available to perform mining.");
       return;
     }
-  
+
     const speedLevel: SpeedLevel = userAutomaton.configuration?.Speed ?? 1;
-    const capacityLevel: CapacityLevel = userAutomaton.configuration?.Capacity ?? 1;
+    const capacityLevel: CapacityLevel =
+      userAutomaton.configuration?.Capacity ?? 1;
     const powerLevel: number = userAutomaton.configuration?.Power ?? 1;
-  
+
     const mineralName = deposit.mineralconfiguration.mineral;
-  
+
     // Check if the power level is sufficient for mining water-ice
     if (mineralName === "water" && powerLevel < 2) {
-      setErrorMessage("This automaton requires a Power level of 2 or greater to mine water. Please upgrade your automaton.");
+      setErrorMessage(
+        "This automaton requires a Power level of 2 or greater to mine water. Please upgrade your automaton."
+      );
       return;
-    };
+    }
 
     if (deposit.mineralconfiguration.mineral === "21" && powerLevel < 2) {
-      setErrorMessage("This automaton requires a Power level of 2 or greater to mine water. Please upgrade your automaton.");
+      setErrorMessage(
+        "This automaton requires a Power level of 2 or greater to mine water. Please upgrade your automaton."
+      );
       return;
-    };
-  
+    }
+
     setMiningInProgress(true);
     setErrorMessage(null);
-  
-    const miningDurations: Record<SpeedLevel, number> = { 1: 25000, 2: 15000, 3: 10000 };
+
+    const miningDurations: Record<SpeedLevel, number> = {
+      1: 25000,
+      2: 15000,
+      3: 10000,
+    };
     const miningDuration = miningDurations[speedLevel] || miningDurations[1];
-  
+
     setCountdownTime(miningDuration);
-  
+
     try {
       const item = inventoryItems.find(
         (invItem) => invItem.id.toString() === mineralName
       );
-  
+
       if (!item) {
-        throw new Error(`No item found in inventory for mineral: ${mineralName}`);
+        throw new Error(
+          `No item found in inventory for mineral: ${mineralName}`
+        );
       }
-  
+
       const deployTime = new Date().toISOString();
       const { error: updateInventoryError } = await supabase
         .from("inventory")
         .update({
-          time_of_deploy: deployTime
+          time_of_deploy: deployTime,
         })
         .eq("id", userAutomaton.id);
-  
+
       if (updateInventoryError) {
-        throw new Error(`Error updating rover deploy time: ${updateInventoryError.message}`);
+        throw new Error(
+          `Error updating rover deploy time: ${updateInventoryError.message}`
+        );
       }
-  
+
       setTimeout(async () => {
         try {
           const { data: mineralData, error: mineralError } = await supabase
@@ -144,56 +165,68 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
             .select("mineralconfiguration")
             .eq("id", deposit.id)
             .single();
-  
+
           if (mineralError || !mineralData) {
-            throw new Error(`Error fetching mineral deposit data: ${mineralError?.message}`);
+            throw new Error(
+              `Error fetching mineral deposit data: ${mineralError?.message}`
+            );
           }
-  
-          const mineralConfig = mineralData.mineralconfiguration as { mineral: string; quantity: number };
-  
+
+          const mineralConfig = mineralData.mineralconfiguration as {
+            mineral: string;
+            quantity: number;
+          };
+
           if (mineralConfig.quantity <= 0) {
             throw new Error(`No quantity left for mineral: ${mineralName}`);
           }
-  
+
           const haulQuantity = Math.min(mineralConfig.quantity, capacityLevel);
           const updatedQuantity = mineralConfig.quantity - haulQuantity;
-  
+
           const { error: updateMineralError } = await supabase
             .from("mineralDeposits")
             .update({
               mineralconfiguration: {
                 ...mineralConfig,
-                quantity: updatedQuantity
-              }
+                quantity: updatedQuantity,
+              },
             })
             .eq("id", deposit.id);
-  
+
           if (updateMineralError) {
-            throw new Error(`Error updating mineral deposit: ${updateMineralError.message}`);
+            throw new Error(
+              `Error updating mineral deposit: ${updateMineralError.message}`
+            );
           }
-  
-          const { data: existingInventory, error: inventoryError } = await supabase
-            .from("inventory")
-            .select("*")
-            .eq("item", item.id)
-            .eq("owner", session?.user?.id)
-            .eq("anomaly", activePlanet?.id)
-            .single();
-  
-          if (inventoryError && inventoryError.code !== 'PGRST116') {
-            throw new Error(`Error fetching inventory data: ${inventoryError.message}`);
+
+          const { data: existingInventory, error: inventoryError } =
+            await supabase
+              .from("inventory")
+              .select("*")
+              .eq("item", item.id)
+              .eq("owner", session?.user?.id)
+              .eq("anomaly", activePlanet?.id)
+              .single();
+
+          if (inventoryError && inventoryError.code !== "PGRST116") {
+            throw new Error(
+              `Error fetching inventory data: ${inventoryError.message}`
+            );
           }
-  
+
           if (existingInventory) {
             const { error: updateExistingInventoryError } = await supabase
               .from("inventory")
               .update({
-                quantity: existingInventory.quantity + haulQuantity
+                quantity: existingInventory.quantity + haulQuantity,
               })
               .eq("id", existingInventory.id);
-  
+
             if (updateExistingInventoryError) {
-              throw new Error(`Error updating inventory: ${updateExistingInventoryError.message}`);
+              throw new Error(
+                `Error updating inventory: ${updateExistingInventoryError.message}`
+              );
             }
           } else {
             const { error: insertInventoryError } = await supabase
@@ -205,25 +238,29 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
                 notes: `Created by rover ${userAutomaton.id}`,
                 time_of_deploy: deployTime,
                 anomaly: activePlanet?.id,
-                configuration: null
+                configuration: null,
               });
-  
+
             if (insertInventoryError) {
-              throw new Error(`Error inserting inventory: ${insertInventoryError.message}`);
+              throw new Error(
+                `Error inserting inventory: ${insertInventoryError.message}`
+              );
             }
           }
-  
+
           const { error: clearDeployTimeError } = await supabase
             .from("inventory")
             .update({
-              time_of_deploy: null
+              time_of_deploy: null,
             })
             .eq("id", userAutomaton.id);
-  
+
           if (clearDeployTimeError) {
-            throw new Error(`Error clearing rover deploy time: ${clearDeployTimeError.message}`);
+            throw new Error(
+              `Error clearing rover deploy time: ${clearDeployTimeError.message}`
+            );
           }
-  
+
           console.log("Mineral collected and added to inventory.");
           alert(`Successfully collected ${haulQuantity} ${mineralName}(s)!`);
           setMiningInProgress(false);
@@ -248,7 +285,7 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
 
     if (miningInProgress && countdownTime !== null && countdownTime > 0) {
       timer = setInterval(() => {
-        setCountdownTime(prevTime => {
+        setCountdownTime((prevTime) => {
           if (prevTime !== null && prevTime > 1000) {
             return prevTime - 1000;
           } else {
@@ -266,7 +303,8 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
     };
   }, [miningInProgress, countdownTime]);
 
-  const formattedCountdown = countdownTime !== null ? Math.ceil(countdownTime / 1000) : 0;
+  const formattedCountdown =
+    countdownTime !== null ? Math.ceil(countdownTime / 1000) : 0;
 
   const handleConfigureAutomaton = () => {
     setIsConfiguring(true);
@@ -298,16 +336,21 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
 
   return (
     <div className="p-4 border rounded-lg shadow-md bg-white bg-opacity-82 overflow-hidden">
-                {roverIconUrl && (
-            <div className="relative h-32">
-              <img
-                src={roverIconUrl}
-                alt="Rover Icon"
-                className="w-32 h-32 absolute"
-                style={{ top: 0, left: 0, animation: "slide 4s infinite alternate ease-in-out", transform: "scaleX(-1)" }}
-              />
-            </div>
-          )}
+      {roverIconUrl && (
+        <div className="relative h-32">
+          <img
+            src={roverIconUrl}
+            alt="Rover Icon"
+            className="w-32 h-32 absolute"
+            style={{
+              top: 0,
+              left: 0,
+              animation: "slide 4s infinite alternate ease-in-out",
+              transform: "scaleX(-1)",
+            }}
+          />
+        </div>
+      )}
       {miningInProgress ? (
         <MapHighlight
           timeRemaining={formattedCountdown}
@@ -319,7 +362,8 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
         <>
           <h2 className="text-xl font-semibold mb-4">Automaton Control</h2>
           <p className="text-sm mb-4">
-            Rover ID: {userAutomaton.id} - Ready to collect <strong>{deposit.mineralconfiguration.mineral}</strong>
+            Rover ID: {userAutomaton.id} - Ready to collect{" "}
+            <strong>{deposit.mineralconfiguration.mineral}</strong>
           </p>
           {userAutomaton && (
             <div>
@@ -341,7 +385,9 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
           )}
           <div className="flex space-x-4 mt-4">
             <button
-              className={`block bg-[#85DDA2] text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${miningInProgress ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`block bg-[#85DDA2] text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${
+                miningInProgress ? "opacity-50 cursor-not-allowed" : ""
+              }`}
               onClick={handleSendRover}
               disabled={miningInProgress}
             >
@@ -355,15 +401,142 @@ export function ActiveAutomatonForMining({ deposit }: ActiveAutomatonForMiningPr
             </button>
           </div>
           {isConfiguring && (
-              <div className="my-3 mx-2">
-                <AutomatonUpgrade inventoryId={userAutomaton.id} onSave={handleSaveConfiguration} />
-              </div>
+            <div className="my-3 mx-2">
+              <AutomatonUpgrade
+                inventoryId={userAutomaton.id}
+                onSave={handleSaveConfiguration}
+              />
+            </div>
           )}
         </>
       )}
     </div>
   );
 };
+
+export function AutomatonUpgrader() {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const { activePlanet } = useActivePlanet();
+
+  const [automatons, setAutomatons] = useState<Automaton[]>([]);
+  const [currentAutomatonIndex, setCurrentAutomatonIndex] = useState(0);
+  const [roverIconUrl, setRoverIconUrl] = useState<string | null>(null);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isConfiguring, setIsConfiguring] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setErrorMessage(null);
+
+        if (!session?.user?.id || !activePlanet?.id) {
+          throw new Error("User session or active planet is not available.");
+        }
+
+        const { data: automatonsData, error: automatonsError } = await supabase
+          .from("inventory")
+          .select("*")
+          .eq("owner", session.user.id)
+          .eq("item", 23)
+          .eq("anomaly", activePlanet.id)
+          .order("id", { ascending: true }); // Fetch and order automatons by id
+
+        if (automatonsError) {
+          throw new Error(
+            `Error fetching automatons data: ${automatonsError.message}`
+          );
+        }
+
+        const parsedAutomatonsData: Automaton[] = automatonsData.map((item: any) => ({
+          ...item,
+          configuration: item.configuration as Automaton["configuration"], // Ensure proper typing
+        }));
+
+        setAutomatons(parsedAutomatonsData);
+
+        const inventoryResponse = await fetch("/api/gameplay/inventory");
+        if (!inventoryResponse.ok) {
+          throw new Error(
+            `Error fetching inventory items: ${inventoryResponse.statusText}`
+          );
+        }
+        const inventoryData: InventoryItem[] = await inventoryResponse.json();
+        setInventoryItems(inventoryData);
+
+        if (parsedAutomatonsData.length > 0) {
+          const automatonItem = inventoryData.find(
+            (item) => item.id === parsedAutomatonsData[0].item
+          );
+          if (automatonItem) {
+            setRoverIconUrl(automatonItem?.gif ?? null);
+          } else {
+            throw new Error("Rover icon URL not found for the specified item.");
+          }
+        }
+      } catch (error: any) {
+        console.error("Error fetching data:", error.message);
+        setErrorMessage(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [session, supabase, activePlanet]);
+
+  const handleConfigureAutomaton = () => {
+    setIsConfiguring(true);
+  };
+
+  const handleSaveConfiguration = () => {
+    setIsConfiguring(false);
+  };
+
+  const handleNextAutomaton = () => {
+    if (automatons.length > 1) {
+      setCurrentAutomatonIndex((prevIndex) => (prevIndex + 1) % automatons.length);
+      setRoverIconUrl(automatons[(currentAutomatonIndex + 1) % automatons.length]?.gif ?? null);
+    }
+  };
+
+  const handlePreviousAutomaton = () => {
+    if (automatons.length > 1) {
+      setCurrentAutomatonIndex((prevIndex) => 
+        (prevIndex - 1 + automatons.length) % automatons.length
+      );
+      setRoverIconUrl(automatons[(currentAutomatonIndex - 1 + automatons.length) % automatons.length]?.gif ?? null);
+    }
+  };
+
+  if (loading) {
+    return <div>Loading automaton and inventory data...</div>;
+  }
+
+  return (
+    <div className="my-3 mx-2">
+      {errorMessage && <div className="text-red-500">{errorMessage}</div>}
+      {automatons.length > 0 ? (
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <button onClick={handlePreviousAutomaton}>← Previous</button>
+            <AutomatonUpgrade
+              inventoryId={automatons[currentAutomatonIndex].id}
+              onSave={handleSaveConfiguration}
+            />
+            <button onClick={handleNextAutomaton}>Next →</button>
+          </div>
+        </div>
+      ) : (
+        <div>No automatons found.</div>
+      )}
+    </div>
+  );
+}
+
 
 interface MapHighlightProps {
   distanceRemaining: number;
@@ -372,7 +545,12 @@ interface MapHighlightProps {
   destinationName: string;
 };
 
-function MapHighlight({ distanceRemaining, timeRemaining, speed, destinationName }: MapHighlightProps) {
+function MapHighlight({
+  distanceRemaining,
+  timeRemaining,
+  speed,
+  destinationName,
+}: MapHighlightProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [pulseSize, setPulseSize] = useState(0);
 
@@ -380,7 +558,7 @@ function MapHighlight({ distanceRemaining, timeRemaining, speed, destinationName
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const getRandomOffset = (range: number) => {
@@ -388,7 +566,7 @@ function MapHighlight({ distanceRemaining, timeRemaining, speed, destinationName
     };
 
     const drawWarpedTopographicRings = () => {
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
       ctx.lineWidth = 1;
 
       const centerX = canvas.width / 2;
@@ -402,7 +580,7 @@ function MapHighlight({ distanceRemaining, timeRemaining, speed, destinationName
 
         ctx.beginPath();
         for (let j = 0; j < points; j++) {
-          const angle = (Math.PI * 2 / points) * j;
+          const angle = ((Math.PI * 2) / points) * j;
           const x = centerX + Math.cos(angle) * (radius + getRandomOffset(10));
           const y = centerY + Math.sin(angle) * (radius + getRandomOffset(10));
 
@@ -410,21 +588,21 @@ function MapHighlight({ distanceRemaining, timeRemaining, speed, destinationName
             ctx.moveTo(x, y);
           } else {
             ctx.lineTo(x, y);
-          };
-        };
+          }
+        }
         ctx.closePath();
         ctx.stroke();
-      };
+      }
     };
 
     const drawDestinationMarker = () => {
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = "white";
       ctx.beginPath();
       ctx.arc(canvas.width * 0.7, canvas.height * 0.3, 5, 0, Math.PI * 2);
       ctx.fill();
 
       // Draw a small crater around the destination
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
       ctx.beginPath();
       ctx.arc(canvas.width * 0.7, canvas.height * 0.3, 15, 0, Math.PI * 2);
       ctx.stroke();
@@ -484,12 +662,13 @@ function MapHighlight({ distanceRemaining, timeRemaining, speed, destinationName
   );
 };
 
-
-          {/* <div className="topographic-map">
+{
+  /* <div className="topographic-map">
           {/* Example of a curved path *
           <div className="path-line" style={{ width: '50%', transform: 'rotate(30deg) translate(50%, -10%)' }}></div>
           <div className="path-line" style={{ width: '30%', transform: 'rotate(60deg) translate(120%, 40%)' }}></div>
           <div className="path-line" style={{ width: '40%', transform: 'rotate(15deg) translate(70%, 80%)' }}></div>
 
           {/* Current Location Indicator 
-          <div className="current-location" style={{ top: '70%', left: '80%' }}>HELLO</div> */}
+          <div className="current-location" style={{ top: '70%', left: '80%' }}>HELLO</div> */
+}

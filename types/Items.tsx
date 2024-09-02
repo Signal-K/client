@@ -17,6 +17,7 @@ export interface MineralDeposit {
 type SpeedLevel = 1 | 2 | 3;
 
 export interface Automaton {
+    gif: null;
     id: number;
     item: number;
     owner: string;

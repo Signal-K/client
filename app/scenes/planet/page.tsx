@@ -63,17 +63,9 @@ export default function PlanetViewPage() {
                 <StructuresOnPlanet onStructuresFetch={handleStructuresFetch} />
             </div>
             <div className="bg-white/50 h-full">
-                Automatons
+                {/* Automatons */}
                 <ChapterOneIntroduction />
             </div>
         </PlanetViewLayout>
-        // <TestLayout>
-        //     <div>
-        //         <StructuresOnPlanet />
-        //     </div>
-        //     <div>
-        //         Automatons
-        //     </div>
-        // </TestLayout>
     );
 };

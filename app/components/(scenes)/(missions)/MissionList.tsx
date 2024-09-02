@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
+import { MineralDepositsNoAction } from "../../(structures)/Mining/AvailableDeposits";
+
 interface Mission {
   id: number;
   name: string;
@@ -49,7 +51,6 @@ export default function MissionLog() {
         const completedMissionIds = completedMissionData?.map((entry) => entry.mission);
 
         const missionResponse = await fetch("/api/gameplay/missions");
-
         let missionData: Mission[] = await missionResponse.json();
 
         missionData = missionData.filter((mission) => mission.id < 1 || mission.id > 100);
@@ -65,20 +66,19 @@ export default function MissionLog() {
         setCompletedMissions(completedMissions);
         setIncompleteMissions(incompleteMissions);
 
-        const groupedIncompleteMissions = missionData.reduce((groups, mission) => {
-          const keyParts = [
-            mission.chapter,
-            mission.classificationModule,
-          ].filter(Boolean); // filter out undefined parts
-          const key = keyParts.join("-");
-          if (!groups[key]) {
-            groups[key] = [];
-          }
-          groups[key].push(mission);
-          return groups;
-        }, {} as Record<string, Mission[]>);
-
-        const initialOpenGroups = Object.keys(groupedIncompleteMissions).slice(0, 3);
+        const initialOpenGroups = Object.keys(
+          missionData.reduce((groups, mission) => {
+            const key = [
+              mission.chapter,
+              mission.classificationModule,
+            ].filter(Boolean).join("-");
+            if (!groups[key]) {
+              groups[key] = [];
+            }
+            groups[key].push(mission);
+            return groups;
+          }, {} as Record<string, Mission[]>)
+        ).slice(0, 3);
         setOpenGroups(initialOpenGroups);
       } catch (error: any) {
         console.error("Error fetching data:", error.message);
@@ -90,11 +90,10 @@ export default function MissionLog() {
   }, [session, supabase]);
 
   const groupedIncompleteMissions = incompleteMissions.reduce((groups, mission) => {
-    const keyParts = [
+    const key = [
       mission.chapter,
       mission.classificationModule,
-    ].filter(Boolean);
-    const key = keyParts.join("-");
+    ].filter(Boolean).join("-");
     if (!groups[key]) {
       groups[key] = [];
     }
@@ -103,11 +102,10 @@ export default function MissionLog() {
   }, {} as Record<string, Mission[]>);
 
   const groupedCompletedMissions = completedMissions.reduce((groups, mission) => {
-    const keyParts = [
+    const key = [
       mission.chapter,
       mission.classificationModule,
-    ].filter(Boolean);
-    const key = keyParts.join("-");
+    ].filter(Boolean).join("-");
     if (!groups[key]) {
       groups[key] = [];
     }
@@ -116,20 +114,16 @@ export default function MissionLog() {
   }, {} as Record<string, Mission[]>);
 
   const toggleGroup = (groupKey: string) => {
-    if (openGroups.includes(groupKey)) {
-      setOpenGroups(openGroups.filter((key) => key !== groupKey));
-    } else {
-      setOpenGroups([...openGroups, groupKey]);
-    }
+    setOpenGroups(openGroups.includes(groupKey)
+      ? openGroups.filter((key) => key !== groupKey)
+      : [...openGroups, groupKey]);
   };
 
   const handleMissionClick = (mission: Mission) => {
-    console.log("Mission clicked:", mission.name);
-    if (mission.component) {
-      setActiveMissionComponent(mission.component);
-    } else {
-      setActiveMissionComponent(null);
-    }
+    console.log(`Clicked mission ID: ${mission.id}`); // Debugging line
+    const component = missionComponents[mission.id];
+    console.log("Selected component:", component); // Debugging line
+    setActiveMissionComponent(component ? React.cloneElement(component) : null);
   };
 
   return (
@@ -167,9 +161,7 @@ export default function MissionLog() {
                         <div className="flex-1">
                           <p className="font-medium text-lg">{mission.name}</p>
                           <p
-                            className={`text-sm ${
-                              mission.component ? "text-blue-500" : "text-gray-500"
-                            }`}
+                            className={`text-sm ${missionComponents[mission.id] ? "text-blue-500" : "text-gray-500"}`}
                           >
                             {mission.description}
                           </p>
@@ -206,20 +198,10 @@ export default function MissionLog() {
                     </h3>
                     <ul className="space-y-2 mt-2">
                       {groupedCompletedMissions[groupKey].map((mission) => (
-                        <li
-                          key={mission.id}
-                          className="bg-gray-100 p-3 rounded-md shadow-md cursor-pointer"
-                          onClick={() => handleMissionClick(mission)}
-                        >
+                        <li key={mission.id} className="bg-gray-100 p-3 rounded-md shadow-md">
                           <div className="flex-1">
                             <p className="font-medium text-lg">{mission.name}</p>
-                            <p
-                              className={`text-sm ${
-                                mission.component ? "text-blue-500" : "text-gray-500"
-                              }`}
-                            >
-                              {mission.description}
-                            </p>
+                            <p className="text-sm text-gray-500">{mission.description}</p>
                           </div>
                         </li>
                       ))}
@@ -239,4 +221,8 @@ export default function MissionLog() {
       </div>
     </div>
   );
+}
+
+const missionComponents: Record<number, React.ReactElement> = {
+  1372002: <MineralDepositsNoAction />,
 };

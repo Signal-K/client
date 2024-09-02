@@ -16,105 +16,104 @@ interface IndividualStructureProps {
       icon: React.ReactNode;
       text: string;
       dynamicComponent?: React.ReactNode;
+      sizePercentage?: number;
     }[];
     onActionClick?: (action: string) => void;
     onClose?: () => void;
 };
 
 const IndividualStructure: React.FC<IndividualStructureProps> = ({
-    name,
-    title,
-    labels,
-    imageSrc,
-    actions,
-    buttons,
-    onActionClick,
-    onClose,
+  name,
+  title,
+  labels,
+  imageSrc,
+  actions,
+  buttons,
+  onActionClick,
+  onClose,
 }) => {
-    const [expanded, setExpanded] = useState(false);
-    const [activeButton, setActiveButton] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [activeButton, setActiveButton] = useState<string | null>(null);
 
-    const handleButtonClick = (buttonText: string) => {
-        setExpanded(true);
-        setActiveButton(buttonText);
-        if (onActionClick) {
-            onActionClick(buttonText);
-        }
-    };
+  const handleButtonClick = (buttonText: string) => {
+    setExpanded(true);
+    setActiveButton(buttonText);
+    if (onActionClick) {
+      onActionClick(buttonText);
+    }
+  };
 
-    const handleClose = () => {
-        setExpanded(false);
-        setActiveButton(null);
-        if (onClose) {
-            onClose();
-        }
-    };
+  const handleClose = () => {
+    setExpanded(false);
+    setActiveButton(null);
+    if (onClose) {
+      onClose();
+    }
+  };
 
-    const activeComponent = buttons.find(button => button.text === activeButton)?.dynamicComponent;
+  const handleCollapse = () => {
+    setExpanded(false);
+    setActiveButton(null);
+  };
 
-    return (
-        <Dialog defaultOpen>
-            <div className={`relative transition-all duration-500 ease-in-out ${expanded ? 'h-screen' : ''}`}>
-                {!expanded && (
-                    <>
-                        <div className="absolute top-[-1.5rem] left-1/2 -translate-x-1/2 bg-[#2e3a47] px-4 py-2 rounded-t-lg">
-                            <h2 className="text-sm font-medium text-muted-foreground">{name}</h2>
-                            <h1 className="text-2xl font-bold text-white">{title}</h1>
-                        </div>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" className="rounded-full">
-                                Open Modal
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="p-4 rounded-3xl bg-[#2C3A4A]/70 text-white max-w-md mx-auto">
-                            <div className="flex justify-between items-center">
-                                <div className="flex items-center space-x-2">
-                                    <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />
-                                    <div>
-                                        <h1 className="text-2xl font-bold text-[#eceff4]">{name}</h1>
-                                    </div>
-                                </div>
-                                <StarIcon className="w-6 h-6 text-[#ebcb8b]" />
-                            </div>
-                            <div className="flex justify-center my-4">
-                                <img
-                                    src={imageSrc}
-                                    alt={title}
-                                    className="w-20 h-20 bg-[#74859A]"
-                                    width="80"
-                                    height="80"
-                                    style={{ aspectRatio: "80/80", objectFit: "cover" }}
-                                />
-                            </div>
-                            <div className="flex justify-center space-x-4">
-                                {labels.map((label, index) => {
-                                    let bgColor = "";
+  const activeButtonConfig = buttons.find(button => button.text === activeButton);
+  const activeComponent = activeButtonConfig?.dynamicComponent;
+  const sizePercentage = activeButtonConfig?.sizePercentage || 100;
 
-                                    switch (label.variant) {
-                                        case "default":
-                                            bgColor = "#5FCBC3";
-                                            break;
-                                        case "secondary":
-                                            bgColor = "#85DDA2";
-                                            break;
-                                        case "destructive":
-                                            bgColor = "#D689E3";
-                                            break;
-                                    }
+  return (
+    <Dialog defaultOpen>
+      <div className={`relative transition-all duration-500 ease-in-out ${expanded ? 'h-screen' : ''}`}>
+        {!expanded && (
+          <>
+            <DialogContent className="p-4 rounded-3xl bg-[#2C3A4A]/70 text-white max-w-md mx-auto">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />
+                  <div>
+                    <h1 className="text-2xl font-bold text-[#eceff4]">{name}</h1>
+                  </div>
+                </div>
+                <StarIcon className="w-6 h-6 text-[#ebcb8b]" />
+              </div>
+              <div className="flex justify-center my-4">
+                <img
+                  src={imageSrc}
+                  alt={title}
+                  className="w-20 h-20 bg-[#74859A]"
+                  width="80"
+                  height="80"
+                  style={{ aspectRatio: "80/80", objectFit: "cover" }}
+                />
+              </div>
+              <div className="flex justify-center space-x-4">
+                {labels.map((label, index) => {
+                  let bgColor = "";
 
-                                    return (
-                                        <Badge 
-                                            key={index} 
-                                            variant={label.variant} 
-                                            className={`text-white/83`} 
-                                            style={{ backgroundColor: bgColor }}
-                                        >
-                                            {label.text}
-                                        </Badge>
-                                    );
-                                })}
-                            </div>
-                            <div className="flex justify-between my-4 space-x-4">
+                  switch (label.variant) {
+                    case "default":
+                      bgColor = "#5FCBC3";
+                      break;
+                    case "secondary":
+                      bgColor = "#85DDA2";
+                      break;
+                    case "destructive":
+                      bgColor = "#D689E3";
+                      break;
+                  }
+
+                  return (
+                    <Badge
+                      key={index}
+                      variant={label.variant}
+                      className={`text-white/83`}
+                      style={{ backgroundColor: bgColor }}
+                    >
+                      {label.text}
+                    </Badge>
+                  );
+                })}
+              </div>
+                {/* <div className="flex justify-between my-4 space-x-4">
                                 {actions.map((action, index) => (
                                     <div
                                         key={index}
@@ -125,46 +124,58 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                                         <p className="text-xs text-[#d8dee9]">{action.text}</p>
                                     </div>
                                 ))}
-                            </div>
-                            <div className="flex flex-col my-4 space-y-4">
-                                {buttons.map((button, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
-                                        onClick={() => handleButtonClick(button.text)}
-                                    >
-                                        <div className="flex-shrink-0">
-                                            {button.icon}
-                                        </div>
-                                        <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </DialogContent>
-                    </>
-                )}
+                            </div> */}
+              <div className="flex flex-col my-4 space-y-4">
+                {buttons.map((button, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
+                    onClick={() => handleButtonClick(button.text)}
+                  >
+                    <div className="flex-shrink-0">
+                      {button.icon}
+                    </div>
+                    <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
+                  </div>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                className="rounded-full p-2 text-[#d8dee9] hover:bg-[#3b4a5a] mt-8"
+                onClick={handleClose}
+              >
+                Close Modal
+              </Button>
+            </DialogContent>
+          </>
+        )}
 
-                {expanded && (
-                    <DialogContent className="p-4 rounded-3xl bg-[#2C3A4A]/90 text-white max-w-screen mx-auto h-full">
-                        <div className="flex flex-col items-center justify-center h-full">
-                            <h1 className="text-3xl font-bold text-[#eceff4] mb-4">{`Expanded View - ${activeButton}`}</h1>
-                            {/* Render dynamic component based on activeButton */}
-                            <div className="flex-grow flex justify-center items-center">
-                                {activeComponent ? activeComponent : <p className="text-lg">No component available.</p>}
-                            </div>
-                            <Button
-                                variant="outline"
-                                className="rounded-full p-2 text-[#d8dee9] hover:bg-[#3b4a5a] mt-8"
-                                onClick={handleClose}
-                            >
-                                <DoorClosedIcon className="w-6 h-6 text-[#d8dee9]" />
-                            </Button>
-                        </div>
-                    </DialogContent>
-                )}
+        {expanded && (
+          <DialogContent
+            className="p-4 rounded-3xl bg-[#2C3A4A]/90 text-white max-w-screen mx-auto h-full"
+            style={{
+              width: `${sizePercentage}%`,
+              height: `${sizePercentage}%`,
+              maxWidth: `${sizePercentage}%`,
+            }}
+          >
+            <div className="relative flex flex-col items-center justify-center h-full">
+              <button
+                className="absolute top-4 right-4 text-white hover:text-red-500"
+                onClick={handleCollapse}
+              >
+                Collapse
+              </button>
+              <h1 className="text-3xl font-bold text-[#eceff4] mb-4">{`${activeButton}`}</h1>
+              <div className="flex-grow flex justify-center items-center">
+                {activeComponent ? activeComponent : <p className="text-lg">No component available.</p>}
+              </div>
             </div>
-        </Dialog>
-    );
+          </DialogContent>
+        )}
+      </div>
+    </Dialog>
+  );
 };
 
 export default IndividualStructure;

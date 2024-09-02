@@ -1,12 +1,19 @@
+import React, { useEffect, useState } from "react";
+import AutomatonUpgrade from "@/app/components/(structures)/Config/AutomatonUpgradeBox";
 import { MiningScene } from "@/app/components/(structures)/Mining/MiningPanels";
-import { BeanIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, RssIcon, SaladIcon, WebcamIcon } from "lucide-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { BeanIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
+import { useActivePlanet } from "@/context/ActivePlanet";
+import { AutomatonUpgrader } from "@/app/components/(vehicles)/(automatons)/ActiveAutomaton";
+import MineralDeposits, { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
+import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
 
 interface IndividualStructureProps {
-    name: string;
-    title: string;
+    name?: string;
+    title?: string;
     labels: { text: string; variant: "default" | "secondary" | "destructive"; }[];
     imageSrc: string;
-    actions: {
+    actions?: {
       icon: React.ReactNode;
       text: string;
     }[];
@@ -14,6 +21,7 @@ interface IndividualStructureProps {
       icon: React.ReactNode;
       text: string;
       dynamicComponent?: React.ReactNode;
+      sizePercentage?: number;
     }[];
     onActionClick?: (action: string) => void;
     onClose?: () => void;
@@ -41,23 +49,27 @@ export const StructuresConfig: StructureConfig = {
       ],
       buttons: [
         { 
-          icon: <WebcamIcon className="w-6 h-6 text-[#a3be8c]" />, 
+          icon: <ConstructionIcon className="w-6 h-6 text-[#a3be8c]" />, 
           text: "Mining", 
           dynamicComponent: <MiningScene />
         },
         { 
-          icon: <LockIcon className="w-6 h-6 text-[#a3be8c]" />, 
-          text: "Locked until level 15" 
+          icon: <PowerIcon className="w-6 h-6 text-[#a3be8c]" />, 
+          text: "Upgrade automaton",
+          dynamicComponent: <AutomatonUpgrader />,
+          sizePercentage: 50
         },
         { 
-          icon: <BeanIcon className="w-6 h-6 text-[#a3be8c]" />, 
-          text: "Dismiss for the day" 
+          icon: <GemIcon className="w-6 h-6 text-[#a3be8c]" />, 
+          text: "View available deposits",
+          dynamicComponent: <MineralDepositsNoAction />,
+          sizePercentage: 50
         },
       ],
     },
     3102: {
-      name: "Mysterious Forest Grove",
-      title: "Forest",
+      name: "Automaton station",
+      title: "Roovers",
       labels: [
         { text: "Ethereal", variant: "default" },
         { text: "Magical", variant: "secondary" },
@@ -72,18 +84,54 @@ export const StructuresConfig: StructureConfig = {
       ],
       buttons: [
         { 
-          icon: <WebcamIcon className="w-6 h-6 text-[#5e81ac]" />, 
-          text: "Record", 
-          dynamicComponent: null
+          icon: <CaravanIcon className="w-6 h-6 text-[#5e81ac]" />, 
+          text: "My Automatons", 
+          dynamicComponent: <AllAutomatonsOnActivePlanet />,
+          sizePercentage: 30,
         },
         { 
-          icon: <LockIcon className="w-6 h-6 text-[#5e81ac]" />, 
-          text: "Locked until level 10" 
+          icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />, 
+          text: "Upgrade your (base) automaton",
+          dynamicComponent: <AutomatonUpgrader />,
+          sizePercentage: 55,
         },
         { 
-          icon: <BeanIcon className="w-6 h-6 text-[#5e81ac]" />, 
-          text: "Leave for the day" 
+          icon: <LockIcon className="w-6 h-6 text-[#FFE3BA]" />, 
+          text: "Further interactions - locked" 
         },
       ],
     },
-}
+    3103: {
+      name: "Transiting Telescope",
+      labels: [
+        {
+          text: "Transit events", variant: "default",
+        },
+        {
+          text: 'Meteorology data', variant: 'default', // Combine styling/content with actions
+        },
+        {
+          text: 'Orbital & Surface', variant: 'secondary', // structure types
+        },
+      ],
+      imageSrc: '/assets/Items/TransitingTelescope.png',
+      actions: [
+        {
+          icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />, text: 'Transit events'
+        },
+        // Copy action/labels
+      ],
+      buttons: [
+        {
+          icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Transit events",
+          dynamicComponent: '',
+          sizePercentage: 60,
+        },
+        {
+          icon: <CloudCogIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Cloud/Weather Data (LOCKED)",
+        },
+      ],
+    },
+};
