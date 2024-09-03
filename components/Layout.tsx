@@ -1,8 +1,7 @@
 import { ReactNode } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import PlanetLayout from "@/ui/Sections/PlanetLayout";
-import { backgroundImages, bgImage, blur } from "@/constants/backgrounds";
+import { backgroundImages, bgImage } from "@/constants/backgrounds";
 
 interface LayoutProps {
     children: ReactNode;
@@ -25,9 +24,7 @@ export default function Layout({ children }: LayoutProps) {
                 backgroundPosition: "center",
             }}            
         >
-            <PlanetLayout>
                 {children}
-            </PlanetLayout>
         </div>
     );
 };
