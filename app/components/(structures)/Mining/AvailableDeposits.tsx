@@ -48,7 +48,7 @@ const fetchInventoryItems = async (): Promise<InventoryItem[]> => {
   const response = await fetch('/api/gameplay/inventory');
   const data = await response.json();
   return data;
-};
+}; 
 
 const MineralDeposits: React.FC<{ onSelectDeposit: (deposit: MineralDepositData) => void }> = ({ onSelectDeposit }) => {
   const { activePlanet } = useActivePlanet();
@@ -89,7 +89,8 @@ const MineralDeposits: React.FC<{ onSelectDeposit: (deposit: MineralDepositData)
     loadInventoryItems();
   }, [activePlanet, session, supabase]);
 
-  const emptySlots = 9 - mineralDeposits.length; // Calculate how many empty slots to display
+  // Ensure emptySlots is not negative
+  const emptySlots = Math.max(0, 9 - mineralDeposits.length);
 
   return (
     <div>

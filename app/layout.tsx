@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic';
 import { InventoryProvider } from "@/context/InventoryContext";
 import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 import { bgImage, backgroundImages } from "@/constants/backgrounds";
+import { Analytics } from "@vercel/analytics/react"
 import { MissionProvider } from "@/context/MissionContext";
 // import { CreateStructureWithItemRequirementinfo } from "@/components/Gameplay/Inventory/Structures/Structure";
 
@@ -67,13 +68,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
           <ActivePlanetProvider>
-            <MissionProvider>
-                <UserAnomaliesProvider>
-                  <InventoryProvider>
+              <MissionProvider>
+                  <UserAnomaliesProvider>
+                    <InventoryProvider>
                       {children}
-                  </InventoryProvider>
-                </UserAnomaliesProvider>
-            </MissionProvider>
+                      <Analytics />
+                    </InventoryProvider>
+                  </UserAnomaliesProvider>
+              </MissionProvider>
           </ActivePlanetProvider>
         </SessionContextProvider>
       </body>

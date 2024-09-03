@@ -12,7 +12,7 @@ export default function MiningScene() {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
-    const [selectedDeposit, setSelectedDeposit] = useState<null | any>(null); // Adjust type if needed
+    const [selectedDeposit, setSelectedDeposit] = useState<null | any>(null);
 
     const handleSelectDeposit = (deposit: any) => {
         setSelectedDeposit(deposit);

@@ -36,11 +36,16 @@ const GeneratedStarterPlanet: React.FC = () => {
 
                 if (allError) throw allError;
 
+                console.log("Fetched classifications:", allClassifications);
+
                 setClassifications(allClassifications || []);
 
                 // Fetch one classification of each type
-                const lightcurve = allClassifications?.find((c: { classificationtype: string; }) => c.classificationtype === "lightcurve") || null;
-                const roverImg = allClassifications?.find((c: { classificationtype: string; }) => c.classificationtype === "roverImg") || null;
+                const lightcurve = allClassifications?.find((c: Classification) => c.classificationtype === "lightcurve") || null;
+                const roverImg = allClassifications?.find((c: Classification) => c.classificationtype === "roverImg") || null;
+
+                console.log("Lightcurve classification:", lightcurve);
+                console.log("Rover image classification:", roverImg);
 
                 setOneLightcurve(lightcurve);
                 setOneRoverImg(roverImg);
@@ -129,22 +134,28 @@ const GeneratedStarterPlanet: React.FC = () => {
                     </ul>
                 </div>
             </div>
-            <div className="text-center mt-4 p-4 bg-blue-100 rounded-lg">
-                <h3 className="text-lg font-bold">Congratulations!</h3>
-                <p className="text-sm mt-2">
-                    Great job completing the onboarding! You're all set.
-                </p>
-                <p className="text-sm mt-2">
-                    Now, it's time to travel to your planet, where your adventure truly begins. Get ready to
-                    explore, discover, and make your mark!
-                </p>
-                <p className="text-sm mt-2">
-                    We're still working on the first chapter, but if you'd like, we do have some old gameplay components for you to check out,
-                    and there's plenty more to classify.
-                </p>
-                <AddMissionsAndItems />
-            </div>
         </Card>
+    );
+};
+
+
+function SendUserToScene() {
+    return (
+        <div className="text-center mt-4 p-4 bg-blue-100 rounded-lg">
+            <h3 className="text-lg font-bold">Congratulations!</h3>
+            <p className="text-sm mt-2">
+                Great job completing the onboarding! You're all set.
+            </p>
+            <p className="text-sm mt-2">
+                Now, it's time to travel to your planet, where your adventure truly begins. Get ready to
+                explore, discover, and make your mark!
+            </p>
+            <p className="text-sm mt-2">
+                We're still working on the first chapter, but if you'd like, we do have some old gameplay components for you to check out,
+                and there's plenty more to classify.
+            </p>
+            <AddMissionsAndItems />
+        </div>
     );
 };
 
@@ -163,7 +174,7 @@ const AddMissionsAndItems: React.FC = () => {
         try {
             const { error: missionError } = await supabase
                 .from("missions")
-                .insert(missionsToAdd.map(missionId => ({
+                .insert(missionsToAdd.map(missionId => ({ 
                     user: session?.user?.id,
                     mission: missionId,
                     time_of_completion: null,

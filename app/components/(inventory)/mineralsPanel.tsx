@@ -18,7 +18,7 @@ interface InventoryItem {
   id: number;
   item: number;
   owner: string;
-  quantity: number;
+  quantity: number; 
   anomaly: number;
   // Other fields...
 }

@@ -49,7 +49,7 @@ const missions: Mission[] = [
     { id: 1370103, name: "Discover your first planet", description: "Use the first graphs provided to you to confirm the validity of an exoplanet candidate", rewards: [], chapter: 'Onboarding'}, // Update description so the user understands they'll be visiting/based on this planet after the onboarding
     { id: 1370104, name: 'Initial roover photos classification', description: 'Send out a rover to explore your planet', rewards: [], chapter: 'Onboarding'},
     // { id: 1370105, name: 'Initial animal classification', description: 'Update this row', rewards: [], chapter: 'Onboarding',},
-    // { id: 1370106, name: 'Generated planet', description: "Here's what we know about your planet. Why not visit it?", rewards: [], chapter: 'Onboarding'},
+    { id: 1370106, name: 'Generated planet', description: "Here's what we know about your planet. Why not visit it?", rewards: [], chapter: 'Onboarding'},
     {
         id: 1370107, name: "Activate retro mode", description: "Going back to the first V2.0 beta after finishing onboarding", rewards: [], chapter: 'Onboarding'
     },
