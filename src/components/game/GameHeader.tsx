@@ -63,7 +63,9 @@ export default function GameHeader({
     if (error) {
       console.error("Error signing out:", error.message);
     } else {
-      window.location.href = "/";
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      }
     }
   };
 

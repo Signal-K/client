@@ -438,26 +438,9 @@ export const DEPLOYMENT_STEPS: TutorialStep[] = [
       "Each location has unique missions. Look for ones marked 'Beginner' if you're just starting out.",
     position: "center",
   },
-  {
-    id: "start-mission",
-    title: "Start Your Mission",
-    description:
-      "Click on a mission to begin. You'll see real scientific data and instructions on what to look for.",
-    position: "center",
-  },
-  {
-    id: "make-classification",
-    title: "Make Your Classification",
-    description:
-      "Analyze the data and submit your classification. Don't worry about being perfect - multiple people classify each item, and consensus determines the answer.",
-    tip: "Your classifications are compared with others. This 'wisdom of the crowd' approach is how real science works!",
-    position: "center",
-  },
-  {
-    id: "earn-rewards",
-    title: "Collect Your Rewards",
-    description:
-      "After classifying, you'll earn Stardust and XP. Complete enough missions to level up and unlock new structures!",
-    position: "center",
-  },
 ];
+
+// Ensure location-related logic is wrapped in a client-side check
+if (typeof window !== "undefined") {
+  console.log("Location is available on the client-side.");
+}

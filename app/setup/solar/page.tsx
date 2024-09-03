@@ -18,7 +18,7 @@ export default function SolarSetupPage() {
 
       <div className="flex-1 z-10 min-h-0 pt-12">
         <TutorialWrapper
-          tutorialId="solar-observatory"
+          tutorialId="solar-deploy"
           steps={SOLAR_INTRO_STEPS}
           title="Solar Observatory Setup"
           onComplete={() => {

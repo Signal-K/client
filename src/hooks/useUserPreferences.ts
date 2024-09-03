@@ -31,6 +31,7 @@ export type TutorialId =
   | "telescope-deploy"       // How to deploy telescope
   | "satellite-deploy"       // How to deploy satellite
   | "rover-deploy"           // How to deploy rover
+  | "solar-deploy"           // Solar observatory deployment tutorial
   // Project-specific tutorials
   | "planet-hunting"         // TESS planet hunting
   | "asteroid-hunting"       // Minor planet/asteroid detection

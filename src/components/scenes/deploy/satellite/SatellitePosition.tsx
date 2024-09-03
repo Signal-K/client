@@ -355,7 +355,9 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
           } else if (satellite.anomalySet === 'lidar-jovianVortexHunter') {
             projectPath = 'jvh'; // Jovian vortex hunter
           }
-          window.location.href = `/structures/balloon/${projectPath}/db-${satellite.anomalyId}/classify`;
+          if (typeof window !== "undefined") {
+            window.location.href = `/structures/balloon/${projectPath}/db-${satellite.anomalyId}/classify`;
+          }
         }
       } else {
         // If still scanning, show unlock dialog

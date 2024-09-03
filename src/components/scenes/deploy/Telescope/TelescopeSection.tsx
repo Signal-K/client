@@ -75,7 +75,9 @@ export default function TelescopeViewportSection() {
 
   // Deploy handler (stub)
   const handleDeployTelescope = async () => {
-    window.location.href = "/activity/deploy/";
+    if (typeof window !== "undefined") {
+      window.location.href = "/activity/deploy/";
+    }
   };
 
   const [state, setState] = useState<TelescopeViewportState>({

@@ -93,7 +93,9 @@ export default function MainHeader({
       console.error("Error signing out:", error.message);
     } else {
       // Signed out
-      window.location.href = '/';
+      if (typeof window !== "undefined") {
+        window.location.href = '/';
+      }
     }
   };
 

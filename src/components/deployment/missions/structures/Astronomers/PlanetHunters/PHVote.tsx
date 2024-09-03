@@ -100,7 +100,9 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
           } catch (error) {
             console.error("PHVote: Router.push error:", error);
             // Fallback to window.location
-            window.location.href = '/';
+            if (typeof window !== "undefined") {
+              window.location.href = '/';
+            }
           }
         }, 3000);
       };
@@ -167,7 +169,9 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
                       router.push('/');
                     } catch (error) {
                       console.error('PHVote: Manual redirect error:', error);
-                      window.location.href = '/';
+                      if (typeof window !== "undefined") {
+                        window.location.href = '/';
+                      }
                     }
                   }}
                   className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4"

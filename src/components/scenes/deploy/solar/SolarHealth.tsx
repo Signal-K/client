@@ -250,7 +250,7 @@ export default function SolarHealth() {
               className="mt-3 w-36 text-xs"
               variant="outline"
               onClick={() =>
-                (window.location.href = `/structures/telescope/sunspot/db-${anomalyId}/count`)
+                (typeof window !== "undefined" && (window.location.href = `/structures/telescope/sunspot/db-${anomalyId}/count`))
               }
             >
               Count Solar Anomalies

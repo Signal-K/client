@@ -165,7 +165,7 @@ export function MineralExtraction({
                   {projectType}
                 </Badge>
               </div>
-              {location && (
+              {typeof window !== "undefined" && location && (
                 <CardDescription className="flex items-center gap-1 text-xs line-clamp-2">
                   <MapPin className="w-3 h-3 flex-shrink-0" />
                   <span>{location}</span>
