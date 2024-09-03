@@ -1,0 +1,72 @@
+.map-highlight {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #c53030; /* Adjusted to match 'bg-red-700' */
+    border-radius: 0.5rem; /* Rounded corners */
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Shadow */
+  }
+  
+  .map-container {
+    position: relative;
+  }
+  
+  .map-canvas {
+    width: 100%;
+    height: auto;
+  }
+  
+  .pulse-indicator {
+    position: absolute;
+    left: 25%;
+    top: 50%;
+    width: 0.75rem; /* Adjusted to match 'w-3' */
+    height: 0.75rem; /* Adjusted to match 'h-3' */
+    background-color: #fff; /* White background */
+    border-radius: 9999px; /* Rounded full */
+  }
+  
+  .map-details {
+    padding: 1rem; /* Adjusted padding */
+    display: grid;
+    gap: 1rem;
+  }
+  
+  .details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff; /* Text color white */
+  }
+  
+  .destination-title {
+    font-size: 1.5rem; /* Adjusted to match 'text-2xl' */
+    font-weight: bold;
+    color: #fff; /* Text color white */
+  }
+  
+  .destination-name {
+    font-size: 2.5rem; /* Adjusted to match 'text-4xl' */
+    font-weight: bold;
+    color: #fff; /* Text color white */
+  }
+  
+  .travel-info {
+    display: flex;
+    justify-content: space-between;
+    color: #fff; /* Text color white */
+  }
+  
+  .info-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .info-item .icon {
+    width: 1.25rem; /* Adjusted to match 'w-5' */
+    height: 1.25rem; /* Adjusted to match 'h-5' */
+    margin-right: 0.5rem; /* Adjusted to match 'mr-2' */
+  }
+  

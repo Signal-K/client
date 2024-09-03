@@ -1,35 +1,25 @@
-"use client"
+"use client";
 
-import { useSession } from "@supabase/auth-helpers-react";
-import { Panels } from "../(layout)/sectionStructure"
-import { SidebarLayout } from "../(layout)/sectionStructure";
-import { useRouter } from "next/navigation";
-import ClassificationsFeed from "@/Classifications/ClassificationFeed";
-import SpaceGamePage from "../(scenes)/(spaceship)/spaceship";
-import Layout, { OnboardingLayout } from "@/components/Layout";
-import OnboardingWindow from "../(scenes)/(onboarding)/window";
-import { ProfileCard } from "../auth/UserProfileFields";
-import ProfileCardModal from "../(settings)/profile/form";
-import SandpackBox from "../(anomalies)/(editor)/Sandbox";
-import PythonSandpackTest from "../(anomalies)/(editor)/Python";
+import React from "react";
+import { OnboardingLayout } from "../components/Template";
+import { Header } from "../components/sections/Header";
+import { AllStructures } from "../components/(structures)/Structures";
+import MissionLog from "../components/(scenes)/(missions)/MissionList";
 
-export default function PageLayout() {
-    const session = useSession();
-    const router = useRouter();
+export default function TestPageForFuckingAround() {
+    const handleActionClick = (action: string) => {
+        console.log(`${action} clicked`);
+    };
+
+    const handleClose = () => {
+        console.log("Dialog closed");
+    };
 
     return (
-        // <SidebarLayout leftContent={<div></div>} middleContent={<Panels />} />
-        // <Layout bg="true">
-        <>
-            {/* <Panels /> */}
-            {/* <ClassificationsFeed /> */}
-            {/* <SpaceGamePage /> */}
-            <OnboardingLayout bg={true}>
-          <OnboardingWindow />
-        </OnboardingLayout>
-            {/* <SandpackBox />
-            <PythonSandpackTest /> */}
-        {/* </Layout> */}
-        </>
+        <OnboardingLayout bg={false}>
+            <Header />
+            <AllStructures />
+            {/* <MissionLog /> */}
+        </OnboardingLayout> //* Replace with regular layout */}
     );
 };

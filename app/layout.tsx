@@ -10,8 +10,6 @@ import dynamic from 'next/dynamic';
 import { InventoryProvider } from "@/context/InventoryContext";
 import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 import { bgImage, backgroundImages } from "@/constants/backgrounds";
-import { RefreshProvider } from "@/context/RefreshState";
-import CraftStructure from "@/components/Gameplay/Inventory/Actions/CraftStructure";
 import { MissionProvider } from "@/context/MissionContext";
 // import { CreateStructureWithItemRequirementinfo } from "@/components/Gameplay/Inventory/Structures/Structure";
 
@@ -70,13 +68,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
           <ActivePlanetProvider>
             <MissionProvider>
-              <RefreshProvider>
                 <UserAnomaliesProvider>
                   <InventoryProvider>
                       {children}
                   </InventoryProvider>
                 </UserAnomaliesProvider>
-              </RefreshProvider>
             </MissionProvider>
           </ActivePlanetProvider>
         </SessionContextProvider>

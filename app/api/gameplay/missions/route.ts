@@ -1,3 +1,4 @@
+import { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
 import { NextRequest, NextResponse } from "next/server";
 
 interface UserMissionInstance {
@@ -10,8 +11,11 @@ interface UserMissionInstance {
 interface Mission {
     id: number;
     name: string;
-    description: string;
-    rewards: number[]; // Array of reward item IDs
+    description?: string;
+    rewards?: number[]; // Array of reward item IDs
+    classificationModule?: string;
+    chapter?: string;
+    component?: React.ComponentType<any>;
 };
 
 const missions: Mission[] = [
@@ -41,13 +45,55 @@ const missions: Mission[] = [
 
 
     // { id: 1370101, name: "Create your account", description: "Create an account to start playing Star Sailors", rewards: []}, // ID: "Mission Group 01, Item 01" - 13 = M, 7 = G
-    { id: 1370102, name: "Create your profile", description: "Fill in your profile so that your discoveries can be credited", rewards: []},
-    { id: 1370103, name: "Discover your first planet", description: "Use the first graphs provided to you to confirm the validity of an exoplanet candidate", rewards: []}, // Update description so the user understands they'll be visiting/based on this planet after the onboarding
-    { id: 1370104, name: 'Initial roover photos classification', description: 'Send out a rover to explore your planet', rewards: []},
-    { id: 1370105, name: 'Initial animal classification', description: 'Update this row', rewards: [],},
-    { id: 1370106, name: 'Generated planet', description: "Here's what we know about your planet. Why not visit it?", rewards: []},
+    { id: 1370102, name: "Create your profile", description: "Fill in your profile so that your discoveries can be credited", rewards: [], chapter: 'Onboarding'},
+    { id: 1370103, name: "Discover your first planet", description: "Use the first graphs provided to you to confirm the validity of an exoplanet candidate", rewards: [], chapter: 'Onboarding'}, // Update description so the user understands they'll be visiting/based on this planet after the onboarding
+    { id: 1370104, name: 'Initial roover photos classification', description: 'Send out a rover to explore your planet', rewards: [], chapter: 'Onboarding'},
+    // { id: 1370105, name: 'Initial animal classification', description: 'Update this row', rewards: [], chapter: 'Onboarding',},
+    // { id: 1370106, name: 'Generated planet', description: "Here's what we know about your planet. Why not visit it?", rewards: [], chapter: 'Onboarding'},
     {
-        id: 1370107, name: "Activate retro mode", description: "Going back to the first V2.0 beta after finishing onboarding", rewards: [],
+        id: 1370107, name: "Activate retro mode", description: "Going back to the first V2.0 beta after finishing onboarding", rewards: [], chapter: 'Onboarding'
+    },
+
+    // Chapter 1 mission group (MG-02-##) - mission group 2
+    {
+        id: 1370201,
+        name: "Initialise chapter 1", 
+        description: '',
+        chapter: "1",
+        classificationModule: 'Mining' // Update this
+    },
+    {
+        id: 1370202, 
+        name: "First animal classification", 
+        description: '', 
+        chapter: "1", 
+        classificationModule: "Zoodex",
+        component: MineralDepositsNoAction,
+    },
+    {
+        id: 1370299,  // -> Edit the id so that it's the last value for mission group 2
+        name: "Find new planet", 
+        chapter: '1', 
+        description: "Now you're ready to travel to other planets", 
+        classificationModule: "Telescope"
+    },
+    {
+        id: 1370203,
+        name: 'Choose your first classification',
+        description: 'Fill me',
+        classificationModule: 'General',
+        chapter: '1'
+    },
+
+    // Telescope mission group (t.m.) (MG-T-##)
+    {
+        id: 1372002, name: "Repair your telescope", classificationModule: "Telescope", chapter: '1',
+        component: MineralDepositsNoAction,
+    },
+
+    // Animal/Zoodex mission group (a.z.) (MG-AZ-##)
+    {
+        id: 13712602, name: "Repair your Zoodex module", classificationModule: "Zoodex", chapter: '1',
     },
 ];
 

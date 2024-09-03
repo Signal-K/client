@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import { UserPlanetData } from '@/components/Gameplay/Inventory/UserPlanets';
 
 // Define the type for the context value
 interface ActivePlanetContextValue {

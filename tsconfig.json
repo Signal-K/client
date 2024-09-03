@@ -32,7 +32,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-, "Classifications/Zoodex/CapturePage.jsx", "Classifications/Zoodex/Mobx.jsx"  ],
+, "app/components/_[archive]/Classifications/Zoodex/CapturePage.jsx", "app/components/_[archive]/Classifications/Zoodex/Mobx.jsx"  ],
   "exclude": [
     "node_modules"
   ]

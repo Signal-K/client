@@ -1,10 +1,10 @@
 import {
   TransitingTelescopeClassifyPlanet,
-  TransitingTelescopeSpecialisedGraphs,
+  TransitingTelescopeSpecialisedGraphs, 
   TransitingTelescopeExplorePlanets,
   TransitingTelescopeMyDiscoveries,
   TransitingTelescopeTutorial
-} from '@/app/(structures)/Telescopes/Transiting';
+} from '@/app/components/(structures)/Telescopes/Transiting';
 
 interface ButtonConfig {
   icon: string | undefined;
