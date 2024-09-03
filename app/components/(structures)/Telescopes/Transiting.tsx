@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 // import { CreateFirstBaseClassification } from '../../_[archive]/Classifications/ClassificationForm';
 import { useActivePlanet } from '@/context/ActivePlanet';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+
+import { Dialog, DialogTrigger, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import ClassificationForm from '../../(create)/(classifications)/PostForm';
 
 // Define the `TransitingTelescopeClassifyPlanet` component
@@ -82,76 +85,105 @@ export const TelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid })
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyid || activePlanet?.id}/Binned.png`;
 
-    // State for managing onboarding/tutorial steps
     const [part, setPart] = useState(1);
     const [line, setLine] = useState(1);
 
-    // Function to handle advancing the line
-    const nextLine = () => {
-        setLine(prevLine => prevLine + 1);
-    };
-
-    // Function to handle advancing to the next part
+    const nextLine = () => setLine(prevLine => prevLine + 1);
     const nextPart = () => {
         setPart(2);
-        setLine(1);
+        setLine(1); 
     };
 
-    // Onboarding/tutorial panel content
     const tutorialContent = (
-        <div className="p-4 bg-blue-100 border border-blue-300 rounded-md shadow-md">
-            {part === 1 && (
-                <>
-                    {line === 1 && <p>Hello there! To start your journey, you'll need to discover your first planet.</p>}
-                    {line === 2 && <p>To determine if a planet is real, you'll need to examine a lightcurve and identify patterns in dips and variations.</p>}
-                    {line === 3 && <p>Look for regular dips—these often signal a planet passing in front of its star and can confirm its orbit.</p>}
-                    {line === 4 && <p>Pay attention to the shape of these dips: a sharp, symmetrical dip usually indicates a genuine planet transit...</p>}
-                    {line === 5 && <p>...While asymmetrical or irregular shapes might suggest something else.</p>}
-                    {line === 6 && <p>Let's give it a try! Identify the dips in this lightcurve:</p>}
-                    {line < 6 && (
-                        <button onClick={nextLine} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Next</button>
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+            <div className="flex items-center">
+                <img
+                    src="/assets/Captn.jpg"
+                    alt="Cosmos Avatar"
+                    className="w-12 h-12 rounded-full bg-[#303F51]"
+                />
+                <h3 className="text-xl font-bold text-[#85DDA2] mt-2 ml-4">Cosmos</h3>
+            </div>
+            <div className="p-4 bg-[#2C3A4A] border border-[#85DDA2] rounded-md shadow-md relative w-full">
+                <div className="relative">
+                    <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
+                    {part === 1 && (
+                        <>
+                            {line === 1 && (
+                                <p className="text-[#EEEAD1]">Hello there! To start your journey, you'll need to discover your first planet.</p>
+                            )}
+                            {line === 2 && (
+                                <p className="text-[#EEEAD1]">To determine if a planet is real, you'll need to examine a lightcurve and identify patterns in dips and variations.</p>
+                            )}
+                            {line === 3 && (
+                                <p className="text-[#EEEAD1]">Look for regular dips—these often signal a planet passing in front of its star and can confirm its orbit.</p>
+                            )}
+                            {line === 4 && (
+                                <p className="text-[#EEEAD1]">Pay attention to the shape of these dips: a sharp, symmetrical dip usually indicates a genuine planet transit...</p>
+                            )}
+                            {line === 5 && (
+                                <p className="text-[#EEEAD1]">...While asymmetrical or irregular shapes might suggest something else.</p>
+                            )}
+                            {line === 6 && (
+                                <p className="text-[#EEEAD1]">Let's give it a try! Identify the dips in this lightcurve:</p>
+                            )}
+                            {line < 6 && (
+                                <button onClick={nextLine} className="mt-4 px-4 py-2 bg-[#D689E3] text-white rounded">Next</button>
+                            )}
+                            {line === 6 && (
+                                <button onClick={nextPart} className="mt-4 px-4 py-2 bg-[#D689E3] text-white rounded">Continue</button>
+                            )}
+                            {line < 6 && (
+                                <div className="flex justify-center mt-4 w-full h-64">
+                                    {line === 1 && <img src="/assets/Template.png" alt="Step 1" className="max-w-full max-h-full object-contain" />}
+                                    {line === 2 && <img src="/assets/Docs/Curves/Step2.png" alt="Step 2" className="max-w-full max-h-full object-contain bg-white" />}
+                                    {line === 3 && <img src="/assets/Docs/Curves/Step1.png" alt="Step 3" className="max-w-full max-h-full object-contain bg-white" />}
+                                    {line === 4 && <img src="/assets/Docs/Curves/Step3.png" alt="Step 4" className="max-w-full max-h-full object-contain bg-white" />}
+                                    {line === 5 && <img src="/assets/Docs/Curves/Step4.png" alt="Step 5" className="max-w-full max-h-full object-contain bg-white" />}
+                                </div>
+                            )}
+                        </>
                     )}
-                    {line === 6 && (
-                        <button onClick={nextPart} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Continue</button>
+                    {part === 2 && (
+                        <>
+                            {line === 1 && (
+                                <p className="text-[#EEEAD1]">Great job! Once you've identified your planet, you can share your findings with the rest of the space sailors community.</p>
+                            )}
+                        </>
                     )}
-                </>
-            )}
-            {part === 2 && (
-                <>
-                    {line === 1 && <p>Great job! Once you've identified your planet, you can share your findings with the rest of the space sailors community.</p>}
-                    {line === 1 && (
-                        <button onClick={() => {/* Handle finish action here */}} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Finish</button>
-                    )}
-                </>
-            )}
+                </div>
+            </div>
         </div>
     );
+    
 
     return (
         <div className="rounded-lg">
             <div className="flex flex-col items-center">
                 {part === 1 && (
-                    <div className="mb-4">{tutorialContent}</div>
+                    <div className="mb-2">{tutorialContent}</div>
                 )}
                 {part === 2 && (
                     <>
-                        <div className="mb-4">
+                        {/* {tutorialContent} */}
+                        <div className="mb-2">
                             <img
-                                src='https://github.com/Signal-K/client/blob/initialClassification/public/assets/Inventory/Structures/TelescopeReceiver.png?raw=true'
+                                src='https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true'
                                 alt='telescope'
                                 className="w-24 h-24 mb-2"
                             />
                         </div>
-                        <div className='relative'>
-                            <div className='absolute inset-0 w-full h-full bg-blue-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
-                            <img
-                                src={imageUrl}
-                                alt={`Active Planet ${activePlanet?.id}`}
-                                className="relative z-10 w-128 h-128"
-                            />
+                        <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                            <div className='relative'>
+                                <div className='absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
+                                <div className='bg-white bg-opacity-90'><img
+                                    src={imageUrl}
+                                    alt={`Active Planet ${activePlanet?.id}`}
+                                    className="relative z-10 w-128 h-128 object-contain"
+                                /></div>
+                            </div>
+                            <ClassificationForm anomalyId={anomalyid} anomalyType='planet' missionNumber={1370103} assetMentioned={imageUrl} />
                         </div>
-                        <ClassificationForm anomalyId={anomalyid} anomalyType='planet' missionNumber={1370103} assetMentioned={imageUrl} />
-                        {tutorialContent}
                     </>
                 )}
             </div>

@@ -91,64 +91,67 @@ export default function DeployRooversInitial() {
   }, [session, supabase, newRoverToInventoryData]);
 
   return (
-    <div className="bg-pastel-blue text-gray-700 font-body p-4 rounded-lg">
-      <Card className="w-full border-gray-300 bg-cyan-50 text-gray-800 rounded-lg">
-        <CardHeader>
-          <CardTitle className="text-pastel-pink font-heading">
-            Rover Control Panel
-          </CardTitle>
-          <CardDescription className="text-gray-600">
-            Deploy and monitor your automated Mars rovers.
-          </CardDescription>
-        </CardHeader>
+    <div className="flex flex-col items-center gap-4 pb-4 relative w-full max-w-lg mx-auto text-white">
+      <Card className="w-full text-white rounded-lg bg-opacity-10">
+        {/* <CardHeader>
+          <div className="flex items-center gap-4">
+            <div>
+              <CardDescription className="text-white">
+                Deploy and monitor your automated Mars rovers.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader> */}
         <CardContent>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 py-2">
             {dialogueStep === 1 && !isDeployed && (
-              <div className="text-lg font-medium">
-                Now that we've discovered a planet, let's deploy a rover to get a closer look!
+              <div className="flex items-center flex-row gap-4">
+                <Avatar className="h-12 w-12 bg-pastel-pink text-white">
+                  <AvatarImage src="/assets/Captn.jpg" alt="Cosmos" />
+                </Avatar>
+                <div className="relative p-4 bg-[#2C3A4A] bg-opacity-75 border border-[#85DDA2] rounded-md shadow-md text-lg font-medium text-white">
+                  <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
+                  Now that we've discovered a planet, let's deploy a rover to get a closer look!
+                </div>
               </div>
             )}
             {dialogueStep === 2 && isDeployed && !roverData && (
-              <div className="text-lg font-medium">
-                Whoa! Now let's analyse your rover photos...
+              <div className="relative p-4 bg-[#2C3A4A] bg-opacity-75 border border-[#85DDA2] rounded-md shadow-md text-lg font-medium text-white">
+                <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
+                Whoa! Now let's analyze your rover photos...
               </div>
             )}
             {dialogueStep === 3 && roverData && (
               <>
                 <RooverFromAppeears />
-                <div className="text-lg font-medium mt-4">
+                <div className="relative p-4 bg-[#2C3A4A] bg-opacity-75 border border-[#85DDA2] rounded-md shadow-md text-lg font-medium text-white mt-4">
+                  <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
                   Select from the available options based on what you can see in the photo.
                 </div>
               </>
             )}
             {!isDeployed && (
               <div className="grid grid-cols-3 gap-4">
-                {["Rover 1"].map((rover, index) => (
-                  <div
+                {["Rover"].map((rover, index) => (
+                  <Button
                     key={index}
-                    className="flex flex-col items-center justify-center gap-2"
+                    className="flex flex-col items-center justify-center gap-2 bg-[#85DDA2] h-24 w-24 text-white rounded-lg"
+                    onClick={deployRover}
+                    disabled={isDeployed}
                   >
-                    <Avatar className="h-12 w-12 bg-pastel-pink text-gray-800">
+                    <Avatar className="h-12 w-12 bg-pastel-pink text-white">
                       <AvatarImage
                         src="https://cdn-icons-png.flaticon.com/512/124/124544.png"
                         alt={rover}
                       />
                       <AvatarFallback>{`R${index + 1}`}</AvatarFallback>
                     </Avatar>
-                    <div className="text-sm font-medium">{rover}</div>
-                  </div>
+                    {/* <div className="text-sm font-medium">{rover}</div> */}
+                    {isDeployed ? "Rover Deployed" : "Deploy Rover"}
+                  </Button>
                 ))}
               </div>
             )}
-            <Button
-              className={`w-full ${
-                isDeployed ? "bg-pastel-green" : "bg-pastel-pink"
-              } text-gray-800`}
-              onClick={deployRover}
-              disabled={isDeployed}
-            >
-              {isDeployed ? "Rover Deployed" : "Deploy Rover"}
-            </Button>
           </div>
         </CardContent>
       </Card>

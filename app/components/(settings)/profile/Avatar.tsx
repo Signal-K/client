@@ -67,7 +67,7 @@ export default function UserAvatar({ url, size, onUpload }: UserAvatarProps) {
             )}
 
             <div style={{ width: size }}>
-                <label className="btn bg-red-800 text-white my-2">
+                <label className="btn bg-[#85DDA2] text-white my-2">
                     {uploading ? "Uploading..." : "Upload new avatar"}
                     <input
                         style={{ display: 'none' }}

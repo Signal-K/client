@@ -8,7 +8,8 @@ import { TelescopeClassification } from "@/app/components/(structures)/Telescope
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ProgressBar from "../(missions)/ProgressBar";
 import DeployRooversInitial from "../roovers/deployAndReturn";
-import GeneratedStarterPlanet from "@/app/components/(anomalies)/(planets)/generated";
+import GeneratedStarterPlanet from "../../(anomalies)/(planets)/generated";
+import { Header } from "../../sections/Header";
 
 interface Mission {
   id: number;
@@ -41,7 +42,9 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
       case 1370103:
         return (
           <div>
-            <TelescopeClassification anomalyid={activePlanet?.id || getRandomPlanetId()} />
+            <TelescopeClassification
+              anomalyid={activePlanet?.id || getRandomPlanetId()}
+            />
           </div>
         );
       case 1370104:
@@ -57,18 +60,18 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
           </div>
         );
       default:
-        return (
-          <div>
-            Star Sailors
-          </div>
-        );
+        return <div>Star Sailors</div>;
     }
   };
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-2 md:mb-4 text-blue-500">{title}</h2>
-      <p className="text-sm md:text-base text-blue-500 mb-4 md:mb-8">{description}</p>
+      <div className="block md:hidden">
+        <h2 className="text-xl font-bold mb-2 md:mb-4 text-blue-500">{title}</h2>
+        <p className="text-sm md:text-base text-blue-500 mb-4 md:mb-8">
+          {description}
+        </p>
+      </div>
       {renderComponentForStep()}
     </div>
   );
@@ -80,7 +83,7 @@ const OnboardingWindow = () => {
 
   const [currentStep, setCurrentStep] = useState<number | null>(null);
   const [steps, setSteps] = useState<Mission[]>([]);
-  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false); // State for dropdown
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 
   const missionIds = [1370102, 1370103, 1370104, 1370106]; // Exclude 1370105 from the missionIds
 
@@ -89,14 +92,12 @@ const OnboardingWindow = () => {
       const response = await fetch("/api/gameplay/missions");
       const data: Mission[] = await response.json();
 
-      // Filter out the relevant missions, excluding 1370105
-      const filteredSteps = data.filter(
-        (mission) => missionIds.includes(mission.id)
+      const filteredSteps = data.filter((mission) =>
+        missionIds.includes(mission.id)
       );
 
       setSteps(filteredSteps);
 
-      // Check the user's progress and set the correct step
       const { data: existingMissions, error } = await supabase
         .from("missions")
         .select("mission")
@@ -150,20 +151,23 @@ const OnboardingWindow = () => {
   };
 
   return (
-    <div className="relative flex flex-col md:flex-row min-h-screen">
+    <div className="relative flex flex-col md:flex-row min-h-screen p-4 md:p-8">
       {/* Left Panel - Desktop */}
-      <div className="hidden md:flex md:w-1/3 w-full flex-col justify-center bg-gray-100 p-4 md:p-10 shadow-4xl z-10">
+      <div className="hidden md:flex rounded-xl md:w-1/3 w-full flex-col justify-center p-2 md:p-10 z-10 backdrop-blur-lg bg-white/30">
         <div className="space-y-4">
           {steps.map((step) => (
             <div
               key={step.id}
               className={`p-2 md:p-4 rounded-lg cursor-pointer ${
-                currentStep === step.id ? "bg-white shadow-md" : "bg-gray-200"
+                currentStep === step.id
+                  ? "bg-white/50 shadow-md"
+                  : "bg-gray-200/50"
               }`}
               onClick={() => handleStepClick(step.id)}
             >
-              <h2 className="text-sm md:text-base font-bold">{step.name}</h2>
-              <p className="text-xs md:text-sm">{step.description}</p>
+              <h2 className="text-sm md:text-base text-[#2C3A4A] font-bold">
+                {step.name}
+              </h2>
             </div>
           ))}
         </div>
@@ -171,51 +175,66 @@ const OnboardingWindow = () => {
 
       {/* Right Panel */}
       <div
-        className={`md:w-2/3 w-full flex flex-col justify-center p-4 md:p-10 h-screen md:overflow-y-auto overflow-hidden`} 
-        style={{ backgroundPosition: "center" }}
+        className="md:w-2/3 px-3 w-full flex flex-col justify-between relative"
+        style={{ minHeight: 'calc(100vh - 64px)' }}
       >
-        <div className="flex-grow flex flex-col justify-between">
+        {/* Header Component for Desktop */}
+        <div className="hidden md:block mb-6">
+          <Header />
+        </div>
+
+        <div className="flex-grow flex flex-col justify-between relative">
           {currentStep ? (
             <motion.div
               key={currentStep}
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
-              className="space-y-2 md:space-y-4 relative z-20"
+              className="space-y-2 md:space-y-4"
             >
               <OnboardingStep
                 title={currentMission.name}
                 description={currentMission.description}
                 step={currentStep}
               />
-              <div className="flex justify-between">
-                <button
-                  onClick={handleBack}
-                  disabled={currentStep === steps[0]?.id}
-                  className="px-2 py-1 md:px-4 md:py-2 bg-gray-300 rounded-lg"
-                >
-                  Back
-                </button>
-                <button
-                  onClick={handleNext}
-                  disabled={currentStep === steps[steps.length - 1]?.id}
-                  className="px-2 py-1 md:px-4 md:py-2 bg-cyan-50 text-white rounded-lg"
-                >
-                  {currentStep === steps[steps.length - 1]?.id ? "" : "Next"}
-                </button>
-              </div>
-              <ProgressBar
-                currentStepIndex={steps.findIndex((step) => step.id === currentStep)}
-                totalSteps={steps.length}
-              />
             </motion.div>
           ) : (
             <div className="text-center">
-              <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Onboarding Completed</h2>
-              <p className="text-sm md:text-base">You have completed all onboarding steps.</p>
+              <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">
+                Onboarding Completed
+              </h2>
+              <p className="text-sm md:text-base">
+                You have completed all onboarding steps.
+              </p>
             </div>
           )}
         </div>
+
+        {/* Bottom Navigation (Desktop) */}
+        {currentStep && (
+          <div className="flex justify-between items-center px-4 md:px-0 md:absolute bottom-4 md:bottom-4 left-0 right-0 md:w-2/3 mx-auto z-20">
+            <button
+              onClick={handleBack}
+              disabled={currentStep === steps[0]?.id}
+              className="px-4 py-2 bg-gray-300 rounded-lg"
+            >
+              Back
+            </button>
+            <ProgressBar
+              currentStepIndex={steps.findIndex(
+                (step) => step.id === currentStep
+              )}
+              totalSteps={steps.length}
+            />
+            <button
+              onClick={handleNext}
+              disabled={currentStep === steps[steps.length - 1]?.id}
+              className="px-4 py-2 bg-cyan-500 text-white rounded-lg"
+            >
+              {currentStep === steps[steps.length - 1]?.id ? "" : "Next"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Mobile View - Dropdown Menu */}
@@ -238,20 +257,43 @@ const OnboardingWindow = () => {
                   }`}
                   onClick={() => handleStepClick(step.id)}
                 >
-                  <h2 className="font-bold text-sm">{step.name}</h2>
-                  <p className="text-xs">{step.description}</p>
+                  <h2 className="text-sm text-gray-800 font-bold">
+                    {step.name}
+                  </h2>
                 </div>
               ))}
-              <button
-                onClick={() => setDropdownOpen(false)}
-                className="w-full p-2 bg-gray-800 text-white rounded-lg mt-4"
-              >
-                Close
-              </button>
             </div>
           </div>
         )}
       </div>
+
+      {/* Bottom Navigation (Mobile) */}
+      {currentStep && (
+        <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-2 md:hidden z-20">
+          <div className="flex justify-between items-center">
+            <button
+              onClick={handleBack}
+              disabled={currentStep === steps[0]?.id}
+              className="px-4 py-2 bg-gray-300 rounded-lg"
+            >
+              Back
+            </button>
+            <ProgressBar
+              currentStepIndex={steps.findIndex(
+                (step) => step.id === currentStep
+              )}
+              totalSteps={steps.length}
+            />
+            <button
+              onClick={handleNext}
+              disabled={currentStep === steps[steps.length - 1]?.id}
+              className="px-4 py-2 bg-cyan-50 text-white rounded-lg"
+            >
+              {currentStep === steps[steps.length - 1]?.id ? "" : "Next"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
