@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
 // import { CreateFirstBaseClassification } from '../../_[archive]/Classifications/ClassificationForm';
 import { useActivePlanet } from '@/context/ActivePlanet'; 
@@ -126,7 +128,7 @@ interface AnomalyClassificationProps {
     onAnomalyFetch: ( anomaly: Anomaly | null ) => void;
 };
 
-interface Anomaly {
+export interface Anomaly {
     id: bigint; // Changed to bigint
     content: string;
     avatar_url?: string;
@@ -146,7 +148,7 @@ export function StarterTelescope() {
             if (!session) {
                 setLoading(false);
                 return;
-            }
+            };
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
@@ -158,13 +160,13 @@ export function StarterTelescope() {
 
                 if (anomalyError) {
                     throw anomalyError;
-                }
+                };
 
                 if (!anomalyData) {
                     setAnomaly(null);
                     setLoading(false);
                     return;
-                }
+                };
 
                 const { data: classificationData, error: classificationError } = await supabase
                     .from('classifications')
@@ -175,7 +177,7 @@ export function StarterTelescope() {
 
                 if (classificationError) {
                     throw classificationError;
-                }
+                };
 
                 if (classificationData) {
                     setAnomaly(null);
@@ -183,14 +185,14 @@ export function StarterTelescope() {
                     setAnomaly(anomalyData as Anomaly);
                     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
                     setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyData.id}/Binned.png`);
-                }
+                };
             } catch (error: any) {
                 console.error('Error fetching anomaly: ', error.message);
                 setAnomaly(null);
             } finally {
                 setLoading(false);
-            }
-        }
+            };
+        };
 
         fetchAnomaly();
     }, [session, supabase, activePlanet]);
@@ -201,7 +203,7 @@ export function StarterTelescope() {
                 <p>Loading...</p>
             </div>
         );
-    }
+    };
 
     if (!anomaly) {
         return (
@@ -209,7 +211,7 @@ export function StarterTelescope() {
                 <p>No anomaly found.</p>
             </div>
         );
-    }
+    };
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
@@ -223,7 +225,7 @@ export function StarterTelescope() {
                 )}
             </div>
             <ClassificationForm 
-                anomalyId={anomaly.id.toString()} // Convert bigint to string
+                anomalyId={anomaly.id.toString()}
                 anomalyType='planet' 
                 missionNumber={1370103} 
                 assetMentioned={imageUrl} 

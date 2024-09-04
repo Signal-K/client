@@ -153,7 +153,7 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <CloudCogIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Search your clouds",
-          dynamicComponent: '',
+          dynamicComponent: <StarterLidar />,
           sizePercentage: 60,
         },
       ]
@@ -161,4 +161,5 @@ export const StructuresConfig: StructureConfig = {
 };
 
 import { BeanIcon, BookCopy, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
-import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Transiting";
+import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Transiting";import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
+

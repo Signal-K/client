@@ -9,6 +9,7 @@ import UserAvatar, { UserAvatarNullUpload } from "@/app/components/(settings)/pr
 interface ClassificationOption {
     id: number;
     text: string;
+    subOptions?: ClassificationOption[];
 };
 
 const planetClassificationOptions: ClassificationOption[] = [
@@ -25,6 +26,52 @@ const roverImgClassificationOptions: ClassificationOption[] = [
     { id: 4, text: 'Volcano (dormant/extinct)' },
     { id: 5, text: 'Mineral deposits' },
     { id: 6, text: 'Sandy/rocky terrain' },
+];
+
+const cloudClassificationOptions: ClassificationOption[] = [
+    {
+      id: 1,
+      text: "Colour",
+      subOptions: [
+        { id: 1, text: "White colour" },
+        { id: 2, text: "Blue colour" },
+      ],
+    },
+    {
+      id: 2,
+      text: "Intensity",
+      subOptions: [
+        { id: 1, text: "Bright clouds" },
+        { id: 2, text: "Faint clouds" },
+        { id: 3, text: "Medium clouds" },
+      ],
+    },
+    {
+      id: 3,
+      text: "Coverage",
+      subOptions: [
+        { id: 1, text: "Clouds cover most of the height" },
+        { id: 2, text: "Clouds are smaller" },
+      ],
+    },
+];
+
+const initialCloudClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "White colour",
+    },
+    {
+        id: 2,
+        text: "Blue colour",
+    },
+    {
+        id: 3,
+        text: "Bright clouds",
+    },
+    {
+        id: 4, text: "Large clouds",
+    },
 ];
 
 interface ClassificationFormProps {
@@ -47,7 +94,19 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     const { activePlanet } = useActivePlanet();
     const { userProfile } = useProfileContext();
 
-    const classificationOptions = anomalyType === "planet" ? planetClassificationOptions : roverImgClassificationOptions;
+    // Determine classification options based on anomalyType
+    const classificationOptions = (() => {
+        switch (anomalyType) {
+            case "planet":
+                return planetClassificationOptions;
+            case "roverImg":
+                return roverImgClassificationOptions;
+            case "cloud":
+                return initialCloudClassificationOptions;
+            default:
+                return [];
+        }
+    })();
 
     useEffect(() => {
         const fetchUserProfile = async () => {
