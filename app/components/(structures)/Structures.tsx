@@ -26,13 +26,14 @@ interface IndividualStructureProps {
         text: string;
     }[];
     buttons: {
+        showInNoModal: boolean;
         icon: React.ReactNode;
         text: string;
         dynamicComponent?: React.ReactNode;
         sizePercentage?: number;
     }[];
     onActionClick?: (action: string) => void;
-onClose?: () => void;
+    onClose?: () => void;
 }
 
 export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
@@ -95,26 +96,26 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                 .eq('owner', session?.user.id)
                 .eq('anomaly', activePlanet.id)
                 .single();
-
+    
             if (inventoryError) {
                 console.error('Error fetching inventory data:', inventoryError);
                 return;
             }
-
+    
             const config = StructuresConfig[itemDetail.id] || {};
             const uses = (inventoryData?.configuration?.Uses ?? 0) as number;
-            const updatedButtons = config.buttons.map(button => {
-                if (uses <= 0) {
-                    return {
-                        ...button,
-                        icon: <LockIcon className="w-6 h-6 text-[#FFE3BA]" />,
-                        text: button.text.includes('locked') ? button.text : `${button.text} - locked`,
-                        disabled: true,
-                    };
-                }
-                return button;
-            });
-
+            const updatedButtons = config.buttons.map(button => ({
+                ...button,
+                showInNoModal: true, // Default value
+                icon: uses <= 0 
+                    ? <LockIcon className="w-6 h-6 text-[#FFE3BA]" /> 
+                    : button.icon,
+                text: uses <= 0 
+                    ? button.text.includes('locked') ? button.text : `${button.text} - locked` 
+                    : button.text,
+                disabled: uses <= 0
+            }));
+    
             setSelectedStructure({
                 name: itemDetail.name,
                 imageSrc: itemDetail.icon_url,
@@ -125,7 +126,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
             });
         }
     };
-
+    
     const handleClose = () => {
         setTimeout(() => {
             setSelectedStructure(null);
@@ -180,6 +181,7 @@ interface IndividualStructureProps {
       text: string;
     }[];
     buttons: {
+      showInNoModal: boolean;
       icon: React.ReactNode;
       text: string;
       dynamicComponent?: React.ReactNode;
@@ -249,11 +251,13 @@ export function AllStructures() {
                 title: config.title || '', 
                 labels: config.labels || [], 
                 actions: config.actions || [],
-                buttons: config.buttons || [], 
+                buttons: config.buttons.map(button => ({
+                    ...button,
+                    showInNoModal: true // Default value
+                })), 
             });
         }
-    };
-    
+    }; 
 
     const handleClose = () => {
         setTimeout(() => {

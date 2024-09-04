@@ -1,5 +1,5 @@
-import { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
 import { NextRequest, NextResponse } from "next/server";
+import { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
 
 interface UserMissionInstance {
     id: number;
@@ -90,10 +90,24 @@ const missions: Mission[] = [
         id: 1372002, name: "Repair your telescope", classificationModule: "Telescope", chapter: '1',
         component: MineralDepositsNoAction,
     },
+    {
+        id: 1372001, name: "Initial planet classification", classificationModule: "Telescope", chapter: '1',
+        // update this/order
+    },
 
     // Animal/Zoodex mission group (a.z.) (MG-AZ-##)
     {
         id: 13712602, name: "Repair your Zoodex module", classificationModule: "Zoodex", chapter: '1',
+    },
+
+    // LIDAR/meteorology mission group (l.m.) (MG-LM-##)
+    { // This is your first
+        id: 137121301, name: "Discover some clouds", classificationModule: 'LIDAR', chapter: '1',
+    },
+
+    // NASA/APPEEARS Roover data | NASA API (MG-NA-##)
+    { // This is your first
+        id: 13714101, name: "Find some rover pics", classificationModule: 'Automaton Camera', chapter: '1',
     },
 ];
 

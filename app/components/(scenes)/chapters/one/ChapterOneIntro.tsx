@@ -3,7 +3,7 @@
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
-
+ 
 export default function ChapterOneIntroduction() {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -58,7 +58,7 @@ export default function ChapterOneIntroduction() {
 
             if (inventoryError) {
                 throw inventoryError;
-            }
+            };
 
             const missionData = {
                 user: session.user.id,

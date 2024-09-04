@@ -1,11 +1,7 @@
-import React, { useEffect, useState } from "react";
-import AutomatonUpgrade from "@/app/components/(structures)/Config/AutomatonUpgradeBox";
+import React from "react";
 import { MiningScene } from "@/app/components/(structures)/Mining/MiningPanels";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { BeanIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
-import { useActivePlanet } from "@/context/ActivePlanet";
 import { AutomatonUpgrader } from "@/app/components/(vehicles)/(automatons)/ActiveAutomaton";
-import MineralDeposits, { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
+import { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
 
 interface IndividualStructureProps {
@@ -22,6 +18,7 @@ interface IndividualStructureProps {
       text: string;
       dynamicComponent?: React.ReactNode;
       sizePercentage?: number;
+      showInNoModal?: boolean;
     }[];
     onActionClick?: (action: string) => void;
     onClose?: () => void;
@@ -99,6 +96,12 @@ export const StructuresConfig: StructureConfig = {
           icon: <LockIcon className="w-6 h-6 text-[#FFE3BA]" />, 
           text: "Further interactions - locked" 
         },
+        {
+          icon: <BookCopy className="w-6 h-6 text-[#5e81ac]" />, text: "Tutorial",
+          dynamicComponent: <p></p>,
+          sizePercentage: 60,
+          showInNoModal: false,
+        },
       ],
     },
     3103: {
@@ -134,4 +137,26 @@ export const StructuresConfig: StructureConfig = {
         },
       ],
     },
+    3105: {
+      name: "LIDAR Detector",
+      labels: [
+        {
+          text: "Clouds", variant: "default",
+        },
+        {
+          text: "Sunspots", variant: "default",
+        },
+      ],
+      imageSrc: '/assets/Items/Lidar.png',
+      buttons: [
+        {
+          icon: <CloudCogIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Search your clouds",
+          dynamicComponent: '',
+          sizePercentage: 60,
+        },
+      ]
+    }
 };
+
+import { BeanIcon, BookCopy, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
