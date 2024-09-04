@@ -127,9 +127,10 @@ export const StructuresConfig: StructureConfig = {
       buttons: [
         {
           icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Transit events",
-          dynamicComponent: '',
+          text: "Transit events (Starter)",
+          dynamicComponent: <StarterTelescope />,
           sizePercentage: 60,
+          showInNoModal: true,
         },
         {
           icon: <CloudCogIcon className="w-6 h-6 text-[#5e81ac]" />,
@@ -160,3 +161,4 @@ export const StructuresConfig: StructureConfig = {
 };
 
 import { BeanIcon, BookCopy, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
+import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Transiting";

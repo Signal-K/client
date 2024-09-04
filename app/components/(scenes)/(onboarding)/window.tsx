@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ProfileCardModal from "@/app/components/(settings)/profile/form";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { TelescopeClassification } from "@/app/components/(structures)/Telescopes/Transiting";
+import { FirstTelescopeClassification } from "@/app/components/(structures)/Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ProgressBar from "../(missions)/ProgressBar";
 import DeployRooversInitial from "../roovers/deployAndReturn";
@@ -42,7 +42,7 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
       case 1370103:
         return (
           <div>
-            <TelescopeClassification
+            <FirstTelescopeClassification
               anomalyid={activePlanet?.id || getRandomPlanetId()}
             />
           </div>

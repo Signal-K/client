@@ -34,7 +34,7 @@ interface IndividualStructureProps {
     }[];
     onActionClick?: (action: string) => void;
     onClose?: () => void;
-}
+};
 
 export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
     const supabase = useSupabaseClient();
@@ -80,53 +80,59 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                 console.error('Error fetching data:', error);
             } finally {
                 setLoading(false);
+                // Provide default empty arrays if no specific data is available
+                onStructuresFetch(userStructuresOnPlanet, [], []);
             }
         }
 
         fetchStructures();
-    }, [session?.user?.id, activePlanet?.id, supabase]);
+    }, [session?.user?.id, activePlanet?.id, supabase, onStructuresFetch, userStructuresOnPlanet]);
 
     const handleIconClick = async (itemId: number) => {
         const itemDetail = itemDetails.get(itemId);
         if (itemDetail) {
-            const { data: inventoryData, error: inventoryError } = await supabase
-                .from('inventory')
-                .select('configuration')
-                .eq('item', itemId)
-                .eq('owner', session?.user.id)
-                .eq('anomaly', activePlanet.id)
-                .single();
-    
-            if (inventoryError) {
-                console.error('Error fetching inventory data:', inventoryError);
-                return;
+            try {
+                const { data: inventoryData, error: inventoryError } = await supabase
+                    .from('inventory')
+                    .select('configuration')
+                    .eq('item', itemId)
+                    .eq('owner', session?.user.id)
+                    .eq('anomaly', activePlanet.id);
+
+                if (inventoryError) {
+                    console.error('Error fetching inventory data:', inventoryError);
+                    return;
+                }
+
+                const config = StructuresConfig[itemDetail.id] || {};
+                const uses = (inventoryData[0]?.configuration?.Uses ?? 0) as number; // Process first row if multiple rows
+
+                const updatedButtons = config.buttons.map(button => ({
+                    ...button,
+                    showInNoModal: true, // Default value
+                    icon: uses <= 0 
+                        ? <LockIcon className="w-6 h-6 text-[#FFE3BA]" /> 
+                        : button.icon,
+                    text: uses <= 0 
+                        ? button.text.includes('locked') ? button.text : `${button.text} - locked` 
+                        : button.text,
+                    disabled: uses <= 0
+                }));
+
+                setSelectedStructure({
+                    name: itemDetail.name,
+                    imageSrc: itemDetail.icon_url,
+                    title: config.title || '',
+                    labels: config.labels || [],
+                    actions: config.actions || [],
+                    buttons: updatedButtons,
+                });
+            } catch (error) {
+                console.error('Error processing structure data:', error);
             }
-    
-            const config = StructuresConfig[itemDetail.id] || {};
-            const uses = (inventoryData?.configuration?.Uses ?? 0) as number;
-            const updatedButtons = config.buttons.map(button => ({
-                ...button,
-                showInNoModal: true, // Default value
-                icon: uses <= 0 
-                    ? <LockIcon className="w-6 h-6 text-[#FFE3BA]" /> 
-                    : button.icon,
-                text: uses <= 0 
-                    ? button.text.includes('locked') ? button.text : `${button.text} - locked` 
-                    : button.text,
-                disabled: uses <= 0
-            }));
-    
-            setSelectedStructure({
-                name: itemDetail.name,
-                imageSrc: itemDetail.icon_url,
-                title: config.title || '',
-                labels: config.labels || [],
-                actions: config.actions || [],
-                buttons: updatedButtons,
-            });
         }
     };
-    
+
     const handleClose = () => {
         setTimeout(() => {
             setSelectedStructure(null);
@@ -170,6 +176,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
         </div>
     );
 };
+
 
 interface IndividualStructureProps {
     name: string;

@@ -120,7 +120,8 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               })}
             </div>
             <div className="flex flex-col my-4 space-y-4">
-              {buttons.map((button, index) => (
+            {buttons.map((button, index) => (
+              button.showInNoModal !== false && (
                 <div
                   key={index}
                   className="flex items-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
@@ -131,7 +132,8 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                   </div>
                   <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
                 </div>
-              ))}
+              )
+            ))}
             </div>
             <Button
               variant="outline"
@@ -262,7 +264,6 @@ export const IndividualStructureNoModal: React.FC<IndividualStructureProps> = ({
           </div>
           <div className="flex flex-col my-4 space-y-4">
             {buttons.map((button, index) => (
-              button.showInNoModal !== false && (
                 <div
                   key={index}
                   className="flex items-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
@@ -273,7 +274,6 @@ export const IndividualStructureNoModal: React.FC<IndividualStructureProps> = ({
                   </div>
                   <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
                 </div>
-              )
             ))}
           </div>
           <button
