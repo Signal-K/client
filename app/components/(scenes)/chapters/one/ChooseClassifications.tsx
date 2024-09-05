@@ -146,6 +146,38 @@ export default function ChooseClassificationStarter() {
         if (!session?.user?.id) return;
 
         try {
+            // Only perform the inventory check if there's an active mission
+            if (activeMission?.structure) {
+                // Check if the item already exists in the inventory
+                const { data: inventoryItem, error: inventoryError } = await supabase
+                    .from('inventory')
+                    .select('id')
+                    .eq('owner', session.user.id)
+                    .eq('anomaly', activePlanet.id)
+                    .eq('item', activeMission.structure) // Ensure structure is defined
+                    .single();
+    
+                if (inventoryError && inventoryError.code !== 'PGRST116') {
+                    throw inventoryError; // Handle non-404 errors
+                }
+    
+                if (!inventoryItem) {
+                    // Insert a new item into the inventory
+                    const { error: insertError } = await supabase
+                        .from('inventory')
+                        .insert([
+                            { owner: session.user.id, anomaly: activePlanet.id, item: activeMission.structure,
+                                time_of_deploy: new Date().toISOString(),
+                             },
+                        ]);
+    
+                    if (insertError) {
+                        console.error("Error inserting structure into inventory:", insertError);
+                    }
+                }
+            }
+    
+            // Reset active mission in the profile
             const { error } = await supabase
                 .from('profiles')
                 .update({ activeMission: null })

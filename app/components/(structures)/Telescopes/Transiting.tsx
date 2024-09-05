@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 // import { CreateFirstBaseClassification } from '../../_[archive]/Classifications/ClassificationForm';
-import { useActivePlanet } from '@/context/ActivePlanet'; 
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useActivePlanet } from '@/context/ActivePlanet'; 
 
 import { Dialog, DialogTrigger, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -129,19 +129,21 @@ interface AnomalyClassificationProps {
 };
 
 export interface Anomaly {
-    id: bigint; // Changed to bigint
+    id: bigint;
     content: string;
     avatar_url?: string;
-}
-
+};
+ 
 export function StarterTelescope() {
     const supabase = useSupabaseClient();
     const session = useSession();
+
     const { activePlanet } = useActivePlanet();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
     const [imageUrl, setImageUrl] = useState<string>('');
+
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         async function fetchAnomaly() {

@@ -3,7 +3,8 @@ import { MiningScene } from "@/app/components/(structures)/Mining/MiningPanels";
 import { AutomatonUpgrader } from "@/app/components/(vehicles)/(automatons)/ActiveAutomaton";
 import { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
-import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Transiting";import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
+import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Transiting";
+import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
 import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
 
 interface IndividualStructureProps {
@@ -147,6 +148,24 @@ export const StructuresConfig: StructureConfig = {
         },
       ],
     },
+    3104: {
+      name: "Zoodex",
+      title: "Animal Observations",
+      labels: [
+        {
+          text: "Earth-based animals", variant: "default",
+        },
+      ],
+      imageSrc: '/assets/Items/Zoodex.png',
+      buttons: [
+        {
+          icon: <DogIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Search your animals",
+          dynamicComponent: <StarterZoodex />,
+          sizePercentage: 60,
+        },
+      ],
+    },
     3105: {
       name: "LIDAR Detector",
       labels: [
@@ -169,4 +188,5 @@ export const StructuresConfig: StructureConfig = {
     }
 };
 
-import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
+import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";

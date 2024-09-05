@@ -74,6 +74,17 @@ const initialCloudClassificationOptions: ClassificationOption[] = [
     },
 ];
 
+const zoodexBurrowingOwlClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Adult owl",
+    },
+    {
+        id: 2,
+        text: "Baby owl",
+    }, // Expand for choosing numbers, pointers, and predators etc.
+];
+
 interface ClassificationFormProps {
     anomalyType: string;
     anomalyId: string; 
@@ -103,6 +114,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return roverImgClassificationOptions;
             case "cloud":
                 return initialCloudClassificationOptions;
+            case "zoodex-burrowingOwl":
+                return zoodexBurrowingOwlClassificationOptions;
             default:
                 return [];
         }
