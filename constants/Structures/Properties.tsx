@@ -3,6 +3,8 @@ import { MiningScene } from "@/app/components/(structures)/Mining/MiningPanels";
 import { AutomatonUpgrader } from "@/app/components/(vehicles)/(automatons)/ActiveAutomaton";
 import { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
+import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Transiting";import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
+import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
 
 interface IndividualStructureProps {
     name?: string;
@@ -136,6 +138,13 @@ export const StructuresConfig: StructureConfig = {
           icon: <CloudCogIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Cloud/Weather Data (LOCKED)",
         },
+        {
+          icon: <BookDashedIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Your planet discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="planet" />,
+          sizePercentage: 75,
+          showInNoModal: true, // This would be false for things like tutorials
+        },
       ],
     },
     3105: {
@@ -160,6 +169,4 @@ export const StructuresConfig: StructureConfig = {
     }
 };
 
-import { BeanIcon, BookCopy, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
-import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Transiting";import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
-
+import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
@@ -14,7 +14,7 @@ interface StructuresOnPlanetProps {
         atmosphereStructures: InventoryStructureItem[],
         surfaceStructures: InventoryStructureItem[]
     ) => void;
-};
+}
 
 interface IndividualStructureProps {
     name: string;
@@ -34,7 +34,7 @@ interface IndividualStructureProps {
     }[];
     onActionClick?: (action: string) => void;
     onClose?: () => void;
-};
+}
 
 export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
     const supabase = useSupabaseClient();
@@ -46,49 +46,53 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
     const [loading, setLoading] = useState(true);
     const [selectedStructure, setSelectedStructure] = useState<IndividualStructureProps | null>(null);
 
-    useEffect(() => {
-        async function fetchStructures() {
-            if (!session?.user?.id || !activePlanet?.id) {
-                setLoading(false);
-                return;
-            }
-
-            try {
-                const { data: inventoryData, error: inventoryError } = await supabase
-                    .from('inventory')
-                    .select('*')
-                    .eq('owner', session.user.id)
-                    .eq('anomaly', activePlanet.id)
-                    .not('item', 'lte', 100); // Exclude items <= 100 (for test/archival)
-
-                if (inventoryError) throw inventoryError;
-
-                setUserStructuresOnPlanet(inventoryData || []);
-
-                const response = await fetch('/api/gameplay/inventory');
-                const itemsData: StructureItemDetail[] = await response.json();
-
-                const itemMap = new Map<number, StructureItemDetail>();
-                itemsData.forEach(item => {
-                    if (item.ItemCategory === 'Structure') {
-                        itemMap.set(item.id, item);
-                    }
-                });
-
-                setItemDetails(itemMap);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
-                // Provide default empty arrays if no specific data is available
-                onStructuresFetch(userStructuresOnPlanet, [], []);
-            }
+    const fetchStructures = useCallback(async () => {
+        if (!session?.user?.id || !activePlanet?.id) {
+            setLoading(false);
+            return;
         }
 
-        fetchStructures();
-    }, [session?.user?.id, activePlanet?.id, supabase, onStructuresFetch, userStructuresOnPlanet]);
+        try {
+            const { data: inventoryData, error: inventoryError } = await supabase
+                .from('inventory')
+                .select('*')
+                .eq('owner', session.user.id)
+                .eq('anomaly', activePlanet.id)
+                .not('item', 'lte', 100);
 
-    const handleIconClick = async (itemId: number) => {
+            if (inventoryError) throw inventoryError;
+
+            setUserStructuresOnPlanet(inventoryData || []);
+
+            const response = await fetch('/api/gameplay/inventory');
+            const itemsData = await response.json();
+
+            const itemMap = new Map<number, StructureItemDetail>();
+            itemsData.forEach((item: StructureItemDetail) => {
+                if (item.ItemCategory === 'Structure') {
+                    itemMap.set(item.id, item);
+                }
+            });
+
+            setItemDetails(itemMap);
+
+            const orbitalStructures = inventoryData.filter(item => item.itemCategory === "Orbital");
+            const atmosphereStructures = inventoryData.filter(item => item.itemCategory === "Atmosphere");
+            const surfaceStructures = inventoryData.filter(item => item.itemCategory === "Surface");
+
+            onStructuresFetch(orbitalStructures, atmosphereStructures, surfaceStructures);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [session?.user?.id, activePlanet?.id, supabase, onStructuresFetch]);
+
+    useEffect(() => {
+        fetchStructures();
+    }, [fetchStructures]);
+
+    const handleIconClick = useCallback(async (itemId: number) => {
         const itemDetail = itemDetails.get(itemId);
         if (itemDetail) {
             try {
@@ -105,17 +109,13 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                 }
 
                 const config = StructuresConfig[itemDetail.id] || {};
-                const uses = (inventoryData[0]?.configuration?.Uses ?? 0) as number; // Process first row if multiple rows
+                const uses = (inventoryData[0]?.configuration?.Uses ?? 0) as number;
 
                 const updatedButtons = config.buttons.map(button => ({
                     ...button,
-                    showInNoModal: true, // Default value
-                    icon: uses <= 0 
-                        ? <LockIcon className="w-6 h-6 text-[#FFE3BA]" /> 
-                        : button.icon,
-                    text: uses <= 0 
-                        ? button.text.includes('locked') ? button.text : `${button.text} - locked` 
-                        : button.text,
+                    showInNoModal: true,
+                    icon: uses <= 0 ? <LockIcon className="w-6 h-6 text-[#FFE3BA]" /> : button.icon,
+                    text: uses <= 0 ? `${button.text} - locked` : button.text,
                     disabled: uses <= 0
                 }));
 
@@ -131,13 +131,11 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                 console.error('Error processing structure data:', error);
             }
         }
-    };
+    }, [itemDetails, supabase, session, activePlanet]);
 
-    const handleClose = () => {
-        setTimeout(() => {
-            setSelectedStructure(null);
-        }, 100);
-    };
+    const handleClose = useCallback(() => {
+        setSelectedStructure(null);
+    }, []);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -146,7 +144,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
     return (
         <div>
             <div className="flex flex-row space-y-4">
-                {userStructuresOnPlanet.map((structure) => {
+                {userStructuresOnPlanet.map(structure => {
                     const itemDetail = itemDetails.get(structure.item);
                     return itemDetail ? (
                         <div key={structure.id} className="flex items-center space-x-4">
@@ -175,27 +173,6 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
             )}
         </div>
     );
-};
-
-
-interface IndividualStructureProps {
-    name: string;
-    title: string;
-    labels: { text: string; variant: "default" | "secondary" | "destructive" }[];
-    imageSrc: string;
-    actions: {
-      icon: React.ReactNode;
-      text: string;
-    }[];
-    buttons: {
-      showInNoModal: boolean;
-      icon: React.ReactNode;
-      text: string;
-      dynamicComponent?: React.ReactNode;
-      sizePercentage?: number;
-    }[];
-    onActionClick?: (action: string) => void;
-    onClose?: () => void;
 };
 
 export function AllStructures() {
