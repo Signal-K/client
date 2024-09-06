@@ -32,15 +32,15 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
     // General background style for all sections
     const containerStyle: CSSProperties = {
         backgroundImage: `url(${Essendonitis})`,
-        backgroundSize: expandedSection === null ? "cover" : "150%", // Zoom in when a section is expanded
+        backgroundSize: expandedSection === null ? "cover" : "150%",
         backgroundPosition: expandedSection === 0
             ? "center top"
             : expandedSection === 1
             ? "center center"
             : expandedSection === 2
             ? "center bottom"
-            : "center", // Adjust based on section
-        transition: "background-size 0.5s ease, background-position 0.5s ease", // Smooth transition for background zoom
+            : "center",
+        transition: "background-size 0.5s ease, background-position 0.5s ease", 
         flex: 1,
     };
 

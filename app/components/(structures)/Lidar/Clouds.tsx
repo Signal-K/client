@@ -9,12 +9,9 @@ import { Anomaly } from "../Telescopes/Transiting";
 export function StarterLidar() {
     const supabase = useSupabaseClient();
     const session = useSession();
-
     const { activePlanet } = useActivePlanet();
-
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -90,10 +87,6 @@ export function StarterLidar() {
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
             <div className="p-4 rounded-md relative w-full">
-                {/* <h3>{anomaly.content}</h3> */}
-                {/* {anomaly.avatar_url && (
-                    <img src={anomaly.avatar_url} alt={anomaly.content} className="w-full h-64 object-cover" />
-                )} */}
                 {imageUrl && (
                     <img src={imageUrl} alt={anomaly.content} className="w-full h-64 object-cover" />
                 )}
@@ -102,6 +95,7 @@ export function StarterLidar() {
                     anomalyType="cloud"
                     missionNumber={137121301}
                     assetMentioned={imageUrl || ""}
+                    originatingStructure={3105} 
                 />
             </div>
         </div>

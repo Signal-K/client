@@ -153,6 +153,7 @@ export const RooverFromAppeears: React.FC = () => {
                                     anomalyType="roverImg"
                                     missionNumber={1370104}
                                     assetMentioned={rover.avatar_url}
+                                    originatingStructure={rover.id}
                                 />
                             )}
                         </div>

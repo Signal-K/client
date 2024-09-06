@@ -90,9 +90,11 @@ interface ClassificationFormProps {
     anomalyId: string; 
     missionNumber: number;
     assetMentioned: string;
+    originatingStructure?: number;
+    structureItemId?: number;
 };
 
-const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, anomalyId, missionNumber, assetMentioned }) => {
+const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, anomalyId, missionNumber, assetMentioned, originatingStructure, structureItemId }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
@@ -102,6 +104,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [avatar_url, setAvatarUrl] = useState<string | undefined>(undefined);
     const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: boolean }>({});
+    const [inventoryItemId, setInventoryItemId] = useState<number | null>(null);
 
     const { userProfile } = useProfileContext();
 
@@ -143,6 +146,34 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
         fetchUserProfile();
     }, [session, supabase]);
 
+    useEffect(() => {
+        const fetchInventoryItemId = async () => {
+            if (!session?.user?.id || !activePlanet?.id || !structureItemId) return;
+
+            try {
+                const { data: inventoryData, error: inventoryError } = await supabase
+                    .from('inventory')
+                    .select('id')
+                    .eq('owner', session.user.id)
+                    .eq('anomaly', activePlanet.id)
+                    .eq('item', structureItemId)
+                    .order('id', { ascending: true }) // Get the item with the lowest ID
+                    .limit(1)
+                    .single();
+
+                if (inventoryError) throw inventoryError;
+
+                if (inventoryData) {
+                    setInventoryItemId(inventoryData.id);
+                }
+            } catch (error: any) {
+                console.error("Error fetching inventory item ID:", error.message);
+            }
+        };
+
+        fetchInventoryItemId();
+    }, [session?.user?.id, activePlanet?.id, structureItemId, supabase]);
+
     const handleOptionClick = (optionId: number) => {
         setSelectedOptions(prev => ({
             ...prev,
@@ -177,10 +208,40 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     value
                 ])
             ),
-            activePlanet: activePlanet?.id // Add activePlanet ID to classificationConfiguration
+            activePlanet: activePlanet?.id,
+            structureId: originatingStructure ?? null,
+            createdBy: inventoryItemId ?? null, // Include the inventory item ID
         };
-
+    
         try {
+            // Fetch current configuration to update "Uses"
+            let currentConfig: any = {};
+            if (inventoryItemId) {
+                const { data: inventoryData, error: inventoryError } = await supabase
+                    .from('inventory')
+                    .select('configuration')
+                    .eq('id', inventoryItemId)
+                    .single();
+                
+                if (inventoryError) throw inventoryError;
+    
+                currentConfig = inventoryData?.configuration || {};
+                if (currentConfig.Uses) {
+                    currentConfig.Uses = Math.max(0, currentConfig.Uses - 1); // Decrement "Uses" value
+                }
+            }
+    
+            // Update the inventory item with the new configuration
+            if (inventoryItemId) {
+                const { error: updateError } = await supabase
+                    .from('inventory')
+                    .update({ configuration: currentConfig })
+                    .eq('id', inventoryItemId);
+    
+                if (updateError) throw updateError;
+            }
+    
+            // Create classification post
             const { data: classificationData, error: classificationError } = await supabase
                 .from("classifications")
                 .insert({
@@ -189,39 +250,27 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     media: [uploads, assetMentioned],
                     anomaly: anomalyId,  
                     classificationtype: anomalyType,
-                    classificationConfiguration,
+                    classificationConfiguration, 
                 })
                 .single();
-
+    
             if (classificationError) {
                 console.error("Error creating classification:", classificationError.message);
                 alert("Failed to create classification. Please try again.");
                 return;
             } else {
-                alert(`Post created`);
+                alert("Post created");
                 setContent('');
                 setSelectedOptions({});
                 setUploads([]);
             }
-
-            if (!activePlanet?.id) {
-                const { error: profileUpdateError } = await supabase
-                    .from("profiles")
-                    .update({ location: anomalyId })
-                    .eq("id", session?.user?.id);
-
-                if (profileUpdateError) {
-                    console.error("Error updating profile with active planet:", profileUpdateError.message);
-                    alert("Failed to update active planet. Please try again.");
-                    return;
-                }
-            }
-
+    
             await handleMissionComplete();
         } catch (error) {
             console.error("Unexpected error:", error);
         }
     };
+    
 
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -249,7 +298,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             }
         }
     };
-
+    
     return (
         <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-[#2E3440] text-white rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
             <div className="flex gap-4">
@@ -284,7 +333,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                             </div>
                             <div className="flex items-center mb-4">
                                 <label className="flex gap-1 items-center cursor-pointer text-[#88C0D0] hover:text-white">
-                                    <input type="file" className="hidden" onChange={addMedia} />
+                                    {/* <input type="file" className="hidden" onChange={addMedia} /> */}
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-6.5 6.5" />
                                     </svg>

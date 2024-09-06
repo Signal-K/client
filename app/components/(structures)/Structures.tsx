@@ -33,6 +33,7 @@ interface IndividualStructureProps {
         dynamicComponent?: React.ReactNode;
         sizePercentage?: number;
     }[];
+    structureId?: number;  // Added structureId as optional
     onActionClick?: (action: string) => void;
     onClose?: () => void;
 };
@@ -58,7 +59,6 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
         }
 
         try {
-            // Fetch user's profile to get the active mission
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('activeMission')
@@ -67,19 +67,16 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
 
             if (profileError) throw profileError;
 
-            setActiveMission(profileData.activeMission); // Set the active mission
+            setActiveMission(profileData.activeMission);
 
-            // Fetch mission module data from the API
             const modulesResponse = await fetch('/api/citizen/modules');
             const modulesData: CitizenScienceModule[] = await modulesResponse.json();
 
-            // Find the module corresponding to the activeMission
             const activeModule = modulesData.find(module => module.starterMission === profileData.activeMission);
             if (activeModule) {
-                setMissionStructureId(activeModule.structure); // Set the structure related to the active mission
+                setMissionStructureId(activeModule.structure);
             }
 
-            // Fetch inventory data for the user on the active planet
             const { data: inventoryData, error: inventoryError } = await supabase
                 .from('inventory')
                 .select('*')
@@ -121,23 +118,24 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
         fetchStructures();
     }, [fetchStructures]);
 
-    const handleIconClick = (itemId: number) => {
+    const handleIconClick = (itemId: number, inventoryId: number) => {
         const itemDetail = itemDetails.get(itemId);
         if (itemDetail) {
             const config = StructuresConfig[itemDetail.id] || {};
             setSelectedStructure({
                 name: itemDetail.name,
                 imageSrc: itemDetail.icon_url,
-                title: config.title || '',
+                title: `Structure ID: ${inventoryId}`, // Pass inventory id here
                 labels: config.labels || [],
                 actions: config.actions || [],
                 buttons: config.buttons.map(button => ({
                     ...button,
                     showInNoModal: true,
                 })),
+                structureId: inventoryId // Pass structureId here
             });
         }
-    };
+    };    
 
     const handleClose = useCallback(() => {
         setSelectedStructure(null);
@@ -147,7 +145,6 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
         return <div>Loading...</div>;
     }
 
-    // Separate the active mission structure from other structures
     const activeStructure = userStructuresOnPlanet.find(structure => structure.item === missionStructureId);
     const otherStructures = userStructuresOnPlanet.filter(structure => structure.item !== missionStructureId);
 
@@ -163,20 +160,19 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                                 src={itemDetail.icon_url}
                                 alt={itemDetail.name}
                                 className="w-16 h-16 object-cover cursor-pointer"
-                                onClick={() => handleIconClick(itemDetail.id)}
+                                onClick={() => handleIconClick(itemDetail.id, structure.id)} // Pass both arguments
                             />
                         </div>
                     ) : null;
                 })}
 
-                {/* Render the active structure at the end */}
                 {activeStructure && (
                     <div key={activeStructure.id} className="flex items-center space-x-4 relative">
                         <img
                             src={itemDetails.get(activeStructure.item)?.icon_url}
                             alt={itemDetails.get(activeStructure.item)?.name}
                             className="w-16 h-16 object-cover cursor-pointer"
-                            onClick={() => handleIconClick(activeStructure.item)}
+                            onClick={() => handleIconClick(activeStructure.item, activeStructure.id)} // Pass both arguments
                         />
                         <AnimatedPointer
                             position="top"
@@ -192,17 +188,18 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                 <IndividualStructure
                     key={selectedStructure.name}
                     name={selectedStructure.name}
-                    title={selectedStructure.title}
+                    title={selectedStructure.title} 
                     labels={selectedStructure.labels}
                     imageSrc={selectedStructure.imageSrc}
                     actions={selectedStructure.actions}
                     buttons={selectedStructure.buttons}
+                    structureId={selectedStructure.structureId} // Fix structureId
                     onClose={handleClose}
                 />
             )}
         </div>
     );
-};
+}
 
 export function StarterMissionStructures() {
     const supabase = useSupabaseClient();
@@ -263,7 +260,7 @@ export function StarterMissionStructures() {
         fetchStructures();
     }, [fetchStructures]);
 
-    const handleIconClick = (itemId: number) => {
+    const handleIconClick = (itemId: number, structureId: number) => {
         const itemDetail = itemDetails.get(itemId);
         if (itemDetail) {
             const config = StructuresConfig[itemDetail.id] || {};
@@ -277,6 +274,7 @@ export function StarterMissionStructures() {
                     ...button,
                     showInNoModal: true,
                 })),
+                structureId: structureId // Pass structureId here
             });
         }
     };
@@ -301,7 +299,7 @@ export function StarterMissionStructures() {
                                 src={itemDetail.icon_url}
                                 alt={itemDetail.name}
                                 className="w-16 h-16 object-cover cursor-pointer"
-                                onClick={() => handleIconClick(itemDetail.id)}
+                                onClick={() => handleIconClick(itemDetail.id, structure.id)} // Pass both arguments
                             />
                         </div>
                     ) : null;
@@ -317,6 +315,7 @@ export function StarterMissionStructures() {
                     imageSrc={selectedStructure.imageSrc}
                     actions={selectedStructure.actions}
                     buttons={selectedStructure.buttons}
+                    structureId={selectedStructure.structureId} // Pass the structureId prop
                     onClose={handleClose}
                 />
             )}
@@ -417,13 +416,14 @@ export function ActiveMissionStructures() {
                             ...button,
                             showInNoModal: true,
                         })),
+                        structureId: firstStructure.id // Pass structureId here
                     });
                 }
             }
         }
     }, [activeMission, missionStructureId, userStructuresOnPlanet, itemDetails]);
 
-    const handleIconClick = (itemId: number) => {
+    const handleIconClick = (itemId: number, structureId: number) => {
         const itemDetail = itemDetails.get(itemId);
         if (itemDetail) {
             const config = StructuresConfig[itemDetail.id] || {};
@@ -437,6 +437,7 @@ export function ActiveMissionStructures() {
                     ...button,
                     showInNoModal: true,
                 })),
+                structureId: structureId // Pass structureId here
             });
         }
     };
@@ -461,7 +462,7 @@ export function ActiveMissionStructures() {
                                 src={itemDetail.icon_url}
                                 alt={itemDetail.name}
                                 className="w-16 h-16 object-cover cursor-pointer"
-                                onClick={() => handleIconClick(itemDetail.id)}
+                                onClick={() => handleIconClick(itemDetail.id, structure.id)} // Pass both arguments
                             />
                             {structure.item === missionStructureId && (
                                 <AnimatedPointer
@@ -485,12 +486,13 @@ export function ActiveMissionStructures() {
                     imageSrc={selectedStructure.imageSrc}
                     actions={selectedStructure.actions}
                     buttons={selectedStructure.buttons}
+                    structureId={selectedStructure.structureId} // Pass the structureId prop
                     onClose={handleClose}
                 />
             )}
         </div>
     );
-};
+}
 
 
 export function AllStructures() {

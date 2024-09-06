@@ -4,23 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export interface IndividualStructureProps {
-    name: string;
-    title: string;
-    labels: { text: string; variant: "default" | "secondary" | "destructive"; }[];
-    imageSrc: string;
-    actions: {
-      icon: React.ReactNode;
-      text: string;
-    }[];
-    buttons: {
-      showInNoModal: boolean;
-      icon: React.ReactNode;
-      text: string;
-      dynamicComponent?: React.ReactNode;
-      sizePercentage?: number;
-    }[];
-    onActionClick?: (action: string) => void;
-    onClose?: () => void;
+  name: string;
+  title: string;
+  labels: { text: string; variant: "default" | "secondary" | "destructive"; }[];
+  imageSrc: string;
+  actions: {
+    icon: React.ReactNode;
+    text: string;
+  }[];
+  buttons: {
+    showInNoModal: boolean;
+    icon: React.ReactNode;
+    text: string;
+    dynamicComponent?: React.ReactNode;
+    sizePercentage?: number;
+  }[];
+  structureId?: number; // Optional structureId prop
+  onActionClick?: (action: string) => void;
+  onClose?: () => void;
 };
 
 interface ButtonConfig {
@@ -40,6 +41,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
   buttons,
   onActionClick,
   onClose,
+  structureId,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [activeButton, setActiveButton] = useState<string | null>(null);
@@ -78,7 +80,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               <div className="flex items-center space-x-2">
                 <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />
                 <div>
-                  <h1 className="text-2xl font-bold text-[#eceff4]">{name}</h1>
+                  <h1 className="text-2xl font-bold text-[#eceff4]">{name}, {structureId}</h1>
                 </div>
               </div>
               <StarIcon className="w-6 h-6 text-[#ebcb8b]" />

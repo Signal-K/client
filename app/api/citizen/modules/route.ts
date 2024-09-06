@@ -14,6 +14,7 @@ export interface Mission {
     description?: string;
     rewards?: number[];
     classificationModule?: string;
+    classificationType?: string;
     structure: number;
     chapter?: string;
 };

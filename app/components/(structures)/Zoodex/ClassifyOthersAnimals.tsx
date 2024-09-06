@@ -98,7 +98,7 @@ export function StarterZoodex() {
                 </button>
             </div>
         );
-    }
+    };
 
     if (loading) {
         return (
@@ -106,7 +106,7 @@ export function StarterZoodex() {
                 <p>Loading...</p>
             </div>
         );
-    }
+    };
 
     if (!anomaly) {
         return (
@@ -114,7 +114,7 @@ export function StarterZoodex() {
                 <p>No anomaly found.</p>
             </div>
         );
-    }
+    };
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
@@ -131,8 +131,9 @@ export function StarterZoodex() {
                 <ClassificationForm 
                     anomalyId={anomaly.id.toString()}
                     anomalyType='zoodex-burrowingOwl' 
-                    missionNumber={1370103} 
+                    missionNumber={1370103}     
                     assetMentioned={imageUrl} 
+                    structureItemId={3104}
                 />
             )}
         </div>

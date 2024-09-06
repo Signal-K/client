@@ -6,6 +6,7 @@ import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons
 import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Transiting";
 import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
 import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
+import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";
 
 interface IndividualStructureProps {
     name?: string;
@@ -25,6 +26,7 @@ interface IndividualStructureProps {
     }[];
     onActionClick?: (action: string) => void;
     onClose?: () => void;
+    structureId?: number;
 };
 
 type StructureConfig = {
@@ -62,7 +64,7 @@ export const StructuresConfig: StructureConfig = {
         },
         {
           icon: <PickaxeIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Go mining",
+          text: `Go mining`,
           dynamicComponent: <MiningScene />,
           sizePercentage: 73,
         },
@@ -156,4 +158,3 @@ export const StructuresConfig: StructureConfig = {
 };
 
 import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
-import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";

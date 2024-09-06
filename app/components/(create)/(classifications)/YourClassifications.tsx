@@ -24,7 +24,7 @@ const ClassificationViewer: React.FC<ClassificationViewerProps> = ({ classificat
         if (!classificationType) return;
 
         const fetchClassifications = async () => {
-            try {
+            try { 
                 const { data, error } = await supabase
                     .from('classifications')
                     .select('id, content, anomaly')

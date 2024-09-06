@@ -170,24 +170,27 @@ export function StarterTelescope() {
                     return;
                 };
 
-                const { data: classificationData, error: classificationError } = await supabase
-                    .from('classifications')
-                    .select('*')
-                    .eq('anomaly', anomalyData.id)
-                    .eq('author', session.user.id)
-                    .maybeSingle();
+                // const { data: classificationData, error: classificationError } = await supabase
+                //     .from('classifications')
+                //     .select('*')
+                //     .eq('anomaly', anomalyData.id)
+                //     .eq('author', session.user.id)
+                //     .maybeSingle();
 
-                if (classificationError) {
-                    throw classificationError;
-                };
+                // if (classificationError) {
+                //     throw classificationError;
+                // };
 
-                if (classificationData) {
-                    setAnomaly(null);
-                } else {
-                    setAnomaly(anomalyData as Anomaly);
-                    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                    setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyData.id}/Binned.png`);
-                };
+                // if (classificationData) {
+                //     setAnomaly(null);
+                // } else {
+                //     setAnomaly(anomalyData as Anomaly);
+                //     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                //     setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyData.id}/Binned.png`);
+                // };
+                setAnomaly(anomalyData as Anomaly);
+                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyData.id}/Binned.png`);
             } catch (error: any) {
                 console.error('Error fetching anomaly: ', error.message);
                 setAnomaly(null);
@@ -197,7 +200,7 @@ export function StarterTelescope() {
         };
 
         fetchAnomaly();
-    }, [session, supabase, activePlanet]);
+    }, [session, supabase, activePlanet]); 
 
     if (loading) {
         return (
@@ -231,6 +234,7 @@ export function StarterTelescope() {
                 anomalyType='planet' 
                 missionNumber={1370103} 
                 assetMentioned={imageUrl} 
+                structureItemId={3103}
             />
         </div>
     );
