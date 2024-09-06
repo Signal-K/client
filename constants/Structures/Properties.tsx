@@ -32,41 +32,6 @@ type StructureConfig = {
 };
 
 export const StructuresConfig: StructureConfig = {
-    3101: {
-      name: "Mining",
-      title: "Station",
-      labels: [
-        { text: "Resources", variant: "default" },
-        { text: "Automation", variant: "secondary" },
-        { text: "Station", variant: "destructive" },
-      ],
-      imageSrc: "/placeholder.svg",
-      actions: [
-        { icon: <HeartIcon className="w-6 h-6 text-[#a3be8c]" />, text: "Cuddle" },
-        { icon: <RssIcon className="w-6 h-6 text-[#a3be8c]" />, text: "Feed" },
-        { icon: <SaladIcon className="w-6 h-6 text-[#a3be8c]" />, text: "Dress" },
-        { icon: <MehIcon className="w-6 h-6 text-[#a3be8c]" />, text: "Meme" },
-      ],
-      buttons: [
-        { 
-          icon: <ConstructionIcon className="w-6 h-6 text-[#a3be8c]" />, 
-          text: "Mining", 
-          dynamicComponent: <MiningScene />
-        },
-        { 
-          icon: <PowerIcon className="w-6 h-6 text-[#a3be8c]" />, 
-          text: "Upgrade automaton",
-          dynamicComponent: <AutomatonUpgrader />,
-          sizePercentage: 50
-        },
-        { 
-          icon: <GemIcon className="w-6 h-6 text-[#a3be8c]" />, 
-          text: "View available deposits",
-          dynamicComponent: <MineralDepositsNoAction />,
-          sizePercentage: 50
-        },
-      ],
-    },
     3102: {
       name: "Automaton station",
       title: "Roovers",
@@ -95,9 +60,11 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <AutomatonUpgrader />,
           sizePercentage: 55,
         },
-        { 
-          icon: <LockIcon className="w-6 h-6 text-[#FFE3BA]" />, 
-          text: "Further interactions - locked" 
+        {
+          icon: <PickaxeIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Go mining",
+          dynamicComponent: <MiningScene />,
+          sizePercentage: 73,
         },
         {
           icon: <BookCopy className="w-6 h-6 text-[#5e81ac]" />, text: "Tutorial",

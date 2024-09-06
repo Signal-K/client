@@ -19,7 +19,7 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
         setClickCounts(updatedClicks);
 
         // Expand the section if clicked twice
-        if (updatedClicks[index] >= 2) {
+        if (updatedClicks[index] >= 3) {
             setExpandedSection(index);
         }
     };

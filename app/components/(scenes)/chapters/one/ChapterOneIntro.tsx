@@ -3,7 +3,7 @@
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from "react";
- 
+
 export default function ChapterOneIntroduction() {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -42,7 +42,7 @@ export default function ChapterOneIntroduction() {
             return;
         }
 
-        const itemsToAdd = [3102, 3101];
+        const itemsToAdd = [3102];
 
         try {
             const { error: inventoryError } = await supabase
@@ -82,15 +82,22 @@ export default function ChapterOneIntroduction() {
     };
 
     if (missionExists) {
-        return null;
-    }
+        return (
+            null
+        );
+    };
 
     return (
-        <div>
-            <p>Some boilerplate text introducing the user</p>
-            <button onClick={handleItemInitialisation} className="block bg-[#85DDA2] text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                Button that creates your structures and marks this as completed
-            </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center max-w-lg w-full">
+                <p>Welcome! You're now on your planet. Let's start doing some classifications. If you start something and don't like it, you'll then be able to change, so don't worry</p>
+                <button
+                    onClick={handleItemInitialisation}
+                    className="mt-4 bg-[#85DDA2] text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                    Get started
+                </button>
+            </div>
         </div>
     );
 }

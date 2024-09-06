@@ -31,7 +31,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "daisyui": "^4.11.1",
-    "framer-motion": "^11.3.30",
+    "framer-motion": "^11.5.4",
     "lodash": "^4.17.21",
     "lucide-react": "^0.394.0",
     "mobx": "^6.13.0",

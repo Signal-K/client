@@ -176,7 +176,7 @@ const AddMissionsAndItems: React.FC = () => {
                 .insert(missionsToAdd.map(missionId => ({ 
                     user: session?.user?.id,
                     mission: missionId,
-                    time_of_completion: null,
+                    time_of_completion: new Date().toISOString(),
                     rewarded_items: [],
                 })));
 

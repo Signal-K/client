@@ -39,7 +39,8 @@ const MineralsInventoryGrid = () => {
           .from("inventory")
           .select("*")
           .eq("anomaly", activePlanet.id)
-          .eq("owner", session?.user?.id);
+          .eq("owner", session?.user?.id)
+          .limit(9);
 
         if (error) {
           console.error("Error fetching inventory items: ", error);
@@ -58,7 +59,6 @@ const MineralsInventoryGrid = () => {
         const res = await fetch("/api/gameplay/inventory");
         const data: Item[] = await res.json();
 
-        // Filter items to get only minerals
         const minerals = data.filter(
           (item) => item.ItemCategory === "Minerals"
         );

@@ -60,13 +60,16 @@ export function MissionStructureDisplay({ activeMission }: MissionStructureDispl
 
     const [selectedStructure, setSelectedStructure] = useState<StructureConfig | null>(null);
     const [loading, setLoading] = useState(true);
+    const [insertLock, setInsertLock] = useState(false); // Prevent duplicate insertions
 
     useEffect(() => {
         async function fetchStructureForMission() {
-            if (!session?.user?.id || !activePlanet?.id) {
+            if (!session?.user?.id || !activePlanet?.id || insertLock) {
                 setLoading(false);
                 return;
             }
+
+            setInsertLock(true); // Set the lock before performing actions
 
             try {
                 // Find the corresponding module and structure based on the activeMission ID
@@ -107,29 +110,48 @@ export function MissionStructureDisplay({ activeMission }: MissionStructureDispl
                     })), 
                 });
 
-                // Insert the structure into the user's inventory if not already present
-                const { error: insertError } = await supabase
+                // Check if the structure already exists in the user's inventory
+                const { data: existingInventory, error: fetchError } = await supabase
                     .from('inventory')
-                    .insert([
-                        { owner: session.user.id, anomaly: activePlanet.id, item: structureId,
-                             time_of_deploy: new Date().toISOString(),
-                             configuration: {"Uses": 1},
-                        },
-                    ]);
+                    .select('*')
+                    .eq('owner', session.user.id)
+                    .eq('anomaly', activePlanet.id)
+                    .eq('item', structureId);
 
-                if (insertError) {
-                    console.error("Error inserting structure into inventory:", insertError);
+                if (fetchError) {
+                    console.error("Error fetching inventory:", fetchError);
+                    setLoading(false);
+                    return;
+                }
+
+                // If the structure is not already present, insert it
+                if (existingInventory.length === 0) {
+                    const { error: insertError } = await supabase
+                        .from('inventory')
+                        .insert([
+                            { owner: session.user.id, 
+                              anomaly: activePlanet.id, 
+                              item: structureId,
+                              time_of_deploy: new Date().toISOString(),
+                              configuration: { "Uses": 1, "Created for": "Starter mission", "Mission ID": activeMission },
+                            },
+                        ]);
+
+                    if (insertError) {
+                        console.error("Error inserting structure into inventory:", insertError);
+                    }
                 }
 
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
+                setInsertLock(false); // Unlock after the operation is complete
                 setLoading(false);
             }
         }
 
         fetchStructureForMission();
-    }, [activeMission, session?.user?.id, activePlanet?.id, supabase]);
+    }, [activeMission, session?.user?.id, activePlanet?.id, insertLock, supabase]);
 
     const handleClose = () => {
         setTimeout(() => {
