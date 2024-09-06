@@ -138,7 +138,6 @@ const GeneratedStarterPlanet: React.FC = () => {
     );
 };
 
-
 function SendUserToScene() {
     return (
         <div className="text-center mt-4 p-4 bg-blue-100 rounded-lg">

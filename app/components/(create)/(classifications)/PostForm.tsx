@@ -95,6 +95,7 @@ interface ClassificationFormProps {
 const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, anomalyId, missionNumber, assetMentioned }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
+    const { activePlanet } = useActivePlanet();
 
     const [content, setContent] = useState<string>("");
     const [uploads, setUploads] = useState<string[]>([]);
@@ -102,7 +103,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     const [avatar_url, setAvatarUrl] = useState<string | undefined>(undefined);
     const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: boolean }>({});
 
-    const { activePlanet } = useActivePlanet();
     const { userProfile } = useProfileContext();
 
     // Determine classification options based on anomalyType
@@ -170,12 +170,15 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     };
 
     const createPost = async () => {
-        const classificationConfiguration = Object.fromEntries(
-            Object.entries(selectedOptions).map(([key, value]) => [
-                classificationOptions.find(option => option.id === parseInt(key))?.text || '',
-                value
-            ])
-        );
+        const classificationConfiguration = {
+            ...Object.fromEntries(
+                Object.entries(selectedOptions).map(([key, value]) => [
+                    classificationOptions.find(option => option.id === parseInt(key))?.text || '',
+                    value
+                ])
+            ),
+            activePlanet: activePlanet?.id // Add activePlanet ID to classificationConfiguration
+        };
 
         try {
             const { data: classificationData, error: classificationError } = await supabase
