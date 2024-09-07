@@ -105,10 +105,10 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     const [avatar_url, setAvatarUrl] = useState<string | undefined>(undefined);
     const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: boolean }>({});
     const [inventoryItemId, setInventoryItemId] = useState<number | null>(null);
+    const [uses, setUses] = useState<number | null>(null); // Track the "Uses" value
 
     const { userProfile } = useProfileContext();
 
-    // Determine classification options based on anomalyType
     const classificationOptions = (() => {
         switch (anomalyType) {
             case "planet":
@@ -153,7 +153,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             try {
                 const { data: inventoryData, error: inventoryError } = await supabase
                     .from('inventory')
-                    .select('id')
+                    .select('id, configuration')
                     .eq('owner', session.user.id)
                     .eq('anomaly', activePlanet.id)
                     .eq('item', structureItemId)
@@ -165,6 +165,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
 
                 if (inventoryData) {
                     setInventoryItemId(inventoryData.id);
+                    setUses(inventoryData.configuration?.Uses || 0); // Set "Uses" value
                 }
             } catch (error: any) {
                 console.error("Error fetching inventory item ID:", error.message);
@@ -270,7 +271,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             console.error("Unexpected error:", error);
         }
     };
-    
 
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -298,59 +298,66 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             }
         }
     };
-    
+
     return (
         <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-[#2E3440] text-white rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
-            <div className="flex gap-4">
-                <div className="flex flex-col gap-2 w-1/3">
-                    {classificationOptions.map(option => (
-                        <button
-                            key={option.id}
-                            onClick={() => handleOptionClick(option.id)}
-                            className={`p-2 rounded-md ${selectedOptions[option.id] ? 'bg-[#88C0D0] text-[#2E3440]' : 'bg-[#4C566A]'} hover:bg-[#81A1C1]`}
-                        >
-                            {option.text}
-                        </button>
-                    ))}
+            {/* Conditional rendering for "Uses" value */}
+            {uses !== null && uses <= 0 ? (
+                <div className="text-red-500 font-bold">
+                    You need to repair the structure's durability before you can use it.
                 </div>
-                <div className="flex flex-col gap-2 w-2/3">
-                    {Object.keys(selectedOptions).length > 0 && (
-                        <>
-                            <div className="flex gap-4 mb-4">
-                                <UserAvatarNullUpload
-                                    url={avatar_url}
-                                    size={64}
-                                    onUpload={(filePath: string) => {
-                                        setAvatarUrl(filePath);
-                                    }}
-                                />
-                                <textarea
-                                    value={content}
-                                    onChange={e => setContent(e.target.value)}
-                                    className="flex-grow p-3 h-24 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
-                                    placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
-                                />
-                            </div>
-                            <div className="flex items-center mb-4">
-                                <label className="flex gap-1 items-center cursor-pointer text-[#88C0D0] hover:text-white">
-                                    {/* <input type="file" className="hidden" onChange={addMedia} /> */}
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-6.5 6.5" />
-                                    </svg>
-                                    <span>Upload Media</span>
-                                </label>
-                                {isUploading && <span className="text-[#88C0D0]">Uploading...</span>}
-                            </div>
+            ) : (
+                <div className="flex gap-4">
+                    <div className="flex flex-col gap-2 w-1/3">
+                        {classificationOptions.map(option => (
                             <button
-                                onClick={createPost}
-                                className="py-2 px-4 bg-[#88C0D0] text-[#2E3440] rounded-md hover:bg-[#81A1C1]"
+                                key={option.id}
+                                onClick={() => handleOptionClick(option.id)}
+                                className={`p-2 rounded-md ${selectedOptions[option.id] ? 'bg-[#88C0D0] text-[#2E3440]' : 'bg-[#4C566A]'} hover:bg-[#81A1C1]`}
                             >
-                                Submit
+                                {option.text}
                             </button>
-                        </>
-                    )}
+                        ))}
+                    </div>
+                    <div className="flex flex-col gap-2 w-2/3">
+                        {Object.keys(selectedOptions).length > 0 && (
+                            <>
+                                <div className="flex gap-4 mb-4">
+                                    <UserAvatarNullUpload
+                                        url={avatar_url}
+                                        size={64}
+                                        onUpload={(filePath: string) => {
+                                            setAvatarUrl(filePath);
+                                        }}
+                                    />
+                                    <textarea
+                                        value={content}
+                                        onChange={e => setContent(e.target.value)}
+                                        className="flex-grow p-3 h-24 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
+                                        placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
+                                    />
+                                </div>
+                                <div className="flex items-center mb-4">
+                                    <label className="flex gap-1 items-center cursor-pointer text-[#88C0D0] hover:text-white">
+                                        <input type="file" className="hidden" onChange={addMedia} />
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-6.5 6.5" />
+                                        </svg>
+                                        <span>Upload Media</span>
+                                    </label>
+                                    {isUploading && <span className="text-[#88C0D0]">Uploading...</span>}
+                                </div>
+                                <button
+                                    onClick={createPost}
+                                    className="py-2 px-4 bg-[#88C0D0] text-[#2E3440] rounded-md hover:bg-[#81A1C1]"
+                                >
+                                    Submit
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

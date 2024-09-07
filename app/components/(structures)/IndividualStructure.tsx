@@ -1,16 +1,17 @@
 import React, { useState } from "react";
-import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export interface IndividualStructureProps {
   name: string;
   title: string;
-  labels: { text: string; variant: "default" | "secondary" | "destructive"; }[];
+  labels: { text: string; variant: "default" | "secondary" | "destructive" }[];
   imageSrc: string;
   actions: {
     icon: React.ReactNode;
     text: string;
+    dynamicComponent?: React.ReactNode;
   }[];
   buttons: {
     showInNoModal: boolean;
@@ -19,17 +20,9 @@ export interface IndividualStructureProps {
     dynamicComponent?: React.ReactNode;
     sizePercentage?: number;
   }[];
-  structureId?: number; // Optional structureId prop
+  structureId?: number;
   onActionClick?: (action: string) => void;
   onClose?: () => void;
-};
-
-interface ButtonConfig {
-  icon: JSX.Element;
-  text: string;
-  dynamicComponent: JSX.Element;
-  sizePercentage?: number;
-  showInNoModal?: boolean;
 }
 
 const IndividualStructure: React.FC<IndividualStructureProps> = ({
@@ -44,38 +37,28 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
   structureId,
 }) => {
   const [expanded, setExpanded] = useState(false);
-  const [activeButton, setActiveButton] = useState<string | null>(null);
+  const [activeComponent, setActiveComponent] = useState<React.ReactNode | null>(null);
 
-  const handleButtonClick = (buttonText: string) => {
-    setExpanded(true);
-    setActiveButton(buttonText);
+  const handleActionClick = (actionText: string, component: React.ReactNode) => {
+    setActiveComponent(component); // Set the action's dynamic component
     if (onActionClick) {
-      onActionClick(buttonText);
+      onActionClick(actionText);
     }
   };
 
   const handleClose = () => {
     setExpanded(false);
-    setActiveButton(null);
+    setActiveComponent(null);
     if (onClose) {
       onClose();
     }
   };
 
-  const handleCollapse = () => {
-    setExpanded(false);
-    setActiveButton(null);
-  };
-
-  const activeButtonConfig = buttons.find(button => button.text === activeButton);
-  const activeComponent = activeButtonConfig?.dynamicComponent;
-  const sizePercentage = activeButtonConfig?.sizePercentage || 100;
-
   return (
     <Dialog defaultOpen>
-      <div className={`relative transition-all duration-500 ease-in-out ${expanded ? 'h-screen' : ''}`}>
-        {!expanded && (
-          <DialogContent className="p-4 rounded-3xl bg-[#2C3A4A]/70 text-white max-w-md mx-auto">
+      <div className="relative transition-all duration-500 ease-in-out">
+        {!activeComponent && (
+          <DialogContent className="p-4 rounded-3xl bg-[#1D2833]/70 text-white max-w-md mx-auto">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />
@@ -121,21 +104,33 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                 );
               })}
             </div>
-            <div className="flex flex-col my-4 space-y-4">
-            {buttons.map((button, index) => (
-              button.showInNoModal !== false && (
+            <div className="flex justify-between my-4 space-x-4">
+              {actions.map((action, index) => (
                 <div
                   key={index}
-                  className="flex items-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
-                  onClick={() => handleButtonClick(button.text)}
+                  className="flex flex-col items-center cursor-pointer"
+                  onClick={() => handleActionClick(action.text, action.dynamicComponent)}
                 >
-                  <div className="flex-shrink-0">
-                    {button.icon}
-                  </div>
-                  <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
+                  {action.icon}
+                  <p className="text-xs text-[#d8dee9]">{action.text}</p>
                 </div>
-              )
-            ))}
+              ))}
+            </div>
+            <div className="flex flex-col my-4 space-y-4">
+              {buttons.map((button, index) => (
+                button.showInNoModal !== false && (
+                  <div
+                    key={index}
+                    className="flex items-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
+                    onClick={() => setExpanded(true)}
+                  >
+                    <div className="flex-shrink-0">
+                      {button.icon}
+                    </div>
+                    <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
+                  </div>
+                )
+              ))}
             </div>
             <Button
               variant="outline"
@@ -147,25 +142,17 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
           </DialogContent>
         )}
 
-        {expanded && (
-          <DialogContent
-            className="p-4 rounded-3xl bg-[#2C3A4A]/90 text-white max-w-screen mx-auto h-full"
-            style={{
-              width: `${sizePercentage}%`,
-              height: `${sizePercentage}%`,
-              maxWidth: `${sizePercentage}%`,
-            }}
-          >
+        {activeComponent && (
+          <DialogContent className="p-4 rounded-3xl bg-[#2C4F64]/60 text-white max-w-md mx-auto">
             <div className="relative flex flex-col items-center justify-center h-full">
               <button
                 className="absolute top-4 right-4 text-white hover:text-red-500"
-                onClick={handleCollapse}
+                onClick={() => setActiveComponent(null)}
               >
-                Collapse
+                Close
               </button>
-              <h1 className="text-3xl font-bold text-[#eceff4] mb-4">{`${activeButton}`}</h1>
               <div className="flex-grow flex justify-center items-center">
-                {activeComponent ? activeComponent : <p className="text-lg">No component available.</p>}
+                {activeComponent}
               </div>
             </div>
           </DialogContent>
@@ -218,7 +205,7 @@ export const IndividualStructureNoModal: React.FC<IndividualStructureProps> = ({
   return (
     <div className={`relative transition-all duration-500 ease-in-out ${expanded ? 'absolute top-0 left-0 right-0 bottom-0' : ''}`}>
       {!expanded && (
-        <div className="p-4 rounded-3xl bg-[#2C3A4A]/70 text-white max-w-md mx-auto">
+        <div className="p-4 rounded-3xl bg-[#2C3A4A]/40 text-white max-w-md mx-auto">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />

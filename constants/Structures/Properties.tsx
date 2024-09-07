@@ -7,6 +7,8 @@ import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Trans
 import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
 import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
 import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";
+import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
+import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
 
 interface IndividualStructureProps {
     name?: string;
@@ -16,6 +18,7 @@ interface IndividualStructureProps {
     actions?: {
       icon: React.ReactNode;
       text: string;
+      dynamicComponent?: React.ReactNode;
     }[];
     buttons: {
       icon: React.ReactNode;
@@ -69,7 +72,7 @@ export const StructuresConfig: StructureConfig = {
           sizePercentage: 73,
         },
         {
-          icon: <BookCopy className="w-6 h-6 text-[#5e81ac]" />, text: "Tutorial",
+          icon: <BookCopy className="w-6 h-6 text-[#5e81ac]" />, text: `Tutorial`,
           dynamicComponent: <p></p>,
           sizePercentage: 60,
           showInNoModal: false,
@@ -92,7 +95,9 @@ export const StructuresConfig: StructureConfig = {
       imageSrc: '/assets/Items/TransitingTelescope.png',
       actions: [
         {
-          icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />, text: 'Transit events'
+          icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
+          , text: 'Durability/Repair'
+          , dynamicComponent: <StructureRepair inventoryId={3103} />
         },
         // Copy action/labels
       ],
@@ -101,7 +106,7 @@ export const StructuresConfig: StructureConfig = {
           icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Transit events (Starter)",
           dynamicComponent: <StarterTelescope />,
-          sizePercentage: 60,
+          sizePercentage: 90,
           showInNoModal: true,
         },
         {
@@ -156,5 +161,3 @@ export const StructuresConfig: StructureConfig = {
       ]
     }
 };
-
-import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";

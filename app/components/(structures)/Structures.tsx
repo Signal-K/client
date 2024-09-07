@@ -398,9 +398,28 @@ export function ActiveMissionStructures() {
         fetchStructures();
     }, [fetchStructures]);
 
+    const handleIconClick = (itemId: number, structureId: number) => {
+        const itemDetail = itemDetails.get(itemId);
+        if (itemDetail) {
+            const config = StructuresConfig[itemDetail.id] || {};
+            setSelectedStructure({
+                name: itemDetail.name,
+                imageSrc: itemDetail.icon_url,
+                title: `${config.title} (ID: ${structureId})`, // Append the structure ID to the title
+                labels: config.labels || [],
+                actions: config.actions || [],
+                buttons: config.buttons.map(button => ({
+                    ...button,
+                    text: button.text?.includes('Tutorial') ? `Tutorial ${structureId}` : button.text, // Dynamically update the text if needed
+                    showInNoModal: true,
+                })),
+                structureId: structureId // Pass structureId here
+            });
+        }
+    };
+    
     useEffect(() => {
         if (activeMission && missionStructureId) {
-            // Automatically open the modal for the first structure with the mission structure ID
             const firstStructure = userStructuresOnPlanet.find(structure => structure.item === missionStructureId);
             if (firstStructure) {
                 const itemDetail = itemDetails.get(firstStructure.item);
@@ -409,11 +428,12 @@ export function ActiveMissionStructures() {
                     setSelectedStructure({
                         name: itemDetail.name,
                         imageSrc: itemDetail.icon_url,
-                        title: config.title || '',
+                        title: `${config.title} (ID: ${firstStructure.id})`, // Append the structure ID to the title
                         labels: config.labels || [],
                         actions: config.actions || [],
                         buttons: config.buttons.map(button => ({
                             ...button,
+                            text: button.text?.includes('Tutorial') ? `Tutorial ${firstStructure.id}` : button.text, // Dynamically update the text if needed
                             showInNoModal: true,
                         })),
                         structureId: firstStructure.id // Pass structureId here
@@ -422,25 +442,6 @@ export function ActiveMissionStructures() {
             }
         }
     }, [activeMission, missionStructureId, userStructuresOnPlanet, itemDetails]);
-
-    const handleIconClick = (itemId: number, structureId: number) => {
-        const itemDetail = itemDetails.get(itemId);
-        if (itemDetail) {
-            const config = StructuresConfig[itemDetail.id] || {};
-            setSelectedStructure({
-                name: itemDetail.name,
-                imageSrc: itemDetail.icon_url,
-                title: config.title || '',
-                labels: config.labels || [],
-                actions: config.actions || [],
-                buttons: config.buttons.map(button => ({
-                    ...button,
-                    showInNoModal: true,
-                })),
-                structureId: structureId // Pass structureId here
-            });
-        }
-    };
 
     const handleClose = () => {
         setSelectedStructure(null);
@@ -492,8 +493,7 @@ export function ActiveMissionStructures() {
             )}
         </div>
     );
-}
-
+};
 
 export function AllStructures() {
     const supabase = useSupabaseClient();
