@@ -19,6 +19,7 @@ interface IndividualStructureProps {
       icon: React.ReactNode;
       text: string;
       dynamicComponent?: React.ReactNode;
+      sizePercentage?: number;
     }[];
     buttons: {
       icon: React.ReactNode;
@@ -97,7 +98,8 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
           , text: 'Durability/Repair'
-          , dynamicComponent: <StructureRepair inventoryId={3103} />
+          , dynamicComponent: <StructureRepair inventoryId={3103} />,
+          sizePercentage: 40,
         },
         // Copy action/labels
       ],

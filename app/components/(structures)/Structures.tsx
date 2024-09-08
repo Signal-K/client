@@ -8,6 +8,7 @@ import IndividualStructure from "./IndividualStructure";
 import { StructuresConfig } from "@/constants/Structures/Properties";
 import { LockIcon } from "lucide-react";
 import AnimatedPointer from "../(scenes)/chapters/helpers/animatedPointer";
+import { IndividualStructureProps } from "./IndividualStructure";
 
 interface StructuresOnPlanetProps {
     onStructuresFetch: (
@@ -15,27 +16,6 @@ interface StructuresOnPlanetProps {
         atmosphereStructures: InventoryStructureItem[],
         surfaceStructures: InventoryStructureItem[]
     ) => void;
-}
-
-interface IndividualStructureProps {
-    name: string;
-    title: string;
-    labels: { text: string; variant: "default" | "secondary" | "destructive" }[];
-    imageSrc: string;
-    actions: { 
-        icon: React.ReactNode;
-        text: string;
-    }[];
-    buttons: {
-        showInNoModal: boolean;
-        icon: React.ReactNode;
-        text: string;
-        dynamicComponent?: React.ReactNode;
-        sizePercentage?: number;
-    }[];
-    structureId?: number;  // Added structureId as optional
-    onActionClick?: (action: string) => void;
-    onClose?: () => void;
 };
 
 import { CitizenScienceModule } from "@/app/api/citizen/modules/route";

@@ -12,6 +12,7 @@ export interface IndividualStructureProps {
     icon: React.ReactNode;
     text: string;
     dynamicComponent?: React.ReactNode;
+    sizePercentage?: number;
   }[];
   buttons: {
     showInNoModal: boolean;
@@ -23,7 +24,7 @@ export interface IndividualStructureProps {
   structureId?: number;
   onActionClick?: (action: string) => void;
   onClose?: () => void;
-}
+};
 
 const IndividualStructure: React.FC<IndividualStructureProps> = ({
   name,
@@ -38,12 +39,22 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [activeComponent, setActiveComponent] = useState<React.ReactNode | null>(null);
+  const [modalSizePercentage, setModalSizePercentage] = useState(100); // Default to 100%
 
-  const handleActionClick = (actionText: string, component: React.ReactNode) => {
-    setActiveComponent(component); // Set the action's dynamic component
+  // Handle clicks on actions
+  const handleActionClick = (actionText: string, component: React.ReactNode, sizePercentage: number = 100) => {
+    setActiveComponent(component);
+    setModalSizePercentage(sizePercentage);
     if (onActionClick) {
       onActionClick(actionText);
     }
+  };
+
+  // Handle clicks on buttons
+  const handleButtonClick = (buttonText: string, component: React.ReactNode, sizePercentage: number = 100) => {
+    setActiveComponent(component);
+    setModalSizePercentage(sizePercentage);
+    setExpanded(true); // Ensures the button expands the component
   };
 
   const handleClose = () => {
@@ -109,7 +120,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                 <div
                   key={index}
                   className="flex flex-col items-center cursor-pointer"
-                  onClick={() => handleActionClick(action.text, action.dynamicComponent)}
+                  onClick={() => handleActionClick(action.text, action.dynamicComponent, action.sizePercentage)}
                 >
                   {action.icon}
                   <p className="text-xs text-[#d8dee9]">{action.text}</p>
@@ -122,7 +133,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                   <div
                     key={index}
                     className="flex items-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
-                    onClick={() => setExpanded(true)}
+                    onClick={() => handleButtonClick(button.text, button.dynamicComponent, button.sizePercentage)}
                   >
                     <div className="flex-shrink-0">
                       {button.icon}
@@ -143,7 +154,13 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
         )}
 
         {activeComponent && (
-          <DialogContent className="p-4 rounded-3xl bg-[#2C4F64]/60 text-white max-w-md mx-auto">
+          <DialogContent
+            className="p-4 rounded-3xl bg-[#2C4F64]/60 text-white mx-auto"
+            style={{
+              width: `${modalSizePercentage}%`,
+              height: `${modalSizePercentage}%`
+            }}
+          >
             <div className="relative flex flex-col items-center justify-center h-full">
               <button
                 className="absolute top-4 right-4 text-white hover:text-red-500"
