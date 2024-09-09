@@ -29,8 +29,9 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
     const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
     const [loading, setLoading] = useState(true);
     const [selectedStructure, setSelectedStructure] = useState<IndividualStructureProps | null>(null);
-    const [activeMission, setActiveMission] = useState<number | null>(null); 
-    const [missionStructureId, setMissionStructureId] = useState<number | null>(null); 
+    const [activeMission, setActiveMission] = useState<number | null>(null);
+    const [missionStructureId, setMissionStructureId] = useState<number | null>(null);
+    const [positions, setPositions] = useState<{ top: number; left: number }[]>([]);
 
     const fetchStructures = useCallback(async () => {
         if (!session?.user?.id || !activePlanet?.id) {
@@ -115,11 +116,64 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                 structureId: inventoryId // Pass structureId here
             });
         }
-    };    
+    };
 
     const handleClose = useCallback(() => {
         setSelectedStructure(null);
     }, []);
+
+    const isTooClose = (newPosition: { top: number; left: number }, minDistance: number) => {
+        return positions.some(pos => {
+            const distance = Math.sqrt(
+                Math.pow(pos.top - newPosition.top, 2) + Math.pow(pos.left - newPosition.left, 2)
+            );
+            return distance < minDistance;
+        });
+    };
+
+    const generateRandomPosition = (containerWidth: number, containerHeight: number, minDistance: number) => {
+        const maxAttempts = 100;
+        let position;
+        let attempts = 0;
+
+        while (attempts < maxAttempts) {
+            position = {
+                top: Math.floor(Math.random() * (containerHeight - 100)) + 50, // Adjust height bounds
+                left: Math.floor(Math.random() * (containerWidth - 100)) + 50 // Adjust width bounds
+            };
+
+            if (!isTooClose(position, minDistance)) {
+                return position;
+            }
+
+            attempts++;
+        }
+
+        // Return a fallback position if all attempts fail
+        return {
+            top: Math.floor(Math.random() * (containerHeight - 100)) + 50,
+            left: Math.floor(Math.random() * (containerWidth - 100)) + 50
+        };
+    };
+
+    const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (containerRef && userStructuresOnPlanet.length > 0) {
+            const newPositions = [];
+            const containerWidth = containerRef.offsetWidth;
+            const containerHeight = containerRef.offsetHeight;
+
+            while (newPositions.length < userStructuresOnPlanet.length) {
+                const newPos = generateRandomPosition(containerWidth, containerHeight, 100); // 100px minimum distance
+                if (!isTooClose(newPos, 100)) {
+                    newPositions.push(newPos);
+                }
+            }
+
+            setPositions(newPositions); // Set positions once after the data and container are ready
+        }
+    }, [containerRef, userStructuresOnPlanet]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -129,46 +183,53 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
     const otherStructures = userStructuresOnPlanet.filter(structure => structure.item !== missionStructureId);
 
     return (
-        <div>
-            <div className="flex flex-row space-y-4 relative">
-                {otherStructures.map((structure) => {
-                    const itemDetail = itemDetails.get(structure.item);
+        <div className="relative w-full h-full" ref={setContainerRef}>
+            {containerRef && otherStructures.map((structure, index) => {
+                const itemDetail = itemDetails.get(structure.item);
+                const position = positions[index];
 
-                    return itemDetail ? (
-                        <div key={structure.id} className="flex items-center space-x-4 relative">
-                            <img
-                                src={itemDetail.icon_url}
-                                alt={itemDetail.name}
-                                className="w-16 h-16 object-cover cursor-pointer"
-                                onClick={() => handleIconClick(itemDetail.id, structure.id)} // Pass both arguments
-                            />
-                        </div>
-                    ) : null;
-                })}
-
-                {activeStructure && (
-                    <div key={activeStructure.id} className="flex items-center space-x-4 relative">
+                return itemDetail && position ? (
+                    <div
+                        key={structure.id}
+                        className="absolute flex items-center space-x-4"
+                        style={{ top: `${position.top}px`, left: `${position.left}px` }} // Randomly place with limited range
+                    >
                         <img
-                            src={itemDetails.get(activeStructure.item)?.icon_url}
-                            alt={itemDetails.get(activeStructure.item)?.name}
+                            src={itemDetail.icon_url}
+                            alt={itemDetail.name}
                             className="w-16 h-16 object-cover cursor-pointer"
-                            onClick={() => handleIconClick(activeStructure.item, activeStructure.id)} // Pass both arguments
-                        />
-                        <AnimatedPointer
-                            position="top"
-                            arrowDirection="left"
-                            offset={-10}
-                            size={40}
+                            onClick={() => handleIconClick(itemDetail.id, structure.id)} // Pass both arguments
                         />
                     </div>
-                )}
-            </div>
+                ) : null;
+            })}
+
+            {activeStructure && positions.length > 0 && (
+                <div
+                    key={activeStructure.id}
+                    className="absolute flex items-center space-x-4"
+                    style={positions[0]} // Use pre-generated position for the active structure
+                >
+                    <img
+                        src={itemDetails.get(activeStructure.item)?.icon_url}
+                        alt={itemDetails.get(activeStructure.item)?.name}
+                        className="w-16 h-16 object-cover cursor-pointer"
+                        onClick={() => handleIconClick(activeStructure.item, activeStructure.id)} // Pass both arguments
+                    />
+                    <AnimatedPointer
+                        position="top"
+                        arrowDirection="left"
+                        offset={-10}
+                        size={40}
+                    />
+                </div>
+            )}
 
             {selectedStructure && (
                 <IndividualStructure
                     key={selectedStructure.name}
                     name={selectedStructure.name}
-                    title={selectedStructure.title} 
+                    title={selectedStructure.title}
                     labels={selectedStructure.labels}
                     imageSrc={selectedStructure.imageSrc}
                     actions={selectedStructure.actions}
@@ -180,6 +241,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
         </div>
     );
 }
+
 
 export function StarterMissionStructures() {
     const supabase = useSupabaseClient();

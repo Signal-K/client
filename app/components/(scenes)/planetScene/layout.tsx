@@ -112,17 +112,13 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
                     {expandedSection === null || expandedSection === 2 ? (
                         <div className="flex flex-1 flex-col">
                             <div className="flex-1">{children[2]}</div>
-                            <div className="flex-1 border-t border-dotted border-gray-300" style={{ flex: 1 }}>
+                            <div className="flex-1 border-t border-dotted border-gray-100" style={{ flex: 1 }}>
                                 {children[3]}
                             </div>
                             {expandedSection === 2 && (
                                 <button
                                     className="absolute top-4 right-4 text-white bg-red-600 p-4 rounded-full shadow-lg text-lg font-bold z-50"
                                     onClick={handleClose}
-                                    style={{
-                                        border: "3px solid white",
-                                        boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.5)",
-                                    }}
                                 >
                                     Close
                                 </button>
@@ -136,8 +132,6 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
 };
 
 export default PlanetViewLayout;
-
-
 
 export const TestLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
     const [expandedSection, setExpandedSection] = useState<number | null>(null);

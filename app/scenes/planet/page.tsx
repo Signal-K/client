@@ -27,7 +27,7 @@ export default function PlanetViewPage() {
             setAtmosphereStructures(atmosphere);
             setSurfaceStructures(surface);
         },
-        []
+        [],
     );
 
     useEffect(() => {
@@ -114,7 +114,7 @@ export default function PlanetViewPage() {
             <div>
                 <StarterMissionStructures />
             </div>
-            <div className="bg-white/50 h-full">
+            <div className="h-full">
                 <ActiveMissionStructures />
             </div>
         </PlanetViewLayout>

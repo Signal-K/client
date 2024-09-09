@@ -68,8 +68,8 @@ const StructureRepair: React.FC<StructureRepairProps> = ({
             setStructureName(item.name); 
           } else {
             setStructureName("Unknown Structure");
-          }
-        }
+          };
+        };
 
         // Fetch total iron stock
         const { data: ironData, error: ironError } = await supabase
