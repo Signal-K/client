@@ -118,7 +118,7 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <BookDashedIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Your planet discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="planet" />,
+          // dynamicComponent: <ClassificationViewer classificationType="planet" />,
           sizePercentage: 75,
           showInNoModal: true, // This would be false for things like tutorials
         },

@@ -50,20 +50,20 @@ const inventoryItems: InventoryItem[] = [
     id: 3101, name: 'Mining station', description: 'Gives you the ability to mine and view your mineral deposits', cost: 1, icon_url: '/assets/items/MiningStructure.png', ItemCategory: 'Structure', parentItem: 30, itemLevel: 1, locationType: 'Surface'
   },
   {
-    id: 3102, name: 'Automaton station', description: 'View, control and upgrade all your automatons and rovers here', cost: 1, icon_url: '/assets/items/AutomatonController.png', ItemCategory: 'Structure', parentItem: 30, itemLevel: 1, locationType: 'Surface'
+    id: 3102, name: 'Automaton station', description: 'View, control and upgrade all your automatons and rovers here', cost: 1, icon_url: '/assets/items/AutoController.png', ItemCategory: 'Structure', parentItem: 30, itemLevel: 1, locationType: 'Surface'
   },
   {
     id: 3103, name: 'Telescope', description: 'Space-based observations & classifications', icon_url: '/assets/Items/Telescope.png', ItemCategory: 'Structure', locationType: 'Orbital'
   },
   {
-    id: 3104, name: "Zoodex", description: "Populate your planet with some animals to gain an understanding of animal behaviour on your planet and aide local research back home", cost: 1, icon_url: "/assets/items/Zoodex.png", ItemCategory: "Structure", parentItem: null, itemLevel: 1, locationType: "Surface"
+    id: 3104, name: "Zoodex", description: "Populate your planet with some animals to gain an understanding of animal behaviour on your planet and aide local research back home", cost: 1, icon_url: "/assets/items/Pokedex.png", ItemCategory: "Structure", parentItem: null, itemLevel: 1, locationType: "Surface"
   },
   {
     id: 3105,
     name: "LIDAR",
     // description: 'This tool is used to scan the surface of your planet and create a 3D model of the terrain', -- This is cool, but not what we're using lidar for yet (thanks copilot)
     description: "Collect and study weather events and entities",
-    icon_url: "/assets/items/Lidar.png",
+    icon_url: "/assets/items/Scoper.png",
     ItemCategory: "Structure",
     locationType: 'Surface',
   },

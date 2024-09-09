@@ -19,7 +19,7 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
         setClickCounts(updatedClicks);
 
         // Expand the section if clicked twice
-        if (updatedClicks[index] >= 3) {
+        if (updatedClicks[index] >= 200000) {
             setExpandedSection(index);
         }
     };
@@ -59,7 +59,7 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
     ];
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen w-full flex flex-col">
             <Header />
             <div className="flex flex-col flex-1" style={containerStyle}>
                 {children.slice(0, 2).map((child, index) => (

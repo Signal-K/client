@@ -102,20 +102,20 @@ export default function PlanetViewPage() {
     // If user has mission 1370201, return the full component content (aka they have initialised chapter 1)
     return (
         <PlanetViewLayout>
-            <div>
+            <div className="w-full">
                 Planet id: {activePlanet?.id}
                 <br />
                 Orbital Structures
             </div>
-            <div>
+            <div className="w-full">
                 Atmosphere Structures
-                <StructuresOnPlanet onStructuresFetch={handleStructuresFetch} />
             </div>
-            <div>
-                <StarterMissionStructures />
+            <div className="w-full">
+                Surface structures
             </div>
             <div className="h-full">
-                <ActiveMissionStructures />
+                {/* <StarterMissionStructures /> */}
+                <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
             </div>
         </PlanetViewLayout>
     );

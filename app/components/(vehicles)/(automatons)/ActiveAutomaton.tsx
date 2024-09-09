@@ -522,12 +522,12 @@ export function AutomatonUpgrader() {
       {automatons.length > 0 ? (
         <div>
           <div className="flex justify-between items-center mb-4">
-            <button onClick={handlePreviousAutomaton}>← Previous</button>
+            {/* <button onClick={handlePreviousAutomaton}>← Previous</button> */}
             <AutomatonUpgrade
               inventoryId={automatons[currentAutomatonIndex].id}
               onSave={handleSaveConfiguration}
             />
-            <button onClick={handleNextAutomaton}>Next →</button>
+            {/* <button onClick={handleNextAutomaton}>Next →</button> */}
           </div>
         </div>
       ) : (
