@@ -1,0 +1,16 @@
+@keyframes subtle-move {
+    0% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(5.5px); /* Moves it slightly to the right */
+    }
+    100% {
+      transform: translateX(0); /* Moves it back to the original position */
+    }
+  }
+  
+  .moving-structure {
+    animation: subtle-move 2s ease-in-out infinite alternate; /* Adjust timing as needed */
+  }
+  

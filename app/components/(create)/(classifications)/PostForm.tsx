@@ -5,6 +5,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useProfileContext } from "@/context/UserProfile";
 import UserAvatar, { UserAvatarNullUpload } from "@/app/components/(settings)/profile/Avatar";
+import { ClassificationOutput } from "./ClassificationResults";
 
 interface ClassificationOption {
     id: number;
@@ -105,7 +106,9 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     const [avatar_url, setAvatarUrl] = useState<string | undefined>(undefined);
     const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: boolean }>({});
     const [inventoryItemId, setInventoryItemId] = useState<number | null>(null);
-    const [uses, setUses] = useState<number | null>(null); // Track the "Uses" value
+    const [classificationOutput, setClassificationOutput] = useState<any | null>(null);
+    const [uses, setUses] = useState<number | null>(null);
+    const [postSubmitted, setPostSubmitted] = useState<boolean>(false);
 
     const { userProfile } = useProfileContext();
 
@@ -260,10 +263,12 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 alert("Failed to create classification. Please try again.");
                 return;
             } else {
-                alert("Post created");
+                // alert("Post created");
+                setClassificationOutput(classificationConfiguration);
                 setContent('');
                 setSelectedOptions({});
                 setUploads([]);
+                setPostSubmitted(true);
             }
     
             await handleMissionComplete();
@@ -295,9 +300,13 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 console.error("Unexpected error during file upload:", err);
             } finally {
                 setIsUploading(false);
-            }
-        }
+            };
+        };
     };
+
+    if (postSubmitted) {
+        return <ClassificationOutput configuration={classificationOutput} />;
+    };    
 
     return (
         <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-[#2E3440] text-white rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
@@ -353,6 +362,9 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                 >
                                     Submit
                                 </button>
+                                {classificationOutput && (
+                                    <ClassificationOutput configuration={classificationOutput} />
+                                )}
                             </>
                         )}
                     </div>

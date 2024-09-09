@@ -9,6 +9,7 @@ import { InventoryStructureItem } from "@/types/Items";
 import ChapterOneIntroduction from "@/app/components/(scenes)/chapters/one/ChapterOneIntro";
 import ChooseClassificationStarter from "@/app/components/(scenes)/chapters/one/ChooseClassifications";
 import MissionLog from "@/app/components/(scenes)/(missions)/MissionList";
+import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
 
 export default function PlanetViewPage() {
     const { activePlanet } = useActivePlanet();
@@ -89,9 +90,9 @@ export default function PlanetViewPage() {
     return (
         <div className="relative min-h-screen">
             <PlanetStructures />
-            <div className="hidden lg:block lg:absolute lg:bottom-0 lg:right-0 lg:w-1/3 lg:h-1/3 lg:max-h-[30vh] lg:bg-white lg:z-50">
+            {/* <div className="hidden lg:block lg:absolute lg:bottom-0 lg:right-0 lg:w-1/3 lg:h-1/3 lg:max-h-[30vh] lg:bg-white lg:z-50">
                 <MissionLog />
-            </div>
+            </div> */}
         </div>
     );
 };
@@ -115,18 +116,16 @@ function PlanetStructures() {
     return (
         <PlanetViewLayout>
             <div className="w-full">
-                Planet id: {activePlanet?.id}
-                <br />
                 Orbital Structures
+                <PlanetarySystem />
             </div>
             <div className="w-full">
                 Atmosphere Structures
             </div>
             <div className="w-full">
-                Surface structures
+                <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
             </div>
             <div className="relative flex-1">
-                <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
                 {/* Container for MissionLog */}
                 {/* <div className="absolute bottom-0 right-0 w-full sm:w-1/3 sm:h-1/3 max-h-[30vh]">
                     <MissionLog />

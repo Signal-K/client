@@ -10,6 +10,8 @@ import { LockIcon } from "lucide-react";
 import AnimatedPointer from "../(scenes)/chapters/helpers/animatedPointer";
 import { IndividualStructureProps } from "./IndividualStructure";
 
+import "../../../styles/Anims/StarterStructureAnimations.css";
+
 interface StructuresOnPlanetProps {
     onStructuresFetch: (
         orbitalStructures: InventoryStructureItem[],
@@ -130,40 +132,34 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
 
     return (
         <div className="relative">
-            <div className="grid grid-cols-3 gap-1">
+            <div className="grid grid-cols-3 gap-1 gap-y-3">
                 {otherStructures.map((structure) => {
                     const itemDetail = itemDetails.get(structure.item);
-
+    
                     return itemDetail ? (
                         <div key={structure.id} className="flex flex-col items-center space-y-2">
                             <img
                                 src={itemDetail.icon_url}
                                 alt={itemDetail.name}
-                                className="w-16 h-16 object-cover cursor-pointer"
+                                className="w-16 h-16 object-cover cursor-pointer moving-structure" // Added class
                                 onClick={() => handleIconClick(itemDetail.id, structure.id)} // Pass both arguments
                             />
                         </div>
                     ) : null;
                 })}
-
+    
                 {activeStructure && (
                     <div key={activeStructure.id} className="flex flex-col items-center space-y-2">
                         <img
                             src={itemDetails.get(activeStructure.item)?.icon_url}
                             alt={itemDetails.get(activeStructure.item)?.name}
-                            className="w-16 h-16 object-cover cursor-pointer"
+                            className="w-16 h-16 object-cover cursor-pointer moving-structure" // Added class
                             onClick={() => handleIconClick(activeStructure.item, activeStructure.id)} // Pass both arguments
                         />
-                        {/* <AnimatedPointer
-                            position="top"
-                            arrowDirection="left"
-                            offset={-10}
-                            size={40}
-                        /> */}
                     </div>
                 )}
             </div>
-
+    
             {selectedStructure && (
                 <IndividualStructure
                     key={selectedStructure.name}
@@ -173,13 +169,13 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                     imageSrc={selectedStructure.imageSrc}
                     actions={selectedStructure.actions}
                     buttons={selectedStructure.buttons}
-                    structureId={selectedStructure.structureId} // Fix structureId
+                    structureId={selectedStructure.structureId}
                     onClose={handleClose}
                 />
             )}
         </div>
-    );
-}
+    );    
+};
 
 export function StarterMissionStructures() {
     const supabase = useSupabaseClient();
