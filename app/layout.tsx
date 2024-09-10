@@ -68,14 +68,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
           <ActivePlanetProvider>
-              <MissionProvider>
+              {/* <MissionProvider> */}
                   <UserAnomaliesProvider>
                     <InventoryProvider>
                       {children}
                       <Analytics />
                     </InventoryProvider>
                   </UserAnomaliesProvider>
-              </MissionProvider>
+              {/* </MissionProvider> */}
           </ActivePlanetProvider>
         </SessionContextProvider>
       </body>

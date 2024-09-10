@@ -41,6 +41,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
         }
 
         try {
+            // Fetch the active mission from the profiles table
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('activeMission')
@@ -51,14 +52,17 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
 
             setActiveMission(profileData.activeMission);
 
+            // Fetch the Citizen Science Module data
             const modulesResponse = await fetch('/api/citizen/modules');
             const modulesData: CitizenScienceModule[] = await modulesResponse.json();
 
+            // Find the module associated with the active mission
             const activeModule = modulesData.find(module => module.starterMission === profileData.activeMission);
             if (activeModule) {
-                setMissionStructureId(activeModule.structure);
+                setMissionStructureId(activeModule.structure);  // Set the structure ID associated with the active mission
             }
 
+            // Fetch inventory data for the user and active planet
             const { data: inventoryData, error: inventoryError } = await supabase
                 .from('inventory')
                 .select('*')
@@ -68,6 +72,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
 
             if (inventoryError) throw inventoryError;
 
+            // Filter for unique structures
             const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
             inventoryData.forEach(structure => {
                 if (!uniqueStructuresMap.has(structure.item)) {
@@ -78,6 +83,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
             const uniqueStructures = Array.from(uniqueStructuresMap.values());
             setUserStructuresOnPlanet(uniqueStructures || []);
 
+            // Fetch item details from the gameplay API
             const response = await fetch('/api/gameplay/inventory');
             const itemsData = await response.json();
 
@@ -107,14 +113,14 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
             setSelectedStructure({
                 name: itemDetail.name,
                 imageSrc: itemDetail.icon_url,
-                title: `Structure ID: ${inventoryId}`, // Pass inventory id here
+                title: `Structure ID: ${inventoryId}`, 
                 labels: config.labels || [],
                 actions: config.actions || [],
                 buttons: config.buttons.map(button => ({
                     ...button,
                     showInNoModal: true,
                 })),
-                structureId: inventoryId // Pass structureId here
+                structureId: inventoryId 
             });
         }
     };
@@ -133,33 +139,32 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
     return (
         <div className="relative">
             <div className="grid grid-cols-3 gap-1 gap-y-3">
-                {otherStructures.map((structure) => {
-                    const itemDetail = itemDetails.get(structure.item);
-    
-                    return itemDetail ? (
-                        <div key={structure.id} className="flex flex-col items-center space-y-2">
-                            <img
-                                src={itemDetail.icon_url}
-                                alt={itemDetail.name}
-                                className="w-16 h-16 object-cover cursor-pointer moving-structure" // Added class
-                                onClick={() => handleIconClick(itemDetail.id, structure.id)} // Pass both arguments
-                            />
-                        </div>
-                    ) : null;
-                })}
-    
                 {activeStructure && (
                     <div key={activeStructure.id} className="flex flex-col items-center space-y-2">
                         <img
                             src={itemDetails.get(activeStructure.item)?.icon_url}
                             alt={itemDetails.get(activeStructure.item)?.name}
-                            className="w-16 h-16 object-cover cursor-pointer moving-structure" // Added class
-                            onClick={() => handleIconClick(activeStructure.item, activeStructure.id)} // Pass both arguments
+                            className="w-16 h-16 object-cover cursor-pointer"
+                            onClick={() => handleIconClick(activeStructure.item, activeStructure.id)}
                         />
                     </div>
                 )}
+                {otherStructures.map((structure) => {
+                    const itemDetail = itemDetails.get(structure.item);
+
+                    return itemDetail ? (
+                        <div key={structure.id} className="flex flex-col items-center space-y-2">
+                            <img
+                                src={itemDetail.icon_url}
+                                alt={itemDetail.name}
+                                className="w-14 h-14 object-cover cursor-pointer moving-structure"
+                                onClick={() => handleIconClick(itemDetail.id, structure.id)}
+                            />
+                        </div>
+                    ) : null;
+                })}
             </div>
-    
+
             {selectedStructure && (
                 <IndividualStructure
                     key={selectedStructure.name}
@@ -174,7 +179,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                 />
             )}
         </div>
-    );    
+    );
 };
 
 export function StarterMissionStructures() {
@@ -250,7 +255,7 @@ export function StarterMissionStructures() {
                     ...button,
                     showInNoModal: true,
                 })),
-                structureId: structureId // Pass structureId here
+                structureId: structureId
             });
         }
     };
@@ -291,7 +296,7 @@ export function StarterMissionStructures() {
                     imageSrc={selectedStructure.imageSrc}
                     actions={selectedStructure.actions}
                     buttons={selectedStructure.buttons}
-                    structureId={selectedStructure.structureId} // Pass the structureId prop
+                    structureId={selectedStructure.structureId}
                     onClose={handleClose}
                 />
             )}
@@ -333,7 +338,7 @@ export function ActiveMissionStructures() {
             const activeModule = modulesData.find((module: { starterMission: any; }) => module.starterMission === profileData.activeMission);
             if (activeModule) {
                 setMissionStructureId(activeModule.structure);
-            }
+            };
 
             const { data: inventoryData, error: inventoryError } = await supabase
                 .from('inventory')

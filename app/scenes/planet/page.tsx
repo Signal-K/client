@@ -11,6 +11,7 @@ import ChooseClassificationStarter from "@/app/components/(scenes)/chapters/one/
 import MissionLog from "@/app/components/(scenes)/(missions)/MissionList";
 import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
 import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
+import StarterMissionsStats from "@/app/components/(scenes)/(missions)/CompletedMissions";
 
 export default function PlanetViewPage() {
     const { activePlanet } = useActivePlanet();
@@ -128,10 +129,9 @@ function PlanetStructures() {
                 <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
             </div>
             <div className="relative flex-1">
-                {/* Container for MissionLog */}
-                {/* <div className="absolute bottom-0 right-0 w-full sm:w-1/3 sm:h-1/3 max-h-[30vh]">
-                    <MissionLog />
-                </div> */}
+                <div className="absolute right-0 w-full sm:w-auto sm:h-auto max-h-[30vh] sm:relative">
+                    <StarterMissionsStats />
+                </div>
             </div>
         </PlanetViewLayout>
     );

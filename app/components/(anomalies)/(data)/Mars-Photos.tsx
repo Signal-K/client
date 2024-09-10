@@ -278,7 +278,7 @@ export const RoverPhoto: React.FC = () => {
                                 <ClassificationForm
                                     anomalyId={rover.id.toString()}
                                     anomalyType="roverImg"
-                                    missionNumber={1370104}
+                                    missionNumber={13714101}
                                     assetMentioned={rover.avatar_url}
                                     originatingStructure={rover.id}
                                     structureItemId={3102}
