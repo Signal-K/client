@@ -10,6 +10,7 @@ import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthe
 import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
+import { AnomalyRoverPhoto } from "@/app/components/(structures)/Auto/AutomatonClassificationShell";
 
 interface IndividualStructureProps {
     name?: string;
@@ -74,7 +75,7 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <SwitchCamera className="w-6 h-6 text-[#5e81ac]" />,
           text: 'View rover photos',
-          dynamicComponent: <RoverPhoto />,
+          dynamicComponent: <AnomalyRoverPhoto />,
           sizePercentage: 73,
         },
         {
