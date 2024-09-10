@@ -68,8 +68,9 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
   return (
     <Dialog defaultOpen>
       <div className="relative transition-all duration-500 ease-in-out">
+        {/* Main Modal */}
         {!activeComponent && (
-          <DialogContent className="p-4 rounded-3xl bg-[#1D2833]/70 text-white max-w-md mx-auto">
+          <DialogContent className="p-4 rounded-3xl bg-[#1D2833]/70 text-white max-w-xl mx-auto">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />
@@ -115,7 +116,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                 );
               })}
             </div>
-            <div className="flex justify-between my-4 space-x-4">
+            <div className="flex items-center justify-between my-4 space-x-4">
               {actions.map((action, index) => (
                 <div
                   key={index}
@@ -127,13 +128,14 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                 </div>
               ))}
             </div>
-            <div className="flex flex-col my-4 space-y-4">
+            <div className="flex flex-col items-center my-4 space-y-4">
               {buttons.map((button, index) => (
                 button.showInNoModal !== false && (
                   <div
                     key={index}
                     className="flex items-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
                     onClick={() => handleButtonClick(button.text, button.dynamicComponent, button.sizePercentage)}
+                    style={{ maxWidth: "200px", width: "auto" }}
                   >
                     <div className="flex-shrink-0">
                       {button.icon}
@@ -153,12 +155,13 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
           </DialogContent>
         )}
 
+        {/* Dynamic Component Modal */}
         {activeComponent && (
           <DialogContent
-            className="p-4 rounded-3xl bg-[#2C4F64]/60 text-white mx-auto"
+            className="p-4 rounded-3xl max-w-xl bg-[#2C4F64]/70 text-white mx-auto"
             style={{
-              width: `${modalSizePercentage}%`,
-              height: `${modalSizePercentage}%`
+              width: `${Math.max(modalSizePercentage, 100)}%`, // Ensure it's never thinner than 100%
+              height: `${modalSizePercentage}%`,
             }}
           >
             <div className="relative flex flex-col items-center justify-center h-full">

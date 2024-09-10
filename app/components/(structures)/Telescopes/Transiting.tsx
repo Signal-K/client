@@ -231,8 +231,8 @@ export function StarterTelescope() {
             </div>
             <ClassificationForm 
                 anomalyId={anomaly.id.toString()}
-                anomalyType='planet' 
-                missionNumber={1370103} 
+                anomalyType='planet'  
+                missionNumber={1372001} 
                 assetMentioned={imageUrl} 
                 structureItemId={3103}
             />

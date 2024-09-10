@@ -7,8 +7,9 @@ import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Trans
 import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
 import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
 import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
+import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
 
 interface IndividualStructureProps {
     name?: string;
@@ -49,9 +50,7 @@ export const StructuresConfig: StructureConfig = {
       imageSrc: "/forest.svg",
       actions: [
         { icon: <PickaxeIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Explore" },
-        { icon: <RssIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Harvest" },
-        { icon: <SaladIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Meditate" },
-        { icon: <MehIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Observe" },
+        { icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Repair", dynamicComponent: <StructureRepair inventoryId={3102} /> },
       ],
       buttons: [
         { 
@@ -70,6 +69,12 @@ export const StructuresConfig: StructureConfig = {
           icon: <PickaxeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: `Go mining`,
           dynamicComponent: <MiningScene />,
+          sizePercentage: 73,
+        },
+        {
+          icon: <SwitchCamera className="w-6 h-6 text-[#5e81ac]" />,
+          text: 'View rover photos',
+          dynamicComponent: <RoverPhoto />,
           sizePercentage: 73,
         },
         {

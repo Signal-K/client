@@ -130,6 +130,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     useEffect(() => {
         const fetchUserProfile = async () => {
             if (!session) return;
+
             try {
                 const { data, error } = await supabase
                     .from("profiles")
@@ -138,14 +139,16 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     .single();
                 if (data) {
                     setAvatarUrl(data.avatar_url);
-                }
+                };
+
                 if (error) {
-                    console.error("Error fetching profile:", error.message);
-                }
-            } catch (error) {
-                console.error("Unexpected error:", error);
-            }
+                    console.error("Error fetching profile: ", error.message);
+                };
+            } catch (error: any) {
+                console.error("Unexpected error: ", error);
+            };
         };
+        
         fetchUserProfile();
     }, [session, supabase]);
 
@@ -309,7 +312,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     };    
 
     return (
-        <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-[#2E3440] text-white rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+        <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-[#2C4F64]/30 text-white rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
             {/* Conditional rendering for "Uses" value */}
             {uses !== null && uses <= 0 ? (
                 <div className="text-red-500 font-bold">
@@ -322,7 +325,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                             <button
                                 key={option.id}
                                 onClick={() => handleOptionClick(option.id)}
-                                className={`p-2 rounded-md ${selectedOptions[option.id] ? 'bg-[#88C0D0] text-[#2E3440]' : 'bg-[#4C566A]'} hover:bg-[#81A1C1]`}
+                                className={`p-2 rounded-md ${selectedOptions[option.id] ? 'bg-[#FFD580] text-[#ffffff]' : 'bg-[#FF695D]'} hover:bg-[#81A1C1]`}
                             >
                                 {option.text}
                             </button>
@@ -358,7 +361,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                 </div>
                                 <button
                                     onClick={createPost}
-                                    className="py-2 px-4 bg-[#88C0D0] text-[#2E3440] rounded-md hover:bg-[#81A1C1]"
+                                    className="py-2 px-4 bg-[#5FCBC3] text-[#2E3440] rounded-md hover:bg-[#85DDA2]"
                                 >
                                     Submit
                                 </button>

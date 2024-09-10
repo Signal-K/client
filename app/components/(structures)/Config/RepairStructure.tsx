@@ -32,7 +32,7 @@ const StructureRepair: React.FC<StructureRepairProps> = ({
   const [ironStock, setIronStock] = useState<number>(0);
 
   useEffect(() => {
-    setPotentialDurability(baseDurability + ironToAdd); 
+    setPotentialDurability(baseDurability + (ironToAdd * 10)); 
   }, [baseDurability, ironToAdd]);
 
   useEffect(() => {
@@ -101,7 +101,7 @@ const StructureRepair: React.FC<StructureRepairProps> = ({
   const repairStructure = async () => {
     try {
       // Update the structure's durability
-      const newDurability = baseDurability + ironToAdd;
+      const newDurability = (baseDurability + ironToAdd) * 10;
       await supabase
         .from("inventory")
         .update({ configuration: { Uses: newDurability } })

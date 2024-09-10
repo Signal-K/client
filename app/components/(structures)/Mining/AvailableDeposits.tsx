@@ -125,7 +125,8 @@ export const MineralDepositsNoAction: React.FC = () => {
           .from('mineralDeposits')
           .select('*')
           .eq('anomaly', activePlanet.id)
-          .eq('owner', session.user.id);
+          .eq('owner', session.user.id)
+          .limit(9);
 
         if (error) throw error;
 

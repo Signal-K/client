@@ -41,7 +41,7 @@ export const RooverFromAppeears: React.FC = () => {
 
     useEffect(() => {
         fetchMarsImages();
-    }, []);
+    }, [supabase]);
 
     useEffect(() => {
         const getRandomMineralDeposits = () => {
@@ -81,11 +81,11 @@ export const RooverFromAppeears: React.FC = () => {
     
                 setRovers(data);
     
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Error collecting images: ", error);
                 alert("Failed to collect and classify the images from your rover.");
-            }
-        }
+            };
+        };
     };
 
     const handleEstablishMiningSettlement = async () => {
@@ -187,6 +187,108 @@ export const RooverFromAppeears: React.FC = () => {
                         Establish mining settlement
                     </button>
                 </div>
+            )}
+        </div>
+    );
+};
+
+export const RoverPhoto: React.FC = () => {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+    const { activePlanet } = useActivePlanet();
+
+    const [rovers, setRovers] = useState<{ id: number; avatar_url: string }[]>([]);
+    const [roverConfig, setRoverConfig] = useState<any>(null);
+    const [imagesCollected, setImagesCollected] = useState(false);
+
+    // Fetch Mars rover images from NASA API
+    const fetchMarsImages = async () => {
+        const randomDate = Math.floor(Math.random() * 1000) + 1;
+        const selectedRover = "perseverance";
+        const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${selectedRover}/photos?sol=${randomDate}&api_key=iT0FQTZKpvadCGPzerqXdO5F4b62arNBOP0dtkXE`;
+
+        try {
+            const response = await axios.get(apiUrl);
+            const photos = response.data.photos.map((photo: { img_src: string }) => photo.img_src);
+
+            if (photos.length > 0) {
+                setRovers([{ id: Date.now(), avatar_url: photos[0] }]);
+                setRoverConfig(response.data);
+                saveImageFromRover(photos[0]); // Save the image once fetched
+            } else {
+                setRovers([{ id: Date.now(), avatar_url: "No images found" }]);
+            }
+        } catch (error) {
+            console.error("Error fetching rover images from NASA:", error);
+            setRovers([{ id: Date.now(), avatar_url: "An error occurred while fetching the images." }]);
+        }
+    };
+
+    // Save the image from the rover to the anomalies table
+    const saveImageFromRover = async (avatar_url: string) => {
+        if (session && activePlanet) {
+            try {
+                const anomaly = {
+                    id: Date.now(),
+                    content: `Rover image by ${session.user.id}`,
+                    anomalytype: "roverImg",
+                    avatar_url: avatar_url,
+                    configuration: roverConfig,
+                    parentAnomaly: activePlanet.id ? Number(activePlanet.id) : null,
+                    created_at: new Date(),
+                };
+
+                const { data, error } = await supabase
+                    .from("anomalies")
+                    .insert([anomaly])
+                    .select("id, avatar_url");
+
+                if (error) {
+                    console.error("Error inserting anomaly:", error.message);
+                    throw error;
+                }
+
+                setImagesCollected(true);
+                setRovers(data); // Update rovers state with saved data
+            } catch (error) {
+                console.error("Error saving rover image:", error);
+                alert("Failed to collect and classify the images from your rover.");
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchMarsImages(); // Trigger image fetching on component mount
+    }, [supabase]);
+
+    return (
+        <div className="">
+            {rovers.length > 0 ? (
+                rovers.map((rover) => (
+                    <div key={rover.id} className="text-center col-span-2">
+                        <div className="p-2 max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur bg-opacity-70">
+                            <div className="relative h-64 w-full">
+                                <img
+                                    src={rover.avatar_url}
+                                    alt={`Mars rover image`}
+                                    className="relative z-10 w-full h-full object-contain"
+                                />
+                            </div>
+                            {imagesCollected && (
+                                <ClassificationForm
+                                    anomalyId={rover.id.toString()}
+                                    anomalyType="roverImg"
+                                    missionNumber={1370104}
+                                    assetMentioned={rover.avatar_url}
+                                    originatingStructure={rover.id}
+                                    structureItemId={3102}
+                                />
+                            )}
+                        </div>
+                    </div>
+                ))
+            ) : (
+                <></>
             )}
         </div>
     );

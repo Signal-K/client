@@ -12,7 +12,7 @@ export function PlanetarySystem() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  const size = 150;
+  const size = 100;
 
   const orbits = [
     { radius: size * 0.25, duration: 20 },  // Updated duration

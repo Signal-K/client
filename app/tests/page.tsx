@@ -6,11 +6,13 @@ import ChooseClassificationStarter from "../components/(scenes)/chapters/one/Cho
 import { AllStructures } from "../components/(structures)/Structures";
 import ClassificationSummary from "../components/(anomalies)/(planets)/classificationsGenerated";
 import StructureRepair from "../components/(structures)/Config/RepairStructure";
+import ChapterOneIntroduction from "../components/(scenes)/chapters/one/ChapterOneIntro";
 
 export default function TestPage() {
     return (
         <div>
             <ClassificationSummary />
+            <ChapterOneIntroduction />
             <ChooseClassificationStarter />
             {/* <AllStructures /> */}
         </div>

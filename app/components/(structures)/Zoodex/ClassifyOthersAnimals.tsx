@@ -39,13 +39,13 @@ export function StarterZoodex() {
 
                 if (anomalyError) {
                     throw anomalyError;
-                }
+                };
 
                 if (!anomalyData) {
                     setAnomaly(null);
                     setLoading(false);
                     return;
-                }
+                };
 
                 const { data: classificationData, error: classificationError } = await supabase
                     .from('classifications')
@@ -56,7 +56,7 @@ export function StarterZoodex() {
 
                 if (classificationError) {
                     throw classificationError;
-                }
+                };
 
                 if (classificationData) {
                     setAnomaly(null);
@@ -64,14 +64,14 @@ export function StarterZoodex() {
                     setAnomaly(anomalyData as Anomaly);
                     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
                     setImageUrl(`${supabaseUrl}/storage/v1/object/public/zoodex/${userChoice}/${anomalyData.id}.jpeg`);
-                }
+                };
             } catch (error: any) {
                 console.error('Error fetching anomaly: ', error.message);
                 setAnomaly(null);
             } finally {
                 setLoading(false);
-            }
-        }
+            };
+        };
 
         fetchAnomaly();
     }, [session, supabase, userChoice, activePlanet]);
@@ -131,7 +131,7 @@ export function StarterZoodex() {
                 <ClassificationForm 
                     anomalyId={anomaly.id.toString()}
                     anomalyType='zoodex-burrowingOwl' 
-                    missionNumber={1370103}     
+                    missionNumber={1370202}     
                     assetMentioned={imageUrl} 
                     structureItemId={3104}
                 />

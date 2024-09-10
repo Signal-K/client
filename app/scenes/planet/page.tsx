@@ -10,6 +10,7 @@ import ChapterOneIntroduction from "@/app/components/(scenes)/chapters/one/Chapt
 import ChooseClassificationStarter from "@/app/components/(scenes)/chapters/one/ChooseClassifications";
 import MissionLog from "@/app/components/(scenes)/(missions)/MissionList";
 import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
+import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
 
 export default function PlanetViewPage() {
     const { activePlanet } = useActivePlanet();
@@ -93,6 +94,7 @@ export default function PlanetViewPage() {
             {/* <div className="hidden lg:block lg:absolute lg:bottom-0 lg:right-0 lg:w-1/3 lg:h-1/3 lg:max-h-[30vh] lg:bg-white lg:z-50">
                 <MissionLog />
             </div> */}
+            <BottomMenuBar onClose={() => null} />
         </div>
     );
 };
