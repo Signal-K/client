@@ -7,7 +7,6 @@ import PlanetViewLayout from "@/app/components/(scenes)/planetScene/layout";
 import StructuresOnPlanet, { ActiveMissionStructures, AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet, StarterMissionStructures } from "@/app/components/(structures)/Structures";
 import { InventoryStructureItem } from "@/types/Items";
 import ChapterOneIntroduction from "@/app/components/(scenes)/chapters/one/ChapterOneIntro";
-import ChooseClassificationStarter from "@/app/components/(scenes)/chapters/one/ChooseClassifications";
 import MissionLog from "@/app/components/(scenes)/(missions)/MissionList";
 import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
 import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
@@ -41,7 +40,7 @@ export default function PlanetViewPage() {
                 console.error('Error checking mission:', error.message);
             } finally {
                 setIsLoading(false);
-            }
+            };
         };
 
         const checkFirstClassificationStatus = async () => {
@@ -61,7 +60,7 @@ export default function PlanetViewPage() {
                 console.error('Error checking mission:', error.message);
             } finally {
                 setIsLoading(false);
-            }
+            };
         };
 
         checkMission();
@@ -70,7 +69,7 @@ export default function PlanetViewPage() {
 
     if (isLoading) {
         return <p>Loading...</p>;
-    }
+    };
 
     if (!hasMission1370201) {
         return (
@@ -79,16 +78,16 @@ export default function PlanetViewPage() {
                 <div><ChapterOneIntroduction /></div>
             </PlanetViewLayout>
         );
-    }
+    };
 
     if (!hasChosenFirstClassification) {
         return (
             <PlanetViewLayout>
                 <div></div>
-                <div><ChooseClassificationStarter /></div>
+                <div><StarterMissionsStats /></div>
             </PlanetViewLayout>
         );
-    }
+    };
 
     return (
         <div className="relative min-h-screen">

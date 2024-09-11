@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { ChevronDown, ChevronUp, CheckCircle, Circle } from 'lucide-react';
+import { useActivePlanet } from '@/context/ActivePlanet';
 
 interface CitizenScienceModule {
   id: number;
@@ -14,15 +15,18 @@ interface CitizenScienceModule {
 }
 
 interface MissionData {
-  mission: number;
-}
+  mission: number; // 1370203
+};
 
 export default function StarterMissionsStats() {
+  const session = useSession();
+  const supabase = useSupabaseClient();
+
+  const { activePlanet } = useActivePlanet();
+
   const [modules, setModules] = useState<CitizenScienceModule[]>([]);
   const [completedMissions, setCompletedMissions] = useState<number[]>([]);
   const [expandedMission, setExpandedMission] = useState<number | null>(null);
-  const session = useSession();
-  const supabase = useSupabaseClient();
 
   useEffect(() => {
     const fetchModules = async () => {
@@ -67,20 +71,111 @@ export default function StarterMissionsStats() {
   const updateActiveMission = async (starterMission: number | undefined) => {
     if (starterMission && session?.user?.id) {
       try {
+        // Check if the user already has the mission with ID 1370203
+        const { data, error } = await supabase
+          .from('missions')
+          .select('*')
+          .eq('user', session.user.id)
+          .eq('mission', starterMission) // Use the selected starter mission instead of hardcoding mission id.
+          .single();
+  
+        if (error && error.code !== 'PGRST116') {
+          throw error;
+        };
+  
+        if (!data) {
+          // If no mission found, insert it
+          const { error: insertError } = await supabase
+            .from('missions')
+            .insert({
+              user: session.user.id,
+              mission: starterMission,
+              time_of_completion: null,
+              configuration: {},
+              rewarded_items: [],
+            });
+  
+          if (insertError) {
+            throw insertError;
+          };
+
+          const { error: insertErrorTwo } = await supabase
+          .from('missions')
+          .insert({
+            user: session.user.id,
+            mission: "1370203",
+            time_of_completion: null,
+            configuration: {},
+            rewarded_items: [],
+          });
+
+          if (insertErrorTwo) {
+            throw insertError;
+          };
+  
+          console.log(`Mission ${starterMission} added to the user's missions.`);
+        } else {
+          console.log(`Mission ${starterMission} already exists for the user.`);
+        }
+  
         // Update the active mission in the user's profile
-        const { error } = await supabase
+        const { error: updateError } = await supabase
           .from('profiles')
           .update({ activeMission: starterMission })
           .eq('id', session.user.id);
-
-        if (error) throw error;
-
+  
+        if (updateError) {
+          throw updateError;
+        }
+  
         console.log(`Active mission updated to: ${starterMission}`);
+  
+        // Fetch the modules after updating the active mission
+        const res = await fetch('/api/citizen/modules');
+        const modules = await res.json();
+  
+        // Find the module matching the selected starterMission
+        const activeModule = modules.find((module: CitizenScienceModule) => module.starterMission === starterMission);
+  
+        if (activeModule) {
+          // Check if the structure is already in the user's inventory
+          const { data: inventoryData, error: inventoryError } = await supabase
+            .from('inventory')
+            .select('*')
+            .eq('anomaly', activePlanet.id) // Check based on active planet and user
+            .eq('owner', session.user.id)
+            .eq('item', activeModule.structure);
+  
+          if (inventoryError) {
+            throw inventoryError;
+          };
+  
+          if (inventoryData.length > 0) {
+            console.log('Inventory items found:', inventoryData);
+          } else {
+            // No inventory items found, insert the new structure
+            const { error: insertInventoryError } = await supabase
+              .from('inventory')
+              .insert({
+                item: activeModule.structure,  // Insert the structure from the selected module
+                owner: session.user.id,
+                anomaly: activePlanet.id, // Active planet's id
+                quantity: 1,  // Default to 1 for now
+                time_of_deploy: new Date(),
+              });
+  
+            if (insertInventoryError) {
+              throw insertInventoryError;
+            };
+  
+            console.log(`Inventory item ${activeModule.structure} added successfully.`);
+          };
+        };
       } catch (error) {
-        console.error('Error updating active mission:', error);
-      }
-    }
-  };
+        console.error('Error updating active mission or inventory:', error);
+      };
+    };
+  };  
 
   const sortedModules = [...modules].sort((a, b) => {
     const aCompleted = isMissionCompleted(a.starterMission);
