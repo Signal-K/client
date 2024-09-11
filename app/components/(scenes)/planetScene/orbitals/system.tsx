@@ -15,9 +15,9 @@ export function PlanetarySystem() {
   const size = 100;
 
   const orbits = [
-    { radius: size * 0.25, duration: 20 },  // Updated duration
-    { radius: size * 0.35, duration: 40 },  // Updated duration
-    { radius: size * 0.45, duration: 55 }   // Updated duration
+    { radius: size * 0.25, duration: 20 },  
+    { radius: size * 0.35, duration: 40 },  
+    { radius: size * 0.45, duration: 55 }   
   ]
 
   return (

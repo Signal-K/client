@@ -73,8 +73,7 @@ export default function AllAutomatonsOnActivePlanet() {
     }
 
     return (
-        <div>
-            <h1 className="text-xl font-bold mb-4">Automatons on {activePlanet?.content}</h1>
+        <div className="p-3">
             <div className="grid grid-cols-3 gap-4">
                 {automatons.map((automaton) => (
                     <div key={automaton.id} className="flex flex-col items-center">
@@ -83,7 +82,6 @@ export default function AllAutomatonsOnActivePlanet() {
                             alt={`Automaton ${automaton.id}`} 
                             className="w-16 h-16 object-cover" 
                         />
-                        <p className="text-sm text-center mt-2">{`ID: ${automaton.id}`}</p>
                     </div>
                 ))}
             </div>

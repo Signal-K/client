@@ -48,16 +48,15 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
 
     return (
         <div className="min-h-screen w-full flex flex-col">
+            <video
+                className="absolute inset-0 w-full h-full object-cover"
+                src="/assets/Backdrops/View.mp4"
+                autoPlay
+                loop
+                muted
+            />
             <Header />
-            {/* Video Background */}
             <div className="relative flex flex-1">
-                <video
-                    className="absolute inset-0 w-full h-full object-cover"
-                    src="/assets/Backdrops/View.mp4"
-                    autoPlay
-                    loop
-                    muted
-                />
                 <div className="relative flex flex-col flex-1">
                     {children.slice(0, 2).map((child, index) => (
                         <div
