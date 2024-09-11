@@ -7,7 +7,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 interface ClassificationCount {
     classificationType: string;
     count: number;
-};
+}
 
 export default function ClassificationSummary() {
     const supabase = useSupabaseClient();
@@ -75,33 +75,35 @@ export default function ClassificationSummary() {
     }, [session?.user?.id, activePlanet?.id, supabase]);
 
     return (
-        <div className="p-4 space-y-4">
-            <h2 className="text-lg font-bold text-[#81A1C1]">Your Classification Summary</h2>
-            <div>
-                <h3 className="text-md font-semibold text-[#88C0D0]">Classifications by Type:</h3>
-                <ul>
-                    {classificationCounts.length > 0 ? (
-                        classificationCounts.map(({ classificationType, count }) => (
-                            <li key={classificationType} className="text-[#E5E9F0]">
-                                <strong className="text-[#BF616A]">{classificationType}:</strong> {count}
-                            </li>
-                        ))
-                    ) : (
-                        <p className="text-[#E5E9F0]">No classifications made yet.</p>
-                    )}
-                </ul>
-            </div>
-            <div>
-                <h3 className="text-md font-semibold text-[#88C0D0]">Classifications for Active Planet:</h3>
-                <p className="text-[#E5E9F0]">
-                    <strong className="text-[#BF616A]">Total:</strong> {planetClassificationCount}
-                </p>
-            </div>
-            <div>
-                <h3 className="text-md font-semibold text-[#88C0D0]">Classifications Including Active Planet:</h3>
-                <p className="text-[#E5E9F0]">
-                    <strong className="text-[#BF616A]">Total:</strong> {activePlanetClassificationCount}
-                </p>
+        <div className="p-4 max-w-lg mx-auto bg-gray-800 text-white rounded-md">
+            <h2 className="text-lg font-bold text-[#5FCBC3] mb-4">Your Classification Summary</h2>
+            <div className="space-y-4">
+                <div>
+                    <h3 className="text-md font-semibold text-[#88C0D0]">Classifications by Type:</h3>
+                    <ul className="space-y-2">
+                        {classificationCounts.length > 0 ? (
+                            classificationCounts.map(({ classificationType, count }) => (
+                                <li key={classificationType} className="text-[#E5E9F0]">
+                                    <strong className="text-[#BF616A]">{classificationType}:</strong> {count}
+                                </li>
+                            ))
+                        ) : (
+                            <p className="text-[#E5E9F0]">No classifications made yet.</p>
+                        )}
+                    </ul>
+                </div>
+                <div>
+                    <h3 className="text-md font-semibold text-[#88C0D0]">Classifications for Active Planet:</h3>
+                    <p className="text-[#E5E9F0]">
+                        <strong className="text-[#BF616A]">Total:</strong> {planetClassificationCount}
+                    </p>
+                </div>
+                <div>
+                    <h3 className="text-md font-semibold text-[#88C0D0]">Classifications Including Active Planet:</h3>
+                    <p className="text-[#E5E9F0]">
+                        <strong className="text-[#BF616A]">Total:</strong> {activePlanetClassificationCount}
+                    </p>
+                </div>
             </div>
         </div>
     );

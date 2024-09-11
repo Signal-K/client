@@ -7,7 +7,7 @@ import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Trans
 import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
 import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
 import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PenBox, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/app/components/(structures)/Auto/AutomatonClassificationShell";
@@ -78,11 +78,17 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <AnomalyRoverPhoto />,
           sizePercentage: 73,
         },
+        // {
+        //   icon: <BookCopy className="w-6 h-6 text-[#5e81ac]" />, text: `Tutorial`,
+        //   dynamicComponent: <p></p>,
+        //   sizePercentage: 60,
+        //   showInNoModal: false,
+        // },
         {
-          icon: <BookCopy className="w-6 h-6 text-[#5e81ac]" />, text: `Tutorial`,
-          dynamicComponent: <p></p>,
-          sizePercentage: 60,
-          showInNoModal: false,
+          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="roverImg" />,
+          sizePercentage: 75,
         },
       ],
     },
@@ -122,11 +128,10 @@ export const StructuresConfig: StructureConfig = {
           text: "Cloud/Weather Data (LOCKED)",
         },
         {
-          icon: <BookDashedIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Your planet discoveries",
-          // dynamicComponent: <ClassificationViewer classificationType="planet" />,
+          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="planet" />,
           sizePercentage: 75,
-          showInNoModal: true, // This would be false for things like tutorials
         },
       ],
     },
@@ -145,6 +150,12 @@ export const StructuresConfig: StructureConfig = {
           text: "Search your animals",
           dynamicComponent: <StarterZoodex />,
           sizePercentage: 60,
+        },
+        {
+          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="zoodex-burrowingOwl" />,
+          sizePercentage: 75,
         },
       ],
     },
@@ -166,6 +177,12 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <StarterLidar />,
           sizePercentage: 60,
         },
-      ]
+        {
+          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="cloud" />,
+          sizePercentage: 75,
+        },
+      ],
     }
 };

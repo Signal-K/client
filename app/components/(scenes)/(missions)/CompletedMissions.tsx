@@ -6,7 +6,7 @@ import { ChevronDown, ChevronUp, CheckCircle, Circle } from 'lucide-react';
 
 interface CitizenScienceModule {
   id: number;
-  name: string;
+  name: string; 
   level?: number;
   starterMission?: number;
   structure: number;
