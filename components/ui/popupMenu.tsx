@@ -1,20 +1,64 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Globe, Rocket, Star, Zap } from 'lucide-react'
-import { ClassificationViewerAll } from '@/app/components/(create)/(classifications)/YourClassifications'
-import MineralsInventoryGrid from '@/app/components/(inventory)/mineralsPanel'
-import StarterMissionsStats from '@/app/components/(scenes)/(missions)/CompletedMissions'
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Globe, Rocket, Star, Zap } from 'lucide-react';
+import { ClassificationViewerAll } from '@/app/components/(create)/(classifications)/YourClassifications';
+import MineralsInventoryGrid from '@/app/components/(inventory)/mineralsPanel';
+import StarterMissionsStats from '@/app/components/(scenes)/(missions)/CompletedMissions';
+import { CaptnCosmosGuideModal } from '@/app/components/(dialogue)/guideBot';
+
+interface TutorialMessageProps {
+  isExpanded: boolean;
+  toggleExpand: () => void;
+};
+
+const TutorialMessage: React.FC<TutorialMessageProps> = ({ isExpanded, toggleExpand }) => (
+  <motion.div
+    initial={{ width: '52px', height: '56px' }}
+    animate={{ 
+      width: isExpanded ? '450px' : '52px',
+      height: isExpanded ? 'auto' : '56px',
+      minHeight: '56px'
+    }}
+    transition={{ duration: 0.3 }}
+    className="absolute bottom-0 right-16 bg-indigo-800 rounded-l-2xl overflow-hidden cursor-pointer"
+    onClick={toggleExpand}
+  >
+    <div className="flex items-start p-2">
+      <div className="w-10 h-10 rounded-full bg-indigo-600 flex-shrink-0 flex items-center justify-center">
+        <img src="/placeholder.svg?height=40&width=40" alt="AI Avatar" className="rounded-full" />
+      </div>
+      <div className={`ml-3 text-white ${isExpanded ? 'block' : 'hidden'}`}>
+        <p className="font-bold text-sm">AI Guide</p>
+        <p className="text-xs mt-1">
+          Welcome to the Cosmic Menu! Click the globe to explore the universe. 
+          Here you can discover new worlds, harness cosmic energy, and embark on 
+          interstellar adventures. Each icon represents a different aspect of your 
+          cosmic journey. Feel free to explore and let me know if you have any questions!
+        </p>
+      </div>
+      <div className="ml-auto">
+        {isExpanded ? (
+          <ChevronLeft className="w-6 h-6 text-white" />
+        ) : (
+          <ChevronRight className="w-6 h-6 text-white" />
+        )}
+      </div>
+    </div>
+  </motion.div>
+);
 
 export function SciFiPopupMenu() {
-  const [isOpen, setIsOpen] = useState(false);
-
   const [showClassifications, setShowClassifications] = useState(false);
   const [showMiningInventory, setShowMiningInventory] = useState(false);
   const [showMissionList, setShowMissionList] = useState(false);
+  
+  const [isOpen, setIsOpen] = useState(false);
+  const [isTutorialExpanded, setIsTutorialExpanded] = useState(false)
 
   const toggleMenu = () => setIsOpen(!isOpen);
+  const toggleTutorial = () => setIsTutorialExpanded(!isTutorialExpanded)
 
   const menuItems = [
     { icon: <Rocket className="w-6 h-6" />, label: 'Classifications', action: () => setShowClassifications(true), },
@@ -68,6 +112,36 @@ export function SciFiPopupMenu() {
           </motion.div>
         )}
       </AnimatePresence>
+      <motion.button
+        onClick={toggleMenu}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        className="bg-purple-600 text-white p-4 rounded-full shadow-lg focus:outline-none"
+      >
+        <Globe className="w-6 h-6" />
+      </motion.button>
+
+      {/* Guide Modal */}
+      <AnimatePresence>
+        {/* {showGuideModal && (
+          <motion.div
+            initial={{ height: 50, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 50, opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed bottom-0 right-8 bg-gray-900 text-white p-4 rounded-t-lg shadow-lg"
+          >
+            <CaptnCosmosGuideModal />
+            <button
+              className="mt-4 px-4 py-2 bg-[#5FCBC3] text-white rounded-md"
+              // onClick={() => setShowGuideModal(false)}
+            >
+              Close
+            </button>
+          </motion.div>
+        )} */}
+      </AnimatePresence>
+      <CaptnCosmosGuideModal isExpanded={isTutorialExpanded} toggleExpand={toggleTutorial} />
       <motion.button
         onClick={toggleMenu}
         whileHover={{ scale: 1.1 }}

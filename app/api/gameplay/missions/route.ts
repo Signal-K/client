@@ -63,21 +63,6 @@ const missions: Mission[] = [
         classificationModule: 'Mining' // Update this
     },
     {
-        id: 1370202, 
-        name: "First animal classification", 
-        description: '', 
-        chapter: "1", 
-        classificationModule: "Zoodex",
-        component: MineralDepositsNoAction,
-    },
-    {
-        id: 1370299,  // -> Edit the id so that it's the last value for mission group 2
-        name: "Find new planet", 
-        chapter: '1', 
-        description: "Now you're ready to travel to other planets", 
-        classificationModule: "Telescope"
-    },
-    {
         id: 1370203,
         name: 'Choose your first classification',
         description: 'Fill me',
@@ -93,18 +78,53 @@ const missions: Mission[] = [
     },
     {
         id: 1370205,
+        name: 'Go mining - first iron',
+        classificationModule: 'Mining',
+        chapter: '1',
+    },
+    {
+        id: 1370206,
         name: 'Repair the research structure',
         description: 'As part of Chapter 1', // Also creates it
         classificationModule: 'General',
         chapter: '1',
     },
     {
-        id: 1370206,
+        id: 1370207,
         name: 'Research a new technology',
         classificationModule: 'General',
         chapter: '1',
     },
+    {
+        id: 1370208,
+        name: 'Second classification (different structure)',
+        classificationModule: 'General',
+        chapter: '1',
+    },
+    {
+        id: 1370209,
+        name: 'Transition to chapter 2',
+        chapter: '1',
+    },
 
+
+
+
+    {
+        id: 1370202, 
+        name: "First animal classification", 
+        description: '', 
+        chapter: "1", 
+        classificationModule: "Zoodex",
+        component: MineralDepositsNoAction,
+    },
+    {
+        id: 1370299,  // -> Edit the id so that it's the last value for mission group 2
+        name: "Find new planet", 
+        chapter: '1', 
+        description: "Now you're ready to travel to other planets", 
+        classificationModule: "Telescope"
+    },
     // Telescope mission group (t.m.) (MG-T-##)
     {
         id: 1372002, name: "Repair your telescope", classificationModule: "Telescope", chapter: '1',
