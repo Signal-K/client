@@ -7,7 +7,7 @@ export interface CitizenScienceModule {
   starterMission?: number;
   structure: number;
   description?: string;
-}
+};
 
 export interface Mission {
   id: number;
@@ -18,7 +18,7 @@ export interface Mission {
   classificationType?: string;
   structure: number;
   chapter?: string;
-}
+};
 
 const modules: CitizenScienceModule[] = [
   {

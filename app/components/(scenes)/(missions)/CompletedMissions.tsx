@@ -54,7 +54,7 @@ export default function StarterMissionsStats() {
         setCompletedMissions(missionIds);
       } catch (error) {
         console.error('Error fetching completed missions:', error);
-      }
+      };
     };
 
     const fetchActiveMission = async () => {
