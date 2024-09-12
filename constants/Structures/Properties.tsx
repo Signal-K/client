@@ -7,7 +7,7 @@ import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Trans
 import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
 import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
 import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PenBox, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookAIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PenBox, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonalIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/app/components/(structures)/Auto/AutomatonClassificationShell";
@@ -184,5 +184,27 @@ export const StructuresConfig: StructureConfig = {
           sizePercentage: 75,
         },
       ],
-    }
+    },
+    3106: {
+      name: "Research station",
+      labels: [
+        {
+          text: "Technology", variant: "destructive",
+        },
+        {
+          text: "Alien artifacts", variant: "secondary",
+        },
+      ],
+      imageSrc: '/assets/Items/Research.png',
+      buttons: [
+        {
+          icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Research technology",
+        },
+        {
+          icon: <BookAIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Decrypt manuscripts",
+        },
+      ],
+    },
 };

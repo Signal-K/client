@@ -110,7 +110,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     const [uses, setUses] = useState<number | null>(null);
     const [postSubmitted, setPostSubmitted] = useState<boolean>(false);
 
+    // To check if it's the user's first time doing a classification (of their own accord/choice)
+    const [hasMission1370204, setHasMission1370204] = useState(false);
+
     const { userProfile } = useProfileContext();
+    const [loading, setIsLoading] = useState(true);
 
     const classificationOptions = (() => {
         switch (anomalyType) {
@@ -148,8 +152,29 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 console.error("Unexpected error: ", error);
             };
         };
+
+        const checkMission = async () => {
+            if (!session?.user) return;
+
+            try {
+                const { data: missions, error } = await supabase
+                    .from('missions')
+                    .select('mission')
+                    .eq('user', session.user.id)
+                    .eq('mission', 1370201);
+
+                if (error) throw error;
+
+                setHasMission1370204(missions?.length > 0);
+            } catch (error: any) {
+                console.error('Error checking mission:', error.message);
+            } finally {
+                setIsLoading(false);
+            };
+        };
         
         fetchUserProfile();
+        checkMission();
     }, [session, supabase]);
 
     useEffect(() => {
@@ -272,12 +297,24 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 setSelectedOptions({});
                 setUploads([]);
                 setPostSubmitted(true);
-            }
+            };
+
+            if (!hasMission1370204) {
+                const { error: insertError } = await supabase
+                    .from('missions')
+                    .insert({
+                    user: session?.user?.id,
+                    mission: '1370204',
+                    time_of_completion: null,
+                    configuration: {},
+                    rewarded_items: [],
+                });
+            };
     
             await handleMissionComplete();
         } catch (error) {
             console.error("Unexpected error:", error);
-        }
+        };
     };
 
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -332,7 +369,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                         ))}
                     </div>
                     <div className="flex flex-col gap-2 w-2/3">
-                        {Object.keys(selectedOptions).length > 0 && (
+                        {/* {Object.keys(selectedOptions).length > 0 && ( */}
                             <>
                                 <div className="flex gap-4 mb-4">
                                     <UserAvatarNullUpload
@@ -369,7 +406,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                     <ClassificationOutput configuration={classificationOutput} />
                                 )}
                             </>
-                        )}
                     </div>
                 </div>
             )}

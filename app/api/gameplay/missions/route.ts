@@ -84,6 +84,33 @@ const missions: Mission[] = [
         classificationModule: 'General',
         chapter: '1'
     },
+    {
+        id: 1370204,
+        name: 'Complete your first (chosen) classification',
+        description: 'As part of Chapter 1',
+        classificationModule: 'General',
+        chapter: '1'
+    },
+    {
+        id: 1370204,
+        name: 'Complete your first (chosen) classification',
+        description: 'As part of Chapter 1',
+        classificationModule: 'General',
+        chapter: '1'
+    },
+    {
+        id: 1370205,
+        name: 'Repair the research structure',
+        description: 'As part of Chapter 1', // Also creates it
+        classificationModule: 'General',
+        chapter: '1',
+    },
+    {
+        id: 1370206,
+        name: 'Research a new technology',
+        classificationModule: 'General',
+        chapter: '1',
+    },
 
     // Telescope mission group (t.m.) (MG-T-##)
     {
@@ -107,8 +134,51 @@ const missions: Mission[] = [
 
     // NASA/APPEEARS Roover data | NASA API (MG-NA-##)
     { // This is your first
-        id: 13714101, name: "Find some rover pics", classificationModule: 'Automaton Camera', chapter: '1',
+        id: 13714101, name: "Find some rover pics", classificationModule: 'AutomatonCamera', chapter: '1',
     },
+
+
+
+    // Research topics
+    // Chapter 1
+    {
+        id: 1800001,
+        name: "Research telescope",
+        classificationModule: 'Telescope',
+        chapter: '1',
+    },
+    {
+        id: 1800002,
+        name: "Research LIDAR",
+        classificationModule: 'LIDAR',
+        chapter: '1',
+    },
+    {
+        id: 1800003,
+        name: "Research Zoodex",
+        classificationModule: 'Zoodex',
+        chapter: '1',
+    },
+    {
+        id: 1800004,
+        name: "Research rover photo module",
+        classificationModule: 'AutomatonCamera',
+        chapter: '1',
+    },
+
+    // Chapter 2
+    {
+        id: 1800005,
+        name: "Ability to upload photos to Zoodex",
+        classificationModule: 'Zoodex',
+        chapter: '2',
+    },
+    {
+        id: 1800006,
+        name: "Phase folded graphs",
+        classificationModule: 'Telescope',
+        chapter: '2',
+    }
 ];
 
 export async function GET(req: NextRequest) {

@@ -12,6 +12,7 @@ import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/
 import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
 import StarterMissionsStats from "@/app/components/(scenes)/(missions)/CompletedMissions";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
+import { SciFiPopupMenu } from "@/components/ui/popupMenu";
 
 export default function PlanetViewPage() {
     const { activePlanet } = useActivePlanet();
@@ -230,6 +231,7 @@ function PlanetStructures() {
                     {/* <StarterMissionsStats /> */}
                 </div>
                 <AllAutomatonsOnActivePlanet />
+                <SciFiPopupMenu />
             </div>
         </PlanetViewLayout>
     );

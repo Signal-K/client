@@ -221,7 +221,7 @@ export function StarterTelescope() {
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
             <div className="p-4 rounded-md relative w-full">
-                <h3>{anomaly.content}</h3>
+                {/* <h3>{anomaly.content}</h3> */}
                 {anomaly.avatar_url && (
                     <img src={anomaly.avatar_url} alt="Anomaly Avatar" className='w-24 h-24' />
                 )}
