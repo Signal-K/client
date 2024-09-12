@@ -161,7 +161,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     .from('missions')
                     .select('mission')
                     .eq('user', session.user.id)
-                    .eq('mission', 1370201);
+                    .eq('mission', 1370204);
 
                 if (error) throw error;
 
@@ -291,14 +291,23 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 alert("Failed to create classification. Please try again.");
                 return;
             } else {
-                // alert("Post created");
                 setClassificationOutput(classificationConfiguration);
                 setContent('');
                 setSelectedOptions({});
                 setUploads([]);
                 setPostSubmitted(true);
-            };
-
+            }
+    
+            // Reset user's active mission to null after classification is created
+            const { error: resetMissionError } = await supabase
+                .from('profiles')
+                .update({ activeMission: null })
+                .eq('id', session?.user?.id);
+    
+            if (resetMissionError) {
+                console.error("Error resetting active mission:", resetMissionError.message);
+            }
+    
             if (!hasMission1370204) {
                 const { error: insertError } = await supabase
                     .from('missions')
@@ -314,8 +323,9 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             await handleMissionComplete();
         } catch (error) {
             console.error("Unexpected error:", error);
-        };
+        }
     };
+    
 
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;

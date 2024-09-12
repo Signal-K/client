@@ -144,6 +144,14 @@ export const StructuresConfig: StructureConfig = {
         },
       ],
       imageSrc: '/assets/Items/Zoodex.png',
+      actions: [
+        {
+          icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
+          , text: 'Durability/Repair'
+          , dynamicComponent: <StructureRepair inventoryId={3104} />,
+          sizePercentage: 40,
+        },
+      ],
       buttons: [
         {
           icon: <DogIcon className="w-6 h-6 text-[#5e81ac]" />,

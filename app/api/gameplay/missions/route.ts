@@ -92,13 +92,6 @@ const missions: Mission[] = [
         chapter: '1'
     },
     {
-        id: 1370204,
-        name: 'Complete your first (chosen) classification',
-        description: 'As part of Chapter 1',
-        classificationModule: 'General',
-        chapter: '1'
-    },
-    {
         id: 1370205,
         name: 'Repair the research structure',
         description: 'As part of Chapter 1', // Also creates it

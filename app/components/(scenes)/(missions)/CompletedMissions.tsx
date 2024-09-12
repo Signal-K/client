@@ -15,18 +15,19 @@ interface CitizenScienceModule {
 }
 
 interface MissionData {
-  mission: number; // 1370203
-};
+  mission: number;
+}
 
 export default function StarterMissionsStats() {
   const session = useSession();
   const supabase = useSupabaseClient();
-
   const { activePlanet } = useActivePlanet();
 
   const [modules, setModules] = useState<CitizenScienceModule[]>([]);
   const [completedMissions, setCompletedMissions] = useState<number[]>([]);
   const [expandedMission, setExpandedMission] = useState<number | null>(null);
+  const [activeMission, setActiveMission] = useState<number | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // To display error messages
 
   useEffect(() => {
     const fetchModules = async () => {
@@ -56,8 +57,26 @@ export default function StarterMissionsStats() {
       }
     };
 
+    const fetchActiveMission = async () => {
+      if (!session) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('activeMission')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error) throw error;
+        setActiveMission(data.activeMission);
+      } catch (error) {
+        console.error('Error fetching active mission:', error);
+      }
+    };
+
     fetchModules();
     fetchCompletedMissions();
+    fetchActiveMission();
   }, [session, supabase]);
 
   const isMissionCompleted = (starterMission: number | undefined) => {
@@ -69,113 +88,70 @@ export default function StarterMissionsStats() {
   };
 
   const updateActiveMission = async (starterMission: number | undefined) => {
-    if (starterMission && session?.user?.id) {
-      try {
-        // Check if the user already has the mission with ID 1370203
-        const { data, error } = await supabase
-          .from('missions')
-          .select('*')
-          .eq('user', session.user.id)
-          .eq('mission', starterMission) // Use the selected starter mission instead of hardcoding mission id.
-          .single();
-  
-        if (error && error.code !== 'PGRST116') {
-          throw error;
-        };
-  
-        if (!data) {
-          // If no mission found, insert it
-          const { error: insertError } = await supabase
-            .from('missions')
-            .insert({
-              user: session.user.id,
-              mission: starterMission,
-              time_of_completion: null,
-              configuration: {},
-              rewarded_items: [],
-            });
-  
-          if (insertError) {
-            throw insertError;
-          };
+    if (!starterMission || !session?.user?.id) return;
 
-          const { error: insertErrorTwo } = await supabase
+    try {
+      // Insert the starter mission for the user
+      const { error: insertError } = await supabase
+        .from('missions')
+        .insert({
+          user: session.user.id,
+          mission: starterMission,
+          time_of_completion: null,
+          configuration: {},
+          rewarded_items: [],
+        });
+
+      if (insertError) throw insertError;
+
+      // Assign mission 1370203 to the user if they don't have it
+      const { data: mission1370203, error: mission1370203Error } = await supabase
+        .from('missions')
+        .select('mission')
+        .eq('user', session.user.id)
+        .eq('mission', 1370203)
+        .single();
+
+      if (!mission1370203 && mission1370203Error?.code === 'PGRST116') {
+        // Insert mission 1370203
+        const { error: insertMission1370203Error } = await supabase
           .from('missions')
           .insert({
             user: session.user.id,
-            mission: "1370203",
+            mission: 1370203,
             time_of_completion: null,
             configuration: {},
             rewarded_items: [],
           });
 
-          if (insertErrorTwo) {
-            throw insertError;
-          };
-  
-          console.log(`Mission ${starterMission} added to the user's missions.`);
-        } else {
-          console.log(`Mission ${starterMission} already exists for the user.`);
-        }
-  
-        // Update the active mission in the user's profile
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ activeMission: starterMission })
-          .eq('id', session.user.id);
-  
-        if (updateError) {
-          throw updateError;
-        }
-  
-        console.log(`Active mission updated to: ${starterMission}`);
-  
-        // Fetch the modules after updating the active mission
-        const res = await fetch('/api/citizen/modules');
-        const modules = await res.json();
-  
-        // Find the module matching the selected starterMission
-        const activeModule = modules.find((module: CitizenScienceModule) => module.starterMission === starterMission);
-  
-        if (activeModule) {
-          // Check if the structure is already in the user's inventory
-          const { data: inventoryData, error: inventoryError } = await supabase
-            .from('inventory')
-            .select('*')
-            .eq('anomaly', activePlanet.id) // Check based on active planet and user
-            .eq('owner', session.user.id)
-            .eq('item', activeModule.structure);
-  
-          if (inventoryError) {
-            throw inventoryError;
-          };
-  
-          if (inventoryData.length > 0) {
-            console.log('Inventory items found:', inventoryData);
-          } else {
-            // No inventory items found, insert the new structure
-            const { error: insertInventoryError } = await supabase
-              .from('inventory')
-              .insert({
-                item: activeModule.structure,  // Insert the structure from the selected module
-                owner: session.user.id,
-                anomaly: activePlanet.id, // Active planet's id
-                quantity: 1,  // Default to 1 for now
-                time_of_deploy: new Date(),
-              });
-  
-            if (insertInventoryError) {
-              throw insertInventoryError;
-            };
-  
-            console.log(`Inventory item ${activeModule.structure} added successfully.`);
-          };
-        };
-      } catch (error) {
-        console.error('Error updating active mission or inventory:', error);
-      };
-    };
-  };  
+        if (insertMission1370203Error) throw insertMission1370203Error;
+      }
+
+      // Update the active mission in the user's profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ activeMission: starterMission })
+        .eq('id', session.user.id);
+
+      if (updateError) throw updateError;
+
+      setActiveMission(starterMission);
+      setErrorMessage(null); // Clear any previous errors
+      console.log(`Active mission updated to: ${starterMission}`);
+    } catch (error) {
+      console.error('Error updating active mission:', error);
+    }
+  };
+
+  const handleSetActiveMission = (starterMission: number | undefined) => {
+    // If the user already has an active mission, show the error message
+    if (activeMission) {
+      setErrorMessage("You already have an active mission. You must complete or cancel it before starting a new one.");
+    } else {
+      // Otherwise, update the active mission
+      updateActiveMission(starterMission);
+    }
+  };
 
   const sortedModules = [...modules].sort((a, b) => {
     const aCompleted = isMissionCompleted(a.starterMission);
@@ -184,9 +160,17 @@ export default function StarterMissionsStats() {
   });
 
   return (
-    <div className=" flex items-center justify-center p-4">
+    <div className="flex items-center justify-center p-4">
       <div className="bg-[#253B4A] rounded-lg shadow-xl max-w-md w-full">
         <h2 className="text-2xl font-bold text-[#5FCBC3] p-4 border-b border-[#5FCBC3]">Mission Log</h2>
+        
+        {/* Display the error message, if any */}
+        {errorMessage && (
+          <div className="text-red-500 text-center mb-4">
+            {errorMessage}
+          </div>
+        )}
+
         <ul className="divide-y divide-[#5FCBC3]">
           {sortedModules.map((module) => (
             <li key={module.id} className="p-4">
@@ -213,7 +197,7 @@ export default function StarterMissionsStats() {
                   <p className="text-[#D689E3] text-sm">{module.description}</p>
                   <button
                     className="mt-2 px-4 py-2 bg-[#5FCBC3] text-white text-sm rounded-md"
-                    onClick={() => updateActiveMission(module.starterMission)}
+                    onClick={() => handleSetActiveMission(module.starterMission)}
                   >
                     Set Active Mission
                   </button>

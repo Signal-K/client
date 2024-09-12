@@ -55,7 +55,7 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
                 loop
                 muted
             />
-            <Header />
+            {/* <Header /> */}
             <div className="relative flex flex-1">
                 <div className="relative flex flex-col flex-1">
                     {children.slice(0, 2).map((child, index) => (

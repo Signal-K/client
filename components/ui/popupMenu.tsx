@@ -3,17 +3,24 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Globe, Rocket, Star, Zap } from 'lucide-react'
+import { ClassificationViewerAll } from '@/app/components/(create)/(classifications)/YourClassifications'
+import MineralsInventoryGrid from '@/app/components/(inventory)/mineralsPanel'
+import StarterMissionsStats from '@/app/components/(scenes)/(missions)/CompletedMissions'
 
 export function SciFiPopupMenu() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = () => setIsOpen(!isOpen)
+  const [showClassifications, setShowClassifications] = useState(false);
+  const [showMiningInventory, setShowMiningInventory] = useState(false);
+  const [showMissionList, setShowMissionList] = useState(false);
+
+  const toggleMenu = () => setIsOpen(!isOpen);
 
   const menuItems = [
-    { icon: <Rocket className="w-6 h-6" />, label: 'Explore' },
-    { icon: <Star className="w-6 h-6" />, label: 'Discover' },
-    { icon: <Zap className="w-6 h-6" />, label: 'Energy' },
-  ]
+    { icon: <Rocket className="w-6 h-6" />, label: 'Classifications', action: () => setShowClassifications(true), },
+    { icon: <Star className="w-6 h-6" />, label: 'Inventory', action: () => setShowMiningInventory(true), },
+    { icon: <Zap className="w-6 h-6" />, label: 'Missions', action: () => setShowMissionList(true), },
+  ];
 
   return (
     <div className="fixed bottom-8 right-8">
@@ -49,7 +56,8 @@ export function SciFiPopupMenu() {
                     initial={{ x: 50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-center space-x-2 text-white"
+                    className="flex items-center space-x-2 text-white cursor-pointer"
+                    onClick={item.action}
                   >
                     {item.icon}
                     <span>{item.label}</span>
@@ -68,6 +76,48 @@ export function SciFiPopupMenu() {
       >
         <Globe className="w-6 h-6" />
       </motion.button>
+
+      {showClassifications && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-gray-900 p-6 rounded-lg max-w-lg w-full">
+            <ClassificationViewerAll />
+            <button
+              className="mt-4 px-4 py-2 bg-[#5FCBC3] text-white rounded-md"
+              onClick={() => setShowClassifications(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showMiningInventory && (
+        <div className="fixed inset-0 bg-opacity-30 flex items-center justify-center">
+          <div className="bg-gray-50 p-6 rounded-lg max-w-lg w-full">
+            <MineralsInventoryGrid />
+            <button
+              className="mt-4 px-4 py-2 bg-[#5FCBC3] text-white rounded-md"
+              onClick={() => setShowMiningInventory(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showMissionList && (
+        <div className="fixed inset-0 bg-red-700 bg-opacity-50 flex items-center justify-center">
+          <div className="p-6 rounded-lg max-w-lg w-full">
+            <StarterMissionsStats />
+            <button
+              className="mt-4 px-4 py-2 bg-[#5FCBC3] text-white rounded-md"
+              onClick={() => setShowMissionList(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
-}
+};
