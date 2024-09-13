@@ -114,4 +114,4 @@ const MineralsInventoryGrid = () => {
   );
 };
 
-export default MineralsInventoryGrid;
+export default MineralsInventoryGrid; 

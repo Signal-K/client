@@ -91,7 +91,7 @@ const MineralDeposits: React.FC<{ onSelectDeposit: (deposit: MineralDepositData)
       }
     };
 
-    fetchMineralDeposits();
+    fetchMineralDeposits(); 
     loadInventoryItems();
   }, [activePlanet, session, supabase]);
 

@@ -30,21 +30,29 @@ export const SelectMineralPanel: React.FC<CollectMineralPanelProps> = ({ deposit
     const fetchInventoryData = async () => {
       try {
         const response = await fetch('/api/gameplay/inventory');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
         const inventoryItems: InventoryItem[] = await response.json();
-
+        
         // Find the item corresponding to the deposit
         const item = inventoryItems.find(
           (i) => i.id === parseInt(deposit.mineralconfiguration.mineral, 10)
         );
-
+        
         if (item) {
           setMineralName(item.name);
           setIconUrl(item.icon_url);
+        } else {
+          console.warn("Item not found in inventory");
         }
       } catch (error) {
         console.error("Failed to fetch inventory data:", error);
       }
     };
+    
 
     fetchInventoryData();
   }, [deposit]);

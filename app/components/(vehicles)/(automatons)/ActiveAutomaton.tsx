@@ -44,12 +44,13 @@ export function ActiveAutomatonForMining({
         }
 
         const { data: automatonData, error: automatonError } = await supabase
-          .from("inventory")
-          .select("*")
-          .eq("owner", session.user.id)
-          .eq("item", 23)
-          .eq("anomaly", activePlanet.id)
-          .single();
+        .from("inventory")
+        .select("*")
+        .eq("owner", session.user.id)
+        .eq("item", 23)
+        .eq("anomaly", activePlanet.id)
+        .single();
+      
 
         if (automatonError) {
           throw new Error(
