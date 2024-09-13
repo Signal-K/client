@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState, useCallback } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { format } from 'date-fns';
@@ -12,7 +10,7 @@ interface Classification {
     anomaly: number | null;
     created_at: string;
     media: any[];
-    classificationConfiguration: Record<string, any>; // Updated type to handle JSON data
+    classificationConfiguration: Record<string, any>;
 };
 
 interface Anomaly {
@@ -36,44 +34,44 @@ const ClassificationViewer: React.FC<ClassificationViewerProps> = ({ classificat
     const [showSummary, setShowSummary] = useState<boolean>(false);
 
     const fetchClassifications = useCallback(async () => {
-        if (!classificationType) return;
-
+        if (!classificationType || !session?.user?.id) return;
+    
         setLoading(true);
-
+    
         try {
             // Fetch classifications
             const { data: classificationsData, error: classificationsError } = await supabase
                 .from('classifications')
                 .select('id, content, author, classificationtype, anomaly, created_at, media, classificationConfiguration')
-                .eq('author', session?.user?.id)
+                .eq('author', session.user.id)
                 .eq('classificationtype', classificationType)
                 .range(offset, offset + 4);
-
+    
             if (classificationsError) throw classificationsError;
-
+    
             setClassifications(classificationsData as Classification[]);
-
+    
             // Fetch anomalies
             const { data: anomaliesData, error: anomaliesError } = await supabase
                 .from('anomalies')
                 .select('id, content');
-
+    
             if (anomaliesError) throw anomaliesError;
-
+    
             // Map anomalies for quick lookup
             const anomaliesMap = new Map<number, Anomaly>();
             anomaliesData.forEach(anomaly => {
                 anomaliesMap.set(anomaly.id, anomaly);
             });
-
+    
             setAnomalies(anomaliesMap);
-
+    
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
             setLoading(false);
         }
-    }, [classificationType, offset, supabase]);
+    }, [classificationType, offset, session?.user?.id, supabase]);    
 
     useEffect(() => {
         fetchClassifications();
@@ -157,17 +155,33 @@ const ClassificationViewer: React.FC<ClassificationViewerProps> = ({ classificat
                                 </div>
                                 <div className="mb-4">
                                     {/* Media display */}
-                                    {selectedClassification.media && selectedClassification.media.map((item, index) => (
-                                        <div key={index} className="mb-2">
-                                            {item[1] && (
-                                                <img
-                                                    src={item[1]}
-                                                    alt={`Media ${index}`}
-                                                    className="max-w-full h-auto"
-                                                />
-                                            )}
-                                        </div>
-                                    ))}
+                                    <div>
+                                        <h3 className="text-lg font-semibold">Media Debug Info:</h3>
+                                        <p className="text-gray-300 mb-2">Raw Media Data: {JSON.stringify(selectedClassification.media)}</p>
+                                        {selectedClassification.media && selectedClassification.media.length > 0 && (
+                                            <div>
+                                                {selectedClassification.media.map((item, index) => {
+                                                    // Directly use the URL if it's a string
+                                                    const mediaUrl = typeof item === 'string' ? item : (Array.isArray(item) && typeof item[1] === 'string' ? item[1] : '');
+                                                    return mediaUrl ? (
+                                                        <div key={index} className="mb-2">
+                                                            <img
+                                                                src={mediaUrl}
+                                                                alt={`Media ${index}`}
+                                                                className="max-w-full h-auto"
+                                                            />
+                                                            <p className="text-gray-300">Image URL: {mediaUrl}</p>
+                                                        </div>
+                                                    ) : (
+                                                        <div key={index} className="mb-2 text-red-500">
+                                                            <p>Error loading image URL.</p>
+                                                            <p className="text-gray-300">Raw Data: {JSON.stringify(item)}</p>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="mb-4">
                                     {/* Classification Configuration */}

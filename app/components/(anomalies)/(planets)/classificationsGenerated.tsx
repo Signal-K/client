@@ -1,9 +1,8 @@
-"use client";
+import { useEffect, useState } from 'react';
+import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
+import { useActivePlanet } from '@/context/ActivePlanet';
 
-import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { useActivePlanet } from "@/context/ActivePlanet";
-
+// Define the type for classification count
 interface ClassificationCount {
     classificationType: string;
     count: number;
@@ -74,6 +73,17 @@ export default function ClassificationSummary() {
         fetchClassificationData();
     }, [session?.user?.id, activePlanet?.id, supabase]);
 
+    // Determine the appropriate image number based on activePlanetClassificationCount
+    const getImageNumber = () => {
+        if (activePlanetClassificationCount === 1) return 1;
+        if (activePlanetClassificationCount === 2) return 2;
+        if (activePlanetClassificationCount <= 4) return 3;
+        return 4;
+    };
+
+    const imageNumber = getImageNumber();
+    const imageUrl = `http://127.0.0.1:54321/storage/v1/object/public/anomalies/${activePlanet?.id}/${imageNumber}.png`;
+
     return (
         <div className="p-4 max-w-lg mx-auto bg-gray-800 text-white rounded-md">
             <h2 className="text-lg font-bold text-[#5FCBC3] mb-4">Your Classification Summary</h2>
@@ -103,6 +113,9 @@ export default function ClassificationSummary() {
                     <p className="text-[#E5E9F0]">
                         <strong className="text-[#BF616A]">Total:</strong> {activePlanetClassificationCount}
                     </p>
+                </div>
+                <div>
+                    <img src={imageUrl} alt="Anomaly Illustration" className="w-full h-auto mt-4" />
                 </div>
             </div>
         </div>

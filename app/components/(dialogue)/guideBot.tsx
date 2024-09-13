@@ -41,7 +41,6 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
       }
     };
     fetchMissions();
-    checkAndAddMission();
   }, []);
 
   useEffect(() => {
@@ -156,53 +155,6 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
       setError("Failed to start mission.");
     }
   };
-
-  const checkAndAddMission = useCallback(async () => {
-    if (!session?.user?.id) return;
-
-    try {
-      // Define missions to check
-      const missionsToCheck = [1372001, 13714101, 137121301, 1370202];
-      const missionToAdd = 1370204;
-      console.log("Checking missions...");
-
-      // Check if user has any of the missions to check
-      const { data: completedData, error } = await supabase
-        .from('missions')
-        .select('mission')
-        .eq('user', session.user.id);
-
-      if (error) throw error;
-
-      const completedMissionIds = completedData.map((entry: { mission: number }) => entry.mission);
-      console.log("Completed missions:", completedMissionIds);
-
-      // Check if any of the missionsToCheck are missing
-      const hasRequiredMissions = missionsToCheck.some(missionId => completedMissionIds.includes(missionId));
-      console.log("Has required missions:", hasRequiredMissions);
-
-      if (hasRequiredMissions && !completedMissionIds.includes(missionToAdd)) {
-        // Add mission 1370204
-        const { error: insertError } = await supabase
-          .from('missions')
-          .insert({ user: session.user.id, mission: missionToAdd });
-
-        if (insertError) throw insertError;
-
-        console.log("Mission 1370204 added.");
-      } else {
-        console.log("Mission 1370204 already exists or required missions are not met.");
-      }
-    } catch (error) {
-      console.error("Error checking and adding mission:", error);
-    }
-  }, [session, supabase]);
-
-  useEffect(() => {
-    if (isExpanded) {
-      checkAndAddMission();
-    }
-  }, [isExpanded, checkAndAddMission]);
 
   const nextMission = getNextMission();
 

@@ -118,7 +118,7 @@ export default function DeployRooversInitial() {
             {dialogueStep === 2 && isDeployed && !roverData && (
               <div className="relative p-4 bg-[#2C3A4A] bg-opacity-75 border border-[#85DDA2] rounded-md shadow-md text-lg font-medium text-white">
                 <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
-                Whoa! Now let's analyze your rover photos...
+                Now let's analyze your rover photos...
               </div>
             )}
             {dialogueStep === 3 && roverData && (
