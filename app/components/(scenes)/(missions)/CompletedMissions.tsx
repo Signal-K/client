@@ -54,7 +54,7 @@ export default function StarterMissionsStats() {
         setCompletedMissions(missionIds);
       } catch (error) {
         console.error('Error fetching completed missions:', error);
-      };
+      }
     };
 
     const fetchActiveMission = async () => {
@@ -87,7 +87,44 @@ export default function StarterMissionsStats() {
     setExpandedMission(expandedMission === id ? null : id);
   };
 
-  const updateActiveMission = async (starterMission: number | undefined) => {
+  const createInventoryEntry = async (module: CitizenScienceModule) => {
+    if (!session || !activePlanet) return;
+
+    try {
+      // Check for existing inventory entry
+      const { data: existingEntries, error: checkError } = await supabase
+        .from('inventory')
+        .select('*')
+        .eq('owner', session.user.id)
+        .eq('item', module.structure)
+        .eq('anomaly', activePlanet.id);
+
+      if (checkError) throw checkError;
+
+      if (existingEntries.length === 0) {
+        // Insert new inventory entry
+        const { error: insertError } = await supabase
+          .from('inventory')
+          .insert({
+            owner: session.user.id,
+            item: module.structure,
+            quantity: 1,
+            time_of_deploy: null,
+            anomaly: activePlanet.id,
+            parentItem: null,
+            configurtion: {"Uses": 1},
+          });
+
+        if (insertError) throw insertError;
+
+        console.log(`Inventory entry created for item ${module.structure}.`);
+      }
+    } catch (error) {
+      console.error('Error creating inventory entry:', error);
+    }
+  };
+
+  const updateActiveMission = async (starterMission: number | undefined, module: CitizenScienceModule) => {
     if (!starterMission || !session?.user?.id) return;
 
     try {
@@ -138,18 +175,24 @@ export default function StarterMissionsStats() {
       setActiveMission(starterMission);
       setErrorMessage(null); // Clear any previous errors
       console.log(`Active mission updated to: ${starterMission}`);
+
+      // Create corresponding inventory entry
+      await createInventoryEntry(module);
     } catch (error) {
       console.error('Error updating active mission:', error);
     }
   };
 
-  const handleSetActiveMission = (starterMission: number | undefined) => {
-    // If the user already has an active mission, show the error message
-    if (activeMission) {
+  const handleSetActiveMission = (module: CitizenScienceModule) => {
+    // Allow updating if the current active mission is 1370203
+    if (activeMission === 1370203) {
+      updateActiveMission(module.starterMission, module);
+    } else if (activeMission) {
+      // Show error message if there's an active mission that's not 1370203
       setErrorMessage("You already have an active mission. You must complete or cancel it before starting a new one.");
     } else {
       // Otherwise, update the active mission
-      updateActiveMission(starterMission);
+      updateActiveMission(module.starterMission, module);
     }
   };
 
@@ -197,7 +240,7 @@ export default function StarterMissionsStats() {
                   <p className="text-[#D689E3] text-sm">{module.description}</p>
                   <button
                     className="mt-2 px-4 py-2 bg-[#5FCBC3] text-white text-sm rounded-md"
-                    onClick={() => handleSetActiveMission(module.starterMission)}
+                    onClick={() => handleSetActiveMission(module)}
                   >
                     Set Active Mission
                   </button>

@@ -13,6 +13,7 @@ import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
 import StarterMissionsStats from "@/app/components/(scenes)/(missions)/CompletedMissions";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
+import { CaptnCosmosGuideModal } from "@/app/components/(dialogue)/guideBot";
 
 export default function PlanetViewPage() {
     const { activePlanet } = useActivePlanet();
@@ -22,6 +23,9 @@ export default function PlanetViewPage() {
     const [hasMission1370201, setHasMission1370201] = useState(false);
     const [hasChosenFirstClassification, setHasChosenFirstClassification] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+
+    const [isTutorialExpanded, setIsTutorialExpanded] = useState(true)
+    const toggleTutorial = () => setIsTutorialExpanded(!isTutorialExpanded)
 
     useEffect(() => {
         const checkMission = async () => {
@@ -76,6 +80,8 @@ export default function PlanetViewPage() {
         return (
             <PlanetViewLayout>
                 <div></div>
+                <div></div>
+                <div></div>
                 <div><ChapterOneIntroduction /></div>
             </PlanetViewLayout>
         );
@@ -85,7 +91,9 @@ export default function PlanetViewPage() {
         return (
             <PlanetViewLayout>
                 <div></div>
-                <div><StarterMissionsStats /></div>
+                <div></div>
+                <div></div>
+                <div><CaptnCosmosGuideModal isExpanded={isTutorialExpanded} toggleExpand={toggleTutorial} /></div>
             </PlanetViewLayout>
         );
     };

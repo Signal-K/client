@@ -60,6 +60,29 @@ const modules: CitizenScienceModule[] = [
     structure: 3102,
     description: "Your rovers have been busy taking photos of the landscape, study their photos to find mineral deposits and map out your planet's terrain",
   },
+
+  // Non citizen-science modules used for "active structure"
+  {
+    id: 106,
+    name: 'Go mining',
+    level: 1,
+    starterMission: 1370205,
+    structure: 3102,
+  },
+  {
+    id: 107,
+    name: 'Repair Research Station',
+    level: 1,
+    starterMission: 1370206,
+    structure: 3106,
+  },
+  {
+    id: 108,
+    name: 'Use the Research Station to unlock a new module',
+    level: 1,
+    starterMission: 1370207,
+    structure: 3106,
+  },
 ];
 
 export async function GET(req: NextRequest) {

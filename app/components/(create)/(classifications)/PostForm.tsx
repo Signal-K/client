@@ -393,7 +393,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                         value={content}
                                         onChange={e => setContent(e.target.value)}
                                         className="flex-grow p-3 h-24 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
-                                        placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
+                                        placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"} candidate?`}
                                     />
                                 </div>
                                 <div className="flex items-center mb-4">

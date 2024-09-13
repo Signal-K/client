@@ -220,12 +220,12 @@ const OnboardingWindow = () => {
             >
               Back
             </button>
-            <ProgressBar
+            {/* <ProgressBar
               currentStepIndex={steps.findIndex(
                 (step) => step.id === currentStep
               )}
               totalSteps={steps.length}
-            />
+            /> */}
             <button
               onClick={handleNext}
               disabled={currentStep === steps[steps.length - 1]?.id}

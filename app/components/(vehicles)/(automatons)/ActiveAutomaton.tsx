@@ -408,7 +408,7 @@ export function ActiveAutomatonForMining({
               />
             </div>
           )}
-        </>
+        </> 
       )}
     </div>
   );

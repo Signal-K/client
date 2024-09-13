@@ -84,7 +84,7 @@ const missions: Mission[] = [
     },
     {
         id: 1370206,
-        name: 'Repair the research structure',
+        name: 'Repair the Research Station',
         description: 'As part of Chapter 1', // Also creates it
         classificationModule: 'General',
         chapter: '1',

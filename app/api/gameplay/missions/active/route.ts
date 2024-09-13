@@ -49,7 +49,7 @@ const missions: UserActiveMission[] = [
     },
     {
         id: 5,
-        name: 'Repair the research structure',
+        name: 'Repair the Research Station',
         starterMission: 1370206,
         structure: 3106,
         createStructure: 3106,
@@ -62,8 +62,9 @@ const missions: UserActiveMission[] = [
     },
     {
         id: 7,
-        name: ''
-    }
+        name: 'Perform a second classification (second classification type)',
+        starterMission: 1370208,
+    },
 ];
 
 export async function GET(req: NextRequest) {

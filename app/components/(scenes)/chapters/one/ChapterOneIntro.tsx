@@ -45,6 +45,7 @@ export default function ChapterOneIntroduction() {
         const itemsToAdd = [3102];
 
         try {
+            // Insert items
             const { error: inventoryError } = await supabase
                 .from("inventory")
                 .insert(itemsToAdd.map((id) => ({
@@ -58,8 +59,9 @@ export default function ChapterOneIntroduction() {
 
             if (inventoryError) {
                 throw inventoryError;
-            };
+            }
 
+            // Insert mission
             const missionData = {
                 user: session.user.id,
                 time_of_completion: new Date().toISOString(),
@@ -74,7 +76,15 @@ export default function ChapterOneIntroduction() {
                 throw missionError;
             }
 
-            console.log("Mission 1370201 created successfully.");
+            // Update activeMission to 1370203
+            const { error: updateError } = await supabase
+                .from("profiles")
+                .update({ activeMission: 1370203 })
+                .eq("id", session.user.id);
+
+            if (updateError) throw updateError;
+
+            console.log("Mission 1370201 created and activeMission updated to 1370203.");
             setMissionExists(true); 
         } catch (error: any) {
             console.error("Error handling item initialization: ", error.message);
@@ -100,4 +110,4 @@ export default function ChapterOneIntroduction() {
             </div>
         </div>
     );
-}
+};
