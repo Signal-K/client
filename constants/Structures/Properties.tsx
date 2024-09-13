@@ -11,6 +11,7 @@ import { BeanIcon, BookAIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIco
 import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/app/components/(structures)/Auto/AutomatonClassificationShell";
+import { AdvancedTechTreeComponent } from "@/app/components/(structures)/Research/TechTree";
 
 interface IndividualStructureProps {
     name?: string;
@@ -208,6 +209,8 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research technology",
+          dynamicComponent: <AdvancedTechTreeComponent />,
+          sizePercentage: 85,
         },
         {
           icon: <BookAIcon className="w-6 h-6 text-[#5e81ac]" />,

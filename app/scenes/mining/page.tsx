@@ -9,7 +9,7 @@ import MineralsInventoryGrid from "@/app/components/(inventory)/mineralsPanel";
 enum Step {
   MineralDeposits = "MINERAL_DEPOSITS",
   MineralDetails = "MINERAL_DETAILS",
-}
+};
 
 export default function MiningScene() {
   const { activePlanet } = useActivePlanet();

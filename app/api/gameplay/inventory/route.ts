@@ -68,7 +68,7 @@ const inventoryItems: InventoryItem[] = [
     locationType: 'Surface',
   },
   {
-    id: 3106,
+    id: 3106, 
     name: "Research Station",
     description: "Unlock new technology and research",
     icon_url: "/assets/items/Research.png",
@@ -91,7 +91,7 @@ const inventoryItems: InventoryItem[] = [
     name: "Camera receiver",
     // description:
     description: "Connect to rovers",
-    icon_url: "/assets/items/Telescope.png",
+    icon_url: "/assets/items/CameraReceiver.png",
     ItemCategory: "Structure",
     locationType: 'Orbital',
   },
