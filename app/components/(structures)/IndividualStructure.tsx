@@ -71,7 +71,13 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       <div className="relative transition-all duration-500 ease-in-out">
         {/* Main Modal */}
         {!activeComponent && (
-          <DialogContent className="p-4 rounded-3xl text-white max-w-xl mx-auto" style={{ background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))' }}>
+          <DialogContent 
+            className="p-4 rounded-3xl text-white max-w-xl mx-auto"
+            style={{ 
+              background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))',
+              width: expanded ? '80%' : '100%' // Adjust width based on expanded state
+            }}
+          >
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />
@@ -137,24 +143,24 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               ))}
             </div>
             <div className="flex flex-col items-center my-4 space-y-4">
-  {buttons.map((button, index) => (
-    button.showInNoModal !== false && (
-      <div
-        key={index}
-        className="flex items-center justify-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
-        onClick={() => handleButtonClick(button.text, button.dynamicComponent, button.sizePercentage)}
-        style={{ width: "100%", maxWidth: "200px" }} // Ensures uniform button size
-      >
-        <div className="flex items-center justify-center w-full">
-          <div className="flex-shrink-0">
-            {button.icon}
-          </div>
-          <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
-        </div>
-      </div>
-    )
-  ))}
-</div>
+              {buttons.map((button, index) => (
+                button.showInNoModal !== false && (
+                  <div
+                    key={index}
+                    className="flex items-center justify-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
+                    onClick={() => handleButtonClick(button.text, button.dynamicComponent, button.sizePercentage)}
+                    style={{ width: "100%", maxWidth: "200px" }} // Ensures uniform button size
+                  >
+                    <div className="flex items-center justify-center w-full">
+                      <div className="flex-shrink-0">
+                        {button.icon}
+                      </div>
+                      <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
+                    </div>
+                  </div>
+                )
+              ))}
+            </div>
 
             <Button
               variant="outline"

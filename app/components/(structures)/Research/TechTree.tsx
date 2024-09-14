@@ -33,6 +33,7 @@ export function AdvancedTechTreeComponent() {
   const [technologies, setTechnologies] = useState<Technology[]>([])
   const [unlockedTechs, setUnlockedTechs] = useState<number[]>([])
   const [userStructures, setUserStructures] = useState<Structure[]>([])
+  const [classificationPoints, setClassificationPoints] = useState<number>(0) // New state for classification points
 
   // Fetch all technologies data from API routes
   const fetchTechnologies = async () => {
@@ -112,38 +113,71 @@ export function AdvancedTechTreeComponent() {
       ...ownedStructureIds.filter((id: number) => !prevUnlockedTechs.includes(id)) // Avoid duplicates
     ]);
   };
+
+  const fetchClassificationPoints = async () => {
+    if (!userId) return;
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('classificationPoints')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching classification points:', error);
+      return;
+    }
+
+    setClassificationPoints(data?.classificationPoints || 0);
+  }
   
   useEffect(() => {
     fetchTechnologies()
     fetchUserStructures()
+    fetchClassificationPoints()  // Fetch classification points on mount
   }, [userId, activePlanet])
 
   const handleUnlock = async (techId: number, techCategory: TechCategory, techItem?: number) => {
     if (userId && canUnlock(techId)) {
-        // Add entry to unlocked_technologies in Supabase
-        // Uncomment if needed
+      if (classificationPoints < 1) {
+        alert('You need at least 1 classification point to unlock a new technology.');
+        return;
+      }
 
-        // Add entry to inventory in Supabase (for structures)
-        if (techCategory === 'Structures' && techItem) {
-            const { error: inventoryError } = await supabase
-                .from('inventory')
-                .insert([{ 
-                    owner: userId, 
-                    anomaly: activePlanet?.id, 
-                    item: techItem,  // Use the `item` value instead of `techId`
-                    configuration: { "Uses": 1 },  // Pass as an object
-                    quantity: 1 
-                }])
-
-            if (inventoryError) {
-                console.error('Error adding structure to inventory:', inventoryError)
-                return
-            }
+      // Add entry to inventory in Supabase (for structures)
+      if (techCategory === 'Structures' && techItem) {
+        const { error: inventoryError } = await supabase
+          .from('inventory')
+          .insert([{ 
+            owner: userId, 
+            anomaly: activePlanet?.id, 
+            item: techItem,  // Use the `item` value instead of `techId`
+            configuration: { "Uses": 1 },  // Pass as an object
+            quantity: 1 
+          }])
+  
+        if (inventoryError) {
+          console.error('Error adding structure to inventory:', inventoryError);
+          return;
         }
-
-        setUnlockedTechs((prevUnlockedTechs) => [...prevUnlockedTechs, techId])
+      }
+  
+      // Deduct 1 classification point after successful unlock
+      const { error: updatePointsError } = await supabase
+        .from('profiles')
+        .update({ classificationPoints: classificationPoints - 1 })
+        .eq('id', userId);
+  
+      if (updatePointsError) {
+        console.error('Error updating classification points:', updatePointsError);
+        return;
+      }
+  
+      setClassificationPoints(prevPoints => prevPoints - 1);
+      setUnlockedTechs(prevUnlockedTechs => [...prevUnlockedTechs, techId]);
     }
-}
+  }
+  
 
   const canUnlock = (techId: number) => {
     const tech = technologies.find((t) => t.id === techId)
@@ -168,9 +202,9 @@ export function AdvancedTechTreeComponent() {
           {tech.icon}
           <h3 className="text-lg font-semibold ml-2">{tech.name}</h3>
         </div>
-        <p className="text-sm text-gray-600 mb-2">{tech.description}</p>
+        <p className="text-sm text-gray-300 mb-2">{tech.description}</p>
         {tech.requiredTech && (
-          <p className="text-xs text-gray-500 mb-2">
+          <p className="text-xs text-gray-300 mb-2">
             Required: {technologies.find((t) => t.id === tech.requiredTech)?.name ?? 'Unknown'}
           </p>
         )}
@@ -182,7 +216,7 @@ export function AdvancedTechTreeComponent() {
               ? 'bg-green-500 text-white'
               : isAvailable
               ? 'bg-purple-500 text-white hover:bg-purple-600'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-gray-300 text-gray-300 cursor-not-allowed'
           }`}
         >
           {isUnlocked ? 'Unlocked' : 'Unlock'}
@@ -193,7 +227,7 @@ export function AdvancedTechTreeComponent() {
 
   const TechCategory = ({ category }: { category: TechCategory }) => (
     <div className="mb-8">
-      <h2 className="text-2xl font-bold mb-4">{category}</h2>
+      {/* <h2 className="text-2xl font-bold mb-4">{category}</h2> */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         {technologies
           .filter((tech) => tech.category === category)
@@ -205,16 +239,13 @@ export function AdvancedTechTreeComponent() {
   )
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-8">Advanced Technology Tree</h1>
-
-      {/* Display the user's structures */}
-      <div className="mb-8">
+    <div className="container mx-auto p-4 bg-white/10">
+      <div className="mb-4">
         <h2 className="text-2xl font-bold mb-4">Your Structures</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
           {userStructures.map((structure) => (
-            <div key={structure.id} className="p-4 rounded-lg shadow-md border-2 border-blue-500">
-              <div className="flex items-center mb-2">
+            <div key={structure.id} className="p-2 rounded-lg shadow-md border-2 border-blue-500">
+              <div className="flex items-center mb-1">
                 {structure.icon}
                 <h3 className="text-lg font-semibold ml-2">{structure.name}</h3>
               </div>
@@ -222,10 +253,21 @@ export function AdvancedTechTreeComponent() {
           ))}
         </div>
       </div>
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-1">Classification Points Balance</h2>
+        <p className="text-lg">{classificationPoints} Points</p>
+        <p className="mt-2 text-sm text-gray-300">
+          Points are earned for contributions and are required to unlock new technology. Each technology unlock costs 1 point.
+        </p>
+      </div>
 
-      {/* Technology categories */}
-      <TechCategory category="Structures" />
-      <TechCategory category="Automatons" />
+      {technologies.some(tech => tech.category === 'Structures') && (
+        <TechCategory category="Structures" />
+      )}
+
+      {/* {technologies.some(tech => tech.category === 'Automatons') && (
+        <TechCategory category="Automatons" />
+      )} */}
     </div>
-  )
+  );
 };
