@@ -1,32 +1,49 @@
-version: '3.6'
+version: '3.8'
+
 services:
-  landing:
+  nextapp:
+    container_name: nextapp
     build:
-      context: "./"
-      dockerfile: Dockerfile.dev
-    networks:
-      - ship
-    environment:
-      APP_ENV: development
-    volumes:
-      - "./src:/app/src"
+      context: ./
+      dockerfile: next.dockerfile
     ports:
       - "3000:3000"
-  db:
-    container_name: db
-    image: postgres:13
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    ports:
-      - "5432:5432"
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - ./:/app
+      - /app/node_modules
+    working_dir: /app
+    command: "npm run dev"
+    # depends_on:
+    #   - flaskapp
+
+#   # flask service
+#   flaskapp:
+#     container_name: flaskapp
+#     image: flaskapp:1.0.0
+#     build:
+#       context: ./backend
+#       dockerfile: flask.dockerfile
+#     ports:
+#       - 4000:4000
+#     environment:
+#       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+#     depends_on:
+#       - db
+
+# # db service
+#   db:
+#     container_name: db
+#     image: postgres:13
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: postgres
+#       POSTGRES_DB: postgres
+#     ports:
+#       - 5432:5432
+#     volumes:
+#       - pgdata:/var/lib/postgresql/data
 
 volumes:
   pgdata: {}
-
-networks:
-  ship:
-    name: ship_network

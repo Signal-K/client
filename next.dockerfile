@@ -5,7 +5,7 @@ FROM node:18-bullseye AS base
 FROM base AS deps
 
 WORKDIR /app
- 
+
 RUN yarn set version berry
 
 COPY package.json yarn.lock* ./

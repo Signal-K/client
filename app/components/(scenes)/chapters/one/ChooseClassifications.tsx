@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { MissionStructureDisplay } from '@/app/components/(structures)/StructuresForMission';
 import { useActivePlanet } from '@/context/ActivePlanet';
+import { Mission } from '@/app/components/(structures)/StructuresForMission';
 
 interface CitizenScienceModule {
     id: number;
@@ -12,16 +13,6 @@ interface CitizenScienceModule {
     starterMission?: number; // used to determine if a user has started it
     structure: number;
 };
-
-interface Mission {
-    id: number;
-    name: string;
-    description?: string;
-    rewards?: number[];
-    classificationModule?: string;
-    structure: number;
-    chapter?: string;
-}; 
 
 export default function ChooseClassificationStarter() {
     const supabase = useSupabaseClient();

@@ -99,6 +99,7 @@ export default function PlanetViewPage() {
     return (
         <div className="relative min-h-screen">
             <PlanetStructures />
+            <SciFiPopupMenu />
             <BottomMenuBar onClose={() => null} />
         </div>
     );

@@ -11,14 +11,16 @@ interface CitizenScienceModule {
     structure: number;
 };
 
-interface Mission {
+export interface Mission {
     id: number;
     name: string;
+    sequence?: number;
     description?: string;
     rewards?: number[];
     classificationModule?: string;
-    structure: number;
+    structure?: number;
     chapter?: number;
+    component?: React.ComponentType<any>;
 };
 
 const modules: CitizenScienceModule[] = [

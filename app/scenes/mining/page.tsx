@@ -30,12 +30,8 @@ export default function MiningScene() {
     <div className="flex flex-col min-h-screen">
       {currentStep === Step.MineralDeposits && (
         <div className="flex flex-col md:flex-row">
-          <div className="flex-1 md:w-3/5 p-4 px-12 rounded-r-lg shadow-lg md:rounded-r-lg border-r border-red-300">
+          <div className="flex-1 p-4 px-12 rounded-r-lg shadow-lg md:rounded-r-lg border-r border-red-300">
             <MineralDeposits onSelectDeposit={handleSelectDeposit} />
-            <MineralsInventoryGrid />
-          </div>
-          <div className="flex-1 md:w-2/5 p-4 rounded-l-lg shadow-lg md:rounded-l-lg border-l border-red-300">
-            <p>Select a mineral deposit to see details.</p>
           </div>
         </div>
       )}

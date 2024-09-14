@@ -62,7 +62,7 @@ export function Header() {
         <>
             <header className="left-0 right-0 z-50 flex h-16 w-full items-center justify-between bg-white/10 px-4 shadow-sm backdrop-blur-md dark:bg-gray-950/80 dark:text-gray-50">
                 <div className="flex items-center gap-4">
-                    <Button
+                    {/* <Button
                         className="rounded-full p-2"
                         size="icon"
                         variant="outline"
@@ -70,7 +70,7 @@ export function Header() {
                         style={{ visibility: "visible" }} // Only show when active planet isn't the smallest one
                     >
                         <LucideArrowLeft className="h-5 w-5" />
-                    </Button>
+                    </Button> */}
                     <Button
                         className="rounded-full p-2"
                         size="icon"
@@ -95,14 +95,14 @@ export function Header() {
                     >
                         <PaintRollerIcon className="h-5 w-5" />
                     </Button>
-                    <Button
+                    {/* <Button
                         className="rounded-full p-2"
                         size="icon"
                         variant="outline"
                     >
                         <LucideArrowRightSquare className="h-5 w-5" />
-                    </Button>
-                    <UserAvatarNullUpload
+                    </Button> */}
+                    {/* <UserAvatarNullUpload
                         url={avatar_url}
                         size={64}
                         onUpload={(
@@ -110,7 +110,7 @@ export function Header() {
                         ) => {
                             setAvatarUrl(filePath)
                         }}
-                    />
+                    /> */}
                 </div>
             </header>
         </>

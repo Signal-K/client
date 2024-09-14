@@ -7,20 +7,10 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { FirstTelescopeClassification } from "@/app/components/(structures)/Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import DeployRooversInitial from "../../roovers/deployAndReturn";
-import { Header } from "@/app/components/sections/header";
+// import { Header } from "@/app/components/sections/header";
 import GeneratedStarterPlanet from "../../../(anomalies)/(planets)/generated";
-
-interface Mission {
-  id: number;
-  name: string;
-  description: string;
-}
-
-interface OnboardingStepProps {
-  title: string;
-  description: string;
-  step: number;
-}
+import { Mission } from "@/types/Missions";
+import { OnboardingStepProps } from "@/types/Onboarding";
 
 const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
   const { activePlanet } = useActivePlanet();
@@ -179,7 +169,7 @@ const OnboardingWindow = () => {
       >
         {/* Header Component for Desktop */}
         <div className="hidden md:block mb-6">
-          <Header />
+          {/* <Header /> */}
         </div>
 
         <div className="flex-grow flex flex-col justify-between relative">

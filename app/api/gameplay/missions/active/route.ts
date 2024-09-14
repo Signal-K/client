@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Mission } from "@/app/components/(structures)/StructuresForMission";
 
 interface Useractivemission {
   id: number;
@@ -9,17 +10,6 @@ interface Useractivemission {
   description?: string;
   createStructure?: number;
   mineralDepositToCreate?: number;
-};
-
-interface Mission {
-  id: number;
-  name: string;
-  description?: string;
-  rewards?: number[];
-  classificationModule?: string;
-  classificationType?: string;
-  structure: number;
-  chapter?: string;
 };
 
 const missions: Useractivemission[] = [

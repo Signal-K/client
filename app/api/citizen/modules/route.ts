@@ -1,23 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Mission } from "@/app/components/(structures)/StructuresForMission";
 
 export interface CitizenScienceModule {
   id: number;
   name: string;
   level?: number; // aka chapter
-  starterMission?: number;
+  starterMission?: number; 
   structure: number;
   description?: string;
-};
-
-export interface Mission {
-  id: number;
-  name: string;
-  description?: string;
-  rewards?: number[];
-  classificationModule?: string;
-  classificationType?: string;
-  structure: number;
-  chapter?: string;
 };
 
 const modules: CitizenScienceModule[] = [

@@ -1,5 +1,4 @@
 import React from "react";
-import { MiningScene } from "@/app/components/(structures)/Mining/MiningPanels";
 import { AutomatonUpgrader } from "@/app/components/(vehicles)/(automatons)/ActiveAutomaton";
 import { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
@@ -12,6 +11,7 @@ import StructureRepair from "@/app/components/(structures)/Config/RepairStructur
 import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/app/components/(structures)/Auto/AutomatonClassificationShell";
 import { AdvancedTechTreeComponent } from "@/app/components/(structures)/Research/TechTree";
+import MiningScene from "@/app/scenes/mining/page";
 
 interface IndividualStructureProps {
     name?: string;
