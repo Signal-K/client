@@ -4,6 +4,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../../(create)/(classifications)/PostForm";
 import { MapPinIcon } from "@/app/components/(inventory)/items/MineralDeposits";
+import Spinner from "@/components/ui/Spinner";
 
 export const RooverFromAppeears: React.FC = () => { 
     const supabase = useSupabaseClient(); 
@@ -15,10 +16,12 @@ export const RooverFromAppeears: React.FC = () => {
     const [imagesCollected, setImagesCollected] = useState(false);
     const [isClassified, setIsClassified] = useState(false);
     const [mineralDeposits, setMineralDeposits] = useState<string[]>([]);
+    const [loading, setLoading] = useState(true); // Add loading state for the spinner
 
     const resourceList = ["11", "15", "16", "17", "19", "20"];
 
     const fetchMarsImages = async () => {
+        setLoading(true); // Start loading when fetching begins
         const randomDate = Math.floor(Math.random() * 1000) + 1;
         const selectedRover = "perseverance";
         const apiUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${selectedRover}/photos?sol=${randomDate}&api_key=iT0FQTZKpvadCGPzerqXdO5F4b62arNBOP0dtkXE`;
@@ -36,6 +39,8 @@ export const RooverFromAppeears: React.FC = () => {
         } catch (error) {
             console.error("Error fetching rover images from NASA:", error);
             setRovers([{ id: Date.now(), avatar_url: "An error occurred while fetching the images." }]);
+        } finally {
+            setLoading(false); // End loading when fetching is done
         }
     };    
 
@@ -119,78 +124,78 @@ export const RooverFromAppeears: React.FC = () => {
 
     return (
         <div className="grid grid-cols-3 gap-4">
-            {rovers.length > 0 ? (
-                rovers.map((rover) => (
-                    <div key={rover.id} className="text-center col-span-3">
-                        {/* <div className="mb-4"> 
-                            <img
-                                src='https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true'
-                                alt='telescope'
-                                className="w-24 h-24 mb-2"
-                            />
-                        </div> */}
-                        <div className="p-2 max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
-                            <div className='relative h-64 w-full'>
-                                <img
-                                    src={rover.avatar_url}
-                                    alt={`Mars rover image`}
-                                    className="relative z-10 w-full h-full object-contain"
-                                />
-                            </div>
-
-                            {!imagesCollected && (
-                                <button
-                                    onClick={handleCollectAndClassify}
-                                    className="col-span-3 mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
-                                >
-                                    Collect this image
-                                </button>
-                            )}
-
-                            {imagesCollected && (
-                                <ClassificationForm
-                                    anomalyId={rover.id.toString()}
-                                    anomalyType="roverImg"
-                                    missionNumber={1370104}
-                                    assetMentioned={rover.avatar_url}
-                                    originatingStructure={rover.id}
-                                />
-                            )}
-                        </div>
-                    </div>
-                ))
+            {loading ? ( // Show spinner if loading is true
+                <Spinner />
             ) : (
-                <div className="text-center col-span-3">
-                    {rovers[0]?.avatar_url}
-                </div>
-            )}
-            {isClassified && (
-                <div className="col-span-3 mt-4">
-                    <h3 className="text-lg font-semibold text-center">
-                        Mineral Deposits Found:
-                    </h3>
-                    <div className="flex justify-center items-center">
-                        {mineralDeposits.map((deposit, index) => (
-                            <div
-                                key={index}
-                                className="flex flex-col items-center m-2 p-2 border-2 border-gray-300 rounded-lg"
-                            >
-                                <MapPinIcon className="h-6 w-6 text-blue-500 mb-2" />
-                                <span className="text-sm">{deposit}</span>
+                <>
+                    {rovers.length > 0 ? (
+                        rovers.map((rover) => (
+                            <div key={rover.id} className="text-center col-span-3">
+                                <div className="p-2 max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                                    <div className='relative h-64 w-full'>
+                                        <img
+                                            src={rover.avatar_url}
+                                            alt={`Mars rover image`}
+                                            className="relative z-10 w-full h-full object-contain"
+                                        />
+                                    </div>
+
+                                    {!imagesCollected && (
+                                        <button
+                                            onClick={handleCollectAndClassify}
+                                            className="col-span-3 mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700"
+                                        >
+                                            Collect this image
+                                        </button>
+                                    )}
+
+                                    {imagesCollected && (
+                                        <ClassificationForm
+                                            anomalyId={rover.id.toString()}
+                                            anomalyType="roverImg"
+                                            missionNumber={1370104}
+                                            assetMentioned={rover.avatar_url}
+                                            originatingStructure={rover.id}
+                                        />
+                                    )}
+                                </div>
                             </div>
-                        ))}
-                    </div>
-                    <button
-                        onClick={handleEstablishMiningSettlement}
-                        className="mt-4 px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-700"
-                    >
-                        Establish mining settlement
-                    </button>
-                </div>
+                        ))
+                    ) : (
+                        <div className="text-center col-span-3">
+                            {rovers[0]?.avatar_url}
+                        </div>
+                    )}
+                    {isClassified && (
+                        <div className="col-span-3 mt-4">
+                            <h3 className="text-lg font-semibold text-center">
+                                Mineral Deposits Found:
+                            </h3>
+                            <div className="flex justify-center items-center">
+                                {mineralDeposits.map((deposit, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex flex-col items-center m-2 p-2 border-2 border-gray-300 rounded-lg"
+                                    >
+                                        <MapPinIcon className="h-6 w-6 text-blue-500 mb-2" />
+                                        <span className="text-sm">{deposit}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <button
+                                onClick={handleEstablishMiningSettlement}
+                                className="mt-4 px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-700"
+                            >
+                                Establish mining settlement
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );
 };
+
 
 export const RoverPhoto: React.FC = () => {
     const supabase = useSupabaseClient();

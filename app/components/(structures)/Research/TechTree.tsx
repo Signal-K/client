@@ -34,21 +34,21 @@ export function AdvancedTechTreeComponent() {
   const [userStructures, setUserStructures] = useState<Structure[]>([])
 
   // Fetch unlocked technologies from Supabase
-  const fetchUnlockedTechnologies = async () => {
-    if (!userId) return
-    const { data, error } = await supabase
-      .from('unlocked_technologies')
-      .select('tech_id')
-      .eq('user_id', userId)
+//   const fetchUnlockedTechnologies = async () => {
+//     if (!userId) return
+//     const { data, error } = await supabase
+//       .from('unlocked_technologies')
+//       .select('tech_id')
+//       .eq('user_id', userId)
 
-    if (error) {
-      console.error('Error fetching unlocked technologies:', error)
-      return
-    }
+//     if (error) {
+//       console.error('Error fetching unlocked technologies:', error)
+//       return
+//     }
 
-    const unlockedIds = data ? data.map((tech) => tech.tech_id) : []
-    setUnlockedTechs(unlockedIds)
-  }
+//     const unlockedIds = data ? data.map((tech) => tech.tech_id) : []
+//     setUnlockedTechs(unlockedIds)
+//   }
 
   // Fetch all technologies data from API routes
   const fetchTechnologies = async () => {
@@ -91,61 +91,61 @@ export function AdvancedTechTreeComponent() {
       .select('item')
       .eq('owner', userId)
       .eq('anomaly', activePlanet.id);
-  
+    
     if (error) {
       console.error('Error fetching user structures from inventory:', error);
       return;
     }
-  
+    
     // Fetch structures from the API route
     const structuresRes = await fetch('/api/gameplay/research/structures');
     const structuresData = await structuresRes.json();
-  
+    
     const structureIds = data.map((inventoryItem) => inventoryItem.item);
-  
+    
     // Match inventory items with structures from the API
     const userStructures = structuresData
-      .filter((structure: any) => structureIds.includes(structure.item))
+      .filter((structure: any) => structure.item && structureIds.includes(structure.item))
       .map((structure: any) => ({
         id: structure.id,
         name: structure.name,
         icon: <Building className="w-6 h-6" />, // Adjust if you have a custom icon
       }));
-  
+    
     // Ensure only unique structures are shown
     const uniqueStructures = userStructures.filter(
       (structure: Structure, index: number, self: Structure[]) =>
         index === self.findIndex((s: Structure) => s.id === structure.id)
     );
-  
+    
     setUserStructures(uniqueStructures);
-
+  
     // Automatically mark owned structures as unlocked
     const ownedStructureIds = userStructures.map((structure: { id: any }) => structure.id);
     setUnlockedTechs((prevUnlockedTechs) => [
       ...prevUnlockedTechs, 
       ...ownedStructureIds.filter((id: number) => !prevUnlockedTechs.includes(id)) // Avoid duplicates
     ]);
-  }
+  };
   
   useEffect(() => {
     fetchTechnologies()
-    fetchUnlockedTechnologies()
+    // fetchUnlockedTechnologies()
     fetchUserStructures()
   }, [userId, activePlanet])
 
   const handleUnlock = async (techId: number, techCategory: TechCategory) => {
     if (userId && canUnlock(techId)) {
       // Add entry to unlocked_technologies in Supabase
-      const { error: unlockError } = await supabase
-        .from('unlocked_technologies')
-        .insert([{ user_id: userId, tech_id: techId, tech_type: techCategory }])
-
-      if (unlockError) {
-        console.error('Error unlocking technology:', unlockError)
-        return
-      }
-
+    //   const { error: unlockError } = await supabase
+    //     .from('unlocked_technologies')
+    //     .insert([{ user_id: userId, tech_id: techId, tech_type: techCategory }])
+  
+    //   if (unlockError) {
+    //     console.error('Error unlocking technology:', unlockError)
+    //     return
+    //   }
+  
       // Add entry to inventory in Supabase (for structures)
       if (techCategory === 'Structures') {
         const { error: inventoryError } = await supabase
@@ -153,15 +153,16 @@ export function AdvancedTechTreeComponent() {
           .insert([{ 
             owner: userId, 
             anomaly: activePlanet?.id, 
-            item: techId 
+            item: techId, // Ensure `item` matches the correct value
+            quantity: 1 
           }])
-
+  
         if (inventoryError) {
           console.error('Error adding structure to inventory:', inventoryError)
           return
         }
       }
-
+  
       setUnlockedTechs((prevUnlockedTechs) => [...prevUnlockedTechs, techId])
     }
   }
@@ -244,8 +245,9 @@ export function AdvancedTechTreeComponent() {
         </div>
       </div>
 
+      {/* Technology categories */}
       <TechCategory category="Structures" />
       <TechCategory category="Automatons" />
     </div>
   )
-};
+}

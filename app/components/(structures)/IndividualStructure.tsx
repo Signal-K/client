@@ -71,7 +71,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       <div className="relative transition-all duration-500 ease-in-out">
         {/* Main Modal */}
         {!activeComponent && (
-          <DialogContent className="p-4 rounded-3xl bg-[#1D2833]/70 text-white max-w-xl mx-auto">
+          <DialogContent className="p-4 rounded-3xl text-white max-w-xl mx-auto" style={{ background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))' }}>
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />
@@ -166,8 +166,9 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
         {/* Dynamic Component Modal */}
         {activeComponent && (
           <DialogContent
-            className="p-4 rounded-3xl max-w-xl bg-[#2C4F64]/70 text-white mx-auto"
+            className="p-4 rounded-3xl max-w-xl text-white mx-auto"
             style={{
+              background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))',
               width: `${Math.max(modalSizePercentage, 100)}%`, // Ensure it's never thinner than 100%
               height: `${modalSizePercentage}%`,
             }}
