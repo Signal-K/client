@@ -120,29 +120,30 @@ export function AdvancedTechTreeComponent() {
 
   const handleUnlock = async (techId: number, techCategory: TechCategory, techItem?: number) => {
     if (userId && canUnlock(techId)) {
-      // Add entry to unlocked_technologies in Supabase
-      // Uncomment if needed
+        // Add entry to unlocked_technologies in Supabase
+        // Uncomment if needed
 
-      // Add entry to inventory in Supabase (for structures)
-      if (techCategory === 'Structures' && techItem) {
-        const { error: inventoryError } = await supabase
-          .from('inventory')
-          .insert([{ 
-            owner: userId, 
-            anomaly: activePlanet?.id, 
-            item: techItem,  // Use the `item` value instead of `techId`
-            quantity: 1 
-          }])
+        // Add entry to inventory in Supabase (for structures)
+        if (techCategory === 'Structures' && techItem) {
+            const { error: inventoryError } = await supabase
+                .from('inventory')
+                .insert([{ 
+                    owner: userId, 
+                    anomaly: activePlanet?.id, 
+                    item: techItem,  // Use the `item` value instead of `techId`
+                    configuration: { "Uses": 1 },  // Pass as an object
+                    quantity: 1 
+                }])
 
-        if (inventoryError) {
-          console.error('Error adding structure to inventory:', inventoryError)
-          return
+            if (inventoryError) {
+                console.error('Error adding structure to inventory:', inventoryError)
+                return
+            }
         }
-      }
 
-      setUnlockedTechs((prevUnlockedTechs) => [...prevUnlockedTechs, techId])
+        setUnlockedTechs((prevUnlockedTechs) => [...prevUnlockedTechs, techId])
     }
-  }
+}
 
   const canUnlock = (techId: number) => {
     const tech = technologies.find((t) => t.id === techId)

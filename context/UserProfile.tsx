@@ -28,7 +28,7 @@ export const UserProfileContextProvider: React.FC<{ children: ReactNode }> = ({ 
         try {
             const { data: profileData, error: profileError } = await supabase
                 .from("profiles")
-                .select("username, full_name, avatar_url, faction")
+                .select("username, full_name, avatar_url, faction, classificationPoints")
                 .eq("id", session?.user?.id)
                 .single();
             

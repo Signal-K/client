@@ -298,10 +298,28 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 setPostSubmitted(true);
             }
     
+            // Update user's classification points
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('classificationPoints')
+                .eq('id', session?.user?.id)
+                .single();
+    
+            if (profileError) throw profileError;
+    
+            const newClassificationPoints = (profileData?.classificationPoints || 0) + 1;
+    
+            const { error: updatePointsError } = await supabase
+                .from('profiles')
+                .update({ classificationPoints: newClassificationPoints })
+                .eq('id', session?.user?.id);
+    
+            if (updatePointsError) throw updatePointsError;
+    
             // Reset user's active mission to null after classification is created
             const { error: resetMissionError } = await supabase
                 .from('profiles')
-                .update({ activemission: null })
+                .update({ activeMission: null })
                 .eq('id', session?.user?.id);
     
             if (resetMissionError) {
@@ -312,13 +330,17 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 const { error: insertError } = await supabase
                     .from('missions')
                     .insert({
-                    user: session?.user?.id,
-                    mission: '1370204',
-                    time_of_completion: null,
-                    configuration: {},
-                    rewarded_items: [],
-                });
-            };
+                        user: session?.user?.id,
+                        mission: '1370204',
+                        time_of_completion: null,
+                        configuration: {},
+                        rewarded_items: [],
+                    });
+    
+                if (insertError) {
+                    console.error("Error inserting mission:", insertError.message);
+                }
+            }
     
             await handleMissionComplete();
         } catch (error) {
@@ -326,7 +348,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
         }
     };
     
-
+    
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (files && files.length > 0 && session) {
@@ -393,7 +415,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                         value={content}
                                         onChange={e => setContent(e.target.value)}
                                         className="flex-grow p-3 h-24 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
-                                        placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"} candidate?`}
+                                        placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
                                     />
                                 </div>
                                 <div className="flex items-center mb-4">
