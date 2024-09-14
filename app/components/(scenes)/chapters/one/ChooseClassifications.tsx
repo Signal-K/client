@@ -30,7 +30,7 @@ export default function ChooseClassificationStarter() {
 
     const [modules, setModules] = useState<CitizenScienceModule[]>([]);
     const [availableMissions, setAvailableMissions] = useState<Mission[]>([]);
-    const [activeMission, setActiveMission] = useState<Mission | null>(null);
+    const [activemission, setactivemission] = useState<Mission | null>(null);
 
     useEffect(() => {
         const fetchModulesAndMissions = async () => {
@@ -47,15 +47,15 @@ export default function ChooseClassificationStarter() {
                 // Fetch profile and check active mission
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
-                    .select('activeMission')
+                    .select('activemission')
                     .eq('id', session?.user.id)
                     .single();
 
                 if (profileError) throw profileError;
 
-                if (profile.activeMission) {
-                    const activeMission = missionsData.find(mission => mission.id === profile.activeMission);
-                    setActiveMission(activeMission || null);
+                if (profile.activemission) {
+                    const activemission = missionsData.find(mission => mission.id === profile.activemission);
+                    setactivemission(activemission || null);
                 } else {
                     // Fetch completed missions and available missions
                     const { data: completedMissions, error: missionsError } = await supabase
@@ -122,7 +122,7 @@ export default function ChooseClassificationStarter() {
             // Update active mission in the profile
             const { error: updateError } = await supabase
                 .from('profiles')
-                .update({ activeMission: mission.id })
+                .update({ activemission: mission.id })
                 .eq('id', session.user.id);
     
             if (updateError) {
@@ -130,7 +130,7 @@ export default function ChooseClassificationStarter() {
             }
     
             // Set the active mission state
-            setActiveMission(mission);
+            setactivemission(mission);
         } catch (error: any) {
             console.error('Error setting active mission:', error.message);
         }
@@ -141,14 +141,14 @@ export default function ChooseClassificationStarter() {
 
         try {
             // Only perform the inventory check if there's an active mission
-            if (activeMission?.structure) {
+            if (activemission?.structure) {
                 // Check if the item already exists in the inventory
                 const { data: inventoryItem, error: inventoryError } = await supabase
                     .from('inventory')
                     .select('id')
                     .eq('owner', session.user.id)
                     .eq('anomaly', activePlanet.id)
-                    .eq('item', activeMission.structure)
+                    .eq('item', activemission.structure)
                     .single();
     
                 if (inventoryError && inventoryError.code !== 'PGRST116') {
@@ -162,7 +162,7 @@ export default function ChooseClassificationStarter() {
                         .insert([
                             { owner: session.user.id, 
                               anomaly: activePlanet.id, 
-                              item: activeMission.structure,
+                              item: activemission.structure,
                               configuration: "created for: first classification mission group, chapter 1", // Add configuration field
                               time_of_deploy: new Date().toISOString(),
                              },
@@ -177,12 +177,12 @@ export default function ChooseClassificationStarter() {
             // Reset active mission in the profile
             const { error } = await supabase
                 .from('profiles')
-                .update({ activeMission: null })
+                .update({ activemission: null })
                 .eq('id', session.user.id);
 
             if (error) throw error;
 
-            setActiveMission(null);
+            setactivemission(null);
         } catch (error: any) {
             console.error('Error resetting active mission:', error.message);
         }
@@ -191,16 +191,16 @@ export default function ChooseClassificationStarter() {
     return (
         <div>
             <h1>Available Missions</h1>
-            {activeMission ? (
+            {activemission ? (
                 <div>
-                    <h2>{activeMission.name}</h2>
-                    <p>{activeMission.description}</p>
+                    <h2>{activemission.name}</h2>
+                    <p>{activemission.description}</p>
                     <button 
                         onClick={handleSwitchClassificationTask} 
                         className="block bg-[#85DDA2] text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                         Switch classification task
                     </button>
-                    <MissionStructureDisplay activeMission={activeMission.id} /> {/* Display the structure modal */}
+                    <MissionStructureDisplay activemission={activemission.id} /> {/* Display the structure modal */}
                 </div>
             ) : (
                 <div>

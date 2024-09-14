@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-interface UserActiveMission {
+interface Useractivemission {
   id: number;
   name: string;
   level?: number; // aka chapter
@@ -22,7 +22,7 @@ interface Mission {
   chapter?: string;
 };
 
-const missions: UserActiveMission[] = [
+const missions: Useractivemission[] = [
     {
         id: 1,
         name: 'Initialise Chapter 1',

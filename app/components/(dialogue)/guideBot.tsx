@@ -12,7 +12,7 @@ interface TutorialMessageProps {
   toggleExpand: () => void;
 };
 
-interface UserActiveMission {
+interface Useractivemission {
   id: number;
   name: string;
   starterMission: number;
@@ -25,16 +25,16 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
   const session = useSession();
   const { activePlanet } = useActivePlanet();
 
-  const [missions, setMissions] = useState<UserActiveMission[]>([]);
+  const [missions, setMissions] = useState<Useractivemission[]>([]);
   const [completedMissions, setCompletedMissions] = useState<number[]>([]);
-  const [activeMission, setActiveMission] = useState<number | null>(null);
+  const [activemission, setactivemission] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMissions = async () => {
       try {
         const response = await fetch('/api/gameplay/missions/active');
-        const data: UserActiveMission[] = await response.json();
+        const data: Useractivemission[] = await response.json();
         setMissions(data);
       } catch (error) {
         console.error("Error fetching missions:", error);
@@ -66,40 +66,40 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
   }, [session, supabase]);
 
   useEffect(() => {
-    const fetchUserActiveMission = async () => {
+    const fetchUseractivemission = async () => {
       if (!session?.user?.id) return;
 
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('activeMission')
+          .select('activemission')
           .eq('id', session.user.id)
           .single();
 
         if (error) throw error;
 
-        setActiveMission(data.activeMission);
+        setactivemission(data.activemission);
       } catch (error) {
         console.error("Error fetching active mission:", error);
       }
     };
 
-    fetchUserActiveMission();
+    fetchUseractivemission();
   }, [session, supabase]);
 
   const getNextMission = () => {
     return missions.find(
       (mission) =>
         !completedMissions.includes(mission.starterMission) &&
-        (activeMission === null || mission.starterMission > activeMission)
+        (activemission === null || mission.starterMission > activemission)
     );
   };
 
-  const resetMission = async (mission: UserActiveMission) => {
+  const resetMission = async (mission: Useractivemission) => {
     try {
       const { error: clearError } = await supabase
         .from('profiles')
-        .update({ activeMission: null })
+        .update({ activemission: null })
         .eq('id', session?.user?.id);
 
       if (clearError) throw clearError;
@@ -107,12 +107,12 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
       // Reset the mission after clearing
       const { error: resetError } = await supabase
         .from('profiles')
-        .update({ activeMission: mission.starterMission })
+        .update({ activemission: mission.starterMission })
         .eq('id', session?.user?.id);
 
       if (resetError) throw resetError;
 
-      setActiveMission(mission.starterMission);
+      setactivemission(mission.starterMission);
       setError(null);
     } catch (error: any) {
       console.error("Error resetting mission:", error.message);
@@ -120,8 +120,8 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
     }
   };
 
-  const startMission = async (mission: UserActiveMission) => {
-    if (activeMission !== null) {
+  const startMission = async (mission: Useractivemission) => {
+    if (activemission !== null) {
       setError("You already have an active mission.");
       return;
     }
@@ -129,12 +129,12 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
     try {
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ activeMission: mission.starterMission })
+        .update({ activemission: mission.starterMission })
         .eq('id', session?.user?.id);
 
       if (updateError) throw updateError;
 
-      setActiveMission(mission.starterMission);
+      setactivemission(mission.starterMission);
 
       if (mission.createStructure) {
         const { error: inventoryError } = await supabase
@@ -186,17 +186,17 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
             <p className="font-bold text-sm">Capt'n Cosmos Says:</p>
 
             {/* Display StarterMissionsStats if the active mission is 1370203 or 1370204 */}
-            {(activeMission === 1370203 || activeMission === 1370204) ? (
+            {(activemission === 1370203 || activemission === 1370204) ? (
               <StarterMissionsStats />
             ) : (
               <>
                 {/* Display the current mission */}
-                {activeMission && (
+                {activemission && (
                   <div className="mb-4">
-                    <p className="text-sm mt-1">Current Mission: {missions.find(m => m.starterMission === activeMission)?.name || "Unknown Mission"}</p>
+                    <p className="text-sm mt-1">Current Mission: {missions.find(m => m.starterMission === activemission)?.name || "Unknown Mission"}</p>
                     <button
                       className="mt-2 px-4 py-2 bg-red-500 text-white text-xs rounded-md"
-                      onClick={() => resetMission(missions.find(m => m.starterMission === activeMission)!)}
+                      onClick={() => resetMission(missions.find(m => m.starterMission === activemission)!)}
                     >
                       Reset Mission
                     </button>
@@ -210,9 +210,9 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
                     <button
                       className="mt-2 px-4 py-2 bg-blue-500 text-white text-xs rounded-md"
                       onClick={() => startMission(nextMission)}
-                      disabled={activeMission !== null}
+                      disabled={activemission !== null}
                     >
-                      {activeMission === null ? 'Start Mission' : 'Complete Current Mission'}
+                      {activemission === null ? 'Start Mission' : 'Complete Current Mission'}
                     </button>
                   </div>
                 )}

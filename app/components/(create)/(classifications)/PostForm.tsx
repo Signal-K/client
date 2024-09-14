@@ -301,7 +301,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             // Reset user's active mission to null after classification is created
             const { error: resetMissionError } = await supabase
                 .from('profiles')
-                .update({ activeMission: null })
+                .update({ activemission: null })
                 .eq('id', session?.user?.id);
     
             if (resetMissionError) {

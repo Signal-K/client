@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { StructuresConfig } from "@/constants/Structures/Properties";
-import { IndividualStructureNoModal as IndividualStructure } from "@/app/components/(structures)/IndividualStructure";
 
 interface CitizenScienceModule {
     id: number;
@@ -41,7 +40,7 @@ const modules: CitizenScienceModule[] = [
 ];
 
 interface MissionStructureDisplayProps {
-    activeMission: number;
+    activemission: number;
 };
 
 interface StructureConfig {
@@ -53,7 +52,7 @@ interface StructureConfig {
     buttons: { icon: React.ReactNode; text: string; showInNoModal: boolean; dynamicComponent?: React.ReactNode; sizePercentage?: number }[];
 }
 
-export function MissionStructureDisplay({ activeMission }: MissionStructureDisplayProps) {
+export function MissionStructureDisplay({ activemission }: MissionStructureDisplayProps) {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
@@ -72,8 +71,8 @@ export function MissionStructureDisplay({ activeMission }: MissionStructureDispl
             setInsertLock(true); // Set the lock before performing actions
 
             try {
-                // Find the corresponding module and structure based on the activeMission ID
-                const module = modules.find(mod => mod.starterMission === activeMission);
+                // Find the corresponding module and structure based on the activemission ID
+                const module = modules.find(mod => mod.starterMission === activemission);
                 if (!module) {
                     setLoading(false);
                     return;
@@ -133,7 +132,7 @@ export function MissionStructureDisplay({ activeMission }: MissionStructureDispl
                               anomaly: activePlanet.id, 
                               item: structureId,
                               time_of_deploy: new Date().toISOString(),
-                              configuration: { "Uses": 1, "Created for": "Starter mission", "Mission ID": activeMission },
+                              configuration: { "Uses": 1, "Created for": "Starter mission", "Mission ID": activemission },
                             },
                         ]);
 
@@ -151,7 +150,7 @@ export function MissionStructureDisplay({ activeMission }: MissionStructureDispl
         }
 
         fetchStructureForMission();
-    }, [activeMission, session?.user?.id, activePlanet?.id, insertLock, supabase]);
+    }, [activemission, session?.user?.id, activePlanet?.id, insertLock, supabase]);
 
     const handleClose = () => {
         setTimeout(() => {
@@ -165,21 +164,6 @@ export function MissionStructureDisplay({ activeMission }: MissionStructureDispl
 
     return (
         <div className="flex flex-col space-y-4">
-            {selectedStructure && (
-                <IndividualStructure
-                    key={selectedStructure.name}
-                    name={selectedStructure.name}
-                    title={selectedStructure.title}
-                    labels={selectedStructure.labels.map(label => ({
-                      text: label.text,
-                      variant: label.variant
-                    }))}
-                    imageSrc={selectedStructure.imageSrc}
-                    actions={selectedStructure.actions}
-                    buttons={selectedStructure.buttons}
-                    onClose={handleClose}
-                />
-            )}
         </div>
     );
 };

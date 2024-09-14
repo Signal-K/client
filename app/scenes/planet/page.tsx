@@ -4,13 +4,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import PlanetViewLayout from "@/app/components/(scenes)/planetScene/layout";
-import StructuresOnPlanet, { ActiveMissionStructures, AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet, StarterMissionStructures } from "@/app/components/(structures)/Structures";
+import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/app/components/(structures)/Structures";
 import { InventoryStructureItem } from "@/types/Items";
 import ChapterOneIntroduction from "@/app/components/(scenes)/chapters/one/ChapterOneIntro";
-import MissionLog from "@/app/components/(scenes)/(missions)/MissionList";
 import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
 import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
-import StarterMissionsStats from "@/app/components/(scenes)/(missions)/CompletedMissions";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
 import { CaptnCosmosGuideModal } from "@/app/components/(dialogue)/guideBot";
@@ -244,46 +242,3 @@ function PlanetStructures() {
         </PlanetViewLayout>
     );
 };
-
-/*
-
-<PlanetViewLayout>
-            <div>
-                Planet id: {activePlanet?.id}
-                <br />
-                Orbital & Orbital structures
-                {/* <div className="flex flex-row space-y-4">
-                    {orbitalStructures.map((structure) => (
-                        <div key={structure.id} className="flex items-center space-x-4">
-                            <img src={structure.itemDetail?.icon_url} alt={structure.itemDetail?.name} className="w-16 h-16 object-cover" />
-                        </div>
-                    ))}
-                </div> 
-                </div>
-                <div>
-                    Atmosphere Structures
-                    {/* <div className="flex flex-row space-y-4">
-                        {atmosphereStructures.map((structure) => (
-                            <div key={structure.id} className="flex items-center space-x-4">
-                                <img src={structure.itemDetail?.icon_url} alt={structure.itemDetail?.name} className="w-16 h-16 object-cover" />
-                            </div>
-                        ))}
-                    </div> 
-                </div>
-                <div>
-                    Surface Structures
-                    {/* <div className="flex flex-row space-y-4">
-                        {surfaceStructures.map((structure) => (
-                            <div key={structure.id} className="flex items-center space-x-4">
-                                <img src={structure.itemDetail?.icon_url} alt={structure.itemDetail?.name} className="w-16 h-16 object-cover" />
-                            </div>
-                        ))}
-                    </div> 
-                    <StructuresOnPlanet onStructuresFetch={handleStructuresFetch} />
-                </div>
-                <div className="bg-white/50 h-full">
-                    {/* Automatons 
-                    <ChapterOneIntroduction />
-                </div>
-            </PlanetViewLayout>
-*/

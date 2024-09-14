@@ -25,7 +25,7 @@ export default function MissionLog() {
   const [showCompleted, setShowCompleted] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [openGroups, setOpenGroups] = useState<string[]>([]);
-  const [activeMissionComponent, setActiveMissionComponent] =
+  const [activemissionComponent, setactivemissionComponent] =
     useState<React.ReactNode | null>(null);
 
   const pastelColors = [
@@ -134,7 +134,7 @@ export default function MissionLog() {
     console.log(`Clicked mission ID: ${mission.id}`); // Debugging line
     const component = missionComponents[mission.id];
     console.log("Selected component:", component); // Debugging line
-    setActiveMissionComponent(component ? React.cloneElement(component) : null);
+    setactivemissionComponent(component ? React.cloneElement(component) : null);
   };
 
   return (
@@ -239,9 +239,9 @@ export default function MissionLog() {
           )}
         </div>
 
-        {activeMissionComponent && (
+        {activemissionComponent && (
           <div className="mt-6 p-4 bg-gray-200 rounded-lg">
-            {activeMissionComponent}
+            {activemissionComponent}
           </div>
         )}
       </div>

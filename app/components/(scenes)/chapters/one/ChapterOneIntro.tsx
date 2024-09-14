@@ -76,15 +76,15 @@ export default function ChapterOneIntroduction() {
                 throw missionError;
             }
 
-            // Update activeMission to 1370203
+            // Update activemission to 1370203
             const { error: updateError } = await supabase
                 .from("profiles")
-                .update({ activeMission: 1370203 })
+                .update({ activemission: 1370203 })
                 .eq("id", session.user.id);
 
             if (updateError) throw updateError;
 
-            console.log("Mission 1370201 created and activeMission updated to 1370203.");
+            console.log("Mission 1370201 created and activemission updated to 1370203.");
             setMissionExists(true); 
         } catch (error: any) {
             console.error("Error handling item initialization: ", error.message);

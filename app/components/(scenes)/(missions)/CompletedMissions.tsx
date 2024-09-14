@@ -26,7 +26,7 @@ export default function StarterMissionsStats() {
   const [modules, setModules] = useState<CitizenScienceModule[]>([]);
   const [completedMissions, setCompletedMissions] = useState<number[]>([]);
   const [expandedMission, setExpandedMission] = useState<number | null>(null);
-  const [activeMission, setActiveMission] = useState<number | null>(null);
+  const [activemission, setactivemission] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null); // To display error messages
 
   useEffect(() => {
@@ -57,18 +57,18 @@ export default function StarterMissionsStats() {
       }
     };
 
-    const fetchActiveMission = async () => {
+    const fetchactivemission = async () => {
       if (!session) return;
 
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('activeMission')
+          .select('activemission')
           .eq('id', session.user.id)
           .single();
 
         if (error) throw error;
-        setActiveMission(data.activeMission);
+        setactivemission(data.activemission);
       } catch (error) {
         console.error('Error fetching active mission:', error);
       }
@@ -76,7 +76,7 @@ export default function StarterMissionsStats() {
 
     fetchModules();
     fetchCompletedMissions();
-    fetchActiveMission();
+    fetchactivemission();
   }, [session, supabase]);
 
   const isMissionCompleted = (starterMission: number | undefined) => {
@@ -124,7 +124,7 @@ export default function StarterMissionsStats() {
     }
   };
 
-  const updateActiveMission = async (starterMission: number | undefined, module: CitizenScienceModule) => {
+  const updateactivemission = async (starterMission: number | undefined, module: CitizenScienceModule) => {
     if (!starterMission || !session?.user?.id) return;
 
     try {
@@ -167,12 +167,12 @@ export default function StarterMissionsStats() {
       // Update the active mission in the user's profile
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ activeMission: starterMission })
+        .update({ activemission: starterMission })
         .eq('id', session.user.id);
 
       if (updateError) throw updateError;
 
-      setActiveMission(starterMission);
+      setactivemission(starterMission);
       setErrorMessage(null); // Clear any previous errors
       console.log(`Active mission updated to: ${starterMission}`);
 
@@ -183,16 +183,16 @@ export default function StarterMissionsStats() {
     }
   };
 
-  const handleSetActiveMission = (module: CitizenScienceModule) => {
+  const handleSetactivemission = (module: CitizenScienceModule) => {
     // Allow updating if the current active mission is 1370203
-    if (activeMission === 1370203) {
-      updateActiveMission(module.starterMission, module);
-    } else if (activeMission) {
+    if (activemission === 1370203) {
+      updateactivemission(module.starterMission, module);
+    } else if (activemission) {
       // Show error message if there's an active mission that's not 1370203
       setErrorMessage("You already have an active mission. You must complete or cancel it before starting a new one.");
     } else {
       // Otherwise, update the active mission
-      updateActiveMission(module.starterMission, module);
+      updateactivemission(module.starterMission, module);
     }
   };
 
@@ -240,7 +240,7 @@ export default function StarterMissionsStats() {
                   <p className="text-[#D689E3] text-sm">{module.description}</p>
                   <button
                     className="mt-2 px-4 py-2 bg-[#5FCBC3] text-white text-sm rounded-md"
-                    onClick={() => handleSetActiveMission(module)}
+                    onClick={() => handleSetactivemission(module)}
                   >
                     Set Active Mission
                   </button>
