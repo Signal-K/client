@@ -83,7 +83,8 @@ export function StarterZoodex() {
     if (!userChoice) {
         return (
             <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
-                <h2 className="text-lg font-bold">Choose Anomaly Set:</h2>
+                <p className="text-sm font-bold">You've been given some animals to observe the behaviour of and compare to their mannerisms on Earth. As you progress, more species will become available</p>
+                <h2 className="text-lg font-bold">Choose animal set:</h2>
                 <button
                     onClick={() => handleChoice('burrowingOwls')}
                     className="bg-blue-500 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-blue-700"
