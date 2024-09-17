@@ -1,49 +1,17 @@
-# This file is based on https://github.com/vercel/next.js/blob/canary/examples/with-docker/Dockerfile
-FROM node:18-bullseye AS base
+# Use the official Node.js image
+FROM node:18-bullseye
 
-# Install dependencies only when needed
-FROM base AS deps
-
+# Set the working directory
 WORKDIR /app
 
-RUN yarn set version berry
+# Copy the package.json and yarn.lock
+COPY package.json yarn.lock ./
 
-COPY package.json yarn.lock* ./
-COPY .yarn/ ./.yarn
-
-ENV YARN_ENABLE_IMMUTABLE_INSTALLS false
+# Install dependencies
 RUN yarn install
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
+# Copy the rest of the application code
 COPY . .
 
-RUN yarn set version berry
-RUN yarn install
-RUN yarn build
-
-# CMD "/bin/sh"
-CMD ["yarn", "run", "dev"]
-
-# Production image, copy all the files and run next
-# FROM base AS runner
-# WORKDIR /app
-
-# ENV NODE_ENV production
-
-# RUN addgroup --system --gid 1001 nodejs
-# RUN adduser --system --uid 1001 nextjs
-
-# COPY --from=builder /app/public ./public
-
-# # Automatically leverage output traces to reduce image size
-# # https://nextjs.org/docs/advanced-features/output-file-tracing
-# COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-# COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# USER nextjs
-# EXPOSE 3000
-# ENV PORT 3000
-
-# CMD ["yarn", "node", "server.js"]
+# For hot-reloading, you can use development mode
+CMD ["yarn", "dev"]

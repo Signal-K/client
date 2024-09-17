@@ -12,6 +12,7 @@ import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
 import { CaptnCosmosGuideModal } from "@/app/components/(dialogue)/guideBot";
+import CitizenData from "@/app/auth/readToFlask";
 
 export default function PlanetViewPage() {
     const { activePlanet } = useActivePlanet();
@@ -257,6 +258,7 @@ function PlanetStructures() {
                 </div>
                 <AllAutomatonsOnActivePlanet />
                 <SciFiPopupMenu />
+                <CitizenData />
             </div>
         </PlanetViewLayout>
     );
