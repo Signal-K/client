@@ -3,7 +3,7 @@
 import { Menu, MenuButton, MenuItem } from "@headlessui/react";
 import { ArrowDownIcon, LucideArrowLeft, LucideArrowRightSquare, LucideBookOpen, PaintRollerIcon } from "lucide-react";
 import { NavMenuProps } from "@/types/Layout/Menu";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";

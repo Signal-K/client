@@ -108,61 +108,6 @@ const missions: Mission[] = [
     { // This is your first
         id: 13714101, name: "Find some rover pics", classificationModule: 'AutomatonCamera', chapter: 1, sequence: 3,
     },
-
-
-
-    // Repairing
-    {
-        id: 1372002, name: "Repair your telescope", classificationModule: "Telescope", chapter: 1,
-        // sequence: 5+,
-        component: MineralDepositsNoAction,
-    },
-    {
-        id: 13712602, name: "Repair your Zoodex module", classificationModule: "Zoodex", chapter: 1, 
-    },
-
-
-
-    // Research topics
-    // Chapter 1
-    {
-        id: 1800001,
-        name: "Research telescope",
-        classificationModule: 'Telescope',
-        chapter: 1,
-    },
-    {
-        id: 1800002,
-        name: "Research LIDAR",
-        classificationModule: 'LIDAR',
-        chapter: 1,
-    },
-    {
-        id: 1800003,
-        name: "Research Zoodex",
-        classificationModule: 'Zoodex',
-        chapter: 1,
-    },
-    {
-        id: 1800004,
-        name: "Research rover photo module",
-        classificationModule: 'AutomatonCamera',
-        chapter: 1,
-    },
-
-    // Chapter 2
-    {
-        id: 1800005,
-        name: "Ability to upload photos to Zoodex",
-        classificationModule: 'Zoodex',
-        chapter: 2,
-    },
-    {
-        id: 1800006,
-        name: "Phase folded graphs",
-        classificationModule: 'Telescope',
-        chapter: 2,
-    }
 ];
 
 export async function GET(req: NextRequest) {

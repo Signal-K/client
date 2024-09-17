@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { Card } from "@/app/components/ui/card";  
+import { Card } from "@/components/ui/card";  
 
 interface Classification {
     id: number;
