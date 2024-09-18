@@ -6,7 +6,7 @@ import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Trans
 import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
 import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
 import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookAIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PenBox, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonalIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookAIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PenBox, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/app/components/(structures)/Auto/AutomatonClassificationShell";
@@ -215,6 +215,17 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <BookAIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Decrypt manuscripts",
+        },
+      ],
+    },
+    10600: {
+      name: "Helicopter (test)",
+      labels: [],
+      imageSrc: '/assets/Items/Helicopter.png',
+      buttons: [
+        {
+          icon: <TestTubeDiagonal className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Test",
         },
       ],
     },

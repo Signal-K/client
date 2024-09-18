@@ -15,9 +15,10 @@ import { CaptnCosmosGuideModal } from "@/app/components/(dialogue)/guideBot";
 import CitizenData from "@/app/auth/readToFlask";
 
 export default function PlanetViewPage() {
-    const { activePlanet } = useActivePlanet();
     const session = useSession();
     const supabase = useSupabaseClient();
+
+    const { activePlanet } = useActivePlanet();
 
     const [hasMission1370201, setHasMission1370201] = useState(false);
     const [hasChosenFirstClassification, setHasChosenFirstClassification] = useState(false);
@@ -45,12 +46,7 @@ export default function PlanetViewPage() {
                 setHasMission1370201(missions?.length > 0);
             } catch (error: any) {
                 console.error('Error checking mission:', error.message);
-            }
-            /* --- Removed finally block ---
-            finally {
-                setIsLoading(false);
             };
-            */
         };
 
         const checkFirstClassificationStatus = async () => {
@@ -68,12 +64,7 @@ export default function PlanetViewPage() {
                 setHasChosenFirstClassification(missions?.length > 0);
             } catch (error: any) {
                 console.error('Error checking mission:', error.message);
-            }
-            /* --- Removed finally block ---
-            finally {
-                setIsLoading(false);
             };
-            */
         };
 
         /* --- Start of changes ---
@@ -125,9 +116,10 @@ export default function PlanetViewPage() {
 };
 
 function PlanetStructures() {
-    const { activePlanet } = useActivePlanet();
     const supabase = useSupabaseClient();
     const session = useSession();
+
+    const { activePlanet } = useActivePlanet();
 
     const [orbitalStructures, setOrbitalStructures] = useState<InventoryStructureItem[]>([]);
     const [atmosphereStructures, setAtmosphereStructures] = useState<InventoryStructureItem[]>([]);

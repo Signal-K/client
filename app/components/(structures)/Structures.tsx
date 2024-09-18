@@ -319,7 +319,7 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
 
   return (
     <div className="relative">
-      <div className="grid grid-cols-3 gap-1 gap-y-3">
+      <div className="grid grid-cols-3 gap-1 gap-y-1">
         {activeStructure && (
           <div key={activeStructure.id} className="flex flex-col items-center space-y-2">
             <img
