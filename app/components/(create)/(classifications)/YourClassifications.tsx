@@ -156,12 +156,9 @@ const ClassificationViewer: React.FC<ClassificationViewerProps> = ({ classificat
                                 <div className="mb-4">
                                     {/* Media display */}
                                     <div>
-                                        <h3 className="text-lg font-semibold">Media Debug Info:</h3>
-                                        <p className="text-gray-300 mb-2">Raw Media Data: {JSON.stringify(selectedClassification.media)}</p>
                                         {selectedClassification.media && selectedClassification.media.length > 0 && (
                                             <div>
                                                 {selectedClassification.media.map((item, index) => {
-                                                    // Directly use the URL if it's a string
                                                     const mediaUrl = typeof item === 'string' ? item : (Array.isArray(item) && typeof item[1] === 'string' ? item[1] : '');
                                                     return mediaUrl ? (
                                                         <div key={index} className="mb-2">
@@ -170,12 +167,9 @@ const ClassificationViewer: React.FC<ClassificationViewerProps> = ({ classificat
                                                                 alt={`Media ${index}`}
                                                                 className="max-w-full h-auto"
                                                             />
-                                                            <p className="text-gray-300">Image URL: {mediaUrl}</p>
                                                         </div>
                                                     ) : (
                                                         <div key={index} className="mb-2 text-red-500">
-                                                            <p>Error loading image URL.</p>
-                                                            <p className="text-gray-300">Raw Data: {JSON.stringify(item)}</p>
                                                         </div>
                                                     );
                                                 })}
@@ -343,17 +337,27 @@ export const ClassificationViewerAll: React.FC = () => {
                                 </div>
                                 <div className="mb-4">
                                     {/* Media display */}
-                                    {selectedClassification.media && selectedClassification.media.map((item, index) => (
-                                        <div key={index} className="mb-2">
-                                            {item[1] && (
-                                                <img
-                                                    src={item[1]}
-                                                    alt={`Media ${index}`}
-                                                    className="max-w-full h-auto"
-                                                />
-                                            )}
-                                        </div>
-                                    ))}
+                                    <div>
+                                        {selectedClassification.media && selectedClassification.media.length > 0 && (
+                                            <div>
+                                                {selectedClassification.media.map((item, index) => {
+                                                    const mediaUrl = typeof item === 'string' ? item : (Array.isArray(item) && typeof item[1] === 'string' ? item[1] : '');
+                                                    return mediaUrl ? (
+                                                        <div key={index} className="mb-2">
+                                                            <img
+                                                                src={mediaUrl}
+                                                                alt={`Media ${index}`}
+                                                                className="max-w-full h-auto"
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <div key={index} className="mb-2 text-red-500">
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="mb-4">
                                     {/* Classification Configuration */}

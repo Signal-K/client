@@ -188,7 +188,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     .eq('owner', session.user.id)
                     .eq('anomaly', activePlanet.id)
                     .eq('item', structureItemId)
-                    .order('id', { ascending: true }) // Get the item with the lowest ID
+                    .order('id', { ascending: true }) // Get the item with the lowest ID/primary key
                     .limit(1)
                     .single();
 
@@ -242,7 +242,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             ),
             activePlanet: activePlanet?.id,
             structureId: originatingStructure ?? null,
-            createdBy: inventoryItemId ?? null, // Include the inventory item ID
+            createdBy: inventoryItemId ?? null,
         };
     
         try {
@@ -324,7 +324,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     
             if (resetMissionError) {
                 console.error("Error resetting active mission:", resetMissionError.message);
-            }
+            };
     
             if (!hasMission1370204) {
                 const { error: insertError } = await supabase

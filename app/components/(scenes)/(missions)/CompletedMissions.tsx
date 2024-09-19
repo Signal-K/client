@@ -26,72 +26,49 @@ export default function StarterMissionsStats() {
   const [modules, setModules] = useState<CitizenScienceModule[]>([]);
   const [completedMissions, setCompletedMissions] = useState<number[]>([]);
   const [expandedMission, setExpandedMission] = useState<number | null>(null);
-  const [activemission, setactivemission] = useState<number | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // To display error messages
+  const [activeMission, setActiveMission] = useState<number | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchModules = async () => {
-      try {
-        const response = await fetch('/api/citizen/modules');
-        const data: CitizenScienceModule[] = await response.json();
-        setModules(data);
-      } catch (error) {
-        console.error('Error fetching modules:', error);
-      }
-    };
-
-    const fetchCompletedMissions = async () => {
+    const fetchData = async () => {
       if (!session) return;
 
       try {
-        const { data, error } = await supabase
-          .from('missions')
-          .select('mission')
-          .eq('user', session.user.id);
+        const [modulesResponse, missionsData, profileData] = await Promise.all([
+          fetch('/api/citizen/modules'),
+          supabase.from('missions').select('mission').eq('user', session.user.id),
+          supabase.from('profiles').select('activemission').eq('id', session.user.id).single()
+        ]);
 
-        if (error) throw error;
-        const missionIds = data.map((mission: MissionData) => mission.mission);
+        const modulesData: CitizenScienceModule[] = await modulesResponse.json();
+        setModules(modulesData);
+
+        if (missionsData.error) throw missionsData.error;
+        const missionIds = missionsData.data.map((mission: MissionData) => mission.mission);
         setCompletedMissions(missionIds);
+
+        if (profileData.error) throw profileData.error;
+        setActiveMission(profileData.data.activemission);
+
       } catch (error) {
-        console.error('Error fetching completed missions:', error);
+        console.error('Error fetching data:', error);
+        setErrorMessage('Failed to load mission data. Please try again.');
       }
     };
 
-    const fetchactivemission = async () => {
-      if (!session) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('activemission')
-          .eq('id', session.user.id)
-          .single();
-
-        if (error) throw error;
-        setactivemission(data.activemission);
-      } catch (error) {
-        console.error('Error fetching active mission:', error);
-      }
-    };
-
-    fetchModules();
-    fetchCompletedMissions();
-    fetchactivemission();
+    fetchData();
   }, [session, supabase]);
 
-  const isMissionCompleted = (starterMission: number | undefined) => {
-    return starterMission && completedMissions.includes(starterMission);
-  };
+  const isMissionCompleted = (starterMission: number | undefined): boolean => 
+    starterMission !== undefined && completedMissions.includes(starterMission);
 
-  const toggleMission = (id: number) => {
+  const toggleMission = (id: number): void => 
     setExpandedMission(expandedMission === id ? null : id);
-  };
 
-  const createInventoryEntry = async (module: CitizenScienceModule) => {
+  const createInventoryEntry = async (module: CitizenScienceModule): Promise<void> => {
     if (!session || !activePlanet) return;
 
     try {
-      // Check for existing inventory entry
       const { data: existingEntries, error: checkError } = await supabase
         .from('inventory')
         .select('*')
@@ -102,69 +79,35 @@ export default function StarterMissionsStats() {
       if (checkError) throw checkError;
 
       if (existingEntries.length === 0) {
-        // Insert new inventory entry
         const { error: insertError } = await supabase
           .from('inventory')
           .insert({
             owner: session.user.id,
             item: module.structure,
-            quantity: 1,
-            time_of_deploy: null,
             anomaly: activePlanet.id,
-            parentItem: null,
-            configurtion: {"Uses": 1},
+            quantity: 1,
           });
 
         if (insertError) throw insertError;
-
-        console.log(`Inventory entry created for item ${module.structure}.`);
       }
     } catch (error) {
       console.error('Error creating inventory entry:', error);
+      setErrorMessage('Failed to update inventory. Please try again.');
     }
   };
 
-  const updateactivemission = async (starterMission: number | undefined, module: CitizenScienceModule) => {
-    if (!starterMission || !session?.user?.id) return;
+  const updateActiveMission = async (starterMission: number | undefined, module: CitizenScienceModule): Promise<void> => {
+    if (!session) return;
 
     try {
-      // Insert the starter mission for the user
-      const { error: insertError } = await supabase
-        .from('missions')
-        .insert({
-          user: session.user.id,
-          mission: starterMission,
-          time_of_completion: null,
-          configuration: {},
-          rewarded_items: [],
-        });
+      await supabase.from('missions').upsert({
+        user: session.user.id,
+        mission: 1370203,
+        time_of_completion: null,
+        configuration: {},
+        rewarded_items: [],
+      });
 
-      if (insertError) throw insertError;
-
-      // Assign mission 1370203 to the user if they don't have it
-      const { data: mission1370203, error: mission1370203Error } = await supabase
-        .from('missions')
-        .select('mission')
-        .eq('user', session.user.id)
-        .eq('mission', 1370203)
-        .single();
-
-      if (!mission1370203 && mission1370203Error?.code === 'PGRST116') {
-        // Insert mission 1370203
-        const { error: insertMission1370203Error } = await supabase
-          .from('missions')
-          .insert({
-            user: session.user.id,
-            mission: 1370203,
-            time_of_completion: null,
-            configuration: {},
-            rewarded_items: [],
-          });
-
-        if (insertMission1370203Error) throw insertMission1370203Error;
-      }
-
-      // Update the active mission in the user's profile
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ activemission: starterMission })
@@ -172,42 +115,36 @@ export default function StarterMissionsStats() {
 
       if (updateError) throw updateError;
 
-      setactivemission(starterMission);
-      setErrorMessage(null); // Clear any previous errors
+      setActiveMission(starterMission || null);
+      setErrorMessage(null);
       console.log(`Active mission updated to: ${starterMission}`);
 
-      // Create corresponding inventory entry
       await createInventoryEntry(module);
     } catch (error) {
       console.error('Error updating active mission:', error);
+      setErrorMessage('Failed to update active mission. Please try again.');
     }
   };
 
-  const handleSetactivemission = (module: CitizenScienceModule) => {
-    // Allow updating if the current active mission is 1370203
-    if (activemission === 1370203) {
-      updateactivemission(module.starterMission, module);
-    } else if (activemission) {
-      // Show error message if there's an active mission that's not 1370203
+  const handleSetActiveMission = (module: CitizenScienceModule): void => {
+    if (activeMission === 1370203) {
+      updateActiveMission(module.starterMission, module);
+    } else if (activeMission) {
       setErrorMessage("You already have an active mission. You must complete or cancel it before starting a new one.");
     } else {
-      // Otherwise, update the active mission
-      updateactivemission(module.starterMission, module);
+      updateActiveMission(module.starterMission, module);
     }
   };
 
-  const sortedModules = [...modules].sort((a, b) => {
-    const aCompleted = isMissionCompleted(a.starterMission);
-    const bCompleted = isMissionCompleted(b.starterMission);
-    return Number(bCompleted) - Number(aCompleted);
-  });
+  const sortedModules = [...modules].sort((a, b) => 
+    Number(isMissionCompleted(b.starterMission)) - Number(isMissionCompleted(a.starterMission))
+  );
 
   return (
     <div className="flex items-center justify-center p-4">
       <div className="bg-[#253B4A] rounded-lg shadow-xl max-w-md w-full">
         <h2 className="text-2xl font-bold text-[#5FCBC3] p-4 border-b border-[#5FCBC3]">Mission Log</h2>
         
-        {/* Display the error message, if any */}
         {errorMessage && (
           <div className="text-red-500 text-center mb-4">
             {errorMessage}
@@ -240,7 +177,7 @@ export default function StarterMissionsStats() {
                   <p className="text-[#D689E3] text-sm">{module.description}</p>
                   <button
                     className="mt-2 px-4 py-2 bg-[#5FCBC3] text-white text-sm rounded-md"
-                    onClick={() => handleSetactivemission(module)}
+                    onClick={() => handleSetActiveMission(module)}
                   >
                     Set Active Mission
                   </button>
@@ -252,4 +189,4 @@ export default function StarterMissionsStats() {
       </div>
     </div>
   );
-};
+}
