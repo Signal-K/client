@@ -149,6 +149,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
               className="w-24 h-24 object-cover cursor-pointer bouncing-structure"
               onClick={() => handleIconClick(activeStructure.item, activeStructure.id)}
             />
+            <p className="text-white text-sm mt-2">{itemDetails.get(activeStructure.item)?.name}</p>
           </div>
         )}
         {otherStructures.slice(0, 2).map((structure) => {
@@ -162,6 +163,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                 className="w-24 h-24 object-cover cursor-pointer moving-structure"
                 onClick={() => handleIconClick(itemDetail.id, structure.id)}
               />
+              <p className="text-white text-sm mt-2">{itemDetail.name}</p>
             </div>
           ) : null;
         })}
@@ -179,6 +181,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                   className="w-24 h-24 object-cover cursor-pointer moving-structure"
                   onClick={() => handleIconClick(itemDetail.id, structure.id)}
                 />
+                <p className="text-white text-sm mt-2">{itemDetail.name}</p>
               </div>
             ) : null;
           })}
@@ -201,6 +204,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
     </div>
   );
 };
+
 
 export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
     const supabase = useSupabaseClient();

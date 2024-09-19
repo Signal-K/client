@@ -12,7 +12,7 @@ import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
 import { CaptnCosmosGuideModal } from "@/app/components/(dialogue)/guideBot";
-import CitizenData from "@/app/auth/readToFlask";
+import GuideButton from "@/app/components/(scenes)/chapters/one/HelpPickup";
 
 export default function PlanetViewPage() {
     const session = useSession();
@@ -23,13 +23,11 @@ export default function PlanetViewPage() {
     const [hasMission1370201, setHasMission1370201] = useState(false);
     const [hasChosenFirstClassification, setHasChosenFirstClassification] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isTutorialExpanded, setIsTutorialExpanded] = useState(true);
+    const [isGuidePopupVisible, setIsGuidePopupVisible] = useState(false); // Manage guide popup visibility
 
-    const [isTutorialExpanded, setIsTutorialExpanded] = useState(true)
-    const toggleTutorial = () => setIsTutorialExpanded(!isTutorialExpanded)
+    const toggleTutorial = () => setIsTutorialExpanded(!isTutorialExpanded);
 
-    /* --- Start of changes ---
-    Consolidated loading state management using Promise.all
-    */
     useEffect(() => {
         const checkMission = async () => {
             if (!session?.user) return;
@@ -46,7 +44,7 @@ export default function PlanetViewPage() {
                 setHasMission1370201(missions?.length > 0);
             } catch (error: any) {
                 console.error('Error checking mission:', error.message);
-            };
+            }
         };
 
         const checkFirstClassificationStatus = async () => {
@@ -64,12 +62,9 @@ export default function PlanetViewPage() {
                 setHasChosenFirstClassification(missions?.length > 0);
             } catch (error: any) {
                 console.error('Error checking mission:', error.message);
-            };
+            }
         };
 
-        /* --- Start of changes ---
-        Consolidated loading state management using Promise.all
-        */
         const fetchData = async () => {
             setIsLoading(true);
             await Promise.all([checkMission(), checkFirstClassificationStatus()]);
@@ -77,12 +72,11 @@ export default function PlanetViewPage() {
         };
 
         fetchData();
-        /* --- End of changes --- */
     }, [session?.user, supabase]);
 
     if (isLoading) {
         return <p>Loading...</p>;
-    };
+    }
 
     if (!hasMission1370201) {
         return (
@@ -93,7 +87,7 @@ export default function PlanetViewPage() {
                 <div><ChapterOneIntroduction /></div>
             </PlanetViewLayout>
         );
-    };
+    }
 
     if (!hasChosenFirstClassification) {
         return (
@@ -104,16 +98,28 @@ export default function PlanetViewPage() {
                 <div><CaptnCosmosGuideModal isExpanded={isTutorialExpanded} toggleExpand={toggleTutorial} /></div>
             </PlanetViewLayout>
         );
-    };
+    }
 
     return (
         <div className="relative min-h-screen">
             <PlanetStructures />
             <SciFiPopupMenu />
             <BottomMenuBar onClose={() => null} />
+            <GuideButton onClick={() => setIsGuidePopupVisible(true)} /> {/* Add the Guide button */}
+            {isGuidePopupVisible && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <ChapterOneIntroduction />
+                    <button
+                        onClick={() => setIsGuidePopupVisible(false)}
+                        className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 focus:outline-none"
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
         </div>
     );
-};
+}
 
 function PlanetStructures() {
     const supabase = useSupabaseClient();
@@ -216,12 +222,11 @@ function PlanetStructures() {
                         </div>
                     ))}
                 </div>
-                <div className="py-2">
+                <div className="py-3">
                     <center><AtmosphereStructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
                 </div>
             </div>
             <div className="w-full">
-                <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
                 <div className="flex flex-row space-y-4">
                     {surfaceStructures.map((structure) => (
                         <div
@@ -243,14 +248,9 @@ function PlanetStructures() {
                         </div>
                     ))}
                 </div>
-            </div>
-            <div className="relative flex-1">
-                <div className="absolute right-0 w-full sm:w-auto sm:h-auto max-h-[30vh] sm:relative">
-                    {/* <StarterMissionsStats /> */}
+                <div className="py-3">
+                    <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
                 </div>
-                <AllAutomatonsOnActivePlanet />
-                <SciFiPopupMenu />
-                <CitizenData />
             </div>
         </PlanetViewLayout>
     );

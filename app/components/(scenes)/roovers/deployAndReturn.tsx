@@ -30,7 +30,17 @@ export default function DeployRooversInitial() {
     parentItem: null,
     time_of_deploy: null,
     anomaly: activePlanet?.id,
+    configuration: '{"Uses": 8}',
   };
+
+  const researchStructureToInventoryData = {
+    item: 3106,
+    owner: session?.user.id,
+    quantity: 1,
+    notes: "Created for introductory mission group",
+    anomaly: activePlanet?.id,
+    configuration: '{"Uses": 8}',
+  }
 
   const [isDeployed, setIsDeployed] = useState<boolean>(false);
   const [roverData, setRoverData] = useState<RoverData | null>(null);
@@ -78,8 +88,18 @@ export default function DeployRooversInitial() {
             console.error("Error creating rover in inventory: ", insertError);
           } else {
             console.log("New rover added to inventory.");
-          }
-        }
+          };
+
+          const { error: insertResearchError } = await supabase
+            .from("inventory")
+            .insert(researchStructureToInventoryData);
+          
+          if (insertResearchError) {
+              console.error("Error creating research structure in inventory: ", insertResearchError);
+            } else {
+              console.log("Research structure added to inventory.");
+            };
+        };
       } catch (error) {
         console.error("Unexpected error: ", error);
       }
