@@ -252,6 +252,9 @@ function PlanetStructures() {
                     <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
                 </div>
             </div>
+            <div className="relative flex-1">
+                <AllAutomatonsOnActivePlanet />
+            </div>
         </PlanetViewLayout>
     );
 };
