@@ -38,7 +38,7 @@ contract AnomalyGovernor is Governor, GovernorSettings, GovernorCountingSimple, 
 
     function votingPeriod() public view override(IGovernor, GovernorSettings) returns (uint256) {
         return super.votingPeriod();
-    }
+    } 
 
     function quorum(uint256 blockNumber) public view override(IGovernor, GovernorVotesQuorumFraction) returns(uint256) {
         return super.quorum(blockNumber);

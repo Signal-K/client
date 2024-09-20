@@ -1,7 +1,7 @@
 import { Fragment, forwardRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ConnectWallet, useAddress, /* useEditionDrop, */ useOwnedNFTs, useContract } from "@thirdweb-dev/react";
+// import { ConnectWallet, useAddress, /* useEditionDrop, */ useOwnedNFTs, useContract } from "@thirdweb-dev/react";
 import styles from '../../styles/Staking-P2E/planetInteraction.module.css';
 
 import {
@@ -21,7 +21,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 export default function CoreNavigation ({ showNav, setShowNav }) {
     const session = useSession();
     const supabase = useSupabaseClient();
-    const address = useAddress();
+    // const address = useAddress();
     const router = useRouter();
 
     const [loading, setLoading] = useState(false);

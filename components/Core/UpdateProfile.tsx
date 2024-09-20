@@ -97,78 +97,6 @@ export default function AccountEditor({ session }: { session: Session }) {
         }
     }
 
-    // Gallery components
-    // Retrieving gallery data for user
-    async function getImages() {
-        const { data, error } = await supabase
-            .storage
-            .from('images')
-            .list(user?.id + '/', {
-                limit: 100, // Get 100 images from this dir
-                offset: 0,
-                sortBy: {
-                    column: 'name',
-                    order: 'asc'
-                }
-            });
-
-        if ( data !== null ) {
-            setImages(data);
-        } else {
-            alert('Error loading images');
-            console.log(error);
-        }
-    }
-
-    async function uploadImage(e) {
-        let file = e.target.files[0];
-        const { data, error } = await supabase
-            .storage
-            .from('images')
-            .upload(user.id + '/' + uuidv4(), file);
-
-        if (data) {
-            getImages();
-        } else {
-            console.log(error);
-        }
-    }
-
-    async function deleteImage (imageName) {
-        const { error } = await supabase
-            .storage
-            .from('images')
-            .remove([ user.id + '/' + imageName ])
-
-        if (error) {
-            alert (error);
-        } else {
-            getImages();
-        }
-    }
-
-    useEffect(() => {
-        if (user) { // Only get images IF the user exists and is logged in
-            getImages(); // Add a getPosts function to get a user's profile posts
-        }
-    }, [user]);
-
-    function convertURIToImageData(URI) {
-        return new Promise(function(resolve, reject) {
-          if (URI == null) return reject();
-          var canvas = document.createElement('canvas'),
-              context = canvas.getContext('2d'),
-              image = new Image();
-          image.addEventListener('load', function() {
-            canvas.width = image.width;
-            canvas.height = image.height;
-            context.drawImage(image, 0, 0, canvas.width, canvas.height);
-            resolve(context.getImageData(0, 0, canvas.width, canvas.height));
-          }, false);
-          image.src = URI;
-        });
-    }
-
     /* PLANET manipulation */
     async function createPlanet({ // Maybe we should add a getPlanet (getUserPlanet) helper as well?
         userId, temperature, radius, date, ticId
@@ -184,7 +112,7 @@ export default function AccountEditor({ session }: { session: Session }) {
             setLoading(true);
             // Is the planet ID going to be based on the user id (obviously not in production, but in this version?)
             const newPlanetParams = {
-                id: user.id, // Generate a random id later
+                // id: user.id, // Generate a random id later
                 // .. other params from database types
             }
         } catch (error) {

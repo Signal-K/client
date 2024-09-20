@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Card from "../../Card";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { SocialGraphHomeNoSidebar } from "../../../pages/posts";
+import SocialGraphHomeNoSidebar from "../../../pages/posts";
 
 export default function PlanetContent ({ activeTab, planetId }) {
     const supabase = useSupabaseClient();
@@ -18,19 +18,6 @@ export default function PlanetContent ({ activeTab, planetId }) {
     async function loadPlanet () {
         //
     }
-
-    async function getPlanetPosts ( planetId ) {
-        const { data, error } = await supabase.from('posts_duplicate')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .eq('planets2', planetId)
-        return data;
-
-        if (error) {
-            console.error(error);
-            return [];
-        }
-    };
 
     async function getPlanetData ( planetId ) {
         const { data } = await supabase.from('planetsss')
