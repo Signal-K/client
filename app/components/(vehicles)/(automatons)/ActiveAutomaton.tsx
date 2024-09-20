@@ -44,12 +44,13 @@ export function ActiveAutomatonForMining({
         }
 
         const { data: automatonData, error: automatonError } = await supabase
-          .from("inventory")
-          .select("*")
-          .eq("owner", session.user.id)
-          .eq("item", 23)
-          .eq("anomaly", activePlanet.id)
-          .single();
+        .from("inventory")
+        .select("*")
+        .eq("owner", session.user.id)
+        .eq("item", 23)
+        .eq("anomaly", activePlanet.id)
+        .single();
+      
 
         if (automatonError) {
           throw new Error(
@@ -262,7 +263,7 @@ export function ActiveAutomatonForMining({
           }
 
           console.log("Mineral collected and added to inventory.");
-          alert(`Successfully collected ${haulQuantity} ${mineralName}(s)!`);
+          console.log(`Successfully collected ${haulQuantity} ${mineralName}(s)!`);
           setMiningInProgress(false);
           setCountdownTime(null);
         } catch (error: any) {
@@ -408,7 +409,7 @@ export function ActiveAutomatonForMining({
               />
             </div>
           )}
-        </>
+        </> 
       )}
     </div>
   );
@@ -522,12 +523,12 @@ export function AutomatonUpgrader() {
       {automatons.length > 0 ? (
         <div>
           <div className="flex justify-between items-center mb-4">
-            <button onClick={handlePreviousAutomaton}>← Previous</button>
+            {/* <button onClick={handlePreviousAutomaton}>← Previous</button> */}
             <AutomatonUpgrade
               inventoryId={automatons[currentAutomatonIndex].id}
               onSave={handleSaveConfiguration}
             />
-            <button onClick={handleNextAutomaton}>Next →</button>
+            {/* <button onClick={handleNextAutomaton}>Next →</button> */}
           </div>
         </div>
       ) : (
@@ -535,8 +536,7 @@ export function AutomatonUpgrader() {
       )}
     </div>
   );
-}
-
+};
 
 interface MapHighlightProps {
   distanceRemaining: number;
@@ -661,14 +661,3 @@ function MapHighlight({
     </div>
   );
 };
-
-{
-  /* <div className="topographic-map">
-          {/* Example of a curved path *
-          <div className="path-line" style={{ width: '50%', transform: 'rotate(30deg) translate(50%, -10%)' }}></div>
-          <div className="path-line" style={{ width: '30%', transform: 'rotate(60deg) translate(120%, 40%)' }}></div>
-          <div className="path-line" style={{ width: '40%', transform: 'rotate(15deg) translate(70%, 80%)' }}></div>
-
-          {/* Current Location Indicator 
-          <div className="current-location" style={{ top: '70%', left: '80%' }}>HELLO</div> */
-}

@@ -3,6 +3,7 @@ import { useProfileContext } from "@/context/UserProfile";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Mission } from "../components/(structures)/StructuresForMission";
 
 interface UserProfile {
   username: string;
@@ -18,13 +19,6 @@ interface User {
   username: string;
   full_name: string;
   location: number;
-};
-
-interface Mission {
-  id: number;
-  name: string;
-  description: string;
-  rewards: number[];
 };
 
 export function ProfileCard() {
@@ -85,7 +79,7 @@ export function ProfileCard() {
       if (profileError) {
         throw profileError;
       }
- 
+
       // Mark mission 2 as complete
       const missionId = 2;
       const mission = missions.find(m => m.id === missionId);
@@ -103,22 +97,26 @@ export function ProfileCard() {
           throw missionError;
         }
 
-        // Add the reward item to the inventory
-        const inventoryData = {
-          item: mission.rewards[0], // Assuming single reward item for mission 2
-          owner: session?.user?.id,
-          quantity: 1,
-          notes: `Reward for completing mission ${missionId}`,
-          parentItem: null,
-          time_of_deploy: new Date().toISOString(),
-          anomaly: null, // Assuming no specific location for the item
-        };
+        // Add the reward item to the inventory (ensure mission.rewards is defined)
+        if (mission.rewards && mission.rewards.length > 0) {
+          const inventoryData = {
+            item: mission.rewards[0], // Assuming single reward item for mission 2
+            owner: session?.user?.id,
+            quantity: 1,
+            notes: `Reward for completing mission ${missionId}`,
+            parentItem: null,
+            time_of_deploy: new Date().toISOString(),
+            anomaly: null, // Assuming no specific location for the item
+          };
 
-        const { error: inventoryError } = await supabase
-          .from('inventory')
-          .insert([inventoryData]);
-        if (inventoryError) {
-          throw inventoryError;
+          const { error: inventoryError } = await supabase
+            .from('inventory')
+            .insert([inventoryData]);
+          if (inventoryError) {
+            throw inventoryError;
+          }
+        } else {
+          console.error(`No rewards found for mission ${missionId}`);
         }
       }
 

@@ -1,0 +1,3 @@
+[submodule "citizen"]
+	path = citizen
+	url = https://github.com/signal-k/sytizen

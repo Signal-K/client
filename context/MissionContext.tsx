@@ -1,19 +1,19 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
 
-interface Mission {
+interface CompletedMission {
   id: number;
   completed: boolean;
-}
+};
 
-interface MissionContextType {
-  missions: Mission[];
-}
+interface ContextTypeMission {
+  missions: CompletedMission[];
+};
 
-const MissionContext = createContext<MissionContextType | undefined>(undefined);
+const MissionContext = createContext<ContextTypeMission | undefined>(undefined);
 
 export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [missions, setMissions] = useState<Mission[]>([]);
+  const [missions, setMissions] = useState<CompletedMission[]>([]);
   const supabase = useSupabaseClient();
   const session = useSession();
 

@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from "react";
-import AutomatonUpgrade from "@/app/components/(structures)/Config/AutomatonUpgradeBox";
-import { MiningScene } from "@/app/components/(structures)/Mining/MiningPanels";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { BeanIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, GemIcon, HeartIcon, LockIcon, MehIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, TelescopeIcon, WebcamIcon } from "lucide-react";
-import { useActivePlanet } from "@/context/ActivePlanet";
+import React from "react";
 import { AutomatonUpgrader } from "@/app/components/(vehicles)/(automatons)/ActiveAutomaton";
-import MineralDeposits, { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
+import { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
+import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Transiting";
+import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
+import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
+import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";
+import { BeanIcon, BookAIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PenBox, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, WebcamIcon } from "lucide-react";
+import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
+import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
+import { AnomalyRoverPhoto } from "@/app/components/(structures)/Auto/AutomatonClassificationShell";
+import { AdvancedTechTreeComponent } from "@/app/components/(structures)/Research/TechTree";
+import MiningScene from "@/app/scenes/mining/page";
 
 interface IndividualStructureProps {
     name?: string;
@@ -16,15 +21,19 @@ interface IndividualStructureProps {
     actions?: {
       icon: React.ReactNode;
       text: string;
+      dynamicComponent?: React.ReactNode;
+      sizePercentage?: number;
     }[];
     buttons: {
       icon: React.ReactNode;
       text: string;
       dynamicComponent?: React.ReactNode;
       sizePercentage?: number;
+      showInNoModal?: boolean;
     }[];
     onActionClick?: (action: string) => void;
     onClose?: () => void;
+    structureId?: number;
 };
 
 type StructureConfig = {
@@ -32,41 +41,6 @@ type StructureConfig = {
 };
 
 export const StructuresConfig: StructureConfig = {
-    3101: {
-      name: "Mining",
-      title: "Station",
-      labels: [
-        { text: "Resources", variant: "default" },
-        { text: "Automation", variant: "secondary" },
-        { text: "Station", variant: "destructive" },
-      ],
-      imageSrc: "/placeholder.svg",
-      actions: [
-        { icon: <HeartIcon className="w-6 h-6 text-[#a3be8c]" />, text: "Cuddle" },
-        { icon: <RssIcon className="w-6 h-6 text-[#a3be8c]" />, text: "Feed" },
-        { icon: <SaladIcon className="w-6 h-6 text-[#a3be8c]" />, text: "Dress" },
-        { icon: <MehIcon className="w-6 h-6 text-[#a3be8c]" />, text: "Meme" },
-      ],
-      buttons: [
-        { 
-          icon: <ConstructionIcon className="w-6 h-6 text-[#a3be8c]" />, 
-          text: "Mining", 
-          dynamicComponent: <MiningScene />
-        },
-        { 
-          icon: <PowerIcon className="w-6 h-6 text-[#a3be8c]" />, 
-          text: "Upgrade automaton",
-          dynamicComponent: <AutomatonUpgrader />,
-          sizePercentage: 50
-        },
-        { 
-          icon: <GemIcon className="w-6 h-6 text-[#a3be8c]" />, 
-          text: "View available deposits",
-          dynamicComponent: <MineralDepositsNoAction />,
-          sizePercentage: 50
-        },
-      ],
-    },
     3102: {
       name: "Automaton station",
       title: "Roovers",
@@ -78,9 +52,7 @@ export const StructuresConfig: StructureConfig = {
       imageSrc: "/forest.svg",
       actions: [
         { icon: <PickaxeIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Explore" },
-        { icon: <RssIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Harvest" },
-        { icon: <SaladIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Meditate" },
-        { icon: <MehIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Observe" },
+        { icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Repair", dynamicComponent: <StructureRepair inventoryId={3102} /> },
       ],
       buttons: [
         { 
@@ -95,9 +67,29 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <AutomatonUpgrader />,
           sizePercentage: 55,
         },
-        { 
-          icon: <LockIcon className="w-6 h-6 text-[#FFE3BA]" />, 
-          text: "Further interactions - locked" 
+        {
+          icon: <PickaxeIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: `Go mining`,
+          dynamicComponent: <MiningScene />,
+          sizePercentage: 73,
+        },
+        {
+          icon: <SwitchCamera className="w-6 h-6 text-[#5e81ac]" />,
+          text: 'View rover photos',
+          dynamicComponent: <AnomalyRoverPhoto />,
+          sizePercentage: 73,
+        },
+        // {
+        //   icon: <BookCopy className="w-6 h-6 text-[#5e81ac]" />, text: `Tutorial`,
+        //   dynamicComponent: <p></p>,
+        //   sizePercentage: 60,
+        //   showInNoModal: false,
+        // },
+        {
+          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="roverImg" />,
+          sizePercentage: 75,
         },
       ],
     },
@@ -117,20 +109,123 @@ export const StructuresConfig: StructureConfig = {
       imageSrc: '/assets/Items/TransitingTelescope.png',
       actions: [
         {
-          icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />, text: 'Transit events'
+          icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
+          , text: 'Durability/Repair'
+          , dynamicComponent: <StructureRepair inventoryId={3103} />,
+          sizePercentage: 40,
         },
         // Copy action/labels
       ],
       buttons: [
         {
           icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Transit events",
-          dynamicComponent: '',
-          sizePercentage: 60,
+          text: "Transit events (Starter)",
+          dynamicComponent: <StarterTelescope />,
+          sizePercentage: 90,
+          showInNoModal: true,
         },
         {
           icon: <CloudCogIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Cloud/Weather Data (LOCKED)",
+        },
+        {
+          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="planet" />,
+          sizePercentage: 75,
+        },
+      ],
+    },
+    3104: {
+      name: "Zoodex",
+      title: "Animal Observations",
+      labels: [
+        {
+          text: "Earth-based animals", variant: "default",
+        },
+      ],
+      imageSrc: '/assets/Items/Zoodex.png',
+      actions: [
+        {
+          icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
+          , text: 'Durability/Repair'
+          , dynamicComponent: <StructureRepair inventoryId={3104} />,
+          sizePercentage: 40,
+        },
+      ],
+      buttons: [
+        {
+          icon: <DogIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Search your animals",
+          dynamicComponent: <StarterZoodex />,
+          sizePercentage: 60,
+        },
+        {
+          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="zoodex-burrowingOwl" />,
+          sizePercentage: 75,
+        },
+      ],
+    },
+    3105: {
+      name: "LIDAR Detector",
+      labels: [
+        {
+          text: "Clouds", variant: "default",
+        },
+        {
+          text: "Sunspots", variant: "default",
+        },
+      ],
+      imageSrc: '/assets/Items/Lidar.png',
+      buttons: [
+        {
+          icon: <CloudCogIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Search your clouds",
+          dynamicComponent: <StarterLidar />,
+          sizePercentage: 60,
+        },
+        {
+          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="cloud" />,
+          sizePercentage: 75,
+        },
+      ],
+    },
+    3106: {
+      name: "Research station",
+      labels: [
+        {
+          text: "Technology", variant: "destructive",
+        },
+        {
+          text: "Alien artifacts", variant: "secondary",
+        },
+      ],
+      imageSrc: '/assets/Items/Research.png',
+      buttons: [
+        {
+          icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Research technology",
+          dynamicComponent: <AdvancedTechTreeComponent />,
+          sizePercentage: 85,
+        },
+        {
+          icon: <BookAIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Decrypt manuscripts",
+        },
+      ],
+    },
+    10600: {
+      name: "Helicopter (test)",
+      labels: [],
+      imageSrc: '/assets/Items/Helicopter.png',
+      buttons: [
+        {
+          icon: <TestTubeDiagonal className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Test",
         },
       ],
     },

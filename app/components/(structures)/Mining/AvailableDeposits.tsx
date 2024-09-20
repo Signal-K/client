@@ -70,7 +70,13 @@ const MineralDeposits: React.FC<{ onSelectDeposit: (deposit: MineralDepositData)
 
         if (error) throw error;
 
-        setMineralDeposits(data);
+        // Filter unique mineral deposits
+        const uniqueMineralDeposits = Array.from(new Map(data.map(deposit => [deposit.mineralconfiguration.mineral, deposit])).values());
+
+        // Limit to 9 unique deposits
+        const limitedDeposits = uniqueMineralDeposits.slice(0, 9);
+
+        setMineralDeposits(limitedDeposits);
       } catch (error) {
         console.error('Error fetching mineral deposits:', error);
       }
@@ -85,7 +91,7 @@ const MineralDeposits: React.FC<{ onSelectDeposit: (deposit: MineralDepositData)
       }
     };
 
-    fetchMineralDeposits();
+    fetchMineralDeposits(); 
     loadInventoryItems();
   }, [activePlanet, session, supabase]);
 
@@ -124,7 +130,8 @@ export const MineralDepositsNoAction: React.FC = () => {
           .from('mineralDeposits')
           .select('*')
           .eq('anomaly', activePlanet.id)
-          .eq('owner', session.user.id);
+          .eq('owner', session.user.id)
+          .limit(9);
 
         if (error) throw error;
 

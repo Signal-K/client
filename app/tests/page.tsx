@@ -1,12 +1,17 @@
 "use client";
 
-import { TestLayout } from "../components/(scenes)/planetScene/layout";
+import React, { useEffect, useState } from "react";
+import ClassificationViewer, { ClassificationViewerAll } from "../components/(create)/(classifications)/YourClassifications";
+import { DataSourcesModal } from "../components/(structures)/Data/unlockNewDataSources";
 
 export default function TestPage() {
     return (
-        <TestLayout>
-            <div>Hello</div>
-            <div>Hello</div>
-        </TestLayout>
-    )
-}
+        <div>
+            {/* <ClassificationViewer classificationType="planet" />
+            <ClassificationViewer classificationType="roverImg" />
+            <ClassificationViewerAll /> */}
+
+            <DataSourcesModal structureId='3104' structure="Zoodex" />
+        </div>
+    );
+};

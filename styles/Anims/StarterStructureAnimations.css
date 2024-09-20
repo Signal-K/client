@@ -1,0 +1,79 @@
+@keyframes subtle-move {
+	0% {
+		transform: translateX(0);
+	}
+
+	50% {
+		transform: translateX(5.5px);
+		/* Moves it slightly to the right */
+	}
+
+	100% {
+		transform: translateX(0);
+		/* Moves it back to the original position */
+	}
+}
+
+.moving-structure {
+	animation: subtle-move 2s ease-in-out infinite alternate;
+	/* Adjust timing as needed */
+}
+
+
+@keyframes bounce {
+	0% {
+		transform: translateY(0);
+	}
+
+	20% {
+		transform: translateY(-10px);
+		/* Move up */
+	}
+
+	40% {
+		transform: translateY(0);
+		/* Move back to the original position */
+	}
+
+	60% {
+		transform: translateY(-5px);
+		/* Move up again but less */
+	}
+
+	80% {
+		transform: translateY(0);
+		/* Move back to the original position */
+	}
+
+	100% {
+		transform: translateY(-2px);
+		/* Final slight move */
+	}
+}
+
+.bouncing-structure {
+	animation: bounce 2s ease-in-out infinite;
+	/* Adjust timing as needed */
+};
+
+@keyframes hover-around {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(60px, -60px); /* Moves diagonally up-right */
+  }
+  50% {
+    transform: translate(60px, 60px); /* Moves diagonally down-right */
+  }
+  75% {
+    transform: translate(-60px, 60px); /* Moves diagonally down-left */
+  }
+  100% {
+    transform: translate(-60px, -60px); /* Moves diagonally up-left */
+  }
+}
+
+.hovering-structure {
+  animation: hover-around 4s ease-in-out infinite; /* Adjust timing and easing as needed */
+};

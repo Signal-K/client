@@ -9,17 +9,18 @@ type Tab = 'Speed' | 'Power' | 'Capacity';
 interface AutomatonUpgradeProps {
   onSave: () => void;
   inventoryId: number;
-}
+};
 
 const AutomatonUpgrade: React.FC<AutomatonUpgradeProps> = ({ onSave, inventoryId }) => {
+  const supabase = createClientComponentClient();
+  const session = useSession();
+
   const [selectedTab, setSelectedTab] = useState<Tab>('Speed');
   const [selectedOption, setSelectedOption] = useState<Record<Tab, number>>({
     Speed: 1,
     Power: 1,
     Capacity: 1,
   });
-  const supabase = createClientComponentClient();
-  const session = useSession();
 
   const options: Record<Tab, string[]> = {
     Speed: ['Level 1', 'Level 2', 'Level 3'],

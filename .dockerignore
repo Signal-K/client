@@ -1,5 +1,4 @@
-# Based on https://github.com/vercel/next.js/blob/canary/examples/with-docker/.dockerignore
-Dockerfile
+next.dockerfile
 .dockerignore
 node_modules
 npm-debug.log

@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { Card } from "@/app/components/ui/card";  
+import { Card } from "@/components/ui/card";  
+import Link from "next/link";
 
 interface Classification {
     id: number;
@@ -138,7 +139,6 @@ const GeneratedStarterPlanet: React.FC = () => {
     );
 };
 
-
 function SendUserToScene() {
     return (
         <div className="text-center mt-4 p-4 bg-blue-100 rounded-lg">
@@ -150,11 +150,17 @@ function SendUserToScene() {
                 Now, it's time to travel to your planet, where your adventure truly begins. Get ready to
                 explore, discover, and make your mark!
             </p>
-            <p className="text-sm mt-2">
+            <Link href="/scenes/planet"><button
+                className="bg-blue-500 text-white py-2 px-4 rounded"
+            >
+                Navigate to your planet
+            </button></Link>
+
+            {/* <p className="text-sm mt-2">
                 We're still working on the first chapter, but if you'd like, we do have some old gameplay components for you to check out,
                 and there's plenty more to classify.
             </p>
-            <AddMissionsAndItems />
+            <AddMissionsAndItems /> */}
         </div>
     );
 };
@@ -177,7 +183,7 @@ const AddMissionsAndItems: React.FC = () => {
                 .insert(missionsToAdd.map(missionId => ({ 
                     user: session?.user?.id,
                     mission: missionId,
-                    time_of_completion: null,
+                    time_of_completion: new Date().toISOString(),
                     rewarded_items: [],
                 })));
 

@@ -30,21 +30,29 @@ export const SelectMineralPanel: React.FC<CollectMineralPanelProps> = ({ deposit
     const fetchInventoryData = async () => {
       try {
         const response = await fetch('/api/gameplay/inventory');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
         const inventoryItems: InventoryItem[] = await response.json();
-
+        
         // Find the item corresponding to the deposit
         const item = inventoryItems.find(
           (i) => i.id === parseInt(deposit.mineralconfiguration.mineral, 10)
         );
-
+        
         if (item) {
           setMineralName(item.name);
           setIconUrl(item.icon_url);
+        } else {
+          console.warn("Item not found in inventory");
         }
       } catch (error) {
         console.error("Failed to fetch inventory data:", error);
       }
     };
+    
 
     fetchInventoryData();
   }, [deposit]);
@@ -88,29 +96,6 @@ export const SelectMineralPanel: React.FC<CollectMineralPanelProps> = ({ deposit
           <div className="mt-4">
             <ActiveAutomatonForMining deposit={deposit} />
           </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export const MiningScene: React.FC = () => {
-  const [selectedDeposit, setSelectedDeposit] = useState<null | MineralDeposit>(null);
-  const handleSelectDeposit = (deposit: MineralDeposit) => {
-    setSelectedDeposit(deposit);
-  };
-
-  return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <div className="flex-1 md:w-3/5 p-4 px-12 rounded-r-lg shadow-lg md:rounded-r-lg border-r border-red-300">
-        <MineralDeposits onSelectDeposit={handleSelectDeposit} />
-        <MineralsInventoryGrid />
-      </div>
-      <div className="flex-1 md:w-2/5 p-4 rounded-l-lg shadow-lg md:rounded-l-lg border-l border-red-300">
-        {selectedDeposit ? (
-          <SelectMineralPanel deposit={selectedDeposit} />
-        ) : (
-          <p>Select a mineral deposit to see details.</p>
         )}
       </div>
     </div>

@@ -1,3 +1,5 @@
 .env.local
 .env
-/app/api/citizen
+citizen/buckets
+citizen/supabase
+citizen/archive

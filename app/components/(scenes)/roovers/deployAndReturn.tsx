@@ -5,9 +5,9 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-} from "@/app/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/app/components/ui/avatar";
-import { Button } from "@/app/components/ui/button";
+} from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { RooverFromAppeears } from "@/app/components/(anomalies)/(data)/Mars-Photos";
@@ -30,7 +30,17 @@ export default function DeployRooversInitial() {
     parentItem: null,
     time_of_deploy: null,
     anomaly: activePlanet?.id,
+    configuration: '{"Uses": 8}',
   };
+
+  const researchStructureToInventoryData = {
+    item: 3106,
+    owner: session?.user.id,
+    quantity: 1,
+    notes: "Created for introductory mission group",
+    anomaly: activePlanet?.id,
+    configuration: '{"Uses": 8}',
+  }
 
   const [isDeployed, setIsDeployed] = useState<boolean>(false);
   const [roverData, setRoverData] = useState<RoverData | null>(null);
@@ -78,8 +88,18 @@ export default function DeployRooversInitial() {
             console.error("Error creating rover in inventory: ", insertError);
           } else {
             console.log("New rover added to inventory.");
-          }
-        }
+          };
+
+          const { error: insertResearchError } = await supabase
+            .from("inventory")
+            .insert(researchStructureToInventoryData);
+          
+          if (insertResearchError) {
+              console.error("Error creating research structure in inventory: ", insertResearchError);
+            } else {
+              console.log("Research structure added to inventory.");
+            };
+        };
       } catch (error) {
         console.error("Unexpected error: ", error);
       }
@@ -118,7 +138,7 @@ export default function DeployRooversInitial() {
             {dialogueStep === 2 && isDeployed && !roverData && (
               <div className="relative p-4 bg-[#2C3A4A] bg-opacity-75 border border-[#85DDA2] rounded-md shadow-md text-lg font-medium text-white">
                 <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
-                Whoa! Now let's analyze your rover photos...
+                Now let's analyze your rover photos...
               </div>
             )}
             {dialogueStep === 3 && roverData && (

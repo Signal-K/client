@@ -1,83 +1,16 @@
-import React, { useState } from 'react';
+"use client";
+
+import React, { useEffect, useState } from 'react';
 // import { CreateFirstBaseClassification } from '../../_[archive]/Classifications/ClassificationForm';
-import { useActivePlanet } from '@/context/ActivePlanet';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useActivePlanet } from '@/context/ActivePlanet'; 
 
 import { Dialog, DialogTrigger, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ClassificationForm from '../../(create)/(classifications)/PostForm';
+import { Classification } from '@/types/Anomalies';
 
-// Define the `TransitingTelescopeClassifyPlanet` component
-export const TransitingTelescopeClassifyPlanet: React.FC = () => {
-    const { activePlanet } = useActivePlanet();
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${activePlanet?.id}/phased.png`;
-
-    return (
-        <div className="flex flex-col items-center">
-            <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} className="w-32 h-32 mb-4" />
-            <p>Your mission is to analyze the phase-folded lightcurve of your home planet. Look closely at the pattern of dips and variations in brightness. This information helps determine if the planet is real.</p>
-            <p>Here are some tips for classifying:</p>
-            <ul className="list-disc pl-5 mb-4">
-                <li>Look for Regular Dips: These dips often indicate a planet passing in front of its star. The regularity can confirm its orbit.</li>
-                <li>Assess the Shape: A sharp, symmetrical dip is typical of a planet transit. Asymmetrical or irregular shapes might suggest other phenomena.</li>
-            </ul>
-            <p>Use these criteria to decide if the lightcurve reveals a legitimate planet. Write a post and click share when you're ready to submit your findings. Happy exploring!</p>
-            {/* <CreateFirstBaseClassification assetMentioned={imageUrl} /> */}
-        </div>
-    );
-};
-
-// Define the `TransitingTelescopeSpecialisedGraphs` component
-export const TransitingTelescopeSpecialisedGraphs: React.FC = () => {
-    return (
-        <div className="flex flex-col items-center">
-            <p>Access advanced graphs and analytics for your lightcurves, adding more data and content to your new planet.</p>
-            {/* Replace with actual specialized graphs content */}
-        </div>
-    );
-};
-
-// Define the `TransitingTelescopeExplorePlanets` component
-export const TransitingTelescopeExplorePlanets: React.FC = () => {
-    return (
-        <div className="flex flex-col items-center">
-            <p>Use your telescope to find other planet candidates and begin classifying them.</p>
-            {/* Replace with actual exploration content */}
-        </div>
-    );
-};
-
-// Define the `TransitingTelescopeMyDiscoveries` component
-export const TransitingTelescopeMyDiscoveries: React.FC = () => {
-    return (
-        <div className="flex flex-col items-center">
-            <p>View all your discoveries and classified lightcurves.</p>
-            {/* Replace with actual discoveries content */}
-        </div>
-    );
-};
-
-// Define the `TransitingTelescopeTutorial` component
-export const TransitingTelescopeTutorial: React.FC = () => {
-    return (
-        <div className="flex flex-col items-center">
-            <p>Learn how to use the telescope and classify lightcurves.</p>
-            {/* Replace with actual tutorial content */}
-        </div>
-    );
-};
-
-interface TelescopeProps {
-    anomalyid: string;
-};
-
-// For the onboarding mission - please re-asses after
-interface TelescopeProps {
-    anomalyid: string;
-};
-
-export const TelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid }) => {
+export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
@@ -189,4 +122,194 @@ export const TelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid })
             </div>
         </div>
     );
+};
+
+interface AnomalyClassificationProps {
+    onAnomalyFetch: ( anomaly: Anomaly | null ) => void;
+};
+
+export interface Anomaly {
+    id: bigint;
+    content: string;
+    avatar_url?: string;
+};
+ 
+export function StarterTelescope() {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const { activePlanet } = useActivePlanet();
+
+    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+    const [imageUrl, setImageUrl] = useState<string>('');
+
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        async function fetchAnomaly() {
+            if (!session) {
+                setLoading(false);
+                return;
+            };
+
+            try {
+                const { data: anomalyData, error: anomalyError } = await supabase
+                    .from("anomalies")
+                    .select("*")
+                    .eq('anomalySet', 'planets2')
+                    .limit(1)
+                    .single();
+
+                if (anomalyError) {
+                    throw anomalyError;
+                };
+
+                if (!anomalyData) {
+                    setAnomaly(null);
+                    setLoading(false);
+                    return;
+                };
+
+                // const { data: classificationData, error: classificationError } = await supabase
+                //     .from('classifications')
+                //     .select('*')
+                //     .eq('anomaly', anomalyData.id)
+                //     .eq('author', session.user.id)
+                //     .maybeSingle();
+
+                // if (classificationError) {
+                //     throw classificationError;
+                // };
+
+                // if (classificationData) {
+                //     setAnomaly(null);
+                // } else {
+                //     setAnomaly(anomalyData as Anomaly);
+                //     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                //     setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyData.id}/Binned.png`);
+                // };
+                setAnomaly(anomalyData as Anomaly);
+                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyData.id}/Binned.png`);
+            } catch (error: any) {
+                console.error('Error fetching anomaly: ', error.message);
+                setAnomaly(null);
+            } finally {
+                setLoading(false);
+            };
+        };
+
+        fetchAnomaly();
+    }, [session, supabase, activePlanet]); 
+
+    if (loading) {
+        return (
+            <div>
+                <p>Loading...</p>
+            </div>
+        );
+    };
+
+    if (!anomaly) {
+        return (
+            <div>
+                <p>No anomaly found.</p>
+            </div>
+        );
+    };
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+            <div className="p-4 rounded-md relative w-full">
+                {/* <h3>{anomaly.content}</h3> */}
+                {anomaly.avatar_url && (
+                    <img src={anomaly.avatar_url} alt="Anomaly Avatar" className='w-24 h-24' />
+                )}
+                {imageUrl && (
+                    <img src={imageUrl} alt="Binned Anomaly" />
+                )}
+            </div>
+            <ClassificationForm 
+                anomalyId={anomaly.id.toString()}
+                anomalyType='planet'  
+                missionNumber={1372001} 
+                assetMentioned={imageUrl} 
+                structureItemId={3103}
+            />
+        </div>
+    );
+};
+
+
+
+
+
+// Define the `TransitingTelescopeClassifyPlanet` component
+export const TransitingTelescopeClassifyPlanet: React.FC = () => {
+    const { activePlanet } = useActivePlanet();
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${activePlanet?.id}/phased.png`;
+
+    return (
+        <div className="flex flex-col items-center">
+            <img src={imageUrl} alt={`Active Planet ${activePlanet?.id}`} className="w-32 h-32 mb-4" />
+            <p>Your mission is to analyze the phase-folded lightcurve of your home planet. Look closely at the pattern of dips and variations in brightness. This information helps determine if the planet is real.</p>
+            <p>Here are some tips for classifying:</p>
+            <ul className="list-disc pl-5 mb-4">
+                <li>Look for Regular Dips: These dips often indicate a planet passing in front of its star. The regularity can confirm its orbit.</li>
+                <li>Assess the Shape: A sharp, symmetrical dip is typical of a planet transit. Asymmetrical or irregular shapes might suggest other phenomena.</li>
+            </ul>
+            <p>Use these criteria to decide if the lightcurve reveals a legitimate planet. Write a post and click share when you're ready to submit your findings. Happy exploring!</p>
+            {/* <CreateFirstBaseClassification assetMentioned={imageUrl} /> */}
+        </div>
+    );
+};
+
+// Define the `TransitingTelescopeSpecialisedGraphs` component
+export const TransitingTelescopeSpecialisedGraphs: React.FC = () => {
+    return (
+        <div className="flex flex-col items-center">
+            <p>Access advanced graphs and analytics for your lightcurves, adding more data and content to your new planet.</p>
+            {/* Replace with actual specialized graphs content */}
+        </div>
+    );
+};
+
+// Define the `TransitingTelescopeExplorePlanets` component
+export const TransitingTelescopeExplorePlanets: React.FC = () => {
+    return (
+        <div className="flex flex-col items-center">
+            <p>Use your telescope to find other planet candidates and begin classifying them.</p>
+            {/* Replace with actual exploration content */}
+        </div>
+    );
+};
+
+// Define the `TransitingTelescopeMyDiscoveries` component
+export const TransitingTelescopeMyDiscoveries: React.FC = () => {
+    return (
+        <div className="flex flex-col items-center">
+            <p>View all your discoveries and classified lightcurves.</p>
+            {/* Replace with actual discoveries content */}
+        </div>
+    );
+};
+
+// Define the `TransitingTelescopeTutorial` component
+export const TransitingTelescopeTutorial: React.FC = () => {
+    return (
+        <div className="flex flex-col items-center">
+            <p>Learn how to use the telescope and classify lightcurves.</p>
+            {/* Replace with actual tutorial content */}
+        </div>
+    );
+};
+
+interface TelescopeProps {
+    anomalyid: string;
+};
+
+// For the onboarding mission - please re-asses after
+interface TelescopeProps {
+    anomalyid: string;
 };

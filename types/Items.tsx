@@ -57,6 +57,7 @@ export interface InventoryItem {
 };
 
 export interface InventoryStructureItem {
+    configuration: {};
     itemDetail: any;
     id: number;
     item: number;

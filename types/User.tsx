@@ -5,6 +5,7 @@ export interface UserProfile {
     id: string;
     avatar_url: string;
     faction: string;
+    classificationPoints: number;
 };
   
 export interface User {
