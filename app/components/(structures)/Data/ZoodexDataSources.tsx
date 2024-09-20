@@ -5,7 +5,7 @@ import { BurrowingOwlIcon } from "../../Icons/BurrowingOwl";
 import { FishIcon } from "../../Icons/FishIcon";
 
 export const zoodexDataSources = [
-    {
+    { 
         category: "Animals",
         items: [
             {
@@ -14,7 +14,7 @@ export const zoodexDataSources = [
                 identifier: "zoodex-burrowingOwl",
                 researchId: "wildwatch-burrowing-owl",
                 researcher: 'sandiego-zoo-global',
-                icon: BurrowingOwlIcon,
+                // icon: BurrowingOwlIcon,
                 unlocked: false,
             },
             {
@@ -23,7 +23,7 @@ export const zoodexDataSources = [
                 identifier: "zoodex-fishResearch",
                 researchId: 'ghigrh',
                 researcher: 'zooniverse',
-                icon: FishIcon,
+                // icon: FishIcon,
                 unlocked: false,
             },
         ],
@@ -37,7 +37,7 @@ export const zoodexDataSources = [
                 identifier: "zoodex-testTubePlant",
                 researchId: 'testtube-plant',
                 researcher: 'botanical-society',
-                icon: TestTube,
+                // icon: TestTube,
                 unlocked: false,
             },
         ],

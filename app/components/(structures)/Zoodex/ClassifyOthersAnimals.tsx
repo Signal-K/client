@@ -73,7 +73,7 @@ export function StarterZoodex() {
             };
         };
 
-        fetchAnomaly();
+        fetchAnomaly(); 
     }, [session, supabase, userChoice, activePlanet]);
 
     const handleChoice = (choice: string) => {

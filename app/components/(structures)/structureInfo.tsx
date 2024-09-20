@@ -22,7 +22,7 @@ export function StructureInfo({ icon, structureName }: StructureInfoProps = { st
       </div>
       <div>
         <h2 className="text-xl font-semibold">{structureName}</h2>
-        <p className="text-sm text-[#5FCBC3]">Planet: {activePlanet?.content}</p>
+        <p className="text-sm text-[#5FCBC3]">Planet: {activePlanet?.content}</p> 
       </div>
     </div>
   );
