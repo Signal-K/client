@@ -60,7 +60,7 @@ export default function RoverExploreDesktop({ id }: { id: string }) {
                   <div>SUNSET</div>
                   <div>6:35 pm</div>
                 </div>
-              </div>
+              </div> 
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>

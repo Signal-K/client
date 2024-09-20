@@ -463,8 +463,8 @@ export function RoverInterfaceDark() {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 function AntennaIcon(props) {
   return (

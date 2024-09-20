@@ -15,7 +15,7 @@ export default function BasePlanetSectors({ planetId }: { planetId: string }) {
     const getPlanetSectors = async () => {
         if (!planetId) {
             return null;
-        }
+        } 
 
         if (!session) {
             return null;
