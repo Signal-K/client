@@ -6,7 +6,7 @@ import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Trans
 import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
 import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
 import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookAIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/app/components/(structures)/Auto/AutomatonClassificationShell";
@@ -184,20 +184,27 @@ export const StructuresConfig: StructureConfig = {
           text: "Available missions",
           dynamicComponent: <MissionsForStructure structureItemId={3104} />,
         },
+        {
+          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="zoodex-burrowingOwl" />,
+        }
       ],
       buttons: [
         {
           icon: <DogIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Search your animals",
+          text: "Classify animals",
           dynamicComponent: <StarterZoodex />,
           sizePercentage: 60,
         },
         {
-          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="zoodex-burrowingOwl" />,
-          sizePercentage: 75,
+          icon: <TreePalmIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Greenhouse",
         },
+        {
+          icon: <PhoneIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Upload media"
+        }
       ],
     },
     3105: {

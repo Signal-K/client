@@ -9,6 +9,7 @@ import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/app/components/(structures)/Structures";
 import { CaptnCosmosGuideModal } from "@/app/components/(dialogue)/guideBot";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
+import CitizenData from "@/app/auth/readToFlask";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
 
 const EarthView: React.FC = () => {
