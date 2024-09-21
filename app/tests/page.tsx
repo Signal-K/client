@@ -11,7 +11,8 @@ export default function TestPage() {
             <ClassificationViewer classificationType="roverImg" />
             <ClassificationViewerAll /> */}
 
-            <DataSourcesModal structureId='3104' structure="Zoodex" />
+            {/* <DataSourcesModal structureId='3104' structure="Zoodex" /> */}
+            <DataSourcesModal structureId='3103' structure="Telescope" />
         </div>
     );
 };

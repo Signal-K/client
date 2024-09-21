@@ -17,10 +17,10 @@ const EarthView: React.FC = () => {
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
 
   const handleUpdateToEarth = () => {
-    updatePlanetLocation(3);
+    updatePlanetLocation(69);
   };
 
-  if (activePlanet?.id !== 3) {
+  if (activePlanet?.id !== 69) {
     return (
     <div className="min-h-screen w-full flex flex-col">
         {/* <img

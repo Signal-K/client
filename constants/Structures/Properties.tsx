@@ -6,12 +6,14 @@ import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Trans
 import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
 import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
 import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookAIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, PenBox, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookAIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/app/components/(structures)/Auto/AutomatonClassificationShell";
 import { AdvancedTechTreeComponent } from "@/app/components/(structures)/Research/TechTree";
 import MiningScene from "@/app/scenes/mining/page";
+import { DataSourcesModal } from "@/app/components/(structures)/Data/unlockNewDataSources";
+import MissionsForStructure from "@/app/components/(structures)/Missions/AvailableMissions";
 
 interface IndividualStructureProps {
     name?: string;
@@ -53,6 +55,16 @@ export const StructuresConfig: StructureConfig = {
       actions: [
         { icon: <PickaxeIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Explore" },
         { icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Repair", dynamicComponent: <StructureRepair inventoryId={3102} /> },
+        {
+          icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Research",
+          dynamicComponent: <DataSourcesModal structureId="3102" structure="Automaton" />,
+        },
+        {
+          icon: <MehIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Available missions",
+          dynamicComponent: <MissionsForStructure structureItemId={3102} />,
+        },
       ],
       buttons: [
         { 
@@ -114,6 +126,16 @@ export const StructuresConfig: StructureConfig = {
           , dynamicComponent: <StructureRepair inventoryId={3103} />,
           sizePercentage: 40,
         },
+        {
+          icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Research",
+          dynamicComponent: <DataSourcesModal structureId="3103" structure="Telescope" />,
+        },
+        {
+          icon: <MehIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Available missions",
+          dynamicComponent: <MissionsForStructure structureItemId={3103} />,
+        },
         // Copy action/labels
       ],
       buttons: [
@@ -152,6 +174,16 @@ export const StructuresConfig: StructureConfig = {
           , dynamicComponent: <StructureRepair inventoryId={3104} />,
           sizePercentage: 40,
         },
+        {
+          icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Research",
+          dynamicComponent: <DataSourcesModal structureId="3104" structure="Zoodex" />,
+        },
+        {
+          icon: <MehIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Available missions",
+          dynamicComponent: <MissionsForStructure structureItemId={3104} />,
+        },
       ],
       buttons: [
         {
@@ -176,6 +208,24 @@ export const StructuresConfig: StructureConfig = {
         },
         {
           text: "Sunspots", variant: "default",
+        },
+      ],
+      actions: [
+        {
+          icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
+          , text: 'Durability/Repair'
+          , dynamicComponent: <StructureRepair inventoryId={3104} />,
+          sizePercentage: 40,
+        },
+        {
+          icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Research",
+          dynamicComponent: <DataSourcesModal structureId="3105" structure="LIDAR" />,
+        },
+        {
+          icon: <MehIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Available missions",
+          dynamicComponent: <MissionsForStructure structureItemId={3105} />,
         },
       ],
       imageSrc: '/assets/Items/Lidar.png',

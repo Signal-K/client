@@ -1,8 +1,8 @@
 "use client";
 
-import { ForwardRefExoticComponent, useState } from "react";
-import { ChevronDown, ChevronUp, Lock, Unlock } from "lucide-react";
-import { zoodexDataSources } from "./ZoodexDataSources";
+import { useEffect, useState } from "react";
+import { ChevronDown, ChevronUp, Unlock } from "lucide-react";
+import { lidarDataSources, telescopeDataSources, zoodexDataSources, roverDataSources } from "./ZoodexDataSources";
 import { StructureInfo } from "../structureInfo";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
@@ -19,12 +19,34 @@ interface ZoodexItem {
   identifier: string;
   researchId: string;
   researcher: string;
-  // icon: React.ReactElement | FC<BurrowingOwlIconProps> | ForwardRefExoticComponent<any>;
   unlocked: boolean;
 };
 
-interface BurrowingOwlIconProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
+interface TelescopeItem {
+  name: string;
+  description: string;
+  identifier: string;
+  researchId: string;
+  researcher: string;
+  unlocked: boolean;
+};
+
+interface LidarItem {
+  name: string;
+  description: string;
+  identifier: string;
+  researchId: string;
+  researcher: string;
+  unlocked: boolean;
+};
+
+interface RoverItem {
+  name: string;
+  description: string;
+  identifier: string;
+  researchId: string;
+  researcher: string;
+  unlocked: boolean;
 };
 
 export function DataSourcesModal({ structureId, structure }: DataSourcesModalProps) {
@@ -33,38 +55,54 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
   const { activePlanet } = useActivePlanet();
 
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(
-    Object.fromEntries(zoodexDataSources.map((category) => [category.category, true]))
+    Object.fromEntries([
+      ...zoodexDataSources,
+      ...telescopeDataSources,
+      ...lidarDataSources,
+      ...roverDataSources, // Add rover data to the categories
+    ].map((category) => [category.category, true]))
   );
-  const [unlockedzoodexDataSources, setUnlockedzoodexDataSources] = useState<Record<string, boolean>>(
+
+  const [unlockedZoodexDataSources, setUnlockedZoodexDataSources] = useState<Record<string, boolean>>(
     Object.fromEntries(
       zoodexDataSources.flatMap((category) =>
-        category.items.map((item) => [item.name, item.unlocked])
+        category.items.map((item: ZoodexItem) => [item.name, item.unlocked])
       ),
-    ),
+    )
   );
 
-  const toggleCategory = (category: string) => {
-    setExpandedCategories((prev) => ({ ...prev, [category]: !prev[category] }));
-  };
+  const [unlockedTelescopeDataSources, setUnlockedTelescopeDataSources] = useState<Record<string, boolean>>(
+    Object.fromEntries(
+      telescopeDataSources.flatMap((category) =>
+        category.items.map((item: TelescopeItem) => [item.name, item.unlocked])
+      ),
+    )
+  );
 
-  const toggleFeature = async (featureName: string) => {
-    const item = zoodexDataSources
-      .flatMap(category => category.items)
-      .find(item => item.name === featureName) as ZoodexItem | undefined;
+  const [unlockedLidarDataSources, setUnlockedLidarDataSources] = useState<Record<string, boolean>>(
+    Object.fromEntries(
+      lidarDataSources.flatMap((category) =>
+        category.items.map((item: LidarItem) => [item.name, item.unlocked])
+      ),
+    )
+  );
+
+  const [unlockedRoverDataSources, setUnlockedRoverDataSources] = useState<Record<string, boolean>>(
+    Object.fromEntries(
+      roverDataSources.flatMap((category) =>
+        category.items.map((item: RoverItem) => [item.name, item.unlocked])
+      ),
+    )
+  );
+
+  useEffect(() => {
+    const fetchConfiguration = async () => {
+      if (!session?.user?.id || !activePlanet?.id) return;
   
-    if (!item) return; // Ensure item exists
-  
-    setUnlockedzoodexDataSources(prev => ({
-      ...prev,
-      [featureName]: !prev[featureName],
-    }));
-  
-    if (session?.user?.id && activePlanet?.id) {
       try {
-        // Fetch the inventory item
         const { data, error } = await supabase
           .from("inventory")
-          .select("id, configuration")
+          .select("configuration")
           .eq("owner", session.user.id)
           .eq("anomaly", activePlanet.id)
           .eq("item", structureId)
@@ -72,36 +110,134 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
   
         if (error) throw error;
   
-        // Ensure configuration is properly parsed as an object (it could be null)
-        const newConfiguration: { "missions unlocked"?: string[] } = data?.configuration || {};
+        const configuration = data?.configuration || {};
+        const missionsUnlocked = configuration["missions unlocked"] || [];
   
-        // Initialize "missions unlocked" array if not present
+        // For Zoodex
+        setUnlockedZoodexDataSources(
+          Object.fromEntries(
+            zoodexDataSources.flatMap((category) =>
+              category.items.map((item: ZoodexItem) => [item.name, missionsUnlocked.includes(item.identifier)])
+            ),
+          ),
+        );
+  
+        // For Telescope
+        setUnlockedTelescopeDataSources(
+          Object.fromEntries(
+            telescopeDataSources.flatMap((category) =>
+              category.items.map((item: TelescopeItem) => [item.name, missionsUnlocked.includes(item.identifier)])
+            ),
+          ),
+        );
+  
+        // For LIDAR
+        setUnlockedLidarDataSources(
+          Object.fromEntries(
+            lidarDataSources.flatMap((category) =>
+              category.items.map((item: LidarItem) => [item.name, missionsUnlocked.includes(item.identifier)])
+            ),
+          ),
+        );
+  
+        // For Rover
+        setUnlockedRoverDataSources(
+          Object.fromEntries(
+            roverDataSources.flatMap((category) =>
+              category.items.map((item: RoverItem) => [item.name, missionsUnlocked.includes(item.identifier)])
+            ),
+          ),
+        );
+  
+      } catch (err) {
+        console.error("Error fetching configuration:", err);
+      }
+    };
+  
+    fetchConfiguration();
+  }, [session, activePlanet, structureId, supabase]);  
+
+  const toggleCategory = (category: string) => {
+    setExpandedCategories((prev) => ({ ...prev, [category]: !prev[category] }));
+  };
+
+  const toggleFeature = async (featureName: string, dataSourceType: "Zoodex" | "Telescope" | "LIDAR" | "Rover") => {
+    const dataSource = dataSourceType === "Zoodex"
+      ? zoodexDataSources
+      : dataSourceType === "Telescope"
+      ? telescopeDataSources
+      : dataSourceType === "LIDAR"
+      ? lidarDataSources
+      : roverDataSources; // Add rover logic
+
+    const item = dataSource
+      .flatMap(category => category.items)
+      .find(item => item.name === featureName);
+
+    if (!item) return;
+
+    if (dataSourceType === "Telescope") {
+      setUnlockedTelescopeDataSources(prev => ({
+        ...prev,
+        [featureName]: !prev[featureName],
+      }));
+    } else if (dataSourceType === "LIDAR") {
+      setUnlockedLidarDataSources(prev => ({
+        ...prev,
+        [featureName]: !prev[featureName],
+      }));
+    } else if (dataSourceType === "Rover") {
+      setUnlockedRoverDataSources(prev => ({
+        ...prev,
+        [featureName]: !prev[featureName],
+      }));
+    } else {
+      setUnlockedZoodexDataSources(prev => ({
+        ...prev,
+        [featureName]: !prev[featureName],
+      }));
+    }
+
+    if (session?.user?.id && activePlanet?.id) {
+      try {
+        const { data, error } = await supabase
+          .from("inventory")
+          .select("id, configuration")
+          .eq("owner", session.user.id)
+          .eq("anomaly", activePlanet.id)
+          .eq("item", structureId)
+          .single();
+
+        if (error) throw error;
+
+        const newConfiguration: { "missions unlocked"?: string[] } = data?.configuration || {};
+
         if (!newConfiguration["missions unlocked"]) {
           newConfiguration["missions unlocked"] = [];
         }
-  
-        // Update only if the item is not already unlocked
+
         const missionsUnlocked = newConfiguration["missions unlocked"];
         if (!missionsUnlocked.includes(item.identifier)) {
-          missionsUnlocked.push(item.identifier); // Add the new mission
-  
-          // Perform the update to the `inventory` table with the new configuration
-          const { error: updateError } = await supabase
-            .from("inventory")
-            .update({ configuration: newConfiguration })
-            .eq("id", data.id);
-  
-          if (updateError) throw updateError;
+          missionsUnlocked.push(item.identifier);
         }
+
+        const { error: updateError } = await supabase
+          .from("inventory")
+          .update({ configuration: newConfiguration })
+          .eq("id", data?.id);
+
+        if (updateError) throw updateError;
+
+        console.log("Updated configuration:", newConfiguration);
       } catch (err) {
-        console.error("Error updating inventory:", err);
+        console.error("Error updating inventory configuration:", err);
       }
     }
-  };  
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#2C4457]">
-      <div className="w-full max-w-md bg-[#2C3A4A] rounded-lg shadow-xl overflow-hidden">
+    <div className="flex items-center justify-center">
+      <div className="w-96 bg-[#2C3A4A] rounded-lg shadow-xl">
         <center>
           <StructureInfo structureName={structure} />
         </center>
@@ -110,6 +246,53 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
             structureId={structureId}
             onInventoryIdFetched={(id) => console.log("Fetched Inventory ID:", id)}
           />
+          {structure === "Telescope" && telescopeDataSources.map((category) => (
+            <div key={category.category} className="space-y-2">
+              <button
+                className="flex w-full items-center justify-between text-[#FF695D] hover:text-[#B9E678] transition-colors"
+                onClick={() => toggleCategory(category.category)}
+              >
+                <h2 className="text-lg font-semibold">{category.category}</h2>
+                {expandedCategories[category.category] ? (
+                  <ChevronUp className="h-5 w-5" />
+                ) : (
+                  <ChevronDown className="h-5 w-5" />
+                )}
+              </button>
+              {expandedCategories[category.category] && (
+                <ul className="space-y-2">
+                  {category.items
+                    .sort(
+                      (a, b) =>
+                        (unlockedTelescopeDataSources[b.name] ? 1 : 0) -
+                        (unlockedTelescopeDataSources[a.name] ? 1 : 0)
+                    )
+                    .map((feature) => (
+                      <li
+                        key={feature.name}
+                        className="flex items-center space-x-3 p-2 rounded-md hover:bg-[#2C4F64] transition-colors"
+                      >
+                        <div className="flex-grow">
+                          <h3 className="font-medium text-[#D689E3]">{feature.name}</h3>
+                          <p className="text-sm text-[#B9E678] opacity-80">{feature.description}</p>
+                        </div>
+                        {unlockedTelescopeDataSources[feature.name] ? (
+                          <Unlock className="h-5 w-5 text-[#B9E678]" aria-label="Unlocked" />
+                        ) : (
+                          <button
+                            onClick={() => toggleFeature(feature.name, "Telescope")}
+                            className="px-3 py-1 text-xs font-semibold text-[#2C3A4A] bg-[#FF695D] rounded-full hover:bg-[#D689E3] transition-colors duration-300"
+                            aria-label={`Unlock ${feature.name}`}
+                          >
+                            Unlock
+                          </button>
+                        )}
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </div>
+          ))}
           {structure === "Zoodex" && zoodexDataSources.map((category) => (
             <div key={category.category} className="space-y-2">
               <button
@@ -128,26 +311,70 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
                   {category.items
                     .sort(
                       (a, b) =>
-                        (unlockedzoodexDataSources[b.name] ? 1 : 0) -
-                        (unlockedzoodexDataSources[a.name] ? 1 : 0)
+                        (unlockedZoodexDataSources[b.name] ? 1 : 0) -
+                        (unlockedZoodexDataSources[a.name] ? 1 : 0)
                     )
                     .map((feature) => (
                       <li
                         key={feature.name}
                         className="flex items-center space-x-3 p-2 rounded-md hover:bg-[#2C4F64] transition-colors"
                       >
-                        {/* <span className="text-2xl" aria-hidden="true">
-                          {feature.icon}
-                        </span> */}
                         <div className="flex-grow">
                           <h3 className="font-medium text-[#D689E3]">{feature.name}</h3>
                           <p className="text-sm text-[#B9E678] opacity-80">{feature.description}</p>
                         </div>
-                        {unlockedzoodexDataSources[feature.name] ? (
+                        {unlockedZoodexDataSources[feature.name] ? (
                           <Unlock className="h-5 w-5 text-[#B9E678]" aria-label="Unlocked" />
                         ) : (
                           <button
-                            onClick={() => toggleFeature(feature.name)}
+                            onClick={() => toggleFeature(feature.name, "Zoodex")}
+                            className="px-3 py-1 text-xs font-semibold text-[#2C3A4A] bg-[#FF695D] rounded-full hover:bg-[#D689E3] transition-colors duration-300"
+                            aria-label={`Unlock ${feature.name}`}
+                          >
+                            Unlock
+                          </button>
+                        )}
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </div>
+          ))}
+          {structure === "Rover" && roverDataSources.map((category) => (
+            <div key={category.category} className="space-y-2">
+              <button
+                className="flex w-full items-center justify-between text-[#FF695D] hover:text-[#B9E678] transition-colors"
+                onClick={() => toggleCategory(category.category)}
+              >
+                <h2 className="text-lg font-semibold">{category.category}</h2>
+                {expandedCategories[category.category] ? (
+                  <ChevronUp className="h-5 w-5" />
+                ) : (
+                  <ChevronDown className="h-5 w-5" />
+                )}
+              </button>
+              {expandedCategories[category.category] && (
+                <ul className="space-y-2">
+                  {category.items
+                    .sort(
+                      (a, b) =>
+                        (unlockedRoverDataSources[b.name] ? 1 : 0) -
+                        (unlockedRoverDataSources[a.name] ? 1 : 0)
+                    )
+                    .map((feature) => (
+                      <li
+                        key={feature.name}
+                        className="flex items-center space-x-3 p-2 rounded-md hover:bg-[#2C4F64] transition-colors"
+                      >
+                        <div className="flex-grow">
+                          <h3 className="font-medium text-[#D689E3]">{feature.name}</h3>
+                          <p className="text-sm text-[#B9E678] opacity-80">{feature.description}</p>
+                        </div>
+                        {unlockedRoverDataSources[feature.name] ? (
+                          <Unlock className="h-5 w-5 text-[#B9E678]" aria-label="Unlocked" />
+                        ) : (
+                          <button
+                            onClick={() => toggleFeature(feature.name, "Rover")}
                             className="px-3 py-1 text-xs font-semibold text-[#2C3A4A] bg-[#FF695D] rounded-full hover:bg-[#D689E3] transition-colors duration-300"
                             aria-label={`Unlock ${feature.name}`}
                           >
