@@ -11,6 +11,7 @@ import { CaptnCosmosGuideModal } from "@/app/components/(dialogue)/guideBot";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
 import CitizenData from "@/app/auth/readToFlask";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
+import { UnownedSurfaceStructures } from "@/app/components/(structures)/Build/EditMode";
 
 const EarthView: React.FC = () => {
   const supabase = useSupabaseClient();
@@ -124,20 +125,7 @@ const EarthStructures: React.FC = () => {
             </div>
             <div className="w-full">
                 <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
-                <div className="flex flex-row space-y-4">
-                    {surfaceStructures.map((structure) => (
-                        <div
-                            key={structure.id}
-                            className="relative flex items-center space-x-4"
-                        >
-                            <img
-                                src={structure.itemDetail?.icon_url}
-                                alt={structure.itemDetail?.name}
-                                className="w-16 h-16 object-cover"
-                            />
-                        </div>
-                    ))}
-                </div>
+                <UnownedSurfaceStructures />      
             </div>
             <div className="relative flex-1">
                 <AllAutomatonsOnActivePlanet />

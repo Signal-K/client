@@ -4,7 +4,7 @@ interface Recipe {
   [key: string]: number;
 }
 
-interface InventoryItem {
+export interface InventoryItem {
   id: number;
   name: string;
   description: string;
@@ -18,10 +18,9 @@ interface InventoryItem {
   gif?: string;
 };
 
-// Mock inventory items data
 const inventoryItems: InventoryItem[] = [
   { id: 11, name: 'Coal', description: 'You can burn this to create power', cost: 1, icon_url: '/assets/Items/Coal.png', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1 },
-  { id: 12, name: 'Telescope Signal Receiver', description: 'This tool is used to receive transmissions from your transiting telescope and decode them into readable data. It is also the first component of your main telescope array', cost: 1, icon_url: 'https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/Telescope2.png?raw=true', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '13': 3, '15': 2 }, locationType: 'Surface' }, // Originally pointed towards 2 alloy
+  { id: 12, name: 'Telescope Signal Receiver', description: 'This tool is used to receive transmissions from your transiting telescope and decode them into readable data. It is also the first component of your main telescope array', cost: 1, icon_url: 'https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/Telescope2.png?raw=true', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '13': 3, '15': 2 }, }, // Originally pointed towards 2 alloy
   { id: 13, name: 'Silicon', description: '', cost: 1, icon_url: '/assets/Items/Silicon.png', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
   { id: 14, name: 'Transiting Telescope', description: '', cost: 1, icon_url: 'https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true', ItemCategory: 'Structure', parentItem: 12, itemLevel: 1, recipe: { '13': 2, '15': 1 } },
   { id: 15, name: 'Iron', description: 'Test', cost: 1, icon_url: '/assets/Items/Iron.png', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
@@ -34,9 +33,6 @@ const inventoryItems: InventoryItem[] = [
   { id: 23, name: 'Rover 1', description: '', cost: 1, icon_url: 'https://static-00.iconduck.com/assets.00/mars-rover-illustration-2048x2048-czfy73zy.png', ItemCategory: 'Automaton', parentItem: 22, itemLevel: 1, gif: "/assets/Items/Roover.gif", },  // https://cdn.dribbble.com/users/107759/screenshots/4248752/rover.gif
   { id: 32, name: 'Camera Receiver', description: 'Keep track of all the photos your anomalies have taken', cost: 1, icon_url: 'https://cdn-icons-png.flaticon.com/512/5169/5169909.png', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '11': 1 }, locationType: 'Orbit' },
   {
-    id: 3101, name: 'Mining station', description: 'Gives you the ability to mine and view your mineral deposits', cost: 1, icon_url: '/assets/Items/MiningStructure.png', ItemCategory: 'Structure', parentItem: 30, itemLevel: 1, locationType: 'Surface'
-  },
-  {
     id: 3102, name: 'Automaton station', description: 'View, control and upgrade all your automatons and rovers here', cost: 1, icon_url: '/assets/Items/AutoController.png', ItemCategory: 'Structure', parentItem: 30, itemLevel: 1, locationType: 'Surface'
   },
   {
@@ -48,7 +44,6 @@ const inventoryItems: InventoryItem[] = [
   {
     id: 3105,
     name: "LIDAR",
-    // description: 'This tool is used to scan the surface of your planet and create a 3D model of the terrain', -- This is cool, but not what we're using lidar for yet (thanks copilot)
     description: "Collect and study weather events and entities",
     icon_url: "/assets/Items/Scoper.png",
     ItemCategory: "Structure",
