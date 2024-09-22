@@ -12,50 +12,56 @@ export interface Anomaly {
     avatar_url?: string;
 };
 
-interface Configuration {
-    Uses: number;
-    missions_unlocked: string[];
-};
-
 export function StarterZoodex() {
     const supabase = useSupabaseClient();
     const session = useSession();
+
     const { activePlanet } = useActivePlanet();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [userChoice, setUserChoice] = useState<string | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>('');
-    const [loading, setLoading] = useState<boolean>(true);
-    const [configuration, setConfiguration] = useState<Configuration | null>(null);
+    const [configuration, setConfiguration] = useState<any | null>(null);
 
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Fetch structure configuration from the `inventory` table
     useEffect(() => {
-        async function fetchStructureConfig() {
-            if (!session) return;
+        async function fetchStructureConfiguration() {
+            if (!session) {
+                return;
+            };
 
             try {
-                const { data, error } = await supabase
-                    .from("inventory")
-                    .select("*")
-                    .eq("item", 3104)  // Replace with the correct item value if needed
-                    .eq("owner", session.user.id)
-                    .order("id", { ascending: true })
+                const { data: inventoryData, error: inventoryError } = await supabase
+                    .from('inventory')
+                    .select('configuration')
+                    .eq('item', 3104)
+                    .eq('anomaly', activePlanet.id)
+                    .eq('owner', session.user.id)
+                    .order('id', { ascending: true })
                     .limit(1)
                     .single();
 
-                if (error) throw error;
+                if (inventoryError) {
+                    throw inventoryError;
+                };
 
-                if (data) {
-                    // Parse the configuration field if it's a valid JSON
-                    const parsedConfig = data.configuration ? JSON.parse(data.configuration) : null;
-                    setConfiguration(parsedConfig);
-                }
+                if (inventoryData && inventoryData.configuration) {
+                    console.log("Raw configuration data:", inventoryData.configuration);
+                    setConfiguration(inventoryData.configuration);
+                } else {
+                    setConfiguration(null);
+                };
             } catch (error: any) {
-                console.error("Error fetching structure config:", error.message);
+                console.error('Error fetching structure config:', error.message || error);
+                setError('Error fetching structure configuration: ' + (error.message || JSON.stringify(error)));
                 setConfiguration(null);
-            }
-        }
+            };
+        };
 
-        fetchStructureConfig();
+        fetchStructureConfiguration();
     }, [session, supabase]);
 
     useEffect(() => {
@@ -63,7 +69,7 @@ export function StarterZoodex() {
             if (!session || !userChoice) {
                 setLoading(false);
                 return;
-            }
+            };
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
@@ -76,13 +82,13 @@ export function StarterZoodex() {
 
                 if (anomalyError) {
                     throw anomalyError;
-                }
+                };
 
                 if (!anomalyData) {
-                    setAnomaly(null);
+                    setAnomaly(null); 
                     setLoading(false);
                     return;
-                }
+                };
 
                 const { data: classificationData, error: classificationError } = await supabase
                     .from('classifications')
@@ -93,7 +99,7 @@ export function StarterZoodex() {
 
                 if (classificationError) {
                     throw classificationError;
-                }
+                };
 
                 if (classificationData) {
                     setAnomaly(null);
@@ -101,28 +107,34 @@ export function StarterZoodex() {
                     setAnomaly(anomalyData as Anomaly);
                     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
                     setImageUrl(`${supabaseUrl}/storage/v1/object/public/zoodex/${userChoice}/${anomalyData.id}.jpeg`);
-                }
+                };
             } catch (error: any) {
                 console.error('Error fetching anomaly: ', error.message);
                 setAnomaly(null);
             } finally {
                 setLoading(false);
-            }
-        }
+            };
+        };
 
-        fetchAnomaly();
+        fetchAnomaly(); 
     }, [session, supabase, userChoice, activePlanet]);
 
-    const handleChoice = (choice: string) => {
+    const handleChoice = ( choice: string ) => {
         setUserChoice(choice);
     };
+
+    if (error) {
+        return (
+            <div>
+                <p>{error}</p>
+            </div>
+        );
+    }
 
     if (!configuration) {
         return (
             <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
-                <p className="text-sm font-bold">
-                    Fetching configuration data...
-                </p>
+                <p className="text-sm font-bold">Fetching structure configuration...</p>
             </div>
         );
     }
@@ -130,11 +142,10 @@ export function StarterZoodex() {
     if (!userChoice) {
         return (
             <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
-                <p className="text-sm font-bold">You've been given some animals to observe the behaviour of and compare to their mannerisms on Earth. As you progress, more species will become available</p>
-                <h2 className="text-lg font-bold">Choose a data source:</h2>
-
-                {configuration?.missions_unlocked && Array.isArray(configuration.missions_unlocked) && configuration.missions_unlocked.length > 0 ? (
-                    configuration.missions_unlocked.map((missionId) => {
+                <p className="text-sm font-bold">You've been given some animals to observe and compare to their mannerisms on Earth. As you progress, more species will become available.</p>
+                <h2 className="text-lg font-bold">Choose a data source: </h2>
+                {configuration["missions unlocked"] && Array.isArray(configuration["missions unlocked"]) && configuration["missions unlocked"].length > 0 ? (
+                    configuration["missions unlocked"].map((missionId: string) => {
                         const mission = zoodexDataSources
                             .flatMap((category) => category.items)
                             .find((item) => item.identifier === missionId);
@@ -156,7 +167,7 @@ export function StarterZoodex() {
                 )}
             </div>
         );
-    }
+    };
 
     if (loading) {
         return (
@@ -164,15 +175,16 @@ export function StarterZoodex() {
                 <p>Loading...</p>
             </div>
         );
-    }
+    };
 
     if (!anomaly) {
         return (
             <div>
                 <p>No anomaly found.</p>
+                <p>{userChoice}</p>
             </div>
         );
-    }
+    };
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
@@ -188,8 +200,8 @@ export function StarterZoodex() {
             {imageUrl && (
                 <ClassificationForm 
                     anomalyId={anomaly.id.toString()}
-                    anomalyType={userChoice}  // Use userChoice as anomalyType
-                    missionNumber={1370202}     // Adjust missionNumber if needed
+                    anomalyType='zoodex-burrowingOwl' 
+                    missionNumber={1370202}     
                     assetMentioned={imageUrl} 
                     structureItemId={3104}
                 />

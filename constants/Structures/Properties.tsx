@@ -6,7 +6,7 @@ import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Trans
 import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
 import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
 import { StarterZoodex } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/app/components/(structures)/Auto/AutomatonClassificationShell";
@@ -58,12 +58,17 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research",
-          dynamicComponent: <DataSourcesModal structureId="3102" structure="Automaton" />,
+          dynamicComponent: <DataSourcesModal structureId="3102" structure="Rover" />,
         },
         {
           icon: <MehIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Available missions",
           dynamicComponent: <MissionsForStructure structureItemId={3102} />,
+        },
+        {
+          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="roverImg" />,
         },
       ],
       buttons: [
@@ -97,12 +102,6 @@ export const StructuresConfig: StructureConfig = {
         //   sizePercentage: 60,
         //   showInNoModal: false,
         // },
-        {
-          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="roverImg" />,
-          sizePercentage: 75,
-        },
       ],
     },
     3103: {
@@ -136,25 +135,28 @@ export const StructuresConfig: StructureConfig = {
           text: "Available missions",
           dynamicComponent: <MissionsForStructure structureItemId={3103} />,
         },
+        {
+          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="planet" />,
+        },
         // Copy action/labels
       ],
       buttons: [
         {
           icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Transit events (Starter)",
+          text: "Discover planets", // Transit events, microlensing, etc
           dynamicComponent: <StarterTelescope />,
           sizePercentage: 90,
           showInNoModal: true,
         },
         {
-          icon: <CloudCogIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Cloud/Weather Data (LOCKED)",
+          icon: <SunIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Sunspot data",
         },
         {
-          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="planet" />,
-          sizePercentage: 75,
+          icon: <StarIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Comets & Asteroids",
         },
       ],
     },
@@ -188,7 +190,7 @@ export const StructuresConfig: StructureConfig = {
           icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "My discoveries",
           dynamicComponent: <ClassificationViewer classificationType="zoodex-burrowingOwl" />,
-        }
+        },
       ],
       buttons: [
         {
@@ -234,6 +236,11 @@ export const StructuresConfig: StructureConfig = {
           text: "Available missions",
           dynamicComponent: <MissionsForStructure structureItemId={3105} />,
         },
+        {
+          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My discoveries",
+          dynamicComponent: <ClassificationViewer classificationType="lidar" />,
+        },
       ],
       imageSrc: '/assets/Items/Lidar.png',
       buttons: [
@@ -242,12 +249,6 @@ export const StructuresConfig: StructureConfig = {
           text: "Search your clouds",
           dynamicComponent: <StarterLidar />,
           sizePercentage: 60,
-        },
-        {
-          icon: <PenBox className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="cloud" />,
-          sizePercentage: 75,
         },
       ],
     },

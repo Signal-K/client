@@ -8,50 +8,10 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { InventoryIdFetcher } from "../fetchId";
 
-interface DataSourcesModalProps {
-  structureId: string;
-  structure: string;
-};
-
-interface ZoodexItem {
-  name: string;
-  description: string;
-  identifier: string;
-  researchId: string;
-  researcher: string;
-  unlocked: boolean;
-};
-
-interface TelescopeItem {
-  name: string;
-  description: string;
-  identifier: string;
-  researchId: string;
-  researcher: string;
-  unlocked: boolean;
-};
-
-interface LidarItem {
-  name: string;
-  description: string;
-  identifier: string;
-  researchId: string;
-  researcher: string;
-  unlocked: boolean;
-};
-
-interface RoverItem {
-  name: string;
-  description: string;
-  identifier: string;
-  researchId: string;
-  researcher: string;
-  unlocked: boolean;
-};
-
 export function DataSourcesModal({ structureId, structure }: DataSourcesModalProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(
@@ -68,7 +28,7 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
       zoodexDataSources.flatMap((category) =>
         category.items.map((item: ZoodexItem) => [item.name, item.unlocked])
       ),
-    )
+    ),
   );
 
   const [unlockedTelescopeDataSources, setUnlockedTelescopeDataSources] = useState<Record<string, boolean>>(
@@ -391,4 +351,45 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
       </div>
     </div>
   );
+};
+
+interface DataSourcesModalProps {
+  structureId: string;
+  structure: string;
+};
+
+interface ZoodexItem {
+  name: string;
+  description: string;
+  identifier: string;
+  researchId: string;
+  researcher: string;
+  unlocked: boolean;
+};
+
+interface TelescopeItem {
+  name: string;
+  description: string;
+  identifier: string;
+  researchId: string;
+  researcher: string;
+  unlocked: boolean;
+};
+
+interface LidarItem {
+  name: string;
+  description: string;
+  identifier: string;
+  researchId: string;
+  researcher: string;
+  unlocked: boolean;
+};
+
+interface RoverItem {
+  name: string;
+  description: string;
+  identifier: string;
+  researchId: string;
+  researcher: string;
+  unlocked: boolean;
 };

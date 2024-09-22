@@ -57,7 +57,7 @@ export const telescopeDataSources = [
                 // icon: TelescopeIcon,
                 unlocked: false,
             },
-            // Other (non-transiting) planet candidates here
+            // Other (non-transiting) planet candidates here e.g. microlensing, radial velocity
         ],
     },
     {
