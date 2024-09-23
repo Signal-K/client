@@ -21,6 +21,7 @@ interface StructuresOnPlanetProps {
 };
 
 import { CitizenScienceModule } from "@/app/api/citizen/modules/route";
+import { UnownedSurfaceStructures } from "./Build/EditMode";
 
 export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
   const supabase = useSupabaseClient();
@@ -41,7 +42,6 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
     }
 
     try {
-      // Fetch active mission from profiles table
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('activemission')
@@ -52,21 +52,17 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
 
       setactivemission(profileData.activemission);
 
-      // Fetch Citizen Science Module data
       const modulesResponse = await fetch('/api/citizen/modules');
       const modulesData: CitizenScienceModule[] = await modulesResponse.json();
 
-      // Find the module associated with the active mission
       const activeModule = modulesData.find(module => module.starterMission === profileData.activemission);
       if (activeModule) {
-        setMissionStructureId(activeModule.structure);  // Set the structure ID associated with the active mission
+        setMissionStructureId(activeModule.structure);
       }
 
-      // Fetch item details from the gameplay API
       const response = await fetch('/api/gameplay/inventory');
       const itemsData: StructureItemDetail[] = await response.json();
 
-      // Create a map for quick access to item details
       const itemMap = new Map<number, StructureItemDetail>();
       itemsData.forEach(item => {
         if (item.ItemCategory === 'Structure') {
@@ -76,7 +72,6 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
 
       setItemDetails(itemMap);
 
-      // Fetch inventory data for user and active planet
       const { data: inventoryData, error: inventoryError } = await supabase
         .from('inventory')
         .select('*')
@@ -85,7 +80,6 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
 
       if (inventoryError) throw inventoryError;
 
-      // Filter for unique structures based on locationType fetched from the API
       const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
       inventoryData.forEach(structure => {
         const itemDetail = itemMap.get(structure.item);
@@ -134,25 +128,10 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
     return <div>Loading...</div>;
   }
 
-  const activeStructure = userStructuresOnPlanet.find(structure => structure.item === missionStructureId);
-  const otherStructures = userStructuresOnPlanet.filter(structure => structure.item !== missionStructureId);
-
   return (
     <div className="relative">
       <div className="grid grid-cols-3 gap-1 gap-y-3 relative">
-        {/* First row: 3 items */}
-        {activeStructure && (
-          <div key={activeStructure.id} className="flex flex-col items-center space-y-2">
-            <img
-              src={itemDetails.get(activeStructure.item)?.icon_url}
-              alt={itemDetails.get(activeStructure.item)?.name}
-              className="w-24 h-24 object-cover cursor-pointer bouncing-structure"
-              onClick={() => handleIconClick(activeStructure.item, activeStructure.id)}
-            />
-            <p className="text-white text-sm mt-2">{itemDetails.get(activeStructure.item)?.name}</p>
-          </div>
-        )}
-        {otherStructures.slice(0, 2).map((structure) => {
+        {userStructuresOnPlanet.map((structure) => {
           const itemDetail = itemDetails.get(structure.item);
 
           return itemDetail ? (
@@ -160,32 +139,13 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
               <img
                 src={itemDetail.icon_url}
                 alt={itemDetail.name}
-                className="w-24 h-24 object-cover cursor-pointer moving-structure"
+                className={`w-24 h-24 object-cover cursor-pointer ${structure.item === missionStructureId ? 'bouncing-structure' : 'moving-structure'}`}
                 onClick={() => handleIconClick(itemDetail.id, structure.id)}
               />
               <p className="text-white text-sm mt-2">{itemDetail.name}</p>
             </div>
           ) : null;
         })}
-
-        {/* Second row: 2 items staggered between the first row */}
-        <div className="col-span-3 grid grid-cols-2 gap-x-8 relative -top-8">
-          {otherStructures.slice(2, 4).map((structure) => {
-            const itemDetail = itemDetails.get(structure.item);
-
-            return itemDetail ? (
-              <div key={structure.id} className="flex flex-col items-center space-y-2">
-                <img
-                  src={itemDetail.icon_url}
-                  alt={itemDetail.name}
-                  className="w-24 h-24 object-cover cursor-pointer moving-structure"
-                  onClick={() => handleIconClick(itemDetail.id, structure.id)}
-                />
-                <p className="text-white text-sm mt-2">{itemDetail.name}</p>
-              </div>
-            ) : null;
-          })}
-        </div>
       </div>
 
       {selectedStructure && (
@@ -201,10 +161,10 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
           onClose={handleClose}
         />
       )}
+      <UnownedSurfaceStructures />
     </div>
   );
 };
-
 
 export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
     const supabase = useSupabaseClient();

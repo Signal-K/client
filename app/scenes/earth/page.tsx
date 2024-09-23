@@ -7,11 +7,9 @@ import { EarthViewLayout } from "@/app/components/(scenes)/planetScene/layout";
 import { InventoryStructureItem } from "@/types/Items";
 import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/app/components/(structures)/Structures";
-import { CaptnCosmosGuideModal } from "@/app/components/(dialogue)/guideBot";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
 import CitizenData from "@/app/auth/readToFlask";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
-import { UnownedSurfaceStructures } from "@/app/components/(structures)/Build/EditMode";
 
 const EarthView: React.FC = () => {
   const supabase = useSupabaseClient();
@@ -124,8 +122,7 @@ const EarthStructures: React.FC = () => {
                 </div>
             </div>
             <div className="w-full">
-                <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
-                <UnownedSurfaceStructures />      
+                <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>  
             </div>
             <div className="relative flex-1">
                 <AllAutomatonsOnActivePlanet />

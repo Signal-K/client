@@ -15,7 +15,7 @@ interface InventoryItem {
     icon_url: string;
     ItemCategory: string;
     locationType?: string;
-}
+};
 
 export function UnownedSurfaceStructures() {
     const supabase = useSupabaseClient();
@@ -68,6 +68,39 @@ export function UnownedSurfaceStructures() {
         fetchStructures();
     }, [session, activePlanet, supabase]);
 
+    async function addToInventory(structure: InventoryItem) {
+        if (!session || !activePlanet) return;
+
+        try {
+            const { data, error } = await supabase
+                .from('inventory')
+                .insert([
+                    {
+                        owner: session.user.id,
+                        anomaly: activePlanet.id,
+                        item: structure.id,
+                        quantity: 1,
+                        configuration: "{Uses: 1}",
+                    },
+                ]);
+
+            if (error) {
+                throw error;
+            }
+
+            console.log(`${structure.name} has been added to the inventory.`);
+            setOpen(false);
+        } catch (error) {
+            console.error('Error adding to inventory:', error);
+            setError('Failed to add the structure to your inventory.');
+        }
+    }
+
+    // If there are no unowned structures, return null to prevent rendering the component.
+    if (unownedStructures.length === 0) {
+        return null;
+    }
+
     return (
         <div className="relative">
             <Dialog open={open} onOpenChange={setOpen}>
@@ -99,8 +132,7 @@ export function UnownedSurfaceStructures() {
                                     size="lg"
                                     className="w-full max-w-md bg-[#7aa2f7] text-[#1a1b26] hover:bg-[#89b4fa]"
                                     onClick={() => {
-                                        console.log(`Placing ${selectedStructure.name}`);
-                                        setOpen(false);
+                                        addToInventory(selectedStructure);
                                     }}
                                 >
                                     Place
@@ -130,16 +162,6 @@ export function UnownedSurfaceStructures() {
                     </AnimatePresence>
                 </DialogContent>
             </Dialog>
-            <Button
-                size="lg"
-                className="fixed bottom-8 left-1/2 transform -translate-x-1/2 rounded-full bg-[#1a1b26] text-[#a9b1d6] hover:bg-[#24283b] shadow-lg"
-                onClick={() => {
-                    setSelectedStructure(null);
-                    setOpen(false);
-                }}
-            >
-                <X size={24} />
-            </Button>
         </div>
     );
 };
