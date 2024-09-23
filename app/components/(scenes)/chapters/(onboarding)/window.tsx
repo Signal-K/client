@@ -7,10 +7,10 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { FirstTelescopeClassification } from "@/app/components/(structures)/Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import DeployRooversInitial from "../../roovers/deployAndReturn";
-// import { Header } from "@/app/components/sections/header";
 import GeneratedStarterPlanet from "../../../(anomalies)/(planets)/generated";
 import { Mission } from "@/types/Missions";
 import { OnboardingStepProps } from "@/types/Onboarding";
+import Link from "next/link"; // Import Link from Next.js
 
 const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
   const { activePlanet } = useActivePlanet();
@@ -74,7 +74,7 @@ const OnboardingWindow = () => {
   const [steps, setSteps] = useState<Mission[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 
-  const missionIds = [1370102, 1370103, 1370104, 1370106]; // Exclude 1370105 from the missionIds
+  const missionIds = [1370102, 1370103, 1370104, 1370106];
 
   useEffect(() => {
     const fetchMissionsData = async () => {
@@ -209,19 +209,21 @@ const OnboardingWindow = () => {
             >
               Back
             </button>
-            {/* <ProgressBar
-              currentStepIndex={steps.findIndex(
-                (step) => step.id === currentStep
-              )}
-              totalSteps={steps.length}
-            /> */}
-            <button
-              onClick={handleNext}
-              disabled={currentStep === steps[steps.length - 1]?.id}
-              className="px-4 py-2 bg-cyan-500 text-white rounded-lg"
-            >
-              {currentStep === steps[steps.length - 1]?.id ? "" : "Next"}
-            </button>
+            {currentStep === steps[steps.length - 1]?.id ? (
+              <Link href="/scenes/planet">
+                <button className="px-4 py-2 bg-cyan-500 text-white rounded-lg">
+                  Go to Planet
+                </button>
+              </Link>
+            ) : (
+              <button
+                onClick={handleNext}
+                disabled={currentStep === steps[steps.length - 1]?.id}
+                className="px-4 py-2 bg-cyan-500 text-white rounded-lg"
+              >
+                Next
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -256,8 +258,8 @@ const OnboardingWindow = () => {
         )}
       </div>
 
-      {/* Bottom Navigation (Mobile) */}
-      {currentStep && (
+      {/* Modal for Mobile */}
+            {currentStep && (
         <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-2 md:hidden z-20">
           <div className="flex justify-between mt-5 items-center">
             <button

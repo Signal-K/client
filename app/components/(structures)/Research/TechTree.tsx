@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { Building, Cpu } from 'lucide-react'
 import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react'
 import { useActivePlanet } from '@/context/ActivePlanet'
+import { InventoryItem } from '@/types/Items'
 
 type TechCategory = 'Structures' | 'Automatons'
 
@@ -15,14 +16,20 @@ type Technology = {
   requiredTech: number | null
   category: TechCategory
   requiresMission?: number
-  item?: number // Points to an entry in `/api/gameplay/inventory`
+  item?: number
 }
 
 type Structure = {
   id: number
   name: string
   icon: React.ReactNode
-}
+};
+
+type ResearchData = {
+  tech_id: any
+  tech_type: number; 
+  item?: number; 
+};
 
 export function AdvancedTechTreeComponent() {
   const supabase = useSupabaseClient()
@@ -33,7 +40,7 @@ export function AdvancedTechTreeComponent() {
   const [technologies, setTechnologies] = useState<Technology[]>([])
   const [unlockedTechs, setUnlockedTechs] = useState<number[]>([])
   const [userStructures, setUserStructures] = useState<Structure[]>([])
-  const [classificationPoints, setClassificationPoints] = useState<number>(0) // New state for classification points
+  const [classificationPoints, setClassificationPoints] = useState<number>(0)
 
   // Fetch all technologies data from API routes
   const fetchTechnologies = async () => {
@@ -70,49 +77,50 @@ export function AdvancedTechTreeComponent() {
 
   const fetchUserStructures = async () => {
     if (!userId || !activePlanet?.id) return;
-    
-    // Fetch inventory items for the user and active planet
-    const { data, error } = await supabase
-      .from('inventory')
-      .select('item')
-      .eq('owner', userId)
-      .eq('anomaly', activePlanet.id);
-    
-    if (error) {
-      console.error('Error fetching user structures from inventory:', error);
+  
+    const { data: researchData, error: researchError } = await supabase
+      .from('researched')
+      .select('tech_type, tech_id')
+      .eq('user_id', userId);
+  
+    if (researchError) {
+      console.error('Error fetching user structures:', researchError);
       return;
     }
-    
-    // Fetch structures from the API route
+  
+    console.log('Research Data:', researchData); // Log research data for debugging
+  
     const structuresRes = await fetch('/api/gameplay/research/structures');
     const structuresData = await structuresRes.json();
-    
-    const structureIds = data.map((inventoryItem) => inventoryItem.item);
-    
-    // Match inventory items with structures from the API
+  
+    const structureIds = researchData
+      .filter((item: ResearchData) => item.tech_type) // Ensure tech_type is valid
+      .map((item: ResearchData) => item.tech_id); // Use tech_id to match structures
+  
     const userStructures = structuresData
-      .filter((structure: any) => structure.item && structureIds.includes(structure.item))
+      .filter((structure: any) => structure.item && structureIds.includes(structure.id)) // Match by structure ID
       .map((structure: any) => ({
         id: structure.id,
         name: structure.name,
-        icon: <Building className="w-6 h-6" />, // Adjust if you have a custom icon
+        icon: <Building className="w-6 h-6" />,
       }));
-    
-    // Ensure only unique structures are shown
+  
+    console.log('User Structures:', userStructures); // Log user structures for debugging
+  
+    // Ensure unique structures
     const uniqueStructures = userStructures.filter(
       (structure: Structure, index: number, self: Structure[]) =>
         index === self.findIndex((s: Structure) => s.id === structure.id)
     );
-    
+  
     setUserStructures(uniqueStructures);
   
-    // Automatically mark owned structures as unlocked
-    const ownedStructureIds = userStructures.map((structure: { id: any }) => structure.id);
+    const ownedStructureIds = uniqueStructures.map((structure: { id: any }) => structure.id);
     setUnlockedTechs((prevUnlockedTechs) => [
-      ...prevUnlockedTechs, 
-      ...ownedStructureIds.filter((id: number) => !prevUnlockedTechs.includes(id)) // Avoid duplicates
+      ...prevUnlockedTechs,
+      ...ownedStructureIds.filter((id: number) => !prevUnlockedTechs.includes(id)),
     ]);
-  };
+  };  
 
   const fetchClassificationPoints = async () => {
     if (!userId) return;
@@ -143,7 +151,18 @@ export function AdvancedTechTreeComponent() {
         alert('You need at least 1 classification point to unlock a new technology.');
         return;
       }
-
+  
+      // Fetch the item name from the API
+      const itemResponse = await fetch(`/api/gameplay/inventory`);
+      const inventoryItems = await itemResponse.json();
+      const item = inventoryItems.find((i: InventoryItem) => i.id === techItem);
+  
+      // If the item was not found, handle accordingly
+      if (!item) {
+        console.error('Item not found for techItem:', techItem);
+        return;
+      }
+  
       // Add entry to inventory in Supabase (for structures)
       if (techCategory === 'Structures' && techItem) {
         const { error: inventoryError } = await supabase
@@ -154,7 +173,7 @@ export function AdvancedTechTreeComponent() {
             item: techItem,  // Use the `item` value instead of `techId`
             configuration: { "Uses": 1 },  // Pass as an object
             quantity: 1 
-          }])
+          }]);
   
         if (inventoryError) {
           console.error('Error adding structure to inventory:', inventoryError);
@@ -173,10 +192,25 @@ export function AdvancedTechTreeComponent() {
         return;
       }
   
+      // Insert into the `researched` table to track the research event
+      const { error: researchedError } = await supabase
+        .from('researched')
+        .insert([{ 
+          user_id: userId, 
+          tech_type: item.id, // Use the item's name instead of the category
+          tech_id: techId,         // Insert the technology ID
+        }]);
+  
+      if (researchedError) {
+        console.error('Error inserting research data:', researchedError);
+        return;
+      }
+  
+      // Update local state
       setClassificationPoints(prevPoints => prevPoints - 1);
       setUnlockedTechs(prevUnlockedTechs => [...prevUnlockedTechs, techId]);
     }
-  }
+  };
   
 
   const canUnlock = (techId: number) => {

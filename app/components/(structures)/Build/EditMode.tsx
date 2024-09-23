@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet';
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,28 +34,40 @@ export function UnownedSurfaceStructures() {
                 setLoading(false);
                 return;
             }
-
+    
             try {
-                const response = await fetch('/api/gameplay/inventory');
-                const inventoryItems: InventoryItem[] = await response.json();
-
-                const surfaceStructures = inventoryItems.filter(item =>
-                    item.ItemCategory === 'Structure' && item.locationType === 'Surface'
-                );
-
+                const { data: researchedStructures, error: researchError } = await supabase
+                    .from('researched')
+                    .select('tech_type')
+                    .eq('user_id', session.user.id);
+                
+                if (researchError) {
+                    throw researchError;
+                }
+    
+                const researchedIds = researchedStructures.map((item: { tech_type: string }) => Number(item.tech_type));
+    
                 const { data: userInventory, error: inventoryError } = await supabase
                     .from('inventory')
                     .select('item')
                     .eq('owner', session.user.id)
                     .eq('anomaly', activePlanet.id);
-
+    
                 if (inventoryError) {
                     throw inventoryError;
                 }
-
+    
                 const ownedItems = userInventory.map((item: { item: number }) => item.item);
+    
+                const response = await fetch('/api/gameplay/inventory');
+                const inventoryItems: InventoryItem[] = await response.json();
+    
+                const surfaceStructures = inventoryItems.filter(item =>
+                    item.ItemCategory === 'Structure' && item.locationType === 'Surface' && researchedIds.includes(item.id)
+                );
+    
                 const unowned = surfaceStructures.filter(structure => !ownedItems.includes(structure.id));
-
+    
                 setUnownedStructures(unowned);
             } catch (error) {
                 console.error('Error fetching structures:', error);
@@ -64,7 +76,7 @@ export function UnownedSurfaceStructures() {
                 setLoading(false);
             }
         }
-
+    
         fetchStructures();
     }, [session, activePlanet, supabase]);
 
@@ -72,7 +84,7 @@ export function UnownedSurfaceStructures() {
         if (!session || !activePlanet) return;
 
         try {
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from('inventory')
                 .insert([
                     {
@@ -80,7 +92,7 @@ export function UnownedSurfaceStructures() {
                         anomaly: activePlanet.id,
                         item: structure.id,
                         quantity: 1,
-                        configuration: "{Uses: 1}",
+                        configuration: { Uses: 1 },
                     },
                 ]);
 
@@ -96,9 +108,25 @@ export function UnownedSurfaceStructures() {
         }
     }
 
-    // If there are no unowned structures, return null to prevent rendering the component.
+    if (loading) {
+        return <p>Loading...</p>;
+    }
+
     if (unownedStructures.length === 0) {
-        return null;
+        return (
+            <div className="relative">
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger asChild>
+                        <Button size="lg" className="rounded-full p-4 bg-[#1a1b26] text-[#a9b1d6] hover:bg-[#24283b] shadow-lg">
+                            <Plus size={36} />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-full w-[18%] h-[18%] p-4 bg-[#1a1b26] text-[#a9b1d6] rounded-3xl shadow-lg">
+                        <p className="text-center">Use the Research Station to research more structures.</p>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        );
     }
 
     return (
@@ -110,7 +138,7 @@ export function UnownedSurfaceStructures() {
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-full max-h-[90vh] w-full sm:w-[90vw] h-full sm:h-[90vh] p-0 bg-gradient-to-br from-[#1a1b26] via-[#292e42] to-[#565f89] rounded-3xl overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIiBmaWxsPSIjMWExYjI2IiBmaWxsLW9wYWNpdHk9Ii4xNSIvPjwvZz48L3N2Zz4=')] opacity-20" />
+                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,...')] opacity-20" />
                     <AnimatePresence>
                         {selectedStructure ? (
                             <motion.div
@@ -143,7 +171,7 @@ export function UnownedSurfaceStructures() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="relative grid grid-cols-3 gap-4 p-4 h-full overflow-y-auto"
+                                className="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 h-full overflow-y-auto"
                             >
                                 {unownedStructures.map((structure) => (
                                     <Button
