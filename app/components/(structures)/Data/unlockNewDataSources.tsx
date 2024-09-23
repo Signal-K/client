@@ -21,7 +21,7 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
       ...lidarDataSources,
       ...roverDataSources, // Add rover data to the categories
     ].map((category) => [category.category, true]))
-  );
+  ); 
 
   const [unlockedZoodexDataSources, setUnlockedZoodexDataSources] = useState<Record<string, boolean>>(
     Object.fromEntries(

@@ -24,6 +24,7 @@ services:
       - "5001:5001"
     environment:
       - FLASK_APP=app.py
+      - FLASK_ENV=development
     volumes:
       - ./citizen:/app
     working_dir: /app

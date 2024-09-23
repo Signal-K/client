@@ -22,9 +22,9 @@ export function StarterZoodex() {
     const [userChoice, setUserChoice] = useState<string | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>('');
     const [configuration, setConfiguration] = useState<any | null>(null);
-
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [anomalyType, setAnomalyType] = useState<string | null>(null);
 
     // Fetch structure configuration from the `inventory` table
     useEffect(() => {
@@ -69,7 +69,7 @@ export function StarterZoodex() {
             if (!session || !userChoice) {
                 setLoading(false);
                 return;
-            };
+            }; 
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
@@ -107,6 +107,15 @@ export function StarterZoodex() {
                     setAnomaly(anomalyData as Anomaly);
                     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
                     setImageUrl(`${supabaseUrl}/storage/v1/object/public/zoodex/${userChoice}/${anomalyData.id}.jpeg`);
+
+                    // Set anomalyType based on the selected userChoice
+                    const selectedMission = zoodexDataSources
+                        .flatMap(category => category.items)
+                        .find(item => item.identifier === userChoice);
+
+                    if (selectedMission) {
+                        setAnomalyType(selectedMission.identifier);
+                    }
                 };
             } catch (error: any) {
                 console.error('Error fetching anomaly: ', error.message);
@@ -119,8 +128,9 @@ export function StarterZoodex() {
         fetchAnomaly(); 
     }, [session, supabase, userChoice, activePlanet]);
 
-    const handleChoice = ( choice: string ) => {
+    const handleChoice = (choice: string) => {
         setUserChoice(choice);
+        setAnomalyType(null); // Reset anomalyType when a new choice is made
     };
 
     if (error) {
@@ -197,10 +207,10 @@ export function StarterZoodex() {
                     <img src={imageUrl} alt="Binned Anomaly" />
                 )}
             </div>
-            {imageUrl && (
+            {imageUrl && anomalyType && (
                 <ClassificationForm 
                     anomalyId={anomaly.id.toString()}
-                    anomalyType='zoodex-burrowingOwl' 
+                    anomalyType={anomalyType}
                     missionNumber={1370202}     
                     assetMentioned={imageUrl} 
                     structureItemId={3104}

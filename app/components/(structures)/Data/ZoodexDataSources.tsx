@@ -18,6 +18,14 @@ export const zoodexDataSources = [
                 unlocked: false,
             },
             {
+                name: "Iguanas from Above",
+                description: "Help us count Galapagos Marine Iguanas from aerial photographs",
+                identifier: "zoodex-iguanasFromAbove",
+                researchId: 'iguanas-from-above',
+                researcher: 'andreavarela89',
+                unlocked: false,
+            },
+            {
                 name: "Fish Research",
                 description: 'Hello there',
                 identifier: "zoodex-fishResearch",

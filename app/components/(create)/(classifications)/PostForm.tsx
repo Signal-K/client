@@ -86,6 +86,25 @@ const zoodexBurrowingOwlClassificationOptions: ClassificationOption[] = [
     }, // Expand for choosing numbers, pointers, and predators etc.
 ];
 
+const zoodexIguanasFromAboveClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Adult Male not in a Lek",
+    },
+    {
+        id: 2,
+        text: "Adult male with a Lek",
+    },
+    {
+        id: 3,
+        text: "Juvenile/Female",
+    },
+    {
+        id: 4,
+        text: "Partial iguana",
+    },
+];
+
 interface ClassificationFormProps {
     anomalyType: string;
     anomalyId: string; 
@@ -126,10 +145,12 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return initialCloudClassificationOptions;
             case "zoodex-burrowingOwl":
                 return zoodexBurrowingOwlClassificationOptions;
+            case 'zoodex-iguanasFromAbove':
+                return zoodexIguanasFromAboveClassificationOptions;
             default:
                 return [];
         }
-    })();
+    })();    
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -415,7 +436,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                         value={content}
                                         onChange={e => setContent(e.target.value)}
                                         className="flex-grow p-3 h-24 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
-                                        placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
+                                        // placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
+                                        placeholder="What do you think about this?"
                                     />
                                 </div>
                                 <div className="flex items-center mb-4">
