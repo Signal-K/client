@@ -9,12 +9,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://flask:5001
+      - NEXT_PUBLIC_API_URL=http://flask:5001 
     volumes:
       - ./:/app
       - /app/node_modules
     working_dir: /app
-    command: "yarn start" 
+    command: "npm run dev"
   flask:
     container_name: flask
     build:

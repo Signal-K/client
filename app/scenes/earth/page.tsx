@@ -14,6 +14,7 @@ import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons
 const EarthView: React.FC = () => {
   const supabase = useSupabaseClient();
   const session = useSession();
+  
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
 
   const handleUpdateToEarth = () => {
