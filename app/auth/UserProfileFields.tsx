@@ -97,16 +97,15 @@ export function ProfileCard() {
           throw missionError;
         }
 
-        // Add the reward item to the inventory (ensure mission.rewards is defined)
         if (mission.rewards && mission.rewards.length > 0) {
           const inventoryData = {
-            item: mission.rewards[0], // Assuming single reward item for mission 2
+            item: mission.rewards[0],
             owner: session?.user?.id,
             quantity: 1,
             notes: `Reward for completing mission ${missionId}`,
             parentItem: null,
             time_of_deploy: new Date().toISOString(),
-            anomaly: null, // Assuming no specific location for the item
+            anomaly: null,
           };
 
           const { error: inventoryError } = await supabase

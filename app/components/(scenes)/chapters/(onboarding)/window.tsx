@@ -106,9 +106,9 @@ const OnboardingWindow = () => {
           if (!completedMissions.includes(missionIds[i])) {
             setCurrentStep(missionIds[i]);
             break;
-          }
-        }
-      }
+          };
+        };
+      };
     };
 
     fetchMissionsData();
