@@ -8,11 +8,11 @@ interface Mission {
   classificationModule: string;
   completed?: boolean;
   structure?: number;
-}
+};
 
 interface MissionsForStructureProps {
   structureItemId: number;
-}
+};
 
 const MissionsForStructure: React.FC<MissionsForStructureProps> = ({ structureItemId }) => {
   const supabase = useSupabaseClient();
@@ -42,13 +42,12 @@ const MissionsForStructure: React.FC<MissionsForStructureProps> = ({ structureIt
         if (inventoryData.length === 0) {
           console.error('No matching structure found in inventory for the user.');
           return;
-        }
+        };
 
-        // Fetch missions from the API route
         const response = await fetch('/api/gameplay/missions');
         if (!response.ok) {
           throw new Error('Failed to fetch missions');
-        }
+        };
         const missions: Mission[] = await response.json();
 
         const filteredMissions = missions.filter(mission => mission.structure === structureItemId);
@@ -66,7 +65,7 @@ const MissionsForStructure: React.FC<MissionsForStructureProps> = ({ structureIt
         setCompletedMissions(completedMissionSet);
       } catch (error) {
         console.error('Error fetching missions:', error);
-      }
+      };
     };
 
     fetchMissions();

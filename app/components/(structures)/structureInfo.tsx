@@ -20,7 +20,7 @@ export function StructureInfo({ icon, structureName }: StructureInfoProps = { st
       <div className="flex-shrink-0">
         {icon || <Building2 size={24} className="text-[#5FCBC3]" />}
       </div>
-      <div>
+      <div> 
         <h2 className="text-xl font-semibold">{structureName}</h2>
         <p className="text-sm text-[#5FCBC3]">Planet: {activePlanet?.content}</p> 
       </div>

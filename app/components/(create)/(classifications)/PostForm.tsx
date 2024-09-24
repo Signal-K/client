@@ -117,6 +117,7 @@ interface ClassificationFormProps {
 const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, anomalyId, missionNumber, assetMentioned, originatingStructure, structureItemId }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
+    
     const { activePlanet } = useActivePlanet();
 
     const [content, setContent] = useState<string>("");

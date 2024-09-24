@@ -5,6 +5,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from '../../(create)/(classifications)/PostForm';
 import { zoodexDataSources } from "../Data/ZoodexDataSources";
+import { StructureInfo } from "../structureInfo";
 
 export interface Anomaly {
     id: bigint;
@@ -152,6 +153,7 @@ export function StarterZoodex() {
     if (!userChoice) {
         return (
             <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+                <StructureInfo structureName="Zoodex" />
                 <p className="text-sm font-bold">You've been given some animals to observe and compare to their mannerisms on Earth. As you progress, more species will become available.</p>
                 <h2 className="text-lg font-bold">Choose a data source: </h2>
                 {configuration["missions unlocked"] && Array.isArray(configuration["missions unlocked"]) && configuration["missions unlocked"].length > 0 ? (
@@ -198,6 +200,7 @@ export function StarterZoodex() {
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+            <StructureInfo structureName="Zoodex" />
             <div className="p-4 rounded-md relative w-full">
                 <h3>{anomaly.content}</h3>
                 {anomaly.avatar_url && (

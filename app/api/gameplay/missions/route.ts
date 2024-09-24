@@ -32,7 +32,7 @@ const missions: Mission[] = [
     {
         id: 1370203,
         name: 'Choose your first classification',
-        description: 'Fill me',
+        description: 'Fill me', // up
         classificationModule: 'General',
         sequence: 2,
         chapter: 1

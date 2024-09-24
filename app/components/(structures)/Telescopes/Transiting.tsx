@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet'; 
 import ClassificationForm from '../../(create)/(classifications)/PostForm';
+import { StructureInfo } from '../structureInfo';
 
 export interface Anomaly {
     id: bigint;
@@ -123,6 +124,7 @@ export function StarterTelescope() {
     if (!userChoice) {
         return (
             <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+                <StructureInfo structureName="Telescope" />
                 <p className="text-sm font-bold">Choose a target to observe using your Telescope:</p>
                 {configuration["missions unlocked"] && Array.isArray(configuration["missions unlocked"]) && configuration["missions unlocked"].length > 0 ? (
                     configuration["missions unlocked"].map((missionId: string) => (
@@ -159,6 +161,7 @@ export function StarterTelescope() {
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+            <StructureInfo structureName="Telescope" />
             <div className="p-4 rounded-md relative w-full">
                 {anomaly.avatar_url && (
                     <img src={anomaly.avatar_url} alt="Anomaly Avatar" className='w-24 h-24' />

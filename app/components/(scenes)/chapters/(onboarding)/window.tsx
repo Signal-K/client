@@ -10,7 +10,7 @@ import DeployRooversInitial from "../../roovers/deployAndReturn";
 import GeneratedStarterPlanet from "../../../(anomalies)/(planets)/generated";
 import { Mission } from "@/types/Missions";
 import { OnboardingStepProps } from "@/types/Onboarding";
-import Link from "next/link"; // Import Link from Next.js
+import Link from "next/link";
 
 const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
   const { activePlanet } = useActivePlanet();
@@ -183,7 +183,7 @@ const OnboardingWindow = () => {
             >
               <OnboardingStep
                 title={currentMission.name}
-                description={currentMission.description}
+                description={currentMission.description || ""}
                 step={currentStep}
               />
             </motion.div>
