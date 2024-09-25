@@ -239,7 +239,7 @@ export const RoverPhoto: React.FC = () => {
                     anomalytype: "roverImg",
                     avatar_url: avatar_url,
                     configuration: roverConfig,
-                    parentAnomaly: activePlanet.id ? Number(activePlanet.id) : null,
+                    parentAnomaly: activePlanet.id ? Number(activePlanet.id) || null : null,
                     created_at: new Date(),
                 };
 

@@ -164,22 +164,22 @@ export function AdvancedTechTreeComponent() {
       }
   
       // Add entry to inventory in Supabase (for structures)
-      if (techCategory === 'Structures' && techItem) {
-        const { error: inventoryError } = await supabase
-          .from('inventory')
-          .insert([{ 
-            owner: userId, 
-            anomaly: activePlanet?.id, 
-            item: techItem,  // Use the `item` value instead of `techId`
-            configuration: { "Uses": 1 },  // Pass as an object
-            quantity: 1 
-          }]);
+      // if (techCategory === 'Structures' && techItem) {
+      //   const { error: inventoryError } = await supabase
+      //     .from('inventory')
+      //     .insert([{ 
+      //       owner: userId, 
+      //       anomaly: activePlanet?.id, 
+      //       item: techItem,  // Use the `item` value instead of `techId`
+      //       configuration: { "Uses": 1 },  // Pass as an object
+      //       quantity: 1 
+      //     }]);
   
-        if (inventoryError) {
-          console.error('Error adding structure to inventory:', inventoryError);
-          return;
-        }
-      }
+      //   if (inventoryError) {
+      //     console.error('Error adding structure to inventory:', inventoryError);
+      //     return;
+      //   }
+      // }
   
       // Deduct 1 classification point after successful unlock
       const { error: updatePointsError } = await supabase
