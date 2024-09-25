@@ -11,7 +11,7 @@ import { planetClassificationConfig } from '../../(create)/(classifications)/For
 export interface Anomaly {
     id: bigint;
     content: string;
-    avatar_url?: string;
+    avatar_url?: string; 
 };
 
 export function StarterTelescope() {
@@ -188,7 +188,6 @@ export function StarterTelescope() {
     );
 };
 
-
 interface TelescopeProps {
     anomalyid: string;
 };
@@ -196,6 +195,7 @@ interface TelescopeProps {
 export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
+
     const { activePlanet } = useActivePlanet();
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -218,7 +218,7 @@ export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomaly
                     alt="Cosmos Avatar"
                     className="w-12 h-12 rounded-full bg-[#303F51]"
                 />
-                <h3 className="text-xl font-bold text-[#85DDA2] mt-2 ml-4">Cosmos</h3>
+                <h3 className="text-xl font-bold text-[#85DDA2] mt-2 ml-4">Capt'n Cosmos</h3>
             </div>
             <div className="p-4 bg-[#2C3A4A] border border-[#85DDA2] rounded-md shadow-md relative w-full">
                 <div className="relative">
