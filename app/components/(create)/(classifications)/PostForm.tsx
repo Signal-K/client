@@ -279,7 +279,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     .eq('owner', session.user.id)
                     .eq('anomaly', activePlanet.id)
                     .eq('item', structureItemId)
-                    .order('id', { ascending: true }) // Get the item with the lowest ID/primary key
+                    .order('id', { ascending: true })
                     .limit(1)
                     .single();
 
@@ -287,11 +287,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
 
                 if (inventoryData) {
                     setInventoryItemId(inventoryData.id);
-                    setUses(inventoryData.configuration?.Uses || 0); // Set "Uses" value
-                }
+                    setUses(inventoryData.configuration?.Uses || 0);
+                };
             } catch (error: any) {
                 console.error("Error fetching inventory item ID:", error.message);
-            }
+            };
         };
 
         fetchInventoryItemId();
@@ -410,7 +410,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             // Reset user's active mission to null after classification is created
             const { error: resetMissionError } = await supabase
                 .from('profiles')
-                .update({ activeMission: null })
+                .update({ activemission: null })
                 .eq('id', session?.user?.id);
     
             if (resetMissionError) {
@@ -438,8 +438,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             console.error("Unexpected error:", error);
         }
     };
-    
-    
+     
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (files && files.length > 0 && session) {
@@ -492,7 +491,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                         ))}
                     </div>
                     <div className="flex flex-col gap-2 w-2/3">
-                        {/* {Object.keys(selectedOptions).length > 0 && ( */}
                             <>
                                 <div className="flex gap-4 mb-4">
                                     <UserAvatarNullUpload

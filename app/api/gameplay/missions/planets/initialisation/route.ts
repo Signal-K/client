@@ -41,6 +41,31 @@ const planetInitialisationMissions: Mission[] = [
         anomaly: 50,
     },
     {
+        id: 500011,
+        name: "Initialise Amalthea",
+        anomaly: 51,
+    },
+    {
+        id: 500021,
+        name: "Initialise Io",
+        anomaly: 52,
+    },
+    {
+        id: 500031,
+        name: "Initialise Callisto",
+        anomaly: 53,
+    },
+    {
+        id: 500041,
+        name: "Initialise Ganymede",
+        anomaly: 54,
+    },
+    {
+        id: 500051,
+        name: "Initialise Europa",
+        anomaly: 55,
+    },
+    {
         id: 600001,
         name: "Initialise Saturn",
         anomaly: 60,

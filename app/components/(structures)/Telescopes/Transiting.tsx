@@ -5,6 +5,8 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet'; 
 import ClassificationForm from '../../(create)/(classifications)/PostForm';
 import { StructureInfo } from '../structureInfo';
+import { ClassificationFormComponentT } from '../../(create)/(classifications)/MegaClassificationForm';
+import { planetClassificationConfig } from '../../(create)/(classifications)/FormConfigurations';
 
 export interface Anomaly {
     id: bigint;
@@ -171,13 +173,16 @@ export function StarterTelescope() {
                 )}
             </div>
             {imageUrl && (
-                <ClassificationForm 
-                    anomalyId={anomaly.id.toString()}
-                    anomalyType='telescope'  
-                    missionNumber={1372001} 
-                    assetMentioned={imageUrl} 
-                    structureItemId={3103} // Replace with correct structure item ID
-                />
+                // <ClassificationForm 
+                //     anomalyId={anomaly.id.toString()}
+                //     anomalyType='telescope'  
+                //     missionNumber={1372001} 
+                //     assetMentioned={imageUrl} 
+                //     structureItemId={3103} // Replace with correct structure item ID
+                // />
+                <ClassificationFormComponentT config={planetClassificationConfig} anomalyId={anomaly.id.toString()} anomalyType='planet' missionNumber={1370103} assetMentioned={imageUrl} onSubmit={function (data: any): void {
+                    throw new Error('Function not implemented.');
+                } } />
             )}
         </div>
     );

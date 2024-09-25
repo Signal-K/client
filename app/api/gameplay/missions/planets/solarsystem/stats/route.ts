@@ -120,6 +120,81 @@ const planetConfigurations: PlanetConfig[] = [
     planetType: "GasGiant",
   },
   {
+    id: 500011,
+    name: "Amalthea",
+    mass: "2.08 × 10^18 kg",
+    radius: "83.5 km",
+    temperature: {
+      average: "-153 °C"
+    },
+    equilibriumTemperature: "98 K",
+    volume: "2.43 × 10^5 km³",
+    density: "0.857 g/cm³",
+    distanceFromSunOrPlanet: "181,000 km (from Jupiter)",
+    orbitalPeriod: "0.498 days",
+    planetType: "Rocky",
+  },
+  {
+    id: 500021,
+    name: "Io",
+    mass: "8.9319 × 10^22 kg",
+    radius: "1,821.6 km",
+    temperature: {
+      average: "-143 °C"
+    },
+    equilibriumTemperature: "110 K",
+    volume: "2.53 × 10^10 km³",
+    density: "3.528 g/cm³",
+    distanceFromSunOrPlanet: "421,700 km (from Jupiter)",
+    orbitalPeriod: "1.77 days",
+    planetType: "Volcanic",
+  },
+  {
+    id: 500031,
+    name: "Callisto",
+    mass: "1.0759 × 10^23 kg",
+    radius: "2,410.3 km",
+    temperature: {
+      average: "-139 °C"
+    },
+    equilibriumTemperature: "99 K",
+    volume: "5.9 × 10^10 km³",
+    density: "1.834 g/cm³",
+    distanceFromSunOrPlanet: "1,882,700 km (from Jupiter)",
+    orbitalPeriod: "16.69 days",
+    planetType: "Icy",
+  },
+  {
+    id: 500041,
+    name: "Ganymede",
+    mass: "1.4819 × 10^23 kg",
+    radius: "2,634.1 km",
+    temperature: {
+      average: "-160 °C"
+    },
+    equilibriumTemperature: "110 K",
+    volume: "7.6 × 10^10 km³",
+    density: "1.936 g/cm³",
+    distanceFromSunOrPlanet: "1,070,400 km (from Jupiter)",
+    orbitalPeriod: "7.15 days",
+    planetType: "Icy",
+  },
+  {
+    id: 500051,
+    name: "Europa",
+    mass: "4.7998 × 10^22 kg",
+    radius: "1,560.8 km",
+    temperature: {
+      average: "-160 °C"
+    },
+    equilibriumTemperature: "102 K",
+    volume: "1.593 × 10^10 km³",
+    density: "3.013 g/cm³",
+    distanceFromSunOrPlanet: "671,100 km (from Jupiter)",
+    orbitalPeriod: "3.55 days",
+    planetType: "Icy",
+  },
+  {
     id: 600001,
     name: "Saturn",
     mass: "5.6834 × 10^26 kg",
