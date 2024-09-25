@@ -17,6 +17,7 @@ export interface FormConfig {
   title?: string;
   richTextFields: number;
   options?: ClassificationOption[];
+  richTextTitles?: (string | undefined)[];
 };
 
 interface ClassificationFormProps {
@@ -49,7 +50,7 @@ export function ClassificationFormComponentT({
   const supabase = useSupabaseClient();
   const session = useSession();
   const { activePlanet } = useActivePlanet();
-  const { title, richTextFields, options } = { ...defaultConfig, ...config };
+  const { title, richTextFields, richTextTitles, options } = { ...defaultConfig, ...config };
   const [richTextValues, setRichTextValues] = useState<string[]>(Array(richTextFields).fill(""));
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number[]>>({}); // Updated to support multiple selections
 
@@ -297,14 +298,17 @@ export function ClassificationFormComponentT({
                 ))}
               </div>
               {richTextValues.map((richTextValue, index) => (
-                <textarea
-                  key={index}
-                  value={richTextValue}
-                  onChange={(e) => handleRichTextChange(index, e.target.value)}
-                  className="w-full mb-4 p-3 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
-                  placeholder={`Details for rich text field ${index + 1}`}
-                  rows={3}
-                />
+                <div key={index}>
+                  {richTextTitles?.[index] && <h2>{richTextTitles[index]}</h2>}
+                  <textarea
+                    key={index}
+                    value={richTextValue}
+                    onChange={(e) => handleRichTextChange(index, e.target.value)}
+                    className="w-full mb-4 p-3 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
+                    placeholder={`Details for rich text field ${index + 1}`}
+                    rows={3}
+                  />
+                </div>
               ))}
               <button
                 type="submit"
