@@ -84,21 +84,45 @@ const cloudClassificationOptions: ClassificationOption[] = [
     },
 ];
 
+// const initialCloudClassificationOptions: ClassificationOption[] = [
+//     {
+//         id: 1,
+//         text: "White colour",
+//     },
+//     {
+//         id: 2,
+//         text: "Blue colour",
+//     },
+//     {
+//         id: 3,
+//         text: "Bright clouds",
+//     },
+//     {
+//         id: 4, text: "Large clouds",
+//     },
+// ];
+
 const initialCloudClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
-        text: "White colour",
+        text: "Narrow arch",
     },
     {
         id: 2,
-        text: "Blue colour",
+        text: "Wide arch",
     },
     {
         id: 3,
-        text: "Bright clouds",
+        text: "1 cloud",
     },
     {
-        id: 4, text: "Large clouds",
+        id: 4, text: "2 clouds",
+    },
+    {
+        id: 5, text: "3 clouds",
+    },
+    {
+        id: 6, text: "4+ clouds",
     },
 ];
 

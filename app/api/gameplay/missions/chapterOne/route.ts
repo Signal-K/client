@@ -15,27 +15,33 @@ const chapterOneMissions: Mission[] = [
 
     // Classification tutorials
     {
-        id: 100000021,
+        // id: 100000021,
+        id: 3000001,
         name: 'Complete Telescope > TESS tutorial',
     },
     {
-        id: 100000022,
+        // id: 100000022,
+        id: 3000003,
         name: 'Complete Telescope > Sunspots tutorial',
     },
     {
-        id: 100000023,
+        // id: 100000023,
+        id: 3000009,
         name: 'Complete Telescpe > Disk Detector tutorial',
     },
     {
-        id: 100000024,
+        id: 3000010,
+        // id: 100000024,
         name: 'Complete LIDAR > Martian Clouds tutorial',
     },
     {
-        id: 100000025,
+        // id: 100000025,
+        id: 3000002,
         name: 'Complete Zoodex > Burrowing Owls tutorial',
     },
     {
-        id: 100000026,
+        // id: 100000026,
+        id: 3000004,
         name: 'Complete Zoodex > Iguanas from above tutorial',
     },
     {
@@ -43,7 +49,8 @@ const chapterOneMissions: Mission[] = [
         name: 'Complete Zoodex > South Coast Fauna Recovery tutorial',
     },
     {
-        id: 100000028,
+        id: 3000005,
+        // id: 100000028,
         name: 'Complete Zoodex > Nest Quest Go tutorial',
     },
 
