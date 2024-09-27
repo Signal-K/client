@@ -20,6 +20,33 @@ const planetClassificationOptions: ClassificationOption[] = [
     { id: 4, text: 'Dips aligned to one side' },
 ];
 
+const diskDetectorClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Object moves away from crosshairs",
+    },
+    {
+        id: 2,
+        text: "Object is extended beyond the outer circle",
+    },
+    {
+        id: 3,
+        text: "Multiple objects inside inner circle",
+    },
+    {
+        id: 4,
+        text: "Objects between inner and outer circles",
+    },
+    {
+        id: 5,
+        text: "Object is not round",
+    },
+    {
+        id: 6,
+        text: "None of the above",
+    },
+];
+
 const roverImgClassificationOptions: ClassificationOption[] = [
     { id: 1, text: 'Dried-up water channels' },
     { id: 2, text: 'Pebbles/medium-sized rocks' },
@@ -83,7 +110,31 @@ const zoodexBurrowingOwlClassificationOptions: ClassificationOption[] = [
     {
         id: 2,
         text: "Baby owl",
-    }, // Expand for choosing numbers, pointers, and predators etc.
+    },
+    {
+        id: 3,
+        text: 'Mortality event',
+    },
+    {
+        id: 4,
+        text: "Infanticide",
+    },
+    {
+        id: 5,
+        text: "Prey delivery",
+    },
+    {
+        id: 6,
+        text: "Mating",
+    },
+    {
+        id: 7,
+        text: "Feeding",
+    },
+    {
+        id: 8,
+        text: "Owls have bands",
+    },// Expand for choosing numbers, pointers, and predators etc.
 ];
 
 const zoodexIguanasFromAboveClassificationOptions: ClassificationOption[] = [
@@ -217,6 +268,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return zoodexIguanasFromAboveClassificationOptions;
             case 'zoodex-southCoastFaunaRecovery':
                 return zoodexSouthCoastFaunaRecovery;
+            case 'DiskDetective':
+                return diskDetectorClassificationOptions;
             default:
                 return [];
           };    

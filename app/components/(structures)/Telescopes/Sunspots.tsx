@@ -5,6 +5,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { StructureInfo } from "../structureInfo";
 import { ClassificationFormComponentT } from "../../(create)/(classifications)/MegaClassificationForm";
+import ClassificationForm from "../../(create)/(classifications)/PostForm";
 
 interface TelescopeProps {
     anomalyId: string;
@@ -71,7 +72,7 @@ export const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
                             )}
                             {line === 6 && (
                                 <p className="text-[#EEEAD1]">
-                                    Let's get started
+                                    Let's get started!
                                 </p>
                             )}
                             {line < 6 && (
@@ -96,26 +97,26 @@ export const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
                                         src="/assets/Docs/Telescopes/Sunspots/Step1.png" 
                                         alt="Step 2" 
                                         className="max-w-full max-h-full object-contain bg-white" 
-                                    />}
+                                    />};
                                     {line === 3 && <img 
                                         src="/assets/Docs/Telescopes/Sunspots/Step2.png" 
                                         alt="Step 3" 
                                         className="max-w-full max-h-full object-contain bg-white" 
-                                    />}
+                                    />};
                                     {line === 4 && <img 
                                         src="/assets/Docs/Telescopes/Sunspots/Step3.png" 
                                         alt="Step 4" 
                                         className="max-w-full max-h-full object-contain bg-white" 
-                                    />}
+                                    />};
                                     {line === 5 && <img 
                                         src="/assets/Docs/Telescopes/Sunspots/Step4.png" 
                                         alt="Step 5" 
                                         className="max-w-full max-h-full object-contain bg-white"   
-                                    />}
+                                    />};
                                 </div>
-                            )}
+                            )};
                         </>
-                    )}
+                    )};
                     {part === 2 && (
                         <>
                             {line === 1 && (
@@ -124,7 +125,7 @@ export const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
                                 </p>
                             )}
                         </>
-                    )}
+                    )};
                 </div>
             </div>
         </div>
@@ -136,8 +137,9 @@ export const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
                 {part === 1 && (
                     <div className="mb-2">
                         {tutorialContent}
+                        <div></div>
                     </div>
-                )}
+                )};
                 {part === 2 && (
                     <>
                         <div className="mb-2">
@@ -159,12 +161,13 @@ export const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
                                     />
                                 </div>
                             </div>
-                            <ClassificationFormComponentT anomalyId={anomalyId} anomalyType='sunspot' missionNumber={3000003} assetMentioned={imageUrl} onSubmit={function (data: any): void {
+                            {/* <ClassificationFormComponentT anomalyId={anomalyId} anomalyType='sunspot' missionNumber={3000003} assetMentioned={imageUrl} onSubmit={function (data: any): void {
                                 throw new Error("Function not implemented.");
-                            } } />
+                            } } /> */}
+                            <ClassificationForm anomalyId={anomalyId} anomalyType='sunspot' missionNumber={3000003} assetMentioned={imageUrl} />
                         </div>
                     </>
-                )}
+                )};
             </div>
         </div>
     );

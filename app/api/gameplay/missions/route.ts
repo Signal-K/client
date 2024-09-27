@@ -8,7 +8,7 @@ interface UserMissionInstance {
     time_of_completion: string;
     mission: number;
     structure?: number;
-};
+}; 
 
 const missions: Mission[] = [
     // { id: 1370101, name: "Create your account", description: "Create an account to start playing Star Sailors", rewards: []}, // ID: "Mission Group 01, Item 01" - 13 = M, 7 = G

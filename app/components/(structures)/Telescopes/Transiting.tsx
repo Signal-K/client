@@ -173,16 +173,16 @@ export function StarterTelescope() {
                 )}
             </div>
             {imageUrl && (
-                // <ClassificationForm 
-                //     anomalyId={anomaly.id.toString()}
-                //     anomalyType='telescope'  
-                //     missionNumber={1372001} 
-                //     assetMentioned={imageUrl} 
-                //     structureItemId={3103} // Replace with correct structure item ID
-                // />
-                <ClassificationFormComponentT config={planetClassificationConfig} anomalyId={anomaly.id.toString()} anomalyType='planet' missionNumber={1370103} assetMentioned={imageUrl} onSubmit={function (data: any): void {
-                    throw new Error('Function not implemented.');
-                } } />
+                <ClassificationForm 
+                    anomalyId={anomaly.id.toString()}
+                    anomalyType='planet'  
+                    missionNumber={1372001} 
+                    assetMentioned={imageUrl} 
+                    structureItemId={3103}
+                />
+                // <ClassificationFormComponentT config={planetClassificationConfig} anomalyId={anomaly.id.toString()} anomalyType='planet' missionNumber={1370103} assetMentioned={imageUrl} onSubmit={function (data: any): void {
+                //     throw new Error('Function not implemented.');
+                // } } />
             )}
         </div>
     );

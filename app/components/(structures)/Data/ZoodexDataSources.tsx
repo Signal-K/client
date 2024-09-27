@@ -49,35 +49,35 @@ export const zoodexDataSources = [
                 compatiblePlanetTypes: ['Lush'],
                 bestPlanetType: ['Lush'],
             },
-            {
-                name: "Fish Research",
-                description: 'Hello there',
-                identifier: "zoodex-fishResearch",
-                researchId: 'ghigrh',
-                researcher: 'zooniverse',
-                // icon: FishIcon,
-                unlocked: false,
-                compatiblePlanetTypes: ['Lush'],
-                bestPlanetType: ['Lush'],
-            },
+            // {
+            //     name: "Fish Research",
+            //     description: 'Hello there',
+            //     identifier: "zoodex-fishResearch",
+            //     researchId: 'ghigrh',
+            //     researcher: 'zooniverse',
+            //     // icon: FishIcon,
+            //     unlocked: false,
+            //     compatiblePlanetTypes: ['Lush'],
+            //     bestPlanetType: ['Lush'],
+            // },
         ],
     },
-    {
-        category: "Plants",
-        items: [
-            {
-                name: "Test Tube Plant",
-                description: 'Description for test tube plant',
-                identifier: "zoodex-testTubePlant",
-                researchId: 'testtube-plant',
-                researcher: 'botanical-society',
-                // icon: TestTube,
-                unlocked: false,
-                compatiblePlanetTypes: ['Arid', 'Frozen'],
-                // bestPlanetType: ['Lush'],
-            },
-        ],
-    },
+    // {
+    //     category: "Plants",
+    //     items: [
+    //         {
+    //             name: "Test Tube Plant",
+    //             description: 'Description for test tube plant',
+    //             identifier: "zoodex-testTubePlant",
+    //             researchId: 'testtube-plant',
+    //             researcher: 'botanical-society',
+    //             // icon: TestTube,
+    //             unlocked: false,
+    //             compatiblePlanetTypes: ['Arid', 'Frozen'],
+    //             // bestPlanetType: ['Lush'],
+    //         },
+    //     ],
+    // },
 ];
 
 export const telescopeDataSources = [

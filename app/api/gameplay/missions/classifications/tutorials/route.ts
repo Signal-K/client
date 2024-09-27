@@ -26,7 +26,7 @@ const classificationTutorialMissions: Mission[] = [
         id: 3000005,
         name: "First nest classification",
         description: "Zoodex > zoodexNestQuestGo",
-    },
+    },  
     {
         id: 3000006,
         name: "First south coast fauan recovery classification",

@@ -14,7 +14,7 @@ export interface ClassificationOption {
 };
 
 export interface FormConfig {
-  title?: string;
+  title?: string; 
   richTextFields: number;
   options?: ClassificationOption[];
   richTextTitles?: (string | undefined)[];
