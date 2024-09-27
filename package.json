@@ -38,7 +38,7 @@
     "daisyui": "^4.11.1",
     "date-fns": "^3.6.0",
     "eslint-config-next": "^14.2.13",
-    "framer-motion": "^11.5.6",
+    "framer-motion": "^11.9.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.394.0",
     "mobx": "^6.13.0",

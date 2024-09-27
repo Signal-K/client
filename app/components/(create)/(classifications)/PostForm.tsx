@@ -494,26 +494,10 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 console.error("Error resetting active mission:", resetMissionError.message);
             };
     
-            if (!hasMission1370204) {
-                const { error: insertError } = await supabase
-                    .from('missions')
-                    .insert({
-                        user: session?.user?.id,
-                        mission: '1370204',
-                        time_of_completion: null,
-                        configuration: {},
-                        rewarded_items: [],
-                    });
-    
-                if (insertError) {
-                    console.error("Error inserting mission:", insertError.message);
-                }
-            }
-    
             await handleMissionComplete();
         } catch (error) {
             console.error("Unexpected error:", error);
-        }
+        };
     };
      
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {

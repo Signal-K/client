@@ -58,3 +58,7 @@ const classificationTutorialMissions: Mission[] = [
         description: "AutomatonStation > roverPhotos",
     },
 ];
+
+export async function GET(req: NextRequest) {
+    return NextResponse.json(classificationTutorialMissions);
+};

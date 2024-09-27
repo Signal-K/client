@@ -21,73 +21,97 @@ export function StarterTelescope() {
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [userChoice, setUserChoice] = useState<string | null>(null);
-    const [imageUrl, setImageUrl] = useState<string | null>('');
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [configuration, setConfiguration] = useState<any | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [hasMission3000001, setHasMission3000001] = useState<boolean | null>(null);
+    const [missionLoading, setMissionLoading] = useState<boolean>(true); 
 
-    // Fetch structure configuration from the `inventory` table
+    // Check tutorial mission
     useEffect(() => {
-        async function fetchStructureConfiguration() {
-            if (!session) {
-                return;
-            };
+        const checkTutorialMission = async () => {
+            if (!session) return;
+
+            try {
+                const { data: missionData, error: missionError } = await supabase
+                    .from('missions')
+                    .select('id')
+                    .eq('user', session.user.id)
+                    .eq('mission', '3000001')
+                    .single();
+
+                if (missionError) throw missionError;
+
+                setHasMission3000001(!!missionData);
+            } catch (error: any) {
+                console.error('Error checking user mission:', error.message || error);
+                setHasMission3000001(false);
+            } finally {
+                setMissionLoading(false);
+            }
+        };
+
+        checkTutorialMission();
+    }, [session, supabase]);
+
+    // Fetch structure configuration
+    useEffect(() => {
+        const fetchStructureConfiguration = async () => {
+            if (!session) return;
 
             try {
                 const { data: inventoryData, error: inventoryError } = await supabase
                     .from('inventory')
                     .select('configuration')
-                    .eq('item', 3103) // Replace with the correct item ID for Telescope
+                    .eq('item', 3103)
                     .eq('anomaly', activePlanet.id)
                     .eq('owner', session.user.id)
                     .order('id', { ascending: true })
                     .limit(1)
                     .single();
 
-                if (inventoryError) {
-                    throw inventoryError;
-                };
+                if (inventoryError) throw inventoryError;
 
                 if (inventoryData && inventoryData.configuration) {
                     console.log("Raw configuration data:", inventoryData.configuration);
                     setConfiguration(inventoryData.configuration);
                 } else {
                     setConfiguration(null);
-                };
+                }
             } catch (error: any) {
-                console.error('Error fetching structure config:', error.message || error);
+                console.error('Error fetching structure config:', error.message);
                 setError('Error fetching structure configuration: ' + (error.message || JSON.stringify(error)));
                 setConfiguration(null);
-            };
+            }
         };
 
         fetchStructureConfiguration();
     }, [session, supabase, activePlanet]);
 
+    // Fetch anomaly
     useEffect(() => {
-        async function fetchAnomaly() {
+        const fetchAnomaly = async () => {
             if (!session || !userChoice) {
                 setLoading(false);
                 return;
-            };
+            }
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")
                     .select("*")
-                    .eq("anomalySet", userChoice) // Use the user choice to filter anomalies
+                    .eq("anomalySet", userChoice)
                     .limit(1)
                     .single();
 
-                if (anomalyError) {
-                    throw anomalyError;
-                };
+                if (anomalyError) throw anomalyError;
 
                 if (!anomalyData) {
-                    setAnomaly(null); 
+                    setAnomaly(null);
                     setLoading(false);
                     return;
-                };
+                }
 
                 setAnomaly(anomalyData as Anomaly);
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -97,16 +121,17 @@ export function StarterTelescope() {
                 setAnomaly(null);
             } finally {
                 setLoading(false);
-            };
+            }
         };
 
-        fetchAnomaly(); 
+        fetchAnomaly();
     }, [session, supabase, userChoice, activePlanet]);
 
     const handleChoice = (choice: string) => {
         setUserChoice(choice);
     };
 
+    // Error handling
     if (error) {
         return (
             <div>
@@ -115,6 +140,7 @@ export function StarterTelescope() {
         );
     }
 
+    // Configuration loading state
     if (!configuration) {
         return (
             <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
@@ -123,6 +149,7 @@ export function StarterTelescope() {
         );
     }
 
+    // User choice handling
     if (!userChoice) {
         return (
             <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
@@ -135,7 +162,7 @@ export function StarterTelescope() {
                             onClick={() => handleChoice(missionId)}
                             className="bg-blue-500 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-blue-700"
                         >
-                            {missionId} {/* Replace with actual mission names if available */}
+                            {missionId}
                         </button>
                     ))
                 ) : (
@@ -143,24 +170,27 @@ export function StarterTelescope() {
                 )}
             </div>
         );
-    };
+    }
 
+    // Loading state
     if (loading) {
         return (
             <div>
                 <p>Loading...</p>
             </div>
         );
-    };
+    }
 
+    // No anomaly found
     if (!anomaly) {
         return (
             <div>
                 <p>No anomaly found.</p>
             </div>
         );
-    };
+    }
 
+    // Main rendering
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
             <StructureInfo structureName="Telescope" />
@@ -180,13 +210,11 @@ export function StarterTelescope() {
                     assetMentioned={imageUrl} 
                     structureItemId={3103}
                 />
-                // <ClassificationFormComponentT config={planetClassificationConfig} anomalyId={anomaly.id.toString()} anomalyType='planet' missionNumber={1370103} assetMentioned={imageUrl} onSubmit={function (data: any): void {
-                //     throw new Error('Function not implemented.');
-                // } } />
             )}
         </div>
     );
-};
+}
+
 
 interface TelescopeProps {
     anomalyid: string;
@@ -298,7 +326,7 @@ export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomaly
                                     className="relative z-10 w-128 h-128 object-contain"
                                 /></div>
                             </div>
-                            <ClassificationForm anomalyId={anomalyid} anomalyType='planet' missionNumber={1370103} assetMentioned={imageUrl} />
+                            <ClassificationForm anomalyId={anomalyid} anomalyType='planet' missionNumber={3000001} assetMentioned={imageUrl} />
                         </div>
                     </>
                 )}

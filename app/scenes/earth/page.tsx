@@ -8,8 +8,8 @@ import { InventoryStructureItem } from "@/types/Items";
 import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/app/components/(structures)/Structures";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
-import CitizenData from "@/app/auth/readToFlask";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
+import InitialiseChapterOneUser from "@/app/components/(scenes)/chapters/one/InitialiseUser";
 
 const EarthView: React.FC = () => {
   const supabase = useSupabaseClient();
@@ -17,22 +17,9 @@ const EarthView: React.FC = () => {
   
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
 
-  const handleUpdateToEarth = () => {
-    updatePlanetLocation(69);
-  };
-
   if (activePlanet?.id !== 69) {
     return (
-    <div className="min-h-screen w-full flex flex-col">
-        {/* <img
-          className="absolute inset-0 w-full h-full object-cover"
-          src="/assets/Backdrops/Earth.png"
-        /> */}
-        <div className="bg-black/90">
-            <p>Current planet is not Earth.</p>
-            <button onClick={handleUpdateToEarth}>Switch to Earth</button>
-        </div>
-      </div>
+        <InitialiseChapterOneUser />
     );
   };
 
