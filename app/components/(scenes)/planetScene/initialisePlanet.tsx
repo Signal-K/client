@@ -7,11 +7,11 @@ interface Mission {
     id: number;
     name: string;
     anomaly: number;
-}
+};
 
 interface InitialisePlanetProps {
     planetId: number;
-}
+};
 
 export default function InitialisePlanet({ planetId }: InitialisePlanetProps) {
     const supabase = useSupabaseClient();

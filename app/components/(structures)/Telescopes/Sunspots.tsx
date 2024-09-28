@@ -172,3 +172,122 @@ export const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
         </div>
     );
 };
+
+import { Anomaly } from "./Transiting";
+
+export function TelescopeSunspotDetector() {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const { activePlanet } = useActivePlanet();
+
+    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        async function fetchAnomaly() {
+            if (!session) {
+                setLoading(false);
+                return;
+            };
+
+            try {
+                const { data: anomalyData, error: anomalyError } = await supabase
+                    .rpc("get_random_anomaly", { anomaly_type: "telescopeOthers", anomalySet: "sunspot" })
+                    .single();
+
+                if (anomalyError) {
+                    throw anomalyError;
+                };
+
+                if (!anomalyData) {
+                    setLoading(false);
+                    setAnomaly(null);
+                    return;
+                };
+
+                const fetchedAnomaly = anomalyData as Anomaly;
+                setAnomaly(fetchedAnomaly);
+
+                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${fetchedAnomaly.id}.png`);
+            } catch (error: any) {
+                console.error("Error fetching sunspot: ", error.message);
+                setAnomaly(null);
+            } finally {
+                setLoading(false);
+            };
+        };
+
+        fetchAnomaly();
+    }, [session, supabase, activePlanet]);
+
+    const [hasMission3000003, setHasMission3000003] = useState<boolean>(false);
+    useEffect(() => {
+        const checkTutorialMission = async () => {
+            if (!session) {
+                return;
+            };
+
+            try {
+                const { data: missionData, error: missionError } = await supabase
+                    .from("missions")
+                    .select("id")
+                    .eq("user", session.user.id)
+                    .eq("mission", "3000003")
+                    .single();
+                
+                if (missionError) {
+                    throw missionError;
+                };
+
+                if (missionData) {
+                    setHasMission3000003(true);
+                };
+            } catch (error: any) {
+                console.error("Error checking tutorial mission: ", error.message);
+                setHasMission3000003(false);
+            };
+        };
+
+        checkTutorialMission();
+    }, [session, supabase]);
+
+    if (!hasMission3000003) {
+        return <SunspotDetectorTutorial anomalyId={anomaly?.id?.toString() || "101266259"} />;
+    };
+
+    if (loading) {
+        return (
+            <div>
+                <p>Loading...</p>
+            </div>
+        );
+    };
+
+    if (!anomaly) {
+        return (
+            <div>
+                <p>Looks like the sun's inactive at the moment. Check back when we have more data!</p>
+            </div>
+        );
+    };
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+            <div className="p-4 rounded-md relative w-full">
+                {imageUrl && (
+                    <img src={imageUrl} alt="Sunspot" className="w-full h-full object-cover" />
+                )}
+                <ClassificationForm
+                    anomalyId={anomaly.id.toString()}
+                    anomalyType="sunspot"
+                    missionNumber={100000032}
+                    assetMentioned={imageUrl || ""}
+                    originatingStructure={3103}
+                />
+            </div>
+        </div>
+    );
+};

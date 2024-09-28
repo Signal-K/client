@@ -180,6 +180,21 @@ const zoodexIguanasFromAboveClassificationOptions: ClassificationOption[] = [
     },
 ];
 
+const sunspotsConfigurationTemporary: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "No sunspots",
+    },
+    {
+        id: 2,
+        text: "1 sunspot",
+    },
+    {
+        id: 3,
+        text: "Multiple sunspots",
+    },
+];
+
 const zoodexSouthCoastFaunaRecovery: ClassificationOption[] = [
     { id: 1, text: "Australian raven" },
     { id: 2, text: "Red-winged fairy-wren" },
@@ -289,6 +304,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return "Describe the iguana sightings...";
             case 'DiskDetective':
                 return "Describe the object seen in the disk...";
+            case 'sunspot':
+                return "Describe the sunspots you see...";
             default:
                 return "Enter your classification details...";
         };
@@ -310,6 +327,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return zoodexSouthCoastFaunaRecovery;
             case 'DiskDetective':
                 return diskDetectorClassificationOptions;
+            case 'sunspot':
+                return sunspotsConfigurationTemporary;
             default:
                 return [];
           };    

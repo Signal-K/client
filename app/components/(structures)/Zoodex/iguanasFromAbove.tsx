@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { StructureInfo } from "../structureInfo";
@@ -10,7 +10,7 @@ interface ZoodexProps {
   anomalyId: string;
 };
 
-export const IguanasFromAbove: React.FC<ZoodexProps> = ({ anomalyId }) => {
+export const IguanasFromAboveTutorial: React.FC<ZoodexProps> = ({ anomalyId }) => {
   const supabase = useSupabaseClient();
   const session = useSession();
 
@@ -183,3 +183,121 @@ export const IguanasFromAbove: React.FC<ZoodexProps> = ({ anomalyId }) => {
     </div>
   );
 };
+
+import { Anomaly } from "../Telescopes/Transiting";
+
+export function ZoodexIguanas() {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const { activePlanet } = useActivePlanet();
+
+  const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function fetchAnomaly() {
+      if (!session) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data: anomalyData, error: anomalyError } = await supabase
+          .rpc('get_random_anomaly', { anomaly_type: 'zoodexOthers', anomalySet: 'zoodex-iguanas' })
+          .single();
+
+        if (anomalyError) {
+          throw anomalyError;
+        }
+
+        if (!anomalyData) {
+          setAnomaly(null);
+          setLoading(false);
+          return;
+        }
+
+        const fetchedAnomaly = anomalyData as Anomaly;
+        setAnomaly(fetchedAnomaly);
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        setImageUrl(`${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-iguanasFromAbove/${fetchedAnomaly.id}.jpeg`);
+      } catch (error: any) {
+        console.error('Error fetching iguana: ', error.message);
+        setAnomaly(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAnomaly();
+  }, [session, supabase, activePlanet]);
+
+  const [hasMission3000004, setHasMission3000004] = useState<boolean>(false);
+  useEffect(() => {
+    const checkTutorialMission = async () => {
+      if (!session) {
+        return;
+      }
+
+      try {
+        const { data: missionData, error: missionError } = await supabase
+          .from('missions')
+          .select('id')
+          .eq('user', session.user.id)
+          .eq('mission', 3000004)
+          .single();
+
+        if (missionError) {
+          throw missionError;
+        }
+
+        setHasMission3000004(!!missionData);
+      } catch (error: any) {
+        console.error('Error checking iguana mission: ', error.message);
+        setHasMission3000004(false);
+      }
+    };
+
+    checkTutorialMission();
+  }, [session, supabase]); // Added square brackets around dependencies
+
+  if (!hasMission3000004) {
+    return (
+      <IguanasFromAboveTutorial anomalyId={anomaly?.id?.toString() || '5757557437553254'} />
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!anomaly) {
+    return (
+      <div>
+        <p>Looks like we've run out of Iguanas at the moment, maybe come back later.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+      <div className="p-4 rounded-md relative w-full">
+        {imageUrl && (
+          <img src={imageUrl} alt={anomaly.content} className="w-full h-64 object-cover" />
+        )}
+        <ClassificationForm
+          anomalyId={anomaly.id.toString()}
+          anomalyType="zoodex-iguanasFromAbove"
+          missionNumber={100000036}
+          assetMentioned={imageUrl || ''}
+          originatingStructure={3104}
+        />
+      </div>
+    </div>
+  );
+}

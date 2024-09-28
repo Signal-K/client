@@ -151,7 +151,7 @@ export const NestQuestGo: React.FC<ZoodexProps> = ({
                 {part === 1 && (
                     <div className="mb-2">
                         {tutorialContent}
-                    </div>
+                    </div> 
                 )}
                 {part === 2 && (
                     <>
