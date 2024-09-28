@@ -5,10 +5,11 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { StructureInfo } from "../structureInfo";
 import ClassificationForm from "../../(create)/(classifications)/PostForm";
+import { Anomaly } from "./Transiting";
 
 interface TelescopeProps {
   anomalyId: string;
-}
+};
 
 export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
   anomalyId,
@@ -222,6 +223,135 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
             </div>
           </>
         )}
+      </div>
+    </div>
+  );
+};
+
+export function TelescopeDiskDetector() {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const { activePlanet } = useActivePlanet();
+
+  const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function fetchAnomaly() {
+      if (!session) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data: anomalyData, error: anomalyError } = await supabase
+          .rpc("get_random_anomaly", {
+            anomaly_type: "zoodexOthers",
+            anomalySet: "diskdetective",
+          })
+          .single();
+
+        if (anomalyError) {
+          throw anomalyError;
+        }
+
+        if (!anomalyData) {
+          setAnomaly(null);
+          setLoading(false);
+          return;
+        }
+
+        const fetchedAnomaly = anomalyData as Anomaly;
+        setAnomaly(fetchedAnomaly);
+
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        setImageUrl(
+          `${supabaseUrl}/storage/v1/object/public/telescope/telescope-diskDetective/${fetchedAnomaly.id}/1.png`
+        );
+      } catch (error: any) {
+        console.error("Error fetching disk cloud: ", error.message);
+        setAnomaly(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAnomaly();
+  }, [session, supabase, activePlanet]);
+
+  if (loading) {
+    return (
+      <div>
+        <p>Loading...</p>
+      </div>
+    );
+  };
+
+  if (!anomaly) {
+    return (
+      <div>
+        <p>No disk clouds available</p>
+      </div>
+    );
+  };
+
+  const [hasMission3000009, setHasMission3000009] = useState<boolean | null>(
+    null
+  );
+  const [missionLoading, setMissionLoading] = useState<boolean>(true);
+
+  // Check tutorial mission
+  useEffect(() => {
+    const checkTutorialMission = async () => {
+      if (!session) return;
+
+      try {
+        const { data: missionData, error: missionError } = await supabase
+          .from("missions")
+          .select("id")
+          .eq("user", session.user.id)
+          .eq("mission", "3000009")
+          .single();
+
+        if (missionError) throw missionError;
+
+        setHasMission3000009(!!missionData);
+      } catch (error: any) {
+        console.error("Error checking user mission:", error.message || error);
+        setHasMission3000009(false);
+      } finally {
+        setMissionLoading(false);
+      }
+    };
+
+    checkTutorialMission();
+  }, [session, supabase]);
+
+  if (!hasMission3000009) {
+    return <DiskDetectorTutorial anomalyId={anomaly.id.toString()} />;
+  };
+
+  return (
+    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+      <div className="p-4 rounded-md relative w-full">
+        {imageUrl && (
+          <img
+            src={imageUrl}
+            alt={anomaly.content}
+            className="w-full h-64 object-cover"
+          />
+        )}
+        <p>{anomaly.id}</p>
+        <ClassificationForm
+          anomalyId={anomaly.id.toString()}
+          anomalyType="DiskDetective"
+          missionNumber={100000033}
+          assetMentioned={imageUrl || ""}
+          originatingStructure={3103}
+        />
       </div>
     </div>
   );

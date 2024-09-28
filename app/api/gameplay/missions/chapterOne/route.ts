@@ -17,7 +17,7 @@ const chapterOneMissions: Mission[] = [
     {
         // id: 100000021,
         id: 3000001,
-        name: 'Complete Telescope > TESS tutorial',
+        name: 'Complete Telescope > TESS tutorial', 
     },
     {
         // id: 100000022,

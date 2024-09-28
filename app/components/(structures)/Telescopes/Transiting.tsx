@@ -131,23 +131,31 @@ export function StarterTelescope() {
         setUserChoice(choice);
     };
 
-    // Error handling
     if (error) {
         return (
             <div>
                 <p>{error}</p>
             </div>
         );
-    }
+    };
 
-    // Configuration loading state
     if (!configuration) {
         return (
             <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
                 <p className="text-sm font-bold">Fetching structure configuration...</p>
             </div>
         );
-    }
+    };
+
+    if (!hasMission3000001) {
+        return (
+            <div>
+                <FirstTelescopeClassification
+                    anomalyid={"6"}
+                />
+            </div>
+        );
+    };
 
     // User choice handling
     if (!userChoice) {
@@ -170,7 +178,7 @@ export function StarterTelescope() {
                 )}
             </div>
         );
-    }
+    };
 
     // Loading state
     if (loading) {
@@ -213,8 +221,7 @@ export function StarterTelescope() {
             )}
         </div>
     );
-}
-
+};
 
 interface TelescopeProps {
     anomalyid: string;

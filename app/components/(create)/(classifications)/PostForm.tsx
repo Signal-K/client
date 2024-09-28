@@ -272,11 +272,27 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     const [uses, setUses] = useState<number | null>(null);
     const [postSubmitted, setPostSubmitted] = useState<boolean>(false);
 
-    // To check if it's the user's first time doing a classification (of their own accord/choice)
-    const [hasMission1370204, setHasMission1370204] = useState(false);
-
     const { userProfile } = useProfileContext();
     const [loading, setIsLoading] = useState(true);
+
+    const placeholder = (() => {
+        switch (anomalyType) {
+            case "planet":
+                return "Describe the planetary dips you see...";
+            case "roverImg":
+                return "Describe the terrain or objects found in the image...";
+            case "cloud":
+                return "Describe the cloud formations & locations...";
+            case "zoodex-burrowingOwl":
+                return "Describe the behavior or condition of the owls...";
+            case 'zoodex-iguanasFromAbove':
+                return "Describe the iguana sightings...";
+            case 'DiskDetective':
+                return "Describe the object seen in the disk...";
+            default:
+                return "Enter your classification details...";
+        };
+    })();
 
     const classificationOptions = (() => {
         switch (anomalyType) {
@@ -320,29 +336,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 console.error("Unexpected error: ", error);
             };
         };
-
-        const checkMission = async () => {
-            if (!session?.user) return;
-
-            try {
-                const { data: missions, error } = await supabase
-                    .from('missions')
-                    .select('mission')
-                    .eq('user', session.user.id)
-                    .eq('mission', 1370204);
-
-                if (error) throw error;
-
-                setHasMission1370204(missions?.length > 0);
-            } catch (error: any) {
-                console.error('Error checking mission:', error.message);
-            } finally {
-                setIsLoading(false);
-            };
-        };
         
         fetchUserProfile();
-        checkMission();
     }, [session, supabase]);
 
     useEffect(() => {
@@ -566,7 +561,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                         onChange={e => setContent(e.target.value)}
                                         className="flex-grow p-3 h-24 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
                                         // placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
-                                        placeholder="What do you think about this?"
+                                        placeholder={placeholder}
                                     />
                                 </div>
                                 <div className="flex items-center mb-4">

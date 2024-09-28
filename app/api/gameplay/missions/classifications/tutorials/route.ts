@@ -15,7 +15,7 @@ const classificationTutorialMissions: Mission[] = [
     {
         id: 3000003,
         name: "First sunspot classification",
-        description: "Telescope > telescopeSunspot",
+        description: "Telescope > telescopeSunspot", 
     },
     {
         id: 3000004,

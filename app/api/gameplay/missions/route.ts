@@ -11,172 +11,162 @@ interface UserMissionInstance {
 }; 
 
 const missions: Mission[] = [
-    // { id: 1370101, name: "Create your account", description: "Create an account to start playing Star Sailors", rewards: []}, // ID: "Mission Group 01, Item 01" - 13 = M, 7 = G
-    { id: 1370102, name: "Create your profile", description: "Fill in your profile so that your discoveries can be credited", rewards: [], }, //chapter: 'Onboarding'},
-    { id: 1370103, name: "Discover your first planet", description: "Use the first graphs provided to you to confirm the validity of an exoplanet candidate", rewards: [], }, //chapter: 'Onboarding'}, // Update description so the user understands they'll be visiting/based on this planet after the onboarding
-    { id: 1370104, name: 'Initial roover photos classification', description: 'Send out a rover to explore your planet', rewards: [], }, //chapter: 'Onboarding'},
-    // { id: 1370105, name: 'Initial animal classification', description: 'Update this row', rewards: [], chapter: 'Onboarding',},
-    { id: 1370106, name: 'Generated planet', description: "Here's what we know about your planet. Why not visit it?", rewards: [], }, //chapter: 'Onboarding'},
+    // Chapter One Missions
     {
-        id: 1370107, name: "Activate retro mode", description: "Going back to the first V2.0 beta after finishing onboarding", rewards: [], }, //chapter: 'Onboarding'},
-
-    // Chapter 1 mission group (MG-02-##) - mission group 2
-    {
-        id: 1370201,
-        name: "Initialise chapter 1", 
-        description: '',
-        chapter: 1,
-        sequence: 1,
-        classificationModule: 'Mining' // Update this
+        id: 10000001,
+        name: 'Initialise Chapter 1',
     },
+
+    // Classifications
     {
-        id: 1370203,
+        id: 10000002,
         name: 'Choose your first classification',
-        description: 'Fill me', // up
-        classificationModule: 'General',
-        sequence: 2,
-        chapter: 1
-    },
-    {
-        id: 1370204,
-        name: 'Complete your first (chosen) classification',
-        description: 'As part of Chapter 1',
-        classificationModule: 'General',
-        sequence: 3,
-        chapter: 1
-    },
-    {
-        id: 1370205,
-        name: 'Go mining - first iron',
-        classificationModule: 'Mining',
-        sequence: 4,
-        chapter: 1,
-    },
-    {
-        id: 1370206,
-        name: 'Repair the Research Station',
-        description: 'As part of Chapter 1', // Also creates it
-        classificationModule: 'General',
-        sequence: 5,
-        chapter: 1,
-    },
-    {
-        id: 1370207,
-        name: 'Research a new technology',
-        classificationModule: 'General',
-        sequence: 6,
-        chapter: 1,
-    },
-    {
-        id: 1370208,
-        name: 'Second classification (different structure)',
-        classificationModule: 'General',
-        sequence: 7,
-        chapter: 1,
-    },
-    {
-        id: 1370209,
-        name: 'Transition to chapter 2',
-        sequence: 8, // Still need to determine scope
-        chapter: 1,
-    },
-    {
-        id: 1370299,  // -> Edit the id so that it's the last value for mission group 2
-        name: "Find new planet", 
-        chapter: 1, 
-        description: "Now you're ready to travel to other planets", 
-        sequence: 3,
-        classificationModule: "Telescope"
     },
 
-
-    // Animal/Zoodex mission group (a.z.) (MG-AZ-##)
+    // Classification tutorials
     {
-        id: 1370202, 
-        name: "First animal classification", 
-        description: '', 
-        chapter: 1, 
-        classificationModule: "Zoodex",
-        sequence: 3,
-        component: MineralDepositsNoAction,
-        structure: 3104
-    },
-    // Telescope mission group (t.m.) (MG-T-##)
-    {
-        id: 1372001, name: "Initial planet classification", classificationModule: "Telescope", chapter: 1,
-        sequence: 3,
-        structure: 3103
-        // update this/order
-    },
-
-    // LIDAR/meteorology mission group (l.m.) (MG-LM-##)
-    { // This is your first
-        id: 137121301, name: "Discover some clouds", classificationModule: 'LIDAR', chapter: 1, sequence: 3, structure: 3105,
-    },
-
-    // NASA/APPEEARS Roover data | NASA API (MG-NA-##)
-    { // This is your first
-        id: 13714101, name: "Find some rover pics", classificationModule: 'AutomatonCamera', chapter: 1, sequence: 3, structure: 3102,
-    },
-
-
-
-    // First classifications list - the prod list
-    {
-        id: 3000001, // Also interchanges with 1370103
-        name: "First planet classification",
-        description: "Telescope > Lightkurve",
+        // id: 100000021,
+        id: 3000001,
+        name: 'Complete Telescope > TESS tutorial',
     },
     {
-        id: 3000002,
-        name: "First burrowing owl classification",
-        description: "Zoodex > zoodexBurrowingOwl",
-    },
-    {
+        // id: 100000022,
         id: 3000003,
-        name: "First sunspot classification",
-        description: "Telescope > telescopeSunspot",
+        name: 'Complete Telescope > Sunspots tutorial',
     },
     {
-        id: 3000004,
-        name: "First iguana classification",
-        description: "Zoodex > zoodexIguanasFromAbove",
-    },
-    {
-        id: 3000005,
-        name: "First nest classification",
-        description: "Zoodex > zoodexNestQuestGo",
-    },
-    {
-        id: 3000006,
-        name: "First south coast fauan recovery classification",
-        description: "Zoodex > zoodexSouthCoastFaunaRecovery",
-    },
-    {
-        id: 3000007,
-        name: "First fish classification",
-        description: "Zoodex > zoodexFishResearch",
-    },
-    {
-        id: 3000008,
-        name: "First plant classification",
-        description: "Zoodex > zoodexTestTubePlant",
-    },
-    {
+        // id: 100000023,
         id: 3000009,
-        name: "First Disk Detective classification",
-        description: "Zoodex > zoodexDiskDetective",
+        name: 'Complete Telescpe > Disk Detector tutorial',
     },
     {
         id: 3000010,
-        name: "First martian cloud classification",
-        description: "Zoodex > zoodexMartianClouds",
+        // id: 100000024,
+        name: 'Complete LIDAR > Martian Clouds tutorial',
     },
     {
-        id: 3000011,
-        name: "First mars rover classification",
-        description: "AutomatonStation > roverPhotos",
+        id: 3000002,
+        name: 'Complete Zoodex > Burrowing Owls tutorial',
     },
+    {
+        id: 3000004,
+        name: 'Complete Zoodex > Iguanas from above tutorial',
+    },
+    {
+        id: 100000027,
+        name: 'Complete Zoodex > South Coast Fauna Recovery tutorial',
+    },
+    {
+        id: 3000005,
+        // id: 100000028,
+        name: 'Complete Zoodex > Nest Quest Go tutorial',
+    },
+
+    // User classifications
+    {
+        id: 10000003,
+        name: 'Complete first (chosen) classification',
+    },
+    {
+        id: 100000031,
+        name: 'Complete (first) Telescope > TESS classification',
+    },
+    {
+        id: 100000032,
+        name: 'Complete (first) Telescope > Sunspots',
+    },
+    {
+        id: 100000033,
+        name: 'Complete (first) Telescpe > Disk Detector',
+    },
+    {
+        id: 100000034,
+        name: 'Complete (first) LIDAR > Martian Clouds',
+    },
+    {
+        id: 100000035,
+        name: 'Complete (first) Zoodex > Burrowing Owls',
+    },
+    {
+        id: 100000036,
+        name: 'Complete (first) Zoodex > Iguanas from above',
+    },
+    {
+        id: 100000037,
+        name: 'Complete (first) Zoodex > South Coast Fauna Recovery',
+    },
+    {
+        id: 100000038,
+        name: 'Complete (first) Zoodex > Nest Quest Go',
+    },
+
+    // Next step (after (first) classification)
+    {
+        id: 10000004,
+        name: "Choose next step (after (first) classification)",
+    },
+
+    // If/when user chooses to travel
+    {
+        id: 100000041,
+        name: 'Research spaceship',
+    },
+    {
+        id: 100000042,
+        name: "Research launchpad",
+    },
+    {
+        id: 100000043,
+        name: 'Build spaceship',
+    },
+    {
+        id: 100000044,
+        name: 'Build launchpad',
+    },
+    {
+        id: 100000045,
+        name: "Complete launchpad tutorial",
+    },
+    {
+        id: 100000046,
+        name: "Complete spaceship tutorial",
+    },
+    {
+        id: 100000047,
+        name: 'Complete Planet Switcher tutorial',
+    },
+    
+    // If user chooses to pursue a new module on the same structure
+    {
+        id: 100000048,
+        name: 'Initialise same structure, new module',
+    },
+    {
+        id: 100000049,
+        name: 'Research a new module',
+    }, // Then completing the tutorial and first classification for that module would go back to 10000002/3
+
+    // If user chooses to pursue a new structure
+    {
+        id: 10000000410,
+        name: "Initialise new structure research",
+    },
+    {
+        id: 10000000411,
+        name: 'Research new structure',
+    },
+    {
+        id: 10000000412,
+        name: "Place new structure",
+    }, // Then 100000049, then 10000002/3
+
+    // Finishing #Chapter-1 (travelling)
+    {
+        id: 100000005,
+        name: "Pick new planet and travel",
+    },
+
+    // Any resource collection missions...
 ];
 
 export async function GET(req: NextRequest) {
