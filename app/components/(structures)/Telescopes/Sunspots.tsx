@@ -11,7 +11,7 @@ interface TelescopeProps {
     anomalyId: string;
 };
 
-export const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
+const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
     anomalyId,
 }) => {
     const supabase = useSupabaseClient();
@@ -97,26 +97,26 @@ export const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
                                         src="/assets/Docs/Telescopes/Sunspots/Step1.png" 
                                         alt="Step 2" 
                                         className="max-w-full max-h-full object-contain bg-white" 
-                                    />};
+                                    />}
                                     {line === 3 && <img 
                                         src="/assets/Docs/Telescopes/Sunspots/Step2.png" 
                                         alt="Step 3" 
                                         className="max-w-full max-h-full object-contain bg-white" 
-                                    />};
+                                    />}
                                     {line === 4 && <img 
                                         src="/assets/Docs/Telescopes/Sunspots/Step3.png" 
                                         alt="Step 4" 
                                         className="max-w-full max-h-full object-contain bg-white" 
-                                    />};
+                                    />}
                                     {line === 5 && <img 
                                         src="/assets/Docs/Telescopes/Sunspots/Step4.png" 
                                         alt="Step 5" 
                                         className="max-w-full max-h-full object-contain bg-white"   
-                                    />};
+                                    />}
                                 </div>
-                            )};
+                            )}
                         </>
-                    )};
+                    )}
                     {part === 2 && (
                         <>
                             {line === 1 && (
@@ -125,7 +125,7 @@ export const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
                                 </p>
                             )}
                         </>
-                    )};
+                    )}
                 </div>
             </div>
         </div>
@@ -139,7 +139,7 @@ export const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
                         {tutorialContent}
                         <div></div>
                     </div>
-                )};
+                )}
                 {part === 2 && (
                     <>
                         <div className="mb-2">
@@ -167,7 +167,7 @@ export const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
                             <ClassificationForm anomalyId={anomalyId} anomalyType='sunspot' missionNumber={3000003} assetMentioned={imageUrl} />
                         </div>
                     </>
-                )};
+                )}
             </div>
         </div>
     );
@@ -194,7 +194,10 @@ export function TelescopeSunspotDetector() {
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
-                    .rpc("get_random_anomaly", { anomaly_type: "telescopeOthers", anomalySet: "sunspot" })
+                    // .rpc("get_random_anomaly", { anomaly_type: "telescopeOthers", anomalySet: "sunspot" })
+                    .from("anomalies")
+                    .select("*")
+                    .eq("anomalySet", "sunspot")
                     .single();
 
                 if (anomalyError) {

@@ -38,7 +38,7 @@ const combineCategories = (): Category[] => {
                 activeStructure: item.activeStructure,
                 identifier: item.identifier,
                 techId: item.techId,
-            }))),
+            }))), 
         },
         {
             title: "Meteorological Studies", // Lidar
@@ -163,7 +163,7 @@ export default function InitialiseChapterOneUser() {
 
             if (missionError1) {
                 throw missionError1;
-            }
+            };
 
             const { error: missionError2 } = await supabase
                 .from('missions')
@@ -171,7 +171,7 @@ export default function InitialiseChapterOneUser() {
 
             if (missionError2) {
                 throw missionError2;
-            }
+            };
 
             const { error: inventoryError } = await supabase
                 .from("inventory")
@@ -188,7 +188,7 @@ export default function InitialiseChapterOneUser() {
             setConfirmationMessage("Mission confirmed and added successfully!");
         } catch (error: any) {
             setConfirmationMessage(`Error: ${error.message}`);
-        }
+        };
     };
 
     return (

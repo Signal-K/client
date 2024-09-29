@@ -48,7 +48,7 @@ export default function InitialisePlanet({ planetId }: InitialisePlanetProps) {
             if (error) {
                 console.error('Error checking existing missions: ', error.message);
                 return;
-            }
+            };
 
             setHasMission(data && data.length > 0);
         };
@@ -67,21 +67,21 @@ export default function InitialisePlanet({ planetId }: InitialisePlanetProps) {
             console.error('Error creating mission: ', error.message);
         } else {
             console.log('Planet initialized successfully');
-            setHasMission(true); // Update state to reflect the new mission has been added
-        }
+            setHasMission(true)
+        };
     };
 
     if (loading) {
         return <p>Loading...</p>;
-    }
+    };
 
     if (!mission) {
         return <p>No mission found for this planet.</p>;
-    }
+    };
 
     if (hasMission) {
-        return null; // Return nothing if the mission exists
-    }
+        return null;
+    };
 
     return (
         <button

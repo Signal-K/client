@@ -231,10 +231,13 @@ export function BurrowingOwl() {
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
-                    .rpc("get_random_anomaly", {
-                        anomaly_type: "zoodexOthers",
-                        anomalySet: "zoodex-burrowingOwl",
-                    })
+                    // .rpc("get_random_anomaly", {
+                    //     anomaly_type: "zoodexOthers",
+                    //     anomalySet: "zoodex-burrowingOwl",
+                    // })
+                    .from("anomalies")
+                    .select("*")
+                    .eq("anomalySet", "zoodex-burrowingOwl")
                     .single();
 
                 if (anomalyError) {

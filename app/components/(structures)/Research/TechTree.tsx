@@ -7,7 +7,7 @@ import { useActivePlanet } from '@/context/ActivePlanet'
 import { InventoryItem } from '@/types/Items'
 
 type TechCategory = 'Structures' | 'Automatons'
-
+ 
 type Technology = {
   id: number
   name: string

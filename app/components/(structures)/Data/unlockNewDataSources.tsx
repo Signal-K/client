@@ -11,7 +11,7 @@ import { InventoryIdFetcher } from "../fetchId";
 export function DataSourcesModal({ structureId, structure }: DataSourcesModalProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
-  
+   
   const { activePlanet } = useActivePlanet();
 
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(

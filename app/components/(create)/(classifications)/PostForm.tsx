@@ -6,6 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useProfileContext } from "@/context/UserProfile";
 import UserAvatar, { UserAvatarNullUpload } from "@/app/components/(settings)/profile/Avatar";
 import { ClassificationOutput } from "./ClassificationResults";
+import IntroduceUserToResearch from "../../(scenes)/chapters/(onboarding)/initialiseResearch";
 
 interface ClassificationOption {
     id: number;
@@ -334,6 +335,31 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
           };    
     })();    
 
+    const [hasClassified, setHasClassified] = useState<boolean>(false);
+    const [showResearch, setShowResearch] = useState<boolean>(false);
+
+    useEffect(() => {
+        const checkUserClassification = async () => {
+          if (!session?.user?.id || !anomalyId) return;
+    
+          const { data, error } = await supabase
+            .from("classifications")
+            .select("id")
+            .eq("author", session.user.id)
+            .eq("anomaly", anomalyId)
+            .single();
+    
+          if (data) {
+            setHasClassified(true);
+          }
+          if (error) {
+            console.error("Error checking classification:", error.message);
+          }
+        };
+    
+        checkUserClassification();
+    }, [session?.user?.id, anomalyId, supabase]);
+
     useEffect(() => {
         const fetchUserProfile = async () => {
             if (!session) return;
@@ -478,7 +504,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 setSelectedOptions({});
                 setUploads([]);
                 setPostSubmitted(true);
-            }
+
+                setTimeout(() => {
+                    setShowResearch(true);
+                }, 1200);
+            };
     
             // Update user's classification points
             const { data: profileData, error: profileError } = await supabase
@@ -512,6 +542,20 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
         } catch (error) {
             console.error("Unexpected error:", error);
         };
+    };
+
+    const [showModal, setShowModal] = useState(true);
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
+    if (postSubmitted && showResearch) {
+        return (
+            <>
+                {showModal && <IntroduceUserToResearch closeModal={closeModal} />}
+            </>
+        );
     };
      
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {

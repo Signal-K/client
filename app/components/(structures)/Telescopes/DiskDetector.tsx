@@ -248,11 +248,14 @@ export function TelescopeDiskDetector() {
 
       try {
         const { data: anomalyData, error: anomalyError } = await supabase
-          .rpc("get_random_anomaly", {
-            anomaly_type: "zoodexOthers",
-            anomalySet: "diskdetective",
-          })
-          .single();
+          // .rpc("get_random_anomaly", {
+          //   anomaly_type: "zoodexOthers",
+          //   anomalySet: "diskdetective",
+          // })
+          .from("anomalies")
+            .select("*")
+            .eq("anomalySet", "diskdetective")
+            .single();
 
         if (anomalyError) {
           throw anomalyError;

@@ -14,6 +14,8 @@ import { AdvancedTechTreeComponent } from "@/app/components/(structures)/Researc
 import MiningScene from "@/app/scenes/mining/page";
 import { DataSourcesModal } from "@/app/components/(structures)/Data/unlockNewDataSources";
 import MissionsForStructure from "@/app/components/(structures)/Missions/AvailableMissions";
+import { TelescopeSunspotDetector } from "@/app/components/(structures)/Telescopes/Sunspots";
+import { TelescopeDiskDetector } from "@/app/components/(structures)/Telescopes/DiskDetector";
 
 interface IndividualStructureProps {
     name?: string;
@@ -153,6 +155,14 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <SunIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Sunspot data",
+          dynamicComponent: <TelescopeSunspotDetector />,
+          sizePercentage: 80,
+        },
+        {
+          icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Find early solar systems",
+          dynamicComponent: <TelescopeDiskDetector />,
+          sizePercentage: 80,
         },
         {
           icon: <StarIcon className="w-6 h-6 text-[#5e81ac]" />,
@@ -200,14 +210,14 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <StarterZoodexGallery />,
           sizePercentage: 60,
         },
-        {
-          icon: <TreePalmIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Greenhouse",
-        },
-        {
-          icon: <PhoneIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Upload media"
-        }
+        // {
+        //   icon: <TreePalmIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Greenhouse",
+        // },
+        // {
+        //   icon: <PhoneIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Upload media"
+        // }
       ],
     },
     3105: {

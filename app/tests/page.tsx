@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import InitialiseChapterOneUser from "../components/(scenes)/chapters/one/InitialiseUser";
+import React from "react";
+import IntroduceUserToResearch from "../components/(scenes)/chapters/(onboarding)/initialiseResearch";
 
 export default function TestPage() {
     return (
         <div>
-            <InitialiseChapterOneUser />
+            {/* <IntroduceUserToResearch /> */}
         </div>
     );
 };

@@ -205,7 +205,10 @@ export function ZoodexIguanas() {
 
       try {
         const { data: anomalyData, error: anomalyError } = await supabase
-          .rpc('get_random_anomaly', { anomaly_type: 'zoodexOthers', anomalySet: 'zoodex-iguanas' })
+          // .rpc('get_random_anomaly', { anomaly_type: 'zoodexOthers', anomalySet: 'zoodex-iguanas' })
+          .from("anomalies")
+          .select("*")
+          .eq("anomalySet", "zoodexIguanas")
           .single();
 
         if (anomalyError) {
