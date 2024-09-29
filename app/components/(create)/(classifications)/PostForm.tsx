@@ -6,6 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useProfileContext } from "@/context/UserProfile";
 import UserAvatar, { UserAvatarNullUpload } from "@/app/components/(settings)/profile/Avatar";
 import { ClassificationOutput } from "./ClassificationResults";
+import IntroduceUserToResearch from "../../(scenes)/chapters/(onboarding)/initialiseResearch";
 
 interface ClassificationOption {
     id: number;
@@ -18,6 +19,33 @@ const planetClassificationOptions: ClassificationOption[] = [
     { id: 2, text: 'Repeating dips' },
     { id: 3, text: 'Dips with similar size' },
     { id: 4, text: 'Dips aligned to one side' },
+];
+
+const diskDetectorClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Object moves away from crosshairs",
+    },
+    {
+        id: 2,
+        text: "Object is extended beyond the outer circle",
+    },
+    {
+        id: 3,
+        text: "Multiple objects inside inner circle",
+    },
+    {
+        id: 4,
+        text: "Objects between inner and outer circles",
+    },
+    {
+        id: 5,
+        text: "Object is not round",
+    },
+    {
+        id: 6,
+        text: "None of the above",
+    },
 ];
 
 const roverImgClassificationOptions: ClassificationOption[] = [
@@ -57,21 +85,45 @@ const cloudClassificationOptions: ClassificationOption[] = [
     },
 ];
 
+// const initialCloudClassificationOptions: ClassificationOption[] = [
+//     {
+//         id: 1,
+//         text: "White colour",
+//     },
+//     {
+//         id: 2,
+//         text: "Blue colour",
+//     },
+//     {
+//         id: 3,
+//         text: "Bright clouds",
+//     },
+//     {
+//         id: 4, text: "Large clouds",
+//     },
+// ];
+
 const initialCloudClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
-        text: "White colour",
+        text: "Narrow arch",
     },
     {
         id: 2,
-        text: "Blue colour",
+        text: "Wide arch",
     },
     {
         id: 3,
-        text: "Bright clouds",
+        text: "1 cloud",
     },
     {
-        id: 4, text: "Large clouds",
+        id: 4, text: "2 clouds",
+    },
+    {
+        id: 5, text: "3 clouds",
+    },
+    {
+        id: 6, text: "4+ clouds",
     },
 ];
 
@@ -83,7 +135,132 @@ const zoodexBurrowingOwlClassificationOptions: ClassificationOption[] = [
     {
         id: 2,
         text: "Baby owl",
-    }, // Expand for choosing numbers, pointers, and predators etc.
+    },
+    {
+        id: 3,
+        text: 'Mortality event',
+    },
+    {
+        id: 4,
+        text: "Infanticide",
+    },
+    {
+        id: 5,
+        text: "Prey delivery",
+    },
+    {
+        id: 6,
+        text: "Mating",
+    },
+    {
+        id: 7,
+        text: "Feeding",
+    },
+    {
+        id: 8,
+        text: "Owls have bands",
+    },// Expand for choosing numbers, pointers, and predators etc.
+];
+
+const zoodexIguanasFromAboveClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Adult Male not in a Lek",
+    },
+    {
+        id: 2,
+        text: "Adult male with a Lek",
+    },
+    {
+        id: 3,
+        text: "Juvenile/Female",
+    },
+    {
+        id: 4,
+        text: "Partial iguana",
+    },
+];
+
+const sunspotsConfigurationTemporary: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "No sunspots",
+    },
+    {
+        id: 2,
+        text: "1 sunspot",
+    },
+    {
+        id: 3,
+        text: "Multiple sunspots",
+    },
+];
+
+const zoodexSouthCoastFaunaRecovery: ClassificationOption[] = [
+    { id: 1, text: "Australian raven" },
+    { id: 2, text: "Red-winged fairy-wren" },
+    { id: 3, text: "Cat" },
+    { id: 4, text: "Brown falcon" },
+    { id: 5, text: "Silvereye" },
+    { id: 6, text: "Echidna" },
+    { id: 7, text: "Brown quail" },
+    { id: 8, text: "Southern emu-wren" },
+    { id: 9, text: "Fox" },
+    { id: 10, text: "Brush bronzewing" },
+    { id: 11, text: "Splendid fairy-wren" },
+    { id: 12, text: "Mouse or smaller?" },
+    { id: 13, text: "Carnaby's black cockatoo" },
+    { id: 14, text: "Spotted nightjar" },
+    { id: 15, text: "Quenda" },
+    { id: 16, text: "Common bronzewing" },
+    { id: 17, text: "Tawny frogmouth" },
+    { id: 18, text: "Quokka" },
+    { id: 19, text: "Emu" },
+    { id: 20, text: "Tawny-crowned honeyeater" },
+    { id: 21, text: "Rabbit" },
+    { id: 22, text: "Galah" },
+    { id: 23, text: "Wedge-tailed eagle" },
+    { id: 24, text: "Western brush wallaby" },
+    { id: 25, text: "Grey butcherbird" },
+    { id: 26, text: "Welcome swallow" },
+    { id: 27, text: "Western grey kangaroo" },
+    { id: 28, text: "Grey currawong" },
+    { id: 29, text: "Western bristlebird" },
+    { id: 30, text: "Western ringtail possum" },
+    { id: 31, text: "Grey fantail" },
+    { id: 32, text: "Western fieldwren" },
+    { id: 33, text: "Faulty" },
+    { id: 34, text: "Laughing kookaburra" },
+    { id: 35, text: "Human" },
+    { id: 36, text: "Magpie" },
+    { id: 37, text: "Western rosella" },
+    { id: 38, text: "Nothing" },
+    { id: 39, text: "Malleefowl" },
+    { id: 40, text: "Western spinebill" },
+    { id: 41, text: "Small mammal" },
+    { id: 42, text: "Nankeen kestrel" },
+    { id: 43, text: "Western wattlebird" },
+    { id: 44, text: "Bird" },
+    { id: 45, text: "New holland honeyeater" },
+    { id: 46, text: "Western whipbird" },
+    { id: 47, text: "Mammal" },
+    { id: 48, text: "Noisy scrub-bird" },
+    { id: 49, text: "Western whistler" },
+    { id: 50, text: "Reptile" },
+    { id: 51, text: "Painted button-quail" },
+    { id: 52, text: "White-browed scrubwren" },
+    { id: 53, text: "Bobtail skink" },
+    { id: 54, text: "Purple swamphen" },
+    { id: 55, text: "White-cheeked honeyeater" },
+    { id: 56, text: "Heath monitor" },
+    { id: 57, text: "Red wattlebird" },
+    { id: 58, text: "Willie wagtail" },
+    { id: 59, text: "King skink" },
+    { id: 60, text: "Red-capped parrot" },
+    { id: 61, text: "Brushtail possum" },
+    { id: 62, text: "Western blue-tongued skink" },
+    { id: 63, text: "Red-eared firetail" },
+    { id: 64, text: "Bush rat" },
 ];
 
 interface ClassificationFormProps {
@@ -98,6 +275,7 @@ interface ClassificationFormProps {
 const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, anomalyId, missionNumber, assetMentioned, originatingStructure, structureItemId }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
+    
     const { activePlanet } = useActivePlanet();
 
     const [content, setContent] = useState<string>("");
@@ -110,11 +288,29 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     const [uses, setUses] = useState<number | null>(null);
     const [postSubmitted, setPostSubmitted] = useState<boolean>(false);
 
-    // To check if it's the user's first time doing a classification (of their own accord/choice)
-    const [hasMission1370204, setHasMission1370204] = useState(false);
-
     const { userProfile } = useProfileContext();
     const [loading, setIsLoading] = useState(true);
+
+    const placeholder = (() => {
+        switch (anomalyType) {
+            case "planet":
+                return "Describe the planetary dips you see...";
+            case "roverImg":
+                return "Describe the terrain or objects found in the image...";
+            case "cloud":
+                return "Describe the cloud formations & locations...";
+            case "zoodex-burrowingOwl":
+                return "Describe the behavior or condition of the owls...";
+            case 'zoodex-iguanasFromAbove':
+                return "Describe the iguana sightings...";
+            case 'DiskDetective':
+                return "Describe the object seen in the disk...";
+            case 'sunspot':
+                return "Describe the sunspots you see...";
+            default:
+                return "Enter your classification details...";
+        };
+    })();
 
     const classificationOptions = (() => {
         switch (anomalyType) {
@@ -126,10 +322,43 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return initialCloudClassificationOptions;
             case "zoodex-burrowingOwl":
                 return zoodexBurrowingOwlClassificationOptions;
+            case 'zoodex-iguanasFromAbove':
+                return zoodexIguanasFromAboveClassificationOptions;
+            case 'zoodex-southCoastFaunaRecovery':
+                return zoodexSouthCoastFaunaRecovery;
+            case 'DiskDetective':
+                return diskDetectorClassificationOptions;
+            case 'sunspot':
+                return sunspotsConfigurationTemporary;
             default:
                 return [];
-        }
-    })();
+          };    
+    })();    
+
+    const [hasClassified, setHasClassified] = useState<boolean>(false);
+    const [showResearch, setShowResearch] = useState<boolean>(false);
+
+    useEffect(() => {
+        const checkUserClassification = async () => {
+          if (!session?.user?.id || !anomalyId) return;
+    
+          const { data, error } = await supabase
+            .from("classifications")
+            .select("id")
+            .eq("author", session.user.id)
+            .eq("anomaly", anomalyId)
+            .single();
+    
+          if (data) {
+            setHasClassified(true);
+          }
+          if (error) {
+            console.error("Error checking classification:", error.message);
+          }
+        };
+    
+        checkUserClassification();
+    }, [session?.user?.id, anomalyId, supabase]);
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -152,29 +381,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 console.error("Unexpected error: ", error);
             };
         };
-
-        const checkMission = async () => {
-            if (!session?.user) return;
-
-            try {
-                const { data: missions, error } = await supabase
-                    .from('missions')
-                    .select('mission')
-                    .eq('user', session.user.id)
-                    .eq('mission', 1370204);
-
-                if (error) throw error;
-
-                setHasMission1370204(missions?.length > 0);
-            } catch (error: any) {
-                console.error('Error checking mission:', error.message);
-            } finally {
-                setIsLoading(false);
-            };
-        };
         
         fetchUserProfile();
-        checkMission();
     }, [session, supabase]);
 
     useEffect(() => {
@@ -188,7 +396,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     .eq('owner', session.user.id)
                     .eq('anomaly', activePlanet.id)
                     .eq('item', structureItemId)
-                    .order('id', { ascending: true }) // Get the item with the lowest ID/primary key
+                    .order('id', { ascending: true })
                     .limit(1)
                     .single();
 
@@ -196,11 +404,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
 
                 if (inventoryData) {
                     setInventoryItemId(inventoryData.id);
-                    setUses(inventoryData.configuration?.Uses || 0); // Set "Uses" value
-                }
+                    setUses(inventoryData.configuration?.Uses || 0);
+                };
             } catch (error: any) {
                 console.error("Error fetching inventory item ID:", error.message);
-            }
+            };
         };
 
         fetchInventoryItemId();
@@ -296,7 +504,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 setSelectedOptions({});
                 setUploads([]);
                 setPostSubmitted(true);
-            }
+
+                setTimeout(() => {
+                    setShowResearch(true);
+                }, 1200);
+            };
     
             // Update user's classification points
             const { data: profileData, error: profileError } = await supabase
@@ -319,36 +531,33 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             // Reset user's active mission to null after classification is created
             const { error: resetMissionError } = await supabase
                 .from('profiles')
-                .update({ activeMission: null })
+                .update({ activemission: null })
                 .eq('id', session?.user?.id);
     
             if (resetMissionError) {
                 console.error("Error resetting active mission:", resetMissionError.message);
             };
     
-            if (!hasMission1370204) {
-                const { error: insertError } = await supabase
-                    .from('missions')
-                    .insert({
-                        user: session?.user?.id,
-                        mission: '1370204',
-                        time_of_completion: null,
-                        configuration: {},
-                        rewarded_items: [],
-                    });
-    
-                if (insertError) {
-                    console.error("Error inserting mission:", insertError.message);
-                }
-            }
-    
             await handleMissionComplete();
         } catch (error) {
             console.error("Unexpected error:", error);
-        }
+        };
     };
-    
-    
+
+    const [showModal, setShowModal] = useState(true);
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
+    if (postSubmitted && showResearch) {
+        return (
+            <>
+                {showModal && <IntroduceUserToResearch closeModal={closeModal} />}
+            </>
+        );
+    };
+     
     const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (files && files.length > 0 && session) {
@@ -401,7 +610,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                         ))}
                     </div>
                     <div className="flex flex-col gap-2 w-2/3">
-                        {/* {Object.keys(selectedOptions).length > 0 && ( */}
                             <>
                                 <div className="flex gap-4 mb-4">
                                     <UserAvatarNullUpload
@@ -415,7 +623,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                         value={content}
                                         onChange={e => setContent(e.target.value)}
                                         className="flex-grow p-3 h-24 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
-                                        placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
+                                        // placeholder={`What do you think about this ${anomalyType === "planet" ? "planet" : "rover image"}?`}
+                                        placeholder={placeholder}
                                     />
                                 </div>
                                 <div className="flex items-center mb-4">

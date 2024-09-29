@@ -101,7 +101,7 @@ export const ClassificationOutput: React.FC<ClassificationOutputProps> = ({ conf
             <h2 className="text-xl font-bold mb-4">Classification Output</h2>
 
             <div className="flex flex-col gap-2">
-                <h3 className="font-semibold">Selected Terrain Types:</h3>
+                <h3 className="font-semibold">Selected Options:</h3>
                 <ul>
                     {Object.keys(configuration).filter(key => configuration[key]).map((terrain, index) => (
                         <li key={index}>{terrain}</li>

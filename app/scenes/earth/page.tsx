@@ -7,31 +7,19 @@ import { EarthViewLayout } from "@/app/components/(scenes)/planetScene/layout";
 import { InventoryStructureItem } from "@/types/Items";
 import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/app/components/(structures)/Structures";
-import { CaptnCosmosGuideModal } from "@/app/components/(dialogue)/guideBot";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
+import InitialiseChapterOneUser from "@/app/components/(scenes)/chapters/one/InitialiseUser";
 
 const EarthView: React.FC = () => {
   const supabase = useSupabaseClient();
   const session = useSession();
+  
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
 
-  const handleUpdateToEarth = () => {
-    updatePlanetLocation(3);
-  };
-
-  if (activePlanet?.id !== 3) {
+  if (activePlanet?.id !== 69) {
     return (
-    <div className="min-h-screen w-full flex flex-col">
-        {/* <img
-          className="absolute inset-0 w-full h-full object-cover"
-          src="/assets/Backdrops/Earth.png"
-        /> */}
-        <div className="bg-black/90">
-            <p>Current planet is not Earth.</p>
-            <button onClick={handleUpdateToEarth}>Switch to Earth</button>
-        </div>
-      </div>
+        <InitialiseChapterOneUser />
     );
   };
 
@@ -122,21 +110,7 @@ const EarthStructures: React.FC = () => {
                 </div>
             </div>
             <div className="w-full">
-                <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
-                <div className="flex flex-row space-y-4">
-                    {surfaceStructures.map((structure) => (
-                        <div
-                            key={structure.id}
-                            className="relative flex items-center space-x-4"
-                        >
-                            <img
-                                src={structure.itemDetail?.icon_url}
-                                alt={structure.itemDetail?.name}
-                                className="w-16 h-16 object-cover"
-                            />
-                        </div>
-                    ))}
-                </div>
+                <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>  
             </div>
             <div className="relative flex-1">
                 <AllAutomatonsOnActivePlanet />

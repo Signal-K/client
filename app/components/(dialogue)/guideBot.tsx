@@ -36,11 +36,11 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
   Added useEffect to fetch missions and active mission
   */
   useEffect(() => {
-    const fetchMissionsAndActiveMission = async () => {
+    const fetchMissionsAndactivemission = async () => {
       if (!session?.user?.id) return;
 
       try {
-        const [missionsResponse, activeMissionResponse] = await Promise.all([
+        const [missionsResponse, activemissionResponse] = await Promise.all([
           fetch('/api/gameplay/missions/active'),
           supabase
             .from('profiles')
@@ -52,14 +52,14 @@ export const CaptnCosmosGuideModal: React.FC<TutorialMessageProps> = ({ isExpand
         const missionsData: Useractivemission[] = await missionsResponse.json();
         setMissions(missionsData);
 
-        if (activeMissionResponse.error) throw activeMissionResponse.error;
-        setactivemission(activeMissionResponse.data.activemission);
+        if (activemissionResponse.error) throw activemissionResponse.error;
+        setactivemission(activemissionResponse.data.activemission);
       } catch (error) {
         console.error("Error fetching missions or active mission:", error);
       }
     };
 
-    fetchMissionsAndActiveMission();
+    fetchMissionsAndactivemission();
   }, [session, supabase]);
   /* --- End of changes --- */
   

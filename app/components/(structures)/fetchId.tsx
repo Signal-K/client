@@ -7,7 +7,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 
 interface InventoryIdFetcherProps {
   structureId: string;
-  onInventoryIdFetched: (id: number | null) => void; // Allow null to be passed
+  onInventoryIdFetched: (id: number | null) => void;
 };
 
 export const InventoryIdFetcher: React.FC<InventoryIdFetcherProps> = ({ structureId, onInventoryIdFetched }) => {
@@ -22,7 +22,7 @@ export const InventoryIdFetcher: React.FC<InventoryIdFetcherProps> = ({ structur
 
       if (!userId || !planetId) {
         console.error("User ID or Active Planet ID is missing.");
-        onInventoryIdFetched(null); // Pass null if essential data is missing
+        onInventoryIdFetched(null);
         return;
       }
 
@@ -36,25 +36,25 @@ export const InventoryIdFetcher: React.FC<InventoryIdFetcherProps> = ({ structur
           .eq("anomaly", planetId)
           .eq("item", structureId)
           .order("id", { ascending: true })
-          .single(); // Fetch a single record
+          .single(); 
 
         if (error) {
           throw error;
         }
 
         if (data) {
-          onInventoryIdFetched(data.id); // Pass the ID to the parent
+          onInventoryIdFetched(data.id); 
         } else {
-          onInventoryIdFetched(null); // Pass null if no data found
+          onInventoryIdFetched(null);
         }
       } catch (err) {
         console.error("Error fetching inventory data:", err);
-        onInventoryIdFetched(null); // Pass null in case of an error
+        onInventoryIdFetched(null);
       }
     };
 
     fetchInventoryData();
   }, [structureId, activePlanet?.id, session?.user?.id, supabase, onInventoryIdFetched]);
 
-  return null; // This component does not render anything
+  return null;
 };
