@@ -190,29 +190,29 @@ export function TelescopeSunspotDetector() {
             if (!session) {
                 setLoading(false);
                 return;
-            };
-
+            }
+    
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
-                    // .rpc("get_random_anomaly", { anomaly_type: "telescopeOthers", anomalySet: "sunspot" })
                     .from("anomalies")
                     .select("*")
                     .eq("anomalySet", "sunspot")
-                    .single();
-
+                    .limit(1)
+                    .maybeSingle();
+    
                 if (anomalyError) {
                     throw anomalyError;
                 };
-
+    
                 if (!anomalyData) {
                     setLoading(false);
                     setAnomaly(null);
                     return;
                 };
-
+    
                 const fetchedAnomaly = anomalyData as Anomaly;
                 setAnomaly(fetchedAnomaly);
-
+    
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
                 setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${fetchedAnomaly.id}.png`);
             } catch (error: any) {
@@ -222,9 +222,10 @@ export function TelescopeSunspotDetector() {
                 setLoading(false);
             };
         };
-
+    
         fetchAnomaly();
     }, [session, supabase, activePlanet]);
+    
 
     const [hasMission3000003, setHasMission3000003] = useState<boolean>(false);
     useEffect(() => {

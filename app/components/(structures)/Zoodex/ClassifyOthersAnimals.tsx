@@ -13,6 +13,8 @@ export interface Anomaly {
     avatar_url?: string;
 };
 
+import { AnomalyTypes } from "../../(create)/(classifications)/PostForm";
+
 export function StarterZoodex() {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -25,7 +27,7 @@ export function StarterZoodex() {
     const [configuration, setConfiguration] = useState<any | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [anomalyType, setAnomalyType] = useState<string | null>(null);
+    const [anomalyType, setAnomalyType] = useState<AnomalyTypes | null>(null);
 
     // Fetch structure configuration from the `inventory` table
     useEffect(() => {
@@ -116,7 +118,7 @@ export function StarterZoodex() {
 
                     if (selectedMission) {
                         setAnomalyType(selectedMission.identifier);
-                    }
+                    };
                 };
             } catch (error: any) {
                 console.error('Error fetching anomaly: ', error.message);
@@ -235,7 +237,7 @@ export function StarterZoodexGallery() {
     const [configuration, setConfiguration] = useState<any | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [anomalyType, setAnomalyType] = useState<string | null>(null);
+    const [anomalyType, setAnomalyType] = useState<AnomalyTypes | null>(null);
     const [folderPath, setFolderPath] = useState<string | null>(null);
 
     // Fetch structure configuration from the `inventory` table
