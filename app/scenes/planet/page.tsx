@@ -76,7 +76,7 @@ export default function PlanetViewPage() {
 
     if (isLoading) {
         return <p>Loading...</p>;
-    }
+    };
 
     if (!hasMission1370201) {
         return (
@@ -87,7 +87,7 @@ export default function PlanetViewPage() {
                 <div><ChapterOneIntroduction /></div>
             </PlanetViewLayout>
         );
-    }
+    };
 
     if (!hasChosenFirstClassification) {
         return (
@@ -95,10 +95,10 @@ export default function PlanetViewPage() {
                 <div></div>
                 <div></div>
                 <div></div>
-                <div><CaptnCosmosGuideModal isExpanded={isTutorialExpanded} toggleExpand={toggleTutorial} /></div>
+                {/* <div><CaptnCosmosGuideModal isExpanded={isTutorialExpanded} toggleExpand={toggleTutorial} /></div> */}
             </PlanetViewLayout>
         );
-    }
+    };
 
     return (
         <div className="relative min-h-screen">
