@@ -8,7 +8,7 @@ import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPl
 import { InventoryStructureItem } from "@/types/Items";
 import ChapterOneIntroduction from "@/app/components/(scenes)/chapters/one/ChapterOneIntro";
 import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
-import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
+// import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
 import { CaptnCosmosGuideModal } from "@/app/components/(dialogue)/guideBot";
@@ -104,7 +104,7 @@ export default function PlanetViewPage() {
         <div className="relative min-h-screen">
             <PlanetStructures />
             <SciFiPopupMenu />
-            <BottomMenuBar onClose={() => null} />
+            {/* <BottomMenuBar onClose={() => null} /> */}
             <GuideButton onClick={() => setIsGuidePopupVisible(true)} /> {/* Add the Guide button */}
             {isGuidePopupVisible && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">

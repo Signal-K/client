@@ -1,9 +1,9 @@
 import React from 'react';
-import '../../../styles/Icons/BurrowingOwl.css';
+import '../../../styles/Icons/BurrowingOwl.css'; 
 
 interface BurrowingOwlIconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
-}
+};
 
 export const BurrowingOwlIcon: React.FC<BurrowingOwlIconProps> = ({ size = 32, ...props }) => (
   <svg

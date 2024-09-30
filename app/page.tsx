@@ -6,6 +6,7 @@ import { Landing } from "@/app/components/landing";
 import { useEffect, useState } from "react";
 import LoginPage from "./auth/LoginModal";
 import OnboardingWindow from "./components/(scenes)/chapters/(onboarding)/window";
+import EarthView from "./scenes/earth/page";
 
 export default function Home() {
   const supabase = useSupabaseClient();
@@ -16,17 +17,8 @@ export default function Home() {
       <LoginPage />
     );
   };
-  const renderContent = () => {
-    return (
-      <OnboardingLayout bg={true}>
-        <OnboardingWindow />
-      </OnboardingLayout>
-    )
-  }
 
   return (
-    <>
-      {renderContent()} 
-    </>
+    <EarthView />
   );
 }; 

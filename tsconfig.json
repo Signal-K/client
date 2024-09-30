@@ -25,14 +25,17 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "target": "ES2017"
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
-, "app/components/_[archive]/Classifications/Zoodex/CapturePage.jsx", "app/components/_[archive]/Classifications/Zoodex/Mobx.jsx"  ],
+    ".next/types/**/*.ts",
+    "app/components/_[archive]/Classifications/Zoodex/CapturePage.jsx",
+    "app/components/_[archive]/Classifications/Zoodex/Mobx.jsx"
+  ],
   "exclude": [
     "node_modules"
   ]

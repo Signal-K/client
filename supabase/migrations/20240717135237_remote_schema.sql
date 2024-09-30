@@ -8,6 +8,8 @@ create table "public"."anomalies" (
     "type" text,
     "classification_status" text,
     "avatar_url" text,
+    "activemission" bigint,
+    "classificationPoints" bigint,
     "created_at" timestamp with time zone not null default now(),
     "deepnote" text,
     "configuration" jsonb,

@@ -26,7 +26,7 @@ export default function StarterMissionsStats() {
   const [modules, setModules] = useState<CitizenScienceModule[]>([]);
   const [completedMissions, setCompletedMissions] = useState<number[]>([]);
   const [expandedMission, setExpandedMission] = useState<number | null>(null);
-  const [activeMission, setActiveMission] = useState<number | null>(null);
+  const [activemission, setactivemission] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function StarterMissionsStats() {
         setCompletedMissions(missionIds);
 
         if (profileData.error) throw profileData.error;
-        setActiveMission(profileData.data.activemission);
+        setactivemission(profileData.data.activemission);
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -96,7 +96,7 @@ export default function StarterMissionsStats() {
     }
   };
 
-  const updateActiveMission = async (starterMission: number | undefined, module: CitizenScienceModule): Promise<void> => {
+  const updateactivemission = async (starterMission: number | undefined, module: CitizenScienceModule): Promise<void> => {
     if (!session) return;
 
     try {
@@ -115,7 +115,7 @@ export default function StarterMissionsStats() {
 
       if (updateError) throw updateError;
 
-      setActiveMission(starterMission || null);
+      setactivemission(starterMission || null);
       setErrorMessage(null);
       console.log(`Active mission updated to: ${starterMission}`);
 
@@ -126,13 +126,13 @@ export default function StarterMissionsStats() {
     }
   };
 
-  const handleSetActiveMission = (module: CitizenScienceModule): void => {
-    if (activeMission === 1370203) {
-      updateActiveMission(module.starterMission, module);
-    } else if (activeMission) {
+  const handleSetactivemission = (module: CitizenScienceModule): void => {
+    if (activemission === 1370203) {
+      updateactivemission(module.starterMission, module);
+    } else if (activemission) {
       setErrorMessage("You already have an active mission. You must complete or cancel it before starting a new one.");
     } else {
-      updateActiveMission(module.starterMission, module);
+      updateactivemission(module.starterMission, module);
     }
   };
 
@@ -177,7 +177,7 @@ export default function StarterMissionsStats() {
                   <p className="text-[#D689E3] text-sm">{module.description}</p>
                   <button
                     className="mt-2 px-4 py-2 bg-[#5FCBC3] text-white text-sm rounded-md"
-                    onClick={() => handleSetActiveMission(module)}
+                    onClick={() => handleSetactivemission(module)}
                   >
                     Set Active Mission
                   </button>

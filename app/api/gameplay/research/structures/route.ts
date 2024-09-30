@@ -47,6 +47,17 @@ const ResearchedStructures: ResearchedStructureItem[] = [
         item: 3105,
         chapter: 1,
     },
+    {
+        id: 4,
+        name: "Zoodex",
+        description: "Used to discover and collate animal & plant data",
+        icon_url: '/assets/Items/Pokedex.png',
+        requiresMission: 1370203,
+        usedFor: 137121301,
+        classificationType: 'zoodex',
+        item: 3104,
+        chapter: 1,
+    },
 ];
 
 export async function GET(req: NextRequest) {

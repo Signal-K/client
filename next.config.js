@@ -9,6 +9,10 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 	images: {
 	  unoptimized: true,
 	},
+	pwa: {
+		dest: 'public',
+		mode: 'production'
+	},
 	async rewrites() {
 	  return [
 		// Rewrite /citizen requests to the Flask API
