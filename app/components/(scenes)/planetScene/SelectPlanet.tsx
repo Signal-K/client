@@ -72,8 +72,6 @@ export default function PlanetSelector() {
     };
   };
 
-
-
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);

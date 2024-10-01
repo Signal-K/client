@@ -287,6 +287,34 @@ export const StructuresConfig: StructureConfig = {
         },
       ],
     },
+    3107: {
+      name: "Launchpad",
+      title: "Rocket Launchpad",
+      labels: [
+        {
+          text: "Manned Vehicles",
+          variant: "default",
+        },
+      ],
+      imageSrc: '/assets/Items/Launchpad.jpg',
+      actions: [
+        {
+          icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Repair",
+          dynamicComponent: <StructureRepair inventoryId={3107} />,
+        },
+      ],
+      buttons: [
+        {
+          icon: <CaravanIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Build a rocket",
+        },
+        {
+          icon: <PowerIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Launch a rocket (travel)",
+        }
+      ]
+    },
     10600: {
       name: "Helicopter (test)",
       labels: [],

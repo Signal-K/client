@@ -57,6 +57,22 @@ const inventoryItems: InventoryItem[] = [
     ItemCategory: "Structure",
     locationType: 'Surface',
   },
+  {
+    id: 3107,
+    name: "Launchpad",
+    description: "Launch rockets and satellites",
+    icon_url: "/assets/Items/Launchpad.jpg",
+    ItemCategory: "Structure",
+    locationType: 'Surface',
+  },
+  {
+    id: 3108,
+    name: "First rocket",
+    description: "Travel the solar-system",
+    icon_url: "/assets/Items/Rocket.png",
+    ItemCategory: "Structure",
+    locationType: 'Atmosphere',
+  },
   
   // Tests
   {

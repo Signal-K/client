@@ -247,28 +247,22 @@ export default function InitialiseChapterOneUser() {
                                     className="space-y-6"
                                 >
                                     <h2 className="text-3xl font-semibold text-center bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">
-                                        {selectedCategory.title}
+                                        Missions in {selectedCategory.title}
                                     </h2>
-                                    <p className="text-gray-200 text-center">{selectedCategory.description}</p>
-                                    <ul className="space-y-2">
-                                        {selectedCategory.details.map((detail, index) => (
-                                            <li key={index} className="flex flex-col text-gray-200">
-                                                <button
-                                                    onClick={() => handleMissionSelect(detail)}
-                                                    className="flex items-center justify-between w-full"
-                                                >
-                                                    <div className="flex items-center">
-                                                        <ChevronRight className="text-cyan-400 mr-2" size={16} />
-                                                        <span>{detail.name}</span>
-                                                    </div>
-                                                </button>
-                                                <p className="text-sm text-gray-400 ml-6">{detail.description}</p>
-                                            </li>
+                                    <div className="flex flex-wrap justify-center gap-4">
+                                        {selectedCategory.details.map((mission) => (
+                                            <button
+                                                key={mission.identifier}
+                                                onClick={() => handleMissionSelect(mission)}
+                                                className="w-48 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors duration-300"
+                                            >
+                                                {mission.name}
+                                            </button>
                                         ))}
-                                    </ul>
+                                    </div>
                                     <button
                                         onClick={handleBackToCategories}
-                                        className="mt-6 w-full bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2 px-4 rounded transition-colors duration-300"
+                                        className="mt-6 text-blue-300 hover:text-blue-500 font-medium transition-colors duration-300"
                                     >
                                         Back to Categories
                                     </button>
@@ -276,21 +270,23 @@ export default function InitialiseChapterOneUser() {
                             )
                         ) : (
                             <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="space-y-6"
+                                key="categories"
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.5 }}
                             >
-                                <h2 className="text-3xl font-semibold text-center bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">Choose your area of interest</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    {categories.map((category, idx) => (
+                                <h2 className="text-3xl font-semibold text-center bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">
+                                    Choose a Category
+                                </h2>
+                                <div className="flex flex-col space-y-4">
+                                    {categories.map((category) => (
                                         <button
-                                            key={idx}
+                                            key={category.title}
                                             onClick={() => handleCategoryClick(category)}
-                                            className="bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-lg p-4 text-left space-y-2"
+                                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded transition-colors duration-300"
                                         >
-                                            <h3 className="text-xl font-medium text-gray-200">{category.title}</h3>
-                                            <ChevronRight className="text-cyan-400" />
+                                            {category.title}
                                         </button>
                                     ))}
                                 </div>
@@ -298,20 +294,14 @@ export default function InitialiseChapterOneUser() {
                         )}
                     </AnimatePresence>
                 </div>
-                <div className="flex justify-between p-4 bg-gray-800">
-                    <button
-                        onClick={handleBack}
-                        disabled={step === 0}
-                        className="text-gray-300 hover:text-white transition-colors duration-300"
-                    >
-                        <ChevronLeft size={20} />
+                <div className="flex justify-between p-4 bg-gray-800 border-t border-gray-700">
+                    <button onClick={handleBack} className="text-gray-400 hover:text-white transition-colors duration-300">
+                        <ChevronLeft className="w-5 h-5 inline" />
+                        Back
                     </button>
-                    <button
-                        onClick={handleNext}
-                        disabled={step === introSteps.length && !selectedCategory}
-                        className="text-gray-300 hover:text-white transition-colors duration-300"
-                    >
-                        <ChevronRight size={20} />
+                    <button onClick={handleNext} className="text-gray-400 hover:text-white transition-colors duration-300">
+                        <ChevronRight className="w-5 h-5 inline" />
+                        Next
                     </button>
                 </div>
             </div>

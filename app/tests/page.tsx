@@ -1,12 +1,12 @@
 "use client";
 
-import React from "react";
-import IntroduceUserToResearch from "../components/(scenes)/chapters/(onboarding)/initialiseResearch";
+import React, { useEffect, useState, useCallback } from "react";
+import { PlanetSwitcher } from "../components/(scenes)/planetScene/SwitchPlanet";
 
 export default function TestPage() {
     return (
         <div>
-            {/* <IntroduceUserToResearch /> */}
+            <PlanetSwitcher />
         </div>
     );
 };
