@@ -50,14 +50,7 @@ export function ProfileCard() {
       }
     };
 
-    const fetchMissions = async () => {
-      const res = await fetch('/api/gameplay/missions');
-      const data = await res.json();
-      setMissions(data); 
-    };
-
     fetchProfile();
-    fetchMissions();
   }, [session]);
 
   const handleFieldChange = (e: { target: { name: any; value: any; }; }) => {

@@ -6,14 +6,15 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from '../../(create)/(classifications)/PostForm';
 import { zoodexDataSources } from "../Data/ZoodexDataSources";
 import { StructureInfo } from "../structureInfo";
+import { BurrowingOwl } from "./burrowingOwls";
+import { ZoodexIguanas } from "./iguanasFromAbove";
+import { NestQuestGo } from "./NestQuestGo";
 
 export interface Anomaly {
     id: bigint;
     content: string;
     avatar_url?: string;
 };
-
-import { AnomalyTypes } from "../../(create)/(classifications)/PostForm";
 
 export function StarterZoodex() {
     const supabase = useSupabaseClient();
@@ -27,7 +28,7 @@ export function StarterZoodex() {
     const [configuration, setConfiguration] = useState<any | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [anomalyType, setAnomalyType] = useState<AnomalyTypes | null>(null);
+    const [anomalyType, setAnomalyType] = useState<string | null>(null);
 
     // Fetch structure configuration from the `inventory` table
     useEffect(() => {
@@ -118,7 +119,7 @@ export function StarterZoodex() {
 
                     if (selectedMission) {
                         setAnomalyType(selectedMission.identifier);
-                    };
+                    }
                 };
             } catch (error: any) {
                 console.error('Error fetching anomaly: ', error.message);
@@ -237,10 +238,9 @@ export function StarterZoodexGallery() {
     const [configuration, setConfiguration] = useState<any | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [anomalyType, setAnomalyType] = useState<AnomalyTypes | null>(null);
+    const [anomalyType, setAnomalyType] = useState<string | null>(null);
     const [folderPath, setFolderPath] = useState<string | null>(null);
 
-    // Fetch structure configuration from the `inventory` table
     useEffect(() => {
         async function fetchStructureConfiguration() {
             if (!session) return;
@@ -281,7 +281,6 @@ export function StarterZoodexGallery() {
             }
 
             try {
-                // Fetch anomaly based on user choice
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")
                     .select("*")
@@ -299,30 +298,27 @@ export function StarterZoodexGallery() {
                 }
 
                 setAnomaly(anomalyData as Anomaly);
-
-                // Construct the folder path correctly
+                
                 const baseFolder = `zoodex`;
-                const folder = `${baseFolder}/${userChoice}`; // Ensure this matches your folder structure
+                const folder = `${baseFolder}/${userChoice}`;
                 const { data: files, error: storageError } = await supabase
                     .storage
                     .from('public')
-                    .list(folder, { limit: 100 }); // Add limit if necessary to control response size
+                    .list(folder, { limit: 100 });
 
                 if (storageError) throw storageError;
 
-                console.log('Fetched files:', files); // Log the files fetched
+                console.log('Fetched files:', files);
 
                 if (files && files.length > 0) {
                     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                    // Construct the URLs correctly
                     const urls = files.map(file => `${supabaseUrl}/storage/v1/object/public/${folder}/${file.name}`);
                     setImageUrls(urls);
-                    setFolderPath(folder); // Set the complete folder path
+                    setFolderPath(folder);
                 } else {
                     setImageUrls([]);
                 }
 
-                // Set anomalyType based on the selected userChoice
                 const selectedMission = zoodexDataSources
                     .flatMap(category => category.items)
                     .find(item => item.identifier === userChoice);
@@ -420,7 +416,6 @@ export function StarterZoodexGallery() {
                 )}
             </div>
 
-            {/* Display all the images from the directory */}
             <div className="grid grid-cols-3 gap-4">
                 {imageUrls.length > 0 ? (
                     imageUrls.map((url, index) => (
@@ -434,7 +429,6 @@ export function StarterZoodexGallery() {
                 )}
             </div>
 
-            {/* Show classification form if images are available */}
             {imageUrls.length > 0 && anomalyType && (
                 <ClassificationForm 
                     anomalyId={anomaly.id.toString()}
@@ -444,6 +438,33 @@ export function StarterZoodexGallery() {
                     structureItemId={3104}
                 />
             )}
+
+            {userChoice === 'zoodex-burrowingOwl' && (
+                <div>
+                    <h2>Burrowing Owl Data</h2>
+                    <BurrowingOwl />
+                </div>
+            )}
+
+            {userChoice === 'zoodex-iguanasFromAbove' && (
+                <div>
+                    <h2>Iguanas from Above Data</h2>
+                    <ZoodexIguanas />
+                </div>
+            )}
+
+            {userChoice === 'zoodex-nestQuestGo' && (
+                <div>
+                    <h2>Nest Quest Go Data</h2>
+                    {/* <NestQuestGo /> */}
+                </div>
+            )}
+
+            {/* {userChoice === 'zoodex-southCoastFaunaRecovery' && (
+                <div>
+                    <h2>South Coast Fauna Recovery Data</h2>
+                </div>
+            )} */}
         </div>
     );
 };

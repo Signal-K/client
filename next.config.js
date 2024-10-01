@@ -11,7 +11,8 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 	},
 	pwa: {
 		dest: 'public',
-		mode: 'production'
+		mode: 'production',
+		disable: process.env.NODE_ENV === 'development',
 	},
 	async rewrites() {
 	  return [

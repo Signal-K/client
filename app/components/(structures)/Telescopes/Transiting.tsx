@@ -89,7 +89,6 @@ export function StarterTelescope() {
         fetchStructureConfiguration();
     }, [session, supabase, activePlanet]);
 
-    // Fetch anomaly
     useEffect(() => {
         const fetchAnomaly = async () => {
             if (!session || !userChoice) {
@@ -102,8 +101,6 @@ export function StarterTelescope() {
                     .from("anomalies")
                     .select("*")
                     .eq("anomalySet", userChoice)
-                    .limit(1)
-                    .single();
 
                 if (anomalyError) throw anomalyError;
 
@@ -111,11 +108,12 @@ export function StarterTelescope() {
                     setAnomaly(null);
                     setLoading(false);
                     return;
-                }
+                };
 
-                setAnomaly(anomalyData as Anomaly);
+                const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
+                setAnomaly(randomAnomaly);
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyData.id}/Binned.png`);
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Binned.png`);
             } catch (error: any) {
                 console.error('Error fetching anomaly: ', error.message);
                 setAnomaly(null);

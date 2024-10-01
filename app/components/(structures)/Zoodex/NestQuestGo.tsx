@@ -5,11 +5,12 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { StructureInfo } from "../structureInfo";
 import ClassificationForm from "../../(create)/(classifications)/PostForm";
+import { NestQuestGoClassificationForm } from "../../(create)/(classifications)/temp/NestQuestGoForm";
 
 interface ZoodexProps {
   anomalyId: string;
 };
-
+ 
 export const NestQuestGo: React.FC<ZoodexProps> = ({
     anomalyId
 }) => {
@@ -169,7 +170,13 @@ export const NestQuestGo: React.FC<ZoodexProps> = ({
                                     />
                                 </div>
                             </div>
-                            <ClassificationForm
+                            {/* <ClassificationForm
+                                anomalyId={anomalyId}
+                                anomalyType="zoodex-nestQuestGo"
+                                missionNumber={3000005}
+                                assetMentioned={imageUrl}
+                            /> */}
+                            <NestQuestGoClassificationForm
                                 anomalyId={anomalyId}
                                 anomalyType="zoodex-nestQuestGo"
                                 missionNumber={3000005}

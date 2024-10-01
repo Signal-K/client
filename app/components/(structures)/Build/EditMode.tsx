@@ -5,7 +5,7 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet';
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button"; 
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface InventoryItem {
@@ -122,6 +122,7 @@ export function UnownedSurfaceStructures() {
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-full w-[18%] h-[18%] p-4 bg-[#1a1b26] text-[#a9b1d6] rounded-3xl shadow-lg">
+                        <DialogTitle></DialogTitle>
                         <p className="text-center">Use the Research Station to research more structures.</p>
                     </DialogContent>
                 </Dialog>

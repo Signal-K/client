@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -182,6 +182,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               height: `${modalSizePercentage}%`,
             }}
           >
+            <DialogTitle></DialogTitle>
             <div className="relative flex flex-col items-center justify-center h-full">
               <button
                 className="absolute top-4 right-4 text-white hover:text-red-500"

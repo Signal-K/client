@@ -76,7 +76,7 @@ export function SciFiPopupMenu() {
           </motion.div>
         )}
       </AnimatePresence>
-      <CaptnCosmosGuideModal isExpanded={isTutorialExpanded} toggleExpand={toggleTutorial} />
+      {/* <CaptnCosmosGuideModal isExpanded={isTutorialExpanded} toggleExpand={toggleTutorial} /> */}
       <motion.button
         onClick={toggleMenu}
         whileHover={{ scale: 1.1 }}

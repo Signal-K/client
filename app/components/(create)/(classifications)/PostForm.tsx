@@ -8,6 +8,12 @@ import UserAvatar, { UserAvatarNullUpload } from "@/app/components/(settings)/pr
 import { ClassificationOutput } from "./ClassificationResults";
 import IntroduceUserToResearch from "../../(scenes)/chapters/(onboarding)/initialiseResearch";
 
+interface ClassificationOption {
+    id: number;
+    text: string;
+    subOptions?: ClassificationOption[];
+};
+
 const zoodexSouthCoastFaunaRecovery: ClassificationOption[] = [
     { id: 1, text: "Australian raven" },
     { id: 2, text: "Red-winged fairy-wren" },
@@ -240,71 +246,12 @@ const sunspotsConfigurationTemporary: ClassificationOption[] = [
 ]; // text-only?
 
 interface ClassificationFormProps {
-    anomalyType: AnomalyTypes;
+    anomalyType: string;
     anomalyId: string; 
     missionNumber: number;
     assetMentioned: string;
     originatingStructure?: number;
     structureItemId?: number;
-};
-
-interface ClassificationOption {
-    id: number;
-    text: string;
-    subOptions?: ClassificationOption[];
-};
-
-export type AnomalyTypes = 
-    | "planet"
-    | "roverImg"
-    | "cloud"
-    | "zoodex-burrowingOwl"
-    | "zoodex-iguanasFromAbove"
-    | "DiskDetective"
-    | "sunspot"
-    | "zoodex-nestQuestGo";
-
-const anomalyConfig: Record<AnomalyTypes, { placeholder: string; options: ClassificationOption[]; textAreaCount: number }> = {
-    "planet": {
-        placeholder: "Describe the planetary dips you see...",
-        options: planetClassificationOptions,
-        textAreaCount: 1
-    },
-    "roverImg": {
-        placeholder: "Describe the terrain or objects found in the image...",
-        options: roverImgClassificationOptions,
-        textAreaCount: 1
-    },
-    "cloud": {
-        placeholder: "Describe the cloud formations & locations...",
-        options: initialCloudClassificationOptions,
-        textAreaCount: 1
-    },
-    "zoodex-burrowingOwl": {
-        placeholder: "Describe the behavior or condition of the owls...",
-        options: zoodexBurrowingOwlClassificationOptions,
-        textAreaCount: 1
-    },
-    "zoodex-iguanasFromAbove": {
-        placeholder: "Describe the iguana sightings...",
-        options: zoodexIguanasFromAboveClassificationOptions,
-        textAreaCount: 1
-    },
-    "DiskDetective": {
-        placeholder: "Describe the object seen in the disk...",
-        options: diskDetectorClassificationOptions,
-        textAreaCount: 1
-    },
-    "sunspot": {
-        placeholder: "Describe the sunspots you see and how many...",
-        options: [],
-        textAreaCount: 2,
-    },
-    "zoodex-nestQuestGo": {
-        placeholder: "Enter details about the nest...",
-        options: [],
-        textAreaCount: 3,
-    },
 };
 
 const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, anomalyId, missionNumber, assetMentioned, originatingStructure, structureItemId }) => {
@@ -326,10 +273,54 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     const { userProfile } = useProfileContext();
     const [loading, setIsLoading] = useState(true);
 
-    const { placeholder, options: classificationOptions, textAreaCount } = anomalyConfig[anomalyType] || { placeholder: "Enter your classification details...", options: [], textAreaCount: 0 };
-    const showTextArea = classificationOptions.length === 0;
+    const placeholder = (() => {
+        switch (anomalyType) {
+            case "planet":
+                return "Describe the planetary dips you see...";
+            case "roverImg":
+                return "Describe the terrain or objects found in the image...";
+            case "cloud":
+                return "Describe the cloud formations & locations...";
+            case "zoodex-burrowingOwl":
+                return "Describe the behavior or condition of the owls...";
+            case 'zoodex-iguanasFromAbove':
+                return "Describe the iguana sightings...";
+            case 'DiskDetective':
+                return "Describe the object seen in the disk...";
+            case 'sunspot':
+                return "Describe the sunspots you see and how many...";
+            default:
+                return "Enter your classification details...";
+        };
+    })();
 
-    const [textAreaContents, setTextAreaContents] = useState<string[]>(Array(textAreaCount).fill(""));
+    const classificationOptions = (() => {
+        switch (anomalyType) {
+            case "planet":
+                return planetClassificationOptions;
+            case "roverImg":
+                return roverImgClassificationOptions;
+            case "cloud":
+                return initialCloudClassificationOptions;
+            case "zoodex-burrowingOwl":
+                return zoodexBurrowingOwlClassificationOptions;
+            case 'zoodex-iguanasFromAbove':
+                return zoodexIguanasFromAboveClassificationOptions;
+            case 'zoodex-southCoastFaunaRecovery':
+                return zoodexSouthCoastFaunaRecovery;
+            case 'DiskDetective':
+                return diskDetectorClassificationOptions;
+            case 'sunspot':
+                // return sunspotsConfigurationTemporary;
+                return [];
+            case 'zoodex-nestQuestGo':
+                return [];
+            default:
+                return [];
+          };    
+    })();    
+
+    const showTextArea = classificationOptions.length === 0;
 
     const [hasClassified, setHasClassified] = useState<boolean>(false);
     const [showResearch, setShowResearch] = useState<boolean>(false);
@@ -366,6 +357,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     .select("username, avatar_url")
                     .eq("id", session?.user?.id)
                     .single();
+
                 if (data) {
                     setAvatarUrl(data.avatar_url);
                 };
@@ -447,7 +439,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             activePlanet: activePlanet?.id,
             structureId: originatingStructure ?? null,
             createdBy: inventoryItemId ?? null,
-            textAreas: textAreaContents,
         };
     
         try {
@@ -464,21 +455,21 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     
                 currentConfig = inventoryData?.configuration || {};
                 if (currentConfig.Uses) {
-                    currentConfig.Uses = Math.max(0, currentConfig.Uses - 1); // Decrement "Uses" value
-                }
-            }
+                    currentConfig.Uses = Math.max(0, currentConfig.Uses - 1);
+                };
+            };
     
-            // Update the inventory item with the new configuration
             if (inventoryItemId) {
                 const { error: updateError } = await supabase
                     .from('inventory')
                     .update({ configuration: currentConfig })
                     .eq('id', inventoryItemId);
     
-                if (updateError) throw updateError;
-            }
+                if (updateError) {
+                    throw updateError;
+                };
+            };
     
-            // Create classification post
             const { data: classificationData, error: classificationError } = await supabase
                 .from("classifications")
                 .insert({
@@ -492,7 +483,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 .single();
     
             if (classificationError) {
-                console.error("Error creating classification:", classificationError.message);
+                console.error("Error creating classification: ", classificationError.message);
                 alert("Failed to create classification. Please try again.");
                 return;
             } else {
@@ -507,7 +498,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 }, 1200);
             };
     
-            // Update user's classification points
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('classificationPoints')
@@ -536,7 +526,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
             };
     
             await handleMissionComplete();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Unexpected error:", error);
         };
     };
@@ -588,7 +578,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
 
     return (
         <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-[#2C4F64]/30 text-white rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
-            {/* Conditional rendering for "Uses" value */}
             {uses !== null && uses <= 0 ? (
                 <div className="text-red-500 font-bold">
                     You need to repair the structure's durability before you can use it.
@@ -613,7 +602,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                     <UserAvatarNullUpload
                                         url={avatar_url}
                                         size={64}
-                                        onUpload={(filePath) => {
+                                        onUpload={(filePath: string) => {
                                             setAvatarUrl(filePath);
                                         }}
                                     />
@@ -648,7 +637,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                                 <UserAvatarNullUpload
                                     url={avatar_url}
                                     size={64}
-                                    onUpload={(filePath) => {
+                                    onUpload={(filePath: string) => {
                                         setAvatarUrl(filePath);
                                     }}
                                 />
@@ -680,7 +669,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 </div>
             )}
         </div>
-    );  
+    );     
 };
 
 export default ClassificationForm;

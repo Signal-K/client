@@ -205,26 +205,25 @@ export function ZoodexIguanas() {
 
       try {
         const { data: anomalyData, error: anomalyError } = await supabase
-          // .rpc('get_random_anomaly', { anomaly_type: 'zoodexOthers', anomalySet: 'zoodex-iguanas' })
           .from("anomalies")
           .select("*")
-          .eq("anomalySet", "zoodexIguanas")
-          .single();
+          .eq("anomalySet", "zoodex-iguanasFromAbove");
 
         if (anomalyError) {
           throw anomalyError;
         }
 
-        if (!anomalyData) {
+        if (!anomalyData || anomalyData.length === 0) {
           setAnomaly(null);
           setLoading(false);
           return;
         }
 
-        const fetchedAnomaly = anomalyData as Anomaly;
-        setAnomaly(fetchedAnomaly);
+        const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
+        setAnomaly(randomAnomaly);
+
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        setImageUrl(`${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-iguanasFromAbove/${fetchedAnomaly.id}.jpeg`);
+        setImageUrl(`${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-iguanasFromAbove/${randomAnomaly.id}.jpeg`);
       } catch (error: any) {
         console.error('Error fetching iguana: ', error.message);
         setAnomaly(null);
@@ -248,14 +247,13 @@ export function ZoodexIguanas() {
           .from('missions')
           .select('id')
           .eq('user', session.user.id)
-          .eq('mission', 3000004)
-          .single();
+          .eq('mission', 3000004);
 
         if (missionError) {
           throw missionError;
         }
 
-        setHasMission3000004(!!missionData);
+        setHasMission3000004(missionData.length > 0);
       } catch (error: any) {
         console.error('Error checking iguana mission: ', error.message);
         setHasMission3000004(false);
@@ -263,7 +261,7 @@ export function ZoodexIguanas() {
     };
 
     checkTutorialMission();
-  }, [session, supabase]); // Added square brackets around dependencies
+  }, [session, supabase]);
 
   if (!hasMission3000004) {
     return (
@@ -303,4 +301,4 @@ export function ZoodexIguanas() {
       </div>
     </div>
   );
-}
+};

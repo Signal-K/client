@@ -95,7 +95,7 @@ export default function PlanetViewPage() {
                 <div></div>
                 <div></div>
                 <div></div>
-                <div><CaptnCosmosGuideModal isExpanded={isTutorialExpanded} toggleExpand={toggleTutorial} /></div>
+                {/* <div><CaptnCosmosGuideModal isExpanded={isTutorialExpanded} toggleExpand={toggleTutorial} /></div> */}
             </PlanetViewLayout>
         );
     }
