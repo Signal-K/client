@@ -312,7 +312,7 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <PowerIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Launch a rocket (travel)",
-        }
+        },
       ]
     },
     10600: {

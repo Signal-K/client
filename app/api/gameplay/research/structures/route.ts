@@ -58,6 +58,16 @@ const ResearchedStructures: ResearchedStructureItem[] = [
         item: 3104,
         chapter: 1,
     },
+    {
+        id: 5,
+        name: "Launchpad",
+        description: "Launch rockets and satellites using your launchpad",
+        icon_url: '/assets/Items/Launchpad.jpg',
+        requiresMission: 10000004,
+        usedFor: 100000042,
+        item: 3107,
+        chapter: 1,
+    },
 ];
 
 export async function GET(req: NextRequest) {

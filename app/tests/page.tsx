@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { PlanetSwitcher } from "../components/(scenes)/planetScene/SwitchPlanet";
+import LaunchpadStructure from "../components/(structures)/Launchpad/Dashboard";
 
 export default function TestPage() {
     return (
         <div>
-            <PlanetSwitcher />
+            <LaunchpadStructure />
         </div>
     );
 };
+
+

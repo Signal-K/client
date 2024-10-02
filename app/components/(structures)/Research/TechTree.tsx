@@ -171,7 +171,7 @@ export function AdvancedTechTreeComponent() {
       //       owner: userId, 
       //       anomaly: activePlanet?.id, 
       //       item: techItem,  // Use the `item` value instead of `techId`
-      //       configuration: { "Uses": 1 },  // Pass as an object
+      //       configuration: { "Uses": 1 },  // Pass as an object 
       //       quantity: 1 
       //     }]);
   
