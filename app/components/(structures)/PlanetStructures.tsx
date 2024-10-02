@@ -1,51 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-
-import { EarthViewLayout } from "@/app/components/(scenes)/planetScene/layout";
-import InitialisePlanet from "@/app/components/(scenes)/planetScene/initialisePlanet";
-import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/app/components/(structures)/Structures";
 import { InventoryStructureItem } from "@/types/Items";
-import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
-import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
- 
-const MarsView: React.FC = () => {
-    const supabase = useSupabaseClient();
-    const session = useSession();
+import { EarthViewLayout } from "../(scenes)/planetScene/layout";
+import { PlanetarySystem } from "../(scenes)/planetScene/orbitals/system";
+import StructuresOnPlanet, { OrbitalStructuresOnPlanet, AtmosphereStructuresOnPlanet } from "./Structures";
+import AllAutomatonsOnActivePlanet from "../(vehicles)/(automatons)/AllAutomatons";
 
-    const { activePlanet, updatePlanetLocation } = useActivePlanet();
-    const handleUpdateToMars = () => {
-        updatePlanetLocation(40);
-    };
-
-    if (activePlanet?.id !== 40) {
-        return (
-        <div className="min-h-screen w-full flex flex-col">
-            {/* <img
-              className="absolute inset-0 w-full h-full object-cover"
-              src="/assets/Backdrops/Mars.png"
-            /> */}
-            <div className="bg-black/90">
-                <p>Current planet is not Mars.</p>
-                <button onClick={handleUpdateToMars}>Switch to Mars</button>
-            </div>
-          </div>
-        );
-    };
-
-    return (
-        <div className="relative min-h-screen">
-            <InitialisePlanet planetId={40} />
-            <MarsStructures />
-        </div>
-    );
-};
-
-export default MarsView;
-
-const MarsStructures: React.FC = () => {
+const PlanetStructures: React.FC = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -96,3 +60,5 @@ const MarsStructures: React.FC = () => {
         </EarthViewLayout>
     );
 };
+
+export default PlanetStructures;

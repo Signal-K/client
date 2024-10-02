@@ -26,7 +26,6 @@ export default function InitialisePlanet({ planetId }: InitialisePlanetProps) {
             const response = await fetch('/api/gameplay/missions/planets/initialisation');
             const missions: Mission[] = await response.json();
 
-            // Find the mission for the given planetId
             const foundMission = missions.find(m => m.anomaly === planetId);
             setMission(foundMission || null);
             setLoading(false);
