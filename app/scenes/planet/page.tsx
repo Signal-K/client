@@ -11,7 +11,6 @@ import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/
 // import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
 import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
-import { CaptnCosmosGuideModal } from "@/app/components/(dialogue)/guideBot";
 import GuideButton from "@/app/components/(scenes)/chapters/one/HelpPickup";
 
 export default function PlanetViewPage() {
@@ -95,7 +94,7 @@ export default function PlanetViewPage() {
                 <div></div>
                 <div></div>
                 <div></div>
-                {/* <div><CaptnCosmosGuideModal isExpanded={isTutorialExpanded} toggleExpand={toggleTutorial} /></div> */}
+                <div></div>
             </PlanetViewLayout>
         );
     }

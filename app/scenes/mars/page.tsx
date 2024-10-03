@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-
+ 
 import { EarthViewLayout } from "@/app/components/(scenes)/planetScene/layout";
 import InitialisePlanet from "@/app/components/(scenes)/planetScene/initialisePlanet";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/app/components/(structures)/Structures";

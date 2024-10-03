@@ -167,6 +167,13 @@ const missions: Mission[] = [
     },
 
     // Any resource collection missions...
+
+
+    // Citizen science missions introduced in #Chapter-2
+    {
+        id: 20000001,
+        name: "Complete Count That Neutrino tutorial",
+    },
 ];
 
 export async function GET(req: NextRequest) {

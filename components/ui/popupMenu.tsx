@@ -6,7 +6,6 @@ import { ChevronLeft, ChevronRight, Globe, Rocket, Star, Zap } from 'lucide-reac
 import { ClassificationViewerAll } from '@/app/components/(create)/(classifications)/YourClassifications';
 import MineralsInventoryGrid from '@/app/components/(inventory)/mineralsPanel';
 import StarterMissionsStats from '@/app/components/(scenes)/(missions)/CompletedMissions';
-import { CaptnCosmosGuideModal } from '@/app/components/(dialogue)/guideBot';
 
 interface TutorialMessageProps {
   isExpanded: boolean;
@@ -76,7 +75,6 @@ export function SciFiPopupMenu() {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* <CaptnCosmosGuideModal isExpanded={isTutorialExpanded} toggleExpand={toggleTutorial} /> */}
       <motion.button
         onClick={toggleMenu}
         whileHover={{ scale: 1.1 }}

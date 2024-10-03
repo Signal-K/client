@@ -211,7 +211,6 @@ export function AdvancedTechTreeComponent() {
       setUnlockedTechs(prevUnlockedTechs => [...prevUnlockedTechs, techId]);
     }
   };
-  
 
   const canUnlock = (techId: number) => {
     const tech = technologies.find((t) => t.id === techId)

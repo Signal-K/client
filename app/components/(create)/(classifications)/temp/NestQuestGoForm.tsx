@@ -216,15 +216,6 @@ export const NestQuestGoClassificationForm: React.FC<ClassificationFormProps> = 
     
             if (updatePointsError) throw updatePointsError;
     
-            const { error: resetMissionError } = await supabase
-                .from('profiles')
-                .update({ activemission: null })
-                .eq('id', session?.user?.id);
-    
-            if (resetMissionError) {
-                console.error("Error resetting active mission:", resetMissionError.message);
-            };
-    
             await handleMissionComplete();
         } catch (error: any) {
             console.error("Error creating classification:", error.message);
