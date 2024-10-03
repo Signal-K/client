@@ -15,7 +15,7 @@ const planetTypeColors: { [key: string]: string } = {
   "Gas Giant": "#9C27B0",
   Rocky: "#795548",     
   "Ice Giant": "#00BCD4" 
-};
+}; 
 
 const planets = [
   {

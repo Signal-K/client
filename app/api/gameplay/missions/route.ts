@@ -174,6 +174,26 @@ const missions: Mission[] = [
         id: 20000001,
         name: "Complete Count That Neutrino tutorial",
     },
+    {
+        id: 200000012,
+        name: "Make your first CTN classification",
+    },
+    {
+        id: 20000002,
+        name: 'Complete Cosmic Muon tutorial',
+    },
+    {
+        id: 200000022,
+        name: 'Make your first CM classification',
+    },
+    {
+        id: 20000003,
+        name: 'Complete Minor Planet tutorial'
+    },
+    {
+        id: 200000032,
+        name: 'Make your first MP classification',
+    },
 ];
 
 export async function GET(req: NextRequest) {

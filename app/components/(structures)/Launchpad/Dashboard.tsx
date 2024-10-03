@@ -17,7 +17,7 @@ export default function LaunchpadStructure() {
 
     const [modalContent, setModalContent] = useState<string | null>(null);
     const [researchOptions, setResearchOptions] = useState<any[]>([]);
-    const [researchedItems, setResearchedItems] = useState<number[]>([]);
+    const [researchedItems, setResearchedItems] = useState<number[]>([]); 
     const [loadingResearch, setLoadingResearch] = useState<boolean>(false);
 
     const systemStatus = [
@@ -44,26 +44,32 @@ export default function LaunchpadStructure() {
         setModalContent(null);
     };
 
+    useEffect(() => {
+        fetchLaunchOptions();
+        console.log(session?.user.id);
+    }, []);
+
     const fetchLaunchOptions = async () => {
         try {
             const res = await fetch('/api/gameplay/research/travel');
             const data = await res.json();
+            console.log('Data from API:', data);
             setResearchOptions(data);
-
+    
             const { data: researched, error } = await supabase
                 .from('researched')
                 .select('tech_id')
                 .eq('tech_type', 3107)
-                .eq('user_id', session?.user?.id);
-
+                .eq('user_id', session?.user?.id);        
+    
             if (error) throw error;
-
+    
             const researchedIds = researched?.map(item => item.tech_id) || [];
             setResearchedItems(researchedIds);
         } catch (error) {
             console.error('Error fetching research options:', error);
         };
-    };
+    };    
 
     const [rocketParts, setRocketParts] = useState<any[]>([]);
 

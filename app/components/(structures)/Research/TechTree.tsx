@@ -125,19 +125,21 @@ export function AdvancedTechTreeComponent() {
   const fetchClassificationPoints = async () => {
     if (!userId) return;
 
+    console.log('test session', session.user.id);
+
     const { data, error } = await supabase
       .from('profiles')
       .select('classificationPoints')
-      .eq('id', userId)
+      .eq('id', session.user.id)
       .single();
 
     if (error) {
       console.error('Error fetching classification points:', error);
       return;
-    }
+    };
 
     setClassificationPoints(data?.classificationPoints || 0);
-  }
+  };
   
   useEffect(() => {
     fetchTechnologies()

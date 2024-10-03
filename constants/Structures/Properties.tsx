@@ -16,6 +16,8 @@ import { DataSourcesModal } from "@/app/components/(structures)/Data/unlockNewDa
 import MissionsForStructure from "@/app/components/(structures)/Missions/AvailableMissions";
 import { TelescopeSunspotDetector } from "@/app/components/(structures)/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/app/components/(structures)/Telescopes/DiskDetector";
+import LaunchpadStructure from "@/app/components/(structures)/Launchpad/Dashboard";
+import { PlanetSwitcher } from "@/app/components/(scenes)/planetScene/SwitchPlanet";
 
 interface IndividualStructureProps {
     name?: string;
@@ -312,6 +314,10 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <PowerIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Launch a rocket (travel)",
+          // dynamicComponent: <LaunchpadStructure />,
+          dynamicComponent: <PlanetSwitcher />,
+          sizePercentage: 40,
+
         },
       ]
     },

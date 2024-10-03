@@ -6,19 +6,19 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import InitialisePlanet from "@/app/components/(scenes)/planetScene/initialisePlanet";
 import PlanetStructures from "@/app/components/(structures)/PlanetStructures";
 
-const JupiterView: React.FC = () => {
+const VenusView: React.FC = () => {
     const { activePlanet, updatePlanetLocation } = useActivePlanet();
 
-    const handleUpdateToJupiter = () => { 
-        updatePlanetLocation(50);
+    const handleUpdateToVenus = () => { 
+        updatePlanetLocation(20);
     };
 
-    if (activePlanet?.id !== 50) {
+    if (activePlanet?.id !== 20) {
         return (
             <div className="min-h-screen w-full flex flex-col">
                 <div className="bg-black/90">
-                    <p>Current planet is not Jupiter.</p>
-                    <button onClick={handleUpdateToJupiter}>Switch to Jupiter</button>
+                    <p>Current planet is not Venus.</p>
+                    <button onClick={handleUpdateToVenus}>Switch to Venus</button>
                 </div>
             </div>
         );
@@ -26,10 +26,10 @@ const JupiterView: React.FC = () => {
 
     return (
         <div className="relative min-h-screen">
-            <InitialisePlanet planetId={50} />
+            <InitialisePlanet planetId={20} />
             <PlanetStructures />
         </div>
     );
 };
 
-export default JupiterView;
+export default VenusView;
