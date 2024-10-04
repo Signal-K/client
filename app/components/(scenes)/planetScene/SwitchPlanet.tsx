@@ -5,110 +5,150 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Globe } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { zoodexDataSources, telescopeDataSources, lidarDataSources, roverDataSources } from "@/app/components/(structures)/Data/ZoodexDataSources";
+import MissionList from "./availableMissions";
+import { Button } from "antd";
 
 const planetTypeColors: { [key: string]: string } = {
   Lush: "#4CAF50",    
   Arid: "#FF9800",      
   Hellhole: "#FF5722", 
   Frozen: "#03A9F4",     
-  "Gas Giant": "#9C27B0",
+  "GasGiant": "#9C27B0",
   Rocky: "#795548",     
-  "Ice Giant": "#00BCD4" 
+  "IceGiant": "#00BCD4" 
 }; 
+
+interface Planet {
+  id: number;
+  name: string;
+  color: string;
+  stats: {
+    gravity: string;
+    temp: string;
+  };
+  anomaly: number;
+  initialisationMissionId: number | null;
+  planetType: string; 
+}
 
 const planets = [
   {
+    id: 10,
     name: "Mercury",
     color: "bg-gray-400",
-    stats: { population: "0", gravity: "3.7 m/s²", temp: "430°C" },
+    stats: { gravity: "3.7 m/s²", temp: "430°C" },
     anomaly: 10,
+    planetType: 'Arid',
     initialisationMissionId: 100001,
   },
   {
+    id: 20,
     name: "Venus",
     color: "bg-yellow-200",
-    stats: { population: "0", gravity: "8.87 m/s²", temp: "462°C" },
+    stats: { gravity: "8.87 m/s²", temp: "462°C" },
     anomaly: 20,
+    planetType: 'Arid',
     initialisationMissionId: 200001,
   },
   {
+    id: 69,
     name: "Earth",
     color: "bg-blue-500",
-    stats: { population: "7.8 billion", gravity: "9.8 m/s²", temp: "15°C" },
+    stats: { gravity: "9.8 m/s²", temp: "15°C" },
     anomaly: 69,
+    planetType: 'Lush',
     initialisationMissionId: 300001,
   },
+  // {
+  //   id: 31,
+  //   name: "Moon",
+  //   color: "bg-gray-300",
+  //   stats: { gravity: "1.62 m/s²", temp: "-53°C" },
+  //   anomaly: 31,
+  //   planetType: 'Arid',
+  //   initialisationMissionId: null,
+  // },
   {
-    name: "Moon",
-    color: "bg-gray-300",
-    stats: { population: "0", gravity: "1.62 m/s²", temp: "-53°C" },
-    anomaly: 31,
-    initialisationMissionId: null,
-  },
-  {
+    id: 40,
     name: "Mars",
     color: "bg-red-500",
-    stats: { population: "0", gravity: "3.71 m/s²", temp: "-63°C" },
+    stats: { gravity: "3.71 m/s²", temp: "-63°C" },
     anomaly: 40,
+    planetType: 'Arid',
     initialisationMissionId: 400001,
   },
-  {
-    name: "Jupiter",
-    color: "bg-orange-300",
-    stats: { population: "0", gravity: "24.79 m/s²", temp: "-108°C" },
-    anomaly: 50,
-    initialisationMissionId: null,
-  },
-  {
-    name: "Europa",
-    color: "bg-blue-200",
-    stats: { population: "0", gravity: "1.31 m/s²", temp: "-160°C" },
-    anomaly: 51,
-    initialisationMissionId: null,
-  },
-  {
-    name: "Io",
-    color: "bg-yellow-400",
-    stats: { population: "0", gravity: "1.79 m/s²", temp: "-143°C" },
-    anomaly: 52,
-    initialisationMissionId: null,
-  },
-  {
-    name: "Amalthea",
-    color: "bg-red-400",
-    stats: { population: "0", gravity: "0.026 m/s²", temp: "-113°C" },
-    anomaly: 53,
-    initialisationMissionId: null,
-  },
-  {
-    name: "Saturn",
-    color: "bg-yellow-600",
-    stats: { population: "0", gravity: "10.44 m/s²", temp: "-139°C" },
-    anomaly: 60,
-    initialisationMissionId: 600001,
-  },
-  {
-    name: "Enceladus",
-    color: "bg-white",
-    stats: { population: "0", gravity: "0.113 m/s²", temp: "-201°C" },
-    anomaly: 61,
-    initialisationMissionId: null,
-  },
-  {
-    name: "Uranus",
-    color: "bg-cyan-300",
-    stats: { population: "0", gravity: "8.69 m/s²", temp: "-197°C" },
-    anomaly: 70,
-    initialisationMissionId: 700001,
-  },
-  {
-    name: "Neptune",
-    color: "bg-blue-700",
-    stats: { population: "0", gravity: "11.15 m/s²", temp: "-214°C" },
-    anomaly: 80,
-    initialisationMissionId: 800001,
-  },
+  // {
+  //   id: 50,
+  //   name: "Jupiter",
+  //   color: "bg-orange-300",
+  //   stats: { gravity: "24.79 m/s²", temp: "-108°C" },
+  //   anomaly: 50,
+  //   planetType: 'Arid',
+  //   initialisationMissionId: null,
+  // },
+  // {
+  //   id: 55,
+  //   name: "Europa",
+  //   color: "bg-blue-200",
+  //   stats: { gravity: "1.31 m/s²", temp: "-160°C" },
+  //   anomaly: 51,
+  //   planetType: 'Arid',
+  //   initialisationMissionId: null,
+  // },
+  // {
+  //   id: 52,
+  //   name: "Io",
+  //   color: "bg-yellow-400",
+  //   stats: { gravity: "1.79 m/s²", temp: "-143°C" },
+  //   anomaly: 52,
+  //   planetType: 'Arid',
+  //   initialisationMissionId: null,
+  // },
+  // {
+  //   id: 51,
+  //   name: "Amalthea",
+  //   color: "bg-red-400",
+  //   stats: { gravity: "0.026 m/s²", temp: "-113°C" },
+  //   anomaly: 53,
+  //   planetType: 'Arid',
+  //   initialisationMissionId: null,
+  // },
+  // {
+  //   id: 60,
+  //   name: "Saturn",
+  //   color: "bg-yellow-600",
+  //   stats: { gravity: "10.44 m/s²", temp: "-139°C" },
+  //   anomaly: 60,
+  //   planetType: 'Arid',
+  //   initialisationMissionId: 600001,
+  // },
+  // {
+  //   id: 61,
+  //   name: "Enceladus",
+  //   color: "bg-white",
+  //   stats: { gravity: "0.113 m/s²", temp: "-201°C" },
+  //   anomaly: 61,
+  //   planetType: 'Arid',
+  //   initialisationMissionId: null,
+  // },
+  // {
+  //   id: 70,
+  //   name: "Uranus",
+  //   color: "bg-cyan-300",
+  //   stats: { gravity: "8.69 m/s²", temp: "-197°C" },
+  //   anomaly: 70,
+  //   planetType: 'Arid',
+  //   initialisationMissionId: 700001,
+  // },
+  // {
+  //   id: 80,
+  //   name: "Neptune",
+  //   color: "bg-blue-700",
+  //   stats: { gravity: "11.15 m/s²", temp: "-214°C" },
+  //   anomaly: 80,
+  //   planetType: 'Arid',
+  //   initialisationMissionId: 800001,
+  // },
 ];
 
 const usePlanetSwitcher = (initialIndex = 0) => {
@@ -143,15 +183,15 @@ export function PlanetSwitcher() {
   const [availableMissions, setAvailableMissions] = useState<any[]>([]);
 
   const { currentPlanet, nextPlanet, prevPlanet, currentIndex } = usePlanetSwitcher();
-  
+
   useEffect(() => {
     const fetchVisitedPlanets = async () => {
       if (session?.user?.id) {
         try {
           const { data: missions, error } = await supabase
-            .from("missions")
-            .select("mission")
-            .eq("user", session.user.id);
+            .from('missions')
+            .select('mission')
+            .eq('user', session.user.id);
 
           if (error) throw error;
 
@@ -162,18 +202,18 @@ export function PlanetSwitcher() {
 
           setVisitedPlanets(visited);
         } catch (error: any) {
-          console.error("Error fetching missions:", error.message);
-        };
-      };
+          console.error('Error fetching missions:', error.message);
+        }
+      }
     };
 
     const fetchPlanetStats = async () => {
       try {
-        const response = await fetch("/api/gameplay/missions/planets/solarsystem/stats");
+        const response = await fetch('/api/gameplay/missions/planets/solarsystem/stats');
         const data = await response.json();
         setPlanetStats(data);
       } catch (error) {
-        console.error("Error fetching planet stats:", error);
+        console.error('Error fetching planet stats:', error);
       };
     };
 
@@ -181,9 +221,9 @@ export function PlanetSwitcher() {
       if (session?.user?.id) {
         try {
           const { data: classificationsData, error } = await supabase
-            .from("classifications")
-            .select("classificationtype, classificationConfiguration")
-            .eq("author", session.user.id);
+            .from('classifications')
+            .select('classificationtype, classificationConfiguration')
+            .eq('author', session.user.id);
 
           if (error) throw error;
 
@@ -201,46 +241,26 @@ export function PlanetSwitcher() {
 
           setClassificationsByPlanet(classificationsByPlanetTemp);
         } catch (error: any) {
-          console.error("Error fetching classifications:", error.message);
-        };
-      };
-    };
-
-    const filterMissionsByPlanetType = () => {
-      const planetType = planetDetails.planetType; 
-      const compatibleMissions: SetStateAction<any[]> = [];
-  
-      const allMissions = [
-        ...zoodexDataSources.flatMap((dataSource) => dataSource.items),
-        ...telescopeDataSources.flatMap((dataSource) => dataSource.items),
-        ...lidarDataSources.flatMap((dataSource) => dataSource.items),
-        ...roverDataSources.flatMap((dataSource) => dataSource.items),
-      ];
-  
-      allMissions.forEach((mission) => {
-        if (mission.compatiblePlanetTypes.includes(planetType)) {
-          compatibleMissions.push(mission);
-        };
-      });
-  
-      setAvailableMissions(compatibleMissions);
+          console.error('Error fetching classifications:', error.message);
+        }
+      }
     };
 
     const checkRocketInInventory = async () => {
       if (session?.user?.id) {
         try {
           const { data, error } = await supabase
-            .from("inventory")
-            .select("id")
-            .eq("item", 3108)
-            .eq("anomaly", activePlanet.id)
-            .eq("owner", session.user.id);
+            .from('inventory')
+            .select('id')
+            .eq('item', 3108)
+            .eq('anomaly', activePlanet?.id)
+            .eq('owner', session.user.id);
 
           if (error) throw error;
 
           setHasRocket(data.length > 0);
         } catch (error: any) {
-          console.error("Error checking inventory:", error.message);
+          console.error('Error checking inventory:', error.message);
         }
       }
     };
@@ -248,16 +268,39 @@ export function PlanetSwitcher() {
     fetchVisitedPlanets();
     fetchPlanetStats();
     fetchClassifications();
-    checkRocketInInventory(); 
+    checkRocketInInventory();
   }, [session, supabase, activePlanet]);
-  
-  const handlePlanetClick = (planet: any) => {
-    if (planet.anomaly !== activePlanet.id) {
+
+  const moveItemsToNewPlanet = async (newPlanetId: number) => {
+    if (session?.user?.id) {
+      const itemsToMove = [3108, 3107]; // Rocket and Launchpad item IDs
+
+      try {
+        await Promise.all(
+          itemsToMove.map(async (itemId) => {
+            const { data, error } = await supabase
+              .from('inventory')
+              .update({ anomaly: newPlanetId })
+              .eq('item', itemId)
+              .eq('owner', session.user.id);
+
+            if (error) throw error;
+            return data;
+          })
+        );
+      } catch (error: any) {
+        console.error('Error moving items:', error.message);
+      }
+    }
+  };
+
+  const handlePlanetClick = async (planet: any) => {
+    if (planet.anomaly !== activePlanet?.id) {
+      await moveItemsToNewPlanet(planet.anomaly); // Move items before changing the planet
       updatePlanetLocation(planet.anomaly);
     }
   };
 
-  // const hasVisited = visitedPlanets[currentPlanet.initialisationMissionId || 0];
   const isVisited = classificationsByPlanet[currentPlanet.anomaly]?.length > 0;
   const planetDetails = planetStats?.find((planet) => planet.id === currentPlanet.initialisationMissionId);
 
@@ -271,7 +314,7 @@ export function PlanetSwitcher() {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -50 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               className="bg-[#303F51] rounded-lg p-6 shadow-lg"
             >
               <div className="flex items-center justify-between mb-4">
@@ -294,7 +337,8 @@ export function PlanetSwitcher() {
                   <ChevronRight size={24} />
                 </button>
               </div>
-              <div className="grid grid-cols-3 gap-4 mb-4">
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
                 {Object.entries(currentPlanet.stats).map(([key, value]) => (
                   <div key={key} className="bg-[#2C4F64] p-2 rounded">
                     <p className="text-xs uppercase text-gray-200">{key}</p>
@@ -304,85 +348,57 @@ export function PlanetSwitcher() {
               </div>
 
               <div className="mt-4">
-                <h3 className="text-lg font-semibold">Switch Planets:</h3>
                 <ul>
                   <li>
-                  {currentPlanet.anomaly !== activePlanet.id && (
-          <button onClick={() => handlePlanetClick(currentPlanet)}>
-            Travel to {currentPlanet.name}
-          </button>
-        )}
+                    {currentPlanet.anomaly !== activePlanet?.id && (
+                      <Button className="px-4 py-2 bg-cyan-500 text-white rounded-lg" onClick={() => handlePlanetClick(currentPlanet)}>Travel to {currentPlanet.name}</Button>
+                    )}
                   </li>
                 </ul>
               </div>
 
-              <div className="missions">
-        <h3>Available Missions</h3>
-        <ul>
-          {availableMissions.map((mission) => (
-            <li key={mission.identifier}>
-              <h4>{mission.name}</h4>
-              <p>{mission.description}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-              {isVisited ? (
-                <div>
-                  <h3 className="text-lg font-semibold">Planet Details</h3>
-                  {planetDetails ? (
-  <ul>
-    <li>
-      <strong>Population:</strong> {planetDetails.population}
-    </li>
-    <li>
-      <strong>Resources:</strong> {Array.isArray(planetDetails.resources) ? planetDetails.resources.join(", ") : "No resources available"}
-    </li>
-    <li>
-      <strong>Planet Type:</strong>{" "}
-      <span
-        style={{
-          backgroundColor: planetTypeColors[planetDetails.planetType] || "#607D8B", 
-          padding: "4px 8px",
-          borderRadius: "4px",
-          color: "#fff"
-        }}
-      >
-        {planetDetails.planetType || "Unknown"}
-      </span>
-    </li>
-  </ul>
-) : (
-  <p>Loading planet details...</p>
-)}
-                </div>
-              ) : (
-                <p>You haven't visited this planet yet.</p>
-              )}
-
-              <p className="mt-4">
-                {hasRocket
-                  ? "You have a rocket to travel to this planet!"
-                  : "You need a rocket to travel to this planet."}
-              </p>
-
               <div className="mt-4">
-          <h3>Classifications:</h3>
-          {classificationsByPlanet[currentPlanet.anomaly]?.length > 0 ? (
-            classificationsByPlanet[currentPlanet.anomaly].map((classification, index) => (
-              <div key={index}>
-                {classification.classificationtype}
+                {currentPlanet.anomaly === activePlanet?.id ? null : isVisited ? (
+                  <div>
+                    <h3 className="text-lg font-semibold">Planet Details</h3>
+                    {planetDetails ? (
+                      <ul>
+                        <li>
+                          <strong>Planet Type:</strong>{' '}
+                          <span
+                            style={{
+                              backgroundColor: planetTypeColors[planetDetails.planetType] || '#607D8B',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              color: '#fff',
+                            }}
+                          >
+                            {planetDetails.planetType || 'Unknown'}
+                          </span>
+                        </li>
+                      </ul>
+                    ) : (
+                      <p>Loading planet details...</p>
+                    )}
+                  </div>
+                ) : (
+                  <p>You haven't visited this planet yet.</p>
+                )}
               </div>
-            ))
-          ) : (
-            <p>No classifications for this planet.</p>
-          )}
-              </div>
+              {planetDetails?.planetType ? (
+                <MissionList planetType={planetDetails.planetType} />
+              ) : (
+                <p>Planet type information not available.</p>
+              )}
+                            {planetDetails?.planetType ? (
+  <MissionList planetType={planetDetails.planetType} />
+) : (
+  <p>Planet type information not available.</p>
+)}
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
     </div>
   );
-};
+}
