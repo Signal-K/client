@@ -88,6 +88,25 @@ export const telescopeDataSources = [
         ],
     },
     {
+        category: 'Solar System Objects',
+        items: [
+            {
+                name: "The Daily Minor Planet",
+                description: 'Discover new asteroids every day by searching through your telescope data',
+                identifier: 'telescope-minorPlanet',
+                researchId: 'the-daily-minor-planet',
+                researcher: 'zooniverse/fulsdavid',
+                unlocked: false,
+                compatiblePlanetTypes: ['Arid', 'Hellhole', 'Asteroid', 'Frozen'],
+                bestPlanetType: ['Asteroid'],
+                tutorialMission: 20000004,
+                activeStructure: 3103,
+                researched: 'telescope-minorPlanets',
+                techId: 1,
+            },
+        ],
+    },
+    {
         category: "Solar observations",
         items: [
             {
@@ -145,6 +164,40 @@ export const lidarDataSources = [
                 tutorialMission: 3000010,
                 activeStructure: 3105,
                 techId: 5,
+            },
+        ],
+    },
+];
+
+export const physicsLabDataSources = [
+    {
+        category: 'Particle Accelerator',
+        items: [
+            {
+                name: 'Cosmic Muon Images',
+                description: 'Using Muon Tomography we can probe the internal structure of massive objects, like volcanoes, with particles from stars and galaxies far far away... help us identify these particles inside our detectors',
+                identifier: 'physicslab-cosmicMuons',
+                researchId: 'muon-cosmic-muon-images',
+                researcher: 'zooniverse/reinforce',
+                unlocked: false,
+                compatiblePlanets: ['Frozen', 'Hellhole', "Arid", 'Lush', "Ice Giant", "Gas Giant"],
+                bestPlanetType: ['Hellhole'],
+                tutorialMission: 20000002,
+                activeStructure: 31010,
+                techId: 6,
+            },
+            {
+                name: 'Name that Neutrino',
+                description: 'When a neutrino interacts in ice, a signal or light pattern is produced. Classify the shape of the signals to help us understand the pattern and movement of these particles',
+                identifier: 'physicslab-neutrinoName',
+                researchId: 'name-that-neutrino',
+                researcher: 'zooniverse/icecubeobservatory',
+                unlocked: false,
+                compatiblePlanets: ['Frozen', 'Hellhole', "Arid", 'Lush', "Ice Giant", "Gas Giant"],
+                bestPlanetType: ['Frozen'],
+                tutorialMission: 20000001,
+                activeStructure: 31010,
+                techId: 6,
             },
         ],
     },

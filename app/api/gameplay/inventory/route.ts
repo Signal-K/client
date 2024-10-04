@@ -73,6 +73,17 @@ const inventoryItems: InventoryItem[] = [
     ItemCategory: "Structure",
     locationType: 'Atmosphere',
   },
+
+
+  // Classification structures introduced in C2
+  {
+    id: 31010,
+    name: "Physics Lab",
+    description: "Catalogue results from different particle experiments across the universe",
+    icon_url: "/assets/Items/PhysicsLab.png",
+    ItemCategory: "Structure",
+    locationType: 'Surface',
+  },
   
   // Tests
   {

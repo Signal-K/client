@@ -202,8 +202,8 @@ export function PlanetSwitcher() {
           setClassificationsByPlanet(classificationsByPlanetTemp);
         } catch (error: any) {
           console.error("Error fetching classifications:", error.message);
-        }
-      }
+        };
+      };
     };
 
     const filterMissionsByPlanetType = () => {
@@ -220,7 +220,7 @@ export function PlanetSwitcher() {
       allMissions.forEach((mission) => {
         if (mission.compatiblePlanetTypes.includes(planetType)) {
           compatibleMissions.push(mission);
-        }
+        };
       });
   
       setAvailableMissions(compatibleMissions);
