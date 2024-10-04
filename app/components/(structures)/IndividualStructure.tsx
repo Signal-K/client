@@ -82,7 +82,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               <div className="flex items-center space-x-2">
                 <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />
                 <div>
-                  <h1 className="text-2xl font-bold text-[#eceff4]">{name}, {structureId}</h1>
+                  <h1 className="text-2xl font-bold text-[#eceff4]">{name}</h1> {/* , {structureId} */}
                 </div>
               </div>
               <StarIcon className="w-6 h-6 text-[#ebcb8b]" />

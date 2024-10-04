@@ -12,6 +12,7 @@ import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 import { bgImage, backgroundImages } from "@/constants/backgrounds";
 import { Analytics } from "@vercel/analytics/react"
 import { MissionProvider } from "@/context/MissionContext";
+import TutorialPopup from "./components/(dialogue)/helpButton";
 // import { CreateStructureWithItemRequirementinfo } from "@/components/Gameplay/Inventory/Structures/Structure";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <UserAnomaliesProvider>
                     <InventoryProvider>
                       {children}
+                      <TutorialPopup />
                       <Analytics />
                     </InventoryProvider>
                   </UserAnomaliesProvider>
