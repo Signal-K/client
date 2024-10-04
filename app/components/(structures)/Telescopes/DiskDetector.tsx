@@ -231,13 +231,13 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
 export function TelescopeDiskDetector() {
   const supabase = useSupabaseClient();
   const session = useSession();
-
   const { activePlanet } = useActivePlanet();
 
   const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-
   const [loading, setLoading] = useState<boolean>(true);
+  const [hasMission3000009, setHasMission3000009] = useState<boolean | null>(null);
+  const [missionLoading, setMissionLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function fetchAnomaly() {
@@ -248,31 +248,22 @@ export function TelescopeDiskDetector() {
 
       try {
         const { data: anomalyData, error: anomalyError } = await supabase
-          // .rpc("get_random_anomaly", {
-          //   anomaly_type: "zoodexOthers",
-          //   anomalySet: "diskdetective",
-          // })
           .from("anomalies")
-            .select("*")
-            .eq("anomalySet", "diskdetective")
-            .single();
+          .select("*")
+          .eq("anomalySet", "diskdetective")
+          .single();
 
-        if (anomalyError) {
-          throw anomalyError;
-        }
-
+        if (anomalyError) throw anomalyError;
         if (!anomalyData) {
           setAnomaly(null);
           setLoading(false);
           return;
         }
 
-        const fetchedAnomaly = anomalyData as Anomaly;
-        setAnomaly(fetchedAnomaly);
-
+        setAnomaly(anomalyData as Anomaly);
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
         setImageUrl(
-          `${supabaseUrl}/storage/v1/object/public/telescope/telescope-diskDetective/${fetchedAnomaly.id}/1.png`
+          `${supabaseUrl}/storage/v1/object/public/telescope/telescope-diskDetective/${anomalyData.id}/1.png`
         );
       } catch (error: any) {
         console.error("Error fetching disk cloud: ", error.message);
@@ -283,30 +274,8 @@ export function TelescopeDiskDetector() {
     }
 
     fetchAnomaly();
-  }, [session, supabase, activePlanet]);
+  }, [session, supabase]);
 
-  if (loading) {
-    return (
-      <div>
-        <p>Loading...</p>
-      </div>
-    );
-  };
-
-  if (!anomaly) {
-    return (
-      <div>
-        <p>No disk clouds available</p>
-      </div>
-    );
-  };
-
-  const [hasMission3000009, setHasMission3000009] = useState<boolean | null>(
-    null
-  );
-  const [missionLoading, setMissionLoading] = useState<boolean>(true);
-
-  // Check tutorial mission
   useEffect(() => {
     const checkTutorialMission = async () => {
       if (!session) return;
@@ -320,7 +289,6 @@ export function TelescopeDiskDetector() {
           .single();
 
         if (missionError) throw missionError;
-
         setHasMission3000009(!!missionData);
       } catch (error: any) {
         console.error("Error checking user mission:", error.message || error);
@@ -333,29 +301,46 @@ export function TelescopeDiskDetector() {
     checkTutorialMission();
   }, [session, supabase]);
 
-  if (!hasMission3000009) {
-    return <DiskDetectorTutorial anomalyId={anomaly.id.toString()} />;
-  };
+  // Loading state
+  if (loading || missionLoading) {
+    return <div><p>Loading...</p></div>;
+  }
 
+  // No anomaly case
+  if (!anomaly) {
+    return <div><p>No disk clouds available</p></div>;
+  }
+
+  // Check if the user has the mission
+  if (hasMission3000009 === null) {
+    // If the mission check is still loading, you can add a loading state here if necessary.
+    return null; // Optionally return a loading state
+  }
+
+  // Render the tutorial or the main content based on the mission status
   return (
     <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
-      <div className="p-4 rounded-md relative w-full">
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            alt={anomaly.content}
-            className="w-full h-64 object-cover"
+      {hasMission3000009 ? (
+        <div className="p-4 rounded-md relative w-full">
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt={anomaly.content}
+              className="w-full h-64 object-cover"
+            />
+          )}
+          <p>{anomaly.id}</p>
+          <ClassificationForm
+            anomalyId={anomaly.id.toString()}
+            anomalyType="DiskDetective"
+            missionNumber={100000033}
+            assetMentioned={imageUrl || ""}
+            originatingStructure={3103}
           />
-        )}
-        <p>{anomaly.id}</p>
-        <ClassificationForm
-          anomalyId={anomaly.id.toString()}
-          anomalyType="DiskDetective"
-          missionNumber={100000033}
-          assetMentioned={imageUrl || ""}
-          originatingStructure={3103}
-        />
-      </div>
+        </div>
+      ) : (
+        <DiskDetectorTutorial anomalyId={anomaly.id.toString()} />
+      )}
     </div>
   );
 };

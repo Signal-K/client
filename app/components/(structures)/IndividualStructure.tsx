@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -82,7 +82,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               <div className="flex items-center space-x-2">
                 <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />
                 <div>
-                  <h1 className="text-2xl font-bold text-[#eceff4]">{name}, {structureId}</h1>
+                  <h1 className="text-2xl font-bold text-[#eceff4]">{name}</h1> {/* , {structureId} */}
                 </div>
               </div>
               <StarIcon className="w-6 h-6 text-[#ebcb8b]" />
@@ -182,6 +182,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               height: `${modalSizePercentage}%`,
             }}
           >
+            <DialogTitle></DialogTitle>
             <div className="relative flex flex-col items-center justify-center h-full">
               <button
                 className="absolute top-4 right-4 text-white hover:text-red-500"

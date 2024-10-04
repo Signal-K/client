@@ -32,7 +32,6 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
   const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
   const [loading, setLoading] = useState(true);
   const [selectedStructure, setSelectedStructure] = useState<IndividualStructureProps | null>(null);
-  const [activemission, setactivemission] = useState<number | null>(null);
   const [missionStructureId, setMissionStructureId] = useState<number | null>(null);
 
   const fetchStructures = useCallback(async () => {
@@ -42,23 +41,8 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
     }
 
     try {
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('activemission')
-        .eq('id', session.user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      setactivemission(profileData.activemission);
-
       const modulesResponse = await fetch('/api/citizen/modules');
       const modulesData: CitizenScienceModule[] = await modulesResponse.json();
-
-      const activeModule = modulesData.find(module => module.starterMission === profileData.activemission);
-      if (activeModule) {
-        setMissionStructureId(activeModule.structure);
-      }
 
       const response = await fetch('/api/gameplay/inventory');
       const itemsData: StructureItemDetail[] = await response.json();
@@ -67,7 +51,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
       itemsData.forEach(item => {
         if (item.ItemCategory === 'Structure') {
           itemMap.set(item.id, item);
-        }
+        };
       });
 
       setItemDetails(itemMap);
@@ -94,7 +78,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
-    }
+    };
   }, [session?.user?.id, activePlanet?.id, supabase]);
 
   useEffect(() => {
@@ -175,7 +159,6 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
   const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
   const [loading, setLoading] = useState(true);
   const [selectedStructure, setSelectedStructure] = useState<IndividualStructureProps | null>(null);
-  const [activemission, setactivemission] = useState<number | null>(null);
   const [missionStructureId, setMissionStructureId] = useState<number | null>(null);
 
   const fetchStructures = useCallback(async () => {
@@ -185,26 +168,9 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
     }
 
     try {
-      // Fetch active mission from profiles table
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('activemission')
-        .eq('id', session.user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      setactivemission(profileData.activemission);
-
       // Fetch Citizen Science Module data
       const modulesResponse = await fetch('/api/citizen/modules');
       const modulesData: CitizenScienceModule[] = await modulesResponse.json();
-
-      // Find the module associated with the active mission
-      const activeModule = modulesData.find(module => module.starterMission === profileData.activemission);
-      if (activeModule) {
-        setMissionStructureId(activeModule.structure);  // Set the structure ID associated with the active mission
-      }
 
       // Fetch item details from the gameplay API
       const response = await fetch('/api/gameplay/inventory');
@@ -336,7 +302,6 @@ export function AtmosphereStructuresOnPlanet({ onStructuresFetch }: StructuresOn
   const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
   const [loading, setLoading] = useState(true);
   const [selectedStructure, setSelectedStructure] = useState<IndividualStructureProps | null>(null);
-  const [activemission, setactivemission] = useState<number | null>(null);
   const [missionStructureId, setMissionStructureId] = useState<number | null>(null);
 
   const fetchStructures = useCallback(async () => {
@@ -346,26 +311,9 @@ export function AtmosphereStructuresOnPlanet({ onStructuresFetch }: StructuresOn
     }
 
     try {
-      // Fetch active mission from profiles table
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('activemission')
-        .eq('id', session.user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      setactivemission(profileData.activemission);
-
       // Fetch Citizen Science Module data
       const modulesResponse = await fetch('/api/citizen/modules');
       const modulesData: CitizenScienceModule[] = await modulesResponse.json();
-
-      // Find the module associated with the active mission
-      const activeModule = modulesData.find(module => module.starterMission === profileData.activemission);
-      if (activeModule) {
-        setMissionStructureId(activeModule.structure);  // Set the structure ID associated with the active mission
-      }
 
       // Fetch item details from the gameplay API
       const response = await fetch('/api/gameplay/inventory');

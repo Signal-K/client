@@ -219,7 +219,7 @@ export function BurrowingOwl() {
     const [loading, setLoading] = useState(true);
 
     // Check tutorial mission
-    const [hasMission3000010, setHasMission3000010] = useState<boolean | null>(null);
+    const [hasMission3000002, setHasMission3000002] = useState<boolean | null>(null);
     const [missionLoading, setMissionLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -227,41 +227,36 @@ export function BurrowingOwl() {
             if (!session) {
                 setLoading(false);
                 return;
-            }
+            };
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
-                    // .rpc("get_random_anomaly", {
-                    //     anomaly_type: "zoodexOthers",
-                    //     anomalySet: "zoodex-burrowingOwl",
-                    // })
                     .from("anomalies")
                     .select("*")
                     .eq("anomalySet", "zoodex-burrowingOwl")
-                    .single();
 
                 if (anomalyError) {
                     throw anomalyError;
-                }
+                };
 
                 if (!anomalyData) {
                     setAnomaly(null);
                     setLoading(false);
                     return;
-                }
+                };
 
-                const fetchedAnomaly = anomalyData as Anomaly;
+                const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
+                setAnomaly(randomAnomaly);
 
-                setAnomaly(fetchedAnomaly);
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                setImageUrl(`${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-burrowingOwl/${fetchedAnomaly.id}.jpeg`);
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-burrowingOwl/${randomAnomaly.id}.jpeg`);
             } catch (error: any) {
                 console.error("Error fetching burrowing owl: ", error.message);
                 setAnomaly(null);
             } finally {
                 setLoading(false);
-            }
-        }
+            };
+        };
 
         fetchAnomaly();
     }, [session, supabase, activePlanet]);
@@ -276,15 +271,14 @@ export function BurrowingOwl() {
                     .from("missions")
                     .select("id")
                     .eq("user", session.user.id)
-                    .eq("mission", "3000010")
-                    .single();
+                    .eq("mission", "3000002");
 
                 if (missionError) throw missionError;
 
-                setHasMission3000010(!!missionData);
+                setHasMission3000002(missionData.length > 0);
             } catch (error: any) {
-                console.error("Error checking user mission:", error.message || error);
-                setHasMission3000010(false);
+                console.error("Error checking user mission: ", error.message || error);
+                setHasMission3000002(false);
             } finally {
                 setMissionLoading(false);
             }
@@ -297,11 +291,11 @@ export function BurrowingOwl() {
         return <div>Loading mission status...</div>;
     }
 
-    if (!hasMission3000010) {
+    if (!hasMission3000002) {
         return (
             <BurrowingOwlTutorial anomalyId={anomaly?.id.toString() || "4567867"} />
         );
-    };
+    }
 
     if (loading) {
         return (
@@ -309,7 +303,7 @@ export function BurrowingOwl() {
                 <p>Loading...</p>
             </div>
         );
-    };
+    }
 
     if (!anomaly) {
         return (
@@ -317,7 +311,7 @@ export function BurrowingOwl() {
                 <p>The owls are sleeping, try again later</p>
             </div>
         );
-    };
+    }
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">

@@ -125,7 +125,6 @@ export function MissionStructureDisplay({ activemission }: MissionStructureDispl
                     return;
                 }
 
-                // If the structure is not already present, insert it
                 if (existingInventory.length === 0) {
                     const { error: insertError } = await supabase
                         .from('inventory')
@@ -134,7 +133,7 @@ export function MissionStructureDisplay({ activemission }: MissionStructureDispl
                               anomaly: activePlanet.id, 
                               item: structureId,
                               time_of_deploy: new Date().toISOString(),
-                              configuration: { "Uses": 1, "Created for": "Starter mission", "Mission ID": activemission },
+                              configuration: { "Uses": 10, "Created for": "Starter mission", "Mission ID": activemission },
                             },
                         ]);
 

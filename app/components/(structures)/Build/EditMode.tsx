@@ -5,7 +5,7 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet';
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button"; 
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface InventoryItem {
@@ -33,7 +33,7 @@ export function UnownedSurfaceStructures() {
             if (!session || !activePlanet) {
                 setLoading(false);
                 return;
-            }
+            };
     
             try {
                 const { data: researchedStructures, error: researchError } = await supabase
@@ -43,7 +43,7 @@ export function UnownedSurfaceStructures() {
                 
                 if (researchError) {
                     throw researchError;
-                }
+                };
     
                 const researchedIds = researchedStructures.map((item: { tech_type: string }) => Number(item.tech_type));
     
@@ -55,7 +55,7 @@ export function UnownedSurfaceStructures() {
     
                 if (inventoryError) {
                     throw inventoryError;
-                }
+                };
     
                 const ownedItems = userInventory.map((item: { item: number }) => item.item);
     
@@ -74,11 +74,42 @@ export function UnownedSurfaceStructures() {
                 setError('Failed to load structures.');
             } finally {
                 setLoading(false);
-            }
-        }
+            };
+        };
     
         fetchStructures();
     }, [session, activePlanet, supabase]);
+
+    const [hasResearchStation, setHasResearchStation] = useState(false);
+
+    async function addResearchStation() {
+        if (!session || !activePlanet || hasResearchStation) return;
+
+        try {
+            const { error: researchError } = await supabase
+                .from('inventory')
+                .insert([
+                    {
+                        owner: session.user.id,
+                        anomaly: activePlanet.id,
+                        item: 3106,
+                        quantity: 1,
+                        configuration: { Uses: 1 },
+                    },
+                ]);
+
+            if (researchError) {
+                throw researchError;
+            }
+
+            console.log("Research Station has been added to the inventory.");
+            alert("You now have a Research Station in your inventory!");
+            setHasResearchStation(true);
+        } catch (error) {
+            console.error('Error adding research station:', error);
+            setError('Failed to add the Research Station.');
+        }
+    };
 
     async function addToInventory(structure: InventoryItem) {
         if (!session || !activePlanet) return;
@@ -105,12 +136,12 @@ export function UnownedSurfaceStructures() {
         } catch (error) {
             console.error('Error adding to inventory:', error);
             setError('Failed to add the structure to your inventory.');
-        }
-    }
+        };
+    };
 
     if (loading) {
         return <p>Loading...</p>;
-    }
+    };
 
     if (unownedStructures.length === 0) {
         return (
@@ -122,7 +153,9 @@ export function UnownedSurfaceStructures() {
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-full w-[18%] h-[18%] p-4 bg-[#1a1b26] text-[#a9b1d6] rounded-3xl shadow-lg">
+                        <DialogTitle></DialogTitle>
                         <p className="text-center">Use the Research Station to research more structures.</p>
+                        <Button onClick={addResearchStation}>Add Research Station</Button>
                     </DialogContent>
                 </Dialog>
             </div>

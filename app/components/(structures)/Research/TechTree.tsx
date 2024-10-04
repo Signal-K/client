@@ -125,19 +125,21 @@ export function AdvancedTechTreeComponent() {
   const fetchClassificationPoints = async () => {
     if (!userId) return;
 
+    console.log('test session', session.user.id);
+
     const { data, error } = await supabase
       .from('profiles')
       .select('classificationPoints')
-      .eq('id', userId)
+      .eq('id', session.user.id)
       .single();
 
     if (error) {
       console.error('Error fetching classification points:', error);
       return;
-    }
+    };
 
     setClassificationPoints(data?.classificationPoints || 0);
-  }
+  };
   
   useEffect(() => {
     fetchTechnologies()
@@ -171,7 +173,7 @@ export function AdvancedTechTreeComponent() {
       //       owner: userId, 
       //       anomaly: activePlanet?.id, 
       //       item: techItem,  // Use the `item` value instead of `techId`
-      //       configuration: { "Uses": 1 },  // Pass as an object
+      //       configuration: { "Uses": 1 },  // Pass as an object 
       //       quantity: 1 
       //     }]);
   
@@ -211,7 +213,6 @@ export function AdvancedTechTreeComponent() {
       setUnlockedTechs(prevUnlockedTechs => [...prevUnlockedTechs, techId]);
     }
   };
-  
 
   const canUnlock = (techId: number) => {
     const tech = technologies.find((t) => t.id === techId)

@@ -164,9 +164,84 @@ const missions: Mission[] = [
     {
         id: 100000005,
         name: "Pick new planet and travel",
-    },
+    }, // Plus planet initialisation missions
 
     // Any resource collection missions...
+
+
+    // Citizen science missions introduced in #Chapter-2
+    {
+        id: 20000001,
+        name: "Complete Count That Neutrino tutorial",
+    },
+    {
+        id: 200000012,
+        name: "Make your first CTN classification",
+    },
+    {
+        id: 20000002,
+        name: 'Complete Cosmic Muon tutorial',
+    },
+    {
+        id: 200000022,
+        name: 'Make your first CM classification',
+    },
+    {
+        id: 20000003,
+        name: 'Complete Minor Planet tutorial'
+    },
+    {
+        id: 200000032,
+        name: 'Make your first MP classification',
+    },
+    {
+        id: 20000004,
+        name: 'Complete the DMP tutorial',
+    },
+    {
+        id: 200000042,
+        name: 'Make your first DMP classification',
+    },
+    {
+        id: 20000005,
+        name: 'Complete the Planet Four tutorial',
+    },
+    {
+        id: 200000052,
+        name: 'Make your first P4 classification',
+    },
+    {
+        id: 20000006,
+        name: 'Complete the AI for Mars tutorial',
+    },
+    {
+        id: 200000062,
+        name: 'Make your first AI4M classification',
+    },
+    {
+        id: 20000007,
+        name: 'Complete the JVH tutorial',
+    },
+    {
+        id: 200000072,
+        name: 'Make your first JVH classification',
+    },
+    {
+        id: 20000008,
+        name: 'Complete the SFNZ tutorial',
+    },
+    {
+        id: 200000082,
+        name: 'Make your first SFNZ classification',
+    },
+    {
+        id: 20000009,
+        name: 'Complete Solar Storm Watch tutorial',
+    },
+    {
+        id: 200000092,
+        name: 'Make your first SSW classification',
+    },
 ];
 
 export async function GET(req: NextRequest) {
