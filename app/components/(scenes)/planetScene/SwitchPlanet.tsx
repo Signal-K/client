@@ -77,78 +77,78 @@ const planets = [
     planetType: 'Arid',
     initialisationMissionId: 400001,
   },
-  // {
-  //   id: 50,
-  //   name: "Jupiter",
-  //   color: "bg-orange-300",
-  //   stats: { gravity: "24.79 m/s²", temp: "-108°C" },
-  //   anomaly: 50,
-  //   planetType: 'Arid',
-  //   initialisationMissionId: null,
-  // },
-  // {
-  //   id: 55,
-  //   name: "Europa",
-  //   color: "bg-blue-200",
-  //   stats: { gravity: "1.31 m/s²", temp: "-160°C" },
-  //   anomaly: 51,
-  //   planetType: 'Arid',
-  //   initialisationMissionId: null,
-  // },
-  // {
-  //   id: 52,
-  //   name: "Io",
-  //   color: "bg-yellow-400",
-  //   stats: { gravity: "1.79 m/s²", temp: "-143°C" },
-  //   anomaly: 52,
-  //   planetType: 'Arid',
-  //   initialisationMissionId: null,
-  // },
-  // {
-  //   id: 51,
-  //   name: "Amalthea",
-  //   color: "bg-red-400",
-  //   stats: { gravity: "0.026 m/s²", temp: "-113°C" },
-  //   anomaly: 53,
-  //   planetType: 'Arid',
-  //   initialisationMissionId: null,
-  // },
-  // {
-  //   id: 60,
-  //   name: "Saturn",
-  //   color: "bg-yellow-600",
-  //   stats: { gravity: "10.44 m/s²", temp: "-139°C" },
-  //   anomaly: 60,
-  //   planetType: 'Arid',
-  //   initialisationMissionId: 600001,
-  // },
-  // {
-  //   id: 61,
-  //   name: "Enceladus",
-  //   color: "bg-white",
-  //   stats: { gravity: "0.113 m/s²", temp: "-201°C" },
-  //   anomaly: 61,
-  //   planetType: 'Arid',
-  //   initialisationMissionId: null,
-  // },
-  // {
-  //   id: 70,
-  //   name: "Uranus",
-  //   color: "bg-cyan-300",
-  //   stats: { gravity: "8.69 m/s²", temp: "-197°C" },
-  //   anomaly: 70,
-  //   planetType: 'Arid',
-  //   initialisationMissionId: 700001,
-  // },
-  // {
-  //   id: 80,
-  //   name: "Neptune",
-  //   color: "bg-blue-700",
-  //   stats: { gravity: "11.15 m/s²", temp: "-214°C" },
-  //   anomaly: 80,
-  //   planetType: 'Arid',
-  //   initialisationMissionId: 800001,
-  // },
+  {
+    id: 50,
+    name: "Jupiter",
+    color: "bg-orange-300",
+    stats: { gravity: "24.79 m/s²", temp: "-108°C" },
+    anomaly: 50,
+    planetType: 'Arid',
+    initialisationMissionId: null,
+  },
+  {
+    id: 55,
+    name: "Europa",
+    color: "bg-blue-200",
+    stats: { gravity: "1.31 m/s²", temp: "-160°C" },
+    anomaly: 51,
+    planetType: 'Arid',
+    initialisationMissionId: null,
+  },
+  {
+    id: 52,
+    name: "Io",
+    color: "bg-yellow-400",
+    stats: { gravity: "1.79 m/s²", temp: "-143°C" },
+    anomaly: 52,
+    planetType: 'Arid',
+    initialisationMissionId: null,
+  },
+  {
+    id: 51,
+    name: "Amalthea",
+    color: "bg-red-400",
+    stats: { gravity: "0.026 m/s²", temp: "-113°C" },
+    anomaly: 53,
+    planetType: 'Arid',
+    initialisationMissionId: null,
+  },
+  {
+    id: 60,
+    name: "Saturn",
+    color: "bg-yellow-600",
+    stats: { gravity: "10.44 m/s²", temp: "-139°C" },
+    anomaly: 60,
+    planetType: 'Arid',
+    initialisationMissionId: 600001,
+  },
+  {
+    id: 61,
+    name: "Enceladus",
+    color: "bg-white",
+    stats: { gravity: "0.113 m/s²", temp: "-201°C" },
+    anomaly: 61,
+    planetType: 'Arid',
+    initialisationMissionId: null,
+  },
+  {
+    id: 70,
+    name: "Uranus",
+    color: "bg-cyan-300",
+    stats: { gravity: "8.69 m/s²", temp: "-197°C" },
+    anomaly: 70,
+    planetType: 'Arid',
+    initialisationMissionId: 700001,
+  },
+  {
+    id: 80,
+    name: "Neptune",
+    color: "bg-blue-700",
+    stats: { gravity: "11.15 m/s²", temp: "-214°C" },
+    anomaly: 80,
+    planetType: 'Arid',
+    initialisationMissionId: 800001,
+  },
 ];
 
 const usePlanetSwitcher = (initialIndex = 0) => {
@@ -273,7 +273,7 @@ export function PlanetSwitcher() {
 
   const moveItemsToNewPlanet = async (newPlanetId: number) => {
     if (session?.user?.id) {
-      const itemsToMove = [3108, 3107]; // Rocket and Launchpad item IDs
+      const itemsToMove = [3108, 3107];
 
       try {
         await Promise.all(
@@ -296,18 +296,29 @@ export function PlanetSwitcher() {
 
   const handlePlanetClick = async (planet: any) => {
     if (planet.anomaly !== activePlanet?.id) {
-      await moveItemsToNewPlanet(planet.anomaly); // Move items before changing the planet
+      const { error: missonsError } = await supabase
+        .from('missions')
+        .insert([initialisePlanetMissionData]);
+
+      await moveItemsToNewPlanet(planet.anomaly);
       updatePlanetLocation(planet.anomaly);
-    }
+    };
   };
 
   const isVisited = classificationsByPlanet[currentPlanet.anomaly]?.length > 0;
   const planetDetails = planetStats?.find((planet) => planet.id === currentPlanet.initialisationMissionId);
+  const initialisationMission = currentPlanet.initialisationMissionId;
+
+  const initialisePlanetMissionData = {
+    user: session?.user.id,
+    time_of_completion: new Date().toISOString(),
+    mission: initialisationMission,
+};
 
   return (
     <div className="flex items-center justify-center text-white p-4">
       <div className="w-full max-w-md">
-        <div className="relative overflow-hidden">
+        <div className="">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPlanet.name}
@@ -385,11 +396,6 @@ export function PlanetSwitcher() {
                   <p>You haven't visited this planet yet.</p>
                 )}
               </div>
-              {planetDetails?.planetType ? (
-                <MissionList planetType={planetDetails.planetType} />
-              ) : (
-                <p>Planet type information not available.</p>
-              )}
                             {planetDetails?.planetType ? (
   <MissionList planetType={planetDetails.planetType} />
 ) : (

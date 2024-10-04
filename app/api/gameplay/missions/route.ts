@@ -164,7 +164,7 @@ const missions: Mission[] = [
     {
         id: 100000005,
         name: "Pick new planet and travel",
-    },
+    }, // Plus planet initialisation missions
 
     // Any resource collection missions...
 

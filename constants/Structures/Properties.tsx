@@ -316,7 +316,7 @@ export const StructuresConfig: StructureConfig = {
           text: "Launch a rocket (travel)",
           // dynamicComponent: <LaunchpadStructure />,
           dynamicComponent: <PlanetSwitcher />,
-          sizePercentage: 40,
+          sizePercentage: 100,
 
         },
       ]

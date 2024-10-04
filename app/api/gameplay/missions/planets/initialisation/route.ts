@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-// import { Mission } from "@/types/Missions";
 
 export interface Mission {
     id: number;
@@ -79,6 +78,16 @@ const planetInitialisationMissions: Mission[] = [
         id: 600001,
         name: "Initialise Saturn",
         anomaly: 60,
+    },
+    {
+        id: 600011,
+        name: "Initialise Enceladus",
+        anomaly: 61,
+    },
+    {
+        id: 600021,
+        name: "Initialise Titan",
+        anomaly: 62,
     },
     {
         id: 700001,

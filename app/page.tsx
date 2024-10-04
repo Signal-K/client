@@ -40,28 +40,27 @@ export default function Home() {
     console.log(session?.user.id);
   })
 
-  // Mapping planet IDs to corresponding views
   const planetViews: Record<number, JSX.Element> = {
     10: <MercuryView />,
     20: <VenusView />,
     69: <EarthView />,
-    70: <MoonView />,
-    30: <MarsView />,
-    31: <PhobosView />,
-    32: <DeimosView />,
-    40: <JupiterView />,
-    41: <IoView />,
-    42: <EuropaView />,
-    43: <AmaltheaView />,
-    50: <SaturnView />,
-    51: <TitanView />,
-    52: <EnceladusView />,
-    60: <UranusView />,
-    61: <MirandaView />,
-    // 70: <NeptuneView />,
-    71: <TritonView />,
-    80: <PlutoView />,
-    90: <MiningView />,
+    31: <MoonView />,
+    40: <MarsView />,
+    41: <PhobosView />,
+    42: <DeimosView />,
+    50: <JupiterView />,
+    52: <IoView />,
+    55: <EuropaView />,
+    51: <AmaltheaView />,
+    60: <SaturnView />,
+    62: <TitanView />,
+    61: <EnceladusView />,
+    70: <UranusView />,
+    71: <MirandaView />,
+    80: <NeptuneView />,
+    81: <TritonView />,
+    90: <PlutoView />,
+    // <MiningView />,
   };
 
   if (!session) {
