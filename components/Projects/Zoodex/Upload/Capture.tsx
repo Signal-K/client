@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image"; // Note: This import is currently unused
+import Image from "next/image";
 import { StoreContext, useReactContext, observer } from '@/app/store/mobx';
 import React from 'react';
 

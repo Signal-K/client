@@ -7,7 +7,6 @@ import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import { InventoryStructureItem } from "@/types/Items";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/(structures)/Structures";
-import { SciFiPopupMenu } from "@/components/ui/popupMenu";
 import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
 import InitialiseChapterOneUser from "@/components/(scenes)/chapters/one/InitialiseUser";
 
@@ -26,7 +25,6 @@ const EarthView: React.FC = () => {
   return (
     <div className="relative min-h-screen">
         <EarthStructures />
-        <SciFiPopupMenu />
     </div>
   );
 };

@@ -10,7 +10,6 @@ import ChapterOneIntroduction from "@/components/(scenes)/chapters/one/ChapterOn
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
 // import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
 import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
-import { SciFiPopupMenu } from "@/components/ui/popupMenu";
 
 export default function PlanetViewPage() {
     const session = useSession();

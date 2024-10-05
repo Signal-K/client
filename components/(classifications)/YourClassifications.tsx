@@ -84,7 +84,7 @@ const ClassificationViewer: React.FC<ClassificationViewerProps> = ({ classificat
     const handleClose = () => {
         setSelectedClassification(null);
     };
-
+ 
     const loadMore = () => {
         setOffset(prevOffset => prevOffset + 5);
     };
