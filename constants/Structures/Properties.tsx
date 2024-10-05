@@ -1,23 +1,23 @@
 import React from "react";
-import { AutomatonUpgrader } from "@/app/components/(vehicles)/(automatons)/ActiveAutomaton";
-import { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
-import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
-import { StarterTelescope } from "@/app/components/(structures)/Telescopes/Transiting";
-import { StarterLidar } from "@/app/components/(structures)/Lidar/Clouds";
-import ClassificationViewer from "@/app/components/(create)/(classifications)/YourClassifications";
-import { StarterZoodex, StarterZoodexGallery } from "@/app/components/(structures)/Zoodex/ClassifyOthersAnimals";
+import AutomatonUpgrade from "@/components/(structures)/Config/AutomatonUpgradeBox";
+import { MineralDepositsNoAction } from "@/components/(structures)/Mining/AvailableDeposits";
+import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
+import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
+import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
+import ClassificationViewer from "@/components/(classifications)/YourClassifications";
+import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
 import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
-import StructureRepair from "@/app/components/(structures)/Config/RepairStructure";
-import { RoverPhoto } from "@/app/components/(anomalies)/(data)/Mars-Photos";
-import { AnomalyRoverPhoto } from "@/app/components/(structures)/Auto/AutomatonClassificationShell";
-import { AdvancedTechTreeComponent } from "@/app/components/(structures)/Research/TechTree";
+import StructureRepair from "@/components/(structures)/Config/RepairStructure";
+import { RoverPhoto } from "@/components/(anomalies)/(data)/Mars-Photos";
+import { AnomalyRoverPhoto } from "@/components/(structures)/Auto/AutomatonClassificationShell";
+import { AdvancedTechTreeComponent } from "@/components/(structures)/Research/TechTree";
 import MiningScene from "@/app/scenes/mining/page";
-import { DataSourcesModal } from "@/app/components/(structures)/Data/unlockNewDataSources";
-import MissionsForStructure from "@/app/components/(structures)/Missions/AvailableMissions";
-import { TelescopeSunspotDetector } from "@/app/components/(structures)/Telescopes/Sunspots";
-import { TelescopeDiskDetector } from "@/app/components/(structures)/Telescopes/DiskDetector";
-import LaunchpadStructure from "@/app/components/(structures)/Launchpad/Dashboard";
-import { PlanetSwitcher } from "@/app/components/(scenes)/planetScene/SwitchPlanet";
+import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
+import MissionsForStructure from "@/components/(structures)/Missions/AvailableMissions";
+import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
+import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
+import LaunchpadStructure from "@/components/(structures)/Launchpad/Dashboard";
+import { PlanetSwitcher } from "@/components/(scenes)/planetScene/SwitchPlanet";
 
 interface IndividualStructureProps {
     name?: string;
@@ -82,12 +82,12 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <AllAutomatonsOnActivePlanet />,
           sizePercentage: 30,
         },
-        { 
-          icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />, 
-          text: "Upgrade your (base) automaton",
-          dynamicComponent: <AutomatonUpgrader />,
-          sizePercentage: 55,
-        },
+        // { 
+        //   icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />, 
+        //   text: "Upgrade your (base) automaton",
+        //   dynamicComponent: <AutomatonUpgrade />,
+        //   sizePercentage: 55,
+        // },
         {
           icon: <PickaxeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: `Go mining`,

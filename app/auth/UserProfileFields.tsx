@@ -3,15 +3,17 @@ import { useProfileContext } from "@/context/UserProfile";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Mission } from "../components/(structures)/StructuresForMission";
 
-interface UserProfile {
-  username: string;
-  full_name: string;
-  location: number;
-  id: string;
-  avatar_url: string;
-  faction: string;
+export interface Mission {
+  id: number;
+  name: string;
+  sequence?: number;
+  description?: string;
+  rewards?: number[];
+  classificationModule?: string;
+  structure?: number;
+  chapter?: number;
+  component?: React.ComponentType<any>;
 };
 
 interface User {

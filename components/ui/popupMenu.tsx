@@ -3,9 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Globe, Rocket, Star, Zap } from 'lucide-react';
-import { ClassificationViewerAll } from '@/app/components/(create)/(classifications)/YourClassifications';
-import MineralsInventoryGrid from '@/app/components/(inventory)/mineralsPanel';
-import StarterMissionsStats from '@/app/components/(scenes)/(missions)/CompletedMissions';
+import { ClassificationViewerAll } from '@/components/(classifications)/YourClassifications';
 
 interface TutorialMessageProps {
   isExpanded: boolean;
@@ -98,24 +96,9 @@ export function SciFiPopupMenu() {
         </div>
       )}
 
-      {showMiningInventory && (
-        <div className="fixed inset-0 bg-opacity-30 flex items-center justify-center">
-          <div className="bg-gray-50 p-6 rounded-lg max-w-lg w-full">
-            <MineralsInventoryGrid />
-            <button
-              className="mt-4 px-4 py-2 bg-[#5FCBC3] text-white rounded-md"
-              onClick={() => setShowMiningInventory(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-
       {showMissionList && (
         <div className="fixed inset-0 bg-red-700 bg-opacity-50 flex items-center justify-center">
           <div className="p-6 rounded-lg max-w-lg w-full">
-            <StarterMissionsStats />
             <button
               className="mt-4 px-4 py-2 bg-[#5FCBC3] text-white rounded-md"
               onClick={() => setShowMissionList(false)}

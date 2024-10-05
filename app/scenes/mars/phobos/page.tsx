@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import InitialisePlanet from "@/app/components/(scenes)/planetScene/initialisePlanet";
-import PlanetStructures from "@/app/components/(structures)/PlanetStructures";
+import InitialisePlanet from "@/components/(scenes)/planetScene/initialisePlanet";
+import PlanetStructures from "@/components/(anomalies)/(planets)/PlanetStructures";
 
 const PhobosView: React.FC = () => {
     const { activePlanet, updatePlanetLocation } = useActivePlanet();

@@ -3,13 +3,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { EarthViewLayout } from "@/app/components/(scenes)/planetScene/layout";
+import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import { InventoryStructureItem } from "@/types/Items";
-import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
-import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/app/components/(structures)/Structures";
+import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
+import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/(structures)/Structures";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
-import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
-import InitialiseChapterOneUser from "@/app/components/(scenes)/chapters/one/InitialiseUser";
+import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
+import InitialiseChapterOneUser from "@/components/(scenes)/chapters/one/InitialiseUser";
 
 const EarthView: React.FC = () => {
   const supabase = useSupabaseClient();

@@ -3,15 +3,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import PlanetViewLayout from "@/app/components/(scenes)/planetScene/layout";
-import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/app/components/(structures)/Structures";
+import PlanetViewLayout from "@/components/(scenes)/planetScene/layout";
+import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/(structures)/Structures";
 import { InventoryStructureItem } from "@/types/Items";
-import ChapterOneIntroduction from "@/app/components/(scenes)/chapters/one/ChapterOneIntro";
-import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
+import ChapterOneIntroduction from "@/components/(scenes)/chapters/one/ChapterOneIntro";
+import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
 // import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
-import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
+import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
 import { SciFiPopupMenu } from "@/components/ui/popupMenu";
-import GuideButton from "@/app/components/(scenes)/chapters/one/HelpPickup";
 
 export default function PlanetViewPage() {
     const session = useSession();
@@ -102,9 +101,6 @@ export default function PlanetViewPage() {
     return (
         <div className="relative min-h-screen">
             <PlanetStructures />
-            <SciFiPopupMenu />
-            {/* <BottomMenuBar onClose={() => null} /> */}
-            <GuideButton onClick={() => setIsGuidePopupVisible(true)} /> {/* Add the Guide button */}
             {isGuidePopupVisible && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <ChapterOneIntroduction />

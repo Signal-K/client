@@ -4,12 +4,12 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
  
-import { EarthViewLayout } from "@/app/components/(scenes)/planetScene/layout";
-import InitialisePlanet from "@/app/components/(scenes)/planetScene/initialisePlanet";
-import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/app/components/(structures)/Structures";
+import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
+import InitialisePlanet from "@/components/(scenes)/planetScene/initialisePlanet";
+import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/(structures)/Structures";
 import { InventoryStructureItem } from "@/types/Items";
-import { PlanetarySystem } from "@/app/components/(scenes)/planetScene/orbitals/system";
-import AllAutomatonsOnActivePlanet from "@/app/components/(vehicles)/(automatons)/AllAutomatons";
+import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
+import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
  
 const MarsView: React.FC = () => {
     const supabase = useSupabaseClient();

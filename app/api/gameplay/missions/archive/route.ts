@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
-import { Mission } from "@/app/components/(structures)/StructuresForMission";
+import { MineralDepositsNoAction } from "@/components/(structures)/Mining/AvailableDeposits";
 
 interface UserMissionInstance {
     id: number;
     user: string;
     time_of_completion: string; 
     mission: number;
+};
+
+export interface Mission {
+    id: number;
+    name: string;
+    sequence?: number;
+    description?: string;
+    rewards?: number[];
+    classificationModule?: string;
+    structure?: number;
+    chapter?: number;
+    component?: React.ComponentType<any>;
 };
 
 const missions: Mission[] = [

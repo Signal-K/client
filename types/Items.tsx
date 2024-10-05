@@ -1,4 +1,4 @@
-import { CapacityLevel } from "@/app/components/(vehicles)/(automatons)/ActiveAutomaton";
+import { CapacityLevel } from "@/components/(structures)/Auto/ActiveAutomaton";
 
 interface Recipe {
     [key: string]: number;

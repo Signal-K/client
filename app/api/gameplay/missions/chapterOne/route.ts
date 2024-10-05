@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Mission } from "@/app/components/(structures)/StructuresForMission";
+
+export interface Mission {
+    id: number;
+    name: string;
+    sequence?: number;
+    description?: string;
+    rewards?: number[];
+    classificationModule?: string;
+    structure?: number;
+    chapter?: number;
+    component?: React.ComponentType<any>;
+};
 
 const chapterOneMissions: Mission[] = [
     {
