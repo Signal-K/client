@@ -359,7 +359,7 @@ export function AtmosphereStructuresOnPlanet({ onStructuresFetch }: StructuresOn
         labels: config.labels || [],
         actions: config.actions || [],
         buttons: config.buttons.map(button => ({
-          ...button,
+          ...button, 
           showInNoModal: true,
         })),
         structureId: inventoryId
