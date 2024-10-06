@@ -1,15 +1,13 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import LaunchpadStructure from "../../components/(structures)/Launchpad/Dashboard";
-import MissionList from "../../components/(scenes)/planetScene/availableMissions";
-import { PlanetSwitcher } from "../../components/(scenes)/planetScene/SwitchPlanet";
+import Camera from "@/components/Projects/Zoodex/Upload/Camera";
+import CloudUploadEarthCameraComponent from "@/components/Projects/Lidar/Upload/CloudCamera";
 
 export default function TestPage() {
     return (
         <div>
-            {/* <LaunchpadStructure /> */}
-            <PlanetSwitcher />
+            <CloudUploadEarthCameraComponent />
         </div>
     );
 };

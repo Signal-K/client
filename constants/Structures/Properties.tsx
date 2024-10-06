@@ -6,7 +6,7 @@ import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import ClassificationViewer from "@/components/(classifications)/YourClassifications";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/(structures)/Auto/AutomatonClassificationShell";
@@ -18,6 +18,7 @@ import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunsp
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
 import LaunchpadStructure from "@/components/(structures)/Launchpad/Dashboard";
 import { PlanetSwitcher } from "@/components/(scenes)/planetScene/SwitchPlanet";
+import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
 
 interface IndividualStructureProps {
     name?: string;
@@ -202,6 +203,12 @@ export const StructuresConfig: StructureConfig = {
           icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "My discoveries",
           dynamicComponent: <ClassificationViewer classificationType="zoodex-burrowingOwl" />,
+        },
+        {
+          icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Capture animals",
+          dynamicComponent: <CameraComponent />,
+          sizePercentage: 60,
         },
       ],
       buttons: [

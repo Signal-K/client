@@ -6,7 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 import IndividualStructure from "./IndividualStructure";
 import { StructuresConfig } from "@/constants/Structures/Properties";
-import { LockIcon } from "lucide-react";
+import { LockIcon } from "lucide-react"; 
 import { IndividualStructureProps } from "./IndividualStructure";
 
 import "../../styles/Anims/StarterStructureAnimations.css";
@@ -359,7 +359,7 @@ export function AtmosphereStructuresOnPlanet({ onStructuresFetch }: StructuresOn
         labels: config.labels || [],
         actions: config.actions || [],
         buttons: config.buttons.map(button => ({
-          ...button,
+          ...button, 
           showInNoModal: true,
         })),
         structureId: inventoryId

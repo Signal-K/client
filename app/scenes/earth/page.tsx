@@ -7,7 +7,6 @@ import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import { InventoryStructureItem } from "@/types/Items";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/(structures)/Structures";
-import { SciFiPopupMenu } from "@/components/ui/popupMenu";
 import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
 import InitialiseChapterOneUser from "@/components/(scenes)/chapters/one/InitialiseUser";
 
@@ -17,16 +16,15 @@ const EarthView: React.FC = () => {
   
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
 
-  if (activePlanet?.id !== 69) {
+  if (activePlanet?.id !== 69 || 35) {
     return (
         <InitialiseChapterOneUser />
     );
   };
 
-  return (
+  return ( 
     <div className="relative min-h-screen">
         <EarthStructures />
-        <SciFiPopupMenu />
     </div>
   );
 };
@@ -73,7 +71,7 @@ const EarthStructures: React.FC = () => {
             handleStructuresFetch(orbital, atmosphere, surface);
         } catch (error) {
             console.error('Error fetching structures:', error);
-        }
+        };
     }, [session?.user?.id, activePlanet?.id, supabase]);
 
     useEffect(() => {

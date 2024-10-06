@@ -116,6 +116,33 @@ const planetClassificationOptions: ClassificationOption[] = [
     { id: 4, text: 'Dips aligned to one side' },
 ];
 
+const planktonPortalClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1, 
+        text: 'Round plankton, no tentacles',
+    },
+    {
+        id: 2, 
+        text: "Head with tail",
+    },
+    {
+        id: 3, 
+        text: 'Jellyfish-like',
+    },
+    {
+        id: 4, 
+        text: 'Bug-like',
+    },
+    {
+        id: 5,
+        text: "Ribbon/elongated",
+    },
+    {
+        id: 6,
+        text: "Unidentifiable/None",
+    },
+];
+
 const diskDetectorClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
@@ -140,6 +167,29 @@ const diskDetectorClassificationOptions: ClassificationOption[] = [
     {
         id: 6,
         text: "None of the above",
+    },
+];
+
+const penguinWatchClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Adult penguin",
+    },
+    {
+        id: 2,
+        text: "Penguin chicks",
+    },
+    {
+        id: 3,
+        text: "Penguin eggs",
+    },
+    {
+        id: 4,
+        text: "Nesting pair with eggs",
+    },
+    {
+        id: 5,
+        text: "No penguins/too blurry"
     },
 ];
 
@@ -173,6 +223,100 @@ const initialCloudClassificationOptions: ClassificationOption[] = [
     },
     {
         id: 6, text: "4+ clouds",
+    },
+];
+
+const lidarEarthCloudsReadClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Nimbostratus",
+    },
+    {
+        id: 2,
+        text: 'Cumulonimbus',
+    },
+    {
+        id: 3,
+        text: 'Stratocumulus',
+    },
+    {
+        id: 4,
+        text: 'Stratus'
+    },
+    {
+        id: 5,
+        text: "Cumulus",
+    },
+    {
+        id: 6,
+        text: "Altostratus",
+    },
+    {
+        id: 7,
+        text: "Altocumulus",
+    },
+    {
+        id: 8,
+        text: "Cirrostratus",
+    },
+    {
+        id: 9,
+        text: "Cirrocumulus",
+    },
+    {
+        id: 10,
+        text: "Cirrus",
+    },
+    {
+        id: 11,
+        text: "No clouds",
+    },
+];
+
+const lidarEarthCloudsUploadClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Nimbostratus",
+    },
+    {
+        id: 2,
+        text: 'Cumulonimbus',
+    },
+    {
+        id: 3,
+        text: 'Stratocumulus',
+    },
+    {
+        id: 4,
+        text: 'Stratus'
+    },
+    {
+        id: 5,
+        text: "Cumulus",
+    },
+    {
+        id: 6,
+        text: "Altostratus",
+    },
+    {
+        id: 7,
+        text: "Altocumulus",
+    },
+    {
+        id: 8,
+        text: "Cirrostratus",
+    },
+    {
+        id: 9,
+        text: "Cirrocumulus",
+    },
+    {
+        id: 10,
+        text: "Cirrus",
+    },
+    {
+        id: 11,
+        text: "No clouds",
     },
 ];
 
@@ -289,6 +433,12 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return "Describe the object seen in the disk...";
             case 'sunspot':
                 return "Describe the sunspots you see and how many...";
+            case 'zoodex-penguinWatch':
+                return 'Describe the number and behaviour of the penguins...'
+            case 'zoodex-planktonPortal':
+                return 'Describe the plankton you see and their behaviour...'
+            case 'lidar-earthCloudRead':
+                return 'Describe the type of cloud you see...'
             default:
                 return "Enter your classification details...";
         };
@@ -308,8 +458,14 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return zoodexIguanasFromAboveClassificationOptions;
             case 'zoodex-southCoastFaunaRecovery':
                 return zoodexSouthCoastFaunaRecovery;
+            case 'zoodex-penguinWatch':
+                return penguinWatchClassificationOptions;
             case 'DiskDetective':
                 return diskDetectorClassificationOptions;
+            case 'zoodex-planktonPortal':
+                return planktonPortalClassificationOptions;
+            case 'lidar-earthCloudRead':
+                return lidarEarthCloudsReadClassificationOptions;
             case 'sunspot':
                 // return sunspotsConfigurationTemporary;
                 return [];
