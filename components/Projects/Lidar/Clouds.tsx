@@ -18,7 +18,7 @@ export function StarterLidar() {
 
     const [loading, setLoading] = useState<boolean>(true);
 
-    useEffect(() => {
+    useEffect(() => {  
         async function fetchAnomaly() {
             if (!session) {
                 setLoading(false);

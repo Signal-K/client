@@ -15,7 +15,7 @@ export const CloudspottingOnMars: React.FC<LidarProps> = ({
 }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
-
+  
     const { activePlanet } = useActivePlanet();
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

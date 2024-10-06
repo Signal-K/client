@@ -159,7 +159,7 @@ export function StarterTelescope() {
     if (!userChoice) {
         return (
             <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
-                <StructureInfo structureName="Telescope" />
+                {/* <StructureInfo structureName="Telescope" /> */}
                 <p className="text-sm font-bold">Choose a target to observe using your Telescope:</p>
                 {configuration["missions unlocked"] && Array.isArray(configuration["missions unlocked"]) && configuration["missions unlocked"].length > 0 ? (
                     configuration["missions unlocked"].map((missionId: string) => (

@@ -6,7 +6,7 @@ import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import ClassificationViewer from "@/components/(classifications)/YourClassifications";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BirdIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseMedical, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, FishIcon, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BirdIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseMedical, CameraIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, FishIcon, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/(structures)/Auto/AutomatonClassificationShell";
@@ -22,6 +22,7 @@ import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
 import { PenguinWatch } from "@/components/Projects/Zoodex/penguinWatch";
 import { PlanktonPortal, PlanktonPortalTutorial } from "@/components/Projects/Zoodex/planktonPortal";
 import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
+import CloudUploadEarthCameraComponent from "@/components/Projects/Lidar/Upload/CloudCamera";
 
 interface IndividualStructureProps {
     name?: string;
@@ -98,12 +99,12 @@ export const StructuresConfigForSandbox: StructureConfig = {
       ],
       imageSrc: '/assets/Items/Zoodex.png',
       buttons: [
-        {
-          icon: <DogIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Classify animals",
-          dynamicComponent: <StarterZoodexGallery />,
-          sizePercentage: 60,
-        },
+        // {
+        //   icon: <DogIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Classify animals",
+        //   dynamicComponent: <StarterZoodexGallery />,
+        //   sizePercentage: 60,
+        // },
         {
             icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
             text: "Capture animals",
@@ -145,9 +146,15 @@ export const StructuresConfigForSandbox: StructureConfig = {
       buttons: [
         {
           icon: <CloudCogIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Search your clouds",
+          text: "Classify Martian clouds",
           dynamicComponent: <StarterLidar />,
           sizePercentage: 60,
+        },
+        {
+            icon: <CloudDrizzleIcon className="w-6 h-6 text-[#5e81ac]" />,
+            text: "Upload clouds you see",
+            dynamicComponent: <CloudUploadEarthCameraComponent />,
+            sizePercentage: 70,
         },
       ],
     },

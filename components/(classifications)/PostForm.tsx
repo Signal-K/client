@@ -226,6 +226,100 @@ const initialCloudClassificationOptions: ClassificationOption[] = [
     },
 ];
 
+const lidarEarthCloudsReadClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Nimbostratus",
+    },
+    {
+        id: 2,
+        text: 'Cumulonimbus',
+    },
+    {
+        id: 3,
+        text: 'Stratocumulus',
+    },
+    {
+        id: 4,
+        text: 'Stratus'
+    },
+    {
+        id: 5,
+        text: "Cumulus",
+    },
+    {
+        id: 6,
+        text: "Altostratus",
+    },
+    {
+        id: 7,
+        text: "Altocumulus",
+    },
+    {
+        id: 8,
+        text: "Cirrostratus",
+    },
+    {
+        id: 9,
+        text: "Cirrocumulus",
+    },
+    {
+        id: 10,
+        text: "Cirrus",
+    },
+    {
+        id: 11,
+        text: "No clouds",
+    },
+];
+
+const lidarEarthCloudsUploadClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Nimbostratus",
+    },
+    {
+        id: 2,
+        text: 'Cumulonimbus',
+    },
+    {
+        id: 3,
+        text: 'Stratocumulus',
+    },
+    {
+        id: 4,
+        text: 'Stratus'
+    },
+    {
+        id: 5,
+        text: "Cumulus",
+    },
+    {
+        id: 6,
+        text: "Altostratus",
+    },
+    {
+        id: 7,
+        text: "Altocumulus",
+    },
+    {
+        id: 8,
+        text: "Cirrostratus",
+    },
+    {
+        id: 9,
+        text: "Cirrocumulus",
+    },
+    {
+        id: 10,
+        text: "Cirrus",
+    },
+    {
+        id: 11,
+        text: "No clouds",
+    },
+];
+
 const zoodexBurrowingOwlClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
@@ -343,6 +437,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return 'Describe the number and behaviour of the penguins...'
             case 'zoodex-planktonPortal':
                 return 'Describe the plankton you see and their behaviour...'
+            case 'lidar-earthCloudRead':
+                return 'Describe the type of cloud you see...'
             default:
                 return "Enter your classification details...";
         };
@@ -368,6 +464,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return diskDetectorClassificationOptions;
             case 'zoodex-planktonPortal':
                 return planktonPortalClassificationOptions;
+            case 'lidar-earthCloudRead':
+                return lidarEarthCloudsReadClassificationOptions;
             case 'sunspot':
                 // return sunspotsConfigurationTemporary;
                 return [];
