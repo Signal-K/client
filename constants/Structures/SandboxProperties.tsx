@@ -6,7 +6,7 @@ import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import ClassificationViewer from "@/components/(classifications)/YourClassifications";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BirdIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BirdIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseMedical, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, FishIcon, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/(structures)/Auto/AutomatonClassificationShell";
@@ -20,6 +20,8 @@ import LaunchpadStructure from "@/components/(structures)/Launchpad/Dashboard";
 import { PlanetSwitcher } from "@/components/(scenes)/planetScene/SwitchPlanet";
 import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
 import { PenguinWatch } from "@/components/Projects/Zoodex/penguinWatch";
+import { PlanktonPortal, PlanktonPortalTutorial } from "@/components/Projects/Zoodex/planktonPortal";
+import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
 
 interface IndividualStructureProps {
     name?: string;
@@ -112,6 +114,19 @@ export const StructuresConfigForSandbox: StructureConfig = {
             icon: <BirdIcon className="w-6 h-6 text-[#5e81ac]" />,
             text: "Penguin Watch",
             dynamicComponent: <PenguinWatch />,
+            sizePercentage: 60,
+        },
+        {
+            icon: <FishIcon className="w-6 h-6 text-[#5e81ac]" />,
+            text: "Plankton Portal",
+            // dynamicComponent: <PlanktonPortal />,
+            dynamicComponent: <PlanktonPortalTutorial anomalyId={"59875273"} />,
+            sizePercentage: 60,
+        },
+        {
+            icon: <BriefcaseMedical className="w-6 h-6 text-[#5e81ac]" />,
+            text: "Burrowing Owls",
+            dynamicComponent: <BurrowingOwl />,
             sizePercentage: 60,
         },
       ],

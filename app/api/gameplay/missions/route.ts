@@ -253,6 +253,14 @@ const missions: Mission[] = [
         id: 2000000102,
         name: 'Make your first PW classification',
     },
+    {
+        id: 200000012,
+        name: "Complete the Plankton Portal tutorial",
+    },
+    {
+        id: 2000000122,
+        name: 'Make your first Plankton Portal classification',
+    },
 ];
 
 export async function GET(req: NextRequest) {

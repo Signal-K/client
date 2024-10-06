@@ -16,7 +16,7 @@ const EarthView: React.FC = () => {
   
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
 
-  if (activePlanet?.id !== 69) {
+  if (activePlanet?.id !== 69 || 35) {
     return (
         <InitialiseChapterOneUser />
     );

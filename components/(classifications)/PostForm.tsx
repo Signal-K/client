@@ -116,6 +116,33 @@ const planetClassificationOptions: ClassificationOption[] = [
     { id: 4, text: 'Dips aligned to one side' },
 ];
 
+const planktonPortalClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1, 
+        text: 'Round plankton, no tentacles',
+    },
+    {
+        id: 2, 
+        text: "Head with tail",
+    },
+    {
+        id: 3, 
+        text: 'Jellyfish-like',
+    },
+    {
+        id: 4, 
+        text: 'Bug-like',
+    },
+    {
+        id: 5,
+        text: "Ribbon/elongated",
+    },
+    {
+        id: 6,
+        text: "Unidentifiable/None",
+    },
+];
+
 const diskDetectorClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
@@ -314,6 +341,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return "Describe the sunspots you see and how many...";
             case 'zoodex-penguinWatch':
                 return 'Describe the number and behaviour of the penguins...'
+            case 'zoodex-planktonPortal':
+                return 'Describe the plankton you see and their behaviour...'
             default:
                 return "Enter your classification details...";
         };
@@ -337,6 +366,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return penguinWatchClassificationOptions;
             case 'DiskDetective':
                 return diskDetectorClassificationOptions;
+            case 'zoodex-planktonPortal':
+                return planktonPortalClassificationOptions;
             case 'sunspot':
                 // return sunspotsConfigurationTemporary;
                 return [];

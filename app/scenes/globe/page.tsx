@@ -5,7 +5,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryStructureItem } from "@/types/Items";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
-import StructuresOnPlanet from "@/components/(structures)/Structures";
+import StructuresOnPlanet from "./Structures";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 
 const GlobeView: React.FC = () => {

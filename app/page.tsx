@@ -30,6 +30,7 @@ import {
   MirandaView,
   VenusView
 } from './scenes';
+import GlobeView from "./scenes/globe/page";
 
 export default function Home() {
   const session = useSession();
@@ -70,6 +71,12 @@ export default function Home() {
   if (activePlanet?.id === null || activePlanet?.id == 69) {
     return (
       <EarthView />
+    );
+  };
+
+  if (activePlanet?.id == 35) {
+    return (
+      <GlobeView />
     );
   };
 
