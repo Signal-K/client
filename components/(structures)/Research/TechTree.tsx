@@ -254,7 +254,7 @@ export function AdvancedTechTreeComponent() {
               : 'bg-gray-300 text-gray-300 cursor-not-allowed'
           }`}
         >
-          {isUnlocked ? 'Unlocked' : 'Unlock'}
+          {isUnlocked ? 'Researched' : 'Research'}
         </button>
       </div>
     )

@@ -150,7 +150,7 @@ const CameraComponent = () => {
     };
     
     return (
-      <div className="min-h-screen bg-[#2C4F64] flex items-center justify-center p-4">
+      <div className="bg-[#2C4F64] flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-[#FF695D] rounded-3xl p-8 shadow-lg">
           {!showCommentBox ? (
             <>

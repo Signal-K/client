@@ -198,9 +198,9 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
   return (
     <div className="flex items-center justify-center">
       <div className="w-96 bg-[#2C3A4A] rounded-lg shadow-xl">
-        <center>
+        {/* <center>
           <StructureInfo structureName={structure} />
-        </center>
+        </center> */}
         <div className="p-6 space-y-6">
           <InventoryIdFetcher
             structureId={structureId}
