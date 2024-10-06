@@ -245,6 +245,14 @@ const missions: Mission[] = [
         id: 200000092,
         name: 'Make your first SSW classification',
     },
+    {
+        id: 200000010,
+        name: "Complete the Penguin Watch tutorial",
+    },
+    {
+        id: 2000000102,
+        name: 'Make your first PW classification',
+    },
 ];
 
 export async function GET(req: NextRequest) {

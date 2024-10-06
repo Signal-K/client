@@ -24,6 +24,19 @@ export const zoodexDataSources = [
                 
             },
             {
+                name: "Penguin Watch",
+                description: "Count penguin adults, chicks and eggs in far away lands to help us understand their lives and environment",
+                identifier: 'zoodex-penguinWatch',
+                researchId: 'penguin-watch',
+                researcher: 'zooniverse/penguintom79',
+                unlocked: false,
+                compatiblePlanetTypes: ['Frozen', 'Lush'],
+                bestPlanetType: ['Lush'],
+                tutorialMission: 200000010,
+                activeStructure: 3104,
+                techId: 5,
+            },
+            {
                 name: 'Iguanas from Above',
                 description: 'Help us count Galapagos Marine Iguanas from aerial photographs',
                 identifier: 'zoodex-iguanasFromAbove',

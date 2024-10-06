@@ -245,14 +245,14 @@ export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomaly
 
     const tutorialContent = (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
                 <img
                     src="/assets/Captn.jpg"
                     alt="Cosmos Avatar"
                     className="w-12 h-12 rounded-full bg-[#303F51]"
                 />
                 <h3 className="text-xl font-bold text-[#85DDA2] mt-2 ml-4">Capt'n Cosmos</h3>
-            </div>
+            </div> */}
             <div className="p-4 bg-[#2C3A4A] border border-[#85DDA2] rounded-md shadow-md relative w-full">
                 <div className="relative">
                     <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>

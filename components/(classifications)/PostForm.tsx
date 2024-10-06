@@ -143,6 +143,29 @@ const diskDetectorClassificationOptions: ClassificationOption[] = [
     },
 ];
 
+const penguinWatchClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Adult penguin",
+    },
+    {
+        id: 2,
+        text: "Penguin chicks",
+    },
+    {
+        id: 3,
+        text: "Penguin eggs",
+    },
+    {
+        id: 4,
+        text: "Nesting pair with eggs",
+    },
+    {
+        id: 5,
+        text: "No penguins/too blurry"
+    },
+];
+
 const roverImgClassificationOptions: ClassificationOption[] = [
     { id: 1, text: 'Dried-up water channels' },
     { id: 2, text: 'Pebbles/medium-sized rocks' },
@@ -289,6 +312,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return "Describe the object seen in the disk...";
             case 'sunspot':
                 return "Describe the sunspots you see and how many...";
+            case 'zoodex-penguinWatch':
+                return 'Describe the number and behaviour of the penguins...'
             default:
                 return "Enter your classification details...";
         };
@@ -308,6 +333,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 return zoodexIguanasFromAboveClassificationOptions;
             case 'zoodex-southCoastFaunaRecovery':
                 return zoodexSouthCoastFaunaRecovery;
+            case 'zoodex-penguinWatch':
+                return penguinWatchClassificationOptions;
             case 'DiskDetective':
                 return diskDetectorClassificationOptions;
             case 'sunspot':

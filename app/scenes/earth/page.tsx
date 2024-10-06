@@ -22,7 +22,7 @@ const EarthView: React.FC = () => {
     );
   };
 
-  return (
+  return ( 
     <div className="relative min-h-screen">
         <EarthStructures />
     </div>
@@ -71,7 +71,7 @@ const EarthStructures: React.FC = () => {
             handleStructuresFetch(orbital, atmosphere, surface);
         } catch (error) {
             console.error('Error fetching structures:', error);
-        }
+        };
     }, [session?.user?.id, activePlanet?.id, supabase]);
 
     useEffect(() => {
