@@ -251,7 +251,7 @@ export function AdvancedTechTreeComponent() {
               ? 'bg-green-500 text-white'
               : isAvailable
               ? 'bg-purple-500 text-white hover:bg-purple-600'
-              : 'bg-gray-300 text-gray-300 cursor-not-allowed'
+              : 'bg-[#2C3A4A] text-gray-300 cursor-not-allowed'
           }`}
         >
           {isUnlocked ? 'Researched' : 'Research'}

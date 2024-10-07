@@ -20,7 +20,7 @@ const MineralDeposit: React.FC<MineralDepositProps> = ({ deposit, inventoryItems
           <p className="text-xs">Quantity: {deposit.mineralconfiguration.quantity}</p>
         </div>
       ) : (
-        // <div className="w-full h-full bg-gray-400/80 rounded-md flex items-center justify-center">
+        // <div className="w-full h-full bg-[#2C3A4A]/80 rounded-md flex items-center justify-center">
         // </div>
         <div className='bg-opacity-10'></div>
       )}

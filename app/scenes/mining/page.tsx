@@ -40,7 +40,7 @@ export default function MiningScene() {
         <div className="flex flex-col md:flex-row">
           <div className="flex-1 md p-4 px-12 rounded-r-lg shadow-lg md:rounded-r-lg border-r border-red-300">
             <button
-              className="mb-4 bg-gray-500 text-white px-4 py-2 rounded"
+              className="mb-4 bg-[#2C3A4A] text-white px-4 py-2 rounded"
               onClick={handleBack}
             >
               Back

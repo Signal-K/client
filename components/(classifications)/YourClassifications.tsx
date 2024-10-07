@@ -115,7 +115,7 @@ const ClassificationViewer: React.FC<ClassificationViewerProps> = ({ classificat
                                     return (
                                         <div
                                             key={classification.id}
-                                            className="p-4 bg-gray-700 border border-gray-600 rounded-md flex flex-col cursor-pointer"
+                                            className="p-4 bg-[#2C3A4A] border border-gray-600 rounded-md flex flex-col cursor-pointer"
                                             onClick={() => handleClassificationClick(classification)}
                                         >
                                             <div className="flex items-start space-x-3">
@@ -145,7 +145,7 @@ const ClassificationViewer: React.FC<ClassificationViewerProps> = ({ classificat
 
                     {selectedClassification && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                            <div className="bg-gray-900 p-4 rounded-lg max-w-lg w-full overflow-y-auto">
+                            <div className="bg-[#2C3A4A] p-4 rounded-lg max-w-lg w-full overflow-y-auto">
                                 <h2 className="text-xl font-bold mb-4">Classification Details</h2>
                                 <div className="mb-4">
                                     <p className="text-lg font-semibold">{selectedClassification.content}</p>
@@ -298,7 +298,7 @@ export const ClassificationViewerAll: React.FC = () => {
                                     return (
                                         <div
                                             key={classification.id}
-                                            className="p-4 bg-gray-700 border border-gray-600 rounded-md flex flex-col cursor-pointer"
+                                            className="p-4 bg-[#2C3A4A] border border-gray-600 rounded-md flex flex-col cursor-pointer"
                                             onClick={() => handleClassificationClick(classification)}
                                         >
                                             <div className="flex items-start space-x-3">
@@ -327,7 +327,7 @@ export const ClassificationViewerAll: React.FC = () => {
 
                     {selectedClassification && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                            <div className="bg-gray-900 p-4 rounded-lg max-w-lg w-full overflow-y-auto">
+                            <div className="bg-[#2C3A4A] p-4 rounded-lg max-w-lg w-full overflow-y-auto">
                                 <h2 className="text-xl font-bold mb-4">Classification Details</h2>
                                 <div className="mb-4">
                                     <p className="text-lg font-semibold">{selectedClassification.content}</p>

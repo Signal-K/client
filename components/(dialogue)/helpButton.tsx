@@ -81,62 +81,64 @@ export default function TutorialPopup() {
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button size="icon" className="fixed bottom-4 bg-red-800 right-4 rounded-full">
-                    <HelpCircle className="h-5 w-5" />
-                    {/* <span className="sr-only">Help/Guide</span> */}
-                    {/* <span>Help/Guide</span> */}
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>
-                        {tutorialSteps[currentStep].title}
-                    </DialogTitle>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-4 top-4"
-                        onClick={handleClose}
-                    >
-                        <X className="h-4 w-4" />
-                        <span className="sr-only">Close</span>
+        <div className="bg=[#2C3A4A]">
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogTrigger asChild>
+                    <Button size="icon" className="fixed bottom-4 bg-red-800 right-4 rounded-full">
+                        <HelpCircle className="h-5 w-5" />
+                        {/* <span className="sr-only">Help/Guide</span> */}
+                        {/* <span>Help/Guide</span> */}
                     </Button>
-                </DialogHeader>
-                <div className="flex flex-col items-center gap-4">
-                    <img
-                        src={tutorialSteps[currentStep].image}
-                        alt={`Step ${currentStep + 1}`}
-                        className="rounded-lg object-cover"
-                        width={400}
-                        height={320}
-                    />
-                    <p className="text-center text-sm">
-                        {tutorialSteps[currentStep].content}
-                    </p>
-                    <div className="flex w-full justify-between">
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {tutorialSteps[currentStep].title}
+                        </DialogTitle>
                         <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleBack}
-                            disabled={currentStep === 0}
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-4 top-4"
+                            onClick={handleClose}
                         >
-                            <ChevronLeftSquare className="mr-2 h-4 w-4" />
-                            Back
+                            <X className="h-4 w-4" />
+                            <span className="sr-only">Close</span>
                         </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleNext}
-                            disabled={currentStep === tutorialSteps.length - 1}
-                        >
-                            Next
-                            <ChevronRightSquare className="ml-2 h-4 w-4" />
-                        </Button>
+                    </DialogHeader>
+                    <div className="flex flex-col items-center gap-4">
+                        <img
+                            src={tutorialSteps[currentStep].image}
+                            alt={`Step ${currentStep + 1}`}
+                            className="rounded-lg object-cover"
+                            width={400}
+                            height={320}
+                        />
+                        <p className="text-center text-sm">
+                            {tutorialSteps[currentStep].content}
+                        </p>
+                        <div className="flex w-full justify-between">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleBack}
+                                disabled={currentStep === 0}
+                            >
+                                <ChevronLeftSquare className="mr-2 h-4 w-4" />
+                                Back
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleNext}
+                                disabled={currentStep === tutorialSteps.length - 1}
+                            >
+                                Next
+                                <ChevronRightSquare className="ml-2 h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
-                </div>
-            </DialogContent>
-        </Dialog>
+                </DialogContent>
+            </Dialog>
+        </div>
     );
 };

@@ -180,7 +180,7 @@ function PlanetStructures() {
                                 className="w-16 h-16 object-cover"
                             />
                             {tooltip?.visible && (
-                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm p-2 rounded-md">
+                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-[#2C3A4A] text-white text-sm p-2 rounded-md">
                                     {tooltip.text}
                                 </div>
                             )}
@@ -209,7 +209,7 @@ function PlanetStructures() {
                                 className="w-16 h-16 object-cover"
                             />
                             {tooltip?.visible && (
-                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm p-2 rounded-md">
+                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-[#2C3A4A] text-white text-sm p-2 rounded-md">
                                     {tooltip.text}
                                 </div>
                             )}
@@ -235,7 +235,7 @@ function PlanetStructures() {
                                 className="w-16 h-16 object-cover"
                             />
                             {tooltip?.visible && (
-                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm p-2 rounded-md">
+                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-[#2C3A4A] text-white text-sm p-2 rounded-md">
                                     {tooltip.text}
                                 </div>
                             )}

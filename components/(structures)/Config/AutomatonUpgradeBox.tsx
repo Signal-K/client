@@ -94,7 +94,7 @@ const AutomatonUpgrade: React.FC<AutomatonUpgradeProps> = ({ onSave, inventoryId
           <button
             key={tab}
             onClick={() => handleTabClick(tab as Tab)}
-            className={`px-4 py-2 rounded-lg ${selectedTab === tab ? 'bg-white text-black' : 'bg-gray-700'}`}
+            className={`px-4 py-2 rounded-lg ${selectedTab === tab ? 'bg-white text-black' : 'bg-[#2C3A4A]'}`}
           >
             {tab}
           </button>
@@ -104,7 +104,7 @@ const AutomatonUpgrade: React.FC<AutomatonUpgradeProps> = ({ onSave, inventoryId
       <div className="flex items-center justify-center mb-6">
         <button
           onClick={() => handleOptionChange(-1)}
-          className="px-2 py-1 bg-gray-700 rounded-l-lg"
+          className="px-2 py-1 bg-[#2C3A4A] rounded-l-lg"
         >
           ←
         </button>
@@ -118,7 +118,7 @@ const AutomatonUpgrade: React.FC<AutomatonUpgradeProps> = ({ onSave, inventoryId
         </div>
         <button
           onClick={() => handleOptionChange(1)}
-          className="px-2 py-1 bg-gray-700 rounded-r-lg"
+          className="px-2 py-1 bg-[#2C3A4A] rounded-r-lg"
         >
           →
         </button>

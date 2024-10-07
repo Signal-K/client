@@ -85,7 +85,7 @@ export default function ClassificationSummary() {
     const imageUrl = `http://127.0.0.1:54321/storage/v1/object/public/anomalies/${activePlanet?.id}/${imageNumber}.png`;
 
     return (
-        <div className="p-4 max-w-lg mx-auto bg-gray-800 text-white rounded-md">
+        <div className="p-4 max-w-lg mx-auto bg-[#2C3A4A] text-white rounded-md">
             <h2 className="text-lg font-bold text-[#5FCBC3] mb-4">Your Classification Summary</h2>
             <div className="space-y-4">
                 <div>

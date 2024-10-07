@@ -7,7 +7,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import AvailableMissionsListForPlanet from './availableMissions';
 
 const planets = [
-  { name: 'Mercury', color: 'bg-gray-400', image: '/assets/Planets/Mercury.png', link: '/scenes/mercury', anomaly: 10, initialisationMissionId: 100001 },
+  { name: 'Mercury', color: 'bg-[#2C3A4A]', image: '/assets/Planets/Mercury.png', link: '/scenes/mercury', anomaly: 10, initialisationMissionId: 100001 },
   { name: 'Venus', color: 'bg-yellow-200', image: '/assets/Planets/Venus.png', link: '/scenes/venus', anomaly: 20, initialisationMissionId: 200001 },
   { name: 'Earth', color: 'bg-blue-500', image: '/assets/Planets/Earth.png', link: '/scenes/earth', anomaly: 69, initialisationMissionId: 300001 },
   { name: 'Mars', color: 'bg-red-500', image: '/assets/Planets/Mars.png', link: '/scenes/mars', anomaly: 40, initialisationMissionId: 400001 },
@@ -91,7 +91,7 @@ export default function PlanetSelector() {
   const planetDetails = planetStats?.find((planet) => planet.id === selectedPlanet.initialisationMissionId);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900 text-white p-6">
+    <div className="flex flex-col h-screen bg-[#2C3A4A] text-white p-6">
       <h1 className="text-3xl font-bold mb-4">Let's book your trip to</h1>
       <div className="relative h-32 mb-8">
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 50" preserveAspectRatio="none">

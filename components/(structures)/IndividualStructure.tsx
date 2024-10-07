@@ -99,7 +99,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                 onMouseLeave={() => setTooltip(null)}
               />
               {tooltip?.visible && (
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-800 text-white text-xs p-1 rounded-md shadow-lg">
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-[#2C3A4A] text-white text-xs p-1 rounded-md shadow-lg">
                   {tooltip.text}
                 </div>
               )}

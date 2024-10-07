@@ -73,7 +73,7 @@ export const SelectMineralPanel: React.FC<CollectMineralPanelProps> = ({ deposit
               className="w-16 h-16 mr-4"
             />
           ) : (
-            <div className="w-16 h-16 mr-4 bg-gray-200"></div>
+            <div className="w-16 h-16 mr-4 bg-[#2C3A4A]"></div>
           )}
           <div>
             <h3 className="text-lg font-bold">

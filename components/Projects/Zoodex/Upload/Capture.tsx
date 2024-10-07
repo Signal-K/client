@@ -17,11 +17,11 @@ const Home = observer(() => {
       {store.capture.image}
 	  
       <input type="file" onChange={store.handleCaptureImage} />
-      <button onClick={store.fetchVoice} className="p-2 bg-gray-200 rounded">Submit</button>
+      <button onClick={store.fetchVoice} className="p-2 bg-[#2C3A4A] rounded">Submit</button>
 	  
       {store.capture.image ? 
         <img src={store.capture.image} className="rounded-lg max-h-[200px]" alt="Capture" /> : 
-        <div className="h-24 w-48 bg-gray-200 rounded-lg max-h-[200px]"></div>}
+        <div className="h-24 w-48 bg-[#2C3A4A] rounded-lg max-h-[200px]"></div>}
         
       {store.capture.voiceUrl && 
         <audio src={store.capture.voiceUrl} controls autoPlay playsInline />}

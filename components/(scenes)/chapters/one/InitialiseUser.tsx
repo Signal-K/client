@@ -192,14 +192,14 @@ export default function InitialiseChapterOneUser() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-[#2C3A4A] text-gray-100 flex items-center justify-center p-4">
             <style jsx global>{`
                 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
                 body {
                     font-family: 'Space Grotesk', sans-serif;
                 }
             `}</style>
-            <div className="max-w-4xl w-full bg-gray-800 rounded-xl shadow-2xl overflow-hidden">
+            <div className="max-w-4xl w-full bg-[#2C3A4A] rounded-xl shadow-2xl overflow-hidden">
                 <div className="p-8 space-y-6">
                     <AnimatePresence mode="wait">
                         {step < introSteps.length ? (
@@ -210,6 +210,7 @@ export default function InitialiseChapterOneUser() {
                                 exit={{ opacity: 0, y: -28 }}
                                 transition={{ duration: 0.5 }}
                                 className="text-2xl font-light text-center h-20 flex items-center justify-center"
+                                style={{ wordBreak: "break-word", overflowWrap: "break-word" }}
                             >
                                 <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">
                                     {introSteps[step]}
@@ -223,6 +224,7 @@ export default function InitialiseChapterOneUser() {
                                     exit={{ opacity: 0, height: 0 }}
                                     transition={{ duration: 0.5 }}
                                     className="space-y-6"
+                                    style={{ maxWidth: "100%", wordBreak: "break-word" }}
                                 >
                                     <h2 className="text-3xl font-semibold text-center bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">
                                         {selectedMission.name}
@@ -245,24 +247,26 @@ export default function InitialiseChapterOneUser() {
                                     exit={{ opacity: 0, height: 0 }}
                                     transition={{ duration: 0.5 }}
                                     className="space-y-6"
+                                    style={{ maxWidth: "100%", wordBreak: "break-word" }}
                                 >
                                     <h2 className="text-3xl font-semibold text-center bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">
-                                        Missions in {selectedCategory.title}
+                                        {selectedCategory.title}
                                     </h2>
-                                    <div className="flex flex-wrap justify-center gap-4">
-                                        {selectedCategory.details.map((mission) => (
-                                            <button
-                                                key={mission.identifier}
+                                    <p className="text-gray-200 text-center">{selectedCategory.description}</p>
+                                    <ul className="space-y-4">
+                                        {selectedCategory.details.map((mission, idx) => (
+                                            <li
+                                                key={idx}
                                                 onClick={() => handleMissionSelect(mission)}
-                                                className="w-48 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors duration-300"
+                                                className="p-4 bg-[#364C61] hover:bg-[#2C3A4A] rounded-lg cursor-pointer transition-colors duration-300"
                                             >
                                                 {mission.name}
-                                            </button>
+                                            </li>
                                         ))}
-                                    </div>
+                                    </ul>
                                     <button
                                         onClick={handleBackToCategories}
-                                        className="mt-6 text-blue-300 hover:text-blue-500 font-medium transition-colors duration-300"
+                                        className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded transition-colors duration-300"
                                     >
                                         Back to Categories
                                     </button>
@@ -271,38 +275,48 @@ export default function InitialiseChapterOneUser() {
                         ) : (
                             <motion.div
                                 key="categories"
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
                                 transition={{ duration: 0.5 }}
+                                className="space-y-6"
+                                style={{ maxWidth: "100%", wordBreak: "break-word" }}
                             >
                                 <h2 className="text-3xl font-semibold text-center bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">
-                                    Choose a Category
+                                    Choose a Project Category
                                 </h2>
-                                <div className="flex flex-col space-y-4">
-                                    {categories.map((category) => (
-                                        <button
-                                            key={category.title}
+                                <ul className="space-y-4">
+                                    {categories.map((category, idx) => (
+                                        <li
+                                            key={idx}
                                             onClick={() => handleCategoryClick(category)}
-                                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded transition-colors duration-300"
+                                            className="p-4 bg-[#364C61] hover:bg-[#2C3A4A] rounded-lg cursor-pointer transition-colors duration-300"
                                         >
                                             {category.title}
-                                        </button>
+                                        </li>
                                     ))}
-                                </div>
+                                </ul>
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
-                <div className="flex justify-between p-4 bg-gray-800 border-t border-gray-700">
-                    <button onClick={handleBack} className="text-gray-400 hover:text-white transition-colors duration-300">
-                        <ChevronLeft className="w-5 h-5 inline" />
+                <div className="flex justify-between p-8">
+                    <button
+                        onClick={handleBack}
+                        className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded transition-colors duration-300 flex items-center"
+                    >
+                        <ChevronLeft className="w-5 h-5 mr-2" />
                         Back
                     </button>
-                    <button onClick={handleNext} className="text-gray-400 hover:text-white transition-colors duration-300">
-                        <ChevronRight className="w-5 h-5 inline" />
-                        Next
-                    </button>
+                    {step < introSteps.length - 1 && (
+                        <button
+                            onClick={handleNext}
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors duration-300 flex items-center"
+                        >
+                            Next
+                            <ChevronRight className="w-5 h-5 ml-2" />
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

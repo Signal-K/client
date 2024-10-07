@@ -35,7 +35,7 @@ const planets = [
   {
     id: 10,
     name: "Mercury",
-    color: "bg-gray-400",
+    color: "bg-[#2C3A4A]",
     stats: { gravity: "3.7 m/s²", temp: "430°C" },
     anomaly: 10,
     planetType: 'Arid',
@@ -65,7 +65,7 @@ const planets = [
   // {
   //   id: 31,
   //   name: "Moon",
-  //   color: "bg-gray-300",
+  //   color: "bg-[#2C3A4A]",
   //   stats: { gravity: "1.62 m/s²", temp: "-53°C" },
   //   anomaly: 31,
   //   planetType: 'Arid',
