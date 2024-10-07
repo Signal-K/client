@@ -6,7 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 import IndividualStructure from "./IndividualStructure";
 import { StructuresConfig } from "@/constants/Structures/Properties";
-import { LockIcon } from "lucide-react"; 
+import { LockIcon } from "lucide-react";
 import { IndividualStructureProps } from "./IndividualStructure";
 
 import "../../styles/Anims/StarterStructureAnimations.css";
@@ -148,6 +148,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
 export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
     const supabase = useSupabaseClient();
   const session = useSession();
+
   const { activePlanet } = useActivePlanet();
 
   const [userStructuresOnPlanet, setUserStructuresOnPlanet] = useState<InventoryStructureItem[]>([]);
@@ -163,12 +164,9 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
     };
 
     try {
-
-      // Fetch item details from the gameplay API
       const response = await fetch('/api/gameplay/inventory');
       const itemsData: StructureItemDetail[] = await response.json();
 
-      // Create a map for quick access to item details
       const itemMap = new Map<number, StructureItemDetail>();
       itemsData.forEach(item => {
         if (item.ItemCategory === 'Structure') {
@@ -178,7 +176,6 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
 
       setItemDetails(itemMap);
 
-      // Fetch inventory data for user and active planet
       const { data: inventoryData, error: inventoryError } = await supabase
         .from('inventory')
         .select('*')
@@ -187,7 +184,6 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
 
       if (inventoryError) throw inventoryError;
 
-      // Filter for unique structures based on locationType fetched from the API
       const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
       inventoryData.forEach(structure => {
         const itemDetail = itemMap.get(structure.item);
@@ -208,6 +204,9 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
   useEffect(() => {
     fetchStructures();
   }, [fetchStructures]);
+
+  const getRandomAnimationDuration = () => `${Math.random() * 2 + 1.5}s`;
+  const getRandomAnimationDelay = () => `${Math.random() * 1}s`;
 
   const handleIconClick = (itemId: number, inventoryId: number) => {
     const itemDetail = itemDetails.get(itemId);
@@ -247,7 +246,7 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
             <img
               src={itemDetails.get(activeStructure.item)?.icon_url}
               alt={itemDetails.get(activeStructure.item)?.name}
-              className="w-16 h-16 object-cover cursor-pointer bouncing-structure"
+              className="w-10 h-10 object-cover cursor-pointer bouncing-structure"
               onClick={() => handleIconClick(activeStructure.item, activeStructure.id)}
             />
           </div>
@@ -260,7 +259,7 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
               <img
                 src={itemDetail.icon_url}
                 alt={itemDetail.name}
-                className="w-14 h-14 object-cover cursor-pointer moving-structure"
+                className="w-8 h-8 object-cover cursor-pointer moving-structure"
                 onClick={() => handleIconClick(itemDetail.id, structure.id)}
               />
             </div>

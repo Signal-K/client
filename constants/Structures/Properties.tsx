@@ -6,7 +6,6 @@ import { MineralDepositsNoAction } from "@/components/(structures)/Mining/Availa
 import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
 import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
-import ClassificationViewer from "@/components/(classifications)/YourClassifications";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
 import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/(structures)/Config/RepairStructure";
@@ -73,11 +72,6 @@ export const StructuresConfig: StructureConfig = {
         //   text: "Available missions",
         //   dynamicComponent: <MissionsForStructure structureItemId={3102} />,
         // },
-        {
-          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="roverImg" />,
-        },
       ],
       buttons: [
         { 
@@ -143,11 +137,6 @@ export const StructuresConfig: StructureConfig = {
         //   text: "Available missions",
         //   dynamicComponent: <MissionsForStructure structureItemId={3103} />,
         // },
-        {
-          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="planet" />,
-        },
         // Copy action/labels
       ],
       buttons: [
@@ -203,11 +192,6 @@ export const StructuresConfig: StructureConfig = {
         //   dynamicComponent: <MissionsForStructure structureItemId={3104} />,
         // },
         {
-          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="zoodex-burrowingOwl" />,
-        },
-        {
           icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Capture animals",
           dynamicComponent: <CameraComponent />,
@@ -220,12 +204,6 @@ export const StructuresConfig: StructureConfig = {
           text: "Classify animals",
           // dynamicComponent: <StarterZoodex />,
           dynamicComponent: <StarterZoodexGallery />,
-          sizePercentage: 60,
-        },
-        {
-          icon: <LucideSalad className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Plant life",
-          dynamicComponent: <PlanktonPortalTutorial anomalyId="59876090" />,
           sizePercentage: 60,
         },
         // {
@@ -265,11 +243,11 @@ export const StructuresConfig: StructureConfig = {
         //   text: "Available missions",
         //   dynamicComponent: <MissionsForStructure structureItemId={3105} />,
         // },
-        {
-          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="lidar" />,
-        },
+        // {
+        //   icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "My discoveries",
+        //   dynamicComponent: <ClassificationViewer classificationType="lidar" />,
+        // },
       ],
       imageSrc: '/assets/Items/Lidar.png',
       buttons: [

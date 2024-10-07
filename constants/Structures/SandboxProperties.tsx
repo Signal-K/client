@@ -4,7 +4,7 @@ import { MineralDepositsNoAction } from "@/components/(structures)/Mining/Availa
 import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
 import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
-import ClassificationViewer from "@/components/(classifications)/YourClassifications";
+// import ClassificationViewer from "@/components/(classifications)/YourClassifications";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
 import { BeanIcon, BirdIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseMedical, CameraIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, FishIcon, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/(structures)/Config/RepairStructure";
@@ -65,13 +65,13 @@ export const StructuresConfigForSandbox: StructureConfig = {
         },
       ],
       imageSrc: '/assets/Items/TransitingTelescope.png',
-      actions: [
-        {
-          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="planet" />,
-        },
-      ],
+    //   actions: [
+    //     {
+    //       icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
+    //       text: "My discoveries",
+    //       dynamicComponent: <ClassificationViewer classificationType="planet" />,
+    //     },
+    //   ],
       buttons: [
         {
           icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,

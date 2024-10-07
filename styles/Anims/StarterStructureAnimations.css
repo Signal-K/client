@@ -16,9 +16,7 @@
 
 .moving-structure {
 	animation: subtle-move 2s ease-in-out infinite alternate;
-	/* Adjust timing as needed */
 }
-
 
 @keyframes bounce {
 	0% {
@@ -53,8 +51,7 @@
 
 .bouncing-structure {
 	animation: bounce 2s ease-in-out infinite;
-	/* Adjust timing as needed */
-};
+}
 
 @keyframes hover-around {
   0% {
@@ -75,5 +72,13 @@
 }
 
 .hovering-structure {
-  animation: hover-around 4s ease-in-out infinite; /* Adjust timing and easing as needed */
-};
+  animation: hover-around 4s ease-in-out infinite;
+}
+
+/* Adjust icon sizes for mobile */
+@media (max-width: 768px) {
+  .moving-structure, .bouncing-structure, .hovering-structure {
+    width: 64px; /* Smaller size for mobile */
+    height: 64px;
+  }
+}
