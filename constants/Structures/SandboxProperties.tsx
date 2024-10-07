@@ -17,7 +17,6 @@ import MissionsForStructure from "@/components/(structures)/Missions/AvailableMi
 import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
 import LaunchpadStructure from "@/components/(structures)/Launchpad/Dashboard";
-import { PlanetSwitcher } from "@/components/(scenes)/planetScene/SwitchPlanet";
 import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
 import { PenguinWatch } from "@/components/Projects/Zoodex/penguinWatch";
 import { PlanktonPortal, PlanktonPortalTutorial } from "@/components/Projects/Zoodex/planktonPortal";

@@ -10,13 +10,11 @@ interface ZoodexProps {
     anomalyId: string;
 };
 
-export const PlanktonPortalTutorial: React.FC<ZoodexProps> = ({
-    anomalyId
-}) => {
+export const PlanktonPortalTutorial: React.FC<ZoodexProps> = ({ anomalyId }) => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-planktonPortal/${anomalyId}.jpeg`;
 
-    const [part, setPart] = useState(0);
+    const [part, setPart] = useState(1);
     const [line, setLine] = useState(1);
 
     const nextLine = () => setLine((prevLine) => prevLine + 1);
@@ -29,11 +27,7 @@ export const PlanktonPortalTutorial: React.FC<ZoodexProps> = ({
                     <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
                     {part === 1 && (
                         <>
-                            {line === 1 && (
-                                <p className="text-[#EEEAD1]">
-                                    Hello, and welcome to Plankton Portal!
-                                </p>
-                            )}
+                            {line === 1 && <p className="text-[#EEEAD1]">Hello, and welcome to Plankton Portal!</p>}
                             {line === 2 && (
                                 <p className="text-[#EEEAD1]">
                                     In this project, you'll be marking images of plankton—tiny oceanic organisms—taken by an underwater imaging system. Because plankton are an important food source and a strong indicator of the health of a marine biome, they can teach us many things about our planet's oceans.
@@ -49,11 +43,7 @@ export const PlanktonPortalTutorial: React.FC<ZoodexProps> = ({
                                     Don't worry too much if you aren't 100% sure—we just want your best guess, no matter what! Many people will see each image, and everyone's classifications will be combined to produce a result. The wisdom of crowds tends to give the right answer.
                                 </p>
                             )}
-                            {line === 5 && (
-                                <p className="text-[#EEEAD1]">
-                                    Let's get started!
-                                </p>
-                            )}
+                            {line === 5 && <p className="text-[#EEEAD1]">Let's get started!</p>}
 
                             {line < 6 && (
                                 <div className="flex justify-center mt-4 w-full h-64">
@@ -109,33 +99,29 @@ export const PlanktonPortalTutorial: React.FC<ZoodexProps> = ({
         <div className="rounded-lg">
             <div className="flex flex-col items-center">
                 {part === 1 && (
-                    <div className="mb-1">
-                        {tutorialContent}
-                    </div>
+                    <div className="mb-1">{tutorialContent}</div>
                 )}
                 {part === 2 && (
-                    <>
-                        <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
-                            <div className="relative">
-                                <div className="absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0">
-                                    <div className="bg-white bg-opacity-60">
-                                        <img
-                                            src={imageUrl}
-                                            alt="Plankton image"
-                                            className="w-full h-96 object-cover rounded-t-md"
-                                        />
-                                    </div>
+                    <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                        <div className="relative">
+                            <div className="absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0">
+                                <div className="bg-white bg-opacity-60">
+                                    <img
+                                        src={imageUrl}
+                                        alt="Plankton image"
+                                        className="w-full h-96 object-cover rounded-t-md"
+                                    />
                                 </div>
-                                <ClassificationForm
-                                    anomalyId={anomalyId}
-                                    anomalyType="zoodex-planktonPortal"
-                                    missionNumber={200000012}
-                                    assetMentioned={imageUrl}
-                                    originatingStructure={3104}
-                                />
                             </div>
+                            <ClassificationForm
+                                anomalyId={anomalyId}
+                                anomalyType="zoodex-planktonPortal"
+                                missionNumber={200000012}
+                                assetMentioned={imageUrl}
+                                originatingStructure={3104}
+                            />
                         </div>
-                    </>
+                    </div>
                 )}
             </div>
         </div>
@@ -180,7 +166,7 @@ export function PlanktonPortal() {
     
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
                 const imageUrl = `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-planktonPortal/${randomAnomaly.id}.jpeg`;
-                setImageUrl(imageUrl); // Ensure you set the image URL here
+                setImageUrl(imageUrl);
             } catch (error: any) {
                 console.error("Error fetching plankton anomaly: ", error.message);
                 setAnomaly(null);
@@ -225,6 +211,7 @@ export function PlanktonPortal() {
             </div>
         );
     };
+
     if (!hasMission200000012) {
         return anomaly ? (
             <PlanktonPortalTutorial anomalyId={anomaly.id.toString()} />
@@ -257,10 +244,10 @@ export function PlanktonPortal() {
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
             <div className="pb-4 rounded-md relative w-full">
                 {imageUrl && (
-                    <img src={imageUrl} alt={anomaly.content} className="w-full h-64 object-cover" />
+                    <img src={imageUrl} alt={anomaly?.content} className="w-full h-64 object-cover" />
                 )}
                 <ClassificationForm
-                    anomalyId={anomaly.id.toString()}
+                    anomalyId={anomaly?.id.toString() || ""}
                     anomalyType="zoodex-planktonPortal"
                     missionNumber={200000012}
                     assetMentioned={imageUrl || ""}

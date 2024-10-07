@@ -1,15 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
-import Camera from "@/components/Projects/Zoodex/Upload/Camera";
-import CloudUploadEarthCameraComponent from "@/components/Projects/Lidar/Upload/CloudCamera";
+import React from "react";
+import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
 
 export default function TestPage() {
     return (
         <div>
-            <CloudUploadEarthCameraComponent />
+            <SwitchPlanet />
         </div>
     );
 };
-
-

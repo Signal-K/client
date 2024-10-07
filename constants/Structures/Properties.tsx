@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import AutomatonUpgrade from "@/components/(structures)/Config/AutomatonUpgradeBox";
 import { MineralDepositsNoAction } from "@/components/(structures)/Mining/AvailableDeposits";
@@ -6,7 +8,7 @@ import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import ClassificationViewer from "@/components/(classifications)/YourClassifications";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/(structures)/Config/RepairStructure";
 import { RoverPhoto } from "@/components/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/(structures)/Auto/AutomatonClassificationShell";
@@ -17,8 +19,9 @@ import MissionsForStructure from "@/components/(structures)/Missions/AvailableMi
 import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
 import LaunchpadStructure from "@/components/(structures)/Launchpad/Dashboard";
-import { PlanetSwitcher } from "@/components/(scenes)/planetScene/SwitchPlanet";
 import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
+import { PlanktonPortal, PlanktonPortalTutorial } from "@/components/Projects/Zoodex/planktonPortal";
+import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
 
 interface IndividualStructureProps {
     name?: string;
@@ -219,6 +222,12 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <StarterZoodexGallery />,
           sizePercentage: 60,
         },
+        {
+          icon: <LucideSalad className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Plant life",
+          dynamicComponent: <PlanktonPortalTutorial anomalyId="59876090" />,
+          sizePercentage: 60,
+        },
         // {
         //   icon: <TreePalmIcon className="w-6 h-6 text-[#5e81ac]" />,
         //   text: "Greenhouse",
@@ -322,7 +331,7 @@ export const StructuresConfig: StructureConfig = {
           icon: <PowerIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Launch a rocket (travel)",
           // dynamicComponent: <LaunchpadStructure />,
-          dynamicComponent: <PlanetSwitcher />,
+          dynamicComponent: <SwitchPlanet />,
           sizePercentage: 100,
 
         },

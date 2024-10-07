@@ -4,9 +4,9 @@ import React, { useState, useEffect } from "react";
 import { Battery, Droplet, Zap, AlertTriangle, BarChart2, Rocket, Satellite, Box, PieChart, X, Cpu, Navigation, Heart, Radio, Radar } from 'lucide-react';
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { PlanetSwitcher } from "../../(scenes)/planetScene/SwitchPlanet";
+import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
 
-const TravelLaunch = () => <div><PlanetSwitcher /></div>;
+const TravelLaunch = () => <div><SwitchPlanet /></div>;
 const DeployProbesLaunch = () => <div>Not available yet</div>;
 const TransportLaunch = () => <div>Not available yet</div>;
 

@@ -433,7 +433,7 @@ export function StarterZoodexGallery() {
             {imageUrls.length > 0 && anomalyType && (
                 <ClassificationForm 
                     anomalyId={anomaly.id.toString()}
-                    anomalyType={anomalyType}
+                    anomalyType={anomalyType} 
                     missionNumber={1370202}     
                     assetMentioned={imageUrls[0]}
                     structureItemId={3104}

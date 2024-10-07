@@ -13,14 +13,6 @@ import InitialiseChapterOneUser from "@/components/(scenes)/chapters/one/Initial
 const EarthView: React.FC = () => {
   const supabase = useSupabaseClient();
   const session = useSession();
-  
-  const { activePlanet, updatePlanetLocation } = useActivePlanet();
-
-  if (activePlanet?.id !== 69 || 35) {
-    return (
-        <InitialiseChapterOneUser />
-    );
-  };
 
   return ( 
     <div className="relative min-h-screen">
