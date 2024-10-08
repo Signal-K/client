@@ -107,7 +107,6 @@ export function ActiveAutomatonForMining({
 
     const mineralName = deposit.mineralconfiguration.mineral;
 
-    // Check if the power level is sufficient for mining water-ice
     if (mineralName === "water" && powerLevel < 2) {
       setErrorMessage(
         "This automaton requires a Power level of 2 or greater to mine water. Please upgrade your automaton."

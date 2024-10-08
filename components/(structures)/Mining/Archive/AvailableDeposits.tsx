@@ -1,4 +1,4 @@
-"use client";
+"use client"; 
  
 import React, { useEffect, useState } from 'react';
 import { useActivePlanet } from '@/context/ActivePlanet';
@@ -51,9 +51,11 @@ const fetchInventoryItems = async (): Promise<InventoryItem[]> => {
 }; 
 
 const MineralDeposits: React.FC<{ onSelectDeposit: (deposit: MineralDepositData) => void }> = ({ onSelectDeposit }) => {
-  const { activePlanet } = useActivePlanet();
   const session = useSession();
   const supabase = useSupabaseClient();
+
+  const { activePlanet } = useActivePlanet();
+
   const [mineralDeposits, setMineralDeposits] = useState<MineralDepositData[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
 

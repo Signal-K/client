@@ -64,7 +64,7 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
       {/* <Navbar /> */}
       <div className="flex flex-col md:flex-row min-h-screen">
         {/* Left Panel */}
-        <div className="md:w-1/2 w-full flex flex-col justify-center items-center bg-[#2C3A4A] p-10">
+        <div className="md:w-1/2 w-full flex flex-col justify-center items-center bg-gray-100 p-10">
           <div className="w-full h-full relative">
             <Image
               src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/garden.png"
@@ -90,7 +90,7 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
         </Flexbox>
         <p className="max-w-[600px] text-muted-foreground md:text-xl">Explore the cosmos & catalogue discoveries in different scientific disciplines</p>
           <div className="max-w-md w-full mx-auto py-5">
-            <div className="bg-[#2C3A4A] p-8 rounded-lg shadow-lg">
+            <div className="bg-gray-100 p-8 rounded-lg shadow-lg">
               {children}
             </div>
           </div>

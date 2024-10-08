@@ -1,4 +1,5 @@
 export interface InventoryItem {
+    item: number;
     owner: string;
     anomaly: number;
     id: number;

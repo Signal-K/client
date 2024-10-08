@@ -81,7 +81,7 @@ export default function TutorialPopup() {
     };
 
     return (
-        <div className="bg=[#2C3A4A]">
+        <div className="bg-[#2C3A4A]">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
                     <Button size="icon" className="fixed bottom-4 bg-red-800 right-4 rounded-full">

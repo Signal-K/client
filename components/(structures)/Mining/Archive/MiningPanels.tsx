@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { MineralDeposit } from "@/types/Items";
-import { ActiveAutomatonForMining } from "../Auto/ActiveAutomaton";
+import { ActiveAutomatonForMining } from "../../Auto/ActiveAutomaton";
 import MineralDeposits from "./AvailableDeposits";
-import MineralsInventoryGrid from "../../(inventory)/mineralsPanel";
+import MineralsInventoryGrid from "../../../(inventory)/mineralsPanel";
 
 interface CollectMineralPanelProps {
   deposit: MineralDeposit;
-}
+};
 
 interface InventoryItem {
   id: number;
@@ -19,7 +19,7 @@ interface InventoryItem {
   ItemCategory: string;
   parentItem: number | null;
   itemLevel: number;
-}
+};
 
 export const SelectMineralPanel: React.FC<CollectMineralPanelProps> = ({ deposit }) => {
   const [showAutomatonPanel, setShowAutomatonPanel] = useState(false);

@@ -161,28 +161,30 @@ export function PenguinWatch() {
                 setLoading(false);
                 return;
             };
-
+    
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")
                     .select("*")
-                    .eq("anomalySet", 'zoodex-penguinWatch')
-
+                    .eq("anomalySet", 'zoodex-penguinWatch');
+    
                 if (anomalyError) {
                     throw anomalyError;
                 };
-
-                if (!anomalyData) {
+    
+                if (!anomalyData || anomalyData.length === 0) {
                     setAnomaly(null);
                     setLoading(false);
                     return;
                 };
-
+    
                 const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
                 setAnomaly(randomAnomaly);
-
+    
+                // Set the imageUrl after selecting the anomaly
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                const imageUrl = `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-penguinWatch/${randomAnomaly.id}.jpeg`;
+                const anomalyImageUrl = `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-penguinWatch/${randomAnomaly.id}.jpeg`;
+                setImageUrl(anomalyImageUrl);  // Set the image URL state here
             } catch (error: any) {
                 console.error('Error fetching penguins: ', error.message);
                 setAnomaly(null);
@@ -190,9 +192,10 @@ export function PenguinWatch() {
                 setLoading(false);
             };
         };
-
+    
         fetchAnomaly();
     }, [session, supabase, activePlanet]);
+    
 
     useEffect(() => {
         const checkTutorialMission = async () => {
