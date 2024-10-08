@@ -1,12 +1,12 @@
 "use client";
 
-import { MiningComponentComponent } from "@/components/(structures)/Mining/Mining";
+import AllClassifications from "@/content/Starnet/YourClassifications";
 import React from "react";
 
 export default function TestPage() {
     return (
         <div>
-            <MiningComponentComponent />
+            <AllClassifications />
         </div>
     );
 };

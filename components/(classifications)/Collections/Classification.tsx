@@ -5,6 +5,21 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, Users, Globe } from 'lucide-react';
+import { zoodexSouthCoastFaunaRecoveryClassificationConfig, cloudClassificationConfig, planetClassificationConfig } from '../FormConfigurations';
+import { zoodexSouthCoastFaunaRecovery, 
+  cloudClassificationOptions, 
+  initialCloudClassificationOptions, 
+  roverImgClassificationOptions, 
+  lidarEarthCloudsReadClassificationOptions, 
+  lidarEarthCloudsUploadClassificationOptions, 
+  planetClassificationOptions, 
+  planktonPortalClassificationOptions, 
+  penguinWatchClassificationOptions, 
+  diskDetectorClassificationOptions, 
+  zoodexIguanasFromAboveClassificationOptions, 
+  zoodexBurrowingOwlClassificationOptions, 
+  sunspotsConfigurationTemporary 
+} from '../PostForm';
 
 interface KeyStat {
   label: string;
@@ -43,7 +58,7 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
       try {
         const { data, error } = await supabase
           .from('classifications')
-          .select('id, content, classificationtype, created_at, media, anomaly')
+          .select('id, content, classificationtype, created_at, media, anomaly, classificationConfiguration')
           .eq('id', classificationId)
           .single();
 
@@ -63,7 +78,7 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
   if (loading) return <p>Loading...</p>;
   if (!classification) return <p>No classification found.</p>;
 
-  const { content, classificationtype, created_at, media, anomaly } = classification;
+  const { content, classificationtype, created_at, media, anomaly, classificationConfiguration } = classification;
   const profileImage = media.length > 0 ? media[0] : undefined;
   const discoveredOn = new Date(created_at).toLocaleDateString();
   const parentAnomaly = anomaly ? `Anomaly ID: ${anomaly}` : 'Earth';
@@ -90,9 +105,64 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
               <Globe className="w-4 h-4 text-slate-600" />
               <span className="text-sm">Parent Anomaly: {parentAnomaly}</span>
             </div>
+            <div className="mt-4">
+              <h3 className="font-semibold">Classification Configuration:</h3>
+              <pre>{JSON.stringify(classificationConfiguration, null, 2)}</pre>
+              <ClassificationOptions classificationConfiguration={classificationConfiguration} />
+            </div>
           </div>
         </div>
       </CardContent>
     </Card>
+  );
+};
+
+interface ClassificationConfiguration {
+  [key: string]: string | number | boolean; 
+}
+
+const ClassificationOptions: React.FC<{ classificationConfiguration: ClassificationConfiguration }> = ({ classificationConfiguration }) => {
+  const getRelevantOptions = (config: ClassificationConfiguration) => {
+    const options = [
+      cloudClassificationOptions,
+      planetClassificationOptions,
+      planktonPortalClassificationOptions,
+      diskDetectorClassificationOptions,
+      penguinWatchClassificationOptions,
+      roverImgClassificationOptions,
+      initialCloudClassificationOptions,
+      lidarEarthCloudsReadClassificationOptions,
+      lidarEarthCloudsUploadClassificationOptions,
+      zoodexBurrowingOwlClassificationOptions,
+      zoodexIguanasFromAboveClassificationOptions,
+      sunspotsConfigurationTemporary,
+    ];
+
+    const allOptions = options.flat();
+
+    const configValues = Object.values(config).filter(value => typeof value === 'string') as string[];
+
+    return allOptions.filter(option =>
+      configValues.some(configValue => option.text.includes(configValue))
+    );
+  };
+  const relevantOptions = getRelevantOptions(classificationConfiguration);
+
+  return (
+    <div>
+      <h2>Classification Configuration:</h2>
+      <pre>{JSON.stringify(classificationConfiguration, null, 2)}</pre>
+
+      <h2>Classification Options:</h2>
+      <ul>
+        {relevantOptions.length > 0 ? (
+          relevantOptions.map(option => (
+            <li key={option.id}>{option.text}</li>
+          ))
+        ) : (
+          <li>No relevant options found</li>
+        )}
+      </ul>
+    </div>
   );
 };

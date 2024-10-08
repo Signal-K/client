@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { DiscoveryCardSingle } from './Classification';
 
-interface DiscoveryCardsByActivePlanetProps {
-  activePlanet: number;
+interface DiscoveryCardsByUserAndAnomalyProps {
+  anomalyId: number;
 };
 
-export function DiscoveryCardsByActivePlanet({ activePlanet }: DiscoveryCardsByActivePlanetProps) {
+export function DiscoveryCardsByUserAndAnomaly({ anomalyId }: DiscoveryCardsByUserAndAnomalyProps) {
   const supabase = useSupabaseClient();
+const session = useSession();
+  
   const [classifications, setClassifications] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +24,8 @@ export function DiscoveryCardsByActivePlanet({ activePlanet }: DiscoveryCardsByA
         const { data, error } = await supabase
           .from('classifications')
           .select('id')
-          .filter('classificationConfiguration->activePlanet', 'eq', activePlanet);
+          .eq('author', session?.user.id)
+          .eq('anomaly', anomalyId); 
 
         if (error) throw error;
 
@@ -36,11 +39,11 @@ export function DiscoveryCardsByActivePlanet({ activePlanet }: DiscoveryCardsByA
     };
 
     fetchClassifications();
-  }, [activePlanet, supabase]);
+  }, [anomalyId, supabase]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
-  if (classifications.length === 0) return <p>No classifications found for active planet {activePlanet}.</p>;
+  if (classifications.length === 0) return <p>No classifications found for this anomaly by user</p>;
 
   return (
     <div className="flex flex-col space-y-4">
@@ -49,4 +52,4 @@ export function DiscoveryCardsByActivePlanet({ activePlanet }: DiscoveryCardsByA
       ))}
     </div>
   );
-}
+};

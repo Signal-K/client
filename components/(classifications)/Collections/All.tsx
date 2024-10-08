@@ -1,28 +1,32 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { DiscoveryCardSingle } from './Classification';
 
-interface DiscoveryCardsByActivePlanetProps {
-  activePlanet: number;
-};
-
-export function DiscoveryCardsByActivePlanet({ activePlanet }: DiscoveryCardsByActivePlanetProps) {
+export function DiscoveryCards() {
   const supabase = useSupabaseClient();
+  const session = useSession();
+
   const [classifications, setClassifications] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchClassifications = async () => {
+      if (!session?.user) {
+        setError('User session not found.');
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError(null);
       try {
         const { data, error } = await supabase
           .from('classifications')
-          .select('id')
-          .filter('classificationConfiguration->activePlanet', 'eq', activePlanet);
+          .select('*')
+          .eq('author', session.user.id); 
 
         if (error) throw error;
 
@@ -36,11 +40,11 @@ export function DiscoveryCardsByActivePlanet({ activePlanet }: DiscoveryCardsByA
     };
 
     fetchClassifications();
-  }, [activePlanet, supabase]);
+  }, [session, supabase]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
-  if (classifications.length === 0) return <p>No classifications found for active planet {activePlanet}.</p>;
+  if (classifications.length === 0) return <p>No classifications found for this user.</p>;
 
   return (
     <div className="flex flex-col space-y-4">

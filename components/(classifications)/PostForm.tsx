@@ -14,7 +14,7 @@ interface ClassificationOption {
     subOptions?: ClassificationOption[];
 };
 
-const zoodexSouthCoastFaunaRecovery: ClassificationOption[] = [
+export const zoodexSouthCoastFaunaRecovery: ClassificationOption[] = [
     { id: 1, text: "Australian raven" },
     { id: 2, text: "Red-winged fairy-wren" },
     { id: 3, text: "Cat" },
@@ -81,7 +81,7 @@ const zoodexSouthCoastFaunaRecovery: ClassificationOption[] = [
     { id: 64, text: "Bush rat" },
 ];
 
-const cloudClassificationOptions: ClassificationOption[] = [
+export const cloudClassificationOptions: ClassificationOption[] = [
     {
       id: 1,
       text: "Colour",
@@ -109,14 +109,14 @@ const cloudClassificationOptions: ClassificationOption[] = [
     },
 ];
 
-const planetClassificationOptions: ClassificationOption[] = [
+export const planetClassificationOptions: ClassificationOption[] = [
     { id: 1, text: 'No dips at all' },
     { id: 2, text: 'Repeating dips' },
     { id: 3, text: 'Dips with similar size' },
     { id: 4, text: 'Dips aligned to one side' },
 ];
 
-const planktonPortalClassificationOptions: ClassificationOption[] = [
+export const planktonPortalClassificationOptions: ClassificationOption[] = [
     {
         id: 1, 
         text: 'Round plankton, no tentacles',
@@ -143,7 +143,7 @@ const planktonPortalClassificationOptions: ClassificationOption[] = [
     },
 ];
 
-const diskDetectorClassificationOptions: ClassificationOption[] = [
+export const diskDetectorClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
         text: "Object moves away from crosshairs",
@@ -170,7 +170,7 @@ const diskDetectorClassificationOptions: ClassificationOption[] = [
     },
 ];
 
-const penguinWatchClassificationOptions: ClassificationOption[] = [
+export const penguinWatchClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
         text: "Adult penguin",
@@ -193,7 +193,7 @@ const penguinWatchClassificationOptions: ClassificationOption[] = [
     },
 ];
 
-const roverImgClassificationOptions: ClassificationOption[] = [
+export const roverImgClassificationOptions: ClassificationOption[] = [
     { id: 1, text: 'Dried-up water channels' },
     { id: 2, text: 'Pebbles/medium-sized rocks' },
     { id: 3, text: 'Hills/mountain formations' },
@@ -202,7 +202,7 @@ const roverImgClassificationOptions: ClassificationOption[] = [
     { id: 6, text: 'Sandy/rocky terrain' },
 ];
 
-const initialCloudClassificationOptions: ClassificationOption[] = [
+export const initialCloudClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
         text: "Narrow arch",
@@ -226,7 +226,7 @@ const initialCloudClassificationOptions: ClassificationOption[] = [
     },
 ];
 
-const lidarEarthCloudsReadClassificationOptions: ClassificationOption[] = [
+export const lidarEarthCloudsReadClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
         text: "Nimbostratus",
@@ -273,7 +273,7 @@ const lidarEarthCloudsReadClassificationOptions: ClassificationOption[] = [
     },
 ];
 
-const lidarEarthCloudsUploadClassificationOptions: ClassificationOption[] = [
+export const lidarEarthCloudsUploadClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
         text: "Nimbostratus",
@@ -320,7 +320,7 @@ const lidarEarthCloudsUploadClassificationOptions: ClassificationOption[] = [
     },
 ];
 
-const zoodexBurrowingOwlClassificationOptions: ClassificationOption[] = [
+export const zoodexBurrowingOwlClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
         text: "Adult owl",
@@ -355,7 +355,7 @@ const zoodexBurrowingOwlClassificationOptions: ClassificationOption[] = [
     },// Expand for choosing numbers, pointers, and predators etc.
 ];
 
-const zoodexIguanasFromAboveClassificationOptions: ClassificationOption[] = [
+export const zoodexIguanasFromAboveClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
         text: "Adult Male not in a Lek",
@@ -374,7 +374,7 @@ const zoodexIguanasFromAboveClassificationOptions: ClassificationOption[] = [
     },
 ];
 
-const sunspotsConfigurationTemporary: ClassificationOption[] = [
+export const sunspotsConfigurationTemporary: ClassificationOption[] = [
     {
         id: 1,
         text: "No sunspots",
@@ -585,20 +585,21 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
     };
 
     const createPost = async () => {
+        const classificationOptionsObj = Object.fromEntries(
+            Object.entries(selectedOptions).map(([key, value]) => [
+                classificationOptions.find(option => option.id === parseInt(key))?.text || '',
+                value
+            ])
+        );
+    
         const classificationConfiguration = {
-            ...Object.fromEntries(
-                Object.entries(selectedOptions).map(([key, value]) => [
-                    classificationOptions.find(option => option.id === parseInt(key))?.text || '',
-                    value
-                ])
-            ),
+            classificationOptions: classificationOptionsObj, 
             activePlanet: activePlanet?.id,
             structureId: originatingStructure ?? null,
             createdBy: inventoryItemId ?? null,
         };
     
         try {
-            // Fetch current configuration to update "Uses"
             let currentConfig: any = {};
             if (inventoryItemId) {
                 const { data: inventoryData, error: inventoryError } = await supabase
@@ -606,7 +607,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     .select('configuration')
                     .eq('id', inventoryItemId)
                     .single();
-                
+                    
                 if (inventoryError) throw inventoryError;
     
                 currentConfig = inventoryData?.configuration || {};
@@ -634,7 +635,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     media: [uploads, assetMentioned],
                     anomaly: anomalyId,  
                     classificationtype: anomalyType,
-                    classificationConfiguration, 
+                    classificationConfiguration,
                 })
                 .single();
     
@@ -648,7 +649,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 setSelectedOptions({});
                 setUploads([]);
                 setPostSubmitted(true);
-
+    
                 setTimeout(() => {
                     setShowResearch(true);
                 }, 1200);
