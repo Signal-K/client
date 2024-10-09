@@ -13,7 +13,6 @@ import { bgImage, backgroundImages } from "@/constants/backgrounds";
 import { Analytics } from "@vercel/analytics/react"
 import { MissionProvider } from "@/context/MissionContext";
 import TutorialPopup from "../content/Dialogue/helpButton";
-import { ThemeProvider } from "@/components/themeProvider";
 // import { CreateStructureWithItemRequirementinfo } from "@/components/Gameplay/Inventory/Structures/Structure";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -69,7 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </Head>
       <body>
         <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {/* <ThemeProviders attribute="class" defaultTheme="system" enableSystem> */}
             <ActivePlanetProvider>
                 {/* <MissionProvider> */}
                     <UserAnomaliesProvider>
@@ -81,7 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     </UserAnomaliesProvider>
                 {/* </MissionProvider> */}
             </ActivePlanetProvider>
-          </ThemeProvider>
+          {/* </ThemeProviders> */}
         </SessionContextProvider>
       </body>
     </html>

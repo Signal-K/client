@@ -40,7 +40,7 @@ export function DiscoveryCardsByUserAndAnomaly({ anomalyId }: DiscoveryCardsByUs
         if (totalError) {
           console.error('Error fetching total classifications:', totalError);
           throw totalError;
-        }
+        };
 
         setTotalClassifications(totalCount);
 
@@ -54,7 +54,7 @@ export function DiscoveryCardsByUserAndAnomaly({ anomalyId }: DiscoveryCardsByUs
         if (userError) {
           console.error('Error fetching user classifications count:', userError);
           throw userError;
-        }
+        };
 
         setUserClassificationsCount(userCount);
 

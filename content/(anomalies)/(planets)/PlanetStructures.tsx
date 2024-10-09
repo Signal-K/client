@@ -24,7 +24,7 @@ const PlanetStructures: React.FC = () => {
         atmosphere: InventoryStructureItem[],
         surface: InventoryStructureItem[]
     ) => {
-        setOrbitalStructures(orbital);
+        setOrbitalStructures(orbital); 
         setAtmosphereStructures(atmosphere);
         setSurfaceStructures(surface);
     };

@@ -15,8 +15,14 @@ const EarthView: React.FC = () => {
   const session = useSession();
 
   return ( 
+    <div className="min-h-screen w-full flex flex-col">
+    <img
+      className="absolute inset-0 w-full h-full object-cover"
+      src="/assets/Backdrops/Mercury.png"
+    />
     <div className="relative min-h-screen">
         <EarthStructures />
+    </div>
     </div>
   );
 };

@@ -36,9 +36,15 @@ const MarsView: React.FC = () => {
     };
 
     return (
+        <div className="min-h-screen w-full flex flex-col">
+    <img
+      className="absolute inset-0 w-full h-full object-cover"
+      src="/assets/Backdrops/Mars.png"
+    />
         <div className="relative min-h-screen">
             <InitialisePlanet planetId={40} />
             <MarsStructures />
+        </div>
         </div>
     );
 };

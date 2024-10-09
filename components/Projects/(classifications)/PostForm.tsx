@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useProfileContext } from "@/context/UserProfile";
-import UserAvatar, { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 import { ClassificationOutput } from "./ClassificationResults";
 import IntroduceUserToResearch from "../../(scenes)/chapters/(onboarding)/initialiseResearch";
 
@@ -22,6 +21,7 @@ import { zoodexSouthCoastFaunaRecovery,
     zoodexBurrowingOwlClassificationOptions, 
     sunspotsConfigurationTemporary 
 } from '@/content/Classifications/Options';
+import UserAvatar, { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 
 interface ClassificationFormProps {
     anomalyType: string;
