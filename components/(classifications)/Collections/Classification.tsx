@@ -19,7 +19,7 @@ import { zoodexSouthCoastFaunaRecovery,
   zoodexIguanasFromAboveClassificationOptions, 
   zoodexBurrowingOwlClassificationOptions, 
   sunspotsConfigurationTemporary 
-} from '../PostForm';
+} from '@/content/Classifications/Options';
 
 interface KeyStat {
   label: string;
@@ -45,6 +45,34 @@ const generateImagePlaceholder = (name: string) => {
     context.fillText((name && name.length > 0) ? name.charAt(0).toUpperCase() : '?', canvas.width / 2, canvas.height / 2);
   }
   return canvas.toDataURL();
+};
+
+interface DiscoveryCardSingleProps {
+  classificationId: number;
+};
+
+const extractImageUrls = (media: any): string[] => {
+  let imageUrls: string[] = [];
+
+  if (typeof media === 'string') {
+    try {
+      const mediaObj = JSON.parse(media);
+      if (mediaObj.uploadUrl) {
+        imageUrls.push(mediaObj.uploadUrl);
+      }
+    } catch {
+      // If it's not a valid JSON, do nothing
+    }
+  } else if (Array.isArray(media)) {
+    // Flatten the array and extract URLs
+    media.flat().forEach((item) => {
+      if (typeof item === 'string' && item.startsWith('http')) {
+        imageUrls.push(item);
+      }
+    });
+  }
+
+  return imageUrls;
 };
 
 export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSingleProps) {
@@ -79,16 +107,23 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
   if (!classification) return <p>No classification found.</p>;
 
   const { content, classificationtype, created_at, media, anomaly, classificationConfiguration } = classification;
-  const profileImage = media.length > 0 ? media[0] : undefined;
   const discoveredOn = new Date(created_at).toLocaleDateString();
   const parentAnomaly = anomaly ? `Anomaly ID: ${anomaly}` : 'Earth';
+
+  // Extract URLs from the media column
+  const imageUrls = extractImageUrls(media);
 
   return (
     <Card className="w-full max-w-2xl bg-gradient-to-br from-slate-100 to-slate-200 text-slate-900 overflow-hidden relative border-2 border-slate-300 rounded-xl shadow-lg">
       <CardContent className="p-6 flex">
         <div className="w-1/3 pr-4 border-r border-slate-300">
           <div className="aspect-square rounded-lg overflow-hidden mb-4 shadow-md">
-            <img src={profileImage || generateImagePlaceholder(content)} alt={content} className="w-full h-full object-cover" />
+            {/* Display first image or placeholder */}
+            {imageUrls.length > 0 ? (
+              <img src={imageUrls[0]} alt="Classification Media" className="w-full h-full object-cover" />
+            ) : (
+              <img src={generateImagePlaceholder(content)} alt={content} className="w-full h-full object-cover" />
+            )}
           </div>
           <h2 className="text-2xl font-bold mb-2">{content}</h2>
           <Badge variant="outline" className="bg-slate-800 text-white">
@@ -108,14 +143,26 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
             <div className="mt-4">
               <h3 className="font-semibold">Classification Configuration:</h3>
               <pre>{JSON.stringify(classificationConfiguration, null, 2)}</pre>
-              <ClassificationOptions classificationConfiguration={classificationConfiguration} />
             </div>
+
+            {/* Display all images from the media */}
+            {imageUrls.length > 1 && (
+              <div className="mt-4">
+                <h3 className="font-semibold">Additional Media:</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {imageUrls.slice(1).map((url, index) => (
+                    <img key={index} src={url} alt={`Media ${index + 1}`} className="w-full h-auto object-cover rounded-lg shadow-md" />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
     </Card>
   );
 };
+
 
 interface ClassificationConfiguration {
   [key: string]: string | number | boolean; 
