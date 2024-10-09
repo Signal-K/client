@@ -6,8 +6,8 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import { InventoryStructureItem } from "@/types/Items";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
-import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/(structures)/Structures";
-import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
+import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
+import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import InitialiseChapterOneUser from "@/components/(scenes)/chapters/one/InitialiseUser";
 
 const EarthView: React.FC = () => {

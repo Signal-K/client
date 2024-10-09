@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryStructureItem } from "@/types/Items";
-import { EarthViewLayout } from "../../(scenes)/planetScene/layout";
-import { PlanetarySystem } from "../../(scenes)/planetScene/orbitals/system";
-import StructuresOnPlanet, { OrbitalStructuresOnPlanet, AtmosphereStructuresOnPlanet } from "../../(structures)/Structures";
-import AllAutomatonsOnActivePlanet from "../../(structures)/Auto/AllAutomatons";
+import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
+import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
+import StructuresOnPlanet, { OrbitalStructuresOnPlanet, AtmosphereStructuresOnPlanet } from "@/components/Structures/Structures";
+import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 
 const PlanetStructures: React.FC = () => {
     const supabase = useSupabaseClient();

@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet'; 
-import ClassificationForm from '@/components/(classifications)/PostForm';
-import { StructureInfo } from "@/components/(structures)/structureInfo";
-import { ClassificationFormComponentT } from '@/components/(classifications)/MegaClassificationForm';
-import { planetClassificationConfig } from '@/components/(classifications)/FormConfigurations';
+import ClassificationForm from '@/components/Projects/(classifications)/PostForm';
+import { StructureInfo } from "@/components/Structures/structureInfo";
+import { ClassificationFormComponentT } from '@/components/Projects/(classifications)/MegaClassificationForm';
+import { planetClassificationConfig } from '@/components/Projects/(classifications)/FormConfigurations';
 
 export interface Anomaly {
     id: bigint;

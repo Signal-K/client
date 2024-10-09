@@ -2,8 +2,8 @@
 
 import React, { useCallback, useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { UnownedSurfaceStructures } from "@/components/(structures)/Build/EditMode";
-import IndividualStructure, { IndividualStructureProps } from "@/components/(structures)/IndividualStructure";
+import { UnownedSurfaceStructures } from "@/components/Structures/Build/EditMode";
+import IndividualStructure, { IndividualStructureProps } from "@/components/Structures/IndividualStructure";
 import { StructuresConfigForSandbox } from "@/constants/Structures/SandboxProperties";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 import { useActivePlanet } from "@/context/ActivePlanet";

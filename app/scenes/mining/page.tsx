@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import MineralDeposits from "@/components/(structures)/Mining/Archive/AvailableDeposits";
-import { SelectMineralPanel } from "@/components/(structures)/Mining/Archive/MiningPanels";
-import MineralsInventoryGrid from "@/components/(inventory)/mineralsPanel";
+import MineralDeposits from "@/components/Structures/Mining/Archive/AvailableDeposits";
+import { SelectMineralPanel } from "@/components/Structures/Mining/Archive/MiningPanels";
+import MineralsInventoryGrid from "@/components/Inventory/mineralsPanel";
 
 enum Step {
   MineralDeposits = "MINERAL_DEPOSITS",

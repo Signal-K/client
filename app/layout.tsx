@@ -12,7 +12,8 @@ import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 import { bgImage, backgroundImages } from "@/constants/backgrounds";
 import { Analytics } from "@vercel/analytics/react"
 import { MissionProvider } from "@/context/MissionContext";
-import TutorialPopup from "../components/(dialogue)/helpButton";
+import TutorialPopup from "../content/Dialogue/helpButton";
+import { ThemeProvider } from "@/components/themeProvider";
 // import { CreateStructureWithItemRequirementinfo } from "@/components/Gameplay/Inventory/Structures/Structure";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -68,50 +69,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </Head>
       <body>
         <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
-          <ActivePlanetProvider>
-              {/* <MissionProvider> */}
-                  <UserAnomaliesProvider>
-                    <InventoryProvider>
-                      {children}
-                      <TutorialPopup />
-                      <Analytics />
-                    </InventoryProvider>
-                  </UserAnomaliesProvider>
-              {/* </MissionProvider> */}
-          </ActivePlanetProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ActivePlanetProvider>
+                {/* <MissionProvider> */}
+                    <UserAnomaliesProvider>
+                      <InventoryProvider>
+                        {children}
+                        <TutorialPopup />
+                        <Analytics />
+                      </InventoryProvider>
+                    </UserAnomaliesProvider>
+                {/* </MissionProvider> */}
+            </ActivePlanetProvider>
+          </ThemeProvider>
         </SessionContextProvider>
       </body>
     </html>
   );
 };
-
-interface LayoutProps {
-  children: ReactNode;
-  bg: any;
-};
-
-interface ResponsiveLayoutProps { 
-  leftContent: React.ReactNode;
-  middleContent: React.ReactNode;
-  // rightContent: React.ReactNode;
-};
-
-interface SectionProps {
-  background: string;
-  children: React.ReactNode;
-}
-
-const Section: React.FC<SectionProps> = ({ background, children }) => (
-  <div
-    className="flex items-center justify-center h-full w-full"
-    style={{
-      backgroundImage: background,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      height: '100%',
-      width: '100%',
-    }}
-  >
-    {children}
-  </div>
-);

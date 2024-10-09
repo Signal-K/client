@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import ProfileCardModal from "@/components/profile/form";
+import ProfileCardModal from "@/components/Profile/form";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { FirstTelescopeClassification } from "@/components/Projects/Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import DeployRooversInitial from "../../../(structures)/Auto/deployAndReturn";
-import GeneratedStarterPlanet from "../../../(anomalies)/(planets)/generated";
+import DeployRooversInitial from "../../../Structures/Auto/deployAndReturn";
+import GeneratedStarterPlanet from "@/content/(anomalies)/(planets)/generated";
 import { Mission } from "@/types/Missions";
 import { OnboardingStepProps } from "@/types/Onboarding";
 import Link from "next/link";

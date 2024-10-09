@@ -4,12 +4,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import PlanetViewLayout from "@/components/(scenes)/planetScene/layout";
-import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/(structures)/Structures";
+import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 import { InventoryStructureItem } from "@/types/Items";
 import ChapterOneIntroduction from "@/components/(scenes)/chapters/one/ChapterOneIntro";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
 // import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
-import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
+import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 
 export default function PlanetViewPage() {
     const session = useSession();

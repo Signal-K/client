@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MineralDepositsNoAction } from "@/components/(structures)/Mining/Archive/AvailableDeposits";
+import { MineralDepositsNoAction } from "@/components/Structures/Mining/Archive/AvailableDeposits";
 
 interface UserMissionInstance {
     id: number;

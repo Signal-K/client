@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useProfileContext } from "@/context/UserProfile";
-import UserAvatar, { UserAvatarNullUpload } from "@/components/profile/Avatar";
+import UserAvatar, { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 import { ClassificationOutput } from "./ClassificationResults";
-import IntroduceUserToResearch from "../(scenes)/chapters/(onboarding)/initialiseResearch";
+import IntroduceUserToResearch from "../../(scenes)/chapters/(onboarding)/initialiseResearch";
 
 import { zoodexSouthCoastFaunaRecovery, 
     cloudClassificationOptions, 

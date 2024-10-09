@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Unlock } from "lucide-react";
 import { lidarDataSources, telescopeDataSources, zoodexDataSources, roverDataSources } from "./ZoodexDataSources";
-import { StructureInfo } from "../(structures)/structureInfo";
+import { StructureInfo } from "../Structures/structureInfo";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { InventoryIdFetcher } from "../(inventory)/fetchId";
+import { InventoryIdFetcher } from "../Inventory/fetchId";
 
 export function DataSourcesModal({ structureId, structure }: DataSourcesModalProps) {
   const supabase = useSupabaseClient();

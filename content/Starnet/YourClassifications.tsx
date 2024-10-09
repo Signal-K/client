@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { DiscoveryCards } from "@/components/(classifications)/Collections/All";
-import { DiscoveryCardsByActivePlanet } from "@/components/(classifications)/Collections/ByActivePlanet";
-import { DiscoveryCardsByUserAndAnomaly } from "@/components/(classifications)/Collections/ByAnomaly";
+import { DiscoveryCards } from "@/components/Projects/(classifications)/Collections/All";
+import { DiscoveryCardsByActivePlanet } from "@/components/Projects/(classifications)/Collections/ByActivePlanet";
+import { DiscoveryCardsByUserAndAnomaly } from "@/components/Projects/(classifications)/Collections/ByAnomaly";
 
 export default function AllClassifications() {
   const [activePlanet, setActivePlanet] = useState<number | null>(null);

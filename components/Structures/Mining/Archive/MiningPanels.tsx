@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { MineralDeposit } from "@/types/Items";
 import { ActiveAutomatonForMining } from "../../Auto/ActiveAutomaton";
 import MineralDeposits from "./AvailableDeposits";
-import MineralsInventoryGrid from "../../../(inventory)/mineralsPanel";
+import MineralsInventoryGrid from "../../../Inventory/mineralsPanel";
 
 interface CollectMineralPanelProps {
   deposit: MineralDeposit;

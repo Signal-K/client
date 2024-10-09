@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { StructureInfo } from "@/components/(structures)/structureInfo";
-import ClassificationForm from "@/components/(classifications)/PostForm";
+import { StructureInfo } from "@/components/Structures/structureInfo";
+import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 
 interface LidarProps {
     anomalyId: string;

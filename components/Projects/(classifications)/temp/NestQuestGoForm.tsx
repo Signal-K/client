@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { UserAvatarNullUpload } from "@/components/profile/Avatar";
+import { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 import IntroduceUserToResearch from "@/components/(scenes)/chapters/(onboarding)/initialiseResearch";
 
 interface ClassificationFormProps {
