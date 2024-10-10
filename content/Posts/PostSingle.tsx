@@ -15,16 +15,17 @@ interface PostCardSingleProps {
     comments: number;
     category: string;
     tags: string[];
-};
+    images: string[];
+}
 
-export function PostCardSingle({ title, author, content, votes, comments, category, tags }: PostCardSingleProps) {
+export function PostCardSingle({ title, author, content, votes, comments, category, tags, images }: PostCardSingleProps) {
     const [voteCount, setVoteCount] = useState(votes);
     const handleVote = () => {
         setVoteCount(prevCount => prevCount + 1);
     };
 
     return (
-        <Card className="w-full max-w-2xl mx-autp my-8 squiggly-connector">
+        <Card className="w-full max-w-2xl mx-auto my-8 squiggly-connector bg-card text-card-foreground border-primary">
             <CardHeader>
                 <div className="flex items-center space-x-4">
                     <Avatar>
@@ -45,6 +46,12 @@ export function PostCardSingle({ title, author, content, votes, comments, catego
                     ))}
                 </div>
                 <p>{content}</p>
+                {/* Display images */}
+                <div className="flex flex-wrap gap-2 mt-4">
+                    {images.map((image, index) => (
+                        <img key={index} src={image} alt={`Media ${index + 1}`} className="w-full h-auto max-w-xs object-cover" />
+                    ))}
+                </div>
             </CardContent>
             <CardFooter className="flex justify-between">
                 <Button variant="ghost" size="sm" onClick={handleVote}>
@@ -54,14 +61,14 @@ export function PostCardSingle({ title, author, content, votes, comments, catego
                 <Button variant="ghost" size="sm">
                     <MessageSquare className="mr-2 h-4 w-4" />
                     {comments}
-                    </Button>
-                    <Button variant="ghost" size="sm">
+                </Button>
+                <Button variant="ghost" size="sm">
                     <GitFork className="mr-2 h-4 w-4" />
                     Fork
-                    </Button>
-                </CardFooter>
-                <div className="squiggly-shape" style={{ left: '-15px', top: '50%' }}></div>
-                <div className="squiggly-shape" style={{ right: '-15px', bottom: '-15px' }}></div>
+                </Button>
+            </CardFooter>
+            <div className="squiggly-shape" style={{ left: '-20px', top: '30%', transform: 'rotate(30deg)' }}></div>
+            <div className="squiggly-shape" style={{ right: '-15px', bottom: '-10px', transform: 'rotate(-15deg)' }}></div>
         </Card>
     );
 };

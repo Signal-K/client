@@ -2,98 +2,106 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-    :root {
-      --background: 240 10% 97%;
-      --foreground: 222 47% 11%;
-      --card: 0 0% 100%;
-      --card-foreground: 222 47% 11%;
-      --popover: 0 0% 100%;
-      --popover-foreground: 222 47% 11%;
-      --primary: 196 64% 29%;
-      --primary-foreground: 210 40% 98%;
-      --secondary: 175 84% 52%;
-      --secondary-foreground: 222 47% 11%;
-      --muted: 210 40% 96.1%;
-      --muted-foreground: 215.4 16.3% 46.9%;
-      --accent: 42 87% 75%;
-      --accent-foreground: 222 47% 11%;
-      --destructive: 0 84.2% 60.2%;
-      --destructive-foreground: 210 40% 98%;
-      --border: 214.3 31.8% 91.4%;
-      --input: 214.3 31.8% 91.4%;
-      --ring: 196 64% 29%;
-      --radius: 0.5rem;
-    }
-  
-    .dark {
-      --background: 222 47% 11%;
-      --foreground: 210 40% 98%;
-      --card: 222 47% 11%;
-      --card-foreground: 210 40% 98%;
-      --popover: 222 47% 11%;
-      --popover-foreground: 210 40% 98%;
-      --primary: 196 64% 29%;
-      --primary-foreground: 210 40% 98%;
-      --secondary: 175 84% 52%;
-      --secondary-foreground: 222 47% 11%;
-      --muted: 217.2 32.6% 17.5%;
-      --muted-foreground: 215 20.2% 65.1%;
-      --accent: 42 87% 75%;
-      --accent-foreground: 222 47% 11%;
-      --destructive: 0 62.8% 30.6%;
-      --destructive-foreground: 210 40% 98%;
-      --border: 217.2 32.6% 17.5%;
-      --input: 217.2 32.6% 17.5%;
-      --ring: 196 64% 29%;
-    }
-  }
-  
-  @layer base {
-    * {
-      @apply border-border;
-    }
-    body {
-      @apply bg-background text-foreground;
-    }
-  }
-  
-  .squiggly-bg {
-    background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%235FCBC3' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  }
-  
-  .squiggly-connector {
-    position: relative;
-  }
-  
-  .squiggly-connector::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 100%;
-    width: 2px;
-    height: 40px;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 5px,
-      #5FCBC3 5px,
-      #5FCBC3 10px
-    );
-    transform: translateX(-50%);
-  }
-  
-  .squiggly-shape {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background-color: #FFD580;
-    opacity: 0.5;
-    animation: float 3s ease-in-out infinite;
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
+:root {
+  --background: 206 28% 16%;
+  --foreground: 43 33% 97%;
+  --card: 203 37% 28%;
+  --card-foreground: 43 33% 97%;
+  --popover: 203 37% 28%;
+  --popover-foreground: 43 33% 97%;
+  --primary: 174 55% 58%;
+  --primary-foreground: 206 28% 16%;
+  --secondary: 84 62% 68%;
+  --secondary-foreground: 206 28% 16%;
+  --muted: 203 37% 28%;
+  --muted-foreground: 43 33% 97%;
+  --accent: 5 100% 68%;
+  --accent-foreground: 206 28% 16%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 43 33% 97%;
+  --border: 174 55% 58%;
+  --input: 203 37% 28%;
+  --ring: 174 55% 58%;
+  --radius: 0.5rem;
+}
+
+body {
+  @apply bg-background text-foreground;
+  background-image: var(--squiggly-bg);
+}
+
+.squiggly-bg {
+  background-image: var(--squiggly-bg);
+}
+
+.squiggly-connector {
+  position: relative;
+}
+
+.squiggly-connector::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 60px;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 5px,
+    hsl(var(--primary)) 5px,
+    hsl(var(--primary)) 10px
+  );
+  transform: translateX(-50%) rotate(5deg);
+}
+
+.squiggly-shape {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50% 20% / 10% 40%;
+  background-color: hsl(var(--primary));
+  opacity: 0.2;
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(10deg); }
+}
+
+.squiggly-divider {
+  position: relative;
+  height: 80px;
+  margin: 30px 0;
+  overflow: visible;
+}
+
+.squiggly-divider::before {
+  content: '';
+  position: absolute;
+  left: -10%;
+  top: 50%;
+  width: 120%;
+  height: 3px;
+  background: repeating-linear-gradient(
+    to right,
+    transparent 0px,
+    transparent 5px,
+    hsl(var(--primary)) 5px,
+    hsl(var(--primary)) 10px
+  );
+  transform: translateY(-50%) rotate(-2deg);
+}
+
+.squiggly-divider::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 15px;
+  height: 15px;
+  background-color: hsl(var(--accent));
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  transform: translate(-50%, -50%) rotate(45deg);
+}

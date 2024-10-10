@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { PostCardSingle } from "@/content/Posts/PostSingle";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import StarnetLayout from "@/components/Layout/Starnet";
 
 export default function TestPage() {
     const supabase = useSupabaseClient();
@@ -30,7 +31,21 @@ export default function TestPage() {
 
                 if (error) throw error;
 
-                setClassifications(data);
+                // Extract image URLs from media
+                const processedData = data.map((classification) => {
+                    const media = classification.media;
+                    let images: string[] = [];
+
+                    if (Array.isArray(media) && media.length === 2 && typeof media[1] === 'string') {
+                        images.push(media[1]); // Array formatted media
+                    } else if (media && media.uploadUrl) {
+                        images.push(media.uploadUrl); // Object formatted media
+                    }
+
+                    return { ...classification, images };
+                });
+
+                setClassifications(processedData);
             } catch (error) {
                 console.error('Error fetching classifications:', error);
                 setError('Failed to load classifications.');
@@ -47,19 +62,42 @@ export default function TestPage() {
     if (classifications.length === 0) return <p>No classifications found for this user.</p>;
 
     return (
-        <div>
-            {classifications.map((classification) => (
-                <PostCardSingle
-                    key={classification.id}
-                    title={classification.content || "Untitled"}
-                    author={classification.author} 
-                    content={classification.content}
-                    votes={0} 
-                    comments={0} 
-                    category={"General"} 
-                    tags={[]} 
-                />
+        <StarnetLayout>
+            <h2 className="text-2xl font-semibold mb-6 text-primary">Latest Community Discoveries</h2>
+            {classifications.map((classification, index) => (
+                <div key={classification.id} className="relative mb-8">
+                    <PostCardSingle
+                        title={classification.content || "Untitled"}
+                        author={classification.author}
+                        content={classification.content}
+                        votes={0}
+                        comments={0}
+                        category={"General"}
+                        tags={[]} 
+                        images={classification.images} 
+                    />
+                    {index < classifications.length - 1 && (
+                        <div className="squiggly-divider">
+                            <div
+                                className="squiggly-shape"
+                                style={{
+                                    left: `${Math.random() * 80 + 10}%`,
+                                    top: `${Math.random() * 60}%`,
+                                    transform: `rotate(${Math.random() * 360}deg)`,
+                                }}
+                            />
+                            <div
+                                className="squiggly-shape"
+                                style={{
+                                    left: `${Math.random() * 80 + 10}%`,
+                                    top: `${Math.random() * 60}%`,
+                                    transform: `rotate(${Math.random() * 360}deg)`,
+                                }}
+                            />
+                        </div>
+                    )}
+                </div>
             ))}
-        </div>
+        </StarnetLayout>
     );
 }

@@ -21,7 +21,7 @@ import { zoodexSouthCoastFaunaRecovery,
     zoodexBurrowingOwlClassificationOptions, 
     sunspotsConfigurationTemporary 
 } from '@/content/Classifications/Options';
-import UserAvatar, { UserAvatarNullUpload } from "@/components/Profile/Avatar";
+// import UserAvatar, { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 
 interface ClassificationFormProps {
     anomalyType: string;
@@ -380,13 +380,13 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                             </div>
                             <div className="flex flex-col gap-2 w-2/3">
                                 <div className="flex gap-4 mb-4">
-                                    <UserAvatarNullUpload
+                                    {/* <UserAvatarNullUpload
                                         url={avatar_url}
                                         size={64}
                                         onUpload={(filePath: string) => {
                                             setAvatarUrl(filePath);
                                         }}
-                                    />
+                                    /> */}
                                     <textarea
                                         value={content}
                                         onChange={e => setContent(e.target.value)}
@@ -415,13 +415,13 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     ) : (
                         <div className="flex flex-col w-full">
                             <div className="flex gap-4 mb-4">
-                                <UserAvatarNullUpload
+                                {/* <UserAvatarNullUpload
                                     url={avatar_url}
                                     size={64}
                                     onUpload={(filePath: string) => {
                                         setAvatarUrl(filePath);
                                     }}
-                                />
+                                /> */}
                                 <textarea
                                     value={content}
                                     onChange={e => setContent(e.target.value)}
