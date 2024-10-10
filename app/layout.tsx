@@ -13,9 +13,13 @@ import { bgImage, backgroundImages } from "@/constants/backgrounds";
 import { Analytics } from "@vercel/analytics/react"
 import { MissionProvider } from "@/context/MissionContext";
 import TutorialPopup from "../content/Dialogue/helpButton";
-// import { CreateStructureWithItemRequirementinfo } from "@/components/Gameplay/Inventory/Structures/Structure";
+import AppLayout from "@/components/Layout/Layout";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   const [supabaseClient] = useState(() => createPagesBrowserClient());
 
   const { activePlanet } = useActivePlanet();
@@ -73,11 +77,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {/* <MissionProvider> */}
                     <UserAnomaliesProvider>
                       <InventoryProvider>
-                        {children}
-                        <TutorialPopup />
-                        <Analytics />
-                      </InventoryProvider>
-                    </UserAnomaliesProvider>
+                        <AppLayout>
+                          {children}
+                        </AppLayout>
+                      <TutorialPopup />
+                    <Analytics />
+                  </InventoryProvider>
+                </UserAnomaliesProvider>
                 {/* </MissionProvider> */}
             </ActivePlanetProvider>
           {/* </ThemeProviders> */}

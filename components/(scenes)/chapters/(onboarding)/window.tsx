@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import ProfileCardModal from "@/components/Profile/form";
+// import ProfileCardModal from "@/components/Profile/form";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { FirstTelescopeClassification } from "@/components/Projects/Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
@@ -22,12 +22,12 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
 
   const renderComponentForStep = () => {
     switch (step) {
-      case 1370102:
-        return (
-          <div>
-            <ProfileCardModal />
-          </div>
-        );
+      // case 1370102:
+      //   return (
+      //     <div>
+      //       <ProfileCardModal />
+      //     </div>
+      //   );
       case 1370103:
         return (
           <div>

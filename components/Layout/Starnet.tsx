@@ -5,7 +5,7 @@ export default function StarnetLayout({ children }: { children: React.ReactNode 
     <div className="flex min-h-screen squiggly-bg bg-background text-foreground">
       <Sidebar />
       <main className="flex-1 p-8 bg-squiggly">
-        {children}
+        {children} 
       </main>
     </div>
   );
