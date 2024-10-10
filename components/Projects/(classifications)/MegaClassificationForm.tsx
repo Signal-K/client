@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useProfileContext } from "@/context/UserProfile";
-import { ClassificationOutput } from "@/components/Projects/(classifications)/ClassificationResults";
-import { UserAvatarNullUpload } from "@/components/Profile/Avatar";
+// import { ClassificationOutput } from "@/components/Projects/(classifications)/ClassificationResults";
+// import { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 
 export interface ClassificationOption {
   id: number;

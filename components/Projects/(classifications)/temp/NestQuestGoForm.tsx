@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { UserAvatarNullUpload } from "@/components/Profile/Avatar";
+// import { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 import IntroduceUserToResearch from "@/components/(scenes)/chapters/(onboarding)/initialiseResearch";
 
 interface ClassificationFormProps {
@@ -259,13 +259,13 @@ export const NestQuestGoClassificationForm: React.FC<ClassificationFormProps> = 
                     <div className="flex gap-4">
                         <div className="flex flex-col gap-2 w-2/3">
                             <div className="flex gap-4 mb-4">
-                                <UserAvatarNullUpload
+                                {/* <UserAvatarNullUpload
                                     url={avatar_url}
                                     size={64}
                                     onUpload={(filePath: string) => {
                                         setAvatarUrl(filePath);
                                     }}
-                                />
+                                /> */}
                             </div>
                             
                             {currentTextArea >= 1 && (

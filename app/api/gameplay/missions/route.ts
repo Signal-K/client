@@ -261,6 +261,16 @@ const missions: Mission[] = [
         id: 2000000122,
         name: 'Make your first Plankton Portal classification',
     },
+    
+    // Chapter 2/3 bridge - finding new (exo-)planet
+    {
+        id: 30000001,
+        name: "Classify and discover a new planet", // Requires classification and period/t0
+    },
+    {
+        id: 300000012,
+        name: "Visit your new planet",
+    },
 ];
 
 export async function GET(req: NextRequest) {
