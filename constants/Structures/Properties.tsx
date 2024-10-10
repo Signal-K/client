@@ -121,12 +121,12 @@ export const StructuresConfig: StructureConfig = {
       ],
       imageSrc: '/assets/Items/TransitingTelescope.png',
       actions: [
-        {
-          icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
-          , text: 'Durability/Repair'
-          , dynamicComponent: <StructureRepair inventoryId={3103} />,
-          sizePercentage: 40,
-        },
+        // {
+        //   icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
+        //   , text: 'Durability/Repair'
+        //   , dynamicComponent: <StructureRepair inventoryId={3103} />,
+        //   sizePercentage: 40,
+        // },
         {
           icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research",
@@ -175,12 +175,12 @@ export const StructuresConfig: StructureConfig = {
       ],
       imageSrc: '/assets/Items/Zoodex.png',
       actions: [
-        {
-          icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
-          , text: 'Durability/Repair'
-          , dynamicComponent: <StructureRepair inventoryId={3104} />,
-          sizePercentage: 40,
-        },
+        // {
+        //   icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
+        //   , text: 'Durability/Repair'
+        //   , dynamicComponent: <StructureRepair inventoryId={3104} />,
+        //   sizePercentage: 40,
+        // },
         {
           icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research",
@@ -227,12 +227,12 @@ export const StructuresConfig: StructureConfig = {
         },
       ],
       actions: [
-        {
-          icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
-          , text: 'Durability/Repair'
-          , dynamicComponent: <StructureRepair inventoryId={3104} />,
-          sizePercentage: 40,
-        },
+        // {
+        //   icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
+        //   , text: 'Durability/Repair'
+        //   , dynamicComponent: <StructureRepair inventoryId={3104} />,
+        //   sizePercentage: 40,
+        // },
         {
           icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research",
@@ -277,10 +277,10 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <AdvancedTechTreeComponent />,
           sizePercentage: 85,
         },
-        {
-          icon: <BookAIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Decrypt manuscripts",
-        },
+        // {
+        //   icon: <BookAIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Decrypt manuscripts",
+        // },
       ],
     },
     3107: {

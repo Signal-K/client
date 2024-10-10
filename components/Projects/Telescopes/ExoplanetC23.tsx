@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useCallback, useRef, useEffect, useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Circle, Pencil, Square } from "lucide-react";
-import * as THREE from "three";
+import { Mesh, SphereGeometry, MeshStandardMaterial } from "three";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ClassificationForm from "../(classifications)/PostForm";
@@ -31,32 +31,83 @@ export interface Anomaly {
 };
 
 function InitialExoplanetGuide({ period }: PlanetProps) {
-    const meshRef = useRef<THREE.Mesh>(null);
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (meshRef.current) {
-                meshRef.current.rotation.y += 0.01
-    }
-    }, 16);
-            return () => clearInterval(interval);
-    
-    }, []);
-
-    let color
-    if (period < 3) {
-        color = '#ff79c6';
-    } else if (period >= 3 && period <= 7) {
-        color = '#8be9fd';
-    } else {
-        color = '#bd93f9';
+    const meshRef = useRef<Mesh>(null)
+  
+  useFrame(() => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y += 0.01
     };
+  });
 
-    return ( // Update to have multiple planes/colour maps & noise later
-        <mesh ref={meshRef}>
-            <sphereGeometry args={[1, 32, 32]} />
-            <meshStandardMaterial color={color} />
-        </mesh>
+  const noise = (x: number, y: number) => {
+    const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453
+    return seed - Math.floor(seed)
+  };
+
+  const generateTerrain = () => {
+    const terrain = [];
+    const resolution = 20;
+    for (let i = 0; i < resolution; i++) {
+      for (let j = 0; j < resolution; j++) {
+        const value = noise(i / resolution * period, j / resolution * period);
+        terrain.push(value);
+      };
+    };
+    return terrain;
+  };
+
+  const terrain = generateTerrain();
+
+  const color = period < 3 ? "#ff79c6" : period >= 3 && period <= 7 ? "#8be9fd" : "#bd93f9";
+
+  return ( // Update to have multiple colours/noise later
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[1, 32, 32]} />
+      <meshStandardMaterial color={color} />
+    </mesh>
+  );
+
+  if (!terrain) {
+    return (
+        <div className="planet-container w-64 h-64 relative">
+      <svg viewBox="0 0 100 100" className="w-full h-full">
+        <defs>
+          <radialGradient id="surfaceGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}88`} />
+          </radialGradient>
+          <filter id="noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+            <feColorMatrix type="saturate" values="0" />
+            <feBlend in="SourceGraphic" mode="multiply" />
+          </filter>
+        </defs>
+        <circle cx="50" cy="50" r="48" fill="url(#surfaceGradient)" filter="url(#noise)" />
+        {terrain.map((height, index) => {
+          const x = (index % 20) * 5
+          const y = Math.floor(index / 20) * 5
+          return (
+            <circle
+              key={index}
+              cx={x}
+              cy={y}
+              r={height * 2}
+              fill={`rgba(255,255,255,${height * 0.5})`}
+              filter="url(#noise)"
+            />
+          )
+        })}
+        <circle cx="50" cy="50" r="48" fill="none" stroke={color} strokeWidth="0.5" />
+      </svg>
+      <div 
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)',
+        }}
+      />
+    </div>
     );
+  };
 };
 
 export function ExoplanetTransitHunter() {
@@ -186,6 +237,7 @@ export function ExoplanetTransitHunter() {
 
     // Fetch structure configuration
     const [configuration, setConfiguration] = useState<any | null>(null);
+    const [structureId, setStructureId] = useState<number | null>(null);
     useEffect(() => {
         const fetchStructureConfiguration = async () => {
             if (!session) {
@@ -195,7 +247,7 @@ export function ExoplanetTransitHunter() {
             try {
                 const { data: inventoryData, error: inventoryError } = await supabase
                     .from("inventory")
-                    .select('configuration')
+                    .select('id, configuration')
                     .eq('item', 3103)
                     .eq('anomaly', activePlanet?.id)
                     .eq('owner', session.user.id)
@@ -209,6 +261,7 @@ export function ExoplanetTransitHunter() {
 
                 if (inventoryData && inventoryData.configuration) {
                     setConfiguration(inventoryData.configuration);
+                    setStructureId(inventoryData.id);
                 } else {
                     setConfiguration(null);
                 };
@@ -267,21 +320,62 @@ export function ExoplanetTransitHunter() {
         );
     };
 
+    // Making the post
+    const handleSubmitClassification = async () => {
+        if (!session || !anomaly) {
+            console.error("User session or anomaly not available");
+            return;
+        };
+
+        const planetGeneratorOptions = {};
+        // Make sure to add mission for completing planet
+
+        const classificationData = {
+            anomaly: anomaly.id,
+            author: session.user.id,
+            content: notes,
+            media: { imageUrl },  
+            classificationtype: "Exoplanet Transit", 
+            classificationConfiguration: {
+                createdBy: configuration?.createdBy || "Telescope", 
+                structureId: structureId, 
+                activePlanet: activePlanet?.id || null,
+                classificationOptions,
+                planetGeneratorOptions, 
+            },
+        };
+
+        try {
+            const { data, error } = await supabase
+                .from('classifications')
+                .insert([classificationData]);
+
+            if (error) {
+                throw error;
+            };
+
+            console.log("Classification submitted:", data);
+        } catch (error) {
+            console.error("Error submitting classification:", error);
+        };
+    };
+
     return (
         <div className="container mx-auto p-4 space-y-6 bg-[#1e2129] text-[#f8f8f2] min-h-screen">
             <h1 className="text-4xl font-bold mb-6 text-[#82aaff]">Exoplanet Transit Hunter</h1>
             <div className="space-y-6">
                 <div className="relative">
-                    <img src={imageUrl} alt="Telescope's Transit Lightkurve image" className="w-full h-auto rounded-lg" />
+                    <img src={imageUrl} alt="Telescope's Transit Lightkurve image" className="w-128 rounded-lg" />
                     <canvas
                         ref={canvasRef}
                         className="absolute top-0 left-0 w-full h-full rounded-lg"
                         style={{ pointerEvents: currentTool ? "auto" : "none" }}
                     />
                 </div>
-                        {/* <div className="flex flex-wrap gap-2">
+<div className="annotation">
+                                                    <div className="flex flex-wrap gap-2">
           <Button
-            onClick={() => handleAnnotation("pen")}
+            // onClick={() => handleAnnotation("pen")}
             variant={currentTool === "pen" ? "secondary" : "outline"}
             className="flex-1 bg-[#44475a] text-[#f8f8f2] hover:bg-[#6272a4]"
           >
@@ -289,7 +383,7 @@ export function ExoplanetTransitHunter() {
             Pen
           </Button>
           <Button
-            onClick={() => handleAnnotation("circle")}
+            // onClick={() => handleAnnotation("circle")}
             variant={currentTool === "circle" ? "secondary" : "outline"}
             className="flex-1 bg-[#44475a] text-[#f8f8f2] hover:bg-[#6272a4]"
           >
@@ -297,14 +391,15 @@ export function ExoplanetTransitHunter() {
             Circle
           </Button>
           <Button
-            onClick={() => handleAnnotation("square")}
+            // onClick={() => handleAnnotation("square")}
             variant={currentTool === "square" ? "secondary" : "outline"}
             className="flex-1 bg-[#44475a] text-[#f8f8f2] hover:bg-[#6272a4]"
           >
             <Square className="w-4 h-4 mr-2" />
             Square
           </Button>
-        </div> */}
+        </div> 
+</div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {Object.entries(classificationOptions).map(([key, value]) => (
                         <Button
@@ -358,7 +453,12 @@ export function ExoplanetTransitHunter() {
                             className="w-full p-2 bg-[#282a36] text-[#f8f8f2] rounded-md focus:ring-2 focus:ring-[#6272a4]"
                         />
                     </div>
-                    <div>
+                    <div className="space-y-2">
+                        <Button onClick={handleSubmitClassification} className="w-full mt-4">
+                            Submit Classification
+                        </Button>
+                    </div>
+                    <div className="planetAmbient">
                         <Canvas className="w-full h-64 bg-[#282a36] rounded-lg">
                             <ambientLight intensity={0.5} />
                             <spotLight position={[10, 15, 10]} angle={0.3} />
