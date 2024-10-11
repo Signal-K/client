@@ -403,12 +403,14 @@ export default function SwitchPlanet() {
             <ul>
               {compatibleMissions.map((mission) => (
                 <li
-                  key={mission.id}
-                  className={`cursor-pointer hover:bg-gray-700 p-2 rounded ${
-                    selectedMission?.id === mission.id ? "bg-gray-600" : ""
-                  }`}
-                  onClick={() => handleMissionClick(mission)}
-                >
+                          key={mission.id}
+                          onClick={() => handleMissionClick(mission)}
+                          className={`cursor-pointer p-2 text-center rounded-lg transition-colors ${
+                            selectedMission?.id === mission.id
+                              ? "bg-[#4BB3A5]"
+                              : "bg-gray-700 hover:bg-gray-600"
+                          }`}
+                        >
                   {mission.name}
                 </li>
               ))}

@@ -301,16 +301,16 @@ export const StructuresConfig: StructureConfig = {
         },
       ],
       buttons: [
-        {
-          icon: <CaravanIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Build a rocket",
-        },
+        // {
+        //   icon: <CaravanIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Build a rocket",
+        // },
         {
           icon: <PowerIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Launch a rocket (travel)",
           // dynamicComponent: <LaunchpadStructure />,
           dynamicComponent: <SwitchPlanet />,
-          sizePercentage: 100,
+          sizePercentage: 60,
 
         },
       ]

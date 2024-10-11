@@ -40,7 +40,7 @@ export default function Home() {
 
   useEffect(() => {
     console.log(session?.user.id);
-  })
+  });
 
   const planetViews: Record<number, JSX.Element> = {
     10: <MercuryView />,

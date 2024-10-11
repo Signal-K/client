@@ -18,7 +18,7 @@ const EarthView: React.FC = () => {
     <div className="min-h-screen w-full flex flex-col">
     <img
       className="absolute inset-0 w-full h-full object-cover"
-      src="/assets/Backdrops/Mercury.png"
+      src="/assets/Backdrops/Earth.png"
     />
     <div className="relative min-h-screen">
         <EarthStructures />
