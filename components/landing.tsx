@@ -14,7 +14,7 @@ export function Landing() {
           <h1 className="text-4xl font-bold tracking-tighter text-nord-4 dark:text-nord-6 sm:text-5xl md:text-6xl">
             Star Sailors
           </h1>
-          <p className="text-nord-3 dark:text-nord-5 md:text-xl">
+          <p className="text-blue-700 dark:text-nord-5 md:text-xl">
             Explore the cosmos & catalogue discoveries in different scientific disciplines
           </p>
           <div className='py-5'><img src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/garden.png" alt="App screenshot" width="2432" height="1442" className="rounded-md shadow-2xl ring-1 ring-gray-900/10" /></div>

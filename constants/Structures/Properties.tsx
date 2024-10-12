@@ -7,7 +7,7 @@ import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomat
 import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/content/(anomalies)/(data)/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
@@ -21,6 +21,7 @@ import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
 import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
 import { PlanktonPortal, PlanktonPortalTutorial } from "@/components/Projects/Zoodex/planktonPortal";
 import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
+import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
 
 interface IndividualStructureProps {
     name?: string;
@@ -144,25 +145,31 @@ export const StructuresConfig: StructureConfig = {
           icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Discover planets", // Transit events, microlensing, etc
           dynamicComponent: <StarterTelescope />,
-          sizePercentage: 90,
+          sizePercentage: 60,
           showInNoModal: true,
+        },
+        {
+          icon: <EarthIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Find new worlds",
+          dynamicComponent: <ExoplanetTransitHunter />,
+          sizePercentage: 80,
         },
         {
           icon: <SunIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Sunspot data",
           dynamicComponent: <TelescopeSunspotDetector />,
-          sizePercentage: 80,
+          sizePercentage: 60,
         },
         {
           icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Find early solar systems",
           dynamicComponent: <TelescopeDiskDetector />,
-          sizePercentage: 80,
+          sizePercentage: 70,
         },
-        {
-          icon: <StarIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Comets & Asteroids",
-        },
+        // {
+        //   icon: <StarIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Comets & Asteroids",
+        // },
       ],
     },
     3104: {

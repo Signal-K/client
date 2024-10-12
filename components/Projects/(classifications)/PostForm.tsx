@@ -205,7 +205,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 user: session?.user?.id,
                 time_of_completion: new Date().toISOString(),
                 mission: missionNumber,
-                configuration: null,
+                configuration: null, 
             };
             await supabase.from("missions").insert([missionData]);
             const newAnomalyData = {

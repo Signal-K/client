@@ -50,7 +50,7 @@ export function StarterTelescope() {
                 setHasMission3000001(false);
             } finally {
                 setMissionLoading(false);
-            }
+            };
         };
 
         checkTutorialMission();

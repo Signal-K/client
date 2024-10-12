@@ -167,35 +167,40 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               className="rounded-full p-2 text-[#d8dee9] hover:bg-[#3b4a5a] mt-8"
               onClick={handleClose}
             >
-              Close Modal
+              Back
             </Button>
           </DialogContent>
         )}
 
-        {/* Dynamic Component Modal */}
-        {activeComponent && (
-          <DialogContent
-            className="p-4 rounded-3xl max-w-xl text-white mx-auto"
-            style={{
-              background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))',
-              width: `${Math.max(modalSizePercentage, 100)}%`, // Ensure it's never thinner than 100%
-              height: `${modalSizePercentage}%`,
-            }}
-          >
-            <DialogTitle></DialogTitle>
-            <div className="relative flex flex-col items-center justify-center h-full">
-              <button
-                className="absolute top-4 right-4 text-white hover:text-red-500"
-                onClick={() => setActiveComponent(null)}
-              >
-                Close
-              </button>
-              <div className="flex-grow flex justify-center items-center">
-                {activeComponent}
-              </div>
-            </div>
-          </DialogContent>
-        )}
+{activeComponent && (
+  <DialogContent
+    className="p-4 rounded-3xl text-white mx-auto"
+    style={{
+      background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))',
+      width: '90%', // Mobile default
+      height: '90%',
+      maxWidth: '40%', // Desktop max-width
+      maxHeight: '90%',
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)', 
+    }}
+  >
+    <DialogTitle></DialogTitle>
+    <div className="relative flex flex-col items-center justify-center h-full">
+      <button
+        className="absolute top-4 right-4 text-white hover:text-red-500"
+        onClick={() => setActiveComponent(null)}
+      >
+        Close
+      </button>
+      <div className="flex-grow flex justify-center items-center">
+        {activeComponent}
+      </div>
+    </div>
+  </DialogContent>
+)}
       </div>
     </Dialog>
   );

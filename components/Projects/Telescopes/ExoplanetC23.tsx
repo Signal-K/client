@@ -320,12 +320,29 @@ export function ExoplanetTransitHunter() {
         );
     };
 
+    const missionData = {
+        user: session?.user.id,
+        time_of_completion: new Date().toISOString(),
+        mission: "3000001",
+        configuration: null,
+    };
+
+    const handleCompleteMission = async () => {
+        try {
+            await supabase.from("missions").insert([missionData]);
+        } catch (error: any) {
+            console.error("Error completing mission: ", error);
+        };
+    };
+
     // Making the post
     const handleSubmitClassification = async () => {
         if (!session || !anomaly) {
             console.error("User session or anomaly not available");
             return;
         };
+
+        handleCompleteMission();
 
         const planetGeneratorOptions = {};
         // Make sure to add mission for completing planet

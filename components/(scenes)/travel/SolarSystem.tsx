@@ -7,72 +7,43 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { lidarDataSources, physicsLabDataSources, roverDataSources, telescopeDataSources, zoodexDataSources } from "@/components/Data/ZoodexDataSources";
 
-const planets = {
-    solarSystem: [
-        {
-            id: 10,
-            name: "Mercury",
-            color: "bg-[#2C3A4A]",
-            stats: { gravity: "3.7 m/s²", temp: "430°C" },
-            anomaly: 10,
-            planetType: 'Arid',
-            initialisationMissionId: 100001,
-            travelTime: '30 seconds',
-            description: '', 
-            image: '/assets/Planets/Mercury.png',
-        },
-        {
-            id: 20,
-            name: "Venus",
-            color: "bg-yellow-200",
-            stats: { gravity: "8.87 m/s²", temp: "462°C" },
-            anomaly: 20,
-            planetType: 'Arid',
-            initialisationMissionId: 200001,
-            travelTime: '30 seconds',
-            description: '',
-            image: '/assets/Planets/Venus.png',
-        },
-        {
-            id: 69,
-            name: "Earth",
-            color: "bg-blue-500",
-            stats: { gravity: "9.8 m/s²", temp: "15°C" },
-            anomaly: 69,
-            planetType: 'Lush',
-            initialisationMissionId: 300001,
-            travelTime: '30 seconds',
-            description: '', 
-            image: '/assets/Planets/Earth.png',
-        },
-        {
-            id: 40,
-            name: "Mars",
-            color: "bg-red-500",
-            stats: { gravity: "3.71 m/s²", temp: "-63°C" },
-            anomaly: 40,
-            planetType: 'Arid',
-            initialisationMissionId: 400001,
-            travelTime: '30 seconds',
-            description: '', 
-            image: '/assets/Planets/Mars.png',
-        },
-    ],
-    exoplanets: [
-        // should only show `anomalies` discovered by user
-    ],
+type Exoplanet = {
+  id: number;
+  name: string;
+  distance: number;
+  anomaly?: number;           
+  planetType?: string;
+  initialisationMissionId?: number;
+  image?: string;
+  description?: string;
 };
 
-// ^^ update this to pull from `anomalies` table
+type SolarSystemPlanet = {
+  id: number;
+  name: string;
+  color: string;
+  stats: {
+    gravity: string;
+    temp: string;
+  };
+  anomaly: number;
+  planetType: string;
+  initialisationMissionId: number;
+  travelTime: string;
+  description: string;
+  image: string;
+};
+
+type Planet = Exoplanet | SolarSystemPlanet;
+
 export default function SwitchPlanet() {
   const supabase = useSupabaseClient();
   const session = useSession();
+  
   const { activePlanet, updatePlanetLocation } = useActivePlanet();
 
   const [activeTab, setActiveTab] = useState<"solarSystem" | "exoplanets">("solarSystem");
   const [currentIndex, setCurrentIndex] = useState(0);
-  const currentPlanets = planets[activeTab];
-  const currentPlanet = currentPlanets[currentIndex];
 
   const [planetStats, setPlanetStats] = useState<any[]>([]);
   const [visitedPlanets, setVisitedPlanets] = useState<{ [key: number]: boolean }>({});
@@ -82,6 +53,173 @@ export default function SwitchPlanet() {
   const [showMissions, setShowMissions] = useState<boolean>(false);
   const [selectedMission, setSelectedMission] = useState<any>(null);
   const [compatibleMissions, setCompatibleMissions] = useState<any[]>([]);
+
+  const [planets, setPlanets] = useState<{
+    solarSystem: SolarSystemPlanet[];
+    exoplanets: Exoplanet[];
+  }>({
+    solarSystem: [
+      {
+        id: 10,
+        name: "Mercury",
+        color: "bg-[#2C3A4A]",
+        stats: { gravity: "3.7 m/s²", temp: "430°C" },
+        anomaly: 10,
+        planetType: 'Arid',
+        initialisationMissionId: 100001,
+        travelTime: '30 seconds',
+        description: '',
+        image: '/assets/Planets/Mercury.png',
+      },
+      {
+        id: 20,
+        name: "Venus",
+        color: "bg-yellow-200",
+        stats: { gravity: "8.87 m/s²", temp: "462°C" },
+        anomaly: 20,
+        planetType: 'Arid',
+        initialisationMissionId: 200001,
+        travelTime: '30 seconds',
+        description: '',
+        image: '/assets/Planets/Venus.png',
+      },
+      {
+        id: 69,
+        name: "Earth",
+        color: "bg-blue-500",
+        stats: { gravity: "9.8 m/s²", temp: "15°C" },
+        anomaly: 69,
+        planetType: 'Lush',
+        initialisationMissionId: 300001,
+        travelTime: '30 seconds',
+        description: '',
+        image: '/assets/Planets/Earth.png',
+      },
+      {
+        id: 40,
+        name: "Mars",
+        color: "bg-red-500",
+        stats: { gravity: "3.71 m/s²", temp: "-63°C" },
+        anomaly: 40,
+        planetType: 'Arid',
+        initialisationMissionId: 400001,
+        travelTime: '30 seconds',
+        description: '',
+        image: '/assets/Planets/Mars.png',
+      },
+    ],
+    exoplanets: [],
+  });  
+
+  const currentPlanets = planets[activeTab];
+  const currentPlanet = currentPlanets[currentIndex];
+  const planetType = currentPlanet?.planetType || 'Unknown';
+  const anomaly = currentPlanet?.anomaly ?? 'Unknown';
+  const initialisationMissionId = currentPlanet?.initialisationMissionId ?? null;
+  const image = currentPlanet?.image ?? '/assets/Planets/DefaultExoplanet.png';
+  const description = currentPlanet?.description ?? 'No description available';
+  const currentPlanetAnomaly = currentPlanet?.anomaly ?? 0;
+
+  useEffect(() => {
+    console.log("Component loaded, exoplanets: ", planets.exoplanets);
+  }, [planets.exoplanets]);
+
+  // Fix for TS error 2345 - ensuring 'number | undefined' doesn't cause an issue
+  const index = currentPlanet?.anomaly !== undefined ? currentPlanet.anomaly : 0;
+
+  useEffect(() => {
+    const fetchExoplanets = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("anomalies")
+          .select("*")
+          .eq("anomalySet", "tess");
+  
+        if (error) throw error;
+  
+        const exoplanetsData = data.map((exoplanet) => ({
+          id: exoplanet.id,
+          name: exoplanet.content,
+          color: "bg-purple-500",
+          stats: { gravity: "Unknown", temp: "Unknown" }, 
+          anomaly: exoplanet.id,
+          planetType: exoplanet.anomalytype || "Unknown",
+          initialisationMissionId: null,
+          travelTime: "Unknown",
+          description: exoplanet.deepnote || "No description available",
+          image: exoplanet.avatar_url || '/assets/Planets/DefaultExoplanet.png',
+        }));        
+  
+        setPlanets((prevState) => ({
+          ...prevState,
+          exoplanets: exoplanetsData as unknown as Exoplanet[], 
+        }));        
+      } catch (error: any) {
+        console.error("Error fetching exoplanets: ", error.message);
+      }
+    };
+  
+    fetchExoplanets();
+  }, [supabase]);  
+
+  useEffect(() => {
+    const fetchExoplanets = async () => {
+      try {
+        // Fetch all exoplanets from the anomalies table where anomalySet is 'tess'
+        const { data: exoplanetData, error: exoplanetError } = await supabase
+          .from("anomalies")
+          .select("*")
+          // .eq("anomalySet", "tess");
+          .eq("anomalytype", 'planet');
+  
+        if (exoplanetError) throw exoplanetError;
+  
+        if (session?.user?.id) {
+          // Fetch classifications where author is the current user and anomaly is one of the exoplanets
+          const { data: classificationData, error: classificationError } = await supabase
+            .from("classifications")
+            .select("anomaly")
+            .eq("author", session.user.id)
+            .in(
+              "anomaly",
+              exoplanetData.map((exoplanet) => exoplanet.id)
+            );
+  
+          if (classificationError) throw classificationError;
+  
+          // Extract anomaly IDs (exoplanet IDs) mentioned in classifications
+          const classifiedExoplanetIds = classificationData.map((classification) => classification.anomaly);
+  
+          // Filter exoplanets based on classified exoplanet IDs
+          const filteredExoplanets = exoplanetData
+            .filter((exoplanet) => classifiedExoplanetIds.includes(exoplanet.id))
+            .map((exoplanet) => ({
+              id: exoplanet.id,
+              name: exoplanet.content,
+              color: "bg-purple-500",
+              stats: { gravity: "Unknown", temp: "Unknown" },
+              anomaly: exoplanet.id,
+              planetType: "Frozen", // Set default planet type as Frozen
+              initialisationMissionId: null,
+              travelTime: "Unknown",
+              description: exoplanet.deepnote || "No description available",
+              image: exoplanet.avatar_url || '/assets/Planets/DefaultExoplanet.png',
+            }));
+  
+          // Update state with the filtered exoplanets
+          setPlanets((prevState) => ({
+            ...prevState,
+            exoplanets: filteredExoplanets as unknown as Exoplanet[],
+          }));
+        }
+      } catch (error: any) {
+        console.error("Error fetching exoplanets: ", error.message);
+      }
+    };
+  
+    fetchExoplanets();
+  }, [supabase, session?.user?.id]);
+  
 
   useEffect(() => {
     const fetchVisitedPlanets = async () => {
@@ -266,7 +404,7 @@ export default function SwitchPlanet() {
         if (!existingInventory || existingInventory.length === 0) {
           const newConfig = {
             Uses: 1,
-            "missions unlocked": [selectedMission?.identifier]
+            "missions unlocked": [selectedMission?.identifier],
           };
   
           const inventoryData = {
@@ -287,8 +425,11 @@ export default function SwitchPlanet() {
           }
         } else {
           // If the structure exists, update the configuration to add the new mission
-          const currentConfig = existingInventory[0].configuration || { Uses: 1, "missions unlocked": [] };
-          
+          const currentConfig = existingInventory[0].configuration || {
+            Uses: 1,
+            "missions unlocked": [],
+          };
+  
           // Add the new mission if it doesn't exist in the configuration already
           const newMission = selectedMission?.identifier;
           if (!currentConfig["missions unlocked"].includes(newMission)) {
@@ -307,12 +448,14 @@ export default function SwitchPlanet() {
         }
       }
   
-      // Continue with other actions like moving items and updating planet location
-      await moveItemsToNewPlanet(currentPlanet.anomaly);
-      updatePlanetLocation(currentPlanet.anomaly);
-    }
-  };
+      // Ensure anomaly is a valid number
+      const validAnomaly = currentPlanet?.anomaly ?? 0;
   
+      // Use validAnomaly for any function calls that require a number
+      await moveItemsToNewPlanet(validAnomaly);
+      updatePlanetLocation(validAnomaly);
+    }
+  };  
 
   const [missionSelected, setMissionSelected] = useState<boolean>(false);
 
@@ -339,7 +482,11 @@ export default function SwitchPlanet() {
     };
   };
 
-  const isVisited = classificationsByPlanet[currentPlanet.anomaly]?.length > 0;
+  const isVisited = currentPlanet?.anomaly !== undefined && classificationsByPlanet[currentPlanet.anomaly]?.length > 0;
+  const handleTabSwitch = (tab: "solarSystem" | "exoplanets") => {
+    setActiveTab(tab);
+    setCurrentIndex(0);
+  };
 
   return (
     <div className="items-center justify-center text-[#CFD1D1] p-4">
@@ -347,13 +494,13 @@ export default function SwitchPlanet() {
         <div className="flex justify-around bg-[#5FCBC3] text-[#2C3A4A] p-4">
           <button
             className={`px-4 py-2 rounded-full ${activeTab === "solarSystem" ? "bg-[#2C3A4A] text-[#5FCBC3]" : ""}`}
-            onClick={() => setActiveTab("solarSystem")}
+            onClick={() => handleTabSwitch("solarSystem")}
           >
             Solar System
           </button>
           <button
-            className="px-4 py-2 rounded-full cursor-not-allowed opacity-50"
-            disabled
+            className={`px-4 py-2 rounded-full ${activeTab === "exoplanets" ? "bg-[#2C3A4A] text-[#5FCBC3]" : ""}`}
+            onClick={() => handleTabSwitch("exoplanets")}
           >
             Exoplanets
           </button>
