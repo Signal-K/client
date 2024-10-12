@@ -8,7 +8,7 @@ export type MineralDeposit = {
     mineral: string; 
     quantity: number;
     availableAmount: number;
-    level: number;
+    level: number; 
     uses: string[];
     position: { x: number; y: number };
   };
@@ -26,7 +26,7 @@ export type MineralDeposit = {
           return <Diamond className="text-[#FFE3BA]" />;
         default:
           return <Diamond className="text-[#FFE3BA]" />;
-      }
+      };
     };
   
     return (
@@ -37,18 +37,19 @@ export type MineralDeposit = {
             <div
               key={deposit.id}
               className={`p-4 rounded-lg cursor-pointer mb-2 ${
-                selectedDeposit?.id === deposit.id ? "bg-[#5FCBC3] text-white" : "bg-gray-100"
+                selectedDeposit?.id === deposit.id ? "bg-[#85DDA2] text-white" : "bg-[#F7F5E9] hover:bg-[#B9E678]"
               }`}
               onClick={() => onSelect(deposit)}
             >
               <div className="flex items-center space-x-2">
                 {getIcon(deposit.mineral)}
-                <h3 className="font-bold">Mineral {deposit.mineral}</h3>
+                {/* <h3 className="font-bold text-[#303F51]">Mineral {deposit.mineral}</h3> */}
+                <h3 className="font-bold text-[#303F51]">Fuel source</h3>
               </div>
-              <p>Quantity: {deposit.quantity}</p>
+              <p className="font-italic text-[#303F51]">Quantity: {deposit.quantity}</p>
             </div>
           ))}
         </div>
       </div>
     );
-  }
+};

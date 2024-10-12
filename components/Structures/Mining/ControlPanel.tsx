@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Truck } from 'lucide-react'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useActivePlanet } from '@/context/ActivePlanet'
+import LaunchpadStatus from '../Launchpad/LaunchpadStatus'
 
 type Rover = {
   id: string
@@ -13,7 +14,7 @@ type Rover = {
 }
 
 type Props = {
-  rovers: Rover[]
+  rovers: Rover[] 
   selectedRover: Rover | null
   onRoverSelect: (rover: Rover) => void
   onStartMining: () => void
@@ -35,24 +36,24 @@ export function ControlPanel({ rovers = [], selectedRover, onRoverSelect, onStar
 
   const handleRoverSelect = (rover: Rover) => {
     onRoverSelect(rover)
-  }
+  };
 
   return (
     <div className="h-full flex flex-col">
       <h2 className="text-xl font-bold text-[#2C4F64] mb-4">Control Panel</h2>
       <div className="overflow-y-auto flex-grow pr-2">
         <div className="mb-4">
-          <h3 className="font-bold mb-2">Select Rover</h3>
+          <h3 className="font-bold mb-2 text-[#303F51]">Select Rover</h3>
           <div className="grid grid-cols-2 gap-2">
             {rovers.map(rover => (
               <div 
                 key={rover.id} 
-                className={`p-2 rounded-lg cursor-pointer ${selectedRover?.id === rover.id ? 'bg-[#5FCBC3] text-white' : 'bg-gray-100'}`}
+                className={`p-2 rounded-lg cursor-pointer ${selectedRover?.id === rover.id ? 'bg-[#85DDA2] text-[#303F51]' : 'bg-[#F7F5E9] hover:bg-[#B9E678] hover:text-[#1D2833]'}`}
                 onClick={() => handleRoverSelect(rover)}
               >
                 <div className="flex items-center space-x-2">
                   <Truck className="text-[#FFE3BA]" />
-                  <span className="font-bold">{rover.name}</span>
+                  <span className="font-bold text-[#303F51]">{rover.name}</span>
                 </div>
               </div>
             ))}
@@ -61,9 +62,9 @@ export function ControlPanel({ rovers = [], selectedRover, onRoverSelect, onStar
         
         {selectedRover && (
           <div className="space-y-4 mt-4">
-            <h3 className="font-bold mb-2">Customize Rover</h3>
+            <h3 className="font-bold mb-2 text-[#303F51]">Customize Rover</h3>
             <div>
-              <label className="block text-sm font-medium text-[#2C4F64]">Speed</label>
+              <label className="block text-sm font-medium text-[#2C3A4A]">Speed</label>
               <input
                 type="range"
                 min={1}
@@ -72,10 +73,10 @@ export function ControlPanel({ rovers = [], selectedRover, onRoverSelect, onStar
                 onChange={(e) => setSpeed(Number(e.target.value))}
                 className="my-2 w-full"
               />
-              <span className="text-sm text-[#2C4F64]">{speed}</span>
+              <span className="text-sm text-[#2C3A4A]">{speed}</span>
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2C4F64]">Efficiency</label>
+              <label className="block text-sm font-medium text-[#2C3A4A]">Efficiency</label>
               <input
                 type="range"
                 min={0}
@@ -84,10 +85,10 @@ export function ControlPanel({ rovers = [], selectedRover, onRoverSelect, onStar
                 onChange={(e) => setEfficiency(Number(e.target.value) / 100)}
                 className="my-2 w-full"
               />
-              <span className="text-sm text-[#2C4F64]">{(efficiency * 100).toFixed(0)}%</span>
+              <span className="text-sm text-[#2C3A4A]">{(efficiency * 100).toFixed(0)}%</span>
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2C4F64]">Mining Level</label>
+              <label className="block text-sm font-medium text-[#2C3A4A]">Mining Level</label>
               <input
                 type="range"
                 min={1}
@@ -96,17 +97,19 @@ export function ControlPanel({ rovers = [], selectedRover, onRoverSelect, onStar
                 onChange={(e) => setMiningLevel(Number(e.target.value))}
                 className="my-2 w-full"
               />
-              <span className="text-sm text-[#2C4F64]">{miningLevel}</span>
+              <span className="text-sm text-[#2C3A4A]">{miningLevel}</span>
             </div>
           </div>
         )}
 
         <AddMineralDeposits />
+
+        <LaunchpadStatus />
         
         <Button 
           onClick={onStartMining} 
           disabled={isMining || !selectedRover}
-          className="w-full mt-4 bg-[#5FCBC3] text-white hover:bg-[#5FCBC3]/80"
+          className="w-full mt-4 bg-[#5FCBC3] text-white hover:bg-[#85DDA2]"
         >
           {isMining ? 'Mining...' : 'Start Mining'}
         </Button>
@@ -159,12 +162,12 @@ function AddMineralDeposits() {
   };
 
   return (
-    <div className="flex flex-col space-y-4 p-4 bg-gray-100 rounded-lg shadow">
-      <h3 className="font-bold text-[#2C4F64]">Add Mineral Deposits</h3>
+    <div className="flex flex-col space-y-4 p-4 bg-[#F7F5E9] rounded-lg shadow">
+      <h3 className="font-bold text-[#303F51]">Add Mineral Deposits</h3>
       <Button
         onClick={handleAddDeposits}
         disabled={isLoading}
-        className="bg-[#5FCBC3] text-white hover:bg-[#5FCBC3]/80"
+        className="bg-[#85DDA2] text-white hover:bg-[#5FCBC3]"
       >
         {isLoading ? 'Adding...' : 'Add 3 Deposits'}
       </Button>

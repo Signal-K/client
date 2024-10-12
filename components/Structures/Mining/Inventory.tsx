@@ -10,7 +10,7 @@ type InventoryItem = {
   name: string;
   amount: number;
 };
-
+ 
 export function Inventory() {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -23,13 +23,13 @@ export function Inventory() {
   // Mapping item IDs to their names
   const itemNames: Record<number, string> = {
     11: 'Iron',
-    13: 'Copper',
-    15: 'Gold',
-    16: 'Titanium',
-    17: 'Platinum',
-    18: 'Diamond',
-    19: 'Emerald',
-    20: 'Sapphire',
+    // 13: 'Copper',
+    // 15: 'Gold',
+    // 16: 'Titanium',
+    // 17: 'Platinum',
+    // 18: 'Diamond',
+    19: 'Fuel',
+    20: 'Copper',
   };
 
   useEffect(() => {
@@ -46,9 +46,9 @@ export function Inventory() {
         const formattedInventory = Object.entries(itemNames).map(([key, name]) => {
           const foundItem = data.find((item) => item.item === Number(key));
           return {
-            id: foundItem ? foundItem.id.toString() : key, // Use key if not found
+            id: foundItem ? foundItem.id.toString() : key, 
             name: name,
-            amount: foundItem ? foundItem.quantity : 0, // Default to 0 if not found
+            amount: foundItem ? foundItem.quantity : 0,
           };
         });
 
@@ -65,16 +65,16 @@ export function Inventory() {
       case 'Iron':
         return <Diamond className="text-[#FFE3BA]" />;
       case 'Copper':
-        return <Zap className="text-[#FFE3BA]" />;
+        return <Zap className="text-[#5FCBC3]" />;
       case 'Gold':
-        return <Gem className="text-[#FFE3BA]" />;
+        return <Gem className="text-[#FFD700]" />;
       case 'Titanium':
-        return <Rocket className="text-[#FFE3BA]" />;
+        return <Rocket className="text-[#B0C4DE]" />;
       case 'Platinum':
-        return <Crown className="text-[#FFE3BA]" />;
+        return <Crown className="text-[#E5E4E2]" />;
       default:
         return <Diamond className="text-[#FFE3BA]" />;
-    }
+    };
   };
 
   if (loading) {
@@ -83,19 +83,19 @@ export function Inventory() {
 
   return (
     <div className="space-y-2">
-      <h2 className="text-xl font-bold text-[#2C4F64]">Inventory</h2>
+      <h2 className="text-xl font-bold text-[#B9E678]">Inventory</h2>              
       <div className="flex space-x-4">
         {inventory.map((item) => (
           <div 
             key={item.id} 
-            className="relative flex items-center space-x-2 bg-gray-100 p-2 rounded-lg"
+            className="relative flex items-center space-x-2 bg-[#2C4F64] p-2 rounded-lg"             
             onMouseEnter={() => setHoveredItem(item.id)}
             onMouseLeave={() => setHoveredItem(null)}
           >
             {getIcon(item.name)}
-            <span className="font-bold">{item.amount}</span>
+            <span className="font-bold text-[#F7F5E9]">{item.amount}</span>             
             {hoveredItem === item.id && (
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-[#2C4F64] text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-[#2C4F64] text-[#F7F5E9] px-2 py-1 rounded text-sm whitespace-nowrap">              
                 {item.name}
               </div>
             )}

@@ -22,7 +22,7 @@ type Rover = {
   speed: number
   efficiency: number
   miningLevel: number
-}
+};
 
 export function MiningComponentComponent() {
   const supabase = useSupabaseClient()
@@ -40,8 +40,6 @@ export function MiningComponentComponent() {
     setRovers([
       { id: '1', name: 'Rover A', speed: 10, efficiency: 0.8, miningLevel: 1 },
       { id: '2', name: 'Rover B', speed: 15, efficiency: 0.7, miningLevel: 2 },
-      { id: '3', name: 'Rover C', speed: 12, efficiency: 0.9, miningLevel: 3 },
-      { id: '4', name: 'Rover D', speed: 18, efficiency: 0.6, miningLevel: 4 },
     ])
   }, [])
 
@@ -52,11 +50,12 @@ export function MiningComponentComponent() {
         .select('id, mineralconfiguration')
         .eq('owner', session?.user.id)
         .eq('anomaly', activePlanet?.id)
+        .limit(3);
   
       if (error) {
         console.error('Error fetching mineral deposits:', error)
         return
-      }
+      };
   
       const formattedDeposits = data?.map((deposit) => ({
         id: deposit.id,
@@ -167,7 +166,7 @@ export function MiningComponentComponent() {
   };  
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 text-[#2C4F64]">
+    <div className="flex flex-col text-[#F7F5E9] bg-[#1D2833]">
       <div className="flex-1 p-4 overflow-hidden flex flex-col">
         <div className="mb-4 flex-shrink-0">
           <TopographicMap 
@@ -176,19 +175,19 @@ export function MiningComponentComponent() {
             selectedDeposit={selectedDeposit}
           />
         </div>
-        <div className="h-24 bg-white py-3 p-4 shadow flex-shrink-0">
+        <div className="h-24 bg-[#2C4F64] text-[#F7F5E9] py-3 p-4 shadow-lg rounded flex-shrink-0">
             <Inventory />
         </div>
-        <div className='bg-gray-100 my-2'></div>
+        <div className="bg-[#303F51] my-2"></div>
         <div className="grid grid-cols-2 gap-4 flex-grow overflow-hidden">
-          <div className="bg-white rounded-lg p-4 shadow overflow-hidden flex flex-col">
+          <div className="bg-[#2C4F64] rounded-lg p-4 shadow-lg overflow-hidden flex flex-col">
             <MineralDepositList 
               deposits={mineralDeposits} 
               onSelect={handleDepositSelect} 
               selectedDeposit={selectedDeposit}
             />
           </div>
-          <div className="bg-white rounded-lg p-4 shadow overflow-hidden flex flex-col">
+          <div className="bg-[#2C4F64] rounded-lg p-4 shadow-lg overflow-hidden flex flex-col">
             <ControlPanel 
               rovers={rovers}
               selectedRover={selectedRover}
