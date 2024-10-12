@@ -13,7 +13,7 @@ const planetInitialisationMissions: Mission[] = [
         id: 100001,
         name: "Initialise Mercury",
         anomaly: 10,
-    }, 
+    },  
     {
         id: 200001,
         name: "Initialise Venus",

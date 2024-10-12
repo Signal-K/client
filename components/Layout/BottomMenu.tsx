@@ -7,7 +7,12 @@ const menuItems = [
   { icon: Globe, label: "Planet", href: "/" },
   { icon: Rss, label: "Mining", href: "/scenes/mining" },
   { icon: HelpCircle, label: "Travel", href: "/scenes/travel" },
-  { icon: Star, label: "Starnet", href: "/starnet" },
+  // { icon: Star, label: "Starnet", href: "/starnet" },
+  {
+    icon: Star,
+    label: "Guide",
+    href: "/tests",
+  },
 ];
 
 export default function BottomMenuLayout({ children }: { children: React.ReactNode }) {

@@ -261,6 +261,26 @@ const missions: Mission[] = [
         id: 2000000122,
         name: 'Make your first Plankton Portal classification',
     },
+    {
+       id: 200000013,
+       name: "Collect some fuel" 
+    },
+    {
+        id: 200000014,
+        name: "Add fuel to your launchpad & rocket" 
+     },
+    {
+        id: 200000015,
+        name: "Build a telescope",
+    },
+    {
+        id: 200000016,
+        name: "Planet hunters module",
+    },
+    {
+        id: 200000017,
+        name: "Build a LIDAR structure",
+    },
     
     // Chapter 2/3 bridge - finding new (exo-)planet
     {
