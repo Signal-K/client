@@ -1,18 +1,9 @@
-const withPWA = require("@ducanh2912/next-pwa").default({
-	dest: "public",
-  });
-  
-  /** @type {import('next').NextConfig} */
-  const nextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
 	reactStrictMode: true,
 	swcMinify: true,
 	images: {
 	  unoptimized: true,
-	},
-	pwa: {
-		dest: 'public',
-		mode: 'production',
-		disable: process.env.NODE_ENV === 'development',
 	},
 	async rewrites() {
 	  return [
@@ -50,4 +41,4 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 	},
   };
   
-  module.exports = withPWA(nextConfig);  
+  module.exports = nextConfig;  

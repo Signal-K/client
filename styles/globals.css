@@ -1,3 +1,216 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --background: 206 28% 16%;
+  --foreground: 43 33% 97%;
+  --card: 203 37% 28%;
+  --card-foreground: 43 33% 97%;
+  --popover: 203 37% 28%;
+  --popover-foreground: 43 33% 97%;
+  --primary: 174 55% 58%;
+  --primary-foreground: 206 28% 16%;
+  --secondary: 84 62% 68%;
+  --secondary-foreground: 206 28% 16%;
+  --muted: 203 37% 28%;
+  --muted-foreground: 43 33% 97%;
+  --accent: 5 100% 68%;
+  --accent-foreground: 206 28% 16%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 43 33% 97%;
+  --border: 174 55% 58%;
+  --input: 203 37% 28%;
+  --ring: 174 55% 58%;
+  --radius: 0.5rem;
+}
+
+body {
+  @apply bg-background text-foreground;
+  background-image: var(--squiggly-bg);
+}
+
+.squiggly-bg {
+  background-image: var(--squiggly-bg);
+}
+
+.squiggly-connector {
+  position: relative;
+}
+
+.squiggly-connector::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 60px;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 5px,
+    hsl(var(--primary)) 5px,
+    hsl(var(--primary)) 10px
+  );
+  transform: translateX(-50%) rotate(5deg);
+}
+
+.squiggly-shape {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50% 20% / 10% 40%;
+  background-color: hsl(var(--primary));
+  opacity: 0.2;
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(10deg); }
+}
+
+.squiggly-divider {
+  position: relative;
+  height: 80px;
+  margin: 30px 0;
+  overflow: visible;
+}
+
+.squiggly-divider::before {
+  content: '';
+  position: absolute;
+  left: -10%;
+  top: 50%;
+  width: 120%;
+  height: 3px;
+  background: repeating-linear-gradient(
+    to right,
+    transparent 0px,
+    transparent 5px,
+    hsl(var(--primary)) 5px,
+    hsl(var(--primary)) 10px
+  );
+  transform: translateY(-50%) rotate(-2deg);
+}
+
+.squiggly-divider::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 15px;
+  height: 15px;
+  background-color: hsl(var(--accent));
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.sci-fi-background {
+  background-color: #1D2833;
+  background-image: linear-gradient(to bottom, #1D2833, #2C4F64);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+.sci-fi-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  opacity: 0.6;
+  mix-blend-mode: screen;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.sci-fi-shape {
+  position: absolute;
+  opacity: 0.6;
+  mix-blend-mode: screen;
+}
+
+.sci-fi-shape-1 {
+  top: 10%;
+  left: 5%;
+  width: 200px;
+  height: 200px;
+  animation: float 6s ease-in-out infinite, pulse 4s ease-in-out infinite;
+}
+
+.sci-fi-shape-2 {
+  bottom: 15%;
+  right: 10%;
+  width: 180px;
+  height: 180px;
+  animation: rotate 20s linear infinite, pulse 4s ease-in-out infinite;
+}
+
+.sci-fi-shape-3 {
+  top: 40%;
+  right: 20%;
+  width: 150px;
+  height: 150px;
+  animation: float 5s ease-in-out infinite, pulse 3s ease-in-out infinite;
+}
+
+.sci-fi-wire {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #5FCBC3, transparent);
+  opacity: 0.5;
+}
+
+.sci-fi-wire-1 {
+  top: 30%;
+  left: 0;
+  right: 0;
+  transform: rotate(5deg);
+}
+
+.sci-fi-wire-2 {
+  bottom: 25%;
+  left: 0;
+  right: 0;
+  transform: rotate(-3deg);
+}
+
+.sci-fi-signal {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border: 2px solid #85DDA2;
+  border-radius: 50%;
+  opacity: 0;
+  animation: signal 3s infinite;
+}
+
+@keyframes signal {
+  0% { transform: scale(0); opacity: 0.5; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+.sci-fi-signal-1 {
+  top: 20%;
+  right: 15%;
+}
+
+.sci-fi-signal-2 {
+  bottom: 10%;
+  left: 10%;
+}

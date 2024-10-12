@@ -21,7 +21,7 @@ export function PlanetarySystem() {
   ]
 
   return (
-    <div className="flex items-center justify-center bg-gray-900/5">
+    <div className="flex items-center justify-center bg-[#2C3A4A]/5">
       <div className="relative" style={{ width: size, height: size }}>
         {/* Central Object */}
         <div className="absolute inset-0 m-auto rounded-full overflow-hidden" style={{ width: size * 0.2, height: size * 0.2 }}>

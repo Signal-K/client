@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet'; 
-import ClassificationForm from '@/components/(classifications)/PostForm';
-import { StructureInfo } from "@/components/(structures)/structureInfo";
-import { ClassificationFormComponentT } from '@/components/(classifications)/MegaClassificationForm';
-import { planetClassificationConfig } from '@/components/(classifications)/FormConfigurations';
+import ClassificationForm from '@/components/Projects/(classifications)/PostForm';
+import { StructureInfo } from "@/components/Structures/structureInfo";
+import { ClassificationFormComponentT } from '@/components/Projects/(classifications)/MegaClassificationForm';
+import { planetClassificationConfig } from '@/components/Projects/(classifications)/FormConfigurations';
 
 export interface Anomaly {
     id: bigint;
@@ -17,6 +17,7 @@ export interface Anomaly {
 export function StarterTelescope() {
     const supabase = useSupabaseClient();
     const session = useSession();
+
     const { activePlanet } = useActivePlanet();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
@@ -45,11 +46,11 @@ export function StarterTelescope() {
 
                 setHasMission3000001(!!missionData);
             } catch (error: any) {
-                console.error('Error checking user mission:', error.message || error);
+                console.error('Error checking user mission: ', error.message || error);
                 setHasMission3000001(false);
             } finally {
                 setMissionLoading(false);
-            }
+            };
         };
 
         checkTutorialMission();
@@ -83,7 +84,7 @@ export function StarterTelescope() {
                 console.error('Error fetching structure config:', error.message);
                 setError('Error fetching structure configuration: ' + (error.message || JSON.stringify(error)));
                 setConfiguration(null);
-            }
+            };
         };
 
         fetchStructureConfiguration();
@@ -94,7 +95,7 @@ export function StarterTelescope() {
             if (!session || !userChoice) {
                 setLoading(false);
                 return;
-            }
+            };
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
@@ -119,7 +120,7 @@ export function StarterTelescope() {
                 setAnomaly(null);
             } finally {
                 setLoading(false);
-            }
+            };
         };
 
         fetchAnomaly();

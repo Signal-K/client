@@ -60,7 +60,7 @@ export default function GlobeView() {
                     </button>
                   ) : (
                     <button
-                      className="bg-gray-200 text-gray-800 p-4 rounded-lg shadow-lg"
+                      className="bg-[#2C3A4A] text-gray-800 p-4 rounded-lg shadow-lg"
                       disabled
                     >
                       No component available

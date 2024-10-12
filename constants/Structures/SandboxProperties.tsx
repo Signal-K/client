@@ -1,23 +1,22 @@
 import React from "react";
-import AutomatonUpgrade from "@/components/(structures)/Config/AutomatonUpgradeBox";
-import { MineralDepositsNoAction } from "@/components/(structures)/Mining/AvailableDeposits";
-import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
+import AutomatonUpgrade from "@/components/Structures/Config/AutomatonUpgradeBox";
+import { MineralDepositsNoAction } from "@/components/Structures/Mining/Archive/AvailableDeposits";
+import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
-import ClassificationViewer from "@/components/(classifications)/YourClassifications";
+// import ClassificationViewer from "@/components/(classifications)/YourClassifications";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
 import { BeanIcon, BirdIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseMedical, CameraIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, FishIcon, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
-import StructureRepair from "@/components/(structures)/Config/RepairStructure";
-import { RoverPhoto } from "@/components/(anomalies)/(data)/Mars-Photos";
-import { AnomalyRoverPhoto } from "@/components/(structures)/Auto/AutomatonClassificationShell";
-import { AdvancedTechTreeComponent } from "@/components/(structures)/Research/TechTree";
+import StructureRepair from "@/components/Structures/Config/RepairStructure";
+import { RoverPhoto } from "@/content/(anomalies)/(data)/Mars-Photos";
+import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
+import { AdvancedTechTreeComponent } from "@/components/Structures/Research/TechTree";
 import MiningScene from "@/app/scenes/mining/page";
 import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
-import MissionsForStructure from "@/components/(structures)/Missions/AvailableMissions";
+import MissionsForStructure from "@/components/Structures/Missions/AvailableMissions";
 import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
-import LaunchpadStructure from "@/components/(structures)/Launchpad/Dashboard";
-import { PlanetSwitcher } from "@/components/(scenes)/planetScene/SwitchPlanet";
+import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
 import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
 import { PenguinWatch } from "@/components/Projects/Zoodex/penguinWatch";
 import { PlanktonPortal, PlanktonPortalTutorial } from "@/components/Projects/Zoodex/planktonPortal";
@@ -66,13 +65,13 @@ export const StructuresConfigForSandbox: StructureConfig = {
         },
       ],
       imageSrc: '/assets/Items/TransitingTelescope.png',
-      actions: [
-        {
-          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="planet" />,
-        },
-      ],
+    //   actions: [
+    //     {
+    //       icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
+    //       text: "My discoveries",
+    //       dynamicComponent: <ClassificationViewer classificationType="planet" />,
+    //     },
+    //   ],
       buttons: [
         {
           icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,

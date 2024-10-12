@@ -4,12 +4,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import PlanetViewLayout from "@/components/(scenes)/planetScene/layout";
-import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/(structures)/Structures";
+import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 import { InventoryStructureItem } from "@/types/Items";
 import ChapterOneIntroduction from "@/components/(scenes)/chapters/one/ChapterOneIntro";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
 // import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
-import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
+import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 
 export default function PlanetViewPage() {
     const session = useSession();
@@ -180,7 +180,7 @@ function PlanetStructures() {
                                 className="w-16 h-16 object-cover"
                             />
                             {tooltip?.visible && (
-                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm p-2 rounded-md">
+                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-[#2C3A4A] text-white text-sm p-2 rounded-md">
                                     {tooltip.text}
                                 </div>
                             )}
@@ -209,7 +209,7 @@ function PlanetStructures() {
                                 className="w-16 h-16 object-cover"
                             />
                             {tooltip?.visible && (
-                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm p-2 rounded-md">
+                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-[#2C3A4A] text-white text-sm p-2 rounded-md">
                                     {tooltip.text}
                                 </div>
                             )}
@@ -235,7 +235,7 @@ function PlanetStructures() {
                                 className="w-16 h-16 object-cover"
                             />
                             {tooltip?.visible && (
-                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm p-2 rounded-md">
+                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-[#2C3A4A] text-white text-sm p-2 rounded-md">
                                     {tooltip.text}
                                 </div>
                             )}

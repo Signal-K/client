@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
-import Camera from "@/components/Projects/Zoodex/Upload/Camera";
-import CloudUploadEarthCameraComponent from "@/components/Projects/Lidar/Upload/CloudCamera";
+import React, { useEffect, useState } from "react";
+import StarnetLayout from "@/components/Layout/Starnet";
+import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
+import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
+import { MissionProgressionComponent } from "@/components/Missions/PathwayGuide";
 
 export default function TestPage() {
     return (
-        <div>
-            <CloudUploadEarthCameraComponent />
-        </div>
+            <div className="1">
+<MissionProgressionComponent />
+            </div>
     );
 };
-
-

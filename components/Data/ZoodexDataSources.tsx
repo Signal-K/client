@@ -1,8 +1,8 @@
 'use client';
 
 import { CloudDrizzleIcon, SunDimIcon, TelescopeIcon, TestTube } from 'lucide-react';
-import { BurrowingOwlIcon } from '../Icons/BurrowingOwl';
-import { FishIcon } from '../Icons/FishIcon';
+import { BurrowingOwlIcon } from '../../content/Icons/BurrowingOwl';
+import { FishIcon } from '../../content/Icons/FishIcon';
 
 export const zoodexDataSources = [
     {

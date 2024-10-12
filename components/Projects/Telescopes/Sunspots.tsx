@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { StructureInfo } from "@/components/(structures)/structureInfo";
-import { ClassificationFormComponentT } from "@/components/(classifications)/MegaClassificationForm";
-import ClassificationForm from "@/components/(classifications)/PostForm";
+import { StructureInfo } from "@/components/Structures/structureInfo";
+import { ClassificationFormComponentT } from "@/components/Projects/(classifications)/MegaClassificationForm";
+import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 
 interface TelescopeProps {
     anomalyId: string;

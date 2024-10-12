@@ -6,10 +6,10 @@ import { useActivePlanet } from "@/context/ActivePlanet";
  
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import InitialisePlanet from "@/components/(scenes)/planetScene/initialisePlanet";
-import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/(structures)/Structures";
+import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 import { InventoryStructureItem } from "@/types/Items";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
-import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
+import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
  
 const MarsView: React.FC = () => {
     const supabase = useSupabaseClient();
@@ -36,9 +36,15 @@ const MarsView: React.FC = () => {
     };
 
     return (
+        <div className="min-h-screen w-full flex flex-col">
+    <img
+      className="absolute inset-0 w-full h-full object-cover"
+      src="/assets/Backdrops/Mars.png"
+    />
         <div className="relative min-h-screen">
             <InitialisePlanet planetId={40} />
             <MarsStructures />
+        </div>
         </div>
     );
 };

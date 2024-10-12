@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MineralDepositsNoAction } from "@/components/(structures)/Mining/AvailableDeposits";
+import { MineralDepositsNoAction } from "@/components/Structures/Mining/Archive/AvailableDeposits";
 
 export interface Mission {
     id: number;
@@ -260,6 +260,36 @@ const missions: Mission[] = [
     {
         id: 2000000122,
         name: 'Make your first Plankton Portal classification',
+    },
+    {
+       id: 200000013,
+       name: "Collect some fuel" 
+    },
+    {
+        id: 200000014,
+        name: "Add fuel to your launchpad & rocket" 
+     },
+    {
+        id: 200000015,
+        name: "Build a telescope",
+    },
+    {
+        id: 200000016,
+        name: "Planet hunters module",
+    },
+    {
+        id: 200000017,
+        name: "Build a LIDAR structure",
+    },
+    
+    // Chapter 2/3 bridge - finding new (exo-)planet
+    {
+        id: 30000001,
+        name: "Classify and discover a new planet", // Requires classification and period/t0
+    },
+    {
+        id: 300000012,
+        name: "Visit your new planet",
     },
 ];
 

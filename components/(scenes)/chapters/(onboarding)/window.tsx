@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import ProfileCardModal from "@/components/profile/form";
+// import ProfileCardModal from "@/components/Profile/form";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { FirstTelescopeClassification } from "@/components/Projects/Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import DeployRooversInitial from "../../../(structures)/Auto/deployAndReturn";
-import GeneratedStarterPlanet from "../../../(anomalies)/(planets)/generated";
+import DeployRooversInitial from "../../../Structures/Auto/deployAndReturn";
+import GeneratedStarterPlanet from "@/content/(anomalies)/(planets)/generated";
 import { Mission } from "@/types/Missions";
 import { OnboardingStepProps } from "@/types/Onboarding";
 import Link from "next/link";
@@ -22,12 +22,12 @@ const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
 
   const renderComponentForStep = () => {
     switch (step) {
-      case 1370102:
-        return (
-          <div>
-            <ProfileCardModal />
-          </div>
-        );
+      // case 1370102:
+      //   return (
+      //     <div>
+      //       <ProfileCardModal />
+      //     </div>
+      //   );
       case 1370103:
         return (
           <div>
@@ -150,7 +150,7 @@ const OnboardingWindow = () => {
               className={`p-2 md:p-4 rounded-lg cursor-pointer ${
                 currentStep === step.id
                   ? "bg-white/50 shadow-md"
-                  : "bg-gray-200/50"
+                  : "bg-[#2C3A4A]/50"
               }`}
               onClick={() => handleStepClick(step.id)}
             >
@@ -205,7 +205,7 @@ const OnboardingWindow = () => {
             <button
               onClick={handleBack}
               disabled={currentStep === steps[0]?.id}
-              className="px-4 py-2 bg-gray-300 rounded-lg"
+              className="px-4 py-2 bg-[#2C3A4A] rounded-lg"
             >
               Back
             </button>
@@ -229,22 +229,22 @@ const OnboardingWindow = () => {
       </div>
 
       {/* Mobile View - Dropdown Menu */}
-      <div className="md:hidden fixed top-0 left-0 w-full bg-gray-100 p-2 z-30">
+      <div className="md:hidden fixed top-0 left-0 w-full bg-[#2C3A4A] p-2 z-30">
         <button
-          className="w-full p-2 bg-gray-800 text-white"
+          className="w-full p-2 bg-[#2C3A4A] text-white"
           onClick={() => setDropdownOpen(!dropdownOpen)}
         >
           {dropdownOpen ? "Close Menu" : "Select Mission"}
         </button>
 
         {dropdownOpen && (
-          <div className="absolute top-12 left-0 w-full bg-gray-100 p-4 shadow-lg z-20 overflow-auto">
+          <div className="absolute top-12 left-0 w-full bg-[#2C3A4A] p-4 shadow-lg z-20 overflow-auto">
             <div className="space-y-4">
               {steps.map((step) => (
                 <div
                   key={step.id}
                   className={`p-2 rounded-lg cursor-pointer ${
-                    currentStep === step.id ? "bg-white shadow-md" : "bg-gray-200"
+                    currentStep === step.id ? "bg-white shadow-md" : "bg-[#2C3A4A]"
                   }`}
                   onClick={() => handleStepClick(step.id)}
                 >
@@ -260,12 +260,12 @@ const OnboardingWindow = () => {
 
       {/* Modal for Mobile */}
             {currentStep && (
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-2 md:hidden z-20">
+        <div className="fixed bottom-0 left-0 right-0 bg-[#2C3A4A] p-2 md:hidden z-20">
           <div className="flex justify-between mt-5 items-center">
             <button
               onClick={handleBack}
               disabled={currentStep === steps[0]?.id}
-              className="px-4 py-2 bg-gray-300 rounded-lg"
+              className="px-4 py-2 bg-[#2C3A4A] rounded-lg"
             >
               Back
             </button>

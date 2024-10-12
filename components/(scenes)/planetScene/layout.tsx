@@ -131,7 +131,7 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
                   >
                     Close
                   </button>
-                )}
+                )} 
               </div>
             ) : null}
           </div>
@@ -162,10 +162,6 @@ export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({
 
   return (
     <div className="min-h-screen w-full flex flex-col">
-      <img
-        className="absolute inset-0 w-full h-full object-cover"
-        src="/assets/Backdrops/Earth.png"
-      />
       <div className="relative flex flex-1">
         <div className="relative flex flex-col flex-1">
           {children.slice(0, 2).map((child, index) => (

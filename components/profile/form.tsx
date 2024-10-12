@@ -121,7 +121,7 @@ export default function ProfileCardModal() {
                 <input
                     id="full_name"
                     type="text"
-                    className="mt-1 block w-full px-3 py-2 bg-gray-800 text-white rounded-md border border-gray-600 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 bg-[#2C3A4A] text-white rounded-md border border-gray-600 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     value={full_name || ''}
                     onChange={(e) => setFull_name(e.target.value)}
                 />
@@ -131,7 +131,7 @@ export default function ProfileCardModal() {
                 <input
                     id="username"
                     type="text"
-                    className="mt-1 block w-full px-3 py-2 bg-gray-800 text-white rounded-md border border-gray-600 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 bg-[#2C3A4A] text-white rounded-md border border-gray-600 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     required
                     value={username || ''}
                     onChange={(e) => setUsername(e.target.value)}
@@ -140,7 +140,7 @@ export default function ProfileCardModal() {
             <div className="mb-4">
                 <label htmlFor="email" className="block text-sm font-medium text-[#85DDA2]">Email: </label>
                 <input
-                    className="mt-1 block w-full px-3 py-2 bg-gray-800 text-white rounded-md border border-gray-600 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 bg-[#2C3A4A] text-white rounded-md border border-gray-600 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     id="email"
                     type="text"
                     value={session?.user?.email || ''}

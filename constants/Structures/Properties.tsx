@@ -1,24 +1,27 @@
+"use client";
+
 import React from "react";
-import AutomatonUpgrade from "@/components/(structures)/Config/AutomatonUpgradeBox";
-import { MineralDepositsNoAction } from "@/components/(structures)/Mining/AvailableDeposits";
-import AllAutomatonsOnActivePlanet from "@/components/(structures)/Auto/AllAutomatons";
+import AutomatonUpgrade from "@/components/Structures/Config/AutomatonUpgradeBox";
+import { MineralDepositsNoAction } from "@/components/Structures/Mining/Archive/AvailableDeposits";
+import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
-import ClassificationViewer from "@/components/(classifications)/YourClassifications";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
-import StructureRepair from "@/components/(structures)/Config/RepairStructure";
-import { RoverPhoto } from "@/components/(anomalies)/(data)/Mars-Photos";
-import { AnomalyRoverPhoto } from "@/components/(structures)/Auto/AutomatonClassificationShell";
-import { AdvancedTechTreeComponent } from "@/components/(structures)/Research/TechTree";
+import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import StructureRepair from "@/components/Structures/Config/RepairStructure";
+import { RoverPhoto } from "@/content/(anomalies)/(data)/Mars-Photos";
+import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
+import { AdvancedTechTreeComponent } from "@/components/Structures/Research/TechTree";
 import MiningScene from "@/app/scenes/mining/page";
 import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
-import MissionsForStructure from "@/components/(structures)/Missions/AvailableMissions";
+import MissionsForStructure from "@/components/Structures/Missions/AvailableMissions";
 import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
-import LaunchpadStructure from "@/components/(structures)/Launchpad/Dashboard";
-import { PlanetSwitcher } from "@/components/(scenes)/planetScene/SwitchPlanet";
+import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
 import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
+import { PlanktonPortal, PlanktonPortalTutorial } from "@/components/Projects/Zoodex/planktonPortal";
+import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
+import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
 
 interface IndividualStructureProps {
     name?: string;
@@ -70,11 +73,6 @@ export const StructuresConfig: StructureConfig = {
         //   text: "Available missions",
         //   dynamicComponent: <MissionsForStructure structureItemId={3102} />,
         // },
-        {
-          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="roverImg" />,
-        },
       ],
       buttons: [
         { 
@@ -124,12 +122,12 @@ export const StructuresConfig: StructureConfig = {
       ],
       imageSrc: '/assets/Items/TransitingTelescope.png',
       actions: [
-        {
-          icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
-          , text: 'Durability/Repair'
-          , dynamicComponent: <StructureRepair inventoryId={3103} />,
-          sizePercentage: 40,
-        },
+        // {
+        //   icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
+        //   , text: 'Durability/Repair'
+        //   , dynamicComponent: <StructureRepair inventoryId={3103} />,
+        //   sizePercentage: 40,
+        // },
         {
           icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research",
@@ -140,11 +138,6 @@ export const StructuresConfig: StructureConfig = {
         //   text: "Available missions",
         //   dynamicComponent: <MissionsForStructure structureItemId={3103} />,
         // },
-        {
-          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="planet" />,
-        },
         // Copy action/labels
       ],
       buttons: [
@@ -152,25 +145,31 @@ export const StructuresConfig: StructureConfig = {
           icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Discover planets", // Transit events, microlensing, etc
           dynamicComponent: <StarterTelescope />,
-          sizePercentage: 90,
+          sizePercentage: 60,
           showInNoModal: true,
+        },
+        {
+          icon: <EarthIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Find new worlds",
+          dynamicComponent: <ExoplanetTransitHunter />,
+          sizePercentage: 80,
         },
         {
           icon: <SunIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Sunspot data",
           dynamicComponent: <TelescopeSunspotDetector />,
-          sizePercentage: 80,
+          sizePercentage: 60,
         },
         {
           icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Find early solar systems",
           dynamicComponent: <TelescopeDiskDetector />,
-          sizePercentage: 80,
+          sizePercentage: 70,
         },
-        {
-          icon: <StarIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Comets & Asteroids",
-        },
+        // {
+        //   icon: <StarIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Comets & Asteroids",
+        // },
       ],
     },
     3104: {
@@ -183,12 +182,12 @@ export const StructuresConfig: StructureConfig = {
       ],
       imageSrc: '/assets/Items/Zoodex.png',
       actions: [
-        {
-          icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
-          , text: 'Durability/Repair'
-          , dynamicComponent: <StructureRepair inventoryId={3104} />,
-          sizePercentage: 40,
-        },
+        // {
+        //   icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
+        //   , text: 'Durability/Repair'
+        //   , dynamicComponent: <StructureRepair inventoryId={3104} />,
+        //   sizePercentage: 40,
+        // },
         {
           icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research",
@@ -199,11 +198,6 @@ export const StructuresConfig: StructureConfig = {
         //   text: "Available missions",
         //   dynamicComponent: <MissionsForStructure structureItemId={3104} />,
         // },
-        {
-          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="zoodex-burrowingOwl" />,
-        },
         {
           icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Capture animals",
@@ -240,12 +234,12 @@ export const StructuresConfig: StructureConfig = {
         },
       ],
       actions: [
-        {
-          icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
-          , text: 'Durability/Repair'
-          , dynamicComponent: <StructureRepair inventoryId={3104} />,
-          sizePercentage: 40,
-        },
+        // {
+        //   icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
+        //   , text: 'Durability/Repair'
+        //   , dynamicComponent: <StructureRepair inventoryId={3104} />,
+        //   sizePercentage: 40,
+        // },
         {
           icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research",
@@ -256,11 +250,11 @@ export const StructuresConfig: StructureConfig = {
         //   text: "Available missions",
         //   dynamicComponent: <MissionsForStructure structureItemId={3105} />,
         // },
-        {
-          icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "My discoveries",
-          dynamicComponent: <ClassificationViewer classificationType="lidar" />,
-        },
+        // {
+        //   icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "My discoveries",
+        //   dynamicComponent: <ClassificationViewer classificationType="lidar" />,
+        // },
       ],
       imageSrc: '/assets/Items/Lidar.png',
       buttons: [
@@ -290,10 +284,10 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <AdvancedTechTreeComponent />,
           sizePercentage: 85,
         },
-        {
-          icon: <BookAIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Decrypt manuscripts",
-        },
+        // {
+        //   icon: <BookAIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Decrypt manuscripts",
+        // },
       ],
     },
     3107: {
@@ -314,16 +308,16 @@ export const StructuresConfig: StructureConfig = {
         },
       ],
       buttons: [
-        {
-          icon: <CaravanIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Build a rocket",
-        },
+        // {
+        //   icon: <CaravanIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Build a rocket",
+        // },
         {
           icon: <PowerIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Launch a rocket (travel)",
           // dynamicComponent: <LaunchpadStructure />,
-          dynamicComponent: <PlanetSwitcher />,
-          sizePercentage: 100,
+          dynamicComponent: <SwitchPlanet />,
+          sizePercentage: 60,
 
         },
       ]
