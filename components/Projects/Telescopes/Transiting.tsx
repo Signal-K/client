@@ -305,7 +305,6 @@ export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomaly
             </div>
         </div>
     );
-    
 
     return (
         <div className="rounded-lg">

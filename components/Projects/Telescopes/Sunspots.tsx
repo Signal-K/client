@@ -183,6 +183,7 @@ export function TelescopeSunspotDetector() {
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -190,7 +191,7 @@ export function TelescopeSunspotDetector() {
             if (!session) {
                 setLoading(false);
                 return;
-            }
+            };
     
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase

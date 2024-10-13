@@ -9,7 +9,7 @@ import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
 import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/Structures/Config/RepairStructure";
-import { RoverPhoto } from "@/content/(anomalies)/(data)/Mars-Photos";
+import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
 import { AdvancedTechTreeComponent } from "@/components/Structures/Research/TechTree";
 import MiningScene from "@/app/scenes/mining/page";

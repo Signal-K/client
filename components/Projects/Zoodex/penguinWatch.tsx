@@ -184,7 +184,7 @@ export function PenguinWatch() {
                 // Set the imageUrl after selecting the anomaly
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
                 const anomalyImageUrl = `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-penguinWatch/${randomAnomaly.id}.jpeg`;
-                setImageUrl(anomalyImageUrl);  // Set the image URL state here
+                setImageUrl(anomalyImageUrl); 
             } catch (error: any) {
                 console.error('Error fetching penguins: ', error.message);
                 setAnomaly(null);
