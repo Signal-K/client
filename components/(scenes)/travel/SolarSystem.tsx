@@ -146,7 +146,7 @@ export default function SwitchPlanet() {
           planetType: exoplanet.anomalytype || "Unknown",
           initialisationMissionId: null,
           travelTime: "Unknown",
-          description: exoplanet.deepnote || "No description available",
+          description: exoplanet.content || "No description available",
           image: exoplanet.avatar_url || '/assets/Planets/DefaultExoplanet.png',
         }));        
   
