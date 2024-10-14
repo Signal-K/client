@@ -5426,6 +5426,11 @@ make-dir@^3.0.2, make-dir@^3.1.0:
   dependencies:
     semver "^6.0.0"
 
+markerjs2@^2.32.3:
+  version "2.32.3"
+  resolved "https://registry.yarnpkg.com/markerjs2/-/markerjs2-2.32.3.tgz#e98e0242613673ab15fe30af97a8150d672bba42"
+  integrity sha512-D7oD4BT5NOsQbugdcO2TFmcw9ZMHp96Ih09A5f0UndxiQNWuz+j5zymtkTHs0WU+oOR8K6dyTufv4KtfJ6diBg==
+
 material-ripple-effects@2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/material-ripple-effects/-/material-ripple-effects-2.0.1.tgz#47803d2ab1561698d930e2524a7a9a19fb2829b7"

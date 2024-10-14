@@ -1,25 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
-import { StructureInfo } from "@/components/Structures/structureInfo";
 
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
 interface Props {
     anomalyid: number | bigint;
 };
 
-export function StarterAiForMars({ anomalyid }: Props) {
-    const supabase = useSupabaseClient();
-    const session = useSession();
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-    const { activePlanet } = useActivePlanet();
-
-    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/automaton-aiForMars/${anomalyid}.jpeg`;
+export function StarterDailyMinorPlanet({
+    anomalyid
+}: Props) {
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}.png`;
 
     const [part, setPart] = useState(1);
     const [line, setLine] = useState(1);
@@ -96,7 +91,7 @@ export function StarterAiForMars({ anomalyid }: Props) {
                 </div>
             </div>
         </div>
-    );;
+    );
 
     return (
         <div className="rounded-lg">
@@ -121,7 +116,7 @@ export function StarterAiForMars({ anomalyid }: Props) {
                                         />
                                     </div>
                                 </div>
-                                <ClassificationForm anomalyId={anomalyid.toString()} anomalyType='automaton-aiForMars' missionNumber={20000006} assetMentioned={imageUrl} />
+                                <ClassificationForm anomalyId={anomalyid.toString()} anomalyType='telescope-minorPlanet' missionNumber={20000003} assetMentioned={imageUrl} />
                             </div>
                         </div>
                     </>
@@ -131,114 +126,117 @@ export function StarterAiForMars({ anomalyid }: Props) {
     );
 };
 
-export function AiForMarsProject() {
+export function DailyMinorPlanet() {
     const supabase = useSupabaseClient();
     const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     const [loading, setLoading] = useState<boolean>(true);
+    const [missionLoading, setMissionLoading] = useState<boolean>(true);
 
-    const [hasMission20000006, setHasMission20000006] = useState<boolean | null>(null);
+    const [hasMission20000003, setHasMission20000003] = useState<boolean | null>(false);
 
     useEffect(() => {
         const checkTutorialMission = async () => {
-            if (!session) return;
-
-            try {
-                const { data: missionData, error: missionError } = await supabase
-                    .from('missions')
-                    .select('id')
-                    .eq('user', session.user.id)
-                    .eq('mission', '20000006')
-                    .single();
-
-                if (missionError) throw missionError;
-
-                setHasMission20000006(!!missionData);
-            } catch (error: any) {
-                console.error('Error checking user mission: ', error.message || error);
-                setHasMission20000006(false);
-            };
-        };
-
-        checkTutorialMission();
-    }, [session, supabase]);
-
-    if (!hasMission20000006) {
-        return (
-            <StarterAiForMars anomalyid={anomaly?.id || 1} />
-        );
-    };
-
-    useEffect(() => {
-        async function fetchAnomaly() {
             if (!session) {
                 setLoading(false);
                 return;
-            };
+            }
+    
+            try {
+                const { data: missionData, error: missionError } = await supabase
+                    .from("missions")
+                    .select("*")
+                    .eq("user", session.user.id)
+                    .eq("mission", 20000003)
+                    .single();
+    
+                console.log("Mission Data:", missionData); 
+    
+                if (missionError) {
+                    throw missionError;
+                }
+    
+                setHasMission20000003(!!missionData);
+            } catch (error: any) {
+                console.error("Mission error:", error);
+                setHasMission20000003(false);
+            } finally {
+                setMissionLoading(false);
+            }
+        };
+    
+        checkTutorialMission();
+    }, [session, supabase]);
 
+    // Fetch anomaly data
+    useEffect(() => {
+        if (!hasMission20000003 || missionLoading || !session) return;
+
+        const fetchAnomaly = async () => {
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")
                     .select("*")
-                    .eq("anomalySet", 'automaton-aiForMars')
-
+                    .eq("anomalySet", "telescope-minorPlanet");
+    
                 if (anomalyError) {
                     throw anomalyError;
-                };
-
+                }
+    
                 const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
                 setAnomaly(randomAnomaly);
-                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${randomAnomaly.id}.jpeg`);
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${randomAnomaly.id}.png`);
             } catch (error: any) {
                 console.error("Error fetching anomaly", error.message);
                 setAnomaly(null);
-                return;
-
             } finally {
                 setLoading(false);
             };
         };
 
         fetchAnomaly();
-    }, [session]);
+    }, [hasMission20000003, missionLoading, session, supabase]);
 
-    if (loading) {
-        return (
-            <div>
-                <p>
-                    Loading...
-                </p>
-            </div>
-        );
-    };
+    // Handle loading states
+    if (loading || missionLoading) {
+        return <div>Loading...</div>;
+    }
 
+    // Render conditionally based on mission
+    if (!hasMission20000003) {
+        return <StarterDailyMinorPlanet anomalyid={anomaly?.id || 100879215} />;
+    }
+
+    // Render anomaly or no anomaly found message
     if (!anomaly) {
         return (
             <div>
                 <p>No anomaly found.</p>
             </div>
         );
-    };
+    }
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
             <div className="p-4 rounded-md relative w-full">
                 {imageUrl && (
-                    <img src={imageUrl} alt="Anomaly" className="w-64 h-64 contained" />
+                    <img
+                        src={imageUrl}
+                        alt="Anomaly"
+                        className="w-full h-full object-contain"
+                    />
                 )}
             </div>
             {imageUrl && (
                 <ClassificationForm
                     anomalyId={anomaly?.id.toString() || ""}
-                    anomalyType='automaton-aiForMars'
-                    missionNumber={200000062}
+                    anomalyType='telescope-minorPlanet'
+                    missionNumber={20000003}
                     assetMentioned={imageUrl}
-                    structureItemId={3102} // I did get conflicted between 3102 and 3103, going with 3102 until the satellite comes into play
+                    structureItemId={3103}
                 />
             )}
         </div>

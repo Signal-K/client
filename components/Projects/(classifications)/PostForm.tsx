@@ -288,6 +288,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                     setShowResearch(true);
                 }, 1200);
             };
+
+            await handleMissionComplete();
     
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
@@ -305,8 +307,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({ anomalyType, an
                 .eq('id', session?.user?.id);
     
             if (updatePointsError) throw updatePointsError;
-    
-            await handleMissionComplete();
         } catch (error: any) {
             console.error("Unexpected error:", error);
         };

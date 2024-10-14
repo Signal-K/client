@@ -133,7 +133,7 @@ export const telescopeDataSources = [
             {
                 name: 'Planet Four',
                 description: "Help explore the surface and weather of Mars' south polar region",
-                identifier: 'telescope-planetFour',
+                identifier: 'satellite-planetFour',
                 researchId: 'planet-four',
                 researcher: 'zooniverse/mschwamb',
                 unlocked: false,
@@ -141,7 +141,7 @@ export const telescopeDataSources = [
                 bestPlanetType: ['Frozen'],
                 tutorialMission: 20000005,
                 activeStructure: 3103,
-                researched: 'telescope-planetFour',
+                researched: 'satellite-planetFour',
                 techId: 1,
             },
         ],

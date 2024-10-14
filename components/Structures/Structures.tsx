@@ -109,7 +109,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
 
   return (
 <div className="relative">
-            <div className={`grid grid-cols-3 gap-1 gap-y-3 relative ${userStructuresOnPlanet.length === 1 ? 'justify-center' : ''}`}>
+            <div className={`grid grid-cols-4 gap-1 gap-y-3 relative ${userStructuresOnPlanet.length === 1 ? 'justify-center' : ''}`}>
                 {userStructuresOnPlanet.map((structure) => {
                     const itemDetail = itemDetails.get(structure.item);
 
@@ -240,7 +240,7 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
 
   return (
     <div className="relative">
-      <div className="grid grid-cols-3 gap-1 gap-y-1">
+      <div className="grid grid-cols-4 gap-1 gap-y-1">
         {activeStructure && (
           <div key={activeStructure.id} className="flex flex-col items-center space-y-2">
             <img
@@ -379,7 +379,7 @@ export function AtmosphereStructuresOnPlanet({ onStructuresFetch }: StructuresOn
 
   return (
     <div className="relative">
-      <div className="grid grid-cols-3 gap-1 gap-y-3">
+      <div className="grid grid-cols-4 gap-1 gap-y-3">
         {activeStructure && (
           <div key={activeStructure.id} className="flex flex-col items-center space-y-2">
             <img

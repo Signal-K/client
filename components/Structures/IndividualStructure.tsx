@@ -30,7 +30,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
   name,
   title,
   labels,
-  imageSrc,
+  imageSrc, 
   actions,
   buttons,
   onActionClick,

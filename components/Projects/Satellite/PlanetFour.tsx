@@ -1,25 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
-import { StructureInfo } from "@/components/Structures/structureInfo";
 
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
+import ImageAnnotation from "../(classifications)/Annotation";
+import * as markerjs2 from "markerjs2";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 interface Props {
     anomalyid: number | bigint;
 };
 
-export function StarterAiForMars({ anomalyid }: Props) {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
-
-    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+export function StarterPlanetFour({
+    anomalyid
+}: Props) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/automaton-aiForMars/${anomalyid}.jpeg`;
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomalyid}.jpeg`;
 
     const [part, setPart] = useState(1);
     const [line, setLine] = useState(1);
@@ -96,13 +95,13 @@ export function StarterAiForMars({ anomalyid }: Props) {
                 </div>
             </div>
         </div>
-    );;
+    );
 
     return (
         <div className="rounded-lg">
             <div className="flex flex-col items-center">
                 {part === 1 && (
-                    <div className="mb-2">
+                    <div className="mb-1">
                         {tutorialContent}
                     </div>
                 )}
@@ -116,129 +115,186 @@ export function StarterAiForMars({ anomalyid }: Props) {
                                     <div className="bg-white bg-opacity-90">
                                         <img
                                             src={imageUrl}
-                                            alt="Anomaly"
+                                            alt="Planet Four"
                                             className="relative z-10 w-128 h-128 object-contain"
                                         />
                                     </div>
                                 </div>
-                                <ClassificationForm anomalyId={anomalyid.toString()} anomalyType='automaton-aiForMars' missionNumber={20000006} assetMentioned={imageUrl} />
+                                <ClassificationForm
+                                    anomalyId={anomalyid.toString()}
+                                    anomalyType="satellite-planetFour"
+                                    missionNumber={20000005}
+                                    assetMentioned={imageUrl}
+                                />
                             </div>
                         </div>
                     </>
                 )}
             </div>
         </div>
-    );
+    );;
 };
 
-export function AiForMarsProject() {
+export function PlanetFourProject() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const { activePlanet } = useActivePlanet();
-
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [missionLoading, setMissionLoading] = useState<boolean>(true);
+    const [hasMission20000005, setHasMission20000005] = useState(false);
+    const imageRef = useRef<HTMLImageElement>(null);
+    const [markerArea, setMarkerArea] = useState<markerjs2.MarkerArea | null>(null);
+    const [annotationState, setAnnotationState] = useState<string | null>(null);
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-    const [loading, setLoading] = useState<boolean>(true);
-
-    const [hasMission20000006, setHasMission20000006] = useState<boolean | null>(null);
-
+    // Check for the mission
     useEffect(() => {
         const checkTutorialMission = async () => {
             if (!session) return;
-
             try {
                 const { data: missionData, error: missionError } = await supabase
-                    .from('missions')
-                    .select('id')
-                    .eq('user', session.user.id)
-                    .eq('mission', '20000006')
+                    .from("missions")
+                    .select("id")
+                    .eq("user", session.user.id)
+                    .eq("mission", 20000005)
                     .single();
 
                 if (missionError) throw missionError;
-
-                setHasMission20000006(!!missionData);
+                setHasMission20000005(!!missionData);
             } catch (error: any) {
-                console.error('Error checking user mission: ', error.message || error);
-                setHasMission20000006(false);
-            };
+                console.error("Error checking user mission: ", error.message || error);
+                setHasMission20000005(false);
+            } finally {
+                setMissionLoading(false);
+            }
         };
 
         checkTutorialMission();
     }, [session, supabase]);
 
-    if (!hasMission20000006) {
-        return (
-            <StarterAiForMars anomalyid={anomaly?.id || 1} />
-        );
-    };
-
+    // Fetch anomaly data
     useEffect(() => {
-        async function fetchAnomaly() {
-            if (!session) {
-                setLoading(false);
-                return;
-            };
+        const fetchAnomaly = async () => {
+            if (!hasMission20000005 || missionLoading || !session) return;
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
-                    .from("anomalies")
-                    .select("*")
-                    .eq("anomalySet", 'automaton-aiForMars')
+                    .from('anomalies')
+                    .select('*')
+                    .eq('anomalySet', 'satellite-planetFour');
 
-                if (anomalyError) {
-                    throw anomalyError;
-                };
+                if (anomalyError) throw anomalyError;
 
                 const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
                 setAnomaly(randomAnomaly);
-                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${randomAnomaly.id}.jpeg`);
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${randomAnomaly.id}.jpeg`);
             } catch (error: any) {
                 console.error("Error fetching anomaly", error.message);
                 setAnomaly(null);
-                return;
-
             } finally {
                 setLoading(false);
-            };
+            }
         };
 
         fetchAnomaly();
-    }, [session]);
+    }, [hasMission20000005, missionLoading, session, supabase, supabaseUrl]);
 
+    // Initialize MarkerArea
+    useEffect(() => {
+        if (imageRef.current) {
+            const ma = new markerjs2.MarkerArea(imageRef.current);
+            setMarkerArea(ma);
+
+            ma.addEventListener("render", (event) => {
+                if (imageRef.current) {
+                    setAnnotationState(JSON.stringify(ma.getState()));
+                    imageRef.current.src = event.dataUrl;
+                }
+            });
+
+            ma.addEventListener("close", () => {
+                setAnnotationState(JSON.stringify(ma.getState()));
+            });
+        }
+    }, [imageUrl]); // Re-run this effect whenever the imageUrl changes
+
+    // Early return after hooks are called
     if (loading) {
-        return (
-            <div>
-                <p>
-                    Loading...
-                </p>
-            </div>
-        );
-    };
+        return <div><p>Loading...</p></div>;
+    }
 
     if (!anomaly) {
-        return (
-            <div>
-                <p>No anomaly found.</p>
-            </div>
-        );
+        return <div><p>No anomaly found.</p></div>;
+    }
+
+    const showMarkerArea = () => {
+        console.log("Show Marker Area called");
+        if (markerArea) {
+            if (annotationState) {
+                try {
+                    markerArea.restoreState(JSON.parse(annotationState));
+                } catch (error) {
+                    console.error("Error restoring state: ", error);
+                }
+            }
+            markerArea.show();
+        } else {
+            console.error("MarkerArea is not initialized");
+        }
+    };
+
+    const downloadImage = () => {
+        if (imageRef.current) {
+            const dataUrl = imageRef.current.src;
+            if (dataUrl.startsWith('data:image')) {
+                const link = document.createElement('a');
+                link.href = dataUrl;
+                link.download = 'annotated_image.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                console.error('No base64 data to download');
+            }
+        }
     };
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
             <div className="p-4 rounded-md relative w-full">
                 {imageUrl && (
-                    <img src={imageUrl} alt="Anomaly" className="w-64 h-64 contained" />
+                    <Card className="w-full max-w-3xl mx-auto">
+                        <CardHeader>
+                            <CardTitle>Image</CardTitle>
+                            <CardDescription>Annotate the image using marker.js</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex flex-col items-center py-10 space-y-4">
+                            <div className="flex space-x-2">
+                                <Button onClick={showMarkerArea}>Start Annotating</Button>
+                                <Button onClick={downloadImage} disabled={!annotationState}>Download Annotated Image</Button>
+                            </div>
+                            <div className="border border-gray-300 rounded-lg overflow-hidden">
+                                <img
+                                    ref={imageRef}
+                                    src={imageUrl}
+                                    alt="Annotation"
+                                    crossOrigin="anonymous"
+                                    className="max-w-full h-auto"
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
                 )}
             </div>
             {imageUrl && (
                 <ClassificationForm
                     anomalyId={anomaly?.id.toString() || ""}
-                    anomalyType='automaton-aiForMars'
-                    missionNumber={200000062}
+                    anomalyType="satellite-planetFour"
+                    missionNumber={200000052}
                     assetMentioned={imageUrl}
-                    structureItemId={3102} // I did get conflicted between 3102 and 3103, going with 3102 until the satellite comes into play
+                    structureItemId={3103}
                 />
             )}
         </div>

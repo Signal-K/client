@@ -9,7 +9,7 @@ import { MissionProgressionComponent } from "@/components/Missions/PathwayGuide"
 export default function TestPage() {
     return (
             <div className="1">
-<MissionProgressionComponent />
+                <MissionProgressionComponent />
             </div>
     );
 };

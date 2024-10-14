@@ -186,7 +186,7 @@ export function StarterTelescope() {
                 <p>Loading...</p>
             </div>
         );
-    }
+    };
 
     // No anomaly found
     if (!anomaly) {
@@ -195,7 +195,7 @@ export function StarterTelescope() {
                 <p>No anomaly found.</p>
             </div>
         );
-    }
+    };
 
     // Main rendering
     return (
