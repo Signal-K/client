@@ -128,27 +128,27 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
 
   const [hasClassified, setHasClassified] = useState<boolean>(false);
 
-  useEffect(() => {
-    const checkUserClassification = async () => {
-      if (!session?.user?.id || !anomalyId) return;
+//   useEffect(() => {
+//     const checkUserClassification = async () => {
+//       if (!session?.user?.id || !anomalyId) return;
 
-      const { data, error } = await supabase
-        .from("classifications")
-        .select("id")
-        .eq("author", session.user.id)
-        .eq("anomaly", anomalyId)
-        .single();
+//       const { data, error } = await supabase
+//         .from("classifications")
+//         .select("id")
+//         .eq("author", session.user.id)
+//         .eq("anomaly", anomalyId)
+//         .single();
 
-      if (data) {
-        setHasClassified(true);
-      }
-      if (error) {
-        console.error("Error checking classification:", error.message);
-      }
-    };
+//       if (data) {
+//         setHasClassified(true);
+//       }
+//       if (error) {
+//         console.error("Error checking classification:", error.message);
+//       }
+//     };
 
-    checkUserClassification();
-  }, [session?.user?.id, anomalyId, supabase]);
+//     checkUserClassification();
+//   }, [session?.user?.id, anomalyId, supabase]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
