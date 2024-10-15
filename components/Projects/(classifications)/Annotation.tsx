@@ -55,8 +55,8 @@ export default function ImageAnnotation({ src }: ImageProps) {
                 document.body.removeChild(link);
             } else {
                 console.error('No base64 data to download');
-            }
-        }
+            };
+        };
     };
 
     return (

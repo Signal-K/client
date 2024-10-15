@@ -4,7 +4,7 @@ import { CloudDrizzleIcon, SunDimIcon, TelescopeIcon, TestTube } from 'lucide-re
 import { BurrowingOwlIcon } from '../../content/Icons/BurrowingOwl';
 import { FishIcon } from '../../content/Icons/FishIcon';
 
-export const zoodexDataSources = [
+export const zoodexDataSources = [ 
     {
         category: 'Animals',
         items: [
@@ -21,7 +21,6 @@ export const zoodexDataSources = [
                 tutorialMission: 3000002,
                 activeStructure: 3104,
                 techId: 5,
-                
             },
             {
                 name: "Penguin Watch",

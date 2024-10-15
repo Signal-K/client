@@ -5,7 +5,6 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet'; 
 import ClassificationForm from '@/components/Projects/(classifications)/PostForm';
 import { StructureInfo } from "@/components/Structures/structureInfo";
-import { ClassificationFormComponentT } from '@/components/Projects/(classifications)/MegaClassificationForm';
 import { planetClassificationConfig } from '@/components/Projects/(classifications)/FormConfigurations';
 
 export interface Anomaly {

@@ -89,13 +89,50 @@ export const cloudClassificationOptions: ClassificationOption[] = [
         { id: 3, text: "Medium clouds" },
       ],
     },
-    {
+    { 
       id: 3,
       text: "Coverage",
       subOptions: [
         { id: 1, text: "Clouds cover most of the height" },
         { id: 2, text: "Clouds are smaller" },
       ],
+    },
+];
+
+export const cloudClassificationOptionsOne: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "White colour",
+    },
+    {
+        id: 2,
+        text: "Blue colour"
+    },
+];
+
+export const cloudClassificationOptionsTwo: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Bright clouds",
+    },
+    {
+        id: 2,
+        text: "Faint clouds",
+    },
+    {
+        id: 3,
+        text: "Medium clouds",
+    },
+];
+
+export const cloudClassificationOptionsThree: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Clouds cover most of the height",
+    },
+    {
+        id: 2,
+        text: "Clouds are smaller",
     },
 ];
 
