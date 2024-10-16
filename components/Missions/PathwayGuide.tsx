@@ -11,7 +11,7 @@ type Mission = {
   title: string;
   routeId: number[];
   mission: string;
-};
+}; 
 
 const missionsData: Record<PlayStyle, Partial<Record<Planet, Mission[]>>> = {
   biologist: {
