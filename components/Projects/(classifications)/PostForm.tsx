@@ -31,7 +31,7 @@ interface ClassificationFormProps {
   anomalyType: string;
   anomalyId: string;
   missionNumber: number;
-  assetMentioned: string;
+  assetMentioned: string | string[];
   originatingStructure?: number;
   structureItemId?: number;
 }
@@ -85,6 +85,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return "Describe the plankton you see and their behaviour...";
       case "lidar-earthCloudRead":
         return "Describe the type of cloud you see...";
+    case "telescope-minorPlanet":
+        return "Does the highlighted object move smoothly through the images? What do you see...?"
       default:
         return "Enter your classification details...";
     }

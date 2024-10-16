@@ -14,14 +14,28 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 export function StarterDailyMinorPlanet({
     anomalyid
 }: Props) {
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}.png`;
+    const imageUrls = [
+        `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/1.png`,
+        `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/2.png`,
+        `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/3.png`,
+        `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/4.png`
+    ];
 
     const [part, setPart] = useState(1);
     const [line, setLine] = useState(1);
     const nextLine = () => setLine(prevLine => prevLine + 1);
+    const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
     const nextPart = () => {
         setPart(2);
         setLine(1);
+    };
+
+    const handlePrevious = () => {
+        setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1));
+    };
+
+    const handleNext = () => {
+        setCurrentImageIndex((prevIndex) => (prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1));
     };
 
     const tutorialContent = (
@@ -109,14 +123,22 @@ export function StarterDailyMinorPlanet({
                                 <div className="relative">
                                     <div className='absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
                                     <div className="bg-white bg-opacity-90">
-                                        <img
-                                            src={imageUrl}
-                                            alt="Anomaly"
-                                            className="relative z-10 w-128 h-128 object-contain"
+                                        <div className="relative">
+                                    <img
+                                        src={imageUrls[currentImageIndex]}
+                                        alt={`Anomaly ${currentImageIndex + 1}`}
+                                        className="w-full h-full object-contain"
+                                    />
+                                    {imageUrls.map((_, index) => (
+                                        <span
+                                            key={index}
+                                            className={`h-2 w-2 rounded-full mx-1 ${index === currentImageIndex ? 'bg-blue-500' : 'bg-gray-300'}`}
                                         />
+                                    ))}
+                                    </div>
                                     </div>
                                 </div>
-                                <ClassificationForm anomalyId={anomalyid.toString()} anomalyType='telescope-minorPlanet' missionNumber={20000003} assetMentioned={imageUrl} />
+                                <ClassificationForm anomalyId={anomalyid.toString()} anomalyType='telescope-minorPlanet' missionNumber={20000003} assetMentioned={imageUrls} />
                             </div>
                         </div>
                     </>
@@ -143,7 +165,7 @@ export function DailyMinorPlanet() {
             if (!session) {
                 setLoading(false);
                 return;
-            }
+            };
 
             try {
                 const { data: missionData, error: missionError } = await supabase
@@ -155,7 +177,7 @@ export function DailyMinorPlanet() {
 
                 if (missionError) {
                     throw missionError;
-                }
+                };
 
                 setHasMission20000003(!!missionData);
             } catch (error: any) {
@@ -181,12 +203,11 @@ export function DailyMinorPlanet() {
 
                 if (anomalyError) {
                     throw anomalyError;
-                }
+                };
 
                 const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
                 setAnomaly(randomAnomaly);
                 
-                // Set URLs for carousel images
                 const imageUrls = [
                     `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${randomAnomaly.id}/1.png`,
                     `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${randomAnomaly.id}/2.png`,
@@ -195,7 +216,7 @@ export function DailyMinorPlanet() {
                 ];
                 setImageUrls(imageUrls);
             } catch (error: any) {
-                console.error("Error fetching anomaly", error.message);
+                console.error("Error fetching anomaly ", error.message);
                 setAnomaly(null);
             } finally {
                 setLoading(false);
@@ -239,8 +260,18 @@ export function DailyMinorPlanet() {
                             alt={`Anomaly ${currentImageIndex + 1}`}
                             className="w-full h-full object-contain"
                         />
-                        <button onClick={handlePrevious} className="absolute left-0 top-1/2 -translate-y-1/2 p-2 bg-gray-600 rounded-full">❮</button>
-                        <button onClick={handleNext} className="absolute right-0 top-1/2 -translate-y-1/2 p-2 bg-gray-600 rounded-full">❯</button>
+                        <button
+                            onClick={handlePrevious}
+                            className="absolute left-0 top-1/2 -translate-y-1/2 p-2 bg-gray-600 rounded-full"
+                        >
+                            ❮
+                        </button>
+                        <button
+                            onClick={handleNext}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 p-2 bg-gray-600 rounded-full"
+                        >
+                            ❯
+                        </button>
                         <div className="flex justify-center mt-2">
                             {imageUrls.map((_, index) => (
                                 <span
@@ -253,14 +284,27 @@ export function DailyMinorPlanet() {
                 )}
             </div>
             {imageUrls.length > 0 && (
+                <div className="flex w-full gap-2 mt-4">
+                    {imageUrls.map((url, index) => (
+                        <img
+                            key={index}
+                            src={url}
+                            alt={`Thumbnail ${index + 1}`}
+                            onClick={() => setCurrentImageIndex(index)}
+                            className={`flex-1 h-16 object-cover cursor-pointer border-2 ${index === currentImageIndex ? 'border-blue-500' : 'border-gray-300'}`}
+                        />
+                    ))}
+                </div>
+            )}
+            {imageUrls.length > 0 && (
                 <ClassificationForm
                     anomalyId={anomaly?.id.toString() || "90670192"}
                     anomalyType='telescope-minorPlanet'
                     missionNumber={20000003}
-                    assetMentioned={imageUrls[currentImageIndex]}
+                    assetMentioned={imageUrls}
                     structureItemId={3103}
                 />
             )}
         </div>
-    );
+    );     
 };
