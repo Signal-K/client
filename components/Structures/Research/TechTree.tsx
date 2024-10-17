@@ -70,10 +70,10 @@ export function AdvancedTechTreeComponent() {
         category: 'Automatons' as TechCategory,
         requiresMission: automaton.requiresMission || null,
       })),
-    ]
+    ];
 
     setTechnologies(combinedTechnologies)
-  }
+  };
 
   const fetchUserStructures = async () => {
     if (!userId || !activePlanet?.id) return;
@@ -86,7 +86,7 @@ export function AdvancedTechTreeComponent() {
     if (researchError) {
       console.error('Error fetching user structures:', researchError);
       return;
-    }
+    };
   
     console.log('Research Data:', researchData); // Log research data for debugging
   

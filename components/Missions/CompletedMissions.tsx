@@ -3,6 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { CheckCircle } from "lucide-react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { AdvancedTechTreeComponent } from "../Structures/Research/TechTree";
+import { UnownedSurfaceStructures } from "../Structures/Build/EditMode";
+import LaunchpadStatus from "../Structures/Launchpad/LaunchpadStatus";
+import SwitchPlanet from "../(scenes)/travel/SolarSystem";
+import { DataSourcesModal } from "../Data/unlockNewDataSources";
 
 type Planet = "Earth" | "Mars" | "Mercury" | "New Planet";
 type Mission = {
@@ -15,8 +20,13 @@ type Mission = {
 type MissionRoute = {
     id: string;
     title: string;
-    routeId: number[];
-    mission: string;
+    routeId?: number[];
+    mission?: string;
+    researchStructureId?: number;
+    inventoryStructureId?: number;
+    route?: string;
+    infoText?: string;
+    component?: React.ReactNode;
 }; 
 
 const planetColors: Record<Planet, string> = {
@@ -35,68 +45,98 @@ const missionsData: Record<PlayStyle, Partial<Record<Planet, MissionRoute[]>>> =
           mission: '10000001',
          },
         { id: 'pick', title: 'Pick your first classification', routeId: [10000002], mission: '10000002' },
-        { id: 'tutorial1', title: "Complete a tutorial for your classification", routeId: [3000001, 3000003, 3000009, 3000002, 3000004, 30000027, 3000005], mission: '3000001',},
-        { id: 'research', title: 'Research the launchpad', routeId: [100000042], mission: '100000042'},
-        { id: 'owl', title: 'Classify some burrowing owls', routeId: [100000035], mission: '100000035', },
-        { id: 'penguin', title: 'Take a look at some penguins', routeId: [200000010], mission: '200000010', },
-        { id: 'build', title: 'Build the launchpad', routeId: [100000044], mission: '100000044', },
+        { id: 'tutorial1', title: "Complete a tutorial for your classification", routeId: [3000001, 3000003, 3000009, 3000002, 3000004, 30000027, 3000005], mission: '3000001',
+          infoText: "To complete classifications, return to your planet page and click on the structure icon to review the data", route: "/",},
+        {
+          id: 'researchStation', title: "Create a Research Station", component: <UnownedSurfaceStructures />, inventoryStructureId: 3106,
+        },
+        { id: 'research', title: 'Research the launchpad', routeId: [100000042], mission: '100000042', researchStructureId: 3107, component: <AdvancedTechTreeComponent />},
+        { id: 'owl', title: 'Classify some burrowing owls', routeId: [100000035], mission: '100000035',
+          infoText: 'Return to the planet page and use the Zoodex structure to classify burrowing owls', route: "/",
+         },
+        { id: 'penguin', title: 'Take a look at some penguins', routeId: [200000010], mission: '200000010',
+          infoText: 'Return to the planet page and use the Zoodex structure to classify penguins', route: "/",
+         },
+        { id: 'build', title: 'Build the launchpad', routeId: [100000044], mission: '100000044', inventoryStructureId: 3107, component: <UnownedSurfaceStructures />,    },
       ],
       Mars: [
         { id: 'travel', title: 'Travel to Mars', routeId: [400001], mission: '400001', },
-        { id: 'fuel', title: 'Collect fuel', routeId: [200000013], mission: '200000013' },
-        { id: 'fuels', title: 'Add fuel to your rocket', routeId: [200000014], mission: '200000014', },
-        { id: 'telescope', title: 'Build a telescope', routeId: [200000015], mission: '200000015', },
-        { id: 'research_ph', title: 'Research the Planet Hunters module', routeId: [200000016], mission: '200000016', },
+        { id: 'fuel', title: 'Collect fuel', routeId: [200000013], mission: '200000013', route: "/mining", },
+        { id: 'fuels', title: 'Add fuel to your rocket', routeId: [200000014], mission: '200000014', component: <LaunchpadStatus /> },
+        { id: 'telescopeResearch', title: 'Research the telescope', routeId: [200000015], mission: '200000015', researchStructureId: 3103, component: <AdvancedTechTreeComponent />,   },
+        { id: 'telescope', title: 'Build a telescope', routeId: [200000015], mission: '200000015', inventoryStructureId: 3103, component: <UnownedSurfaceStructures />,   },
+        { id: 'research_ph', title: 'Research the Planet Hunters module', routeId: [200000016], mission: '200000016', component: <DataSourcesModal structureId="3103" structure="Telescope" /> },
       ],
       'New Planet': [
-        { id: 'discover', title: 'Discover a new planet', routeId: [30000001], mission: '30000001', },
-        { id: 'travel_new', title: 'Travel to the new planet', routeId: [300000012], mission: '300000012', },
+        { id: 'discover', title: 'Discover a new planet', routeId: [30000001], mission: '30000001',
+          infoText: 'Return to the planet page and click on the telescope structure to discover new planets', route: "/",
+         },
+        { id: 'travel_new', title: 'Travel to the new planet', routeId: [300000012], mission: '300000012', component: <SwitchPlanet />, },
       ],
     },
     astronomer: {
       Earth: [
         { id: 'start', title: 'Start the game', routeId: [10000001], mission: '10000001', },
         { id: 'pick', title: 'Pick your first classification', routeId: [10000002], mission: '10000002', },
-        { id: 'tutorial1', title: "Complete a tutorial for your classification", routeId: [3000001, 3000003, 3000009, 3000002, 3000004, 30000027, 3000005], mission: '3000001', },
-        { id: 'research', title: 'Research the launchpad', routeId: [100000042], mission: '100000042', },
-        { id: 'build', title: 'Build the launchpad', routeId: [100000044], mission: '100000044', },
+        { id: 'tutorial1', title: "Complete a tutorial for your classification", routeId: [3000001, 3000003, 3000009, 3000002, 3000004, 30000027, 3000005], mission: '3000001',
+          infoText: "To complete classifications, return to your planet page and click on the structure icon to review the data", route: "/", },
+        {
+          id: 'researchStation', title: "Create a Research Station", component: <UnownedSurfaceStructures />, inventoryStructureId: 3106,
+        },
+        { id: 'research', title: 'Research the launchpad', routeId: [100000042], mission: '100000042', researchStructureId: 3107, component: <AdvancedTechTreeComponent /> },
+        { id: 'build', title: 'Build the launchpad', routeId: [100000044], mission: '100000044', inventoryStructureId: 3107, component: <UnownedSurfaceStructures />,    },
       ],
       Mars: [
         { id: 'travel', title: 'Travel to Mars', routeId: [400001], mission: '400001', },
-        { id: 'telescope', title: 'Build a telescope', routeId: [200000015], mission: '200000015', },
-        { id: 'minor_planet', title: 'Complete the Minor Planet classification', routeId: [20000004], mission: '20000004', },
+        { id: 'telescopeResearch', title: 'Research the telescope', routeId: [200000015], mission: '200000015', researchStructureId: 3103, component: <AdvancedTechTreeComponent />,   },
+        { id: 'telescope', title: 'Build a telescope', routeId: [200000015], mission: '200000015', inventoryStructureId: 3103, component: <UnownedSurfaceStructures />,   },
+        { id: 'minor_planet', title: 'Complete the Minor Planet classification', routeId: [20000004], mission: '20000004',
+          infoText: "Return to the planet page and click on the telescope structure to discover asteroid anomalies", route: "/",
+         },
       ],
       Mercury: [
         { id: 'travel_mercury', title: 'Travel to Mercury', routeId: [100001], mission: '100001', },
         { id: 'sunspots', title: 'Discover sunspots', routeId: [3000003], mission: '3000003', },
-        { id: 'fuel', title: 'Collect fuel', routeId: [200000013], mission: '200000013', },
-        { id: 'research_ph', title: 'Research the Planet Hunters module', routeId: [200000016], mission: '200000016', },
+        { id: 'fuel', title: 'Collect fuel', routeId: [200000013], mission: '200000013', route: "/mining", },
+        { id: 'fuels', title: 'Add fuel to your rocket', routeId: [200000014], mission: '200000014', component: <LaunchpadStatus /> },
+        { id: 'research_ph', title: 'Research the Planet Hunters module', routeId: [200000016], mission: '200000016', component: <DataSourcesModal structureId="3103" structure="Telescope" /> },
       ],
       'New Planet': [
-        { id: 'discover', title: 'Discover a new planet', routeId: [30000001], mission: '30000001', },
-        { id: 'travel_new', title: 'Travel to the new planet', routeId: [300000012], mission: '300000012', },
+        { id: 'discover', title: 'Discover a new planet', routeId: [30000001], mission: '30000001',
+          infoText: 'Return to the planet page and click on the telescope structure to discover new planets', route: "/",
+         },
+        { id: 'travel_new', title: 'Travel to the new planet', routeId: [300000012], mission: '300000012', component: <SwitchPlanet />, },
       ],
     },
     meteorologist: {
       Earth: [
         { id: 'start', title: 'Start the game', routeId: [10000001], mission: '10000001', },
         { id: 'pick', title: 'Pick your first classification', routeId: [10000002], mission: '10000002', },
-        { id: 'tutorial1', title: "Complete a tutorial for your classification", routeId: [3000001, 3000003, 3000009, 3000002, 3000004, 30000027, 3000005], mission: '3000001'},
-        { id: 'research', title: 'Research the launchpad', routeId: [100000042], mission: '100000042', },
-        { id: 'build', title: 'Build the launchpad', routeId: [100000044], mission: '100000044', },
+        { id: 'tutorial1', title: "Complete a tutorial for your classification", routeId: [3000001, 3000003, 3000009, 3000002, 3000004, 30000027, 3000005], mission: '3000001',
+          infoText: "To complete classifications, return to your planet page and click on the structure icon to review the data", route: "/"
+        },
+        { id: 'telescope', title: 'Build a LIDAR module', routeId: [200000017], mission: '200000017', },
         { id: 'clouds', title: 'Classify clouds', routeId: [3000010], mission: '3000010', },
+      {
+        id: 'researchStation', title: "Create a Research Station", component: <UnownedSurfaceStructures />, inventoryStructureId: 3106,
+      },
+        { id: 'research', title: 'Research the launchpad', routeId: [100000042], mission: '100000042', researchStructureId: 3107, component: <AdvancedTechTreeComponent /> },
+        { id: 'build', title: 'Build the launchpad', routeId: [100000044], mission: '100000044', inventoryStructureId: 3107, component: <UnownedSurfaceStructures />,    },
       ],
       Mars: [
         { id: 'travel', title: 'Travel to Mars', routeId: [400001], mission: '400001', },
-        { id: 'telescope', title: 'Build a LIDAR module', routeId: [200000017], mission: '200000017', },
         { id: 'cloud_data', title: 'Classify some Martian clouds', routeId: [100000034], mission: '100000034', },
-        { id: 'fuel', title: 'Collect fuel', routeId: [200000013], mission: '200000013', },
-        { id: 'telescope', title: 'Build a telescope', routeId: [200000015], mission: '200000015', },
-        { id: 'research_ph', title: 'Research the Planet Hunters module', routeId: [200000016], mission: '200000016', },
+        { id: 'fuel', title: 'Collect fuel', routeId: [200000013], mission: '200000013', route: "/mining", },
+        { id: 'fuels', title: 'Add fuel to your rocket', routeId: [200000014], mission: '200000014', component: <LaunchpadStatus /> },
+        { id: 'telescopeResearch', title: 'Research the telescope', routeId: [200000015], mission: '200000015', researchStructureId: 3103, component: <AdvancedTechTreeComponent />,  },
+        { id: 'telescope', title: 'Build a telescope', routeId: [200000015], mission: '200000015', inventoryStructureId: 3103, component: <UnownedSurfaceStructures />,  },
+        { id: 'research_ph', title: 'Research the Planet Hunters module', routeId: [200000016], mission: '200000016', component: <DataSourcesModal structureId="3103" structure="Telescope" /> },
       ],
       'New Planet': [
-        { id: 'discover', title: 'Discover a new planet', routeId: [30000001], mission: '30000001', },
-        { id: 'travel_new', title: 'Travel to the new planet', routeId: [300000012], mission: '300000012', },
+        { id: 'discover', title: 'Discover a new planet', routeId: [30000001], mission: '30000001',
+          infoText: 'Return to the planet page and click on the telescope structure to discover new planets', route: "/",
+         },
+        { id: 'travel_new', title: 'Travel to the new planet', routeId: [300000012], mission: '300000012', component: <SwitchPlanet />, },
       ],
     },
   };
@@ -159,9 +199,9 @@ export default function CompletedMissions() {
           const planetMissions = missionsData[playStyle as PlayStyle][planet as Planet];
           if (planetMissions) {
             allMissionsList.push(...planetMissions);
-          }
-        }
-      }
+          };
+        };
+      };
   
       setAllMissions(allMissionsList);
       fetchCompletedMissions();

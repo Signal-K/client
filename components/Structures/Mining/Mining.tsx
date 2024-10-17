@@ -77,11 +77,38 @@ export function MiningComponentComponent() {
   
   const handleDepositSelect = (deposit: MineralDeposit) => {
     setSelectedDeposit(deposit)
-  }
+  };
 
   const handleRoverSelect = (rover: Rover) => {
     setSelectedRover(rover)
-  }
+  };
+
+  const [hasMission200000013, setHasMission200000013] = useState(false);
+
+  useEffect(() => {
+    if (!session) return;
+    const fetchMission = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("missions")
+          .select("*")
+          .eq("user", session.user.id)
+          .eq("mission", 200000013)
+          .single();
+  
+        if (error) {
+          console.error("Error fetching mission 200000013:", error);
+          return;
+        };
+  
+        setHasMission200000013(data !== null);
+      } catch (error: any) {
+        console.error("Error fetching mission 200000013: ", error);
+      };
+    }
+
+    fetchMission();
+  }, [session]);
 
   const handleStartMining = async () => {
     if (selectedDeposit && selectedRover && session) {
@@ -111,7 +138,6 @@ export function MiningComponentComponent() {
             const { mineral, quantity } = selectedDeposit;
   
             try {
-              // Check if the item already exists in the inventory for the user
               const { data: existingItem, error: fetchError } = await supabase
                 .from('inventory')
                 .select('*')
@@ -121,7 +147,23 @@ export function MiningComponentComponent() {
   
               if (fetchError) {
                 console.error('Error fetching inventory item:', fetchError);
-              }
+              };
+
+              const missionData = {
+                user: session?.user?.id,
+                time_of_completion: new Date().toISOString(),
+                mission: 200000013,
+              };
+
+              if (!hasMission200000013) {
+                const { error: updateMissionError } = await supabase
+                  .from("missions")
+                  .insert([missionData]);
+
+              if (updateMissionError) {
+                console.error("Error updating mission 200000013: ", updateMissionError);
+              };
+            }
   
               if (existingItem) {
                 // Update the existing item quantity
@@ -162,7 +204,7 @@ export function MiningComponentComponent() {
       };
   
       requestAnimationFrame(animateRover);
-    }
+    };
   };  
 
   return (

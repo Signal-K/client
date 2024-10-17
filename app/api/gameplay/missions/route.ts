@@ -115,7 +115,7 @@ const missions: Mission[] = [
         name: 'Research spaceship',
     },
     {
-        id: 100000042,
+        id: 100000042, 
         name: "Research launchpad",
     },
     {

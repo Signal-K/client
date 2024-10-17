@@ -77,6 +77,30 @@ export default function LaunchpadStatus() {
     fetchFuel();
   }, [session, activePlanet, supabase]);
 
+  const [hasMission200000014, setHasMission200000014] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkMission = async () => {
+      if (!session) return;
+
+      const { data, error } = await supabase
+        .from("missions")
+        .select("*")
+        .eq("user", session.user.id)
+        .eq("mission", 200000014)
+        .single();
+
+      if (error) {
+        console.error("Error fetching mission 200000014:", error);
+        return;
+      };
+
+      setHasMission200000014(!!data);
+    };
+
+    checkMission();
+  }, [session]);
+
   const handleAddFuel = async () => {
     if (!launchpad || fuelAvailable <= 0) return;
 
@@ -84,6 +108,21 @@ export default function LaunchpadStatus() {
 
     // Define how much fuel to add (for example, 10 units)
     const fuelToAdd = Math.min(10, fuelAvailable);
+    const missionData = {
+      user: session?.user?.id,
+      time_of_completion: new Date().toISOString(),
+      mission: 200000014,
+    };
+
+    if (!hasMission200000014) {
+      const { error: updateMissionError } = await supabase
+        .from("missions")
+        .insert([missionData]);
+
+    if (updateMissionError) {
+      console.error("Error updating mission 200000013: ", updateMissionError);
+    };
+  };
 
     try {
       // Update the launchpad fuel capacity

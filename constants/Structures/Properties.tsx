@@ -273,7 +273,7 @@ export const StructuresConfig: StructureConfig = {
         // },
         // {
         //   icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "My discoveries",
+        //   text: "My discoveries", 
         //   dynamicComponent: <ClassificationViewer classificationType="lidar" />,
         // },
       ],
