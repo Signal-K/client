@@ -8,6 +8,8 @@ import { UnownedSurfaceStructures } from "../Structures/Build/EditMode";
 import LaunchpadStatus from "../Structures/Launchpad/LaunchpadStatus";
 import SwitchPlanet from "../(scenes)/travel/SolarSystem";
 import { DataSourcesModal } from "../Data/unlockNewDataSources";
+import Link from "next/link";
+import { Button } from "../ui/button";
 
 type Planet = "Earth" | "Mars" | "Mercury" | "New Planet";
 type Mission = {
@@ -207,55 +209,76 @@ export default function CompletedMissions() {
       fetchCompletedMissions();
     }, [session]);
   
-    const getMissionStatus = (mission: MissionRoute) => {
-      const isCompleted = completedMissions.includes(parseInt(mission.mission));
-      return {
-        title: mission.title,
-        isCompleted,
-        missionId: mission.id,
-      };
-    };
-  
-    const renderMission = (mission: MissionRoute, planet: Planet) => {
-        const missionStatus = getMissionStatus(mission);
-        return (
-          <li
-            key={`${planet}-${missionStatus.missionId}`}
-            style={{
-              color: planetColors[planet],
-              textDecoration: missionStatus.isCompleted ? 'line-through' : 'none',
-              padding: "5px 0",
-            }}
-          >
-            {missionStatus.isCompleted ? (
-              <CheckCircle color="green" style={{ marginRight: "8px" }} />
-            ) : (
-              <CheckCircle color="gray" style={{ marginRight: "8px" }} />
-            )}
-            {missionStatus.title}
-          </li>
-        );
-    };      
-  
+    const isMissionCompleted = (missionRoute: MissionRoute): boolean => {
+      if (!missionRoute.mission) return false;
+      return completedMissions.includes(Number(missionRoute.mission));
+    };    
+
+    const [showComponent, setShowComponent] = useState(false);
+
     return (
       <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
-        {Object.keys(missionsData).map((playStyleKey) => (
-          <div key={playStyleKey} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '10px' }}>
-            <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>{playStyleKey.toUpperCase()}</h2>
-            {Object.keys(missionsData[playStyleKey as PlayStyle] ?? {}).map((planetKey) => (
-              <div key={planetKey} style={{ marginBottom: '15px' }}>
-                <h3 style={{ color: planetColors[planetKey as Planet], textAlign: 'center', marginBottom: '5px' }}>
-                  {planetKey}
-                </h3>
-                <ul style={{ listStyleType: 'none', padding: 0 }}>
-                  {missionsData[playStyleKey as PlayStyle][planetKey as Planet]?.map((mission) =>
-                    renderMission(mission, planetKey as Planet)
-                  )}
+        {Object.entries(missionsData).map(([playStyle, planets]) => (
+          <div key={playStyle} style={{ marginBottom: "40px" }}>
+            <h1 style={{ textTransform: "capitalize", marginBottom: "20px" }}>{playStyle}</h1>
+    
+            {Object.entries(planets || {}).map(([planet, missions]) => (
+              <div key={planet} style={{ borderLeft: `5px solid ${planetColors[planet as Planet]}`, marginBottom: "20px", paddingLeft: "10px" }}>
+                <h2>{planet}</h2>
+                <ul>
+                  {missions?.map((missionRoute) => {
+                    const [showInfo, setShowInfo] = useState(false);
+                    
+                    return (
+                      <li key={missionRoute.id} style={{ display: "flex", flexDirection: "column", marginBottom: '20px' }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: '10px' }}>
+                          <span>{missionRoute.title}</span>
+                          {isMissionCompleted(missionRoute) ? (
+                            <CheckCircle color="green" />
+                          ) : (
+                            <span style={{ color: "red" }}>Incomplete</span>
+                          )}
+                        </div>
+                        {missionRoute.infoText && (
+                          <>
+                            <button onClick={() => setShowInfo(!showInfo)} style={{ marginTop: '5px' }}>
+                              {showInfo ? "Read less" : "Read more"}
+                            </button>
+                            {showInfo && <p style={{ marginTop: '5px', color: 'grey' }}>{missionRoute.infoText}</p>}
+                          </>
+                        )}
+                        {missionRoute.route && (
+                          <Link href={missionRoute.route}>
+                            <Button
+                              style={{ marginTop: '10px', backgroundColor: 'blue', color: 'white', padding: '10px', border: 'none', borderRadius: '5px' }}
+                            >
+                              Take me there
+                            </Button>
+                          </Link>
+                        )}
+                      {missionRoute.component && (
+                        <>
+                          <Button 
+                            onClick={() => setShowComponent(!showComponent)}
+                            style={{ marginTop: '10px', backgroundColor: 'blue', color: 'white', padding: '10px', border: 'none', borderRadius: '5px' }}
+                          >
+                            {showComponent ? "Hide Component" : "Show Component"}
+                          </Button>
+                          {showComponent && (
+                            <div style={{ marginTop: '10px' }}>
+                              {missionRoute.component}
+                            </div>
+                          )}
+                        </>
+                      )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}
           </div>
         ))}
       </div>
-    );
+    );    
 };
