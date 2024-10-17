@@ -158,7 +158,7 @@ export function UnownedSurfaceStructures() {
                         <Button onClick={addResearchStation}>Add Research Station</Button>
                     </DialogContent>
                 </Dialog>
-            </div>
+            </div> 
         );
     };
 

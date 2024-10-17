@@ -7,6 +7,7 @@ import { StructureInfo } from "../Structures/structureInfo";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { InventoryIdFetcher } from "../Inventory/fetchId";
+import Link from "next/link";
 
 export function DataSourcesModal({ structureId, structure }: DataSourcesModalProps) {
   const supabase = useSupabaseClient();
@@ -347,7 +348,60 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
               )}
             </div>
           ))}
+                    {structure === "LIDAR" && roverDataSources.map((category) => (
+            <div key={category.category} className="space-y-2">
+              <button
+                className="flex w-full items-center justify-between text-[#FF695D] hover:text-[#B9E678] transition-colors"
+                onClick={() => toggleCategory(category.category)}
+              >
+                <h2 className="text-lg font-semibold">{category.category}</h2>
+                {expandedCategories[category.category] ? (
+                  <ChevronUp className="h-5 w-5" />
+                ) : (
+                  <ChevronDown className="h-5 w-5" />
+                )}
+              </button>
+              {expandedCategories[category.category] && (
+                <ul className="space-y-2">
+                  {category.items
+                    .sort(
+                      (a, b) =>
+                        (unlockedLidarDataSources[b.name] ? 1 : 0) -
+                        (unlockedLidarDataSources[a.name] ? 1 : 0)
+                    )
+                    .map((feature) => (
+                      <li
+                        key={feature.name}
+                        className="flex items-center space-x-3 p-2 rounded-md hover:bg-[#2C4F64] transition-colors"
+                      >
+                        <div className="flex-grow">
+                          <h3 className="font-medium text-[#D689E3]">{feature.name}</h3>
+                          <p className="text-sm text-[#B9E678] opacity-80">{feature.description}</p>
+                        </div>
+                        {unlockedLidarDataSources[feature.name] ? (
+                          <Unlock className="h-5 w-5 text-[#B9E678]" aria-label="Unlocked" />
+                        ) : (
+                          <button
+                            onClick={() => toggleFeature(feature.name, "Rover")}
+                            className="px-3 py-1 text-xs font-semibold text-[#2C3A4A] bg-[#FF695D] rounded-full hover:bg-[#D689E3] transition-colors duration-300"
+                            aria-label={`Unlock ${feature.name}`}
+                          >
+                            Unlock
+                          </button>
+                        )}
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </div>
+          ))}
         </div>
+        <center><Link href="/"><button
+                            className="px-3 py-1 text-xs font-semibold text-[#2C3A4A] bg-[#FF695D] rounded-full hover:bg-[#D689E3] transition-colors duration-300"
+                          >
+                            Back to structure
+                          </button></Link></center>
+                          <div className="py-2"></div>
       </div>
     </div>
   );
