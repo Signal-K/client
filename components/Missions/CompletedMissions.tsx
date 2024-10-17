@@ -53,10 +53,10 @@ const missionsData: Record<PlayStyle, Partial<Record<Planet, MissionRoute[]>>> =
           id: 'researchStation', title: "Create a Research Station", component: <UnownedSurfaceStructures />, inventoryStructureId: 3106,
         },
         { id: 'research', title: 'Research the launchpad', routeId: [100000042], mission: '100000042', researchStructureId: 3107, component: <AdvancedTechTreeComponent />},
-        { id: 'owl', title: 'Classify some burrowing owls', routeId: [100000035], mission: '100000035',
+        { id: 'owl', title: 'Classify some burrowing owls', routeId: [100000035], mission: '100000035', component: <DataSourcesModal structureId="3104" structure="Zoodex" />,
           infoText: 'Return to the planet page and use the Zoodex structure to classify burrowing owls', route: "/",
          },
-        { id: 'penguin', title: 'Take a look at some penguins', routeId: [200000010], mission: '200000010',
+        { id: 'penguin', title: 'Take a look at some penguins', routeId: [200000010], mission: '200000010',  component: <DataSourcesModal structureId="3104" structure="Zoodex" />,
           infoText: 'Return to the planet page and use the Zoodex structure to classify penguins', route: "/",
          },
         { id: 'build', title: 'Build the launchpad', routeId: [100000044], mission: '100000044', inventoryStructureId: 3107, component: <UnownedSurfaceStructures />,    },
@@ -214,7 +214,43 @@ export default function CompletedMissions() {
       return completedMissions.includes(Number(missionRoute.mission));
     };    
 
-    const [showComponent, setShowComponent] = useState(false);
+    const [selectedPlayStyle, setSelectedPlayStyle] = useState<PlayStyle | null>(null);
+    const [filteredMissions, setFilteredMissions] = useState<MissionRoute[]>([]);
+
+    useEffect(() => {
+      const fetchMissionsByPlayStyle = () => {
+        if (!selectedPlayStyle) return; 
+  
+        const missionsList = missionsData[selectedPlayStyle];
+        if (missionsList) {
+          const allMissionsList: MissionRoute[] = [];
+          for (const planet in missionsList) {
+            const planetMissions = missionsList[planet as Planet];
+            if (planetMissions) {
+              allMissionsList.push(...planetMissions);
+            };
+          };
+          setFilteredMissions(allMissionsList);
+        };
+      };
+  
+      fetchMissionsByPlayStyle();
+    }, [selectedPlayStyle]);
+
+    return (
+      <div className="min-h-screen bg-[#1D2833] text-[#F7F5E9] p-4 md:p-8 relative overflow-hidden">
+        <div className="absolutte inset-0 overflow-hidden pointer-events-none">
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,50 Q50,0 100,50 T200,50" fill="none" stroke="#2C3A4A" strokeWidth="2" />
+            <path d="M0,100 Q50,50 100,100 T200,100" fill="none" stroke="#5FCBC3" strokeWidth="2" />
+            <circle cx="80%" cy="20%" r="50" fill="#303F51" opacity="0.5" />
+            <rect x="10%" y="70%" width="100" height="100" fill="#74859A" opacity="0.3" />
+          </svg>
+        </div>
+
+        <h1 className="text-3xl font-bold mb-8 relative z-10">Mission Progression</h1>
+      </div>
+    );
 
     return (
       <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
@@ -228,6 +264,7 @@ export default function CompletedMissions() {
                 <ul>
                   {missions?.map((missionRoute) => {
                     const [showInfo, setShowInfo] = useState(false);
+                    const [showComponent, setShowComponent] = useState(false);
                     
                     return (
                       <li key={missionRoute.id} style={{ display: "flex", flexDirection: "column", marginBottom: '20px' }}>
@@ -241,9 +278,9 @@ export default function CompletedMissions() {
                         </div>
                         {missionRoute.infoText && (
                           <>
-                            <button onClick={() => setShowInfo(!showInfo)} style={{ marginTop: '5px' }}>
+                            <Button onClick={() => setShowInfo(!showInfo)} style={{ marginTop: '5px' }}>
                               {showInfo ? "Read less" : "Read more"}
-                            </button>
+                            </Button>
                             {showInfo && <p style={{ marginTop: '5px', color: 'grey' }}>{missionRoute.infoText}</p>}
                           </>
                         )}

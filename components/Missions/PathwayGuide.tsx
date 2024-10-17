@@ -297,4 +297,120 @@ export function MissionProgressionComponent() {
       )}
     </div>
   );
+};
+
+type MissionRoute = {
+  id: string;
+  title: string;
+  routeId?: number[];
+  mission?: string;
+  researchStructureId?: number;
+  inventoryStructureId?: number;
+  route?: string;
+  infoText?: string;
+  component?: React.ReactNode;
+}; 
+
+export function CompletedMissionsss() {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const [completedMissions, setCompletedMissions] = useState<number[]>([]);
+  const [selectedPlayStyle, setSelectedPlayStyle] = useState<PlayStyle | null>(null);
+  const [filteredMissions, setFilteredMissions] = useState<MissionRoute[]>([]);
+  const [selectedMission, setSelectedMission] = useState<MissionRoute | null>(null);
+
+  const handlePlayStyleSelect = (playStyle: PlayStyle) => {
+    setSelectedPlayStyle(playStyle);
+  };
+
+  const isMissionCompleted = (missionRoute: MissionRoute): boolean => {
+    if (!missionRoute.mission) return false;
+    return completedMissions.includes(Number(missionRoute.mission));
+  };
+
+  const handleMissionSelect = (mission: MissionRoute) => {
+    setSelectedMission(mission);
+  };
+
+  useEffect(() => {
+    const fetchCompletedMissions = async () => {
+      if (!session) return;
+      try {
+        const { data, error } = await supabase
+          .from('missions')
+          .select('mission')
+          .eq('user', session.user.id);
+
+        if (error) throw error;
+
+        const completedMissionIds = data.map((missionEntry: { mission: number }) => missionEntry.mission);
+        setCompletedMissions(completedMissionIds);
+      } catch (error) {
+        console.error("Error fetching completed missions", error);
+      }
+    };
+
+    fetchCompletedMissions();
+  }, [session]); // Fetch completed missions when session changes
+
+  useEffect(() => {
+    // Fetch all missions based on the selected play style
+    const fetchMissionsByPlayStyle = () => {
+      if (!selectedPlayStyle) return; // Exit if no playstyle is selected
+
+      const missionsList = missionsData[selectedPlayStyle];
+      if (missionsList) {
+        const allMissionsList: MissionRoute[] = [];
+        for (const planet in missionsList) {
+          const planetMissions = missionsList[planet as Planet];
+          if (planetMissions) {
+            allMissionsList.push(...planetMissions);
+          }
+        }
+        setFilteredMissions(allMissionsList);
+      }
+    };
+
+    fetchMissionsByPlayStyle();
+  }, [selectedPlayStyle]); // Run effect when selected play style changes
+
+  return (
+    <div>
+      <div>
+        <h2>Select Your Playstyle</h2>
+        <button onClick={() => handlePlayStyleSelect('biologist')}>Biologist</button>
+        <button onClick={() => handlePlayStyleSelect('astronomer')}>Astronomer</button>
+        <button onClick={() => handlePlayStyleSelect('meteorologist')}>Meteorologist</button>
+      </div>
+
+      {selectedPlayStyle ? (
+        <div>
+          {selectedMission ? (
+            <div>
+              <h3>{selectedMission.title}</h3>
+              <p>{selectedMission.infoText}</p>
+              {selectedMission.component}
+              <button onClick={() => setSelectedMission(null)}>Back to Mission List</button>
+            </div>
+          ) : (
+            filteredMissions.map((mission) => (
+              <div
+                key={mission.id}
+                onClick={() => handleMissionSelect(mission)}
+                style={{ cursor: 'pointer', marginBottom: '10px', padding: '10px', border: isMissionCompleted(mission) ? '2px solid green' : '2px solid red' }}
+              >
+                <h3>{mission.title}</h3>
+                <p>{mission.infoText}</p>
+                <span style={{ color: isMissionCompleted(mission) ? 'green' : 'red' }}>
+                  {isMissionCompleted(mission) ? 'Completed' : 'Incomplete'}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        <p>Please select a playstyle to view your missions.</p>
+      )}
+    </div>
+  );
 }
