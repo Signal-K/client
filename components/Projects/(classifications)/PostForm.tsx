@@ -437,7 +437,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
   };
 
   return (
-    <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full w-full bg-[#2C4F64]/30 text-white rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+    <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full bg-[#2C4F64]/30 text-white bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
       {uses !== null && uses <= 0 ? (
         <div className="text-red-500 font-bold">
           You need to repair the structure's durability before you can use it.
@@ -445,71 +445,56 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       ) : (
         <div className="flex flex-col gap-4">
           {classificationOptions.length > 0 ? (
-            <div className="flex gap-4">
-              <div className="flex flex-col gap-2 w-1/3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Multiple Choice Buttons */}
+              <div className="flex flex-col gap-2">
                 {classificationOptions.map((optionSet, setIndex) => (
-                  <div key={setIndex} className="flex flex-col gap-2 w-full">
-                    <h3 className="font-bold">Option Set {setIndex + 1}</h3>
-                    <div className="flex gap-4">
-                      {classificationOptions.map((optionSet, setIndex) => (
-                        <div
-                          key={setIndex}
-                          className="flex flex-col gap-2 w-full"
+                  <div key={setIndex} className="flex flex-col gap-2">
+                    <h3 className="font-bold text-sm">Option Set {setIndex + 1}</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {optionSet.map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => handleOptionClick(setIndex, option.id)}
+                          className={`p-2 rounded text-xs ${
+                            selectedOptions[setIndex]?.[option.id]
+                              ? "bg-blue-500"
+                              : "bg-gray-300"
+                          }`}
                         >
-                          <h3 className="font-bold">
-                            Option Set {setIndex + 1}
-                          </h3>
-                          <div className="flex gap-4">
-                            {optionSet.map((option) => (
-                              <button
-                                key={option.id}
-                                onClick={() =>
-                                  handleOptionClick(setIndex, option.id)
-                                }
-                                className={`p-2 rounded ${
-                                  selectedOptions[setIndex]?.[option.id]
-                                    ? "bg-blue-500"
-                                    : "bg-gray-300"
-                                }`}
-                              >
-                                {option.text}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                          {option.text}
+                        </button>
                       ))}
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="flex flex-col gap-2 w-2/3">
-                <div className="flex gap-4 mb-4">
+  
+              {/* Text Area Inputs */}
+              <div className="md:col-span-2 flex flex-col gap-2">
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  className="p-3 h-24 text-sm text-white rounded-md border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
+                  placeholder={placeholder}
+                />
+  
+                {/* Additional Text Area Fields */}
+                {[...Array(additionalTextAreaConfig.count)].map((_, index) => (
                   <textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    className="flex-grow p-3 h-24 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
-                    placeholder={placeholder}
+                    key={index}
+                    value={additionalFields[`field_${index}`] || ""}
+                    onChange={(e) => handleAdditionalFieldChange(index, e.target.value)}
+                    className="p-3 h-24 text-sm text-white rounded-md border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
+                    placeholder={
+                      additionalTextAreaConfig.placeholders[index] ||
+                      `Additional detail ${index + 1}`
+                    }
                   />
-                </div>
-                <div className="py-3">
-                  {[...Array(additionalTextAreaConfig.count)].map(
-                    (_, index) => (
-                      <textarea
-                        key={index}
-                        value={additionalFields[`field_${index}`] || ""}
-                        onChange={(e) =>
-                          handleAdditionalFieldChange(index, e.target.value)
-                        }
-                        className="flex-grow p-3 h-24 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
-                        placeholder={
-                          additionalTextAreaConfig.placeholders[index] ||
-                          `Additional detail ${index + 1}`
-                        }
-                      />
-                    )
-                  )}
-                </div>
-                <div className="flex items-center mb-4">
+                ))}
+  
+                {/* Upload Button and Submit */}
+                <div className="flex items-center justify-between">
                   <label className="flex gap-1 items-center cursor-pointer text-[#88C0D0] hover:text-white">
                     <input type="file" className="hidden" onChange={addMedia} />
                     <svg
@@ -528,29 +513,25 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
                     </svg>
                     <span>Upload Media</span>
                   </label>
-                  {isUploading && (
-                    <span className="text-[#88C0D0]">Uploading...</span>
-                  )}
+                  {isUploading && <span className="text-[#88C0D0]">Uploading...</span>}
+                  <button
+                    onClick={createPost}
+                    className="py-2 px-4 bg-[#5FCBC3] text-[#2E3440] rounded-md hover:bg-[#85DDA2]"
+                  >
+                    Submit
+                  </button>
                 </div>
-                <button
-                  onClick={createPost}
-                  className="py-2 px-4 bg-[#5FCBC3] text-[#2E3440] rounded-md hover:bg-[#85DDA2]"
-                >
-                  Submit
-                </button>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col w-full">
-              <div className="flex gap-4 mb-4">
-                <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className="flex-grow p-3 h-40 text-white rounded-xl border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
-                  placeholder={placeholder}
-                />
-              </div>
-              <div className="flex items-center mb-4">
+            <div className="flex flex-col gap-2">
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className="p-3 h-40 text-sm text-white rounded-md border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
+                placeholder={placeholder}
+              />
+              <div className="flex items-center justify-between">
                 <label className="flex gap-1 items-center cursor-pointer text-[#88C0D0] hover:text-white">
                   <input type="file" className="hidden" onChange={addMedia} />
                   <svg
@@ -569,22 +550,20 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
                   </svg>
                   <span>Upload Media</span>
                 </label>
-                {isUploading && (
-                  <span className="text-[#88C0D0]">Uploading...</span>
-                )}
+                {isUploading && <span className="text-[#88C0D0]">Uploading...</span>}
+                <button
+                  onClick={createPost}
+                  className="py-2 px-4 bg-[#5FCBC3] text-[#2E3440] rounded-md hover:bg-[#85DDA2]"
+                >
+                  Submit
+                </button>
               </div>
-              <button
-                onClick={createPost}
-                className="py-2 px-4 bg-[#5FCBC3] text-[#2E3440] rounded-md hover:bg-[#85DDA2]"
-              >
-                Submit
-              </button>
             </div>
           )}
         </div>
       )}
     </div>
-  );
+  );  
 };
 
 export default ClassificationForm;

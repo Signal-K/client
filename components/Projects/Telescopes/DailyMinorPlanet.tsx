@@ -248,7 +248,7 @@ export function DailyMinorPlanet() {
                 <p>No anomaly found.</p>
             </div>
         );
-    };
+    }; 
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">

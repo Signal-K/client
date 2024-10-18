@@ -6,10 +6,10 @@ import { useState } from "react";
 const menuItems = [
   { icon: Globe, label: "Planet", href: "/" },
   { icon: Rss, label: "Mining", href: "/scenes/mining" },
-  { icon: HelpCircle, label: "Travel", href: "/scenes/travel" },
+  { icon: Star, label: "Travel", href: "/scenes/travel" },
   // { icon: Star, label: "Starnet", href: "/starnet" },
   {
-    icon: Star,
+    icon: HelpCircle,
     label: "Guide",
     href: "/tests",
   },

@@ -168,7 +168,7 @@ export function AiForMarsProject() {
         checkTutorialMission();
     }, [session, supabase]);
 
-    if (!hasMission20000006) {
+    if (!hasMission20000006) { 
         return (
             <StarterAiForMars anomalyid={anomaly?.id || 1} />
         );

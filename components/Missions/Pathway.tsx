@@ -176,8 +176,7 @@ const PlanetIcon: React.FC<{ planet: Planet }> = ({ planet }) => (
   </svg>
 );
 
-
-export default function CompletedMissions() {
+export default function MissionPathway() {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [completedMissions, setCompletedMissions] = useState<number[]>([]);
@@ -249,7 +248,7 @@ export default function CompletedMissions() {
   }, [selectedPlayStyle]);
 
   return (
-    <div className="min-h-screen bg-[#1D2833] text-[#F7F5E9] p-4 md:p-8 relative overflow-hidden">
+    <div className="bg-[#1D2833] text-[#F7F5E9] p-4 md:p-8 relative overflow-hidden">
       <h1 className="text-3xl font-bold mb-8 text-center">Mission Progression</h1>
   
       {!selectedPlayStyle ? (
@@ -279,7 +278,7 @@ export default function CompletedMissions() {
 {filteredMissions.map((mission) => (
   <div
     key={mission.id}
-    className={`p-2 md:p-4 rounded-lg shadow-lg transition-all hover:shadow-xl relative border-l-4 md:border-l-8 ${
+    className={`p-2 md:p-4 overflow-y-auto rounded-lg shadow-lg transition-all hover:shadow-xl relative border-l-4 md:border-l-8 ${
       showComponent[mission.id] ? 'flex flex-col' : 'flex flex-col md:flex-row items-center justify-between'
     }`} 
     style={{

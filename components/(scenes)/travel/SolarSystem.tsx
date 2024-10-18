@@ -383,11 +383,9 @@ export default function SwitchPlanet() {
         return;
       }
   
-      // Add mission's structure to inventory when planet is visited
       if (selectedMission?.activeStructure) {
         const structureId = selectedMission.activeStructure;
   
-        // Check if the structure already exists in the inventory
         const { data: existingInventory, error: fetchError } = await supabase
           .from("inventory")
           .select("*")
@@ -398,9 +396,8 @@ export default function SwitchPlanet() {
         if (fetchError) {
           console.error("Error fetching inventory data:", fetchError);
           return;
-        }
-  
-        // If no data is returned, create a new entry in the inventory
+        };
+        
         if (!existingInventory || existingInventory.length === 0) {
           const newConfig = {
             Uses: 1,
@@ -408,11 +405,11 @@ export default function SwitchPlanet() {
           };
   
           const inventoryData = {
-            item: structureId, // the structure id from the mission
+            item: structureId, 
             owner: session?.user?.id,
-            quantity: 1, // always 1 for new missions
-            anomaly: currentPlanet.anomaly, // id of the planet being visited
-            configuration: newConfig, // new configuration including missions unlocked
+            quantity: 1, 
+            anomaly: currentPlanet.anomaly, 
+            configuration: newConfig,
           };
   
           const { error: inventoryError } = await supabase
@@ -424,14 +421,15 @@ export default function SwitchPlanet() {
             return;
           }
         } else {
-          // If the structure exists, update the configuration to add the new mission
           const currentConfig = existingInventory[0].configuration || {
             Uses: 1,
             "missions unlocked": [],
           };
   
-          // Add the new mission if it doesn't exist in the configuration already
           const newMission = selectedMission?.identifier;
+          if (!currentConfig["missions unlocked"]) {
+            currentConfig["missions unlocked"] = [];
+          }
           if (!currentConfig["missions unlocked"].includes(newMission)) {
             currentConfig["missions unlocked"].push(newMission);
           }
@@ -448,10 +446,8 @@ export default function SwitchPlanet() {
         }
       }
   
-      // Ensure anomaly is a valid number
       const validAnomaly = currentPlanet?.anomaly ?? 0;
   
-      // Use validAnomaly for any function calls that require a number
       await moveItemsToNewPlanet(validAnomaly);
       updatePlanetLocation(validAnomaly);
     }

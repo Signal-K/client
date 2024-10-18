@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { HelpCircle, ChevronLeftSquare, ChevronRightSquare, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import MissionPathway from "@/components/Missions/Pathway";
+import Link from "next/link";
 
 const tutorialSteps = [
     {
@@ -81,16 +83,16 @@ export default function TutorialPopup() {
     };
 
     return (
-        <div className="bg-[#2C3A4A]">
+        <Link href="/tests/"><div className="bg-[#2C3A4A]">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
                     <Button size="icon" className="fixed bottom-4 bg-red-800 right-4 rounded-full">
-                        <HelpCircle className="h-5 w-5" />
-                        {/* <span className="sr-only">Help/Guide</span> */}
-                        {/* <span>Help/Guide</span> */}
+                        <HelpCircle className="text-red-500 h-10 w-10" />
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                {/* <DialogContent 
+                    className="w-full h-[500px] sm:h-[500px] lg:w-[800px] lg:h-[600px]" 
+                >
                     <DialogHeader>
                         <DialogTitle>
                             {tutorialSteps[currentStep].title}
@@ -105,8 +107,17 @@ export default function TutorialPopup() {
                             <span className="sr-only">Close</span>
                         </Button>
                     </DialogHeader>
-                    <div className="flex flex-col items-center gap-4">
-                        <img
+                    
+                    <div className="flex flex-col items-center gap-4 overflow-y-auto h-[300px] w-full">
+                        <MissionPathway />
+                    </div>
+                </DialogContent> */}
+            </Dialog>
+        </div></Link>
+    );
+};
+
+                        {/* <img
                             src={tutorialSteps[currentStep].image}
                             alt={`Step ${currentStep + 1}`}
                             className="rounded-lg object-cover"
@@ -135,10 +146,4 @@ export default function TutorialPopup() {
                                 Next
                                 <ChevronRightSquare className="ml-2 h-4 w-4" />
                             </Button>
-                        </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
-        </div>
-    );
-};
+                        </div> */}
