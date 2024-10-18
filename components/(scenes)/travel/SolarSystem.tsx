@@ -6,6 +6,7 @@ import { Star, MapPin, Clock, ThermometerSun, Users, ChevronLeft, ChevronRight }
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { lidarDataSources, physicsLabDataSources, roverDataSources, telescopeDataSources, zoodexDataSources } from "@/components/Data/ZoodexDataSources";
+import InventoryList from "@/components/Inventory/items/ItemsOnPlanet";
 
 type Exoplanet = {
   id: number;
@@ -165,7 +166,6 @@ export default function SwitchPlanet() {
   useEffect(() => {
     const fetchExoplanets = async () => {
       try {
-        // Fetch all exoplanets from the anomalies table where anomalySet is 'tess'
         const { data: exoplanetData, error: exoplanetError } = await supabase
           .from("anomalies")
           .select("*")
@@ -175,7 +175,6 @@ export default function SwitchPlanet() {
         if (exoplanetError) throw exoplanetError;
   
         if (session?.user?.id) {
-          // Fetch classifications where author is the current user and anomaly is one of the exoplanets
           const { data: classificationData, error: classificationError } = await supabase
             .from("classifications")
             .select("anomaly")
@@ -187,10 +186,8 @@ export default function SwitchPlanet() {
   
           if (classificationError) throw classificationError;
   
-          // Extract anomaly IDs (exoplanet IDs) mentioned in classifications
           const classifiedExoplanetIds = classificationData.map((classification) => classification.anomaly);
   
-          // Filter exoplanets based on classified exoplanet IDs
           const filteredExoplanets = exoplanetData
             .filter((exoplanet) => classifiedExoplanetIds.includes(exoplanet.id))
             .map((exoplanet) => ({
@@ -199,22 +196,21 @@ export default function SwitchPlanet() {
               color: "bg-purple-500",
               stats: { gravity: "Unknown", temp: "Unknown" },
               anomaly: exoplanet.id,
-              planetType: "Frozen", // Set default planet type as Frozen
+              planetType: "Frozen", 
               initialisationMissionId: null,
               travelTime: "Unknown",
               description: exoplanet.deepnote || "No description available",
               image: exoplanet.avatar_url || '/assets/Planets/DefaultExoplanet.png',
             }));
   
-          // Update state with the filtered exoplanets
           setPlanets((prevState) => ({
             ...prevState,
             exoplanets: filteredExoplanets as unknown as Exoplanet[],
           }));
-        }
+        };
       } catch (error: any) {
         console.error("Error fetching exoplanets: ", error.message);
-      }
+      };
     };
   
     fetchExoplanets();
@@ -244,7 +240,7 @@ export default function SwitchPlanet() {
         setVisitedPlanets(visited);
       } catch (error: any) {
         console.error("Error fetching visited planets: ", error.message);
-      }
+      };
     };
 
     const fetchPlanetStats = async () => {
@@ -254,7 +250,7 @@ export default function SwitchPlanet() {
         setPlanetStats(data);
       } catch (error) {
         console.error("Error fetching planet stats:", error);
-      }
+      };
     };
 
     const fetchClassifications = async () => {
@@ -282,8 +278,8 @@ export default function SwitchPlanet() {
           setClassificationsByPlanet(classificationsByPlanetTemp);
         } catch (error: any) {
           console.error("Error fetching classifications:", error.message);
-        }
-      }
+        };
+      };
     };
 
     const checkRocketInInventory = async () => {
@@ -301,8 +297,8 @@ export default function SwitchPlanet() {
           setHasRocket(data.length > 0);
         } catch (error: any) {
           console.error("Error checking inventory:", error.message);
-        }
-      }
+        };
+      };
     };
 
     fetchVisitedPlanets();
@@ -341,7 +337,7 @@ export default function SwitchPlanet() {
       };
 
       filterCompatibleMissions();
-    }
+    };
   }, [currentPlanet]);
 
   const nextPlanet = () => {
@@ -381,7 +377,7 @@ export default function SwitchPlanet() {
       if (missionsError) {
         console.error("Error inserting mission data:", missionsError);
         return;
-      }
+      };
   
       if (selectedMission?.activeStructure) {
         const structureId = selectedMission.activeStructure;
@@ -442,15 +438,15 @@ export default function SwitchPlanet() {
           if (updateError) {
             console.error("Error updating inventory configuration:", updateError);
             return;
-          }
-        }
-      }
+          };
+        };
+      };
   
       const validAnomaly = currentPlanet?.anomaly ?? 0;
   
       await moveItemsToNewPlanet(validAnomaly);
       updatePlanetLocation(validAnomaly);
-    }
+    };
   };  
 
   const [missionSelected, setMissionSelected] = useState<boolean>(false);
@@ -579,6 +575,12 @@ export default function SwitchPlanet() {
                   >
                     Visit
                   </button>
+        </div>
+      )}
+
+      {!missionSelected && (
+        <div className="p-4">
+          <InventoryList anomaly={currentPlanetAnomaly} />
         </div>
       )}
               </div>

@@ -28,10 +28,10 @@ export const CloudspottingOnMars: React.FC<LidarProps> = ({
     const nextPart = () => {
         setPart(2);
         setLine(1);
-    };
+    }; 
 
     const tutorialContent = (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             {/* <div className="flex items-center">
                 <img
                     src="/assets/Captn.jpg"
@@ -193,7 +193,7 @@ export const CloudspottingOnMars: React.FC<LidarProps> = ({
     );
 
     return (
-        <div className="rounded-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="flex flex-col items-center">
                 {part === 1 && (
                     <div className="mb-2">

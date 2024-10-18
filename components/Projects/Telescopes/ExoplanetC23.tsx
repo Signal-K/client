@@ -378,7 +378,7 @@ export function ExoplanetTransitHunter() {
     };
 
     return (
-        <div className="container mx-auto p-4 space-y-6 bg-[#1e2129] text-[#f8f8f2] min-h-screen">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <h1 className="text-4xl font-bold mb-6 text-[#82aaff]">Exoplanet Transit Hunter</h1>
             <div className="space-y-6">
                 <div className="relative">

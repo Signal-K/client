@@ -30,7 +30,7 @@ const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
     };
 
     const tutorialContent = (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             {/* <div className="flex items-center">
                 <img
                     src="/assets/Captn.jpg"
@@ -279,7 +279,7 @@ export function TelescopeSunspotDetector() {
     };
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 rounded-md relative w-full">
                 {imageUrl && (
                     <img src={imageUrl} alt="Sunspot" className="w-full h-full object-cover" />

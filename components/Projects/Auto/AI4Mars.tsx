@@ -30,7 +30,7 @@ export function StarterAiForMars({ anomalyid }: Props) {
     };
 
     const tutorialContent = (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 bg-[#2C3A4A] border border-[#85DDA2] rounded-md shadow-md relative w-full">
                 <div className="relative">
                     <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
@@ -226,7 +226,7 @@ export function AiForMarsProject() {
     };
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 rounded-md relative w-full">
                 {imageUrl && (
                     <img src={imageUrl} alt="Anomaly" className="w-64 h-64 contained" />

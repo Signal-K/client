@@ -44,6 +44,11 @@ interface IndividualStructureProps {
       sizePercentage?: number;
       showInNoModal?: boolean;
     }[];
+    modals?: {
+      icon: React.ReactNode;
+      text: string;
+      component: React.ReactNode
+    }[];
     onActionClick?: (action: string) => void;
     onClose?: () => void;
     structureId?: number;
@@ -299,11 +304,18 @@ export const StructuresConfig: StructureConfig = {
       ],
       imageSrc: '/assets/Items/Research.png',
       buttons: [
+        { 
+          icon: <CaravanIcon className="w-6 h-6 text-[#5e81ac]" />, 
+          text: "Research technology", 
+          dynamicComponent: <AdvancedTechTreeComponent />,
+          sizePercentage: 60,
+        },
+      ],
+      modals: [
         {
           icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research technology",
-          dynamicComponent: <AdvancedTechTreeComponent />,
-          sizePercentage: 85,
+          component: <AdvancedTechTreeComponent />,
         },
         // {
         //   icon: <BookAIcon className="w-6 h-6 text-[#5e81ac]" />,

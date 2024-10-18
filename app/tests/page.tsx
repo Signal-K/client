@@ -7,8 +7,8 @@ import MissionPathway from "@/components/Missions/Pathway";
 
 export default function TestPage() {
     return (
-            <div className="1">
-                <MissionPathway />
-            </div>
+        <div className="1">
+            <MissionPathway />
+        </div>
     );
 };

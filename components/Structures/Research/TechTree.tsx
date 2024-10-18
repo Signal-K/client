@@ -1,308 +1,226 @@
-'use client'
+import React, { useState, useEffect } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Rocket, Microscope, BarChart3, Atom, Satellite, Zap, Globe, CircleDot, Building, Cpu, ChevronDownCircle } from "lucide-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useActivePlanet } from "@/context/ActivePlanet";
 
-import React, { useEffect, useState } from 'react'
-import { Building, Cpu } from 'lucide-react'
-import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react'
-import { useActivePlanet } from '@/context/ActivePlanet'
-import { InventoryItem } from '@/types/Items'
-
-type TechCategory = 'Structures' | 'Automatons'
- 
-type Technology = {
-  id: number
-  name: string
-  description: string
-  icon: React.ReactNode
-  requiredTech: number | null
-  category: TechCategory
-  requiresMission?: number
-  item?: number
-}
-
-type Structure = {
-  id: number
-  name: string
-  icon: React.ReactNode
+const techIcons = {
+  "Advanced Propulsion": Rocket,
+  "Quantum Computing": Atom,
+  "Nano-fabrication": Zap,
+  "Fusion Reactor": Satellite,
+  "Dark Matter Detector": Microscope,
+  "Asteroid Mining": Globe,
 };
 
-type ResearchData = {
-  tech_id: any
-  tech_type: number; 
-  item?: number; 
+type TechCategory = 'Structures' | 'Automatons';
+ 
+type Technology = {
+  id: number;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  requiredTech: number | null;
+  category: TechCategory;
+  requiresMission?: number;
+  item?: number;
+};
+
+interface SupabaseInventoryItem {
+  id: number;
+  item: number;
+  owner: string;
+  quantity: number;
+  anomaly: number;
 };
 
 export function AdvancedTechTreeComponent() {
-  const supabase = useSupabaseClient()
-  const session = useSession()
-  const userId = session?.user?.id
-  const { activePlanet } = useActivePlanet()
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const { activePlanet } = useActivePlanet();
 
-  const [technologies, setTechnologies] = useState<Technology[]>([])
-  const [unlockedTechs, setUnlockedTechs] = useState<number[]>([])
-  const [userStructures, setUserStructures] = useState<Structure[]>([])
-  const [classificationPoints, setClassificationPoints] = useState<number>(0)
+  const [technologies, setTechnologies] = useState<Technology[]>([]);
+  const [unlockedTechs, setUnlockedTechs] = useState<number[]>([]);
+  const [filteredItems, setFilteredItems] = useState<SupabaseInventoryItem[]>([]);
+  const [planetsWithItem, setPlanetsWithItem] = useState<Array<{ id: number; content: string }>>([]);
 
-  // Fetch all technologies data from API routes
   const fetchTechnologies = async () => {
-    const structuresRes = await fetch('/api/gameplay/research/structures')
-    const structuresData = await structuresRes.json()
+    const structuresRes = await fetch("/api/gameplay/research/structures");
+    const structuresData = await structuresRes.json();
 
-    const automatonsRes = await fetch('/api/gameplay/research/automatons')
-    const automatonsData = await automatonsRes.json()
+    const automatonsRes = await fetch("/api/gameplay/research/automatons");
+    const automatonsData = await automatonsRes.json();
 
-    const combinedTechnologies = [
+    const combinedTechnologies: Technology[] = [
       ...structuresData.map((structure: any) => ({
         id: structure.id,
         name: structure.name,
-        description: structure.description || 'No description available',
+        description: structure.description || "No description available",
         icon: <Building className="w-6 h-6" />,
         requiredTech: structure.requires || null,
-        category: 'Structures' as TechCategory,
+        category: "Structures" as TechCategory,
         requiresMission: structure.requiresMission || null,
-        item: structure.item,  // Add the `item` field here
+        item: structure.item,
       })),
       ...automatonsData.map((automaton: any) => ({
         id: automaton.id,
         name: automaton.name,
-        description: 'Automaton component or ability',
+        description: "Automaton component or ability",
         icon: <Cpu className="w-6 h-6" />,
         requiredTech: automaton.requires || null,
-        category: 'Automatons' as TechCategory,
+        category: "Automatons" as TechCategory,
         requiresMission: automaton.requiresMission || null,
       })),
     ];
 
-    setTechnologies(combinedTechnologies)
+    setTechnologies(combinedTechnologies);
   };
 
   const fetchUserStructures = async () => {
-    if (!userId || !activePlanet?.id) return;
-  
+    if (!session?.user.id || !activePlanet?.id) return;
+
     const { data: researchData, error: researchError } = await supabase
-      .from('researched')
-      .select('tech_type, tech_id')
-      .eq('user_id', userId);
-  
+      .from("researched")
+      .select("tech_type, tech_id")
+      .eq("user_id", session?.user.id);
+
     if (researchError) {
-      console.error('Error fetching user structures:', researchError);
+      console.error("Error fetching user structures:", researchError);
       return;
-    };
+    }
+
+    const structureIds = researchData.map((item: any) => item.tech_id);
+    const researchedTech = new Set(structureIds);
+
+    setUnlockedTechs(Array.from(researchedTech));
+  };
+
+  const fetchPlanetsWithItem = async (itemId: number) => {
+    if (!session?.user?.id) return;
   
-    console.log('Research Data:', researchData); // Log research data for debugging
+    const { data, error } = await supabase
+      .from('inventory')
+      .select('anomaly') 
+      .eq('owner', session.user.id)
+      .eq('item', itemId);
   
-    const structuresRes = await fetch('/api/gameplay/research/structures');
-    const structuresData = await structuresRes.json();
+    if (error) {
+      console.error('Error fetching planets with item:', error);
+      return;
+    }
   
-    const structureIds = researchData
-      .filter((item: ResearchData) => item.tech_type) // Ensure tech_type is valid
-      .map((item: ResearchData) => item.tech_id); // Use tech_id to match structures
+    const anomalies = data?.map((inventoryItem: { anomaly: number }) => inventoryItem.anomaly) || [];
   
-    const userStructures = structuresData
-      .filter((structure: any) => structure.item && structureIds.includes(structure.id)) // Match by structure ID
-      .map((structure: any) => ({
-        id: structure.id,
-        name: structure.name,
-        icon: <Building className="w-6 h-6" />,
-      }));
+    const { data: planetsData, error: planetsError } = await supabase
+      .from('anomalies')
+      .select('id, content')
+      .in('id', anomalies);
   
-    console.log('User Structures:', userStructures); // Log user structures for debugging
+    if (planetsError) {
+      console.error('Error fetching planet names:', planetsError);
+      return;
+    }
   
-    // Ensure unique structures
-    const uniqueStructures = userStructures.filter(
-      (structure: Structure, index: number, self: Structure[]) =>
-        index === self.findIndex((s: Structure) => s.id === structure.id)
-    );
-  
-    setUserStructures(uniqueStructures);
-  
-    const ownedStructureIds = uniqueStructures.map((structure: { id: any }) => structure.id);
-    setUnlockedTechs((prevUnlockedTechs) => [
-      ...prevUnlockedTechs,
-      ...ownedStructureIds.filter((id: number) => !prevUnlockedTechs.includes(id)),
-    ]);
+    const planetNames = planetsData.map((planet: { id: number; content: string }) => ({
+      id: planet.id,
+      content: planet.content,
+    }));
+    setPlanetsWithItem(planetNames);
   };  
 
-  const fetchClassificationPoints = async () => {
-    if (!userId) return;
-
-    console.log('test session', session.user.id);
-
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('classificationPoints')
-      .eq('id', session.user.id)
-      .single();
-
-    if (error) {
-      console.error('Error fetching classification points:', error);
-      return;
-    };
-
-    setClassificationPoints(data?.classificationPoints || 0);
-  };
-  
-  useEffect(() => {
-    fetchTechnologies()
-    fetchUserStructures()
-    fetchClassificationPoints()  // Fetch classification points on mount
-  }, [userId, activePlanet])
-
-  const handleUnlock = async (techId: number, techCategory: TechCategory, techItem?: number) => {
-    if (userId && canUnlock(techId)) {
-      if (classificationPoints < 1) {
-        alert('You need at least 1 classification point to unlock a new technology.');
-        return;
-      }
-  
-      // Fetch the item name from the API
-      const itemResponse = await fetch(`/api/gameplay/inventory`);
-      const inventoryItems = await itemResponse.json();
-      const item = inventoryItems.find((i: InventoryItem) => i.id === techItem);
-  
-      // If the item was not found, handle accordingly
-      if (!item) {
-        console.error('Item not found for techItem:', techItem);
-        return;
-      }
-  
-      // Add entry to inventory in Supabase (for structures)
-      // if (techCategory === 'Structures' && techItem) {
-      //   const { error: inventoryError } = await supabase
-      //     .from('inventory')
-      //     .insert([{ 
-      //       owner: userId, 
-      //       anomaly: activePlanet?.id, 
-      //       item: techItem,  // Use the `item` value instead of `techId`
-      //       configuration: { "Uses": 1 },  // Pass as an object 
-      //       quantity: 1 
-      //     }]);
-  
-      //   if (inventoryError) {
-      //     console.error('Error adding structure to inventory:', inventoryError);
-      //     return;
-      //   }
-      // }
-  
-      // Deduct 1 classification point after successful unlock
-      const { error: updatePointsError } = await supabase
-        .from('profiles')
-        .update({ classificationPoints: classificationPoints - 1 })
-        .eq('id', userId);
-  
-      if (updatePointsError) {
-        console.error('Error updating classification points:', updatePointsError);
-        return;
-      }
-  
-      // Insert into the `researched` table to track the research event
-      const { error: researchedError } = await supabase
-        .from('researched')
-        .insert([{ 
-          user_id: userId, 
-          tech_type: item.id, // Use the item's name instead of the category
-          tech_id: techId,         // Insert the technology ID
-        }]);
-  
-      if (researchedError) {
-        console.error('Error inserting research data:', researchedError);
-        return;
-      }
-  
-      // Update local state
-      setClassificationPoints(prevPoints => prevPoints - 1);
-      setUnlockedTechs(prevUnlockedTechs => [...prevUnlockedTechs, techId]);
-    }
-  };
-
   const canUnlock = (techId: number) => {
-    const tech = technologies.find((t) => t.id === techId)
-    return tech?.requiredTech === null || (tech?.requiredTech && unlockedTechs.includes(tech.requiredTech))
-  }
+    const tech = technologies.find((t) => t.id === techId);
+    return tech?.requiredTech === null || (tech?.requiredTech && unlockedTechs.includes(tech.requiredTech));
+  };
 
-  const TechItem = ({ tech }: { tech: Technology }) => {
-    const isUnlocked = unlockedTechs.includes(tech.id)
-    const isAvailable = canUnlock(tech.id)
-
-    return (
-      <div
-        className={`p-4 rounded-lg shadow-md ${
-          isUnlocked
-            ? 'border-2 border-green-500'
-            : isAvailable
-            ? 'border-2 border-purple-500'
-            : 'border-2 border-red-500'
-        }`}
-      >
-        <div className="flex items-center mb-2">
-          {tech.icon}
-          <h3 className="text-lg font-semibold ml-2">{tech.name}</h3>
-        </div>
-        <p className="text-sm text-gray-300 mb-2">{tech.description}</p>
-        {tech.requiredTech && (
-          <p className="text-xs text-gray-300 mb-2">
-            Required: {technologies.find((t) => t.id === tech.requiredTech)?.name ?? 'Unknown'}
-          </p>
-        )}
-        <button
-          onClick={() => handleUnlock(tech.id, tech.category, tech.item)}
-          disabled={isUnlocked || !isAvailable}
-          className={`px-3 py-1 text-sm rounded ${
-            isUnlocked
-              ? 'bg-green-500 text-white'
-              : isAvailable
-              ? 'bg-purple-500 text-white hover:bg-purple-600'
-              : 'bg-[#2C3A4A] text-gray-300 cursor-not-allowed'
-          }`}
-        >
-          {isUnlocked ? 'Researched' : 'Research'}
-        </button>
-      </div>
-    )
-  }
-
-  const TechCategory = ({ category }: { category: TechCategory }) => (
-    <div className="mb-8">
-      {/* <h2 className="text-2xl font-bold mb-4">{category}</h2> */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-        {technologies
-          .filter((tech) => tech.category === category)
-          .map((tech) => (
-            <TechItem key={tech.id} tech={tech} />
-          ))}
-      </div>
-    </div>
-  )
+  useEffect(() => {
+    fetchTechnologies();
+    fetchUserStructures();
+  }, [session?.user.id, activePlanet]);
 
   return (
-    <div className="container mx-auto p-4 bg-white/10">
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold mb-4">Your Structures</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
-          {userStructures.map((structure) => (
-            <div key={structure.id} className="p-2 rounded-lg shadow-md border-2 border-blue-500">
-              <div className="flex items-center mb-1">
-                {structure.icon}
-                <h3 className="text-lg font-semibold ml-2">{structure.name}</h3>
-              </div>
+    <div className="bg-gradient-to-br from-[#2C4F64] to-[#303F51] text-[#F7F5E9] container mx-auto p-4 ">
+      <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-[#5FCBC3] to-[#FF695D]">
+        Research Station
+      </h1>
+      <Tabs defaultValue="Structures" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 bg-gradient-to-r from-[#2C4F64] to-[#3A5A6D]">
+          <TabsTrigger value="Structures">Structures</TabsTrigger>
+          <TabsTrigger value="Automatons">Automatons</TabsTrigger>
+          <TabsTrigger value="Other">Other</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="Structures">
+          <ScrollArea className="h-[calc(100vh-200px)] rounded-md border border-[#5FCBC3] p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {technologies
+  .filter((tech) => tech.category === "Structures")
+  .map((tech) => (
+    <div
+      key={tech.id}
+      className={`p-4 rounded-md ${unlockedTechs.includes(tech.id) ? 'bg-green-500' : 'bg-red-500'}`}
+      onClick={() => fetchPlanetsWithItem(tech.item ?? 0)}
+    >
+      <div className="flex items-center space-x-4">
+        {tech.icon}
+        <h3 className="text-xl font-bold">{tech.name}</h3>
+      </div>
+      <p>{tech.description}</p>
+      <button
+        className="text-xs px-2 py-1 rounded bg-[#5FCBC3] text-[#303F51]"
+        disabled={!canUnlock(tech.id)}
+      >
+        {unlockedTechs.includes(tech.id) ? "Researched" : "Research"}
+      </button>
+
+      <ChevronDownCircle className="mt-1" />
+
+      {planetsWithItem.length > 0 && (
+  <div className="mt-4 p-2 bg-[#F7F5E9] text-[#303F51] rounded-md">
+    <h4 className="text-md font-semibold mb-2">Planets with this technology:</h4>
+    <ul>
+      {planetsWithItem.map((planet) => (
+        <li key={planet.id}>Planet: {planet.content} (ID: {planet.id})</li>
+      ))}
+    </ul>
+  </div>
+)}
+    </div>
+  ))}
+
             </div>
-          ))}
-        </div>
-      </div>
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-1">Classification Points Balance</h2>
-        <p className="text-lg">{classificationPoints} Points</p>
-        <p className="mt-2 text-sm text-gray-300">
-          Points are earned for contributions and are required to unlock new technology. Each technology unlock costs 1 point.
-        </p>
-      </div>
+          </ScrollArea>
+        </TabsContent>
 
-      {technologies.some(tech => tech.category === 'Structures') && (
-        <TechCategory category="Structures" />
-      )}
-
-      {/* {technologies.some(tech => tech.category === 'Automatons') && (
-        <TechCategory category="Automatons" />
-      )} */}
+        <TabsContent value="Automatons">
+          <ScrollArea className="h-[calc(100vh-200px)] rounded-md border border-[#5FCBC3] p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {technologies
+                .filter((tech) => tech.category === "Automatons")
+                .map((tech) => (
+                  <div
+                    key={tech.id}
+                    className={`p-4 rounded-md ${unlockedTechs.includes(tech.id) ? 'bg-green-500' : 'bg-red-500'}`}
+                    onClick={() => fetchPlanetsWithItem(tech.item ?? 0)}
+                  >
+                    <div className="flex items-center space-x-4">
+                      {tech.icon}
+                      <h3 className="text-xl font-bold">{tech.name}</h3>
+                    </div>
+                    <p>{tech.description}</p>
+                    <button
+                      className="text-xs px-2 py-1 rounded bg-[#5FCBC3] text-[#303F51]"
+                      disabled={!canUnlock(tech.id)}
+                    >
+                      {unlockedTechs.includes(tech.id) ? "Researched" : "Research"}
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </ScrollArea>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

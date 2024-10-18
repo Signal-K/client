@@ -51,7 +51,7 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
   };
 
   const tutorialContent = (
-    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
       {/* <div className="flex items-center">
         <img
           src="/assets/Captn.jpg"
@@ -319,7 +319,7 @@ export function TelescopeDiskDetector() {
 
   // Render the tutorial or the main content based on the mission status
   return (
-    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
       {hasMission3000009 ? (
         <div className="p-4 rounded-md relative w-full">
           {imageUrl && (
