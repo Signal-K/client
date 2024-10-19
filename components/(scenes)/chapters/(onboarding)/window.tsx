@@ -13,7 +13,7 @@ import { OnboardingStepProps } from "@/types/Onboarding";
 import Link from "next/link";
 
 const OnboardingStep = ({ title, description, step }: OnboardingStepProps) => {
-  const { activePlanet } = useActivePlanet();
+  const { activePlanet } = useActivePlanet(); 
   const basePlanetIds = [1, 2, 3, 4, 5, 6];
 
   const getRandomPlanetId = () => {

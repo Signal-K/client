@@ -12,7 +12,7 @@ import Link from "next/link";
 export function DataSourcesModal({ structureId, structure }: DataSourcesModalProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
-   
+    
   const { activePlanet } = useActivePlanet();
 
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(

@@ -25,7 +25,7 @@ const CloudUploadEarthCameraComponent = () => {
     const [cloudName, setCloudName] = useState<string>("");
     const [location, setLocation] = useState<string>("");
     const [uploads, setUploads] = useState<string[]>([]);
-    const [showCommentBox, setShowCommentBox] = useState(false);
+    const [showCommentBox, setShowCommentBox] = useState(false); 
 
     const takeScreenshot = async () => {
         if (loadingContent || buttonPressed) return;

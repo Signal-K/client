@@ -11,7 +11,7 @@ const menuItems = [
   {
     icon: HelpCircle,
     label: "Guide",
-    href: "/tests",
+    href: "/starnet",
   },
 ];
 
