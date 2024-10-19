@@ -1,4 +1,32 @@
-import { FormConfig, ClassificationOption } from "./MegaClassificationForm";
+export interface ClassificationOption {
+  id: number;
+  text?: string;
+  subOptions?: ClassificationOption[];
+};
+
+export interface FormConfig {
+  title?: string; 
+  richTextFields: number;
+  options?: ClassificationOption[];
+  richTextTitles?: (string | undefined)[];
+};
+
+interface ClassificationFormProps {
+  config?: FormConfig;
+  onSubmit: (data: any) => void;
+  anomalyType: string;
+  anomalyId: string;
+  missionNumber: number;
+  assetMentioned: string;
+  originatingStructure?: number;
+  structureItemId?: number;
+};
+
+const defaultConfig: FormConfig = {
+  title: "Classification Form",
+  richTextFields: 1,
+  options: [],
+};
 
 const planetClassificationOptions: ClassificationOption[] = [
   { id: 1,

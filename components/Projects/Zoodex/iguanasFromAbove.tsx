@@ -29,7 +29,7 @@ export const IguanasFromAboveTutorial: React.FC<ZoodexProps> = ({ anomalyId }) =
   };
 
   const tutorialContent = (
-    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
       {/* <div className="flex items-center">
         <img
           src="/assets/Captn.jpg"
@@ -286,7 +286,7 @@ export function ZoodexIguanas() {
   }
 
   return (
-    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
       <div className="p-4 rounded-md relative w-full">
         {imageUrl && (
           <img src={imageUrl} alt={anomaly.content} className="w-full h-64 object-cover" />

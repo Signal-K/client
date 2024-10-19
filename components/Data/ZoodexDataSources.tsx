@@ -4,7 +4,7 @@ import { CloudDrizzleIcon, SunDimIcon, TelescopeIcon, TestTube } from 'lucide-re
 import { BurrowingOwlIcon } from '../../content/Icons/BurrowingOwl';
 import { FishIcon } from '../../content/Icons/FishIcon';
 
-export const zoodexDataSources = [
+export const zoodexDataSources = [ 
     {
         category: 'Animals',
         items: [
@@ -21,7 +21,6 @@ export const zoodexDataSources = [
                 tutorialMission: 3000002,
                 activeStructure: 3104,
                 techId: 5,
-                
             },
             {
                 name: "Penguin Watch",
@@ -133,7 +132,7 @@ export const telescopeDataSources = [
             {
                 name: 'Planet Four',
                 description: "Help explore the surface and weather of Mars' south polar region",
-                identifier: 'telescope-planetFour',
+                identifier: 'satellite-planetFour',
                 researchId: 'planet-four',
                 researcher: 'zooniverse/mschwamb',
                 unlocked: false,
@@ -141,7 +140,7 @@ export const telescopeDataSources = [
                 bestPlanetType: ['Frozen'],
                 tutorialMission: 20000005,
                 activeStructure: 3103,
-                researched: 'telescope-planetFour',
+                researched: 'satellite-planetFour',
                 techId: 1,
             },
         ],

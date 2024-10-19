@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { Anomaly } from "@/types/Anomalies";
-import { RoverPhoto } from "@/content/(anomalies)/(data)/Mars-Photos";
+import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 
 interface AnomalyClassificationProps {
     onAnomalyFetch: ( anomaly: Anomaly | null ) => void;

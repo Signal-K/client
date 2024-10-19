@@ -12,3 +12,6 @@ down:
 
 down-full:
 	docker-compose build && yarn build && docker-compose down && supabase stop
+
+deploy-test:
+	docker-compose build && yarn build && vercel

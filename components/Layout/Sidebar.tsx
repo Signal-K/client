@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Rocket, User, Globe, List } from 'lucide-react';
-
+ 
 export function Sidebar() {
   return (
     <aside className="w-64 bg-card h-screen p-4 flex flex-col">

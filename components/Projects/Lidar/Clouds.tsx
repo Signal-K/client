@@ -5,7 +5,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 import { Anomaly } from "../Telescopes/Transiting";
-import { CloudspottingOnMars } from "./cloudspottingOnMars";
+import { CloudspottingOnMars } from "./cloudspottingOnMars"; 
 
 export function StarterLidar() {
     const supabase = useSupabaseClient();
@@ -27,8 +27,9 @@ export function StarterLidar() {
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
-                    .rpc("get_random_anomaly", { anomaly_type: "cloud" })
-                    .single();
+                    .from("anomalies")
+                    .select("*")
+                    .eq("anomalytype", "cloud")
 
                 if (anomalyError) {
                     throw anomalyError;
@@ -40,11 +41,11 @@ export function StarterLidar() {
                     return;
                 };
 
-                const fetchedAnomaly = anomalyData as Anomaly;
+                const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
 
-                setAnomaly(fetchedAnomaly);
+                setAnomaly(randomAnomaly);
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                setImageUrl(`${supabaseUrl}/storage/v1/object/public/clouds/${fetchedAnomaly.id}.png`);
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/clouds/${randomAnomaly.id}.png`);
 
                 // const { data: classificationData, error: classificationError } = await supabase
                 //     .from("classifications")
@@ -103,9 +104,9 @@ export function StarterLidar() {
         checkTutorialMission();
       }, [session, supabase]);
     
-      if (!hasMission3000010) {
-        return <CloudspottingOnMars anomalyId={anomaly?.id.toString() || "8423850802"} />;
-      };
+    if (!hasMission3000010) {
+    return <CloudspottingOnMars anomalyId={anomaly?.id.toString() || "8423850802"} />;
+    };
 
     if (loading) {
         return (
@@ -114,7 +115,7 @@ export function StarterLidar() {
             </div>
         );
     };
-
+ 
     if (!anomaly) {
         return (
             <div>
@@ -124,7 +125,7 @@ export function StarterLidar() {
     };
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh]">
             <div className="p-4 rounded-md relative w-full">
                 {imageUrl && (
                     <img src={imageUrl} alt={anomaly.content} className="w-full h-64 object-cover" />

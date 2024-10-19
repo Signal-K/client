@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { Anomaly } from "../Telescopes/ExoplanetC23";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { StructureInfo } from "@/components/Structures/structureInfo";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
-import { NestQuestGoClassificationForm } from "@/components/Projects/(classifications)/temp/NestQuestGoForm";
 
 interface ZoodexProps {
-  anomalyId: string;
+  anomalyId: number | bigint;
 };
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
  
-export const NestQuestGo: React.FC<ZoodexProps> = ({
+export const NestQuestGoStarter: React.FC<ZoodexProps> = ({
     anomalyId
 }) => {
     const supabase = useSupabaseClient();
@@ -32,15 +34,7 @@ export const NestQuestGo: React.FC<ZoodexProps> = ({
     };
 
     const tutorialContent = (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
-            {/* <div className="flex items-center">
-                <img
-                    src="/assets/Captn.jpg"
-                    alt="Captain Cosmos Avatar"
-                    className="w-12 h-12 rounded-full bg-[#303F51]"
-                />
-                <h3 className="text-xl font-bold text-[#85DDA2] mt-2 ml-4">Capt'n Cosmos</h3>
-            </div> */}
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 bg-[#2C3A4A] border border-[#85DDA2] rounded-md shadow-md relative w-full">
                 <div className="relative">
                     <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
@@ -170,14 +164,8 @@ export const NestQuestGo: React.FC<ZoodexProps> = ({
                                     />
                                 </div>
                             </div>
-                            {/* <ClassificationForm
-                                anomalyId={anomalyId}
-                                anomalyType="zoodex-nestQuestGo"
-                                missionNumber={3000005}
-                                assetMentioned={imageUrl}
-                            /> */}
-                            <NestQuestGoClassificationForm
-                                anomalyId={anomalyId}
+                            <ClassificationForm
+                                anomalyId={anomalyId.toString()}
                                 anomalyType="zoodex-nestQuestGo"
                                 missionNumber={3000005}
                                 assetMentioned={imageUrl}
@@ -186,6 +174,167 @@ export const NestQuestGo: React.FC<ZoodexProps> = ({
                     </>
                 )}
             </div>
+        </div>
+    );
+};
+
+export function NestQuestGo() {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
+    const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+
+    const [loading, setLoading] = useState<boolean>(true);
+    const [missionLoading, setMissionLoading] = useState<boolean>(true);
+    const [hasMission3000005, setHasMission3000005] = useState<boolean>(false);
+
+    useEffect(() => {
+        const checkTutorialMission = async () => {
+            if (!session) {
+                setLoading(false);
+                return;
+            };
+
+            try {
+                const { data: missionData, error: missionError } = await supabase
+                    .from("missions")
+                    .select("*")
+                    .eq("user", session.user.id)
+                    .eq("mission", 3000005)
+                    .single();
+
+                if (missionError) {
+                    throw missionError;
+                };
+
+                setHasMission3000005(!!missionData);
+            } catch (error: any) {
+                console.error("Error checking user mission: ", error.message || error);
+                setHasMission3000005(false);
+            } finally {
+                setMissionLoading(false);
+            };
+        };
+
+        checkTutorialMission();
+    }, [session, supabase]);
+
+    useEffect(() => {
+        if (!hasMission3000005 || missionLoading || !session) return;
+
+        const fetchAnomaly = async () => {
+            try {
+                const { data: anomalyData, error: anomalyError } = await supabase
+                    .from("anomalies")
+                    .select("*")
+                    .eq("anomalySet", "zoodex-nestQuestGo")
+
+                if (anomalyError) {
+                    throw anomalyError;
+                };
+
+                const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
+                setAnomaly(randomAnomaly);
+
+                const imageUrls = [
+                    `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-nestQuestGo/${randomAnomaly.id}/1.png`,
+                    `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-nestQuestGo/${randomAnomaly.id}/2.png`,
+                    `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-nestQuestGo/${randomAnomaly.id}/3.png`,
+                    `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-nestQuestGo/${randomAnomaly.id}/4.png`
+                ];
+                setImageUrls(imageUrls);
+            } catch ( error: any ) {
+                console.error("Error fetching anomaly ", error.message);
+                setAnomaly(null);
+            } finally {
+                setLoading(false);
+            };
+        };
+
+        fetchAnomaly();
+    }, [hasMission3000005, missionLoading, session, supabase]);
+
+    const handlePrevious = () => {
+        setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1));
+    };
+
+    const handleNext = () => {
+        setCurrentImageIndex((prevIndex) => (prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1));
+    };
+
+    if (loading || missionLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (!hasMission3000005) {
+        return <NestQuestGoStarter anomalyId={anomaly?.id || 90670192} />;
+    };
+
+    if (!anomaly) {
+        return (
+            <div>
+                <p>No anomaly found.</p>
+            </div>
+        );
+    };
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+            <div className="p-4 rounded-md relative w-full">
+                {imageUrls.length > 0 && (
+                    <div className="relative">
+                        <img
+                            src={imageUrls[currentImageIndex]}
+                            alt="Nest card picture"
+                            className="w-70 h-70 object-contain"
+                        />
+                        <button
+                            onClick={handlePrevious}
+                            className="absolute left-0 top-1/2 -translate-y-1/2 p-2 bg-gray-600 rounded-full"
+                        >
+                            ❮
+                        </button>
+                        <button
+                            onClick={handleNext}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 p-2 bg-gray-600 rounded-full"
+                        >
+                            ❯
+                        </button>
+                        <div className="flex justify-center mt-2">
+                            {imageUrls.map((_, index) => (
+                                <span
+                                    key={index}
+                                    className={`h-2 w-2 rounded-full mx-1 ${index === currentImageIndex ? 'bg-blue-500' : 'bg-gray-300'}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+            {imageUrls.length > 0 && (
+                <div className="flex w-full gap-2 mt-4">
+                    {imageUrls.map((url, index) => (
+                        <img
+                            key={index}
+                            src={url}
+                            alt={`Thumbnail ${index + 1}`}
+                            onClick={() => setCurrentImageIndex(index)}
+                            className={`flex-1 h-16 object-cover cursor-pointer border-2 ${index === currentImageIndex ? 'border-blue-500' : 'border-gray-300'}`}
+                        />
+                    ))}
+                </div>
+            )}
+            {imageUrls.length > 0 && (
+                <ClassificationForm
+                    anomalyId={anomaly?.id.toString() || "90670192"}
+                    anomalyType='zoodex-nestQuestGo'
+                    missionNumber={100000038}
+                    assetMentioned={imageUrls}
+                    structureItemId={3104}
+                />
+            )}
         </div>
     );
 };

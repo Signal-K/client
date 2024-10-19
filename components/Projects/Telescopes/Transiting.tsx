@@ -5,7 +5,6 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet'; 
 import ClassificationForm from '@/components/Projects/(classifications)/PostForm';
 import { StructureInfo } from "@/components/Structures/structureInfo";
-import { ClassificationFormComponentT } from '@/components/Projects/(classifications)/MegaClassificationForm';
 import { planetClassificationConfig } from '@/components/Projects/(classifications)/FormConfigurations';
 
 export interface Anomaly {
@@ -140,7 +139,7 @@ export function StarterTelescope() {
 
     if (!configuration) {
         return (
-            <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+            <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
                 <p className="text-sm font-bold">Fetching structure configuration...</p>
             </div>
         );
@@ -159,7 +158,7 @@ export function StarterTelescope() {
     // User choice handling
     if (!userChoice) {
         return (
-            <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+            <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
                 {/* <StructureInfo structureName="Telescope" /> */}
                 <p className="text-sm font-bold">Choose a target to observe using your Telescope:</p>
                 {configuration["missions unlocked"] && Array.isArray(configuration["missions unlocked"]) && configuration["missions unlocked"].length > 0 ? (
@@ -186,7 +185,7 @@ export function StarterTelescope() {
                 <p>Loading...</p>
             </div>
         );
-    }
+    };
 
     // No anomaly found
     if (!anomaly) {
@@ -195,11 +194,11 @@ export function StarterTelescope() {
                 <p>No anomaly found.</p>
             </div>
         );
-    }
+    };
 
     // Main rendering
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <StructureInfo structureName="Telescope" />
             <div className="p-4 rounded-md relative w-full">
                 {anomaly.avatar_url && (
@@ -245,7 +244,7 @@ export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomaly
     };
 
     const tutorialContent = (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             {/* <div className="flex items-center">
                 <img
                     src="/assets/Captn.jpg"
@@ -305,7 +304,6 @@ export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomaly
             </div>
         </div>
     );
-    
 
     return (
         <div className="rounded-lg">

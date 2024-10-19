@@ -109,7 +109,6 @@ export default function ProfileCardModal() {
             <h2 className="text-2xl font-bold mb-4 text-[#85DDA2]">Edit profile</h2>
             <p className="text-[#85DDA2] mb-6">Provide details about yourself and any other pertinent information.</p>
             <div className="mb-4">
-                <label htmlFor="avatar" className="block text-sm font-medium text-[#85DDA2]">Profile avatar</label>
                 <UserAvatar
                     url={avatar_url}
                     size={150}

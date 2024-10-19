@@ -22,7 +22,7 @@ export const PenguinWatchTutorial: React.FC<ZoodexProps> = ({ anomalyId }) => {
     const nextPart = () => setPart((prevPart) => prevPart + 1);
  
     const tutorialContent = (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 bg-[#2C3A4A] border border-[#85DDA2] rounded-md shadow-md relative w-full">
                 <div className="relative">
                     <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
@@ -184,7 +184,7 @@ export function PenguinWatch() {
                 // Set the imageUrl after selecting the anomaly
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
                 const anomalyImageUrl = `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-penguinWatch/${randomAnomaly.id}.jpeg`;
-                setImageUrl(anomalyImageUrl);  // Set the image URL state here
+                setImageUrl(anomalyImageUrl); 
             } catch (error: any) {
                 console.error('Error fetching penguins: ', error.message);
                 setAnomaly(null);
@@ -255,7 +255,7 @@ export function PenguinWatch() {
     };
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="pb-4 rounded-md relative w-full">
                 {imageUrl && (
                     <img src={imageUrl} alt={anomaly.content} className="w-full h-64 object-cover" />

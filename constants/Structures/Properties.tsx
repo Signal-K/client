@@ -7,9 +7,9 @@ import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomat
 import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/Structures/Config/RepairStructure";
-import { RoverPhoto } from "@/content/(anomalies)/(data)/Mars-Photos";
+import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
 import { AdvancedTechTreeComponent } from "@/components/Structures/Research/TechTree";
 import MiningScene from "@/app/scenes/mining/page";
@@ -22,6 +22,9 @@ import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
 import { PlanktonPortal, PlanktonPortalTutorial } from "@/components/Projects/Zoodex/planktonPortal";
 import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
 import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
+import { AiForMarsProject } from "@/components/Projects/Auto/AI4Mars";
+import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
+import { PlanetFourProject } from "@/components/Projects/Satellite/PlanetFour";
 
 interface IndividualStructureProps {
     name?: string;
@@ -40,6 +43,11 @@ interface IndividualStructureProps {
       dynamicComponent?: React.ReactNode;
       sizePercentage?: number;
       showInNoModal?: boolean;
+    }[];
+    modals?: {
+      icon: React.ReactNode;
+      text: string;
+      component: React.ReactNode
     }[];
     onActionClick?: (action: string) => void;
     onClose?: () => void;
@@ -98,6 +106,12 @@ export const StructuresConfig: StructureConfig = {
           text: 'View rover photos',
           dynamicComponent: <AnomalyRoverPhoto />,
           sizePercentage: 73,
+        },
+        {
+          icon: <CameraOffIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: 'Map the surface of planets',
+          dynamicComponent: <AiForMarsProject />,
+          sizePercentage: 50,
         },
         // {
         //   icon: <BookCopy className="w-6 h-6 text-[#5e81ac]" />, text: `Tutorial`,
@@ -165,6 +179,18 @@ export const StructuresConfig: StructureConfig = {
           text: "Find early solar systems",
           dynamicComponent: <TelescopeDiskDetector />,
           sizePercentage: 70,
+        },
+        {
+          icon: <MoonStarIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Discover asteroids",
+          dynamicComponent: <DailyMinorPlanet />,
+          sizePercentage: 50,
+        },
+        {
+          icon: <RssIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Planet Four Test",
+          dynamicComponent: <PlanetFourProject />,
+          sizePercentage: 50,
         },
         // {
         //   icon: <StarIcon className="w-6 h-6 text-[#5e81ac]" />,
@@ -252,7 +278,7 @@ export const StructuresConfig: StructureConfig = {
         // },
         // {
         //   icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "My discoveries",
+        //   text: "My discoveries", 
         //   dynamicComponent: <ClassificationViewer classificationType="lidar" />,
         // },
       ],
@@ -278,11 +304,18 @@ export const StructuresConfig: StructureConfig = {
       ],
       imageSrc: '/assets/Items/Research.png',
       buttons: [
+        { 
+          icon: <CaravanIcon className="w-6 h-6 text-[#5e81ac]" />, 
+          text: "Research technology", 
+          dynamicComponent: <AdvancedTechTreeComponent />,
+          sizePercentage: 60,
+        },
+      ],
+      modals: [
         {
           icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research technology",
-          dynamicComponent: <AdvancedTechTreeComponent />,
-          sizePercentage: 85,
+          component: <AdvancedTechTreeComponent />,
         },
         // {
         //   icon: <BookAIcon className="w-6 h-6 text-[#5e81ac]" />,

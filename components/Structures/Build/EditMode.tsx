@@ -100,7 +100,7 @@ export function UnownedSurfaceStructures() {
 
             if (researchError) {
                 throw researchError;
-            }
+            };
 
             console.log("Research Station has been added to the inventory.");
             alert("You now have a Research Station in your inventory!");
@@ -108,7 +108,7 @@ export function UnownedSurfaceStructures() {
         } catch (error) {
             console.error('Error adding research station:', error);
             setError('Failed to add the Research Station.');
-        }
+        };
     };
 
     async function addToInventory(structure: InventoryItem) {
@@ -158,9 +158,9 @@ export function UnownedSurfaceStructures() {
                         <Button onClick={addResearchStation}>Add Research Station</Button>
                     </DialogContent>
                 </Dialog>
-            </div>
+            </div> 
         );
-    }
+    };
 
     return (
         <div className="relative">

@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { StructureInfo } from "@/components/Structures/structureInfo";
-import { ClassificationFormComponentT } from "@/components/Projects/(classifications)/MegaClassificationForm";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 
 interface TelescopeProps {
@@ -31,7 +30,7 @@ const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
     };
 
     const tutorialContent = (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             {/* <div className="flex items-center">
                 <img
                     src="/assets/Captn.jpg"
@@ -183,6 +182,7 @@ export function TelescopeSunspotDetector() {
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -190,7 +190,7 @@ export function TelescopeSunspotDetector() {
             if (!session) {
                 setLoading(false);
                 return;
-            }
+            };
     
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
@@ -279,7 +279,7 @@ export function TelescopeSunspotDetector() {
     };
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 rounded-md relative w-full">
                 {imageUrl && (
                     <img src={imageUrl} alt="Sunspot" className="w-full h-full object-cover" />

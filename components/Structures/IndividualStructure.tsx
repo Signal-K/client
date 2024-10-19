@@ -21,6 +21,11 @@ export interface IndividualStructureProps {
     dynamicComponent?: React.ReactNode;
     sizePercentage?: number;
   }[];
+  modals?: {
+    component: React.ReactNode;
+    text: string;
+    icon: React.ReactNode;
+  }[];
   structureId?: number;
   onActionClick?: (action: string) => void;
   onClose?: () => void;
@@ -30,9 +35,10 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
   name,
   title,
   labels,
-  imageSrc,
+  imageSrc, 
   actions,
   buttons,
+  modals,
   onActionClick,
   onClose,
   structureId,
@@ -42,7 +48,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
   const [modalSizePercentage, setModalSizePercentage] = useState(100); // Default to 100%
   const [tooltip, setTooltip] = useState<{ visible: boolean; text: string } | null>(null);
 
-  // Handle clicks on actions
+  // Handle clicks on action
   const handleActionClick = (actionText: string, component: React.ReactNode, sizePercentage: number = 100) => {
     setActiveComponent(component);
     setModalSizePercentage(sizePercentage);
@@ -51,19 +57,23 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
     }
   };
 
-  // Handle clicks on buttons
   const handleButtonClick = (buttonText: string, component: React.ReactNode, sizePercentage: number = 100) => {
     setActiveComponent(component);
     setModalSizePercentage(sizePercentage);
-    setExpanded(true); // Ensures the button expands the component
+    setExpanded(true); 
   };
+
+  const handleModalClick = (component: React.ReactNode, text: string) => {
+    setActiveComponent(component);
+    setExpanded(true);
+  };  
 
   const handleClose = () => {
     setExpanded(false);
     setActiveComponent(null);
     if (onClose) {
       onClose();
-    }
+    };
   };
 
   return (
@@ -75,7 +85,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
             className="p-4 rounded-3xl text-white max-w-xl mx-auto"
             style={{ 
               background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))',
-              width: expanded ? '80%' : '100%' // Adjust width based on expanded state
+              width: expanded ? '80%' : '100%' 
             }}
           >
             <div className="flex justify-between items-center">
@@ -149,7 +159,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                     key={index}
                     className="flex items-center justify-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
                     onClick={() => handleButtonClick(button.text, button.dynamicComponent, button.sizePercentage)}
-                    style={{ width: "100%", maxWidth: "200px" }} // Ensures uniform button size
+                    style={{ width: "100%", maxWidth: "200px" }}
                   >
                     <div className="flex items-center justify-center w-full">
                       <div className="flex-shrink-0">
@@ -161,7 +171,23 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                 )
               ))}
             </div>
-
+            <div className="flex flex-col items-center my-4 space-y-4">
+  {modals && modals.length > 0 && modals.map((modal, index) => (
+    <div
+      key={index}
+      className="flex items-center justify-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
+      onClick={() => handleModalClick(modal.component, modal.text || '')}
+      style={{ width: "100%", maxWidth: "200px" }}
+    >
+      <div className="flex items-center justify-center w-full">
+        <div className="flex-shrink-0">
+          {modal.icon}
+        </div>
+        <p className="ml-2 text-xs text-[#d8dee9]">{modal.text}</p>
+      </div>
+    </div>
+  ))}
+</div>
             <Button
               variant="outline"
               className="rounded-full p-2 text-[#d8dee9] hover:bg-[#3b4a5a] mt-8"
@@ -177,14 +203,15 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
     className="p-4 rounded-3xl text-white mx-auto"
     style={{
       background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))',
-      width: '90%', // Mobile default
+      width: '90%',
       height: '90%',
-      maxWidth: '40%', // Desktop max-width
+      maxWidth: '100%',
       maxHeight: '90%',
       position: 'fixed',
       top: '50%',
       left: '50%',
-      transform: 'translate(-50%, -50%)', 
+      transform: 'translate(-50%, -50%)',
+      overflow: 'hidden', // Ensure the content doesn't overflow outside the container
     }}
   >
     <DialogTitle></DialogTitle>
@@ -195,7 +222,8 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       >
         Close
       </button>
-      <div className="flex-grow flex justify-center items-center">
+      <div className="flex-grow flex justify-center items-center overflow-y-auto w-full">
+        {/* Ensure that the content of the modal is scrollable */}
         {activeComponent}
       </div>
     </div>

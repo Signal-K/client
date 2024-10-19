@@ -40,7 +40,7 @@ const missions: Mission[] = [
     {
         // id: 100000023,
         id: 3000009,
-        name: 'Complete Telescpe > Disk Detector tutorial',
+        name: 'Complete telescope > Disk Detector tutorial',
     },
     {
         id: 3000010,
@@ -80,7 +80,7 @@ const missions: Mission[] = [
     },
     {
         id: 100000033,
-        name: 'Complete (first) Telescpe > Disk Detector',
+        name: 'Complete (first) telescope > Disk Detector',
     },
     {
         id: 100000034,
@@ -115,7 +115,7 @@ const missions: Mission[] = [
         name: 'Research spaceship',
     },
     {
-        id: 100000042,
+        id: 100000042, 
         name: "Research launchpad",
     },
     {
