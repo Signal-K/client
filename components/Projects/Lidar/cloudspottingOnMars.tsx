@@ -6,7 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { StructureInfo } from "@/components/Structures/structureInfo";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 
-interface LidarProps {
+interface LidarProps { 
     anomalyId: string;
 };
 

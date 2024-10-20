@@ -6,7 +6,7 @@ import ClassificationForm from "../(classifications)/PostForm";
 
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
 interface Props {
-    anomalyid: number | bigint;
+    anomalyid: number | bigint; 
 };
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
