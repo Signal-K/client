@@ -140,7 +140,7 @@ export const StructuresConfig: StructureConfig = {
         //   icon: <DotSquare className="w-6 h-6 text-[#5e81ac]" />
         //   , text: 'Durability/Repair'
         //   , dynamicComponent: <StructureRepair inventoryId={3103} />,
-        //   sizePercentage: 40,
+        //   sizePercentage: 40, 
         // },
         {
           icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,

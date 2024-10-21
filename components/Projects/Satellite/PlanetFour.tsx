@@ -37,22 +37,22 @@ export function StarterPlanetFour({
                         <>
                             {line === 1 && (
                                 <p className="text-[#EEEAD1]">
-
+                                    Welcome to P4 project. The images you're about to review come directly from the observation satellites orbiting your assigned planet. These satellites are critical for mapping the surface, assessing terrain, and collecting vital data to support future construction efforts on this planet and others like it.
                                 </p>
                             )}
                             {line === 2 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    In this region of the planet, unique surface formations are often observed due to geological and environmental factors. Your mission is to help analyze these formations. By classifying the surface features, you'll be providing invaluable data that will inform the development of infrastructure and scientific research for this planet.
                                 </p>
                             )}
                             {line === 3 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    In these images, you'll encounter various surface patterns that result from processes like wind erosion, tectonic activity, and weather phenomena. Some of these patterns may indicate areas ideal for constructing future research stations or landing sites, while others may suggest potential resource deposits.
                                 </p>
                             )}
                             {line === 4 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    To proceed, simply review the image and select the best classification from the options provided. Every classification you make brings us closer to building on this planet and establishing a foothold for exploration in the future.
                                 </p>
                             )}
 
@@ -74,10 +74,10 @@ export function StarterPlanetFour({
                             )}
                             {line < 5 && (
                                 <div className="flex justify-center mt-4 w-full h-64">
-                                    {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step1.jpeg" alt="Step 1" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step2.jpeg" alt="Step 2" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step3.jpeg" alt="Step 3" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step4.jpeg" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 1 && <img src="/assets/Docs/Satellites/Planet-Four/Step1.jpeg" alt="Step 1" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 1 && <img src="/assets/Docs/Satellites/Planet-Four/Step2.jpeg" alt="Step 2" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 1 && <img src="/assets/Docs/Satellites/Planet-Four/Step3.jpeg" alt="Step 3" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 1 && <img src="/assets/Docs/Satellites/Planet-Four/Step6.jpeg" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
                                 </div>
                             )}
                         </>
@@ -132,7 +132,7 @@ export function StarterPlanetFour({
                 )}
             </div>
         </div>
-    );;
+    );
 };
 
 export function PlanetFourProject() {
@@ -142,32 +142,33 @@ export function PlanetFourProject() {
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-    const [missionLoading, setMissionLoading] = useState<boolean>(true);
     const [hasMission20000005, setHasMission20000005] = useState(false);
-    const imageRef = useRef<HTMLImageElement>(null);
-    const [markerArea, setMarkerArea] = useState<markerjs2.MarkerArea | null>(null);
-    const [annotationState, setAnnotationState] = useState<string | null>(null);
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-    // Check for the mission
     useEffect(() => {
         const checkTutorialMission = async () => {
             if (!session) return;
+
             try {
                 const { data: missionData, error: missionError } = await supabase
-                    .from("missions")
-                    .select("id")
-                    .eq("user", session.user.id)
-                    .eq("mission", 20000005)
-                    .single();
+                    .from('missions')
+                    .select('id')
+                    .eq('user', session.user.id)
+                    .eq('mission', '20000006') // Ensure this is the correct mission ID
+                    .limit(1);
 
-                if (missionError) throw missionError;
-                setHasMission20000005(!!missionData);
-            } catch (error: any) {
-                console.error("Error checking user mission: ", error.message || error);
+                if (missionError) {
+                    console.error("Error fetching mission data:", missionError);
+                    setHasMission20000005(false);
+                    return;
+                };
+
+                const hasMission = missionData && missionData.length > 0;
+                setHasMission20000005(hasMission);
+                console.log("Has mission 20000006:", hasMission);
+            } catch (error) {
+                console.error("Error checking user mission: ", error);
                 setHasMission20000005(false);
-            } finally {
-                setMissionLoading(false);
             }
         };
 
@@ -177,7 +178,7 @@ export function PlanetFourProject() {
     // Fetch anomaly data
     useEffect(() => {
         const fetchAnomaly = async () => {
-            if (!hasMission20000005 || missionLoading || !session) return;
+            if (!hasMission20000005 || !session) return;
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
@@ -199,68 +200,26 @@ export function PlanetFourProject() {
         };
 
         fetchAnomaly();
-    }, [hasMission20000005, missionLoading, session, supabase, supabaseUrl]);
+    }, [session, supabase, supabaseUrl, hasMission20000005]); // Add hasMission20000005 as a dependency
 
-    // Initialize MarkerArea
-    useEffect(() => {
-        if (imageRef.current) {
-            const ma = new markerjs2.MarkerArea(imageRef.current);
-            setMarkerArea(ma);
-
-            ma.addEventListener("render", (event) => {
-                if (imageRef.current) {
-                    setAnnotationState(JSON.stringify(ma.getState()));
-                    imageRef.current.src = event.dataUrl;
-                }
-            });
-
-            ma.addEventListener("close", () => {
-                setAnnotationState(JSON.stringify(ma.getState()));
-            });
-        }
-    }, [imageUrl]); // Re-run this effect whenever the imageUrl changes
-
-    // Early return after hooks are called
     if (loading) {
         return <div><p>Loading...</p></div>;
+    }
+
+    // Log the value of hasMission20000005
+    console.log("Has Mission:", hasMission20000005);
+
+    // Check the condition to render the tutorial or main component
+    if (!hasMission20000005) {
+        console.log("Showing tutorial component...");
+        return <StarterPlanetFour anomalyid={83742405} />;
     }
 
     if (!anomaly) {
         return <div><p>No anomaly found.</p></div>;
     }
 
-    const showMarkerArea = () => {
-        console.log("Show Marker Area called");
-        if (markerArea) {
-            if (annotationState) {
-                try {
-                    markerArea.restoreState(JSON.parse(annotationState));
-                } catch (error) {
-                    console.error("Error restoring state: ", error);
-                }
-            }
-            markerArea.show();
-        } else {
-            console.error("MarkerArea is not initialized");
-        }
-    };
-
-    const downloadImage = () => {
-        if (imageRef.current) {
-            const dataUrl = imageRef.current.src;
-            if (dataUrl.startsWith('data:image')) {
-                const link = document.createElement('a');
-                link.href = dataUrl;
-                link.download = 'annotated_image.png';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else {
-                console.error('No base64 data to download');
-            }
-        }
-    };
-
+    // Render the main component when the user has the mission
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 rounded-md relative w-full">
@@ -271,13 +230,8 @@ export function PlanetFourProject() {
                             <CardDescription>Annotate the image using marker.js</CardDescription>
                         </CardHeader>
                         <CardContent className="flex flex-col items-center py-10 space-y-4">
-                            <div className="flex space-x-2">
-                                <Button onClick={showMarkerArea}>Start Annotating</Button>
-                                <Button onClick={downloadImage} disabled={!annotationState}>Download Annotated Image</Button>
-                            </div>
                             <div className="border border-gray-300 rounded-lg overflow-hidden">
                                 <img
-                                    ref={imageRef}
                                     src={imageUrl}
                                     alt="Annotation"
                                     crossOrigin="anonymous"

@@ -99,6 +99,67 @@ export const cloudClassificationOptions: ClassificationOption[] = [
     },
 ];
 
+export const DailyMinorPlanetOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Object cannot be followed",
+    },
+    {
+        id: 2,
+        text: 'Object follows green circle consistently',
+    },
+    {
+        id: 3,
+        text: "Varied/unknown",
+    },
+];
+
+export const PlanetFourOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Dust Deposits",
+    },
+    {
+        id: 2,
+        text: "Surface Cracks",
+    },
+    {
+        id: 3,
+        text: "Spider-like Features",
+    },
+    {
+        id: 4,
+        text: "Rocky Outcrops",
+    },
+    {
+        id: 5,
+        text: "Smooth Terrain",
+    },
+];
+
+export const automatonaiForMarsOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Big rocks",
+    },
+    {
+        id: 2,
+        text: "Sand"
+    },
+    {
+        id: 3,
+        text: 'Soil'
+    },
+    {
+        id: 4,
+        text: "Bedrock"
+    },
+    {
+        id: 5,
+        text: "Unlabelled"
+    },
+];
+
 export const cloudClassificationOptionsOne: ClassificationOption[] = [
     {
         id: 1,

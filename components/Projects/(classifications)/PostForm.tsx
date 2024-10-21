@@ -24,6 +24,9 @@ import {
   cloudClassificationOptionsThree,
   cloudClassificationOptionsTwo,
   cloudClassificationOptionsOne,
+  automatonaiForMarsOptions,
+  DailyMinorPlanetOptions,
+  PlanetFourOptions,
 } from "@/content/Classifications/Options";
 // import UserAvatar, { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 
@@ -83,8 +86,12 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return "Describe the number and behaviour of the penguins...";
       case "zoodex-planktonPortal":
         return "Describe the plankton you see and their behaviour...";
+      case "satellite-planetFour":
+        return 'Describe any additional details you notice about the terrain. How could these features impact future construction or exploration efforts?';
       case "lidar-earthCloudRead":
         return "Describe the type of cloud you see...";
+      case "automaton-aiForMars":
+        return "What surface types do you see from your rover?";
     case "telescope-minorPlanet":
         return "Does the highlighted object move smoothly through the images? What do you see...?"
       default:
@@ -119,6 +126,12 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       case "sunspot":
         // return sunspotsConfigurationTemporary;
         return [];
+      case "satellite-planetFour":
+        return [PlanetFourOptions];
+      case "telescope-minorPlanet":
+        return [DailyMinorPlanetOptions];
+      case "automaton-aiForMars":
+        return [automatonaiForMarsOptions];
       case "zoodex-nestQuestGo":
         return [];
       default:
@@ -376,9 +389,9 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
     }
   };
 
-  if (postSubmitted) {
-    return <ClassificationOutput configuration={classificationOutput} />;
-  }
+  // if (postSubmitted) {
+  //   return <ClassificationOutput configuration={classificationOutput} />;
+  // };
 
   const [additionalFields, setAdditionalFields] = useState<{
     [key: string]: string;
@@ -443,13 +456,13 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
           You need to repair the structure's durability before you can use it.
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           {classificationOptions.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <>
               {/* Multiple Choice Buttons */}
               <div className="flex flex-col gap-2">
                 {classificationOptions.map((optionSet, setIndex) => (
-                  <div key={setIndex} className="flex flex-col gap-2">
+                  <div key={setIndex} className="flex flex-col gap-4">
                     <h3 className="font-bold text-sm">Option Set {setIndex + 1}</h3>
                     <div className="grid grid-cols-2 gap-2">
                       {optionSet.map((option) => (
@@ -471,7 +484,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
               </div>
   
               {/* Text Area Inputs */}
-              <div className="md:col-span-2 flex flex-col gap-2">
+              <div className="flex flex-col gap-4">
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
@@ -522,9 +535,9 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
                   </button>
                 </div>
               </div>
-            </div>
+            </>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-4">
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
