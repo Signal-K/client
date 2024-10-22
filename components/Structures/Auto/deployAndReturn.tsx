@@ -19,7 +19,8 @@ interface RoverData {
 
 export default function DeployRooversInitial() {
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet(); 
 
   const newRoverToInventoryData = {

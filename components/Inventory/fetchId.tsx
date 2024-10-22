@@ -12,7 +12,8 @@ interface InventoryIdFetcherProps {
 
 export const InventoryIdFetcher: React.FC<InventoryIdFetcherProps> = ({ structureId, onInventoryIdFetched }) => {
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   useEffect(() => {

@@ -13,7 +13,8 @@ type InventoryItem = {
  
 export function Inventory() {
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   const [inventory, setInventory] = useState<InventoryItem[]>([]);

@@ -37,7 +37,8 @@ interface SupabaseInventoryItem {
 
 export function AdvancedTechTreeComponent() {
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   const [technologies, setTechnologies] = useState<Technology[]>([]);

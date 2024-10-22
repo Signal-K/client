@@ -21,7 +21,8 @@ export function ActiveAutomatonForMining({
   deposit,
 }: ActiveAutomatonForMiningProps) {
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
@@ -416,7 +417,8 @@ export function ActiveAutomatonForMining({
 
 export function AutomatonUpgrader() {
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   const [automatons, setAutomatons] = useState<Automaton[]>([]);

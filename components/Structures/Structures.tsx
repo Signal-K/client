@@ -4,10 +4,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
-import IndividualStructure from "./IndividualStructure";
+import IndividualStructure, { IndividualStructureProps } from "./IndividualStructure";
 import { StructuresConfig } from "@/constants/Structures/Properties";
-import { LockIcon } from "lucide-react";
-import { IndividualStructureProps } from "./IndividualStructure";
 
 import "../../styles/Anims/StarterStructureAnimations.css";
 
@@ -17,31 +15,32 @@ interface StructuresOnPlanetProps {
         atmosphereStructures: InventoryStructureItem[],
         surfaceStructures: InventoryStructureItem[]
     ) => void;
-};
+}; 
 
 import { UnownedSurfaceStructures } from "./Build/EditMode";
 
 export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
+
   const { activePlanet } = useActivePlanet();
 
   const [userStructuresOnPlanet, setUserStructuresOnPlanet] = useState<InventoryStructureItem[]>([]);
   const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
-  const [loading, setLoading] = useState(true);
   const [selectedStructure, setSelectedStructure] = useState<IndividualStructureProps | null>(null);
   const [missionStructureId, setMissionStructureId] = useState<number | null>(null);
+
+  const [loading, setLoading] = useState(true);
 
   const fetchStructures = useCallback(async () => {
     if (!session?.user?.id || !activePlanet?.id) {
       setLoading(false);
       return;
-    }
+    };
 
     try {
       const response = await fetch('/api/gameplay/inventory');
       const itemsData: StructureItemDetail[] = await response.json();
-
       const itemMap = new Map<number, StructureItemDetail>();
       itemsData.forEach(item => {
         if (item.ItemCategory === 'Structure') {
@@ -64,7 +63,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
         const itemDetail = itemMap.get(structure.item);
         if (itemDetail && itemDetail.locationType === 'Surface' && !uniqueStructuresMap.has(structure.item)) {
           uniqueStructuresMap.set(structure.item, structure);
-        }
+        };
       });
 
       const uniqueStructures = Array.from(uniqueStructuresMap.values());
@@ -287,6 +286,7 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
 export function AtmosphereStructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
     const supabase = useSupabaseClient();
   const session = useSession();
+
   const { activePlanet } = useActivePlanet();
 
   const [userStructuresOnPlanet, setUserStructuresOnPlanet] = useState<InventoryStructureItem[]>([]);

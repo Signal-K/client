@@ -230,7 +230,8 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
 
 export function TelescopeDiskDetector() {
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
