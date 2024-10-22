@@ -20,6 +20,7 @@ interface InventoryItem {
 export function UnownedSurfaceStructures() {
     const supabase = useSupabaseClient();
     const session = useSession();
+
     const { activePlanet } = useActivePlanet();
 
     const [unownedStructures, setUnownedStructures] = useState<InventoryItem[]>([]);
@@ -127,9 +128,9 @@ export function UnownedSurfaceStructures() {
                     },
                 ]);
 
-            if (error) {
+            if (error) { 
                 throw error;
-            }
+            };
 
             console.log(`${structure.name} has been added to the inventory.`);
             setOpen(false);
@@ -140,7 +141,11 @@ export function UnownedSurfaceStructures() {
     };
 
     if (loading) {
-        return <p>Loading...</p>;
+        return (
+            <p>
+                Loading...
+            </p>
+        );
     };
 
     if (unownedStructures.length === 0) {

@@ -84,6 +84,16 @@ const inventoryItems: InventoryItem[] = [
     ItemCategory: "Structure",
     locationType: 'Surface',
   },
+
+  // Community stations
+  {
+    id: 31011,
+    name: "Greenhouse",
+    description: "Collect and study biological anomalies across multiple locations",
+    icon_url: "/assets/Items/Greenhouse.png",
+    ItemCategory: 'CommunityStation',
+    locationType: 'Surface',
+  },
   
   // Tests
   {
