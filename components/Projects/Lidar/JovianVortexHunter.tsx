@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ClassificationForm from "../(classifications)/PostForm";
 

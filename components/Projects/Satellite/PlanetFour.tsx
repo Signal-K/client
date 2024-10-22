@@ -75,9 +75,9 @@ export function StarterPlanetFour({
                             {line < 5 && (
                                 <div className="flex justify-center mt-4 w-full h-64">
                                     {line === 1 && <img src="/assets/Docs/Satellites/Planet-Four/Step1.jpeg" alt="Step 1" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Satellites/Planet-Four/Step2.jpeg" alt="Step 2" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Satellites/Planet-Four/Step3.jpeg" alt="Step 3" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Satellites/Planet-Four/Step6.jpeg" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 2 && <img src="/assets/Docs/Satellites/Planet-Four/Step2.jpeg" alt="Step 2" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 3 && <img src="/assets/Docs/Satellites/Planet-Four/Step3.jpeg" alt="Step 3" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 4 && <img src="/assets/Docs/Satellites/Planet-Four/Step6.jpeg" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
                                 </div>
                             )}
                         </>
@@ -148,46 +148,49 @@ export function PlanetFourProject() {
     useEffect(() => {
         const checkTutorialMission = async () => {
             if (!session) return;
-
+    
             try {
                 const { data: missionData, error: missionError } = await supabase
                     .from('missions')
                     .select('id')
                     .eq('user', session.user.id)
-                    .eq('mission', '20000006') // Ensure this is the correct mission ID
+                    .eq('mission', '20000005')
                     .limit(1);
-
+    
                 if (missionError) {
                     console.error("Error fetching mission data:", missionError);
                     setHasMission20000005(false);
-                    return;
-                };
-
-                const hasMission = missionData && missionData.length > 0;
-                setHasMission20000005(hasMission);
-                console.log("Has mission 20000006:", hasMission);
+                } else {
+                    const hasMission = missionData && missionData.length > 0;
+                    setHasMission20000005(hasMission);
+                }
             } catch (error) {
                 console.error("Error checking user mission: ", error);
                 setHasMission20000005(false);
+            } finally {
+                setLoading(false); 
             }
         };
-
-        checkTutorialMission();
+    
+        if (session) {
+            checkTutorialMission();
+        } else {
+            setLoading(false); 
+        }
     }, [session, supabase]);
-
-    // Fetch anomaly data
+    
     useEffect(() => {
         const fetchAnomaly = async () => {
             if (!hasMission20000005 || !session) return;
-
+    
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from('anomalies')
                     .select('*')
                     .eq('anomalySet', 'satellite-planetFour');
-
+    
                 if (anomalyError) throw anomalyError;
-
+    
                 const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
                 setAnomaly(randomAnomaly);
                 setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${randomAnomaly.id}.jpeg`);
@@ -195,31 +198,27 @@ export function PlanetFourProject() {
                 console.error("Error fetching anomaly", error.message);
                 setAnomaly(null);
             } finally {
-                setLoading(false);
+                setLoading(false); 
             }
         };
-
-        fetchAnomaly();
-    }, [session, supabase, supabaseUrl, hasMission20000005]); // Add hasMission20000005 as a dependency
-
+    
+        if (hasMission20000005 && session) {
+            fetchAnomaly();
+        }
+    }, [session, supabase, supabaseUrl, hasMission20000005]);
+    
     if (loading) {
         return <div><p>Loading...</p></div>;
-    }
-
-    // Log the value of hasMission20000005
-    console.log("Has Mission:", hasMission20000005);
-
-    // Check the condition to render the tutorial or main component
+    };
+    
     if (!hasMission20000005) {
-        console.log("Showing tutorial component...");
         return <StarterPlanetFour anomalyid={83742405} />;
-    }
-
+    };
+    
     if (!anomaly) {
         return <div><p>No anomaly found.</p></div>;
-    }
-
-    // Render the main component when the user has the mission
+    };
+    
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 rounded-md relative w-full">
@@ -253,4 +252,4 @@ export function PlanetFourProject() {
             )}
         </div>
     );
-};
+};    

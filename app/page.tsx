@@ -1,8 +1,6 @@
 "use client"
 
-import { OnboardingLayout } from "@/components/Template";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Landing } from "@/components/landing";
 import { useEffect, useState } from "react";
 import LoginPage from "./auth/LoginModal";
 import OnboardingWindow from "../components/(scenes)/chapters/(onboarding)/window";
