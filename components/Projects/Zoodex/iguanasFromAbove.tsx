@@ -5,8 +5,8 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { StructureInfo } from "@/components/Structures/structureInfo";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
-
-interface ZoodexProps {
+ 
+interface ZoodexProps { 
   anomalyId: string;
 };
 

@@ -4,6 +4,7 @@ interface Project {
   id: string;
   name: string;
   identifier: string;
+  missionRoute: number;
 };
 
 interface Mission {
@@ -29,11 +30,13 @@ const greenhouseStation: CommunityStationConfig = {
       id: "1",
       name: "Wildwatch Burrowing Owls",
       identifier: "zoodex-burrOwls",
+      missionRoute: 3000002,
     },
     {
       id: "2",
       name: "Iguanas from Above",
       identifier: "zoodex-iguanasFromAbove",
+      missionRoute: 3000004,
     },
   ],
   missions: [

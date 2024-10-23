@@ -14,15 +14,20 @@ export interface IndividualStationProps {
   projects: Project[];
   missions: Mission[];
   anomalies: AnomalyPiece[];
+  InventoryItemId: number; // InventoryItemId should be consistent with your new logic
   configuration: any; 
 }
 
 type Project = {
-  id: string;
-  name: string;
-  identifier: string;
-  isUnlocked: boolean;
-  level: number;
+  id: string
+  name: string
+  identifier: string
+  isUnlocked: boolean
+  component: React.ComponentType;
+  level: number
+  missionId: number
+  isCompleted: boolean
+  missionRoute: number
 };
 
 type Mission = {
@@ -88,14 +93,16 @@ export default function StationsOnPlanet() {
       const stations = Array.from(uniqueStructuresMap.values()).map((structure) => {
         const config = typeof structure.configuration === 'string' 
           ? JSON.parse(structure.configuration) 
-          : structure.configuration; // Change here to ensure you're directly using the parsed config if it's an object
-      
+          : structure.configuration;
+
         const projects = config?.projects?.map((project: any) => ({
           id: project.id,
           name: project.name,
           identifier: project.identifier,
           isUnlocked: !project.locked,
           level: project.level,
+          missionId: project.mission, // Ensure this property exists in your structure
+          isCompleted: false, // Set this default or fetch the actual value
         })) || [];
       
         const missions = config?.missions?.map((mission: any) => ({
@@ -113,10 +120,11 @@ export default function StationsOnPlanet() {
           stationName: itemMap.get(structure.item)?.name || "Unknown Station",
           imageSrc: itemMap.get(structure.item)?.icon_url || "/default-image.png",
           item: structure.item,
-          projects, // Pass the extracted projects here
-          missions, // Pass the extracted missions here
+          projects, 
+          missions, 
           anomalies: [],
-          configuration: config, // Pass the full config
+          configuration: config,
+          InventoryItemId: structure.id, // Get inventory item ID from the structure
         };
       });      
 
@@ -142,28 +150,25 @@ export default function StationsOnPlanet() {
 
   return (
     <div className="stations-container">
-{stationsOnPlanet.map((station, index) => (
-  <CommunityScienceStation
-    key={index}
-    stationName={station.stationName}
-    projects={station.projects} 
-    missions={station.missions} 
-    anomalies={station.anomalies || []}
-    imageSrc={station.imageSrc}
-    configuration={station.configuration}
-    onClick={() => handleStationClick(station)} 
-  />
-))}
+      {stationsOnPlanet.map((station, index) => (
+        <CommunityScienceStation
+          key={index}
+          inventoryItemId={station.InventoryItemId} // Pass the inventory item ID here
+          stationName={station.stationName}
+          projects={station.projects} 
+          missions={station.missions} 
+          anomalies={station.anomalies || []}
+          imageSrc={station.imageSrc}
+          configuration={station.configuration}
+          onClick={() => handleStationClick(station)} 
+        />
+      ))}
 
       {selectedStation && (
         <div className="selected-station">
           <h2>{selectedStation.stationName}</h2>
-          <h3>Configuration:</h3>
-          <pre>{JSON.stringify(selectedStation.configuration, null, 2)}</pre>
-          <h3>Relevant Inventory Items:</h3>
-          <pre>{JSON.stringify(inventoryItems, null, 2)}</pre>
         </div>
       )}
     </div>
   );
-};
+}

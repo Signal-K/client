@@ -1,21 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
+import React from 'react';
+
+import { BurrowingOwl } from '@/components/Projects/Zoodex/burrowingOwls';
+import { ZoodexIguanas } from '@/components/Projects/Zoodex/iguanasFromAbove';
 
 interface Project {
   id: string;
   name: string;
   identifier: string;
-//   isUnlocked: boolean;
-//   level: number;
+  component: React.ComponentType;
+  missionRoute: number;
+  // isUnlocked: boolean; // Uncomment if needed
+  // level: number; // Uncomment if needed
 }
 
 interface Mission {
   id: string;
   name: string;
   type: string;
-//   completionRate: number;
+  // completionRate: number; // Uncomment if needed
   project: string;
-//   level: number;
-//   isUnlocked: boolean;
+  // level: number; // Uncomment if needed
+  // isUnlocked: boolean; // Uncomment if needed
 }
 
 interface CommunityStationConfig {
@@ -32,12 +38,16 @@ const greenhouseStation: CommunityStationConfig = {
     {
       id: "1",
       name: "Wildwatch Burrowing Owls",
-      identifier: "zoodex-burrOwls",
+      identifier: "zoodex-burrowingOwls",
+      component: BurrowingOwl,
+      missionRoute: 3000002,
     },
     {
       id: "2",
       name: "Iguanas from Above",
       identifier: "zoodex-iguanasFromAbove",
+      component: ZoodexIguanas,
+      missionRoute: 3000004,
     },
   ],
   missions: [
@@ -58,4 +68,4 @@ const greenhouseStation: CommunityStationConfig = {
 
 export async function GET(req: NextRequest) {
   return NextResponse.json(greenhouseStation);
-};
+}
