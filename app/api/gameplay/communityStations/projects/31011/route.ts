@@ -4,7 +4,7 @@ interface Project {
   id: string;
   name: string;
   identifier: string;
-}
+};
 
 interface Mission {
   id: string;
@@ -12,14 +12,14 @@ interface Mission {
   type: string;
   project: string;
   missionRouteId?: number;
-}
+};
 
 interface CommunityStationConfig {
   stationName: string;
   inventoryItemId: number;
   projects: Project[];
   missions: Mission[];
-}
+};
 
 const greenhouseStation: CommunityStationConfig = {
   stationName: "Greenhouse",
