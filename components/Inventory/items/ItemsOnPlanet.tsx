@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-
-interface InventoryItem {
-  id: number;
-  name: string;
-  description: string;
-  icon_url: string;
-  ItemCategory: string;
-}
+import { InventoryItem } from '@/types/Items';
 
 interface SupabaseInventoryItem {
   id: number;

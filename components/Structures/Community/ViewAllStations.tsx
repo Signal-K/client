@@ -19,15 +19,16 @@ export interface IndividualStationProps {
 }
 
 type Project = {
-  id: string
-  name: string
-  identifier: string
-  isUnlocked: boolean
+  id: string;
+  name: string;
+  identifier: string;
+  isUnlocked: boolean;
+  structure: string;
   component: React.ComponentType;
-  level: number
-  missionId: number
-  isCompleted: boolean
-  missionRoute: number
+  level: number;
+  missionId: number;
+  isCompleted: boolean;
+  missionRoute: number;
 };
 
 type Mission = {
@@ -83,7 +84,7 @@ export default function StationsOnPlanet() {
       });
 
       const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
-      inventoryData.forEach(structure => {
+      inventoryData.forEach((structure: InventoryStructureItem) => {
         const itemDetail = itemMap.get(structure.item);
         if (itemDetail && itemDetail.locationType === 'Surface' && !uniqueStructuresMap.has(structure.item)) {
           uniqueStructuresMap.set(structure.item, structure);
@@ -100,11 +101,12 @@ export default function StationsOnPlanet() {
           name: project.name,
           identifier: project.identifier,
           isUnlocked: !project.locked,
+          structure: project.structure, // Ensure the structure field is assigned
           level: project.level,
-          missionId: project.mission, // Ensure this property exists in your structure
-          isCompleted: false, // Set this default or fetch the actual value
+          missionId: project.mission,
+          isCompleted: false, // Default or actual value
         })) || [];
-      
+
         const missions = config?.missions?.map((mission: any) => ({
           id: mission.id,
           name: mission.name,
@@ -114,7 +116,7 @@ export default function StationsOnPlanet() {
           completionRate: 0,
           level: mission.level,
         })) || [];
-      
+
         return {
           id: structure.item, 
           stationName: itemMap.get(structure.item)?.name || "Unknown Station",
@@ -126,11 +128,11 @@ export default function StationsOnPlanet() {
           configuration: config,
           InventoryItemId: structure.id, // Get inventory item ID from the structure
         };
-      });      
+      });
 
-      setStationsOnPlanet(stations);      
+      setStationsOnPlanet(stations);
 
-      const filteredInventoryItems = inventoryData.filter(item => uniqueStructuresMap.has(item.item));
+      const filteredInventoryItems = inventoryData.filter((item: { item: number; }) => uniqueStructuresMap.has(item.item));
       setInventoryItems(filteredInventoryItems);
     } catch (error) {
       console.error('Error fetching structures:', error);
@@ -171,4 +173,4 @@ export default function StationsOnPlanet() {
       )}
     </div>
   );
-}
+};

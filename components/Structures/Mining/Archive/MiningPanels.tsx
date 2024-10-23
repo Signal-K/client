@@ -5,20 +5,10 @@ import { MineralDeposit } from "@/types/Items";
 import { ActiveAutomatonForMining } from "../../Auto/ActiveAutomaton";
 import MineralDeposits from "./AvailableDeposits";
 import MineralsInventoryGrid from "../../../Inventory/mineralsPanel";
+import { InventoryItem } from "@/types/Items";
 
 interface CollectMineralPanelProps {
   deposit: MineralDeposit;
-};
-
-interface InventoryItem {
-  id: number;
-  name: string;
-  description: string;
-  cost: number;
-  icon_url: string;
-  ItemCategory: string;
-  parentItem: number | null;
-  itemLevel: number;
 };
 
 export const SelectMineralPanel: React.FC<CollectMineralPanelProps> = ({ deposit }) => {

@@ -10,7 +10,7 @@ export interface InventoryItem {
   description: string;
   cost?: number;
   icon_url: string;
-  ItemCategory: string;
+  ItemCategory: string; 
   parentItem?: number | null;
   itemLevel?: number;
   locationType?: string;

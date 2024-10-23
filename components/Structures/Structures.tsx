@@ -59,7 +59,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
       if (inventoryError) throw inventoryError;
 
       const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
-      inventoryData.forEach(structure => {
+      inventoryData.forEach((structure: InventoryStructureItem) => {
         const itemDetail = itemMap.get(structure.item);
         if (itemDetail && itemDetail.locationType === 'Surface' && !uniqueStructuresMap.has(structure.item)) {
           uniqueStructuresMap.set(structure.item, structure);
@@ -190,7 +190,7 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
       if (inventoryError) throw inventoryError;
 
       const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
-      inventoryData.forEach(structure => {
+      inventoryData.forEach((structure: InventoryStructureItem) => {
         const itemDetail = itemMap.get(structure.item);
         if (itemDetail && itemDetail.locationType === 'Orbital' && !uniqueStructuresMap.has(structure.item)) {
           uniqueStructuresMap.set(structure.item, structure);
@@ -333,7 +333,7 @@ export function AtmosphereStructuresOnPlanet({ onStructuresFetch }: StructuresOn
 
       // Filter for unique structures based on locationType fetched from the API
       const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
-      inventoryData.forEach(structure => {
+      inventoryData.forEach((structure: InventoryStructureItem) => {
         const itemDetail = itemMap.get(structure.item);
         if (itemDetail && itemDetail.locationType === 'Atmosphere' && !uniqueStructuresMap.has(structure.item)) {
           uniqueStructuresMap.set(structure.item, structure);

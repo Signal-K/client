@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { InventoryItem } from "@/types/Items";
 
 interface Item {
   id: number;
@@ -12,15 +13,7 @@ interface Item {
   parentItem: number | null;
   itemLevel: number;
   recipe?: { [key: string]: number };
-}
-
-interface InventoryItem {
-  id: number;
-  item: number;
-  owner: string;
-  quantity: number; 
-  anomaly: number;
-}
+};
 
 const MineralsInventoryGrid = () => {
   const supabase = useSupabaseClient();

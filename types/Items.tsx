@@ -45,14 +45,20 @@ export interface Automaton {
 };  
 
 export interface InventoryItem {
+    item: number;
+    owner: string;
+    anomaly: number;
     id: number;
     name: string;
+    quantity?: number;
     description: string;
     cost: number;
     icon_url: string;
     ItemCategory: string;
     parentItem: number | null;
+    locationType?: string;
     itemLevel: number;
+    gif?: string;
     recipe?: Recipe;
 };
 

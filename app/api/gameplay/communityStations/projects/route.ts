@@ -10,6 +10,7 @@ interface Project {
   identifier: string;
   component: React.ComponentType;
   missionRoute: number;
+  structure: string;
   // isUnlocked: boolean; // Uncomment if needed
   // level: number; // Uncomment if needed
 }
@@ -40,6 +41,7 @@ const greenhouseStation: CommunityStationConfig = {
       name: "Wildwatch Burrowing Owls",
       identifier: "zoodex-burrowingOwls",
       component: BurrowingOwl,
+      structure: "Zoodex",
       missionRoute: 3000002,
     },
     {
@@ -47,6 +49,7 @@ const greenhouseStation: CommunityStationConfig = {
       name: "Iguanas from Above",
       identifier: "zoodex-iguanasFromAbove",
       component: ZoodexIguanas,
+      structure: "Zoodex",
       missionRoute: 3000004,
     },
   ],

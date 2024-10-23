@@ -65,20 +65,20 @@ const MineralDeposits: React.FC<{ onSelectDeposit: (deposit: MineralDepositData)
 
       try {
         const { data, error } = await supabase
-          .from('mineralDeposits')
-          .select('*')
-          .eq('anomaly', activePlanet.id)
-          .eq('owner', session.user.id);
-
-        if (error) throw error;
-
-        // Filter unique mineral deposits
-        const uniqueMineralDeposits = Array.from(new Map(data.map(deposit => [deposit.mineralconfiguration.mineral, deposit])).values());
-
-        // Limit to 9 unique deposits
-        const limitedDeposits = uniqueMineralDeposits.slice(0, 9);
-
-        setMineralDeposits(limitedDeposits);
+        .from('mineralDeposits')
+        .select('*')
+        .eq('anomaly', activePlanet.id)
+        .eq('owner', session.user.id);
+      
+      if (error) throw error;
+      
+      // Cast the data to the correct type
+      const uniqueMineralDeposits = Array.from(new Map((data as MineralDepositData[]).map((deposit) => [deposit.mineralconfiguration.mineral, deposit])).values());
+      
+      // Limit to 9 unique deposits
+      const limitedDeposits = uniqueMineralDeposits.slice(0, 9);
+      
+      setMineralDeposits(limitedDeposits);      
       } catch (error) {
         console.error('Error fetching mineral deposits:', error);
       }

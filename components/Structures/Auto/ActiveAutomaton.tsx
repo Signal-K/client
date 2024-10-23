@@ -3,7 +3,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { MineralDeposit, Automaton } from "@/types/Items";
 import AutomatonUpgrade from "../Config/AutomatonUpgradeBox";
-import { InventoryItem } from "@/types/Inventory";
+import { InventoryItem } from "@/types/Items";
 import { Battery, MapPin, Rocket, Clock } from "lucide-react";
 
 import "../../../styles/Anims/MiningAnimations.css";

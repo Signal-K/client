@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { CreateStructure } from "../Build/CreateDedicatedStructure"
 
 type Project = {
   id: string
@@ -13,6 +14,7 @@ type Project = {
   identifier: string
   isUnlocked: boolean
   level: number
+  structure: string;
   missionId: number
   component: React.ComponentType;
   isCompleted: boolean
@@ -61,89 +63,40 @@ export function CommunityScienceStation({
   const session = useSession()
 
   const [activeSection, setActiveSection] = useState<string | null>(null)
-  const [localProjects, setLocalProjects] = useState<Project[]>([])
-  const [localMissions, setLocalMissions] = useState<Mission[]>([])
+  const [localProjects, setLocalProjects] = useState<Project[]>(projects)
+  const [localMissions, setLocalMissions] = useState<Mission[]>(missions)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [isDarkMode, setIsDarkMode] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [projectDetails, setProjectDetails] = useState<any | null>(null)
+  const [structureType, setStructureType] = useState<string | null>(null) 
 
   const toggleDarkMode = () => setIsDarkMode(prev => !prev)
   const baseColors = isDarkMode
     ? { bg: "#303F51", text: "#F7F5E9", accent1: "#85DDA2", accent2: "#5FCBC3" }
     : { bg: "#F7F5E9", text: "#303F51", accent1: "#FFD580", accent2: "#5FCBC3" }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/gameplay/communityStations/projects/')
-        const { projects: fetchedProjects, missions: fetchedMissions } = await response.json()
-
-        const completedMissions = await fetchUserCompletedMissions()
-        const updatedProjects = fetchedProjects.map((project: Project) => ({
-          ...project,
-          isCompleted: completedMissions.includes(project.missionRoute),
-        }))
-
-        setLocalProjects(updatedProjects)
-        setLocalMissions(fetchedMissions)
-      } catch (error) {
-        console.error("Error fetching data:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [supabase, session?.user?.id])
-
-  const fetchUserCompletedMissions = async () => {
-    const { data, error } = await supabase
-      .from('missions')
-      .select('mission')
-      .eq('user', session?.user?.id)
-
-    if (error) {
-      console.error('Error fetching completed missions:', error)
-      return []
-    }
-
-    return data?.map(m => m.mission) || []
-  }
-
   const handleBack = () => {
     setActiveSection(null)
     setSelectedProject(null)
+    setProjectDetails(null)
+    setStructureType(null) 
   }
 
-  const handleProjectClick = async (project: Project) => {
-    if (!project.isCompleted) {
-      console.error('Error: You must complete the prerequisite mission to unlock this project.');
-      alert('You must complete the prerequisite mission to unlock this project.');
-      return;
+  const handleProjectClick = (projectId: string) => {
+    const project = configuration.projects.find((proj: Project) => proj.id === projectId)
+
+    if (project) {
+      setSelectedProject(project)
+      setProjectDetails(project)
+    } else {
+      console.error("Project not found in configuration.")
+      alert('Project not found in configuration.')
     }
+  }
 
-    const updatedConfiguration = { ...configuration };
-    updatedConfiguration.projects = updatedConfiguration.projects.map((p: { id: string }) => 
-      p.id === project.id ? { ...p, locked: false } : p
-    );
-
-    try {
-      const { error } = await supabase
-        .from('inventory')
-        .update({ configuration: updatedConfiguration })
-        .eq('id', inventoryItemId);
-
-      if (error) {
-        console.error('Error updating configuration:', error);
-      }
-    } catch (error) {
-      console.error('Error during project click handling:', error);
-    }
-
-    setSelectedProject(project);
+  const handleStructureSelection = (type: string) => {
+    setStructureType(type);
   };
-
-  if (isLoading) return <div>Loading...</div>
 
   return (
     <div 
@@ -209,7 +162,7 @@ export function CommunityScienceStation({
                         <span className="mr-2">Lvl {project.level}</span>
                       </div>
                       <Button 
-                        onClick={() => handleProjectClick(project)}  
+                        onClick={() => handleProjectClick(project.id)}  // Pass the clicked project id
                         style={{ backgroundColor: baseColors.accent2, color: baseColors.text }}
                       >
                         View Project
@@ -249,16 +202,28 @@ export function CommunityScienceStation({
                   )}
                 />
               )}
-
-              {selectedProject && selectedProject.component && (
-                <div className="mt-4">
-                  {React.createElement(selectedProject.component)}
-                </div>
-              )}
             </div>
           </ScrollArea>
         </div>
       </div>
+
+      {selectedProject && (
+        <div className="p-4 mt-4 rounded-lg shadow-md w-full" style={{ backgroundColor: baseColors.accent1 }}>
+          <h3 className="text-lg font-bold mb-2">{selectedProject.name} - Details</h3>
+          <pre className="whitespace-pre-wrap">
+            {projectDetails ? JSON.stringify(projectDetails, null, 2) : "No configuration available."}
+          </pre>
+          <Button
+            onClick={() => handleStructureSelection(selectedProject.structure)} 
+            style={{ backgroundColor: baseColors.accent2, color: baseColors.text }}
+          >
+            Create Structure
+          </Button>
+          {structureType && (
+            <CreateStructure structureType={structureType} />
+          )}
+        </div>
+      )}
     </div>
   );
 };

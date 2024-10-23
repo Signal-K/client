@@ -7,15 +7,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button"; 
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-
-interface InventoryItem {
-    id: number;
-    name: string;
-    description: string;
-    icon_url: string;
-    ItemCategory: string;
-    locationType?: string;
-};
+import { InventoryItem } from '@/types/Items';
 
 interface Project {
     id: string;
