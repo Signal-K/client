@@ -7,10 +7,19 @@ import MissionPathway from "@/components/Missions/Pathway";
 import ProfileCardModal from "@/components/profile/form";
 import { CommunityScienceStation } from "@/components/Structures/Community/StationModal";
 import { CreateCommunityStation } from "@/components/Structures/Build/MakeCommunityStation";
+import StationsOnPlanet from "@/components/Structures/Community/ViewAllStations";
 
 export default function TestPage() {
     return (
         <StarnetLayout>
+  <CreateCommunityStation />
+  <StationsOnPlanet />
+        </StarnetLayout>
+    );
+};
+
+/*
+
             <CommunityScienceStation  stationName = {"Greenhouse"}
   projects = {[
     {
@@ -47,7 +56,5 @@ export default function TestPage() {
         "A hardened owl that is ready to be transported to another lush location.",
     },
   ]}  />
-  <CreateCommunityStation />
-        </StarnetLayout>
-    );
-};
+
+*/

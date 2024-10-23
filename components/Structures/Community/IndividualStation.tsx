@@ -5,8 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Building2 } from "lucide-react";
 
 export interface IndividualStationProps {
+    id: number;
     name: string;
-    projects: Project[];
+    imageSrc: string;
+    item: number; 
+    projects: Project[]; 
     onClose?: () => void;
     // Will add more from `StationModal.tsx` script later
     // For now, the focus is on integrating projects

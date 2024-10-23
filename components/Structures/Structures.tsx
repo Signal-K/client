@@ -95,7 +95,7 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
         })),
         structureId: inventoryId
       });
-    }
+    };
   };
 
   const handleClose = useCallback(() => {
@@ -103,8 +103,14 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
-  }
+    return (
+        <div>
+            <p>
+                Loading...
+            </p>
+        </div>
+    );
+  };
 
   return (
 <div className="relative">

@@ -6,65 +6,95 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import IndividualCommunityStation, { IndividualStationProps } from "./IndividualStation";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 
-import "../../styles/Anims/StarterStructureAnimations.css";
-import { CreateCommunityStation } from "../Build/MakeCommunityStation";
-
 export default function StationsOnPlanet() {
-    const supabase = useSupabaseClient();
-    const session = useSession();
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const { activePlanet } = useActivePlanet();
 
-    const { activePlanet } = useActivePlanet();
+  const [stationsOnPlanet, setStationsOnPlanet] = useState<IndividualStationProps[]>([]);
+  const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
+  const [selectedStation, setSelectedStation] = useState<IndividualStationProps | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    const [stationsOnPlanet, setStationsOnPlanet] = useState<IndividualStationProps[]>([]);
-    const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
-    const [selectedStation, setSelectedStation] = useState<IndividualStationProps | null>(null);
-    
-    const [loading, setLoading] = useState(true);
+  const fetchStructures = useCallback(async () => {
+    if (!session?.user?.id || !activePlanet?.id) {
+      setLoading(false);
+      return;
+    }
 
-    const fetchStructures = useCallback(async () => {
-        if (!session || !activePlanet) {
-            setLoading(false);
-            return;
-        };
+    try {
+      const response = await fetch('/api/gameplay/inventory');
+      const itemsData: StructureItemDetail[] = await response.json();
+      const itemMap = new Map<number, StructureItemDetail>();
 
-        try {
-            const response = await fetch('/api/gameplay/inventory');
-            const itemData: StructureItemDetail[] = await response.json();
-            const itemMap = new Map<number, StructureItemDetail>();
-            itemData.forEach(item => {
-                if (item.ItemCategory === "CommunityStation") {
-                    itemMap.set(item.id, item);
-                }
-            });
+      itemsData.forEach(item => {
+        if (item.ItemCategory === 'CommunityStation') {
+          itemMap.set(item.id, item);
+        }
+      });
 
-            setItemDetails(itemMap);
-            const { data: inventoryData, error: inventoryError } = await supabase
-                .from('inventory')
-                .select("*")
-                .eq('anomaly', activePlanet.id);
+      setItemDetails(itemMap);
 
-            if (inventoryError) {
-                throw inventoryError;
-            };
+      const { data: inventoryData, error: inventoryError } = await supabase
+        .from('inventory')
+        .select('*')
+        .eq('anomaly', activePlanet.id);
 
-            const stations = new Map<number, InventoryStructureItem>();
-            inventoryData.forEach(structure => {
-                const itemDetail = itemMap.get(structure.item);
-                if (itemDetail && itemDetail.locationType === 'Surface' && !stations.has(structure.item)) {
-                    stations.set(structure.item, structure);
-                };
-            });
+      if (inventoryError) throw inventoryError;
 
-            const uniqueStations = Array.from(stations.values());
-            // setStationsOnPlanet(uniqueStations || []);
-        } catch (error: any) {
-            console.error("Error fetching structures", error);
-        } finally {
-            setLoading(false);
-        };
-    }, [session, activePlanet, supabase, itemDetails]);
+      const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
+      inventoryData.forEach(structure => {
+        const itemDetail = itemMap.get(structure.item);
+        if (itemDetail && itemDetail.locationType === 'Surface' && !uniqueStructuresMap.has(structure.item)) {
+          uniqueStructuresMap.set(structure.item, structure);
+        }
+      });
 
-    return (
-        <></>
-    );
+      const uniqueStructures = Array.from(uniqueStructuresMap.values()).map(structure => ({
+        id: structure.item,
+        name: itemMap.get(structure.item)?.name || '',
+        imageSrc: itemMap.get(structure.item)?.icon_url || '',
+        item: structure.item,
+        projects: [],
+        configuration: structure.configuration || {},
+      }));
+
+      setStationsOnPlanet(uniqueStructures || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [session?.user?.id, activePlanet?.id, supabase]);
+
+  useEffect(() => {
+    fetchStructures();
+  }, [fetchStructures]);
+
+  if (loading) return <div className="text-center">Loading...</div>;
+
+  return (
+    <div className="flex flex-wrap gap-4 justify-center p-4">
+      {stationsOnPlanet.map((station) => (
+        <div
+          key={station.id}
+          className="cursor-pointer p-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300"
+          onClick={() => setSelectedStation(station)}
+        >
+          <img className="w-16 h-16 object-cover" src={station.imageSrc} alt={station.name} />
+          <p className="text-center mt-2 text-sm">{station.name}</p>
+        </div>
+      ))}
+      {selectedStation && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <IndividualCommunityStation
+              {...selectedStation}
+              onClose={() => setSelectedStation(null)}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Moon,
   Sun,
@@ -28,7 +28,6 @@ type Project = {
 type Mission = {
   id: string; // points to id in `/api/gameplay/missions/route.ts`
   name: string;
-  // project: Project;
   project: string;
   isUnlocked: boolean;
   type: string;
@@ -45,42 +44,38 @@ type AnomalyPiece = {
 
 type CommunityStationProps = {
   stationName: string;
-  projects: Project[];
-  missions: Mission[];
   anomalies?: AnomalyPiece[];
+  projects: Project[]; 
+  missions: Mission[];   
 };
 
-// Update these to be split between project pathway options
+type SectionProps = {
+  title: string;
+  items: Project[] | Mission[];
+  baseColors: { bg: string; text: string; accent1: string; accent2: string; };
+  onItemClick: (item: Project | Mission) => void;
+  renderItem?: (item: Project | Mission) => JSX.Element;
+};
+
+const Section: React.FC<SectionProps> = ({
+  title,
+  items,
+  baseColors,
+  onItemClick,
+  renderItem,
+}) => {
+  return (
+    <div>
+      <h3 className="text-lg font-semibold">{title}</h3>
+      <div className="space-y-2">
+        {/* {items.map(renderItem)} */}
+      </div>
+    </div>
+  );
+};
 
 export function CommunityScienceStation({
   stationName = "Greenhouse",
-  projects = [
-    {
-      id: "1",
-      name: "Wildwatch Burrowing Owls",
-      identifier: "zoodex-burrOwls",
-      isUnlocked: false,
-      level: 0,
-    },
-    {
-      id: "2",
-      name: "Iguanas from Above",
-      identifier: "zoodex-iguanasFromAbove",
-      isUnlocked: false,
-      level: 0,
-    },
-  ],
-  missions = [
-    {
-      id: "1",
-      name: "Spot an owl in the wild",
-      type: "Upload",
-      completionRate: 4,
-      project: "1",
-      level: 2,
-      isUnlocked: false,
-    }, // add some new ones, not just upload. Maybe finding specific things/anomalies, a completion rate, moving things around and generating, etc
-  ],
   anomalies = [
     {
       id: "1",
@@ -89,13 +84,18 @@ export function CommunityScienceStation({
         "A hardened owl that is ready to be transported to another lush location.",
     },
   ],
+  projects = [], 
+  missions = [], 
 }: CommunityStationProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
 
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Project | Mission | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
   const baseColors = isDarkMode
     ? { bg: "#303F51", text: "#F7F5E9", accent1: "#85DDA2", accent2: "#5FCBC3" }
@@ -106,7 +106,15 @@ export function CommunityScienceStation({
         accent2: "#5FCBC3",
       };
 
-  const handleItemClick = (item: any) => {
+  useEffect(() => {
+    console.log("Fetching projects and missions...");
+    // Display projects and missions received as props
+    console.log("Projects:", projects);
+    console.log("Missions:", missions);
+    setIsLoading(false);
+  }, [projects, missions]);
+
+  const handleItemClick = (item: Project | Mission) => {
     setSelectedItem(item);
   };
 
@@ -116,21 +124,23 @@ export function CommunityScienceStation({
   };
 
   const toggleUnlock = (item: Project | Mission) => {
+    console.log("Toggling unlock for item:", item);
     if (activeSection === "Projects") {
       const updatedProjects = projects.map((p) =>
         p.id === item.id ? { ...p, isUnlocked: !p.isUnlocked } : p
       );
-      console.log("Updated: ", updatedProjects);
+      console.log("Updated projects:", updatedProjects);
     } else if (activeSection === "Missions") {
       const updatedMissions = missions.map((m) =>
         m.id === item.id ? { ...m, completionRate: m.completionRate + 1 } : m
       );
-
-      console.log("Updated: ", updatedMissions);
+      console.log("Updated missions:", updatedMissions);
     }
 
     setSelectedItem({ ...item, isUnlocked: !item.isUnlocked });
   };
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div
@@ -237,122 +247,70 @@ export function CommunityScienceStation({
                   items={projects}
                   baseColors={baseColors}
                   onItemClick={handleItemClick}
-                  renderItem={(project) => (
-                    <div className="flex items-center justify-between">
-                      <span>{project.name}</span>
-                      <div className="flex items-center">
-                        <span className="mr-2">Lvl {project.level}</span>
-                        {project.isUnlocked ? (
-                          <Unlock className="w-4 h-4" />
-                        ) : (
-                          <Lock className="w-4 h-4" />
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  // renderItem={(item) => {
+                  //   if (isProject(item)) {
+                  //     return (
+                  //       <div
+                  //         key={item.id}
+                  //         onClick={() => handleItemClick(item)}
+                  //         className={`flex justify-between items-center p-2 border-b ${
+                  //           item.isUnlocked ? "text-green-600" : "text-red-600"
+                  //         }`}
+                  //       >
+                  //         <span>{item.name}</span>
+                  //         <Button
+                  //           onClick={() => toggleUnlock(item)}
+                  //           variant="outline"
+                  //         >
+                  //           {item.isUnlocked ? (
+                  //             <Unlock className="w-4 h-4" />
+                  //           ) : (
+                  //             <Lock className="w-4 h-4" />
+                  //           )}
+                  //         </Button>
+                  //       </div>
+                  //     );
+                  //   }
+                  //   return null; // Should not reach here
+                  // }}
                 />
               )}
+
               {activeSection === "Missions" && (
                 <Section
                   title="Missions"
                   items={missions}
                   baseColors={baseColors}
                   onItemClick={handleItemClick}
-                  renderItem={(mission) => (
-                    <div className="flex items-center justify-between">
-                      <span>{mission.name}</span>
-                      <div className="flex items-center">
-                        <span className="mr-2">Lvl {mission.level}</span>
-                        {mission.isUnlocked ? (
-                          <Unlock className="w-4 h-4" />
-                        ) : (
-                          <Lock className="w-4 h-4" />
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  // renderItem={(item) => {
+                  //   if (isMission(item)) {
+                  //     return (
+                  //       <div
+                  //         key={item.id}
+                  //         onClick={() => handleItemClick(item)}
+                  //         className={`flex justify-between items-center p-2 border-b ${
+                  //           item.isUnlocked ? "text-green-600" : "text-red-600"
+                  //         }`}
+                  //       >
+                  //         <span>{item.name}</span>
+                  //         <Button
+                  //           onClick={() => toggleUnlock(item)}
+                  //           variant="outline"
+                  //         >
+                  //           {item.isUnlocked ? (
+                  //             <Unlock className="w-4 h-4" />
+                  //           ) : (
+                  //             <Lock className="w-4 h-4" />
+                  //           )}
+                  //         </Button>
+                  //       </div>
+                  //     );
+                  //   }
+                  //   return null; // Should not reach here
+                  // }}
                 />
               )}
-              {activeSection === "Items" && (
-                <Section
-                  title="Items to Transfer"
-                  items={anomalies || []}
-                  baseColors={baseColors}
-                  onItemClick={handleItemClick}
-                  renderItem={(item) => (
-                    <div className="flex items-center justify-between">
-                      <span>{item.name}</span>
-                      <Send className="w-4 h-4" />
-                    </div>
-                  )}
-                />
-              )}
-              {activeSection === "AddData" && (
-                <div
-                  className="mt-4 p-4 rounded"
-                  style={{ backgroundColor: baseColors.accent1 }}
-                >
-                  <h3 className="text-xl font-bold mb-4">Add Your Data</h3>
-                  <p className="mb-2">Submit your research data here:</p>
-                  <textarea
-                    className="w-full p-2 rounded"
-                    rows={4}
-                    placeholder="Enter your data..."
-                    style={{
-                      backgroundColor: baseColors.bg,
-                      color: baseColors.text,
-                    }}
-                  />
-                  <Button
-                    className="mt-2 w-full"
-                    style={{
-                      backgroundColor: baseColors.accent2,
-                      color: baseColors.text,
-                    }}
-                  >
-                    Submit Data
-                  </Button>
-                </div>
-              )}
-              {selectedItem && (
-                <div className="mt-4">
-                  <h3 className="text-xl font-bold mb-4">
-                    {selectedItem.name}
-                  </h3>
-                  {(activeSection === "Projects" ||
-                    activeSection === "Missions") && (
-                    <div>
-                      <p className="mb-2">Level: {selectedItem.level}</p>
-                      <p className="mb-4">
-                        Status:{" "}
-                        {selectedItem.isUnlocked ? "Unlocked" : "Locked"}
-                      </p>
-                      <Button
-                        className="w-full"
-                        onClick={() => toggleUnlock(selectedItem)}
-                        style={{
-                          backgroundColor: baseColors.accent2,
-                          color: baseColors.text,
-                        }}
-                      >
-                        {selectedItem.isUnlocked ? "Lock" : "Unlock"}{" "}
-                        {activeSection === "Projects" ? "Project" : "Mission"}
-                      </Button>
-                    </div>
-                  )}
-                  {activeSection === "Items" && (
-                    <Button
-                      className="w-full"
-                      style={{
-                        backgroundColor: baseColors.accent2,
-                        color: baseColors.text,
-                      }}
-                    >
-                      Transfer Item
-                    </Button>
-                  )}
-                </div>
-              )}
+              {/* Add additional sections e.g. SSC-14 upload */}
             </div>
           </ScrollArea>
         </div>
@@ -360,36 +318,3 @@ export function CommunityScienceStation({
     </div>
   );
 }
-
-type SectionProps = {
-  title: string;
-  items: any[];
-  baseColors: { bg: string; text: string; accent1: string; accent2: string };
-  onItemClick: (item: any) => void;
-  renderItem: (item: any) => React.ReactNode;
-};
-
-function Section({
-  title,
-  items,
-  baseColors,
-  onItemClick,
-  renderItem,
-}: SectionProps) {
-  return (
-    <div className="space-y-2">
-      <h3 className="text-xl font-bold mb-4">{title}</h3>
-      {items.map((item) => (
-        <Button
-          key={item.id}
-          className="w-full justify-start"
-          variant="outline"
-          style={{ borderColor: baseColors.accent1, color: baseColors.text }}
-          onClick={() => onItemClick(item)}
-        >
-          {renderItem(item)}
-        </Button>
-      ))}
-    </div>
-  );
-};
