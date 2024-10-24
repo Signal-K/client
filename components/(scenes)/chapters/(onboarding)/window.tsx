@@ -141,7 +141,6 @@ const OnboardingWindow = () => {
 
   return (
     <div className="relative flex flex-col md:flex-row min-h-screen p-4 md:p-8">
-      {/* Left Panel - Desktop */}
       <div className="hidden md:flex rounded-xl md:w-1/3 w-full flex-col justify-center p-2 md:p-10 z-10 backdrop-blur-lg bg-white/30">
         <div className="space-y-4">
           {steps.map((step) => (
@@ -161,17 +160,11 @@ const OnboardingWindow = () => {
           ))}
         </div>
       </div>
-
-      {/* Right Panel */}
       <div
         className="md:w-2/3 px-3 w-full flex flex-col justify-between relative"
         style={{ minHeight: 'calc(100vh - 64px)' }}
       >
-        {/* Header Component for Desktop */}
-        <div className="hidden md:block mb-6">
-          {/* <Header /> */}
-        </div>
-
+        <div className="hidden md:block mb-6"></div>
         <div className="flex-grow flex flex-col justify-between relative">
           {currentStep ? (
             <motion.div

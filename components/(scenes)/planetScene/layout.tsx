@@ -10,14 +10,15 @@ import {
   mining,
 } from "@/constants/backgrounds";
 import backgroundImage from "@/public/assets/Backdrops/Negotiations.jpg";
+import Header from "@/components/ui/Header";
 
 interface PlanetViewLayoutProps {
   children: React.ReactNode[];
-}
+};
 
 interface PlanetViewLayoutProps {
   children: React.ReactNode[];
-}
+};
 
 const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
   const [expandedSection, setExpandedSection] = useState<number | null>(null);
@@ -61,7 +62,6 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
         loop
         muted
       />
-      {/* <Header /> */}
       <div className="relative flex flex-1">
         <div className="relative flex flex-col flex-1">
           {children.slice(0, 2).map((child, index) => (
