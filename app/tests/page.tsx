@@ -8,14 +8,12 @@ import ProfileCardModal from "@/components/profile/form";
 import { CommunityScienceStation } from "@/components/Structures/Community/StationModal";
 import { CreateCommunityStation } from "@/components/Structures/Build/MakeCommunityStation";
 import StationsOnPlanet from "@/components/Structures/Community/ViewAllStations";
-import OnlineUserList from "../auth/onlineUsers";
 
 export default function TestPage() {
     return (
         <StarnetLayout>
   <CreateCommunityStation />
   <StationsOnPlanet />
-  <OnlineUserList />
         </StarnetLayout>
     );
 };

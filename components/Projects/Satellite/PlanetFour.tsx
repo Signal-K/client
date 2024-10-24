@@ -142,7 +142,9 @@ export function PlanetFourProject() {
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [showTutorial, setShowTutorial] = useState(false);
     const [hasMission20000005, setHasMission20000005] = useState(false);
+
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
     useEffect(() => {
@@ -178,6 +180,10 @@ export function PlanetFourProject() {
             setLoading(false); 
         }
     }, [session, supabase]);
+
+    const handleShowTutorial = () => {
+        setShowTutorial(true);
+    };
     
     useEffect(() => {
         const fetchAnomaly = async () => {
@@ -221,34 +227,47 @@ export function PlanetFourProject() {
     
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-            <div className="p-4 rounded-md relative w-full">
-                {imageUrl && (
-                    <Card className="w-full max-w-3xl mx-auto">
-                        <CardHeader>
-                            <CardTitle>Image</CardTitle>
-                            <CardDescription>Annotate the image using marker.js</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-col items-center py-10 space-y-4">
-                            <div className="border border-gray-300 rounded-lg overflow-hidden">
-                                <img
-                                    src={imageUrl}
-                                    alt="Annotation"
-                                    crossOrigin="anonymous"
-                                    className="max-w-full h-auto"
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
-            </div>
-            {imageUrl && (
-                <ClassificationForm
-                    anomalyId={anomaly?.id.toString() || ""}
-                    anomalyType="satellite-planetFour"
-                    missionNumber={200000052}
-                    assetMentioned={imageUrl}
-                    structureItemId={3103}
-                />
+            {!showTutorial ? (
+                <>
+                    <div className="p-4 rounded-md relative w-full">
+                        {imageUrl && (
+                            <Card className="w-full max-w-3xl mx-auto">
+                                <CardHeader>
+                                    <CardTitle>Image</CardTitle>
+                                    <CardDescription>Annotate the image using marker.js</CardDescription>
+                                </CardHeader>
+                                <CardContent className="flex flex-col items-center py-10 space-y-4">
+                                    <div className="border border-gray-300 rounded-lg overflow-hidden">
+                                        <img
+                                            src={imageUrl}
+                                            alt="Annotation"
+                                            crossOrigin="anonymous"
+                                            className="max-w-full h-auto" />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
+                    <Button
+                        className="mb-4"
+                        onClick={handleShowTutorial}
+                    >
+                        Show Tutorial
+                    </Button>
+                    {imageUrl && (
+                        <ClassificationForm
+                            anomalyId={anomaly?.id.toString() || ""}
+                            anomalyType="satellite-planetFour"
+                            missionNumber={200000052}
+                            assetMentioned={imageUrl}
+                            structureItemId={3103}
+                        />
+                    )}
+                </>
+            ) : (
+                <div>
+                    <StarterPlanetFour anomalyid={anomaly?.id} />
+                </div>
             )}
         </div>
     );

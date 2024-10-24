@@ -5,15 +5,17 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 
 export default function OnlineUserList() {
     const supabase = useSupabaseClient();
-    const session = useSession();
-
+    const session = useSession();  // Session must be loaded first
     const [onlineUsers, setOnlineUsers] = useState(0);
 
     useEffect(() => {
+        // Wait until session is ready
+        if (!session?.user?.id) return;
+
         const roomOne = supabase.channel('room_01', {
             config: {
                 presence: {
-                    key: session?.user.id || '',
+                    key: session.user.id,  // Ensure session user id is used correctly
                 },
             },
         });
@@ -21,7 +23,6 @@ export default function OnlineUserList() {
         roomOne
             .on('presence', { event: 'sync' }, () => {
                 const currentPresenceState = roomOne.presenceState();
-                // Update the onlineUsers state with the number of currently online users
                 const onlineUsersCount = Object.keys(currentPresenceState).length;
                 setOnlineUsers(onlineUsersCount);
             })
@@ -37,7 +38,7 @@ export default function OnlineUserList() {
         return () => {
             roomOne.unsubscribe();
         };
-    }, [supabase]);
+    }, [session?.user?.id, supabase]);
 
     return (
         <div className="flex items-center gap-1">
