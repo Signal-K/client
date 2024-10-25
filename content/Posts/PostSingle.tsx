@@ -1,4 +1,3 @@
-// PostCardSingle.tsx (Updated)
 "use client";
 
 import { useEffect, useState } from "react";
@@ -66,7 +65,6 @@ export function PostCardSingle({
     setVoteCount((prevCount) => prevCount + 1);
   };
 
-  // Callback to refresh the comments list after adding a new comment
   const handleCommentAdded = () => {
     fetchComments();
   };
@@ -125,7 +123,7 @@ export function PostCardSingle({
               author={comment.author}
               content={comment.content}
               createdAt={comment.created_at}
-              replyCount={0} // You can implement reply count logic here
+              replyCount={0}
             />
           ))
         )}

@@ -18,6 +18,8 @@ interface StructuresOnPlanetProps {
 }; 
 
 import { UnownedSurfaceStructures } from "./Build/EditMode";
+import { CreateCommunityStation } from "./Build/MakeCommunityStation";
+import StationsOnPlanet, { StationsOnPlanetOpen } from "./Community/ViewAllStations";
 
 export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
   const supabase = useSupabaseClient();
@@ -146,6 +148,8 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                 />
             )}
             <UnownedSurfaceStructures />
+            <CreateCommunityStation />
+            <StationsOnPlanetOpen />
         </div>
   );
 };

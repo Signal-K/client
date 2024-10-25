@@ -1,52 +1,52 @@
 'use client'
 
-import React, { useState, useEffect } from "react"
-import { Moon, Sun, Lock, Unlock, ChevronRight, ChevronLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
-import { CreateStructure } from "../Build/CreateDedicatedStructure"
+import React, { useState } from "react";
+import { Moon, Sun, Lock, Unlock, ChevronRight, ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { CreateStructure } from "../Build/CreateDedicatedStructure";
 
 type Project = {
-  id: string
-  name: string
-  identifier: string
-  isUnlocked: boolean
-  level: number
+  id: string;
+  name: string;
+  identifier: string;
+  isUnlocked: boolean;
+  level: number;
   structure: string;
-  missionId: number
+  missionId: number;
   component: React.ComponentType;
-  isCompleted: boolean
-  missionRoute: number
+  isCompleted: boolean;
+  missionRoute: number;
 };
 
 type Mission = {
-  id: string
-  name: string
-  project: string
-  isUnlocked: boolean
-  type: string
-  completionRate: number
-  level: number
+  id: string;
+  name: string;
+  project: string;
+  isUnlocked: boolean;
+  type: string;
+  completionRate: number;
+  level: number;
 };
 
 type AnomalyPiece = {
-  id: string
-  name: string
-  description: string
-  file?: string
+  id: string;
+  name: string;
+  description: string;
+  file?: string;
 };
 
 type CommunityStationProps = {
-  stationName: string
-  anomalies?: AnomalyPiece[]
+  stationName: string;
+  anomalies?: AnomalyPiece[];
   projects: Project[];
   inventoryItemId: number;
-  missions: Mission[]
-  imageSrc: string
-  configuration: any
-  onClick: () => void
+  missions: Mission[];
+  imageSrc: string;
+  configuration: any;
+  onClick: () => void;
 };
 
 export function CommunityScienceStation({
@@ -59,40 +59,40 @@ export function CommunityScienceStation({
   onClick,
   inventoryItemId,
 }: CommunityStationProps) {
-  const supabase = useSupabaseClient()
-  const session = useSession()
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-  const [activeSection, setActiveSection] = useState<string | null>(null)
-  const [localProjects, setLocalProjects] = useState<Project[]>(projects)
-  const [localMissions, setLocalMissions] = useState<Mission[]>(missions)
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
-  const [isDarkMode, setIsDarkMode] = useState(false)
-  const [projectDetails, setProjectDetails] = useState<any | null>(null)
-  const [structureType, setStructureType] = useState<string | null>(null) 
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [localProjects, setLocalProjects] = useState<Project[]>(projects);
+  const [localMissions, setLocalMissions] = useState<Mission[]>(missions);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [projectDetails, setProjectDetails] = useState<any | null>(null);
+  const [structureType, setStructureType] = useState<string | null>(null);
 
-  const toggleDarkMode = () => setIsDarkMode(prev => !prev)
+  const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
   const baseColors = isDarkMode
     ? { bg: "#303F51", text: "#F7F5E9", accent1: "#85DDA2", accent2: "#5FCBC3" }
-    : { bg: "#F7F5E9", text: "#303F51", accent1: "#FFD580", accent2: "#5FCBC3" }
+    : { bg: "#F7F5E9", text: "#303F51", accent1: "#FFD580", accent2: "#5FCBC3" };
 
   const handleBack = () => {
-    setActiveSection(null)
-    setSelectedProject(null)
-    setProjectDetails(null)
-    setStructureType(null) 
-  }
+    setActiveSection(null);
+    setSelectedProject(null);
+    setProjectDetails(null);
+    setStructureType(null);
+  };
 
   const handleProjectClick = (projectId: string) => {
-    const project = configuration.projects.find((proj: Project) => proj.id === projectId)
+    const project = configuration.projects.find((proj: Project) => proj.id === projectId);
 
     if (project) {
-      setSelectedProject(project)
-      setProjectDetails(project)
+      setSelectedProject(project);
+      setProjectDetails(project);
     } else {
-      console.error("Project not found in configuration.")
-      alert('Project not found in configuration.')
+      console.error("Project not found in configuration.");
+      alert('Project not found in configuration.');
     }
-  }
+  };
 
   const handleStructureSelection = (type: string) => {
     setStructureType(type);
@@ -102,7 +102,6 @@ export function CommunityScienceStation({
     <div 
       className={`flex flex-col items-center p-6 rounded-lg shadow-lg w-full max-w-md mx-auto transition-colors duration-300 ease-in-out overflow-hidden`}
       style={{ backgroundColor: baseColors.bg, color: baseColors.text }}
-      onClick={onClick}
     >
       <div className="flex justify-between items-center w-full mb-6">
         <img src={imageSrc} alt={`${stationName} Image`} className="w-10 h-10 object-cover rounded-full" />
@@ -162,7 +161,7 @@ export function CommunityScienceStation({
                         <span className="mr-2">Lvl {project.level}</span>
                       </div>
                       <Button 
-                        onClick={() => handleProjectClick(project.id)}  // Pass the clicked project id
+                        onClick={() => handleProjectClick(project.id)} 
                         style={{ backgroundColor: baseColors.accent2, color: baseColors.text }}
                       >
                         View Project
@@ -229,11 +228,11 @@ export function CommunityScienceStation({
 };
 
 type SectionProps<T> = {
-  title: string
-  items: T[]
-  baseColors: { bg: string, text: string, accent1: string, accent2: string }
-  renderItem: (item: T) => React.ReactNode
-}
+  title: string;
+  items: T[];
+  baseColors: { bg: string; text: string; accent1: string; accent2: string };
+  renderItem: (item: T) => React.ReactNode;
+};
 
 function Section<T>({ title, items, baseColors, renderItem }: SectionProps<T>) {
   return (
@@ -251,5 +250,5 @@ function Section<T>({ title, items, baseColors, renderItem }: SectionProps<T>) {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Lock, Rocket, MapPin, Building, Star, Clock } from "lucide-react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { CreateCommunityStation } from "../Structures/Build/MakeCommunityStation";
 
 type CommunityMission = {
   id: number;
@@ -32,9 +33,10 @@ const missions: CommunityMission[] = [
     Output: [
         "Can study plants & animals on other planets",
         "Creator of the planet's greenhouse gets 5% of all stardust created from classifications performed using the greenhouse",
+        "Click on the plus button to see if somebody else has placed a greenhouse on your planet. If not, you're able to build your own and open up the ecosystem for others!",
     ],
     poster: "Capt'n Cosmos",
-    isLocked: true,
+    isLocked: false,
     structure: "Greenhouse",
     location: "Mercury, Venus, Moon, Mars",
     difficulty: 2,
@@ -164,7 +166,12 @@ export default function CommunityMissionList() {
                     </>
                   ) : (
                     <>
-                      <Rocket className="w-4 h-4 mr-2" />
+                      <div className="mb-5">
+                        <Rocket className="w-4 h-4 mr-2" />
+                      </div>
+                      <div className="mt-5">
+                        <CreateCommunityStation />
+                      </div>
                       Mission in progress
                       {/* Accept Mission */}
                     </>

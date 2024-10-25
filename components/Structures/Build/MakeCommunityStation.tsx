@@ -15,7 +15,7 @@ interface Project {
     identifier: string;
     level: number;
     locked: boolean;
-}
+};
 
 interface Mission {
     id: string;
@@ -24,14 +24,14 @@ interface Mission {
     project: string;
     level: number;
     locked: boolean;
-}
+};
 
 interface CommunityStationConfig {
     stationName: string;
     inventoryItemId: number;
     projects: Project[];
     missions: Mission[];
-}
+};
 
 export function CreateCommunityStation() {
     const supabase = useSupabaseClient();
@@ -152,7 +152,7 @@ export function CreateCommunityStation() {
             <div className='relative'>
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                        <Button size="lg" className='rounded-full p-4 bg-[#1a1b26] text-[#a9b1d6] hover:bg-[#24283b] shadow-lg'>
+                        <Button size="lg" className='rounded-full p-4 bg-[#FFD580] text-[#a9b1d6] hover:bg-[#24283b] shadow-lg'>
                             <Plus size={36} />
                         </Button>
                     </DialogTrigger>
@@ -169,7 +169,7 @@ export function CreateCommunityStation() {
         <div className='relative'>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <Button size="lg" className='rounded-full p-4 bg-[#1a1b26] text-[#a9b1d6] hover:bg-[#24283b] shadow-lg'>
+                    <Button size="lg" className='rounded-full p-4 bg-[#FFD580] text-[#a9b1d6] hover:bg-[#24283b] shadow-lg'>
                         <Plus size={36} />
                     </Button>
                 </DialogTrigger>
