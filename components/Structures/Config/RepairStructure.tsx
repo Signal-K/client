@@ -18,7 +18,8 @@ const StructureRepair: React.FC<StructureRepairProps> = ({
   inventoryId,
 }) => {
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   const [structureDurability, setStructureDurability] = useState<number>(0);

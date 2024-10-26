@@ -7,19 +7,12 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button"; 
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
-
-interface InventoryItem {
-    id: number;
-    name: string;
-    description: string;
-    icon_url: string;
-    ItemCategory: string;
-    locationType?: string;
-};
+import { InventoryItem } from '@/types/Items';
 
 export function UnownedSurfaceStructures() {
     const supabase = useSupabaseClient();
     const session = useSession();
+
     const { activePlanet } = useActivePlanet();
 
     const [unownedStructures, setUnownedStructures] = useState<InventoryItem[]>([]);
@@ -127,9 +120,9 @@ export function UnownedSurfaceStructures() {
                     },
                 ]);
 
-            if (error) {
+            if (error) { 
                 throw error;
-            }
+            };
 
             console.log(`${structure.name} has been added to the inventory.`);
             setOpen(false);
@@ -140,7 +133,11 @@ export function UnownedSurfaceStructures() {
     };
 
     if (loading) {
-        return <p>Loading...</p>;
+        return (
+            <p>
+                Loading...
+            </p>
+        );
     };
 
     if (unownedStructures.length === 0) {
@@ -175,9 +172,9 @@ export function UnownedSurfaceStructures() {
                     <AnimatePresence>
                         {selectedStructure ? (
                             <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
+                                initial={{ opacity: 0, }}
+                                animate={{ opacity: 1, }}
+                                exit={{ opacity: 0, }}
                                 className="relative h-full flex flex-col items-center justify-between p-8"
                             >
                                 <div className="text-center">

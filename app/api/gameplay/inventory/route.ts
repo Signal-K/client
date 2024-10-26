@@ -10,7 +10,7 @@ export interface InventoryItem {
   description: string;
   cost?: number;
   icon_url: string;
-  ItemCategory: string;
+  ItemCategory: string; 
   parentItem?: number | null;
   itemLevel?: number;
   locationType?: string;
@@ -83,6 +83,32 @@ const inventoryItems: InventoryItem[] = [
     icon_url: "/assets/Items/PhysicsLab.png",
     ItemCategory: "Structure",
     locationType: 'Surface',
+  },
+
+  // Community stations
+  {
+    id: 31011,
+    name: "Greenhouse",
+    description: "Collect and study biological anomalies across multiple locations",
+    icon_url: "/assets/Items/Greenhouse.png",
+    ItemCategory: 'CommunityStation',
+    locationType: 'Surface',
+  },
+  {
+    id: 31012,
+    name: "Weather balloon",
+    description: "Collect and study weather events and entities more closely in your planet's atmosphere",
+    icon_url: "/assets/Items/WeatherBalloon.png",
+    ItemCategory: 'CommunityStation',
+    locationType: 'Atmosphere',
+  },
+  {
+    id: 31013,
+    name: "Space Telescope",
+    description: "Collect & compare discoveries more readily per-location", // to-update
+    icon_url: "/assets/Items/SpaceTelescope.png",
+    ItemCategory: 'CommunityStation',
+    locationType: 'Orbital',
   },
   
   // Tests

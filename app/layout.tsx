@@ -14,10 +14,11 @@ import { Analytics } from "@vercel/analytics/react"
 import { MissionProvider } from "@/context/MissionContext";
 import TutorialPopup from "../content/Dialogue/helpButton";
 import AppLayout from "@/components/Layout/Layout";
+import Header from "@/components/ui/Header";
 
 interface RootLayoutProps {
   children: ReactNode;
-}
+};
 
 export default function RootLayout({ children }: RootLayoutProps) {
   const [supabaseClient] = useState(() => createPagesBrowserClient());

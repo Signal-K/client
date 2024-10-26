@@ -8,7 +8,7 @@ import ClassificationForm from "@/components/Projects/(classifications)/PostForm
 import { Anomaly } from "../Telescopes/Transiting";
 
 interface ZoodexProps {
-    anomalyId: string;
+    anomalyId: string; 
 };
 
 export const BurrowingOwlTutorial: React.FC<ZoodexProps> = ({ 

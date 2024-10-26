@@ -5,8 +5,10 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ClassificationForm from "../(classifications)/PostForm";
 
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
+import { Button } from "@/components/ui/button";
+import ImageAnnotation from "../(classifications)/Annotation";
 interface Props {
-    anomalyid: number | bigint;
+    anomalyid: number | bigint; 
 };
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -47,22 +49,22 @@ export function StarterDailyMinorPlanet({
                         <>
                             {line === 1 && (
                                 <p className="text-[#EEEAD1]">
-
+                                    Welcome to the Asteroid Hunters project. In this project, you will be identifying minor planet candidates, like asteroids, around your local star.
                                 </p>
                             )}
                             {line === 2 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    We use the apparent movement of asteroids from image to image to find them, so if you don't see movement, click through the different images to see if the circled object moves
                                 </p>
                             )}
                             {line === 3 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    Find the green circle in the subject clip. Within the green circle is one object (light spot) that moves from frame to frame. We call this light spot inside the green circle a detection.
                                 </p>
                             )}
                             {line === 4 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    That's it! Get ready to explore the skies. Click "Continue" to start classifying. 
                                 </p>
                             )}
 
@@ -83,21 +85,21 @@ export function StarterDailyMinorPlanet({
                                 </button>
                             )}
                             {line < 5 && (
-                                <div className="flex justify-center mt-4 w-full h-64">
-                                    {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step1.jpeg" alt="Step 1" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step2.jpeg" alt="Step 2" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step3.jpeg" alt="Step 3" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step4.jpeg" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
+                                <div className="flex justify-center mt-4 w-full h-128">
+                                    {line === 1 && <img src="/assets/Docs/Telescopes/DailyMinorPlanet/Step1.png" alt="Step 1" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 2 && <img src="/assets/Docs/Telescopes/DailyMinorPlanet/Step2.png" alt="Step 2" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 3 && <img src="/assets/Docs/Telescopes/DailyMinorPlanet/Step3.png" alt="Step 3" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 4 && <img src="/assets/Docs/Telescopes/DailyMinorPlanet/Step4.png" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
                                 </div>
                             )}
                         </>
                     )}
 
-                    {part === 1 && (
+                    {part === 2 && (
                         <>
                             {line === 1 && (
                                 <p className="text-[#EEEAD1]">
-                                    Content
+                                    
                                 </p>
                             )}
                         </>
@@ -155,10 +157,10 @@ export function DailyMinorPlanet() {
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-
     const [loading, setLoading] = useState<boolean>(true);
     const [missionLoading, setMissionLoading] = useState<boolean>(true);
     const [hasMission20000003, setHasMission20000003] = useState<boolean | null>(false);
+    const [showTutorial, setShowTutorial] = useState(false);
 
     useEffect(() => {
         const checkTutorialMission = async () => {
@@ -173,13 +175,15 @@ export function DailyMinorPlanet() {
                     .select("*")
                     .eq("user", session.user.id)
                     .eq("mission", 20000003)
-                    .single();
+                    .limit(1); // Limiting the result to 1 row
 
                 if (missionError) {
                     throw missionError;
                 };
 
-                setHasMission20000003(!!missionData);
+                // Even if there are multiple rows, we just care about one row.
+                const hasMission = missionData && missionData.length > 0;
+                setHasMission20000003(hasMission);
             } catch (error: any) {
                 console.error("Mission error:", error);
                 setHasMission20000003(false);
@@ -236,9 +240,9 @@ export function DailyMinorPlanet() {
 
     if (loading || missionLoading) {
         return <div>Loading...</div>;
-    }
+    };
 
-    if (!hasMission20000003) {
+    if (!hasMission20000003 || showTutorial) {
         return <StarterDailyMinorPlanet anomalyid={anomaly?.id || 90670192} />;
     };
 
@@ -248,7 +252,7 @@ export function DailyMinorPlanet() {
                 <p>No anomaly found.</p>
             </div>
         );
-    }; 
+    };
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
@@ -296,6 +300,9 @@ export function DailyMinorPlanet() {
                     ))}
                 </div>
             )}
+
+            <Button className='mt-4' onClick={() => setShowTutorial(true)}>Show Tutorial</Button>
+
             {imageUrls.length > 0 && (
                 <ClassificationForm
                     anomalyId={anomaly?.id.toString() || "90670192"}

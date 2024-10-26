@@ -6,7 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { StructureInfo } from "@/components/Structures/structureInfo";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 
-interface LidarProps {
+interface LidarProps { 
     anomalyId: string;
 };
 
@@ -21,7 +21,7 @@ export const CloudspottingOnMars: React.FC<LidarProps> = ({
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/clouds/${anomalyId}.png`;
 
-    const [part, setPart] = useState(1);
+const [part, setPart] = useState(1);
     const [line, setLine] = useState(1);
 
     const nextLine = () => setLine((prevLine) => prevLine + 1);

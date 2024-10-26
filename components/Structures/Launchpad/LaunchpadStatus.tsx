@@ -22,7 +22,8 @@ export default function LaunchpadStatus() {
   const [fuelAvailable, setFuelAvailable] = useState<number>(0);
   const [isAddingFuel, setIsAddingFuel] = useState<boolean>(false);
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   useEffect(() => {

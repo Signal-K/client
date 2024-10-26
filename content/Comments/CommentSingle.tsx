@@ -11,8 +11,8 @@ interface CommentCardProps {
   createdAt: string;
   replyCount: number;
   parentCommentId?: number | null;
-}
-
+};
+ 
 export function CommentCard({ author, content, createdAt, replyCount, parentCommentId }: CommentCardProps) {
   return (
     <Card className="w-full max-w-2xl mx-auto my-4 squiggly-connector bg-card text-card-foreground border-primary">

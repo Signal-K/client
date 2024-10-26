@@ -2,14 +2,25 @@
 
 import React, { useEffect, useState } from "react";
 import StarnetLayout from "@/components/Layout/Starnet";
-import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
-import MissionPathway from "@/components/Missions/Pathway";
-import ProfileCardModal from "@/components/profile/form";
+import ImageAnnotation from "@/components/Projects/(classifications)/Annotation";
 
 export default function TestPage() {
     return (
         <StarnetLayout>
-            <MissionPathway />
+          <></>
         </StarnetLayout>
     );
 };
+
+/*
+<ImageAnnotation src={imageUrls[currentImageIndex]} onUpload={uploadAnnotatedImage} />
+  anomalies = {[
+    {
+      id: "1",
+      name: "Hardened owl",
+      description:
+        "A hardened owl that is ready to be transported to another lush location.",
+    },
+  ]}  />
+
+*/

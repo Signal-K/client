@@ -6,6 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { StructureInfo } from "@/components/Structures/structureInfo";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 import { Anomaly } from "./Transiting";
+import { Button } from "@/components/ui/button";
 
 interface TelescopeProps {
   anomalyId: string;
@@ -230,7 +231,8 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
 
 export function TelescopeDiskDetector() {
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
@@ -239,12 +241,14 @@ export function TelescopeDiskDetector() {
   const [hasMission3000009, setHasMission3000009] = useState<boolean | null>(null);
   const [missionLoading, setMissionLoading] = useState<boolean>(true);
 
+  const [showTutorial, setShowTutorial] = useState<boolean>(false);
+
   useEffect(() => {
     async function fetchAnomaly() {
       if (!session) {
         setLoading(false);
         return;
-      }
+      };
 
       try {
         const { data: anomalyData, error: anomalyError } = await supabase
@@ -258,7 +262,7 @@ export function TelescopeDiskDetector() {
           setAnomaly(null);
           setLoading(false);
           return;
-        }
+        };
 
         setAnomaly(anomalyData as Anomaly);
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -270,33 +274,34 @@ export function TelescopeDiskDetector() {
         setAnomaly(null);
       } finally {
         setLoading(false);
-      }
-    }
+      };
+    };
 
     fetchAnomaly();
   }, [session, supabase]);
 
   useEffect(() => {
-    const checkTutorialMission = async () => {
-      if (!session) return;
-
-      try {
-        const { data: missionData, error: missionError } = await supabase
-          .from("missions")
-          .select("id")
-          .eq("user", session.user.id)
-          .eq("mission", "3000009")
-          .single();
-
-        if (missionError) throw missionError;
-        setHasMission3000009(!!missionData);
-      } catch (error: any) {
-        console.error("Error checking user mission:", error.message || error);
-        setHasMission3000009(false);
-      } finally {
-        setMissionLoading(false);
-      }
-    };
+      const checkTutorialMission = async () => {
+        if (!session) return;
+    
+        try {
+          const { data: missionData, error: missionError } = await supabase
+            .from("missions")
+            .select("id")
+            .eq("user", session.user.id)
+            .eq("mission", 3000009); 
+    
+          if (missionError) throw missionError;
+    
+          setHasMission3000009(missionData.length > 0);
+        } catch (error: any) {
+          console.error("Error checking user mission:", error.message || error);
+          setHasMission3000009(false);
+        } finally {
+          setMissionLoading(false);
+        }
+      };
+     
 
     checkTutorialMission();
   }, [session, supabase]);
@@ -312,10 +317,11 @@ export function TelescopeDiskDetector() {
   }
 
   // Check if the user has the mission
-  if (hasMission3000009 === null) {
-    // If the mission check is still loading, you can add a loading state here if necessary.
-    return null; // Optionally return a loading state
-  }
+  if (hasMission3000009 === null || showTutorial) {
+    return (
+      <DiskDetectorTutorial anomalyId={anomaly.id.toString()} />
+    );
+  };
 
   // Render the tutorial or the main content based on the mission status
   return (
@@ -329,7 +335,11 @@ export function TelescopeDiskDetector() {
               className="w-full h-64 object-cover"
             />
           )}
-          <p>{anomaly.id.toString()}</p>
+          <Button className="bg-[#85DDA2] text-[#2C3A4A] px-4 py-2 rounded-md"
+            onClick={() => setShowTutorial(true)}
+          >
+            Show tutorial
+          </Button>
           <ClassificationForm
             anomalyId={anomaly.id.toString()}
             anomalyType="DiskDetective"

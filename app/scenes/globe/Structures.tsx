@@ -8,6 +8,7 @@ import { StructuresConfigForSandbox } from "@/constants/Structures/SandboxProper
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import "../../../styles/Anims/StarterStructureAnimations.css";
+import { CreateCommunityStation } from "@/components/Structures/Build/MakeCommunityStation";
 
 interface StructuresOnPlanetProps {
     onStructuresFetch: (
@@ -105,6 +106,9 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
   
     return (
   <div className="relative">
+                <div className="mx-3">
+                  <CreateCommunityStation />
+                </div>
               <div className={`grid grid-cols-3 gap-1 gap-y-3 relative ${userStructuresOnPlanet.length === 1 ? 'justify-center' : ''}`}>
                   {userStructuresOnPlanet.map((structure) => {
                       const itemDetail = itemDetails.get(structure.item);
@@ -136,7 +140,11 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                       onClose={handleClose}
                   />
               )}
-              <UnownedSurfaceStructures />
+              <div className="m">
+                <div className="mx-3">
+                  <UnownedSurfaceStructures />
+                </div>
+              </div>
           </div>
     );
 };

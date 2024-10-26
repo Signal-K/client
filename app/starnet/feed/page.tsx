@@ -25,8 +25,9 @@ export default function Starnet() {
     try {
       const { data, error } = await supabase
         .from("classifications")
-        .select("*")
-        .eq("author", session.user.id);
+        .select("*, classificationConfiguration, classificationtype")
+        .eq("author", session.user.id)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
@@ -40,7 +41,9 @@ export default function Starnet() {
           images.push(media.uploadUrl);
         }
 
-        return { ...classification, images };
+        const votes = classification.classificationConfiguration?.votes || 0;
+
+        return { ...classification, images, votes };
       });
 
       setClassifications(processedData);
@@ -76,7 +79,7 @@ export default function Starnet() {
         setClassifications((prevClassifications) =>
           prevClassifications.map((classification) =>
             classification.id === classificationId
-              ? { ...classification, votes: currentVotes + 1 }
+              ? { ...classification, votes: updatedConfig.votes }
               : classification
           )
         );
@@ -105,6 +108,9 @@ export default function Starnet() {
               category={classification.category}
               tags={classification.tags || []}
               images={classification.images || []}
+              anomalyId={classification.anomaly}
+              classificationConfig={classification.classificationConfiguration}
+              classificationType={classification.classificationtype} // Pass classificationtype to child
               onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
             />
           ))

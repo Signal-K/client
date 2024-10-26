@@ -3,7 +3,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { MineralDeposit, Automaton } from "@/types/Items";
 import AutomatonUpgrade from "../Config/AutomatonUpgradeBox";
-import { InventoryItem } from "@/types/Inventory";
+import { InventoryItem } from "@/types/Items";
 import { Battery, MapPin, Rocket, Clock } from "lucide-react";
 
 import "../../../styles/Anims/MiningAnimations.css";
@@ -21,7 +21,8 @@ export function ActiveAutomatonForMining({
   deposit,
 }: ActiveAutomatonForMiningProps) {
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   const [userAutomaton, setUserAutomaton] = useState<Automaton | null>(null);
@@ -416,7 +417,8 @@ export function ActiveAutomatonForMining({
 
 export function AutomatonUpgrader() {
   const supabase = useSupabaseClient();
-  const session = useSession();
+    const session = useSession();
+  
   const { activePlanet } = useActivePlanet();
 
   const [automatons, setAutomatons] = useState<Automaton[]>([]);

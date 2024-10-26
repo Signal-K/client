@@ -38,26 +38,41 @@ export function StarterAiForMars({ anomalyid }: Props) {
                         <>
                             {line === 1 && (
                                 <p className="text-[#EEEAD1]">
-
+                                    You can help to improve rover performance & safety by labeling images from your rovers. You will see a series of images taken on your planet - label what you see and any landmarks that are visible.
                                 </p>
                             )}
                             {line === 2 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    Sand - Look for areas with fine, powdery dust, often with visible ripples. Sand is slippery for rovers and leaves deep wheel tracks. Ignore small sand patches narrower than 20-50 cm based on the trapezoid marker.
                                 </p>
                             )}
                             {line === 3 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    Soil - Soil is cohesive and may have small gravel. The rover can drive on it without much slip, leaving light wheel tracks. It looks more compact and smooth compared to sand.
                                 </p>
                             )}
                             {line === 4 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    Bedrock - Bedrock appears as large, solid, often cracked plates. It's a stable surface for the rover and easily distinguishable from sand or soil. Large flat rocks form the base.
+                                </p>
+                            )}
+                            {line === 5 && (
+                                <p className="text-[#EEEAD1]">
+                                    Larger objects - Big rocks are larger than the trapezoid (20-50 cm) and act as obstacles for the rover. Avoid overlapping these with other labels since they’re distinct hazards. 
+                                </p>
+                            )}
+                            {line === 6 && (
+                                <p className="text-[#EEEAD1]">
+                                    Ignore terrain further than 30 meters, as it is too far to classify. Dark areas in the distance usually indicate this.
+                                </p>
+                            )}
+                            {line === 7 && (
+                                <p className="text-[#EEEAD1]">
+                                    Let's get started!
                                 </p>
                             )}
 
-                            {line < 4 && (
+                            {line < 7 && (
                                 <button
                                     onClick={nextLine}
                                     className="absolute bottom-4 right-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
@@ -65,7 +80,7 @@ export function StarterAiForMars({ anomalyid }: Props) {
                                     Next
                                 </button>
                             )}
-                            {line === 4 && (
+                            {line === 7 && (
                                 <button
                                     onClick={nextPart}
                                     className="absolute bottom-4 right-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
@@ -73,12 +88,15 @@ export function StarterAiForMars({ anomalyid }: Props) {
                                     Continue
                                 </button>
                             )}
-                            {line < 5 && (
+                            {line < 8 && (
                                 <div className="flex justify-center mt-4 w-full h-64">
                                     {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step1.jpeg" alt="Step 1" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step2.jpeg" alt="Step 2" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step3.jpeg" alt="Step 3" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 1 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step4.jpeg" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 2 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step2.png" alt="Step 2" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 3 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step3.png" alt="Step 3" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 4 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step4.png" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 5 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step5.png" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 6 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step6.png" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
+                                    {line === 7 && <img src="/assets/Docs/Automatons/automatons-ai4Mars/Step7.jpeg" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
                                 </div>
                             )}
                         </>
@@ -147,65 +165,64 @@ export function AiForMarsProject() {
     useEffect(() => {
         const checkTutorialMission = async () => {
             if (!session) return;
-
+    
             try {
                 const { data: missionData, error: missionError } = await supabase
                     .from('missions')
                     .select('id')
                     .eq('user', session.user.id)
                     .eq('mission', '20000006')
-                    .single();
-
-                if (missionError) throw missionError;
-
-                setHasMission20000006(!!missionData);
-            } catch (error: any) {
-                console.error('Error checking user mission: ', error.message || error);
+                    .limit(1);  
+    
+                if (missionError) {
+                    console.error("Error fetching mission data:", missionError);
+                    setHasMission20000006(false); 
+                    return;
+                }
+    
+                setHasMission20000006(missionData && missionData.length > 0);
+            } catch (error) {
+                console.error("Error checking user mission: ", error);
                 setHasMission20000006(false);
-            };
+            }
         };
-
+    
         checkTutorialMission();
     }, [session, supabase]);
-
-    if (!hasMission20000006) { 
-        return (
-            <StarterAiForMars anomalyid={anomaly?.id || 1} />
-        );
-    };
-
+    
     useEffect(() => {
         async function fetchAnomaly() {
             if (!session) {
                 setLoading(false);
                 return;
-            };
-
+            }
+    
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")
                     .select("*")
                     .eq("anomalySet", 'automaton-aiForMars')
-
+    
                 if (anomalyError) {
                     throw anomalyError;
-                };
-
+                }
+    
                 const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
                 setAnomaly(randomAnomaly);
                 setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${randomAnomaly.id}.jpeg`);
             } catch (error: any) {
                 console.error("Error fetching anomaly", error.message);
                 setAnomaly(null);
-                return;
-
             } finally {
                 setLoading(false);
-            };
+            }
         };
-
-        fetchAnomaly();
-    }, [session]);
+    
+        if (session && hasMission20000006) {
+            fetchAnomaly();
+        }
+    }, [session, hasMission20000006, supabase]);
+    
 
     if (loading) {
         return (
@@ -225,22 +242,38 @@ export function AiForMarsProject() {
         );
     };
 
-    return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-            <div className="p-4 rounded-md relative w-full">
-                {imageUrl && (
-                    <img src={imageUrl} alt="Anomaly" className="w-64 h-64 contained" />
-                )}
-            </div>
-            {imageUrl && (
-                <ClassificationForm
-                    anomalyId={anomaly?.id.toString() || ""}
-                    anomalyType='automaton-aiForMars'
-                    missionNumber={200000062}
-                    assetMentioned={imageUrl}
-                    structureItemId={3102} // I did get conflicted between 3102 and 3103, going with 3102 until the satellite comes into play
-                />
+    const content = !hasMission20000006 
+    ? <StarterAiForMars anomalyid={anomaly?.id || 69592674} />
+    : (
+        <>
+            {loading && <p>Loading...</p>}
+            {!loading && !anomaly && <p>No anomaly found.</p>}
+            {!loading && anomaly && (
+                <>
+                    <div className="p-4 rounded-md relative w-full">
+                        {imageUrl && <img src={imageUrl} alt="Anomaly" className="w-64 h-64 contained" />}
+                    </div>
+                    {imageUrl && (
+                        <ClassificationForm
+                            anomalyId={anomaly?.id.toString() || ""}
+                            anomalyType='automaton-aiForMars'
+                            missionNumber={200000062}
+                            assetMentioned={imageUrl}
+                            structureItemId={3102} 
+                        />
+                    )}
+                </>
             )}
-        </div>
+        </>
     );
+
+return (
+    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+        {content}
+    </div>
+);
+
+
+ // I did get conflicted between 3102 and 3103, going with 3102 until the satellite comes into play
+
 };
