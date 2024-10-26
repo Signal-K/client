@@ -49,7 +49,7 @@ export default function StarnetLayout({ children }: { children: React.ReactNode 
 
       <div className="flex-1 flex flex-col h-screen">
         <header className="bg-squiggly border-b border-gray-200 p-4">
-          <h1 className="text-xl font-bold text-gray-800 text-center md:text-left">Starnet</h1>
+          <center><h1 className="text-xl font-bold text-gray-100 text-center md:text-left">Starnet</h1></center>
         </header>
 
         <nav className="md:hidden bg-gray-50 border-b border-gray-200">

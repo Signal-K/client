@@ -6,6 +6,7 @@ import ClassificationForm from "../(classifications)/PostForm";
 
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
 import { Button } from "@/components/ui/button";
+import ImageAnnotation from "../(classifications)/Annotation";
 interface Props {
     anomalyid: number | bigint; 
 };
@@ -48,22 +49,22 @@ export function StarterDailyMinorPlanet({
                         <>
                             {line === 1 && (
                                 <p className="text-[#EEEAD1]">
-
+                                    Welcome to the Asteroid Hunters project. In this project, you will be identifying minor planet candidates, like asteroids, around your local star.
                                 </p>
                             )}
                             {line === 2 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    We use the apparent movement of asteroids from image to image to find them, so if you don't see movement, click through the different images to see if the circled object moves
                                 </p>
                             )}
                             {line === 3 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    Find the green circle in the subject clip. Within the green circle is one object (light spot) that moves from frame to frame. We call this light spot inside the green circle a detection.
                                 </p>
                             )}
                             {line === 4 && (
                                 <p className="text-[#EEEAD1]">
-                                    
+                                    That's it! Get ready to explore the skies. Click "Continue" to start classifying. 
                                 </p>
                             )}
 
@@ -84,7 +85,7 @@ export function StarterDailyMinorPlanet({
                                 </button>
                             )}
                             {line < 5 && (
-                                <div className="flex justify-center mt-4 w-full h-64">
+                                <div className="flex justify-center mt-4 w-full h-128">
                                     {line === 1 && <img src="/assets/Docs/Telescopes/DailyMinorPlanet/Step1.png" alt="Step 1" className="mex-w-full max-h-full object-contain" />} 
                                     {line === 2 && <img src="/assets/Docs/Telescopes/DailyMinorPlanet/Step2.png" alt="Step 2" className="mex-w-full max-h-full object-contain" />} 
                                     {line === 3 && <img src="/assets/Docs/Telescopes/DailyMinorPlanet/Step3.png" alt="Step 3" className="mex-w-full max-h-full object-contain" />} 
@@ -94,11 +95,11 @@ export function StarterDailyMinorPlanet({
                         </>
                     )}
 
-                    {part === 1 && (
+                    {part === 2 && (
                         <>
                             {line === 1 && (
                                 <p className="text-[#EEEAD1]">
-                                    Content
+                                    
                                 </p>
                             )}
                         </>

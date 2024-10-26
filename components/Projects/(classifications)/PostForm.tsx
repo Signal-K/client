@@ -133,30 +133,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
 
   const showTextArea = classificationOptions.length === 0;
 
-  const [hasClassified, setHasClassified] = useState<boolean>(false);
-
-//   useEffect(() => {
-//     const checkUserClassification = async () => {
-//       if (!session?.user?.id || !anomalyId) return;
-
-//       const { data, error } = await supabase
-//         .from("classifications")
-//         .select("id")
-//         .eq("author", session.user.id)
-//         .eq("anomaly", anomalyId)
-//         .single();
-
-//       if (data) {
-//         setHasClassified(true);
-//       }
-//       if (error) {
-//         console.error("Error checking classification:", error.message);
-//       }
-//     };
-
-//     checkUserClassification();
-//   }, [session?.user?.id, anomalyId, supabase]);
-
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!session) return;
@@ -348,10 +324,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
 
   // if (postSubmitted && showResearch) {
   //     return (
-  //         <>
   //             {showModal && <IntroduceUserToResearch closeModal={closeModal} />}
-  //         </>
   //     );
+  // if (postSubmitted) {
+  //   return <ClassificationOutput configuration={classificationOutput} />;
+  // };
   // };
 
   const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -380,10 +357,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       }
     }
   };
-
-  // if (postSubmitted) {
-  //   return <ClassificationOutput configuration={classificationOutput} />;
-  // };
 
   const [additionalFields, setAdditionalFields] = useState<{
     [key: string]: string;
@@ -451,7 +424,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         <div className="flex flex-col gap-6">
           {classificationOptions.length > 0 ? (
             <>
-              {/* Multiple Choice Buttons */}
               <div className="flex flex-col gap-2">
                 {classificationOptions.map((optionSet, setIndex) => (
                   <div key={setIndex} className="flex flex-col gap-4">
@@ -475,7 +447,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
                 ))}
               </div>
   
-              {/* Text Area Inputs */}
               <div className="flex flex-col gap-4">
                 <textarea
                   value={content}
@@ -484,7 +455,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
                   placeholder={placeholder}
                 />
   
-                {/* Additional Text Area Fields */}
                 {[...Array(additionalTextAreaConfig.count)].map((_, index) => (
                   <textarea
                     key={index}
@@ -498,7 +468,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
                   />
                 ))}
   
-                {/* Upload Button and Submit */}
                 <div className="flex items-center justify-between">
                   <label className="flex gap-1 items-center cursor-pointer text-[#88C0D0] hover:text-white">
                     <input type="file" className="hidden" onChange={addMedia} />
