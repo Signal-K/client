@@ -12,7 +12,6 @@ import StationsOnPlanet from "@/components/Structures/Community/ViewAllStations"
 export default function TestPage() {
     return (
         <StarnetLayout>
-            <CreateCommunityStation />
             <StationsOnPlanet />
         </StarnetLayout>
     );

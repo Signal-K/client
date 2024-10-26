@@ -10,6 +10,7 @@ import SwitchPlanet from "../(scenes)/travel/SolarSystem";
 import { DataSourcesModal } from "../Data/unlockNewDataSources";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import CommunityMissions from "./CommunityMissions";
 
 type Planet = "Earth" | "Mars" | "Mercury" | "New Planet";
 type Mission = {
@@ -190,6 +191,10 @@ export default function MissionPathway() {
       setSelectedPlayStyle(playStyle);
   };
 
+  const handleBackButtonClick = () => {
+    setSelectedPlayStyle(null);
+  };
+
   useEffect(() => {
       const fetchCompletedMissions = async () => {
           if (!session) return;
@@ -214,9 +219,9 @@ export default function MissionPathway() {
               const planetMissions = missionsData[playStyle as PlayStyle][planet as Planet];
               if (planetMissions) {
                   allMissionsList.push(...planetMissions);
-              }
-          }
-      }
+              };
+          };
+      };
 
       setAllMissions(allMissionsList);
       fetchCompletedMissions();
@@ -241,7 +246,7 @@ export default function MissionPathway() {
                   }
               }
               setFilteredMissions(allMissionsList);
-          }
+          };
       };
 
       fetchMissionsByPlayStyle();
@@ -272,9 +277,16 @@ export default function MissionPathway() {
           >
             Meteorologist
           </button>
+          <CommunityMissions />
         </div>
       ) : (
         <div className="flex flex-col gap-8 max-w-screen-md mx-auto">
+          <button
+            onClick={handleBackButtonClick}
+            className="self-center px-6 py-3 bg-red-600 text-white text-lg rounded-lg hover:bg-red-500 transition-colors mb-4"
+          >
+            Go Back
+          </button>
 {filteredMissions.map((mission) => (
   <div
     key={mission.id}

@@ -25,7 +25,7 @@ const missions: CommunityMission[] = [
   {
     id: 1,
     title: "Build Greenhouses",
-    steps: [
+    steps: [ 
       "Classify some animals on Earth",
       "Fly to a planet of your choice and create a community mission",
       "Share your structure - now everyone can use your greenhouse on that planet",

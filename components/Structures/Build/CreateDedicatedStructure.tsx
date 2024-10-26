@@ -24,7 +24,7 @@ export function CreateStructure({ structureType }: { structureType: string }) {
                 
                 items.forEach(item => {
                     if (item.ItemCategory === 'Structure') {
-                        map[item.name] = item; // Store the entire item
+                        map[item.name] = item; 
                     }
                 });
                 
@@ -41,7 +41,7 @@ export function CreateStructure({ structureType }: { structureType: string }) {
         if (!session || !activePlanet) {
             setLoading(false);
             return;
-        }
+        };
 
         const structureItem = structureItemMap[structureType];
 
@@ -59,7 +59,7 @@ export function CreateStructure({ structureType }: { structureType: string }) {
                     {
                         owner: session.user.id,
                         anomaly: activePlanet.id,
-                        item: structureItem.id, // Use the item id from the object
+                        item: structureItem.id, 
                         quantity: 1,
                         configuration: { Uses: 5 },
                     },
@@ -67,13 +67,13 @@ export function CreateStructure({ structureType }: { structureType: string }) {
 
             if (inventoryError) {
                 throw inventoryError;
-            }
+            };
         } catch (error: any) {
             console.error("Error adding structure to inventory", error.message);
         } finally {
             setLoading(false);
-        }
-    }
+        };
+    };
 
     return (
         <div className="max-w-full max-h-[90vh] w-full sm:w-[90vw] h-full sm:h-[90vh] p-0 bg-gradient-to-br from-[#1a1b26] via-[#292e42] to-[#565f89] rounded-3xl overflow-hidden">
