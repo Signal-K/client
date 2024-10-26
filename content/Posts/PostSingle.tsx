@@ -1,24 +1,37 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, MessageSquare, GitFork } from "lucide-react";
+import { ThumbsUp, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CommentCard } from "../Comments/CommentSingle";
 import { CommentForm } from "../Comments/CommentForm";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
+import { 
+  DailyMinorPlanetOptions,
+  PlanetFourOptions,
+  automatonaiForMarsOptions,
+  cloudClassificationOptionsOne, cloudClassificationOptionsTwo, cloudClassificationOptionsThree,
+  planetClassificationOptions,
+  diskDetectorClassificationOptions,
+  roverImgClassificationOptions,
+  zoodexBurrowingOwlClassificationOptions,
+  zoodexIguanasFromAboveClassificationOptions,
+} from "../Classifications/Options";
+
 interface PostCardSingleProps {
   classificationId: number;
   title: string;
+  anomalyId: string;
   author: string;
   content: string;
   votes: number;
   category: string;
   tags: string[];
+  classificationConfig: any;
   images: string[];
+  classificationType: string;
   onVote: () => void;
 }
 
@@ -30,12 +43,20 @@ export function PostCardSingle({
   votes,
   category,
   tags,
+  anomalyId,
+  classificationConfig,
   images,
+  classificationType,
   onVote,
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
   const [comments, setComments] = useState<any[]>([]);
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
+  const [voteCount, setVoteCount] = useState(votes);
+
+  useEffect(() => {
+    fetchComments();
+  }, [classificationId]);
 
   const fetchComments = async () => {
     setLoadingComments(true);
@@ -54,12 +75,6 @@ export function PostCardSingle({
     }
   };
 
-  useEffect(() => {
-    fetchComments();
-  }, [classificationId]);
-
-  const [voteCount, setVoteCount] = useState(votes);
-
   const handleVoteClick = () => {
     onVote();
     setVoteCount((prevCount) => prevCount + 1);
@@ -67,6 +82,59 @@ export function PostCardSingle({
 
   const handleCommentAdded = () => {
     fetchComments();
+  };
+
+  const getClassificationOptions = (classificationType: string) => {
+    switch (classificationType) {
+      case "planet":
+        return planetClassificationOptions;
+      case "roverImg":
+        return roverImgClassificationOptions;
+      case "cloud":
+        return [
+          ...cloudClassificationOptionsOne,
+          ...cloudClassificationOptionsTwo,
+          ...cloudClassificationOptionsThree,
+        ];
+      case "zoodex-burrowingOwl":
+        return zoodexBurrowingOwlClassificationOptions;
+      case "zoodex-iguanasFromAbove":
+        return zoodexIguanasFromAboveClassificationOptions;
+      case "DiskDetective":
+        return diskDetectorClassificationOptions;
+      case "telescope-minorPlanet":
+        return DailyMinorPlanetOptions;
+      case "automaton-aiForMars":
+        return automatonaiForMarsOptions;
+      default:
+        return [];
+    }
+  };
+
+  const renderClassificationOptions = () => {
+    if (!classificationConfig || !classificationConfig.classificationOptions) {
+      return null;
+    }
+  
+    const selectedOptions = classificationConfig.classificationOptions[""] || {};
+    const options = getClassificationOptions(classificationType);
+
+    return (
+      <div className="mt-4 p-4 border border-secondary rounded">
+        <h3 className="text-lg font-bold">Classification Options</h3>
+        <ul className="list-none">
+          {options.map((option) => {
+            const isSelected = selectedOptions[option.id] || false;
+            const optionColor = isSelected ? "bg-green-200" : "bg-red-200";
+            return (
+              <li key={option.id} className={`p-2 rounded ${optionColor}`}>
+                {option.text}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
   };
 
   return (
@@ -96,41 +164,38 @@ export function PostCardSingle({
             <img key={index} src={image} alt={`Media ${index + 1}`} className="w-full h-auto max-w-xs object-cover" />
           ))}
         </div>
+
+        {classificationType && (
+          <div className="mt-4 p-4 border border-secondary rounded">
+            <h3 className="text-lg font-bold">Classification Type</h3>
+            <p>{classificationType}</p>
+          </div>
+        )}
+
+        {renderClassificationOptions()}
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="ghost" size="sm" onClick={handleVoteClick}>
-          <ThumbsUp className="mr-2 h-4 w-4" />
-          {voteCount}
+      <CardFooter className="flex items-center justify-between">
+        <Button onClick={handleVoteClick} size="sm">
+          <ThumbsUp className="mr-2" /> {voteCount}
         </Button>
-        <Button variant="ghost" size="sm">
-          <MessageSquare className="mr-2 h-4 w-4" />
-          {comments.length} Comments
-        </Button>
-        <Button variant="ghost" size="sm">
-          <GitFork className="mr-2 h-4 w-4" />
-          Fork
+        <Button size="sm">
+          <MessageSquare className="mr-2" /> {comments.length}
         </Button>
       </CardFooter>
-      <div className="mt-8">
+      <CardContent>
         {loadingComments ? (
           <p>Loading comments...</p>
-        ) : comments.length === 0 ? (
-          <p>No comments yet.</p>
-        ) : (
+        ) : comments.length > 0 ? (
           comments.map((comment) => (
-            <CommentCard
-              key={comment.id}
-              author={comment.author}
-              content={comment.content}
-              createdAt={comment.created_at}
-              replyCount={0}
-            />
+            <CommentCard key={comment.id} {...comment} />
           ))
+        ) : (
+          <p>No comments yet.</p>
         )}
-      </div>
-      <div className="mt-8">
+      </CardContent>
+      <CardFooter>
         <CommentForm classificationId={classificationId} onCommentAdded={handleCommentAdded} />
-      </div>
+      </CardFooter>
     </Card>
   );
 };

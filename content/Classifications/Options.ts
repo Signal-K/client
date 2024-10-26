@@ -461,18 +461,3 @@ export const zoodexIguanasFromAboveClassificationOptions: ClassificationOption[]
         text: "Partial iguana",
     },
 ];
-
-export const sunspotsConfigurationTemporary: ClassificationOption[] = [
-    {
-        id: 1,
-        text: "No sunspots",
-    },
-    {
-        id: 2,
-        text: "1 sunspot",
-    },
-    {
-        id: 3,
-        text: "Multiple sunspots",
-    },
-]; // text-only?

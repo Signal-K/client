@@ -18,7 +18,6 @@ import { zoodexSouthCoastFaunaRecovery,
   diskDetectorClassificationOptions, 
   zoodexIguanasFromAboveClassificationOptions, 
   zoodexBurrowingOwlClassificationOptions, 
-  sunspotsConfigurationTemporary 
 } from '@/content/Classifications/Options';
 
 interface KeyStat {

@@ -9,21 +9,14 @@ import { ClassificationOutput } from "./ClassificationResults";
 
 import {
   zoodexSouthCoastFaunaRecovery,
-  cloudClassificationOptions,
-  initialCloudClassificationOptions,
   roverImgClassificationOptions,
   lidarEarthCloudsReadClassificationOptions,
-  lidarEarthCloudsUploadClassificationOptions,
   planetClassificationOptions,
   planktonPortalClassificationOptions,
-  penguinWatchClassificationOptions,
   diskDetectorClassificationOptions,
   zoodexIguanasFromAboveClassificationOptions,
   zoodexBurrowingOwlClassificationOptions,
-  sunspotsConfigurationTemporary,
-  cloudClassificationOptionsThree,
-  cloudClassificationOptionsTwo,
-  cloudClassificationOptionsOne,
+  cloudClassificationOptionsOne, cloudClassificationOptionsTwo, cloudClassificationOptionsThree,
   automatonaiForMarsOptions,
   DailyMinorPlanetOptions,
   PlanetFourOptions,
@@ -124,7 +117,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       case "lidar-earthCloudRead":
         return [lidarEarthCloudsReadClassificationOptions];
       case "sunspot":
-        // return sunspotsConfigurationTemporary;
         return [];
       case "satellite-planetFour":
         return [PlanetFourOptions];

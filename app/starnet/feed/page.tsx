@@ -19,33 +19,33 @@ export default function Starnet() {
       setLoading(false);
       return;
     }
-  
+
     setLoading(true);
     setError(null);
     try {
       const { data, error } = await supabase
         .from("classifications")
-        .select("*, classificationConfiguration") 
+        .select("*, classificationConfiguration, classificationtype")
         .eq("author", session.user.id)
         .order("created_at", { ascending: false });
-  
+
       if (error) throw error;
-  
+
       const processedData = data.map((classification) => {
         const media = classification.media;
         let images: string[] = [];
-  
+
         if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
           images.push(media[1]);
         } else if (media && media.uploadUrl) {
           images.push(media.uploadUrl);
         }
-  
-        const votes = classification.classificationConfiguration?.votes || 0; // Fetch votes
-  
+
+        const votes = classification.classificationConfiguration?.votes || 0;
+
         return { ...classification, images, votes };
       });
-  
+
       setClassifications(processedData);
     } catch (error) {
       console.error("Error fetching classifications:", error);
@@ -62,17 +62,17 @@ export default function Starnet() {
   const handleVote = async (classificationId: number, currentConfig: any) => {
     try {
       const currentVotes = currentConfig?.votes || 0;
-  
+
       const updatedConfig = {
         ...currentConfig,
         votes: currentVotes + 1,
       };
-  
+
       const { error } = await supabase
         .from("classifications")
         .update({ classificationConfiguration: updatedConfig })
         .eq("id", classificationId);
-  
+
       if (error) {
         console.error("Error updating classificationConfiguration:", error);
       } else {
@@ -87,7 +87,7 @@ export default function Starnet() {
     } catch (error) {
       console.error("Error voting:", error);
     }
-  };  
+  };
 
   return (
     <StarnetLayout>
@@ -98,18 +98,21 @@ export default function Starnet() {
           <p>{error}</p>
         ) : (
           classifications.map((classification) => (
-<PostCardSingle
-  key={classification.id}
-  classificationId={classification.id}
-  title={classification.title}
-  author={classification.author}
-  content={classification.content}
-  votes={classification.votes || 0} 
-  category={classification.category}
-  tags={classification.tags || []}
-  images={classification.images || []}
-  onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
-/>
+            <PostCardSingle
+              key={classification.id}
+              classificationId={classification.id}
+              title={classification.title}
+              author={classification.author}
+              content={classification.content}
+              votes={classification.votes || 0}
+              category={classification.category}
+              tags={classification.tags || []}
+              images={classification.images || []}
+              anomalyId={classification.anomaly}
+              classificationConfig={classification.classificationConfiguration}
+              classificationType={classification.classificationtype} // Pass classificationtype to child
+              onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
+            />
           ))
         )}
       </div>
