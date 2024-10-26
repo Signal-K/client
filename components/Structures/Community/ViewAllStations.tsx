@@ -15,7 +15,7 @@ export interface IndividualStationProps {
   projects: Project[];
   missions: Mission[];
   anomalies: AnomalyPiece[];
-  InventoryItemId: number; // InventoryItemId should be consistent with your new logic
+  InventoryItemId: number;
   configuration: any; 
 }
 
@@ -64,7 +64,7 @@ export default function StationsOnPlanet() {
     if (!session?.user?.id || !activePlanet?.id) {
       setLoading(false);
       return;
-    }
+    };
 
     try {
       const { data: inventoryData, error: inventoryError } = await supabase
@@ -102,10 +102,10 @@ export default function StationsOnPlanet() {
           name: project.name,
           identifier: project.identifier,
           isUnlocked: !project.locked,
-          structure: project.structure, // Ensure the structure field is assigned
+          structure: project.structure, 
           level: project.level,
           missionId: project.mission,
-          isCompleted: false, // Default or actual value
+          isCompleted: false, 
         })) || [];
 
         const missions = config?.missions?.map((mission: any) => ({
@@ -127,7 +127,7 @@ export default function StationsOnPlanet() {
           missions, 
           anomalies: [],
           configuration: config,
-          InventoryItemId: structure.id, // Get inventory item ID from the structure
+          InventoryItemId: structure.id,   
         };
       });
 
@@ -156,7 +156,7 @@ export default function StationsOnPlanet() {
       {stationsOnPlanet.map((station, index) => (
         <CommunityScienceStation
           key={index}
-          inventoryItemId={station.InventoryItemId} // Pass the inventory item ID here
+          inventoryItemId={station.InventoryItemId}
           stationName={station.stationName}
           projects={station.projects} 
           missions={station.missions} 

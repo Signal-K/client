@@ -69,6 +69,42 @@ const greenhouseStation: CommunityStationConfig = {
   ],
 };
 
+const weatherBalloonStation: CommunityStationConfig = {
+  stationName: "Weather balloon",
+  inventoryItemId: 31012,
+  projects: [],
+  missions: [
+    {
+      id: "1",
+      name: "Determine planet type to allow for population of relevant anomalies, and then attribute some clouds",
+      type: "Upload",
+      project: "1",
+    },
+  ],
+};
+
+const spaceTelescopeStation: CommunityStationConfig = {
+  stationName: "Space telescope",
+  inventoryItemId: 31013,
+  projects: [],
+  missions: [
+    {
+      id: "1",
+      name: "Map planet type based on lightcurve information", // and then we can attribute/participate other missions/projects",
+      type: "Upload",
+      project: "1",
+    },
+  ],
+};
+
 export async function GET(req: NextRequest) {
-  return NextResponse.json(greenhouseStation);
-}
+  const response = {
+    stations: [
+      greenhouseStation,
+      weatherBalloonStation,
+      spaceTelescopeStation,
+    ],
+  };
+  
+  return NextResponse.json(response);
+};

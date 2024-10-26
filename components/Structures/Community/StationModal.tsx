@@ -51,7 +51,7 @@ type CommunityStationProps = {
 
 export function CommunityScienceStation({
   stationName,
-  anomalies = [],
+  anomalies = [], 
   projects = [],
   missions = [],
   imageSrc,

@@ -13,7 +13,7 @@ const missions = [
   { id: 3, title: "Mineral Extraction", location: "Mountains", reward: "600 credits" },
   { id: 4, title: "Atmospheric Data Collection", location: "Sky City", reward: "400 credits" },
 ];
-
+ 
 const stations = [
   { id: 31011, name: "Greenhouse" },
   { id: 31012, name: "Weather balloon" },

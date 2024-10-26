@@ -41,7 +41,7 @@ export function CreateStructure({ structureType }: { structureType: string }) {
         if (!session || !activePlanet) {
             setLoading(false);
             return;
-        };
+        }; 
 
         const structureItem = structureItemMap[structureType];
 

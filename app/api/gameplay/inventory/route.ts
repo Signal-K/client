@@ -94,6 +94,22 @@ const inventoryItems: InventoryItem[] = [
     ItemCategory: 'CommunityStation',
     locationType: 'Surface',
   },
+  {
+    id: 31012,
+    name: "Weather balloon",
+    description: "Collect and study weather events and entities more closely in your planet's atmosphere",
+    icon_url: "/assets/Items/WeatherBalloon.png",
+    ItemCategory: 'CommunityStation',
+    locationType: 'Atmosphere',
+  },
+  {
+    id: 31013,
+    name: "Space Telescope",
+    description: "Collect & compare discoveries more readily per-location", // to-update
+    icon_url: "/assets/Items/SpaceTelescope.png",
+    ItemCategory: 'CommunityStation',
+    locationType: 'Orbital',
+  },
   
   // Tests
   {
