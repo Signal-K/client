@@ -99,6 +99,25 @@ export const cloudClassificationOptions: ClassificationOption[] = [
     },
 ];
 
+export const jvhOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Vortex",
+    },
+    {
+        id: 2,
+        text: "Turbulent region",
+    },
+    {
+        id: 3,
+        text: "Cloud bands",
+    },
+    {
+        id: 4,
+        text: "None of the above/content too blurry",
+    },
+];
+
 export const DailyMinorPlanetOptions: ClassificationOption[] = [
     {
         id: 1,

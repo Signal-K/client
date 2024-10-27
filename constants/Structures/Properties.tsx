@@ -7,7 +7,7 @@ import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomat
 import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
-import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
@@ -25,6 +25,7 @@ import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/Exoplan
 import { AiForMarsProject } from "@/components/Projects/Auto/AI4Mars";
 import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
 import { PlanetFourProject } from "@/components/Projects/Satellite/PlanetFour";
+import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
 
 interface IndividualStructureProps {
     name?: string;
@@ -288,6 +289,12 @@ export const StructuresConfig: StructureConfig = {
           icon: <CloudCogIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Search your clouds",
           dynamicComponent: <StarterLidar />,
+          sizePercentage: 60,
+        },
+        {
+          icon: <GlassesIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Map gaseous planets",
+          dynamicComponent: <LidarJVHSatellite />,
           sizePercentage: 60,
         },
       ],
