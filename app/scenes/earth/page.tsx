@@ -11,9 +11,6 @@ import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomat
 import InitialiseChapterOneUser from "@/components/(scenes)/chapters/one/InitialiseUser";
 
 const EarthView: React.FC = () => {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-
   return ( 
     <div className="min-h-screen w-full flex flex-col">
     <img
