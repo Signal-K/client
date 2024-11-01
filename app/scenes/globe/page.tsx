@@ -125,47 +125,6 @@ export default function GlobeView() {
 // export default GlobeView;
 
 const GlobeStructures: React.FC = () => {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
-
-    const [surfaceStructures, setSurfaceStructures] = useState<InventoryStructureItem[]>([]);
-
-    const handleStructuresFetch = (
-        surface: InventoryStructureItem[]
-    ) => {
-        setSurfaceStructures(surface);
-    };
-
-    const fetchStructures = useCallback(async () => {
-        if (!session || !activePlanet?.id) {
-            return;
-        };
-
-        try {
-            const { data: inventoryData, error } = await supabase
-                .from("inventory")
-                .select("*")
-                .eq("owner", session.user.id)
-                .eq("anomaly", activePlanet.id || 35 || 69)
-                .not('item', 'lte', 100)
-
-            if (error) {
-                throw error;
-            };
-
-            const surface = inventoryData.filter((item) => item.locationType === 'Surface');
-            handleStructuresFetch(surface);
-        } catch (error: any) {
-            console.error('Error fetching surface structures: ', error.message);
-        };
-    }, [session?.user?.id, activePlanet?.id, supabase]);
-
-    useEffect(() => {
-        fetchStructures();
-    }, [fetchStructures]);
-
     return (
         <EarthViewLayout>
             <div className="w-full">
@@ -184,7 +143,7 @@ const GlobeStructures: React.FC = () => {
                 </div>
             </div>
             <div className="w-full">
-                <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
+                {/* <center><StructuresOnPlanet /></center> */}
             </div>
         </EarthViewLayout>
     );

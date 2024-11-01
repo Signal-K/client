@@ -12,7 +12,7 @@ export interface MineralDeposit {
     mineral: string;
     quantity: number;
   };
-};
+}; 
 
 type SpeedLevel = 1 | 2 | 3;
 

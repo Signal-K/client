@@ -116,134 +116,24 @@ export default function PlanetViewPage() {
 }
 
 function PlanetStructures() {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
-
-    const [orbitalStructures, setOrbitalStructures] = useState<InventoryStructureItem[]>([]);
-    const [atmosphereStructures, setAtmosphereStructures] = useState<InventoryStructureItem[]>([]);
-    const [surfaceStructures, setSurfaceStructures] = useState<InventoryStructureItem[]>([]);
-    const [tooltip, setTooltip] = useState<{ visible: boolean, text: string } | null>(null);
-
-    const handleStructuresFetch = (
-        orbital: InventoryStructureItem[],
-        atmosphere: InventoryStructureItem[],
-        surface: InventoryStructureItem[]
-    ) => {
-        setOrbitalStructures(orbital);
-        setAtmosphereStructures(atmosphere);
-        setSurfaceStructures(surface);
-    };
-
-    const fetchStructures = useCallback(async () => {
-        if (!session?.user?.id || !activePlanet?.id) return;
-
-        try {
-            const { data: inventoryData, error } = await supabase
-                .from('inventory')
-                .select('*')
-                .eq('owner', session.user.id)
-                .eq('anomaly', activePlanet.id)
-                .not('item', 'lte', 100);
-
-            if (error) throw error;
-
-            const orbital = inventoryData.filter((item) => item.locationType === 'Orbital');
-            const atmosphere = inventoryData.filter((item) => item.locationType === 'Atmosphere');
-            const surface = inventoryData.filter((item) => item.locationType === 'Surface');
-
-            handleStructuresFetch(orbital, atmosphere, surface);
-        } catch (error) {
-            console.error('Error fetching structures:', error);
-        }
-    }, [session?.user?.id, activePlanet?.id, supabase]);
-
-    useEffect(() => {
-        fetchStructures();
-    }, [fetchStructures]);
-
     return (
         <PlanetViewLayout>
             <div className="w-full">
-                <div className="flex flex-row space-y-4">
-                    {orbitalStructures.map((structure) => (
-                        <div
-                            key={structure.id}
-                            className="relative flex items-center space-x-4"
-                            onMouseEnter={() => setTooltip({ visible: true, text: structure.itemDetail?.name || 'Unknown' })}
-                            onMouseLeave={() => setTooltip(null)}
-                        >
-                            <img
-                                src={structure.itemDetail?.icon_url}
-                                alt={structure.itemDetail?.name}
-                                className="w-16 h-16 object-cover"
-                            />
-                            {tooltip?.visible && (
-                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-[#2C3A4A] text-white text-sm p-2 rounded-md">
-                                    {tooltip.text}
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
                 <div className="py-3">
                     <div className="py-1">
                         <PlanetarySystem />
                     </div>
-                    <center><OrbitalStructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
+                    <center><OrbitalStructuresOnPlanet /></center>
                 </div>
             </div>
             <div className="w-full">
-                <div className="flex flex-row space-y-4">
-                    {atmosphereStructures.map((structure) => (
-                        <div
-                            key={structure.id}
-                            className="relative flex items-center space-x-4"
-                            onMouseEnter={() => setTooltip({ visible: true, text: structure.itemDetail?.name || 'Unknown' })}
-                            onMouseLeave={() => setTooltip(null)}
-                        >
-                            <img
-                                src={structure.itemDetail?.icon_url}
-                                alt={structure.itemDetail?.name}
-                                className="w-16 h-16 object-cover"
-                            />
-                            {tooltip?.visible && (
-                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-[#2C3A4A] text-white text-sm p-2 rounded-md">
-                                    {tooltip.text}
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
                 <div className="py-3">
-                    <center><AtmosphereStructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
+                    <center><AtmosphereStructuresOnPlanet /></center>
                 </div>
             </div>
             <div className="w-full">
-                <div className="flex flex-row space-y-4">
-                    {surfaceStructures.map((structure) => (
-                        <div
-                            key={structure.id}
-                            className="relative flex items-center space-x-4"
-                            onMouseEnter={() => setTooltip({ visible: true, text: structure.itemDetail?.name || 'Unknown' })}
-                            onMouseLeave={() => setTooltip(null)}
-                        >
-                            <img
-                                src={structure.itemDetail?.icon_url}
-                                alt={structure.itemDetail?.name}
-                                className="w-16 h-16 object-cover"
-                            />
-                            {tooltip?.visible && (
-                                <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-[#2C3A4A] text-white text-sm p-2 rounded-md">
-                                    {tooltip.text}
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
                 <div className="py-3">
-                    <center><StructuresOnPlanet onStructuresFetch={handleStructuresFetch} /></center>
+                    <center><StructuresOnPlanet /></center>
                 </div>
             </div>
             <div className="relative flex-1">
