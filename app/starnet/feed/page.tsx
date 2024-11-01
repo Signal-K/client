@@ -5,6 +5,17 @@ import { PostCardSingle } from "@/content/Posts/PostSingle";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import StarnetLayout from "@/components/Layout/Starnet";
 
+interface Classification {
+  id: number;
+  created_at: string;
+  content: string | null;
+  author: string | null;
+  anomaly: number | null;
+  media: any | null; 
+  classificationtype: string | null;
+  classificationConfiguration: any | null; 
+};
+
 export default function Starnet() {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -19,33 +30,33 @@ export default function Starnet() {
       setLoading(false);
       return;
     }
-
+  
     setLoading(true);
     setError(null);
     try {
       const { data, error } = await supabase
-        .from("classifications")
-        .select("*, classificationConfiguration, classificationtype")
-        .eq("author", session.user.id)
-        .order("created_at", { ascending: false });
-
+        .from('classifications')
+        .select('*')
+        .eq('author', session.user.id)
+        .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
+  
       if (error) throw error;
-
+  
       const processedData = data.map((classification) => {
         const media = classification.media;
         let images: string[] = [];
-
+  
         if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
           images.push(media[1]);
         } else if (media && media.uploadUrl) {
           images.push(media.uploadUrl);
         }
-
+  
         const votes = classification.classificationConfiguration?.votes || 0;
-
+  
         return { ...classification, images, votes };
       });
-
+  
       setClassifications(processedData);
     } catch (error) {
       console.error("Error fetching classifications:", error);
@@ -53,7 +64,7 @@ export default function Starnet() {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   useEffect(() => {
     fetchClassifications();
