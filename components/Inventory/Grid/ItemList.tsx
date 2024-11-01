@@ -11,10 +11,15 @@ interface InventoryListProps {
     inventoryItems: InventoryItem[];
 }
 
-export function InventoryList({ userInventory, inventoryItems }: InventoryListProps) {
+export function InventoryList({
+    userInventory,
+    inventoryItems,
+}: InventoryListProps) {
     return (
         <Card className="p-4 bg-card/90 backdrop-blur-sm border-primary/20">
-            <h2 className="text-lg font-semibold mb-4 text-foreground">Inventory Items</h2>
+            <h2 className="text-lg font-semibold mb-4 text-foreground">
+                Inventory Items
+            </h2>
             <ScrollArea className="h-[300px]">
                 <Droppable droppableId="inventoryList" direction="vertical">
                     {(provided) => (
@@ -25,7 +30,7 @@ export function InventoryList({ userInventory, inventoryItems }: InventoryListPr
                         >
                             {userInventory.map((item, index) => {
                                 const itemDefinition = inventoryItems.find(
-                                    def => def.id === item.item
+                                    (def) => def.id === item.item
                                 );
                                 if (!itemDefinition) return null;
 
@@ -40,7 +45,7 @@ export function InventoryList({ userInventory, inventoryItems }: InventoryListPr
                                                 ref={provided.innerRef}
                                                 {...provided.draggableProps}
                                                 {...provided.dragHandleProps}
-                                                className="border p-2 rounded-md shadow-sm bg-secondary/80"
+                                                className="border p-2 rounded-md shadow-sm bg-transparent hover:bg-secondary/80"
                                             >
                                                 <Image
                                                     src={itemDefinition.icon_url}

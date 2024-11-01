@@ -9,7 +9,7 @@ import { StructuresConfig } from "@/constants/Structures/Properties";
 
 import "../../styles/Anims/StarterStructureAnimations.css";
 
-interface StructuresOnPlanetProps {
+interface StructuresOnPlanetProps { 
     onStructuresFetch: (
         orbitalStructures: InventoryStructureItem[],
         atmosphereStructures: InventoryStructureItem[],

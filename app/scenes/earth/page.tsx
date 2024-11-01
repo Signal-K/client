@@ -9,6 +9,9 @@ import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/syst
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import InitialiseChapterOneUser from "@/components/(scenes)/chapters/one/InitialiseUser";
+import InventoryPage from "@/components/Inventory/Grid/Grid";
+import EnhancedWeatherEventsComponent from "@/components/enhanced-weather-events";
+import TopographicMap from "@/components/topographic-map";
 
 const EarthView: React.FC = () => {
   return ( 
@@ -29,21 +32,25 @@ export default EarthView;
 const EarthStructures: React.FC = () => {
     return (
         <EarthViewLayout>
-            <div className="w-full">
+            <EnhancedWeatherEventsComponent />
+            {/* <div className="w-full">
                 <div className="py-3">
                     <div className="py-1">
                         <PlanetarySystem />
                     </div>
                     <center><OrbitalStructuresOnPlanet /></center>
                 </div>
-            </div>
+            </div> */}
+            {/* <TopographicMap /> */}
             <div className="w-full">
                 <div className="py-2">
                     <center><AtmosphereStructuresOnPlanet /></center>
                 </div>
             </div>
             <div className="w-full">
-                <center><StructuresOnPlanet /></center>  
+                <center>
+                    {/* <InventoryPage /> */}
+                    <StructuresOnPlanet /></center>
             </div>
             <div className="relative flex-1">
                 <AllAutomatonsOnActivePlanet />
