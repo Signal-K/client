@@ -10,25 +10,6 @@ import StructuresOnPlanet, { OrbitalStructuresOnPlanet, AtmosphereStructuresOnPl
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 
 const PlanetStructures: React.FC = () => {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
-
-    const [orbitalStructures, setOrbitalStructures] = useState<InventoryStructureItem[]>([]);
-    const [atmosphereStructures, setAtmosphereStructures] = useState<InventoryStructureItem[]>([]);
-    const [surfaceStructures, setSurfaceStructures] = useState<InventoryStructureItem[]>([]);
-
-    const handleStructuresFetch = (
-        orbital: InventoryStructureItem[],
-        atmosphere: InventoryStructureItem[],
-        surface: InventoryStructureItem[]
-    ) => {
-        setOrbitalStructures(orbital); 
-        setAtmosphereStructures(atmosphere);
-        setSurfaceStructures(surface);
-    };
-
     return (
         <EarthViewLayout>
             <div className="w-full">
@@ -38,20 +19,20 @@ const PlanetStructures: React.FC = () => {
                         <PlanetarySystem />
                     </div>
                     <center>
-                        <OrbitalStructuresOnPlanet onStructuresFetch={handleStructuresFetch} />
+                        <OrbitalStructuresOnPlanet />
                     </center>
                 </div>
             </div>
             <div className="w-full">
                 <div className="py-2">
                     <center>
-                        <AtmosphereStructuresOnPlanet onStructuresFetch={handleStructuresFetch} />
+                        <AtmosphereStructuresOnPlanet />
                     </center>
                 </div>
             </div>
             <div className="w-full">
                 <center>
-                    <StructuresOnPlanet onStructuresFetch={handleStructuresFetch} />
+                    <StructuresOnPlanet />
                 </center>
             </div>
             <div className="relative flex-1">
