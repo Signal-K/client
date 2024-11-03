@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, MessageSquare } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge"; 
 import { CommentCard } from "../Comments/CommentSingle";
 import { CommentForm } from "../Comments/CommentForm";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";

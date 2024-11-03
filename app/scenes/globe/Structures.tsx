@@ -58,9 +58,9 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
   
     return (
       <div className="relative">
-                <div className="mx-3">
+                {/* <div className="mx-3">
                   <CreateCommunityStation />
-                </div>
+                </div> */}
               <div className={`grid grid-cols-3 gap-1 gap-y-3 relative ${userStructuresOnPlanet.length === 1 ? 'justify-center' : ''}`}>
                   {userStructuresOnPlanet.map((structure) => {
                       const itemDetail = itemDetails.get(structure.item);

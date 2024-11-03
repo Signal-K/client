@@ -148,8 +148,8 @@ export default function StructuresOnPlanet() {
                 />
             )}
             <UnownedSurfaceStructures />
-            <CreateCommunityStation />
-            <StationsOnPlanetOpen />
+            {/* <CreateCommunityStation /> */}
+            {/* <StationsOnPlanetOpen /> */}
         </div>
   );
 };

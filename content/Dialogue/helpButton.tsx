@@ -50,7 +50,7 @@ const tutorialSteps = [
         image: "/assets/Docs/Guide/ResearchModal.png",
     },
     {
-        title: "Chapter 2",
+        title: "Chapter 2", 
         content: "Chapter 2 begins when you feel ready to step off Earth and start exploring the Solar System. This unlocks new missions and new data for existing missions. Research and create a launchpad to start this process",
         image: '/assets/Docs/Guide/TravelInfo.png',
     },

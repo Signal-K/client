@@ -1,61 +1,97 @@
-'use client';
+'use client'
 
-import { useState, useEffect, SetStateAction, Key } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, CloudSun, Rocket, Leaf } from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronRight, ChevronLeft, CloudSun, Rocket, Leaf, LucideIcon } from 'lucide-react'
+import { zoodexDataSources, telescopeDataSources, lidarDataSources } from "@/components/Data/ZoodexDataSources";
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useActivePlanet } from '@/context/ActivePlanet';
 
-// Define types for the category and mission objects
-type Mission = {
+interface Mission {
   name: string;
-  icon: string; // Assuming the icons are emoji strings or similar
-};
+  icon: string;
+  description: string;
+  identifier: string;
+  techId: number;
+  tutorialMission: number;
+  activeStructure: number;
+}
 
-type Category = {
+interface Category {
   id: number;
   title: string;
   description: string;
-  icon: React.ComponentType<any>; // Adjust if you have a specific icon type
+  icon: LucideIcon;
   details: Mission[];
+}
+
+// Function to generate categories dynamically from zoodexDataSources
+const combineCategories = (): Category[] => {
+  return [
+    {
+      id: 1,
+      title: "Biological Projects",
+      description: "Explore biological research projects related to animals and biodiversity.",
+      icon: Leaf,
+      details: zoodexDataSources.flatMap(source =>
+        source.items.map(item => ({
+          name: item.name,
+          techId: item.techId,
+          icon: '🐾', 
+          description: item.description,
+          identifier: item.identifier,
+          tutorialMission: item.tutorialMission,
+          activeStructure: item.activeStructure
+        }))
+      ),
+    },
+    {
+      id: 2,
+      title: "Space Investigations",
+      description: "Dive into astronomical research focused on planets, stars, and cosmic phenomena.",
+      icon: Rocket,
+      details: telescopeDataSources.flatMap(source =>
+        source.items.filter(item => item.techId === 1).map(item => ({
+          name: item.name,
+          icon: '🚀', // Example icon
+          description: item.description,
+          techId: item.techId,
+          identifier: item.identifier,
+          tutorialMission: item.tutorialMission,
+          activeStructure: item.activeStructure
+        }))
+      ),
+    },
+    {
+      id: 3,
+      title: "Meteorological Studies",
+      description: "Study weather patterns and cloud formations on various planets.",
+      icon: CloudSun,
+      details: lidarDataSources.flatMap(source =>
+        source.items.filter(item => item.techId === 5).map(item => ({
+          name: item.name,
+          techId: item.techId,
+          icon: '🌦️',
+          description: item.description,
+          identifier: item.identifier,
+          tutorialMission: item.tutorialMission,
+          activeStructure: item.activeStructure
+        }))
+      ),
+    },
+  ];
 };
 
-// Categories data
-const categories: Category[] = [
-  {
-    id: 1,
-    title: 'Meteorology/Geology',
-    description: 'Study weather patterns and geological phenomena',
-    icon: CloudSun,
-    details: [
-      { name: 'Track storms on gas giants', icon: '🌪️' },
-      { name: 'Analyze seismic activity on Mars', icon: '🌋' },
-      { name: 'Study cloud formations on Venus', icon: '☁️' }
-    ]
-  },
-  {
-    id: 2,
-    title: 'Astronomy',
-    description: 'Explore the cosmos and celestial bodies',
-    icon: Rocket,
-    details: [
-      { name: 'Analyze telescope imagery', icon: '🔭' },
-      { name: 'Search for exoplanets', icon: '🪐' },
-      { name: 'Study black hole behavior', icon: '🕳️' }
-    ]
-  },
-  {
-    id: 3,
-    title: 'Biology',
-    description: 'Investigate life forms and ecosystems',
-    icon: Leaf,
-    details: [
-      { name: 'Catalog deep-sea creatures', icon: '🐙' },
-      { name: 'Study microbial life in extreme environments', icon: '🦠' },
-      { name: 'Analyze plant growth in microgravity', icon: '🌱' }
-    ]
-  }
-];
+export default function MissionSelector() {
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-export function MissionSelectorComponent() {
+  const { activePlanet, updatePlanetLocation } = useActivePlanet();
+
+  // if (!activePlanet || activePlanet.id ! == 30) {
+  //   updatePlanetLocation(30);
+  // };
+
   const [step, setStep] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
@@ -64,8 +100,10 @@ export function MissionSelectorComponent() {
   const introSteps = [
     "Welcome, future scientist!",
     "Your journey into the world of scientific discovery begins now.",
-    "Choose your field of study and embark on an exciting mission!"
+    "Choose your field of study and embark on an exciting mission!",
   ];
+
+  const categories = combineCategories(); // Use dynamically generated categories
 
   useEffect(() => {
     if (step < introSteps.length) {
@@ -103,23 +141,91 @@ export function MissionSelectorComponent() {
     setSelectedMission(null);
   };
 
-  const handleConfirmMission = () => {
+  const handleConfirmMission = async () => {
+    if (!session || !selectedMission) return;
+
+    const initialiseUserMissionData = {
+      user: session.user.id,
+      time_of_completion: new Date().toISOString(),
+      mission: 10000001,
+    };
+
+    const chooseFirstClassificationMissionData = {
+      user: session.user.id,
+      time_of_completion: new Date().toISOString(),
+      mission: 10000002,
+    };
+
+    const structureCreationData = {
+      owner: session.user.id,
+      item: selectedMission.activeStructure,
+      anomaly: activePlanet.id || 30,
+      quantity: 1,
+      notes: "Created for user's first classification mission",
+      configuration: {
+        "Uses": 10,
+        "missions unlocked": [selectedMission.identifier],
+      },
+    };
+
+    const researchedStructureData = {
+      user_id: session?.user.id,
+      tech_type: selectedMission.activeStructure,
+      tech_id: selectedMission.techId,
+      created_at: new Date().toISOString(),
+    };
+
+    try {
+      updatePlanetLocation(30);
+      const { error: missionError1 } = await supabase
+          .from('missions')
+          .insert([initialiseUserMissionData]);
+
+      if (missionError1) {
+          throw missionError1;
+      };
+
+      const { error: missionError2 } = await supabase
+          .from('missions')
+          .insert([chooseFirstClassificationMissionData]);
+
+      if (missionError2) {
+          throw missionError2;
+      };
+
+      const { error: inventoryError } = await supabase
+          .from("inventory")
+          .insert([structureCreationData]);
+
+      if (inventoryError) {
+          throw inventoryError;
+      };
+
+      const { error: researchedError } = await supabase
+          .from("researched")
+          .insert([researchedStructureData]);
+
+      setConfirmationMessage("Mission confirmed and added successfully!");
+  } catch (error: any) {
+      setConfirmationMessage(`Error: ${error.message}`);
+  };
+
     if (selectedMission) {
       setConfirmationMessage(`Congratulations! You've embarked on the "${selectedMission.name}" mission. Your scientific adventure begins now!`);
-    }
+    };
   };
 
   const MissionIcon = ({ icon, isSelected }: { icon: string; isSelected: boolean }) => (
     <motion.div
       className="text-4xl"
       animate={{ scale: isSelected ? [1, 1.2, 1] : 1 }}
-      transition={{ duration: 0.5, repeat: isSelected ? Infinity : 0, repeatType: 'reverse' }}
+      transition={{ duration: 0.5, repeat: isSelected ? Infinity : 0, repeatType: "reverse" }}
     >
       {icon}
     </motion.div>
   );
 
-  return ( // bg-[url('/placeholder.svg?height=1080&width=1920')]
+  return ( 
     <div className="min-h-screen bg-cover bg-center flex items-center justify-center p-4">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -138,9 +244,11 @@ export function MissionSelectorComponent() {
                 exit={{ opacity: 0, y: -28 }}
                 transition={{ duration: 0.5 }}
                 className="text-xl font-light text-center h-20 flex items-center justify-center"
-                style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
+                style={{ wordBreak: "break-word", overflowWrap: "break-word" }}
               >
-                <span className="text-green-800">{introSteps[step]}</span>
+                <span className="text-green-800">
+                  {introSteps[step]}
+                </span>
               </motion.div>
             ) : selectedCategory ? (
               selectedMission ? (
@@ -150,14 +258,15 @@ export function MissionSelectorComponent() {
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.5 }}
                   className="space-y-6"
-                  style={{ maxWidth: '100%', wordBreak: 'break-word' }}
+                  style={{ maxWidth: "100%", wordBreak: "break-word" }}
                 >
                   <h2 className="text-2xl font-semibold text-center text-green-800">
                     {selectedMission.name}
                   </h2>
-                  <p className="text-green-700 text-center text-sm">
-                    Part of ({selectedCategory.description})
-                  </p>
+                  <p className="text-green-700 text-center text-sm">{selectedMission.description}</p>
+                  <p className="text-green-700 text-center text-xs">Identifier: {selectedMission.identifier}</p>
+                  <p className="text-green-700 text-center text-xs">Tutorial Mission: {selectedMission.tutorialMission}</p>
+                  <p className="text-green-700 text-center text-xs">Active Structure: {selectedMission.activeStructure}</p>
                   <div className="flex justify-center">
                     <MissionIcon icon={selectedMission.icon} isSelected={true} />
                   </div>
@@ -178,28 +287,27 @@ export function MissionSelectorComponent() {
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.5 }}
                   className="space-y-6"
-                  style={{ maxWidth: '100%', wordBreak: 'break-word' }}
+                  style={{ maxWidth: "100%", wordBreak: "break-word" }}
                 >
                   <h2 className="text-2xl font-semibold text-center text-green-800">
                     {selectedCategory.title}
                   </h2>
-                  <p className="text-green-700 text-center text-sm">
-                    {selectedCategory.description}
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {selectedCategory.details.map((mission) => (
-                      <button
-                        key={mission.name}
+                  <p className="text-green-700 text-center text-sm">{selectedCategory.description}</p>
+                  <ul className="space-y-4">
+                    {selectedCategory.details.map((mission, idx) => (
+                      <li
+                        key={idx}
                         onClick={() => handleMissionSelect(mission)}
-                        className="w-full bg-green-200 hover:bg-green-300 text-green-800 font-medium py-2 px-4 rounded transition-colors duration-300 text-sm"
+                        className="p-4 bg-green-200 hover:bg-green-300 rounded-lg cursor-pointer transition-colors duration-300 flex items-center space-x-4"
                       >
-                        {mission.name}
-                      </button>
+                        <MissionIcon icon={mission.icon} isSelected={false} />
+                        <span className="text-green-800 text-sm">{mission.name}</span>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                   <button
                     onClick={handleBackToCategories}
-                    className="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded transition-colors duration-300 text-sm"
+                    className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded transition-colors duration-300 text-sm"
                   >
                     Back to Categories
                   </button>
@@ -210,45 +318,47 @@ export function MissionSelectorComponent() {
                 key="categories"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -28 }}
+                exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
-                className="text-center"
+                className="space-y-6"
               >
-                <h2 className="text-2xl font-semibold text-green-800">Select a Category</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                  {categories.map((category) => (
-                    <button
+                <h2 className="text-2xl font-semibold text-center text-green-800">Select Your Scientific Path</h2>
+                <ul className="space-y-4">
+                  {categories.map(category => (
+                    <li
                       key={category.id}
                       onClick={() => handleCategoryClick(category)}
-                      className="w-full bg-green-200 hover:bg-green-300 text-green-800 font-medium py-2 px-4 rounded transition-colors duration-300 text-sm"
+                      className="p-4 bg-green-200 hover:bg-green-300 rounded-lg cursor-pointer transition-colors duration-300 flex items-center space-x-4"
                     >
-                      {category.title}
-                    </button>
+                      <category.icon className="text-green-800" />
+                      <span className="text-green-800 text-sm">{category.title}</span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </motion.div>
             )}
           </AnimatePresence>
-          {step >= introSteps.length && !selectedCategory && (
-            <div className="flex justify-between items-center">
-              <button
-                onClick={handleBack}
-                className="flex items-center space-x-2 text-green-800 hover:text-green-600"
-              >
-                <ChevronLeft />
-                <span>Back</span>
-              </button>
-              <button
-                onClick={handleNext}
-                className="flex items-center space-x-2 text-green-800 hover:text-green-600"
-              >
-                <span>Next</span>
-                <ChevronRight />
-              </button>
-            </div>
-          )}
         </div>
+        {step < introSteps.length ? (
+          <div className="flex justify-end p-4">
+            <button
+              onClick={handleNext}
+              className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded transition-colors duration-300"
+            >
+              <ChevronRight />
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-between p-4">
+            <button
+              onClick={handleBack}
+              className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded transition-colors duration-300"
+            >
+              <ChevronLeft />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
-}
+};

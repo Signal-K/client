@@ -161,8 +161,14 @@ export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({
   ];
 
   return (
-    <div className="min-h-screen w-full flex flex-col">
-      <div className="relative flex flex-1">
+    <div className="relative min-h-screen w-full flex flex-col">
+      <img
+        className="absolute inset-0 w-full h-full object-cover"
+        src="/assets/Backdrops/Earth.png"
+        alt="Earth Background"
+      />
+      
+      <div className="relative flex flex-1 z-10">
         <div className="relative flex flex-col flex-1">
           {children.slice(0, 2).map((child, index) => (
             <div
@@ -173,20 +179,20 @@ export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({
               {child}
             </div>
           ))}
-          {/* Third and fourth sections */}
           <div
             className="relative flex flex-1 border-b border-dotted border-gray-5"
             style={sectionStyles[2]}
           >
             <div className="flex flex-1 flex-col">
-              {/* Third section */}
               <div className="flex-1">{children[2]}</div>
-              {/* Fourth section, if present */}
               {children[3] && (
                 <div className="flex-1 border-t border-dotted border-gray-100">
                   {children[3]}
                 </div>
               )}
+            </div>
+            <div className="flex-shrink-0 mx-7">
+              {children[4]}
             </div>
           </div>
         </div>

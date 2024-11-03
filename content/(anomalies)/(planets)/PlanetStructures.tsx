@@ -12,7 +12,7 @@ import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomat
 const PlanetStructures: React.FC = () => {
     return (
         <EarthViewLayout>
-            <div className="w-full">
+            <div className="w-full"> 
                 <div className="flex flex-row space-y-4"></div>
                 <div className="py-3">
                     <div className="py-1">

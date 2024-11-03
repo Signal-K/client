@@ -169,9 +169,9 @@ export default function CommunityMissionList() {
                       <div className="mb-5">
                         <Rocket className="w-4 h-4 mr-2" />
                       </div>
-                      <div className="mt-5">
+                      {/* <div className="mt-5">
                         <CreateCommunityStation />
-                      </div>
+                      </div> */}
                       Mission in progress
                       {/* Accept Mission */}
                     </>

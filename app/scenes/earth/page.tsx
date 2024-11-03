@@ -36,15 +36,6 @@ const EarthStructures: React.FC = () => {
   return (
     <EarthViewLayout>
       <EnhancedWeatherEventsComponent />
-      {/* <div className="w-full">
-                <div className="py-3">
-                    <div className="py-1">
-                        <PlanetarySystem />
-                    </div>
-                    <center><OrbitalStructuresOnPlanet /></center>
-                </div>
-            </div> */}
-      {/* <TopographicMap /> */}
       <div className="w-full">
         <div className="py-2">
           <center>
@@ -54,7 +45,6 @@ const EarthStructures: React.FC = () => {
       </div>
       <div className="w-full">
         <center>
-          {/* <InventoryPage /> */}
           <StructuresOnPlanet />
         </center>
       </div>
@@ -64,3 +54,14 @@ const EarthStructures: React.FC = () => {
     </EarthViewLayout>
   );
 };
+
+      {/* <div className="w-full">
+        {/* <InventoryPage />
+                <div className="py-3">
+                    <div className="py-1">
+                        <PlanetarySystem />
+                    </div>
+                    <center><OrbitalStructuresOnPlanet /></center>
+                </div>
+            </div> */}
+      {/* <TopographicMap /> */}

@@ -12,7 +12,6 @@ import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 import { bgImage, backgroundImages } from "@/constants/backgrounds";
 import { Analytics } from "@vercel/analytics/react"
 import { MissionProvider } from "@/context/MissionContext";
-import TutorialPopup from "../content/Dialogue/helpButton";
 import AppLayout from "@/components/Layout/Layout";
 import Header from "@/components/ui/Header";
 
@@ -103,9 +102,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
                     <div className="sci-fi-signal sci-fi-signal-1"></div>
                     <div className="sci-fi-signal sci-fi-signal-2"></div>
                   </div>
+                  <div className="relative min-h-screen w-full flex flex-col">
                           {children}
+                          </div>
                         </AppLayout>
-                      <TutorialPopup />
                     <Analytics />
                   </InventoryProvider>
                 </UserAnomaliesProvider>
