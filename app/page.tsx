@@ -96,9 +96,6 @@ export default function Home() {
         </center>
       </div>
       <div className="w-full py-2">
-    <center>
-      <VerticalToolbar />
-    </center>
   </div>
     </EarthViewLayout>
     // 60: <SaturnView />,

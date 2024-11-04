@@ -11,6 +11,7 @@ import {
 } from "@/constants/backgrounds";
 import backgroundImage from "@/public/assets/Backdrops/Negotiations.jpg";
 import Header from "@/components/ui/Header";
+import VerticalToolbar from "@/components/Layout/Toolbar";
 
 interface PlanetViewLayoutProps {
   children: React.ReactNode[];
@@ -167,8 +168,10 @@ export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({
         src="/assets/Backdrops/Earth.png"
         alt="Earth Background"
       />
-      
+
       <div className="relative flex flex-1 z-10">
+        <VerticalToolbar />
+
         <div className="relative flex flex-col flex-1">
           {children.slice(0, 2).map((child, index) => (
             <div
