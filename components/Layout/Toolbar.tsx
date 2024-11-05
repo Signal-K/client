@@ -20,7 +20,6 @@ export default function VerticalToolbar() {
 
   return (
     <div className="z-50">
-      {/* Desktop Toolbar */}
       <div className="hidden md:block fixed left-4 top-1/4 transform -translate-y-1/2">
         <nav className="bg-[#1E3A4C] rounded-xl shadow-lg backdrop-blur-md bg-opacity-80 p-2">
           <ul className="flex flex-col space-y-4">
@@ -30,16 +29,20 @@ export default function VerticalToolbar() {
                   <a
                     onMouseEnter={() => setHovered(label)}
                     onMouseLeave={() => setHovered(null)}
-                    className={`flex items-center space-x-2 px-4 py-3 rounded-full transition-all duration-300 
+                    className={`flex items-center px-4 py-3 rounded-full transition-all duration-300 relative 
                       ${pathname === href
                         ? "bg-white text-[#1E3A4C] shadow-md"
                         : "text-white hover:bg-white/10"}`}
                     aria-label={label}
                   >
                     <Icon className="w-6 h-6" />
-                    {(pathname === href || hovered === label) && (
-                      <span className="text-sm font-medium">{label}</span>
-                    )}
+                    <span
+                      className={`absolute left-12 opacity-0 transition-opacity duration-300 ${
+                        hovered === label || pathname === href ? 'opacity-100' : ''
+                      } text-sm font-medium whitespace-nowrap bg-[#1E3A4C] bg-opacity-90 text-white px-2 py-1 rounded-md`}
+                    >
+                      {label}
+                    </span>
                   </a>
                 </Link>
               </li>
@@ -53,7 +56,6 @@ export default function VerticalToolbar() {
         </nav>
       </div>
 
-      {/* Mobile Toolbar with Gear Icon */}
       <div className="block md:hidden fixed left-4 bottom-4">
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -70,7 +72,7 @@ export default function VerticalToolbar() {
                 <li key={label}>
                   <Link legacyBehavior href={href}>
                     <a
-                      onClick={() => setIsMenuOpen(false)}  // Close menu after selection
+                      onClick={() => setIsMenuOpen(false)}
                       className={`flex items-center space-x-2 px-4 py-3 rounded-full transition-all duration-300 
                         ${pathname === href
                           ? "bg-white text-[#1E3A4C] shadow-md"

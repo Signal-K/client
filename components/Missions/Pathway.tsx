@@ -28,7 +28,7 @@ type MissionRoute = {
   researchStructureId?: number;
   inventoryStructureId?: number;
   route?: string;
-  infoText?: string;
+  infoText?: string; 
   component?: React.ReactNode;
   planet: string;
 }; 

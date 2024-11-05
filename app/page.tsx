@@ -37,6 +37,7 @@ import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomat
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import Onboarding from "./scenes/onboarding/page";
 import VerticalToolbar from "@/components/Layout/Toolbar";
+import StructureMissionGuide from "@/components/Layout/Guide";
 
 export default function Home() {
   const session = useSession();
@@ -95,7 +96,7 @@ export default function Home() {
           <AllAutomatonsOnActivePlanet />
         </center>
       </div>
-      <div className="w-full py-2">
+      <div className="w-full py-2"><StructureMissionGuide />
   </div>
     </EarthViewLayout>
     // 60: <SaturnView />,
@@ -119,17 +120,11 @@ export default function Home() {
     );
   };
 
-  if (activePlanet?.id === null) {
-    return (
-      <Onboarding />
-    );
-  };
-
   if (activePlanet?.id == 35) {
     return (
       <GlobeView />
     );
   };
 
-  return planetViews[activePlanet?.id] || <EarthView />;
+  return planetViews[activePlanet?.id] || <Onboarding />;
 };

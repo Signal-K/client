@@ -12,7 +12,7 @@ export interface Mission {
     chapter?: number;
     component?: React.ComponentType<any>;
 }; 
-
+ 
 const missions: Mission[] = [
     // Chapter One Missions
     {

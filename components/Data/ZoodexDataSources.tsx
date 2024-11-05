@@ -93,7 +93,7 @@ export const zoodexDataSources = [
 export const telescopeDataSources = [
     {
         category: 'Planets',
-        items: [
+        items: [ 
             {
                 name: 'Transiting Exoplanet Survey Satellite Search',
                 description: 'Hunt for exoplanet candidates using lightcurve data',
