@@ -17,8 +17,8 @@ interface PlanetViewLayoutProps {
   children: React.ReactNode[];
 };
 
-interface PlanetViewLayoutProps {
-  children: React.ReactNode[];
+interface PlanetActionSceneProps {
+  children: React.ReactNode;
 };
 
 const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
@@ -170,7 +170,7 @@ export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({
       />
 
       <div className="relative flex flex-1 z-10">
-        <VerticalToolbar />
+        {/* <VerticalToolbar /> */}
 
         <div className="relative flex flex-col flex-1">
           {children.slice(0, 2).map((child, index) => (
@@ -200,6 +200,21 @@ export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+export const EarthActionSceneLayout:  React.FC<PlanetActionSceneProps> = ({
+  children,
+}) => {
+  return (
+    <div className="relative min-h-screen h-screen w-full flex flex-col">
+      <img
+        className="absolute inset-0 w-full h-full object-cover"
+        src="/assets/Backdrops/Earth.png"
+        alt="Earth Background"
+      />
+      {children}
     </div>
   );
 };

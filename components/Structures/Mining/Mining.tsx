@@ -10,6 +10,7 @@ import { useActivePlanet } from '@/context/ActivePlanet'
 import { Info } from 'lucide-react'
 
 export type MineralDeposit = {
+  name: string;
   id: string;
   mineral: string; 
   quantity: number;
@@ -27,7 +28,7 @@ type Rover = {
   miningLevel: number
 };
 
-export function MiningComponentComponent() {
+export function MiningComponent() {
   const supabase = useSupabaseClient()
   const session = useSession()
   const { activePlanet } = useActivePlanet()
@@ -63,13 +64,14 @@ export function MiningComponentComponent() {
   
       const formattedDeposits = data?.map((deposit) => ({
         id: deposit.id,
+        name: deposit.mineralconfiguration.mineral || "Unknown",
         mineral: deposit.mineralconfiguration.mineral || "Unknown",
         quantity: deposit.mineralconfiguration.quantity || 0, 
         availableAmount: deposit.mineralconfiguration.availableAmount || 0, 
         level: deposit.mineralconfiguration.level || 1,
         uses: deposit.mineralconfiguration.uses || [],
-        position: deposit.mineralconfiguration.position || { x: 0, y: 0 }, 
-      }))
+        position: deposit.mineralconfiguration.position || { x: 50, y: 50 }, 
+      }));      
   
       setMineralDeposits(formattedDeposits || [])
     }
@@ -136,7 +138,6 @@ export function MiningComponentComponent() {
             setRoverPosition({ x: 50, y: 50 });
             setIsMining(false);
   
-            // Mining logic: Insert or update inventory
             const { mineral, quantity } = selectedDeposit;
   
             try {
@@ -168,7 +169,6 @@ export function MiningComponentComponent() {
             }
   
               if (existingItem) {
-                // Update the existing item quantity
                 const newQuantity = existingItem.quantity + quantity;
                 const { error: updateError } = await supabase
                   .from('inventory')
@@ -181,7 +181,6 @@ export function MiningComponentComponent() {
                   console.log(`Updated inventory item. New quantity: ${newQuantity}`);
                 }
               } else {
-                // Insert a new inventory item
                 const { error: insertError } = await supabase
                   .from('inventory')
                   .insert({
@@ -201,7 +200,7 @@ export function MiningComponentComponent() {
             } catch (error) {
               console.error('Error during mining process:', error);
             }
-          }, 5000); // Simulate mining completion delay
+          }, 5000);
         }
       };
   
@@ -209,32 +208,30 @@ export function MiningComponentComponent() {
     };
   };  
 
-  return (
-    <div className="flex flex-col text-[#F7F5E9] bg-[#1D2833] max-w-4xl mx-auto">
-      <div className="flex-1 p-4 overflow-hidden flex flex-col space-y-4">
-        <div className="flex-shrink-0">
-          <TopographicMap 
-            deposits={mineralDeposits} 
-            roverPosition={roverPosition}
-            selectedDeposit={selectedDeposit}
-          />
-        </div>
-        <div className="bg-[#2C4F64] text-[#F7F5E9] p-4 shadow-lg rounded flex-shrink-0">
+  return ( // w-[95%]
+    <div className="relative  h-full">
+      <div className="absolute inset-0 z-0">
+        <TopographicMap 
+          deposits={mineralDeposits} 
+          roverPosition={roverPosition}
+          selectedDeposit={selectedDeposit}
+        />
+      </div>
+  
+      <div className="absolute inset-0 z-10 p-4 space-y-4 flex flex-col">
+        <div className="bg-[#2C4F64] text-[#F7F5E9] p-4 shadow-lg rounded w-full max-w-md mx-auto">
           <h2 className="text-xl font-bold mb-2 flex items-center">
             Inventory
-            {/* <Tooltip content="Your current resources"> */}
-              <Info className="ml-2 h-4 w-4" />
-            {/* </Tooltip> */}
+            <Info className="ml-2 h-4 w-4" />
           </h2>
           <Inventory />
         </div>
+  
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-[#2C4F64] rounded-lg p-4 shadow-lg overflow-hidden flex flex-col">
+          <div className="bg-[#2C4F64] rounded-lg p-4 shadow-lg">
             <h2 className="text-xl font-bold mb-4 flex items-center">
               Mineral Deposits
-              {/* <Tooltip content="Select a deposit to mine"> */}
-                <Info className="ml-2 h-4 w-4" />
-              {/* </Tooltip> */}
+              <Info className="ml-2 h-4 w-4" />
             </h2>
             <MineralDepositList 
               deposits={mineralDeposits} 
@@ -242,23 +239,23 @@ export function MiningComponentComponent() {
               selectedDeposit={selectedDeposit}
             />
           </div>
-          <div className="bg-[#2C4F64] rounded-lg p-4 shadow-lg overflow-hidden flex flex-col">
+  
+          <div className="bg-[#2C4F64] rounded-lg p-4 shadow-lg">
             <h2 className="text-xl font-bold mb-4 flex items-center">
-              Control Panel
-              {/* <Tooltip content="Select a rover and start mining"> */}
-                <Info className="ml-2 h-4 w-4" />
-              {/* </Tooltip> */}
+              Rovers
+              <Info className="ml-2 h-4 w-4" />
             </h2>
-            <ControlPanel 
+            <ControlPanel
               rovers={rovers}
               selectedRover={selectedRover}
               onRoverSelect={handleRoverSelect}
               onStartMining={handleStartMining}
-              isMining={isMining}
+              isMining={isMining} 
+              selectedDeposit={selectedDeposit}
             />
           </div>
         </div>
       </div>
     </div>
-  );
+  );  
 };

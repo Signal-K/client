@@ -16,7 +16,7 @@ type Props = {
     selectedDeposit: MineralDeposit | null;
 };
 
-export function TopographicMap({ deposits = [], roverPosition, selectedDeposit }: Props) {
+export function TopographicMap({ deposits = [], roverPosition, selectedDeposit }: Props) { 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     useEffect(() => {
@@ -75,7 +75,7 @@ export function TopographicMap({ deposits = [], roverPosition, selectedDeposit }
       }, [deposits]);
 
       return (
-        <div className="relative w-full h-[400px] bg-[#2C3A4A]"> 
+        <div className="relative w-full bg-[#2C3A4A]"> 
           <canvas ref={canvasRef} className="w-full h-full" width={800} height={400} />
           {roverPosition && (
             <motion.div

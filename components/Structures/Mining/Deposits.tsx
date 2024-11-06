@@ -4,15 +4,15 @@ import React from "react";
 import { Diamond } from "lucide-react";
 
 export type MineralDeposit = {
-    id: string;
-    mineral: string; 
-    quantity: number;
-    availableAmount: number;
-    level: number; 
-    uses: string[];
-    position: { x: number; y: number };
-  };
-
+  name: string;
+  id: string;
+  mineral: string; 
+  quantity: number;
+  availableAmount: number;
+  level: number; 
+  uses: string[];
+  position: { x: number; y: number };
+};
   type Props = {
     deposits: MineralDeposit[];
     onSelect: (deposit: MineralDeposit) => void;

@@ -1,11 +1,11 @@
-import { Globe, Rss, HelpCircle, Star } from "lucide-react";
+import { Globe, HelpCircle, Star, Pickaxe } from "lucide-react";
 import { usePathname } from "next/navigation";    
 import Link from "next/link";
 import { useState } from "react";
 
 const menuItems = [
   { icon: Globe, label: "Planet", href: "/" },
-  { icon: Rss, label: "Mining", href: "/scenes/mining" },
+  { icon: Pickaxe, label: "Mining", href: "/scenes/mining" },
   { icon: Star, label: "Travel", href: "/scenes/travel" },
   {
     icon: HelpCircle,
