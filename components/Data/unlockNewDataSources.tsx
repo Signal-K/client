@@ -169,18 +169,22 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
           .eq("item", structureId)
           .single();
 
+        const { data: updateDataO } = await supabase
+          .from("missions")
+          .insert([{ user: session.user.id, time_of_completion: new Date().toISOString(), mission: 200000015 }]);
+
         if (error) throw error;
 
         const newConfiguration: { "missions unlocked"?: string[] } = data?.configuration || {};
 
         if (!newConfiguration["missions unlocked"]) {
           newConfiguration["missions unlocked"] = [];
-        }
+        };
 
         const missionsUnlocked = newConfiguration["missions unlocked"];
         if (!missionsUnlocked.includes(item.identifier)) {
           missionsUnlocked.push(item.identifier);
-        }
+        };
 
         const { error: updateError } = await supabase
           .from("inventory")

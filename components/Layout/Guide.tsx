@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, CloudHail, HelpCircle, LightbulbIcon, LucideTestTubeDiagonal, Pickaxe, Telescope, TestTube2, TreeDeciduous } from "lucide-react";
+import { ChevronLeft, HelpCircleIcon, ChevronRight, CloudHail, HelpCircle, LightbulbIcon, LucideTestTubeDiagonal, Pickaxe, Telescope, TestTube2, TreeDeciduous, XCircle, Shapes, Expand } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import MissionPathway from "../Missions/Pathway";
 import { useActivePlanet } from "@/context/ActivePlanet";
 
 interface Mission {
-    id: number;
+    id: number | number[]; 
     name: string;
     description: string;
     icon: React.ElementType;
@@ -23,7 +23,7 @@ interface DialogueStep {
 
 const astronomyMissions: Mission[] = [
     {
-        id: 3000001 | 20000004 | 3000002,
+        id: [3000001, 20000004, 3000002],
         name: "Complete an astronomy mission using your telescope",
         description: "Click on the 'Telescope' structure to make some classifications",
         icon: Telescope,
@@ -31,17 +31,18 @@ const astronomyMissions: Mission[] = [
         requiredItem: 3103,
     },
     {
-        id: 10000001,
-        name: "This is a test mission",
-        description: 'Not needed',
-        icon: LightbulbIcon,
-        color: 'text-yellow-300',
-    },
+        id: 200000015,
+        name: "Research Disk Detector project",
+        description: "Use your telescope to research the Disk Detector project, where you'll be able to discover early solar systems",
+        icon: Shapes,
+        color: 'text-purple-300',
+        requiredItem: 3103,
+    }
 ];
 
 const biologistMissions: Mission[] = [
     {
-        id: 3000004 | 3000004,
+        id: [3000004 | 3000004],
         name: "Classify some animals using your Biodome",
         description: "Click on the 'Biodome' structure to make some classifications",
         icon: TreeDeciduous,
@@ -52,7 +53,7 @@ const biologistMissions: Mission[] = [
 
 const meteorologyMissions: Mission[] = [
     {
-        id: 3000010 | 20000007,
+        id: [3000010 | 20000007],
         name: "Study some weather events using your atmospheric probe",
         description: "Click on your LIDAR module to make some classifications",
         icon: CloudHail,
@@ -83,6 +84,20 @@ const globalMissions: Mission[] = [
         icon: Telescope,
         color: 'text-purple-300',
     },
+    {
+        id: 1,
+        name: "Continue researching & investigating",
+        description: "Keep researching new projects and building new structures, and wait for new missions and expeditions to be added",
+        icon: LightbulbIcon,
+        color: 'text-yellow-300',
+    },
+    {
+        id: 2,
+        name: "Vote & advise other's discoveries",
+        description: "Click on the 'Discoveries' button to view and vote on other player\'s discoveries",
+        icon: LucideTestTubeDiagonal,
+        color: 'text-blue-300',
+    },
 ];
 
 // Research station - walk the user through this. Then upload data, verify/vet (consensus), then we introduce travel. Add a "close"/swipe-down option so that the tutorial section can be hidden/minimised. Then we go through the guide for the different views....and determine the differentials from Pathway.tsx and this new list
@@ -104,6 +119,9 @@ const StructureMissionGuide = () => {
     const [minimized, setMinimized] = useState(false);
     const [ownedItems, setOwnedItems] = useState<number[]>([]);
     const [scrollableMissions, setScrollableMissions] = useState<Mission[]>([]);
+    const [showWelcome, setShowWelcome] = useState(false);
+    const [showPopup, setShowPopup] = useState(false);
+    const [showModal, setShowModal] = useState(false); // State to manage modal visibility
 
     const categories = [
         { missions: astronomyMissions, name: 'Astronomer' },
@@ -121,7 +139,7 @@ const StructureMissionGuide = () => {
                     .select('item')
                     .eq('owner', session.user.id)
                     .eq('anomaly', activePlanet.id)
-                    .in('item', [3103, 3104, 3105, 3106]);
+                    .in('item', [3103, 3104, 3105]);
 
                 if (inventoryError) throw inventoryError;
 
@@ -147,6 +165,9 @@ const StructureMissionGuide = () => {
                 } else {
                     setCurrentCategory(Math.floor(Math.random() * categories.length)); // Random category if no specific items are owned
                 }
+
+                setShowWelcome(completedMissionIds.length === 0);
+
             } catch (error) {
                 console.error("Error fetching inventory or missions:", error);
             }
@@ -158,9 +179,10 @@ const StructureMissionGuide = () => {
     }, [session, activePlanet, supabase]);
 
     useEffect(() => {
+        // Display category-specific missions followed by global missions
         const missionsToDisplay = [
-            ...categories[currentCategory].missions.slice(0, 2), // Get only the first 2 missions
-            ...globalMissions.slice(0, 2), // Add 2 global missions
+            ...categories[currentCategory].missions, // Category missions
+            ...globalMissions, // Global missions
         ];
         setScrollableMissions(missionsToDisplay);
     }, [currentCategory]);
@@ -168,6 +190,232 @@ const StructureMissionGuide = () => {
     const userHasRequiredItem = (requiredItem?: number) => {
         return requiredItem ? ownedItems.includes(requiredItem) : false;
     };
+
+    const renderMission = (mission: Mission) => {
+        const missionId = Array.isArray(mission.id) ? mission.id[0] : mission.id;
+        const isCompleted = completedMissions.includes(missionId);
+    
+        return (
+            <Card
+                key={missionId}  // Ensure key is a single number
+                className={`cursor-pointer border border-gray-600 mb-2 ${isCompleted ? 'bg-gray-700' : 'bg-gray-800'}`}
+            >
+                <CardContent className="p-4 flex items-center space-x-4">
+                    <mission.icon className={`w-8 h-8 ${mission.color}`} />
+                    <div>
+                        <h3 className={`text-lg font-semibold ${isCompleted ? 'text-green-500 line-through' : 'text-gray-200'}`}>
+                            {mission.name}
+                        </h3>
+                        <p className={`text-sm ${isCompleted ? 'text-green-400' : 'text-gray-400'}`}>
+                            {mission.description}
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    };    
+
+    return (
+        <div className="p-4 max-w-6xl mx-auto font-mono">
+            <div className="hidden md:block"> {/* Hide everything below md */}
+                <Card className="relative bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-2 border-gray-700">
+                    <CardContent className="p-4">
+                        <div className="absolute top-4 right-4 flex items-center space-x-2">
+                            <Button onClick={() => setShowPopup(true)} className="text-gray-300 hover:text-white">
+                                <HelpCircle className="w-6 h-6" />
+                            </Button>
+                            <Button
+                                onClick={() => setMinimized(true)}
+                                className="bg-gray-700 text-gray-300 hover:bg-gray-600 px-2 py-1 text-sm"
+                            >
+                                Minimize
+                            </Button>
+                            {/* Expansion Button */}
+                            <Button
+                                onClick={() => setShowModal(true)}  // Show modal when clicked
+                                className="bg-gray-700 text-gray-300 hover:bg-gray-600 p-2"
+                            >
+                                <Expand className="w-6 h-6" />
+                            </Button>
+                        </div>
+
+                        {showPopup && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+                                <div className="bg-gray-800 p-6 rounded shadow-lg max-w-md w-full">
+                                    <div className="flex justify-between items-center">
+                                        <h2 className="text-lg font-semibold text-white">Welcome!</h2>
+                                        <Button onClick={() => setShowPopup(false)} className="text-gray-400 hover:text-white">
+                                            <XCircle className="w-5 h-5" />
+                                        </Button>
+                                    </div>
+                                    <p className="mt-4 text-gray-300">
+                                        Follow this mission guide for a walkthrough of different projects and actions. Use your research station (Plus icon) to unlock new projects and data sources.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex justify-between mb-4 items-center">
+                            <h2 className="text-xl font-semibold text-gray-300">
+                                Mission Guide for {categories[currentCategory].name} Pathway
+                            </h2>
+                        </div>
+
+                        <div className="flex justify-between mb-4">
+                            <Button
+                                onClick={() => setCurrentCategory((currentCategory - 1 + categories.length) % categories.length)}
+                                className="bg-gray-700 text-gray-300 hover:bg-gray-600 p-2"
+                            >
+                                <ChevronLeft />
+                            </Button>
+                            <Button
+                                onClick={() => setCurrentCategory((currentCategory + 1) % categories.length)}
+                                className="bg-gray-700 text-gray-300 hover:bg-gray-600 p-2"
+                            >
+                                <ChevronRight />
+                            </Button>
+                        </div>
+
+                        <div className="max-h-32 overflow-y-auto">
+                            {scrollableMissions.map(renderMission)}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Modal for expanded view */}
+            <AnimatePresence>
+                {showModal && (  // Only show modal if showModal state is true
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-20"
+                    >
+                        <div className="bg-gray-800 p-8 rounded-lg max-w-4xl w-full">
+                            <div className="flex justify-between items-center">
+                                <h2 className="text-2xl font-semibold text-white">Mission Guide</h2>
+                                <Button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white">
+                                    <XCircle className="w-5 h-5" />
+                                </Button>
+                            </div>
+                            {/* Modal Content */}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
+export default StructureMissionGuide;
+
+export const StructureMissionGuideMobile = () => {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+    const { activePlanet } = useActivePlanet();
+
+    const [completedMissions, setCompletedMissions] = useState<number[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [currentCategory, setCurrentCategory] = useState(0);
+    const [minimized, setMinimized] = useState(false);
+    const [ownedItems, setOwnedItems] = useState<number[]>([]);
+    const [scrollableMissions, setScrollableMissions] = useState<Mission[]>([]);
+    const [showWelcome, setShowWelcome] = useState(false);
+    const [showPopup, setShowPopup] = useState(false);
+    const [showModal, setShowModal] = useState(false); // State to manage modal visibility
+
+    const categories = [
+        { missions: astronomyMissions, name: 'Astronomer' },
+        { missions: biologistMissions, name: 'Biologist' },
+        { missions: meteorologyMissions, name: 'Meteorologist' },
+    ];
+
+    useEffect(() => {
+        async function fetchInventoryAndCompletedMissions() {
+            if (!session?.user?.id || !activePlanet?.id) return;
+
+            try {
+                const { data: inventoryData, error: inventoryError } = await supabase
+                    .from('inventory')
+                    .select('item')
+                    .eq('owner', session.user.id)
+                    .eq('anomaly', activePlanet.id)
+                    .in('item', [3103, 3104, 3105]);
+
+                if (inventoryError) throw inventoryError;
+
+                const ownedItems = inventoryData.map((inv: { item: number }) => inv.item);
+                setOwnedItems(ownedItems);
+
+                const { data: missionData, error: missionError } = await supabase
+                    .from('missions')
+                    .select('mission')
+                    .eq('user', session.user.id);
+
+                if (missionError) throw missionError;
+
+                const completedMissionIds = missionData.map((mission: { mission: number }) => mission.mission);
+                setCompletedMissions(completedMissionIds);
+
+                if (ownedItems.includes(3103)) {
+                    setCurrentCategory(0); // Astronomy
+                } else if (ownedItems.includes(3104)) {
+                    setCurrentCategory(1); // Biology
+                } else if (ownedItems.includes(3105)) {
+                    setCurrentCategory(2); // Meteorology
+                } else {
+                    setCurrentCategory(Math.floor(Math.random() * categories.length)); // Random category if no specific items are owned
+                }
+
+                setShowWelcome(completedMissionIds.length === 0);
+
+            } catch (error) {
+                console.error("Error fetching inventory or missions:", error);
+            }
+
+            setLoading(false);
+        }
+
+        fetchInventoryAndCompletedMissions();
+    }, [session, activePlanet, supabase]);
+
+    useEffect(() => {
+        // Display category-specific missions followed by global missions
+        const missionsToDisplay = [
+            ...categories[currentCategory].missions, // Category missions
+            ...globalMissions, // Global missions
+        ];
+        setScrollableMissions(missionsToDisplay);
+    }, [currentCategory]);
+
+    const userHasRequiredItem = (requiredItem?: number) => {
+        return requiredItem ? ownedItems.includes(requiredItem) : false;
+    };
+
+    const renderMission = (mission: Mission) => {
+        const missionId = Array.isArray(mission.id) ? mission.id[0] : mission.id;
+        const isCompleted = completedMissions.includes(missionId);
+    
+        return (
+            <Card
+                key={missionId}  // Ensure key is a single number
+                className={`cursor-pointer border border-gray-600 mb-2 ${isCompleted ? 'bg-gray-700' : 'bg-gray-800'}`}
+            >
+                <CardContent className="p-4 flex items-center space-x-4">
+                    <mission.icon className={`w-8 h-8 ${mission.color}`} />
+                    <div>
+                        <h3 className={`text-lg font-semibold ${isCompleted ? 'text-green-500 line-through' : 'text-gray-200'}`}>
+                            {mission.name}
+                        </h3>
+                        <p className={`text-sm ${isCompleted ? 'text-green-400' : 'text-gray-400'}`}>
+                            {mission.description}
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    };    
 
     return (
         <div className="p-4 max-w-6xl mx-auto font-mono">
@@ -177,76 +425,94 @@ const StructureMissionGuide = () => {
                     <span>Help</span>
                 </Button>
             ) : (
-                <Card className="overflow-hidden relative bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-2 border-gray-700">
+                <Card className="relative bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-2 border-gray-700">
                     <CardContent className="p-4">
-                        <div className="flex justify-between mb-4 items-center">
-                            <h2 className="text-xl font-semibold text-gray-300">
-                                Mission Guide for {categories[currentCategory].name} Pathway
-                            </h2>
+                        <div className="absolute top-4 right-4 flex items-center space-x-2">
+                            <Button onClick={() => setShowPopup(true)} className="text-gray-300 hover:text-white">
+                                <HelpCircle className="w-6 h-6" />
+                            </Button>
                             <Button
                                 onClick={() => setMinimized(true)}
                                 className="bg-gray-700 text-gray-300 hover:bg-gray-600 px-2 py-1 text-sm"
                             >
                                 Minimize
                             </Button>
+                            {/* Expansion Button */}
+                            <Button
+                                onClick={() => setShowModal(true)}  // Show modal when clicked
+                                className="bg-gray-700 text-gray-300 hover:bg-gray-600 p-2"
+                            >
+                                <Expand className="w-6 h-6" />
+                            </Button>
                         </div>
-
+    
+                        {showPopup && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+                                <div className="bg-gray-800 p-6 rounded shadow-lg max-w-md w-full">
+                                    <div className="flex justify-between items-center">
+                                        <h2 className="text-lg font-semibold text-white">Welcome!</h2>
+                                        <Button onClick={() => setShowPopup(false)} className="text-gray-400 hover:text-white">
+                                            <XCircle className="w-5 h-5" />
+                                        </Button>
+                                    </div>
+                                    <p className="mt-4 text-gray-300">
+                                        Follow this mission guide for a walkthrough of different projects and actions. Use your research station (Plus icon) to unlock new projects and data sources.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+    
+                        <div className="flex justify-between mb-4 items-center">
+                            <h2 className="text-xl font-semibold text-gray-300">
+                                Mission Guide for {categories[currentCategory].name} Pathway
+                            </h2>
+                        </div>
+    
                         <div className="flex justify-between mb-4">
                             <Button
                                 onClick={() => setCurrentCategory((currentCategory - 1 + categories.length) % categories.length)}
                                 className="bg-gray-700 text-gray-300 hover:bg-gray-600 p-2"
-                                disabled={categories.length <= 1}
                             >
                                 <ChevronLeft />
                             </Button>
                             <Button
                                 onClick={() => setCurrentCategory((currentCategory + 1) % categories.length)}
                                 className="bg-gray-700 text-gray-300 hover:bg-gray-600 p-2"
-                                disabled={categories.length <= 1}
                             >
                                 <ChevronRight />
                             </Button>
                         </div>
-
-                        <div className="mb-4 p-4 border border-gray-600 rounded bg-gray-800 text-gray-200">
-                            <p className="mt-1">
-                                Welcome! Build structures like the Telescope to complete missions and expand your research.
-                                Click the 'Guide' button to view your missions.
-                            </p>
-                        </div>
-
-                        {/* Scrollable Missions Section */}
-                        <div className="overflow-y-auto max-h-40 relative">
-                            <div className="grid grid-cols-1 gap-4">
-                                {scrollableMissions.map((mission) => (
-                                    <div key={mission.id} className="flex">
-                                        <Card
-                                            className={`cursor-pointer hover:shadow-lg transition-all duration-300 ${
-                                                completedMissions.includes(mission.id) ? 'bg-gray-700' : 'bg-gray-800'
-                                            } border border-gray-600 relative overflow-hidden w-full`}
-                                        >
-                                            <CardContent className="p-2 flex items-center">
-                                                <mission.icon className={`w-6 h-6 mr-2 ${mission.color}`} />
-                                                <div>
-                                                    <h3 className={`font-semibold text-gray-300 ${completedMissions.includes(mission.id) ? 'line-through text-green-400' : ''}`}>
-                                                        {mission.name}
-                                                    </h3>
-                                                    <p className="text-gray-400">{mission.description}</p>
-                                                    {userHasRequiredItem(mission.requiredItem) && (
-                                                        <span className="text-green-300 text-sm">Ready to complete!</span>
-                                                    )}
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </div>
-                                ))}
-                            </div>
+    
+                        <div className="max-h-45 overflow-y-auto">
+                            {scrollableMissions.map(renderMission)}
                         </div>
                     </CardContent>
                 </Card>
             )}
+    
+            {/* Modal for expanded view */}
+            <AnimatePresence>
+                {showModal && (  // Only show modal if showModal state is true
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-20"
+                    >
+                        <div className="bg-gray-800 p-8 rounded-lg max-w-4xl w-full">
+                            <div className="flex justify-between items-center">
+                                <h2 className="text-2xl font-semibold text-white">Mission Guide</h2>
+                                <Button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white">
+                                    <XCircle className="w-6 h-6" />
+                                </Button>
+                            </div>
+                            <div className="mt-4 space-y-4">
+                                {scrollableMissions.map(renderMission)} {/* Display expanded list of missions */}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
-
-export default StructureMissionGuide;
