@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, HelpCircleIcon, ChevronRight, CloudHail, HelpCircle, LightbulbIcon, LucideTestTubeDiagonal, Pickaxe, Telescope, TestTube2, TreeDeciduous, XCircle, Shapes, Expand } from "lucide-react";
+import { ChevronLeft, HelpCircleIcon, ChevronRight, CloudHail, HelpCircle, LightbulbIcon, LucideTestTubeDiagonal, Pickaxe, Telescope, TestTube2, TreeDeciduous, XCircle, Shapes, Expand, CameraIcon } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import MissionPathway from "../Missions/Pathway";
 import { useActivePlanet } from "@/context/ActivePlanet";
@@ -14,6 +14,8 @@ interface Mission {
     icon: React.ElementType;
     color: string;
     requiredItem?: number;
+    tableEntry?: string;
+    tableColumn?: string;
 };
 
 interface DialogueStep {
@@ -64,7 +66,7 @@ const meteorologyMissions: Mission[] = [
 
 const globalMissions: Mission[] = [
     {
-        id: 200000015,
+        id: 2000000015,
         name: "Research a new module",
         description: 'Click on your structure and then the "Research" tab to unlock new projects and data sources to contribute to!',
         icon: TestTube2,
@@ -94,9 +96,20 @@ const globalMissions: Mission[] = [
     {
         id: 2,
         name: "Vote & advise other's discoveries",
-        description: "Click on the 'Discoveries' button to view and vote on other player\'s discoveries",
+        description: "Click on the 'Discoveries' button to view and comment on other player\'s discoveries to determine their accuracy and attributes",
         icon: LucideTestTubeDiagonal,
         color: 'text-blue-300',
+        tableEntry: 'comments',
+        tableColumn: 'author',
+    },
+    {
+        id: 3,
+        name: "Add your own data for review",
+        description: "Click on the plus icon in the toolbar to add your own files that might be able to be part of a project, adding your own content and creations to our network",
+        icon: CameraIcon,
+        color: 'text-green-300',
+        tableEntry: 'uploads',
+        tableColumn: 'author',
     },
 ];
 
@@ -132,30 +145,55 @@ const StructureMissionGuide = () => {
     useEffect(() => {
         async function fetchInventoryAndCompletedMissions() {
             if (!session?.user?.id || !activePlanet?.id) return;
-
+    
             try {
+                // Fetch owned items
                 const { data: inventoryData, error: inventoryError } = await supabase
                     .from('inventory')
                     .select('item')
                     .eq('owner', session.user.id)
                     .eq('anomaly', activePlanet.id)
                     .in('item', [3103, 3104, 3105]);
-
+    
                 if (inventoryError) throw inventoryError;
-
+    
                 const ownedItems = inventoryData.map((inv: { item: number }) => inv.item);
                 setOwnedItems(ownedItems);
-
+    
+                // Fetch completed missions from the `missions` table
                 const { data: missionData, error: missionError } = await supabase
                     .from('missions')
                     .select('mission')
                     .eq('user', session.user.id);
-
+    
                 if (missionError) throw missionError;
-
+    
                 const completedMissionIds = missionData.map((mission: { mission: number }) => mission.mission);
+    
+                // Loop through missions and check for additional table-based entries
+                for (const mission of [...astronomyMissions, ...biologistMissions, ...meteorologyMissions, ...globalMissions]) {
+                    if (mission.tableEntry && mission.tableColumn && session?.user?.id) {
+                        const { data: tableData, error: tableError } = await supabase
+                            .from(mission.tableEntry)
+                            .select(mission.tableColumn)
+                            .eq(mission.tableColumn, session.user.id);
+    
+                        if (tableError) {
+                            console.error('Error fetching data:', tableError);
+                        }
+    
+                        // If data is found, mark the mission as completed
+                        if (tableData && tableData.length > 0) {
+                            // Add the mission ID to the completedMissions array
+                            const missionId = Array.isArray(mission.id) ? mission.id[0] : mission.id;
+                            completedMissionIds.push(missionId);
+                        }
+                    }
+                }
+    
                 setCompletedMissions(completedMissionIds);
-
+    
+                // Set current category based on owned items
                 if (ownedItems.includes(3103)) {
                     setCurrentCategory(0); // Astronomy
                 } else if (ownedItems.includes(3104)) {
@@ -165,18 +203,17 @@ const StructureMissionGuide = () => {
                 } else {
                     setCurrentCategory(Math.floor(Math.random() * categories.length)); // Random category if no specific items are owned
                 }
-
+    
                 setShowWelcome(completedMissionIds.length === 0);
-
             } catch (error) {
                 console.error("Error fetching inventory or missions:", error);
             }
-
+    
             setLoading(false);
         }
-
+    
         fetchInventoryAndCompletedMissions();
-    }, [session, activePlanet, supabase]);
+    }, [session, activePlanet, supabase]);     
 
     useEffect(() => {
         // Display category-specific missions followed by global missions
