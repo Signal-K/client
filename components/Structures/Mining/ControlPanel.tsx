@@ -105,13 +105,18 @@ export function ControlPanel({
 }
 
 function AddMineralDeposits() {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
-
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const { activePlanet } = useActivePlanet();
   const [isLoading, setIsLoading] = useState(false);
-  const mineral = 19;
+
+  // Array of minerals to randomly select from
+  const minerals = [13, 15, 19];
+
+  // Function to select a random mineral from the array
+  const getRandomMineral = () => {
+    return minerals[Math.floor(Math.random() * minerals.length)];
+  };
 
   const handleAddDeposits = async () => {
     setIsLoading(true);
@@ -121,7 +126,7 @@ function AddMineralDeposits() {
         anomaly: activePlanet.id ? Number(activePlanet.id) : null,
         owner: session?.user.id,
         mineralconfiguration: {
-          mineral: mineral,
+          mineral: getRandomMineral(), // Use random mineral
           quantity: Math.floor(Math.random() * 100) + 1,
         },
       }));
@@ -133,14 +138,14 @@ function AddMineralDeposits() {
       if (error) {
         console.error("Error inserting mineral deposits: ", error.message);
         throw error;
-      };
+      }
 
       console.log("Mineral deposits added:", data);
     } catch (error) {
       console.error("Error adding mineral deposits:", error);
     } finally {
       setIsLoading(false);
-    };
+    }
   };
 
   return (

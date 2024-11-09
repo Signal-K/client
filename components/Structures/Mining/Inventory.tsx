@@ -10,10 +10,10 @@ type InventoryItem = {
   name: string;
   amount: number;
 };
- 
+
 export function Inventory() {
   const supabase = useSupabaseClient();
-    const session = useSession();
+  const session = useSession();
   
   const { activePlanet } = useActivePlanet();
 
@@ -24,28 +24,32 @@ export function Inventory() {
   // Mapping item IDs to their names
   const itemNames: Record<number, string> = {
     11: 'Iron',
-    // 13: 'Copper',
-    // 15: 'Gold',
-    // 16: 'Titanium',
-    // 17: 'Platinum',
-    // 18: 'Diamond',
     19: 'Fuel',
     20: 'Copper',
   };
 
   useEffect(() => {
     const fetchInventory = async () => {
-      const { data, error } = await supabase
-        .from('inventory')
-        .select('id, item, quantity')
-        .eq('owner', session?.user.id)
-        .in('item', Object.keys(itemNames).map(Number)); // Fetch all items defined
+      // Check if session and user ID are available
+      if (!session?.user?.id) {
+        console.error('Session or user ID is missing');
+        setLoading(false);
+        return;
+      }
 
-      if (error) {
-        console.error('Error fetching inventory:', error);
-      } else {
+      try {
+        const { data, error } = await supabase
+          .from('inventory')
+          .select('id, item, quantity')
+          .eq('owner', session.user.id)
+          .in('item', Object.keys(itemNames).map(Number)); // Fetch all items defined
+
+        if (error) {
+          throw error;
+        }
+
         const formattedInventory = Object.entries(itemNames).map(([key, name]) => {
-          const foundItem = data.find((item) => item.item === Number(key));
+          const foundItem = data?.find((item) => item.item === Number(key));
           return {
             id: foundItem ? foundItem.id.toString() : key, 
             name: name,
@@ -54,8 +58,11 @@ export function Inventory() {
         });
 
         setInventory(formattedInventory);
+      } catch (error) {
+        console.error('Error fetching inventory:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchInventory();

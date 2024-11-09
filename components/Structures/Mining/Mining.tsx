@@ -50,36 +50,41 @@ export function MiningComponent() {
 
   useEffect(() => {
     const fetchDeposits = async () => {
+      if (!session?.user?.id || !activePlanet?.id) {
+        console.error('User or activePlanet is undefined.');
+        return;
+      }
+  
       const { data, error } = await supabase
         .from('mineralDeposits')
         .select('id, mineralconfiguration')
-        .eq('owner', session?.user.id)
-        .eq('anomaly', activePlanet?.id)
+        .eq('owner', session.user.id)
+        .eq('anomaly', activePlanet.id)
         .limit(3);
   
       if (error) {
-        console.error('Error fetching mineral deposits:', error)
-        return
-      };
+        console.error('Error fetching mineral deposits:', error);
+        return;
+      }
   
       const formattedDeposits = data?.map((deposit) => ({
         id: deposit.id,
         name: deposit.mineralconfiguration.mineral || "Unknown",
         mineral: deposit.mineralconfiguration.mineral || "Unknown",
-        quantity: deposit.mineralconfiguration.quantity || 0, 
-        availableAmount: deposit.mineralconfiguration.availableAmount || 0, 
+        quantity: deposit.mineralconfiguration.quantity || 0,
+        availableAmount: deposit.mineralconfiguration.availableAmount || 0,
         level: deposit.mineralconfiguration.level || 1,
         uses: deposit.mineralconfiguration.uses || [],
-        position: deposit.mineralconfiguration.position || { x: 50, y: 50 }, 
-      }));      
+        position: deposit.mineralconfiguration.position || { x: 50, y: 50 },
+      }));
   
-      setMineralDeposits(formattedDeposits || [])
-    }
+      setMineralDeposits(formattedDeposits || []);
+    };
   
-    if (session) {
-      fetchDeposits()
+    if (session && activePlanet) {
+      fetchDeposits();
     }
-  }, [session, activePlanet?.id, supabase])
+  }, [session, activePlanet, supabase]);
   
   const handleDepositSelect = (deposit: MineralDeposit) => {
     setSelectedDeposit(deposit)

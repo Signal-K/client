@@ -351,7 +351,7 @@ export const StructureMissionGuideMobile = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
-
+ 
     const [completedMissions, setCompletedMissions] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentCategory, setCurrentCategory] = useState(0);

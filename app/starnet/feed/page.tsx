@@ -29,7 +29,7 @@ export default function Starnet() {
       setError("User session not found.");
       setLoading(false);
       return;
-    }
+    };
   
     setLoading(true);
     setError(null);

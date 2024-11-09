@@ -17,6 +17,22 @@ import EnhancedWeatherEventsComponent from "@/components/enhanced-weather-events
 import TopographicMap from "@/components/topographic-map";
 
 const EarthView: React.FC = () => {
+  const { activePlanet, updatePlanetLocation } = useActivePlanet();
+  const handleUpdateToEarth = () => {
+    updatePlanetLocation(69);
+  };
+
+  if (activePlanet?.id !== 50) {
+    return (
+        <div className="min-h-screen w-full flex flex-col">
+            <div className="bg-black/90">
+                <p>Current planet is not "old" Earth.</p>
+                <button onClick={handleUpdateToEarth}>Switch to 'old' Earth</button>
+            </div>
+        </div>
+    );
+};
+
   return (
     <div className="min-h-screen w-full flex flex-col">
       <img
