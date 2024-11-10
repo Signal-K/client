@@ -1,8 +1,19 @@
 'use client';
 
-import { CloudDrizzleIcon, SunDimIcon, TelescopeIcon, TestTube } from 'lucide-react';
+import { CameraIcon, CloudDrizzleIcon, DogIcon, MicroscopeIcon, SunDimIcon, TelescopeIcon, TestTube } from 'lucide-react';
 import { BurrowingOwlIcon } from '../../content/Icons/BurrowingOwl';
 import { FishIcon } from '../../content/Icons/FishIcon';
+import { StarterTelescope } from '../Projects/Telescopes/Transiting';
+import { DailyMinorPlanet } from '../Projects/Telescopes/DailyMinorPlanet';
+import { PlanetFourProject } from '../Projects/Satellite/PlanetFour';
+import { TelescopeSunspotDetector } from '../Projects/Telescopes/Sunspots';
+import { TelescopeDiskDetector } from '../Projects/Telescopes/DiskDetector';
+import { StarterZoodexGallery } from '../Projects/Zoodex/ClassifyOthersAnimals';
+import CameraComponent from '../Projects/Zoodex/Upload/Camera';
+import { DataSourcesModal } from './unlockNewDataSources';
+import { BurrowingOwl } from '../Projects/Zoodex/burrowingOwls';
+import { PenguinWatch } from '../Projects/Zoodex/penguinWatch';
+import { ZoodexIguanas } from '../Projects/Zoodex/iguanasFromAbove';
 
 export const zoodexDataSources = [ 
     {
@@ -100,7 +111,6 @@ export const telescopeDataSources = [
                 identifier: 'telescope-tess',
                 researchId: 'planet-hunters-tess',
                 researcher: 'zooniverse',
-                // icon: TelescopeIcon,
                 unlocked: false,
                 compatiblePlanetTypes: ['Lush', 'Frozen', 'Hellhole', 'Arid'],
                 bestPlanetType: ['Lush', 'Frozen', 'Hellhole', 'Arid'],
@@ -108,9 +118,9 @@ export const telescopeDataSources = [
                 activeStructure: 3103,
                 researched: 'telescope-tess',
                 techId: 1,
-            },
-            // Other (non-transiting) planet candidates here e.g. microlensing, radial velocity
-        ],
+                dynamicComponent: <StarterTelescope />
+            }
+        ]
     },
     {
         category: 'Solar System Objects',
@@ -128,6 +138,7 @@ export const telescopeDataSources = [
                 activeStructure: 3103,
                 researched: 'telescope-minorPlanets',
                 techId: 1,
+                dynamicComponent: <DailyMinorPlanet />
             },
             {
                 name: 'Planet Four',
@@ -142,8 +153,9 @@ export const telescopeDataSources = [
                 activeStructure: 3103,
                 researched: 'satellite-planetFour',
                 techId: 1,
-            },
-        ],
+                dynamicComponent: <PlanetFourProject />
+            }
+        ]
     },
     {
         category: 'Solar observations',
@@ -154,7 +166,6 @@ export const telescopeDataSources = [
                 identifier: 'telescope-sunspots',
                 researchId: 'sunspot-detectives',
                 researcher: 'zooniverse/teolixx',
-                // icon: SunDimIcon,
                 unlocked: false,
                 compatiblePlanetTypes: ['Lush', 'Frozen', 'Hellhole', 'Arid'],
                 bestPlanetType: ['Lush', 'Frozen', 'Hellhole', 'Arid'],
@@ -162,8 +173,9 @@ export const telescopeDataSources = [
                 activeStructure: 3103,
                 researched: 'telescope-sunspots',
                 techId: 5,
-            },
-        ], 
+                dynamicComponent: <TelescopeSunspotDetector />
+            }
+        ] 
     },
     {
         category: 'exo-Solar System Observations',
@@ -181,10 +193,12 @@ export const telescopeDataSources = [
                 activeStructure: 3103,
                 researched: 'telescope-diskDetective',
                 techId: 5,
-            },
-        ],
-    },
+                dynamicComponent: <TelescopeDiskDetector />
+            }
+        ]
+    }
 ];
+
 
 export const lidarDataSources = [
     {

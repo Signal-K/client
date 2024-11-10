@@ -29,7 +29,6 @@ import {
   VenusView
 } from './scenes';
 import GlobeView from "./scenes/globe/page";
-import InitialiseChapterOneUser from "@/components/(scenes)/chapters/one/InitialiseUser";
 import { EarthScene } from "./scenes/earth/scene";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 import EnhancedWeatherEvents from "@/components/enhanced-weather-events";

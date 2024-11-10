@@ -121,7 +121,7 @@ export const StructuresConfig: StructureConfig = {
         //   showInNoModal: false,
         // },
       ],
-    },
+    }, 
     3103: {
       name: "Transiting Telescope",
       labels: [

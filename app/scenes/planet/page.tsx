@@ -6,7 +6,6 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import PlanetViewLayout from "@/components/(scenes)/planetScene/layout";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 import { InventoryStructureItem } from "@/types/Items";
-import ChapterOneIntroduction from "@/components/(scenes)/chapters/one/ChapterOneIntro";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
 // import { BottomMenuBar } from "@/app/components/sections/bottomMenuBar";
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
@@ -81,7 +80,6 @@ export default function PlanetViewPage() {
                 <div></div>
                 <div></div>
                 <div></div>
-                <div><ChapterOneIntroduction /></div>
             </PlanetViewLayout>
         );
     }
@@ -102,7 +100,6 @@ export default function PlanetViewPage() {
             <PlanetStructures />
             {isGuidePopupVisible && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <ChapterOneIntroduction />
                     <button
                         onClick={() => setIsGuidePopupVisible(false)}
                         className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 focus:outline-none"

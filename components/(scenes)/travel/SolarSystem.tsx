@@ -312,29 +312,33 @@ export default function SwitchPlanet() {
 
     if (planetType) {
       const filterCompatibleMissions = () => {
-        const zoodexMissions = zoodexDataSources.flatMap((category) =>
-          category.items.filter((item) => item.compatiblePlanetTypes.includes(planetType))
-        );
-        const physicsLabMissions = physicsLabDataSources.flatMap((category) =>
-          category.items.filter((item) => item.compatiblePlanetTypes.includes(planetType))
-        );
-        const telescopeMissions = telescopeDataSources.flatMap((category) =>
-          category.items.filter((item) => item.compatiblePlanetTypes.includes(planetType))
-        );
-        const roverMissions = roverDataSources.flatMap((category) =>
-          category.items.filter((item) => item.compatiblePlanetTypes.includes(planetType))
-        );
-        const lidarMissions = lidarDataSources.flatMap((category) =>
-          category.items.filter((item) => item.compatiblePlanetTypes.includes(planetType))
-        );
-        setCompatibleMissions([
-          ...zoodexMissions,
-          ...physicsLabMissions,
-          ...telescopeMissions,
-          ...roverMissions,
-          ...lidarMissions,
-        ]);
+        const planetType = currentPlanet?.planetType;
+        if (planetType) {
+          // const zoodexMissions = zoodexDataSources.flatMap((category) =>
+          //   category.items.filter((item) => item.compatiblePlanetTypes.includes(planetType))
+          // );
+          const physicsLabMissions = physicsLabDataSources.flatMap((category) =>
+            category.items.filter((item) => item.compatiblePlanetTypes.includes(planetType))
+          );
+          const telescopeMissions = telescopeDataSources.flatMap((category) =>
+            category.items.filter((item) => item.compatiblePlanetTypes.includes(planetType))
+          );
+          const roverMissions = roverDataSources.flatMap((category) =>
+            category.items.filter((item) => item.compatiblePlanetTypes.includes(planetType))
+          );
+          const lidarMissions = lidarDataSources.flatMap((category) =>
+            category.items.filter((item) => item.compatiblePlanetTypes.includes(planetType))
+          );
+          setCompatibleMissions([
+            // ...zoodexMissions,
+            ...physicsLabMissions,
+            ...telescopeMissions,
+            ...roverMissions,
+            ...lidarMissions,
+          ]);
+        }
       };
+      
 
       filterCompatibleMissions();
     };

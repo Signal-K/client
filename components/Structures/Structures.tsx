@@ -112,7 +112,7 @@ export default function StructuresOnPlanet() {
             </p>
         </div>
     );
-  };
+  }; 
 
   return (
 <div className="relative">
