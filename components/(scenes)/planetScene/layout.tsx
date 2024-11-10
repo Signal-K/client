@@ -170,7 +170,7 @@ export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({
       />
 
       <div className="relative flex flex-1 z-10">
-        {/* <VerticalToolbar /> */}
+        <VerticalToolbar />
 
         <div className="relative flex flex-col flex-1">
           {children.slice(0, 2).map((child, index) => (

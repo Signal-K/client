@@ -65,22 +65,22 @@ const meteorologyMissions: Mission[] = [
 ];
 
 const globalMissions: Mission[] = [
+    // {
+    //     id: 2000000015,
+    //     name: "Research a new module",
+    //     description: 'Click on your structure and then the "Research" tab to unlock new projects and data sources to contribute to!',
+    //     icon: TestTube2,
+    //     color: 'text-purple-300',
+    // },
+    // {
+    //     id: 200000013,
+    //     name: "Collect some fuel",
+    //     description: "Click on the mining tab to visit some mineral deposits your probes have found and mine them for fuel",
+    //     icon: Pickaxe,
+    //     color: 'text-red-300',
+    // },
     {
-        id: 2000000015,
-        name: "Research a new module",
-        description: 'Click on your structure and then the "Research" tab to unlock new projects and data sources to contribute to!',
-        icon: TestTube2,
-        color: 'text-purple-300',
-    },
-    {
-        id: 200000013,
-        name: "Collect some fuel",
-        description: "Click on the mining tab to visit some mineral deposits your probes have found and mine them for fuel",
-        icon: Pickaxe,
-        color: 'text-red-300',
-    },
-    {
-        id: 30000001,
+        id: 3000001,
         name: "Discover a new planet",
         description: "Create and use a telescope to discover a new planet using the Planet Hunters module",
         icon: Telescope,
