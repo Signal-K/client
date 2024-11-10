@@ -5,37 +5,51 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useActivePlanet } from '@/context/ActivePlanet'
 import LaunchpadStatus from '../Launchpad/LaunchpadStatus'
 
+type MineralDeposit = {
+  id: string;
+  name: string;
+  quantity: number;
+};
+
 type Rover = {
-  id: string
-  name: string
-  speed: number
-  efficiency: number
-  miningLevel: number
-}
+  id: string;
+  name: string;
+  speed: number;
+  efficiency: number;
+  miningLevel: number;
+};
 
 type Props = {
-  rovers: Rover[] 
-  selectedRover: Rover | null
-  onRoverSelect: (rover: Rover) => void
-  onStartMining: () => void
-  isMining: boolean
-}
+  rovers: Rover[];
+  selectedRover: Rover | null;
+  onRoverSelect: (rover: Rover) => void;
+  onStartMining: () => void;
+  isMining: boolean;
+  selectedDeposit: MineralDeposit | null; 
+};
 
-export function ControlPanel({ rovers = [], selectedRover, onRoverSelect, onStartMining, isMining }: Props) {
-  const [speed, setSpeed] = useState(10)
-  const [efficiency, setEfficiency] = useState(0.8)
-  const [miningLevel, setMiningLevel] = useState(1)
+export function ControlPanel({
+  rovers = [],
+  selectedRover,
+  onRoverSelect,
+  onStartMining,
+  isMining,
+  selectedDeposit,
+}: Props) {
+  const [speed, setSpeed] = useState(10);
+  const [efficiency, setEfficiency] = useState(0.8);
+  const [miningLevel, setMiningLevel] = useState(1);
 
   useEffect(() => {
     if (selectedRover) {
-      setSpeed(selectedRover.speed)
-      setEfficiency(selectedRover.efficiency)
-      setMiningLevel(selectedRover.miningLevel)
+      setSpeed(selectedRover.speed);
+      setEfficiency(selectedRover.efficiency);
+      setMiningLevel(selectedRover.miningLevel);
     }
-  }, [selectedRover])
+  }, [selectedRover]);
 
   const handleRoverSelect = (rover: Rover) => {
-    onRoverSelect(rover)
+    onRoverSelect(rover);
   };
 
   return (
@@ -46,9 +60,13 @@ export function ControlPanel({ rovers = [], selectedRover, onRoverSelect, onStar
           <h3 className="font-bold mb-2 text-[#303F51]">Select Rover</h3>
           <div className="grid grid-cols-2 gap-2">
             {rovers.map(rover => (
-              <div 
-                key={rover.id} 
-                className={`p-2 rounded-lg cursor-pointer ${selectedRover?.id === rover.id ? 'bg-[#85DDA2] text-[#303F51]' : 'bg-[#F7F5E9] hover:bg-[#B9E678] hover:text-[#1D2833]'}`}
+              <div
+                key={rover.id}
+                className={`p-2 rounded-lg cursor-pointer ${
+                  selectedRover?.id === rover.id
+                    ? "bg-[#85DDA2] text-[#303F51]"
+                    : "bg-[#F7F5E9] hover:bg-[#B9E678] hover:text-[#1D2833]"
+                }`}
                 onClick={() => handleRoverSelect(rover)}
               >
                 <div className="flex items-center space-x-2">
@@ -59,77 +77,46 @@ export function ControlPanel({ rovers = [], selectedRover, onRoverSelect, onStar
             ))}
           </div>
         </div>
-        
-        {selectedRover && (
-          <div className="space-y-4 mt-4">
-            <h3 className="font-bold mb-2 text-[#303F51]">Customize Rover</h3>
-            <div>
-              <label className="block text-sm font-medium text-[#2C3A4A]">Speed</label>
-              <input
-                type="range"
-                min={1}
-                max={20}
-                value={speed}
-                onChange={(e) => setSpeed(Number(e.target.value))}
-                className="my-2 w-full"
-              />
-              <span className="text-sm text-[#2C3A4A]">{speed}</span>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[#2C3A4A]">Efficiency</label>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={efficiency * 100}
-                onChange={(e) => setEfficiency(Number(e.target.value) / 100)}
-                className="my-2 w-full"
-              />
-              <span className="text-sm text-[#2C3A4A]">{(efficiency * 100).toFixed(0)}%</span>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[#2C3A4A]">Mining Level</label>
-              <input
-                type="range"
-                min={1}
-                max={5}
-                value={miningLevel}
-                onChange={(e) => setMiningLevel(Number(e.target.value))}
-                className="my-2 w-full"
-              />
-              <span className="text-sm text-[#2C3A4A]">{miningLevel}</span>
-            </div>
+
+        {/* Now you can use selectedDeposit */}
+        {selectedDeposit && (
+          <div>
+            <h3 className="font-bold mb-2 text-[#303F51]">Selected Deposit</h3>
+            <p>
+              Name: {selectedDeposit.name}, Quantity: {selectedDeposit.quantity}
+            </p>
           </div>
         )}
 
         <AddMineralDeposits />
 
         <LaunchpadStatus />
-        
-        <Button 
-          onClick={onStartMining} 
+
+        <Button
+          onClick={onStartMining}
           disabled={isMining || !selectedRover}
           className="w-full mt-4 bg-[#5FCBC3] text-white hover:bg-[#85DDA2]"
         >
-          {isMining ? 'Mining...' : 'Start Mining'}
+          {isMining ? "Mining..." : "Start Mining"}
         </Button>
       </div>
     </div>
   );
-};
-
-
-
-// test
+}
 
 function AddMineralDeposits() {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
-
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const { activePlanet } = useActivePlanet();
   const [isLoading, setIsLoading] = useState(false);
-  const mineral = 19;
+
+  // Array of minerals to randomly select from
+  const minerals = [13, 15, 19];
+
+  // Function to select a random mineral from the array
+  const getRandomMineral = () => {
+    return minerals[Math.floor(Math.random() * minerals.length)];
+  };
 
   const handleAddDeposits = async () => {
     setIsLoading(true);
@@ -139,7 +126,7 @@ function AddMineralDeposits() {
         anomaly: activePlanet.id ? Number(activePlanet.id) : null,
         owner: session?.user.id,
         mineralconfiguration: {
-          mineral: mineral,
+          mineral: getRandomMineral(), // Use random mineral
           quantity: Math.floor(Math.random() * 100) + 1,
         },
       }));
@@ -151,14 +138,14 @@ function AddMineralDeposits() {
       if (error) {
         console.error("Error inserting mineral deposits: ", error.message);
         throw error;
-      };
+      }
 
       console.log("Mineral deposits added:", data);
     } catch (error) {
       console.error("Error adding mineral deposits:", error);
     } finally {
       setIsLoading(false);
-    };
+    }
   };
 
   return (

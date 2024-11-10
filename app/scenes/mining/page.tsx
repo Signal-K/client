@@ -5,10 +5,10 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import MineralDeposits from "@/components/Structures/Mining/Archive/AvailableDeposits";
 import { SelectMineralPanel } from "@/components/Structures/Mining/Archive/MiningPanels";
 import MineralsInventoryGrid from "@/components/Inventory/mineralsPanel";
-import { MiningComponentComponent } from "@/components/Structures/Mining/Mining";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { MiningComponent } from "@/components/Structures/Mining/Mining";
 import StarnetLayout from "@/components/Layout/Starnet";
+import { EarthActionSceneLayout, EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
+import StructureMissionGuide from "@/components/Layout/Guide";
 
 enum Step {
   MineralDeposits = "MINERAL_DEPOSITS",
@@ -17,14 +17,10 @@ enum Step {
 
 export default function Mining() {
   return (
-    <StarnetLayout>
-      <main className="container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-        </div>
-        <MiningComponentComponent />
-      </main>
-    </StarnetLayout>
+    <EarthActionSceneLayout>
+        <MiningComponent />
+        <StructureMissionGuide />
+    </EarthActionSceneLayout>
   );
 };
 

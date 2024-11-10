@@ -30,6 +30,14 @@ import {
 } from './scenes';
 import GlobeView from "./scenes/globe/page";
 import InitialiseChapterOneUser from "@/components/(scenes)/chapters/one/InitialiseUser";
+import { EarthScene } from "./scenes/earth/scene";
+import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
+import EnhancedWeatherEvents from "@/components/enhanced-weather-events";
+import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
+import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
+import Onboarding from "./scenes/onboarding/page";
+import VerticalToolbar from "@/components/Layout/Toolbar";
+import StructureMissionGuide from "@/components/Layout/Guide";
 
 export default function Home() {
   const session = useSession();
@@ -52,6 +60,45 @@ export default function Home() {
     52: <IoView />,
     55: <EuropaView />,
     51: <AmaltheaView />,
+    // 30: <EarthScene
+    //   topSection={
+    //     <EnhancedWeatherEvents />
+    //   }
+    //   middleSection={
+    //     <StructuresOnPlanet />
+    //   }
+    //   middleSectionTwo={
+    //     <AllAutomatonsOnActivePlanet />
+    //   }
+    // />,
+    30: <EarthViewLayout>
+      <div className="w-full">
+        <div className="flex flex-row space-y-4"></div>
+        <div className="py-3">
+          <div className="py-1">
+            <EnhancedWeatherEvents />
+          </div>
+          <center>
+            <OrbitalStructuresOnPlanet />
+          </center>
+        </div>
+      </div>
+      <div className="w-full">
+        <div className="py-2">
+          <center>
+            <AtmosphereStructuresOnPlanet />
+          </center>
+        </div>
+      </div>
+      <div className="w-full py-2">
+        <center>
+          <StructuresOnPlanet />
+          <AllAutomatonsOnActivePlanet />
+        </center>
+      </div>
+      <div className="w-full py-2"><StructureMissionGuide />
+  </div>
+    </EarthViewLayout>
     // 60: <SaturnView />,
     // 62: <TitanView />,
     // 61: <EnceladusView />,
@@ -69,13 +116,7 @@ export default function Home() {
 
   if (activePlanet?.id === 69) {
     return (
-      <EarthView />
-    );
-  };
-
-  if (activePlanet?.id === null) {
-    return (
-      <InitialiseChapterOneUser />
+      <EarthScene />
     );
   };
 
@@ -85,5 +126,5 @@ export default function Home() {
     );
   };
 
-  return planetViews[activePlanet?.id] || <EarthView />;
+  return planetViews[activePlanet?.id] || <Onboarding />;
 };

@@ -10,6 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, ChevronRight, Camera } from "lucide-react";
 
+const STRUCTURE_OPTIONS: Record<string, string[]> = { // Update to add `dataSources...` identifiers
+    Telescope: ["Sunspot", "Asteroid", "Planet", "Star", "Nebula", "Crater"],
+    LIDAR: ["Planetary Cloud", "Neutrino", "Earth Cloud", "Surface"],
+    Zoodex: ["Bird", "Penguin", "Owl", "Other Animal"],
+};
+
 const FreeformUploadData = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -24,11 +30,13 @@ const FreeformUploadData = () => {
     const [comment, setComment] = useState<string>("");
     const [cloudName, setCloudName] = useState<string>("");
     const [location, setLocation] = useState<string>("");
+    const [anomalyType, setAnomalyType] = useState<string>("");
+    const [structure, setStructure] = useState<string>("");
     const [uploads, setUploads] = useState<string[]>([]);
 
     const takeScreenshot = async () => {
         if (loadingContent || buttonPressed) return;
-        setButtonPressed(true);
+        setButtonPressed(true); 
         setTimeout(() => {
             setButtonPressed(false);
             setLoadingContent(true);
@@ -84,14 +92,16 @@ const FreeformUploadData = () => {
                 }
             } catch (err) {
                 console.error('Unexpected error during file upload:', err);
-            };
-        };
+            }
+        }
 
         const classificationConfiguration = {
             media: imageUrl ? { uploadUrl: imageUrl } : null,
             comment: comment,
             cloudName: cloudName,
             location: location,
+            anomalyType: anomalyType,
+            structure: structure,
         };
 
         try {
@@ -140,6 +150,35 @@ const FreeformUploadData = () => {
                         onChange={(e) => setComment(e.target.value)}
                         className="bg-white text-[#2C4F64] placeholder:text-[#2C4F64]/70 p-2 rounded-md w-full h-32"
                     />
+                    <div className="grid grid-cols-1 gap-4">
+                        <Label htmlFor="anomalyType" className="text-white">Structure/Project group</Label>
+                        <select
+                            id="anomalyType"
+                            value={anomalyType}
+                            onChange={(e) => setAnomalyType(e.target.value)}
+                            className="bg-white text-[#2C4F64] rounded p-2"
+                        >
+                            <option value="" disabled>Select Structure</option>
+                            {Object.keys(STRUCTURE_OPTIONS).map((structure) => (
+                                <option key={structure} value={structure}>{structure}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4">
+                        <Label htmlFor="structure" className="text-white">Anomaly</Label>
+                        <select
+                            id="structure"
+                            value={structure}
+                            onChange={(e) => setStructure(e.target.value)}
+                            className="bg-white text-[#2C4F64] rounded p-2"
+                            disabled={!anomalyType}
+                        >
+                            <option value="" disabled>Select anomaly/entity type</option>
+                            {anomalyType && STRUCTURE_OPTIONS[anomalyType].map((struct) => (
+                                <option key={struct} value={struct}>{struct}</option>
+                            ))}
+                        </select>
+                    </div>
                     <div className="bg-[#5FCBC3] rounded-lg p-4 aspect-square mb-4">
                         {captureImage ? (
                             <img src={captureImage} alt="Captured" className="w-full h-full object-cover rounded" />
@@ -174,7 +213,8 @@ const FreeformUploadData = () => {
                     </div>
 
                     <Button type="submit" className="w-full bg-[#2C4F64] text-white hover:bg-[#1E3D4F]">
-                        <ChevronRight className="mr-2 h-4 w-4" /> Submit
+                        <ChevronRight className="mr-2 h-4 w-4" />
+                        Submit
                     </Button>
                 </form>
             </div>

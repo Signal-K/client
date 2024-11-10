@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, MessageSquare } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge"; 
 import { CommentCard } from "../Comments/CommentSingle";
 import { CommentForm } from "../Comments/CommentForm";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
@@ -20,7 +20,7 @@ import {
   zoodexIguanasFromAboveClassificationOptions,
 } from "../Classifications/Options";
 
-interface PostCardSingleProps {
+interface PostCardSingleProps { 
   classificationId: number;
   title: string;
   anomalyId: string;
@@ -33,7 +33,7 @@ interface PostCardSingleProps {
   images: string[];
   classificationType: string;
   onVote: () => void;
-}
+};
 
 export function PostCardSingle({
   classificationId,
@@ -115,7 +115,7 @@ export function PostCardSingle({
     if (!classificationConfig || !classificationConfig.classificationOptions) {
       return null;
     }
-  
+
     const selectedOptions = classificationConfig.classificationOptions[""] || {};
     const options = getClassificationOptions(classificationType);
 
@@ -169,9 +169,18 @@ export function PostCardSingle({
           <div className="mt-4 p-4 border border-secondary rounded">
             <h3 className="text-lg font-bold">Classification Type</h3>
             <p>{classificationType}</p>
+            {voteCount <= 5 && (
+              <p className="tex-red-600 font-bold mt-2">
+                Anomalies require at least 5 votes to be classified & confirmed.
+              </p>
+            )}
+            {classificationType === "planet" && voteCount > 5 && (
+              <p className="text-green-600 font-bold mt-2">
+                This anomaly has been voted as a planet
+              </p>
+            )}
           </div>
         )}
-
         {renderClassificationOptions()}
       </CardContent>
       <CardFooter className="flex items-center justify-between">

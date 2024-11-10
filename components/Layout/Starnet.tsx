@@ -34,44 +34,53 @@ export default function StarnetLayout({ children }: { children: React.ReactNode 
   );
 
   return (
-    <div className="flex h-screen squiggly-bg bg-background text-foreground">
-      <aside className="hidden md:flex flex-col items-center justify-center w-16 bg-squiggly py-4 space-y-8 border-r border-gray-200">
-        {menuItems.map((item, index) => (
-          <MenuIcon 
-            key={index} 
-            Icon={item.icon} 
-            label={item.label} 
-            isActive={index === activeItem}
-            onClick={() => router.push(item.route)}
-          />
-        ))}
-      </aside>
+    <div className="relative min-h-screen w-full flex">
+      <img
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        src="/assets/Backdrops/Earth.png"
+        alt="Earth Background"
+      />
 
-      <div className="flex-1 flex flex-col h-screen">
-        <header className="bg-squiggly border-b border-gray-200 p-4">
-          <center><h1 className="text-xl font-bold text-gray-100 text-center md:text-left">Starnet</h1></center>
-        </header>
+      <div className="relative flex flex-1 z-10 squiggly-bg bg-background text-foreground h-[99vh] w-[99vw] shadow-lg"> {/* [m-3%] */}
+        <aside className="hidden md:flex flex-col items-center justify-center w-16 bg-squiggly py-4 space-y-8 border-r border-gray-200">
+          {menuItems.map((item, index) => (
+            <MenuIcon 
+              key={index} 
+              Icon={item.icon} 
+              label={item.label} 
+              isActive={index === activeItem}
+              onClick={() => router.push(item.route)}
+            />
+          ))}
+        </aside>
 
-        <nav className="md:hidden bg-gray-50 border-b border-gray-200">
-          <div className="flex justify-between items-center">
-            {menuItems.map((item, index) => (
-              <div 
-                key={index} 
-                className={`flex-1 p-2 flex flex-col items-center justify-center ${index === activeItem ? 'text-blue-500' : 'text-gray-600'}`}
-                onClick={() => router.push(item.route)}
-              >
-                <item.icon className="w-6 h-6" />
-                <span className="text-xs mt-1">{item.label.split(' ')[0]}</span>
-              </div>
-            ))}
-          </div>
-        </nav>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col h-full">
+          <header className="bg-squiggly border-b border-gray-200 p-4">
+            <h1 className="text-xl font-bold text-gray-100 text-center md:text-left">Starnet</h1>
+          </header>
 
-        <main className="flex-1 overflow-y-auto p-8 squiggly-bg">
-          <div className="max-w-3xl mx-auto w-full">
-            {children}
-          </div>
-        </main>
+          <nav className="md:hidden bg-gray-50 border-b border-gray-200">
+            <div className="flex justify-between items-center">
+              {menuItems.map((item, index) => (
+                <div 
+                  key={index} 
+                  className={`flex-1 p-2 flex flex-col items-center justify-center ${index === activeItem ? 'text-blue-500' : 'text-gray-600'}`}
+                  onClick={() => router.push(item.route)}
+                >
+                  <item.icon className="w-6 h-6" />
+                  <span className="text-xs mt-1">{item.label.split(' ')[0]}</span>
+                </div>
+              ))}
+            </div>
+          </nav>
+
+          <main className="flex-1 overflow-y-auto p-8">
+            <div className="max-w-3xl mx-auto w-full">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );

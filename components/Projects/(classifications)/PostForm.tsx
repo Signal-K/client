@@ -20,6 +20,7 @@ import {
   automatonaiForMarsOptions,
   DailyMinorPlanetOptions,
   PlanetFourOptions,
+  jvhOptions,
 } from "@/content/Classifications/Options";
 // import UserAvatar, { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 
@@ -85,6 +86,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return "Describe the type of cloud you see...";
       case "automaton-aiForMars":
         return "What surface types do you see from your rover?";
+      case 'lidar-jovianVortexHunter':
+        return "Describe the patterns in the clouds you see...";
     case "telescope-minorPlanet":
         return "Does the highlighted object move smoothly through the images? What do you see...?"
       default:
@@ -108,6 +111,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return [zoodexBurrowingOwlClassificationOptions];
       case "zoodex-iguanasFromAbove":
         return [zoodexIguanasFromAboveClassificationOptions];
+      case 'lidar-jovianVortexHunter':
+        return [jvhOptions];
       case "zoodex-southCoastFaunaRecovery":
         return [zoodexSouthCoastFaunaRecovery];
       case "DiskDetective":

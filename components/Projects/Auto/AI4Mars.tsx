@@ -178,13 +178,13 @@ export function AiForMarsProject() {
                     console.error("Error fetching mission data:", missionError);
                     setHasMission20000006(false); 
                     return;
-                }
+                };
     
                 setHasMission20000006(missionData && missionData.length > 0);
             } catch (error) {
                 console.error("Error checking user mission: ", error);
                 setHasMission20000006(false);
-            }
+            };
         };
     
         checkTutorialMission();
@@ -205,7 +205,7 @@ export function AiForMarsProject() {
     
                 if (anomalyError) {
                     throw anomalyError;
-                }
+                };
     
                 const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
                 setAnomaly(randomAnomaly);
@@ -215,15 +215,14 @@ export function AiForMarsProject() {
                 setAnomaly(null);
             } finally {
                 setLoading(false);
-            }
+            };
         };
     
         if (session && hasMission20000006) {
             fetchAnomaly();
-        }
+        };
     }, [session, hasMission20000006, supabase]);
     
-
     if (loading) {
         return (
             <div>

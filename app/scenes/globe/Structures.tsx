@@ -29,54 +29,6 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
     const [selectedStructure, setSelectedStructure] = useState<IndividualStructureProps | null>(null);
     const [missionStructureId, setMissionStructureId] = useState<number | null>(null);
   
-    const fetchStructures = useCallback(async () => {
-      if (!session?.user?.id || !activePlanet?.id) {
-        setLoading(false);
-        return;
-      }
-  
-      try {
-        const response = await fetch('/api/gameplay/inventory');
-        const itemsData: StructureItemDetail[] = await response.json();
-  
-        const itemMap = new Map<number, StructureItemDetail>();
-        itemsData.forEach(item => {
-          if (item.ItemCategory === 'Structure') {
-            itemMap.set(item.id, item);
-          };
-        });
-  
-        setItemDetails(itemMap);
-  
-        const { data: inventoryData, error: inventoryError } = await supabase
-          .from('inventory')
-          .select('*')
-          .eq('owner', session.user.id)
-          .eq('anomaly', activePlanet.id);
-  
-        if (inventoryError) throw inventoryError;
-  
-        const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
-        inventoryData.forEach(structure => {
-          const itemDetail = itemMap.get(structure.item);
-          if (itemDetail && itemDetail.locationType === 'Surface' && !uniqueStructuresMap.has(structure.item)) {
-            uniqueStructuresMap.set(structure.item, structure);
-          }
-        });
-  
-        const uniqueStructures = Array.from(uniqueStructuresMap.values());
-        setUserStructuresOnPlanet(uniqueStructures || []);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      };
-    }, [session?.user?.id, activePlanet?.id, supabase]);
-  
-    useEffect(() => {
-      fetchStructures();
-    }, [fetchStructures]);
-  
     const handleIconClick = (itemId: number, inventoryId: number) => {
       const itemDetail = itemDetails.get(itemId);
       if (itemDetail) {
@@ -105,10 +57,10 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
     }
   
     return (
-  <div className="relative">
-                <div className="mx-3">
+      <div className="relative">
+                {/* <div className="mx-3">
                   <CreateCommunityStation />
-                </div>
+                </div> */}
               <div className={`grid grid-cols-3 gap-1 gap-y-3 relative ${userStructuresOnPlanet.length === 1 ? 'justify-center' : ''}`}>
                   {userStructuresOnPlanet.map((structure) => {
                       const itemDetail = itemDetails.get(structure.item);

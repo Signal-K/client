@@ -7,11 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, Users, Globe } from 'lucide-react';
 import { zoodexSouthCoastFaunaRecoveryClassificationConfig, cloudClassificationConfig, planetClassificationConfig } from '../FormConfigurations';
 import { zoodexSouthCoastFaunaRecovery, 
-  cloudClassificationOptions, 
   initialCloudClassificationOptions, 
   roverImgClassificationOptions, 
   lidarEarthCloudsReadClassificationOptions, 
-  lidarEarthCloudsUploadClassificationOptions, 
   planetClassificationOptions, 
   planktonPortalClassificationOptions, 
   penguinWatchClassificationOptions, 

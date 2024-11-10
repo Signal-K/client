@@ -9,7 +9,7 @@ import { StructuresConfig } from "@/constants/Structures/Properties";
 
 import "../../styles/Anims/StarterStructureAnimations.css";
 
-interface StructuresOnPlanetProps {
+interface StructuresOnPlanetProps { 
     onStructuresFetch: (
         orbitalStructures: InventoryStructureItem[],
         atmosphereStructures: InventoryStructureItem[],
@@ -21,7 +21,7 @@ import { UnownedSurfaceStructures } from "./Build/EditMode";
 import { CreateCommunityStation } from "./Build/MakeCommunityStation";
 import StationsOnPlanet, { StationsOnPlanetOpen } from "./Community/ViewAllStations";
 
-export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
+export default function StructuresOnPlanet() {
   const supabase = useSupabaseClient();
   const session = useSession();
 
@@ -148,13 +148,13 @@ export default function StructuresOnPlanet({ onStructuresFetch }: StructuresOnPl
                 />
             )}
             <UnownedSurfaceStructures />
-            <CreateCommunityStation />
-            <StationsOnPlanetOpen />
+            {/* <CreateCommunityStation /> */}
+            {/* <StationsOnPlanetOpen /> */}
         </div>
   );
 };
 
-export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
+export function OrbitalStructuresOnPlanet() {
     const supabase = useSupabaseClient();
   const session = useSession();
 
@@ -293,7 +293,7 @@ export function OrbitalStructuresOnPlanet({ onStructuresFetch }: StructuresOnPla
   );
 };
 
-export function AtmosphereStructuresOnPlanet({ onStructuresFetch }: StructuresOnPlanetProps) {
+export function AtmosphereStructuresOnPlanet() {
     const supabase = useSupabaseClient();
   const session = useSession();
 

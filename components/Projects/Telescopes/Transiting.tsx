@@ -31,19 +31,23 @@ export function StarterTelescope() {
     // Check tutorial mission
     useEffect(() => {
         const checkTutorialMission = async () => {
-            if (!session) return;
+            if (!session) return; 
 
             try {
                 const { data: missionData, error: missionError } = await supabase
                     .from('missions')
                     .select('id')
                     .eq('user', session.user.id)
-                    .eq('mission', '3000001')
+                    .eq('mission', 3000001)  // Changed to ensure integer comparison
                     .single();
 
                 if (missionError) throw missionError;
 
-                setHasMission3000001(!!missionData);
+                // Log mission data and error for debugging
+                console.log({ missionData, missionError });
+
+                // Check if missionData contains valid data
+                setHasMission3000001(!!missionData?.id);
             } catch (error: any) {
                 console.error('Error checking user mission: ', error.message || error);
                 setHasMission3000001(false);
@@ -159,7 +163,6 @@ export function StarterTelescope() {
     if (!userChoice) {
         return (
             <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-                {/* <StructureInfo structureName="Telescope" /> */}
                 <p className="text-sm font-bold">Choose a target to observe using your Telescope:</p>
                 {configuration["missions unlocked"] && Array.isArray(configuration["missions unlocked"]) && configuration["missions unlocked"].length > 0 ? (
                     configuration["missions unlocked"].map((missionId: string) => (
@@ -220,6 +223,7 @@ export function StarterTelescope() {
         </div>
     );
 };
+
 
 interface TelescopeProps {
     anomalyid: string;
