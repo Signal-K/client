@@ -136,6 +136,7 @@ const StructureMissionGuide = () => {
     const [showPopup, setShowPopup] = useState(false);
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
 
+    // Categories with missions
     const categories = [
         { missions: astronomyMissions, name: 'Astronomer' },
         { missions: biologistMissions, name: 'Biologist' },
@@ -145,7 +146,7 @@ const StructureMissionGuide = () => {
     useEffect(() => {
         async function fetchInventoryAndCompletedMissions() {
             if (!session?.user?.id || !activePlanet?.id) return;
-    
+
             try {
                 // Fetch owned items
                 const { data: inventoryData, error: inventoryError } = await supabase
@@ -154,45 +155,23 @@ const StructureMissionGuide = () => {
                     .eq('owner', session.user.id)
                     .eq('anomaly', activePlanet.id)
                     .in('item', [3103, 3104, 3105]);
-    
+
                 if (inventoryError) throw inventoryError;
-    
+
                 const ownedItems = inventoryData.map((inv: { item: number }) => inv.item);
                 setOwnedItems(ownedItems);
-    
+
                 // Fetch completed missions from the `missions` table
                 const { data: missionData, error: missionError } = await supabase
                     .from('missions')
                     .select('mission')
                     .eq('user', session.user.id);
-    
+
                 if (missionError) throw missionError;
-    
+
                 const completedMissionIds = missionData.map((mission: { mission: number }) => mission.mission);
-    
-                // Loop through missions and check for additional table-based entries
-                for (const mission of [...astronomyMissions, ...biologistMissions, ...meteorologyMissions, ...globalMissions]) {
-                    if (mission.tableEntry && mission.tableColumn && session?.user?.id) {
-                        const { data: tableData, error: tableError } = await supabase
-                            .from(mission.tableEntry)
-                            .select(mission.tableColumn)
-                            .eq(mission.tableColumn, session.user.id);
-    
-                        if (tableError) {
-                            console.error('Error fetching data:', tableError);
-                        }
-    
-                        // If data is found, mark the mission as completed
-                        if (tableData && tableData.length > 0) {
-                            // Add the mission ID to the completedMissions array
-                            const missionId = Array.isArray(mission.id) ? mission.id[0] : mission.id;
-                            completedMissionIds.push(missionId);
-                        }
-                    }
-                }
-    
                 setCompletedMissions(completedMissionIds);
-    
+
                 // Set current category based on owned items
                 if (ownedItems.includes(3103)) {
                     setCurrentCategory(0); // Astronomy
@@ -203,17 +182,17 @@ const StructureMissionGuide = () => {
                 } else {
                     setCurrentCategory(Math.floor(Math.random() * categories.length)); // Random category if no specific items are owned
                 }
-    
+
                 setShowWelcome(completedMissionIds.length === 0);
             } catch (error) {
                 console.error("Error fetching inventory or missions:", error);
             }
-    
+
             setLoading(false);
         }
-    
+
         fetchInventoryAndCompletedMissions();
-    }, [session, activePlanet, supabase]);     
+    }, [session, activePlanet, supabase]);
 
     useEffect(() => {
         // Display category-specific missions followed by global missions
@@ -224,14 +203,10 @@ const StructureMissionGuide = () => {
         setScrollableMissions(missionsToDisplay);
     }, [currentCategory]);
 
-    const userHasRequiredItem = (requiredItem?: number) => {
-        return requiredItem ? ownedItems.includes(requiredItem) : false;
-    };
-
     const renderMission = (mission: Mission) => {
         const missionId = Array.isArray(mission.id) ? mission.id[0] : mission.id;
         const isCompleted = completedMissions.includes(missionId);
-    
+
         return (
             <Card
                 key={missionId}  // Ensure key is a single number
@@ -250,7 +225,7 @@ const StructureMissionGuide = () => {
                 </CardContent>
             </Card>
         );
-    };    
+    };
 
     return (
         <div className="p-4 max-w-6xl mx-auto font-mono">
@@ -276,71 +251,67 @@ const StructureMissionGuide = () => {
                             </Button>
                         </div>
 
-                        {showPopup && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-                                <div className="bg-gray-800 p-6 rounded shadow-lg max-w-md w-full">
-                                    <div className="flex justify-between items-center">
-                                        <h2 className="text-lg font-semibold text-white">Welcome!</h2>
-                                        <Button onClick={() => setShowPopup(false)} className="text-gray-400 hover:text-white">
-                                            <XCircle className="w-5 h-5" />
-                                        </Button>
-                                    </div>
-                                    <p className="mt-4 text-gray-300">
-                                        Follow this mission guide for a walkthrough of different projects and actions. Use your research station (Plus icon) to unlock new projects and data sources.
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-
                         <div className="flex justify-between mb-4 items-center">
-                            <h2 className="text-xl font-semibold text-gray-300">
-                                Mission Guide for {categories[currentCategory].name} Pathway
+                            <h2 className="text-xl font-semibold text-gray-200">
+                                {categories[currentCategory].name} Missions
                             </h2>
                         </div>
 
-                        <div className="flex justify-between mb-4">
-                            <Button
-                                onClick={() => setCurrentCategory((currentCategory - 1 + categories.length) % categories.length)}
-                                className="bg-gray-700 text-gray-300 hover:bg-gray-600 p-2"
-                            >
-                                <ChevronLeft />
-                            </Button>
-                            <Button
-                                onClick={() => setCurrentCategory((currentCategory + 1) % categories.length)}
-                                className="bg-gray-700 text-gray-300 hover:bg-gray-600 p-2"
-                            >
-                                <ChevronRight />
-                            </Button>
-                        </div>
-
-                        <div className="max-h-32 overflow-y-auto">
-                            {scrollableMissions.map(renderMission)}
+                        {/* Scrollable Missions - Limit to 2.3 visible items */}
+                        <div
+                            className="overflow-y-auto max-h-[calc(2.3*4rem)]" // Limit the visible height to 2.3 items (each item ~4rem)
+                        >
+                            <div className="space-y-4">
+                                {scrollableMissions.map(renderMission)}
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* Modal for expanded view */}
-            <AnimatePresence>
-                {showModal && (  // Only show modal if showModal state is true
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-20"
-                    >
-                        <div className="bg-gray-800 p-8 rounded-lg max-w-4xl w-full">
-                            <div className="flex justify-between items-center">
-                                <h2 className="text-2xl font-semibold text-white">Mission Guide</h2>
-                                <Button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white">
-                                    <XCircle className="w-5 h-5" />
-                                </Button>
-                            </div>
-                            {/* Modal Content */}
+            {/* On Mobile */}
+            <div className="md:hidden"> {/* Show only on mobile */}
+                <Card className="relative bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-2 border-gray-700">
+                    <CardContent className="p-4">
+                        <div className="flex justify-between mb-4 items-center">
+                            <h2 className="text-xl font-semibold text-gray-200">Current Mission</h2>
+                            <Button
+                                onClick={() => setShowModal(true)}  // Show modal when clicked
+                                className="text-gray-300 hover:text-white"
+                            >
+                                <ChevronRight className="w-6 h-6" />
+                            </Button>
                         </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+
+                        {/* Display only the first mission on mobile */}
+                        {scrollableMissions.length > 0 && renderMission(scrollableMissions[0])}
+
+                    </CardContent>
+                </Card>
+
+                {/* Mission Modal */}
+                <AnimatePresence>
+                    {showModal && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black bg-opacity-50 z-20"
+                            onClick={() => setShowModal(false)}
+                        >
+                            <motion.div
+                                className="bg-gray-800 p-6 rounded-lg max-w-md mx-auto my-24"
+                                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+                            >
+                                <h2 className="text-2xl font-semibold text-gray-200">Mission List</h2>
+                                <div className="space-y-4 mt-4">
+                                    {scrollableMissions.map(renderMission)}
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     );
 };
