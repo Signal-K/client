@@ -6,7 +6,6 @@ import { MineralDepositsNoAction } from "@/components/Structures/Mining/Archive/
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
-import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
 import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
@@ -14,7 +13,6 @@ import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassif
 import { AdvancedTechTreeComponent } from "@/components/Structures/Research/TechTree";
 import MiningScene from "@/app/scenes/mining/page";
 import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
-import MissionsForStructure from "@/components/Structures/Missions/AvailableMissions";
 import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
 import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
@@ -77,11 +75,6 @@ export const StructuresConfig: StructureConfig = {
           text: "Research",
           dynamicComponent: <DataSourcesModal structureId="3102" structure="Rover" />,
         },
-        // {
-        //   icon: <MehIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Available missions",
-        //   dynamicComponent: <MissionsForStructure structureItemId={3102} />,
-        // },
       ],
       buttons: [
         { 
@@ -148,11 +141,6 @@ export const StructuresConfig: StructureConfig = {
           text: "Research",
           dynamicComponent: <DataSourcesModal structureId="3103" structure="Telescope" />,
         },
-        // {
-        //   icon: <MehIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Available missions",
-        //   dynamicComponent: <MissionsForStructure structureItemId={3103} />,
-        // },
         // Copy action/labels
       ],
       buttons: [
@@ -220,11 +208,6 @@ export const StructuresConfig: StructureConfig = {
           text: "Research",
           dynamicComponent: <DataSourcesModal structureId="3104" structure="Zoodex" />,
         },
-        // {
-        //   icon: <MehIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Available missions",
-        //   dynamicComponent: <MissionsForStructure structureItemId={3104} />,
-        // },
         {
           icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Capture animals",
@@ -233,13 +216,6 @@ export const StructuresConfig: StructureConfig = {
         },
       ],
       buttons: [
-        {
-          icon: <DogIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Classify animals",
-          // dynamicComponent: <StarterZoodex />,
-          dynamicComponent: <StarterZoodexGallery />,
-          sizePercentage: 60,
-        },
         // {
         //   icon: <TreePalmIcon className="w-6 h-6 text-[#5e81ac]" />,
         //   text: "Greenhouse",
@@ -272,11 +248,6 @@ export const StructuresConfig: StructureConfig = {
           text: "Research",
           dynamicComponent: <DataSourcesModal structureId="3105" structure="LIDAR" />,
         },
-        // {
-        //   icon: <MehIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Available missions",
-        //   dynamicComponent: <MissionsForStructure structureItemId={3105} />,
-        // },
         // {
         //   icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
         //   text: "My discoveries", 

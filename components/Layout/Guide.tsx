@@ -291,26 +291,40 @@ const StructureMissionGuide = () => {
 
                 {/* Mission Modal */}
                 <AnimatePresence>
-                    {showModal && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black bg-opacity-50 z-20"
-                            onClick={() => setShowModal(false)}
-                        >
-                            <motion.div
-                                className="bg-gray-800 p-6 rounded-lg max-w-md mx-auto my-24"
-                                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
-                            >
-                                <h2 className="text-2xl font-semibold text-gray-200">Mission List</h2>
-                                <div className="space-y-4 mt-4">
-                                    {scrollableMissions.map(renderMission)}
-                                </div>
-                            </motion.div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+    {showModal && (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-20"
+            onClick={() => setShowModal(false)}
+        >
+            <motion.div
+                className="bg-gray-800 p-6 rounded-lg max-w-md mx-auto my-24"
+                onClick={(e) => e.stopPropagation()} // Prevent clicks from closing the modal
+            >
+                <div className="flex justify-between mb-4 items-center">
+                    <h2 className="text-xl font-semibold text-gray-200">
+                        {categories[currentCategory].name} Missions
+                    </h2>
+                    <Button
+                        onClick={() => setShowModal(false)}
+                        className="text-gray-300 hover:text-white"
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </Button>
+                </div>
+
+                {/* Scrollable Missions */}
+                <div className="overflow-y-auto max-h-96">
+                    <div className="space-y-4">
+                        {scrollableMissions.map(renderMission)}
+                    </div>
+                </div>
+            </motion.div>
+        </motion.div>
+    )}
+</AnimatePresence>
             </div>
         </div>
     );

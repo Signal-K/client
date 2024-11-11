@@ -7,6 +7,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 const TelescopeComponent: React.FC = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
+
     const { activePlanet } = useActivePlanet();
 
     const [configuration, setConfiguration] = useState<any>(null);
@@ -17,7 +18,7 @@ const TelescopeComponent: React.FC = () => {
         const fetchConfiguration = async () => {
             if (!session || !activePlanet) {
                 return;
-            }
+            };
 
             const { data: inventoryData, error } = await supabase
                 .from('inventory')
@@ -30,18 +31,27 @@ const TelescopeComponent: React.FC = () => {
                 setConfiguration(inventoryData[0].configuration);
             } else {
                 setHasTelescope(false);
-            }
+            };
         };
+
         fetchConfiguration();
     }, [session, activePlanet, supabase]);
 
     if (!hasTelescope) {
-        return <div>You don't have a telescope in your inventory.</div>;
-    } 
+        return (
+            <div>
+                You don't have a telescope in your inventory
+            .</div>
+        );
+    };
 
     if (!configuration) {
-        return <div>Loading configuration...</div>;
-    }
+        return (
+            <div>
+                Loading configuration...
+            </div>
+        );
+    };
 
     const unlockedMissions = configuration['missions unlocked'] || [];
     const availableProjects = telescopeDataSources

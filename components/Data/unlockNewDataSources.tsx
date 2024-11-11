@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Unlock } from "lucide-react";
 import { lidarDataSources, telescopeDataSources, zoodexDataSources, roverDataSources } from "./ZoodexDataSources";
-import { StructureInfo } from "../Structures/structureInfo";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { InventoryIdFetcher } from "../Inventory/fetchId";
@@ -203,9 +202,6 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
   return (
     <div className="flex items-center justify-center">
       <div className="w-96 bg-[#2C3A4A] rounded-lg shadow-xl">
-        {/* <center>
-          <StructureInfo structureName={structure} />
-        </center> */}
         <div className="p-6 space-y-6">
           <InventoryIdFetcher
             structureId={structureId}

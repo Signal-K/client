@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { StructureInfo } from "@/components/Structures/structureInfo";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 import { Anomaly } from "../Telescopes/Transiting";
 
@@ -179,11 +178,6 @@ export const BurrowingOwlTutorial: React.FC<ZoodexProps> = ({
                 )}
                 {part === 2 && (
                     <>
-                        <div className="mb-2">
-                            <StructureInfo
-                                structureName="Zoodex"
-                            />
-                        </div>
                         <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
                             <div className="relative">
                                 <div className="absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0"></div>

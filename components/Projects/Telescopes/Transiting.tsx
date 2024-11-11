@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet'; 
 import ClassificationForm from '@/components/Projects/(classifications)/PostForm';
-import { StructureInfo } from "@/components/Structures/structureInfo";
 import { planetClassificationConfig } from '@/components/Projects/(classifications)/FormConfigurations';
 
 export interface Anomaly {
@@ -202,7 +201,6 @@ export function StarterTelescope() {
     // Main rendering
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-            <StructureInfo structureName="Telescope" />
             <div className="p-4 rounded-md relative w-full">
                 {anomaly.avatar_url && (
                     <img src={anomaly.avatar_url} alt="Anomaly Avatar" className='w-24 h-24' />

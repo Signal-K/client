@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { StructureInfo } from "@/components/Structures/structureInfo";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 import { Anomaly } from "./Transiting";
 import { Button } from "@/components/ui/button";
@@ -184,14 +183,6 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
         )}
         {part === 2 && (
           <>
-            {/* <div className="mb-2"> */}
-              {/* <StructureInfo structureName="Telescope" /> */}
-              {/* <img
-                src="https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true"
-                alt="telescope"
-                className="w-24 h-24 mb-2"
-              /> */}
-            {/* </div> */}
             <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
               <div className="relative">
                 <div className=" absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0"></div>
