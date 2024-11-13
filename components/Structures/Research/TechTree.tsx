@@ -1,57 +1,69 @@
-import React, { useState, useEffect } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Rocket, Microscope, BarChart3, Atom, Satellite, Zap, Globe, CircleDot, Building, Cpu, ChevronDownCircle } from "lucide-react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useActivePlanet } from "@/context/ActivePlanet";
+"use client"
 
-const techIcons = {
+import React, { ReactNode } from "react"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Rocket, Microscope, Atom, Satellite, Zap, Globe, Building, Cpu, CircleDot, Check, Plus, BarChart3 } from 'lucide-react'
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useActivePlanet } from "@/context/ActivePlanet"
+
+const techIcons: { [key: string]: React.FC<any> } = {
   "Advanced Propulsion": Rocket,
   "Quantum Computing": Atom,
   "Nano-fabrication": Zap,
   "Fusion Reactor": Satellite,
   "Dark Matter Detector": Microscope,
   "Asteroid Mining": Globe,
-};
+}
 
-type TechCategory = 'Structures' | 'Automatons';
- 
+type TechCategory = 'Structures' | 'Automatons'
+
 type Technology = {
-  id: number;
-  name: string;
-  description: string;
-  icon: React.ReactNode;
-  requiredTech: number | null;
-  category: TechCategory;
-  requiresMission?: number;
-  item?: number;
-};
+  planets: any
+  level: ReactNode
+  modules: any
+  id: number
+  name: string
+  description: string
+  icon: React.ReactNode
+  requiredTech: number | null
+  category: TechCategory
+  requiresMission?: number
+  item?: number
+}
 
-interface SupabaseInventoryItem {
-  id: number;
-  item: number;
-  owner: string;
-  quantity: number;
-  anomaly: number;
-};
+type SupabaseInventoryItem = {
+  id: number
+  item: number
+  owner: string
+  quantity: number
+  anomaly: number
+}
 
-export function AdvancedTechTreeComponent() {
-  const supabase = useSupabaseClient();
-    const session = useSession();
-  
-  const { activePlanet } = useActivePlanet();
+export default function ModernTechTree() {
+  const supabase = useSupabaseClient()
+  const session = useSession()
+  const { activePlanet } = useActivePlanet()
 
-  const [technologies, setTechnologies] = useState<Technology[]>([]);
-  const [unlockedTechs, setUnlockedTechs] = useState<number[]>([]);
-  const [filteredItems, setFilteredItems] = useState<SupabaseInventoryItem[]>([]);
-  const [planetsWithItem, setPlanetsWithItem] = useState<Array<{ id: number; content: string }>>([]);
+  const [technologies, setTechnologies] = React.useState<Technology[]>([])
+  const [unlockedTechs, setUnlockedTechs] = React.useState<number[]>([])
+  const [filteredItems, setFilteredItems] = React.useState<SupabaseInventoryItem[]>([])
+  const [openTech, setOpenTech] = React.useState<number | null>(null)
+
+  const sections = [
+    { id: "discovery", name: "Discovery Stations", icon: Microscope },
+    { id: "spacecraft", name: "Spacecraft", icon: Rocket },
+    { id: "resources", name: "Resource Management", icon: BarChart3 },
+    { id: "structures", name: "Structures", icon: Building },
+    { id: "automatons", name: "Automatons", icon: Cpu },
+  ]
 
   const fetchTechnologies = async () => {
-    const structuresRes = await fetch("/api/gameplay/research/structures");
-    const structuresData = await structuresRes.json();
+    const structuresRes = await fetch("/api/gameplay/research/structures")
+    const structuresData = await structuresRes.json()
 
-    const automatonsRes = await fetch("/api/gameplay/research/automatons");
-    const automatonsData = await automatonsRes.json();
+    const automatonsRes = await fetch("/api/gameplay/research/automatons")
+    const automatonsData = await automatonsRes.json()
 
     const combinedTechnologies: Technology[] = [
       ...structuresData.map((structure: any) => ({
@@ -73,155 +85,160 @@ export function AdvancedTechTreeComponent() {
         category: "Automatons" as TechCategory,
         requiresMission: automaton.requiresMission || null,
       })),
-    ];
-
-    setTechnologies(combinedTechnologies);
-  };
+    ]
+    setTechnologies(combinedTechnologies)
+  }
 
   const fetchUserStructures = async () => {
-    if (!session?.user.id || !activePlanet?.id) return;
+    if (!session?.user.id || !activePlanet?.id) return
 
     const { data: researchData, error: researchError } = await supabase
       .from("researched")
       .select("tech_type, tech_id")
-      .eq("user_id", session?.user.id);
+      .eq("user_id", session?.user.id)
 
     if (researchError) {
-      console.error("Error fetching user structures:", researchError);
-      return;
+      console.error("Error fetching user structures:", researchError)
+      return
     }
 
-    const structureIds = researchData.map((item: any) => item.tech_id);
-    const researchedTech = new Set(structureIds);
+    const structureIds = researchData.map((item: any) => item.tech_id)
+    const researchedTech = new Set(structureIds)
 
-    setUnlockedTechs(Array.from(researchedTech));
-  };
+    setUnlockedTechs(Array.from(researchedTech))
+  }
 
   const fetchPlanetsWithItem = async (itemId: number) => {
-    if (!session?.user?.id) return;
-  
+    if (!session?.user?.id) return
+
     const { data, error } = await supabase
       .from('inventory')
       .select('anomaly') 
       .eq('owner', session.user.id)
-      .eq('item', itemId);
-  
+      .eq('item', itemId)
+
     if (error) {
-      console.error('Error fetching planets with item:', error);
-      return;
+      console.error('Error fetching planets with item:', error)
+      return
     }
-  
-    const anomalies = data?.map((inventoryItem: { anomaly: number }) => inventoryItem.anomaly) || [];
-  
-    const { data: planetsData, error: planetsError } = await supabase
-      .from('anomalies')
-      .select('id, content')
-      .in('id', anomalies);
-  
-    if (planetsError) {
-      console.error('Error fetching planet names:', planetsError);
-      return;
-    }
-  
-    const planetNames = planetsData.map((planet: { id: number; content: string }) => ({
-      id: planet.id,
-      content: planet.content,
-    }));
-    setPlanetsWithItem(planetNames);
-  };  
 
-  const canUnlock = (techId: number) => {
-    const tech = technologies.find((t) => t.id === techId);
-    return tech?.requiredTech === null || (tech?.requiredTech && unlockedTechs.includes(tech.requiredTech));
-  };
+    const anomalies = data?.map((inventoryItem: { anomaly: number }) => inventoryItem.anomaly) || []
+    // Additional processing of anomalies (if needed)
+  }
 
-  useEffect(() => {
-    fetchTechnologies();
-    fetchUserStructures();
-  }, [session?.user.id, activePlanet]);
+  const toggleTech = (techId: number) => {
+    setOpenTech(openTech === techId ? null : techId)
+  }
+
+  const researchModule = (techId: number, moduleName: string) => {
+    setTechnologies(techs =>
+      techs.map(tech =>
+        tech.id === techId
+          ? {
+              ...tech,
+              modules: tech.modules.map((module: { name: string }) =>
+                module.name === moduleName ? { ...module, researched: true } : module
+              ),
+            }
+          : tech
+      )
+    )
+  }
+
+  React.useEffect(() => {
+    fetchTechnologies()
+    fetchUserStructures()
+  }, [session?.user.id, activePlanet?.id])
 
   return (
-    <div className="bg-gradient-to-br from-[#2C4F64] to-[#303F51] text-[#F7F5E9] container mx-auto p-4 ">
+    <div className="min-h-screen bg-[#1D2833] text-[#F7F5E9] p-4 md:p-8">
       <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-[#5FCBC3] to-[#FF695D]">
         Research Station
       </h1>
-      <Tabs defaultValue="Structures" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-gradient-to-r from-[#2C4F64] to-[#3A5A6D]">
-          <TabsTrigger value="Structures">Structures</TabsTrigger>
-          <TabsTrigger value="Automatons">Automatons</TabsTrigger>
-          <TabsTrigger value="Other">Other</TabsTrigger>
+      <Tabs defaultValue="discovery" className="w-full">
+        <TabsList className="flex justify-center mb-6 bg-transparent">
+          {sections.map((section) => (
+            <TabsTrigger
+              key={section.id}
+              value={section.id}
+              className="px-4 py-2 rounded-full text-[#F7F5E9] data-[state=active]:bg-[#2C4F64] data-[state=active]:text-[#5FCBC3] transition-all duration-300"
+            >
+              <section.icon className="w-4 h-4 mr-2 inline-block" />
+              {section.name}
+            </TabsTrigger>
+          ))}
         </TabsList>
-
-        <TabsContent value="Structures">
-          <ScrollArea className="h-[calc(100vh-200px)] rounded-md border border-[#5FCBC3] p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {technologies
-  .filter((tech) => tech.category === "Structures")
-  .map((tech) => (
-    <div
-      key={tech.id}
-      className={`p-4 rounded-md ${unlockedTechs.includes(tech.id) ? 'bg-green-500' : 'bg-red-500'}`}
-      onClick={() => fetchPlanetsWithItem(tech.item ?? 0)}
-    >
-      <div className="flex items-center space-x-4">
-        {tech.icon}
-        <h3 className="text-xl font-bold">{tech.name}</h3>
-      </div>
-      <p>{tech.description}</p>
-      <button
-        className="text-xs px-2 py-1 rounded bg-[#5FCBC3] text-[#303F51]"
-        disabled={!canUnlock(tech.id)}
-      >
-        {unlockedTechs.includes(tech.id) ? "Researched" : "Research"}
-      </button>
-
-      <ChevronDownCircle className="mt-1" />
-
-      {planetsWithItem.length > 0 && (
-  <div className="mt-4 p-2 bg-[#F7F5E9] text-[#303F51] rounded-md">
-    <h4 className="text-md font-semibold mb-2">Planets with this technology:</h4>
-    <ul>
-      {planetsWithItem.map((planet) => (
-        <li key={planet.id}>Planet: {planet.content} (ID: {planet.id})</li>
-      ))}
-    </ul>
-  </div>
-)}
-    </div>
-  ))}
-
-            </div>
-          </ScrollArea>
-        </TabsContent>
-
-        <TabsContent value="Automatons">
-          <ScrollArea className="h-[calc(100vh-200px)] rounded-md border border-[#5FCBC3] p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {technologies
-                .filter((tech) => tech.category === "Automatons")
-                .map((tech) => (
-                  <div
-                    key={tech.id}
-                    className={`p-4 rounded-md ${unlockedTechs.includes(tech.id) ? 'bg-green-500' : 'bg-red-500'}`}
-                    onClick={() => fetchPlanetsWithItem(tech.item ?? 0)}
-                  >
-                    <div className="flex items-center space-x-4">
-                      {tech.icon}
-                      <h3 className="text-xl font-bold">{tech.name}</h3>
-                    </div>
-                    <p>{tech.description}</p>
-                    <button
-                      className="text-xs px-2 py-1 rounded bg-[#5FCBC3] text-[#303F51]"
-                      disabled={!canUnlock(tech.id)}
-                    >
-                      {unlockedTechs.includes(tech.id) ? "Researched" : "Research"}
-                    </button>
-                  </div>
-                ))}
-            </div>
-          </ScrollArea>
-        </TabsContent>
+        {sections.map((section) => (
+          <TabsContent key={section.id} value={section.id}>
+            <ScrollArea className="h-[calc(100vh-200px)]">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {technologies
+                  .filter((tech) => tech.category.toLowerCase() === section.id)
+                  .map((tech) => {
+                    const TechIcon = techIcons[tech.name] || CircleDot
+                    return (
+                      <div key={tech.id} className="relative">
+                        <div className="bg-[#2C4F64] p-6 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105">
+                          <div className="flex items-center mb-4">
+                            <TechIcon className="w-8 h-8 mr-3 text-[#5FCBC3]" />
+                            <h3 className="text-2xl font-semibold">{tech.name}</h3>
+                          </div>
+                          <div className="flex items-center justify-between mb-4">
+                            <span className="text-sm text-[#5FCBC3]">Level {tech.level}</span>
+                            <button
+                              onClick={() => toggleTech(tech.id)}
+                              className="bg-[#5FCBC3] text-[#1D2833] px-4 py-2 rounded-full hover:bg-opacity-80 transition-colors duration-300"
+                            >
+                              {openTech === tech.id ? "Close" : "Details"}
+                            </button>
+                          </div>
+                          {openTech === tech.id && (
+                            <div className="mt-4 space-y-4">
+                              <div>
+                                <h4 className="text-[#5FCBC3] font-semibold mb-2">Planets</h4>
+                                <ul className="space-y-2">
+                                  {tech.planets.map((planet: { name: string; visited: boolean }) => (
+                                    <li key={planet.name} className="flex items-center justify-between">
+                                      <span className="flex items-center">
+                                        <CircleDot className="w-4 h-4 mr-2 text-[#FF695D]" />
+                                        {planet.name}
+                                        {planet.visited && <Check className="w-4 h-4 ml-2 text-[#5FCBC3]" />}
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div>
+                                <h4 className="text-[#5FCBC3] font-semibold mb-2">Modules</h4>
+                                <ul className="space-y-2">
+                                  {tech.modules?.map((module: { name: string; researched: boolean }) => (
+                                    <li key={module.name} className="flex items-center justify-between">
+                                      <span>{module.name}</span>
+                                      {module.researched ? (
+                                        <Check className="w-4 h-4 text-[#5FCBC3]" />
+                                      ) : (
+                                        <button
+                                          onClick={() => researchModule(tech.id, module.name)}
+                                          className="bg-[#FF695D] text-[#F7F5E9] px-2 py-1 rounded-full hover:bg-opacity-80 transition-all duration-300"
+                                        >
+                                          Research
+                                        </button>
+                                      )}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+        ))}
       </Tabs>
     </div>
-  );
+  )
 };

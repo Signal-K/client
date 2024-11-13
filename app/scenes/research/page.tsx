@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AdvancedTechTreeComponent } from "@/components/Structures/Research/TechTree";
+import ModernTechTree from "@/components/Structures/Research/TechTree";
 
 export default function ResearchPage() {
     return ( 
@@ -11,7 +11,7 @@ export default function ResearchPage() {
                 src="/assets/Backdrops/Earth.png"
             />
             <div className="relative">
-                <AdvancedTechTreeComponent />
+                <ModernTechTree />
             </div>
         </div>
     );

@@ -19,7 +19,7 @@ export function DataSourcesModal({ structureId, structure }: DataSourcesModalPro
       ...zoodexDataSources,
       ...telescopeDataSources,
       ...lidarDataSources,
-      ...roverDataSources, // Add rover data to the categories
+      ...roverDataSources,
     ].map((category) => [category.category, true]))
   ); 
 

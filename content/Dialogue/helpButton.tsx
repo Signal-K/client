@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { HelpCircle, ChevronLeftSquare, ChevronRightSquare, X, PlusSquareIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import MissionPathway from "@/components/Missions/Pathway";
 import Link from "next/link";
 import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
 

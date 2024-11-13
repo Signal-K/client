@@ -10,7 +10,7 @@ import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIco
 import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
-import { AdvancedTechTreeComponent } from "@/components/Structures/Research/TechTree";
+import ModernTechTree from "@/components/Structures/Research/TechTree";
 import MiningScene from "@/app/scenes/mining/page";
 import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
 import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
@@ -285,7 +285,7 @@ export const StructuresConfig: StructureConfig = {
         { 
           icon: <CaravanIcon className="w-6 h-6 text-[#5e81ac]" />, 
           text: "Research technology", 
-          dynamicComponent: <AdvancedTechTreeComponent />,
+          dynamicComponent: <ModernTechTree />,
           sizePercentage: 60,
         },
       ],
@@ -293,7 +293,7 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research technology",
-          component: <AdvancedTechTreeComponent />,
+          component: <ModernTechTree />,
         },
         // {
         //   icon: <BookAIcon className="w-6 h-6 text-[#5e81ac]" />,

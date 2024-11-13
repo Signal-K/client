@@ -6,7 +6,7 @@ import { DiscoveryCardSingle } from './Classification';
 
 interface DiscoveryCardsByUserAndAnomalyProps {
   anomalyId: number;
-}
+}; 
 
 export function DiscoveryCardsByUserAndAnomaly({ anomalyId }: DiscoveryCardsByUserAndAnomalyProps) {
   const supabase = useSupabaseClient();

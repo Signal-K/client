@@ -9,7 +9,7 @@ import { BeanIcon, BirdIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon,
 import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
-import { AdvancedTechTreeComponent } from "@/components/Structures/Research/TechTree";
+import ModernTechTree from "@/components/Structures/Research/TechTree";
 import MiningScene from "@/app/scenes/mining/page";
 import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
 import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";

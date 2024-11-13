@@ -6,12 +6,12 @@ import ImageAnnotation from "@/components/Projects/(classifications)/Annotation"
 import InventoryPage from "@/components/Inventory/Grid/Grid";
 import TelescopeComponent from "@/constants/Structures/Telescope";
 import ZoodexComponent from "@/constants/Structures/Zoodex";
+import { CreateStructure } from "@/components/Structures/Build/CreateDedicatedStructure";
 
 export default function TestPage() {
     return (
         <StarnetLayout>
-          <TelescopeComponent />
-          <ZoodexComponent />
+          <></>
         </StarnetLayout>
     );
 };
