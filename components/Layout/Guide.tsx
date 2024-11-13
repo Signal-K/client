@@ -23,10 +23,18 @@ interface DialogueStep {
 };
 
 const astronomyMissions: Mission[] = [
+    // {
+    //     id: [3000001, 20000004,], // 3000002],
+    //     name: "Complete a mission using your created structure",
+    //     description: "Click on the structure you created to make some classifications",
+    //     icon: Telescope,
+    //     color: 'text-cyan-300',
+    //     requiredItem: 3103,
+    // },
     {
-        id: [3000001, 20000004, 3000002],
-        name: "Complete a mission using your created structure",
-        description: "Click on the structure you created to make some classifications",
+        id: 3000001,
+        name: "Complete an astronomy mission using your telescope",
+        description: "Click on the 'Telescope' structure to make some classifications",
         icon: Telescope,
         color: 'text-cyan-300',
         requiredItem: 3103,
@@ -38,7 +46,7 @@ const astronomyMissions: Mission[] = [
         icon: Shapes,
         color: 'text-purple-300',
         requiredItem: 3103,
-    }
+    },
 ];
 
 const biologistMissions: Mission[] = [
@@ -128,7 +136,6 @@ const StructureMissionGuide = () => {
     const [completedMissions, setCompletedMissions] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentCategory, setCurrentCategory] = useState(0);
-    const [minimized, setMinimized] = useState(false);
     const [ownedItems, setOwnedItems] = useState<number[]>([]);
     const [scrollableMissions, setScrollableMissions] = useState<Mission[]>([]);
 
@@ -180,23 +187,36 @@ const StructureMissionGuide = () => {
     }, [session, activePlanet, supabase]);
 
     useEffect(() => {
+        // Get the current category's missions
+        const currentMissions = categories[currentCategory].missions;
+    
+        // Filter global missions based on category and owned items
+        const filteredGlobalMissions = globalMissions.filter((mission) => {
+            // Example: Only show astronomy-specific missions if requiredItem matches owned items
+            if (mission.requiredItem && !ownedItems.includes(mission.requiredItem)) {
+                return false; // Do not display if required item is not owned
+            }
+            return true; // Display if no restrictions
+        });
+    
+        // Combine current category missions with filtered global missions
         const missionsToDisplay = [
-            ...categories[currentCategory].missions,
-            ...globalMissions,
+            ...currentMissions,
+            ...filteredGlobalMissions,
         ];
-
-        // Remove duplicates if they already exist in scrollableMissions
+    
+        // Remove duplicates based on mission id
         const uniqueMissions = [
             ...new Map(missionsToDisplay.map(mission => [mission.id, mission])).values(),
         ];
-
+    
         setScrollableMissions(uniqueMissions);
-    }, [currentCategory]);
+    }, [currentCategory, ownedItems]);    
 
     const renderMission = (mission: Mission) => {
         const missionId = Array.isArray(mission.id) ? mission.id[0] : mission.id;
         const isCompleted = completedMissions.includes(missionId);
-    
+
         return (
             <Card key={missionId} className={`cursor-pointer border mb-2 ${isCompleted ? 'bg-gray-700' : 'bg-gray-800'}`}>
                 <CardContent className="p-4 flex items-center space-x-4">
@@ -237,11 +257,14 @@ const StructureMissionGuide = () => {
                             <ChevronRight className="w-6 h-6" />
                         </Button>
                     </div>
-                    <div className="space-y-2">
+
+                    <div className="overflow-y-auto max-h-40 space-y-2">
                         {!loading && scrollableMissions.length > 0 ? (
-                            scrollableMissions.map(renderMission)
+                            <div className="space-y-2">
+                                {scrollableMissions.map((mission) => renderMission(mission))}
+                            </div>
                         ) : (
-                            <p className="text-center text-gray-500">No missions available.</p>
+                            <p className="text-gray-400">No missions available.</p>
                         )}
                     </div>
                 </CardContent>
