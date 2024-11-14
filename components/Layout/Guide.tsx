@@ -7,7 +7,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 
 interface Mission {
-    id: number | number[]; 
+    id: number | number[];
     name: string;
     description: string;
     icon: React.ElementType;
@@ -23,14 +23,6 @@ interface DialogueStep {
 };
 
 const astronomyMissions: Mission[] = [
-    // {
-    //     id: [3000001, 20000004,], // 3000002],
-    //     name: "Complete a mission using your created structure",
-    //     description: "Click on the structure you created to make some classifications",
-    //     icon: Telescope,
-    //     color: 'text-cyan-300',
-    //     requiredItem: 3103,
-    // },
     {
         id: 3000001,
         name: "Complete an astronomy mission using your telescope",
@@ -72,20 +64,6 @@ const meteorologyMissions: Mission[] = [
 ];
 
 const globalMissions: Mission[] = [
-    // {
-    //     id: 2000000015,
-    //     name: "Research a new module",
-    //     description: 'Click on your structure and then the "Research" tab to unlock new projects and data sources to contribute to!',
-    //     icon: TestTube2,
-    //     color: 'text-purple-300',
-    // },
-    // {
-    //     id: 200000013,
-    //     name: "Collect some fuel",
-    //     description: "Click on the mining tab to visit some mineral deposits your probes have found and mine them for fuel",
-    //     icon: Pickaxe,
-    //     color: 'text-red-300',
-    // },
     {
         id: 3000001,
         name: "Discover a new planet",
@@ -120,14 +98,6 @@ const globalMissions: Mission[] = [
     },
 ];
 
-// Research station - walk the user through this. Then upload data, verify/vet (consensus), then we introduce travel. Add a "close"/swipe-down option so that the tutorial section can be hidden/minimised. Then we go through the guide for the different views....and determine the differentials from Pathway.tsx and this new list
-// As well as researching for other projects/mission modules that aren't in `mission-selector`
-// We'll also need to update this for different planets & chapters
-
-const dialogueSteps: DialogueStep[] = [
-
-];
-
 const StructureMissionGuide = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -148,7 +118,7 @@ const StructureMissionGuide = () => {
     useEffect(() => {
         async function fetchInventoryAndCompletedMissions() {
             if (!session?.user?.id || !activePlanet?.id) return;
-
+    
             try {
                 const { data: inventoryData } = await supabase
                     .from('inventory')
@@ -156,62 +126,93 @@ const StructureMissionGuide = () => {
                     .eq('owner', session.user.id)
                     .eq('anomaly', activePlanet.id)
                     .in('item', [3103, 3104, 3105]);
-
+    
                 const ownedItems = inventoryData ? inventoryData.map((inv: { item: number }) => inv.item) : [];
                 setOwnedItems(ownedItems);
-
+    
+                // Fetch completed missions
                 const { data: missionData } = await supabase
                     .from('missions')
                     .select('mission')
                     .eq('user', session.user.id);
-
+    
                 const completedMissionIds = missionData ? missionData.map((mission: { mission: number }) => mission.mission) : [];
+    
+                // Check missions with tableEntry and tableColumn
+                const additionalChecks = await Promise.all(globalMissions.map(async (mission) => {
+                    if (mission.tableEntry && mission.tableColumn) {
+                        const { data: tableData } = await supabase
+                            .from(mission.tableEntry)
+                            .select('*')
+                            .eq(mission.tableColumn, session.user.id);
+    
+                            if (tableData && tableData.length > 0) {
+                                // Check if mission.id is an array, and if so, push the first element
+                                if (Array.isArray(mission.id)) {
+                                    completedMissionIds.push(mission.id[0]);  // Pushing the first element of the array
+                                } else {
+                                    completedMissionIds.push(mission.id);  // Otherwise, push the number directly
+                                }
+                            }                            
+                    }
+                }));
+    
                 setCompletedMissions(completedMissionIds);
-
-                if (ownedItems.includes(3103)) {
-                    setCurrentCategory(0); // Astronomy
-                } else if (ownedItems.includes(3104)) {
-                    setCurrentCategory(1); // Biology
-                } else if (ownedItems.includes(3105)) {
-                    setCurrentCategory(2); // Meteorology
-                } else {
-                    setCurrentCategory(0); // Default to Astronomy
-                }
+                setLoading(false);
             } catch (error) {
                 console.error("Error fetching inventory or missions:", error);
+                setLoading(false);
             }
-            setLoading(false);
         }
-
+    
         fetchInventoryAndCompletedMissions();
     }, [session, activePlanet, supabase]);
-
+    
     useEffect(() => {
-        // Get the current category's missions
         const currentMissions = categories[currentCategory].missions;
     
-        // Filter global missions based on category and owned items
         const filteredGlobalMissions = globalMissions.filter((mission) => {
-            // Example: Only show astronomy-specific missions if requiredItem matches owned items
             if (mission.requiredItem && !ownedItems.includes(mission.requiredItem)) {
-                return false; // Do not display if required item is not owned
+                return false;
             }
-            return true; // Display if no restrictions
+            return true;
         });
     
-        // Combine current category missions with filtered global missions
         const missionsToDisplay = [
             ...currentMissions,
             ...filteredGlobalMissions,
         ];
     
-        // Remove duplicates based on mission id
         const uniqueMissions = [
-            ...new Map(missionsToDisplay.map(mission => [mission.id, mission])).values(),
+            ...new Map(missionsToDisplay.map(mission => [Array.isArray(mission.id) ? mission.id[0] : mission.id, mission])).values(),
         ];
     
         setScrollableMissions(uniqueMissions);
-    }, [currentCategory, ownedItems]);    
+    }, [currentCategory, ownedItems]);
+    
+    
+
+    useEffect(() => {
+        const currentMissions = categories[currentCategory].missions;
+
+        const filteredGlobalMissions = globalMissions.filter((mission) => {
+            if (mission.requiredItem && !ownedItems.includes(mission.requiredItem)) {
+                return false;
+            }
+            return true;
+        });
+
+        const missionsToDisplay = [
+            ...currentMissions,
+            ...filteredGlobalMissions,
+        ];
+
+        const uniqueMissions = [
+            ...new Map(missionsToDisplay.map(mission => [mission.id, mission])).values(),
+        ];
+
+        setScrollableMissions(uniqueMissions);
+    }, [currentCategory, ownedItems]);
 
     const renderMission = (mission: Mission) => {
         const missionId = Array.isArray(mission.id) ? mission.id[0] : mission.id;
@@ -250,23 +251,20 @@ const StructureMissionGuide = () => {
                         <Button onClick={previousCategory} className="p-2 text-gray-300">
                             <ChevronLeft className="w-6 h-6" />
                         </Button>
-                        <h2 className="text-xl font-semibold text-gray-200">
-                            {categories[currentCategory].name} Missions
-                        </h2>
+                        <h2 className="text-xl font-semibold text-gray-200">{categories[currentCategory].name}</h2>
                         <Button onClick={nextCategory} className="p-2 text-gray-300">
                             <ChevronRight className="w-6 h-6" />
                         </Button>
                     </div>
-
+                    <AnimatePresence>
                     <div className="overflow-y-auto max-h-40 space-y-2">
-                        {!loading && scrollableMissions.length > 0 ? (
-                            <div className="space-y-2">
-                                {scrollableMissions.map((mission) => renderMission(mission))}
-                            </div>
-                        ) : (
-                            <p className="text-gray-400">No missions available.</p>
-                        )}
-                    </div>
+                            {loading ? (
+                                <div>Loading...</div>
+                            ) : (
+                                scrollableMissions.map(renderMission)
+                            )}
+                        </div>
+                    </AnimatePresence>
                 </CardContent>
             </div>
         </div>
