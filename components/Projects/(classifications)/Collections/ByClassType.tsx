@@ -4,13 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { DiscoveryCardSingle } from './Classification';
 
-interface DiscoveryCardsByClassificationTypeProps {
+interface DiscoveryCardsByClassificationTypeProps { 
   classificationtype: string;
 };
 
 export function DiscoveryCardsByClassificationType({ classificationtype }: DiscoveryCardsByClassificationTypeProps) {
   const supabase = useSupabaseClient();
-const session = useSession();
+  const session = useSession();
   
   const [classifications, setClassifications] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -23,9 +23,8 @@ const session = useSession();
       try {
         const { data, error } = await supabase
           .from('classifications')
-          .select('id')
-          .eq('author', session?.user.id)
-          .eq('anomaly', classificationtype); 
+          .select('*')
+          .eq('classificationtype', classificationtype); 
 
         if (error) throw error;
 
@@ -38,12 +37,14 @@ const session = useSession();
       }
     };
 
-    fetchClassifications();
+    if (classificationtype) { 
+      fetchClassifications();
+    }
   }, [classificationtype, supabase]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
-  if (classifications.length === 0) return <p>No classifications found for this anomaly by user</p>;
+  if (classifications.length === 0) return <p>No classifications found for this classification type</p>;
 
   return (
     <div className="flex flex-col space-y-4">

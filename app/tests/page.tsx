@@ -7,11 +7,14 @@ import InventoryPage from "@/components/Inventory/Grid/Grid";
 import TelescopeComponent from "@/constants/Structures/Telescope";
 import ZoodexComponent from "@/constants/Structures/Zoodex";
 import { CreateStructure } from "@/components/Structures/Build/CreateDedicatedStructure";
+import AllClassifications from "@/content/Starnet/YourClassifications";
 
 export default function TestPage() {
     return (
         <StarnetLayout>
-          <></>
+          <>
+            <AllClassifications />
+          </>
         </StarnetLayout>
     );
 };

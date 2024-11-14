@@ -15,10 +15,10 @@ export function DiscoveryCards() {
   useEffect(() => {
     const fetchClassifications = async () => {
       if (!session?.user) {
-        setError('User session not found.');
+        setError('User session not found.'); 
         setLoading(false);
         return;
-      }
+      };
 
       setLoading(true);
       setError(null);
@@ -36,7 +36,7 @@ export function DiscoveryCards() {
         setError('Failed to load classifications.');
       } finally {
         setLoading(false);
-      }
+      };
     };
 
     fetchClassifications();
@@ -53,4 +53,4 @@ export function DiscoveryCards() {
       ))}
     </div>
   );
-}
+};

@@ -44,10 +44,6 @@ const generateImagePlaceholder = (name: string) => {
   return canvas.toDataURL();
 };
 
-interface DiscoveryCardSingleProps {
-  classificationId: number;
-};
-
 const extractImageUrls = (media: any): string[] => {
   let imageUrls: string[] = [];
 
@@ -75,21 +71,33 @@ const extractImageUrls = (media: any): string[] => {
 export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSingleProps) {
   const supabase = useSupabaseClient();
   const [classification, setClassification] = useState<any>(null);
+  const [anomaly, setAnomaly] = useState<any>(null);  // For anomaly data
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchClassification = async () => {
       setLoading(true);
       try {
+        // Fetch classification data along with anomaly data (join anomalies table)
         const { data, error } = await supabase
           .from('classifications')
-          .select('id, content, classificationtype, created_at, media, anomaly, classificationConfiguration')
+          .select('id, content, classificationtype, created_at, media, anomaly, classificationConfiguration, anomalies(avatar_url)')
           .eq('id', classificationId)
           .single();
 
         if (error) throw error;
 
         setClassification(data);
+        if (data.anomaly) {
+          // Fetch anomaly data separately if needed
+          const { data: anomalyData } = await supabase
+            .from('anomalies')
+            .select('avatar_url')
+            .eq('id', data.anomaly)
+            .single();
+          
+          setAnomaly(anomalyData);  // Store the anomaly's avatar_url
+        }
       } catch (error) {
         console.error('Error fetching classification:', error);
       } finally {
@@ -103,9 +111,9 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
   if (loading) return <p>Loading...</p>;
   if (!classification) return <p>No classification found.</p>;
 
-  const { content, classificationtype, created_at, media, anomaly, classificationConfiguration } = classification;
+  const { content, classificationtype, created_at, media, classificationConfiguration } = classification;
   const discoveredOn = new Date(created_at).toLocaleDateString();
-  const parentAnomaly = anomaly ? `Anomaly ID: ${anomaly}` : 'Earth';
+  const parentAnomaly = classification.anomaly ? `Anomaly ID: ${classification.anomaly}` : 'Earth';
 
   // Extract URLs from the media column
   const imageUrls = extractImageUrls(media);
@@ -137,6 +145,19 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
               <Globe className="w-4 h-4 text-slate-600" />
               <span className="text-sm">Parent Anomaly: {parentAnomaly}</span>
             </div>
+            
+            {/* Display Anomaly Avatar if available */}
+            {anomaly?.avatar_url && (
+              <div className="mt-4">
+                <h3 className="font-semibold">Anomaly Avatar:</h3>
+                <img 
+                  src={anomaly.avatar_url} 
+                  alt="Anomaly Avatar" 
+                  className="w-16 h-16 rounded-full object-cover shadow-md" 
+                />
+              </div>
+            )}
+
             <div className="mt-4">
               <h3 className="font-semibold">Classification Configuration:</h3>
               <pre>{JSON.stringify(classificationConfiguration, null, 2)}</pre>
@@ -159,8 +180,3 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
     </Card>
   );
 };
-
-
-interface ClassificationConfiguration {
-  [key: string]: string | number | boolean; 
-}
