@@ -1,22 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, Users, Globe } from 'lucide-react';
+import { CalendarIcon, Users, Globe, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { zoodexSouthCoastFaunaRecoveryClassificationConfig, cloudClassificationConfig, planetClassificationConfig } from '../FormConfigurations';
-import { zoodexSouthCoastFaunaRecovery, 
-  initialCloudClassificationOptions, 
-  roverImgClassificationOptions, 
-  lidarEarthCloudsReadClassificationOptions, 
-  planetClassificationOptions, 
-  planktonPortalClassificationOptions, 
-  penguinWatchClassificationOptions, 
-  diskDetectorClassificationOptions, 
-  zoodexIguanasFromAboveClassificationOptions, 
-  zoodexBurrowingOwlClassificationOptions, 
-} from '@/content/Classifications/Options';
+import { zoodexSouthCoastFaunaRecovery, initialCloudClassificationOptions, roverImgClassificationOptions, lidarEarthCloudsReadClassificationOptions, planetClassificationOptions, planktonPortalClassificationOptions, penguinWatchClassificationOptions, diskDetectorClassificationOptions, zoodexIguanasFromAboveClassificationOptions, zoodexBurrowingOwlClassificationOptions } from '@/content/Classifications/Options';
+import { Button } from '@/components/ui/button';
 
 interface KeyStat {
   label: string;
@@ -57,7 +48,6 @@ const extractImageUrls = (media: any): string[] => {
       // If it's not a valid JSON, do nothing
     }
   } else if (Array.isArray(media)) {
-    // Flatten the array and extract URLs
     media.flat().forEach((item) => {
       if (typeof item === 'string' && item.startsWith('http')) {
         imageUrls.push(item);
@@ -70,33 +60,49 @@ const extractImageUrls = (media: any): string[] => {
 
 export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSingleProps) {
   const supabase = useSupabaseClient();
+  const user = useUser();  // To get the current user's session data
   const [classification, setClassification] = useState<any>(null);
-  const [anomaly, setAnomaly] = useState<any>(null);  // For anomaly data
+  const [anomaly, setAnomaly] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [voteCount, setVoteCount] = useState<number>(0);
+  const [userVote, setUserVote] = useState<number | null>(null); // Track user's vote: 1 for upvote, -1 for downvote
 
   useEffect(() => {
     const fetchClassification = async () => {
       setLoading(true);
       try {
-        // Fetch classification data along with anomaly data (join anomalies table)
         const { data, error } = await supabase
           .from('classifications')
           .select('id, content, classificationtype, created_at, media, anomaly, classificationConfiguration, anomalies(avatar_url)')
           .eq('id', classificationId)
           .single();
-
+  
         if (error) throw error;
-
+  
         setClassification(data);
+  
+        // Get total votes from classificationConfiguration
+        const totalVotes = data?.classificationConfiguration?.votes || 0;
+        setVoteCount(totalVotes);  // Use the total votes from classifications
+  
         if (data.anomaly) {
-          // Fetch anomaly data separately if needed
           const { data: anomalyData } = await supabase
             .from('anomalies')
             .select('avatar_url')
             .eq('id', data.anomaly)
             .single();
-          
-          setAnomaly(anomalyData);  // Store the anomaly's avatar_url
+          setAnomaly(anomalyData);
+        }
+  
+        // Fetch user's individual vote from the votes table
+        const { data: voteData } = await supabase
+          .from('votes')
+          .select('vote')
+          .eq('classification_id', classificationId)
+          .eq('user_id', user?.id);
+  
+        if (voteData && voteData.length > 0) {
+          setUserVote(voteData[0].vote);
         }
       } catch (error) {
         console.error('Error fetching classification:', error);
@@ -104,9 +110,53 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
         setLoading(false);
       }
     };
+  
+    if (user) {
+      fetchClassification();
+    }
+  }, [classificationId, supabase, user]);
+  
 
-    fetchClassification();
-  }, [classificationId, supabase]);
+  const handleVote = async () => {
+    if (!user) return alert('Please log in to vote');
+  
+    try {
+      // Step 1: Insert a new row into the 'votes' table
+      const { data: voteData, error: voteError } = await supabase
+        .from('votes')
+        .insert({
+          user_id: user.id,
+          classification_id: classification.id,
+          anomaly_id: classification.anomaly,  // Assuming 'classification.anomaly' holds the anomaly_id
+        });
+  
+      if (voteError) throw voteError;
+  
+      // Step 2: Increment the vote count in classificationConfiguration.votes
+      const updatedVotes = (classification.classificationConfiguration?.votes || 0) + 1;
+  
+      const updatedConfiguration = {
+        ...classification.classificationConfiguration,
+        votes: updatedVotes, // Update the vote count
+      };
+  
+      const { data: updateData, error: updateError } = await supabase
+        .from('classifications')
+        .update({
+          classificationConfiguration: updatedConfiguration,
+        })
+        .eq('id', classification.id);
+  
+      if (updateError) throw updateError;
+  
+      // Step 3: Update the UI
+      setVoteCount(updatedVotes);
+      setClassification({ ...classification, classificationConfiguration: updatedConfiguration });
+  
+    } catch (error) {
+      console.error('Error updating vote:', error);
+    }
+  };  
 
   if (loading) return <p>Loading...</p>;
   if (!classification) return <p>No classification found.</p>;
@@ -114,8 +164,6 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
   const { content, classificationtype, created_at, media, classificationConfiguration } = classification;
   const discoveredOn = new Date(created_at).toLocaleDateString();
   const parentAnomaly = classification.anomaly ? `Anomaly ID: ${classification.anomaly}` : 'Earth';
-
-  // Extract URLs from the media column
   const imageUrls = extractImageUrls(media);
 
   return (
@@ -123,7 +171,6 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
       <CardContent className="p-6 flex">
         <div className="w-1/3 pr-4 border-r border-slate-300">
           <div className="aspect-square rounded-lg overflow-hidden mb-4 shadow-md">
-            {/* Display first image or placeholder */}
             {imageUrls.length > 0 ? (
               <img src={imageUrls[0]} alt="Classification Media" className="w-full h-full object-cover" />
             ) : (
@@ -146,7 +193,6 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
               <span className="text-sm">Parent Anomaly: {parentAnomaly}</span>
             </div>
             
-            {/* Display Anomaly Avatar if available */}
             {anomaly?.avatar_url && (
               <div className="mt-4">
                 <h3 className="font-semibold">Anomaly Avatar:</h3>
@@ -163,7 +209,6 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
               <pre>{JSON.stringify(classificationConfiguration, null, 2)}</pre>
             </div>
 
-            {/* Display all images from the media */}
             {imageUrls.length > 1 && (
               <div className="mt-4">
                 <h3 className="font-semibold">Additional Media:</h3>
@@ -174,6 +219,17 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Voting Section */}
+          <div className="flex justify-between items-center mt-6">
+            <div className="flex items-center space-x-4">
+            <Button onClick={handleVote}>
+  <ThumbsUp />
+</Button>
+
+            </div>
+            <Users className="w-5 h-5 text-slate-600" />
           </div>
         </div>
       </CardContent>
