@@ -30,7 +30,7 @@ type Technology = {
   category: TechCategory
   requiresMission?: number
   item?: number
-}
+};
 
 type SupabaseInventoryItem = {
   id: number
@@ -38,17 +38,18 @@ type SupabaseInventoryItem = {
   owner: string
   quantity: number
   anomaly: number
-}
+};
 
 export default function ModernTechTree() {
-  const supabase = useSupabaseClient()
-  const session = useSession()
-  const { activePlanet } = useActivePlanet()
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-  const [technologies, setTechnologies] = React.useState<Technology[]>([])
-  const [unlockedTechs, setUnlockedTechs] = React.useState<number[]>([])
-  const [filteredItems, setFilteredItems] = React.useState<SupabaseInventoryItem[]>([])
-  const [openTech, setOpenTech] = React.useState<number | null>(null)
+  const { activePlanet } = useActivePlanet();
+
+  const [technologies, setTechnologies] = React.useState<Technology[]>([]);
+  const [unlockedTechs, setUnlockedTechs] = React.useState<number[]>([]);
+  const [filteredItems, setFilteredItems] = React.useState<SupabaseInventoryItem[]>([]);
+  const [openTech, setOpenTech] = React.useState<number | null>(null);
 
   const sections = [
     { id: "discovery", name: "Discovery Stations", icon: Microscope },
@@ -56,7 +57,7 @@ export default function ModernTechTree() {
     { id: "resources", name: "Resource Management", icon: BarChart3 },
     { id: "structures", name: "Structures", icon: Building },
     { id: "automatons", name: "Automatons", icon: Cpu },
-  ]
+  ];
 
   const fetchTechnologies = async () => {
     const structuresRes = await fetch("/api/gameplay/research/structures")
@@ -100,13 +101,13 @@ export default function ModernTechTree() {
     if (researchError) {
       console.error("Error fetching user structures:", researchError)
       return
-    }
+    };
 
     const structureIds = researchData.map((item: any) => item.tech_id)
     const researchedTech = new Set(structureIds)
 
     setUnlockedTechs(Array.from(researchedTech))
-  }
+  };
 
   const fetchPlanetsWithItem = async (itemId: number) => {
     if (!session?.user?.id) return
