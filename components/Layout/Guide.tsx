@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, HelpCircle, Expand, Telescope, TreeDeciduous, CloudHail, LightbulbIcon, LucideTestTubeDiagonal, CameraIcon, Shapes } from "lucide-react";
+import { ChevronLeft, ChevronRight, HelpCircle, Expand, Telescope, TreeDeciduous, CloudHail, LightbulbIcon, LucideTestTubeDiagonal, CameraIcon, Shapes, PersonStandingIcon } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 
@@ -15,6 +15,7 @@ interface Mission {
     requiredItem?: number;
     tableEntry?: string;
     tableColumn?: string;
+    voteOn?: string;
 };
 
 interface DialogueStep {
@@ -96,11 +97,22 @@ const globalMissions: Mission[] = [
         tableEntry: 'uploads',
         tableColumn: 'author',
     },
+    {
+        id: 4,
+        name: "Vote on planet candidate classifications",
+        description: "Other users, or maybe you, have discovered some potential planet candidates. Go to your Telescope structure, click 'View all discoveries', and vote to select which classifications are valid, which in turn will allow anomalies to be added to the ecosystem",
+        icon: PersonStandingIcon,
+        color: 'text-red-300',
+        tableEntry: 'votes',
+        tableColumn: 'user_id',
+        voteOn: 'planet',
+    },
 ];
 
 const StructureMissionGuide = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
+
     const { activePlanet } = useActivePlanet();
 
     const [completedMissions, setCompletedMissions] = useState<number[]>([]);
@@ -138,7 +150,27 @@ const StructureMissionGuide = () => {
     
                 const completedMissionIds = missionData ? missionData.map((mission: { mission: number }) => mission.mission) : [];
     
-                // Check missions with tableEntry and tableColumn
+                // Fetch specific votes based on mission's voteOn classification type
+                const voteOnMissions = await Promise.all(globalMissions.map(async (mission) => {
+                    if (mission.voteOn) {
+                        const { data: specificVotes } = await supabase
+                            .from('votes')
+                            .select('*')
+                            .eq("user_id", session.user.id)
+                            .eq("classificationtype", mission.voteOn);  // Check vote classification type
+    
+                        if (specificVotes && specificVotes.length > 0) {
+                            // If the user has voted on this classification, mark the mission as completed
+                            if (Array.isArray(mission.id)) {
+                                completedMissionIds.push(mission.id[0]);  // Pushing the first element if mission id is an array
+                            } else {
+                                completedMissionIds.push(mission.id);
+                            }
+                        }
+                    }
+                }));
+    
+                // Check tableEntry and tableColumn
                 const additionalChecks = await Promise.all(globalMissions.map(async (mission) => {
                     if (mission.tableEntry && mission.tableColumn) {
                         const { data: tableData } = await supabase
@@ -146,14 +178,14 @@ const StructureMissionGuide = () => {
                             .select('*')
                             .eq(mission.tableColumn, session.user.id);
     
-                            if (tableData && tableData.length > 0) {
-                                // Check if mission.id is an array, and if so, push the first element
-                                if (Array.isArray(mission.id)) {
-                                    completedMissionIds.push(mission.id[0]);  // Pushing the first element of the array
-                                } else {
-                                    completedMissionIds.push(mission.id);  // Otherwise, push the number directly
-                                }
-                            }                            
+                        if (tableData && tableData.length > 0) {
+                            // If table data exists, mark mission as completed
+                            if (Array.isArray(mission.id)) {
+                                completedMissionIds.push(mission.id[0]);  // Pushing the first element if mission id is an array
+                            } else {
+                                completedMissionIds.push(mission.id);
+                            }
+                        }
                     }
                 }));
     
@@ -166,7 +198,7 @@ const StructureMissionGuide = () => {
         }
     
         fetchInventoryAndCompletedMissions();
-    }, [session, activePlanet, supabase]);
+    }, [session, activePlanet, supabase]);    
     
     useEffect(() => {
         const currentMissions = categories[currentCategory].missions;

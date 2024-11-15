@@ -6,7 +6,7 @@ import { MineralDepositsNoAction } from "@/components/Structures/Mining/Archive/
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
-import { BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import { BarChart, BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
@@ -24,6 +24,7 @@ import { AiForMarsProject } from "@/components/Projects/Auto/AI4Mars";
 import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
 import { PlanetFourProject } from "@/components/Projects/Satellite/PlanetFour";
 import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
+import AllClassifications from "@/content/Starnet/YourClassifications";
 
 interface IndividualStructureProps {
     name?: string;
@@ -140,6 +141,12 @@ export const StructuresConfig: StructureConfig = {
           icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research",
           dynamicComponent: <DataSourcesModal structureId="3103" structure="Telescope" />,
+        },
+        {
+          icon: <BarChart className="w-6 h-6 text-[#5e81ac]" />,
+          text: "View all discoveries",
+          dynamicComponent: <AllClassifications initialType="planet" />
+
         },
         // Copy action/labels
       ],

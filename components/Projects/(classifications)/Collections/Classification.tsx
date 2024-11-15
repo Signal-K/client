@@ -4,9 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, Users, Globe, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { zoodexSouthCoastFaunaRecoveryClassificationConfig, cloudClassificationConfig, planetClassificationConfig } from '../FormConfigurations';
-import { zoodexSouthCoastFaunaRecovery, initialCloudClassificationOptions, roverImgClassificationOptions, lidarEarthCloudsReadClassificationOptions, planetClassificationOptions, planktonPortalClassificationOptions, penguinWatchClassificationOptions, diskDetectorClassificationOptions, zoodexIguanasFromAboveClassificationOptions, zoodexBurrowingOwlClassificationOptions } from '@/content/Classifications/Options';
+import { CalendarIcon, Users, Globe, ThumbsUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface KeyStat {
@@ -16,7 +14,7 @@ interface KeyStat {
 
 interface DiscoveryCardSingleProps {
   classificationId: number;
-};
+}
 
 const generateImagePlaceholder = (name: string) => {
   const canvas = document.createElement('canvas');
@@ -60,12 +58,13 @@ const extractImageUrls = (media: any): string[] => {
 
 export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSingleProps) {
   const supabase = useSupabaseClient();
-  const user = useUser();  // To get the current user's session data
+  const user = useUser();  
   const [classification, setClassification] = useState<any>(null);
   const [anomaly, setAnomaly] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [voteCount, setVoteCount] = useState<number>(0);
-  const [userVote, setUserVote] = useState<number | null>(null); // Track user's vote: 1 for upvote, -1 for downvote
+  const [userVote, setUserVote] = useState<number | null>(null); 
+  const [showTooltip, setShowTooltip] = useState(false); // For Tailwind tooltip
 
   useEffect(() => {
     const fetchClassification = async () => {
@@ -76,15 +75,15 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
           .select('id, content, classificationtype, created_at, media, anomaly, classificationConfiguration, anomalies(avatar_url)')
           .eq('id', classificationId)
           .single();
-  
+
         if (error) throw error;
-  
+
         setClassification(data);
-  
+
         // Get total votes from classificationConfiguration
         const totalVotes = data?.classificationConfiguration?.votes || 0;
-        setVoteCount(totalVotes);  // Use the total votes from classifications
-  
+        setVoteCount(totalVotes); 
+
         if (data.anomaly) {
           const { data: anomalyData } = await supabase
             .from('anomalies')
@@ -93,14 +92,14 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
             .single();
           setAnomaly(anomalyData);
         }
-  
+
         // Fetch user's individual vote from the votes table
         const { data: voteData } = await supabase
           .from('votes')
           .select('vote')
           .eq('classification_id', classificationId)
           .eq('user_id', user?.id);
-  
+
         if (voteData && voteData.length > 0) {
           setUserVote(voteData[0].vote);
         }
@@ -110,49 +109,55 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
         setLoading(false);
       }
     };
-  
+
     if (user) {
       fetchClassification();
     }
   }, [classificationId, supabase, user]);
-  
 
   const handleVote = async () => {
     if (!user) return alert('Please log in to vote');
   
     try {
+      // Only allow voting if the user hasn't already voted
+      if (userVote !== null) {
+        return;
+      }
+
       // Step 1: Insert a new row into the 'votes' table
       const { data: voteData, error: voteError } = await supabase
         .from('votes')
         .insert({
           user_id: user.id,
           classification_id: classification.id,
-          anomaly_id: classification.anomaly,  // Assuming 'classification.anomaly' holds the anomaly_id
+          anomaly_id: classification.anomaly, 
+          vote: 1, 
         });
-  
+
       if (voteError) throw voteError;
-  
+
       // Step 2: Increment the vote count in classificationConfiguration.votes
       const updatedVotes = (classification.classificationConfiguration?.votes || 0) + 1;
-  
+
       const updatedConfiguration = {
         ...classification.classificationConfiguration,
-        votes: updatedVotes, // Update the vote count
+        votes: updatedVotes, 
       };
-  
+
       const { data: updateData, error: updateError } = await supabase
         .from('classifications')
         .update({
           classificationConfiguration: updatedConfiguration,
         })
         .eq('id', classification.id);
-  
+
       if (updateError) throw updateError;
-  
+
       // Step 3: Update the UI
       setVoteCount(updatedVotes);
+      setUserVote(1); 
       setClassification({ ...classification, classificationConfiguration: updatedConfiguration });
-  
+
     } catch (error) {
       console.error('Error updating vote:', error);
     }
@@ -168,6 +173,13 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
 
   return (
     <Card className="w-full max-w-2xl bg-gradient-to-br from-slate-100 to-slate-200 text-slate-900 overflow-hidden relative border-2 border-slate-300 rounded-xl shadow-lg">
+      {voteCount >= 5 && (
+        <div className="absolute top-2 right-2">
+          <Badge className="bg-green-500 text-white">
+            Confirmed {classificationtype} by the community
+          </Badge>
+        </div>
+      )}
       <CardContent className="p-6 flex">
         <div className="w-1/3 pr-4 border-r border-slate-300">
           <div className="aspect-square rounded-lg overflow-hidden mb-4 shadow-md">
@@ -210,26 +222,51 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
             </div>
 
             {imageUrls.length > 1 && (
-              <div className="mt-4">
+              <div>
                 <h3 className="font-semibold">Additional Media:</h3>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2 mt-2">
                   {imageUrls.slice(1).map((url, index) => (
-                    <img key={index} src={url} alt={`Media ${index + 1}`} className="w-full h-auto object-cover rounded-lg shadow-md" />
+                    <img 
+                      key={index} 
+                      src={url} 
+                      alt={`Additional media ${index + 1}`} 
+                      className="w-full h-auto rounded-lg object-cover" 
+                    />
                   ))}
                 </div>
               </div>
             )}
           </div>
 
-          {/* Voting Section */}
           <div className="flex justify-between items-center mt-6">
-            <div className="flex items-center space-x-4">
-            <Button onClick={handleVote}>
-  <ThumbsUp />
-</Button>
-
+            <div className="text-gray-700 flex items-center space-x-2">
+              <ThumbsUp className={`w-6 h-6 ${userVote ? 'text-gray-500' : 'text-blue-600'} cursor-pointer`} />
+              <span className="text-lg font-semibold">{voteCount}</span>
+              {userVote !== null && (
+                <span className="text-sm text-gray-500">Voted</span>
+              )}
             </div>
-            <Users className="w-5 h-5 text-slate-600" />
+
+            <div 
+              className="relative"
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+            >
+              <Button 
+                variant="outline" 
+                onClick={handleVote} 
+                disabled={userVote !== null}
+                className={`${userVote !== null ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {userVote ? 'Already Voted' : 'Vote'}
+              </Button>
+
+              {userVote !== null && showTooltip && (
+                <div className="absolute bottom-full mb-2 w-max bg-gray-700 text-white text-sm p-2 rounded-lg shadow-lg">
+                  You've already voted
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>

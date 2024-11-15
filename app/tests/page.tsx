@@ -13,7 +13,7 @@ export default function TestPage() {
     return (
         <StarnetLayout>
           <>
-            <AllClassifications />
+            <AllClassifications initialType="planet" />
           </>
         </StarnetLayout>
     );
