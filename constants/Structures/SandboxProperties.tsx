@@ -5,15 +5,13 @@ import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomat
 import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 // import ClassificationViewer from "@/components/(classifications)/YourClassifications";
-import { StarterZoodexGallery } from "@/components/Projects/Zoodex/ClassifyOthersAnimals";
 import { BeanIcon, BirdIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseMedical, CameraIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, FishIcon, GemIcon, HeartIcon, LockIcon, MehIcon, MicroscopeIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
-import { AdvancedTechTreeComponent } from "@/components/Structures/Research/TechTree";
+import ModernTechTree from "@/components/Structures/Research/TechTree";
 import MiningScene from "@/app/scenes/mining/page";
 import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
-import MissionsForStructure from "@/components/Structures/Missions/AvailableMissions";
 import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
 import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
@@ -98,12 +96,6 @@ export const StructuresConfigForSandbox: StructureConfig = {
       ],
       imageSrc: '/assets/Items/Zoodex.png',
       buttons: [
-        // {
-        //   icon: <DogIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Classify animals",
-        //   dynamicComponent: <StarterZoodexGallery />,
-        //   sizePercentage: 60,
-        // },
         {
             icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
             text: "Capture animals",

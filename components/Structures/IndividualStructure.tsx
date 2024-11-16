@@ -210,7 +210,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       top: '50%',
       left: '50%',
       transform: 'translate(-50%, -50%)',
-      overflow: 'hidden', // Ensure the content doesn't overflow outside the container
+      overflow: 'hidden',
     }}
   >
     <DialogTitle></DialogTitle>
@@ -221,8 +221,8 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       >
         Close
       </button>
-      <div className="flex-grow flex justify-center items-center overflow-y-auto w-full">
-        {/* Ensure that the content of the modal is scrollable */}
+      {/* Wrapping the content inside a scrollable container */}
+      <div className="flex-grow flex justify-center items-center w-full overflow-y-auto max-h-full">
         {activeComponent}
       </div>
     </div>

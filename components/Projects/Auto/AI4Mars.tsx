@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
-import { StructureInfo } from "@/components/Structures/structureInfo";
 
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
 interface Props {
@@ -12,12 +11,6 @@ interface Props {
 };
 
 export function StarterAiForMars({ anomalyid }: Props) {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
-
-    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/automaton-aiForMars/${anomalyid}.jpeg`;
 

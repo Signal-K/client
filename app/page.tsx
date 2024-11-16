@@ -3,7 +3,6 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 import LoginPage from "./auth/LoginModal";
-import OnboardingWindow from "../components/(scenes)/chapters/(onboarding)/window";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import {
   EarthView,
@@ -29,7 +28,6 @@ import {
   VenusView
 } from './scenes';
 import GlobeView from "./scenes/globe/page";
-import InitialiseChapterOneUser from "@/components/(scenes)/chapters/one/InitialiseUser";
 import { EarthScene } from "./scenes/earth/scene";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 import EnhancedWeatherEvents from "@/components/enhanced-weather-events";

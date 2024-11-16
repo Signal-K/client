@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { AdvancedTechTreeComponent } from "@/components/Structures/Research/TechTree";
+import ModernTechTree from "@/components/Structures/Research/TechTree";
+import { AdvancedTechTreeComponent } from "@/components/Structures/Research/OldTechTree";
 
 export default function ResearchPage() {
     return ( 

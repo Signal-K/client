@@ -31,7 +31,7 @@ export function CreateStructure({ structureType }: { structureType: string }) {
                 setStructureItemMap(map);
             } catch (error) {
                 console.error("Error fetching inventory items:", error);
-            }
+            };
         };
 
         fetchInventoryItems();
@@ -48,7 +48,7 @@ export function CreateStructure({ structureType }: { structureType: string }) {
         if (!structureItem) {
             console.error("Invalid structure type");
             return;
-        }
+        };
 
         setLoading(true);
 

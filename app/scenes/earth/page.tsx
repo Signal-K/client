@@ -11,7 +11,6 @@ import StructuresOnPlanet, {
   OrbitalStructuresOnPlanet,
 } from "@/components/Structures/Structures";
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
-import InitialiseChapterOneUser from "@/components/(scenes)/chapters/one/InitialiseUser";
 import InventoryPage from "@/components/Inventory/Grid/Grid";
 import EnhancedWeatherEventsComponent from "@/components/enhanced-weather-events";
 import TopographicMap from "@/components/topographic-map";

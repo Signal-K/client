@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { Anomaly } from "../Telescopes/ExoplanetC23";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { StructureInfo } from "@/components/Structures/structureInfo";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 
 interface ZoodexProps {
@@ -16,11 +15,6 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 export const NestQuestGoStarter: React.FC<ZoodexProps> = ({
     anomalyId
 }) => {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
-
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-nestQuestGo/${anomalyId}/1.jpeg`;
 
@@ -150,9 +144,6 @@ export const NestQuestGoStarter: React.FC<ZoodexProps> = ({
                 )}
                 {part === 2 && (
                     <>
-                        {/* <div className="mb-2">
-                            <StructureInfo structureName="Zoodex" />
-                        </div> */}
                         <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
                             <div className="relative">
                                 <div className="absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0"></div>
