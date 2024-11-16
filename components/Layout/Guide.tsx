@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, HelpCircle, Expand, Telescope, TreeDeciduous, CloudHail, LightbulbIcon, LucideTestTubeDiagonal, CameraIcon, Shapes, PersonStandingIcon } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import MissionInfoModal from "../Missions/MissionInfoModal";
+import AllClassifications from "@/content/Starnet/YourClassifications";
 
-interface Mission {
+export interface Mission {
     id: number | number[];
     name: string;
     description: string;
@@ -16,6 +18,7 @@ interface Mission {
     tableEntry?: string;
     tableColumn?: string;
     voteOn?: string;
+    modalContent?: React.ReactNode;
 };
 
 interface DialogueStep {
@@ -106,6 +109,7 @@ const globalMissions: Mission[] = [
         tableEntry: 'votes',
         tableColumn: 'user_id',
         voteOn: 'planet',
+        modalContent: <AllClassifications initialType="planet" />,
     },
 ];
 
@@ -126,6 +130,17 @@ const StructureMissionGuide = () => {
         { missions: biologistMissions, name: 'Biologist' },
         { missions: meteorologyMissions, name: 'Meteorologist' },
     ];
+
+    // For modals
+    const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
+
+    const handleMissionClick = (mission: Mission) => {
+      setSelectedMission(mission);
+    };
+  
+    const closeModal = () => {
+      setSelectedMission(null);
+    };
 
     useEffect(() => {
         async function fetchInventoryAndCompletedMissions() {
@@ -221,8 +236,9 @@ const StructureMissionGuide = () => {
     
         setScrollableMissions(uniqueMissions);
     }, [currentCategory, ownedItems]);
-    
-    
+
+    const [modalMissionContent, setModalMissionContent] = useState<React.ReactNode>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false); 
 
     useEffect(() => {
         const currentMissions = categories[currentCategory].missions;
@@ -246,16 +262,33 @@ const StructureMissionGuide = () => {
         setScrollableMissions(uniqueMissions);
     }, [currentCategory, ownedItems]);
 
+    const nextCategory = () => {
+        setCurrentCategory((prev) => (prev + 1) % categories.length);
+    };
+
+    const previousCategory = () => {
+        setCurrentCategory((prev) => (prev - 1 + categories.length) % categories.length);
+    };
+
     const renderMission = (mission: Mission) => {
         const missionId = Array.isArray(mission.id) ? mission.id[0] : mission.id;
         const isCompleted = completedMissions.includes(missionId);
 
+        const handleMissionClick = () => {
+            setModalMissionContent(mission.modalContent);
+            setIsModalOpen(true);
+        };
+
         return (
-            <Card key={missionId} className={`cursor-pointer border mb-2 ${isCompleted ? 'bg-gray-700' : 'bg-gray-800'}`}>
+            <Card
+                key={missionId}
+                className={`cursor-pointer border mb-2 ${isCompleted ? "bg-gray-700" : "bg-gray-800"}`}
+                onClick={handleMissionClick}
+            >
                 <CardContent className="p-4 flex items-center space-x-4">
                     <mission.icon className={`w-8 h-8 ${mission.color}`} />
                     <div>
-                        <h3 className={`text-lg font-semibold ${isCompleted ? 'text-green-500 line-through' : 'text-gray-200'}`}>
+                        <h3 className={`text-lg font-semibold ${isCompleted ? "text-green-500 line-through" : "text-gray-200"}`}>
                             {mission.name}
                         </h3>
                         <p className={`text-sm ${isCompleted ? 'text-green-400' : 'text-gray-400'}`}>
@@ -265,14 +298,6 @@ const StructureMissionGuide = () => {
                 </CardContent>
             </Card>
         );
-    };
-
-    const nextCategory = () => {
-        setCurrentCategory((prev) => (prev + 1) % categories.length);
-    };
-
-    const previousCategory = () => {
-        setCurrentCategory((prev) => (prev - 1 + categories.length) % categories.length);
     };
 
     return (
@@ -299,6 +324,11 @@ const StructureMissionGuide = () => {
                     </AnimatePresence>
                 </CardContent>
             </div>
+            <MissionInfoModal
+                show={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                content={modalMissionContent}
+            />
         </div>
     );
 };
