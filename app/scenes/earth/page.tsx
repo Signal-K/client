@@ -13,7 +13,7 @@ import StructuresOnPlanet, {
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import InventoryPage from "@/components/Inventory/Grid/Grid";
 import EnhancedWeatherEventsComponent from "@/components/enhanced-weather-events";
-import TopographicMap from "@/components/topographic-map";
+// import TopographicMap from "@/components/topographic-map";
 
 const EarthView: React.FC = () => {
   const { activePlanet, updatePlanetLocation } = useActivePlanet();

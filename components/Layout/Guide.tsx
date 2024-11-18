@@ -294,6 +294,9 @@ const StructureMissionGuide = () => {
                         <p className={`text-sm ${isCompleted ? 'text-green-400' : 'text-gray-400'}`}>
                             {mission.description}
                         </p>
+                        {mission.modalContent && (
+                            <Button variant="outline" className="mt-2">Action</Button>
+                        )}
                     </div>
                 </CardContent>
             </Card>
