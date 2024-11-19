@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MineralDepositList } from './Structures/Mining/Deposits';
 import { ControlPanel } from './Structures/Mining/ControlPanel';
-import { TopographicMap } from './Topo';
 // import { TerrainMap } from './terrain-map';
 import { Inventory } from './Inventory';
 
@@ -13,7 +12,7 @@ type MineralDeposit = {
   level: number
   uses: string[]
   position: { x: number; y: number }
-}
+};
 
 type Rover = {
   id: string
@@ -21,13 +20,13 @@ type Rover = {
   speed: number
   efficiency: number
   miningLevel: number
-}
+};
 
 type InventoryItem = {
   id: string
   name: string
   amount: number
-}
+};
 
 export function MiningComponentComponent() {
   const [mineralDeposits, setMineralDeposits] = useState<MineralDeposit[]>([])

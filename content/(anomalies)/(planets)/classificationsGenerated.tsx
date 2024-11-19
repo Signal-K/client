@@ -11,6 +11,7 @@ interface ClassificationCount {
 export default function ClassificationSummary() {
     const supabase = useSupabaseClient();
     const session = useSession();
+    
     const { activePlanet } = useActivePlanet();
 
     const [classificationCounts, setClassificationCounts] = useState<ClassificationCount[]>([]);
