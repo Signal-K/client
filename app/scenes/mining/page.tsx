@@ -21,7 +21,7 @@ export default function Mining() {
         <MiningComponent />
         <StructureMissionGuide />
     </EarthActionSceneLayout>
-  );
+  ); 
 };
 
 function MiningScene() {
