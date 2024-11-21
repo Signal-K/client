@@ -1,16 +1,12 @@
-import { useState, useEffect } from 'react'
-import { MineralDepositList } from './MineralDepositList'
-import { TopographicMap } from './TopographicMap'
-import { TerrainMap } from './TerrainMap'
-import { Inventory } from './Inventory'
-import { Button } from "@/components/ui/button"
-
-type MineralDeposit = {
-  id: string
-  name: string
-  amount: number
-  position: { x: number; y: number }
-}
+import { useState, useEffect } from 'react';
+import { MineralDepositList } from './mineral-deposit-list';
+import { TopographicMap } from './topographic-map';
+import { TerrainMap } from './terrain-map';
+import { Inventory } from './Inventory';
+import { Button } from "@/components/ui/button";
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useActivePlanet } from '@/context/ActivePlanet';
+import { MineralDeposit } from './mineral-deposit-list';
 
 type Rover = {
   id: string
@@ -18,13 +14,13 @@ type Rover = {
   speed: number
   efficiency: number
   miningLevel: number
-}
+};
 
 type InventoryItem = {
   id: string
   name: string
   amount: number
-}
+};
 
 type Landmark = {
   id: string
@@ -32,45 +28,86 @@ type Landmark = {
   description: string
   position: { x: number; y: number }
   isOpen: boolean
-}
+};
 
-const MINERALS = ['Iron', 'Copper', 'Coal', 'Nickel']
+const MINERALS = ['Iron', 'Copper', 'Coal', 'Nickel'];
 
 const LANDMARKS: Landmark[] = [
   { id: '1', name: 'Base Camp', description: 'Main operations center for the mining colony.', position: { x: 10, y: 10 }, isOpen: false },
   { id: '2', name: 'Power Plant', description: 'Generates power for the entire mining operation.', position: { x: 80, y: 30 }, isOpen: false },
   { id: '3', name: 'Research Lab', description: 'Conducts studies on Martian geology and potential life.', position: { x: 30, y: 70 }, isOpen: false },
-]
+];
 
 export function MiningComponentComponent() {
-  const [mineralDeposits, setMineralDeposits] = useState<MineralDeposit[]>([])
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const { activePlanet } = useActivePlanet();
+  
+  const [mineralDeposits, setMineralDeposits] = useState<MineralDeposit[]>([]);
   const [rover, setRover] = useState<Rover | null>(null)
   const [selectedDeposit, setSelectedDeposit] = useState<MineralDeposit | null>(null)
   const [roverPosition, setRoverPosition] = useState<{ x: number; y: number } | null>(null)
   const [inventory, setInventory] = useState<InventoryItem[]>([])
   const [isMining, setIsMining] = useState(false)
   const [activeMap, setActiveMap] = useState<'2D' | '3D'>('2D')
-  const [landmarks, setLandmarks] = useState<Landmark[]>(LANDMARKS)
+  const [landmarks, setLandmarks] = useState<Landmark[]>(LANDMARKS);
 
   useEffect(() => {
-    const generateDeposits = () => {
-      const deposits: MineralDeposit[] = []
-      for (let i = 0; i < 4; i++) {
-        const mineral = MINERALS[Math.floor(Math.random() * MINERALS.length)]
-        deposits.push({
-          id: `${i + 1}`,
-          name: mineral,
-          amount: Math.floor(Math.random() * 500) + 500,
-          position: { x: Math.random() * 80 + 10, y: Math.random() * 80 + 10 },
-        })
+    const fetchDeposits = async () => {
+      if (!session?.user?.id || !activePlanet?.id) {
+        console.error("User or activePlanet is undefined.");
+        return;
       }
-      return deposits
-    }
+  
+      const { data, error } = await supabase
+        .from("mineralDeposits")
+        .select('id, mineralconfiguration')
+        .eq('owner', session?.user.id)
+        .eq('anomaly', activePlanet?.id)
+        .limit(4);
+  
+      if (error) {
+        console.error("Error fetching mineral deposits:", error);
+        return;
+      }
+  
+      const formattedDeposits = data?.map((deposit) => ({
+        id: deposit.id,
+        name: deposit.mineralconfiguration.mineral || "Unknown",
+        mineral: deposit.mineralconfiguration.mineral || "Unknown",
+        amount: deposit.mineralconfiguration.quantity || 0, // Use 'amount'
+        icon_url: deposit.mineralconfiguration.icon_url || "",
+        level: deposit.mineralconfiguration.level || 1,
+        uses: deposit.mineralconfiguration.uses || [],
+        position: deposit.mineralconfiguration.position || { x: 50, y: 50 },
+      }));
+  
+      setMineralDeposits(formattedDeposits || []);
+    };
+  
+    fetchDeposits();
+  }, [session, activePlanet, supabase]);  
 
-    setMineralDeposits(generateDeposits())
-    setRover({ id: '1', name: 'Mars Rover', speed: 15, efficiency: 0.8, miningLevel: 2 })
-    setInventory(MINERALS.map((mineral, index) => ({ id: `${index + 1}`, name: mineral, amount: 0 })))
-  }, [])
+  // useEffect(() => {
+  //   const generateDeposits = () => {
+  //     const deposits: MineralDeposit[] = []
+  //     for (let i = 0; i < 4; i++) {
+  //       const mineral = MINERALS[Math.floor(Math.random() * MINERALS.length)]
+  //       deposits.push({
+  //         id: `${i + 1}`,
+  //         name: mineral,
+  //         amount: Math.floor(Math.random() * 500) + 500,
+  //         position: { x: Math.random() * 80 + 10, y: Math.random() * 80 + 10 },
+  //       })
+  //     }
+  //     return deposits
+  //   }
+
+  //   setMineralDeposits(generateDeposits())
+  //   setRover({ id: '1', name: 'Mars Rover', speed: 15, efficiency: 0.8, miningLevel: 2 })
+  //   setInventory(MINERALS.map((mineral, index) => ({ id: `${index + 1}`, name: mineral, amount: 0 })))
+  // }, [])
 
   const handleDepositSelect = (deposit: MineralDeposit) => {
     setSelectedDeposit(deposit)
@@ -183,7 +220,7 @@ export function MiningComponentComponent() {
         </div>
       </div>
       <div className="bg-white bg-opacity-90 p-4 border-t border-gray-200">
-        <Inventory inventory={inventory} />
+        <Inventory />
       </div>
     </div>
   )

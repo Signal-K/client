@@ -30,7 +30,8 @@ type Rover = {
 
 export function MiningComponent() {
   const supabase = useSupabaseClient()
-  const session = useSession()
+  const session = useSession();
+  
   const { activePlanet } = useActivePlanet()
 
   const [mineralDeposits, setMineralDeposits] = useState<MineralDeposit[]>([])

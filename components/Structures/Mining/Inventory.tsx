@@ -14,14 +14,12 @@ type InventoryItem = {
 export function Inventory() {
   const supabase = useSupabaseClient();
   const session = useSession();
-  
-  const { activePlanet } = useActivePlanet();
 
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
+
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Mapping item IDs to their names
   const itemNames: Record<number, string> = {
     11: 'Iron',
     19: 'Fuel',
@@ -30,12 +28,11 @@ export function Inventory() {
 
   useEffect(() => {
     const fetchInventory = async () => {
-      // Check if session and user ID are available
       if (!session?.user?.id) {
         console.error('Session or user ID is missing');
         setLoading(false);
         return;
-      }
+      };
 
       try {
         const { data, error } = await supabase
@@ -87,7 +84,7 @@ export function Inventory() {
 
   if (loading) {
     return <div>Loading...</div>;
-  }
+  };
 
   return (
     <div className="space-y-2">

@@ -40,7 +40,7 @@ export function MineralDepositList({ deposits, onSelect, selectedDeposit }: Prop
         setInventoryItems(data);
       } catch (error) {
         console.error("Error fetching inventory items:", error);
-      }
+      };
     };
 
     fetchInventoryItems();
