@@ -11,11 +11,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-type MineralDeposit = {
-  id: string
-  name: string
-  amount: number
-  position: { x: number; y: number }
+export type MineralDeposit = {
+  id: string;
+  name: string;
+  mineral: string;
+  amount: number;
+  position: { x: number; y: number };
+  icon_url: string;
+  level: number;
+  uses: any[]; // Adjust this according to your actual data structure
 };
 
 type Landmark = {
@@ -134,14 +138,19 @@ export function TerrainMap({ deposits = [], roverPosition, selectedDeposit, land
           </DialogContent>
         </Dialog>
       ))}
-      {roverPosition && (
-        <motion.div
-          className="absolute w-4 h-4 bg-[#2C4F64] rounded-full"
-          style={{ left: `${roverPosition.x}%`, top: `${roverPosition.y}%`, transform: 'translate(-50%, -50%)' }}
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ repeat: Infinity, duration: 1 }}
-        />
-      )}
+{roverPosition && (
+  <motion.div
+    style={{
+      position: 'absolute',
+      left: `${roverPosition.x}%`,
+      top: `${roverPosition.y}%`,
+      transform: 'translate(-50%, -50%)',
+    }}
+    className="rover-icon"
+  >
+    {/* Rover icon */}
+  </motion.div>
+)}
       {selectedDeposit && (
         <div
           className="absolute w-6 h-6 border-2 border-[#5FCBC3] rounded-full"

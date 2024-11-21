@@ -1,18 +1,19 @@
 'use client';
 
-import { Button } from "@/components/ui/button"
-import { Magnet, Zap, Battery, Diamond } from 'lucide-react'
+import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
+import { Diamond, Zap, Battery, Magnet, Crown, Gem } from 'lucide-react';
+import { useSession } from "@supabase/auth-helpers-react";
 
 export type MineralDeposit = {
   id: string;
   name: string;
-  amount: number;
   mineral: string;
+  amount: number;
+  position: { x: number; y: number };
   icon_url: string;
   level: number;
-  uses: string[];
-  position: { x: number; y: number };
+  uses: any[]; // Adjust this according to your actual data structure
 };
 
 export interface InventoryItem {
@@ -21,28 +22,41 @@ export interface InventoryItem {
   description: string;
   cost?: number;
   icon_url: string;
-  ItemCategory: string; 
+  ItemCategory: string;
 };
 
 type Props = {
-  deposits: MineralDeposit[]
-  onSelect: (deposit: MineralDeposit) => void
-  selectedDeposit: MineralDeposit | null
+  deposits: MineralDeposit[];
+  onSelect: (deposit: MineralDeposit) => void;
+  selectedDeposit: MineralDeposit | null;
 };
 
-const getMineralIcon = (mineralName: string) => {
-  switch (mineralName) {
+const itemNames: Record<string, string> = {
+  11: 'Coal',
+  13: 'Silicon',
+  15: 'Iron',
+  16: 'Nickel',
+  18: 'Fuel',
+  19: 'Copper',
+};
+
+const getIcon = (name: string) => {
+  switch (name) {
     case 'Iron':
-      return <Magnet className="text-red-500" />
+      return <Diamond className="text-[#FFE3BA]" />;
     case 'Copper':
-      return <Zap className="text-orange-500" />
+      return <Zap className="text-[#5FCBC3]" />;
     case 'Coal':
-      return <Battery className="text-gray-700" />
+      return <Magnet className="text-[#FFD700]" />;
+    case 'Silicon':
+      return <Gem className="text-[#B0C4DE]" />;
+    case 'Fuel':
+      return <Battery className="text-[#020403]" />;
     case 'Nickel':
-      return <Diamond className="text-green-500" />
+      return <Crown className="text-[#E5E4E2]" />;
     default:
-      return <Diamond className="text-blue-500" />
-  };
+      return <Diamond className="text-[#FFE3BA]" />;
+  }
 };
 
 export function MineralDepositList({ deposits = [], onSelect, selectedDeposit }: Props) {
@@ -56,28 +70,20 @@ export function MineralDepositList({ deposits = [], onSelect, selectedDeposit }:
         setInventoryItems(data);
       } catch (error) {
         console.error("Error fetching inventory items:", error);
-      };
+      }
     };
 
     fetchInventoryItems();
   }, []);
 
-  const getMineralDetails = (mineralId: string) => {
-    const mineral = inventoryItems.find(item => item.id === parseInt(mineralId));
-    
-    if (!mineral) {
-      console.error(`Mineral with ID: ${mineralId} not found in inventory`);
-    }
+  const getMineralDetails = (deposit: MineralDeposit) => {
+    // Map the mineral name using `deposit.mineral` or fallback to `deposit.name`
+    const mineralName = deposit.mineral ? itemNames[deposit.mineral] || deposit.mineral : deposit.name || "Unknown Mineral";
 
-    return mineral
-      ? {
-          icon: <img src={mineral.icon_url} alt={mineral.name} className="w-6 h-6" />,
-          name: mineral.name,
-        }
-      : {
-          icon: <Diamond className="text-[#FFE3BA]" />,
-          name: "Unknown Mineral",
-        };
+    return {
+      icon: getIcon(mineralName),
+      name: mineralName,
+    };
   };
 
   if (inventoryItems.length === 0) {
@@ -87,18 +93,21 @@ export function MineralDepositList({ deposits = [], onSelect, selectedDeposit }:
   return (
     <div className="space-y-4 overflow-y-auto max-h-[60vh]">
       <h3 className="text-lg font-semibold mb-2">Mineral Deposits</h3>
-      {deposits.map((deposit) => (
-        <Button
-          key={deposit.id}
-          className={`w-full justify-start ${selectedDeposit?.id === deposit.id ? 'bg-blue-100' : ''}`}
-          onClick={() => onSelect(deposit)}
-        >
-          <div className="flex items-center">
-            {getMineralIcon(deposit.name)}
-            <span className="ml-2">{deposit.name} - {deposit.amount} units</span>
-          </div>
-        </Button>
-      ))}
+      {deposits.map((deposit) => {
+        const { icon, name } = getMineralDetails(deposit);
+        return (
+          <Button
+            key={deposit.id}
+            className={`w-full justify-start ${selectedDeposit?.id === deposit.id ? 'bg-blue-100' : ''}`}
+            onClick={() => onSelect(deposit)}
+          >
+            <div className="flex items-center">
+              {icon}
+              <span className="ml-2">{name} - {deposit.amount} units</span>
+            </div>
+          </Button>
+        );
+      })}
     </div>
   );
 };

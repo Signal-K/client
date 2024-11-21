@@ -115,37 +115,40 @@ export function MiningComponentComponent() {
 
   const handleStartMining = () => {
     if (selectedDeposit && rover) {
-      setIsMining(true)
-      setRoverPosition({ x: 5, y: 5 }) // Start position
-      
-      const duration = 5000 // 5 seconds to reach deposit
-      const startTime = Date.now()
-      
+      console.log("Starting mining:", selectedDeposit, rover); // Add this to check
+      setIsMining(true);
+      setRoverPosition({ x: 5, y: 5 }); // Start position
+  
+      const duration = 5000; // 5 seconds to reach deposit
+      const startTime = Date.now();
+  
       const animateRover = () => {
-        const elapsedTime = Date.now() - startTime
-        const progress = Math.min(elapsedTime / duration, 1)
-        
+        const elapsedTime = Date.now() - startTime;
+        const progress = Math.min(elapsedTime / duration, 1);
+  
         setRoverPosition({
           x: 5 + (selectedDeposit.position.x - 5) * progress,
-          y: 5 + (selectedDeposit.position.y - 5) * progress
-        })
-        
+          y: 5 + (selectedDeposit.position.y - 5) * progress,
+        });
+  
         if (progress < 1) {
-          requestAnimationFrame(animateRover)
+          requestAnimationFrame(animateRover);
         } else {
           // At deposit, start mining
           setTimeout(() => {
-            setRoverPosition({ x: 5, y: 5 }) // Return to base
-            setIsMining(false)
-            updateInventory(selectedDeposit.name, 50) // Add mined resources to inventory
-            setSelectedDeposit(null) // Reset selected deposit
-          }, 5000) // 5 seconds at deposit
+            setRoverPosition({ x: 5, y: 5 }); // Return to base
+            setIsMining(false);
+            updateInventory(selectedDeposit.name, 50); // Add mined resources to inventory
+            setSelectedDeposit(null); // Reset selected deposit
+          }, 5000); // 5 seconds at deposit
         }
-      }
-      
-      requestAnimationFrame(animateRover)
+      };
+  
+      requestAnimationFrame(animateRover);
+    } else {
+      console.error("No deposit selected or rover not available.");
     }
-  }
+  };  
 
   const updateInventory = (resourceName: string, amount: number) => {
     setInventory(prev => prev.map(item => 
@@ -179,11 +182,12 @@ export function MiningComponentComponent() {
         <div className="w-full md:w-3/4 h-1/2 md:h-full relative">
           {activeMap === '2D' ? (
             <TopographicMap 
-              deposits={mineralDeposits} 
+              deposits={mineralDeposits}
               roverPosition={roverPosition}
               selectedDeposit={selectedDeposit}
               landmarks={landmarks}
-              onLandmarkClick={handleLandmarkClick}
+              onLandmarkClick={handleLandmarkClick} 
+              onDepositSelect={handleDepositSelect}                    
             />
           ) : (
             <TerrainMap 
@@ -202,12 +206,12 @@ export function MiningComponentComponent() {
                 <h3 className="text-lg font-semibold mb-2">Selected Deposit: {selectedDeposit.name}</h3>
                 <p>Amount: {selectedDeposit.amount} units</p>
                 <Button 
-                  onClick={handleStartMining} 
-                  disabled={isMining}
-                  className="w-full mt-4"
-                >
-                  {isMining ? 'Mining...' : 'Start Mining'}
-                </Button>
+  onClick={handleStartMining} 
+  disabled={isMining}
+  className="w-full mt-4"
+>
+  {isMining ? 'Mining...' : 'Start Mining'}
+</Button>
               </div>
             ) : (
               <MineralDepositList 
