@@ -121,15 +121,11 @@ export function TopographicMap({
       {landmarks.map((landmark) => (
         <div
           key={landmark.id}
-          className="absolute"
-          style={{
-            left: `${landmark.position.x}%`,
-            top: `${landmark.position.y}%`,
-            transform: 'translate(-50%, -50%)',
-          }}
+          className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+          style={{ top: `${landmark.position.y}%`, left: `${landmark.position.x}%` }}
           onClick={() => onLandmarkClick(landmark.id)}
         >
-          <MapPin />
+          <MapPin className="text-blue-500 hover:text-blue-700" />
         </div>
       ))}
     </div>

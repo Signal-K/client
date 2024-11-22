@@ -30,14 +30,6 @@ type Landmark = {
   isOpen: boolean
 };
 
-const MINERALS = ['Iron', 'Copper', 'Coal', 'Nickel'];
-
-const LANDMARKS: Landmark[] = [
-  { id: '1', name: 'Base Camp', description: 'Main operations center for the mining colony.', position: { x: 10, y: 10 }, isOpen: false },
-  { id: '2', name: 'Power Plant', description: 'Generates power for the entire mining operation.', position: { x: 80, y: 30 }, isOpen: false },
-  { id: '3', name: 'Research Lab', description: 'Conducts studies on Martian geology and potential life.', position: { x: 30, y: 70 }, isOpen: false },
-];
-
 export function MiningComponentComponent() {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -51,32 +43,84 @@ export function MiningComponentComponent() {
   const [inventory, setInventory] = useState<InventoryItem[]>([])
   const [isMining, setIsMining] = useState(false)
   const [activeMap, setActiveMap] = useState<'2D' | '3D'>('2D')
-  const [landmarks, setLandmarks] = useState<Landmark[]>(LANDMARKS);
+  const [landmarks, setLandmarks] = useState<Landmark[]>([]);
 
   useEffect(() => {
-    const fetchDeposits = async () => {
+    const fetchLandmarks = async () => {
       if (!session?.user?.id || !activePlanet?.id) {
         console.error("User or activePlanet is undefined.");
         return;
       }
   
-      const { data, error } = await supabase
-        .from("mineralDeposits")
-        .select('id, mineralconfiguration')
-        .eq('owner', session?.user.id)
-        .eq('anomaly', activePlanet?.id)
-        .limit(4);
+      // Fetch inventory from Supabase
+      const { data: inventoryData, error: inventoryError } = await supabase
+        .from("inventory")
+        .select("id, item, quantity")
+        .eq("owner", session.user.id)
+        .eq("anomaly", activePlanet.id)
+        .gt("quantity", 0);
   
-      if (error) {
-        console.error("Error fetching mineral deposits:", error);
+      if (inventoryError) {
+        console.error("Error fetching inventory:", inventoryError);
         return;
       }
   
-      const formattedDeposits = data?.map((deposit) => ({
-        id: deposit.id,
+      // Fetch all item details from API
+      const res = await fetch('/api/gameplay/inventory');
+      const items = await res.json();
+  
+      // Filter for structures and map to landmarks
+      const structures = inventoryData
+        ?.filter((inventoryItem) =>
+          items.some(
+            (item: { id: any; ItemCategory: string }) =>
+              item.id === inventoryItem.item && item.ItemCategory === "Structure"
+          )
+        )
+        .map((inventoryItem) => {
+          const itemDetails = items.find(
+            (item: { id: any }) => item.id === inventoryItem.item
+          );
+  
+          return {
+            id: inventoryItem.id.toString(),
+            name: itemDetails?.name || "Unknown",
+            description: itemDetails?.description || "No description available",
+            position: itemDetails?.position || { x: Math.random() * 100, y: Math.random() * 100 }, // Default to random position
+            isOpen: false,
+          };
+        });
+  
+      setLandmarks(structures || []);
+    };
+  
+    fetchLandmarks();
+  }, [session, activePlanet, supabase]);
+
+  useEffect(() => {
+    const fetchDepositsAndInventory = async () => {
+      if (!session?.user?.id || !activePlanet?.id) {
+        console.error("User or activePlanet is undefined.");
+        return;
+      }
+  
+      // Fetch deposits
+      const { data: deposits, error: depositsError } = await supabase
+        .from("mineralDeposits")
+        .select("id, mineralconfiguration")
+        .eq("owner", session?.user.id)
+        .eq("anomaly", activePlanet?.id);
+  
+      if (depositsError) {
+        console.error("Error fetching mineral deposits:", depositsError);
+        return;
+      }
+  
+      const formattedDeposits = deposits?.map((deposit, index) => ({
+        id: `${deposit.id}-${index}`, // Ensure uniqueness
         name: deposit.mineralconfiguration.mineral || "Unknown",
         mineral: deposit.mineralconfiguration.mineral || "Unknown",
-        amount: deposit.mineralconfiguration.quantity || 0, // Use 'amount'
+        amount: deposit.mineralconfiguration.quantity || 0,
         icon_url: deposit.mineralconfiguration.icon_url || "",
         level: deposit.mineralconfiguration.level || 1,
         uses: deposit.mineralconfiguration.uses || [],
@@ -84,34 +128,64 @@ export function MiningComponentComponent() {
       }));
   
       setMineralDeposits(formattedDeposits || []);
+  
+      // Fetch inventory and filter structures
+      const { data: inventoryData, error: inventoryError } = await supabase
+        .from("inventory")
+        .select("id, item, quantity")
+        .eq("owner", session?.user.id)
+        .eq("anomaly", activePlanet?.id)
+        .gt("quantity", 0);
+  
+      if (inventoryError) {
+        console.error("Error fetching inventory:", inventoryError);
+        return;
+      }
+  
+      // Fetch all items from the API route
+      const res = await fetch('/api/gameplay/inventory');
+      const items = await res.json();
+  
+      // Filter inventory to include only items of type "Structure"
+      const structures = inventoryData
+        ?.filter((inventoryItem) =>
+          items.some(
+            (item: { id: any; ItemCategory: string; }) =>
+              item.id === inventoryItem.item &&
+              item.ItemCategory === "Structure"
+          )
+        )
+        .map((inventoryItem) => {
+          const itemDetails = items.find(
+            (item: { id: any; }) => item.id === inventoryItem.item
+          );
+          return {
+            id: inventoryItem.id.toString(),
+            name: itemDetails?.name || "Unknown",
+            description: itemDetails?.description || "",
+            amount: inventoryItem.quantity || 0,
+            icon_url: itemDetails?.icon_url || "",
+            locationType: itemDetails?.locationType || "Unknown",
+          };
+        });
+  
+      setInventory(structures || []);
+      setRover({
+        id: "1",
+        name: "Mars Rover",
+        speed: 15,
+        efficiency: 0.8,
+        miningLevel: 2,
+      });
     };
   
-    fetchDeposits();
-  }, [session, activePlanet, supabase]);  
-
-  // useEffect(() => {
-  //   const generateDeposits = () => {
-  //     const deposits: MineralDeposit[] = []
-  //     for (let i = 0; i < 4; i++) {
-  //       const mineral = MINERALS[Math.floor(Math.random() * MINERALS.length)]
-  //       deposits.push({
-  //         id: `${i + 1}`,
-  //         name: mineral,
-  //         amount: Math.floor(Math.random() * 500) + 500,
-  //         position: { x: Math.random() * 80 + 10, y: Math.random() * 80 + 10 },
-  //       })
-  //     }
-  //     return deposits
-  //   }
-
-  //   setMineralDeposits(generateDeposits())
-  //   setRover({ id: '1', name: 'Mars Rover', speed: 15, efficiency: 0.8, miningLevel: 2 })
-  //   setInventory(MINERALS.map((mineral, index) => ({ id: `${index + 1}`, name: mineral, amount: 0 })))
-  // }, [])
-
+    fetchDepositsAndInventory();
+  }, [session, activePlanet, supabase]);
+  
   const handleDepositSelect = (deposit: MineralDeposit) => {
-    setSelectedDeposit(deposit)
-  }
+    console.log("Deposit selected:", deposit); // Debugging line
+    setSelectedDeposit(deposit);
+  };  
 
   const handleStartMining = () => {
     if (selectedDeposit && rover) {
@@ -138,9 +212,9 @@ export function MiningComponentComponent() {
           setTimeout(() => {
             setRoverPosition({ x: 5, y: 5 }); // Return to base
             setIsMining(false);
-            updateInventory(selectedDeposit.name, 50); // Add mined resources to inventory
+            updateInventory(selectedDeposit.name, 50); // Update Supabase with mined resources
             setSelectedDeposit(null); // Reset selected deposit
-          }, 5000); // 5 seconds at deposit
+          }, 5000); // 5 seconds at deposit          
         }
       };
   
@@ -150,21 +224,86 @@ export function MiningComponentComponent() {
     }
   };  
 
-  const updateInventory = (resourceName: string, amount: number) => {
-    setInventory(prev => prev.map(item => 
-      item.name === resourceName ? { ...item, amount: item.amount + amount } : item
-    ))
-  }
+  const updateInventory = async (resourceName: string, minedAmount: number) => {
+    if (!session?.user?.id || !activePlanet?.id) {
+      console.error("User or activePlanet is undefined.");
+      return;
+    }
+  
+    const existingItem = inventory.find(item => item.name === resourceName);
+  
+    if (existingItem) {
+      // Update existing item in inventory
+      const { error } = await supabase
+        .from("inventory")
+        .update({ quantity: existingItem.amount + minedAmount })
+        .eq("id", existingItem.id)
+        .eq("owner", session.user.id)
+        .eq("anomaly", activePlanet.id);
+  
+      if (error) {
+        console.error("Error updating inventory:", error);
+      } else {
+        setInventory(prev =>
+          prev.map(item =>
+            item.id === existingItem.id
+              ? { ...item, amount: item.amount + minedAmount }
+              : item
+          )
+        );
+      }
+    } else {
+      // Insert new item into inventory
+      const { data, error } = await supabase
+        .from("inventory")
+        .insert([
+          {
+            item: resourceName, // Map this to an ID if needed
+            owner: session.user.id,
+            quantity: minedAmount,
+            anomaly: activePlanet.id,
+            configuration: { Uses: 1 },
+          },
+        ])
+        .select();
+  
+      if (error) {
+        console.error("Error inserting new item into inventory:", error);
+      } else {
+        setInventory(prev => [
+          ...prev,
+          { id: data[0].id.toString(), name: resourceName, amount: minedAmount },
+        ]);
+      }
+    }
+  };  
 
   const toggleMap = () => {
     setActiveMap(prev => prev === '2D' ? '3D' : '2D')
   }
 
+  const [activeLandmark, setActiveLandmark] = useState<Landmark | null>(null);
+
   const handleLandmarkClick = (id: string) => {
-    setLandmarks(prev => prev.map(landmark => 
-      landmark.id === id ? { ...landmark, isOpen: !landmark.isOpen } : landmark
-    ))
-  }
+    console.log("Landmark clicked:", id);
+    const landmark = landmarks.find((l) => l.id === id);
+    if (landmark) {
+      setActiveLandmark({ ...landmark, isOpen: true });
+    }
+  };  
+
+  const closeModal = () => {
+    if (activeLandmark) {
+      setLandmarks((prev: Landmark[] = []) =>
+        prev.map((landmark: Landmark) =>
+          landmark.id === activeLandmark.id
+            ? { ...landmark, isOpen: false }
+            : landmark
+        )
+      );
+      setActiveLandmark(null);
+    }
+  };  
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-gray-100 text-[#2C4F64] flex flex-col">
@@ -226,6 +365,38 @@ export function MiningComponentComponent() {
       <div className="bg-white bg-opacity-90 p-4 border-t border-gray-200">
         <Inventory />
       </div>
+      {activeLandmark && (
+        <LandmarkModal
+          landmark={activeLandmark}
+          isOpen={activeLandmark.isOpen}
+          onClose={closeModal}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
+
+type LandmarkModalProps = {
+  landmark: Landmark | null;
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+const LandmarkModal: React.FC<LandmarkModalProps> = ({ landmark, isOpen, onClose }) => {
+  if (!isOpen || !landmark) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
+        <button
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+          onClick={onClose}
+        >
+          &times;
+        </button>
+        <h2 className="text-2xl font-bold mb-2">{landmark.name}</h2>
+        <p className="text-gray-700">{landmark.description}</p>
+      </div>
+    </div>
+  );
+};
