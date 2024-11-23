@@ -76,7 +76,7 @@ export default function Home() {
           <div className="py-1">
             <EnhancedWeatherEvents />
           </div>
-          <center>
+          <center> 
             <OrbitalStructuresOnPlanet />
           </center>
         </div>

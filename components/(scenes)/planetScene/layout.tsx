@@ -150,7 +150,7 @@ export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({
   const sectionStyles: CSSProperties[] = [
     {
       flex: 8,
-    },
+    }, 
     {
       flex: 6,
     },

@@ -20,7 +20,7 @@ export default function Starnet() {
     );
 };
 
-const StructureMissionGuideMobile = () => {
+export const StructureMissionGuideMobile = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
 

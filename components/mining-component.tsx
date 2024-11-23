@@ -308,11 +308,11 @@ export function MiningComponentComponent() {
   return (
     <div className="relative h-screen w-full overflow-hidden bg-gray-100 text-[#2C4F64] flex flex-col">
       <div className="flex justify-between items-center p-4">
-        <h2 className="text-2xl font-bold">Mars Mining Operation</h2>
+        <h2 className="text-2xl font-bold">Mining Operations</h2>
         <Button
           onClick={toggleMap}
           variant="outline"
-          className="text-[#2C4F64] hover:bg-[#5FCBC3]/20"
+          className="text-[#ffffff] hover:bg-[#5FCBC3]/20"
         >
           Switch to {activeMap === '2D' ? '3D' : '2D'} Map
         </Button>

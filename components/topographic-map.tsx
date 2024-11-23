@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Pickaxe, Zap, Battery, Magnet } from 'lucide-react';
+import { useEffect, useRef, useState } from "react";
+import { MapPin, Pickaxe, Zap, Battery, Magnet } from "lucide-react";
+import { createNoise2D } from "simplex-noise";
+import alea from "alea";
 
 export type MineralDeposit = {
   id: string;
@@ -10,7 +11,7 @@ export type MineralDeposit = {
   position: { x: number; y: number };
   icon_url: string;
   level: number;
-  uses: any[]; // Adjust this according to your actual data structure
+  uses: any[];
 };
 
 type Landmark = {
@@ -32,37 +33,53 @@ type TopographicMapProps = {
 
 const getMineralIcon = (name: string) => {
   switch (name) {
-    case 'Iron':
+    case "Iron":
       return <Magnet className="text-red-500" />;
-    case 'Copper':
+    case "Copper":
       return <Zap className="text-orange-500" />;
-    case 'Coal':
+    case "Coal":
       return <Battery className="text-gray-700" />;
-    case 'Nickel':
+    case "Nickel":
       return <Pickaxe className="text-green-500" />;
     default:
       return <Pickaxe className="text-blue-500" />;
   }
 };
 
-const BackgroundMap = ({ deposits }: { deposits: MineralDeposit[] }) => {
+const BackgroundMap = ({ deposits, seed }: { deposits: MineralDeposit[]; seed: string }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    const prng = alea(seed); // Use the seed for consistency
+    const noise2D = createNoise2D(prng);
 
     const drawMap = () => {
       const { width, height } = canvas;
 
-      ctx.fillStyle = '#F5F5DC';
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "#F5F5DC";
       ctx.fillRect(0, 0, width, height);
 
+      // Draw contour lines
+      const step = 10;
+      for (let y = 0; y < height; y += step) {
+        for (let x = 0; x < width; x += step) {
+          const elevation = noise2D(x * 0.005, y * 0.005);
+          const color = elevation > 0 ? `rgba(96, 165, 250, ${elevation})` : `rgba(30, 58, 138, ${-elevation})`;
+          ctx.fillStyle = color;
+          ctx.fillRect(x, y, step, step);
+        }
+      }
+
+      // Highlight deposits
       deposits.forEach((deposit) => {
-        ctx.fillStyle = '#A52A2A';
+        ctx.fillStyle = "#A52A2A";
         ctx.beginPath();
         ctx.arc(
           deposit.position.x * (width / 100),
@@ -72,7 +89,7 @@ const BackgroundMap = ({ deposits }: { deposits: MineralDeposit[] }) => {
           2 * Math.PI
         );
         ctx.fill();
-        ctx.strokeStyle = '#2C4F64';
+        ctx.strokeStyle = "#2C4F64";
         ctx.lineWidth = 2;
         ctx.stroke();
       });
@@ -84,11 +101,11 @@ const BackgroundMap = ({ deposits }: { deposits: MineralDeposit[] }) => {
       drawMap();
     };
 
-    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    return () => window.removeEventListener('resize', resizeCanvas);
-  }, [deposits]);
+    return () => window.removeEventListener("resize", resizeCanvas);
+  }, [deposits, seed]);
 
   return <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" />;
 };
@@ -101,9 +118,28 @@ export function TopographicMap({
   onDepositSelect,
   onLandmarkClick,
 }: TopographicMapProps) {
+  const [terrainSeed, setTerrainSeed] = useState("default");
+  const [dynamicLandmarks, setDynamicLandmarks] = useState(landmarks);
+
+  const generateNewSector = () => {
+    const newSeed = Math.random().toString(); // Generate a new random seed
+    setTerrainSeed(newSeed);
+
+    // Move landmarks to random positions
+    setDynamicLandmarks(
+      dynamicLandmarks.map((landmark) => ({
+        ...landmark,
+        position: {
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+        },
+      }))
+    );
+  };
+
   return (
-    <div className="absolute inset-0">
-      <BackgroundMap deposits={deposits} />
+    <div className="relative w-full h-full">
+      <BackgroundMap deposits={deposits} seed={terrainSeed} />
       {deposits.map((deposit) => (
         <div
           key={deposit.id}
@@ -111,14 +147,14 @@ export function TopographicMap({
           style={{
             left: `${deposit.position.x}%`,
             top: `${deposit.position.y}%`,
-            transform: 'translate(-50%, -50%)',
+            transform: "translate(-50%, -50%)",
           }}
           onClick={() => onDepositSelect(deposit)}
         >
           {getMineralIcon(deposit.mineral)}
         </div>
       ))}
-      {landmarks.map((landmark) => (
+      {dynamicLandmarks.map((landmark) => (
         <div
           key={landmark.id}
           className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
@@ -128,6 +164,12 @@ export function TopographicMap({
           <MapPin className="text-blue-500 hover:text-blue-700" />
         </div>
       ))}
+      <button
+        onClick={generateNewSector}
+        className="absolute bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-700"
+      >
+        Generate Next Sector
+      </button>
     </div>
   );
-}
+};
