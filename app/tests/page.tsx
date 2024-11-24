@@ -3,7 +3,6 @@
 import React from "react";
 import StarnetLayout from "@/components/Layout/Starnet";
 import { MiningComponentComponent } from "@/components/mining-component";
-import { MiningComponent } from "@/components/Structures/Mining/Mining";
 // import { TopographicMap } from "@/components/topographic-map";
 
 export default function TestPage() {

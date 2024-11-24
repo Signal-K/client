@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { MiningComponent } from "../Mining/Mining"; 
+import { MiningComponentComponent } from "@/components/mining-component";
 
 interface InventoryItem {
     id: number;
@@ -116,7 +116,7 @@ export default function AllAutomatonsOnActivePlanet() {
                             &times;
                         </button>
 
-                        <MiningComponent />
+                        <MiningComponentComponent />
                     </div>
                 </div>
             )}

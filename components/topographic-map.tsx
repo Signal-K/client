@@ -20,7 +20,7 @@ type Landmark = {
   description: string;
   position: { x: number; y: number };
   isOpen: boolean;
-};
+}; 
 
 type TopographicMapProps = {
   deposits: MineralDeposit[];
@@ -56,7 +56,7 @@ const BackgroundMap = ({ deposits, seed }: { deposits: MineralDeposit[]; seed: s
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const prng = alea(seed); // Use the seed for consistency
+    const prng = alea(seed);
     const noise2D = createNoise2D(prng);
 
     const drawMap = () => {
@@ -66,7 +66,6 @@ const BackgroundMap = ({ deposits, seed }: { deposits: MineralDeposit[]; seed: s
       ctx.fillStyle = "#F5F5DC";
       ctx.fillRect(0, 0, width, height);
 
-      // Draw contour lines
       const step = 10;
       for (let y = 0; y < height; y += step) {
         for (let x = 0; x < width; x += step) {
@@ -77,7 +76,6 @@ const BackgroundMap = ({ deposits, seed }: { deposits: MineralDeposit[]; seed: s
         }
       }
 
-      // Highlight deposits
       deposits.forEach((deposit) => {
         ctx.fillStyle = "#A52A2A";
         ctx.beginPath();
