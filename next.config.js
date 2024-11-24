@@ -32,13 +32,22 @@ const nextConfig = {
 		  ...config.resolve.alias,
 		},
 	  };
-	  if (!isServer) {
+	  
+	  if (isServer) {
+		// Exclude `konva` and `canvas` from server-side builds
+		config.externals = [
+		  ...(config.externals || []),
+		  { 'konva': 'konva', 'canvas': 'canvas' }
+		];
+	  } else {
+		// Adjust node configuration for client-side
 		config.node = {
 		  ...config.node,
 		};
 	  }
+	  
 	  return config;
 	},
-  };
+};
   
-  module.exports = nextConfig;  
+module.exports = nextConfig;

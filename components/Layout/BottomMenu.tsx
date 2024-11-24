@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { MiningComponentComponent } from "../mining-component";
-import { StructureMissionGuideMobile } from "@/app/starnet/page";
+import { StructureMissionGuideMobile } from "./Guide";
 
 const menuItems = [
   { icon: Globe, label: "Planet", href: "/" },
