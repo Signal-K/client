@@ -13,7 +13,7 @@ type Exoplanet = {
   name: string;
   distance: number;
   anomaly?: number;           
-  planetType?: string;
+  planetType?: string; 
   initialisationMissionId?: number;
   image?: string;
   description?: string;
@@ -114,19 +114,12 @@ export default function SwitchPlanet() {
 
   const currentPlanets = planets[activeTab];
   const currentPlanet = currentPlanets[currentIndex];
-  const planetType = currentPlanet?.planetType || 'Unknown';
-  const anomaly = currentPlanet?.anomaly ?? 'Unknown';
-  const initialisationMissionId = currentPlanet?.initialisationMissionId ?? null;
-  const image = currentPlanet?.image ?? '/assets/Planets/DefaultExoplanet.png';
-  const description = currentPlanet?.description ?? 'No description available';
+  // const planetType = currentPlanet?.planetType || 'Unknown';
+  // const anomaly = currentPlanet?.anomaly ?? 'Unknown';
+  // const initialisationMissionId = currentPlanet?.initialisationMissionId ?? null;
+  // const image = currentPlanet?.image ?? '/assets/Planets/DefaultExoplanet.png';
+  // const description = currentPlanet?.description ?? 'No description available';
   const currentPlanetAnomaly = currentPlanet?.anomaly ?? 0;
-
-  useEffect(() => {
-    console.log("Component loaded, exoplanets: ", planets.exoplanets);
-  }, [planets.exoplanets]);
-
-  // Fix for TS error 2345 - ensuring 'number | undefined' doesn't cause an issue
-  const index = currentPlanet?.anomaly !== undefined ? currentPlanet.anomaly : 0;
 
   useEffect(() => {
     const fetchExoplanets = async () => {
