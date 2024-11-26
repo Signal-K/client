@@ -1,6 +1,18 @@
 import React from 'react';
-import { BoardingPass } from "@/types/Travel";
 import Image from 'next/image';
+
+// Define the BoardingPass interface
+interface BoardingPass {
+  userName: string;
+  frequentFlyerNumber: string;
+  frequentFlyerStatus: string;
+  departurePlanet: string;
+  departureTemperature: number;
+  destinationPlanet: string;
+  destinationTemperature: number;
+  rocketType: string;
+  departureTime: string; // ISO 8601 string
+}
 
 interface BoardingPassCardProps {
   boardingPass: BoardingPass;
@@ -19,10 +31,19 @@ const BoardingPassCard: React.FC<BoardingPassCardProps> = ({ boardingPass }) => 
         </div>
         <div>
           <h3 className="text-xl font-semibold mb-2 text-[#B9E678]">Flight Information</h3>
-          <p><span className="font-semibold">From:</span> {boardingPass.departurePlanet} ({boardingPass.departureTemperature}°C)</p>
-          <p><span className="font-semibold">To:</span> {boardingPass.destinationPlanet} ({boardingPass.destinationTemperature}°C)</p>
+          <p>
+            <span className="font-semibold">From:</span> {boardingPass.departurePlanet} 
+            ({boardingPass.departureTemperature}°C)
+          </p>
+          <p>
+            <span className="font-semibold">To:</span> {boardingPass.destinationPlanet} 
+            ({boardingPass.destinationTemperature}°C)
+          </p>
           <p><span className="font-semibold">Rocket:</span> {boardingPass.rocketType}</p>
-          <p><span className="font-semibold">Departure:</span> {new Date(boardingPass.departureTime).toLocaleString()}</p>
+          <p>
+            <span className="font-semibold">Departure:</span> 
+            {new Date(boardingPass.departureTime).toLocaleString()}
+          </p>
         </div>
       </div>
       <div className="mt-6 flex justify-center">

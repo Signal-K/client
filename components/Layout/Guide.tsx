@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, HelpCircle, XCircle, Expand, Telescope, TreeDeciduous, CloudHail, LightbulbIcon, LucideTestTubeDiagonal, CameraIcon, Shapes, PersonStandingIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, HelpCircle, XCircle, Expand, Telescope, TreeDeciduous, CloudHail, LightbulbIcon, LucideTestTubeDiagonal, CameraIcon, Shapes, PersonStandingIcon, Pickaxe, DiamondPercent, Rocket } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import MissionInfoModal from "../Missions/MissionInfoModal";
 import AllClassifications from "@/content/Starnet/YourClassifications";
+import SwitchPlanet from "../(scenes)/travel/SolarSystem";
+import { MiningComponentComponent } from "../mining-component";
 
 export interface Mission {
     id: number | number[];
@@ -113,6 +115,33 @@ const globalMissions: Mission[] = [
     },
 ];
 
+const communityExpeditions: Mission[] = [
+    {
+        id: 3500011,
+        name: "Travel to Mars",
+        description: "Join the community expedition to Mars, where you'll be able to use your scientific tooling & understanding to build mining settlements & infrastructure",
+        icon: Pickaxe,
+        color: 'text-red-300',
+        modalContent: <SwitchPlanet />,
+    },
+    {
+        id: 3500012,
+        name: "Mine some resources",
+        description: "Use the rovers you've travelled with to mine some anomalies you and the community have found on Mars. This will allow you to produce some materials & more structures for community use",
+        icon: DiamondPercent,
+        color: 'text-cyan-300',
+        modalContent: <MiningComponentComponent />
+    },
+    {
+        id: 3500013,
+        name: "Return to Earth",
+        description: "Complete your mission on Mars and return to Earth to continue your research and exploration with the new resources you've obtained from Mars with the rest of the community",
+        icon: Rocket,
+        color: 'text-green-300',
+        modalContent: <SwitchPlanet />
+    },
+];
+
 const StructureMissionGuide = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -125,13 +154,25 @@ const StructureMissionGuide = () => {
     const [ownedItems, setOwnedItems] = useState<number[]>([]);
     const [scrollableMissions, setScrollableMissions] = useState<Mission[]>([]);
 
+    const [hideCompleted, setHideCompleted] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);   
+    const toggleHideCompleted = () => {
+        setHideCompleted((prev) => !prev);
+    };
+    const toggleHeight = () => {
+        setIsExpanded((prev) => !prev);
+    };
+
     const categories = [
         { missions: astronomyMissions, name: 'Astronomer' },
         { missions: biologistMissions, name: 'Biologist' },
         { missions: meteorologyMissions, name: 'Meteorologist' },
+        {
+            missions: communityExpeditions,
+            name: "Community Expeditions",
+        },
     ];
 
-    // For modals
     const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
 
     const handleMissionClick = (mission: Mission) => {
@@ -157,7 +198,6 @@ const StructureMissionGuide = () => {
                 const ownedItems = inventoryData ? inventoryData.map((inv: { item: number }) => inv.item) : [];
                 setOwnedItems(ownedItems);
     
-                // Fetch completed missions
                 const { data: missionData } = await supabase
                     .from('missions')
                     .select('mission')
@@ -165,19 +205,18 @@ const StructureMissionGuide = () => {
     
                 const completedMissionIds = missionData ? missionData.map((mission: { mission: number }) => mission.mission) : [];
     
-                // Fetch specific votes based on mission's voteOn classification type
                 const voteOnMissions = await Promise.all(globalMissions.map(async (mission) => {
                     if (mission.voteOn) {
                         const { data: specificVotes } = await supabase
                             .from('votes')
                             .select('*')
                             .eq("user_id", session.user.id)
-                            .eq("classificationtype", mission.voteOn);  // Check vote classification type
+                            .eq("classificationtype", mission.voteOn);  
     
                         if (specificVotes && specificVotes.length > 0) {
-                            // If the user has voted on this classification, mark the mission as completed
+                            
                             if (Array.isArray(mission.id)) {
-                                completedMissionIds.push(mission.id[0]);  // Pushing the first element if mission id is an array
+                                completedMissionIds.push(mission.id[0]); 
                             } else {
                                 completedMissionIds.push(mission.id);
                             }
@@ -185,7 +224,6 @@ const StructureMissionGuide = () => {
                     }
                 }));
     
-                // Check tableEntry and tableColumn
                 const additionalChecks = await Promise.all(globalMissions.map(async (mission) => {
                     if (mission.tableEntry && mission.tableColumn) {
                         const { data: tableData } = await supabase
@@ -194,7 +232,6 @@ const StructureMissionGuide = () => {
                             .eq(mission.tableColumn, session.user.id);
     
                         if (tableData && tableData.length > 0) {
-                            // If table data exists, mark mission as completed
                             if (Array.isArray(mission.id)) {
                                 completedMissionIds.push(mission.id[0]);  // Pushing the first element if mission id is an array
                             } else {
@@ -214,28 +251,6 @@ const StructureMissionGuide = () => {
     
         fetchInventoryAndCompletedMissions();
     }, [session, activePlanet, supabase]);    
-    
-    useEffect(() => {
-        const currentMissions = categories[currentCategory].missions;
-    
-        const filteredGlobalMissions = globalMissions.filter((mission) => {
-            if (mission.requiredItem && !ownedItems.includes(mission.requiredItem)) {
-                return false;
-            }
-            return true;
-        });
-    
-        const missionsToDisplay = [
-            ...currentMissions,
-            ...filteredGlobalMissions,
-        ];
-    
-        const uniqueMissions = [
-            ...new Map(missionsToDisplay.map(mission => [Array.isArray(mission.id) ? mission.id[0] : mission.id, mission])).values(),
-        ];
-    
-        setScrollableMissions(uniqueMissions);
-    }, [currentCategory, ownedItems]);
 
     const [modalMissionContent, setModalMissionContent] = useState<React.ReactNode>(null);
     const [isModalOpen, setIsModalOpen] = useState(false); 
@@ -243,6 +258,7 @@ const StructureMissionGuide = () => {
     useEffect(() => {
         const currentMissions = categories[currentCategory].missions;
 
+        // Filter global missions based on ownership of required items
         const filteredGlobalMissions = globalMissions.filter((mission) => {
             if (mission.requiredItem && !ownedItems.includes(mission.requiredItem)) {
                 return false;
@@ -250,17 +266,30 @@ const StructureMissionGuide = () => {
             return true;
         });
 
-        const missionsToDisplay = [
-            ...currentMissions,
-            ...filteredGlobalMissions,
-        ];
+        // Determine missions to display based on the selected category
+        const missionsToDisplay = currentCategory === 3
+            ? [...currentMissions]
+            : [
+                ...currentMissions,
+                ...filteredGlobalMissions,
+                ...communityExpeditions,
+            ];
 
+        // Ensure missions are unique by ID
         const uniqueMissions = [
-            ...new Map(missionsToDisplay.map(mission => [mission.id, mission])).values(),
+            ...new Map(missionsToDisplay.map((mission) => [Array.isArray(mission.id) ? mission.id[0] : mission.id, mission])).values(),
         ];
 
-        setScrollableMissions(uniqueMissions);
-    }, [currentCategory, ownedItems]);
+        // Apply completed missions filter
+        const filteredMissions = hideCompleted
+            ? uniqueMissions.filter((mission) => {
+                const missionId = Array.isArray(mission.id) ? mission.id[0] : mission.id;
+                return !completedMissions.includes(missionId);
+            })
+            : uniqueMissions;
+
+        setScrollableMissions(filteredMissions);
+    }, [currentCategory, ownedItems, hideCompleted]); 
 
     const nextCategory = () => {
         setCurrentCategory((prev) => (prev + 1) % categories.length);
@@ -311,13 +340,23 @@ const StructureMissionGuide = () => {
                         <Button onClick={previousCategory} className="p-2 text-gray-300">
                             <ChevronLeft className="w-6 h-6" />
                         </Button>
+                        <div className="flex items-center space-x-4">
+                            <Button onClick={toggleHideCompleted} variant="outline" className="p-2 text-gray-300">
+                                {hideCompleted ? "Show Completed" : "Hide Completed"}
+                            </Button>
                         <h2 className="text-xl font-semibold text-gray-200">{categories[currentCategory].name}</h2>
+                        <Button onClick={toggleHeight} variant="outline" className="p-2 text-gray-300">
+                                {isExpanded ? "Shrink" : "Expand"}
+                            </Button>
+                        </div>
                         <Button onClick={nextCategory} className="p-2 text-gray-300">
                             <ChevronRight className="w-6 h-6" />
                         </Button>
                     </div>
                     <AnimatePresence>
-                    <div className="overflow-y-auto max-h-40 space-y-2">
+                        <div
+                            className={`overflow-y-auto ${isExpanded ? "max-h-80" : "max-h-40"} space-y-2 transition-all duration-300`}
+                        >
                             {loading ? (
                                 <div>Loading...</div>
                             ) : (
@@ -358,6 +397,10 @@ export const StructureMissionGuideMobile = () => {
         { missions: astronomyMissions, name: 'Astronomer' },
         { missions: biologistMissions, name: 'Biologist' },
         { missions: meteorologyMissions, name: 'Meteorologist' },
+        {
+            missions: communityExpeditions,
+            name: "Community Expeditions",
+        },
     ];
 
     useEffect(() => {
@@ -410,7 +453,6 @@ export const StructureMissionGuideMobile = () => {
     }, [session, activePlanet, supabase]);
 
     useEffect(() => {
-        // Display category-specific missions followed by global missions
         const missionsToDisplay = [
             ...categories[currentCategory].missions, // Category missions
             ...globalMissions, // Global missions
