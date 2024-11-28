@@ -583,11 +583,11 @@ export default function SwitchPlanet() {
         </div>
       )}
 
-      {!missionSelected && (
+      {/* {!missionSelected && (
         <div className="p-4">
           <InventoryList anomaly={currentPlanetAnomaly} />
         </div>
-      )}
+      )} */}
               </div>
             </motion.div>
           )}

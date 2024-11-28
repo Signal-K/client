@@ -262,7 +262,7 @@ export function MiningComponentComponent() {
             owner: session.user.id,
             quantity: minedAmount,
             anomaly: activePlanet.id,
-            configuration: { Uses: 1 },
+            configuration: { Uses: 1, CommunityExpedition: "1 Mars 29 Nov 2024" },
           },
         ])
         .select();
@@ -305,97 +305,200 @@ export function MiningComponentComponent() {
     }
   };  
 
-  return (
-    <div className="relative h-screen w-full overflow-hidden bg-gray-100 text-[#2C4F64] flex flex-col">
-      <div className="flex justify-between items-center p-4">
-        <h2 className="text-2xl font-bold">Mining Operations</h2>
-        <Button
-          onClick={toggleMap}
-          variant="outline"
-          className="text-[#ffffff] hover:bg-[#5FCBC3]/20"
-        >
-          Switch to {activeMap === '2D' ? '3D' : '2D'} Map
-        </Button>
-      </div>
-      <div className="flex-grow flex flex-col md:flex-row overflow-hidden">
-        <div className="w-full md:w-3/4 h-1/2 md:h-full relative">
-          {activeMap === '2D' ? (
-            <TopographicMap 
-              deposits={mineralDeposits}
-              roverPosition={roverPosition}
-              selectedDeposit={selectedDeposit}
-              landmarks={landmarks}
-              onLandmarkClick={handleLandmarkClick} 
-              onDepositSelect={handleDepositSelect}                    
-            />
-          ) : (
-            <TerrainMap 
-              deposits={mineralDeposits} 
-              roverPosition={roverPosition}
-              selectedDeposit={selectedDeposit}
-              landmarks={landmarks}
-              onLandmarkClick={handleLandmarkClick}
-            />
-          )}
-        </div>
-        <div className="w-full md:w-1/4 h-1/2 md:h-full overflow-y-auto bg-white bg-opacity-90 p-4">
-          <div className="space-y-4">
-            {selectedDeposit ? (
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Selected Deposit: {selectedDeposit.name}</h3>
-                <p>Amount: {selectedDeposit.amount} units</p>
-                <Button 
-  onClick={handleStartMining} 
-  disabled={isMining}
-  className="w-full mt-4"
->
-  {isMining ? 'Mining...' : 'Start Mining'}
-</Button>
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+        <div className="relative w-[90%] h-[90%] bg-gray-100 text-[#2C4F64] flex flex-col rounded-lg overflow-hidden md:w-[90%] md:h-[90%] sm:w-full sm:h-full">
+          <div className="flex justify-between items-center p-4 bg-white shadow">
+            <h2 className="text-2xl font-bold">Mining Operations</h2>
+            <Button
+              onClick={toggleMap}
+              variant="outline"
+              className="text-[#ffffff] hover:bg-[#5FCBC3]/20"
+            >
+              Switch to {activeMap === '2D' ? '3D' : '2D'} Map
+            </Button>
+          </div>
+          <div className="flex-grow flex flex-col md:flex-row overflow-hidden">
+            <div className="w-full md:w-3/4 h-1/2 md:h-full relative">
+              {activeMap === '2D' ? (
+                <TopographicMap
+                  deposits={mineralDeposits}
+                  roverPosition={roverPosition}
+                  selectedDeposit={selectedDeposit}
+                  landmarks={landmarks}
+                  onLandmarkClick={handleLandmarkClick}
+                  onDepositSelect={handleDepositSelect}
+                />
+              ) : (
+                <TerrainMap
+                  deposits={mineralDeposits}
+                  roverPosition={roverPosition}
+                  selectedDeposit={selectedDeposit}
+                  landmarks={landmarks}
+                  onLandmarkClick={handleLandmarkClick}
+                />
+              )}
+            </div>
+            <div className="w-full md:w-1/4 h-1/2 md:h-full overflow-y-auto bg-white bg-opacity-90 p-4">
+              <div className="space-y-4">
+                {selectedDeposit ? (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Selected Deposit</h3>
+                    <p>{selectedDeposit.name}</p>
+                    <Button
+                      onClick={handleStartMining}
+                      className="mt-2 bg-green-500 hover:bg-green-600 text-white"
+                    >
+                      Start Mining
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-gray-500">Select a deposit to start mining.</p>
+                )}
               </div>
-            ) : (
+              <div>
               <MineralDepositList 
                 deposits={mineralDeposits} 
                 onSelect={handleDepositSelect}
                 selectedDeposit={selectedDeposit}
               />
-            )}
+                <MineralDepositsGenerator />
+              </div>
+              <Inventory />
+            </div>
           </div>
+          {activeLandmark && (
+            <div
+              className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+              onClick={closeModal}
+            >
+              <div
+                className="bg-white rounded-lg p-4 max-w-md w-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-xl font-bold">{activeLandmark.name}</h3>
+                <p>{activeLandmark.description}</p>
+                <Button
+                  onClick={closeModal}
+                  className="mt-4 bg-red-500 hover:bg-red-600 text-white"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      <div className="bg-white bg-opacity-90 p-4 border-t border-gray-200">
-        <Inventory />
-      </div>
-      {activeLandmark && (
-        <LandmarkModal
-          landmark={activeLandmark}
-          isOpen={activeLandmark.isOpen}
-          onClose={closeModal}
-        />
-      )}
-    </div>
-  );
+    );  
 };
 
-type LandmarkModalProps = {
-  landmark: Landmark | null;
-  isOpen: boolean;
-  onClose: () => void;
-};
+// type LandmarkModalProps = {
+//   landmark: Landmark | null;
+//   isOpen: boolean;
+//   onClose: () => void;
+// };
 
-const LandmarkModal: React.FC<LandmarkModalProps> = ({ landmark, isOpen, onClose }) => {
-  if (!isOpen || !landmark) return null;
+// const LandmarkModal: React.FC<LandmarkModalProps> = ({ landmark, isOpen, onClose }) => {
+//   if (!isOpen || !landmark) return null;
+
+//   return (
+//     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+//       <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
+//         <button
+//           className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+//           onClick={onClose}
+//         >
+//           &times;
+//         </button>
+//         <h2 className="text-2xl font-bold mb-2">{landmark.name}</h2>
+//         <p className="text-gray-700">{landmark.description}</p>
+//       </div>
+//     </div>
+//   );
+// };
+
+const MineralDepositsGenerator: React.FC = () => {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const { activePlanet } = useActivePlanet();
+
+  const [classificationsCount, setClassificationsCount] = useState(0);
+  const [creatingDeposits, setCreatingDeposits] = useState(false);
+  const [mineralDeposits, setMineralDeposits] = useState<any[]>([]); // Track created deposits
+  const [notification, setNotification] = useState<string | null>(null);
+
+  const availableMinerals = [11, 13, 15, 16, 18, 19];
+
+  useEffect(() => {
+    const fetchClassifications = async () => {
+      if (!session?.user?.id || !activePlanet?.id) {
+        console.error("User or activePlanet is undefined.");
+        return;
+      }
+      const { data: classifications, error } = await supabase
+        .from('classifications')
+        .select('*')
+        .eq('user', session.user.id)
+        .eq('planet_id', activePlanet.id);
+  
+      if (error) {
+        console.error("Error fetching classifications:", error);
+      } else {
+        console.log("Fetched classifications:", classifications);
+        // Make sure to set the classifications state correctly
+      }
+    };
+    fetchClassifications();
+  }, [session, activePlanet, supabase]);
+
+  const handleCreateDeposits = async () => {
+    if (!session?.user?.id || !activePlanet?.id) {
+      console.error("User or activePlanet is undefined.");
+      return;
+    }
+
+    // Randomly pick a mineral ID from availableMinerals
+    const randomMineral = availableMinerals[Math.floor(Math.random() * availableMinerals.length)];
+
+    const newDeposit = {
+      mineralconfiguration: {
+        mineral: randomMineral,  // Use the mineral ID (number)
+        quantity: 100,
+        icon_url: `https://example.com/mineral-icon-${randomMineral}.png`,  // Assuming different icons for each mineral
+        level: 1,
+        uses: ['Mining', 'Excavation'],
+        position: { x: Math.random() * 100, y: Math.random() * 100 }  // Random position
+      },
+      owner: session.user.id,
+      anomaly: activePlanet.id,
+    };
+
+    const { data, error } = await supabase
+      .from('mineralDeposits')
+      .insert([newDeposit])
+      .select();
+
+    if (error) {
+      console.error("Error creating deposit:", error);
+      return;
+    }
+
+    console.log("Created new deposit:", data);
+    // Optionally, update the local state to reflect the new deposit
+    setMineralDeposits(prevDeposits => [
+      ...prevDeposits,
+      { ...newDeposit.mineralconfiguration, id: data[0].id }
+    ]);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
-        <button
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-          onClick={onClose}
-        >
-          &times;
-        </button>
-        <h2 className="text-2xl font-bold mb-2">{landmark.name}</h2>
-        <p className="text-gray-700">{landmark.description}</p>
+    <div className="mineral-deposits-container">
+      <div className="content">
+        <h2>Create Mineral Deposits</h2>
+        <p>You have {classificationsCount} classifications. You can create up to 3 mineral deposits.</p>
+        <Button onClick={handleCreateDeposits} disabled={creatingDeposits}>
+          {creatingDeposits ? 'Creating...' : 'Create Deposits'}
+        </Button>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
  
-import { EarthActionSceneLayout, EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
+import { EarthActionSceneLayout, EarthViewLayout, MarsActionSceneLayout } from "@/components/(scenes)/planetScene/layout";
 import InitialisePlanet from "@/components/(scenes)/planetScene/initialisePlanet";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 import { InventoryStructureItem } from "@/types/Items";
@@ -55,10 +55,10 @@ export default MarsView;
 
 const MarsStructures: React.FC = () => {
     return (
-        <EarthActionSceneLayout>
-        <MiningComponentComponent />
-        <StructureMissionGuide />
-    </EarthActionSceneLayout>
+        <MarsActionSceneLayout>
+            <MiningComponentComponent />
+            <StructureMissionGuide />
+        </MarsActionSceneLayout>
         // <EarthViewLayout>
         //     <div className="w-full">
         //         <div className="flex flex-row space-y-4"></div>

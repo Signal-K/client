@@ -218,3 +218,18 @@ export const EarthActionSceneLayout:  React.FC<PlanetActionSceneProps> = ({
     </div>
   );
 };
+
+export const MarsActionSceneLayout: React.FC<PlanetActionSceneProps> = ({
+  children
+}) => {
+  return (
+    <div className="relative min-h-screen h-screen w-full flex flex-col">
+      <img
+        className="absolute inset-0 w-full h-full object-cover"
+        src="/assets/Backdrops/View.jpeg"
+        alt="Mars Background"
+      />
+      {children}
+    </div>
+  );
+};
