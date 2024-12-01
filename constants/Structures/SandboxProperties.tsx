@@ -1,6 +1,5 @@
 import React from "react";
 import AutomatonUpgrade from "@/components/Structures/Config/AutomatonUpgradeBox";
-import { MineralDepositsNoAction } from "@/components/Structures/Mining/Archive/AvailableDeposits";
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";

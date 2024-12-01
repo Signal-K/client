@@ -75,7 +75,7 @@ const InventoryList = ({ anomaly }: InventoryListProps) => {
   return (
     <div className="grid grid-cols-3 gap-4">
       {filteredItems.length > 0 ? (
-        filteredItems.map((item) => {
+        filteredItems.map((item) => { 
           const apiItem = inventoryItems.find(apiItem => apiItem.id === item.item);
           return (
             <div key={item.id} className="flex flex-col items-center p-4 border rounded">

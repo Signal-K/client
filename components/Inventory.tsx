@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Diamond, Zap, Battery, Magnet, Crown, Gem } from 'lucide-react';
 import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
-import { Diamond, Zap, Gem, Rocket, Crown } from 'lucide-react';
-import { useActivePlanet } from '@/context/ActivePlanet';
 
 type InventoryItem = {
   id: string;
@@ -11,27 +10,43 @@ type InventoryItem = {
   amount: number;
 };
 
+const getMineralColor = (name: string) => {
+  switch (name) {
+    case 'Iron':
+      return 'bg-red-100';
+    case 'Copper':
+      return 'bg-orange-100';
+    case 'Coal':
+      return 'bg-gray-100';
+    case 'Nickel':
+      return 'bg-green-100';
+    case 'Fuel':
+      return 'bg-cyan-100';
+    default:
+      return 'bg-blue-100';
+  }
+};
+
 export function Inventory() {
   const supabase = useSupabaseClient();
   const session = useSession();
-  
-  const { activePlanet } = useActivePlanet();
 
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
-  // Mapping item IDs to their names
   const itemNames: Record<number, string> = {
-    11: 'Iron',
-    19: 'Fuel',
-    20: 'Copper',
+    11: 'Coal',
+    13: 'Silicon',
+    15: 'Iron',
+    16: 'Nickel',
+    18: 'Fuel',
+    19: 'Copper',
   };
 
   useEffect(() => {
     const fetchInventory = async () => {
-      // Check if session and user ID are available
-      if (!session?.user?.id) {
+      if (!session?.user.id) {
         console.error('Session or user ID is missing');
         setLoading(false);
         return;
@@ -42,7 +57,7 @@ export function Inventory() {
           .from('inventory')
           .select('id, item, quantity')
           .eq('owner', session.user.id)
-          .in('item', Object.keys(itemNames).map(Number)); // Fetch all items defined
+          .in('item', Object.keys(itemNames).map(Number));
 
         if (error) {
           throw error;
@@ -51,7 +66,7 @@ export function Inventory() {
         const formattedInventory = Object.entries(itemNames).map(([key, name]) => {
           const foundItem = data?.find((item) => item.item === Number(key));
           return {
-            id: foundItem ? foundItem.id.toString() : key, 
+            id: foundItem ? foundItem.id.toString() : key,
             name: name,
             amount: foundItem ? foundItem.quantity : 0,
           };
@@ -74,15 +89,17 @@ export function Inventory() {
         return <Diamond className="text-[#FFE3BA]" />;
       case 'Copper':
         return <Zap className="text-[#5FCBC3]" />;
-      case 'Gold':
-        return <Gem className="text-[#FFD700]" />;
-      case 'Titanium':
-        return <Rocket className="text-[#B0C4DE]" />;
-      case 'Platinum':
+      case 'Coal':
+        return <Magnet className="text-[#FFD700]" />;
+      case 'Silicon':
+        return <Gem className="text-[#B0C4DE]" />;
+      case 'Fuel':
+        return <Battery className="text-[#020403]" />;
+      case 'Nickel':
         return <Crown className="text-[#E5E4E2]" />;
       default:
         return <Diamond className="text-[#FFE3BA]" />;
-    };
+    }
   };
 
   if (loading) {
@@ -91,19 +108,19 @@ export function Inventory() {
 
   return (
     <div className="space-y-2">
-      <h2 className="text-xl font-bold text-[#B9E678]">Inventory</h2>              
-      <div className="flex space-x-4">
+      <h2 className="text-xl font-bold text-[#2C4F64]">Inventory</h2>
+      <div className="flex flex-wrap gap-4">
         {inventory.map((item) => (
-          <div 
-            key={item.id} 
-            className="relative flex items-center space-x-2 bg-[#2C4F64] p-2 rounded-lg"             
-            onMouseEnter={() => setHoveredItem(item.id)}
+          <div
+            key={item.id}
+            className={`relative flex items-center space-x-2 p-2 rounded-lg ${getMineralColor(item.name)}`}
+            onMouseEnter={() => setHoveredItem(item.name)} // Use name for hover
             onMouseLeave={() => setHoveredItem(null)}
           >
             {getIcon(item.name)}
-            <span className="font-bold text-[#F7F5E9]">{item.amount}</span>             
-            {hoveredItem === item.id && (
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-[#2C4F64] text-[#F7F5E9] px-2 py-1 rounded text-sm whitespace-nowrap">              
+            <span className="font-bold">{item.amount}</span>
+            {hoveredItem === item.name && ( // Compare against name
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-[#2C4F64] text-white px-2 py-1 rounded text-sm whitespace-nowrap">
                 {item.name}
               </div>
             )}

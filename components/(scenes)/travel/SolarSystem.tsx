@@ -13,7 +13,7 @@ type Exoplanet = {
   name: string;
   distance: number;
   anomaly?: number;           
-  planetType?: string;
+  planetType?: string; 
   initialisationMissionId?: number;
   image?: string;
   description?: string;
@@ -60,42 +60,30 @@ export default function SwitchPlanet() {
     exoplanets: Exoplanet[];
   }>({
     solarSystem: [
-      {
-        id: 10,
-        name: "Mercury",
-        color: "bg-[#2C3A4A]",
-        stats: { gravity: "3.7 m/s²", temp: "430°C" },
-        anomaly: 10,
-        planetType: 'Arid',
-        initialisationMissionId: 100001,
-        travelTime: '30 seconds',
-        description: '',
-        image: '/assets/Planets/Mercury.png',
-      },
-      {
-        id: 20,
-        name: "Venus",
-        color: "bg-yellow-200",
-        stats: { gravity: "8.87 m/s²", temp: "462°C" },
-        anomaly: 20,
-        planetType: 'Arid',
-        initialisationMissionId: 200001,
-        travelTime: '30 seconds',
-        description: '',
-        image: '/assets/Planets/Venus.png',
-      },
-      {
-        id: 69,
-        name: "Earth",
-        color: "bg-blue-500",
-        stats: { gravity: "9.8 m/s²", temp: "15°C" },
-        anomaly: 69,
-        planetType: 'Lush',
-        initialisationMissionId: 300001,
-        travelTime: '30 seconds',
-        description: '',
-        image: '/assets/Planets/Earth.png',
-      },
+      // {
+      //   id: 10,
+      //   name: "Mercury",
+      //   color: "bg-[#2C3A4A]",
+      //   stats: { gravity: "3.7 m/s²", temp: "430°C" },
+      //   anomaly: 10,
+      //   planetType: 'Arid',
+      //   initialisationMissionId: 100001,
+      //   travelTime: '30 seconds',
+      //   description: '',
+      //   image: '/assets/Planets/Mercury.png',
+      // },
+      // {
+      //   id: 20,
+      //   name: "Venus",
+      //   color: "bg-yellow-200",
+      //   stats: { gravity: "8.87 m/s²", temp: "462°C" },
+      //   anomaly: 20,
+      //   planetType: 'Arid',
+      //   initialisationMissionId: 200001,
+      //   travelTime: '30 seconds',
+      //   description: '',
+      //   image: '/assets/Planets/Venus.png',
+      // },
       {
         id: 40,
         name: "Mars",
@@ -108,25 +96,30 @@ export default function SwitchPlanet() {
         description: '',
         image: '/assets/Planets/Mars.png',
       },
+      {
+        id: 30, // 69
+        name: "Earth",
+        color: "bg-blue-500",
+        stats: { gravity: "9.8 m/s²", temp: "15°C" },
+        anomaly: 30,
+        planetType: 'Lush',
+        initialisationMissionId: 300001,
+        travelTime: '30 seconds',
+        description: '',
+        image: '/assets/Planets/Earth.png',
+      },
     ],
     exoplanets: [],
   });  
 
   const currentPlanets = planets[activeTab];
   const currentPlanet = currentPlanets[currentIndex];
-  const planetType = currentPlanet?.planetType || 'Unknown';
-  const anomaly = currentPlanet?.anomaly ?? 'Unknown';
-  const initialisationMissionId = currentPlanet?.initialisationMissionId ?? null;
-  const image = currentPlanet?.image ?? '/assets/Planets/DefaultExoplanet.png';
-  const description = currentPlanet?.description ?? 'No description available';
+  // const planetType = currentPlanet?.planetType || 'Unknown';
+  // const anomaly = currentPlanet?.anomaly ?? 'Unknown';
+  // const initialisationMissionId = currentPlanet?.initialisationMissionId ?? null;
+  // const image = currentPlanet?.image ?? '/assets/Planets/DefaultExoplanet.png';
+  // const description = currentPlanet?.description ?? 'No description available';
   const currentPlanetAnomaly = currentPlanet?.anomaly ?? 0;
-
-  useEffect(() => {
-    console.log("Component loaded, exoplanets: ", planets.exoplanets);
-  }, [planets.exoplanets]);
-
-  // Fix for TS error 2345 - ensuring 'number | undefined' doesn't cause an issue
-  const index = currentPlanet?.anomaly !== undefined ? currentPlanet.anomaly : 0;
 
   useEffect(() => {
     const fetchExoplanets = async () => {
@@ -520,12 +513,20 @@ export default function SwitchPlanet() {
                 <div className="flex flex-col justify-between items-center mb-4">
                   <h3 className="text-xl font-semibold">{currentPlanet.name}</h3>
                   <p className="text-sm">{currentPlanet.description}</p>
-                  <button
+                  {/* <button
                     onClick={handleSelectMission}
                     className="bg-[#5FCBC3] hover:bg-[#4BB3A5] text-white py-2 px-4 rounded-lg mt-2"
                   >
                     Select Mission
+                  </button> */}
+                          <div className="m-1">
+                            <button
+                    onClick={handleVisitPlanet}
+                    className="bg-[#5FCBC3] hover:bg-[#4BB3A5] text-white py-2 px-4 rounded-lg mt-2"
+                  >
+                    Visit
                   </button>
+        </div>
                 </div>
 
                 <div className="flex justify-between items-center">
@@ -582,11 +583,11 @@ export default function SwitchPlanet() {
         </div>
       )}
 
-      {!missionSelected && (
+      {/* {!missionSelected && (
         <div className="p-4">
           <InventoryList anomaly={currentPlanetAnomaly} />
         </div>
-      )}
+      )} */}
               </div>
             </motion.div>
           )}
