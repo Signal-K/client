@@ -34,7 +34,7 @@ export function MiningComponentComponent() {
   const supabase = useSupabaseClient();
   const session = useSession();
 
-  const { activePlanet } = useActivePlanet();
+  const { activePlanet, updatePlanetLocation } = useActivePlanet();
   
   const [mineralDeposits, setMineralDeposits] = useState<MineralDeposit[]>([]);
   const [rover, setRover] = useState<Rover | null>(null)
@@ -193,7 +193,7 @@ export function MiningComponentComponent() {
       setIsMining(true);
       setRoverPosition({ x: 5, y: 5 }); // Start position
   
-      const duration = 5000; // 5 seconds to reach deposit
+      const duration = 5000; 
       const startTime = Date.now();
   
       const animateRover = () => {
@@ -208,7 +208,6 @@ export function MiningComponentComponent() {
         if (progress < 1) {
           requestAnimationFrame(animateRover);
         } else {
-          // At deposit, start mining
           setTimeout(() => {
             setRoverPosition({ x: 5, y: 5 }); // Return to base
             setIsMining(false);
@@ -367,6 +366,12 @@ export function MiningComponentComponent() {
               <Inventory />
             </div>
           </div>
+          <Button
+                      onClick={() => updatePlanetLocation(30)}
+                      className="mt-2 bg-green-500 hover:bg-green-600 text-white"
+                    >
+                      Return to Earth
+                    </Button>
           {activeLandmark && (
             <div
               className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
