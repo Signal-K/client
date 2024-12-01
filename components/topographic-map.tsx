@@ -63,7 +63,7 @@ const BackgroundMap = ({ deposits, seed }: { deposits: MineralDeposit[]; seed: s
       const { width, height } = canvas;
 
       ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = "#F5F5DC";
+      ctx.fillStyle = "#a6142a" // "#F5F5DC";
       ctx.fillRect(0, 0, width, height);
 
       const step = 10;
