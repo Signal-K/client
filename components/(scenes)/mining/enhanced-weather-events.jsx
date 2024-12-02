@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Cloud, Sun, Zap, Droplets, Bird, Mountain, Star, Settings } from 'lucide-react'
-import { PlanetarySystem } from './(scenes)/planetScene/orbitals/system'
+import { PlanetarySystem } from '../planetScene/orbitals/system'
 
 const cloudTypes = ['cumulus', 'vortex', 'turbulent', 'bands', 'martian']
 

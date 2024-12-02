@@ -2,14 +2,15 @@
 
 import React from "react";
 import StarnetLayout from "@/components/Layout/Starnet";
-import { MiningComponentComponent } from "@/components/mining-component";
+import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-component";
+import Greenhouse from "@/page.test";
 // import { TopographicMap } from "@/components/topographic-map";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
-              <MiningComponentComponent />
+              <Greenhouse />
               {/* <MiningComponent /> */}
           </>
         // {/* </StarnetLayout> */}

@@ -12,7 +12,7 @@ import StructuresOnPlanet, {
 } from "@/components/Structures/Structures";
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import InventoryPage from "@/components/Inventory/Grid/Grid";
-import EnhancedWeatherEventsComponent from "@/components/enhanced-weather-events";
+import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
 // import TopographicMap from "@/components/topographic-map";
 
 const EarthView: React.FC = () => {
@@ -50,7 +50,7 @@ export default EarthView;
 const EarthStructures: React.FC = () => {
   return (
     <EarthViewLayout>
-      <EnhancedWeatherEventsComponent />
+      <EnhancedWeatherEvents />
       <div className="w-full">
         <div className="py-2">
           <center>

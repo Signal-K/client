@@ -10,7 +10,7 @@ import {
   Settings,
 } from "lucide-react";
 import TutorialPopup from "@/content/Dialogue/helpButton";
-import { MiningComponentComponent } from "../mining-component";
+import { MiningComponentComponent } from "../(scenes)/mining/mining-component";
 
 const menuItems = [
   { icon: Building2Icon, label: "Structures", content: "Structures Content" },

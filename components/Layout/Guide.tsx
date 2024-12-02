@@ -8,7 +8,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import MissionInfoModal from "../Missions/MissionInfoModal";
 import AllClassifications from "@/content/Starnet/YourClassifications";
 import SwitchPlanet from "../(scenes)/travel/SolarSystem";
-import { MiningComponentComponent } from "../mining-component";
+import { MiningComponentComponent } from "../(scenes)/mining/mining-component";
 
 export interface Mission {
     id: number | number[];

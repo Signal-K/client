@@ -130,7 +130,6 @@ export function MiningComponentComponent() {
   
       setMineralDeposits(formattedDeposits || []);
   
-      // Fetch inventory and filter structures
       const { data: inventoryData, error: inventoryError } = await supabase
         .from("inventory")
         .select("id, item, quantity")
@@ -143,11 +142,9 @@ export function MiningComponentComponent() {
         return;
       }
   
-      // Fetch all items from the API route
       const res = await fetch('/api/gameplay/inventory');
       const items = await res.json();
   
-      // Filter inventory to include only items of type "Structure"
       const structures = inventoryData
         ?.filter((inventoryItem) =>
           items.some(
@@ -184,15 +181,15 @@ export function MiningComponentComponent() {
   }, [session, activePlanet, supabase]);
   
   const handleDepositSelect = (deposit: MineralDeposit) => {
-    console.log("Deposit selected:", deposit); // Debugging line
+    console.log("Deposit selected:", deposit);
     setSelectedDeposit(deposit);
   };  
 
   const handleStartMining = () => {
     if (selectedDeposit && rover) {
-      console.log("Starting mining:", selectedDeposit, rover); // Add this to check
+      console.log("Starting mining:", selectedDeposit, rover);
       setIsMining(true);
-      setRoverPosition({ x: 5, y: 5 }); // Start position
+      setRoverPosition({ x: 5, y: 5 }); 
   
       const duration = 5000; 
       const startTime = Date.now();
@@ -223,11 +220,11 @@ export function MiningComponentComponent() {
           requestAnimationFrame(animateRover);
         } else {
           setTimeout(() => {
-            setRoverPosition({ x: 5, y: 5 }); // Return to base
+            setRoverPosition({ x: 5, y: 5 });
             setIsMining(false);
-            updateInventory(selectedDeposit.name, 50); // Update Supabase with mined resources
-            setSelectedDeposit(null); // Reset selected deposit
-          }, 5000); // 5 seconds at deposit          
+            updateInventory(selectedDeposit.name, 50); 
+            setSelectedDeposit(null);
+          }, 5000);        
         }
       };
   
@@ -265,12 +262,11 @@ export function MiningComponentComponent() {
         );
       }
     } else {
-      // Insert new item into inventory
       const { data, error } = await supabase
         .from("inventory")
         .insert([
           {
-            item: resourceName, // Map this to an ID if needed
+            item: resourceName,
             owner: session.user.id,
             quantity: minedAmount,
             anomaly: activePlanet.id,
@@ -324,7 +320,6 @@ export function MiningComponentComponent() {
   };
 
   useEffect(() => {
-    // Logic to fetch data whenever refreshKey changes
     console.log('Parent component refreshed.');
   }, [refreshKey]);
 

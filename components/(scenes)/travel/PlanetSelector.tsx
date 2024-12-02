@@ -81,7 +81,7 @@ export default function PlanetSelector({ user, onSelect }: PlanetSelectorProps) 
     const session = useSession();
 
     const [planets, setPlanets] = useState<Planet[]>([...initialPlanets]); // Use renamed constant here
-  const [selectedPlanet, setSelectedPlanet] = useState<Planet>(initialPlanets[0]);
+    const [selectedPlanet, setSelectedPlanet] = useState<Planet>(initialPlanets[0]);
     const [selectedType, setSelectedType] = useState<'intra-solar' | 'interstellar'>('intra-solar');
     const [isBooked, setIsBooked] = useState(false);
   
