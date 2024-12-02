@@ -19,7 +19,7 @@ export type MineralDeposit = {
   position: { x: number; y: number };
   icon_url: string;
   level: number;
-  uses: any[]; // Adjust this according to your actual data structure
+  uses: any[];
 };
 
 type Landmark = {

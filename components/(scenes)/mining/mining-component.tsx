@@ -51,9 +51,8 @@ export function MiningComponentComponent() {
       if (!session?.user?.id || !activePlanet?.id) {
         console.error("User or activePlanet is undefined.");
         return;
-      }
-  
-      // Fetch inventory from Supabase
+      };
+
       const { data: inventoryData, error: inventoryError } = await supabase
         .from("inventory")
         .select("id, item, quantity")
@@ -93,6 +92,7 @@ export function MiningComponentComponent() {
         });
   
       setLandmarks(structures || []);
+      refreshParent(); 
     };
   
     fetchLandmarks();
@@ -287,8 +287,10 @@ export function MiningComponentComponent() {
   };  
 
   const toggleMap = () => {
-    setActiveMap(prev => prev === '2D' ? '3D' : '2D')
-  }
+    setActiveLandmark(null);
+    setLandmarks((prev) => [...prev]); // Trigger re-render for landmarks
+    setActiveMap((prev) => (prev === "2D" ? "3D" : "2D"));
+  };
 
   const [activeLandmark, setActiveLandmark] = useState<Landmark | null>(null);
 
@@ -340,6 +342,7 @@ export function MiningComponentComponent() {
             <div className="w-full md:w-3/4 h-1/2 md:h-full relative">
               {activeMap === '2D' ? (
                 <TopographicMap
+                  key={JSON.stringify(landmarks)}
                   deposits={mineralDeposits}
                   roverPosition={roverPosition}
                   selectedDeposit={selectedDeposit}
