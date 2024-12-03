@@ -27,36 +27,34 @@ export function StarterTelescope() {
     const [hasMission3000001, setHasMission3000001] = useState<boolean | null>(null);
     const [missionLoading, setMissionLoading] = useState<boolean>(true); 
 
-    // Check tutorial mission
     useEffect(() => {
         const checkTutorialMission = async () => {
-            if (!session) return; 
-
+            if (!session) return;
+    
             try {
                 const { data: missionData, error: missionError } = await supabase
                     .from('missions')
                     .select('id')
                     .eq('user', session.user.id)
-                    .eq('mission', 3000001)  // Changed to ensure integer comparison
-                    .single();
-
+                    .eq('mission', 3000001);
+    
                 if (missionError) throw missionError;
-
-                // Log mission data and error for debugging
-                console.log({ missionData, missionError });
-
-                // Check if missionData contains valid data
-                setHasMission3000001(!!missionData?.id);
+    
+                // Log data for debugging
+                console.log('Mission Data:', missionData);
+    
+                // Check if any rows exist
+                setHasMission3000001(missionData && missionData.length > 0);
             } catch (error: any) {
                 console.error('Error checking user mission: ', error.message || error);
                 setHasMission3000001(false);
             } finally {
                 setMissionLoading(false);
-            };
+            }
         };
-
+    
         checkTutorialMission();
-    }, [session, supabase]);
+    }, [session, supabase]);    
 
     // Fetch structure configuration
     useEffect(() => {
@@ -197,6 +195,18 @@ export function StarterTelescope() {
             </div>
         );
     };
+
+    if (missionLoading || hasMission3000001 === null) {
+        return <div>Loading...</div>;
+    }
+    
+    if (!hasMission3000001) {
+        return (
+            <div>
+                <FirstTelescopeClassification anomalyid={"6"} />
+            </div>
+        );
+    };    
 
     // Main rendering
     return (

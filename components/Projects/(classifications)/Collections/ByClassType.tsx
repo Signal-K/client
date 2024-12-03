@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface DiscoveryCardsByClassificationTypeProps { 
   classificationtype: string;
-};
+}; 
 
 export function DiscoveryCardsByClassificationType({ classificationtype }: DiscoveryCardsByClassificationTypeProps) {
   const supabase = useSupabaseClient();

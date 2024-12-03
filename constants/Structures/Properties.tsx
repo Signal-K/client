@@ -159,13 +159,13 @@ export const StructuresConfig: StructureConfig = {
         // Copy action/labels
       ],
       buttons: [
-        // {
-        //   icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Discover planets", // Transit events, microlensing, etc
-        //   dynamicComponent: <StarterTelescope />,
-        //   sizePercentage: 60,
-        //   showInNoModal: true,
-        // },
+        {
+          icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Discover planets", // Transit events, microlensing, etc
+          dynamicComponent: <StarterTelescope />,
+          sizePercentage: 60,
+          showInNoModal: true,
+        },
         {
           icon: <EarthIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Find new worlds",
