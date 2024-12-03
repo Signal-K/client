@@ -288,7 +288,7 @@ export function MiningComponentComponent() {
 
   const toggleMap = () => {
     setActiveLandmark(null);
-    setLandmarks((prev) => [...prev]); // Trigger re-render for landmarks
+    setLandmarks((prev) => [...prev]);
     setActiveMap((prev) => (prev === "2D" ? "3D" : "2D"));
   };
 

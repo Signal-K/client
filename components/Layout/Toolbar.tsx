@@ -24,9 +24,15 @@ export default function VerticalToolbar() {
   const [hovered, setHovered] = useState<string | null>(null);
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    // Close modal if the backdrop (not the modal content) is clicked
+    if ((e.target as HTMLElement).id === "backdrop") {
+      setActiveModal(null);
+    }
+  };
+
   return (
     <div className="z-50">
-      {/* Vertical Toolbar for larger screens */}
       <div className="hidden md:block fixed left-4 top-1/4 transform -translate-y-1/2">
         <nav className="bg-[#1E3A4C] rounded-xl shadow-lg backdrop-blur-md bg-opacity-80 p-2">
           <ul className="flex flex-col space-y-4">
@@ -59,9 +65,12 @@ export default function VerticalToolbar() {
         </nav>
       </div>
 
-      {/* Modal for Popups */}
       {activeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div
+          id="backdrop"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={handleBackdropClick}
+        >
           <div
             className="w-[90vw] max-w-3xl h-[90vh] bg-white rounded-lg p-4 overflow-y-auto relative"
           >

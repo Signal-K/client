@@ -25,6 +25,8 @@ import { PlanetFourProject } from "@/components/Projects/Satellite/PlanetFour";
 import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
 import AllClassifications from "@/content/Starnet/YourClassifications";
 import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
+import TutorialPopup from "@/content/Dialogue/helpButton";
+import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
 
 interface IndividualStructureProps {
     name?: string;
@@ -76,6 +78,7 @@ export const StructuresConfig: StructureConfig = {
           text: "Research",
           dynamicComponent: <DataSourcesModal structureId="3102" structure="Rover" />,
         },
+        
       ],
       buttons: [
         { 
@@ -148,16 +151,21 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <AllClassifications initialType="planet" />
 
         },
+        {
+          icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Upload content",
+          dynamicComponent: <FreeformUploadData />,
+        }
         // Copy action/labels
       ],
       buttons: [
-        {
-          icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Discover planets", // Transit events, microlensing, etc
-          dynamicComponent: <StarterTelescope />,
-          sizePercentage: 60,
-          showInNoModal: true,
-        },
+        // {
+        //   icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Discover planets", // Transit events, microlensing, etc
+        //   dynamicComponent: <StarterTelescope />,
+        //   sizePercentage: 60,
+        //   showInNoModal: true,
+        // },
         {
           icon: <EarthIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Find new worlds",
@@ -170,24 +178,24 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <TelescopeSunspotDetector />,
           sizePercentage: 60,
         },
-        {
-          icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Find early solar systems",
-          dynamicComponent: <TelescopeDiskDetector />,
-          sizePercentage: 70,
-        },
+        // {
+        //   icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Find early solar systems",
+        //   dynamicComponent: <TelescopeDiskDetector />,
+        //   sizePercentage: 70,
+        // },
         {
           icon: <MoonStarIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Discover asteroids",
           dynamicComponent: <DailyMinorPlanet />,
           sizePercentage: 50,
         },
-        {
-          icon: <RssIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Planet Four Test",
-          dynamicComponent: <PlanetFourProject />,
-          sizePercentage: 50,
-        },
+        // {
+        //   icon: <RssIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Planet Four Test",
+        //   dynamicComponent: <PlanetFourProject />,
+        //   sizePercentage: 50,
+        // },
         // {
         //   icon: <StarIcon className="w-6 h-6 text-[#5e81ac]" />,
         //   text: "Comets & Asteroids",

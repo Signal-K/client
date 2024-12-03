@@ -23,7 +23,7 @@ type Landmark = {
 }; 
 
 type TopographicMapProps = {
-  deposits: MineralDeposit[];
+  deposits: MineralDeposit[]; 
   roverPosition: { x: number; y: number } | null;
   selectedDeposit: MineralDeposit | null;
   landmarks: Landmark[];
@@ -123,7 +123,6 @@ export function TopographicMap({
     const newSeed = Math.random().toString(); // Generate a new random seed
     setTerrainSeed(newSeed);
 
-    // Move landmarks to random positions
     setDynamicLandmarks(
       dynamicLandmarks.map((landmark) => ({
         ...landmark,
@@ -139,19 +138,23 @@ export function TopographicMap({
     <div className="relative w-full h-full">
       <BackgroundMap deposits={deposits} seed={terrainSeed} />
       {deposits.map((deposit) => (
-        <div
-          key={deposit.id}
-          className="absolute"
-          style={{
-            left: `${deposit.position.x}%`,
-            top: `${deposit.position.y}%`,
-            transform: "translate(-50%, -50%)",
-          }}
-          onClick={() => onDepositSelect(deposit)}
-        >
-          {getMineralIcon(deposit.mineral)}
-        </div>
-      ))}
+  <div
+    key={deposit.id}
+    className="absolute"
+    style={{
+      left: `${deposit.position.x}%`,
+      top: `${deposit.position.y}%`,
+      transform: "translate(-50%, -50%)",
+    }}
+    onClick={() => onDepositSelect(deposit)}
+  >
+    {deposit.icon_url ? (
+      <img src={deposit.icon_url} alt={deposit.mineral} />
+    ) : (
+      getMineralIcon(deposit.mineral)
+    )}
+  </div>
+))}
       {dynamicLandmarks.map((landmark) => (
         <div
           key={landmark.id}
