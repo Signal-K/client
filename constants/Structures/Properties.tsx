@@ -166,24 +166,24 @@ export const StructuresConfig: StructureConfig = {
           sizePercentage: 60,
           showInNoModal: true,
         },
-        {
-          icon: <EarthIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Find new worlds",
-          dynamicComponent: <ExoplanetTransitHunter />,
-          sizePercentage: 80,
-        },
+        // {
+        //   icon: <EarthIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Find new worlds",
+        //   dynamicComponent: <ExoplanetTransitHunter />,
+        //   sizePercentage: 80,
+        // },
         {
           icon: <SunIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Sunspot data",
           dynamicComponent: <TelescopeSunspotDetector />,
           sizePercentage: 60,
         },
-        // {
-        //   icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Find early solar systems",
-        //   dynamicComponent: <TelescopeDiskDetector />,
-        //   sizePercentage: 70,
-        // },
+        {
+          icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Find early solar systems",
+          dynamicComponent: <TelescopeDiskDetector />,
+          sizePercentage: 70,
+        },
         {
           icon: <MoonStarIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Discover asteroids",
