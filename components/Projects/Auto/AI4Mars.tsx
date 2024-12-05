@@ -149,6 +149,7 @@ export function AiForMarsProject() {
     const { activePlanet } = useActivePlanet();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+    const [showTutorial, setShowTutorial] = useState<boolean>(false);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -234,6 +235,8 @@ export function AiForMarsProject() {
         );
     };
 
+    const startTutorial = () => setShowTutorial(true);
+
     const content = !hasMission20000006 
     ? <StarterAiForMars anomalyid={anomaly?.id || 69592674} />
     : (
@@ -256,6 +259,12 @@ export function AiForMarsProject() {
                     )}
                 </>
             )}
+            <button
+                        onClick={startTutorial}
+                        className="mt-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
+                    >
+                        Reopen Tutorial
+                    </button>
         </>
     );
 
@@ -265,7 +274,6 @@ return (
     </div>
 );
 
+};
 
  // I did get conflicted between 3102 and 3103, going with 3102 until the satellite comes into play
-
-};

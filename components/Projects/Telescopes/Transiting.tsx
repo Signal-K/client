@@ -172,6 +172,113 @@ export function StarterTelescope() {
     );
 };
 
+export function StarterTelescopeTess() {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+    const { activePlanet } = useActivePlanet();
+
+    const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
+    const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [hasMission3000001, setHasMission3000001] = useState<boolean | null>(null);
+    const [missionLoading, setMissionLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const checkTutorialMission = async () => {
+            if (!session) return;
+            try {
+                const { data: missionData, error: missionError } = await supabase
+                    .from('missions')
+                    .select('id')
+                    .eq('user', session.user.id)
+                    .eq('mission', 3000001);
+                if (missionError) throw missionError;
+                setHasMission3000001(missionData && missionData.length > 0);
+            } catch (error: any) {
+                console.error('Error checking user mission: ', error.message || error);
+                setHasMission3000001(false);
+            } finally {
+                setMissionLoading(false);
+            }
+        };
+        checkTutorialMission();
+    }, [session, supabase]);
+
+    useEffect(() => {
+        const fetchAnomalies = async () => {
+            if (!session) {
+                setLoading(false);
+                return;
+            }
+            try {
+                const { data: anomalyData, error: anomalyError } = await supabase
+                    .from("anomalies")
+                    .select("*")
+                    .eq("anomalySet", "telescope-tess"); // Hardcoded choice
+                if (anomalyError) throw anomalyError;
+
+                setAnomalies(anomalyData || []);
+                console.log("Fetched anomalies:", anomalyData);
+
+                if (anomalyData?.length > 0) {
+                    const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)];
+                    console.log("Random anomaly selected:", randomAnomaly);
+
+                    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://your-default-supabase-url.com';
+                    if (randomAnomaly?.id) {
+                        const constructedUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Binned.png`;
+                        console.log("Constructed image URL:", constructedUrl);
+                        setImageUrl(constructedUrl);
+                    } else {
+                        console.error("Random anomaly ID is null or undefined.");
+                    }
+                    setSelectedAnomaly(randomAnomaly);
+                } else {
+                    console.log("No anomalies found.");
+                    setSelectedAnomaly(null);
+                }
+            } catch (error: any) {
+                console.error("Error fetching anomalies:", error.message || error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAnomalies();
+    }, [session, supabase]);
+
+    if (error) return <div><p>{error}</p></div>;
+    if (missionLoading || hasMission3000001 === null) return <div>Loading...</div>;
+    if (!hasMission3000001) {
+        return (
+            <div>
+                <FirstTelescopeClassification anomalyid={"6"} />
+            </div>
+        );
+    }
+    if (loading) return <div><p>Loading...</p></div>;
+    if (!anomalies.length) return <div><p>No anomaly found.</p></div>;
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+            <div className="p-4 rounded-md relative w-full">
+                {selectedAnomaly?.avatar_url && <img src={selectedAnomaly.avatar_url} alt="Anomaly Avatar" />}
+                {imageUrl && <img src={imageUrl} alt="Anomaly Binned Image" />}
+                {selectedAnomaly && (
+                    <ClassificationForm
+                        anomalyId={selectedAnomaly.id.toString()}
+                        anomalyType="planet"
+                        missionNumber={1372001}
+                        assetMentioned={selectedAnomaly?.id.toString()}
+                        structureItemId={3103}
+                    />
+                )}
+            </div>
+        </div>
+    );
+};
+
 interface TelescopeProps {
     anomalyid: string;
 };
