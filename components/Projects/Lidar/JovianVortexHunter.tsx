@@ -3,13 +3,10 @@
 import React, { useState, useEffect } from "react"; 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ClassificationForm from "../(classifications)/PostForm";
+import { Props } from "@/types/Anomalies";
 
 import { Anomaly } from "../Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
-
-interface Props {
-    anomalyid: number | bigint;
-};
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -146,8 +143,6 @@ export function LidarJVHSatellite() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const { activePlanet } = useActivePlanet();
-
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [hasMission20000007, setHasMission20000007] = useState<boolean>(false);
@@ -193,7 +188,7 @@ export function LidarJVHSatellite() {
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")
                     .select("*")
-                    .eq("anomalySet", "lidar-jovianVortexHunter")
+                    .eq("anomalySet", "lidar-jovianVortexHunter");
 
                 if (anomalyError) {
                     throw anomalyError;
