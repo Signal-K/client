@@ -156,40 +156,40 @@ export function AiForMarsProject() {
 
     const [hasMission20000006, setHasMission20000006] = useState<boolean | null>(null);
 
-    useEffect(() => {
-        const checkTutorialMission = async () => {
-            if (!session) return;
+    // useEffect(() => {
+    //     const checkTutorialMission = async () => {
+    //         if (!session) return;
     
-            try {
-                const { data: missionData, error: missionError } = await supabase
-                    .from('missions')
-                    .select('id')
-                    .eq('user', session.user.id)
-                    .eq('mission', '20000006')
-                    .limit(1);  
+    //         try {
+    //             const { data: missionData, error: missionError } = await supabase
+    //                 .from('missions')
+    //                 .select('id')
+    //                 .eq('user', session.user.id)
+    //                 .eq('mission', '20000006')
+    //                 .limit(1);  
     
-                if (missionError) {
-                    console.error("Error fetching mission data:", missionError);
-                    setHasMission20000006(false); 
-                    return;
-                };
+    //             if (missionError) {
+    //                 console.error("Error fetching mission data:", missionError);
+    //                 setHasMission20000006(false); 
+    //                 return;
+    //             };
     
-                setHasMission20000006(missionData && missionData.length > 0);
-            } catch (error) {
-                console.error("Error checking user mission: ", error);
-                setHasMission20000006(false);
-            };
-        };
+    //             setHasMission20000006(missionData && missionData.length > 0);
+    //         } catch (error) {
+    //             console.error("Error checking user mission: ", error);
+    //             setHasMission20000006(false);
+    //         };
+    //     };
     
-        checkTutorialMission();
-    }, [session, supabase]);
+    //     checkTutorialMission();
+    // }, [session, supabase]);
     
     useEffect(() => {
         async function fetchAnomaly() {
             if (!session) {
                 setLoading(false);
                 return;
-            }
+            };
     
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
@@ -212,7 +212,7 @@ export function AiForMarsProject() {
             };
         };
     
-        if (session && hasMission20000006) {
+        if (session) { // && hasMission20000006) {
             fetchAnomaly();
         };
     }, [session, hasMission20000006, supabase]);
