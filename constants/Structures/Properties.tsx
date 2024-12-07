@@ -3,9 +3,9 @@
 import React from "react";
 import AutomatonUpgrade from "@/components/Structures/Config/AutomatonUpgradeBox";
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
-import { StarterTelescope } from "@/components/Projects/Telescopes/Transiting";
+import { StarterTelescope, StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
-import { BarChart, BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import { BarChart, BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
@@ -24,6 +24,10 @@ import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPla
 import { PlanetFourProject } from "@/components/Projects/Satellite/PlanetFour";
 import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
 import AllClassifications from "@/content/Starnet/YourClassifications";
+import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
+import TutorialPopup from "@/content/Dialogue/helpButton";
+import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
+import { ZoodexIguanas } from "@/components/Projects/Zoodex/iguanasFromAbove";
 
 interface IndividualStructureProps {
     name?: string;
@@ -75,6 +79,7 @@ export const StructuresConfig: StructureConfig = {
           text: "Research",
           dynamicComponent: <DataSourcesModal structureId="3102" structure="Rover" />,
         },
+        
       ],
       buttons: [
         { 
@@ -101,12 +106,12 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <AnomalyRoverPhoto />,
           sizePercentage: 73,
         },
-        {
-          icon: <CameraOffIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: 'Map the surface of planets',
-          dynamicComponent: <AiForMarsProject />,
-          sizePercentage: 50,
-        },
+        // {
+        //   icon: <CameraOffIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: 'Map the surface of planets',
+        //   dynamicComponent: <AiForMarsProject />,
+        //   sizePercentage: 50,
+        // },
         // {
         //   icon: <BookCopy className="w-6 h-6 text-[#5e81ac]" />, text: `Tutorial`,
         //   dynamicComponent: <p></p>,
@@ -147,22 +152,28 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <AllClassifications initialType="planet" />
 
         },
+        {
+          icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Upload content",
+          dynamicComponent: <FreeformUploadData />,
+        }
         // Copy action/labels
       ],
       buttons: [
         {
           icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Discover planets", // Transit events, microlensing, etc
-          dynamicComponent: <StarterTelescope />,
+          // dynamicComponent: <StarterTelescope />,
+          dynamicComponent: <StarterTelescopeTess />,
           sizePercentage: 60,
           showInNoModal: true,
         },
-        {
-          icon: <EarthIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Find new worlds",
-          dynamicComponent: <ExoplanetTransitHunter />,
-          sizePercentage: 80,
-        },
+        // {
+        //   icon: <EarthIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Find new worlds",
+        //   dynamicComponent: <ExoplanetTransitHunter />,
+        //   sizePercentage: 80,
+        // },
         {
           icon: <SunIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Sunspot data",
@@ -179,12 +190,6 @@ export const StructuresConfig: StructureConfig = {
           icon: <MoonStarIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Discover asteroids",
           dynamicComponent: <DailyMinorPlanet />,
-          sizePercentage: 50,
-        },
-        {
-          icon: <RssIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Planet Four Test",
-          dynamicComponent: <PlanetFourProject />,
           sizePercentage: 50,
         },
         // {
@@ -230,6 +235,18 @@ export const StructuresConfig: StructureConfig = {
         //   icon: <PhoneIcon className="w-6 h-6 text-[#5e81ac]" />,
         //   text: "Upload media"
         // }
+        {
+          icon: <BriefcaseIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Burrowing Owls",
+          dynamicComponent: <BurrowingOwl />,
+          sizePercentage: 60,
+        },
+        {
+          icon: <SaladIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Iguanas",
+          dynamicComponent: <ZoodexIguanas />,
+          sizePercentage: 60,
+        }
       ],
     },
     3105: {
@@ -269,10 +286,22 @@ export const StructuresConfig: StructureConfig = {
           sizePercentage: 60,
         },
         {
-          icon: <GlassesIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Map gaseous planets",
+          icon: <CloudDrizzleIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Map storms on gas planets",
           dynamicComponent: <LidarJVHSatellite />,
           sizePercentage: 60,
+        },
+        {
+          icon: <RssIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Map the surface of terrestrial planets",
+          dynamicComponent: <PlanetFourProject />,
+          sizePercentage: 50,
+        },
+        {
+          icon: <CameraOffIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: 'Map the surface of planets',
+          dynamicComponent: <AiForMarsProject />,
+          sizePercentage: 50,
         },
       ],
     },

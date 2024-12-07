@@ -1,17 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { useActivePlanet } from "@/context/ActivePlanet";
-import MineralsInventoryGrid from "@/components/Inventory/mineralsPanel";
-import StarnetLayout from "@/components/Layout/Starnet";
+import React from "react";
 import { EarthActionSceneLayout, EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import StructureMissionGuide from "@/components/Layout/Guide";
-import { MiningComponentComponent } from "@/components/mining-component";
-
-enum Step {
-  MineralDeposits = "MINERAL_DEPOSITS",
-  MineralDetails = "MINERAL_DETAILS",
-};
+import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-component";
 
 export default function Mining() {
   return (

@@ -10,7 +10,7 @@ import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPl
 import { InventoryStructureItem } from "@/types/Items";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
-import { MiningComponentComponent } from "@/components/mining-component";
+import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-component";
 import StructureMissionGuide from "@/components/Layout/Guide";
  
 const MarsView: React.FC = () => {

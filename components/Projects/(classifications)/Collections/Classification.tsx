@@ -80,7 +80,6 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
 
         setClassification(data);
 
-        // Get total votes from classificationConfiguration
         const totalVotes = data?.classificationConfiguration?.votes || 0;
         setVoteCount(totalVotes); 
 
@@ -93,7 +92,6 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
           setAnomaly(anomalyData);
         }
 
-        // Fetch user's individual vote from the votes table
         const { data: voteData } = await supabase
           .from('votes')
           .select('vote')
@@ -119,45 +117,36 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
     if (!user) return alert('Please log in to vote');
   
     try {
-      // Only allow voting if the user hasn't already voted
-      if (userVote !== null) {
-        return;
-      }
-
-      // Step 1: Insert a new row into the 'votes' table
+      if (userVote !== null) return; // Prevent duplicate votes
+  
       const { data: voteData, error: voteError } = await supabase
         .from('votes')
         .insert({
           user_id: user.id,
-          classification_id: classification.id,
-          anomaly_id: classification.anomaly, 
-          vote: 1, 
+          classification_id: classification?.id || null,
+          anomaly_id: classification?.anomaly || null,
+          vote: 1,
         });
-
+  
       if (voteError) throw voteError;
-
-      // Step 2: Increment the vote count in classificationConfiguration.votes
+  
       const updatedVotes = (classification.classificationConfiguration?.votes || 0) + 1;
-
       const updatedConfiguration = {
         ...classification.classificationConfiguration,
-        votes: updatedVotes, 
+        votes: updatedVotes,
       };
-
-      const { data: updateData, error: updateError } = await supabase
+  
+      const { error: updateError } = await supabase
         .from('classifications')
-        .update({
-          classificationConfiguration: updatedConfiguration,
-        })
+        .update({ classificationConfiguration: updatedConfiguration })
         .eq('id', classification.id);
-
+  
       if (updateError) throw updateError;
-
-      // Step 3: Update the UI
+  
       setVoteCount(updatedVotes);
-      setUserVote(1); 
+      setUserVote(1);
       setClassification({ ...classification, classificationConfiguration: updatedConfiguration });
-
+  
     } catch (error) {
       console.error('Error updating vote:', error);
     }

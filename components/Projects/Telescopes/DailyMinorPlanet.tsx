@@ -197,18 +197,18 @@ export function DailyMinorPlanet() {
 
     useEffect(() => {
         if (!hasMission20000003 || missionLoading || !session) return;
-
+    
         const fetchAnomaly = async () => {
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")
                     .select("*")
                     .eq("anomalySet", "telescope-minorPlanet");
-
+    
                 if (anomalyError) {
                     throw anomalyError;
                 };
-
+    
                 const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
                 setAnomaly(randomAnomaly);
                 
@@ -218,7 +218,12 @@ export function DailyMinorPlanet() {
                     `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${randomAnomaly.id}/3.png`,
                     `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${randomAnomaly.id}/4.png`
                 ];
+    
                 setImageUrls(imageUrls);
+    
+                // Log the anomaly ID and image URLs in the console
+                console.log("Anomaly ID:", randomAnomaly.id);
+                console.log("Image URLs:", imageUrls);
             } catch (error: any) {
                 console.error("Error fetching anomaly ", error.message);
                 setAnomaly(null);
@@ -226,9 +231,9 @@ export function DailyMinorPlanet() {
                 setLoading(false);
             };
         };
-
+    
         fetchAnomaly();
-    }, [hasMission20000003, missionLoading, session, supabase]);
+    }, [hasMission20000003, missionLoading, session, supabase]);    
 
     const handlePrevious = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1));

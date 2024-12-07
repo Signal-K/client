@@ -44,15 +44,15 @@ export function MiningComponentComponent() {
   const [isMining, setIsMining] = useState(false)
   const [activeMap, setActiveMap] = useState<'2D' | '3D'>('2D')
   const [landmarks, setLandmarks] = useState<Landmark[]>([]);
+  const [timeRemaining, setTimeRemaining] = useState(0);
 
   useEffect(() => {
     const fetchLandmarks = async () => {
       if (!session?.user?.id || !activePlanet?.id) {
         console.error("User or activePlanet is undefined.");
         return;
-      }
-  
-      // Fetch inventory from Supabase
+      };
+
       const { data: inventoryData, error: inventoryError } = await supabase
         .from("inventory")
         .select("id, item, quantity")
@@ -92,6 +92,7 @@ export function MiningComponentComponent() {
         });
   
       setLandmarks(structures || []);
+      refreshParent(); 
     };
   
     fetchLandmarks();
@@ -129,7 +130,6 @@ export function MiningComponentComponent() {
   
       setMineralDeposits(formattedDeposits || []);
   
-      // Fetch inventory and filter structures
       const { data: inventoryData, error: inventoryError } = await supabase
         .from("inventory")
         .select("id, item, quantity")
@@ -142,11 +142,9 @@ export function MiningComponentComponent() {
         return;
       }
   
-      // Fetch all items from the API route
       const res = await fetch('/api/gameplay/inventory');
       const items = await res.json();
   
-      // Filter inventory to include only items of type "Structure"
       const structures = inventoryData
         ?.filter((inventoryItem) =>
           items.some(
@@ -183,18 +181,31 @@ export function MiningComponentComponent() {
   }, [session, activePlanet, supabase]);
   
   const handleDepositSelect = (deposit: MineralDeposit) => {
-    console.log("Deposit selected:", deposit); // Debugging line
+    console.log("Deposit selected:", deposit);
     setSelectedDeposit(deposit);
   };  
 
   const handleStartMining = () => {
     if (selectedDeposit && rover) {
-      console.log("Starting mining:", selectedDeposit, rover); // Add this to check
+      console.log("Starting mining:", selectedDeposit, rover);
       setIsMining(true);
-      setRoverPosition({ x: 5, y: 5 }); // Start position
+      setRoverPosition({ x: 5, y: 5 }); 
   
       const duration = 5000; 
       const startTime = Date.now();
+      const endTime = Date.now() + duration;
+      const timer = setInterval(() => {
+        const remaining = Math.max(0, endTime - Date.now());
+        setTimeRemaining(Math.ceil(remaining / 1000));
+        if (remaining <= 0) {
+          clearInterval(timer);
+          setIsMining(false);
+          setTimeRemaining(0);
+          setRoverPosition({ x: 5, y: 5 });
+          updateInventory(selectedDeposit.name, 10);
+          setSelectedDeposit(null);
+        }
+      }, 1000);
   
       const animateRover = () => {
         const elapsedTime = Date.now() - startTime;
@@ -209,11 +220,11 @@ export function MiningComponentComponent() {
           requestAnimationFrame(animateRover);
         } else {
           setTimeout(() => {
-            setRoverPosition({ x: 5, y: 5 }); // Return to base
+            setRoverPosition({ x: 5, y: 5 });
             setIsMining(false);
-            updateInventory(selectedDeposit.name, 50); // Update Supabase with mined resources
-            setSelectedDeposit(null); // Reset selected deposit
-          }, 5000); // 5 seconds at deposit          
+            updateInventory(selectedDeposit.name, 50); 
+            setSelectedDeposit(null);
+          }, 5000);        
         }
       };
   
@@ -232,7 +243,6 @@ export function MiningComponentComponent() {
     const existingItem = inventory.find(item => item.name === resourceName);
   
     if (existingItem) {
-      // Update existing item in inventory
       const { error } = await supabase
         .from("inventory")
         .update({ quantity: existingItem.amount + minedAmount })
@@ -252,12 +262,11 @@ export function MiningComponentComponent() {
         );
       }
     } else {
-      // Insert new item into inventory
       const { data, error } = await supabase
         .from("inventory")
         .insert([
           {
-            item: resourceName, // Map this to an ID if needed
+            item: resourceName,
             owner: session.user.id,
             quantity: minedAmount,
             anomaly: activePlanet.id,
@@ -278,8 +287,10 @@ export function MiningComponentComponent() {
   };  
 
   const toggleMap = () => {
-    setActiveMap(prev => prev === '2D' ? '3D' : '2D')
-  }
+    setActiveLandmark(null);
+    setLandmarks((prev) => [...prev]);
+    setActiveMap((prev) => (prev === "2D" ? "3D" : "2D"));
+  };
 
   const [activeLandmark, setActiveLandmark] = useState<Landmark | null>(null);
 
@@ -304,6 +315,16 @@ export function MiningComponentComponent() {
     }
   };  
 
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshParent = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
+
+  useEffect(() => {
+    console.log('Parent component refreshed.');
+  }, [refreshKey]);
+
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
         <div className="relative w-[90%] h-[90%] bg-gray-100 text-[#2C4F64] flex flex-col rounded-lg overflow-hidden md:w-[90%] md:h-[90%] sm:w-full sm:h-full">
@@ -321,6 +342,7 @@ export function MiningComponentComponent() {
             <div className="w-full md:w-3/4 h-1/2 md:h-full relative">
               {activeMap === '2D' ? (
                 <TopographicMap
+                  key={JSON.stringify(landmarks)}
                   deposits={mineralDeposits}
                   roverPosition={roverPosition}
                   selectedDeposit={selectedDeposit}
@@ -345,11 +367,14 @@ export function MiningComponentComponent() {
                     <h3 className="text-lg font-semibold mb-2">Selected Deposit</h3>
                     <p>{selectedDeposit.name}</p>
                     <Button
-                      onClick={handleStartMining}
-                      className="mt-2 bg-green-500 hover:bg-green-600 text-white"
-                    >
-                      Start Mining
-                    </Button>
+              onClick={handleStartMining}
+              disabled={isMining || !selectedDeposit}
+              className="w-full py-2 text-white bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400"
+            >
+              {isMining
+                ? `Mining in progress, time remaining: ${timeRemaining}s`
+                : "Start Mining"}
+            </Button>
                   </div>
                 ) : (
                   <p className="text-gray-500">Select a deposit to start mining.</p>
@@ -366,12 +391,14 @@ export function MiningComponentComponent() {
               <Inventory />
             </div>
           </div>
-          <Button
-                      onClick={() => updatePlanetLocation(30)}
-                      className="mt-2 bg-green-500 hover:bg-green-600 text-white"
-                    >
-                      Return to Earth
-                    </Button>
+          {activePlanet !== 30 && (
+            <Button
+              onClick={() => updatePlanetLocation(30)}
+              className="mt-2 bg-green-500 hover:bg-green-600 text-white"
+            >
+              Return to Earth
+            </Button>
+          )}
           {activeLandmark && (
             <div
               className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
@@ -397,64 +424,14 @@ export function MiningComponentComponent() {
     );  
 };
 
-// type LandmarkModalProps = {
-//   landmark: Landmark | null;
-//   isOpen: boolean;
-//   onClose: () => void;
-// };
-
-// const LandmarkModal: React.FC<LandmarkModalProps> = ({ landmark, isOpen, onClose }) => {
-//   if (!isOpen || !landmark) return null;
-
-//   return (
-//     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-//       <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
-//         <button
-//           className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-//           onClick={onClose}
-//         >
-//           &times;
-//         </button>
-//         <h2 className="text-2xl font-bold mb-2">{landmark.name}</h2>
-//         <p className="text-gray-700">{landmark.description}</p>
-//       </div>
-//     </div>
-//   );
-// };
-
 const MineralDepositsGenerator: React.FC = () => {
   const supabase = useSupabaseClient();
   const session = useSession();
+
   const { activePlanet } = useActivePlanet();
 
-  const [classificationsCount, setClassificationsCount] = useState(0);
-  const [creatingDeposits, setCreatingDeposits] = useState(false);
-  const [mineralDeposits, setMineralDeposits] = useState<any[]>([]); // Track created deposits
-  const [notification, setNotification] = useState<string | null>(null);
-
   const availableMinerals = [11, 13, 15, 16, 18, 19];
-
-  useEffect(() => {
-    const fetchClassifications = async () => {
-      if (!session?.user?.id || !activePlanet?.id) {
-        console.error("User or activePlanet is undefined.");
-        return;
-      }
-      const { data: classifications, error } = await supabase
-        .from('classifications')
-        .select('*')
-        .eq('user', session.user.id)
-        .eq('planet_id', activePlanet.id);
-  
-      if (error) {
-        console.error("Error fetching classifications:", error);
-      } else {
-        console.log("Fetched classifications:", classifications);
-        // Make sure to set the classifications state correctly
-      }
-    };
-    fetchClassifications();
-  }, [session, activePlanet, supabase]);
+  const [creatingDeposits, setCreatingDeposits] = useState(false);
 
   const handleCreateDeposits = async () => {
     if (!session?.user?.id || !activePlanet?.id) {
@@ -462,47 +439,43 @@ const MineralDepositsGenerator: React.FC = () => {
       return;
     }
 
-    // Randomly pick a mineral ID from availableMinerals
+    setCreatingDeposits(true);
+
     const randomMineral = availableMinerals[Math.floor(Math.random() * availableMinerals.length)];
 
     const newDeposit = {
       mineralconfiguration: {
-        mineral: randomMineral,  // Use the mineral ID (number)
+        mineral: randomMineral,
         quantity: 100,
-        icon_url: `https://example.com/mineral-icon-${randomMineral}.png`,  // Assuming different icons for each mineral
+        icon_url: `https://example.com/mineral-icon-${randomMineral}.png`,
         level: 1,
-        uses: ['Mining', 'Excavation'],
-        position: { x: Math.random() * 100, y: Math.random() * 100 }  // Random position
+        uses: ["Mining", "Excavation"],
+        position: { x: Math.random() * 100, y: Math.random() * 100 },
       },
       owner: session.user.id,
       anomaly: activePlanet.id,
     };
 
-    const { data, error } = await supabase
-      .from('mineralDeposits')
-      .insert([newDeposit])
-      .select();
+    const { error } = await supabase
+      .from("mineralDeposits")
+      .insert([newDeposit]);
 
     if (error) {
       console.error("Error creating deposit:", error);
+      setCreatingDeposits(false);
       return;
     }
 
-    console.log("Created new deposit:", data);
-    // Optionally, update the local state to reflect the new deposit
-    setMineralDeposits(prevDeposits => [
-      ...prevDeposits,
-      { ...newDeposit.mineralconfiguration, id: data[0].id }
-    ]);
+    // Trigger full reload
+    window.location.reload();
   };
 
   return (
     <div className="mineral-deposits-container">
       <div className="content">
         <h2>Create Mineral Deposits</h2>
-        <p>You have {classificationsCount} classifications. You can create up to 3 mineral deposits.</p>
         <Button onClick={handleCreateDeposits} disabled={creatingDeposits}>
-          {creatingDeposits ? 'Creating...' : 'Create Deposits'}
+          {creatingDeposits ? "Creating..." : "Create Deposits"}
         </Button>
       </div>
     </div>

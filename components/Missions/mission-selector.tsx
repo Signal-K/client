@@ -6,8 +6,8 @@ import { ChevronRight, ChevronLeft, CloudSun, Rocket, Leaf, LucideIcon } from 'l
 import { zoodexDataSources, telescopeDataSources, lidarDataSources } from "@/components/Data/ZoodexDataSources";
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
+import { Card, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
 
 interface Mission {
   name: string;

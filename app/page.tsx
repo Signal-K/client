@@ -30,7 +30,7 @@ import {
 import GlobeView from "./scenes/globe/page";
 import { EarthScene } from "./scenes/earth/scene";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
-import EnhancedWeatherEvents from "@/components/enhanced-weather-events";
+import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import Onboarding from "./scenes/onboarding/page";

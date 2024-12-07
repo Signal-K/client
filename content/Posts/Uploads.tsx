@@ -29,7 +29,7 @@ export default function Uploads() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>("");
-  const [voteCounts, setVoteCounts] = useState<{ [uploadId: number]: number }>({}); // State to store vote counts for each upload
+  const [voteCounts, setVoteCounts] = useState<{ [uploadId: number]: number }>({});
 
   // Function to fetch uploads
   const fetchUploads = () => {
@@ -38,7 +38,7 @@ export default function Uploads() {
       setLoading(false);
       return;
     }
-
+ 
     setLoading(true);
     setError(null);
     
@@ -58,7 +58,6 @@ export default function Uploads() {
       });
   };
 
-  // Function to fetch vote count for a specific upload
   const fetchVotesCount = (uploadId: number) => {
     return supabase
       .from("votes")
@@ -78,13 +77,12 @@ export default function Uploads() {
   const handleVote = (uploadId: number) => {
     if (!session?.user) return;
 
-    // Insert a new vote into the 'votes' table
     supabase
       .from("votes")
       .insert([
         {
           upload: uploadId,
-          user_id: session.user.id, // Associate the vote with the current user
+          user_id: session.user.id,
         },
       ])
       .then((result) => {

@@ -22,6 +22,9 @@ import {
   PlanetFourOptions,
   jvhOptions,
 } from "@/content/Classifications/Options";
+import { useRouter } from "next/navigation";
+import { Button } from "antd";
+import Link from "next/link";
 // import UserAvatar, { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 
 interface ClassificationFormProps {
@@ -59,6 +62,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
   );
   const [uses, setUses] = useState<number | null>(null);
   const [postSubmitted, setPostSubmitted] = useState<boolean>(false);
+
+  const router = useRouter();
 
   const placeholder = (() => {
     switch (anomalyType) {
@@ -219,7 +224,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       await supabase.from("user_anomalies").insert([newAnomalyData]);
     } catch (error: any) {
       console.error(error);
-    }
+    };
   };
 
   const createPost = async () => {
@@ -316,15 +321,29 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         .eq("id", session?.user?.id);
 
       if (updatePointsError) throw updatePointsError;
+      router.refresh();
+      window.location.reload();
     } catch (error: any) {
       console.error("Unexpected error:", error);
-    }
+    };
+
+    router.refresh();
   };
 
   const [showModal, setShowModal] = useState(true);
 
   const closeModal = () => {
     setShowModal(false);
+  };
+
+  if (postSubmitted) {
+    <Button
+      className="bg-[#5FCBC3] text-[#2E3440] rounded-md hover:bg-[#85DDA2]"
+    >
+      <Link href='/'>
+        Return
+      </Link>
+    </Button>
   };
 
   // if (postSubmitted && showResearch) {
