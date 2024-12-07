@@ -18,7 +18,6 @@ export function StarterJovianVortexHunter({
     const [part, setPart] = useState(1);
     const [line, setLine] = useState(1);
     const nextLine = () => setLine(prevLine => prevLine + 1);
-    const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
     const nextPart = () => {
         setPart(2);
         setLine(1);
