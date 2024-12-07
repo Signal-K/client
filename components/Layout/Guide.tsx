@@ -9,6 +9,8 @@ import MissionInfoModal from "../Missions/MissionInfoModal";
 import AllClassifications from "@/content/Starnet/YourClassifications";
 import SwitchPlanet from "../(scenes)/travel/SolarSystem";
 import { MiningComponentComponent } from "../(scenes)/mining/mining-component";
+import DiscoveriesPage from "@/content/Classifications/minimalDiscoveries";
+import FreeformUploadData from "../Projects/(classifications)/FreeForm";
 
 export interface Mission {
     id: number | number[];
@@ -38,6 +40,14 @@ const astronomyMissions: Mission[] = [
         requiredItem: 3103,
     },
     {
+        id: 10001,
+        name: "View your discoveries",
+        description: "Vote on discoveries made by other players to help classify & audit them",
+        icon: LightbulbIcon,
+        color: 'text-yellow-300',
+        modalContent: <DiscoveriesPage />,
+    },
+    {
         id: 200000015,
         name: "Research Disk Detector project",
         description: "Use your telescope to research the Disk Detector project, where you'll be able to discover early solar systems",
@@ -56,6 +66,14 @@ const biologistMissions: Mission[] = [
         color: 'text-green-300',
         requiredItem: 3104,
     },
+    {
+        id: 10001,
+        name: "View your discoveries",
+        description: "Vote on discoveries made by other players to help classify & audit them",
+        icon: LightbulbIcon,
+        color: 'text-yellow-300',
+        modalContent: <DiscoveriesPage />,
+    },
 ];
 
 const meteorologyMissions: Mission[] = [
@@ -66,6 +84,14 @@ const meteorologyMissions: Mission[] = [
         icon: CloudHail,
         color: 'text-blue-300',
         requiredItem: 3105,
+    },
+    {
+        id: 10001,
+        name: "View your discoveries",
+        description: "Vote on discoveries made by other players to help classify & audit them",
+        icon: LightbulbIcon,
+        color: 'text-yellow-300',
+        modalContent: <DiscoveriesPage />,
     },
 ];
 
@@ -84,15 +110,15 @@ const globalMissions: Mission[] = [
         icon: LightbulbIcon,
         color: 'text-yellow-300',
     },
-    {
-        id: 2,
-        name: "Vote & advise other's discoveries",
-        description: "Click on the 'Discoveries' button to view and comment on other player\'s discoveries to determine their accuracy and attributes",
-        icon: LucideTestTubeDiagonal,
-        color: 'text-blue-300',
-        tableEntry: 'comments',
-        tableColumn: 'author',
-    },
+    // {
+    //     id: 2,
+    //     name: "Vote & advise other's discoveries",
+    //     description: "Click on the 'Discoveries' button to view and comment on other player\'s discoveries to determine their accuracy and attributes",
+    //     icon: LucideTestTubeDiagonal,
+    //     color: 'text-blue-300',
+    //     tableEntry: 'comments',
+    //     tableColumn: 'author',
+    // },
     {
         id: 3,
         name: "Add your own data for review",
@@ -101,6 +127,7 @@ const globalMissions: Mission[] = [
         color: 'text-green-300',
         tableEntry: 'uploads',
         tableColumn: 'author',
+        modalContent: <FreeformUploadData />,
     },
     {
         id: 4,

@@ -224,7 +224,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       await supabase.from("user_anomalies").insert([newAnomalyData]);
     } catch (error: any) {
       console.error(error);
-    }
+    };
   };
 
   const createPost = async () => {
@@ -322,9 +322,12 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
 
       if (updatePointsError) throw updatePointsError;
       router.refresh();
+      window.location.reload();
     } catch (error: any) {
       console.error("Unexpected error:", error);
-    }
+    };
+
+    router.refresh();
   };
 
   const [showModal, setShowModal] = useState(true);
@@ -341,7 +344,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         Return
       </Link>
     </Button>
-  }
+  };
 
   // if (postSubmitted && showResearch) {
   //     return (
