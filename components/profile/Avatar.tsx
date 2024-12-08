@@ -87,7 +87,7 @@ interface UserAvatarPropsNullUpload {
     size: number;
 }
 
-export function UserAvatarNullUpload({ url, size }: UserAvatarProps) {
+function UserAvatarNullUpload({ url, size }: UserAvatarProps) {
     const supabase = useSupabaseClient();
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
