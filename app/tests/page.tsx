@@ -6,6 +6,7 @@ import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-co
 import Greenhouse from "@/page.test";
 import BigMap from "@/components/(scenes)/planetScene/bigMap";
 import DiscoveriesPage from "@/content/Classifications/minimalDiscoveries";
+import Onboarding from "../scenes/onboarding/page";
 // import { TopographicMap } from "@/components/topographic-map";
 
 export default function TestPage() {
@@ -15,6 +16,7 @@ export default function TestPage() {
               {/* <Greenhouse /> */}
               {/* <BigMap /> */}
               <DiscoveriesPage />
+              {/* <Onboarding /> */}
               {/* <MiningComponent /> */}
           </>
         // {/* </StarnetLayout> */}
