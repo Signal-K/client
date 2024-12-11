@@ -6,17 +6,18 @@ import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-co
 import Greenhouse from "@/page.test";
 import BigMap from "@/components/(scenes)/planetScene/bigMap";
 import DiscoveriesPage from "@/content/Classifications/minimalDiscoveries";
-import Onboarding from "../scenes/onboarding/page";
+import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters";
 // import { TopographicMap } from "@/components/topographic-map";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
+
+            <PlanetHuntersSteps />
               {/* <Greenhouse /> */}
               {/* <BigMap /> */}
-              <DiscoveriesPage />
-              {/* <Onboarding /> */}
+              {/* <DiscoveriesPage /> */}
               {/* <MiningComponent /> */}
           </>
         // {/* </StarnetLayout> */}

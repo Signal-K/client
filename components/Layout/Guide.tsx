@@ -76,6 +76,33 @@ const biologistMissions: Mission[] = [
     },
 ];
 
+const communityExpeditions: Mission[] = [
+    {
+        id: 3500011,
+        name: "Travel to Mars",
+        description: "Join the community expedition to Mars, where you'll be able to use your scientific tooling & understanding to build mining settlements & infrastructure",
+        icon: Pickaxe,
+        color: 'text-red-300',
+        modalContent: <SwitchPlanet />,
+    },
+    {
+        id: 3500012,
+        name: "Mine some resources",
+        description: "Use the rovers you've travelled with to mine some anomalies you and the community have found on Mars. This will allow you to produce some materials & more structures for community use",
+        icon: DiamondPercent,
+        color: 'text-cyan-300',
+        modalContent: <MiningComponentComponent />
+    },
+    {
+        id: 3500013,
+        name: "Return to Earth",
+        description: "Complete your mission on Mars and return to Earth to continue your research and exploration with the new resources you've obtained from Mars with the rest of the community",
+        icon: Rocket,
+        color: 'text-green-300',
+        modalContent: <SwitchPlanet />
+    },
+];
+
 const meteorologyMissions: Mission[] = [
     {
         id: [3000010 | 20000007],
@@ -139,33 +166,6 @@ const globalMissions: Mission[] = [
         tableColumn: 'user_id',
         voteOn: 'planet',
         modalContent: <AllClassifications initialType="planet" />,
-    },
-];
-
-const communityExpeditions: Mission[] = [
-    {
-        id: 3500011,
-        name: "Travel to Mars",
-        description: "Join the community expedition to Mars, where you'll be able to use your scientific tooling & understanding to build mining settlements & infrastructure",
-        icon: Pickaxe,
-        color: 'text-red-300',
-        modalContent: <SwitchPlanet />,
-    },
-    {
-        id: 3500012,
-        name: "Mine some resources",
-        description: "Use the rovers you've travelled with to mine some anomalies you and the community have found on Mars. This will allow you to produce some materials & more structures for community use",
-        icon: DiamondPercent,
-        color: 'text-cyan-300',
-        modalContent: <MiningComponentComponent />
-    },
-    {
-        id: 3500013,
-        name: "Return to Earth",
-        description: "Complete your mission on Mars and return to Earth to continue your research and exploration with the new resources you've obtained from Mars with the rest of the community",
-        icon: Rocket,
-        color: 'text-green-300',
-        modalContent: <SwitchPlanet />
     },
 ];
 

@@ -90,14 +90,14 @@ export default function DiscoveriesPage({ defaultClassificationType }: Discoveri
   
       if (selectedType) {
         query.eq("classificationtype", selectedType);
-      }
+      };
   
       const { data, error } = await query;
   
       if (error) {
         console.error("Error fetching classifications:", error);
         return;
-      }
+      };
   
       const formattedData: Discovery[] = (data as unknown as Classification[]).map((item) => ({
         id: item.id.toString(),
