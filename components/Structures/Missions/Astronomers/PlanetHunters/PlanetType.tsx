@@ -19,7 +19,7 @@ const PlanetTypeCommentForm = () => {
   const [loading, setLoading] = useState(true);
   const [classifications, setClassifications] = useState<Classification[]>([]);
   const [comments, setComments] = useState<any[]>([]);
-  const [commentInput, setCommentInput] = useState("");
+  const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,7 +29,6 @@ const PlanetTypeCommentForm = () => {
         const { data: classificationData, error: classificationError } = await supabase
           .from("classifications")
           .select("*")
-          .eq("author", session.user.id)
           .eq("classificationtype", "planet");
 
         if (classificationError) {
@@ -60,18 +59,6 @@ const PlanetTypeCommentForm = () => {
 
         setClassifications(classificationData);
         setComments(commentsData);
-
-        const proposedPlanetComments = commentsData.filter(
-          (comment) => comment.configuration?.planetType
-        );
-
-        const proposedCandidates = classificationData.filter((classification) => {
-          const config = classification.classificationConfiguration;
-          if (!config || !config.classificationOptions) return false;
-          const options = config.classificationOptions[""] || {};
-          return !options["1"];
-        });
-
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -88,9 +75,7 @@ const PlanetTypeCommentForm = () => {
     if (!selectedComment) return;
 
     const classificationToUpdate = classifications.find((classification) => classification.id === classificationId);
-    if (!classificationToUpdate) return;
-
-    if (classificationToUpdate.author !== session?.user?.id) return;
+    if (!classificationToUpdate || classificationToUpdate.author !== session?.user?.id) return;
 
     const planetType = selectedComment.configuration?.planetType;
     if (!planetType) return;
@@ -99,8 +84,8 @@ const PlanetTypeCommentForm = () => {
       ...classificationToUpdate.classificationConfiguration,
       classificationOptions: {
         ...classificationToUpdate.classificationConfiguration.classificationOptions,
-        "planetType": [...(classificationToUpdate.classificationConfiguration.classificationOptions["planetType"] || []), planetType],
-      }
+        planetType: [...(classificationToUpdate.classificationConfiguration.classificationOptions["planetType"] || []), planetType],
+      },
     };
 
     const { error } = await supabase
@@ -132,6 +117,7 @@ const PlanetTypeCommentForm = () => {
   };
 
   const handleProposePlanetType = async (classificationId: number, planetType: "Terrestrial" | "Gaseous") => {
+    const commentInput = commentInputs[classificationId];
     if (!commentInput) {
       console.error("Comment input is required");
       return;
@@ -151,9 +137,13 @@ const PlanetTypeCommentForm = () => {
     if (error) {
       console.error("Error inserting comment:", error);
     } else {
-      setCommentInput("");
+      setCommentInputs((prev) => ({ ...prev, [classificationId]: "" }));
       console.log("Comment inserted successfully with planet type");
     }
+  };
+
+  const handleCommentInputChange = (classificationId: number, value: string) => {
+    setCommentInputs((prev) => ({ ...prev, [classificationId]: value }));
   };
 
   return (
@@ -182,7 +172,10 @@ const PlanetTypeCommentForm = () => {
                       <div className="flex justify-between items-center">
                         <button
                           onClick={() => handleSelectPreferredComment(classification.id, comment.id)}
-                          className="mt-2 text-gray-600"
+                          className={`mt-2 text-gray-600 ${
+                            classification.author !== session?.user?.id ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
+                          disabled={classification.author !== session?.user?.id}
                         >
                           Mark as Preferred
                         </button>
@@ -194,8 +187,8 @@ const PlanetTypeCommentForm = () => {
 
               <div className="mt-4 space-y-2">
                 <textarea
-                  value={commentInput}
-                  onChange={(e) => setCommentInput(e.target.value)}
+                  value={commentInputs[classification.id] || ""}
+                  onChange={(e) => handleCommentInputChange(classification.id, e.target.value)}
                   placeholder="Make a comment and propose a planet type"
                   className="w-full p-2 border text-gray-500 border-gray-300 rounded"
                 />
