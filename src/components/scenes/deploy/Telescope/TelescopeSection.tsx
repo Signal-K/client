@@ -7,7 +7,6 @@ import { AnomalyDetailDialog } from "@/src/components/classification/viewport/an
 import { ClassificationDetailDialog } from "@/src/components/classification/viewport/classification-detail-dialog";
 import { TelescopeViewportState } from "@/src/components/classification/telescope/telescope-viewport";
 import Section from "@/src/components/sections/Section";
-import TutorialWrapper, { TELESCOPE_INTRO_STEPS } from "@/src/components/onboarding/TutorialWrapper";
 import { Anomaly } from "@/types/Structures/telescope";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
@@ -103,13 +102,7 @@ export default function TelescopeViewportSection() {
   });
 
   return (
-    <TutorialWrapper
-      tutorialId="telescope-intro"
-      steps={TELESCOPE_INTRO_STEPS}
-      title="Telescope Introduction"
-      showReplayButton
-    >
-      <Section
+    <Section
         sectionId="telescope-viewport"
         variant="viewport"
         backgroundType="interstellar"
@@ -297,6 +290,5 @@ export default function TelescopeViewportSection() {
         )}
       </div>
     </Section>
-    </TutorialWrapper>
   );
 };

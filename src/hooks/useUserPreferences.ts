@@ -14,6 +14,9 @@ export type ProjectType =
 // Structure types
 export type StructureType = "telescope" | "satellite" | "rover" | "solar";
 
+// Telescope focus types
+export type TelescopeFocusType = "stellar" | "planetary";
+
 // Tutorial identifiers - comprehensive list of all tutorials in the app
 export type TutorialId = 
   // Overall app tutorials
@@ -71,6 +74,9 @@ export interface UserPreferences {
   // Preferred structure order on dashboard
   structureOrder: StructureType[];
   
+  // Telescope focus preference (stellar vs planetary)
+  telescopeFocus: TelescopeFocusType | null;
+  
   // Last time preferences were asked (to avoid asking too often)
   lastPreferencesAsked: string | null;
   
@@ -106,6 +112,7 @@ const defaultPreferences: UserPreferences = {
   hasSeenMineralGuide: false,
   completedTutorials: {},
   structureOrder: ["telescope", "satellite", "rover", "solar"],
+  telescopeFocus: null,
   lastPreferencesAsked: null,
   deviceId: "",
 };
@@ -214,6 +221,11 @@ export function useUserPreferences() {
     savePreferences({ structureOrder: order });
   }, [savePreferences]);
 
+  // Set telescope focus preference
+  const setTelescopeFocus = useCallback((focus: TelescopeFocusType | null) => {
+    savePreferences({ telescopeFocus: focus });
+  }, [savePreferences]);
+
   // Dismiss the preferences prompt without setting preferences
   const dismissPreferencesPrompt = useCallback(() => {
     setNeedsPreferencesPrompt(false);
@@ -291,9 +303,11 @@ export function useUserPreferences() {
     hasTutorialCompleted,
     resetTutorial,
     setStructureOrder,
+    setTelescopeFocus,
     dismissPreferencesPrompt,
     showPreferencesPrompt,
     isProjectInterested,
     resetPreferences,
+    savePreferences,
   };
 }

@@ -19,6 +19,8 @@ import {
 } from "@/src/components/ui/dialog";
 import { Badge } from "@/src/components/ui/badge";
 import ConvertAnonymousAccount from "@/src/components/profile/auth/ConvertAnonymousAccount";
+import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal";
+import { useUserPreferences, ProjectType } from "@/src/hooks/useUserPreferences";
 import Link from "next/link";
 import { cn } from "@/src/shared/utils";
 
@@ -38,8 +40,14 @@ export default function GameHeader({
   const session = useSession();
   const supabase = useSupabaseClient();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [projectPreferencesOpen, setProjectPreferencesOpen] = useState(false);
+  const { preferences, savePreferences } = useUserPreferences();
 
   const isAnonymousUser = session?.user?.is_anonymous;
+
+  const handleProjectPreferencesSave = (interests: ProjectType[]) => {
+    savePreferences({ projectInterests: interests });
+  };
 
   const handleLogout = async () => {
     // Clear all browser storage before signing out
@@ -139,6 +147,10 @@ export default function GameHeader({
                 <DropdownMenuItem asChild>
                   <Link href="/leaderboards">Leaderboards</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setProjectPreferencesOpen(true)}>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Project Preferences
+                </DropdownMenuItem>
                 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-red-500">
@@ -160,6 +172,13 @@ export default function GameHeader({
           <ConvertAnonymousAccount onSuccess={() => setShowUpgradeModal(false)} />
         </DialogContent>
       </Dialog>
+
+      <ProjectPreferencesModal 
+        isOpen={projectPreferencesOpen}
+        onClose={() => setProjectPreferencesOpen(false)}
+        onSave={handleProjectPreferencesSave}
+        initialInterests={preferences?.projectInterests}
+      />
     </>
   );
 }

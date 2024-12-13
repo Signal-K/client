@@ -62,6 +62,8 @@ export default function TutorialWrapper({
     
     if (forceShow || !completed) {
       setShowTutorial(true);
+    } else {
+      setShowTutorial(false);
     }
     
     setHasChecked(true);
@@ -104,7 +106,7 @@ export default function TutorialWrapper({
           onSkip={handleSkip}
         />
         {/* Still render children behind the overlay so users see the context */}
-        <div className="pointer-events-none">
+        <div>
           {children}
         </div>
       </>

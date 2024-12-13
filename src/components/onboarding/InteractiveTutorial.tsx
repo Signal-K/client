@@ -146,6 +146,22 @@ export default function InteractiveTutorial({
     [allowSkipSteps, currentStep, completedSteps, onStepChange, steps]
   );
 
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && onSkip) {
+        onSkip();
+      } else if (e.key === "ArrowRight") {
+        goNext();
+      } else if (e.key === "ArrowLeft") {
+        goPrev();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [goNext, goPrev, onSkip]);
+
   // Tooltip position calculation
   const getTooltipStyle = (): React.CSSProperties => {
     if (!highlightRect || step?.position === "center") {
@@ -199,7 +215,7 @@ export default function InteractiveTutorial({
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50" />
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
 
       {/* Highlight cutout */}
       {highlightRect && (
@@ -224,7 +240,7 @@ export default function InteractiveTutorial({
 
       {/* Tutorial card */}
       <div
-        className="z-50 w-full max-w-md bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+        className="z-50 w-full max-w-md bg-card border border-border rounded-2xl shadow-2xl overflow-hidden pointer-events-auto"
         style={getTooltipStyle() as React.CSSProperties}
       >
         {/* Header */}
@@ -237,10 +253,11 @@ export default function InteractiveTutorial({
             {onSkip && (
               <button
                 onClick={onSkip}
-                className="p-1.5 hover:bg-muted rounded-lg transition-colors"
-                aria-label="Skip tutorial"
+                className="p-1.5 hover:bg-destructive/20 hover:text-destructive rounded-lg transition-colors text-muted-foreground"
+                aria-label="Skip tutorial (or press ESC)"
+                title="Skip tutorial (or press ESC)"
               >
-                <X className="w-4 h-4 text-muted-foreground" />
+                <X className="w-5 h-5" />
               </button>
             )}
           </div>

@@ -10,13 +10,13 @@ import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Badge } from "@/src/components/ui/badge"
 import { CheckCircle, Telescope, X, Target, Info, Sun, ArrowLeft } from "lucide-react"
-import TypeSelection from "./Telescope/TypeSelection"
 import DeploymentConfirmation from "./Telescope/DeploymentConfirmation"
 import TelescopeDeploySidebar from "./Telescope/TelescopeDeploySidebar"
 import { seededRandom1, generateAnomalyFromDBFactory, DatabaseAnomaly } from "./Telescope/TelescopeUtils"
 import { fetchAnomalies as fetchAnomaliesAction, checkDeployment as checkDeploymentAction, loadSector as loadSectorAction, fetchSkillProgress as fetchSkillProgressAction, handleDeployAction } from "./Telescope/TelescopeActions"
 import UseDarkMode from "@/src/shared/hooks/useDarkMode"
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
+import { useUserPreferences, TelescopeFocusType } from "@/src/hooks/useUserPreferences"
  
 export type DeploymentType = "stellar" | "planetary";
 
@@ -25,10 +25,26 @@ export default function DeployTelescopeViewport() {
   const session = useSession();
 
   const router = useRouter()
+  
+  // Get stored telescope focus preference
+  const { preferences, setTelescopeFocus, isLoading: prefsLoading } = useUserPreferences();
 
-  // New deployment type selection state
+  // Deployment type - defaults to "planetary" (most popular), can be changed via sidebar
   const [deploymentType, setDeploymentType] = useState<DeploymentType | null>(null)
-  const [showTypeSelection, setShowTypeSelection] = useState(true)
+  
+  // Initialize from stored preferences or default to planetary
+  useEffect(() => {
+    if (!prefsLoading) {
+      const storedFocus = preferences?.telescopeFocus as DeploymentType | null;
+      const focusType = storedFocus || "planetary"; // Default to planetary
+      setDeploymentType(focusType);
+      
+      // Save default preference if none was set
+      if (!storedFocus) {
+        setTelescopeFocus("planetary");
+      }
+    }
+  }, [prefsLoading, preferences?.telescopeFocus, setTelescopeFocus]);
 
   const [currentSector, setCurrentSector] = useState({ x: 0, y: 0 })
   const [tessAnomalies, setTessAnomalies] = useState<DatabaseAnomaly[]>([])
@@ -102,12 +118,14 @@ export default function DeployTelescopeViewport() {
     });
   }
 
-  const handleBackToTypeSelection = () => {
-    setDeploymentType(null)
-    setShowTypeSelection(true)
-    setTessAnomalies([])
-    setSectorAnomalies([])
-    setSelectedSector(null)
+  // Toggle between stellar and planetary focus
+  const handleToggleMissionType = () => {
+    const newType: DeploymentType = deploymentType === "stellar" ? "planetary" : "stellar";
+    setDeploymentType(newType);
+    setTelescopeFocus(newType as TelescopeFocusType);
+    setTessAnomalies([]);
+    setSectorAnomalies([]);
+    setSelectedSector(null);
   }
 
   const handleConfirmationClose = () => {
@@ -155,16 +173,6 @@ export default function DeployTelescopeViewport() {
     )
   }
 
-  if (showTypeSelection && !deploymentType) {
-    return (
-      <TypeSelection
-        onChooseType={(t) => { setDeploymentType(t); setShowTypeSelection(false) }}
-        onBack={() => router.push('/')}
-        session={session}
-      />
-    )
-  }
-
   return (
     <div className={`h-full w-full flex flex-col ${
       isDark 
@@ -208,7 +216,7 @@ export default function DeployTelescopeViewport() {
             isDeploying={deploying}
             alreadyDeployed={alreadyDeployed}
             deploymentMessage={deploymentMessage}
-            onBackToTypeSelection={handleBackToTypeSelection}
+            onBackToTypeSelection={handleToggleMissionType}
             isDarkMode={isDark}
             tessAnomaliesCount={tessAnomalies.length}
           />
@@ -228,7 +236,7 @@ export default function DeployTelescopeViewport() {
           isDeploying={deploying}
           alreadyDeployed={alreadyDeployed}
           deploymentMessage={deploymentMessage}
-          onBackToTypeSelection={handleBackToTypeSelection}
+          onBackToTypeSelection={handleToggleMissionType}
           isMobile
           isDarkMode={isDark}
           tessAnomaliesCount={tessAnomalies.length}

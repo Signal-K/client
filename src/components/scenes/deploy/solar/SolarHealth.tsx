@@ -7,7 +7,6 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { OrbitControls, Stars } from "@react-three/drei";
 import Section from "@/src/components/sections/Section";
-import TutorialWrapper, { SOLAR_INTRO_STEPS } from "@/src/components/onboarding/TutorialWrapper";
 import { Sun } from "@/src/components/discovery/data-sources/Solar/Sun";
 
 function Sun3D({ sunspots }: { sunspots: number }) {
@@ -137,13 +136,7 @@ export default function SolarHealth() {
     : "N/A";
 
   return (
-    <TutorialWrapper
-      tutorialId="solar-intro"
-      steps={SOLAR_INTRO_STEPS}
-      title="Solar Observatory Introduction"
-      showReplayButton
-    >
-      <Section
+    <Section
         sectionId="solar-health"
         variant="viewport"
         backgroundType="inner-solar"
@@ -295,6 +288,5 @@ export default function SolarHealth() {
         )}
       </div>
     </Section>
-    </TutorialWrapper>
   );
 }
