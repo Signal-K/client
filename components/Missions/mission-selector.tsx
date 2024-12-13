@@ -69,7 +69,7 @@ const structures: Structure[] = [
     inventoryItemId: 3104,
   },
   {
-    name: 'Atmospheric Probe',
+    name: 'Atmospheric Probe', 
     icon: CloudSun,
     description: 'For climatologists analyzing extraterrestrial atmospheres',
     bgColor: 'bg-blue-600',

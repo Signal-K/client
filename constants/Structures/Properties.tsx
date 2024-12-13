@@ -28,6 +28,7 @@ import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
 import TutorialPopup from "@/content/Dialogue/helpButton";
 import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
 import { ZoodexIguanas } from "@/components/Projects/Zoodex/iguanasFromAbove";
+import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters";
 
 interface IndividualStructureProps {
     name?: string;
@@ -164,7 +165,8 @@ export const StructuresConfig: StructureConfig = {
           icon: <TelescopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Discover planets", // Transit events, microlensing, etc
           // dynamicComponent: <StarterTelescope />,
-          dynamicComponent: <StarterTelescopeTess />,
+          // dynamicComponent: <StarterTelescopeTess />,
+          dynamicComponent: <PlanetHuntersSteps />,
           sizePercentage: 60,
           showInNoModal: true,
         },

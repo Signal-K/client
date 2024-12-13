@@ -74,7 +74,7 @@ export default function Home() {
         <div className="flex flex-row space-y-4"></div>
         <div className="py-3">
           <div className="py-1">
-            <EnhancedWeatherEvents />
+            {/* <EnhancedWeatherEvents /> */}
           </div>
           <center> 
             <OrbitalStructuresOnPlanet />
@@ -94,8 +94,8 @@ export default function Home() {
           <AllAutomatonsOnActivePlanet />
         </center>
       </div>
-      <div className="w-full py-2"><StructureMissionGuide />
-  </div>
+      {/* <div className="w-full py-2"><StructureMissionGuide />
+  </div> */}
     </EarthViewLayout>
     // 60: <SaturnView />,
     // 62: <TitanView />,

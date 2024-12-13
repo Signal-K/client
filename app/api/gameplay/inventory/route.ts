@@ -43,11 +43,11 @@ const inventoryItems: InventoryItem[] = [
   },
   {
     id: 3105,
-    name: "LIDAR",
+    name: "Weather Balloon", // "LIDAR",
     description: "Collect and study weather events and entities",
-    icon_url: "/assets/Items/Scoper.png",
+    icon_url: "/assets/Items/WeatherBalloon.png", //Scoper.png",
     ItemCategory: "Structure",
-    locationType: 'Surface',
+    locationType: 'Atmosphere',
   },
   {
     id: 3106, 

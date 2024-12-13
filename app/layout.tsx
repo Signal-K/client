@@ -12,7 +12,6 @@ import { UserAnomaliesProvider } from "@/context/UserAnomalies";
 import { bgImage, backgroundImages } from "@/constants/backgrounds";
 import { Analytics } from "@vercel/analytics/react"
 import { MissionProvider } from "@/context/MissionContext";
-import AppLayout from "@/components/Layout/Layout";
 import Header from "@/components/ui/Header";
 
 interface RootLayoutProps {
@@ -77,7 +76,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 {/* <MissionProvider> */}
                     <UserAnomaliesProvider>
                       <InventoryProvider>
-                        <AppLayout>
                         <div className="sci-fi-overlay">
                     <svg className="sci-fi-shape sci-fi-shape-1" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                       <path d="M100,10 L190,50 L190,150 L100,190 L10,150 L10,50 Z" fill="none" stroke="#5FCBC3" strokeWidth="2" />
@@ -105,7 +103,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   <div className="relative min-h-screen w-full flex flex-col">
                           {children}
                           </div>
-                        </AppLayout>
                     <Analytics />
                   </InventoryProvider>
                 </UserAnomaliesProvider>

@@ -107,7 +107,7 @@ const meteorologyMissions: Mission[] = [
     {
         id: [3000010 | 20000007],
         name: "Study some weather events using your atmospheric probe",
-        description: "Click on your LIDAR module to make some classifications",
+        description: "Click on your Weather Balloon to make some classifications",
         icon: CloudHail,
         color: 'text-blue-300',
         requiredItem: 3105,
