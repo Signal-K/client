@@ -23,6 +23,16 @@ const PlanetHuntersSteps = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMission, setSelectedMission] = useState<MissionStep | null>(null);
   const [currentChapter, setCurrentChapter] = useState<number>(1);
+  const [experiencePoints, setExperiencePoints] = useState<number>(0); // Track total points
+  const [level, setLevel] = useState<number>(1); // Track level
+
+  const missionPoints = {
+    1: 2, // Mission 1 = 2 points
+    2: 1, // Mission 2 = 1 point
+    3: 2, // Mission 3 = 2 points
+    4: 1, // Mission 4 = 1 point
+    5: 1, // Mission 5 = 1 point
+  };
 
   useEffect(() => {
     if (!session?.user) return;
@@ -76,6 +86,18 @@ const PlanetHuntersSteps = () => {
                 classification.classificationtype === "planet"
             )
         ).length || 0;
+
+        const totalPoints = (
+          mission1CompletedCount * missionPoints[1] +
+          mission2CompletedCount * missionPoints[2] +
+          mission3CompletedCount * missionPoints[3] +
+          mission4CompletedCount * missionPoints[4] +
+          mission5CompletedCount * missionPoints[5]
+        );
+
+        const newLevel = Math.floor(totalPoints / 8) + 1; // Every 8 points = level up
+        setLevel(newLevel);
+        setExperiencePoints(totalPoints);
 
         setSteps([
           {
@@ -156,22 +178,34 @@ const PlanetHuntersSteps = () => {
   return (
     <div className="flex flex-col items-center bg-[#2C4F64] text-white rounded-2xl shadow-lg p-6">
       <div className="flex justify-between w-full mb-6">
-        {/* <button
+        <button
           className="px-5 py-2 bg-[#5FCBC3] text-[#1D2833] rounded-full hover:bg-opacity-90"
           onClick={() => setCurrentChapter((prev) => Math.max(1, prev - 1))}
           disabled={currentChapter === 1}
         >
           Previous
-        </button> */}
+        </button>
         <h1 className="text-xl font-bold">Chapter {currentChapter}</h1>
-        {/* <button
+        <button
           className="px-5 py-2 bg-[#5FCBC3] text-[#1D2833] rounded-full hover:bg-opacity-90"
           onClick={() => setCurrentChapter((prev) => Math.min(2, prev + 1))}
           disabled={currentChapter === 2}
         >
           Next
-        </button> */}
+        </button>
       </div>
+
+      {/* Experience Bar */}
+      <div className="w-full bg-gray-700 rounded-full h-4 mb-6">
+        <div
+          className="bg-[#5FCBC3] h-4 rounded-full"
+          style={{ width: `${(experiencePoints % 8) * 12.5}%` }}
+        ></div>
+      </div>
+      <p className="text-sm text-center mb-6">
+        Level {level} ({experiencePoints} points)
+      </p>
+
       <div className="grid gap-4 w-full">
         {steps.map((step) => (
           <div

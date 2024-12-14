@@ -194,10 +194,10 @@ const StructureMissionGuide = () => {
         { missions: astronomyMissions, name: 'Astronomer' },
         { missions: biologistMissions, name: 'Biologist' },
         { missions: meteorologyMissions, name: 'Meteorologist' },
-        {
-            missions: communityExpeditions,
-            name: "Community Expeditions",
-        },
+        // {
+        //     missions: communityExpeditions,
+        //     name: "Community Expeditions",
+        // },
     ];
 
     const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
@@ -299,7 +299,7 @@ const StructureMissionGuide = () => {
             : [
                 ...currentMissions,
                 ...filteredGlobalMissions,
-                ...communityExpeditions,
+                // ...communityExpeditions,
             ];
 
         // Ensure missions are unique by ID
@@ -424,10 +424,10 @@ export const StructureMissionGuideMobile = () => {
         { missions: astronomyMissions, name: 'Astronomer' },
         { missions: biologistMissions, name: 'Biologist' },
         { missions: meteorologyMissions, name: 'Meteorologist' },
-        {
-            missions: communityExpeditions,
-            name: "Community Expeditions",
-        },
+        // {
+        //     missions: communityExpeditions,
+        //     name: "Community Expeditions",
+        // },
     ];
 
     useEffect(() => {
