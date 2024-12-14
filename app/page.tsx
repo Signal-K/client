@@ -94,8 +94,8 @@ export default function Home() {
           <AllAutomatonsOnActivePlanet />
         </center>
       </div>
-      {/* <div className="w-full py-2"><StructureMissionGuide />
-  </div> */}
+      <div className="w-full py-2"><StructureMissionGuide />
+  </div>
     </EarthViewLayout>
     // 60: <SaturnView />,
     // 62: <TitanView />,

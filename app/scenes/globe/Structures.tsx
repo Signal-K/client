@@ -8,7 +8,7 @@ import { StructuresConfigForSandbox } from "@/constants/Structures/SandboxProper
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import "../../../styles/Anims/StarterStructureAnimations.css";
-import { CreateCommunityStation } from "@/components/Structures/Build/MakeCommunityStation";
+// import { CreateCommunityStation } from "@/components/Structures/Build/MakeCommunityStation";
 
 interface StructuresOnPlanetProps {
     onStructuresFetch: (

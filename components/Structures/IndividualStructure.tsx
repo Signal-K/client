@@ -210,7 +210,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       top: '50%',
       left: '50%',
       transform: 'translate(-50%, -50%)',
-      overflow: 'hidden',
+      overflow: 'hidden', 
     }}
   >
     <DialogTitle></DialogTitle>
@@ -221,8 +221,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       >
         Close
       </button>
-      {/* Wrapping the content inside a scrollable container */}
-      <div className="flex-grow flex justify-center items-center w-full overflow-y-auto max-h-full">
+      <div className="flex-grow flex justify-center items-center overflow-y-auto w-full">
         {activeComponent}
       </div>
     </div>
