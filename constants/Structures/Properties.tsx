@@ -154,11 +154,11 @@ export const StructuresConfig: StructureConfig = {
         //   text: "View all discoveries",
         //   dynamicComponent: <AllClassifications initialType="planet" />
         // },
-        {
-          icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Upload content",
-          dynamicComponent: <FreeformUploadData />,
-        }
+        // {
+        //   icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Upload content",
+        //   dynamicComponent: <FreeformUploadData />,
+        // }
         // Copy action/labels
       ],
       buttons: [
