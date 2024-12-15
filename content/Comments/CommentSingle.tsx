@@ -24,17 +24,17 @@ export function CommentCard({ author, content, createdAt, replyCount, parentComm
           </Avatar>
           <div>
             <CardTitle>{author}</CardTitle>
-            <p className="text-sm text-muted-foreground">Posted at {new Date(createdAt).toLocaleString()}</p>
+            {/* <p className="text-sm text-muted-foreground">Posted at {new Date(createdAt).toLocaleString()}</p> */}
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <p>{content}</p>
       </CardContent>
-      <Button variant="ghost" size="sm" className="flex items-center">
+      {/* <Button variant="ghost" size="sm" className="flex items-center">
         <MessageSquare className="mr-2 h-4 w-4" />
         {replyCount} Replies
-      </Button>
+      </Button> */}
     </Card>
   );
 };

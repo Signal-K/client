@@ -29,6 +29,7 @@ import TutorialPopup from "@/content/Dialogue/helpButton";
 import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
 import { ZoodexIguanas } from "@/components/Projects/Zoodex/iguanasFromAbove";
 import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters";
+import { useRouter } from 'next/router';
 
 interface IndividualStructureProps {
     name?: string;
@@ -47,6 +48,7 @@ interface IndividualStructureProps {
       dynamicComponent?: React.ReactNode;
       sizePercentage?: number;
       showInNoModal?: boolean;
+      onClick?: () => void;
     }[];
     modals?: {
       icon: React.ReactNode;
@@ -151,7 +153,6 @@ export const StructuresConfig: StructureConfig = {
           icon: <BarChart className="w-6 h-6 text-[#5e81ac]" />,
           text: "View all discoveries",
           dynamicComponent: <AllClassifications initialType="planet" />
-
         },
         {
           icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
@@ -166,8 +167,12 @@ export const StructuresConfig: StructureConfig = {
           text: "Discover planets", // Transit events, microlensing, etc
           // dynamicComponent: <StarterTelescope />,
           // dynamicComponent: <StarterTelescopeTess />,
+          onClick: () => {
+            const router = useRouter();
+            router.push("/tests");  // Redirect to the "/tests" route
+          },
           dynamicComponent: <PlanetHuntersSteps />,
-          sizePercentage: 60,
+          sizePercentage: 95,
           showInNoModal: true,
         },
         // {

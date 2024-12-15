@@ -22,7 +22,7 @@ interface PlanetVoteProps {
 const PlanetVoteComponent: React.FC<PlanetVoteProps> = ({ classification, onVote }) => {
   const isConfirmed = classification.vote_count >= 5;
 
-  return (
+  return ( 
     <div className={`p-4 border rounded-md ${isConfirmed ? "bg-green-100" : "bg-white"}`}>
       <h3 className="text-lg font-semibold">Planet Classification</h3>
       <p className="text-sm text-gray-700">{classification.content}</p>

@@ -6,7 +6,7 @@ type Discovery = {
   id: string;
   project: string;
   classification: string;
-  classificationConfiguration: any;
+  classificationConfiguration: any; 
   content: string;
   author: {
     name: string;
@@ -86,7 +86,7 @@ export default function DiscoveriesPage({ defaultClassificationType }: Discoveri
             user_id
           )
         `, { count: "exact" })
-        // .eq("author", session?.user.id); // This is optional
+        .eq("author", session?.user.id); // This is optional
   
       if (selectedType) {
         query.eq("classificationtype", selectedType);

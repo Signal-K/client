@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,8 +45,9 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [activeComponent, setActiveComponent] = useState<React.ReactNode | null>(null);
-  const [modalSizePercentage, setModalSizePercentage] = useState(100); // Default to 100%
+  const [modalSizePercentage, setModalSizePercentage] = useState(100); 
   const [tooltip, setTooltip] = useState<{ visible: boolean; text: string } | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const handleActionClick = (actionText: string, component: React.ReactNode, sizePercentage: number = 100) => {
     setActiveComponent(component);
@@ -75,10 +76,23 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
     };
   };
 
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        handleClose();
+        setActiveComponent(null)
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [handleClose]);
+
   return (
     <Dialog defaultOpen>
       <div className="relative transition-all duration-500 ease-in-out">
-        {/* Main Modal */}
         {!activeComponent && (
           <DialogContent 
             className="p-4 rounded-3xl text-white max-w-xl mx-auto"
@@ -199,19 +213,10 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
 
 {activeComponent && (
   <DialogContent
-    className="p-4 rounded-3xl text-white mx-auto"
-    style={{
-      background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))',
-      width: '90%',
-      height: '90%',
-      maxWidth: '100%',
-      maxHeight: '90%',
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      overflow: 'hidden', 
-    }}
+    className={`p-4 rounded-3xl text-white mx-auto 
+      w-[90%] h-[90%] max-w-full max-h-[95%] fixed top-1/2 left-1/2 
+      transform -translate-x-1/2 -translate-y-1/2 
+      overflow-hidden bg-[#1D2833]/90`}
   >
     <DialogTitle></DialogTitle>
     <div className="relative flex flex-col items-center justify-center h-full">
@@ -227,6 +232,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
     </div>
   </DialogContent>
 )}
+
       </div>
     </Dialog>
   );
