@@ -41,34 +41,54 @@ const PlanetHuntersSteps = () => {
 
     const fetchMissionData = async () => {
       try {
-        const { data: classificationsData } = await supabase
+        // Fetch classifications data
+        const { data: classificationsData, error: classificationsError } = await supabase
           .from("classifications")
           .select("*")
           .eq("classificationtype", "planet")
           .eq("author", session.user.id);
 
+        if (classificationsError) throw classificationsError;
+
+        // Mission 1: Count all classifications of type 'planet'
         const mission1CompletedCount = classificationsData?.length || 0;
 
-        const mission2Data = classificationsData?.filter((classification) => {
-          const config = classification.classificationConfiguration;
-          return config && !config["1"] && (config["2"] || config["3"] || config["4"]);
-        }) || [];
+        // Mission 2: Filter classifications based on classificationConfiguration logic
+        const mission2Data =
+          classificationsData?.filter((classification) => {
+            const config = classification.classificationConfiguration;
+            if (!config) return false;
+
+            const options = config.classificationOptions?.[""] || {};
+            return (
+              !options["1"] && // Ensure '1' is NOT selected
+              (options["2"] || options["3"] || options["4"]) // Ensure at least one of 2, 3, or 4 is selected
+            );
+          }) || [];
         const mission2CompletedCount = mission2Data.length;
 
-        const { data: commentsData } = await supabase
+        // Fetch comments data
+        const { data: commentsData, error: commentsError } = await supabase
           .from("comments")
           .select("*")
           .eq("author", session.user.id);
 
+        if (commentsError) throw commentsError;
+
+        // Mission 3: Comments with planet type proposals
         const mission3CompletedCount = commentsData?.filter(
           (comment) => comment.configuration?.planetType
         ).length || 0;
 
-        const { data: votesData } = await supabase
+        // Fetch votes data
+        const { data: votesData, error: votesError } = await supabase
           .from("votes")
           .select("*")
           .eq("user_id", session.user.id);
 
+        if (votesError) throw votesError;
+
+        // Mission 4: Votes on planet classifications
         const planetVotes = votesData?.filter((vote) =>
           classificationsData?.some(
             (classification) =>
@@ -76,9 +96,9 @@ const PlanetHuntersSteps = () => {
               classification.classificationtype === "planet"
           )
         ) || [];
-
         const mission4CompletedCount = planetVotes.length;
 
+        // Mission 5: Comments linked to classifications
         const mission5CompletedCount = commentsData?.filter(
           (comment) =>
             comment.classification_id &&
@@ -89,6 +109,7 @@ const PlanetHuntersSteps = () => {
             )
         ).length || 0;
 
+        // Calculate total points and level
         const totalPoints = (
           mission1CompletedCount * missionPoints[1] +
           mission2CompletedCount * missionPoints[2] +
@@ -97,10 +118,11 @@ const PlanetHuntersSteps = () => {
           mission5CompletedCount * missionPoints[5]
         );
 
-        const newLevel = Math.floor(totalPoints / 8) + 1; // Every 8 points = level up
+        const newLevel = Math.floor(totalPoints / 9) + 1; // Every 8 points = level up
         setLevel(newLevel);
         setExperiencePoints(totalPoints);
 
+        // Update mission steps
         setSteps([
           {
             id: 1,
@@ -129,15 +151,6 @@ const PlanetHuntersSteps = () => {
             completedCount: mission3CompletedCount,
             color: "text-green-500",
           },
-          // {
-          //   id: 4,
-          //   title: "Vote on Planet Classifications",
-          //   description: "Review and vote on another user's planet classification.",
-          //   icon: PersonStandingIcon,
-          //   action: () => {},
-          //   completedCount: mission4CompletedCount,
-          //   color: "text-yellow-500",
-          // },
           {
             id: 5,
             title: "Comment & vote on Planet Classifications",
@@ -151,6 +164,7 @@ const PlanetHuntersSteps = () => {
 
         setLoading(false);
       } catch (error) {
+        console.error("Error fetching mission data:", error);
         setLoading(false);
       }
     };
@@ -175,33 +189,18 @@ const PlanetHuntersSteps = () => {
               {selectedMission.id === 1 && <StarterTelescopeTess />}
               {selectedMission.id === 2 && <StarterTelescopeTess />}
               {selectedMission.id === 3 && <PlanetTypeCommentForm />}
-              {/* {selectedMission.id === 4 && <DiscoveriesPage defaultClassificationType="planet" />} */}
               {selectedMission.id === 5 && <VotePlanetClassifictions />}
             </center>
           </div>
         </div>
       </div>
     );
-  };  
+  };
 
   return (
     <div className="flex flex-col items-center bg-[#1D2833]/90 width-[100%] text-white rounded-2xl p-6">
       <div className="flex justify-between w-full mb-6">
-        {/* <button
-          className="px-5 py-2 bg-[#5FCBC3] text-[#1D2833] rounded-full hover:bg-opacity-90"
-          onClick={() => setCurrentChapter((prev) => Math.max(1, prev - 1))}
-          disabled={currentChapter === 1}
-        >
-          Previous
-        </button> */}
         <h1 className="text-xl font-bold">Chapter {currentChapter}</h1>
-        {/* <button
-          className="px-5 py-2 bg-[#5FCBC3] text-[#1D2833] rounded-full hover:bg-opacity-90"
-          onClick={() => setCurrentChapter((prev) => Math.min(2, prev + 1))}
-          disabled={currentChapter === 2}
-        >
-          Next
-        </button> */}
       </div>
 
       {/* Experience Bar */}
@@ -209,7 +208,7 @@ const PlanetHuntersSteps = () => {
         <div className="w-full bg-gray-700 rounded-full h-4 mb-6">
           <div
             className="bg-[#5FCBC3] h-4 rounded-full"
-            style={{ width: `${(experiencePoints % 8) * 12.5}%` }}
+            style={{ width: `${(experiencePoints % 9) * 10.5}%` }}
           ></div>
         </div>
       </div>
@@ -217,7 +216,6 @@ const PlanetHuntersSteps = () => {
         Level {level} ({experiencePoints} points)
       </p>
 
-      <div className="grid gap-4 w-full">
       <div className="grid gap-4 w-full">
         {steps.map((step) => (
           <div
@@ -240,7 +238,6 @@ const PlanetHuntersSteps = () => {
             </div>
           </div>
         ))}
-      </div>
       </div>
     </div>
   );

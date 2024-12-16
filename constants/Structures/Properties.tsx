@@ -48,7 +48,6 @@ interface IndividualStructureProps {
       dynamicComponent?: React.ReactNode;
       sizePercentage?: number;
       showInNoModal?: boolean;
-      onClick?: () => void;
     }[];
     modals?: {
       icon: React.ReactNode;
@@ -167,10 +166,6 @@ export const StructuresConfig: StructureConfig = {
           text: "Discover planets", // Transit events, microlensing, etc
           // dynamicComponent: <StarterTelescope />,
           // dynamicComponent: <StarterTelescopeTess />,
-          onClick: () => {
-            const router = useRouter();
-            router.push("/tests");  // Redirect to the "/tests" route
-          },
           dynamicComponent: <PlanetHuntersSteps />,
           sizePercentage: 95,
           showInNoModal: true,
