@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Lock, Rocket, MapPin, Building, Star, Clock } from "lucide-react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { CreateCommunityStation } from "../Structures/Build/MakeCommunityStation";
 
 type CommunityMission = {
   id: number;

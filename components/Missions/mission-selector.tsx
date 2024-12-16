@@ -53,7 +53,7 @@ const structures: Structure[] = [
   {
     name: 'Refracting Telescope',
     icon: Rocket,
-    description: 'Browse & classify space-based observations & classifications',
+    description: 'Browse & classify space-based observations & classifications', 
     bgColor: 'bg-indigo-900',
     accentColor: 'text-purple-400',
     shape: <div className="absolute top-0 right-0 w-32 h-32 bg-purple-800 rounded-full -mr-16 -mt-16 opacity-20"></div>,
@@ -69,7 +69,7 @@ const structures: Structure[] = [
     inventoryItemId: 3104,
   },
   {
-    name: 'Atmospheric Probe',
+    name: 'Atmospheric Probe', 
     icon: CloudSun,
     description: 'For climatologists analyzing extraterrestrial atmospheres',
     bgColor: 'bg-blue-600',

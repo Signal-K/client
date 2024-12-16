@@ -18,8 +18,6 @@ interface StructuresOnPlanetProps {
 }; 
 
 import { UnownedSurfaceStructures } from "./Build/EditMode";
-import { CreateCommunityStation } from "./Build/MakeCommunityStation";
-import StationsOnPlanet, { StationsOnPlanetOpen } from "./Community/ViewAllStations";
 
 export default function StructuresOnPlanet() {
   const supabase = useSupabaseClient();
@@ -294,7 +292,7 @@ export function OrbitalStructuresOnPlanet() {
 };
 
 export function AtmosphereStructuresOnPlanet() {
-    const supabase = useSupabaseClient();
+  const supabase = useSupabaseClient();
   const session = useSession();
 
   const { activePlanet } = useActivePlanet();
@@ -303,7 +301,6 @@ export function AtmosphereStructuresOnPlanet() {
   const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
   const [loading, setLoading] = useState(true);
   const [selectedStructure, setSelectedStructure] = useState<IndividualStructureProps | null>(null);
-  const [missionStructureId, setMissionStructureId] = useState<number | null>(null);
 
   const fetchStructures = useCallback(async () => {
     if (!session?.user?.id || !activePlanet?.id) {
@@ -382,25 +379,12 @@ export function AtmosphereStructuresOnPlanet() {
 
   if (loading) {
     return <div>Loading...</div>;
-  }
-
-  const activeStructure = userStructuresOnPlanet.find(structure => structure.item === missionStructureId);
-  const otherStructures = userStructuresOnPlanet.filter(structure => structure.item !== missionStructureId);
+  };
 
   return (
     <div className="relative">
-      <div className="grid grid-cols-4 gap-1 gap-y-3">
-        {activeStructure && (
-          <div key={activeStructure.id} className="flex flex-col items-center space-y-2">
-            <img
-              src={itemDetails.get(activeStructure.item)?.icon_url}
-              alt={itemDetails.get(activeStructure.item)?.name}
-              className="w-16 h-16 object-cover cursor-pointer hovering-structure"
-              onClick={() => handleIconClick(activeStructure.item, activeStructure.id)}
-            />
-          </div>
-        )}
-        {otherStructures.map((structure) => {
+      <div className="grid grid-cols-4 gap-1 gap-y-3 relative">
+        {userStructuresOnPlanet.map((structure) => {
           const itemDetail = itemDetails.get(structure.item);
 
           return itemDetail ? (
@@ -408,9 +392,10 @@ export function AtmosphereStructuresOnPlanet() {
               <img
                 src={itemDetail.icon_url}
                 alt={itemDetail.name}
-                className="w-14 h-14 object-cover cursor-pointer hovering-structure"
+                className="w-16 h-16 object-cover cursor-pointer"
                 onClick={() => handleIconClick(itemDetail.id, structure.id)}
               />
+              <p className="text-white text-sm mt-2">{itemDetail.name}</p>
             </div>
           ) : null;
         })}
@@ -431,4 +416,4 @@ export function AtmosphereStructuresOnPlanet() {
       )}
     </div>
   );
-};
+}

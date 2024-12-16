@@ -3,9 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { useProfileContext } from "@/context/UserProfile";
-import { ClassificationOutput } from "./ClassificationResults";
-// import IntroduceUserToResearch from "../../(scenes)/chapters/(onboarding)/initialiseResearch";
 
 import {
   zoodexSouthCoastFaunaRecovery,
@@ -26,15 +23,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "antd";
 import Link from "next/link";
 // import UserAvatar, { UserAvatarNullUpload } from "@/components/Profile/Avatar";
-
-interface ClassificationFormProps {
-  anomalyType: string;
-  anomalyId: string;
-  missionNumber: number;
-  assetMentioned: string | string[];
-  originatingStructure?: number;
-  structureItemId?: number;
-}
+import { ClassificationFormProps } from "./FormConfigurations";
 
 const ClassificationForm: React.FC<ClassificationFormProps> = ({
   anomalyType,
@@ -330,31 +319,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
     router.refresh();
   };
 
-  const [showModal, setShowModal] = useState(true);
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
-  if (postSubmitted) {
-    <Button
-      className="bg-[#5FCBC3] text-[#2E3440] rounded-md hover:bg-[#85DDA2]"
-    >
-      <Link href='/'>
-        Return
-      </Link>
-    </Button>
-  };
-
-  // if (postSubmitted && showResearch) {
-  //     return (
-  //             {showModal && <IntroduceUserToResearch closeModal={closeModal} />}
-  //     );
-  // if (postSubmitted) {
-  //   return <ClassificationOutput configuration={classificationOutput} />;
-  // };
-  // };
-
   const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0 && session) {
@@ -440,11 +404,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
 
   return (
     <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full bg-[#2C4F64]/30 text-white bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
-      {uses !== null && uses <= 0 ? (
+      {/* {uses !== null && uses <= 0 ? (
         <div className="text-red-500 font-bold">
           You need to repair the structure's durability before you can use it.
         </div>
-      ) : (
+      ) : ( */}
         <div className="flex flex-col gap-6">
           {classificationOptions.length > 0 ? (
             <>
@@ -559,7 +523,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
             </div>
           )}
         </div>
-      )}
+      {/* )} */}
     </div>
   );  
 };

@@ -11,13 +11,13 @@ export interface FormConfig {
   richTextTitles?: (string | undefined)[];
 };
 
-interface ClassificationFormProps {
+export interface ClassificationFormProps {
   config?: FormConfig;
-  onSubmit: (data: any) => void;
+  onSubmit?: (data: any) => void;
   anomalyType: string;
   anomalyId: string;
   missionNumber: number;
-  assetMentioned: string;
+  assetMentioned: string | string[];
   originatingStructure?: number;
   structureItemId?: number;
 };

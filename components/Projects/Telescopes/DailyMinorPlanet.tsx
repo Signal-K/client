@@ -162,41 +162,41 @@ export function DailyMinorPlanet() {
     const [hasMission20000003, setHasMission20000003] = useState<boolean | null>(false);
     const [showTutorial, setShowTutorial] = useState(false);
 
+    // useEffect(() => {
+    //     const checkTutorialMission = async () => {
+    //         if (!session) {
+    //             setLoading(false);
+    //             return;
+    //         };
+
+    //         try {
+    //             const { data: missionData, error: missionError } = await supabase
+    //                 .from("missions")
+    //                 .select("*")
+    //                 .eq("user", session.user.id)
+    //                 .eq("mission", 20000003)
+    //                 .limit(1); // Limiting the result to 1 row
+
+    //             if (missionError) {
+    //                 throw missionError;
+    //             };
+
+    //             // Even if there are multiple rows, we just care about one row.
+    //             const hasMission = missionData && missionData.length > 0;
+    //             setHasMission20000003(hasMission);
+    //         } catch (error: any) {
+    //             console.error("Mission error:", error);
+    //             setHasMission20000003(false);
+    //         } finally {
+    //             setMissionLoading(false);
+    //         };
+    //     };
+
+    //     checkTutorialMission();
+    // }, [session, supabase]);
+
     useEffect(() => {
-        const checkTutorialMission = async () => {
-            if (!session) {
-                setLoading(false);
-                return;
-            };
-
-            try {
-                const { data: missionData, error: missionError } = await supabase
-                    .from("missions")
-                    .select("*")
-                    .eq("user", session.user.id)
-                    .eq("mission", 20000003)
-                    .limit(1); // Limiting the result to 1 row
-
-                if (missionError) {
-                    throw missionError;
-                };
-
-                // Even if there are multiple rows, we just care about one row.
-                const hasMission = missionData && missionData.length > 0;
-                setHasMission20000003(hasMission);
-            } catch (error: any) {
-                console.error("Mission error:", error);
-                setHasMission20000003(false);
-            } finally {
-                setMissionLoading(false);
-            };
-        };
-
-        checkTutorialMission();
-    }, [session, supabase]);
-
-    useEffect(() => {
-        if (!hasMission20000003 || missionLoading || !session) return;
+        // if (!hasMission20000003 || missionLoading || !session) return;
     
         const fetchAnomaly = async () => {
             try {
@@ -233,7 +233,7 @@ export function DailyMinorPlanet() {
         };
     
         fetchAnomaly();
-    }, [hasMission20000003, missionLoading, session, supabase]);    
+    }, [session, supabase]);    
 
     const handlePrevious = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1));
@@ -243,13 +243,9 @@ export function DailyMinorPlanet() {
         setCurrentImageIndex((prevIndex) => (prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1));
     };
 
-    if (loading || missionLoading) {
-        return <div>Loading...</div>;
-    };
-
-    if (!hasMission20000003 || showTutorial) {
-        return <StarterDailyMinorPlanet anomalyid={anomaly?.id || 90670192} />;
-    };
+    // if (!hasMission20000003 || showTutorial) {
+    //     return <StarterDailyMinorPlanet anomalyid={anomaly?.id || 90670192} />;
+    // };
 
     if (!anomaly) {
         return (

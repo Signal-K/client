@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet';
 import { Plus } from "lucide-react";
@@ -27,66 +25,61 @@ export function UnownedSurfaceStructures() {
     const [error, setError] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
     const [selectedStructure, setSelectedStructure] = useState<InventoryItem | null>(null);
+    const [fetchTrigger, setFetchTrigger] = useState(0); // Track changes for re-fetching
 
-    useEffect(() => {
-        async function fetchStructures() {
-            if (!session || !activePlanet) {
-                setLoading(false);
-                return;
-            };
-    
-            try {
-                const { data: researchedStructures, error: researchError } = await supabase
-                    .from('researched')
-                    .select('tech_type')
-                    .eq('user_id', session.user.id);
-                
-                if (researchError) {
-                    throw researchError;
-                };
-    
-                const researchedIds = researchedStructures.map((item: { tech_type: string }) => Number(item.tech_type));
-    
-                const { data: userInventory, error: inventoryError } = await supabase
-                    .from('inventory')
-                    .select('item')
-                    .eq('owner', session.user.id)
-                    .eq('anomaly', activePlanet.id);
-    
-                if (inventoryError) {
-                    throw inventoryError;
-                };
-    
-                const ownedItems = userInventory.map((item: { item: number }) => item.item);
-    
-                const response = await fetch('/api/gameplay/inventory');
-                const inventoryItems: InventoryItem[] = await response.json();
-    
-                const surfaceStructures = inventoryItems.filter(item =>
-                    item.ItemCategory === 'Structure' && item.locationType === 'Surface' && researchedIds.includes(item.id)
-                );
-    
-                const unowned = surfaceStructures.filter(structure => !ownedItems.includes(structure.id));
-    
-                setUnownedStructures(unowned);
-            } catch (error) {
-                console.error('Error fetching structures:', error);
-                setError('Failed to load structures.');
-            } finally {
-                setLoading(false);
-            };
+    const fetchStructures = useCallback(async () => {
+        if (!session || !activePlanet) {
+            setLoading(false);
+            return;
         };
-    
-        fetchStructures();
-    }, [session, activePlanet, supabase]);
-
-    const [hasResearchStation, setHasResearchStation] = useState(false);
-
-    async function addResearchStation() {
-        if (!session || !activePlanet || hasResearchStation) return;
 
         try {
-            const { error: researchError } = await supabase
+            const { data: researchedStructures, error: researchError } = await supabase
+                .from('researched')
+                .select('tech_type')
+                .eq('user_id', session.user.id);
+            
+            if (researchError) throw researchError;
+
+            const researchedIds = researchedStructures.map((item: { tech_type: string }) => Number(item.tech_type));
+
+            const { data: userInventory, error: inventoryError } = await supabase
+                .from('inventory')
+                .select('item')
+                .eq('owner', session.user.id)
+                .eq('anomaly', activePlanet.id);
+
+            if (inventoryError) throw inventoryError;
+
+            const ownedItems = userInventory.map((item: { item: number }) => item.item);
+
+            const response = await fetch('/api/gameplay/inventory');
+            const inventoryItems: InventoryItem[] = await response.json();
+
+            const surfaceStructures = inventoryItems.filter(item =>
+                item.ItemCategory === 'Structure' && item.locationType === 'Surface' && researchedIds.includes(item.id)
+            );
+
+            const unowned = surfaceStructures.filter(structure => !ownedItems.includes(structure.id));
+
+            setUnownedStructures(unowned);
+        } catch (error) {
+            console.error('Error fetching structures:', error);
+            setError('Failed to load structures.');
+        } finally {
+            setLoading(false);
+        };
+    }, [session, activePlanet, supabase]);
+
+    useEffect(() => {
+        fetchStructures();
+    }, [fetchTrigger, fetchStructures]); // Re-fetch when fetchTrigger changes
+
+    const addResearchStation = async () => {
+        if (!session || !activePlanet) return;
+
+        try {
+            const { error } = await supabase
                 .from('inventory')
                 .insert([
                     {
@@ -98,20 +91,17 @@ export function UnownedSurfaceStructures() {
                     },
                 ]);
 
-            if (researchError) {
-                throw researchError;
-            };
+            if (error) throw error;
 
-            console.log("Research Station has been added to the inventory.");
             alert("You now have a Research Station in your inventory!");
-            setHasResearchStation(true);
+            setFetchTrigger(fetchTrigger + 1); // Trigger a re-fetch
         } catch (error) {
             console.error('Error adding research station:', error);
             setError('Failed to add the Research Station.');
         };
     };
 
-    async function addToInventory(structure: InventoryItem) {
+    const addToInventory = async (structure: InventoryItem) => {
         if (!session || !activePlanet) return;
 
         try {
@@ -127,21 +117,18 @@ export function UnownedSurfaceStructures() {
                     },
                 ]);
 
-            if (error) {
-                throw error;
-            }
+            if (error) throw error;
 
-            console.log(`${structure.name} has been added to the inventory.`);
+            alert(`${structure.name} has been added to the inventory.`);
             setOpen(false);
+            setFetchTrigger(fetchTrigger + 1); // Trigger a re-fetch
         } catch (error) {
             console.error('Error adding to inventory:', error);
             setError('Failed to add the structure to your inventory.');
         };
     };
 
-    if (loading) {
-        return <p>Loading...</p>;
-    };
+    if (loading) return <p>Loading...</p>;
 
     if (unownedStructures.length === 0) {
         return (
@@ -160,7 +147,7 @@ export function UnownedSurfaceStructures() {
                 </Dialog>
             </div>
         );
-    };
+    }
 
     return (
         <div className="relative">
@@ -171,7 +158,6 @@ export function UnownedSurfaceStructures() {
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-full max-h-[90vh] w-full sm:w-[90vw] h-full sm:h-[90vh] p-0 bg-gradient-to-br from-[#1a1b26] via-[#292e42] to-[#565f89] rounded-3xl overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,...')] opacity-20" />
                     <AnimatePresence>
                         {selectedStructure ? (
                             <motion.div
@@ -192,9 +178,7 @@ export function UnownedSurfaceStructures() {
                                 <Button
                                     size="lg"
                                     className="w-full max-w-md bg-[#7aa2f7] text-[#1a1b26] hover:bg-[#89b4fa]"
-                                    onClick={() => {
-                                        addToInventory(selectedStructure);
-                                    }}
+                                    onClick={() => addToInventory(selectedStructure)}
                                 >
                                     Place
                                 </Button>

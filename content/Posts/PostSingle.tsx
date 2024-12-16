@@ -3,24 +3,25 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, MessageSquare } from "lucide-react";
-import { Badge } from "@/components/ui/badge"; 
+import { Badge } from "@/components/ui/badge";
 import { CommentCard } from "../Comments/CommentSingle";
 import { CommentForm } from "../Comments/CommentForm";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
-import { 
-  DailyMinorPlanetOptions,
-  PlanetFourOptions,
-  automatonaiForMarsOptions,
-  cloudClassificationOptionsOne, cloudClassificationOptionsTwo, cloudClassificationOptionsThree,
+import {
   planetClassificationOptions,
-  diskDetectorClassificationOptions,
   roverImgClassificationOptions,
+  cloudClassificationOptionsOne,
+  cloudClassificationOptionsTwo,
+  cloudClassificationOptionsThree,
   zoodexBurrowingOwlClassificationOptions,
   zoodexIguanasFromAboveClassificationOptions,
+  diskDetectorClassificationOptions,
+  DailyMinorPlanetOptions,
+  automatonaiForMarsOptions,
 } from "../Classifications/Options";
 
-interface PostCardSingleProps { 
+interface PostCardSingleProps {
   classificationId: number;
   title: string;
   anomalyId: string;
@@ -28,12 +29,14 @@ interface PostCardSingleProps {
   content: string;
   votes: number;
   category: string;
-  tags: string[];
-  classificationConfig: any;
+  tags?: string[];
+  classificationConfig?: any;
   images: string[];
   classificationType: string;
-  onVote: () => void;
-};
+  onVote?: () => void;
+  children?: React.ReactNode;
+  commentStatus?: boolean;
+}
 
 export function PostCardSingle({
   classificationId,
@@ -47,6 +50,7 @@ export function PostCardSingle({
   classificationConfig,
   images,
   classificationType,
+  commentStatus,
   onVote,
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
@@ -76,7 +80,9 @@ export function PostCardSingle({
   };
 
   const handleVoteClick = () => {
-    onVote();
+    if (onVote) {
+      onVote();
+    };
     setVoteCount((prevCount) => prevCount + 1);
   };
 
@@ -84,7 +90,7 @@ export function PostCardSingle({
     fetchComments();
   };
 
-  const getClassificationOptions = (classificationType: string) => {
+  const getClassificationOptions = () => {
     switch (classificationType) {
       case "planet":
         return planetClassificationOptions;
@@ -112,12 +118,12 @@ export function PostCardSingle({
   };
 
   const renderClassificationOptions = () => {
-    if (!classificationConfig || !classificationConfig.classificationOptions) {
+    if (!classificationConfig?.classificationOptions) {
       return null;
     }
 
-    const selectedOptions = classificationConfig.classificationOptions[""] || {};
-    const options = getClassificationOptions(classificationType);
+    const selectedOptions = classificationConfig.classificationOptions || {};
+    const options = getClassificationOptions();
 
     return (
       <div className="mt-4 p-4 border border-secondary rounded">
@@ -138,7 +144,7 @@ export function PostCardSingle({
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto my-8 squiggly-connector bg-card text-card-foreground border-primary">
+    <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
       <CardHeader>
         <div className="flex items-center space-x-4">
           <Avatar>
@@ -147,41 +153,29 @@ export function PostCardSingle({
           </Avatar>
           <div>
             <CardTitle>{title}</CardTitle>
-            <p className="text-sm text-muted-foreground"> by {author} </p>
+            <p className="text-sm text-muted-foreground">by {author}</p>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <div className="mb-4">
           <Badge variant="secondary" className="mr-2">{category}</Badge>
-          {tags.map((tag, index) => (
+          {/* {tags.map((tag, index) => (
             <Badge key={index} variant="outline" className="mr-2">{tag}</Badge>
-          ))}
+          ))} */}
         </div>
         <p>{content}</p>
         <div className="flex flex-wrap gap-2 mt-4">
           {images.map((image, index) => (
-            <img key={index} src={image} alt={`Media ${index + 1}`} className="w-full h-auto max-w-xs object-cover" />
+            <img
+              key={index}
+              src={image}
+              alt={`Media ${index + 1}`}
+              className="w-full h-auto max-w-xs object-cover"
+            />
           ))}
         </div>
-
-        {classificationType && (
-          <div className="mt-4 p-4 border border-secondary rounded">
-            <h3 className="text-lg font-bold">Classification Type</h3>
-            <p>{classificationType}</p>
-            {voteCount <= 5 && (
-              <p className="tex-red-600 font-bold mt-2">
-                Anomalies require at least 5 votes to be classified & confirmed.
-              </p>
-            )}
-            {classificationType === "planet" && voteCount > 5 && (
-              <p className="text-green-600 font-bold mt-2">
-                This anomaly has been voted as a planet
-              </p>
-            )}
-          </div>
-        )}
-        {renderClassificationOptions()}
+        {/* {classificationConfig && renderClassificationOptions()} */}
       </CardContent>
       <CardFooter className="flex items-center justify-between">
         <Button onClick={handleVoteClick} size="sm">
@@ -191,20 +185,27 @@ export function PostCardSingle({
           <MessageSquare className="mr-2" /> {comments.length}
         </Button>
       </CardFooter>
-      <CardContent>
-        {loadingComments ? (
-          <p>Loading comments...</p>
-        ) : comments.length > 0 ? (
-          comments.map((comment) => (
-            <CommentCard key={comment.id} {...comment} />
-          ))
-        ) : (
-          <p>No comments yet.</p>
-        )}
-      </CardContent>
-      <CardFooter>
-        <CommentForm classificationId={classificationId} onCommentAdded={handleCommentAdded} />
-      </CardFooter>
+      {commentStatus !== false && (
+        <>
+          <CardContent>
+            {loadingComments ? (
+              <p>Loading comments...</p>
+            ) : comments.length > 0 ? (
+              comments.map((comment) => (
+                <CommentCard key={comment.id} {...comment} />
+              ))
+            ) : (
+              <p>No comments yet.</p>
+            )}
+          </CardContent>
+          <CardFooter>
+            <CommentForm
+              classificationId={classificationId}
+              onCommentAdded={handleCommentAdded}
+            />
+          </CardFooter>
+        </>
+      )}
     </Card>
   );
 };

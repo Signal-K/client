@@ -3,7 +3,7 @@ import axios from "axios";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
-import { MapPinIcon } from "@/components/Inventory/items/MineralDeposits";
+import { MapPinIcon } from "@/components/ui/icons/MapPin";
 import Spinner from "@/components/ui/Spinner";
 
 export const RooverFromAppeears: React.FC = () => { 

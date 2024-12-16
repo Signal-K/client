@@ -36,6 +36,7 @@ import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import Onboarding from "./scenes/onboarding/page";
 import VerticalToolbar from "@/components/Layout/Toolbar";
 import StructureMissionGuide from "@/components/Layout/Guide";
+import SimpleeMissionGuide from "./tests/singleMissionGuide";
 
 export default function Home() {
   const session = useSession();
@@ -74,7 +75,7 @@ export default function Home() {
         <div className="flex flex-row space-y-4"></div>
         <div className="py-3">
           <div className="py-1">
-            <EnhancedWeatherEvents />
+            {/* <EnhancedWeatherEvents /> */}
           </div>
           <center> 
             <OrbitalStructuresOnPlanet />
@@ -94,7 +95,8 @@ export default function Home() {
           <AllAutomatonsOnActivePlanet />
         </center>
       </div>
-      <div className="w-full py-2"><StructureMissionGuide />
+      {/* <div className="w-full py-2"><StructureMissionGuide /> */}
+      <div className="w-full py-2"><SimpleeMissionGuide />
   </div>
     </EarthViewLayout>
     // 60: <SaturnView />,

@@ -16,7 +16,7 @@ interface Classification {
     classificationConfiguration: any | null; 
 };
 
-export default function StarnetVotePlanetClassifictions() {
+export default function VotePlanetClassifictions() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -37,7 +37,7 @@ export default function StarnetVotePlanetClassifictions() {
           const { data, error } = await supabase
             .from('classifications')
             .select('*')
-            .eq('author', session.user.id)
+            // .eq('author', session.user.id)
             .eq('classificationtype', 'planet')
             .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
       
@@ -102,7 +102,6 @@ export default function StarnetVotePlanetClassifictions() {
     };
 
     return (
-        <StarnetLayout>
           <div className="space-y-8">
             {loading ? (
               <p>Loading classifications...</p>
@@ -122,12 +121,11 @@ export default function StarnetVotePlanetClassifictions() {
                   images={classification.images || []}
                   anomalyId={classification.anomaly}
                   classificationConfig={classification.classificationConfiguration}
-                  classificationType={classification.classificationtype} // Pass classificationtype to child
+                  classificationType={classification.classificationtype}
                   onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
                 />
               ))
             )}
           </div>
-        </StarnetLayout>
     );
 };
