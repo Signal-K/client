@@ -179,7 +179,7 @@ const PlanetHuntersSteps = () => {
       <div className="flex-1 overflow-y-auto w-full h-screen flex flex-col">
         <div className="flex flex-col items-center bg-[#1D2833] text-white rounded-2xl shadow-lg p-8 flex-1">
           <button
-            className="mb-4 px-5 py-2 bg-[#5FCBC3] text-[#1D2833] rounded-full hover:bg-opacity-90"
+            className="mb-4 px-5 py-2 bg-[#1D2833] text-[#5FCBC3] rounded-full hover:bg-opacity-90"
             onClick={() => setSelectedMission(null)}
           >
             Back
@@ -216,8 +216,33 @@ const PlanetHuntersSteps = () => {
         Level {level} ({experiencePoints} points)
       </p>
 
-      <div className="grid gap-4 w-full">
-        {steps.map((step) => (
+      <div className="bg-gray-700 p-6 rounded-2xl w-full mb-6">
+        <div className="grid grid-cols-2 gap-4 w-full">
+          {[steps[0], steps[1]].map((step) => (
+            <div
+              key={step.id}
+              className={`flex items-center p-6 rounded-2xl cursor-pointer ${
+                step.completedCount > 0 ? "bg-gray-700" : "bg-blue-500"
+              }`}
+              onClick={() => setSelectedMission(step)}
+            >
+              <step.icon className={`h-10 w-10 ${step.color}`} />
+              <div className="ml-4">
+                <h2 className={`text-lg font-bold ${step.color}`}>{step.title}</h2>
+                <p className={`text-sm ${step.color}`}>{step.description}</p>
+              </div>
+              <div className="ml-auto text-right">
+                <p className="text-xs">Completed</p>
+                <p className="text-xl font-bold">{step.completedCount}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mission 3 & Mission 4 below */}
+      <div className="grid gap-4 w-full mt-6">
+        {[steps[2], steps[3]].map((step) => (
           <div
             key={step.id}
             className={`flex items-center p-6 rounded-2xl shadow-md cursor-pointer ${
@@ -227,9 +252,7 @@ const PlanetHuntersSteps = () => {
           >
             <step.icon className={`h-10 w-10 ${step.color}`} />
             <div className="ml-4">
-              <h2 className={`text-lg font-bold ${step.color}`}>
-                {step.title}
-              </h2>
+              <h2 className={`text-lg font-bold ${step.color}`}>{step.title}</h2>
               <p className={`text-sm ${step.color}`}>{step.description}</p>
             </div>
             <div className="ml-auto text-right">

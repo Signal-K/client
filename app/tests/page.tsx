@@ -6,16 +6,14 @@ import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-co
 import Greenhouse from "@/page.test";
 import BigMap from "@/components/(scenes)/planetScene/bigMap";
 import DiscoveriesPage from "@/content/Classifications/minimalDiscoveries";
-import UserMissions from "./missionsUnlocked";
-import SimpleeMissionGuide from "./singleMissionGuide";
+import DailyMinorPlanetMissions from "@/components/Structures/Missions/Astronomers/DailyMinorPlanet";
 // import { TopographicMap } from "@/components/topographic-map";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
-          <UserMissions />
-          <SimpleeMissionGuide />
+          <DailyMinorPlanetMissions />
               {/* <Greenhouse /> */}
               {/* <BigMap /> */}
               {/* <DiscoveriesPage /> */}
