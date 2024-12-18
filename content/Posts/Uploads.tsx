@@ -7,8 +7,8 @@ interface Upload {
   id: number;
   created_at: string;
   author: string | null;
-  file_url: string;  // URL of the file (image, etc.)
-  content: string | null;  // Content of the post
+  file_url: string; 
+  content: string | null;  
   structure_type: string | null;
 };
 

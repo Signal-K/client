@@ -6,7 +6,6 @@ import { ChevronLeft, ChevronRight, HelpCircle, XCircle, Expand, Telescope, Tree
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import MissionInfoModal from "../Missions/MissionInfoModal";
-import AllClassifications from "@/content/Starnet/YourClassifications";
 import SwitchPlanet from "../(scenes)/travel/SolarSystem";
 import { MiningComponentComponent } from "../(scenes)/mining/mining-component";
 import DiscoveriesPage from "@/content/Classifications/minimalDiscoveries";
@@ -156,17 +155,17 @@ const globalMissions: Mission[] = [
         tableColumn: 'author',
         modalContent: <FreeformUploadData />,
     },
-    {
-        id: 4,
-        name: "Vote on planet candidate classifications",
-        description: "Other users, or maybe you, have discovered some potential planet candidates. Go to your Telescope structure, click 'View all discoveries', and vote to select which classifications are valid, which in turn will allow anomalies to be added to the ecosystem",
-        icon: PersonStandingIcon,
-        color: 'text-red-300',
-        tableEntry: 'votes',
-        tableColumn: 'user_id',
-        voteOn: 'planet',
-        modalContent: <AllClassifications initialType="planet" />,
-    },
+    // {
+    //     id: 4,
+    //     name: "Vote on planet candidate classifications",
+    //     description: "Other users, or maybe you, have discovered some potential planet candidates. Go to your Telescope structure, click 'View all discoveries', and vote to select which classifications are valid, which in turn will allow anomalies to be added to the ecosystem",
+    //     icon: PersonStandingIcon,
+    //     color: 'text-red-300',
+    //     tableEntry: 'votes',
+    //     tableColumn: 'user_id',
+    //     voteOn: 'planet',
+    //     modalContent: <AllClassifications initialType="planet" />,
+    // },
 ];
 
 const StructureMissionGuide = () => {
@@ -618,7 +617,3 @@ export const StructureMissionGuideMobile = () => {
 // Research station - walk the user through this. Then upload data, verify/vet (consensus), then we introduce travel. Add a "close"/swipe-down option so that the tutorial section can be hidden/minimised. Then we go through the guide for the different views....and determine the differentials from Pathway.tsx and this new list
 // As well as researching for other projects/mission modules that aren't in `mission-selector`
 // We'll also need to update this for different planets & chapters
-
-const dialogueSteps: DialogueStep[] = [
-
-];

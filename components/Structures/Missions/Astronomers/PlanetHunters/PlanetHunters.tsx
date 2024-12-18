@@ -136,7 +136,7 @@ const PlanetHuntersSteps = () => {
           {
             id: 2,
             title: "Propose 1 planetary candidate",
-            description: "Classify a planet without selecting '1' as an option.",
+            description: "Make a classification indicating a positive candidate.",
             icon: RadioIcon,
             action: () => {},
             completedCount: mission2CompletedCount,

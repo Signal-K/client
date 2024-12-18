@@ -14,6 +14,7 @@ export default function TestPage() {
         // <StarnetLayout>
           <>
           <DailyMinorPlanetMissions />
+          <DiscoveriesPage />
               {/* <Greenhouse /> */}
               {/* <BigMap /> */}
               {/* <DiscoveriesPage /> */}

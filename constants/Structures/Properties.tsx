@@ -23,7 +23,6 @@ import { AiForMarsProject } from "@/components/Projects/Auto/AI4Mars";
 import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
 import { PlanetFourProject } from "@/components/Projects/Satellite/PlanetFour";
 import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
-import AllClassifications from "@/content/Starnet/YourClassifications";
 import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
 import TutorialPopup from "@/content/Dialogue/helpButton";
 import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
@@ -148,11 +147,11 @@ export const StructuresConfig: StructureConfig = {
           text: "Research",
           dynamicComponent: <DataSourcesModal structureId="3103" structure="Telescope" />,
         },
-        {
-          icon: <BarChart className="w-6 h-6 text-[#5e81ac]" />,
-          text: "View all discoveries",
-          dynamicComponent: <AllClassifications initialType="planet" />
-        },
+        // {
+        //   icon: <BarChart className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "View all discoveries",
+        //   dynamicComponent: <AllClassifications initialType="planet" />
+        // },
         {
           icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Upload content",
