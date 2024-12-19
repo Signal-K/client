@@ -29,6 +29,7 @@ import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm
 import { ZoodexIguanas } from "@/components/Projects/Zoodex/iguanasFromAbove";
 import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters";
 import { useRouter } from 'next/router';
+import DailyMinorPlanetMissions from "@/components/Structures/Missions/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
 
 interface IndividualStructureProps {
     name?: string;
@@ -190,8 +191,9 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <MoonStarIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Discover asteroids",
-          dynamicComponent: <DailyMinorPlanet />,
-          sizePercentage: 50,
+          // dynamicComponent: <DailyMinorPlanet />,
+          dynamicComponent: <DailyMinorPlanetMissions />,
+          sizePercentage: 95,
         },
         // {
         //   icon: <StarIcon className="w-6 h-6 text-[#5e81ac]" />,

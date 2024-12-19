@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
-import MissionShell from "../BasePlate";
+import MissionShell from "../../BasePlate";
+import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
+import VoteDMPClassifications from "./DMPVote";
 
 const DailyMinorPlanetMissions = () => {
   const supabase = useSupabaseClient();
@@ -15,7 +17,7 @@ const DailyMinorPlanetMissions = () => {
       icon: TelescopeIcon,
       points: 2,
       completedCount: 0,
-      internalComponent: () => <div>Asteroid classification component here</div>,
+      internalComponent: () => <DailyMinorPlanet />,
       color: "text-blue-500",
       shadow: false,
       action: () => {},
@@ -27,7 +29,7 @@ const DailyMinorPlanetMissions = () => {
       icon: RadioIcon,
       points: 1,
       completedCount: 0,
-      internalComponent: () => <div>Classification proposal component here</div>,
+      internalComponent: () => <DailyMinorPlanet />,
       color: "text-green-500",
       shadow: false,
       action: () => {},
@@ -40,7 +42,7 @@ const DailyMinorPlanetMissions = () => {
       icon: SpeechIcon,
       points: 1,
       completedCount: 0,
-      internalComponent: () => <div></div>,
+      internalComponent: () => <VoteDMPClassifications />,
       color: "text-cyan-600",
       shadow: true,
       action: () => {},

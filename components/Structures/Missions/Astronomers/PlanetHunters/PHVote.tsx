@@ -8,7 +8,7 @@ import StarnetLayout from "@/components/Layout/Starnet";
 interface Classification {
     id: number;
     created_at: string;
-    content: string | null;
+    content: string | null; 
     author: string | null;
     anomaly: number | null;
     media: any | null; 
