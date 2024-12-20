@@ -235,7 +235,6 @@ const PlanetHuntersSteps = () => {
         </button>
       </div>
 
-      {/* Mission container with fixed size */}
       <div className="bg-gray-700 p-6 rounded-2xl w-full mb-6">
         <div className="grid grid-cols-2 gap-4 w-full">
           {filteredSteps.slice(0, 2).map((step) => (
@@ -260,7 +259,6 @@ const PlanetHuntersSteps = () => {
         </div>
       </div>
 
-      {/* Remaining missions in the current chapter */}
       <div className="grid gap-4 w-full mt-6">
         {filteredSteps.slice(2).map((step) => (
           <div

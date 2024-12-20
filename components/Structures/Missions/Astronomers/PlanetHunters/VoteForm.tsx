@@ -124,5 +124,3 @@ const MissionFour: React.FC = () => {
     </div>
   );
 };
-
-export default MissionFour;

@@ -3,7 +3,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { MiningComponentComponent } from "../(scenes)/mining/mining-component";
-import { StructureMissionGuideMobile } from "./Guide";
 import DiscoveriesPage from "@/content/Classifications/minimalDiscoveries";
 
 const menuItems = [
@@ -20,18 +19,6 @@ const ModalContent = ({ onClose }: { onClose: () => void }) => (
       ✕
     </button>
     <MiningComponentComponent />
-  </div>
-);
-
-const ModalContentGuide = ({ onClose }: { onClose: () => void }) => (
-  <div className="flex flex-col h-full w-full p-4 rounded-md">
-    <button
-      onClick={onClose}
-      className="self-end text-gray-500 hover:text-gray-800 text-lg"
-    >
-      ✕
-    </button>
-    <StructureMissionGuideMobile />
   </div>
 );
 

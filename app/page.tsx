@@ -35,7 +35,6 @@ import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomat
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import Onboarding from "./scenes/onboarding/page";
 import VerticalToolbar from "@/components/Layout/Toolbar";
-import StructureMissionGuide from "@/components/Layout/Guide";
 import SimpleeMissionGuide from "./tests/singleMissionGuide";
 
 export default function Home() {
