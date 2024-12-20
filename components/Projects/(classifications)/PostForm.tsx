@@ -30,7 +30,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
   anomalyId,
   missionNumber,
   assetMentioned,
-  originatingStructure,
   structureItemId,
 }) => {
   const supabase = useSupabaseClient();
@@ -231,7 +230,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       classificationOptions: classificationOptionsObj,
       additionalFields,
       activePlanet: activePlanet?.id,
-      structureId: originatingStructure ?? null,
       createdBy: inventoryItemId ?? null,
     };
 

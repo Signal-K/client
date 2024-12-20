@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
+import { BarChartBigIcon, GlassWater, Guitar, PenBoxIcon, RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
 import MissionShell from "../../BasePlate";
 import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
 import VoteDMPClassifications from "./DMPVote";
@@ -59,8 +59,57 @@ const DailyMinorPlanetMissions = () => {
       icon: VoteIcon,
       points: 3,
       completedCount: 0,
-      internalComponent: () => <div></div>,
+      // internalComponent: () => <div></div>,
       color: "text-red-700",
+      shadow: true,
+      action: () => {},
+    },
+    {
+      id: 5,
+      chapter: 2,
+      title: "Make an active asteroid classification",
+      description:
+        "The next step in your asteroid research involves finding asteroids with tails, helping us find clues about water on smaller objects",
+      icon: Guitar,
+      points: 2,
+      completedCount: 0,
+      // internalComponent: () => <div></div>,
+      color: 'text-green-300',
+      shadow: true,
+      action: () => {},
+    },
+    {
+      id: 6,
+      chapter: 2,
+      title: "Compare AA & DMP Classification",
+      description:
+        "Pick out classifications you've made from both datasets and compare the differences and potential validity",
+      icon: BarChartBigIcon,
+      points: 2,
+      color: 'text-green-700',
+      shadow: true,
+      action: () => {},
+    },
+    {
+      id: 7,
+      chapter: 2,
+      title: "Comment & Vote on AA candidates",
+      description: "Work with other players to confirm classifications and provide feedback & consensus",
+      icon: PenBoxIcon,
+      points: 1,
+      color: 'text-blue-300',
+      shadow: true,
+      action: () => [],
+    },
+    {
+      id: 8,
+      chapter: 2,
+      title: "Propose tail, dust cloud, or null value",
+      description:
+        "Go through verified AA & DMP anomalies and propose what's going on specifically",
+      icon: GlassWater,
+      points: 1,
+      color: 'text-blue-700',
       shadow: true,
       action: () => {},
     },
@@ -126,30 +175,32 @@ const DailyMinorPlanetMissions = () => {
 
         const mission3CompletedCount = mission3CommentCount + mission3VoteCount;
 
-        // Mission 4: Check classifications with 5+ votes
         const mission4CompletedCount = classificationsData?.filter(({ id: classificationId }) => {
           const voteCount = voteData?.filter(({ classification_id }) => classification_id === classificationId)
             .length;
-          return voteCount > 4.9999; // Greater than 5 votes
+          return voteCount > 4.9999;
         }).length || 0;
 
         setMissions((prevMissions) =>
           prevMissions.map((mission) => {
             if (mission.id === 1) {
-              return { ...mission, completedCount: mission1CompletedCount };
+              return { ...mission, completedCount: mission1CompletedCount, points: mission.points || 0 };
             }
             if (mission.id === 2) {
-              return { ...mission, completedCount: mission2CompletedCount };
+              return { ...mission, completedCount: mission2CompletedCount, points: mission.points || 0 };
             }
             if (mission.id === 3) {
-              return { ...mission, completedCount: mission3CompletedCount };
+              return { ...mission, completedCount: mission3CompletedCount, points: mission.points || 0 };
             }
             if (mission.id === 4) {
-              return { ...mission, completedCount: mission4CompletedCount };
+              return { ...mission, completedCount: mission4CompletedCount, points: mission.points || 0 };
+            }
+            if (mission.id === 5) {
+              return { ...mission, completedCount: mission4CompletedCount, points: mission.points || 0 };
             }
             return mission;
           })
-        );
+        );        
 
         const totalPoints =
           mission1CompletedCount * 2 +

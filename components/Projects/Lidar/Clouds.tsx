@@ -135,7 +135,7 @@ export function StarterLidar() {
                     anomalyType="cloud"
                     missionNumber={100000034}
                     assetMentioned={imageUrl || ""}
-                    originatingStructure={3105}
+                    structureItemId={3105}
                 />
             </div>
         </div>

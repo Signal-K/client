@@ -319,7 +319,7 @@ export function BurrowingOwl() {
                     anomalyType="zoodex-burrowingOwl"
                     missionNumber={100000035}
                     assetMentioned={imageUrl || ""}
-                    originatingStructure={3104}
+                    structureItemId={3104}
                 />
             </div>
         </div>

@@ -279,7 +279,7 @@ export function TelescopeSunspotDetector() {
                     anomalyType="sunspot"
                     missionNumber={100000032}
                     assetMentioned={imageUrl || ""}
-                    originatingStructure={3103}
+                    structureItemId={3103}
                 />
             </div>
         </div>

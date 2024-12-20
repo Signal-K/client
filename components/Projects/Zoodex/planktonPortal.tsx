@@ -118,7 +118,7 @@ export const PlanktonPortalTutorial: React.FC<ZoodexProps> = ({ anomalyId }) => 
                                 anomalyType="zoodex-planktonPortal"
                                 missionNumber={200000012}
                                 assetMentioned={imageUrl}
-                                originatingStructure={3104}
+                                structureItemId={3104}
                             />
                         </div>
                     </div>
@@ -251,7 +251,7 @@ export function PlanktonPortal() {
                     anomalyType="zoodex-planktonPortal"
                     missionNumber={200000012}
                     assetMentioned={imageUrl || ""}
-                    originatingStructure={3104}
+                    structureItemId={3104}
                 />
             </div>
         </div>

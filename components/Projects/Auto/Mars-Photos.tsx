@@ -155,7 +155,7 @@ export const RooverFromAppeears: React.FC = () => {
                                             anomalyType="roverImg"
                                             missionNumber={1370104}
                                             assetMentioned={rover.avatar_url}
-                                            originatingStructure={rover.id}
+                                            structureItemId={rover.id}
                                         />
                                     )}
                                 </div>
@@ -284,7 +284,7 @@ export const RoverPhoto: React.FC = () => {
                                     anomalyType="roverImg"
                                     missionNumber={13714101}
                                     assetMentioned={rover.avatar_url}
-                                    originatingStructure={rover.id}
+                                    // structureItemId={rover.id}
                                     structureItemId={3102}
                                 />
                             )}

@@ -264,7 +264,7 @@ export function PenguinWatch() {
                     anomalyType="zoodex-penguinWatch"
                     missionNumber={2000000102}
                     assetMentioned={imageUrl || ""}
-                    originatingStructure={3104}
+                    structureItemId={3104}
                 />
             </div>
         </div>
