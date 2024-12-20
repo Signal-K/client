@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import StarnetLayout from "@/components/Layout/Starnet";
 import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-component";
 import Greenhouse from "@/page.test";

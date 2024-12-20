@@ -12,6 +12,7 @@ const DailyMinorPlanetMissions = () => {
   const [missions, setMissions] = useState([
     {
       id: 1,
+      chapter: 1,
       title: "Make an asteroid classification",
       description: "Use your telescope to look for an asteroid candidate.",
       icon: TelescopeIcon,
@@ -24,6 +25,7 @@ const DailyMinorPlanetMissions = () => {
     },
     {
       id: 2,
+      chapter: 1,
       title: "Propose an asteroid candidate",
       description: "Make a classification indicating a positive asteroid candidate.",
       icon: RadioIcon,
@@ -36,6 +38,7 @@ const DailyMinorPlanetMissions = () => {
     },
     {
       id: 3,
+      chapter: 1,
       title: "Vote & comment on classifications",
       description:
         "Work with other players to rate proposed asteroid candidates and get rewards.",
@@ -49,6 +52,7 @@ const DailyMinorPlanetMissions = () => {
     },
     {
       id: 4,
+      chapter: 2,
       title: "Have an asteroid candidate confirmed",
       description:
         "When one of your proposals gets 5 upvotes by the community, it is considered a valid asteroid, and you can begin surveying it in Chapter 2.",
@@ -64,6 +68,12 @@ const DailyMinorPlanetMissions = () => {
 
   const [experiencePoints, setExperiencePoints] = useState(0);
   const [level, setLevel] = useState(1);
+  const [currentChapter, setCurrentChapter] = useState(1);
+
+  const maxUnlockedChapter = Math.max(
+    Math.floor(experiencePoints / 9) + 1, // Based on experience points
+    Math.max(...missions.map(mission => mission.chapter)) // Ensure higher chapters are unlocked if there are missions in them
+  );
 
   useEffect(() => {
     if (!session?.user) return;
@@ -157,17 +167,23 @@ const DailyMinorPlanetMissions = () => {
     fetchMissionData();
   }, [supabase, session?.user]);
 
+  const handlePreviousChapter = () => {
+    if (currentChapter > 1) setCurrentChapter(currentChapter - 1);
+  };
+
+  const handleNextChapter = () => {
+    if (currentChapter < maxUnlockedChapter) setCurrentChapter(currentChapter + 1);
+  };
+
   return (
     <MissionShell
-      missions={missions.map((mission) => ({
-        ...mission,
-        style: {
-          backgroundColor: mission.completedCount && mission.completedCount > 0 ? "#74859A" : "#74859A",
-        },
-      }))}
+      missions={missions.filter((mission) => mission.chapter === currentChapter)}
       experiencePoints={experiencePoints}
       level={level}
-      currentChapter={1}
+      currentChapter={currentChapter}
+      maxUnlockedChapter={maxUnlockedChapter}
+      onPreviousChapter={handlePreviousChapter}
+      onNextChapter={handleNextChapter}
     />
   );
 };

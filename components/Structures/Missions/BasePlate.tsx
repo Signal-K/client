@@ -13,16 +13,27 @@ interface MissionConfig {
   color: string;
   action: () => void;
   completedCount?: number;
-}
+};
 
 interface MissionShellProps {
   missions: MissionConfig[];
   experiencePoints: number;
   level: number;
   currentChapter: number;
-}
+  maxUnlockedChapter: number;
+  onPreviousChapter: () => void;
+  onNextChapter: () => void;
+};
 
-const MissionShell = ({ missions, experiencePoints, level, currentChapter }: MissionShellProps) => {
+const MissionShell = ({
+  missions,
+  experiencePoints,
+  level,
+  currentChapter,
+  maxUnlockedChapter,
+  onPreviousChapter,
+  onNextChapter,
+}: MissionShellProps) => {
   const [selectedMission, setSelectedMission] = useState<MissionConfig | null>(null);
 
   const renderMission = (mission: MissionConfig) => {
@@ -56,12 +67,26 @@ const MissionShell = ({ missions, experiencePoints, level, currentChapter }: Mis
     );
   };
 
+  // Calculate points needed for next chapter
+  const pointsForNextChapter = currentChapter * 9;
+
   return (
     <div className="flex flex-col items-center bg-[#1D2833] text-white rounded-2xl shadow-lg p-6 w-full max-w-4xl mx-auto">
       {!selectedMission && (
         <>
-          <div className="flex justify-between w-full mb-6">
+          <div className="flex justify-between items-center w-full mb-6">
             <h1 className="text-xl font-bold">Chapter {currentChapter}</h1>
+            <div className="flex space-x-4">
+              <Button onClick={onPreviousChapter} disabled={currentChapter === 1}>
+                Previous
+              </Button>
+              <Button
+                onClick={onNextChapter}
+                disabled={currentChapter === maxUnlockedChapter || experiencePoints < pointsForNextChapter}
+              >
+                Next
+              </Button>
+            </div>
           </div>
           <div className="flex-1 overflow-y-auto w-full">
             <div className="w-full bg-gray-700 rounded-full h-4 mb-6">

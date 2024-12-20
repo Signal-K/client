@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { TelescopeIcon, CheckIcon, RadioIcon, SpeakerIcon, PersonStandingIcon, DiscAlbum } from "lucide-react";
+import { TelescopeIcon, RadioIcon, SpeakerIcon, DiscAlbum, PersonStandingIcon } from "lucide-react";
 import PlanetTypeCommentForm from "./PlanetType";
-import MissionFour from "./VoteForm";
 import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
-import DiscoveriesPage from "@/content/Classifications/minimalDiscoveries";
 import VotePlanetClassifictions from "./PHVote";
 
 interface MissionStep {
@@ -15,7 +13,8 @@ interface MissionStep {
   action: () => void;
   completedCount: number;
   color: string;
-};
+  chapter: number;
+}
 
 const PlanetHuntersSteps = () => {
   const supabase = useSupabaseClient();
@@ -25,15 +24,15 @@ const PlanetHuntersSteps = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMission, setSelectedMission] = useState<MissionStep | null>(null);
   const [currentChapter, setCurrentChapter] = useState<number>(1);
-  const [experiencePoints, setExperiencePoints] = useState<number>(0); // Track total points
-  const [level, setLevel] = useState<number>(1); // Track level
+  const [experiencePoints, setExperiencePoints] = useState<number>(0);
+  const [level, setLevel] = useState<number>(1);
 
   const missionPoints = {
-    1: 2, // Mission 1 = 2 points
-    2: 1, // Mission 2 = 1 point
-    3: 2, // Mission 3 = 2 points
-    4: 1, // Mission 4 = 1 point
-    5: 1, // Mission 5 = 1 point
+    1: 2,
+    2: 1,
+    3: 2,
+    4: 1,
+    5: 1,
   };
 
   useEffect(() => {
@@ -41,7 +40,6 @@ const PlanetHuntersSteps = () => {
 
     const fetchMissionData = async () => {
       try {
-        // Fetch classifications data
         const { data: classificationsData, error: classificationsError } = await supabase
           .from("classifications")
           .select("*")
@@ -50,10 +48,8 @@ const PlanetHuntersSteps = () => {
 
         if (classificationsError) throw classificationsError;
 
-        // Mission 1: Count all classifications of type 'planet'
         const mission1CompletedCount = classificationsData?.length || 0;
 
-        // Mission 2: Filter classifications based on classificationConfiguration logic
         const mission2Data =
           classificationsData?.filter((classification) => {
             const config = classification.classificationConfiguration;
@@ -61,13 +57,12 @@ const PlanetHuntersSteps = () => {
 
             const options = config.classificationOptions?.[""] || {};
             return (
-              !options["1"] && // Ensure '1' is NOT selected
-              (options["2"] || options["3"] || options["4"]) // Ensure at least one of 2, 3, or 4 is selected
+              !options["1"] &&
+              (options["2"] || options["3"] || options["4"])
             );
           }) || [];
         const mission2CompletedCount = mission2Data.length;
 
-        // Fetch comments data
         const { data: commentsData, error: commentsError } = await supabase
           .from("comments")
           .select("*")
@@ -75,12 +70,10 @@ const PlanetHuntersSteps = () => {
 
         if (commentsError) throw commentsError;
 
-        // Mission 3: Comments with planet type proposals
         const mission3CompletedCount = commentsData?.filter(
           (comment) => comment.configuration?.planetType
         ).length || 0;
 
-        // Fetch votes data
         const { data: votesData, error: votesError } = await supabase
           .from("votes")
           .select("*")
@@ -88,7 +81,6 @@ const PlanetHuntersSteps = () => {
 
         if (votesError) throw votesError;
 
-        // Mission 4: Votes on planet classifications
         const planetVotes = votesData?.filter((vote) =>
           classificationsData?.some(
             (classification) =>
@@ -98,7 +90,6 @@ const PlanetHuntersSteps = () => {
         ) || [];
         const mission4CompletedCount = planetVotes.length;
 
-        // Mission 5: Comments linked to classifications
         const mission5CompletedCount = commentsData?.filter(
           (comment) =>
             comment.classification_id &&
@@ -109,7 +100,6 @@ const PlanetHuntersSteps = () => {
             )
         ).length || 0;
 
-        // Calculate total points and level
         const totalPoints = (
           mission1CompletedCount * missionPoints[1] +
           mission2CompletedCount * missionPoints[2] +
@@ -118,11 +108,10 @@ const PlanetHuntersSteps = () => {
           mission5CompletedCount * missionPoints[5]
         );
 
-        const newLevel = Math.floor(totalPoints / 9) + 1; // Every 8 points = level up
+        const newLevel = Math.floor(totalPoints / 9) + 1;
         setLevel(newLevel);
         setExperiencePoints(totalPoints);
 
-        // Update mission steps
         setSteps([
           {
             id: 1,
@@ -132,6 +121,7 @@ const PlanetHuntersSteps = () => {
             action: () => {},
             completedCount: mission1CompletedCount,
             color: "text-blue-500",
+            chapter: 1,
           },
           {
             id: 2,
@@ -141,6 +131,7 @@ const PlanetHuntersSteps = () => {
             action: () => {},
             completedCount: mission2CompletedCount,
             color: "text-purple-500",
+            chapter: 1,
           },
           {
             id: 3,
@@ -150,15 +141,27 @@ const PlanetHuntersSteps = () => {
             action: () => {},
             completedCount: mission3CompletedCount,
             color: "text-green-500",
+            chapter: 1,
           },
           {
-            id: 5,
+            id: 4,
             title: "Comment & vote on Planet Classifications",
             description: "Comment & vote on a planet classification.",
             icon: DiscAlbum,
             action: () => {},
-            completedCount: mission5CompletedCount,
+            completedCount: mission4CompletedCount,
             color: "text-red-500",
+            chapter: 1,
+          },
+          {
+            id: 5,
+            title: "Demo Mission for Chapter 3",
+            description: "This is a demo mission to simulate progress in chapter 3.",
+            icon: PersonStandingIcon,
+            action: () => {},
+            completedCount: 0,
+            color: "text-yellow-500",
+            chapter: 2,
           },
         ]);
 
@@ -189,36 +192,53 @@ const PlanetHuntersSteps = () => {
               {selectedMission.id === 1 && <StarterTelescopeTess />}
               {selectedMission.id === 2 && <StarterTelescopeTess />}
               {selectedMission.id === 3 && <PlanetTypeCommentForm />}
-              {selectedMission.id === 5 && <VotePlanetClassifictions />}
+              {selectedMission.id === 4 && <VotePlanetClassifictions />}
+              {selectedMission.id === 5 && <div>Demo Mission for Chapter 3</div>}
             </center>
           </div>
         </div>
       </div>
     );
-  };
+  }
+
+  const filteredSteps = steps.filter((step) => step.chapter === currentChapter);
+
+  const maxChapter = Math.max(...steps.map(step => step.chapter));
 
   return (
     <div className="flex flex-col items-center bg-[#1D2833]/90 width-[100%] text-white rounded-2xl p-6">
-      <div className="flex justify-between w-full mb-6">
-        <h1 className="text-xl font-bold">Chapter {currentChapter}</h1>
-      </div>
-
-      {/* Experience Bar */}
-      <div className="flex-1 overflow-y-auto w-full">
-        <div className="w-full bg-gray-700 rounded-full h-4 mb-6">
+      <div className="w-full mb-6">
+        <h1 className="text-xl font-bold mb-2">Chapter {currentChapter}</h1>
+        <div className="h-2 bg-gray-600 rounded-full w-full mb-4">
           <div
-            className="bg-[#5FCBC3] h-4 rounded-full"
-            style={{ width: `${(experiencePoints % 9) * 10.5}%` }}
-          ></div>
+            className="h-full bg-[#5FCBC3] rounded-full"
+            style={{ width: `${(experiencePoints / (maxChapter * 9)) * 100}%` }}
+          />
         </div>
+        <p className="text-sm text-center">{`Level ${level} - ${experiencePoints} XP`}</p>
       </div>
-      <p className="text-sm text-center mb-6">
-        Level {level} ({experiencePoints} points)
-      </p>
 
+      <div className="flex justify-between w-full mb-6">
+        <button
+          className="px-4 py-2 bg-gray-800 rounded-full"
+          onClick={() => setCurrentChapter(Math.max(currentChapter - 1, 1))}
+          disabled={currentChapter === 1}
+        >
+          Previous Chapter
+        </button>
+        <button
+          className="px-4 py-2 bg-gray-800 rounded-full"
+          onClick={() => setCurrentChapter(Math.min(currentChapter + 1, maxChapter))}
+          disabled={currentChapter === maxChapter}
+        >
+          Next Chapter
+        </button>
+      </div>
+
+      {/* Mission container with fixed size */}
       <div className="bg-gray-700 p-6 rounded-2xl w-full mb-6">
         <div className="grid grid-cols-2 gap-4 w-full">
-          {[steps[0], steps[1]].map((step) => (
+          {filteredSteps.slice(0, 2).map((step) => (
             <div
               key={step.id}
               className={`flex items-center p-6 rounded-2xl cursor-pointer ${
@@ -240,9 +260,9 @@ const PlanetHuntersSteps = () => {
         </div>
       </div>
 
-      {/* Mission 3 & Mission 4 below */}
+      {/* Remaining missions in the current chapter */}
       <div className="grid gap-4 w-full mt-6">
-        {[steps[2], steps[3]].map((step) => (
+        {filteredSteps.slice(2).map((step) => (
           <div
             key={step.id}
             className={`flex items-center p-6 rounded-2xl shadow-md cursor-pointer ${
