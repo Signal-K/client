@@ -30,6 +30,7 @@ import { ZoodexIguanas } from "@/components/Projects/Zoodex/iguanasFromAbove";
 import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters";
 import { useRouter } from 'next/router';
 import DailyMinorPlanetMissions from "@/components/Structures/Missions/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
+import CloudspottingOnMars from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudspottingOnMars";
 
 interface IndividualStructureProps {
     name?: string;
@@ -285,7 +286,7 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <CloudCogIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Search your clouds",
-          dynamicComponent: <StarterLidar />,
+          dynamicComponent: <CloudspottingOnMars />,
           sizePercentage: 60,
         },
         {

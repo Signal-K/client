@@ -28,7 +28,7 @@ export default function VoteDMPClassifications() {
             setError("User session not found.");
             setLoading(false);
             return;
-        }
+        };
 
         setLoading(true);
         setError(null);
@@ -45,15 +45,12 @@ export default function VoteDMPClassifications() {
                 const media = classification.media;
                 let images: string[] = [];
 
-                // Check if media is an array with at least 2 elements (array structure like [[], [...image URLs]])
                 if (Array.isArray(media) && media.length > 1) {
-                    // Extract the image URLs from the second element if it's an array of URLs
                     images = media[1] && Array.isArray(media[1]) ? media[1] : [];
                 } 
-                // Check if there's a single image URL (media is not an array but an object with uploadUrl)
                 else if (media && typeof media === "object" && media.uploadUrl) {
                     images.push(media.uploadUrl);
-                }
+                }''
 
                 const votes = classification.classificationConfiguration?.votes || 0;
 
@@ -66,7 +63,7 @@ export default function VoteDMPClassifications() {
             setError("Failed to load classifications.");
         } finally {
             setLoading(false);
-        }
+        }''
     };
 
     useEffect(() => {
@@ -100,7 +97,7 @@ export default function VoteDMPClassifications() {
             }
         } catch (error) {
             console.error("Error voting:", error);
-        }
+        };
     };
 
     return (

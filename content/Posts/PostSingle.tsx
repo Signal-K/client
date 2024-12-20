@@ -29,7 +29,7 @@ interface PostCardSingleProps {
   votes: number;
   category: string;
   tags?: string[];
-  classificationConfig?: any;
+  classificationConfig?: any; 
   images: string[];
   classificationType: string;
   onVote?: () => void;

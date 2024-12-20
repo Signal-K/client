@@ -120,8 +120,8 @@ const DailyMinorPlanetMissions = () => {
   const [currentChapter, setCurrentChapter] = useState(1);
 
   const maxUnlockedChapter = Math.max(
-    Math.floor(experiencePoints / 9) + 1, // Based on experience points
-    Math.max(...missions.map(mission => mission.chapter)) // Ensure higher chapters are unlocked if there are missions in them
+    Math.floor(experiencePoints / 9) + 1, 
+    Math.max(...missions.map(mission => mission.chapter)) 
   );
 
   useEffect(() => {

@@ -28,7 +28,7 @@ export default function VotePlanetClassifictions() {
         if (!session?.user) {
           setError("User session not found.");
           setLoading(false);
-          return; 
+          return;
         };
       
         setLoading(true);
@@ -37,8 +37,7 @@ export default function VotePlanetClassifictions() {
           const { data, error } = await supabase
             .from('classifications')
             .select('*')
-            // .eq('author', session.user.id)
-            .eq('classificationtype', 'planet')
+            .eq('classificationtype', 'cloud')
             .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
       
           if (error) throw error;
@@ -98,7 +97,7 @@ export default function VotePlanetClassifictions() {
           }
         } catch (error) {
           console.error("Error voting:", error);
-        }
+        };
     };
 
     return (
