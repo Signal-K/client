@@ -27,7 +27,7 @@ export function CommentForm({ classificationId, onCommentAdded }: CommentFormPro
     setError(null);
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase 
         .from("comments")
         .insert([
           {

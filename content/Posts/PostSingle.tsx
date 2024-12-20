@@ -1,12 +1,24 @@
-import { useEffect, useState, useRef } from "react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
+
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, MessageSquare, Share2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { ThumbsUp, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
-import { CommentForm } from "../Comments/CommentForm";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+
+interface CommentProps {
+  id: number;
+  author: string;
+  content: string;
+  created_at: string;
+  configuration?: {
+    planetType?: string;
+  };
+}
 
 interface PostCardSingleProps {
   classificationId: number;
@@ -21,6 +33,7 @@ interface PostCardSingleProps {
   images: string[];
   classificationType: string;
   onVote?: () => void;
+  enableNewCommentingMethod?: boolean;
   children?: React.ReactNode;
   commentStatus?: boolean;
 }
@@ -39,13 +52,15 @@ export function PostCardSingle({
   classificationType,
   commentStatus,
   onVote,
+  enableNewCommentingMethod = false,
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
-  const [comments, setComments] = useState<any[]>([]);
+  const session = useSession();
+  const [comments, setComments] = useState<CommentProps[]>([]);
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
   const [voteCount, setVoteCount] = useState(votes);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const [newComment, setNewComment] = useState<string>("");
+  const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
 
   useEffect(() => {
     fetchComments();
@@ -57,7 +72,8 @@ export function PostCardSingle({
       const { data, error } = await supabase
         .from("comments")
         .select("*")
-        .eq("classification_id", classificationId);
+        .eq("classification_id", classificationId)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setComments(data);
@@ -69,91 +85,89 @@ export function PostCardSingle({
   };
 
   const handleVoteClick = () => {
-    if (onVote) {
-      onVote();
-    }
-    setVoteCount((prevCount) => prevCount + 1);
+    if (onVote) onVote();
+    setVoteCount((prev) => prev + 1);
   };
 
-  const handleCommentAdded = () => {
-    fetchComments();
-  };
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
 
-  const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-  };
-
-  const handlePreviousImage = () => {
-    setCurrentImageIndex(
-      (prevIndex) => (prevIndex - 1 + images.length) % images.length
-    );
-  };
-
-  const handleShare = async () => {
-    if (!cardRef.current) return;
-  
     try {
-      // Ensure title is a valid string
-      const sanitizedTitle = title?.replace(/\s+/g, "_") || "Post_Title";
-  
-      // Create a canvas element
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
-  
-      if (!context) throw new Error("Canvas not supported");
-  
-      // Set canvas dimensions
-      const card = cardRef.current;
-      const { width, height } = card.getBoundingClientRect();
-      canvas.width = width;
-      canvas.height = height;
-  
-      // Render the DOM element
-      context.fillStyle = window.getComputedStyle(card).backgroundColor || "#fff";
-      context.fillRect(0, 0, width, height);
-  
-      // Draw text content
-      const drawText = (text: string, x: number, y: number, font: string, color: string) => {
-        context.font = font;
-        context.fillStyle = color;
-        context.fillText(text, x, y);
-      };
-  
-      drawText(sanitizedTitle, 20, 40, "20px Arial", "#000"); // Title
-      drawText(`by ${author}`, 20, 70, "16px Arial", "#555"); // Author
-      drawText(content, 20, 100, "14px Arial", "#333"); // Content
-  
-      // Optionally, render other elements like images, badges, etc.
-      if (images.length > 0) {
-        const img = new Image();
-        img.crossOrigin = "Anonymous"; // Add this line to handle CORS
-        img.src = images[currentImageIndex];
-  
-        await new Promise<void>((resolve, reject) => {
-          img.onload = () => {
-            context.drawImage(img, 20, 120, 200, 200); // Adjust image position and size
-            resolve();
-          };
-          img.onerror = reject; // Handle any errors with the image loading
-        });
-      }
-  
-      // Convert canvas to an image and download
-      const dataUrl = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.download = `${sanitizedTitle}.png`;
-      link.href = dataUrl;
-      link.click();
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: newComment,
+            classification_id: classificationId,
+            author: session?.user?.id,
+          },
+        ]);
+
+      if (error) throw error;
+
+      setNewComment("");
+      fetchComments();
     } catch (error) {
-      console.error("Error generating image:", error);
+      console.error("Error adding comment:", error);
     }
-  };  
+  };
+
+  const handleProposePlanetType = async (planetType: "Terrestrial" | "Gaseous") => {
+    const commentInput = commentInputs[classificationId];
+    if (!commentInput) {
+      console.error("Comment input is required");
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: commentInput,
+            classification_id: classificationId,
+            author: session?.user?.id,
+            configuration: { planetType },
+          },
+        ]);
+      if (error) throw error;
+      setCommentInputs((prev) => ({ ...prev, [classificationId]: "" }));
+      fetchComments();
+    } catch (error) {
+      console.error("Error inserting comment:", error);
+    }
+  };
+
+  const handleSelectPreferredComment = async (commentId: number) => {
+    const selectedComment = comments.find((comment) => comment.id === commentId);
+    if (!selectedComment) return;
+
+    const planetType = selectedComment.configuration?.planetType;
+    if (!planetType) return;
+
+    try {
+      const { error } = await supabase
+        .from("classifications")
+        .update({
+          classificationConfiguration: {
+            ...classificationConfig,
+            classificationOptions: {
+              ...classificationConfig?.classificationOptions,
+              planetType: [...(classificationConfig?.classificationOptions?.planetType || []), planetType],
+            },
+          },
+        })
+        .eq("id", classificationId);
+
+      if (error) throw error;
+
+      console.log("Preferred planet type updated:", planetType);
+    } catch (error) {
+      console.error("Error updating preferred comment:", error);
+    };
+  };
 
   return (
-    <Card
-      ref={cardRef}
-      className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary"
-    >
+    <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
       <CardHeader>
         <div className="flex items-center space-x-4">
           <Avatar>
@@ -167,44 +181,11 @@ export function PostCardSingle({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="mb-4">
-          <Badge variant="secondary" className="mr-2">{category}</Badge>
-        </div>
+        <Badge variant="secondary">{category}</Badge>
         <p>{content}</p>
-
         {images.length > 0 && (
-          <div className="relative w-full">
-            <img
-              src={images[currentImageIndex]}
-              alt={`Media ${currentImageIndex + 1}`}
-              className="w-full h-auto object-contain"
-            />
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={handlePreviousImage}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 p-2 bg-gray-600 rounded-full"
-                >
-                  ❮
-                </button>
-                <button
-                  onClick={handleNextImage}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 p-2 bg-gray-600 rounded-full"
-                >
-                  ❯
-                </button>
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                  {images.map((_, index) => (
-                    <span
-                      key={index}
-                      className={`h-2 w-2 rounded-full ${
-                        index === currentImageIndex ? "bg-blue-500" : "bg-gray-300"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
+          <div>
+            <img src={images[0]} alt="Post Image" />
           </div>
         )}
       </CardContent>
@@ -215,30 +196,79 @@ export function PostCardSingle({
         <Button size="sm">
           <MessageSquare className="mr-2" /> {comments.length}
         </Button>
-        <Button onClick={handleShare} size="sm" variant="outline">
-          <Share2 className="mr-2" /> Share
-        </Button>
       </CardFooter>
       {commentStatus !== false && (
-        <>
-          <CardContent>
-            {loadingComments ? (
-              <p>Loading comments...</p>
-            ) : comments.length > 0 ? (
-              comments.map((comment) => (
-                <CommentCard key={comment.id} {...comment} />
-              ))
-            ) : (
-              <p>No comments yet.</p>
+        <CardContent>
+          {enableNewCommentingMethod ? (
+            <div className="space-y-4">
+              <Textarea
+                value={commentInputs[classificationId] || ""}
+                onChange={(e) =>
+                  setCommentInputs((prev) => ({ ...prev, [classificationId]: e.target.value }))
+                }
+                placeholder="Propose a planet type..."
+                rows={3}
+                className="w-full"
+              />
+              <div className="flex space-x-2">
+                <Button onClick={() => handleProposePlanetType("Terrestrial")}>
+                  Propose Terrestrial
+                </Button>
+                <Button onClick={() => handleProposePlanetType("Gaseous")}>
+                  Propose Gaseous
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <Textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Add your comment..."
+                rows={3}
+                className="w-full"
+              />
+              <Button onClick={handleAddComment} className="w-full">
+                Submit Comment
+              </Button>
+            </div>
+          )}
+<div className="mt-4 space-y-2">
+  {loadingComments ? (
+    <p>Loading comments...</p>
+  ) : comments.length > 0 ? (
+    comments.map((comment) => (
+      <CommentCard
+        key={comment.id}
+        author={comment.author}
+        content={comment.content}
+        createdAt={comment.created_at}
+        replyCount={0}
+        parentCommentId={classificationId}
+      >
+        {enableNewCommentingMethod && (
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-gray-600">
+              {comment.configuration?.planetType || "Unknown"}
+            </p>
+            {author === session?.user?.id && (
+              <button
+                onClick={() => handleSelectPreferredComment(comment.id)}
+                className="text-blue-500 mt-2"
+              >
+                Mark as Preferred
+              </button>
             )}
-          </CardContent>
-          <CardFooter>
-            <CommentForm
-              classificationId={classificationId}
-              onCommentAdded={handleCommentAdded}
-            />
-          </CardFooter>
-        </>
+          </div>
+        )}
+      </CommentCard>
+    ))
+  ) : (
+    <p>No comments yet. Be the first to comment!</p>
+  )}
+</div>
+
+        </CardContent>
       )}
     </Card>
   );
