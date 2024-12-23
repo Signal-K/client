@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import StarnetLayout from "@/components/Layout/Starnet";
 import DailyMinorPlanetMissions from "@/components/Structures/Missions/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
 import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
+import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 // import { TopographicMap } from "@/components/topographic-map";
 
 export default function TestPage() {
@@ -12,6 +13,7 @@ export default function TestPage() {
           <>
           <DailyMinorPlanetMissions />
           <TotalPoints />
+          <PlanetGenerator />
               {/* <Greenhouse /> */}
               {/* <MiningComponent /> */}
           </>

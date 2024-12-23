@@ -1,18 +1,13 @@
 'use client'
 
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import { PlanetMesh } from './planet-mesh'
-import type { PlanetStats } from '../utils/planet-physics'
+import type { PlanetStats } from '@/utils/planet-physics'
 
 interface PlanetSceneProps {
   stats: PlanetStats
-}
-
-function Scene({ stats }: { stats: PlanetStats }) {
-  const { camera } = useThree()
-  return <PlanetMesh stats={stats} camera={camera} />
-}
+};
 
 export function PlanetScene({ stats }: PlanetSceneProps) {
   return (
@@ -20,7 +15,7 @@ export function PlanetScene({ stats }: PlanetSceneProps) {
       <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
-        <Scene stats={stats} />
+        <PlanetMesh stats={stats} />
         <Stars radius={300} depth={50} count={5000} factor={4} />
         <OrbitControls 
           enableZoom={false}
@@ -30,6 +25,5 @@ export function PlanetScene({ stats }: PlanetSceneProps) {
         />
       </Canvas>
     </div>
-  )
-}
-
+  );
+};

@@ -1,5 +1,5 @@
 import { Sun, Thermometer, Droplets } from 'lucide-react'
-import { Planet } from '../types/greenhouse'
+import { Planet } from '@/types/greenhouse'
 
 interface PlanetInfoProps {
   planet: Planet;

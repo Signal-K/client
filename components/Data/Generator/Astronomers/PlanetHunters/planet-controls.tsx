@@ -2,7 +2,7 @@ import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import type { PlanetStats } from "../utils/planet-physics"
+import type { PlanetStats } from "@/utils/planet-physics"
 
 interface PlanetControlsProps {
   stats: PlanetStats
