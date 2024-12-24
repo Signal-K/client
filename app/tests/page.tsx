@@ -13,7 +13,6 @@ export default function TestPage() {
           <>
           <DailyMinorPlanetMissions />
           <TotalPoints />
-          <PlanetGenerator />
               {/* <Greenhouse /> */}
               {/* <MiningComponent /> */}
           </>
