@@ -67,77 +67,74 @@ const MissionShell = ({
     );
   };
 
-  // Calculate points needed for next chapter
   const pointsForNextChapter = currentChapter * 9;
 
   return (
-<div className="flex flex-col items-center bg-[#1D2833] text-white rounded-2xl shadow-lg p-6 w-full max-w-4xl mx-auto">
-  {!selectedMission && (
-    <>
-      <div className="flex justify-between items-center w-full mb-6">
-        <h1 className="text-xl font-bold">Chapter {currentChapter}</h1>
-        <div className="flex space-x-4">
-          <Button onClick={onPreviousChapter} disabled={currentChapter === 1}>
-            Previous
-          </Button>
-          <Button
-            onClick={onNextChapter}
-            disabled={currentChapter === maxUnlockedChapter || experiencePoints < pointsForNextChapter}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-      <div className="flex-1 overflow-y-auto w-full">
-        <div className="w-full bg-gray-700 rounded-full h-4 mb-6">
-          <div
-            className="bg-[#5FCBC3] h-4 rounded-full"
-            style={{ width: `${(experiencePoints % 9) * 10.5}%` }}
-          ></div>
-        </div>
-      </div>
-      <p className="text-sm text-center mb-6">
-        Level {level} ({experiencePoints} points)
-      </p>
-      {/* Chapter 1: First two missions in a row, the rest in a column */}
-      {currentChapter === 1 ? (
+    <div className="flex flex-col items-center bg-[#1D2833] text-white rounded-2xl shadow-lg p-6 w-full max-w-4xl mx-auto">
+      {!selectedMission && (
         <>
-          <div className="bg-gray-700 p-6 rounded-2xl w-full mb-6">
-            <div className="grid grid-cols-2 gap-4 w-full">
-              {missions.slice(0, 2).map((mission) => renderMission(mission))}
+          <div className="flex justify-between items-center w-full mb-6">
+            <h1 className="text-xl font-bold">Chapter {currentChapter}</h1>
+            <div className="flex space-x-4">
+              <Button onClick={onPreviousChapter} disabled={currentChapter === 1}>
+                Previous
+              </Button>
+              <Button
+                onClick={onNextChapter}
+                disabled={currentChapter === maxUnlockedChapter || experiencePoints < pointsForNextChapter}
+              >
+                Next
+              </Button>
             </div>
           </div>
-          <div className="grid gap-4 w-full mt-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-            {missions.slice(2).map((mission) => renderMission(mission))}
+          <div className="flex-1 overflow-y-auto w-full">
+            <div className="w-full bg-gray-700 rounded-full h-4 mb-6">
+              <div
+                className="bg-[#5FCBC3] h-4 rounded-full"
+                style={{ width: `${(experiencePoints % 9) * 10.5}%` }}
+              ></div>
+            </div>
           </div>
+          <p className="text-sm text-center mb-6">
+            Level {level} ({experiencePoints} points)
+          </p>
+          {currentChapter === 1 ? (
+            <>
+              <div className="bg-gray-700 p-6 rounded-2xl w-full mb-6">
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  {missions.slice(0, 2).map((mission) => renderMission(mission))}
+                </div>
+              </div>
+              <div className="grid gap-4 w-full mt-6 overflow-y-auto max-h-[calc(100vh-200px)]">
+                {missions.slice(2).map((mission) => renderMission(mission))}
+              </div>
+            </>
+          ) : (
+            <div className="grid gap-4 w-full mt-6 overflow-y-auto max-h-[calc(100vh-200px)]">
+              {missions.map((mission) => renderMission(mission))}
+            </div>
+          )}
         </>
-      ) : (
-        // For other chapters, all missions in a single column
-        <div className="grid gap-4 w-full mt-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-          {missions.map((mission) => renderMission(mission))}
-        </div>
       )}
-    </>
-  )}
-  <AnimatePresence>
-    {selectedMission && (
-      <motion.div
-        className="flex flex-col bg-[#1D2833]"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <div className="flex justify-between items-center p-4">
-          <h3 className="text-xl font-semibold">{selectedMission.title}</h3>
-          <Button onClick={() => setSelectedMission(null)}>Back</Button>
-        </div>
-        <div className="flex-1 overflow-auto">
-          {selectedMission.internalComponent && <selectedMission.internalComponent />}
-        </div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-</div>
+      <AnimatePresence>
+        {selectedMission && (
+          <motion.div
+            className="flex flex-col bg-[#1D2833]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="flex justify-between items-center p-4">
+              <h3 className="text-xl font-semibold">{selectedMission.title}</h3>
+              <Button onClick={() => setSelectedMission(null)}>Back</Button>
+            </div>
+            <div className="flex-1 overflow-auto">
+              {selectedMission.internalComponent && <selectedMission.internalComponent />}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
