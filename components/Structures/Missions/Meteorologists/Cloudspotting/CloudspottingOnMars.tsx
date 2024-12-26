@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../BasePlate";
-import { CloudCogIcon, FolderCog, Vote } from "lucide-react";
+import { CloudCogIcon, FolderCog, PaintBucket, Vote } from "lucide-react";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import VoteCoMClassifications from "./CoMVote";
+import CloudClassificationGenerator from "./CloudMaker";
 
 interface Mission {
     id: number;
@@ -75,13 +76,27 @@ const CloudspottingOnMars = () => {
                 shadow: false,
                 action: () => [],
             },
+            {
+                id: 4,
+                chapter: 2,
+                title: "Create a cloud representation",
+                description:
+                    "You can now add a visual representation of the cloud to your original classification",
+                icon: PaintBucket,
+                points: 1,
+                completedCount: 0,
+                internalComponent: () => <CloudClassificationGenerator />,
+                color: 'text-green-300',
+                shadow: false,
+                action: () => [],
+            },
         ];
     };
 
     useEffect(() => {
         if (!session) {
             return;
-        }
+        };
     
         const fetchMissionPoints = async (
             session: any,

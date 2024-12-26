@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { TelescopeIcon, RadioIcon, SpeakerIcon, DiscAlbum, PersonStandingIcon } from "lucide-react";
+import { TelescopeIcon, RadioIcon, SpeakerIcon, DiscAlbum, PersonStandingIcon, Paintbrush2 } from "lucide-react";
 import PlanetTypeCommentForm from "./PlanetType";
 import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
 import VotePlanetClassifictions from "./PHVote";
+import PHClassificationGenerator from "./PlanetMaker";
 
 interface MissionStep {
   id: number;
@@ -155,9 +156,9 @@ const PlanetHuntersSteps = () => {
           },
           {
             id: 5,
-            title: "Demo Mission for Chapter 3",
-            description: "This is a demo mission to simulate progress in chapter 3.",
-            icon: PersonStandingIcon,
+            title: "Make your own planet design",
+            description: "You're now able to start creating visual representations of your discoveries. These will become more advanced and accurate the more data you discover",
+            icon: Paintbrush2,
             action: () => {},
             completedCount: 0,
             color: "text-yellow-500",
@@ -193,7 +194,7 @@ const PlanetHuntersSteps = () => {
               {selectedMission.id === 2 && <StarterTelescopeTess />}
               {selectedMission.id === 3 && <PlanetTypeCommentForm />}
               {selectedMission.id === 4 && <VotePlanetClassifictions />}
-              {selectedMission.id === 5 && <div>Demo Mission for Chapter 3</div>}
+              {selectedMission.id === 5 && <PHClassificationGenerator />}
             </center>
           </div>
         </div>

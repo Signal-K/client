@@ -1,9 +1,8 @@
-'use client';
+"use client";
 
 import React, { useEffect, useState } from "react";
-import { PostCardSingle } from "@/content/Posts/PostSingle";
+import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import StarnetLayout from "@/components/Layout/Starnet";
 
 interface Classification {
     id: number;
@@ -16,7 +15,7 @@ interface Classification {
     classificationConfiguration: any | null; 
 };
 
-export default function VotePlanetClassifictions() {
+export default function CloudClassificationGenerator() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -37,6 +36,7 @@ export default function VotePlanetClassifictions() {
           const { data, error } = await supabase
             .from('classifications')
             .select('*')
+            .eq("author", session.user.id)
             .eq('classificationtype', 'cloud')
             .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
       
@@ -70,61 +70,30 @@ export default function VotePlanetClassifictions() {
         fetchClassifications();
     }, [session]);
 
-    const handleVote = async (classificationId: number, currentConfig: any) => {
-        try {
-          const currentVotes = currentConfig?.votes || 0;
-    
-          const updatedConfig = {
-            ...currentConfig,
-            votes: currentVotes + 1,
-          };
-    
-          const { error } = await supabase
-            .from("classifications")
-            .update({ classificationConfiguration: updatedConfig })
-            .eq("id", classificationId);
-    
-          if (error) {
-            console.error("Error updating classificationConfiguration:", error);
-          } else {
-            setClassifications((prevClassifications) =>
-              prevClassifications.map((classification) =>
-                classification.id === classificationId
-                  ? { ...classification, votes: updatedConfig.votes }
-                  : classification
-              )
-            );
-          }
-        } catch (error) {
-          console.error("Error voting:", error);
-        };
-    };
-
     return (
-          <div className="space-y-8">
+        <div className="space-y-8">
             {loading ? (
-              <p>Loading classifications...</p>
+                <p>Loading classifications</p>
             ) : error ? (
-              <p>{error}</p>
+                <p>{error}</p>
             ) : (
-              classifications.map((classification) => (
-                <PostCardSingle
-                  key={classification.id}
-                  classificationId={classification.id}
-                  title={classification.title}
-                  author={classification.author}
-                  content={classification.content}
-                  votes={classification.votes || 0}
-                  category={classification.category}
-                  tags={classification.tags || []}
-                  images={classification.images || []}
-                  anomalyId={classification.anomaly}
-                  classificationConfig={classification.classificationConfiguration}
-                  classificationType={classification.classificationtype}
-                  onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
-                />
-              ))
+                classifications.map((classification) => (
+                    <PostCardSingleWithGenerator
+                    key={classification.id}
+                    classificationId={classification.id}
+                    title={classification.title}
+                    author={classification.author}
+                    content={classification.content}
+                    votes={classification.votes || 0}
+                    category={classification.category}
+                    tags={classification.tags || []}
+                    images={classification.images || []}
+                    anomalyId={classification.anomaly}
+                    classificationConfig={classification.classificationConfiguration}
+                    classificationType={classification.classificationtype}
+                    />
+                ))
             )}
-          </div>
+        </div>
     );
 };
