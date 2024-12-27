@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
-import { Plus, Trash2 } from 'lucide-react'
+import { Textarea } from "@/components/ui/textarea"
+import { Plus, Trash2, Copy, ClipboardPasteIcon as Paste } from 'lucide-react'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 type CloudShape = 'arch' | 'loop' | 'wisp'
 type Cloud = {
@@ -11,14 +13,19 @@ type Cloud = {
   altitude: number
   shape: CloudShape
   offset: number
-}
+};
+
+interface CloudSignalProps {
+  classificationConfig?: any;
+  classificationId: string;
+};
 
 // Cloud color ranges
 const COLOR_RANGES = {
   low: { r: 255, g: 255, b: 255 },    // White
   mid: { r: 135, g: 206, b: 235 },    // Sky Blue
   high: { r: 255, g: 253, b: 150 }    // Light Yellow
-}
+};
 
 const generateCloudPath = (shape: CloudShape, width: number, height: number, offset: number = 0) => {
   const points: [number, number][] = []
@@ -99,12 +106,20 @@ const getCloudColor = (altitude: number, shape: CloudShape) => {
   return `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`
 }
 
-export default function CloudSignal() {
-  const [clouds, setClouds] = useState<Cloud[]>([])
+export default function CloudSignal({ classificationConfig, classificationId }: CloudSignalProps) {
+  const supabase = useSupabaseClient();
+
+  // From sb
+  const initialClouds = classificationConfig?.cloudData || [];
+  const [exporting, setExporting] = useState<boolean>(false);
+
+  const [clouds, setClouds] = useState<Cloud[]>(initialClouds);
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const cloudVisRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>()
   const [time, setTime] = useState(0)
+  const [exportedConfig, setExportedConfig] = useState('')
+  const [importConfig, setImportConfig] = useState(JSON.stringify(initialClouds));
 
   const addCloud = () => {
     if (clouds.length >= 4) return
@@ -113,17 +128,87 @@ export default function CloudSignal() {
       altitude: 65,
       shape: 'arch',
       offset: 0
-    }])
-  }
+    }]);
+  };
+
+  useEffect(() => {
+    if (classificationConfig?.cloudConfiguration) {
+      setClouds(classificationConfig.cloudConfiguration);
+    }
+  }, [classificationConfig]);  
 
   const removeCloud = (id: string) => {
     setClouds(prev => prev.filter(cloud => cloud.id !== id))
-  }
+  };
 
   const updateCloud = (id: string, updates: Partial<Cloud>) => {
     setClouds(prev => prev.map(cloud => 
       cloud.id === id ? { ...cloud, ...updates } : cloud
-    ))
+    ));
+  };
+
+  const handleExport = async () => {
+    if (!classificationId) {
+      console.error("Classification ID is missing.");
+      return;
+    }
+    setExporting(true);
+  
+    try {
+      const { data, error } = await supabase
+        .from("classifications")
+        .select("classificationConfiguration")
+        .eq("id", classificationId)
+        .single();
+  
+      if (error) throw error;
+  
+      const currentConfig = data?.classificationConfiguration || {};
+      const newCloudConfig = {
+        cloudData: clouds, // Use clouds as the new cloud configuration
+      };
+  
+      const updatedConfig = { ...currentConfig, ...newCloudConfig };
+  
+      const { error: updateError } = await supabase
+        .from("classifications")
+        .update({ classificationConfiguration: updatedConfig })
+        .eq("id", classificationId);
+  
+      if (updateError) throw updateError;
+  
+      alert("Cloud configuration exported successfully!");
+    } catch (err) {
+      console.error("Error exporting cloud configuration:", err);
+      alert("Failed to export cloud configuration.");
+    } finally {
+      setExporting(false);
+    }
+  };  
+
+  const exportConfiguration = () => {
+    const config = JSON.stringify(clouds, null, 2)
+    setExportedConfig(config)
+  };
+
+  const importConfiguration = () => {
+    try {
+      const importedClouds = JSON.parse(importConfig)
+      if (Array.isArray(importedClouds) && importedClouds.every(cloud => 
+        typeof cloud.id === 'string' &&
+        typeof cloud.altitude === 'number' &&
+        typeof cloud.shape === 'string' &&
+        typeof cloud.offset === 'number'
+      )) {
+        setClouds(importedClouds)
+        setImportConfig('')
+      } else {
+        throw new Error('Invalid cloud configuration')
+      }
+    } catch (error) {
+      console.error('Failed to import configuration:', error)
+      alert('Failed to import configuration. Please check the format and try again.')
+    }
   }
 
   useEffect(() => {
@@ -322,12 +407,52 @@ export default function CloudSignal() {
                 onClick={() => removeCloud(cloud.id)}
               >
                 <Trash2 className="w-4 h-4" />
-              </Button> 
+              </Button>
             </div>
           ))}
         </div>
+
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Export Configuration</h3>
+            <div className="flex space-x-2">
+              <Textarea
+                value={exportedConfig}
+                readOnly
+                className="flex-grow"
+                placeholder="Click 'Export' to see the configuration here"
+              />
+              <Button onClick={exportConfiguration} variant="outline">
+                <Copy className="w-4 h-4 mr-2" />
+                Export
+              </Button>
+              <button
+        onClick={handleExport}
+        disabled={exporting}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+      >
+        {exporting ? "Saving..." : "Save"}
+      </button>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Import Configuration</h3>
+            <div className="flex space-x-2">
+              <Textarea
+                value={importConfig}
+                onChange={(e) => setImportConfig(e.target.value)}
+                className="flex-grow"
+                placeholder="Paste configuration here"
+              />
+              <Button onClick={importConfiguration} variant="outline">
+                <Paste className="w-4 h-4 mr-2" />
+                Import
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </Card>
-  )
-}
-
+  );
+};

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import CloudSignal from "./CloudSignal";
 
 interface Classification {
     id: number;
@@ -18,82 +19,82 @@ interface Classification {
 export default function CloudClassificationGenerator() {
     const supabase = useSupabaseClient();
     const session = useSession();
-
+  
     const [classifications, setClassifications] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
+  
     const fetchClassifications = async () => {
-        if (!session?.user) {
-          setError("User session not found.");
-          setLoading(false);
-          return;
-        };
-      
-        setLoading(true);
-        setError(null);
-        try {
-          const { data, error } = await supabase
-            .from('classifications')
-            .select('*')
-            .eq("author", session.user.id)
-            .eq('classificationtype', 'cloud')
-            .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
-      
-          if (error) throw error;
-      
-          const processedData = data.map((classification) => {
-            const media = classification.media;
-            let images: string[] = [];
-      
-            if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
-              images.push(media[1]);
-            } else if (media && media.uploadUrl) {
-              images.push(media.uploadUrl);
-            }
-      
-            const votes = classification.classificationConfiguration?.votes || 0;
-      
-            return { ...classification, images, votes };
-          });
-      
-          setClassifications(processedData);
-        } catch (error) {
-          console.error("Error fetching classifications:", error);
-          setError("Failed to load classifications.");
-        } finally {
-          setLoading(false);
-        };
-    };  
-
+      if (!session?.user) {
+        setError('User session not found.');
+        setLoading(false);
+        return;
+      }
+  
+      setLoading(true);
+      setError(null);
+      try {
+        const { data, error } = await supabase
+          .from('classifications')
+          .select('*')
+          .eq('author', session.user.id)
+          .eq('classificationtype', 'cloud')
+          .order('created_at', { ascending: false });
+  
+        if (error) throw error;
+  
+        const processedData = data.map((classification) => {
+          const media = classification.media;
+          let images: string[] = [];
+  
+          if (Array.isArray(media) && media.length === 2 && typeof media[1] === 'string') {
+            images.push(media[1]);
+          } else if (media && media.uploadUrl) {
+            images.push(media.uploadUrl);
+          }
+  
+          const votes = classification.classificationConfiguration?.votes || 0;
+  
+          return { ...classification, images, votes };
+        });
+  
+        setClassifications(processedData);
+      } catch (error) {
+        console.error('Error fetching classifications:', error);
+        setError('Failed to load classifications.');
+      } finally {
+        setLoading(false);
+      }
+    };
+  
     useEffect(() => {
-        fetchClassifications();
+      fetchClassifications();
     }, [session]);
-
+  
     return (
-        <div className="space-y-8">
-            {loading ? (
-                <p>Loading classifications</p>
-            ) : error ? (
-                <p>{error}</p>
-            ) : (
-                classifications.map((classification) => (
-                    <PostCardSingleWithGenerator
-                    key={classification.id}
-                    classificationId={classification.id}
-                    title={classification.title}
-                    author={classification.author}
-                    content={classification.content}
-                    votes={classification.votes || 0}
-                    category={classification.category}
-                    tags={classification.tags || []}
-                    images={classification.images || []}
-                    anomalyId={classification.anomaly}
-                    classificationConfig={classification.classificationConfiguration}
-                    classificationType={classification.classificationtype}
-                    />
-                ))
-            )}
-        </div>
+      <div className="space-y-8">
+        {loading ? (
+          <p>Loading classifications</p>
+        ) : error ? (
+          <p>{error}</p>
+        ) : (
+          classifications.map((classification) => (
+            <PostCardSingleWithGenerator
+              key={classification.id}
+              classificationId={classification.id}
+              title={classification.title}
+              author={classification.author}
+              content={classification.content}
+              votes={classification.votes || 0}
+              category={classification.category}
+              tags={classification.tags || []}
+              images={classification.images || []}
+              anomalyId={classification.anomaly}
+              classificationConfig={classification.classificationConfiguration}
+              classificationType={classification.classificationtype}
+            />
+          ))
+        )}
+      </div>
     );
-};
+  }  

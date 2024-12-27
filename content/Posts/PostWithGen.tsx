@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
 
 import CloudSignal from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudSignal";
@@ -17,7 +17,7 @@ interface CommentProps {
   author: string;
   content: string;
   created_at: string;
-};
+}
 
 interface PostCardSingleProps {
   classificationId: number;
@@ -32,9 +32,8 @@ interface PostCardSingleProps {
   images: string[];
   classificationType: string;
   onVote?: () => void;
-  children?: React.ReactNode;
   commentStatus?: boolean;
-};
+}
 
 export function PostCardSingleWithGenerator({
   classificationId,
@@ -75,7 +74,7 @@ export function PostCardSingleWithGenerator({
       console.error("Error fetching comments:", error);
     } finally {
       setLoadingComments(false);
-    };
+    }
   };
 
   const handleVoteClick = () => {
@@ -86,9 +85,12 @@ export function PostCardSingleWithGenerator({
   const renderDynamicComponent = () => {
     switch (classificationType) {
       case "cloud":
-        return <CloudSignal />;
-        case "planet":
-            return <PlanetGenerator />;
+        return <CloudSignal
+            classificationConfig={classificationConfig}
+            classificationId={String(classificationId)}
+        />
+      case "planet":
+        return <PlanetGenerator />;
       default:
         return (
           <div>
@@ -110,7 +112,7 @@ export function PostCardSingleWithGenerator({
             )}
           </div>
         );
-    };
+    }
   };
 
   return (

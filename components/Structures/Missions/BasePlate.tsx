@@ -13,7 +13,7 @@ interface MissionConfig {
   color: string;
   action: () => void;
   completedCount?: number;
-};
+}
 
 interface MissionShellProps {
   missions: MissionConfig[];
@@ -23,7 +23,7 @@ interface MissionShellProps {
   maxUnlockedChapter: number;
   onPreviousChapter: () => void;
   onNextChapter: () => void;
-};
+}
 
 const MissionShell = ({
   missions,
@@ -87,13 +87,11 @@ const MissionShell = ({
               </Button>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto w-full">
-            <div className="w-full bg-gray-700 rounded-full h-4 mb-6">
-              <div
-                className="bg-[#5FCBC3] h-4 rounded-full"
-                style={{ width: `${(experiencePoints % 9) * 10.5}%` }}
-              ></div>
-            </div>
+          <div className="w-full bg-gray-700 rounded-full h-4 mb-6">
+            <div
+              className="bg-[#5FCBC3] h-4 rounded-full"
+              style={{ width: `${(experiencePoints % 9) * 10.5}%` }}
+            ></div>
           </div>
           <p className="text-sm text-center mb-6">
             Level {level} ({experiencePoints} points)
@@ -119,16 +117,16 @@ const MissionShell = ({
       <AnimatePresence>
         {selectedMission && (
           <motion.div
-            className="flex flex-col bg-[#1D2833]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            className="flex flex-col bg-[#1D2833] rounded-2xl p-6 w-full max-w-4xl mx-auto"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
           >
-            <div className="flex justify-between items-center p-4">
+            <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold">{selectedMission.title}</h3>
               <Button onClick={() => setSelectedMission(null)}>Back</Button>
             </div>
-            <div className="flex-1 overflow-auto">
+            <div className="flex-1 overflow-y-auto max-h-[calc(100vh-150px)]">
               {selectedMission.internalComponent && <selectedMission.internalComponent />}
             </div>
           </motion.div>
