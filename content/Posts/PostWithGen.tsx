@@ -17,7 +17,7 @@ interface CommentProps {
   author: string;
   content: string;
   created_at: string;
-}
+};
 
 interface PostCardSingleProps {
   classificationId: number;
@@ -33,7 +33,7 @@ interface PostCardSingleProps {
   classificationType: string;
   onVote?: () => void;
   commentStatus?: boolean;
-}
+};
 
 export function PostCardSingleWithGenerator({
   classificationId,
@@ -86,11 +86,15 @@ export function PostCardSingleWithGenerator({
     switch (classificationType) {
       case "cloud":
         return <CloudSignal
-            classificationConfig={classificationConfig}
-            classificationId={String(classificationId)}
+          classificationConfig={classificationConfig}
+          classificationId={String(classificationId)} 
         />
       case "planet":
-        return <PlanetGenerator />;
+        return <PlanetGenerator
+          classificationId={String(classificationId)} 
+          classificationConfig={classificationConfig}
+          author={author}
+        />;
       default:
         return (
           <div>

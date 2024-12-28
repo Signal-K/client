@@ -79,18 +79,18 @@ export default function PHClassificationGenerator() {
             ) : (
                 classifications.map((classification) => (
                     <PostCardSingleWithGenerator
-                    key={classification.id}
-                    classificationId={classification.id}
-                    title={classification.title}
-                    author={classification.author}
-                    content={classification.content}
-                    votes={classification.votes || 0}
-                    category={classification.category}
-                    tags={classification.tags || []}
-                    images={classification.images || []}
-                    anomalyId={classification.anomaly}
-                    classificationConfig={classification.classificationConfiguration}
-                    classificationType={classification.classificationtype}
+                      key={classification.id}
+                      classificationId={classification.id}
+                      title={classification.title}
+                      author={classification.author}
+                      content={classification.content}
+                      votes={classification.votes || 0}
+                      category={classification.category}
+                      tags={classification.tags || []}
+                      images={classification.images || []}
+                      anomalyId={classification.anomaly}
+                      classificationConfig={classification.classificationConfiguration}
+                      classificationType={classification.classificationtype}
                     />
                 ))
             )}

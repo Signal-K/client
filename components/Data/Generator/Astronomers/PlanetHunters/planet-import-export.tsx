@@ -1,38 +1,48 @@
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { PlanetStats } from '@/utils/planet-physics'
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { PlanetStats } from '@/utils/planet-physics';
 
 interface PlanetImportExportProps {
-  stats: PlanetStats
-  onImport: (importedStats: Partial<PlanetStats>) => void
+  stats: PlanetStats;
+  onImport: (importedStats: Partial<PlanetStats>) => void;
+  onSave: (updatedConfig: any) => void;
 }
 
-export function PlanetImportExport({ stats, onImport }: PlanetImportExportProps) {
-  const [importExportText, setImportExportText] = useState('')
+export function PlanetImportExport({ stats, onImport, onSave }: PlanetImportExportProps) {
+  const [importExportText, setImportExportText] = useState('');
 
   const handleExport = () => {
-    const exportText = `radius: ${stats.radius.toFixed(2)}
-mass: ${stats.mass.toFixed(2)}`
-    setImportExportText(exportText)
-  }
+    const exportText = `radius: ${stats.radius.toFixed(2)}\nmass: ${stats.mass.toFixed(2)}`;
+    setImportExportText(exportText);
+  };
 
   const handleImport = () => {
-    const lines = importExportText.split('\n')
-    const importedStats: Partial<PlanetStats> = {}
+    const lines = importExportText.split('\n');
+    const importedStats: Partial<PlanetStats> = {};
 
     lines.forEach(line => {
-      const [key, value] = line.split(':').map(part => part.trim())
+      const [key, value] = line.split(':').map(part => part.trim());
       if (key === 'radius' || key === 'mass') {
-        importedStats[key] = parseFloat(value)
+        importedStats[key] = parseFloat(value);
       }
-    })
+    });
 
     if (Object.keys(importedStats).length > 0) {
-      onImport(importedStats)
+      onImport(importedStats);
     }
-  }
+  };
+
+  const handleSave = () => {
+    const updatedConfig = {
+      exportedValue: {
+        radius: stats.radius,
+        mass: stats.mass,
+      },
+    };
+    onSave(updatedConfig);
+  };
 
   return (
     <Card className="w-80">
@@ -49,9 +59,9 @@ mass: ${stats.mass.toFixed(2)}`
         <div className="flex justify-between">
           <Button onClick={handleExport}>Export</Button>
           <Button onClick={handleImport}>Import</Button>
+          <Button onClick={handleSave}>Save</Button>
         </div>
       </CardContent>
     </Card>
-  )
-}
-
+  );
+};

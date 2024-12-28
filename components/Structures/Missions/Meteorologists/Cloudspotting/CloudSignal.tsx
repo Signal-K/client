@@ -50,7 +50,7 @@ const generateCloudPath = (shape: CloudShape, width: number, height: number, off
   }
   
   return points
-}
+};
 
 const drawFluffyCloud = (
   ctx: CanvasRenderingContext2D,
@@ -86,7 +86,7 @@ const drawFluffyCloud = (
   ctx.fill()
   
   ctx.restore()
-}
+};
 
 const getCloudColor = (altitude: number, shape: CloudShape) => {
   const normalizedAltitude = (altitude - 50) / 30 // 0 to 1
@@ -104,7 +104,7 @@ const getCloudColor = (altitude: number, shape: CloudShape) => {
   const opacity = shape === 'wisp' ? 0.7 : 0.9
   
   return `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`
-}
+};
 
 export default function CloudSignal({ classificationConfig, classificationId }: CloudSignalProps) {
   const supabase = useSupabaseClient();
