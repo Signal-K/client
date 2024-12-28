@@ -2,19 +2,16 @@
 
 import React, { useState } from "react";
 import StarnetLayout from "@/components/Layout/Starnet";
-import DailyMinorPlanetMissions from "@/components/Structures/Missions/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
-import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
-import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
 // import { TopographicMap } from "@/components/topographic-map";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
-          <DailyMinorPlanetMissions />
-          <TotalPoints />
               {/* <Greenhouse /> */}
               {/* <MiningComponent /> */}
+              <FreeformUploadData />
           </>
         // {/* </StarnetLayout> */}
     );
