@@ -2,8 +2,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { MessageSquare } from "lucide-react";
 
 interface CommentCardProps {
   author: string;
@@ -11,8 +9,9 @@ interface CommentCardProps {
   createdAt: string;
   replyCount: number;
   parentCommentId?: number | null;
+  children?: React.ReactNode;
 };
- 
+  
 export function CommentCard({ author, content, createdAt, replyCount, parentCommentId }: CommentCardProps) {
   return (
     <Card className="w-full max-w-2xl mx-auto my-4 squiggly-connector bg-card text-card-foreground border-primary">

@@ -336,7 +336,7 @@ export function TelescopeDiskDetector() {
             anomalyType="DiskDetective"
             missionNumber={100000033}
             assetMentioned={imageUrl || ""}
-            originatingStructure={3103}
+            structureItemId={3103}
           />
         </div>
       ) : (

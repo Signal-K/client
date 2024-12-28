@@ -1,25 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import StarnetLayout from "@/components/Layout/Starnet";
-import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-component";
-import Greenhouse from "@/page.test";
-import BigMap from "@/components/(scenes)/planetScene/bigMap";
-import DiscoveriesPage from "@/content/Classifications/minimalDiscoveries";
-import UserMissions from "./missionsUnlocked";
-import SimpleeMissionGuide from "./singleMissionGuide";
+import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
 // import { TopographicMap } from "@/components/topographic-map";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
-          <UserMissions />
-          <SimpleeMissionGuide />
               {/* <Greenhouse /> */}
-              {/* <BigMap /> */}
-              {/* <DiscoveriesPage /> */}
               {/* <MiningComponent /> */}
+              <FreeformUploadData />
           </>
         // {/* </StarnetLayout> */}
     );

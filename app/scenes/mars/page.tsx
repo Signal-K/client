@@ -11,7 +11,6 @@ import { InventoryStructureItem } from "@/types/Items";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-component";
-import StructureMissionGuide from "@/components/Layout/Guide";
  
 const MarsView: React.FC = () => {
     const supabase = useSupabaseClient();
@@ -57,7 +56,6 @@ const MarsStructures: React.FC = () => {
     return (
         <MarsActionSceneLayout>
             <MiningComponentComponent />
-            <StructureMissionGuide />
         </MarsActionSceneLayout>
         // <EarthViewLayout>
         //     <div className="w-full">

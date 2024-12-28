@@ -287,7 +287,7 @@ export function ZoodexIguanas() {
           anomalyType="zoodex-iguanasFromAbove"
           missionNumber={100000036}
           assetMentioned={imageUrl || ''}
-          originatingStructure={3104}
+          structureItemId={3104}
         />
       </div>
     </div>

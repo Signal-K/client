@@ -216,7 +216,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
     className={`p-4 rounded-3xl text-white mx-auto 
       w-[90%] h-[90%] max-w-full max-h-[95%] fixed top-1/2 left-1/2 
       transform -translate-x-1/2 -translate-y-1/2 
-      overflow-hidden bg-[#1D2833]/90`}
+      overflow-y-auto bg-[#1D2833]/90`}
   >
     <DialogTitle></DialogTitle>
     <div className="relative flex flex-col items-center justify-center h-full">

@@ -19,7 +19,7 @@ interface Classification {
     classificationOptions: { [key: string]: any };
   };
   image_url?: string;
-}
+};
 
 const PlanetTypeCommentForm = () => {
   const supabase = useSupabaseClient();
@@ -212,10 +212,11 @@ const PlanetTypeCommentForm = () => {
                   .filter((comment) => comment.classification_id === classification.id)
                   .map((comment) => (
                     <div key={comment.id} className="bg-gray-100 p-4 rounded-md shadow-sm">
+                      <p className="text-black">Posted by: {comment.author.id?.substring(0, 8)}...</p>
                       <p className="text-black">{comment.content}</p>
                       <div className="flex justify-between items-center">
                         <p className="text-xs text-gray-600">
-                          {comment.configuration?.planetType || "Unknown"}
+                          Proposed planet type: {comment.configuration?.planetType || "Unknown"}
                         </p>
                         {classification.author === session?.user?.id && (
                           <button

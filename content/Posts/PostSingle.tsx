@@ -1,25 +1,24 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { ThumbsUp, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
-import { CommentForm } from "../Comments/CommentForm";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
-import {
-  planetClassificationOptions,
-  roverImgClassificationOptions,
-  cloudClassificationOptionsOne,
-  cloudClassificationOptionsTwo,
-  cloudClassificationOptionsThree,
-  zoodexBurrowingOwlClassificationOptions,
-  zoodexIguanasFromAboveClassificationOptions,
-  diskDetectorClassificationOptions,
-  DailyMinorPlanetOptions,
-  automatonaiForMarsOptions,
-} from "../Classifications/Options";
+interface CommentProps {
+  id: number;
+  author: string;
+  content: string;
+  created_at: string;
+  configuration?: {
+    planetType?: string;
+  };
+}
 
 interface PostCardSingleProps {
   classificationId: number;
@@ -30,10 +29,11 @@ interface PostCardSingleProps {
   votes: number;
   category: string;
   tags?: string[];
-  classificationConfig?: any;
+  classificationConfig?: any; 
   images: string[];
   classificationType: string;
   onVote?: () => void;
+  enableNewCommentingMethod?: boolean;
   children?: React.ReactNode;
   commentStatus?: boolean;
 }
@@ -52,11 +52,15 @@ export function PostCardSingle({
   classificationType,
   commentStatus,
   onVote,
+  enableNewCommentingMethod = false,
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
-  const [comments, setComments] = useState<any[]>([]);
+  const session = useSession();
+  const [comments, setComments] = useState<CommentProps[]>([]);
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
   const [voteCount, setVoteCount] = useState(votes);
+  const [newComment, setNewComment] = useState<string>("");
+  const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
 
   useEffect(() => {
     fetchComments();
@@ -68,7 +72,8 @@ export function PostCardSingle({
       const { data, error } = await supabase
         .from("comments")
         .select("*")
-        .eq("classification_id", classificationId);
+        .eq("classification_id", classificationId)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setComments(data);
@@ -80,67 +85,85 @@ export function PostCardSingle({
   };
 
   const handleVoteClick = () => {
-    if (onVote) {
-      onVote();
+    if (onVote) onVote();
+    setVoteCount((prev) => prev + 1);
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: newComment,
+            classification_id: classificationId,
+            author: session?.user?.id,
+          },
+        ]);
+
+      if (error) throw error;
+
+      setNewComment("");
+      fetchComments();
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
+
+  const handleProposePlanetType = async (planetType: "Terrestrial" | "Gaseous") => {
+    const commentInput = commentInputs[classificationId];
+    if (!commentInput) {
+      console.error("Comment input is required");
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: commentInput,
+            classification_id: classificationId,
+            author: session?.user?.id,
+            configuration: { planetType },
+          },
+        ]);
+      if (error) throw error;
+      setCommentInputs((prev) => ({ ...prev, [classificationId]: "" }));
+      fetchComments();
+    } catch (error) {
+      console.error("Error inserting comment:", error);
+    }
+  };
+
+  const handleSelectPreferredComment = async (commentId: number) => {
+    const selectedComment = comments.find((comment) => comment.id === commentId);
+    if (!selectedComment) return;
+
+    const planetType = selectedComment.configuration?.planetType;
+    if (!planetType) return;
+
+    try {
+      const { error } = await supabase
+        .from("classifications")
+        .update({
+          classificationConfiguration: {
+            ...classificationConfig,
+            classificationOptions: {
+              ...classificationConfig?.classificationOptions,
+              planetType: [...(classificationConfig?.classificationOptions?.planetType || []), planetType],
+            },
+          },
+        })
+        .eq("id", classificationId);
+
+      if (error) throw error;
+
+      console.log("Preferred planet type updated:", planetType);
+    } catch (error) {
+      console.error("Error updating preferred comment:", error);
     };
-    setVoteCount((prevCount) => prevCount + 1);
-  };
-
-  const handleCommentAdded = () => {
-    fetchComments();
-  };
-
-  const getClassificationOptions = () => {
-    switch (classificationType) {
-      case "planet":
-        return planetClassificationOptions;
-      case "roverImg":
-        return roverImgClassificationOptions;
-      case "cloud":
-        return [
-          ...cloudClassificationOptionsOne,
-          ...cloudClassificationOptionsTwo,
-          ...cloudClassificationOptionsThree,
-        ];
-      case "zoodex-burrowingOwl":
-        return zoodexBurrowingOwlClassificationOptions;
-      case "zoodex-iguanasFromAbove":
-        return zoodexIguanasFromAboveClassificationOptions;
-      case "DiskDetective":
-        return diskDetectorClassificationOptions;
-      case "telescope-minorPlanet":
-        return DailyMinorPlanetOptions;
-      case "automaton-aiForMars":
-        return automatonaiForMarsOptions;
-      default:
-        return [];
-    }
-  };
-
-  const renderClassificationOptions = () => {
-    if (!classificationConfig?.classificationOptions) {
-      return null;
-    }
-
-    const selectedOptions = classificationConfig.classificationOptions || {};
-    const options = getClassificationOptions();
-
-    return (
-      <div className="mt-4 p-4 border border-secondary rounded">
-        <h3 className="text-lg font-bold">Classification Options</h3>
-        <ul className="list-none">
-          {options.map((option) => {
-            const isSelected = selectedOptions[option.id] || false;
-            const optionColor = isSelected ? "bg-green-200" : "bg-red-200";
-            return (
-              <li key={option.id} className={`p-2 rounded ${optionColor}`}>
-                {option.text}
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    );
   };
 
   return (
@@ -158,24 +181,13 @@ export function PostCardSingle({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="mb-4">
-          <Badge variant="secondary" className="mr-2">{category}</Badge>
-          {/* {tags.map((tag, index) => (
-            <Badge key={index} variant="outline" className="mr-2">{tag}</Badge>
-          ))} */}
-        </div>
+        <Badge variant="secondary">{category}</Badge>
         <p>{content}</p>
-        <div className="flex flex-wrap gap-2 mt-4">
-          {images.map((image, index) => (
-            <img
-              key={index}
-              src={image}
-              alt={`Media ${index + 1}`}
-              className="w-full h-auto max-w-xs object-cover"
-            />
-          ))}
-        </div>
-        {/* {classificationConfig && renderClassificationOptions()} */}
+        {images.length > 0 && (
+          <div>
+            <img src={images[0]} alt="Post Image" />
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex items-center justify-between">
         <Button onClick={handleVoteClick} size="sm">
@@ -186,25 +198,77 @@ export function PostCardSingle({
         </Button>
       </CardFooter>
       {commentStatus !== false && (
-        <>
-          <CardContent>
-            {loadingComments ? (
-              <p>Loading comments...</p>
-            ) : comments.length > 0 ? (
-              comments.map((comment) => (
-                <CommentCard key={comment.id} {...comment} />
-              ))
-            ) : (
-              <p>No comments yet.</p>
+        <CardContent>
+          {enableNewCommentingMethod ? (
+            <div className="space-y-4">
+              <Textarea
+                value={commentInputs[classificationId] || ""}
+                onChange={(e) =>
+                  setCommentInputs((prev) => ({ ...prev, [classificationId]: e.target.value }))
+                }
+                placeholder="Propose a planet type..."
+                rows={3}
+                className="w-full"
+              />
+              <div className="flex space-x-2">
+                <Button onClick={() => handleProposePlanetType("Terrestrial")}>
+                  Propose Terrestrial
+                </Button>
+                <Button onClick={() => handleProposePlanetType("Gaseous")}>
+                  Propose Gaseous
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <Textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Add your comment..."
+                rows={3}
+                className="w-full"
+              />
+              <Button onClick={handleAddComment} className="w-full">
+                Submit Comment
+              </Button>
+            </div>
+          )}
+<div className="mt-4 space-y-2">
+  {loadingComments ? (
+    <p>Loading comments...</p>
+  ) : comments.length > 0 ? (
+    comments.map((comment) => (
+      <CommentCard
+        key={comment.id}
+        author={comment.author}
+        content={comment.content}
+        createdAt={comment.created_at}
+        replyCount={0}
+        parentCommentId={classificationId}
+      >
+        {enableNewCommentingMethod && (
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-gray-600">
+              {comment.configuration?.planetType || "Unknown"}
+            </p>
+            {author === session?.user?.id && (
+              <button
+                onClick={() => handleSelectPreferredComment(comment.id)}
+                className="text-blue-500 mt-2"
+              >
+                Mark as Preferred
+              </button>
             )}
-          </CardContent>
-          <CardFooter>
-            <CommentForm
-              classificationId={classificationId}
-              onCommentAdded={handleCommentAdded}
-            />
-          </CardFooter>
-        </>
+          </div>
+        )}
+      </CommentCard>
+    ))
+  ) : (
+    <p>No comments yet. Be the first to comment!</p>
+  )}
+</div>
+
+        </CardContent>
       )}
     </Card>
   );

@@ -2,14 +2,12 @@
 
 import React from "react";
 import { EarthActionSceneLayout, EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
-import StructureMissionGuide from "@/components/Layout/Guide";
 import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-component";
 
 export default function Mining() {
   return (
     <EarthActionSceneLayout>
         <MiningComponentComponent />
-        <StructureMissionGuide />
     </EarthActionSceneLayout>
   ); 
 };

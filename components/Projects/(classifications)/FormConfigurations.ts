@@ -18,7 +18,7 @@ export interface ClassificationFormProps {
   anomalyId: string;
   missionNumber: number;
   assetMentioned: string | string[];
-  originatingStructure?: number;
+  // structureItemId?: number;
   structureItemId?: number;
 };
 
