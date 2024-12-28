@@ -11,6 +11,7 @@ import { CommentCard } from "../Comments/CommentSingle";
 
 import CloudSignal from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudSignal";
 import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+import AsteroidViewer from "@/components/Data/Generator/Astronomers/DailyMinorPlanet/asteroid-viewer";
 
 interface CommentProps {
   id: number;
@@ -94,6 +95,11 @@ export function PostCardSingleWithGenerator({
           classificationId={String(classificationId)} 
           classificationConfig={classificationConfig}
           author={author}
+        />;
+      case "telescope-minorPlanet":
+        return <AsteroidViewer 
+          classificationId={String(classificationId)} 
+          classificationConfig={classificationConfig}
         />;
       default:
         return (

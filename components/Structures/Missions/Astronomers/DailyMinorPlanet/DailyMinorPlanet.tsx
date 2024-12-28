@@ -4,6 +4,7 @@ import { BarChartBigIcon, GlassWater, Guitar, PenBoxIcon, RadioIcon, SpeechIcon,
 import MissionShell from "../../BasePlate";
 import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
 import VoteDMPClassifications from "./DMPVote";
+import DMPGenerator from "./AsteroidMaker";
 
 const DailyMinorPlanetMissions = () => {
   const supabase = useSupabaseClient();
@@ -73,7 +74,7 @@ const DailyMinorPlanetMissions = () => {
       icon: Guitar,
       points: 2,
       completedCount: 0,
-      // internalComponent: () => <div></div>,
+      internalComponent: () => <div><DMPGenerator /></div>,
       color: 'text-green-300',
       shadow: true,
       action: () => {},

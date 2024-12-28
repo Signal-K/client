@@ -1843,16 +1843,9 @@
   dependencies:
     "@radix-ui/react-compose-refs" "1.1.0"
 
-"@radix-ui/react-slot@1.1.1":
+"@radix-ui/react-slot@1.1.1", "@radix-ui/react-slot@^1.1.1":
   version "1.1.1"
   resolved "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.1.1.tgz"
-  integrity sha512-RApLLOcINYJA+dMVbOju7MYv1Mb2EBp2nH4HdDzXTSyaR5optlm6Otrz1euW3HbdOR8UmmFK06TD+A9frYWv+g==
-  dependencies:
-    "@radix-ui/react-compose-refs" "1.1.1"
-
-"@radix-ui/react-slot@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@radix-ui/react-slot/-/react-slot-1.1.1.tgz#ab9a0ffae4027db7dc2af503c223c978706affc3"
   integrity sha512-RApLLOcINYJA+dMVbOju7MYv1Mb2EBp2nH4HdDzXTSyaR5optlm6Otrz1euW3HbdOR8UmmFK06TD+A9frYWv+g==
   dependencies:
     "@radix-ui/react-compose-refs" "1.1.1"
@@ -2193,10 +2186,10 @@
     suspend-react "^0.1.3"
     zustand "^3.7.1"
 
-"@react-three/postprocessing@^2.16.3":
-  version "2.16.3"
-  resolved "https://registry.yarnpkg.com/@react-three/postprocessing/-/postprocessing-2.16.3.tgz#91bad6a541db7573f3100f1c7edf67d22c66413e"
-  integrity sha512-ftodXpUsy0/mzn0KqyV7MBau71dD9C5UOFnB3kHhCLNoxjKYQWZa9do0olJTSkl3owYXRfNHcLriK1Xn8wxZJw==
+"@react-three/postprocessing@^2.16.5":
+  version "2.16.5"
+  resolved "https://registry.yarnpkg.com/@react-three/postprocessing/-/postprocessing-2.16.5.tgz#861db992b8781e54f97b79dee48f84942817cdf5"
+  integrity sha512-LcZy25bSz1g9n/QgSRUfgESXnAUDDDeQBI6FJ9DZsxCBukbgxjT9BHexVIu9JJ3G8SkRi8I68Ii+zytP51D9dg==
   dependencies:
     buffer "^6.0.3"
     maath "^0.6.0"
