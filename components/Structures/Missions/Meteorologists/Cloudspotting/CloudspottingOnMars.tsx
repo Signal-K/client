@@ -16,9 +16,7 @@ interface Mission {
     completedCount: number;
     internalComponent: React.ElementType | (() => JSX.Element);
     color: string;
-    shadow: boolean;
-    action: () => void;
-}
+};
 
 interface MissionPoints {
     [key: number]: number;
@@ -46,8 +44,6 @@ const CloudspottingOnMars = () => {
                 completedCount: 0,
                 internalComponent: () => <StarterLidar />,
                 color: "text-blue-500",
-                shadow: false,
-                action: () => {},
             },
             {
                 id: 2,
@@ -59,8 +55,6 @@ const CloudspottingOnMars = () => {
                 completedCount: 0,
                 internalComponent: () => <StarterLidar />,
                 color: "text-cyan-300",
-                shadow: false,
-                action: () => {},
             },
             {
                 id: 3,
@@ -73,8 +67,6 @@ const CloudspottingOnMars = () => {
                 completedCount: 0,
                 internalComponent: () => <VoteCoMClassifications />,
                 color: "text-green-700",
-                shadow: false,
-                action: () => [],
             },
             {
                 id: 4,
@@ -87,8 +79,6 @@ const CloudspottingOnMars = () => {
                 completedCount: 0,
                 internalComponent: () => <CloudClassificationGenerator />,
                 color: 'text-green-300',
-                shadow: false,
-                action: () => [],
             },
         ];
     };
@@ -101,13 +91,11 @@ const CloudspottingOnMars = () => {
         const fetchMissionPoints = async (
             session: any,
             supabase: any
-        ): Promise<MissionPoints> => {
-            const userId = session.user.id;
-    
+        ): Promise<MissionPoints> => {    
             const { data: classifications } = await supabase
                 .from("classifications")
                 .select("id, classificationtype, classificationConfiguration")
-                .eq("author", userId)
+                .eq("author", session.user.id)
                 .eq("classificationtype", "cloud");
     
             const mission1Points = classifications?.length || 0;
@@ -121,7 +109,7 @@ const CloudspottingOnMars = () => {
             const { data: comments } = await supabase
                 .from("comments")
                 .select("id, classification_id")
-                .eq("author", userId);
+                .eq("author", session.user.id);
     
             const classificationIds = classifications?.map((c: any) => c.id) || [];
             const mission3Points = comments?.filter((comment: any) =>

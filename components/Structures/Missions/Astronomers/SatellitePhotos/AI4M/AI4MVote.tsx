@@ -16,7 +16,7 @@ interface Classification {
     classificationConfiguration: any | null; 
 };
 
-export default function VoteCoMClassifications() {
+export default function VoteAI4MClassifications() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -37,7 +37,7 @@ export default function VoteCoMClassifications() {
           const { data, error } = await supabase
             .from('classifications')
             .select('*')
-            .eq('classificationtype', 'cloud')
+            .eq('classificationtype', 'automaton-aiForMars')
             .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
       
           if (error) throw error;

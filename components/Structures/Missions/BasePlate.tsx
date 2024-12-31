@@ -11,9 +11,9 @@ interface MissionConfig {
   points: number;
   internalComponent?: React.ElementType;
   color: string;
-  action: () => void;
+  action?: () => void;
   completedCount?: number;
-}
+};
 
 interface MissionShellProps {
   missions: MissionConfig[];
@@ -23,7 +23,7 @@ interface MissionShellProps {
   maxUnlockedChapter: number;
   onPreviousChapter: () => void;
   onNextChapter: () => void;
-}
+};
 
 const MissionShell = ({
   missions,
