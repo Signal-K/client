@@ -7,17 +7,20 @@ import { ImageUploader } from './ImageUploader';
 import { DrawingCanvas } from './DrawingCanvas';
 import { DrawingControls } from './DrawingControls';
 import { downloadAnnotatedImage } from './DrawingUtils';
-import type { Point, Line } from '@/types/Annotation';
+import type { Point, Line, Shape, DrawingMode } from '@/types/Annotation';
 import { useToast } from "@/hooks/toast";
 
 export function ImageAnnotator() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentLine, setCurrentLine] = useState<Line>({ points: [], color: '#ff0000', width: 2 });
+  const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [lines, setLines] = useState<Line[]>([]);
+  const [shapes, setShapes] = useState<Shape[]>([]);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [strokeColor, setStrokeColor] = useState('#ff0000');
   const [strokeWidth, setStrokeWidth] = useState(2);
+  const [drawingMode, setDrawingMode] = useState<DrawingMode>('freehand');
   const [isDownloading, setIsDownloading] = useState(false);
   
   const svgRef = useRef<SVGSVGElement>(null);
@@ -28,7 +31,9 @@ export function ImageAnnotator() {
     const url = URL.createObjectURL(file);
     setImageUrl(url);
     setLines([]);
+    setShapes([]);
     setCurrentLine({ points: [], color: strokeColor, width: strokeWidth });
+    setCurrentShape(null);
   };
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -41,27 +46,52 @@ export function ImageAnnotator() {
 
   const handleMouseDown = (point: Point) => {
     setIsDrawing(true);
-    setCurrentLine({
-      points: [point],
-      color: strokeColor,
-      width: strokeWidth
-    });
+    if (drawingMode === 'freehand') {
+      setCurrentLine({
+        points: [point],
+        color: strokeColor,
+        width: strokeWidth
+      });
+    } else {
+      setCurrentShape({
+        type: drawingMode,
+        startPoint: point,
+        endPoint: point,
+        color: strokeColor,
+        width: strokeWidth
+      });
+    }
   };
 
   const handleMouseMove = (point: Point) => {
-    if (isDrawing) {
+    if (!isDrawing) return;
+    
+    if (drawingMode === 'freehand') {
       setCurrentLine(prev => ({
         ...prev,
         points: [...prev.points, point]
+      }));
+    } else if (currentShape) {
+      setCurrentShape(prev => ({
+        ...prev!,
+        endPoint: point
       }));
     }
   };
 
   const handleMouseUp = () => {
-    if (isDrawing && currentLine.points.length > 0) {
-      setLines(prev => [...prev, currentLine]);
-      setCurrentLine({ points: [], color: strokeColor, width: strokeWidth });
+    if (!isDrawing) return;
+
+    if (drawingMode === 'freehand') {
+      if (currentLine.points.length > 0) {
+        setLines(prev => [...prev, currentLine]);
+        setCurrentLine({ points: [], color: strokeColor, width: strokeWidth });
+      }
+    } else if (currentShape) {
+      setShapes(prev => [...prev, currentShape]);
+      setCurrentShape(null);
     }
+    
     setIsDrawing(false);
   };
 
@@ -114,8 +144,10 @@ export function ImageAnnotator() {
           <DrawingControls
             strokeColor={strokeColor}
             strokeWidth={strokeWidth}
+            drawingMode={drawingMode}
             onColorChange={setStrokeColor}
             onWidthChange={setStrokeWidth}
+            onModeChange={setDrawingMode}
           />
           <div className="relative border rounded-lg overflow-hidden">
             <img
@@ -130,7 +162,10 @@ export function ImageAnnotator() {
               ref={svgRef}
               isDrawing={isDrawing}
               currentLine={currentLine}
+              currentShape={currentShape}
               lines={lines}
+              shapes={shapes}
+              drawingMode={drawingMode}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}

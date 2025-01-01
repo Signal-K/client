@@ -1,13 +1,17 @@
 "use client";
 
 import { forwardRef } from 'react';
-import type { Point, Line } from '@/types/Annotation';
+import type { Point, Line, Shape, DrawingMode } from '@/types/Annotation';
 import { createLineGenerator, getMousePosition } from './DrawingUtils';
+import { createShapePath } from '@/types/Annotation/Shapes';
 
 interface DrawingCanvasProps {
   isDrawing: boolean;
   currentLine: Line;
+  currentShape: Shape | null;
   lines: Line[];
+  shapes: Shape[];
+  drawingMode: DrawingMode;
   onMouseDown: (point: Point) => void;
   onMouseMove: (point: Point) => void;
   onMouseUp: () => void;
@@ -18,7 +22,10 @@ interface DrawingCanvasProps {
 export const DrawingCanvas = forwardRef<SVGSVGElement, DrawingCanvasProps>(({
   isDrawing,
   currentLine,
+  currentShape,
   lines,
+  shapes,
+  drawingMode,
   onMouseDown,
   onMouseMove,
   onMouseUp,
@@ -53,9 +60,10 @@ export const DrawingCanvas = forwardRef<SVGSVGElement, DrawingCanvasProps>(({
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseUp}
     >
+      {/* Completed lines */}
       {lines.map((line, i) => (
         <path
-          key={i}
+          key={`line-${i}`}
           d={lineGenerator(line.points) || ''}
           fill="none"
           stroke={line.color}
@@ -63,12 +71,37 @@ export const DrawingCanvas = forwardRef<SVGSVGElement, DrawingCanvasProps>(({
           vectorEffect="non-scaling-stroke"
         />
       ))}
+      
+      {/* Current line */}
       {currentLine.points.length > 0 && (
         <path
           d={lineGenerator(currentLine.points) || ''}
           fill="none"
           stroke={currentLine.color}
           strokeWidth={currentLine.width}
+          vectorEffect="non-scaling-stroke"
+        />
+      )}
+
+      {/* Completed shapes */}
+      {shapes.map((shape, i) => (
+        <path
+          key={`shape-${i}`}
+          d={createShapePath(shape)}
+          fill="none"
+          stroke={shape.color}
+          strokeWidth={shape.width}
+          vectorEffect="non-scaling-stroke"
+        />
+      ))}
+
+      {/* Current shape */}
+      {currentShape && (
+        <path
+          d={createShapePath(currentShape)}
+          fill="none"
+          stroke={currentShape.color}
+          strokeWidth={currentShape.width}
           vectorEffect="non-scaling-stroke"
         />
       )}
