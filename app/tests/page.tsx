@@ -1,9 +1,7 @@
 "use client";
 
+import { ImageAnnotator } from "@/components/Projects/(classifications)/Annotating/Annotator";
 import React, { useState } from "react";
-import StarnetLayout from "@/components/Layout/Starnet";
-import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
-// import { TopographicMap } from "@/components/topographic-map";
 
 export default function TestPage() {
     return (
@@ -11,7 +9,15 @@ export default function TestPage() {
           <>
               {/* <Greenhouse /> */}
               {/* <MiningComponent /> */}
-              <FreeformUploadData />
+              <main className="container mx-auto py-8">
+      <div className="flex flex-col items-center gap-6">
+        <h1 className="text-3xl font-bold">Image Annotator</h1>
+        <p className="text-muted-foreground text-center max-w-2xl">
+          Upload an image and use the pen tool to draw annotations. When you&apos;re done, download the annotated image.
+        </p>
+        <ImageAnnotator />
+      </div>
+    </main>
           </>
         // {/* </StarnetLayout> */}
     );

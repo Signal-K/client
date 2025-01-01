@@ -6,7 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
-import ImageAnnotation from "../(classifications)/Annotation";
+// import ImageAnnotation from "../(classifications)/Annotation";
 import * as markerjs2 from "markerjs2";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
