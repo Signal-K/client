@@ -50,9 +50,7 @@ export const getMousePosition = (
 };
 
 export const downloadAnnotatedImage = async (
-  svgElement: SVGSVGElement,
-  imageElement: HTMLImageElement
-): Promise<void> => {
+svgElement: SVGSVGElement, imageElement: HTMLImageElement, p0: { returnBlob: boolean; }): Promise<void> => {
   // Create canvas with the correct dimensions
   const canvas = document.createElement('canvas');
   const width = imageElement.naturalWidth;

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Upload } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { ImageUploader } from './ImageUploader';
 import { DrawingCanvas } from './DrawingCanvas';
 import { DrawingControls } from './DrawingControls';
@@ -10,8 +10,8 @@ import { downloadAnnotatedImage } from './DrawingUtils';
 import type { Point, Line, Shape, DrawingMode } from '@/types/Annotation';
 import { useToast } from "@/hooks/toast";
 
-export function ImageAnnotator() {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+export function ImageAnnotator({ initialImageUrl }: { initialImageUrl?: string }) {
+  const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl || null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentLine, setCurrentLine] = useState<Line>({ points: [], color: '#ff0000', width: 2 });
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
@@ -104,10 +104,10 @@ export function ImageAnnotator() {
       });
       return;
     }
-
+  
     setIsDownloading(true);
     try {
-      await downloadAnnotatedImage(svgRef.current, imageRef.current);
+      await downloadAnnotatedImage(svgRef.current, imageRef.current, { returnBlob: true });
       toast({
         title: "Success",
         description: "Image downloaded successfully",
@@ -121,13 +121,16 @@ export function ImageAnnotator() {
     } finally {
       setIsDownloading(false);
     }
-  };
+  };  
 
   return (
     <div className="flex flex-col items-center gap-4 p-4">
-      <div className="flex gap-4">
+      {!initialImageUrl && !imageUrl && (
         <ImageUploader onImageUpload={handleImageUpload} />
-        {imageUrl && (
+      )}
+
+      {imageUrl && (
+        <>
           <Button 
             variant="outline" 
             onClick={handleDownload}
@@ -136,11 +139,6 @@ export function ImageAnnotator() {
             <Download className="mr-2 h-4 w-4" />
             {isDownloading ? 'Downloading...' : 'Download'}
           </Button>
-        )}
-      </div>
-
-      {imageUrl && (
-        <>
           <DrawingControls
             strokeColor={strokeColor}
             strokeWidth={strokeWidth}
@@ -178,10 +176,9 @@ export function ImageAnnotator() {
 
       {!imageUrl && (
         <div className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg bg-gray-50 dark:bg-gray-800">
-          <Upload className="h-12 w-12 text-gray-400" />
           <p className="mt-2 text-sm text-gray-500">Upload an image to begin annotating</p>
         </div>
       )}
     </div>
   );
-}
+};
