@@ -11,6 +11,7 @@ export interface CloudComposition {
 }
 
 export interface AtmosphericLayer {
+  color: any
   name: string
   minAltitude: number
   maxAltitude: number

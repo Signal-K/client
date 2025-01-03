@@ -52,7 +52,7 @@ const PlanetFour = () => {
                 points: 2,
                 completedCount: 0,
                 internalComponent: () => <VoteAI4MClassifications />,
-                color: "text-green-500",
+                color: "text-green-500", // Generator beginning: https://v0.dev/chat/tS7nRTd8mMT
             },
             // {
             //     id: 3,
