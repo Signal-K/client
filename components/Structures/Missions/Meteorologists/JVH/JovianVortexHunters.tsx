@@ -5,6 +5,7 @@ import { CloudCogIcon, CloudHail } from "lucide-react";
 import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
 import VoteJVH from "./JVHVote";
 import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
+import JVHCloudClassificationGenerator from "./GaseousPlanetCloudMaker";
 
 interface Mission {
     id: number;
@@ -63,7 +64,7 @@ const JovianVortexHunters = () => {
             icon: CloudHail,
             points: 1,
             completedCount: 0,
-            internalComponent: () => <CloudClassifier />,
+            internalComponent: () => <JVHCloudClassificationGenerator />,
             color: 'text-green-700',
         },
         // {

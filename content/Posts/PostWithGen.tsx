@@ -12,6 +12,7 @@ import { CommentCard } from "../Comments/CommentSingle";
 import CloudSignal from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudSignal";
 import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import AsteroidViewer from "@/components/Data/Generator/Astronomers/DailyMinorPlanet/asteroid-viewer";
+import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
 
 interface CommentProps {
   id: number;
@@ -98,6 +99,11 @@ export function PostCardSingleWithGenerator({
         />;
       case "telescope-minorPlanet":
         return <AsteroidViewer 
+          classificationId={String(classificationId)} 
+          classificationConfig={classificationConfig}
+        />;
+      case "lidar-jovianVortexHunter":
+        return <CloudClassifier
           classificationId={String(classificationId)} 
           classificationConfig={classificationConfig}
         />;
