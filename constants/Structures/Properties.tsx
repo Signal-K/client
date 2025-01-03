@@ -31,6 +31,7 @@ import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/Pla
 import { useRouter } from 'next/router';
 import DailyMinorPlanetMissions from "@/components/Structures/Missions/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
 import CloudspottingOnMars from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudspottingOnMars";
+import JovianVortexHunters from "@/components/Structures/Missions/Meteorologists/JVH/JovianVortexHunters";
 
 interface IndividualStructureProps {
     name?: string;
@@ -292,7 +293,7 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <CloudDrizzleIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Map storms on gas planets",
-          dynamicComponent: <LidarJVHSatellite />,
+          dynamicComponent: <JovianVortexHunters />,
           sizePercentage: 60,
         },
         {

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../BasePlate";
-import { CloudCogIcon } from "lucide-react";
+import { CloudCogIcon, CloudHail } from "lucide-react";
 import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
 import VoteJVH from "./JVHVote";
+import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
 
 interface Mission {
     id: number;
@@ -52,6 +53,18 @@ const JovianVortexHunters = () => {
             completedCount: 0,
             internalComponent: () => <VoteJVH />,
             color: "text-green-500",
+        },
+        {
+            id: 3,
+            chapter: 1,
+            title: "Create your cloud generation",
+            description:
+                "Use sliders and graphs to create a cloud pattern that matches your original classification. This is then used to create a composition chart",
+            icon: CloudHail,
+            points: 1,
+            completedCount: 0,
+            internalComponent: () => <CloudClassifier />,
+            color: 'text-green-700',
         },
         // {
         //     id: 3,
