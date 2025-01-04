@@ -21,7 +21,7 @@ interface MissionPoints {
     [key: number]: number;
 };
 
-const PlanetFour = () => {
+const AI4M = () => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -225,4 +225,4 @@ const PlanetFour = () => {
     );
 };
 
-export default PlanetFour;
+export default AI4M;

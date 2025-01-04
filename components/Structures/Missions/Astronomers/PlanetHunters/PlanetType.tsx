@@ -13,7 +13,7 @@ interface Classification {
   images: string[];
   anomaly: number;
   classificationtype: string;
-  media: any;
+  media: any; 
   classificationConfiguration: {
     votes: number;
     classificationOptions: { [key: string]: any };

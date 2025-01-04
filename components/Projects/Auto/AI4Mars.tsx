@@ -5,7 +5,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
-import { ImageAnnotator } from "../(classifications)/Annotating/Annotator";
+import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
 interface Props {
     anomalyid: number | bigint;
@@ -233,7 +233,7 @@ export function AiForMarsProject() {
     const startTutorial = () => setShowTutorial(true);
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full overflow-y-auto max-h-[90vh] rounded-lg">
             {!hasMission20000006 ? (
                 <StarterAiForMars anomalyid={anomaly.id || 69592674} />
             ) : (
@@ -241,13 +241,16 @@ export function AiForMarsProject() {
                     {imageUrl && (
                         <>
                             <ImageAnnotator
- initialImageUrl={imageUrl}
-                            />
-                            {/*                                 anomalyId={anomaly.id.toString()}
+                                initialImageUrl={imageUrl}
+                                anomalyId={anomaly.id.toString()}
                                 anomalyType="automaton-aiForMars"
                                 missionNumber={200000062}
                                 assetMentioned={imageUrl}
-                                structureItemId={3102} */}
+                                structureItemId={3102}
+                            />
+                            {/* <ClassificationForm
+                                
+                            /> */}
                         </>
                     )}
                     <button

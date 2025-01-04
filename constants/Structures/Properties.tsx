@@ -32,6 +32,8 @@ import { useRouter } from 'next/router';
 import DailyMinorPlanetMissions from "@/components/Structures/Missions/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
 import CloudspottingOnMars from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudspottingOnMars";
 import JovianVortexHunters from "@/components/Structures/Missions/Meteorologists/JVH/JovianVortexHunters";
+import PlanetFour from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/PlanetFour";
+import AI4M from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AIForMars";
 
 interface IndividualStructureProps {
     name?: string;
@@ -305,7 +307,7 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <CameraOffIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: 'Map the surface of planets',
-          dynamicComponent: <AiForMarsProject />,
+          dynamicComponent: <AI4M />,
           sizePercentage: 50,
         },
       ],

@@ -9,7 +9,7 @@ export interface FormConfig {
   richTextFields: number;
   options?: ClassificationOption[];
   richTextTitles?: (string | undefined)[];
-};
+}; 
 
 export interface ClassificationFormProps {
   config?: FormConfig;

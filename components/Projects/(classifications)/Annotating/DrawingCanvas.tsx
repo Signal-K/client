@@ -1,112 +1,158 @@
-"use client";
+'use client';
 
-import { forwardRef } from 'react';
-import type { Point, Line, Shape, DrawingMode } from '@/types/Annotation';
-import { createLineGenerator, getMousePosition } from './DrawingUtils';
-import { createShapePath } from '@/types/Annotation/Shapes';
+import { useEffect } from 'react';
+import { cn } from '@/lib/utils';
+import type { DrawingObject, Tool, AI4MCategory } from '@/types/Annotation';
 
-interface DrawingCanvasProps {
+interface AnnotationCanvasProps {
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+  imageRef: React.RefObject<HTMLImageElement>;
   isDrawing: boolean;
-  currentLine: Line;
-  currentShape: Shape | null;
-  lines: Line[];
-  shapes: Shape[];
-  drawingMode: DrawingMode;
-  onMouseDown: (point: Point) => void;
-  onMouseMove: (point: Point) => void;
-  onMouseUp: () => void;
-  width?: number;
-  height?: number;
-}
+  setIsDrawing: (isDrawing: boolean) => void;
+  currentTool: Tool;
+  currentColor: string;
+  lineWidth: number;
+  drawings: DrawingObject[];
+  setDrawings: (drawings: DrawingObject[]) => void;
+  currentDrawing: DrawingObject | null;
+  setCurrentDrawing: (drawing: DrawingObject | null) => void;
+  currentCategory: AI4MCategory;
+};
 
-export const DrawingCanvas = forwardRef<SVGSVGElement, DrawingCanvasProps>(({
+export function AnnotationCanvas({
+  canvasRef,
+  imageRef,
   isDrawing,
-  currentLine,
-  currentShape,
-  lines,
-  shapes,
-  drawingMode,
-  onMouseDown,
-  onMouseMove,
-  onMouseUp,
-  width,
-  height,
-}, ref) => {
-  const lineGenerator = createLineGenerator();
+  setIsDrawing,
+  currentTool,
+  currentColor,
+  lineWidth,
+  drawings,
+  setDrawings,
+  currentDrawing,
+  setCurrentDrawing,
+  currentCategory,
+}: AnnotationCanvasProps) {
+  const CANVAS_WIDTH = 600; 
+  const CANVAS_HEIGHT = 400;
 
-  const handleMouseDown = (event: React.MouseEvent<SVGSVGElement>) => {
-    const svg = event.currentTarget;
-    const point = getMousePosition(event, svg);
-    onMouseDown(point);
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    setIsDrawing(true);
+    const newDrawing: DrawingObject = {
+      type: currentTool,
+      category: currentCategory,
+      color: currentColor,
+      width: lineWidth,
+      points: [{ x, y }],
+      startPoint: { x, y },
+    };
+    setCurrentDrawing(newDrawing);
   };
 
-  const handleMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
-    if (!isDrawing) return;
-    const svg = event.currentTarget;
-    const point = getMousePosition(event, svg);
-    onMouseMove(point);
+  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing || !currentDrawing || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (currentTool === 'pen') {
+      setCurrentDrawing({
+        ...currentDrawing,
+        points: [...currentDrawing.points, { x, y }],
+      });
+    } else {
+      setCurrentDrawing({
+        ...currentDrawing,
+        endPoint: { x, y },
+      });
+    }
   };
+
+  const stopDrawing = () => {
+    if (currentDrawing) {
+      setDrawings([...drawings, currentDrawing]);
+    }
+    setIsDrawing(false);
+    setCurrentDrawing(null);
+  };
+
+  const drawObject = (ctx: CanvasRenderingContext2D, drawing: DrawingObject) => {
+    ctx.strokeStyle = drawing.color;
+    ctx.lineWidth = drawing.width;
+    ctx.beginPath();
+
+    if (drawing.type === 'pen') {
+      ctx.moveTo(drawing.points[0].x, drawing.points[0].y);
+      drawing.points.forEach((point) => {
+        ctx.lineTo(point.x, point.y);
+      });
+    } else if (drawing.type === 'square' && drawing.startPoint && drawing.endPoint) {
+      const width = drawing.endPoint.x - drawing.startPoint.x;
+      const height = drawing.endPoint.y - drawing.startPoint.y;
+      ctx.rect(drawing.startPoint.x, drawing.startPoint.y, width, height);
+    }
+
+    ctx.stroke();
+  };
+
+  const renderCanvas = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx || !imageRef.current) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(
+      imageRef.current,
+      0,
+      0,
+      CANVAS_WIDTH,
+      CANVAS_HEIGHT // Scale the image to fit within the fixed canvas size
+    );
+
+    drawings.forEach((drawing) => {
+      drawObject(ctx, drawing);
+    });
+
+    if (currentDrawing) {
+      drawObject(ctx, currentDrawing);
+    }
+  };
+
+  useEffect(() => {
+    if (imageRef.current) {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        canvas.width = CANVAS_WIDTH; 
+        canvas.height = CANVAS_HEIGHT; 
+        renderCanvas();
+      }
+    }
+  }, [imageRef.current]);
+
+  useEffect(() => {
+    renderCanvas();
+  }, [drawings, currentDrawing]);
 
   return (
-    <svg
-      ref={ref}
-      className="absolute top-0 left-0 w-full h-full"
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width || 0} ${height || 0}`}
-      preserveAspectRatio="none"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={onMouseUp}
-      onMouseLeave={onMouseUp}
-    >
-      {/* Completed lines */}
-      {lines.map((line, i) => (
-        <path
-          key={`line-${i}`}
-          d={lineGenerator(line.points) || ''}
-          fill="none"
-          stroke={line.color}
-          strokeWidth={line.width}
-          vectorEffect="non-scaling-stroke"
-        />
-      ))}
-      
-      {/* Current line */}
-      {currentLine.points.length > 0 && (
-        <path
-          d={lineGenerator(currentLine.points) || ''}
-          fill="none"
-          stroke={currentLine.color}
-          strokeWidth={currentLine.width}
-          vectorEffect="non-scaling-stroke"
-        />
-      )}
-
-      {/* Completed shapes */}
-      {shapes.map((shape, i) => (
-        <path
-          key={`shape-${i}`}
-          d={createShapePath(shape)}
-          fill="none"
-          stroke={shape.color}
-          strokeWidth={shape.width}
-          vectorEffect="non-scaling-stroke"
-        />
-      ))}
-
-      {/* Current shape */}
-      {currentShape && (
-        <path
-          d={createShapePath(currentShape)}
-          fill="none"
-          stroke={currentShape.color}
-          strokeWidth={currentShape.width}
-          vectorEffect="non-scaling-stroke"
-        />
-      )}
-    </svg>
+    <div className="border rounded-lg overflow-hidden inline-block">
+      <canvas
+        ref={canvasRef}
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+        onMouseOut={stopDrawing}
+        className={cn("cursor-crosshair", isDrawing && "cursor-none")}
+        style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}
+      />
+    </div>
   );
-});
-
-DrawingCanvas.displayName = 'DrawingCanvas';
+};

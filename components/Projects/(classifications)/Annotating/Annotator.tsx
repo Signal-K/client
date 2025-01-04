@@ -1,182 +1,146 @@
-"use client";
+'use client';
 
-import { useRef, useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { AnnotationTools } from './AnnotationTools';
+import { AnnotationCanvas } from './DrawingCanvas';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
-import { ImageUploader } from './ImageUploader';
-import { DrawingCanvas } from './DrawingCanvas';
-import { DrawingControls } from './DrawingControls';
-import { downloadAnnotatedImage } from './DrawingUtils';
-import type { Point, Line, Shape, DrawingMode } from '@/types/Annotation';
-import { useToast } from "@/hooks/toast";
+import { AI4MCATEGORIES, type AI4MCategory, type DrawingObject, type Tool } from '@/types/Annotation';
+import { Legend } from './Legend';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import ClassificationForm from '../PostForm';
 
-export function ImageAnnotator({ initialImageUrl }: { initialImageUrl?: string }) {
-  const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl || null);
+interface ImageAnnotatorProps {
+  initialImageUrl: string;
+  anomalyType: string;
+  anomalyId: string;
+  missionNumber: number;
+  assetMentioned: string | string[];
+  structureItemId?: number;
+};
+
+export default function ImageAnnotator({ initialImageUrl, anomalyType, anomalyId, assetMentioned, missionNumber, structureItemId }: ImageAnnotatorProps) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const [selectedImage, setSelectedImage] = useState<string | null>(initialImageUrl);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [currentLine, setCurrentLine] = useState<Line>({ points: [], color: '#ff0000', width: 2 });
-  const [currentShape, setCurrentShape] = useState<Shape | null>(null);
-  const [lines, setLines] = useState<Line[]>([]);
-  const [shapes, setShapes] = useState<Shape[]>([]);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [strokeColor, setStrokeColor] = useState('#ff0000');
-  const [strokeWidth, setStrokeWidth] = useState(2);
-  const [drawingMode, setDrawingMode] = useState<DrawingMode>('freehand');
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [currentTool, setCurrentTool] = useState<Tool>('pen');
+  const [currentCategory, setCurrentCategory] = useState<AI4MCategory>('custom');
+  const [lineWidth, setLineWidth] = useState(2);
+  const [drawings, setDrawings] = useState<DrawingObject[]>([]);
+  const [currentDrawing, setCurrentDrawing] = useState<DrawingObject | null>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploads, setUploads] = useState<string[]>([]);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
+
+  const addMedia = async () => {
+    if (!canvasRef.current || !session) return;
   
-  const svgRef = useRef<SVGSVGElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const { toast } = useToast();
+    const canvas = canvasRef.current;
+    setIsUploading(true);
   
-  const handleImageUpload = (file: File) => {
-    const url = URL.createObjectURL(file);
-    setImageUrl(url);
-    setLines([]);
-    setShapes([]);
-    setCurrentLine({ points: [], color: strokeColor, width: strokeWidth });
-    setCurrentShape(null);
-  };
-
-  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = e.currentTarget;
-    setDimensions({
-      width: img.naturalWidth,
-      height: img.naturalHeight
-    });
-  };
-
-  const handleMouseDown = (point: Point) => {
-    setIsDrawing(true);
-    if (drawingMode === 'freehand') {
-      setCurrentLine({
-        points: [point],
-        color: strokeColor,
-        width: strokeWidth
-      });
-    } else {
-      setCurrentShape({
-        type: drawingMode,
-        startPoint: point,
-        endPoint: point,
-        color: strokeColor,
-        width: strokeWidth
-      });
-    }
-  };
-
-  const handleMouseMove = (point: Point) => {
-    if (!isDrawing) return;
-    
-    if (drawingMode === 'freehand') {
-      setCurrentLine(prev => ({
-        ...prev,
-        points: [...prev.points, point]
-      }));
-    } else if (currentShape) {
-      setCurrentShape(prev => ({
-        ...prev!,
-        endPoint: point
-      }));
-    }
-  };
-
-  const handleMouseUp = () => {
-    if (!isDrawing) return;
-
-    if (drawingMode === 'freehand') {
-      if (currentLine.points.length > 0) {
-        setLines(prev => [...prev, currentLine]);
-        setCurrentLine({ points: [], color: strokeColor, width: strokeWidth });
-      }
-    } else if (currentShape) {
-      setShapes(prev => [...prev, currentShape]);
-      setCurrentShape(null);
-    }
-    
-    setIsDrawing(false);
-  };
-
-  const handleDownload = async () => {
-    if (!svgRef.current || !imageRef.current) {
-      toast({
-        title: "Error",
-        description: "Image or drawing canvas not ready",
-        variant: "destructive",
-      });
-      return;
-    }
-  
-    setIsDownloading(true);
     try {
-      await downloadAnnotatedImage(svgRef.current, imageRef.current, { returnBlob: true });
-      toast({
-        title: "Success",
-        description: "Image downloaded successfully",
+      // Convert canvas to Blob
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob(resolve, 'image/png');
       });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to download image",
-        variant: "destructive",
-      });
+  
+      if (!blob) throw new Error('Failed to create Blob from canvas');
+  
+      // Prepare file name and upload to Supabase
+      const fileName = `${Date.now()}-${session.user.id}-annotated-image.png`;
+      const { data, error } = await supabase.storage
+        .from('media')
+        .upload(fileName, blob, {
+          contentType: 'image/png',
+        });
+  
+      if (error) {
+        console.error('Upload error:', error.message);
+      } else if (data) {
+        const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
+        setUploads((prevUploads) => [...prevUploads, url]);
+        console.log('Uploaded successfully:', url);
+      }
+    } catch (err) {
+      console.error('Unexpected error during canvas upload:', err);
     } finally {
-      setIsDownloading(false);
+      setIsUploading(false);
     }
   };  
 
+  useEffect(() => {
+    if (initialImageUrl) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        setSelectedImage(initialImageUrl);
+        imageRef.current = img;
+      };
+      img.src = initialImageUrl;
+    }
+  }, [initialImageUrl]);
+
+  const downloadImage = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const link = document.createElement('a');
+    link.download = 'annotated-image.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  };
+
+  const categoryCount = drawings.reduce((acc, drawing) => {
+    acc[drawing.category] = (acc[drawing.category] || 0) + 1;
+    return acc;
+  }, {} as Record<AI4MCategory, number>);
+
   return (
-    <div className="flex flex-col items-center gap-4 p-4">
-      {!initialImageUrl && !imageUrl && (
-        <ImageUploader onImageUpload={handleImageUpload} />
-      )}
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <AnnotationTools
+          currentTool={currentTool}
+          setCurrentTool={setCurrentTool}
+          lineWidth={lineWidth}
+          setLineWidth={setLineWidth}
+        />
+        {/* <Button onClick={downloadImage}>Download Annotated Image</Button> */}
+      </div>
 
-      {imageUrl && (
-        <>
-          <Button 
-            variant="outline" 
-            onClick={handleDownload}
-            disabled={isDownloading}
-          >
-            <Download className="mr-2 h-4 w-4" />
-            {isDownloading ? 'Downloading...' : 'Download'}
-          </Button>
-          <DrawingControls
-            strokeColor={strokeColor}
-            strokeWidth={strokeWidth}
-            drawingMode={drawingMode}
-            onColorChange={setStrokeColor}
-            onWidthChange={setStrokeWidth}
-            onModeChange={setDrawingMode}
+      {selectedImage && (
+        <div className="space-y-4">
+          <AnnotationCanvas
+            canvasRef={canvasRef}
+            imageRef={imageRef}
+            isDrawing={isDrawing}
+            setIsDrawing={setIsDrawing}
+            currentTool={currentTool}
+            currentColor={AI4MCATEGORIES[currentCategory].color}
+            lineWidth={lineWidth}
+            drawings={drawings}
+            setDrawings={setDrawings}
+            currentDrawing={currentDrawing}
+            setCurrentDrawing={setCurrentDrawing}
+            currentCategory={currentCategory}
           />
-          <div className="relative border rounded-lg overflow-hidden">
-            <img
-              ref={imageRef}
-              src={imageUrl}
-              alt="Upload an image to annotate"
-              className="max-w-full h-auto block"
-              style={{ maxHeight: '70vh' }}
-              onLoad={handleImageLoad}
-            />
-            <DrawingCanvas
-              ref={svgRef}
-              isDrawing={isDrawing}
-              currentLine={currentLine}
-              currentShape={currentShape}
-              lines={lines}
-              shapes={shapes}
-              drawingMode={drawingMode}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              width={dimensions.width}
-              height={dimensions.height}
-            />
-          </div>
-        </>
-      )}
-
-      {!imageUrl && (
-        <div className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg bg-gray-50 dark:bg-gray-800">
-          <p className="mt-2 text-sm text-gray-500">Upload an image to begin annotating</p>
+          <Legend
+            currentCategory={currentCategory}
+            setCurrentCategory={setCurrentCategory}
+            categoryCount={categoryCount}
+          />
+          <Button onClick={addMedia} disabled={isUploading}>
+            {isUploading ? 'Uploading...' : 'Save & proceed'}
+          </Button>
+          <ClassificationForm
+            anomalyId={anomalyId}
+            anomalyType="automaton-aiForMars"
+            missionNumber={200000062}
+            assetMentioned={[...uploads, ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned])]}
+            structureItemId={3102}
+          />
         </div>
       )}
     </div>
