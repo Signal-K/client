@@ -40,7 +40,7 @@ const CloudUploadEarthCameraComponent = () => {
             const resizedImage = await resizeImage(imageSrc);
             const file = await convertBase64ToFile(resizedImage, 'screenshot.jpg');
             await uploadImageToSupabase(file);
-        }
+        };
     };
 
     const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,8 +55,8 @@ const CloudUploadEarthCameraComponent = () => {
             const fileArray = Array.from(files);
             for (const file of fileArray) {
                 await uploadImageToSupabase(file);
-            }
-        }
+            };
+        };
     };
 
     const uploadImageToSupabase = async (file: File) => {
@@ -88,14 +88,14 @@ const CloudUploadEarthCameraComponent = () => {
                     setUploads(prev => [...prev, url]);
                     setCaptureImage(url);
                     setShowCommentBox(true);
-                }
-            }
+                };
+            };
         } catch (err) {
             console.error('Unexpected error during file upload:', err);
         } finally {
             setIsUploading(false);
             setLoadingContent(false);
-        }
+        };
     };
 
     const handleSubmitClassification = async (event: React.FormEvent) => {

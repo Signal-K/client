@@ -220,7 +220,7 @@ export function AiForMarsProject() {
                 <p>Loading...</p>
             </div>
         );
-    }
+    };
 
     if (!anomaly) {
         return (
@@ -228,7 +228,7 @@ export function AiForMarsProject() {
                 <p>No anomaly found.</p>
             </div>
         );
-    }
+    };
 
     const startTutorial = () => setShowTutorial(true);
 
@@ -240,14 +240,14 @@ export function AiForMarsProject() {
                 <>
                     {imageUrl && (
                         <>
-                            <ImageAnnotator initialImageUrl={imageUrl} />
-                            <ClassificationForm
-                                anomalyId={anomaly.id.toString()}
+                            <ImageAnnotator
+ initialImageUrl={imageUrl}
+                            />
+                            {/*                                 anomalyId={anomaly.id.toString()}
                                 anomalyType="automaton-aiForMars"
                                 missionNumber={200000062}
                                 assetMentioned={imageUrl}
-                                structureItemId={3102}
-                            />
+                                structureItemId={3102} */}
                         </>
                     )}
                     <button
