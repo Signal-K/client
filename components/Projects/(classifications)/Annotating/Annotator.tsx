@@ -27,6 +27,7 @@ interface ImageAnnotatorProps {
   missionNumber: number;
   assetMentioned: string | string[];
   structureItemId?: number;
+  parentPlanetLocation?: string;
   annotationType: 'AI4M' | 'P4' | 'PH' | 'Custom';
 }; 
 
@@ -36,6 +37,7 @@ export default function ImageAnnotator({
   anomalyId,
   missionNumber,
   assetMentioned,
+  parentPlanetLocation,
   structureItemId,
   annotationType,
 }: ImageAnnotatorProps) {
@@ -81,7 +83,7 @@ export default function ImageAnnotator({
       console.error('Unexpected error during canvas upload:', err);
     } finally {
       setIsUploading(false);
-    }
+    };
   };
 
   useEffect(() => {
@@ -117,22 +119,21 @@ export default function ImageAnnotator({
         <div className="space-y-4">
           <SciFiPanel className="p-4">
           <AnnotationCanvas
-  canvasRef={canvasRef}
-  imageRef={imageRef}
-  isDrawing={isDrawing}
-  setIsDrawing={setIsDrawing}
-  currentTool={currentTool}
-  currentColor={
-    CATEGORY_CONFIG[currentCategory as keyof typeof CATEGORY_CONFIG]?.color || '#000000'
-  }
-  lineWidth={lineWidth}
-  drawings={drawings}
-  setDrawings={setDrawings}
-  currentDrawing={currentDrawing}
-  setCurrentDrawing={setCurrentDrawing}
-  currentCategory={currentCategory}
-/>
-
+            canvasRef={canvasRef}
+            imageRef={imageRef}
+            isDrawing={isDrawing}
+            setIsDrawing={setIsDrawing}
+            currentTool={currentTool}
+            currentColor={
+              CATEGORY_CONFIG[currentCategory as keyof typeof CATEGORY_CONFIG]?.color || '#000000'
+            }
+            lineWidth={lineWidth}
+            drawings={drawings}
+            setDrawings={setDrawings}
+            currentDrawing={currentDrawing}
+            setCurrentDrawing={setCurrentDrawing}
+            currentCategory={currentCategory}
+          />
           </SciFiPanel>
           <SciFiPanel className="p-4">
             <Legend

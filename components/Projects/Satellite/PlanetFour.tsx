@@ -222,6 +222,7 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
                             structureItemId={3103}
                             annotationType="P4"
                             initialImageUrl={imageUrl}
+                            parentPlanetLocation={anomalyid?.toString()}
                         />
                     )}
                     {imageUrl}

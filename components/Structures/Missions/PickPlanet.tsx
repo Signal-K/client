@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { PostCardSingle } from "@/content/Posts/PostSingle";
+import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
+import { SciFiButton } from "@/components/ui/styles/sci-fi/button";
 
 interface Classification {
   id: number;
@@ -11,6 +13,7 @@ interface Classification {
   author: string;
   anomaly: number | null;
   media?: any | null;
+  classificationType: string | null;
   classificationConfiguration: any | null;
   planetType: string | null;
   images?: string[];
@@ -90,29 +93,38 @@ interface PreferredTerrestrialClassificationsProps {
         ) : (
           classifications.map((classification) => (
             <div key={classification.id} className="space-y-4">
-              <PostCardSingle
-                classificationId={classification.id}
-                title={`Classification #${classification.id}`}
-                author={classification.author}
-                content={classification.content || "No content available"}
-                votes={0}
-                category="Terrestrial"
-                tags={["Preferred", "Planet"]}
-                images={classification.media || []}
-                anomalyId={classification.anomaly?.toString() || "N/A"}
-                classificationType="planet"
-                classificationConfig={classification.classificationConfiguration}
-                commentStatus={false}
-                enableNewCommentingMethod={false}
-              />
-              <button
-                onClick={() => onSelectAnomaly(classification.anomaly)}
-                className="mt-2 text-blue-500"
-              >
-                Select this Classification
-              </button>
+                <SimplePostSingle
+                  id={classification.id.toString()}
+                  title={`Classification #${classification.id}`}
+                  author={classification.author}
+                  content={classification.content || "No content available"}
+                  category={classification.classificationType || "Unknown"}
+                  images={classification.images || []}
+                  classificationConfiguration={classification.classificationConfiguration}
+                />
+                {/* <PostCardSingle
+                    classificationId={classification.id}
+                    title={`Classification #${classification.id}`}
+                    author={classification.author}
+                    content={classification.content || "No content available"}
+                    votes={0}
+                    category="Terrestrial"
+                    tags={["Preferred", "Planet"]}
+                    images={classification.media || []}
+                    anomalyId={classification.anomaly?.toString() || "N/A"}
+                    classificationType="planet"
+                    classificationConfig={classification.classificationConfiguration}
+                    commentStatus={false}
+                    enableNewCommentingMethod={false}
+                /> */}
+                <SciFiButton
+                  onClick={() => onSelectAnomaly(classification.anomaly)}
+                  className="mt-2 text-blue-500"
+                >
+                  Search this planet for anomalies to investigate
+                </SciFiButton>
             </div>
-          ))
+            ))
         )}
       </div>
     );

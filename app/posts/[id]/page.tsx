@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
 import StructuresOnPlanet from "@/components/Structures/Structures";
+import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 
 interface Classification {
   id: number;
@@ -13,13 +14,12 @@ interface Classification {
   anomaly: number | null;
   media: string[] | null;
   classificationtype: string | null;
+  classificationConfig?: any | null;
 };
 
 export default function SinglePostPage({ params }: { params: { id: string } }) {
   const supabase = useSupabaseClient();
-  const [classification, setClassification] = useState<Classification | null>(
-    null
-  );
+  const [classification, setClassification] = useState<Classification | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -91,14 +91,14 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
       <div className="relative flex items-center justify-center min-h-screen container mx-auto">
         {classification.author && (
           <div className="w-1/2">
-        <SimplePostSingle
-            id={classification.id.toString()}
-            title={`Classification #${classification.id}`}
-            author={classification.author || "Unknown"}
-            content={classification.content || "No content available"}
-            category={classification.classificationtype || "Unknown"}
-            images={classification.media || []}
-        />
+            <SimplePostSingle
+              id={classification.id.toString()}
+              title={`Classification #${classification.id}`}
+              author={classification.author || "Unknown"}
+              content={classification.content || "No content available"}
+              category={classification.classificationtype || "Unknown"}
+              images={classification.media || []}
+            />
             <StructuresOnPlanet author={classification.author} />
           </div>
         )}

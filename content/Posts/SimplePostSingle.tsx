@@ -5,6 +5,7 @@ import StructuresOnPlanet from '@/components/Structures/Structures';
 import { AvatarGenerator } from '@/components/Account/Avatar';
 import { Button } from '@/components/ui/button';
 import { Share2 } from 'lucide-react';
+import PlanetGenerator from '@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator';
 
 interface SimplePostSingleProps {
   title: string;
@@ -13,6 +14,7 @@ interface SimplePostSingleProps {
   content: string;
   category: string;
   images: string[];
+  classificationConfiguration?: any;
 };
 
 export function SimplePostSingle({
@@ -22,6 +24,7 @@ export function SimplePostSingle({
   content,
   category,
   images,
+  classificationConfiguration,
 }: SimplePostSingleProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -55,9 +58,8 @@ export function SimplePostSingle({
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center">
       <Card className="w-full max-w-lg bg-white/30 backdrop-blur-md border border-white/10 shadow-lg rounded-lg relative">
-        {/* Share Button Positioned in the Top Right */}
         <div
           className="absolute top-2 right-2 z-10"
           ref={dropdownRef}
@@ -130,6 +132,7 @@ export function SimplePostSingle({
             </div>
           )}
         </CardContent>
+        {/* <PlanetGenerator classificationId={String(id)} classificationConfig={classificationConfiguration} author={author} /> */}
         <StructuresOnPlanet author={author} />
       </Card>
     </div>
