@@ -247,6 +247,7 @@ export function AiForMarsProject() {
                                 missionNumber={200000062}
                                 assetMentioned={imageUrl}
                                 structureItemId={3102}
+                                annotationType="AI4M"
                             />
                             {/* <ClassificationForm
                                 

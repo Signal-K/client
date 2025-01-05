@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import type { DrawingObject, Tool, AI4MCategory } from '@/types/Annotation';
+import type { DrawingObject, Tool, AI4MCategory, P4Category } from '@/types/Annotation';
 
 interface AnnotationCanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -16,7 +16,7 @@ interface AnnotationCanvasProps {
   setDrawings: (drawings: DrawingObject[]) => void;
   currentDrawing: DrawingObject | null;
   setCurrentDrawing: (drawing: DrawingObject | null) => void;
-  currentCategory: AI4MCategory;
+  currentCategory: AI4MCategory | P4Category;
 };
 
 export function AnnotationCanvas({

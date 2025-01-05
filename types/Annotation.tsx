@@ -9,6 +9,25 @@ export interface CategoryConfig {
   description: string;
 };
 
+export type P4Category = 'fan' | 'blotch' | 'custom';
+export const P4CATEGORIES: Record<P4Category, CategoryConfig> = {
+  fan: {
+    name: 'Fan',
+    color: '#00BCD4',
+    description: 'Fan-shaped feature'
+  },
+  blotch: {
+    name: 'Blotch',
+    color: '#4CAF50',
+    description: 'Blotch-shaped feature'
+  },
+  custom: {
+    name: 'Custom',
+    color: '#FF0000',
+    description: 'Freeform drawing'
+  },
+};
+
 export type AI4MCategory = 'sand' | 'consolidated-soil' | 'bedrock' | 'big-rocks' | 'custom';
 export const AI4MCATEGORIES: Record<AI4MCategory, CategoryConfig> = {
   sand: {
@@ -57,7 +76,7 @@ export type DrawingObject = {
   points: { x: number; y: number }[];
   startPoint?: { x: number; y: number };
   endPoint?: { x: number; y: number };
-  category: AI4MCategory;
+  category: AI4MCategory | P4Category;
 };
 
 export interface Line {

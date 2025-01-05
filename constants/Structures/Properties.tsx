@@ -300,14 +300,14 @@ export const StructuresConfig: StructureConfig = {
         },
         {
           icon: <RssIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Map the surface of terrestrial planets",
-          dynamicComponent: <PlanetFourProject />,
+          text: "Identify landmarks on terrestrial planets",
+          dynamicComponent: <AI4M />,
           sizePercentage: 50,
         },
         {
           icon: <CameraOffIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: 'Map the surface of planets',
-          dynamicComponent: <AI4M />,
+          dynamicComponent: <PlanetFour />,
           sizePercentage: 50,
         },
       ],
