@@ -20,7 +20,7 @@ interface StructuresOnPlanetProps {
 import { UnownedSurfaceStructures } from "./Build/EditMode";
 
 export default function StructuresOnPlanet() {
-  const supabase = useSupabaseClient();
+  const supabase = useSupabaseClient(); 
   const session = useSession();
 
   const { activePlanet } = useActivePlanet();
