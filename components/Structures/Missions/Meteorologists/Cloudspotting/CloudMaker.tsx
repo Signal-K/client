@@ -3,18 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import CloudSignal from "./CloudSignal";
-
-interface Classification {
-    id: number;
-    created_at: string;
-    content: string | null; 
-    author: string | null;
-    anomaly: number | null;
-    media: any | null; 
-    classificationtype: string | null;
-    classificationConfiguration: any | null; 
-};
 
 export default function CloudClassificationGenerator() {
     const supabase = useSupabaseClient();
@@ -29,7 +17,7 @@ export default function CloudClassificationGenerator() {
         setError('User session not found.');
         setLoading(false);
         return;
-      }
+      };
   
       setLoading(true);
       setError(null);

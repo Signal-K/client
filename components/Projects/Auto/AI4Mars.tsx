@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
-
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
+import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+
 interface Props {
     anomalyid: number | bigint;
 };
@@ -16,6 +17,7 @@ export function StarterAiForMars({ anomalyid }: Props) {
 
     const [part, setPart] = useState(1);
     const [line, setLine] = useState(1);
+
     const nextLine = () => setLine(prevLine => prevLine + 1);
     const nextPart = () => {
         setPart(2);
@@ -145,84 +147,77 @@ export function StarterAiForMars({ anomalyid }: Props) {
 export function AiForMarsProject() {
     const supabase = useSupabaseClient();
     const session = useSession();
-
     const { activePlanet } = useActivePlanet();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
-    const [showTutorial, setShowTutorial] = useState<boolean>(false);
+    const [showTutorial, setShowTutorial] = useState(false);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-
-    const [loading, setLoading] = useState<boolean>(true);
-
+    const [loading, setLoading] = useState(true);
     const [hasMission20000006, setHasMission20000006] = useState<boolean | null>(null);
 
-    // useEffect(() => {
-    //     const checkTutorialMission = async () => {
-    //         if (!session) return;
-    
-    //         try {
-    //             const { data: missionData, error: missionError } = await supabase
-    //                 .from('missions')
-    //                 .select('id')
-    //                 .eq('user', session.user.id)
-    //                 .eq('mission', '20000006')
-    //                 .limit(1);  
-    
-    //             if (missionError) {
-    //                 console.error("Error fetching mission data:", missionError);
-    //                 setHasMission20000006(false); 
-    //                 return;
-    //             };
-    
-    //             setHasMission20000006(missionData && missionData.length > 0);
-    //         } catch (error) {
-    //             console.error("Error checking user mission: ", error);
-    //             setHasMission20000006(false);
-    //         };
-    //     };
-    
-    //     checkTutorialMission();
-    // }, [session, supabase]);
-    
+    useEffect(() => {
+        const checkTutorialMission = async () => {
+            if (!session) return;
+
+            try {
+                const { data: missionData, error: missionError } = await supabase
+                    .from("missions")
+                    .select("id")
+                    .eq("user", session.user.id)
+                    .eq("mission", "20000006")
+                    .limit(1);
+
+                if (missionError) {
+                    console.error("Error fetching mission data:", missionError);
+                    setHasMission20000006(false);
+                    return;
+                }
+
+                setHasMission20000006(missionData && missionData.length > 0);
+            } catch (error) {
+                console.error("Error checking user mission: ", error);
+                setHasMission20000006(false);
+            }
+        };
+
+        checkTutorialMission();
+    }, [session, supabase]);
+
     useEffect(() => {
         async function fetchAnomaly() {
             if (!session) {
                 setLoading(false);
                 return;
-            };
-    
+            }
+
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")
                     .select("*")
-                    .eq("anomalySet", 'automaton-aiForMars')
-    
-                if (anomalyError) {
-                    throw anomalyError;
-                };
-    
+                    .eq("anomalySet", "automaton-aiForMars");
+
+                if (anomalyError) throw anomalyError;
+
                 const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
                 setAnomaly(randomAnomaly);
-                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${randomAnomaly.id}.jpeg`);
+                setImageUrl(
+                    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${randomAnomaly.id}.jpeg`
+                );
             } catch (error: any) {
                 console.error("Error fetching anomaly", error.message);
                 setAnomaly(null);
             } finally {
                 setLoading(false);
-            };
-        };
-    
-        if (session) { // && hasMission20000006) {
-            fetchAnomaly();
-        };
-    }, [session, hasMission20000006, supabase]);
-    
+            }
+        }
+
+        fetchAnomaly();
+    }, [session, supabase]);
+
     if (loading) {
         return (
             <div>
-                <p>
-                    Loading...
-                </p>
+                <p>Loading...</p>
             </div>
         );
     };
@@ -237,43 +232,36 @@ export function AiForMarsProject() {
 
     const startTutorial = () => setShowTutorial(true);
 
-    const content = !hasMission20000006 
-    ? <StarterAiForMars anomalyid={anomaly?.id || 69592674} />
-    : (
-        <>
-            {loading && <p>Loading...</p>}
-            {!loading && !anomaly && <p>No anomaly found.</p>}
-            {!loading && anomaly && (
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full overflow-y-auto max-h-[90vh] rounded-lg">
+            {!hasMission20000006 ? (
+                <StarterAiForMars anomalyid={anomaly.id || 69592674} />
+            ) : (
                 <>
-                    <div className="p-4 rounded-md relative w-full">
-                        {imageUrl && <img src={imageUrl} alt="Anomaly" className="w-64 h-64 contained" />}
-                    </div>
                     {imageUrl && (
-                        <ClassificationForm
-                            anomalyId={anomaly?.id.toString() || ""}
-                            anomalyType='automaton-aiForMars'
-                            missionNumber={200000062}
-                            assetMentioned={imageUrl}
-                            structureItemId={3102} 
-                        />
+                        <>
+                            <ImageAnnotator
+                                initialImageUrl={imageUrl}
+                                anomalyId={anomaly.id.toString()}
+                                anomalyType="automaton-aiForMars"
+                                missionNumber={200000062}
+                                assetMentioned={imageUrl}
+                                structureItemId={3102}
+                                annotationType="AI4M"
+                            />
+                            {/* <ClassificationForm
+                                
+                            /> */}
+                        </>
                     )}
-                </>
-            )}
-            <button
+                    <button
                         onClick={startTutorial}
                         className="mt-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
                     >
                         Reopen Tutorial
                     </button>
-        </>
+                </>
+            )}
+        </div>
     );
-
-return (
-    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-        {content}
-    </div>
-);
-
 };
-
- // I did get conflicted between 3102 and 3103, going with 3102 until the satellite comes into play

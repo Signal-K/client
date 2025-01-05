@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { PostCardSingle } from "@/content/Posts/PostSingle";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import StarnetLayout from "@/components/Layout/Starnet";
 
 interface Classification {
     id: number;
@@ -16,7 +15,7 @@ interface Classification {
     classificationConfiguration: any | null; 
 };
 
-export default function VoteCoMClassifications() {
+export default function VoteJVH() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -26,43 +25,43 @@ export default function VoteCoMClassifications() {
 
     const fetchClassifications = async () => {
         if (!session?.user) {
-          setError("User session not found.");
-          setLoading(false);
-          return;
+            setError("User session not found.");
+            setLoading(false);
+            return;
         };
-      
+        
         setLoading(true);
         setError(null);
         try {
-          const { data, error } = await supabase
+            const { data, error } = await supabase
             .from('classifications')
             .select('*')
-            .eq('classificationtype', 'cloud')
+            .eq('classificationtype', 'lidar-jovianVortexHunter')
             .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
-      
-          if (error) throw error;
-      
-          const processedData = data.map((classification) => {
+        
+            if (error) throw error;
+        
+            const processedData = data.map((classification) => {
             const media = classification.media;
             let images: string[] = [];
-      
+        
             if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
-              images.push(media[1]);
+                images.push(media[1]);
             } else if (media && media.uploadUrl) {
-              images.push(media.uploadUrl);
+                images.push(media.uploadUrl);
             }
-      
+        
             const votes = classification.classificationConfiguration?.votes || 0;
-      
+        
             return { ...classification, images, votes };
-          });
-      
-          setClassifications(processedData);
+            });
+        
+            setClassifications(processedData);
         } catch (error) {
-          console.error("Error fetching classifications:", error);
-          setError("Failed to load classifications.");
+            console.error("Error fetching classifications:", error);
+            setError("Failed to load classifications.");
         } finally {
-          setLoading(false);
+            setLoading(false);
         };
     };  
 
@@ -99,7 +98,6 @@ export default function VoteCoMClassifications() {
           console.error("Error voting:", error);
         };
     };
-
     return (
           <div className="space-y-8">
             {loading ? (

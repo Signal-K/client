@@ -6,7 +6,6 @@ import ClassificationForm from "../(classifications)/PostForm";
 
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
 import { Button } from "@/components/ui/button";
-import ImageAnnotation from "../(classifications)/Annotation";
 interface Props {
     anomalyid: number | bigint; 
 };

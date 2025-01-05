@@ -46,7 +46,7 @@ export function PostCardSingle({
   votes,
   category,
   tags,
-  anomalyId,
+  anomalyId, 
   classificationConfig,
   images,
   classificationType,

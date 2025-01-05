@@ -6,10 +6,11 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
-import ImageAnnotation from "../(classifications)/Annotation";
+// import ImageAnnotation from "../(classifications)/Annotation";
 import * as markerjs2 from "markerjs2";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 interface Props {
     anomalyid: number | bigint;
 };
@@ -135,7 +136,7 @@ export function StarterPlanetFour({
     );
 };
 
-export function PlanetFourProject() {
+export function PlanetFourProject() { 
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -229,25 +230,6 @@ export function PlanetFourProject() {
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             {!showTutorial ? (
                 <>
-                    <div className="p-4 rounded-md relative w-full">
-                        {imageUrl && (
-                            <Card className="w-full max-w-3xl mx-auto">
-                                <CardHeader>
-                                    <CardTitle>Image</CardTitle>
-                                    <CardDescription>Annotate the image using marker.js</CardDescription>
-                                </CardHeader>
-                                <CardContent className="flex flex-col items-center py-10 space-y-4">
-                                    <div className="border border-gray-300 rounded-lg overflow-hidden">
-                                        <img
-                                            src={imageUrl}
-                                            alt="Annotation"
-                                            crossOrigin="anonymous"
-                                            className="max-w-full h-auto" />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
                     <Button
                         className="mb-4"
                         onClick={handleShowTutorial}
@@ -255,13 +237,16 @@ export function PlanetFourProject() {
                         Show Tutorial
                     </Button>
                     {imageUrl && (
-                        <ClassificationForm
+                        <ImageAnnotator
                             anomalyId={anomaly?.id.toString() || ""}
                             anomalyType="satellite-planetFour"
                             missionNumber={200000052}
                             assetMentioned={imageUrl}
                             structureItemId={3103}
+                            annotationType="P4"
+                            initialImageUrl={imageUrl}
                         />
+                        // <ClassificationForm />
                     )}
                 </>
             ) : (

@@ -3,7 +3,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { MiningComponentComponent } from "../(scenes)/mining/mining-component";
-import DiscoveriesPage from "@/content/Classifications/minimalDiscoveries";
 
 const menuItems = [
   { icon: Globe, label: "Planet", href: "/" },
@@ -19,18 +18,6 @@ const ModalContent = ({ onClose }: { onClose: () => void }) => (
       ✕
     </button>
     <MiningComponentComponent />
-  </div>
-);
-
-const ModalContentPosts = ({ onClose }: { onClose: () => void }) => (
-  <div className="flex flex-col h-full w-full p-4 rounded-md">
-    <button
-      onClick={onClose}
-      className="self-end text-gray-500 hover:text-gray-800 text-lg"
-    >
-      ✕
-    </button>
-    <DiscoveriesPage />
   </div>
 );
 
@@ -110,16 +97,6 @@ export default function BottomMenuLayout({ children }: { children: React.ReactNo
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="w-[90%] h-[90%] bg-white rounded-lg shadow-lg">
             <ModalContent onClose={closeModal} />
-          </div>
-        </div>
-      )}
-
-      {/* Modal for Guide */}
-      {isGuideOpen && (
-        <div className="fixed inset-0  flex items-center justify-center z-50">
-          <div className="w-[90%] h-[90%] rounded-lg">
-            {/* <ModalContentGuide onClose={closeModalGuide} /> */}
-            <ModalContentPosts onClose={closeModalGuide} />
           </div>
         </div>
       )}

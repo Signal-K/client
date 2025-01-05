@@ -151,7 +151,7 @@ export default function CloudSignal({ classificationConfig, classificationId }: 
     if (!classificationId) {
       console.error("Classification ID is missing.");
       return;
-    }
+    };
     setExporting(true);
   
     try {

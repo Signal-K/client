@@ -87,7 +87,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return "Enter your classification details...";
     }
   })();
-
+ 
   const classificationOptions = (() => {
     switch (anomalyType) {
       case "planet":
@@ -334,14 +334,14 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
           } else if (data) {
             const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
             setUploads((prevUploads) => [...prevUploads, url]);
-          }
-        }
+          };
+        };
       } catch (err) {
         console.error("Unexpected error during file upload:", err);
       } finally {
         setIsUploading(false);
-      }
-    }
+      };
+    };
   };
 
   const [additionalFields, setAdditionalFields] = useState<{

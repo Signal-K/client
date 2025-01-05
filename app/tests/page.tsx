@@ -1,17 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import StarnetLayout from "@/components/Layout/Starnet";
-import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
-// import { TopographicMap } from "@/components/topographic-map";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
-              {/* <Greenhouse /> */}
-              {/* <MiningComponent /> */}
-              <FreeformUploadData />
           </>
         // {/* </StarnetLayout> */}
     );
