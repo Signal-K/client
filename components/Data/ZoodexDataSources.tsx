@@ -3,7 +3,7 @@
 import { CameraIcon, CloudDrizzleIcon, DogIcon, MicroscopeIcon, SunDimIcon, TelescopeIcon, TestTube } from 'lucide-react';
 import { BurrowingOwlIcon } from '../../content/Icons/BurrowingOwl';
 import { FishIcon } from '../../content/Icons/FishIcon';
-import { StarterTelescope } from '../Projects/Telescopes/Transiting';
+import { StarterTelescopeTess } from '../Projects/Telescopes/Transiting';
 import { DailyMinorPlanet } from '../Projects/Telescopes/DailyMinorPlanet';
 import { PlanetFourProject } from '../Projects/Satellite/PlanetFour';
 import { TelescopeSunspotDetector } from '../Projects/Telescopes/Sunspots';
@@ -117,7 +117,7 @@ export const telescopeDataSources = [
                 activeStructure: 3103,
                 researched: 'telescope-tess',
                 techId: 1,
-                dynamicComponent: <StarterTelescope />
+                dynamicComponent: <StarterTelescopeTess />
             }
         ]
     },

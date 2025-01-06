@@ -241,12 +241,12 @@ export function P4Wrapper () {
 
     return (
         <div className="space-y-8">
-        {!selectedAnomaly && (
-            <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
-        )}
-        {selectedAnomaly && (
-            <PlanetFourProject anomalyid={selectedAnomaly} />
-        )}
+            {!selectedAnomaly && (
+                <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
+            )}
+            {selectedAnomaly && (
+                <PlanetFourProject anomalyid={selectedAnomaly} />
+            )}
         </div>
     );
 };

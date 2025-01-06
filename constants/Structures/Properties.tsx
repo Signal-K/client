@@ -3,7 +3,7 @@
 import React from "react";
 import AutomatonUpgrade from "@/components/Structures/Config/AutomatonUpgradeBox";
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
-import { StarterTelescope, StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
+import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import { BarChart, BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/Structures/Config/RepairStructure";

@@ -10,8 +10,10 @@ import ClassificationForm from '../PostForm';
 import {
   AI4MCATEGORIES,
   P4CATEGORIES,
+  PHCATEGORIES,
   type AI4MCategory,
   type P4Category,
+  type PHCategory,
   type DrawingObject,
   type Tool,
   type CategoryConfig,
@@ -25,7 +27,7 @@ interface ImageAnnotatorProps {
   missionNumber: number;
   assetMentioned: string | string[];
   structureItemId?: number;
-  annotationType: 'AI4M' | 'P4';
+  annotationType: 'AI4M' | 'P4' | 'PH' | 'Custom';
 }; 
 
 export default function ImageAnnotator({
@@ -50,9 +52,14 @@ export default function ImageAnnotator({
   const [uploads, setUploads] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const CATEGORY_CONFIG = annotationType === 'AI4M'
-    ? AI4MCATEGORIES as Record<AI4MCategory, CategoryConfig>
-    : P4CATEGORIES as Record<P4Category, CategoryConfig>;
+  const CATEGORY_CONFIG: Record<string, CategoryConfig> =
+  annotationType === 'AI4M'
+    ? AI4MCATEGORIES
+    : annotationType === 'P4'
+    ? P4CATEGORIES
+    : annotationType === 'PH'
+    ? PHCATEGORIES
+    : {} as Record<string, CategoryConfig>;
 
   const addMedia = async () => {
     if (!canvasRef.current || !session) return;
@@ -109,20 +116,23 @@ export default function ImageAnnotator({
       {selectedImage && (
         <div className="space-y-4">
           <SciFiPanel className="p-4">
-            <AnnotationCanvas
-              canvasRef={canvasRef}
-              imageRef={imageRef}
-              isDrawing={isDrawing}
-              setIsDrawing={setIsDrawing}
-              currentTool={currentTool}
-              currentColor={CATEGORY_CONFIG[currentCategory as keyof typeof CATEGORY_CONFIG].color}
-              lineWidth={lineWidth}
-              drawings={drawings}
-              setDrawings={setDrawings}
-              currentDrawing={currentDrawing}
-              setCurrentDrawing={setCurrentDrawing}
-              currentCategory={currentCategory}
-            />
+          <AnnotationCanvas
+  canvasRef={canvasRef}
+  imageRef={imageRef}
+  isDrawing={isDrawing}
+  setIsDrawing={setIsDrawing}
+  currentTool={currentTool}
+  currentColor={
+    CATEGORY_CONFIG[currentCategory as keyof typeof CATEGORY_CONFIG]?.color || '#000000'
+  }
+  lineWidth={lineWidth}
+  drawings={drawings}
+  setDrawings={setDrawings}
+  currentDrawing={currentDrawing}
+  setCurrentDrawing={setCurrentDrawing}
+  currentCategory={currentCategory}
+/>
+
           </SciFiPanel>
           <SciFiPanel className="p-4">
             <Legend
