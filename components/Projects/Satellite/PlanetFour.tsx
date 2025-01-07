@@ -11,9 +11,11 @@ import * as markerjs2 from "markerjs2";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
+
 interface Props {
     anomalyid: number | bigint;
-};
+}; 
 
 export function StarterPlanetFour({
     anomalyid
@@ -136,7 +138,11 @@ export function StarterPlanetFour({
     );
 };
 
-export function PlanetFourProject() { 
+interface SelectedAnomProps {
+    anomalyid?: number;
+}; 
+
+export function PlanetFourProject({ anomalyid }: SelectedAnomProps) { 
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -147,40 +153,6 @@ export function PlanetFourProject() {
     const [hasMission20000005, setHasMission20000005] = useState(false);
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
-    useEffect(() => {
-        const checkTutorialMission = async () => {
-            if (!session) return;
-    
-            try {
-                const { data: missionData, error: missionError } = await supabase
-                    .from('missions')
-                    .select('id')
-                    .eq('user', session.user.id)
-                    .eq('mission', '20000005')
-                    .limit(1);
-    
-                if (missionError) {
-                    console.error("Error fetching mission data:", missionError);
-                    setHasMission20000005(false);
-                } else {
-                    const hasMission = missionData && missionData.length > 0;
-                    setHasMission20000005(hasMission);
-                }
-            } catch (error) {
-                console.error("Error checking user mission: ", error);
-                setHasMission20000005(false);
-            } finally {
-                setLoading(false); 
-            }
-        };
-    
-        if (session) {
-            checkTutorialMission();
-        } else {
-            setLoading(false); 
-        }
-    }, [session, supabase]);
 
     const handleShowTutorial = () => {
         setShowTutorial(true);
@@ -218,10 +190,6 @@ export function PlanetFourProject() {
         return <div><p>Loading...</p></div>;
     };
     
-    if (!hasMission20000005) {
-        return <StarterPlanetFour anomalyid={83742405} />;
-    };
-    
     if (!anomaly) {
         return <div><p>No anomaly found.</p></div>;
     };
@@ -246,7 +214,6 @@ export function PlanetFourProject() {
                             annotationType="P4"
                             initialImageUrl={imageUrl}
                         />
-                        // <ClassificationForm />
                     )}
                 </>
             ) : (
@@ -254,6 +221,20 @@ export function PlanetFourProject() {
                     <StarterPlanetFour anomalyid={anomaly?.id} />
                 </div>
             )}
+            {anomalyid && <p>Selected Anomaly: {anomalyid}</p>}
         </div>
     );
 };    
+
+export function P4Wrapper () {
+    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+
+    return (
+        <div className="space-y-8">
+        <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
+        {selectedAnomaly && (
+            <PlanetFourProject anomalyid={selectedAnomaly} />
+        )}
+        </div>
+    );
+};

@@ -18,7 +18,7 @@ interface CommentProps {
   configuration?: {
     planetType?: string;
   };
-}
+};
 
 interface PostCardSingleProps {
   classificationId: number;
@@ -36,7 +36,7 @@ interface PostCardSingleProps {
   enableNewCommentingMethod?: boolean;
   children?: React.ReactNode;
   commentStatus?: boolean;
-}
+};
 
 export function PostCardSingle({
   classificationId,
@@ -267,7 +267,6 @@ export function PostCardSingle({
     <p>No comments yet. Be the first to comment!</p>
   )}
 </div>
-
         </CardContent>
       )}
     </Card>

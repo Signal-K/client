@@ -25,7 +25,7 @@ interface ImageAnnotatorProps {
   assetMentioned: string | string[];
   structureItemId?: number;
   annotationType: 'AI4M' | 'P4';
-}
+}; 
 
 export default function ImageAnnotator({
   initialImageUrl,
