@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ThumbsUp, MessageSquare } from "lucide-react";
+import { ThumbsUp, MessageSquare, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
+import canvasToImage from 'canvas-to-image';
+import html2canvas from 'html2canvas';
 
 interface CommentProps {
   id: number;
@@ -61,10 +63,35 @@ export function PostCardSingle({
   const [voteCount, setVoteCount] = useState(votes);
   const [newComment, setNewComment] = useState<string>("");
   const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
+  const [isSharing, setIsSharing] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchComments();
   }, [classificationId]);
+
+  const handleShare = async () => {
+    if (typeof window === "undefined" || !shareCardRef.current) return;
+    setIsSharing(true);
+  
+    try {
+      const canvas = await html2canvas(shareCardRef.current, {
+        backgroundColor: "#ffffff",
+        scale: 2,
+        useCORS: true,
+      });
+  
+      canvasToImage(canvas, {
+        name: `${title.toLowerCase().replace(/\s+/g, "-")}-share`,
+        type: "png",
+        quality: 1.0,
+      });
+    } catch (error) {
+      console.error("Error sharing post:", error);
+    } finally {
+      setIsSharing(false);
+    }
+  };  
 
   const fetchComments = async () => {
     setLoadingComments(true);
@@ -163,112 +190,127 @@ export function PostCardSingle({
       console.log("Preferred planet type updated:", planetType);
     } catch (error) {
       console.error("Error updating preferred comment:", error);
-    };
+    }
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
-      <CardHeader>
-        <div className="flex items-center space-x-4">
-          <Avatar>
-            <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${author}`} />
-            <AvatarFallback>{author[0]}</AvatarFallback>
-          </Avatar>
-          <div>
-            <CardTitle>{title}</CardTitle>
-            <p className="text-sm text-muted-foreground">by {author}</p>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Badge variant="secondary">{category}</Badge>
-        <p>{content}</p>
-        {images.length > 0 && (
-          <div>
-            <img src={images[0]} alt="Post Image" />
-          </div>
-        )}
-      </CardContent>
-      <CardFooter className="flex items-center justify-between">
-        <Button onClick={handleVoteClick} size="sm">
-          <ThumbsUp className="mr-2" /> {voteCount}
-        </Button>
-        <Button size="sm">
-          <MessageSquare className="mr-2" /> {comments.length}
-        </Button>
-      </CardFooter>
-      {commentStatus !== false && (
-        <CardContent>
-          {enableNewCommentingMethod ? (
-            <div className="space-y-4">
-              <Textarea
-                value={commentInputs[classificationId] || ""}
-                onChange={(e) =>
-                  setCommentInputs((prev) => ({ ...prev, [classificationId]: e.target.value }))
-                }
-                placeholder="Propose a planet type..."
-                rows={3}
-                className="w-full"
-              />
-              <div className="flex space-x-2">
-                <Button onClick={() => handleProposePlanetType("Terrestrial")}>
-                  Propose Terrestrial
-                </Button>
-                <Button onClick={() => handleProposePlanetType("Gaseous")}>
-                  Propose Gaseous
-                </Button>
+    <>
+      <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
+        <div ref={shareCardRef}>
+          <CardHeader>
+            <div className="flex items-center space-x-4">
+              <Avatar>
+                <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${author}`} />
+                <AvatarFallback>{author[0]}</AvatarFallback>
+              </Avatar>
+              <div>
+                <CardTitle>{title}</CardTitle>
+                <p className="text-sm text-muted-foreground">by {author}</p>
               </div>
             </div>
-          ) : (
-            <div className="space-y-4">
-              <Textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add your comment..."
-                rows={3}
-                className="w-full"
-              />
-              <Button onClick={handleAddComment} className="w-full">
-                Submit Comment
-              </Button>
-            </div>
-          )}
-<div className="mt-4 space-y-2">
-  {loadingComments ? (
-    <p>Loading comments...</p>
-  ) : comments.length > 0 ? (
-    comments.map((comment) => (
-      <CommentCard
-        key={comment.id}
-        author={comment.author}
-        content={comment.content}
-        createdAt={comment.created_at}
-        replyCount={0}
-        parentCommentId={classificationId}
-      >
-        {enableNewCommentingMethod && (
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-gray-600">
-              {comment.configuration?.planetType || "Unknown"}
-            </p>
-            {author === session?.user?.id && (
-              <button
-                onClick={() => handleSelectPreferredComment(comment.id)}
-                className="text-blue-500 mt-2"
-              >
-                Mark as Preferred
-              </button>
+          </CardHeader>
+          <CardContent>
+            <Badge variant="secondary">{category}</Badge>
+            <p>{content}</p>
+            {images.length > 0 && (
+              <div>
+                <img src={images[0]} alt="Post Image" className="mt-4 rounded-lg" />
+              </div>
             )}
+          </CardContent>
+        </div>
+        <CardFooter className="flex items-center justify-between">
+          <div className="flex gap-2">
+            <Button onClick={handleVoteClick} size="sm">
+              <ThumbsUp className="mr-2" /> {voteCount}
+            </Button>
+            <Button size="sm">
+              <MessageSquare className="mr-2" /> {comments.length}
+            </Button>
           </div>
+          <Button 
+            onClick={handleShare} 
+            size="sm" 
+            disabled={isSharing}
+            variant="outline"
+          >
+            <Share2 className="mr-2" />
+            {isSharing ? 'Sharing...' : 'Share'}
+          </Button>
+        </CardFooter>
+        {commentStatus !== false && (
+          <CardContent>
+            {enableNewCommentingMethod ? (
+              <div className="space-y-4">
+                <Textarea
+                  value={commentInputs[classificationId] || ""}
+                  onChange={(e) =>
+                    setCommentInputs((prev) => ({ ...prev, [classificationId]: e.target.value }))
+                  }
+                  placeholder="Propose a planet type..."
+                  rows={3}
+                  className="w-full"
+                />
+                <div className="flex space-x-2">
+                  <Button onClick={() => handleProposePlanetType("Terrestrial")}>
+                    Propose Terrestrial
+                  </Button>
+                  <Button onClick={() => handleProposePlanetType("Gaseous")}>
+                    Propose Gaseous
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <Textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Add your comment..."
+                  rows={3}
+                  className="w-full"
+                />
+                <Button onClick={handleAddComment} className="w-full">
+                  Submit Comment
+                </Button>
+              </div>
+            )}
+            <div className="mt-4 space-y-2">
+              {loadingComments ? (
+                <p>Loading comments...</p>
+              ) : comments.length > 0 ? (
+                comments.map((comment) => (
+                  <CommentCard
+                    key={comment.id}
+                    author={comment.author}
+                    content={comment.content}
+                    createdAt={comment.created_at}
+                    replyCount={0}
+                    parentCommentId={classificationId}
+                  >
+                    {enableNewCommentingMethod && (
+                      <div className="flex justify-between items-center">
+                        <p className="text-xs text-gray-600">
+                          {comment.configuration?.planetType || "Unknown"}
+                        </p>
+                        {author === session?.user?.id && (
+                          <button
+                            onClick={() => handleSelectPreferredComment(comment.id)}
+                            className="text-blue-500 mt-2"
+                          >
+                            Mark as Preferred
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </CommentCard>
+                ))
+              ) : (
+                <p>No comments yet. Be the first to comment!</p>
+              )}
+            </div>
+          </CardContent>
         )}
-      </CommentCard>
-    ))
-  ) : (
-    <p>No comments yet. Be the first to comment!</p>
-  )}
-</div>
-        </CardContent>
-      )}
-    </Card>
+      </Card>
+    </>
   );
 };

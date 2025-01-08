@@ -6,28 +6,7 @@ import LoginPage from "./auth/LoginModal";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import {
   EarthView,
-  MoonView,
-  JupiterView,
-  AmaltheaView,
-  EuropaView,
-  IoView,
-  MarsView,
-  DeimosView,
-  PhobosView,
-  MercuryView,
-  MiningView,
-  // NeptuneView,
-  // TritonView,
-  PlanetView,
-  // PlutoView,
-  // SaturnView,
-  // EnceladusView,
-  // TitanView,
-  // UranusView,
-  // MirandaView,
-  VenusView
 } from './scenes';
-import GlobeView from "./scenes/globe/page";
 import { EarthScene } from "./scenes/earth/scene";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
@@ -47,17 +26,6 @@ export default function Home() {
   });
 
   const planetViews: Record<number, JSX.Element> = {
-    10: <MercuryView />,
-    20: <VenusView />,
-    69: <EarthView />,
-    31: <MoonView />,
-    40: <MarsView />,
-    41: <PhobosView />,
-    42: <DeimosView />,
-    50: <JupiterView />,
-    52: <IoView />,
-    55: <EuropaView />,
-    51: <AmaltheaView />,
     // 30: <EarthScene
     //   topSection={
     //     <EnhancedWeatherEvents />
@@ -116,12 +84,6 @@ export default function Home() {
   if (activePlanet?.id === 69) {
     return (
       <EarthScene />
-    );
-  };
-
-  if (activePlanet?.id == 35) {
-    return (
-      <GlobeView />
     );
   };
 

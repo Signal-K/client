@@ -10,7 +10,6 @@ import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
 import ModernTechTree from "@/components/Structures/Research/TechTree";
-import MiningScene from "@/app/scenes/mining/page";
 import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
 import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
@@ -103,7 +102,7 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <PickaxeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: `Go mining`,
-          dynamicComponent: <MiningScene />,
+          // dynamicComponent: <MiningScene />,
           sizePercentage: 73,
         },
         {
