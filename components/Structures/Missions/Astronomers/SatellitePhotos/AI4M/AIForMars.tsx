@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../../BasePlate";
 import { CloudCogIcon, FolderCog, PaintBucket, Vote } from "lucide-react";
-import { AiForMarsProject } from "@/components/Projects/Auto/AI4Mars";
+import { AI4MWrapper, AiForMarsProject } from "@/components/Projects/Auto/AI4Mars";
 import VoteAI4MClassifications from "./AI4MVote";
 
 interface Mission {
@@ -40,7 +40,7 @@ const AI4M = () => {
                 icon: CloudCogIcon,
                 points: 2,
                 completedCount: 0,
-                internalComponent: () => <AiForMarsProject />,
+                internalComponent: () => <AI4MWrapper />,
                 color: "text-blue-500",
             },
             {

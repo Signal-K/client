@@ -19,7 +19,7 @@ interface Mission {
 
 interface MissionPoints {
     [key: number]: number;
-};
+}; 
 
 const PlanetFour = () => {
     const supabase = useSupabaseClient();

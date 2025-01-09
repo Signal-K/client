@@ -157,43 +157,43 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
     const handleShowTutorial = () => {
         setShowTutorial(true);
     };
-    
-    useEffect(() => {
-        const fetchAnomaly = async () => {
-            if (!hasMission20000005 || !session) return;
-    
-            try {
-                const { data: anomalyData, error: anomalyError } = await supabase
-                    .from('anomalies')
-                    .select('*')
-                    .eq('anomalySet', 'satellite-planetFour');
-    
-                if (anomalyError) throw anomalyError;
-    
-                const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
-                setAnomaly(randomAnomaly);
-                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${randomAnomaly.id}.jpeg`);
-            } catch (error: any) {
-                console.error("Error fetching anomaly", error.message);
-                setAnomaly(null);
-            } finally {
-                setLoading(false); 
-            }
+
+    const fetchAnomaly = async () => {
+        if (!anomalyid || !session) return; 
+
+        setLoading(true); 
+        
+        try {
+            const { data: anomalyData, error: anomalyError } = await supabase
+                .from('anomalies')
+                .select('*')
+                .eq('id', anomalyid)  
+                .single();  
+
+            if (anomalyError) throw anomalyError;
+
+            setAnomaly(anomalyData);
+            setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomalyData.id}.jpeg`);
+        } catch (error: any) {
+            console.error("Error fetching anomaly", error.message);
+            setAnomaly(null);
+        } finally {
+            setLoading(false); 
         };
-    
-        if (hasMission20000005 && session) {
-            fetchAnomaly();
-        }
-    }, [session, supabase, supabaseUrl, hasMission20000005]);
-    
+    };
+
+    useEffect(() => {
+        fetchAnomaly();
+    }, [anomalyid, session, supabase, supabaseUrl]);
+
     if (loading) {
         return <div><p>Loading...</p></div>;
     };
-    
+
     if (!anomaly) {
-        return <div><p>No anomaly found.</p></div>;
+        return <div><p>No anomaly found with ID {anomalyid}</p></div>;
     };
-    
+
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             {!showTutorial ? (
@@ -206,7 +206,7 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
                     </Button>
                     {imageUrl && (
                         <ImageAnnotator
-                            anomalyId={anomaly?.id.toString() || ""}
+                            anomalyId={anomaly.id.toString()}
                             anomalyType="satellite-planetFour"
                             missionNumber={200000052}
                             assetMentioned={imageUrl}
@@ -218,10 +218,10 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
                 </>
             ) : (
                 <div>
-                    <StarterPlanetFour anomalyid={anomaly?.id} />
+                    <StarterPlanetFour anomalyid={anomaly.id} />
                 </div>
             )}
-            {anomalyid && <p>Selected Anomaly: {anomalyid}</p>}
+            <p>Selected Anomaly ID: {anomalyid}</p>
         </div>
     );
 };    

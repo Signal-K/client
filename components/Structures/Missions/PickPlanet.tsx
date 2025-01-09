@@ -18,7 +18,7 @@ interface Classification {
 
 interface PreferredTerrestrialClassificationsProps {
     onSelectAnomaly: (anomalyId: number | null) => void;
-  }
+  };
   
   export default function PreferredTerrestrialClassifications({
     onSelectAnomaly,
@@ -46,7 +46,7 @@ interface PreferredTerrestrialClassificationsProps {
         if (classificationIds.length === 0) {
           setClassifications([]);
           return;
-        }
+        };
   
         const { data: classificationsData, error: classificationsError } = await supabase
           .from("classifications")
@@ -62,8 +62,8 @@ interface PreferredTerrestrialClassificationsProps {
               images = classification.media.filter((url: any) => typeof url === "string");
             } else if (typeof classification.media === "object" && classification.media.uploadUrl) {
               images.push(classification.media.uploadUrl);
-            }
-          }
+            };
+          };
           return { ...classification, images };
         });
   
@@ -72,7 +72,7 @@ interface PreferredTerrestrialClassificationsProps {
         setError("An unexpected error occurred.");
       } finally {
         setLoading(false);
-      }
+      };
     };
   
     useEffect(() => {
@@ -98,7 +98,7 @@ interface PreferredTerrestrialClassificationsProps {
                 votes={0}
                 category="Terrestrial"
                 tags={["Preferred", "Planet"]}
-                images={classification.images || []}
+                images={classification.media || []}
                 anomalyId={classification.anomaly?.toString() || "N/A"}
                 classificationType="planet"
                 classificationConfig={classification.classificationConfiguration}

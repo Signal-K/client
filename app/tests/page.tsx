@@ -1,11 +1,13 @@
 "use client";
 
+import PlanetFour from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/PlanetFour";
 import React, { useState } from "react";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
+            <PlanetFour />
           </>
         // {/* </StarnetLayout> */}
     );
