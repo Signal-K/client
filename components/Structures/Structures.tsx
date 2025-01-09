@@ -19,7 +19,11 @@ interface StructuresOnPlanetProps {
 
 import { UnownedSurfaceStructures } from "./Build/EditMode";
 
-export default function StructuresOnPlanet() {
+interface Props {
+  author?: string;
+};
+
+export default function StructuresOnPlanet({ author }: Props) {
   const supabase = useSupabaseClient(); 
   const session = useSession();
 
@@ -75,8 +79,57 @@ export default function StructuresOnPlanet() {
     };
   }, [session?.user?.id, activePlanet?.id, supabase]);
 
+  const fetchStructuresFromProvidedAuthor = useCallback(async () => {
+    if (!session?.user?.id || !activePlanet?.id) {
+      setLoading(false);
+      return;
+    };
+
+    try {
+      const response = await fetch('/api/gameplay/inventory');
+      const itemsData: StructureItemDetail[] = await response.json();
+      const itemMap = new Map<number, StructureItemDetail>();
+      itemsData.forEach(item => {
+        if (item.ItemCategory === 'Structure') {
+          itemMap.set(item.id, item);
+        };
+      });
+
+      setItemDetails(itemMap);
+
+      const { data: inventoryData, error: inventoryError } = await supabase
+        .from('inventory')
+        .select('*')
+        .eq('owner', author)
+        .eq('anomaly', activePlanet.id);
+
+      if (inventoryError) throw inventoryError;
+
+      const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
+      inventoryData.forEach((structure: InventoryStructureItem) => {
+        const itemDetail = itemMap.get(structure.item);
+        if (itemDetail && itemDetail.locationType === 'Surface' && !uniqueStructuresMap.has(structure.item)) {
+          uniqueStructuresMap.set(structure.item, structure);
+        };
+      });
+
+      const uniqueStructures = Array.from(uniqueStructuresMap.values());
+      setUserStructuresOnPlanet(uniqueStructures || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    };
+  }, [session?.user?.id, activePlanet?.id, supabase]);
+
   useEffect(() => {
-    fetchStructures();
+    if (!author) {
+      fetchStructures();
+    };
+
+    if (author) {
+      fetchStructuresFromProvidedAuthor();
+    };
   }, [fetchStructures]);
 
   const handleIconClick = (itemId: number, inventoryId: number) => {
@@ -113,7 +166,7 @@ export default function StructuresOnPlanet() {
   }; 
 
   return (
-<div className="relative">
+    <div className="relative">
             <div className={`grid grid-cols-4 gap-1 gap-y-3 relative ${userStructuresOnPlanet.length === 1 ? 'justify-center' : ''}`}>
                 {userStructuresOnPlanet.map((structure) => {
                     const itemDetail = itemDetails.get(structure.item);
@@ -126,7 +179,9 @@ export default function StructuresOnPlanet() {
                                 className={`w-24 h-24 object-cover cursor-pointer ${structure.item === missionStructureId ? 'bouncing-structure' : 'moving-structure'}`}
                                 onClick={() => handleIconClick(itemDetail.id, structure.id)}
                             />
-                            <p className="text-white text-sm mt-2">{itemDetail.name}</p>
+                            {!author && (
+                              <p className="text-white text-sm mt-2">{itemDetail.name}</p>
+                            )}
                         </div>
                     ) : null;
                 })}
@@ -145,7 +200,9 @@ export default function StructuresOnPlanet() {
                     onClose={handleClose}
                 />
             )}
-            <UnownedSurfaceStructures />
+            {!author && (
+              <UnownedSurfaceStructures />
+            )}
             {/* <CreateCommunityStation /> */}
             {/* <StationsOnPlanetOpen /> */}
         </div>

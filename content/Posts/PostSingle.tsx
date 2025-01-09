@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -166,6 +166,18 @@ export function PostCardSingle({
     }
   };
 
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+
+  const goToNextImage = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+  };
+
+  const goToPreviousImage = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
+  };
+
   return (
     <>
       <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
@@ -186,10 +198,50 @@ export function PostCardSingle({
             <Badge variant="secondary">{category}</Badge>
             <p>{content}</p>
             {images.length > 0 && (
-              <div>
-                <img src={images[0]} alt="Post Image" className="mt-4 rounded-lg" />
-              </div>
+          <div className="relative mt-4">
+            {/* Image */}
+            <img
+              src={images[currentIndex]}
+              alt={`Image ${currentIndex + 1}`}
+              className="rounded-lg w-full"
+            />
+
+            {/* Left Arrow */}
+            {images.length > 1 && (
+              <button
+                onClick={goToPreviousImage}
+                className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2 focus:outline-none"
+              >
+                &#8592;
+              </button>
             )}
+
+            {/* Right Arrow */}
+            {images.length > 1 && (
+              <button
+                onClick={goToNextImage}
+                className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2 focus:outline-none"
+              >
+                &#8594;
+              </button>
+            )}
+
+            {/* Indicators */}
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`h-2 w-2 rounded-full ${
+                    currentIndex === index
+                      ? 'bg-white'
+                      : 'bg-gray-400'
+                  }`}
+                ></button>
+              ))}
+            </div>
+          </div>
+        )}
           </CardContent>
         </div>
         <CardFooter className="flex items-center justify-between">
