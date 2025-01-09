@@ -9,8 +9,6 @@ import { ThumbsUp, MessageSquare, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
-import canvasToImage from 'canvas-to-image';
-import html2canvas from 'html2canvas';
 
 interface CommentProps {
   id: number;
@@ -63,35 +61,10 @@ export function PostCardSingle({
   const [voteCount, setVoteCount] = useState(votes);
   const [newComment, setNewComment] = useState<string>("");
   const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
-  const [isSharing, setIsSharing] = useState(false);
-  const shareCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchComments();
   }, [classificationId]);
-
-  const handleShare = async () => {
-    if (typeof window === "undefined" || !shareCardRef.current) return;
-    setIsSharing(true);
-  
-    try {
-      const canvas = await html2canvas(shareCardRef.current, {
-        backgroundColor: "#ffffff",
-        scale: 2,
-        useCORS: true,
-      });
-  
-      canvasToImage(canvas, {
-        name: `${title.toLowerCase().replace(/\s+/g, "-")}-share`,
-        type: "png",
-        quality: 1.0,
-      });
-    } catch (error) {
-      console.error("Error sharing post:", error);
-    } finally {
-      setIsSharing(false);
-    }
-  };  
 
   const fetchComments = async () => {
     setLoadingComments(true);
@@ -196,7 +169,7 @@ export function PostCardSingle({
   return (
     <>
       <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
-        <div ref={shareCardRef}>
+        <div>
           <CardHeader>
             <div className="flex items-center space-x-4">
               <Avatar>
@@ -228,7 +201,7 @@ export function PostCardSingle({
               <MessageSquare className="mr-2" /> {comments.length}
             </Button>
           </div>
-          <Button 
+          {/* <Button 
             onClick={handleShare} 
             size="sm" 
             disabled={isSharing}
@@ -236,7 +209,7 @@ export function PostCardSingle({
           >
             <Share2 className="mr-2" />
             {isSharing ? 'Sharing...' : 'Share'}
-          </Button>
+          </Button> */}
         </CardFooter>
         {commentStatus !== false && (
           <CardContent>
