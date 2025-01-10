@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "@chakra-ui/react": "^3.2.3",
+    "@dicebear/collection": "^9.2.2",
+    "@dicebear/converter": "^9.2.2",
+    "@dicebear/core": "^9.2.2",
     "@headlessui/react": "^2.2.0",
     "@hello-pangea/dnd": "^16.5.0",
     "@radix-ui/react-accordion": "^1.2.0",

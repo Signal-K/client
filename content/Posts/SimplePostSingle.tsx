@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import StructuresOnPlanet from '@/components/Structures/Structures';
+import { AvatarGenerator } from '@/app/tests/page';
 
 interface SimplePostSingleProps {
   title: string;
@@ -35,10 +36,7 @@ export function SimplePostSingle({
       <Card className="w-full max-w-lg bg-white/30 backdrop-blur-md border border-white/10 shadow-lg rounded-lg">
         <CardHeader>
           <div className="flex items-center space-x-4">
-            <Avatar>
-              <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${author}`} />
-              <AvatarFallback>{author[0]}</AvatarFallback>
-            </Avatar>
+            <AvatarGenerator author={author} />
             <div>
               <CardTitle>{title}</CardTitle>
               <p className="text-sm text-muted-foreground">by {author}</p>

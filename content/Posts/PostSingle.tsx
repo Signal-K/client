@@ -9,6 +9,7 @@ import { ThumbsUp, MessageSquare, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
+import { AvatarGenerator } from "@/app/tests/page";
 
 interface CommentProps {
   id: number;
@@ -185,8 +186,9 @@ export function PostCardSingle({
           <CardHeader>
             <div className="flex items-center space-x-4">
               <Avatar>
-                <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${author}`} />
+                <AvatarImage src={`https://api.dicebear.com/6.x/bottts/svg?seed=${encodeURIComponent(author)}`} />
                 <AvatarFallback>{author[0]}</AvatarFallback>
+                <AvatarGenerator author={author} />
               </Avatar>
               <div>
                 <CardTitle>{title}</CardTitle>
