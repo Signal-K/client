@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../BasePlate";
-import { CloudCogIcon, CloudHail } from "lucide-react";
+import { CloudCogIcon, CloudHail, ShovelIcon } from "lucide-react";
 import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
 import VoteJVH from "./JVHVote";
 import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
 import JVHCloudClassificationGenerator from "./GaseousPlanetCloudMaker";
+import ClassificationOptionsCounter from "@/content/Posts/ClassificationOptionsCounter";
 
 interface Mission {
     id: number;
@@ -66,6 +67,18 @@ const JovianVortexHunters = () => {
             completedCount: 0,
             internalComponent: () => <JVHCloudClassificationGenerator />,
             color: 'text-green-700',
+        },
+        {
+            id: 4,
+            chapter: 1,
+            title: "Find all cloud types",
+            description: 
+                "Identify and classify all cloud types in the data.",
+            icon: ShovelIcon,
+            points: 2,
+            completedCount: 0,
+            internalComponent: () => <ClassificationOptionsCounter />,
+            color: 'text-red-500',
         },
         // {
         //     id: 3,
