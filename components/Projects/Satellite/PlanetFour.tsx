@@ -159,32 +159,41 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
     };
 
     const fetchAnomaly = async () => {
-        if (!anomalyid || !session) return; 
-
-        setLoading(true); 
-        
+        if (!session) {
+            console.error("No session found");
+            setLoading(false);
+            return;
+        };
+    
+        setLoading(true);
+    
         try {
-            const { data: anomalyData, error: anomalyError } = await supabase
+            const { data: anomalies, error } = await supabase
                 .from('anomalies')
                 .select('*')
-                .eq('id', anomalyid)  
-                .single();  
-
-            if (anomalyError) throw anomalyError;
-
-            setAnomaly(anomalyData);
-            setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomalyData.id}.jpeg`);
-        } catch (error: any) {
-            console.error("Error fetching anomaly", error.message);
+                .eq('anomalySet', 'satellite-planetFour');
+    
+            if (error) throw error;
+    
+            if (!anomalies || anomalies.length === 0) {
+                console.error("No anomalies found for the given type");
+                setAnomaly(null);
+            } else {
+                const anomaly = anomalies[0];
+                setAnomaly(anomaly);
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomaly.id}.jpeg`);
+            }
+        } catch (error) {
+            console.error("Error fetching anomaly", error);
             setAnomaly(null);
         } finally {
-            setLoading(false); 
+            setLoading(false);
         };
-    };
+    };    
 
     useEffect(() => {
         fetchAnomaly();
-    }, [anomalyid, session, supabase, supabaseUrl]);
+    }, [session, supabase, supabaseUrl]);
 
     if (loading) {
         return <div><p>Loading...</p></div>;
@@ -215,6 +224,7 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
                             initialImageUrl={imageUrl}
                         />
                     )}
+                    {imageUrl}
                 </>
             ) : (
                 <div>
@@ -231,7 +241,9 @@ export function P4Wrapper () {
 
     return (
         <div className="space-y-8">
-        <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
+        {!selectedAnomaly && (
+            <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
+        )}
         {selectedAnomaly && (
             <PlanetFourProject anomalyid={selectedAnomaly} />
         )}

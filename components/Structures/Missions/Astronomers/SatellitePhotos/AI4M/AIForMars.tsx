@@ -42,7 +42,7 @@ const AI4M = () => {
                 completedCount: 0,
                 internalComponent: () => <AI4MWrapper />,
                 color: "text-blue-500",
-            },
+            }, 
             {
                 id: 2,
                 chapter: 1,
