@@ -16,6 +16,7 @@ import {
   type Tool,
   type CategoryConfig,
 } from '@/types/Annotation';
+import { SciFiPanel } from '@/components/ui/styles/sci-fi/panel';
 
 interface ImageAnnotatorProps {
   initialImageUrl: string;
@@ -96,45 +97,55 @@ export default function ImageAnnotator({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <AnnotationTools
-          currentTool={currentTool}
-          setCurrentTool={setCurrentTool}
-          lineWidth={lineWidth}
-          setLineWidth={setLineWidth}
-        />
+        <SciFiPanel className="p-4">
+          <AnnotationTools
+            currentTool={currentTool}
+            setCurrentTool={setCurrentTool}
+            lineWidth={lineWidth}
+            setLineWidth={setLineWidth}
+          />
+        </SciFiPanel>
       </div>
       {selectedImage && (
         <div className="space-y-4">
-          <AnnotationCanvas
-            canvasRef={canvasRef}
-            imageRef={imageRef}
-            isDrawing={isDrawing}
-            setIsDrawing={setIsDrawing}
-            currentTool={currentTool}
-            currentColor={CATEGORY_CONFIG[currentCategory as keyof typeof CATEGORY_CONFIG].color}
-            lineWidth={lineWidth}
-            drawings={drawings}
-            setDrawings={setDrawings}
-            currentDrawing={currentDrawing}
-            setCurrentDrawing={setCurrentDrawing}
-            currentCategory={currentCategory}
-          />
-          <Legend
-            currentCategory={currentCategory}
-            setCurrentCategory={setCurrentCategory}
-            categoryCount={categoryCount}
-            categories={CATEGORY_CONFIG as Record<AI4MCategory | P4Category, CategoryConfig>}
-          />
-          <Button onClick={addMedia} disabled={isUploading}>
-            {isUploading ? 'Uploading...' : 'Save & proceed'}
-          </Button>
-          <ClassificationForm
-            anomalyId={anomalyId}
-            anomalyType={anomalyType}
-            missionNumber={missionNumber}
-            assetMentioned={[...uploads, ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned])]}
-            structureItemId={structureItemId}
-          />
+          <SciFiPanel className="p-4">
+            <AnnotationCanvas
+              canvasRef={canvasRef}
+              imageRef={imageRef}
+              isDrawing={isDrawing}
+              setIsDrawing={setIsDrawing}
+              currentTool={currentTool}
+              currentColor={CATEGORY_CONFIG[currentCategory as keyof typeof CATEGORY_CONFIG].color}
+              lineWidth={lineWidth}
+              drawings={drawings}
+              setDrawings={setDrawings}
+              currentDrawing={currentDrawing}
+              setCurrentDrawing={setCurrentDrawing}
+              currentCategory={currentCategory}
+            />
+          </SciFiPanel>
+          <SciFiPanel className="p-4">
+            <Legend
+              currentCategory={currentCategory}
+              setCurrentCategory={setCurrentCategory}
+              categoryCount={categoryCount}
+              categories={CATEGORY_CONFIG as Record<AI4MCategory | P4Category, CategoryConfig>}
+            />
+          </SciFiPanel>
+          <SciFiPanel className="p-4">
+            <Button onClick={addMedia} disabled={isUploading}>
+              {isUploading ? 'Uploading...' : 'Save & proceed'}
+            </Button>
+          </SciFiPanel>
+          <SciFiPanel className="p-4">
+            <ClassificationForm
+              anomalyId={anomalyId}
+              anomalyType={anomalyType}
+              missionNumber={missionNumber}
+              assetMentioned={[...uploads, ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned])]}
+              structureItemId={structureItemId}
+            />
+          </SciFiPanel>
         </div>
       )}
     </div>

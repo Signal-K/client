@@ -2,7 +2,7 @@ interface SciFiPanelProps {
   children: React.ReactNode
   variant?: "primary" | "secondary"
   className?: string
-}
+};
 
 export function SciFiPanel({ children, variant = "primary", className = "" }: SciFiPanelProps) {
   return (
@@ -27,6 +27,5 @@ export function SciFiPanel({ children, variant = "primary", className = "" }: Sc
       {/* Glowing Effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent pointer-events-none" />
     </div>
-  )
-}
-
+  );
+};

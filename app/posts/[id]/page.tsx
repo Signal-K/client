@@ -92,6 +92,7 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
         {classification.author && (
           <div className="w-1/2">
         <SimplePostSingle
+            id={classification.id.toString()}
             title={`Classification #${classification.id}`}
             author={classification.author || "Unknown"}
             content={classification.content || "No content available"}

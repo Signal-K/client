@@ -306,7 +306,9 @@ export function AI4MWrapper() {
 
     return (
         <div className="space-y-8">
-            <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
+            {!selectedAnomaly && (
+                <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
+            )}
             {selectedAnomaly && 
                 <AiForMarsProject anomalyid={selectedAnomaly}
             />}

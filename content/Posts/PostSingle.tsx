@@ -9,7 +9,7 @@ import { ThumbsUp, MessageSquare, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
-import { AvatarGenerator } from "@/app/tests/page";
+import { AvatarGenerator } from '@/components/Account/Avatar';
 
 interface CommentProps {
   id: number;
@@ -135,7 +135,7 @@ export function PostCardSingle({
       fetchComments();
     } catch (error) {
       console.error("Error inserting comment:", error);
-    }
+    };
   };
 
   const handleSelectPreferredComment = async (commentId: number) => {
@@ -164,7 +164,7 @@ export function PostCardSingle({
       console.log("Preferred planet type updated:", planetType);
     } catch (error) {
       console.error("Error updating preferred comment:", error);
-    }
+    };
   };
 
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -177,6 +177,25 @@ export function PostCardSingle({
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
+  };
+
+  // For sharing
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
+  };
+
+  const handleCopyLink = () => {
+    const link = `https://starsailors.space/posts/${classificationId}`;
+    navigator.clipboard.writeText(link).then(() => {
+      alert("Link copied to clipboard!");
+    });
+  };
+
+  const openPostInNewTab = () => {
+    window.open(`/posts/${classificationId}`, "_blank");
   };
 
   return (
@@ -254,6 +273,38 @@ export function PostCardSingle({
             <Button size="sm">
               <MessageSquare className="mr-2" /> {comments.length}
             </Button>
+          </div>
+          <div className="relative" ref={dropdownRef}>
+            <Button
+              onClick={toggleDropdown}
+              size="lg"
+              className="flex items-center gap-2 w-40 justify-center"
+            >
+              <Share2 className="mr-2" /> Share
+            </Button>
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-72 bg-card border rounded shadow-md z-50 p-4">
+                <p className="text-sm mb-2">
+                  Share this post:{" "}
+                  <a
+                    href={`https://starsailors.space/posts/${classificationId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    starsailors.space/posts/{classificationId}
+                  </a>
+                </p>
+                <div className="flex gap-2">
+                  <Button onClick={handleCopyLink} className="flex-1">
+                    Copy Link
+                  </Button>
+                  <Button onClick={openPostInNewTab} className="flex-1">
+                    Open
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
           {/* <Button 
             onClick={handleShare} 

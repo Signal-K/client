@@ -24,6 +24,7 @@ import { Button } from "antd";
 import Link from "next/link";
 // import UserAvatar, { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 import { ClassificationFormProps } from "./FormConfigurations";
+import { SciFiButton } from "@/components/ui/styles/sci-fi/button";
 
 const ClassificationForm: React.FC<ClassificationFormProps> = ({
   anomalyType,
@@ -247,8 +248,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         currentConfig = inventoryData?.configuration || {};
         if (currentConfig.Uses) {
           currentConfig.Uses = Math.max(0, currentConfig.Uses - 1);
-        }
-      }
+        };
+      };
 
       if (inventoryItemId) {
         const { error: updateError } = await supabase
@@ -258,8 +259,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
 
         if (updateError) {
           throw updateError;
-        }
-      }
+        };
+      };
 
       const { data: classificationData, error: classificationError } =
         await supabase
@@ -287,7 +288,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         setSelectedOptions({});
         setUploads([]);
         setPostSubmitted(true);
-      }
+      };
 
       await handleMissionComplete();
 
@@ -474,12 +475,12 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
                     <span>Upload Media</span>
                   </label>
                   {isUploading && <span className="text-[#88C0D0]">Uploading...</span>}
-                  <button
+                  <SciFiButton
                     onClick={createPost}
                     className="py-2 px-4 bg-[#5FCBC3] text-[#2E3440] rounded-md hover:bg-[#85DDA2]"
                   >
                     Submit
-                  </button>
+                  </SciFiButton>
                 </div>
               </div>
             </>
@@ -511,12 +512,12 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
                   <span>Upload Media</span>
                 </label>
                 {isUploading && <span className="text-[#88C0D0]">Uploading...</span>}
-                <button
+                <SciFiButton
                   onClick={createPost}
-                  className="py-2 px-4 bg-[#5FCBC3] text-[#2E3440] rounded-md hover:bg-[#85DDA2]"
+                  className="flex items-center justify-center gap-2"
                 >
                   Submit
-                </button>
+                </SciFiButton>
               </div>
             </div>
           )}

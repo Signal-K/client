@@ -1,25 +1,29 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import StructuresOnPlanet from '@/components/Structures/Structures';
-import { AvatarGenerator } from '@/app/tests/page';
+import { AvatarGenerator } from '@/components/Account/Avatar';
+import { Button } from '@/components/ui/button';
+import { Share2 } from 'lucide-react';
 
 interface SimplePostSingleProps {
   title: string;
+  id: string;
   author: string;
   content: string;
   category: string;
   images: string[];
-}
+};
 
 export function SimplePostSingle({
+  id,
   title,
   author,
   content,
   category,
   images,
 }: SimplePostSingleProps) {
-  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const goToNextImage = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -31,9 +35,51 @@ export function SimplePostSingle({
     );
   };
 
+  // For sharing
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
+  };
+
+  const handleCopyLink = () => {
+    const link = `https://starsailors.space/posts/${id}`;
+    navigator.clipboard.writeText(link).then(() => {
+      alert('Link copied to clipboard!');
+    });
+  };
+
+  const openPostInNewTab = () => {
+    window.open(`/posts/${id}`, '_blank');
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <Card className="w-full max-w-lg bg-white/30 backdrop-blur-md border border-white/10 shadow-lg rounded-lg">
+      <Card className="w-full max-w-lg bg-white/30 backdrop-blur-md border border-white/10 shadow-lg rounded-lg relative">
+        {/* Share Button Positioned in the Top Right */}
+        <div
+          className="absolute top-2 right-2 z-10"
+          ref={dropdownRef}
+        >
+          <Button
+            onClick={toggleDropdown}
+            className="flex items-center gap-2 justify-center"
+          >
+            <Share2 className="mr-2" /> Share
+          </Button>
+          {dropdownOpen && (
+            <div className="absolute top-10 right-0 bg-white/30 backdrop-blur-md border border-white/10 shadow-lg rounded-lg p-4">
+              <Button onClick={handleCopyLink} className="w-full mb-2">
+                Copy Link
+              </Button>
+              <Button onClick={openPostInNewTab} className="w-full">
+                Open
+              </Button>
+            </div>
+          )}
+        </div>
+
         <CardHeader>
           <div className="flex items-center space-x-4">
             <AvatarGenerator author={author} />
