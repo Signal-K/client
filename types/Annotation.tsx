@@ -28,6 +28,30 @@ export const P4CATEGORIES: Record<P4Category, CategoryConfig> = {
   },
 };
 
+export type PHCategory = 'Noise' | 'Clear dip' | 'Missing' | 'Custom/Other';
+export const PHCATEGORIES: Record<PHCategory, CategoryConfig> = {
+  Noise: {
+    name: 'Noise',
+    color: '#00BCD4',
+    description: 'Noise (random or irrelevant data)'
+  },
+  'Clear dip': {
+    name: 'Clear dip',
+    color: '#4CAF50',
+    description: 'Clear dip (a clear dip in the light)'
+  },
+  Missing: {
+    name: 'Missing',
+    color: '#FFC107',
+    description: 'Missing (missing data/empty spot)'
+  },
+  'Custom/Other': {
+    name: 'Custom/Other',
+    color: '#FF0000',
+    description: 'Custom or other annotation'
+  },
+};
+
 export type AI4MCategory = 'sand' | 'consolidated-soil' | 'bedrock' | 'big-rocks' | 'custom';
 export const AI4MCATEGORIES: Record<AI4MCategory, CategoryConfig> = {
   sand: {

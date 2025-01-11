@@ -108,24 +108,39 @@ export function AnnotationCanvas({
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx || !imageRef.current) return;
-
+  
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(
-      imageRef.current,
-      0,
-      0,
-      CANVAS_WIDTH,
-      CANVAS_HEIGHT // Scale the image to fit within the fixed canvas size
-    );
-
+  
+    const img = imageRef.current;
+    const imgAspectRatio = img.width / img.height;
+    const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
+  
+    let drawWidth, drawHeight, offsetX, offsetY;
+  
+    if (imgAspectRatio > canvasAspectRatio) {
+      // Image is wider than canvas
+      drawWidth = CANVAS_WIDTH;
+      drawHeight = CANVAS_WIDTH / imgAspectRatio;
+      offsetX = 0;
+      offsetY = (CANVAS_HEIGHT - drawHeight) / 2;
+    } else {
+      // Image is taller than canvas
+      drawWidth = CANVAS_HEIGHT * imgAspectRatio;
+      drawHeight = CANVAS_HEIGHT;
+      offsetX = (CANVAS_WIDTH - drawWidth) / 2;
+      offsetY = 0;
+    };
+  
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+  
     drawings.forEach((drawing) => {
       drawObject(ctx, drawing);
     });
-
+  
     if (currentDrawing) {
       drawObject(ctx, currentDrawing);
-    }
-  };
+    };
+  };  
 
   useEffect(() => {
     if (imageRef.current) {
@@ -151,7 +166,7 @@ export function AnnotationCanvas({
         onMouseUp={stopDrawing}
         onMouseOut={stopDrawing}
         className={cn("cursor-crosshair", isDrawing && "cursor-none")}
-        style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}
+        style={{ width: `${CANVAS_WIDTH}px`, height: `${CANVAS_HEIGHT}px` }}
       />
     </div>
   );

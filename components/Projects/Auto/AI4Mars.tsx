@@ -6,6 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 
 interface Props {
     anomalyid: number | bigint;
@@ -139,12 +140,18 @@ export function StarterAiForMars({ anomalyid }: Props) {
                         </div>
                     </>
                 )}
-            </div>
+            </div> 
         </div>
     );
 };
 
-export function AiForMarsProject() {
+interface SelectedAnomProps {
+    anomalyid?: number;
+}; 
+
+export function AiForMarsProject({
+    anomalyid
+}: SelectedAnomProps) {
     const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
@@ -183,33 +190,60 @@ export function AiForMarsProject() {
         checkTutorialMission();
     }, [session, supabase]);
 
+    const fetchAnomaly = async () => {
+        if (!session) {
+            setLoading(false);
+            return;
+        };
+
+        try {
+            const { data: anomalyData, error: anomalyError } = await supabase
+                .from("anomalies")
+                .select("*")
+                .eq("anomalySet", "automaton-aiForMars");
+
+            if (anomalyError) throw anomalyError;
+
+            const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
+            setAnomaly(randomAnomaly);
+            setImageUrl(
+                `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${randomAnomaly.id}.jpeg`
+            );
+        } catch (error: any) {
+            console.error("Error fetching anomaly", error.message);
+            setAnomaly(null);
+        } finally {
+            setLoading(false);
+        };
+    };
+
     useEffect(() => {
-        async function fetchAnomaly() {
-            if (!session) {
-                setLoading(false);
-                return;
-            }
+        // async function fetchAnomaly() {
+        //     if (!session) {
+        //         setLoading(false);
+        //         return;
+        //     };
 
-            try {
-                const { data: anomalyData, error: anomalyError } = await supabase
-                    .from("anomalies")
-                    .select("*")
-                    .eq("anomalySet", "automaton-aiForMars");
+        //     try {
+        //         const { data: anomalyData, error: anomalyError } = await supabase
+        //             .from("anomalies")
+        //             .select("*")
+        //             .eq("anomalySet", "automaton-aiForMars");
 
-                if (anomalyError) throw anomalyError;
+        //         if (anomalyError) throw anomalyError;
 
-                const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
-                setAnomaly(randomAnomaly);
-                setImageUrl(
-                    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${randomAnomaly.id}.jpeg`
-                );
-            } catch (error: any) {
-                console.error("Error fetching anomaly", error.message);
-                setAnomaly(null);
-            } finally {
-                setLoading(false);
-            }
-        }
+        //         const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
+        //         setAnomaly(randomAnomaly);
+        //         setImageUrl(
+        //             `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${randomAnomaly.id}.jpeg`
+        //         );
+        //     } catch (error: any) {
+        //         console.error("Error fetching anomaly", error.message);
+        //         setAnomaly(null);
+        //     } finally {
+        //         setLoading(false);
+        //     }
+        // }
 
         fetchAnomaly();
     }, [session, supabase]);
@@ -254,6 +288,7 @@ export function AiForMarsProject() {
                             /> */}
                         </>
                     )}
+                    <p>Selected Anomaly ID: {anomalyid}</p>
                     <button
                         onClick={startTutorial}
                         className="mt-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
@@ -262,6 +297,21 @@ export function AiForMarsProject() {
                     </button>
                 </>
             )}
+        </div>
+    );
+};
+
+export function AI4MWrapper() {
+    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+
+    return (
+        <div className="space-y-8">
+            {!selectedAnomaly && (
+                <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
+            )}
+            {selectedAnomaly && 
+                <AiForMarsProject anomalyid={selectedAnomaly}
+            />}
         </div>
     );
 };

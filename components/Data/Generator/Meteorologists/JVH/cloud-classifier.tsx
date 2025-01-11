@@ -67,14 +67,13 @@ export default function CloudClassifier({ classificationConfig, classificationId
   const handleImport = (config: CloudConfiguration) => {
     setSelectedPatterns(config.patterns)
     setAltitude(config.altitude)
-  }
+  };
 
-  // Initialize the component state with classificationConfig if available
   useEffect(() => {
     if (classificationConfig) {
       setSelectedPatterns(classificationConfig.patterns || [])
       setAltitude(classificationConfig.altitude || 500)
-    }
+    };
   }, [classificationConfig])
 
   return (

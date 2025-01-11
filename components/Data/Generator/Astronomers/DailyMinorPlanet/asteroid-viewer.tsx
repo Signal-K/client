@@ -17,11 +17,11 @@ export default function AsteroidViewer({ classificationConfig, classificationId 
 
   return (
     <div className="w-full h-screen bg-black">
-      <Canvas camera={{ position: [0, 0, 4] }}>
+      {/* <Canvas camera={{ position: [0, 0, 4] }} children={<Background />} /> */}
         <Background />
         <Asteroid metallic={metallic} />
         <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={1} />
-      </Canvas>
+      {/* </Canvas> */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-64 bg-black/50 p-4 rounded-lg">
         <label htmlFor="material-slider" className="text-white text-sm mb-2 block">Material Type</label>
         <Slider

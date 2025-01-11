@@ -18,6 +18,7 @@ export interface ClassificationFormProps {
   anomalyId: string;
   missionNumber: number;
   assetMentioned: string | string[];
+  parentPlanetLocation?: string;
   // structureItemId?: number;
   structureItemId?: number;
 };

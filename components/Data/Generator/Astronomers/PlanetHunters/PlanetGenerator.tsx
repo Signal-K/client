@@ -17,7 +17,7 @@ interface PlanetGeneratorProps {
 
 export default function PlanetGenerator({ classificationConfig, author, classificationId }: PlanetGeneratorProps) {
   const supabase = useSupabaseClient();
-  const session = useSession();
+  const session = useSession(); 
 
   const initialMass = classificationConfig?.exportedValue?.mass ?? 1;
   const initialRadius = classificationConfig?.exportedValue?.radius ?? 1;
