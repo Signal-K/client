@@ -15,7 +15,7 @@ interface MissionStep {
   completedCount: number;
   color: string;
   chapter: number;
-}
+};
 
 const PlanetHuntersSteps = () => {
   const supabase = useSupabaseClient();
