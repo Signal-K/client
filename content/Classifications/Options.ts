@@ -137,6 +137,34 @@ export const roverImgClassificationOptions: ClassificationOption[] = [
     { id: 6, text: 'Sandy/rocky terrain' },
 ];
 
+export const initialCloudClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Narrow arch",
+    },
+    {
+        id: 2,
+        text: "Wide arch",
+    },
+    {
+        id: 3,
+        text: "1 cloud",
+    },
+    {
+        id: 4, text: "2 clouds",
+    },
+    {
+        id: 5, text: "3 clouds",
+    },
+    {
+        id: 6, text: "4+ clouds",
+    },
+];
+
+
+
+
+
 export const lidarEarthCloudsReadClassificationOptions: ClassificationOption[] = [
     {
         id: 1,
@@ -258,30 +286,6 @@ export const penguinWatchClassificationOptions: ClassificationOption[] = [
     {
         id: 5,
         text: "No penguins/too blurry"
-    },
-];
-
-export const initialCloudClassificationOptions: ClassificationOption[] = [
-    {
-        id: 1,
-        text: "Narrow arch",
-    },
-    {
-        id: 2,
-        text: "Wide arch",
-    },
-    {
-        id: 3,
-        text: "1 cloud",
-    },
-    {
-        id: 4, text: "2 clouds",
-    },
-    {
-        id: 5, text: "3 clouds",
-    },
-    {
-        id: 6, text: "4+ clouds",
     },
 ];
 
