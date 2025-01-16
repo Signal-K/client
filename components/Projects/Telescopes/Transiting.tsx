@@ -108,7 +108,7 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 rounded-md relative w-full">
-                {imageUrls.length > 0 && (
+                {/* {imageUrls.length > 0 && (
                     <div className="relative w-full">
                         <div className="carousel relative">
                             {imageUrls.map((url, index) => (
@@ -131,15 +131,24 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
                             ))}
                         </div>
                     </div>
-                )}
+                )} */}
                 {selectedAnomaly && (
-                    <ClassificationForm
-                        anomalyId={selectedAnomaly.id.toString()}
-                        anomalyType="planet"
+                    <ImageAnnotator
+                        otherAssets={imageUrls}
+                        anomalyType='planet'
                         missionNumber={1372001}
-                        assetMentioned={selectedAnomaly?.id.toString()}
-                        structureItemId={3103}
+                        assetMentioned={selectedAnomaly.id.toString()}
+                        annotationType='PH'
+                        initialImageUrl={imageUrls[1]}
+                        anomalyId={selectedAnomaly.id.toString()}
                     />
+                    // <ClassificationForm
+                    //     anomalyId={selectedAnomaly.id.toString()}
+                    //     anomalyType="planet"
+                    //     missionNumber={1372001}
+                    //     assetMentioned={selectedAnomaly?.id.toString()}
+                    //     structureItemId={3103}
+                    // />
                 )}
             </div>
         </div>

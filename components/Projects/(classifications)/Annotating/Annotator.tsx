@@ -22,6 +22,7 @@ import { SciFiPanel } from '@/components/ui/styles/sci-fi/panel';
 
 interface ImageAnnotatorProps {
   initialImageUrl: string;
+  otherAssets?: string[];
   anomalyType: string;
   anomalyId: string;
   missionNumber: number;
@@ -29,7 +30,7 @@ interface ImageAnnotatorProps {
   structureItemId?: number;
   parentPlanetLocation?: string;
   annotationType: 'AI4M' | 'P4' | 'PH' | 'Custom';
-}; 
+}
 
 export default function ImageAnnotator({
   initialImageUrl,
@@ -37,6 +38,7 @@ export default function ImageAnnotator({
   anomalyId,
   missionNumber,
   assetMentioned,
+  otherAssets,
   parentPlanetLocation,
   structureItemId,
   annotationType,
@@ -54,14 +56,15 @@ export default function ImageAnnotator({
   const [uploads, setUploads] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
+
   const CATEGORY_CONFIG: Record<string, CategoryConfig> =
-  annotationType === 'AI4M'
-    ? AI4MCATEGORIES
-    : annotationType === 'P4'
-    ? P4CATEGORIES
-    : annotationType === 'PH'
-    ? PHCATEGORIES
-    : {} as Record<string, CategoryConfig>;
+    annotationType === 'AI4M'
+      ? AI4MCATEGORIES
+      : annotationType === 'P4'
+      ? P4CATEGORIES
+      : annotationType === 'PH'
+      ? PHCATEGORIES
+      : {} as Record<string, CategoryConfig>;
 
   const addMedia = async () => {
     if (!canvasRef.current || !session) return;
@@ -74,8 +77,9 @@ export default function ImageAnnotator({
       const { data, error } = await supabase.storage
         .from('media')
         .upload(fileName, blob, { contentType: 'image/png' });
-      if (error) console.error('Upload error:', error.message);
-      else if (data) {
+      if (error) {
+        console.error('Upload error:', error.message);
+      } else if (data) {
         const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
         setUploads((prev) => [...prev, url]);
       }
@@ -83,7 +87,7 @@ export default function ImageAnnotator({
       console.error('Unexpected error during canvas upload:', err);
     } finally {
       setIsUploading(false);
-    };
+    }
   };
 
   useEffect(() => {
@@ -118,22 +122,22 @@ export default function ImageAnnotator({
       {selectedImage && (
         <div className="space-y-4">
           <SciFiPanel className="p-4">
-          <AnnotationCanvas
-            canvasRef={canvasRef}
-            imageRef={imageRef}
-            isDrawing={isDrawing}
-            setIsDrawing={setIsDrawing}
-            currentTool={currentTool}
-            currentColor={
-              CATEGORY_CONFIG[currentCategory as keyof typeof CATEGORY_CONFIG]?.color || '#000000'
-            }
-            lineWidth={lineWidth}
-            drawings={drawings}
-            setDrawings={setDrawings}
-            currentDrawing={currentDrawing}
-            setCurrentDrawing={setCurrentDrawing}
-            currentCategory={currentCategory}
-          />
+            <AnnotationCanvas
+              canvasRef={canvasRef}
+              imageRef={imageRef}
+              isDrawing={isDrawing}
+              setIsDrawing={setIsDrawing}
+              currentTool={currentTool}
+              currentColor={
+                CATEGORY_CONFIG[currentCategory as keyof typeof CATEGORY_CONFIG]?.color || '#000000'
+              }
+              lineWidth={lineWidth}
+              drawings={drawings}
+              setDrawings={setDrawings}
+              currentDrawing={currentDrawing}
+              setCurrentDrawing={setCurrentDrawing}
+              currentCategory={currentCategory}
+            />
           </SciFiPanel>
           <SciFiPanel className="p-4">
             <Legend
@@ -148,12 +152,33 @@ export default function ImageAnnotator({
               {isUploading ? 'Uploading...' : 'Save & proceed'}
             </Button>
           </SciFiPanel>
+          {otherAssets && (
+            <SciFiPanel>
+              {otherAssets.map((url, index) => (
+                <div
+                  key={index}
+                  id={`slide-${index}`}
+                  className="carousel-item relative w-full h-64 flex-shrink-0"
+                >
+                  <img
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${url}`}
+                    alt={`Anomaly image ${index + 1}`}
+                    className="w-full h-full object-contain rounded-lg"
+                  />
+                </div>
+              ))}
+            </SciFiPanel>
+          )}
           <SciFiPanel className="p-4">
             <ClassificationForm
               anomalyId={anomalyId}
               anomalyType={anomalyType}
               missionNumber={missionNumber}
-              assetMentioned={[...uploads, ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned])]}
+              assetMentioned={[
+                ...uploads,
+                ...(otherAssets || []),
+                ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]),
+              ].filter((item): item is string => typeof item === 'string')}
               structureItemId={structureItemId}
             />
           </SciFiPanel>
