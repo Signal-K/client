@@ -51,7 +51,6 @@ next-env.d.ts
 TODOs.md
 
 public/sw.js.map
-public/sw.js
 public/workbox-7144475a.js
 public/workbox-7144475a.js.map
 public/workbox-f1770938.js
