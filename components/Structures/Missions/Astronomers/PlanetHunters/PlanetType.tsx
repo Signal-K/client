@@ -14,7 +14,7 @@ interface Classification {
   anomaly: number;
   classificationtype: string;
   media: any; 
-  classificationConfiguration: {
+  classificationConfiguration: { 
     votes: number;
     classificationOptions: { [key: string]: any };
   };
@@ -58,7 +58,7 @@ const PlanetTypeCommentForm = () => {
         setClassifications(processedData || []);
       } catch (err) {
         console.error(err);
-      }
+      };
     };
 
     const fetchComments = async () => {
@@ -86,7 +86,7 @@ const PlanetTypeCommentForm = () => {
         setComments(data || []);
       } catch (err) {
         console.error(err);
-      }
+      };
     };
 
     const fetchData = async () => {
@@ -149,7 +149,7 @@ const PlanetTypeCommentForm = () => {
     if (!commentInput) {
       console.error("Comment input is required");
       return;
-    }
+    };
 
     try {
       const { error } = await supabase
@@ -168,7 +168,7 @@ const PlanetTypeCommentForm = () => {
       setCommentInputs((prev) => ({ ...prev, [classificationId]: "" }));
       console.log("Comment inserted successfully with planet type.");
     } catch (err) {
-      console.error("Error inserting comment:", err);
+      console.error("Error inserting comment: ", err);
     }
   };
 

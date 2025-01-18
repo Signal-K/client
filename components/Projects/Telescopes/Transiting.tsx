@@ -47,7 +47,7 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
                 setHasMission3000001(false);
             } finally {
                 setMissionLoading(false);
-            }
+            };
         };
         checkTutorialMission();
     }, [session, supabase]);
@@ -79,7 +79,7 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
                         const binnedUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Binned.png`;
                         const sectorUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Sector1.png`;
                         imageList.push(binnedUrl, sectorUrl); 
-                    }
+                    };
 
                     setImageUrls(imageList);
                     setSelectedAnomaly(randomAnomaly);
