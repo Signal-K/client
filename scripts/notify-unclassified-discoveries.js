@@ -19,7 +19,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Configure webpush
 webpush.setVapidDetails(
-  'mailto:admin@starsailors.app',
+  'mailto:teddy@scroobl.es',
   vapidPublicKey,
   vapidPrivateKey
 );
@@ -48,6 +48,19 @@ async function findUsersWithUnclassifiedDiscoveries() {
 
     console.log(`Found ${linkedAnomalies?.length || 0} linked anomalies`);
 
+    // Get already notified anomalies from push_anomaly_log
+    const { data: notifiedAnomalies, error: notifiedError } = await supabase
+      .from('push_anomaly_log')
+      .select('anomaly_id');
+
+    if (notifiedError) {
+      console.error('Error fetching notified anomalies:', notifiedError);
+      return [];
+    }
+
+    console.log(`Found ${notifiedAnomalies?.length || 0} already notified anomalies`);
+    const notifiedAnomalyIds = new Set(notifiedAnomalies?.map(log => log.anomaly_id) || []);
+
     // Get all classifications
     const { data: classifications, error: classError } = await supabase
       .from('classifications')
@@ -75,12 +88,18 @@ async function findUsersWithUnclassifiedDiscoveries() {
     linkedAnomalies?.forEach(linkedAnomaly => {
       const userId = linkedAnomaly.author;
       const anomalyId = linkedAnomaly.anomaly_id;
+      const linkedAnomalyId = linkedAnomaly.id;
       
+      // Skip if already notified about this linked anomaly
+      if (notifiedAnomalyIds.has(linkedAnomalyId)) {
+        return;
+      }
+
       // Check if this user has classified this specific anomaly
       const userClassifications = userClassifiedAnomalies.get(userId) || new Set();
       
       if (!userClassifications.has(anomalyId)) {
-        // This is an unclassified discovery
+        // This is an unclassified discovery that hasn't been notified about
         if (!usersWithUnclassified.has(userId)) {
           usersWithUnclassified.set(userId, []);
         }
@@ -94,7 +113,7 @@ async function findUsersWithUnclassifiedDiscoveries() {
       }
     });
 
-    console.log(`Found ${usersWithUnclassified.size} users with unclassified discoveries`);
+    console.log(`Found ${usersWithUnclassified.size} users with unclassified discoveries (excluding already notified)`);
 
     return Array.from(usersWithUnclassified.entries()).map(([userId, discoveries]) => ({
       userId,
@@ -104,6 +123,34 @@ async function findUsersWithUnclassifiedDiscoveries() {
   } catch (error) {
     console.error('Error finding unclassified discoveries:', error);
     return [];
+  }
+}
+
+async function logNotifiedAnomalies(discoveries) {
+  try {
+    if (discoveries.length === 0) return;
+
+    console.log(`Logging ${discoveries.length} anomalies as notified...`);
+    
+    const logEntries = discoveries.map(discovery => ({
+      anomaly_id: discovery.linkedAnomalyId
+    }));
+
+    const { data, error } = await supabase
+      .from('push_anomaly_log')
+      .insert(logEntries)
+      .select();
+
+    if (error) {
+      console.error('Error logging notified anomalies:', error);
+      return false;
+    }
+
+    console.log(`Successfully logged ${data?.length || 0} anomalies as notified`);
+    return true;
+  } catch (error) {
+    console.error('Error in logNotifiedAnomalies:', error);
+    return false;
   }
 }
 
@@ -151,8 +198,22 @@ async function sendNotificationsToUser(userId, discoveries) {
     const payload = JSON.stringify({
       title,
       body,
-      icon: '/assets/Captn.jpg',
-      url: '/structures/telescope' // Or wherever users go to classify
+      icon: '/assets/Captn.jpg', // Keep using Captn.jpg for both iOS and Android
+      badge: '/assets/Captn.jpg', // Badge for Android
+      image: '/assets/Captn.jpg', // Large image for rich notifications
+      url: '/structures/telescope', // Or wherever users go to classify
+      tag: 'unclassified-discoveries', // Prevent multiple notifications from stacking
+      requireInteraction: true, // Keep notification visible until user interacts
+      actions: [
+        {
+          action: 'classify',
+          title: '🔬 Classify Now'
+        },
+        {
+          action: 'dismiss',
+          title: 'Later'
+        }
+      ]
     });
 
     // Send notifications to all user's endpoints
@@ -178,6 +239,14 @@ async function sendNotificationsToUser(userId, discoveries) {
 
     const successful = results.filter(r => r.success).length;
     const failed = results.filter(r => !r.success).length;
+
+    if (successful > 0) {
+      // Log the anomalies as notified only if at least one notification was successful
+      const logged = await logNotifiedAnomalies(discoveries);
+      if (!logged) {
+        console.warn(`Failed to log anomalies for user ${userId}, but notifications were sent`);
+      }
+    }
 
     console.log(`User ${userId}: ${successful} notifications sent, ${failed} failed`);
     return { success: true, sent: successful, failed };
