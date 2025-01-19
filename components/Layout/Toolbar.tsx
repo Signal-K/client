@@ -9,14 +9,13 @@ import {
   HandMetalIcon,
   Settings,
 } from "lucide-react";
-import TutorialPopup from "@/content/Dialogue/helpButton";
+// import TutorialPopup from "@/content/Dialogue/helpButton";
 import { MiningComponentComponent } from "../(scenes)/mining/mining-component";
 
 const menuItems = [
   { icon: Building2Icon, label: "Structures", content: "Structures Content" },
   { icon: Construction, label: "Mining", content: <MiningComponentComponent /> },
   { icon: CloudDrizzleIcon, label: "Weather", content: "Weather Content" },
-  { icon: HandMetalIcon, label: "Topography", content: <TutorialPopup /> },
 ];
 
 export default function VerticalToolbar() {

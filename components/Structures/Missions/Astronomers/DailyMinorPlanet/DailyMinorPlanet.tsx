@@ -17,7 +17,7 @@ const DailyMinorPlanetMissions = () => {
       title: "Make an asteroid classification",
       description: "Use your telescope to look for an asteroid candidate.",
       icon: TelescopeIcon,
-      points: 2,
+      points: 2, 
       completedCount: 0,
       internalComponent: () => <DailyMinorPlanet />,
       color: "text-blue-500",

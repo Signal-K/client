@@ -1,12 +1,12 @@
 "use client";
 
-import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
+import JournalPage from "@/components/Structures/Missions/Stardust/Journal";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
-            <TotalPoints />
+            <JournalPage />
           </>
         // {/* </StarnetLayout> */}
     );

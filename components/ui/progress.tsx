@@ -25,4 +25,28 @@ const Progress = React.forwardRef<
 ))
 Progress.displayName = ProgressPrimitive.Root.displayName
 
-export { Progress }
+export { Progress };
+
+interface ProgressBarProps {
+  progress: number
+  total: number
+  showPercentage?: boolean
+};
+
+export function JournalProgressBar({ progress, total, showPercentage = false }: ProgressBarProps) {
+  const percentage = Math.round((progress / total) * 100)
+  
+  return (
+    <div className="w-full bg-[#2C4F64]/20 rounded-full h-2.5 my-2">
+      <div
+        className="bg-[#5FCBC3] h-2.5 rounded-full transition-all duration-300 ease-in-out"
+        style={{ width: `${percentage}%` }}
+      />
+      {showPercentage && (
+        <div className="text-xs text-[#5FCBC3] mt-1">
+          {percentage}% complete
+        </div>
+      )}
+    </div>
+  );
+};
