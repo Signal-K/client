@@ -7,7 +7,7 @@ interface ClassificationConfiguration {
   classificationOptions: { [key: string]: any };
   temperature?: string;
   votes?: number;
-}
+};
 
 interface Classification {
   author: string;
@@ -21,7 +21,80 @@ interface Classification {
   image_url?: string;
   images?: string[];
   votes?: number;
-}
+};
+
+const calculatePlanetTemperature = (
+  surfaceTempStar: number,
+  orbitalPeriodDays: number,
+  albedo: number = 0.3
+): number => {
+  const orbitalPeriodSeconds = orbitalPeriodDays * 24 * 60 * 60;
+  const semiMajorAxis = Math.cbrt((orbitalPeriodSeconds ** 2 * 6.67430e-11 * 1.989e30) / (4 * Math.PI ** 2));
+  const flux = (surfaceTempStar ** 4 * 5.670374419e-8) / (4 * Math.PI * semiMajorAxis ** 2);
+  const equilibriumTemp = ((1 - albedo) * flux / (4 * 5.670374419e-8)) ** 0.25;
+  return Math.round(equilibriumTemp - 273.15); // Convert to Celsius
+};
+
+const Calculator: React.FC = () => {
+  const [surfaceTempStar, setSurfaceTempStar] = useState("");
+  const [orbitalPeriodDays, setOrbitalPeriodDays] = useState("");
+  const [albedo, setAlbedo] = useState("0.3");
+  const [result, setResult] = useState<number | null>(null);
+
+  const handleCalculate = () => {
+    const tempStar = parseFloat(surfaceTempStar);
+    const periodDays = parseFloat(orbitalPeriodDays);
+    const albedoValue = parseFloat(albedo);
+    if (!isNaN(tempStar) && !isNaN(periodDays) && !isNaN(albedoValue)) {
+      setResult(calculatePlanetTemperature(tempStar, periodDays, albedoValue));
+    }
+  };
+
+  return (
+    <div className="p-4 rounded shadow-md text-white bg-blackboard">
+      <h3 className="text-lg font-bold mb-4">Temperature Calculator</h3>
+      <div className="mb-2">
+        <label className="block text-gray-300">Star Surface Temperature (K)</label>
+        <input
+          type="number"
+          value={surfaceTempStar}
+          onChange={(e) => setSurfaceTempStar(e.target.value)}
+          className="w-full p-2 rounded bg-gray-800 text-white border border-gray-600"
+        />
+      </div>
+      <div className="mb-2">
+        <label className="block text-gray-300">Orbital Period (days)</label>
+        <input
+          type="number"
+          value={orbitalPeriodDays}
+          onChange={(e) => setOrbitalPeriodDays(e.target.value)}
+          className="w-full p-2 rounded bg-gray-800 text-white border border-gray-600"
+        />
+      </div>
+      <div className="mb-2">
+        <label className="block text-gray-300">Albedo</label>
+        <input
+          type="number"
+          step="0.01"
+          value={albedo}
+          onChange={(e) => setAlbedo(e.target.value)}
+          className="w-full p-2 rounded bg-gray-800 text-white border border-gray-600"
+        />
+      </div>
+      <button
+        onClick={handleCalculate}
+        className="w-full p-2 bg-blue-500 rounded text-white hover:bg-blue-600"
+      >
+        Calculate
+      </button>
+      {result !== null && (
+        <p className="mt-4 text-green-400 text-center">
+          Estimated Temperature: {result}°C
+        </p>
+      )}
+    </div>
+  );
+};
 
 const PlanetTemperatureForm: React.FC = () => {
   const supabase = useSupabaseClient();
@@ -125,7 +198,7 @@ const PlanetTemperatureForm: React.FC = () => {
 
   if (loading) {
     return <>Loading...</>;
-  }
+  };
 
   return (
     <div className="flex flex-col justify-center items-center">
@@ -139,8 +212,10 @@ const PlanetTemperatureForm: React.FC = () => {
               content={currentClassification.content || ""}
               category={currentClassification.classificationtype || "Planet"}
               images={currentClassification.images || []}
-            //   votes={currentClassification.votes || 0}
             />
+          </SciFiPanel>
+          <SciFiPanel>
+            <Calculator />
           </SciFiPanel>
           <SciFiPanel>
             <div className="flex flex-col items-center mt-4 gap-4">
@@ -165,12 +240,12 @@ const PlanetTemperatureForm: React.FC = () => {
               </button>
               <button
                 onClick={fetchRandomClassification}
-                className="px-4 py-2 text-white bg-gray-500 rounded mt-2"
+                className="px-4 py-2 text-white bg-green-500 rounded mt-2"
               >
-                Show Random Post
+                Select a different planet
               </button>
             </div>
-          </SciFiPanel>
+            </SciFiPanel>
         </div>
       ) : (
         <div>No classifications found.</div>
