@@ -24,7 +24,7 @@ import { RightSidebar } from "./blocks/viewport/right-sidebar"
 
 type ExtendedViewMode = ViewMode | "skill-tree";
 
-export interface TelescopeViewportState {
+export interface TelescopeViewportState { 
   currentSector: { x: number; y: number }
   anomalies: any[]
   filteredAnomalies: any[]
