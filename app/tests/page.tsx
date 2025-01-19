@@ -1,9 +1,12 @@
 "use client";
 
+import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
+
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
+            <TotalPoints />
           </>
         // {/* </StarnetLayout> */}
     );
