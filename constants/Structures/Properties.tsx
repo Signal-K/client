@@ -23,7 +23,7 @@ import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPla
 import { PlanetFourProject } from "@/components/Projects/Satellite/PlanetFour";
 import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
 import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
-import TutorialPopup from "@/content/Dialogue/helpButton";
+// import TutorialPopup from "@/content/Dialogue/helpButton";
 import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
 import { ZoodexIguanas } from "@/components/Projects/Zoodex/iguanasFromAbove";
 import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters";

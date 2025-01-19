@@ -4,13 +4,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CloudDrizzleIcon, LightbulbIcon, Telescope, ArrowUpIcon, ArrowDownIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import JournalPage from "@/components/Structures/Missions/Stardust/Journal";
 
 // Define Mission and other types
 export interface Mission {
   id: number;
   name: string;
   description: string;
-  additionalDescription: string; // New property for additional context
+  additionalDescription: string | React.ReactNode; // New property for additional context
   icon: React.ElementType;
   color: string;
   identifier: string;
@@ -92,7 +93,8 @@ const defaultMission: Mission = {
   id: 0,
   name: "Welcome to Star Sailors",
   description: "You've been given some basic structures to start your journey. Click on their icons to classify the data they've collected for you. New data & projects are being added weekly.",
-  additionalDescription: "You'll get to explore various missions, starting with basic tasks such as classifying objects in the sky and on Earth. Each task you complete unlocks new insights. Next week (22nd December) you'll be able to upload your own discoveries and clips",
+  additionalDescription: <JournalPage />,
+  //   additionalDescription: "You'll get to explore various missions, starting with basic tasks such as classifying objects in the sky and on Earth. Each task you complete unlocks new insights. Next week (22nd December) you'll be able to upload your own discoveries and clips",
   icon: LightbulbIcon,
   color: "text-blue-400",
   identifier: "default-starting-mission",
@@ -224,7 +226,7 @@ const SimpleeMissionGuide = () => {
 
       {isModalOpen && selectedMission && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-          <div className="bg-[#2C4F64] p-4 max-w-md w-full rounded-lg">
+          <div className="bg-[#2C4F64] p-4 h-[70%] w-[90%] max-w-screen-md rounded-lg">
             <h3 className="text-xl font-semibold mb-2">{selectedMission.name}</h3>
             <p>{selectedMission.additionalDescription}</p> {/* Display additional description */}
             <Button onClick={closeModal} className="mt-4">

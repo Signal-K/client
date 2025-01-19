@@ -25,7 +25,7 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
 
     const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
     const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [hasMission3000001, setHasMission3000001] = useState<boolean | null>(null);
@@ -47,7 +47,7 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
                 setHasMission3000001(false);
             } finally {
                 setMissionLoading(false);
-            }
+            };
         };
         checkTutorialMission();
     }, [session, supabase]);
@@ -62,28 +62,27 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")
                     .select("*")
-                    .eq("anomalySet", "telescope-tess"); // Hardcoded choice
+                    .eq("anomalySet", "telescope-tess");
                 if (anomalyError) throw anomalyError;
 
                 setAnomalies(anomalyData || []);
-                console.log("Fetched anomalies:", anomalyData);
-
                 if (anomalyData?.length > 0) {
                     const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)];
-                    console.log("Random anomaly selected:", randomAnomaly);
-
                     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://your-default-supabase-url.com';
+                    const imageList = [];
+
+                    if (randomAnomaly?.avatar_url) {
+                        imageList.push(randomAnomaly.avatar_url);
+                    };
+
                     if (randomAnomaly?.id) {
-                        const constructedUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Binned.png`;
-                        console.log("Constructed image URL:", constructedUrl);
-                        setImageUrl(constructedUrl);
-                    } else {
-                        console.error("Random anomaly ID is null or undefined.");
-                    }
+                        const binnedUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Binned.png`;
+                        const sectorUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Sector1.png`;
+                        imageList.push(binnedUrl, sectorUrl); 
+                    };
+
+                    setImageUrls(imageList);
                     setSelectedAnomaly(randomAnomaly);
-                } else {
-                    console.log("No anomalies found.");
-                    setSelectedAnomaly(null);
                 }
             } catch (error: any) {
                 console.error("Error fetching anomalies:", error.message || error);
@@ -109,49 +108,51 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 rounded-md relative w-full">
-                {selectedAnomaly?.avatar_url && <img src={selectedAnomaly.avatar_url} alt="Anomaly Avatar" />}
-                {imageUrl && <img src={imageUrl} alt="Anomaly Binned Image" />}
+                {/* {imageUrls.length > 0 && (
+                    <div className="relative w-full">
+                        <div className="carousel relative">
+                            {imageUrls.map((url, index) => (
+                                <div
+                                    key={index}
+                                    id={`slide-${index}`}
+                                    className="carousel-item relative w-full h-64 flex-shrink-0"
+                                >
+                                    <img src={url} alt={`Anomaly Image ${index + 1}`} className="w-full h-full object-contain rounded-lg" />
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex justify-center space-x-2 mt-4">
+                            {imageUrls.map((_, index) => (
+                                <a
+                                    key={index}
+                                    href={`#slide-${index}`}
+                                    className="w-3 h-3 rounded-full bg-gray-400 hover:bg-blue-500 transition"
+                                ></a>
+                            ))}
+                        </div>
+                    </div>
+                )} */}
                 {selectedAnomaly && (
-                    <ClassificationForm
-                        anomalyId={selectedAnomaly.id.toString()}
-                        anomalyType="planet"
+                    <ImageAnnotator
+                        otherAssets={imageUrls}
+                        anomalyType='planet'
                         missionNumber={1372001}
-                        assetMentioned={selectedAnomaly?.id.toString()}
-                        structureItemId={3103}
+                        assetMentioned={selectedAnomaly.id.toString()}
+                        annotationType='PH'
+                        initialImageUrl={imageUrls[1]}
+                        anomalyId={selectedAnomaly.id.toString()}
                     />
+                    // <ClassificationForm
+                    //     anomalyId={selectedAnomaly.id.toString()}
+                    //     anomalyType="planet"
+                    //     missionNumber={1372001}
+                    //     assetMentioned={selectedAnomaly?.id.toString()}
+                    //     structureItemId={3103}
+                    // />
                 )}
             </div>
         </div>
     );
-
-    // return (
-    //     <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-    //         <div className="p-4 rounded-md relative w-full">
-    //             {selectedAnomaly?.avatar_url && <img src={selectedAnomaly.avatar_url} alt="Anomaly Avatar" />}
-    //             {imageUrl && selectedAnomaly && (
-    //                 <ImageAnnotator
-    //                     anomalyId={selectedAnomaly.id.toString()}
-    //                     anomalyType='planet'
-    //                     missionNumber={1372001}
-    //                     assetMentioned={imageUrl}
-    //                     structureItemId={3103}
-    //                     annotationType='PH'
-    //                     initialImageUrl={imageUrl}
-    //                 />
-    //             )}
-    //             {/* {imageUrl && <img src={imageUrl} alt="Anomaly Binned Image" />}
-    //             {selectedAnomaly && (
-    //                 <ClassificationForm
-    //                     anomalyId={selectedAnomaly.id.toString()}
-    //                     anomalyType="planet"
-    //                     missionNumber={1372001}
-    //                     assetMentioned={selectedAnomaly?.id.toString()}
-    //                     structureItemId={3103}
-    //                 />
-    //             )} */}
-    //         </div>
-    //     </div>
-    // );
 };
 
 interface TelescopeProps {

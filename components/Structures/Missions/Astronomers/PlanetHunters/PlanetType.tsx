@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { PostCardSingle } from "@/content/Posts/PostSingle";
+import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
 
 interface Classification {
   author: string;
@@ -14,7 +15,7 @@ interface Classification {
   anomaly: number;
   classificationtype: string;
   media: any; 
-  classificationConfiguration: {
+  classificationConfiguration: { 
     votes: number;
     classificationOptions: { [key: string]: any };
   };
@@ -44,10 +45,20 @@ const PlanetTypeCommentForm = () => {
           const media = classification.media;
           let images: string[] = [];
 
-          if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
-            images.push(media[1]);
-          } else if (media && media.uploadUrl) {
-            images.push(media.uploadUrl);
+          if (Array.isArray(media)) {
+            media.forEach((item) => {
+              if (typeof item === "string" && item.startsWith("http")) {
+                images.push(item);
+              } else if (Array.isArray(item)) {
+                item.forEach((nested) => {
+                  if (typeof nested === "string" && nested.startsWith("http")) {
+                    images.push(nested);
+                  }
+                });
+              } else if (typeof item === "object" && item.uploadUrl) {
+                images.push(item.uploadUrl);
+              }
+            });
           }
 
           const votes = classification.classificationConfiguration?.votes || 0;
@@ -58,7 +69,7 @@ const PlanetTypeCommentForm = () => {
         setClassifications(processedData || []);
       } catch (err) {
         console.error(err);
-      }
+      };
     };
 
     const fetchComments = async () => {
@@ -86,7 +97,7 @@ const PlanetTypeCommentForm = () => {
         setComments(data || []);
       } catch (err) {
         console.error(err);
-      }
+      };
     };
 
     const fetchData = async () => {
@@ -149,7 +160,7 @@ const PlanetTypeCommentForm = () => {
     if (!commentInput) {
       console.error("Comment input is required");
       return;
-    }
+    };
 
     try {
       const { error } = await supabase
@@ -168,8 +179,8 @@ const PlanetTypeCommentForm = () => {
       setCommentInputs((prev) => ({ ...prev, [classificationId]: "" }));
       console.log("Comment inserted successfully with planet type.");
     } catch (err) {
-      console.error("Error inserting comment:", err);
-    }
+      console.error("Error inserting comment: ", err);
+    };
   };
 
   const handleCommentInputChange = (classificationId: number, value: string) => {
@@ -184,7 +195,15 @@ const PlanetTypeCommentForm = () => {
         <div className="space-y-8">
           {classifications.map((classification) => (
             <div key={classification.id} className="space-y-4">
-              <PostCardSingle
+              <SimplePostSingle
+                id={classification.id.toString()}
+                title={`Planet discovery #${classification.id}`}
+                author={classification.author || "Unknown"}
+                content={classification.content || ""}
+                category={classification.classificationtype || "Planet"}
+                images={classification.images || []}
+              />
+              {/* <PostCardSingle
                 key={classification.id}
                 classificationId={classification.id}
                 title={classification.title}
@@ -198,7 +217,7 @@ const PlanetTypeCommentForm = () => {
                 classificationConfig={classification.classificationConfiguration}
                 classificationType={classification.classificationtype}
                 commentStatus={false}
-              />
+              /> */}
               <p className="text-sm italic text-cyan-500">{classification.content}</p>
               {classification.image_url && (
                 <img

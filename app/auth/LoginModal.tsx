@@ -92,7 +92,7 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
       >
         <strong className="font-extrabold text-transparent text-8xl bg-clip-text bg-gradient-to-r from-green-200 to-amber-300" style={{ fontSize: 'min(56px, 8vw)' }}>Star Sailors</strong>
         </Flexbox>
-        <p className="max-w-[600px] text-muted-foreground text-blue-800 md:text-xl">Explore the cosmos & catalogue discoveries in different scientific disciplines</p>
+        <p className="max-w-[600px] text-blue-800 md:text-xl">Explore the cosmos & catalogue discoveries in different scientific disciplines</p>
           <div className="max-w-md w-full mx-auto py-5">
             <Card>
           <CardContent>

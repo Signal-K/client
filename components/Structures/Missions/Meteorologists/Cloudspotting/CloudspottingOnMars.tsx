@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../BasePlate";
 import { CloudCogIcon, FolderCog, PaintBucket, Vote } from "lucide-react";
-import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
+import { CloudspottingWrapper, StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import VoteCoMClassifications from "./CoMVote";
 import CloudClassificationGenerator from "./CloudMaker";
 
@@ -42,7 +42,7 @@ const CloudspottingOnMars = () => {
                 icon: CloudCogIcon,
                 points: 2,
                 completedCount: 0,
-                internalComponent: () => <StarterLidar />,
+                internalComponent: () => <CloudspottingWrapper />,
                 color: "text-blue-500",
             },
             {

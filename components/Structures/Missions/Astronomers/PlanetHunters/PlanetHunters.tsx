@@ -5,6 +5,7 @@ import PlanetTypeCommentForm from "./PlanetType";
 import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
 import VotePlanetClassifictions from "./PHVote";
 import PHClassificationGenerator from "./PlanetMaker";
+import PlanetTemperatureForm from "./PlanetTemperature";
 
 interface MissionStep {
   id: number;
@@ -15,7 +16,7 @@ interface MissionStep {
   completedCount: number;
   color: string;
   chapter: number;
-}
+};
 
 const PlanetHuntersSteps = () => {
   const supabase = useSupabaseClient();
@@ -156,6 +157,17 @@ const PlanetHuntersSteps = () => {
           },
           {
             id: 5,
+            title: "Calculate planetary temperatures",
+            description: "Use satellite data to help determine the temperature of planets you've discovered",
+            action: () => {},
+            // completedCount: mission4CompletedCount
+            color: 'text-yellow-700',
+            chapter: 1,
+            icon: "symbol",
+            completedCount: 0
+          },
+          {
+            id: 6,
             title: "Make your own planet design",
             description: "You're now able to start creating visual representations of your discoveries. These will become more advanced and accurate the more data you discover",
             icon: Paintbrush2,
@@ -194,7 +206,8 @@ const PlanetHuntersSteps = () => {
               {selectedMission.id === 2 && <StarterTelescopeTess />}
               {selectedMission.id === 3 && <PlanetTypeCommentForm />}
               {selectedMission.id === 4 && <VotePlanetClassifictions />}
-              {selectedMission.id === 5 && <PHClassificationGenerator />}
+              {selectedMission.id === 5 && <PlanetTemperatureForm />}
+              {selectedMission.id === 6 && <PHClassificationGenerator />}
             </center>
           </div>
         </div>
@@ -207,7 +220,7 @@ const PlanetHuntersSteps = () => {
   const maxChapter = Math.max(...steps.map(step => step.chapter));
 
   return (
-    <div className="flex flex-col items-center bg-[#1D2833]/90 width-[100%] text-white rounded-2xl p-6">
+    <div className="flex flex-col items-center width-[100%] text-white rounded-2xl p-6">
       <div className="w-full mb-6">
         <h1 className="text-xl font-bold mb-2">Chapter {currentChapter}</h1>
         <div className="h-2 bg-gray-600 rounded-full w-full mb-4">

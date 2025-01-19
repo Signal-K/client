@@ -1,12 +1,12 @@
 "use client";
 
-import PlanetFour from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/PlanetFour";
+import JournalPage from "@/components/Structures/Missions/Stardust/Journal";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
-            {/* <PlanetFour /> */}
+            <JournalPage />
           </>
         // {/* </StarnetLayout> */}
     );

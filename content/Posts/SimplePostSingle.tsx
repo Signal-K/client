@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import StructuresOnPlanet from '@/components/Structures/Structures';
 import { AvatarGenerator } from '@/components/Account/Avatar';
 import { Button } from '@/components/ui/button';
-import { Share2 } from 'lucide-react';
+import { Share2, ThumbsUpIcon } from 'lucide-react';
 import PlanetGenerator from '@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator';
 
 interface SimplePostSingleProps {
@@ -14,6 +14,7 @@ interface SimplePostSingleProps {
   content: string;
   category: string;
   images: string[];
+  votes?: number;
   classificationConfiguration?: any;
 };
 
@@ -24,6 +25,7 @@ export function SimplePostSingle({
   content,
   category,
   images,
+  votes,
   classificationConfiguration,
 }: SimplePostSingleProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -129,11 +131,12 @@ export function SimplePostSingle({
                   </div>
                 </>
               )}
+              {/* {votes &&<ThumbsUpIcon className='text-blue-500' /> {votes} Votes */}
             </div>
           )}
         </CardContent>
         {/* <PlanetGenerator classificationId={String(id)} classificationConfig={classificationConfiguration} author={author} /> */}
-        <StructuresOnPlanet author={author} />
+        {/* <StructuresOnPlanet author={author} /> */}
       </Card>
     </div>
   );

@@ -6,8 +6,13 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 import { Anomaly } from "../Telescopes/Transiting";
 import { CloudspottingOnMars } from "./cloudspottingOnMars"; 
+import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 
-export function StarterLidar() {
+interface SelectedAnomProps {
+    anomalyid?: number;
+};
+
+export function StarterLidar({ anomalyid }: SelectedAnomProps) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -136,8 +141,24 @@ export function StarterLidar() {
                     missionNumber={100000034}
                     assetMentioned={imageUrl || ""}
                     structureItemId={3105}
+                    parentPlanetLocation={anomalyid?.toString()}
                 />
             </div>
         </div>
     );
 };
+
+export function CloudspottingWrapper() {
+    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+
+    return (
+        <div className="space-y-8">
+            {!selectedAnomaly && (
+                <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
+            )}
+            {selectedAnomaly && (
+                <StarterLidar anomalyid={selectedAnomaly} />
+            )}
+        </div>
+    )
+}
