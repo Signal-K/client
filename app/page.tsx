@@ -29,6 +29,7 @@ import ProfileSetupRequired from "@/src/components/profile/setup/ProfileSetupReq
 import LegacyTipsPanel from "@/src/components/profile/dashboard/LegacyTipsPanel";
 import LegacyMilestonesSection from "@/src/components/profile/dashboard/LegacyMilestonesSection";
 import RecentDiscoveries from "@/src/components/social/activity/RecentDiscoveries";
+import NotificationSubscribeButton from "@/src/components/providers/NotificationSubscribeButton";
 
 // Import custom hooks
 import { usePageData } from "@/hooks/usePageData";
@@ -159,6 +160,9 @@ export default function ActivityPage() {
           classifications={classifications}
           incompletePlanet={incompletePlanet}
         />
+
+        {/* Notification Subscription */}
+        <NotificationSubscribeButton />
 
         {/* Next Steps Guide - PRIORITY #1 for new users */}
         {/* <NextStepsSection
