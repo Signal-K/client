@@ -15,6 +15,7 @@ import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import Onboarding from "./scenes/onboarding/page";
 import VerticalToolbar from "@/components/Layout/Toolbar";
 import SimpleeMissionGuide from "./tests/singleMissionGuide";
+import Navbar from "@/components/Layout/Navbar";
 
 export default function Home() {
   const session = useSession();
@@ -39,6 +40,7 @@ export default function Home() {
     // />,
     30: <EarthViewLayout>
       <div className="w-full">
+        <Navbar />
         <div className="flex flex-row space-y-4"></div>
         <div className="py-3">
           <div className="py-1">

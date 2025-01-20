@@ -1,12 +1,12 @@
 "use client";
 
-import JournalPage from "@/components/Structures/Missions/Stardust/Journal";
+import ProfileSetupForm from "@/components/Account/ProfileSetup";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
-            <JournalPage />
+            <ProfileSetupForm />
           </>
         // {/* </StarnetLayout> */}
     );
