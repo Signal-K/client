@@ -5,7 +5,7 @@ const webpush = require('web-push');
 
 // Configuration
 const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY;
 
