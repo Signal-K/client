@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
 import { SciFiButton } from "@/components/ui/styles/sci-fi/button";
+import PickPlanetCard from "@/content/Posts/PickPlanetCard";
 
 interface Classification {
   id: number;
@@ -87,8 +88,8 @@ export default function PreferredTerrestrialClassifications({
               images = classification.media.filter((url: any) => typeof url === "string");
             } else if (typeof classification.media === "object" && classification.media.uploadUrl) {
               images.push(classification.media.uploadUrl);
-            }
-          }
+            };
+          };
 
           return { ...classification, images, temperature };
         })
@@ -117,7 +118,16 @@ export default function PreferredTerrestrialClassifications({
       ) : (
         classifications.map((classification) => (
           <div key={classification.id} className="space-y-4">
-            <SimplePostSingle
+            <PickPlanetCard
+              id={classification.id.toString()}
+              title={`Planet #${classification.id}`}
+              author={classification.author}
+              anomalyTitle=""
+              content={classification.content || "No content available"}
+              images={classification.images || []}
+              classificationConfiguration={classification.classificationConfiguration}
+            />
+            {/* <SimplePostSingle
               id={classification.id.toString()}
               title={`Planet #${classification.id}`}
               author={classification.author}
@@ -125,7 +135,7 @@ export default function PreferredTerrestrialClassifications({
               category={classification.classificationType || "Unknown"}
               images={classification.images || []}
               classificationConfiguration={classification.classificationConfiguration}
-            />
+            /> */}
             {classification.temperature && (
               <p className="text-gray-500">Estimated Temperature: {classification.temperature}°C</p>
             )}

@@ -3,7 +3,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
-export default function ProfileSetupForm() {
+interface ProfileSetupFormProps {
+  onProfileUpdate: () => void | null;
+};
+
+export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter(); 
@@ -33,15 +37,15 @@ export default function ProfileSetupForm() {
           setUsername(data.username);
           setFirstName(data?.full_name);
           setAvatarPreview(data?.avatar_url || "");
-        }
-      }
+        };
+      };
 
       setLoading(false);
-    }
+    };
 
     if (session?.user?.id) {
       getProfile();
-    }
+    };
 
     return () => {
       ignore = true;
@@ -65,7 +69,7 @@ export default function ProfileSetupForm() {
     if (!username || !session?.user?.email) {
       setError("Username and email are required.");
       return;
-    }
+    };
 
     setLoading(true);
     setError(null);
@@ -102,11 +106,12 @@ export default function ProfileSetupForm() {
     if (error) {
       alert(error.message);
     } else {
-      router.push("/"); // Redirect to the home page
+      router.push("/"); 
+      onProfileUpdate();
     }
 
     setLoading(false);
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1D2833] p-4 bg-[url('/game-background.jpg')] bg-cover bg-center">

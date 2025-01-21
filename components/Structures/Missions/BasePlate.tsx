@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { AnimatePresence } from "framer-motion";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
+import Navbar from "@/components/Layout/Navbar";
+import ProfileSetupForm from "@/components/Account/ProfileSetup";
 
 interface MissionConfig {
   id: number;
@@ -34,7 +38,48 @@ const MissionShell = ({
   onPreviousChapter,
   onNextChapter,
 }: MissionShellProps) => {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  
+  const [loading, setLoading] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [username, setUsername] = useState("");
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [refresh, setRefresh] = useState(false);
+
   const [selectedMission, setSelectedMission] = useState<MissionConfig | null>(null);
+
+  useEffect(() => {
+    let ignore = false;
+    async function getProfile() {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select(`username, full_name, avatar_url`)
+        .eq("id", session?.user.id)
+        .single();
+  
+      if (!ignore) {
+        if (error) {
+          console.warn(error);
+        } else if (data) {
+          setUsername(data.username);
+          setFirstName(data?.full_name);
+          setAvatarPreview(data?.avatar_url || "");
+        }
+      }
+      setLoading(false);
+    }
+  
+    if (session?.user?.id) {
+      getProfile();
+    }
+  
+    return () => {
+      ignore = true;
+    };
+  }, [session, refresh]);  
 
   const renderMission = (mission: MissionConfig) => {
     const completedCount = mission.completedCount ?? 0;
@@ -68,6 +113,15 @@ const MissionShell = ({
   };
 
   const pointsForNextChapter = currentChapter * 9;
+
+  if (!firstName) {
+    return (
+      <EarthViewLayout>
+        <ProfileSetupForm onProfileUpdate={() => setRefresh((prev) => !prev)} />
+        <div></div>
+      </EarthViewLayout>
+    );
+  };
 
   return (
     <div className="flex flex-col items-center bg-[#1D2833] text-white rounded-2xl shadow-lg p-6 w-full max-w-4xl mx-auto">

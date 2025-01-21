@@ -1,12 +1,12 @@
 "use client";
 
-import ProfileSetupForm from "@/components/Account/ProfileSetup";
+import { BasicPopupModal } from "@/components/Layout/Modal";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
-            <ProfileSetupForm />
+            <BasicPopupModal />
           </>
         // {/* </StarnetLayout> */}
     );

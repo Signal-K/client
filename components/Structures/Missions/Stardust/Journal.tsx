@@ -346,8 +346,7 @@ function JournalAchievement({
   };
 
   return (
-    <div className="flex flex-col lg:flex-row bg-[#1D2833] rounded-lg shadow-lg overflow-hidden border border-[#2C4F64]/20">
-      {/* Left column: Categories and Projects */}
+    <div className="max-w-full h-[90vh] flex-col w-full sm:w-[90vw] lg:flex-row bg-[#1D2833] rounded-lg shadow-lg overflow-hidden border border-[#2C4F64]/20">
       <div className="w-full lg:w-1/2 p-6 bg-gradient-to-b from-[#1D2833] to-[#2C4F64]/10">
         <h2 className="text-2xl font-bold mb-6 text-[#2C4F64] flex items-center gap-2">
           <Award className="w-6 h-6 text-[#FF695D]" />
@@ -397,7 +396,6 @@ function JournalAchievement({
         ))}
       </div>
 
-      {/* Right column: Missions */}
       {selectedProject && (
         <div className="w-full lg:w-1/2 p-6 bg-gradient-to-b from-[#2C4F64]/10 to-[#1D2833]">
           <h3 className="text-xl font-bold mb-4 text-[#FFD700]">
@@ -430,42 +428,6 @@ function JournalAchievement({
               </li>
             ))}
           </ul>
-        </div>
-      )}
-    </div>
-  );
-};
-
-import { Sparkles, Coins } from 'lucide-react';
-
-interface MissionCardProps {
-  mission: Mission
-};
-
-function MissionCard({ mission }: MissionCardProps) {
-  return (
-    <div className="bg-[#2C4F64]/10 rounded-lg p-4 mb-2 shadow-sm border border-[#2C4F64]/20">
-      <div className="flex justify-between items-start mb-2">
-        <h4 className="font-medium text-[#5FCBC3]">{mission.name}</h4>
-        <div className="flex gap-4">
-          <div className="flex items-center gap-1 text-sm">
-            <Sparkles className="w-4 h-4 text-[#5FCBC3]" />
-            <span className="text-[#5FCBC3]">{mission.xpReward} XP</span>
-          </div>
-          <div className="flex items-center gap-1 text-sm">
-            <Coins className="w-4 h-4 text-[#FF695D]" />
-            <span className="text-[#5FCBC3]">{mission.coinReward}</span>
-          </div>
-        </div>
-      </div>
-      <JournalProgressBar 
-        progress={mission.progress} 
-        total={mission.totalSteps}
-        showPercentage 
-      />
-      {mission.isComplete && (
-        <div className="flex justify-end">
-          <span className="text-[#FF695D] text-sm">✓ Complete</span>
         </div>
       )}
     </div>
