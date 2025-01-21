@@ -2,16 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
 import { SciFiButton } from "@/components/ui/styles/sci-fi/button";
 import PickPlanetCard from "@/content/Posts/PickPlanetCard";
+import { Card, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface Classification {
   id: number;
   created_at: string;
   content: string | null;
   author: string;
-  anomaly: number | null;
+  anomaly: number;
   media?: any | null;
   classificationType: string | null;
   classificationConfiguration: any | null;
@@ -108,7 +109,7 @@ export default function PreferredTerrestrialClassifications({
   }, [session]);
 
   return (
-    <div className="space-y-8">
+    <div>
       {loading ? (
         <p>Loading classifications...</p>
       ) : error ? (
@@ -116,37 +117,36 @@ export default function PreferredTerrestrialClassifications({
       ) : classifications.length === 0 ? (
         <p>No classifications found for preferred terrestrial planets.</p>
       ) : (
-        classifications.map((classification) => (
-          <div key={classification.id} className="space-y-4">
-            <PickPlanetCard
-              id={classification.id.toString()}
-              title={`Planet #${classification.id}`}
-              author={classification.author}
-              anomalyTitle=""
-              content={classification.content || "No content available"}
-              images={classification.images || []}
-              classificationConfiguration={classification.classificationConfiguration}
-            />
-            {/* <SimplePostSingle
-              id={classification.id.toString()}
-              title={`Planet #${classification.id}`}
-              author={classification.author}
-              content={classification.content || "No content available"}
-              category={classification.classificationType || "Unknown"}
-              images={classification.images || []}
-              classificationConfiguration={classification.classificationConfiguration}
-            /> */}
-            {classification.temperature && (
-              <p className="text-gray-500">Estimated Temperature: {classification.temperature}°C</p>
-            )}
-            <SciFiButton
-              onClick={() => onSelectAnomaly(classification.anomaly)}
-              className="mt-2 text-blue-500"
-            >
-              Search this planet for anomalies to investigate
-            </SciFiButton>
-          </div>
-        ))
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {classifications.map((classification) => (
+            <Card key={classification.id} className="bg-white/10 backdrop-blur-md border border-white/10 shadow-lg rounded-lg">
+              <CardHeader>
+                <PickPlanetCard
+                  id={classification.id.toString()}
+                  title={`Planet #${classification.id}`}
+                  author={classification.author}
+                  anomalyTitle=""
+                  content={classification.content || "No content available"}
+                  images={classification.images || []}
+                  classificationConfiguration={classification.classificationConfiguration}
+                  anomaly={classification.anomaly.toString()}
+                />
+                {classification.temperature && (
+                  <p className="text-gray-500 mt-2">
+                    Estimated Temperature: {classification.temperature}°C
+                  </p>
+                )}
+                <SciFiButton
+                  onClick={() => onSelectAnomaly(classification.anomaly)}
+                  className="mt-2 text-blue-500"
+                >
+                  {/* Search this planet for anomalies to investigate */}
+                  Search this planet
+                </SciFiButton>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );

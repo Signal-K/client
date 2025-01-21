@@ -14,6 +14,7 @@ export interface PlanetGeneratorProps {
   content?: string;
   classificationId: string;
   author: string;
+  type?: string;
 };
 
 export default function PlanetGenerator({ classificationConfig, author, classificationId }: PlanetGeneratorProps) {
