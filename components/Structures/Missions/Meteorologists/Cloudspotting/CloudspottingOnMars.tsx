@@ -20,7 +20,7 @@ interface Mission {
 
 interface MissionPoints {
     [key: number]: number;
-};
+}; 
 
 const CloudspottingOnMars = () => {
     const supabase = useSupabaseClient();

@@ -19,7 +19,7 @@ export function BasicPopupModal() {
                         <h2 className="text-l text-red-500">Mission Log</h2>
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-full max-h-[90vh] w-full sm:w-[90vw] h-full sm:h-[90vh] p-4 bg-gradient-to-br from-[#1a1b26] via-[#292e42] to-[#565f89] rounded-3xl">
+                <DialogContent className="max-w-full max-h-[90vh] w-full sm:w-[90vw] h-full sm:h-[90vh] p-4 rounded-3xl">
                     <AnimatePresence>
                         <motion.div
                             initial={{ opacity: 0 }}

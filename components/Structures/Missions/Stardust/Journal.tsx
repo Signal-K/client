@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import TotalPoints from './Total';
+import { ChevronDown, ChevronRight, Award, Star } from 'lucide-react';
+import { Category, Project, Mission } from '@/types/journal';
+import { JournalProgressBar } from "@/components/ui/progress";
 
 export default function JournalPage() {
   const [pointsData, setPointsData] = useState<{
@@ -25,9 +28,7 @@ export default function JournalPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1D2833] py-8">
-      <div className="container mx-auto px-4">
-        <div className="max-w-7xl mx-auto">
+    <div className="bg-[#1D2833] py-8 h-[90vh]">
           <h1 className="text-3xl font-bold mb-6 text-[#5FCBC3]">Citizen Science Journal</h1>
           
           <TotalPoints onExport={handleExport} />
@@ -42,15 +43,9 @@ export default function JournalPage() {
               cloudspottingPoints={pointsData.cloudspottingPoints}
             />
           )}
-        </div>
-      </div>
     </div>
   );
 };
-
-import { ChevronDown, ChevronRight, Award, Star } from 'lucide-react';
-import { Category, Project, Mission } from '@/types/journal';
-import { JournalProgressBar } from "@/components/ui/progress";
 
 const categories: Category[] = [
     {
@@ -311,22 +306,22 @@ const categories: Category[] = [
 ];  
 
 function JournalAchievement({
-    planetHuntersPoints,
-    dailyMinorPlanetPoints,
-    ai4mPoints,
-    planetFourPoints,
-    jvhPoints,
-    cloudspottingPoints,
-  }: {
-    planetHuntersPoints: number;
-    dailyMinorPlanetPoints: number;
-    ai4mPoints: number;
-    planetFourPoints: number;
-    jvhPoints: number;
-    cloudspottingPoints: number;
-  }) {
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  planetHuntersPoints,
+  dailyMinorPlanetPoints,
+  ai4mPoints,
+  planetFourPoints,
+  jvhPoints,
+  cloudspottingPoints,
+}: {
+  planetHuntersPoints: number;
+  dailyMinorPlanetPoints: number;
+  ai4mPoints: number;
+  planetFourPoints: number;
+  jvhPoints: number;
+  cloudspottingPoints: number;
+}) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [openCategories, setOpenCategories] = useState<number[]>([]); // Track open categories
 
   const projectPoints: { [key: string]: number } = {
     "1": planetHuntersPoints,
@@ -335,101 +330,105 @@ function JournalAchievement({
     "5": planetFourPoints,
     "8": jvhPoints,
     "6": cloudspottingPoints,
-  };  
+  };
 
-  const toggleCategory = (categoryId: string) => {
-    setExpandedCategory(expandedCategory === categoryId ? null : categoryId)
+  const toggleCategory = (categoryId: number) => {
+    setOpenCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    );
   };
 
   const selectProject = (project: Project) => {
-    setSelectedProject(project)
+    setSelectedProject(project);
   };
 
   return (
-    <div className="max-w-full h-[90vh] flex-col w-full sm:w-[90vw] lg:flex-row bg-[#1D2833] rounded-lg shadow-lg overflow-hidden border border-[#2C4F64]/20">
-      <div className="w-full lg:w-1/2 p-6 bg-gradient-to-b from-[#1D2833] to-[#2C4F64]/10">
+    <div className="flex w-full h-full">
+      {/* Left Panel: Categories and Projects */}
+      <div className="flex-1 p-6 bg-gradient-to-b from-[#1D2833] to-[#2C4F64]/10 overflow-y-auto">
         <h2 className="text-2xl font-bold mb-6 text-[#2C4F64] flex items-center gap-2">
           <Award className="w-6 h-6 text-[#FF695D]" />
           Journal & Achievements
         </h2>
-
         {categories.map((category) => (
           <div key={category.id} className="mb-4">
             <button
               className="flex items-center justify-between w-full p-3 bg-[#2C4F64]/5 rounded-lg shadow-sm border border-[#2C4F64]/20 hover:bg-[#2C4F64]/20 transition-colors"
-              onClick={() => toggleCategory(category.id)}
+              onClick={() => toggleCategory(Number(category.id))} 
             >
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-[#2C4F64]">{category.name}</span>
-                <span className="text-sm text-[#5FCBC3]">
-                  (Total: {category.totalTally})
-                </span>
               </div>
-              {expandedCategory === category.id ? <ChevronDown /> : <ChevronRight />}
-            </button>
-
-            {expandedCategory === category.id && (
-              <div className="mt-4 space-y-3">
-                {category.projects.map((project) => (
-                  <button
-                    key={project.id}
-                    className={`w-full p-3 bg-[#2C4F64]/10 rounded-lg shadow-sm border ${
-                      selectedProject?.id === project.id
-                        ? "border-[#5FCBC3]"
-                        : "border-[#2C4F64]/20"
-                    } hover:bg-[#2C4F64]/20 transition-colors`}
-                    onClick={() => selectProject(project)}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold text-[#5FCBC3]">
-                        {project.name}
-                      </span>
-                      <span className="text-sm text-[#FFD700]">
-                        Points: {projectPoints[project.id] || 0}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+              <ChevronDown
+                className={`transition-transform ${
+                  openCategories.includes(Number(category.id)) ? "rotate-180" : ""
+                }`}
+              />
+              </button>
+              <div
+                className={`mt-4 space-y-3 transition-all duration-300 ease-in-out ${
+                  openCategories.includes(Number(category.id)) ? "max-h-screen" : "max-h-0"
+                } overflow-hidden`}
+              >
+              {category.projects.map((project) => (
+                <button
+                  key={project.id}
+                  className={`w-full p-3 bg-[#2C4F64]/10 rounded-lg shadow-sm border ${
+                    selectedProject?.id === project.id
+                      ? "border-[#5FCBC3]"
+                      : "border-[#2C4F64]/20"
+                  } hover:bg-[#2C4F64]/20 transition-colors`}
+                  onClick={() => selectProject(project)}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-[#5FCBC3]">
+                      {project.name}
+                    </span>
+                    <span className="text-sm text-[#FFD700]">
+                      Points: {projectPoints[project.id] || 0}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         ))}
       </div>
 
-      {selectedProject && (
-        <div className="w-full lg:w-1/2 p-6 bg-gradient-to-b from-[#2C4F64]/10 to-[#1D2833]">
-          <h3 className="text-xl font-bold mb-4 text-[#FFD700]">
-            {selectedProject.name}
-          </h3>
-          <ul className="space-y-3">
-            {selectedProject.missions.map((mission) => (
-              <li
-                key={mission.id}
-                className="p-3 bg-[#1D2833] rounded-lg shadow-sm border border-[#2C4F64]/20"
-              >
-                <div className="flex justify-between items-center">
-                  <span className="text-[#5FCBC3] font-semibold">
-                    {mission.name}
-                  </span>
-                  <div className="text-sm">
-                    <span className="text-[#FFD700] font-bold">
-                      XP: {mission.xpReward}
-                    </span>{" "}
-                    |{" "}
-                    <span className="text-[#FF695D] font-bold">
-                      Coins: {mission.coinReward}
+      {/* Right Panel: Selected Project Details */}
+      <div className="flex-1 p-6 bg-gradient-to-b from-[#2C4F64]/10 to-[#1D2833] overflow-y-auto">
+        {selectedProject ? (
+          <>
+            <h3 className="text-xl font-bold mb-4 text-[#FFD700]">
+              {selectedProject.name}
+            </h3>
+            <ul className="space-y-3">
+              {selectedProject.missions.map((mission) => (
+                <li
+                  key={mission.id}
+                  className="p-3 bg-[#1D2833] rounded-lg shadow-sm border border-[#2C4F64]/20"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#5FCBC3] font-semibold">
+                      {mission.name}
                     </span>
                   </div>
-                </div>
-                <JournalProgressBar
+                  <JournalProgressBar
                     progress={mission.progress}
                     total={mission.totalSteps}
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+                  />
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-full text-[#5FCBC3]">
+            <span>Select a project to see details</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
