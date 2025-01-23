@@ -33,6 +33,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
   assetMentioned,
   parentPlanetLocation,
   structureItemId,
+  annotationOptions,
 }) => {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -207,11 +208,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         configuration: null,
       };
       await supabase.from("missions").insert([missionData]);
-      const newAnomalyData = {
-        user_id: session?.user?.id,
-        anomaly_id: activePlanet?.id,
-      };
-      await supabase.from("user_anomalies").insert([newAnomalyData]);
+      // const newAnomalyData = {
+      //   user_id: session?.user?.id,
+      //   anomaly_id: activePlanet?.id,
+      // };
+      // await supabase.from("user_anomalies").insert([newAnomalyData]);
     } catch (error: any) {
       console.error(error);
     };
@@ -234,6 +235,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       parentPlanetLocation: parentPlanetLocation || null,
       activePlanet: activePlanet?.id,
       createdBy: inventoryItemId ?? null,
+      annotationOptions: annotationOptions,
     };
 
     try {

@@ -54,6 +54,7 @@ export default function ImageAnnotator({
   const [currentDrawing, setCurrentDrawing] = useState<DrawingObject | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploads, setUploads] = useState<string[]>([]);
+  const [annotationOptions, setAnnotationOptions] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
 
@@ -101,6 +102,24 @@ export default function ImageAnnotator({
       img.src = initialImageUrl;
     }
   }, [initialImageUrl]);
+
+  // Update annotationOptions to include the name and quantity for each category
+  useEffect(() => {
+    const options = drawings.reduce((acc, drawing) => {
+      const categoryName = CATEGORY_CONFIG[drawing.category]?.name || drawing.category;
+      const existingOption = acc.find((option) => option.name === categoryName);
+
+      if (existingOption) {
+        existingOption.quantity += 1;
+      } else {
+        acc.push({ name: categoryName, quantity: 1 });
+      }
+
+      return acc;
+    }, [] as { name: string; quantity: number }[]);
+
+    setAnnotationOptions(options.map((opt) => `${opt.name} (x${opt.quantity})`));
+  }, [drawings, CATEGORY_CONFIG]);
 
   const categoryCount = drawings.reduce((acc, drawing) => {
     acc[drawing.category] = (acc[drawing.category] || 0) + 1;
@@ -180,6 +199,7 @@ export default function ImageAnnotator({
                 ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]),
               ].filter((item): item is string => typeof item === 'string')}
               structureItemId={structureItemId}
+              annotationOptions={annotationOptions}
             />
           </SciFiPanel>
         </div>
