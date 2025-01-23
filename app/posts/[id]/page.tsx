@@ -5,6 +5,7 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
 import StructuresOnPlanet from "@/components/Structures/Structures";
 import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+import Navbar from "@/components/Layout/Navbar";
 
 interface Classification {
   id: number;
@@ -83,6 +84,7 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="min-h-screen w-full flex flex-col">
+      <Navbar />
       <img
         className="absolute inset-0 w-full h-full object-cover"
         src="/assets/Backdrops/Earth.png"
