@@ -7,7 +7,7 @@ interface TotalPointsProps {
     planetHuntersPoints: number;
     dailyMinorPlanetPoints: number;
     ai4mPoints: number;
-    planetFourPoints: number; 
+    planetFourPoints: number;
     jvhPoints: number;
     cloudspottingPoints: number;
     totalPoints: number;

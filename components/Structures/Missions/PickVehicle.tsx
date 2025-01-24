@@ -1,41 +1,57 @@
-"use client";
-
-import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
-import { useState, useCallback } from "react";
-import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
-import { Truck, Shield, Users, Gauge, TruckIcon } from "lucide-react";
+import { Truck, Shield, Users, Gauge, Search } from "lucide-react";
 import type { Vehicle } from "@/types/Vehicles";
+import TotalPoints from "./Stardust/Total";
+import { useCallback, useState } from "react";
+
+interface PickAutomatonForPickPlanetProps {
+  onSelectVehicle: (vehicleId: string) => void;
+};
 
 const automatons: Vehicle[] = [
-  {
-    id: "1",
-    name: "Visual Satellite",
-    description: "Use this to find landmarks and sites on the planet you chose",
-    icon: "truck",
-    stats: {
-      speed: 65,
-      armor: 30,
-      capacity: 8,
+    {
+      id: "1",
+      name: "Visual Satellite",
+      description: "Use this to find landmarks and sites on the planet you chose",
+      icon: "truck",
+      stats: {
+        speed: 65,
+        armor: 30,
+        capacity: 8,
+      },
+      cost: 1,
+      quantity: 0,
     },
-    cost: 1,
-    quantity: 0,
-  },
-  {
-    id: "2",
-    name: "Scout Rover",
-    description: "Help train these rovers to better understand their surroundings",
-    icon: "scout",
-    stats: {
-      speed: 65,
-      armor: 30,
-      capacity: 8,
+    {
+      id: "2",
+      name: "Scout Rover",
+      description: "Help train these rovers to better understand their surroundings",
+      icon: "scout",
+      stats: {
+        speed: 65,
+        armor: 30,
+        capacity: 8,
+      },
+      cost: 1,
+      quantity: 0,
     },
-    cost: 1,
-    quantity: 0,
-  },
 ];
 
-export default function PickAutomatonForPickPlanet() {
+export default function PickAutomatonForPickPlanet({
+  onSelectVehicle,
+}: PickAutomatonForPickPlanetProps) {
+  const formatNumber = (num: number) => new Intl.NumberFormat().format(num);
+
+  const renderIcon = (iconName: string) => {
+    switch (iconName) {
+      case "truck":
+        return <Truck className="w-24 h-24 text-primary" />;
+      case "scout":
+        return <Search className="w-24 h-24 text-accent" />;
+      default:
+        return <Truck className="w-24 h-24 text-muted" />;
+    };
+  };
+
   const [pointsData, setPointsData] = useState<{
     planetHuntersPoints: number;
     dailyMinorPlanetPoints: number;
@@ -50,56 +66,52 @@ export default function PickAutomatonForPickPlanet() {
     setPointsData(points);
   }, []);
 
-  const formatNumber = ( num: number ) => new Intl.NumberFormat().format(num);
-  const renderIcon = ( iconName: string ) => {
-    switch ( iconName ) {
-      case "truck":
-        return <Truck className="w-24 h-24" />
-      default:
-        return <Truck className="w-24 h-24" />
-    };
-  };
-
   return (
     <div className="w-full max-w-5xl mx-auto p-4 space-y-8">
       <div className="grid md:grid-cols-2 gap-6">
-        <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
-          <CardContent className="flex items-center justify-between p-6">
+        <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 rounded-lg shadow">
+          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-primary">Current XP Balance</h2>
+              <h2 className="text-lg font-semibold text-primary">Current XP Balance: </h2>
               <TotalPoints onExport={handleExport} />
               <p className="text-3xl font-bold text-primary">{pointsData?.totalPoints}</p>
             </div>
             <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
               <Gauge className="w-8 h-8 text-primary" />
             </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradeint-to-br from-secondary/10 to-secondary/5">
-          <CardContent className="p-6">
-            <h2 className="font-semibold text-secondary mb-2">Vehicle Selection</h2>
-            <p className="text-sm text-secondary-foreground/80 leading-tight">
-              Browse and select from available vehicles. Each vehicle has unique stats and costs XP to acquire. Your current XP balance is shown on the left.
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 p-6 rounded-lg shadow">
+          <h2 className="font-semibold text-secondary mb-2">Vehicle Selection</h2>
+          <p className="text-sm text-secondary-foreground/80 leading-tight">
+            Browse and select from available vehicles. Each vehicle has unique stats and costs XP to acquire. Your
+            current XP balance is shown on the left.
+          </p>
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {automatons.map((vehicle) => (
-          <Card key={vehicle.id} className="overflow-hidden group hover:shadow-lg transition-shadow">
+          <div
+            key={vehicle.id}
+            className="rounded-lg shadow overflow-hidden group hover:shadow-lg transition-shadow"
+          >
             <div className="relative h-48 bg-gradient-to-br from-muted/80 to-muted flex items-center justify-center p-6 border-b">
-              <div className="transform group-hover:scale-110 transition-transform">{renderIcon(vehicle.icon)}</div>
+              <div className="transform group-hover:scale-110 transition-transform">
+                {renderIcon(vehicle.icon)}
+              </div>
             </div>
-            <CardHeader className="space-y-1">
+
+            <div className="p-6 space-y-2">
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-xl font-semibold">{vehicle.name}</h3>
                   <div className="text-sm text-muted-foreground">ID: {vehicle.id}</div>
                 </div>
               </div>
-              <CardDescription className="mt-2">{vehicle.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
+              <p className="text-sm text-muted-foreground">{vehicle.description}</p>
+            </div>
+            <div className="p-6">
               <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-muted/50 rounded-lg">
                 <div className="flex flex-col items-center p-2 rounded-md hover:bg-muted transition-colors">
                   <Gauge className="w-6 h-6 mb-1 text-primary" />
@@ -127,8 +139,16 @@ export default function PickAutomatonForPickPlanet() {
                   <span className="ml-2 font-semibold text-secondary">{vehicle.quantity}</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <div className="p-6">
+                <button
+                  onClick={() => onSelectVehicle(vehicle.id)}
+                  className="w-full bg-primary/20 py-2 text-primary rounded-lg hover:bg-primary/30 transition-colors"
+                >
+                  Select {vehicle.name}
+                </button>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     </div>

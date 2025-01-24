@@ -1,13 +1,12 @@
 "use client";
 
 import { BasicPopupModal } from "@/components/Layout/Modal";
-import PickAutomatonForPickPlanet from "@/components/Structures/Missions/PickVehicle";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
-            <PickAutomatonForPickPlanet />
+            <BasicPopupModal />
           </>
         // {/* </StarnetLayout> */}
     );

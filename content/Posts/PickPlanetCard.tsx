@@ -89,7 +89,7 @@ export default function PickPlanetCard({
       };
     };
 
-    if (supabase && author) {
+    if (supabase && author) { 
       fetchAvatar();
     };
   }, [supabase, author]);
