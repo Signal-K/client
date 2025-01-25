@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PlanetScene } from './planet-scene';
+import { PlanetScene } from './planet-scene'; 
 import { PlanetControls } from './planet-controls';
 import { PlanetImportExport } from './planet-import-export';
 import { calculatePlanetStats } from '@/utils/planet-physics';
@@ -9,10 +9,12 @@ import type { PlanetStats } from '@/utils/planet-physics';
 const TERRESTRIAL_THRESHOLD = 7.5; // Earth masses
 const GASEOUS_THRESHOLD = 2.0; // Earth radii
 
-interface PlanetGeneratorProps {
+export interface PlanetGeneratorProps {
   classificationConfig?: any;
+  content?: string;
   classificationId: string;
   author: string;
+  type?: string;
 };
 
 export default function PlanetGenerator({ classificationConfig, author, classificationId }: PlanetGeneratorProps) {
@@ -62,10 +64,11 @@ export default function PlanetGenerator({ classificationConfig, author, classifi
   const handleImport = (importedStats: Partial<PlanetStats>) => {
     if (importedStats.mass !== undefined) {
       setMass(importedStats.mass);
-    }
+    };
     if (importedStats.radius !== undefined) {
       setRadius(importedStats.radius);
-    }
+    };
+
     setTypeOverride(null);
   };
 
@@ -73,7 +76,7 @@ export default function PlanetGenerator({ classificationConfig, author, classifi
     if (!classificationId) {
       console.error('Classification ID is missing.');
       return;
-    }
+    };
 
     const idToQuery = typeof classificationId === 'string' ? classificationId : String(classificationId);
 
@@ -95,7 +98,7 @@ export default function PlanetGenerator({ classificationConfig, author, classifi
       const { error: updateError } = await supabase
         .from('classifications')
         .update({ classificationConfiguration: newConfig })
-        .eq('id', idToQuery);
+        .eq('id', idToQuery); 
 
       if (updateError) throw updateError;
 
@@ -103,7 +106,7 @@ export default function PlanetGenerator({ classificationConfig, author, classifi
     } catch (err) {
       console.error('Error saving planet configuration:', err);
       alert('Failed to save planet configuration.');
-    }
+    };
   };
 
   return (

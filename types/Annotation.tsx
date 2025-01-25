@@ -9,7 +9,21 @@ export interface CategoryConfig {
   description: string;
 };
 
-export type P4Category = 'fan' | 'blotch' | 'custom';
+export type CoMCategory = 'Peak' | 'Custom';
+export const CoMCATEGORIES: Record<CoMCategory, CategoryConfig> = {
+  Peak: {
+    name: 'Peak',
+    color: '#ACAF50',
+    description: "Search for arches in each of the frames. Arches will have two sides, a gap in between the sides, and a peak at the top"
+  },
+  Custom: {
+    name: 'Custom',
+    color: '#FF0000',
+    description: 'Freeform drawing'
+  },
+};
+
+export type P4Category = 'fan' | 'blotch' | 'Custom';
 export const P4CATEGORIES: Record<P4Category, CategoryConfig> = {
   fan: {
     name: 'Fan',
@@ -21,14 +35,14 @@ export const P4CATEGORIES: Record<P4Category, CategoryConfig> = {
     color: '#4CAF50',
     description: 'Blotch-shaped feature'
   },
-  custom: {
+  Custom: {
     name: 'Custom',
     color: '#FF0000',
     description: 'Freeform drawing'
   },
 };
 
-export type PHCategory = 'Noise' | 'Clear dip' | 'Missing' | 'Custom/Other';
+export type PHCategory = 'Noise' | 'Clear dip' | 'Missing' | 'Custom';
 export const PHCATEGORIES: Record<PHCategory, CategoryConfig> = {
   Noise: {
     name: 'Noise',
@@ -45,14 +59,14 @@ export const PHCATEGORIES: Record<PHCategory, CategoryConfig> = {
     color: '#FFC107',
     description: 'Missing (missing data/empty spot)'
   },
-  'Custom/Other': {
-    name: 'Custom/Other',
+  'Custom': {
+    name: 'Custom',
     color: '#FF0000',
     description: 'Custom or other annotation'
   },
 };
 
-export type AI4MCategory = 'sand' | 'consolidated-soil' | 'bedrock' | 'big-rocks' | 'custom';
+export type AI4MCategory = 'sand' | 'consolidated-soil' | 'bedrock' | 'big-rocks' | 'Custom';
 export const AI4MCATEGORIES: Record<AI4MCategory, CategoryConfig> = {
   sand: {
     name: 'Sand',
@@ -74,7 +88,7 @@ export const AI4MCATEGORIES: Record<AI4MCategory, CategoryConfig> = {
     color: '#E91E63',
     description: 'Big rocks (extremely rare, stands more than 30 cm/1 ft high)'
   },
-  custom: {
+  Custom: {
     name: 'Custom',
     color: '#FF0000',
     description: 'Custom annotation'

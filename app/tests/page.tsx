@@ -1,12 +1,12 @@
 "use client";
 
-import JournalPage from "@/components/Structures/Missions/Stardust/Journal";
+import { BasicPopupModal } from "@/components/Layout/Modal";
 
 export default function TestPage() {
     return (
         // <StarnetLayout>
           <>
-            <JournalPage />
+            <BasicPopupModal />
           </>
         // {/* </StarnetLayout> */}
     );

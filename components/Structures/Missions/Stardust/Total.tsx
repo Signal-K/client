@@ -153,34 +153,27 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
       }
     };
 
-    const fetchAi4mPoints = async () => {
-      try {
-        const { data: classificationsData } = await supabase
-          .from("classifications")
-          .select("*")
-          .eq("classificationtype", "automaton-aiForMars")
-          .eq("author", session.user.id);
-
-        const mission1CompletedCount = classificationsData?.length ?? 0;
-
-        const { data: commentsData } = await supabase
-          .from("comments")
-          .select("*")
-          .eq("author", session.user.id);
-
-        const mission2CompletedCount = commentsData?.filter(
-          (comment) => comment.classification_id && classificationsData?.some(
-            (classification) => classification.id === comment.classification_id
-          )
-        ).length ?? 0;
-
-        const totalPoints = mission1CompletedCount * 2 + mission2CompletedCount * 2;
-
-        setAi4mPoints(totalPoints);
-      } catch (error) {
-        console.error("Error fetching AI4M points:", error);
-      }
-    };
+    const fetchAi4MPoints = async () => {
+      const { data: classifications } = await supabase
+        .from("classifications")
+        .select("id, classificationtype, classificationConfiguration")
+        .eq("author", session.user.id)
+        .eq("classificationtype", "automaton-aiForMars");
+    
+      const mission1Points = classifications?.length || 0;
+    
+      const { data: comments } = await supabase
+        .from("comments")
+        .select("id, classification_id")
+        .eq("author", session.user.id);
+    
+      const classificationIds = classifications?.map((c: any) => c.id) || [];
+      const mission2Points = comments?.filter((comment: any) =>
+        classificationIds.includes(comment.classification_id)
+      ).length || 0;
+    
+      setAi4mPoints(mission1Points + mission2Points);
+    };;    
 
     const fetchPlanetFourPoints = async () => {
       try {
@@ -208,46 +201,62 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
         setPlanetFourPoints(totalPoints);
       } catch (error) {
         console.error("Error fetching Planet Four points:", error);
-      }
+      };
     };
 
     const fetchJvhPoints = async () => {
-      try {
-        const { data: classificationsData } = await supabase
-          .from("classifications")
-          .select("*")
-          .eq("classificationtype", "jovian-vortex-hunters")
-          .eq("author", session.user.id);
+      const { data: classifications } = await supabase
+        .from("classifications")
+        .select("id")
+        .eq("author", session.user.id)
+        .eq("classificationtype", "lidar-jovianVortexHunter");
 
-        const mission1CompletedCount = classificationsData?.length ?? 0;
-        const totalPoints = mission1CompletedCount * 3;
+      const mission1Points = classifications?.length || 0;
+      
+      const { data: comments } = await supabase
+        .from("comments")
+        .select("id, classification_id")
+        .eq("author", session.user.id);
 
-        setJvhPoints(totalPoints);
-      } catch (error) {
-        console.error("Error fetching Jovian Vortex Hunters points:", error);
-      }
+      const classificationIds = classifications?.map((c) => c.id) || [];
+      const mission2Points = comments?.filter((comment) =>
+        classificationIds.includes(comment.classification_id)
+      ).length || 0;
+
+      setJvhPoints(mission1Points + mission2Points);
     };
 
     const fetchCloudspottingPoints = async () => {
-      try {
-        const { data: classificationsData } = await supabase
-          .from("classifications")
-          .select("*")
-          .eq("classificationtype", "cloudspotting")
-          .eq("author", session.user.id);
+      const { data: classifications } = await supabase
+        .from("classifications")
+        .select("id, classificationtype, classificationConfiguration")
+        .eq("author", session.user.id)
+        .eq("classificationtype", "cloud");
 
-        const mission1CompletedCount = classificationsData?.length ?? 0;
-        const totalPoints = mission1CompletedCount * 2;
+      const mission1Points = classifications?.length || 0;
+      
+      const mission2Points = classifications?.filter((classification: any) => {
+        const config = classification.classificationConfiguration || {};
+        const options = config?.classificationOptions?.[""] || {};
+        return Object.values(options).some((value) => value === true);
+      }).length || 0;
 
-        setCloudspottingPoints(totalPoints);
-      } catch (error) {
-        console.error("Error fetching Cloudspotting points:", error);
-      }
+      const { data: comments } = await supabase
+        .from("comments")
+        .select("id, classification_id")
+        .eq("author", session.user.id);
+
+      const classificationIds = classifications?.map((c: any) => c.id) || [];
+      const mission3Points = comments?.filter((comment: any) =>
+          classificationIds.includes(comment.classification_id)
+      ).length || 0;
+
+      setCloudspottingPoints(mission1Points + mission2Points + mission3Points);
     };
 
     fetchPlanetHuntersPoints();
     fetchDailyMinorPlanetPoints();
-    fetchAi4mPoints();
+    fetchAi4MPoints();
     fetchPlanetFourPoints();
     fetchJvhPoints();
     fetchCloudspottingPoints();

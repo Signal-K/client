@@ -68,7 +68,7 @@ export function PostCardSingleWithGenerator({
         .from("comments")
         .select("*")
         .eq("classification_id", classificationId)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false }); 
 
       if (error) throw error;
       setComments(data);

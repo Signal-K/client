@@ -158,37 +158,38 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
         setShowTutorial(true);
     };
 
-    const fetchAnomaly = async () => {
-        if (!session) {
-            console.error("No session found");
-            setLoading(false);
-            return;
-        };
-    
-        setLoading(true);
-    
-        try {
-            const { data: anomalies, error } = await supabase
-                .from('anomalies')
-                .select('*')
-                .eq('anomalySet', 'satellite-planetFour');
-    
-            if (error) throw error;
-    
-            if (!anomalies || anomalies.length === 0) {
-                console.error("No anomalies found for the given type");
+        const fetchAnomaly = async () => {
+            if (!session) {
+                console.error("No session found");
+                setLoading(false);
+                return;
+            };
+        
+            setLoading(true);
+        
+            try {
+                const { data: anomalies, error } = await supabase
+                    .from('anomalies')
+                    .select('*')
+                    .eq('anomalySet', 'satellite-planetFour');
+        
+                if (error) throw error;
+        
+                if (!anomalies || anomalies.length === 0) {
+                    console.error("No anomalies found for the given type");
+                    setAnomaly(null);
+                } else {
+                    const randomIndex = Math.floor(Math.random() * anomalies.length);
+                    const anomaly = anomalies[randomIndex];
+                    setAnomaly(anomaly);
+                    setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomaly.id}.jpeg`);
+                }
+            } catch (error) {
+                console.error("Error fetching anomaly", error);
                 setAnomaly(null);
-            } else {
-                const anomaly = anomalies[0];
-                setAnomaly(anomaly);
-                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomaly.id}.jpeg`);
-            }
-        } catch (error) {
-            console.error("Error fetching anomaly", error);
-            setAnomaly(null);
-        } finally {
-            setLoading(false);
-        };
+            } finally {
+                setLoading(false);
+            }    
     };    
 
     useEffect(() => {

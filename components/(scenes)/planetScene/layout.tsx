@@ -144,13 +144,17 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
 
 export default PlanetViewLayout;
 
-export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({
-  children,
-}) => {
+interface EarthViewLayoutProps {
+  children: React.ReactNode;
+};
+
+export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
+  const childrenArray = React.Children.toArray(children);
+
   const sectionStyles: CSSProperties[] = [
     {
       flex: 8,
-    }, 
+    },
     {
       flex: 6,
     },
@@ -170,10 +174,9 @@ export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({
       />
 
       <div className="relative flex flex-1 z-10">
-        {/* <VerticalToolbar /> */}
-
         <div className="relative flex flex-col flex-1">
-          {children.slice(0, 2).map((child, index) => (
+          {/* <VerticalToolbar /> goes somewhere here */}
+          {childrenArray.slice(0, 2).map((child, index) => (
             <div
               key={index}
               className="relative flex-1"
@@ -187,16 +190,14 @@ export const EarthViewLayout: React.FC<PlanetViewLayoutProps> = ({
             style={sectionStyles[2]}
           >
             <div className="flex flex-1 flex-col">
-              <div className="flex-1">{children[2]}</div>
-              {children[3] && (
+              <div className="flex-1">{childrenArray[2]}</div>
+              {childrenArray[3] && (
                 <div className="flex-1 border-t border-dotted border-gray-100">
-                  {children[3]}
+                  {childrenArray[3]}
                 </div>
               )}
             </div>
-            <div className="flex-shrink-0 mx-7">
-              {children[4]}
-            </div>
+            <div className="flex-shrink-0 mx-7">{childrenArray[4]}</div>
           </div>
         </div>
       </div>

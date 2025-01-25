@@ -21,6 +21,7 @@ export interface ClassificationFormProps {
   parentPlanetLocation?: string;
   // structureItemId?: number;
   structureItemId?: number;
+  annotationOptions?: string[];
 };
 
 const defaultConfig: FormConfig = {

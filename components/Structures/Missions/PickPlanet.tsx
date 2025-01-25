@@ -1,27 +1,28 @@
-'use client';
-
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
+import PickPlanetCard from "@/content/Posts/PickPlanetCard";
+import PickAutomatonForPickPlanet from "./PickVehicle";
+import { Card, CardHeader } from "@/components/ui/card";
 import { SciFiButton } from "@/components/ui/styles/sci-fi/button";
+import PlanetRocketAnimation from "../Launchpad/PickTravel/PlanetRocketAnimation";
 
 interface Classification {
   id: number;
   created_at: string;
   content: string | null;
   author: string;
-  anomaly: number | null;
+  anomaly: number;
   media?: any | null;
   classificationType: string | null;
   classificationConfiguration: any | null;
   planetType: string | null;
   images?: string[];
   temperature?: string | null;
-};
+}
 
 interface PreferredTerrestrialClassificationsProps {
-  onSelectAnomaly: (anomalyId: number | null) => void;
-};
+  onSelectAnomaly: (anomalyId: number | null, selectedVehicle: string | null) => void;
+}
 
 export default function PreferredTerrestrialClassifications({
   onSelectAnomaly,
@@ -33,11 +34,15 @@ export default function PreferredTerrestrialClassifications({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
+
+  const [isVehicleSelectionFocused, setIsVehicleSelectionFocused] = useState<boolean>(false);
+  const [isAnimationVisible, setIsAnimationVisible] = useState<boolean>(false);
+
   const fetchClassifications = async () => {
     try {
       setLoading(true);
-
-      // Fetch comments with preferred terrestrial configurations
       const { data: comments, error: commentsError } = await supabase
         .from("comments")
         .select("classification_id, configuration")
@@ -52,7 +57,6 @@ export default function PreferredTerrestrialClassifications({
         return;
       }
 
-      // Fetch classifications for the selected classification IDs
       const { data: classificationsData, error: classificationsError } = await supabase
         .from("classifications")
         .select("*")
@@ -60,14 +64,13 @@ export default function PreferredTerrestrialClassifications({
 
       if (classificationsError) throw classificationsError;
 
-      // Fetch temperature comments for each classification
       const enrichedClassifications = await Promise.all(
         classificationsData.map(async (classification) => {
           const { data: tempComments, error: tempCommentsError } = await supabase
-          .from("comments")
-          .select("configuration")
-          .eq("classification_id", classification.id)
-          .filter("configuration->>temperature", "ilike", "%temperature%");
+            .from("comments")
+            .select("configuration")
+            .eq("classification_id", classification.id)
+            .filter("configuration->>temperature", "ilike", "%temperature%");
 
           if (tempCommentsError) console.error(tempCommentsError);
 
@@ -99,49 +102,98 @@ export default function PreferredTerrestrialClassifications({
       setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
-    };
+    }
   };
 
   useEffect(() => {
     fetchClassifications();
   }, [session]);
 
+  const handleConfirmSelection = () => {
+    if (selectedAnomaly && selectedVehicle) {
+      setIsAnimationVisible(true);
+    }
+  };
+
+  const handleAnimationFinish = () => {
+    onSelectAnomaly(selectedAnomaly, selectedVehicle);
+    setIsAnimationVisible(false);
+  };
+
   return (
-    <div className="space-y-8">
-      {loading ? (
+    <div>
+      {isAnimationVisible ? (
+        <PlanetRocketAnimation onFinish={handleAnimationFinish} />
+      ) : loading ? (
         <p>Loading classifications...</p>
       ) : error ? (
         <p>{error}</p>
       ) : classifications.length === 0 ? (
         <p>No classifications found for preferred terrestrial planets.</p>
       ) : (
-        classifications.map((classification) => (
-          <div key={classification.id} className="space-y-4">
-            <SimplePostSingle
-              id={classification.id.toString()}
-              title={`Planet #${classification.id}`}
-              author={classification.author}
-              content={classification.content || "No content available"}
-              category={classification.classificationType || "Unknown"}
-              images={classification.images || []}
-              classificationConfiguration={classification.classificationConfiguration}
-            />
-            {classification.temperature && (
-              <p className="text-gray-500">Estimated Temperature: {classification.temperature}°C</p>
-            )}
-            <SciFiButton
-              onClick={() => onSelectAnomaly(classification.anomaly)}
-              className="mt-2 text-blue-500"
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ${
+            isVehicleSelectionFocused ? "hidden" : ""
+          }`}
+        >
+          {classifications.map((classification) => (
+            <Card
+              key={classification.id}
+              className={`bg-white/10 backdrop-blur-md border border-white/10 shadow-lg rounded-lg ${
+                selectedAnomaly === classification.anomaly ? "ring-2 ring-primary" : ""
+              }`}
             >
-              Search this planet for anomalies to investigate
+              <CardHeader>
+                <PickPlanetCard
+                  id={classification.id.toString()}
+                  title={`Planet #${classification.id}`}
+                  author={classification.author}
+                  anomalyTitle=""
+                  content={classification.content || "No content available"}
+                  images={classification.images || []}
+                  classificationConfiguration={classification.classificationConfiguration}
+                  anomaly={classification.anomaly.toString()}
+                />
+                {classification.temperature && (
+                  <p className="text-gray-500 mt-2">
+                    Estimated Temperature: {classification.temperature}°C
+                  </p>
+                )}
+                <SciFiButton
+                  onClick={() => {
+                    setSelectedAnomaly(classification.anomaly);
+                    setIsVehicleSelectionFocused(true);
+                  }}
+                  className="mt-2 text-blue-500"
+                >
+                  Select this planet
+                </SciFiButton>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {selectedAnomaly && isVehicleSelectionFocused && (
+        <div className="mt-6 w-full h-full">
+          <h3 className="text-lg font-semibold text-gray-800">Select a Vehicle</h3>
+          <PickAutomatonForPickPlanet
+            onSelectVehicle={(vehicleId: string) => setSelectedVehicle(vehicleId)}
+          />
+          <div className="mt-4">
+            <SciFiButton
+              onClick={handleConfirmSelection}
+              disabled={!selectedAnomaly || !selectedVehicle}
+              className="text-blue-500"
+            >
+              Confirm Selection
             </SciFiButton>
           </div>
-        ))
+        </div>
       )}
     </div>
   );
 };
-
 
                 {/* <PostCardSingle
                     classificationId={classification.id}

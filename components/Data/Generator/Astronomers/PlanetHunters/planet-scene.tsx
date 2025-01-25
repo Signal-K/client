@@ -4,14 +4,24 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import { PlanetMesh } from './planet-mesh'
 import type { PlanetStats } from '@/utils/planet-physics'
+import { Button } from '@/components/ui/button'
 
 interface PlanetSceneProps {
   stats: PlanetStats
+  type?: string;
 };
 
-export function PlanetScene({ stats }: PlanetSceneProps) {
+export function PlanetScene({ stats, type }: PlanetSceneProps) {
   return (
     <div className="w-full h-[500px] bg-black rounded-lg overflow-hidden">
+            {type && (
+          <Button
+              variant="link"
+              className="mt-2 text-blue-500"
+              >
+              {type} Planet
+          </Button>
+        )}
       <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
