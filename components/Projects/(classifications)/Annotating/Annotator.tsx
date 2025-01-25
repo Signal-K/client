@@ -14,9 +14,11 @@ import {
   type AI4MCategory,
   type P4Category,
   type PHCategory,
+  type CoMCategory,
   type DrawingObject,
   type Tool,
   type CategoryConfig,
+  CoMCATEGORIES,
 } from '@/types/Annotation';
 import { SciFiPanel } from '@/components/ui/styles/sci-fi/panel';
 
@@ -29,8 +31,8 @@ interface ImageAnnotatorProps {
   assetMentioned: string | string[];
   structureItemId?: number;
   parentPlanetLocation?: string;
-  annotationType: 'AI4M' | 'P4' | 'PH' | 'Custom';
-}
+  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'Custom';
+};
 
 export default function ImageAnnotator({
   initialImageUrl,
@@ -48,13 +50,14 @@ export default function ImageAnnotator({
   const [selectedImage, setSelectedImage] = useState<string | null>(initialImageUrl);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentTool, setCurrentTool] = useState<Tool>('pen');
-  const [currentCategory, setCurrentCategory] = useState<AI4MCategory | P4Category>('custom');
+  const [currentCategory, setCurrentCategory] = useState<AI4MCategory | P4Category>('Custom');
   const [lineWidth, setLineWidth] = useState(2);
   const [drawings, setDrawings] = useState<DrawingObject[]>([]);
   const [currentDrawing, setCurrentDrawing] = useState<DrawingObject | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploads, setUploads] = useState<string[]>([]);
   const [annotationOptions, setAnnotationOptions] = useState<string[]>([]);
+  const [isFormVisible, setIsFormVisible] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
 
@@ -63,6 +66,8 @@ export default function ImageAnnotator({
       ? AI4MCATEGORIES
       : annotationType === 'P4'
       ? P4CATEGORIES
+      : annotationType === 'CoM'
+      ? CoMCATEGORIES
       : annotationType === 'PH'
       ? PHCATEGORIES
       : {} as Record<string, CategoryConfig>;
@@ -83,6 +88,7 @@ export default function ImageAnnotator({
       } else if (data) {
         const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
         setUploads((prev) => [...prev, url]);
+        setIsFormVisible(true); // Show the form after a successful upload
       }
     } catch (err) {
       console.error('Unexpected error during canvas upload:', err);
@@ -103,7 +109,6 @@ export default function ImageAnnotator({
     }
   }, [initialImageUrl]);
 
-  // Update annotationOptions to include the name and quantity for each category
   useEffect(() => {
     const options = drawings.reduce((acc, drawing) => {
       const categoryName = CATEGORY_CONFIG[drawing.category]?.name || drawing.category;
@@ -188,20 +193,23 @@ export default function ImageAnnotator({
               ))}
             </SciFiPanel>
           )}
-          <SciFiPanel className="p-4">
-            <ClassificationForm
-              anomalyId={anomalyId}
-              anomalyType={anomalyType}
-              missionNumber={missionNumber}
-              assetMentioned={[
-                ...uploads,
-                ...(otherAssets || []),
-                ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]),
-              ].filter((item): item is string => typeof item === 'string')}
-              structureItemId={structureItemId}
-              annotationOptions={annotationOptions}
-            />
-          </SciFiPanel>
+          {isFormVisible && (
+            <SciFiPanel className="p-4">
+              <ClassificationForm
+                anomalyId={anomalyId}
+                anomalyType={anomalyType}
+                missionNumber={missionNumber}
+                parentPlanetLocation={parentPlanetLocation}
+                assetMentioned={[
+                  ...uploads,
+                  ...(otherAssets || []),
+                  ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]),
+                ].filter((item): item is string => typeof item === 'string')}
+                structureItemId={structureItemId}
+                annotationOptions={annotationOptions}
+              />
+            </SciFiPanel>
+          )}
         </div>
       )}
     </div>

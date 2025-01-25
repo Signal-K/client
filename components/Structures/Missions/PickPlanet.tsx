@@ -1,11 +1,10 @@
-'use client';
-
 import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import PickPlanetCard from "@/content/Posts/PickPlanetCard";
 import PickAutomatonForPickPlanet from "./PickVehicle";
 import { Card, CardHeader } from "@/components/ui/card";
 import { SciFiButton } from "@/components/ui/styles/sci-fi/button";
+import PlanetRocketAnimation from "../Launchpad/PickTravel/PlanetRocketAnimation";
 
 interface Classification {
   id: number;
@@ -39,11 +38,11 @@ export default function PreferredTerrestrialClassifications({
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
 
   const [isVehicleSelectionFocused, setIsVehicleSelectionFocused] = useState<boolean>(false);
+  const [isAnimationVisible, setIsAnimationVisible] = useState<boolean>(false);
 
   const fetchClassifications = async () => {
     try {
       setLoading(true);
-
       const { data: comments, error: commentsError } = await supabase
         .from("comments")
         .select("classification_id, configuration")
@@ -112,13 +111,20 @@ export default function PreferredTerrestrialClassifications({
 
   const handleConfirmSelection = () => {
     if (selectedAnomaly && selectedVehicle) {
-      onSelectAnomaly(selectedAnomaly, selectedVehicle);
+      setIsAnimationVisible(true);
     }
+  };
+
+  const handleAnimationFinish = () => {
+    onSelectAnomaly(selectedAnomaly, selectedVehicle);
+    setIsAnimationVisible(false);
   };
 
   return (
     <div>
-      {loading ? (
+      {isAnimationVisible ? (
+        <PlanetRocketAnimation onFinish={handleAnimationFinish} />
+      ) : loading ? (
         <p>Loading classifications...</p>
       ) : error ? (
         <p>{error}</p>
@@ -126,7 +132,9 @@ export default function PreferredTerrestrialClassifications({
         <p>No classifications found for preferred terrestrial planets.</p>
       ) : (
         <div
-          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ${isVehicleSelectionFocused ? 'hidden' : ''}`}
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ${
+            isVehicleSelectionFocused ? "hidden" : ""
+          }`}
         >
           {classifications.map((classification) => (
             <Card

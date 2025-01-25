@@ -7,6 +7,7 @@ import ClassificationForm from "@/components/Projects/(classifications)/PostForm
 import { Anomaly } from "../Telescopes/Transiting";
 import { CloudspottingOnMars } from "./cloudspottingOnMars"; 
 import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
+import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
 interface SelectedAnomProps {
     anomalyid?: number;
@@ -133,16 +134,26 @@ export function StarterLidar({ anomalyid }: SelectedAnomProps) {
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh]">
             <div className="p-4 rounded-md relative w-full">
                 {imageUrl && (
-                    <img src={imageUrl} alt={anomaly.content} className="w-full h-64 object-cover" />
+                    // <img src={imageUrl} alt={anomaly.content} className="w-full h-64 object-cover" />
+                    <ImageAnnotator
+                        initialImageUrl={imageUrl}
+                        anomalyId={anomaly.id.toString()}
+                        anomalyType="cloud"
+                        missionNumber={100000034}
+                        assetMentioned={imageUrl}
+                        structureItemId={3015}
+                        parentPlanetLocation={anomalyid?.toString() || ''}
+                        annotationType="CoM"
+                    />
                 )}
-                <ClassificationForm
+                {/* <ClassificationForm
                     anomalyId={anomaly.id.toString()}
                     anomalyType="cloud"
                     missionNumber={100000034}
                     assetMentioned={imageUrl || ""}
                     structureItemId={3105}
-                    parentPlanetLocation={anomalyid?.toString()}
-                />
+                    parentPlanetLocation={anomalyid?.toString()} 
+                /> */}
             </div>
         </div>
     );

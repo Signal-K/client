@@ -1,4 +1,4 @@
-import { Truck, Shield, Users, Gauge, Search } from "lucide-react";
+import { Truck, Shield, Users, Gauge, Search, Rocket } from "lucide-react";
 import type { Vehicle } from "@/types/Vehicles";
 import TotalPoints from "./Stardust/Total";
 import { useCallback, useState } from "react";
@@ -11,7 +11,7 @@ const automatons: Vehicle[] = [
     {
       id: "1",
       name: "Visual Satellite",
-      description: "Use this to find landmarks and sites on the planet you chose",
+      description: "Use this to find landmarks and sites on the planet you chose. Recommended for Planet Four & Cloudspotting",
       icon: "truck",
       stats: {
         speed: 65,
@@ -24,7 +24,7 @@ const automatons: Vehicle[] = [
     {
       id: "2",
       name: "Scout Rover",
-      description: "Help train these rovers to better understand their surroundings",
+      description: "Help train these rovers to better understand their surroundings and find deposits and terrain. Recommended for AI For Mars",
       icon: "scout",
       stats: {
         speed: 65,
@@ -44,7 +44,7 @@ export default function PickAutomatonForPickPlanet({
   const renderIcon = (iconName: string) => {
     switch (iconName) {
       case "truck":
-        return <Truck className="w-24 h-24 text-primary" />;
+        return <Rocket className="w-24 h-24 text-primary" />;
       case "scout":
         return <Search className="w-24 h-24 text-accent" />;
       default:
@@ -83,10 +83,11 @@ export default function PickAutomatonForPickPlanet({
         </div>
 
         <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 p-6 rounded-lg shadow">
-          <h2 className="font-semibold text-secondary mb-2">Vehicle Selection</h2>
-          <p className="text-sm text-secondary-foreground/80 leading-tight">
-            Browse and select from available vehicles. Each vehicle has unique stats and costs XP to acquire. Your
-            current XP balance is shown on the left.
+          <h2 className="font-semibold text-secondary mb-2">Automaton Selection</h2>
+          <p className="text-sm text-blue-500 leading-tight">
+            Browse and select from available automatons. Each automaton has unique stats and costs XP to acquire. Your
+            current XP balance is shown on the left. After selecting one, you can launch it to the planet you chose to acquire the data
+            and proceed with your classification mission
           </p>
         </div>
       </div>

@@ -364,11 +364,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         };
       case "cloud":
         return {
-          count: 3,
+          count: 1, // 3,
           placeholders: [
             "Cloud type",
-            "Weather conditions",
-            "Time of observation",
+            // "Weather conditions",
+            // "Time of observation",
           ],
         };
       case "DiskDetective":

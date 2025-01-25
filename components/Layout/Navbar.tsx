@@ -25,11 +25,9 @@ export default function Navbar() {
               </a>
             </Link>
             <Link legacyBehavior href="/">
-              {activePlanet && (
-                <div className="text-lg font-bold text-white hidden sm:block">
-                  Star Sailors - you are on: {activePlanet?.content || "Loading..."}
-                </div>
-              )}
+              <div className="text-lg font-bold text-white hidden sm:block">
+                Star Sailors: {activePlanet?.content || "..."}
+              </div>
             </Link>
           </div>
 
