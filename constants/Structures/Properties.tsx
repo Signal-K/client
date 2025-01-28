@@ -34,6 +34,7 @@ import JovianVortexHunters from "@/components/Structures/Missions/Meteorologists
 import PlanetFour from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/PlanetFour";
 import AI4M from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AIForMars";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
+import { GreenhouseResearchStations } from "@/components/Structures/Missions/Biologists/ResearchStations";
 
 interface IndividualStructureProps {
     name?: string;
@@ -211,7 +212,7 @@ export const StructuresConfig: StructureConfig = {
       ],
     },
     3104: {
-      name: "Zoodex",
+      name: "Greenhouse",//Zoodex",
       title: "Animal Observations",
       labels: [
         {
@@ -258,7 +259,13 @@ export const StructuresConfig: StructureConfig = {
           text: "Iguanas",
           dynamicComponent: <ZoodexIguanas />,
           sizePercentage: 60,
-        }
+        },
+        {
+          icon: <BeanIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My Greenhouse Stations",
+          dynamicComponent: <GreenhouseResearchStations />,
+          sizePercentage: 80,
+        },
       ],
     },
     3105: {

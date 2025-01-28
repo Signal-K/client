@@ -7,15 +7,34 @@ interface Props {
 };
 
 export const AvatarGenerator: React.FC<Props> = ({ author }) => {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
     const [avatarUrl, setAvatarUrl] = useState("");
   
     useEffect(() => {
-      const generateAvatar = () => {
-        const apiUrl = `https://api.dicebear.com/6.x/bottts/svg?seed=${encodeURIComponent(author)}`;
-        setAvatarUrl(apiUrl);
-      };
-  
-      generateAvatar();
+      let ignore = false;
+
+      async function fetchAvatar () {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("avatar_url")
+          .eq("id", session?.user.id)
+          .single();
+
+        if (!data?.avatar_url) {
+          const generateAvatar = () => {
+            const apiUrl = `https://api.dicebear.com/6.x/bottts/svg?seed=${encodeURIComponent(author)}`;
+            setAvatarUrl(apiUrl);
+          };
+      
+          generateAvatar();
+        } else {
+          setAvatarUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${data.avatar_url}`)
+        };
+      }
+
+      fetchAvatar();
     }, [author]);
   
     return (
