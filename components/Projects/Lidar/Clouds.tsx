@@ -141,7 +141,7 @@ export function StarterLidar({ anomalyid }: SelectedAnomProps) {
                         anomalyType="cloud"
                         missionNumber={100000034}
                         assetMentioned={imageUrl}
-                        structureItemId={3015}
+                        structureItemId={3105}
                         parentPlanetLocation={anomalyid?.toString() || ''}
                         annotationType="CoM"
                     />

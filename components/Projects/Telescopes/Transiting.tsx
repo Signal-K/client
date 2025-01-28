@@ -137,6 +137,7 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
                         otherAssets={imageUrls}
                         anomalyType='planet'
                         missionNumber={1372001}
+                        structureItemId={3103}
                         assetMentioned={selectedAnomaly.id.toString()}
                         annotationType='PH'
                         initialImageUrl={imageUrls[1]}

@@ -10,9 +10,10 @@ interface TotalPointsProps {
     planetFourPoints: number;
     jvhPoints: number;
     cloudspottingPoints: number;
+    planktonPoints: number;
     totalPoints: number;
   }) => void;
-}
+};
 
 const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) => {
   const supabase = useSupabaseClient();
@@ -23,6 +24,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
   const [ai4mPoints, setAi4mPoints] = useState(0);
   const [planetFourPoints, setPlanetFourPoints] = useState(0);
   const [jvhPoints, setJvhPoints] = useState(0);
+  const [planktonPoints, setPlanktonPoints] = useState(0);
   const [cloudspottingPoints, setCloudspottingPoints] = useState(0);
 
   useEffect(() => {
@@ -260,6 +262,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
     fetchPlanetFourPoints();
     fetchJvhPoints();
     fetchCloudspottingPoints();
+    // fetchPlanktonPoints();
   }, [supabase, session?.user]);
 
   const totalPoints =
@@ -268,7 +271,8 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
     ai4mPoints +
     planetFourPoints +
     jvhPoints +
-    cloudspottingPoints;
+    cloudspottingPoints +
+    planktonPoints;
 
   useEffect(() => {
     if (onPointsUpdate) {
@@ -283,6 +287,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
         planetFourPoints,
         jvhPoints,
         cloudspottingPoints,
+        planktonPoints,
         totalPoints,
       });
     }
