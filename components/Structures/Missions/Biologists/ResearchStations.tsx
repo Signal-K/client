@@ -222,7 +222,9 @@ export function GreenhouseResearchStations() {
               <h2 className="text-2xl font-semibold mb-4 text-blue-400">Available Stations</h2>
               <div className="grid gap-6">
                 {buildableStations.map((station) => (
-                  <StationCard key={station.id} station={station} onBuild={handleBuild} />
+                  <StationCard key={station.id} station={station} onBuild={handleBuild} onView={function (id: string): void {
+                    throw new Error("Function not implemented.");
+                  } } />
                 ))}
               </div>
             </section>
@@ -232,7 +234,9 @@ export function GreenhouseResearchStations() {
                 <h2 className="text-2xl font-semibold mb-4 text-blue-400">Built Stations</h2>
                 <div className="grid gap-6">
                   {builtStations.map((station) => (
-                    <StationCard key={station.id} station={station} onBuild={handleBuild} />
+                    <StationCard key={station.id} station={station} onBuild={handleBuild} onView={function (id: string): void {
+                      throw new Error("Function not implemented.");
+                    } } />
                   ))}
                 </div>
               </section>

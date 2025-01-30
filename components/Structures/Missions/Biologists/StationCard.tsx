@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import type { Station } from "@/types/station"
-import { BiomePattern } from "./BiomePattern"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import type { Station } from "@/types/station";
+import { BiomePattern } from "./BiomePattern";
 import {
   Anchor,
   Trees,
@@ -28,11 +28,12 @@ import {
 } from "lucide-react";
 
 interface StationCardProps {
-  station: Station
-  onBuild: (id: string) => void
-};
+  station: Station;
+  onBuild: (id: string) => void;
+  onView: (id: string) => void;
+}
 
-const iconMap = {
+export const iconMap = {
   Anchor,
   Trees,
   Snowflake,
@@ -55,9 +56,9 @@ function GameButton({
   disabled,
   children,
 }: {
-  onClick: () => void
-  disabled?: boolean
-  children: React.ReactNode
+  onClick: () => void;
+  disabled?: boolean;
+  children: React.ReactNode;
 }) {
   return (
     <button
@@ -72,25 +73,20 @@ function GameButton({
         transition-all duration-300
       `}
     >
-      {/* Button content */}
       <div className="relative z-10 flex items-center justify-center gap-2 text-white font-medium">{children}</div>
-
-      {/* Hover effect */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.2)_50%,transparent_100%)] animate-shimmer" />
       </div>
-
-      {/* Border glow effect */}
       <div className="absolute inset-0 rounded-md opacity-50 group-hover:opacity-100 transition-opacity duration-300">
         <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 blur-sm" />
       </div>
     </button>
-  )
+  );
 }
 
-export function StationCard({ station, onBuild }: StationCardProps) {
-  const StationIcon = iconMap[station.icon as keyof typeof iconMap]
+export function StationCard({ station, onBuild, onView }: StationCardProps) {
+  const StationIcon = iconMap[station.icon as keyof typeof iconMap];
 
   return (
     <Card
@@ -105,7 +101,6 @@ export function StationCard({ station, onBuild }: StationCardProps) {
 
       <BiomePattern biome={station.biome} className="absolute inset-0 opacity-20" />
 
-      {/* Status indicator */}
       <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
         <div
           className={`
@@ -128,7 +123,7 @@ export function StationCard({ station, onBuild }: StationCardProps) {
       <CardContent className="relative z-10 space-y-4">
         <div className="flex items-center gap-2 text-sm text-blue-400">
           <MapPin className="w-4 h-4" />
-          <span>{station.location.coordinates}</span>
+          <span> {station.location.coordinates} </span>
           {station.location.depth && (
             <span className="text-blue-500 flex items-center gap-1">
               <ArrowDown className="w-3 h-3" />
@@ -145,7 +140,7 @@ export function StationCard({ station, onBuild }: StationCardProps) {
 
         <div className="flex flex-wrap gap-2">
           {station.animals.map((animal) => {
-            const AnimalIcon = iconMap[animal.icon as keyof typeof iconMap]
+            const AnimalIcon = iconMap[animal.icon as keyof typeof iconMap];
             return (
               <Badge
                 key={animal.name}
@@ -155,7 +150,7 @@ export function StationCard({ station, onBuild }: StationCardProps) {
                 {AnimalIcon && <AnimalIcon className="w-4 h-4" />}
                 {animal.name}
               </Badge>
-            )
+            );
           })}
         </div>
 
@@ -164,22 +159,29 @@ export function StationCard({ station, onBuild }: StationCardProps) {
             <Globe className="w-4 h-4" />
             {station.biome.name}
           </span>
-          <GameButton onClick={() => onBuild(station.id)} disabled={station.built}>
-            {station.built ? (
-              <>
-                <CheckCircle className="w-4 h-4" />
-                Built
-              </>
-            ) : (
-              <>
-                <Wrench className="w-4 h-4" />
-                Build Station
-              </>
+
+          <div className="flex gap-2">
+            {station.built && (
+              <GameButton onClick={() => onView(station.id)}>
+                View Station
+              </GameButton>
             )}
-          </GameButton>
+            <GameButton onClick={() => onBuild(station.id)} disabled={station.built}>
+              {station.built ? (
+                <>
+                  <CheckCircle className="w-4 h-4" />
+                  Built
+                </>
+              ) : (
+                <>
+                  <Wrench className="w-4 h-4" />
+                  Build Station
+                </>
+              )}
+            </GameButton>
+          </div>
         </div>
       </CardContent>
     </Card>
-  )
-}
-
+  );
+};

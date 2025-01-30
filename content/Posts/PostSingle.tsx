@@ -206,8 +206,28 @@ export function PostCardSingle({
     setIsSharing(true);
   
     const safeTitle = title || "post";
+    
+    // Ensure all images are loaded
+    const images = Array.from(shareCardRef.current.querySelectorAll('img'));
+    const imagePromises = images.map((img: HTMLImageElement) =>
+      new Promise<void>((resolve, reject) => {
+        if (img.complete) {
+          resolve();
+        } else {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error("Image failed to load"));
+        }
+      })
+    );
+  
     try {
-      const canvas = await html2canvas(shareCardRef.current);
+      await Promise.all(imagePromises);
+  
+      const canvas = await html2canvas(shareCardRef.current, {
+        useCORS: true, // Enable CORS for external images
+        scrollX: 0,
+        scrollY: -window.scrollY, // Capture from top of the page
+      });
   
       canvas.toBlob(
         (blob) => {
@@ -225,7 +245,7 @@ export function PostCardSingle({
       console.error("Error sharing post:", error);
     } finally {
       setIsSharing(false);
-    };
+    }
   };  
 
   return (
