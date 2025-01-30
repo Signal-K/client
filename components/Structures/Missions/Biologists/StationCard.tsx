@@ -25,12 +25,12 @@ import {
   Globe,
   CheckCircle,
   Wrench,
-} from "lucide-react"
+} from "lucide-react";
 
 interface StationCardProps {
   station: Station
   onBuild: (id: string) => void
-}
+};
 
 const iconMap = {
   Anchor,
@@ -48,7 +48,7 @@ const iconMap = {
   Cat,
   Rabbit,
   Wand2,
-}
+};
 
 function GameButton({
   onClick,

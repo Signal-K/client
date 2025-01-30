@@ -1,93 +1,94 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StationCard } from "./StationCard";
 import { Milestones } from "./Milestones";
 import type { Station } from "@/types/station";
 import type { Milestone } from "@/types/milestone";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useActivePlanet } from "@/context/ActivePlanet";
+import { InventoryItem } from "@/types/Items";
+import BiomassStats from "./BiomassOnPlanet";
 
 const initialStations: Station[] = [
   {
-    id: "1",
-    name: "Coral Reef Observatory",
-    icon: "Anchor",
+    id: "3104001",
+    name: "Desert Observatory", 
+    icon: "Sun",
     biome: {
-      name: "Marine",
-      color: "rgb(37, 99, 235)",
-      accentColor: "rgb(59, 130, 246)",
+      name: "Desert",
+      color: "rgb(234, 255, 114)",
+      accentColor: "rgb(234, 255, 100)",
       darkColor: "rgb(30, 58, 138)",
     },
     animals: [
-      { name: "Clownfish", icon: "Fish" },
-      { name: "Sea Turtle", icon: "Turtle" },
-      { name: "Coral", icon: "Flower2" },
+      { name: "Burrowing Owl", icon: "Bird", biomassType: 'Fauna', mass: 0.5 },
+      { name: "Iguanas (from above)", icon: "Turtle", biomassType: 'Fauna', mass: 0.25 },
     ],
     location: {
       coordinates: "23.4162° N, 75.2397° W",
-      depth: "-45m",
+      depth: "+2m",
     },
     built: false,
   },
   {
-    id: "2",
-    name: "Rainforest Canopy Station",
-    icon: "Trees",
+    id: "3104002",
+    name: "Ocean Observatory",
+    icon: "Waves",
     biome: {
-      name: "Tropical",
-      color: "rgb(22, 163, 74)",
-      accentColor: "rgb(34, 197, 94)",
+      name: "Ocean",
+      color: "rgb(22, 163, 255)",
+      accentColor: "rgb(34, 87, 245)",
       darkColor: "rgb(20, 83, 45)",
     },
     animals: [
-      { name: "Toucan", icon: "Bird" },
-      { name: "Monkey", icon: "Monkey" },
-      { name: "Butterfly", icon: "Bug" },
+      { name: "Plankton Portal", icon: "Fish", biomassType: 'Fauna', mass: 0.0000001 }, // Need to update mass values
     ],
     location: {
       coordinates: "2.4162° S, 54.2397° W",
-      altitude: "40m",
+      altitude: "-10m",
     },
     built: false,
   },
-  {
-    id: "3",
-    name: "Arctic Research Base",
-    icon: "Snowflake",
-    biome: {
-      name: "Polar",
-      color: "rgb(148, 163, 184)",
-      accentColor: "rgb(226, 232, 240)",
-      darkColor: "rgb(51, 65, 85)",
-    },
-    animals: [
-      { name: "Polar Bear", icon: "Bear" },
-      { name: "Penguin", icon: "Bird" },
-      { name: "Seal", icon: "Fish" },
-    ],
-    location: {
-      coordinates: "78.4162° N, 15.2397° E",
-    },
-    built: false,
-  },
-  {
-    id: "4",
-    name: "Deep Sea Laboratory",
-    icon: "Waves",
-    biome: {
-      name: "Abyssal",
-      color: "rgb(30, 58, 138)",
-      accentColor: "rgb(37, 99, 235)",
-      darkColor: "rgb(30, 27, 75)",
-    },
-    animals: [
-      { name: "Anglerfish", icon: "Fish" },
-      { name: "Giant Squid", icon: "Bug" },
-      { name: "Tube Worm", icon: "Wand2" },
-    ],
-    location: {
-      coordinates: "31.4162° N, 159.2397° W",
-      depth: "-2500m",
-    },
-    built: false,
-  },
+  // {
+  //   id: "3",
+  //   name: "Arctic Research Base",
+  //   icon: "Snowflake",
+  //   biome: {
+  //     name: "Polar",
+  //     color: "rgb(148, 163, 184)",
+  //     accentColor: "rgb(226, 232, 240)",
+  //     darkColor: "rgb(51, 65, 85)",
+  //   },
+  //   animals: [
+  //     { name: "Polar Bear", icon: "Bear" },
+  //     { name: "Penguin", icon: "Bird" },
+  //     { name: "Seal", icon: "Fish" },
+  //   ],
+  //   location: {
+  //     coordinates: "78.4162° N, 15.2397° E",
+  //   },
+  //   built: false,
+  // },
+  // {
+  //   id: "4",
+  //   name: "Deep Sea Laboratory",
+  //   icon: "Waves",
+  //   biome: {
+  //     name: "Abyssal",
+  //     color: "rgb(30, 58, 138)",
+  //     accentColor: "rgb(37, 99, 235)",
+  //     darkColor: "rgb(30, 27, 75)",
+  //   },
+  //   animals: [
+  //     { name: "Anglerfish", icon: "Fish" },
+  //     { name: "Giant Squid", icon: "Bug" },
+  //     { name: "Tube Worm", icon: "Wand2" },
+  //   ],
+  //   location: {
+  //     coordinates: "31.4162° N, 159.2397° W",
+  //     depth: "-2500m",
+  //   },
+  //   built: false,
+  // },
 ];
 
 const initialMilestones: Milestone[] = [
@@ -118,11 +119,87 @@ const initialMilestones: Milestone[] = [
 ];
 
 export function GreenhouseResearchStations() {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const { activePlanet } = useActivePlanet();
+
   const [stations, setStations] = useState<Station[]>(initialStations)
   const [milestones, setMilestones] = useState<Milestone[]>(initialMilestones)
+  const [loading, setLoading] = useState<boolean | null>(false);
 
-  const handleBuild = (id: string) => {
+  // const fetchStations = useCallback(async () => {
+  //   if (!session || !activePlanet) {
+  //     setLoading(false);
+  //     return;
+  //   };
+
+  //   try {
+  //     const { data: createdGreenhouseStations, error: createdGreenhouseStationsError } = await supabase
+  //       .from("inventory")
+  //       .select("*")
+  //       .eq("owner", session.user.id)
+  //       .eq("anomaly", activePlanet.id);
+
+  //     if (createdGreenhouseStationsError) {
+  //       console.error("Error");
+  //       throw createdGreenhouseStationsError;
+  //     };
+
+  //     const ownedStations = createdGreenhouseStations.map((item: { item: number }) => item.item);
+      
+  //     const response = await fetch('/api/gameplay/inventory');
+  //     const stationItems: InventoryItem[] = await response.json();
+  //     const greenhouseStations = stationItems.filter(item =>
+  //       item.ItemCategory === 'BioDomeStation'
+  //     );
+
+  //     setStations(greenhouseStations);
+  //   } catch (error: any) {
+  //     console.error(error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, [session, supabase, activePlanet]);
+
+  useEffect(() => {
+    if (!session) {
+      return;
+    };
+
+    // fetchStations();
+  }, [session]);
+
+  async function handleBuild (id: string) {
     setStations(stations.map((station) => (station.id === id ? { ...station, built: true } : station)))
+
+    if (!session) {
+      console.warn("A unique session error, relating to the attempted creation of a greenhouse station")
+      return (null);
+    };
+
+    try {
+      const { error } = await supabase
+        .from("inventory")
+        .insert([
+          {
+            owner: session.user.id,
+            anomaly: activePlanet?.id || 30,
+            item: id,
+            quantity: 1,
+            configuration: {},
+          },
+        ]);
+
+      if (error) {
+        throw error;
+      };
+
+      alert("You have now built a new observatory for biological missions");
+    } catch (error) {
+      console.error("Error adding greenhouse station: ", error);
+    };
+
     // Update station milestone
     setMilestones(
       milestones.map((milestone) =>
@@ -164,6 +241,7 @@ export function GreenhouseResearchStations() {
 
           <div className="lg:border-l lg:border-gray-800 lg:pl-8">
             <Milestones milestones={milestones} />
+            {/* <BiomassStats /> */}
           </div>
         </div>
       </div>

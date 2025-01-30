@@ -110,6 +110,26 @@ const inventoryItems: InventoryItem[] = [
     ItemCategory: 'CommunityStation',
     locationType: 'Orbital',
   },
+
+
+  // Greenhouse/Biodome stations
+  {
+    id: 3104001,
+    name: "Desert Observatory",
+    description: "Track & tag animals and plants that originate in desert locations on Earth",
+    icon_url: '/assets/Archive/Inventory/Items/Coal.png', // For test
+    ItemCategory: 'BioDomeStation',
+    locationType: 'Surface',
+  },
+  {
+    id: 3104002,
+    name: "Ocean Observatory",
+    description: "Track & tag animals and plants that originate in the oceans of Earth",
+    icon_url: '/assets/Archive/Inventory/Items/Coal.png', // For test
+    ItemCategory: 'BioDomeStation',
+    locationType: 'Surface', // Maybe underwater?
+  },
+
   
   // Tests
   {

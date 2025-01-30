@@ -8,6 +8,7 @@ import { FishIcon } from "lucide-react";
 const PlanktonDiscoveryStats = () => {
   const supabase = useSupabaseClient();
   const session = useSession();
+
   const [totalPlankton, setTotalPlankton] = useState(0);
   const [recentPlankton, setRecentPlankton] = useState(0);
   const [onlyMine, setOnlyMine] = useState(false);
@@ -26,6 +27,7 @@ const PlanktonDiscoveryStats = () => {
       };
 
       const { data, error } = await query;
+      
       if (error) return;
 
       setTotalPlankton(data.length);

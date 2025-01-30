@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { GreenhouseResearchStations } from "./Missions/Biologists/ResearchStations";
 
 export interface IndividualStructureProps {
   name: string;
@@ -48,6 +49,10 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
   const [modalSizePercentage, setModalSizePercentage] = useState(100); 
   const [tooltip, setTooltip] = useState<{ visible: boolean; text: string } | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    console.warn(structureId)
+  }, [])
 
   const handleActionClick = (actionText: string, component: React.ReactNode, sizePercentage: number = 100) => {
     setActiveComponent(component);
@@ -231,6 +236,10 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       </div>
     </div>
   </DialogContent>
+)}
+
+{structureId === 3104 && (
+  <GreenhouseResearchStations />
 )}
 
       </div>
