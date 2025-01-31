@@ -88,10 +88,31 @@ export function PostCardSingle({
     }
   };
 
-  const handleVoteClick = () => {
+  const handleVoteClick = async () => {
+    if (!session?.user?.id) return;  
+
+    try {
+      const { error } = await supabase.from("votes").insert([
+        {
+          user_id: session.user.id,
+          classification_id: classificationId, 
+          anomaly_id: anomalyId,
+        },
+      ]);
+  
+      if (error) {
+        console.error("Error inserting vote:", error);
+        return;
+      };
+  
+      setVoteCount((prev) => prev + 1);
+    } catch (error) {
+      console.error("Error handling vote:", error);
+    }
+  
     if (onVote) onVote();
-    setVoteCount((prev) => prev + 1);
   };
+  
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
@@ -224,9 +245,9 @@ export function PostCardSingle({
       await Promise.all(imagePromises);
   
       const canvas = await html2canvas(shareCardRef.current, {
-        useCORS: true, // Enable CORS for external images
+        useCORS: true, 
         scrollX: 0,
-        scrollY: -window.scrollY, // Capture from top of the page
+        scrollY: -window.scrollY, 
       });
   
       canvas.toBlob(

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../BasePlate";
-import { CloudCogIcon, FolderCog, PaintBucket, Vote } from "lucide-react";
+import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 import { CloudspottingWrapper, StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import VoteCoMClassifications from "./CoMVote";
 import CloudClassificationGenerator from "./CloudMaker";
@@ -83,6 +83,23 @@ const CloudspottingOnMars = () => {
         ];
     };
 
+    const tutorialMission: Mission = {
+        id: 1000,
+        chapter: 1,
+        title: "Welcome to Cloudspotting on Mars",
+        description: "This mission will guide you through the basics of cloud classification. Let's get started!",
+        icon: HelpCircle,
+        points: 0,
+        completedCount: 0,
+        internalComponent: () => (
+            <div>
+                <p>Welcome to your first mission! Here's how you can classify Martian clouds and participate in the game.</p>
+                <p>This tutorial will walk you through the basics of the classification system and introduce you to your first tools.</p>
+            </div>
+        ),
+        color: "text-yellow-500",
+    };
+
     useEffect(() => {
         if (!session) {
             return;
@@ -160,6 +177,7 @@ const CloudspottingOnMars = () => {
             maxUnlockedChapter={maxUnlockedChapter}
             onPreviousChapter={handlePreviousChapter}
             onNextChapter={handleNextChapter}
+            tutorialMission={tutorialMission}
         />
     );
 };

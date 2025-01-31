@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Sun, Trees } from "lucide-react";
+import { Bird, Fish, PawPrint, Sun, Trees } from "lucide-react";
 import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
 import { BiomePattern } from "./BiomePattern";
 import { iconMap } from "./StationCard";
+import { PlanktonPortalFrame } from "@/components/Projects/Zoodex/planktonPortal";
+import { ZoodexIguanas } from "@/components/Projects/Zoodex/iguanasFromAbove";
 
 interface Animal {
   name: string;
@@ -28,28 +30,30 @@ const fetchProjects = (): Project[] => {
       station: 3104001,
       biome: "Desert",
       title: "Burrowing Owls",
-      icon: Sun,
+      icon: Bird,
       completedCount: 0,
       internalComponent: () => <BurrowingOwl />,
       color: "text-green-400",
     },
     {
       id: 2,
-      station: 3104002,
-      biome: "Forest",
-      title: "Trees Conservation",
-      icon: Trees,
+      station: 3104001,
+      biome: "Desert",
+      title: "Iguanas from Above",
+      icon: PawPrint,
       completedCount: 5,
+      internalComponent: () => <ZoodexIguanas />,
       color: "text-green-700",
     },
     {
       id: 3,
-      station: 3104003,
+      station: 3104002,
       biome: "Ocean",
-      title: "Coral Reef Protection",
-      icon: Sun,
-      completedCount: 3,
+      title: "Plankton Portal",
+      icon: Fish,
+      completedCount: 0,
       color: "text-blue-400",
+      internalComponent: () => <PlanktonPortalFrame />,
     },
   ];
 };

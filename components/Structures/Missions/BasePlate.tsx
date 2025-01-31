@@ -27,6 +27,7 @@ interface MissionShellProps {
   maxUnlockedChapter: number;
   onPreviousChapter: () => void;
   onNextChapter: () => void;
+  tutorialMission?: MissionConfig;
 };
 
 const MissionShell = ({
@@ -37,6 +38,7 @@ const MissionShell = ({
   maxUnlockedChapter,
   onPreviousChapter,
   onNextChapter,
+  tutorialMission, 
 }: MissionShellProps) => {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -79,7 +81,7 @@ const MissionShell = ({
     return () => {
       ignore = true;
     };
-  }, [session, refresh]);  
+  }, [session, refresh]);
 
   const renderMission = (mission: MissionConfig) => {
     const completedCount = mission.completedCount ?? 0;
@@ -168,6 +170,14 @@ const MissionShell = ({
           )}
         </>
       )}
+      
+      {/* Display tutorial mission when Chapter 1 is selected */}
+      {currentChapter === 1 && tutorialMission && !selectedMission && (
+  <div className="mt-6">
+    {renderMission(tutorialMission)}
+  </div>
+)}
+
       <AnimatePresence>
         {selectedMission && (
           <motion.div
