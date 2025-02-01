@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../../BasePlate";
-import { CloudCogIcon, FolderCog, PaintBucket, Vote } from "lucide-react";
-import { AI4MWrapper, AiForMarsProject } from "@/components/Projects/Auto/AI4Mars";
+import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
+import { AI4MWrapper, AiForMarsProject, StarterAiForMars } from "@/components/Projects/Auto/AI4Mars";
 import VoteAI4MClassifications from "./AI4MVote";
 
 interface Mission {
@@ -151,6 +151,21 @@ const AI4M = () => {
         ];
     };
 
+    const tutorialMission: Mission = {
+        id: 1000,
+        chapter: 1,
+        title: "Welcome to AI For Mars",
+        description: 
+            "This mission will get you up to speed with how your rovers should be trained and how we can find anomalies from their photos",
+        icon: HelpCircle,
+        points: 0,
+        completedCount: 0,
+        internalComponent: () => {
+            return <StarterAiForMars anomalyid={69592674} />
+        },
+        color: 'text-yellow-500',
+    };
+
     useEffect(() => {
         if (!session) {
             return;
@@ -221,6 +236,7 @@ const AI4M = () => {
             maxUnlockedChapter={maxUnlockedChapter}
             onPreviousChapter={handlePreviousChapter}
             onNextChapter={handleNextChapter}
+            tutorialMission={tutorialMission}
         />
     );
 };

@@ -6,6 +6,7 @@ import { AvatarGenerator } from '@/components/Account/Avatar';
 import { Button } from '@/components/ui/button';
 import { Share2, ThumbsUpIcon } from 'lucide-react';
 import PlanetGenerator from '@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator';
+import html2canvas from 'html2canvas';
 
 interface SimplePostSingleProps {
   title: string;
@@ -29,6 +30,8 @@ export function SimplePostSingle({
   classificationConfiguration,
 }: SimplePostSingleProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isSharing, setIsSharing] = useState<boolean>(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   const goToNextImage = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -59,8 +62,56 @@ export function SimplePostSingle({
     window.open(`/posts/${id}`, '_blank');
   };
 
+  const handleShare = async () => {
+    if (!shareCardRef.current) {
+      return;
+    };
+
+    setIsSharing(true);
+
+    const safeTitle = title || 'post';
+
+    const images = Array.from(shareCardRef.current.querySelectorAll('img'));
+    const imagePromises = images.map((img: HTMLImageElement) =>
+      new Promise<void>((resolve, reject) => {
+        if (img.complete) {
+          resolve();
+        } else {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error("image failed to load"));
+        };
+      })
+    );
+
+    try {
+      await Promise.all(imagePromises);
+      const canvas = await html2canvas(shareCardRef.current, {
+        useCORS: true,
+        scrollX: 0,
+        scrollY: -window.scrollY,
+      });
+
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `${safeTitle.toLowerCase().replace(/\s+/g, "-")}-share.png`;
+            link.click();
+          }
+        },
+        "image/png",
+        1.0,
+      );
+    } catch (error: any) {
+      console.error("Error sharing post: ", error);
+    } finally {
+      setIsSharing(false);
+    };
+  };
+
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center" ref={shareCardRef}>
       <Card className="w-full max-w-lg bg-white/30 backdrop-blur-md border border-white/10 shadow-lg rounded-lg relative">
         <div
           className="absolute top-2 right-2 z-10"
@@ -79,6 +130,9 @@ export function SimplePostSingle({
               </Button>
               <Button onClick={openPostInNewTab} className="w-full">
                 Open
+              </Button>
+              <Button onClick={handleShare} className="w-full mt-2">
+                Download Post
               </Button>
             </div>
           )}

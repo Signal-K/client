@@ -5,8 +5,9 @@ import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-r
 import { CloudspottingWrapper, StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import VoteCoMClassifications from "./CoMVote";
 import CloudClassificationGenerator from "./CloudMaker";
+import { CloudspottingOnMarsTutorial } from "@/components/Projects/Lidar/cloudspottingOnMars";
 
-interface Mission {
+export interface Mission {
     id: number;
     chapter: number;
     title: string;
@@ -92,10 +93,7 @@ const CloudspottingOnMars = () => {
         points: 0,
         completedCount: 0,
         internalComponent: () => (
-            <div>
-                <p>Welcome to your first mission! Here's how you can classify Martian clouds and participate in the game.</p>
-                <p>This tutorial will walk you through the basics of the classification system and introduce you to your first tools.</p>
-            </div>
+            <CloudspottingOnMarsTutorial anomalyId="8423850802" />
         ),
         color: "text-yellow-500",
     };

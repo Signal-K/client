@@ -5,7 +5,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 import { Anomaly } from "../Telescopes/Transiting";
-import { CloudspottingOnMars } from "./cloudspottingOnMars"; 
+import { CloudspottingOnMarsTutorial } from "./cloudspottingOnMars"; 
 import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
@@ -111,7 +111,7 @@ export function StarterLidar({ anomalyid }: SelectedAnomProps) {
       }, [session, supabase]);
     
     if (!hasMission3000010) {
-    return <CloudspottingOnMars anomalyId={anomaly?.id.toString() || "8423850802"} />;
+    return <CloudspottingOnMarsTutorial anomalyId={anomaly?.id.toString() || "8423850802"} />;
     };
 
     if (loading) {

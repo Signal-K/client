@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../../BasePlate";
-import { CloudCogIcon, FolderCog, PaintBucket, Vote } from "lucide-react";
+import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 import VoteP4Classifications from "./P4Vote";
-import { P4Wrapper } from "@/components/Projects/Satellite/PlanetFour";
+import { P4Wrapper, StarterPlanetFour } from "@/components/Projects/Satellite/PlanetFour";
 
 interface Mission {
     id: number;
@@ -151,6 +151,21 @@ const PlanetFour = () => {
         ];
     };
 
+    const tutorialMission: Mission = {
+        id: 1000,
+        chapter: 1,
+        title: "Welcome to Planet Four",
+        description:
+            "This mission will guide you through the basics of documenting & tracking anomalous behaviour on planetary surfaces",
+        icon: HelpCircle,
+        points: 0,
+        completedCount: 0,
+        internalComponent: () => (
+            <StarterPlanetFour anomalyid={46366425} />
+        ),
+        color: 'text-yellow-500',
+    };
+
     useEffect(() => {
         if (!session) {
             return;
@@ -220,6 +235,7 @@ const PlanetFour = () => {
             maxUnlockedChapter={maxUnlockedChapter}
             onPreviousChapter={handlePreviousChapter}
             onNextChapter={handleNextChapter}
+            tutorialMission={tutorialMission}
         />
     );
 };

@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../BasePlate";
-import { FishIcon, PartyPopper, VoicemailIcon } from "lucide-react";
-import { PlanktonPortalFrame } from "@/components/Projects/Zoodex/planktonPortal";
+import { FishIcon, HelpCircle, PartyPopper, VoicemailIcon } from "lucide-react";
+import { PlanktonPortalFrame, PlanktonPortalTutorial } from "@/components/Projects/Zoodex/planktonPortal";
 import VotePPClassifications from "./PPVote";
 import PlanktonDiscoveryStats from "./PlanktonScore";
 
@@ -75,6 +75,21 @@ const PlanktonPortal = () => {
     ];
   }, []);
 
+  const tutorialMission: Mission = {
+    id: 1000,
+    chapter: 1,
+    title: "Welcome to Plankton Portal",
+    description: 
+      'This mission will get you started with tracking and taking care of different plankton species',
+    icon: HelpCircle,
+    points: 0,
+    completedCount: 0,
+    internalComponent: () => (
+      <PlanktonPortalTutorial anomalyId="36896413" />
+    ),
+    color: 'text-yellow-500',
+  };
+
   const fetchMissionPoints = useCallback(
     async (session: any, supabase: any): Promise<MissionPoints> => {
       const { data: classifications } = await supabase
@@ -146,6 +161,7 @@ const PlanktonPortal = () => {
       onNextChapter={() =>
         setCurrentChapter((prev) => Math.min(prev + 1, maxUnlockedChapter))
       }
+      tutorialMission={tutorialMission}
     />
   );
 };

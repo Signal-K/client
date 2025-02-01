@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { BarChartBigIcon, GlassWater, Guitar, PenBoxIcon, RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
+import { BarChartBigIcon, GlassWater, Guitar, HelpCircle, PenBoxIcon, RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
 import MissionShell from "../../BasePlate";
-import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
+import { DailyMinorPlanet, StarterDailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
 import VoteDMPClassifications from "./DMPVote";
 import DMPGenerator from "./AsteroidMaker";
+
+import { Mission } from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudspottingOnMars";
 
 const DailyMinorPlanetMissions = () => {
   const supabase = useSupabaseClient();
@@ -115,6 +117,21 @@ const DailyMinorPlanetMissions = () => {
     //   action: () => {},
     // },
   ]);
+
+  const tutorialMission: Mission = {
+    id: 1000,
+    chapter: 1,
+    title: "Welcome to Daily Minor Planet",
+    description: 
+      "This mission will guide you through the basics of hunting and discovering asteroids",
+    icon: HelpCircle,
+    points: 0,
+    color: 'text-yellow-500',
+    completedCount: 0,
+    internalComponent: () => {
+      return <StarterDailyMinorPlanet anomalyid={90670192} />;
+    }
+  };
 
   const [experiencePoints, setExperiencePoints] = useState(0);
   const [level, setLevel] = useState(1);
@@ -236,6 +253,7 @@ const DailyMinorPlanetMissions = () => {
       maxUnlockedChapter={maxUnlockedChapter}
       onPreviousChapter={handlePreviousChapter}
       onNextChapter={handleNextChapter}
+      tutorialMission={tutorialMission}
     />
   );
 };
