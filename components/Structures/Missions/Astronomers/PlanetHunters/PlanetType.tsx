@@ -83,7 +83,7 @@ const PlanetTypeCommentForm = () => {
             content,
             configuration,
             classification_id,
-            author (
+            author ( 
               id,
               full_name,
               avatar_url
@@ -171,6 +171,7 @@ const PlanetTypeCommentForm = () => {
             classification_id: classificationId,
             author: session?.user?.id,
             configuration: { planetType },
+            // surveyor: True,
           },
         ]);
 

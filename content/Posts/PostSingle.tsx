@@ -263,10 +263,10 @@ export function PostCardSingle({
         1.0
       );
     } catch (error) {
-      console.error("Error sharing post:", error);
+      console.error("Error sharing post: ", error);
     } finally {
       setIsSharing(false);
-    }
+    };
   };  
 
   return (

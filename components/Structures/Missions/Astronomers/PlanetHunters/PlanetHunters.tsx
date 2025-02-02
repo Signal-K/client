@@ -6,7 +6,6 @@ import { FirstTelescopeClassification, StarterTelescopeTess } from "@/components
 import VotePlanetClassifictions from "./PHVote";
 import PHClassificationGenerator from "./PlanetMaker";
 import PlanetTemperatureForm from "./PlanetTemperature";
-import { Mission } from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudspottingOnMars";
 
 interface MissionStep {
   id: number;

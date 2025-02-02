@@ -15,7 +15,6 @@ interface SimplePostSingleProps {
   content: string;
   category: string;
   images: string[];
-  votes?: number;
   classificationConfiguration?: any;
 };
 
@@ -26,7 +25,6 @@ export function SimplePostSingle({
   content,
   category,
   images,
-  votes,
   classificationConfiguration,
 }: SimplePostSingleProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -185,7 +183,6 @@ export function SimplePostSingle({
                   </div>
                 </>
               )}
-              {/* {votes &&<ThumbsUpIcon className='text-blue-500' /> {votes} Votes */}
             </div>
           )}
         </CardContent>
