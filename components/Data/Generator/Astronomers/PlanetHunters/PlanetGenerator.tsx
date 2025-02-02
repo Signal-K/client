@@ -28,7 +28,7 @@ export default function PlanetGenerator({ classificationConfig, author, classifi
   const [radius, setRadius] = useState(initialRadius);
   const [typeOverride, setTypeOverride] = useState<'terrestrial' | 'gaseous' | null>(null);
 
-  const stats = calculatePlanetStats(mass, radius, typeOverride);
+  const stats = calculatePlanetStats(mass, radius, undefined, undefined, typeOverride);
 
   const handleMassChange = (newMass: number) => {
     if (typeOverride === 'terrestrial' && newMass > TERRESTRIAL_THRESHOLD) {

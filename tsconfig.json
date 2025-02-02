@@ -36,7 +36,7 @@
     "app/components/_[archive]/Classifications/Zoodex/CapturePage.jsx",
     "app/components/_[archive]/Classifications/Zoodex/Mobx.jsx",
     "components/topographic-map.jsx",
-    "components/enhanced-weather-events.jsx",
+    "components/enhanced-weather-events.jsx", "content/Comments/SurveyorForm.tsx.tst",
   ],
   "exclude": [
     "node_modules",

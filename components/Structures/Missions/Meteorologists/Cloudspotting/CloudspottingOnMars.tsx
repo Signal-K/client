@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../BasePlate";
-import { CloudCogIcon, FolderCog, PaintBucket, Vote } from "lucide-react";
+import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 import { CloudspottingWrapper, StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import VoteCoMClassifications from "./CoMVote";
 import CloudClassificationGenerator from "./CloudMaker";
+import { CloudspottingOnMarsTutorial } from "@/components/Projects/Lidar/cloudspottingOnMars";
 
-interface Mission {
+export interface Mission {
     id: number;
     chapter: number;
     title: string;
@@ -81,6 +82,20 @@ const CloudspottingOnMars = () => {
                 color: 'text-green-300',
             },
         ];
+    };
+
+    const tutorialMission: Mission = {
+        id: 1000,
+        chapter: 1,
+        title: "Welcome to Cloudspotting on Mars",
+        description: "This mission will guide you through the basics of cloud classification. Let's get started!",
+        icon: HelpCircle,
+        points: 0,
+        completedCount: 0,
+        internalComponent: () => (
+            <CloudspottingOnMarsTutorial anomalyId="8423850802" />
+        ),
+        color: "text-yellow-500",
     };
 
     useEffect(() => {
@@ -160,6 +175,7 @@ const CloudspottingOnMars = () => {
             maxUnlockedChapter={maxUnlockedChapter}
             onPreviousChapter={handlePreviousChapter}
             onNextChapter={handleNextChapter}
+            tutorialMission={tutorialMission}
         />
     );
 };

@@ -9,7 +9,7 @@ interface LidarProps {
     anomalyId: string;
 };
 
-export const CloudspottingOnMars: React.FC<LidarProps> = ({
+export const CloudspottingOnMarsTutorial: React.FC<LidarProps> = ({
     anomalyId
 }) => {
     const supabase = useSupabaseClient();

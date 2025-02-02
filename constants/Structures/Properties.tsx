@@ -5,7 +5,7 @@ import AutomatonUpgrade from "@/components/Structures/Config/AutomatonUpgradeBox
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
-import { BarChart, BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, FlagIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
+import { BarChart, BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, FishIcon, FlagIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, WebcamIcon } from "lucide-react";
 import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
@@ -15,7 +15,7 @@ import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunsp
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
 import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
 import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
-import { PlanktonPortal, PlanktonPortalTutorial } from "@/components/Projects/Zoodex/planktonPortal";
+import PlanktonPortal from "@/components/Structures/Missions/Biologists/Plankton/PlanktonPortal";
 import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
 import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
 import { AiForMarsProject } from "@/components/Projects/Auto/AI4Mars";
@@ -34,6 +34,7 @@ import JovianVortexHunters from "@/components/Structures/Missions/Meteorologists
 import PlanetFour from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/PlanetFour";
 import AI4M from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AIForMars";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
+import { GreenhouseResearchStations } from "@/components/Structures/Missions/Biologists/ResearchStations";
 
 interface IndividualStructureProps {
     name?: string;
@@ -211,7 +212,7 @@ export const StructuresConfig: StructureConfig = {
       ],
     },
     3104: {
-      name: "Zoodex",
+      name: "Greenhouse",//Zoodex",
       title: "Animal Observations",
       labels: [
         {
@@ -258,7 +259,19 @@ export const StructuresConfig: StructureConfig = {
           text: "Iguanas",
           dynamicComponent: <ZoodexIguanas />,
           sizePercentage: 60,
-        }
+        },
+        {
+          icon: <FishIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "Plankton",
+          dynamicComponent: <PlanktonPortal />,
+          sizePercentage: 80,
+        },
+        {
+          icon: <BeanIcon className="w-6 h-6 text-[#5e81ac]" />,
+          text: "My Greenhouse Stations",
+          dynamicComponent: <GreenhouseResearchStations />,
+          sizePercentage: 80,
+        },
       ],
     },
     3105: {

@@ -1,5 +1,5 @@
 import React from "react";
-import { EarthScene } from "../earth/scene";
+import { EarthScene } from "@/app/scenes/earth/scene";
 import InventoryPage from "@/components/Inventory/Grid/Grid";
 import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
 import MissionSelector from "@/components/Missions/mission-selector";

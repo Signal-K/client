@@ -73,7 +73,7 @@ export function UnownedSurfaceStructures() {
 
     useEffect(() => {
         fetchStructures();
-    }, [fetchTrigger, fetchStructures]); // Re-fetch when fetchTrigger changes
+    }, [fetchTrigger, fetchStructures]); // Re-fetch when fetchTrigger changes 
 
     const addResearchStation = async () => {
         if (!session || !activePlanet) return;
@@ -96,7 +96,7 @@ export function UnownedSurfaceStructures() {
             alert("You now have a Research Station in your inventory!");
             setFetchTrigger(fetchTrigger + 1); // Trigger a re-fetch
         } catch (error) {
-            console.error('Error adding research station:', error);
+            console.error('Error adding research station: ', error);
             setError('Failed to add the Research Station.');
         };
     };

@@ -2,7 +2,7 @@ import { Globe, HelpCircle, Star, Pickaxe } from "lucide-react";
 import { usePathname } from "next/navigation";    
 import Link from "next/link";
 import { useState } from "react";
-import { MiningComponentComponent } from "../(scenes)/mining/mining-component";
+import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-component";
 
 const menuItems = [
   { icon: Globe, label: "Planet", href: "/" },

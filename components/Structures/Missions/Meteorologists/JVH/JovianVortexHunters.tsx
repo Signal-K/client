@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../BasePlate";
-import { CloudCogIcon, CloudHail, ShovelIcon } from "lucide-react";
-import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
+import { CloudCogIcon, CloudHail, HelpCircle, ShovelIcon } from "lucide-react";
+import { LidarJVHSatellite, StarterJovianVortexHunter } from "@/components/Projects/Lidar/JovianVortexHunter";
 import VoteJVH from "./JVHVote";
 import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
 import JVHCloudClassificationGenerator from "./GaseousPlanetCloudMaker";
@@ -182,6 +182,21 @@ const JovianVortexHunters = () => {
         updateMissionData();
     }, [session, supabase]);
 
+    const tutorialMission: Mission = {
+        id: 1000,
+        chapter: 1,
+        title: "Welcome to Jovian Vortex Hunters",
+        description: 
+            'This mission gets you started with classifying and tracking storms on gaseous planets',
+        icon: HelpCircle,
+        points: 0,
+        completedCount: 0,
+        internalComponent: () => (
+            <StarterJovianVortexHunter anomalyid={77288648} />
+        ),
+        color: 'text-yellow-500',
+    };
+
     const maxUnlockedChapter = Math.max(
         Math.floor(experiencePoints / 9) + 1,
         Math.max(...missions.map((mission) => mission.chapter))
@@ -204,6 +219,7 @@ const JovianVortexHunters = () => {
             maxUnlockedChapter={maxUnlockedChapter}
             onPreviousChapter={handlePreviousChapter}
             onNextChapter={handleNextChapter}
+            tutorialMission={tutorialMission}
         />
     );
 };

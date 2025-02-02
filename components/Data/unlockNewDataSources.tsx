@@ -5,7 +5,7 @@ import { ChevronDown, ChevronUp, Unlock } from "lucide-react";
 import { lidarDataSources, telescopeDataSources, zoodexDataSources, roverDataSources } from "./ZoodexDataSources";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { InventoryIdFetcher } from "../Inventory/fetchId";
+import { InventoryIdFetcher } from "@/components/Inventory/fetchId";
 import Link from "next/link";
 
 export function DataSourcesModal({ structureId, structure }: DataSourcesModalProps) {

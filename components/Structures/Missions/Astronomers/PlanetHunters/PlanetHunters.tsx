@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { TelescopeIcon, RadioIcon, SpeakerIcon, DiscAlbum, PersonStandingIcon, Paintbrush2 } from "lucide-react";
+import { TelescopeIcon, RadioIcon, SpeakerIcon, DiscAlbum, PersonStandingIcon, Paintbrush2, HelpCircle } from "lucide-react";
 import PlanetTypeCommentForm from "./PlanetType";
-import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
+import { FirstTelescopeClassification, StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
 import VotePlanetClassifictions from "./PHVote";
 import PHClassificationGenerator from "./PlanetMaker";
 import PlanetTemperatureForm from "./PlanetTemperature";
@@ -11,6 +11,7 @@ interface MissionStep {
   id: number;
   title: string;
   description: string;
+  points?: number;
   icon: React.ElementType;
   action: () => void;
   completedCount: number;
@@ -208,11 +209,46 @@ const PlanetHuntersSteps = () => {
               {selectedMission.id === 4 && <VotePlanetClassifictions />}
               {selectedMission.id === 5 && <PlanetTemperatureForm />}
               {selectedMission.id === 6 && <PHClassificationGenerator />}
+              {selectedMission.id === 1000 && <FirstTelescopeClassification anomalyid={"6"} />}
             </center>
           </div>
         </div>
       </div>
     );
+  };
+
+  const tutorialMission: MissionStep = {
+    id: 1000,
+    chapter: 1,
+    title: "Welcome to Planet Hunters",
+    description: 'Learn how to discover planet candidates by following this guide',
+    completedCount: 0,
+    points: 0,
+    icon: HelpCircle,
+    action: () => {},
+    color: 'text-yellow-500',
+  };  
+
+  const renderMission = (mission: MissionStep) => {
+    const completedCount = mission.completedCount ?? 0;
+
+    return (
+      <div
+        key={mission.id}
+        className="flex items-center p-6 rounded-2xl"
+        onClick={() => setSelectedMission(mission)}
+      >
+        <mission.icon className={`w-10 h-10 ${mission.color}`} />
+        <div className="ml-4">
+          <h2 className={`text-lg font-bold ${mission.color}`}>{mission.title}</h2>
+          <p className={`text-sm ${mission.color}`}>{mission.description}</p>
+        </div>
+        <div className="ml-auto text-right">
+          <p className="text-xs">Completed: {completedCount}</p>
+          <p className="text-xl font-bold">{completedCount}</p>
+        </div>
+      </div>
+    )
   }
 
   const filteredSteps = steps.filter((step) => step.chapter === currentChapter);
@@ -293,6 +329,10 @@ const PlanetHuntersSteps = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="mt-6">
+        {renderMission(tutorialMission)}
       </div>
     </div>
   );

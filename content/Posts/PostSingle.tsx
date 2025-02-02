@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
 import { AvatarGenerator } from '@/components/Account/Avatar';
+import html2canvas from 'html2canvas'
 
 interface CommentProps {
   id: number;
@@ -62,6 +63,8 @@ export function PostCardSingle({
   const [voteCount, setVoteCount] = useState(votes);
   const [newComment, setNewComment] = useState<string>("");
   const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
+  const [isSharing, setIsSharing] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchComments();
@@ -85,10 +88,31 @@ export function PostCardSingle({
     }
   };
 
-  const handleVoteClick = () => {
+  const handleVoteClick = async () => {
+    if (!session?.user?.id) return;  
+
+    try {
+      const { error } = await supabase.from("votes").insert([
+        {
+          user_id: session.user.id,
+          classification_id: classificationId, 
+          anomaly_id: anomalyId,
+        },
+      ]);
+  
+      if (error) {
+        console.error("Error inserting vote:", error);
+        return;
+      };
+  
+      setVoteCount((prev) => prev + 1);
+    } catch (error) {
+      console.error("Error handling vote:", error);
+    }
+  
     if (onVote) onVote();
-    setVoteCount((prev) => prev + 1);
   };
+  
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
@@ -198,73 +222,107 @@ export function PostCardSingle({
     window.open(`/posts/${classificationId}`, "_blank");
   };
 
+  const handleShare = async () => {
+    if (!shareCardRef.current) return;
+    setIsSharing(true);
+  
+    const safeTitle = title || "post";
+    
+    // Ensure all images are loaded
+    const images = Array.from(shareCardRef.current.querySelectorAll('img'));
+    const imagePromises = images.map((img: HTMLImageElement) =>
+      new Promise<void>((resolve, reject) => {
+        if (img.complete) {
+          resolve();
+        } else {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error("Image failed to load"));
+        }
+      })
+    );
+  
+    try {
+      await Promise.all(imagePromises);
+  
+      const canvas = await html2canvas(shareCardRef.current, {
+        useCORS: true, 
+        scrollX: 0,
+        scrollY: -window.scrollY, 
+      });
+  
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `${safeTitle.toLowerCase().replace(/\s+/g, "-")}-share.png`;
+            link.click();
+          }
+        },
+        "image/png",
+        1.0
+      );
+    } catch (error) {
+      console.error("Error sharing post: ", error);
+    } finally {
+      setIsSharing(false);
+    };
+  };  
+
   return (
-    <>
+    <div ref={shareCardRef}>
       <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
-        <div>
-          <CardHeader>
-            <div className="flex items-center space-x-4">
-              <Avatar>
-                <AvatarImage src={`https://api.dicebear.com/6.x/bottts/svg?seed=${encodeURIComponent(author)}`} />
-                <AvatarFallback>{author[0]}</AvatarFallback>
-                <AvatarGenerator author={author} />
-              </Avatar>
-              <div>
-                <CardTitle>{title}</CardTitle>
-                <p className="text-sm text-muted-foreground">by {author}</p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Badge variant="secondary">{category}</Badge>
-            <p>{content}</p>
-            {images.length > 0 && (
-          <div className="relative mt-4">
-            {/* Image */}
-            <img
-              src={images[currentIndex]}
-              alt={`Image ${currentIndex + 1}`}
-              className="rounded-lg w-full"
-            />
-
-            {/* Left Arrow */}
-            {images.length > 1 && (
-              <button
-                onClick={goToPreviousImage}
-                className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2 focus:outline-none"
-              >
-                &#8592;
-              </button>
+        <CardHeader>
+          <div className="flex items-center space-x-4">
+            {session && (
+              <AvatarGenerator author={session?.user.id} />
             )}
-
-            {/* Right Arrow */}
-            {images.length > 1 && (
-              <button
-                onClick={goToNextImage}
-                className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2 focus:outline-none"
-              >
-                &#8594;
-              </button>
-            )}
-
-            {/* Indicators */}
-            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
-              {images.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`h-2 w-2 rounded-full ${
-                    currentIndex === index
-                      ? 'bg-white'
-                      : 'bg-gray-400'
-                  }`}
-                ></button>
-              ))}
+            <div>
+              <CardTitle>{title}</CardTitle>
+              <p className="text-sm text-muted-foreground">by {author}</p>
             </div>
           </div>
-        )}
-          </CardContent>
-        </div>
+        </CardHeader>
+        <CardContent>
+          <Badge variant="secondary">{category}</Badge>
+          <p>{content}</p>
+          {images.length > 0 && (
+            <div className="relative mt-4">
+              <img
+                src={images[currentIndex]}
+                alt={`Image ${currentIndex + 1}`}
+                className="rounded-lg w-full"
+              />
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={goToPreviousImage}
+                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2"
+                  >
+                    &#8592;
+                  </button>
+                  <button
+                    onClick={goToNextImage}
+                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2"
+                  >
+                    &#8594;
+                  </button>
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                    {images.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentIndex(index)}
+                        className={`h-2 w-2 rounded-full ${
+                          currentIndex === index ? "bg-white" : "bg-gray-400"
+                        }`}
+                      ></button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </CardContent>
         <CardFooter className="flex items-center justify-between">
           <div className="flex gap-2">
             <Button onClick={handleVoteClick} size="sm">
@@ -275,46 +333,44 @@ export function PostCardSingle({
             </Button>
           </div>
           <div className="relative" ref={dropdownRef}>
-            <Button
-              onClick={toggleDropdown}
-              size="lg"
-              className="flex items-center gap-2 w-40 justify-center"
-            >
-              <Share2 className="mr-2" /> Share
-            </Button>
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-card border rounded shadow-md z-50 p-4">
-                <p className="text-sm mb-2">
-                  Share this post:{" "}
-                  <a
-                    href={`https://starsailors.space/posts/${classificationId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline"
-                  >
-                    starsailors.space/posts/{classificationId}
-                  </a>
-                </p>
-                <div className="flex gap-2">
-                  <Button onClick={handleCopyLink} className="flex-1">
-                    Copy Link
-                  </Button>
-                  <Button onClick={openPostInNewTab} className="flex-1">
-                    Open
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-          {/* <Button 
-            onClick={handleShare} 
-            size="sm" 
-            disabled={isSharing}
-            variant="outline"
-          >
-            <Share2 className="mr-2" />
-            {isSharing ? 'Sharing...' : 'Share'}
-          </Button> */}
+  <Button
+    onClick={() => {
+      toggleDropdown();
+      handleShare();
+    }}
+    size="sm"
+    disabled={isSharing}
+    variant="outline"
+    className="flex items-center gap-2"
+  >
+    <Share2 className="mr-2" />
+    {isSharing ? "Sharing..." : "Share"}
+  </Button>
+  {dropdownOpen && (
+    <div className="absolute right-0 mt-2 w-72 bg-card border rounded shadow-md z-50 p-4">
+      <p className="text-sm mb-2">
+        Share this post:{" "}
+        <a
+          href={`https://starsailors.space/posts/${classificationId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline"
+        >
+          starsailors.space/posts/{classificationId}
+        </a>
+      </p>
+      <div className="flex gap-2">
+        <Button onClick={handleCopyLink} className="flex-1">
+          Copy Link
+        </Button>
+        <Button onClick={handleShare}> Download postcard </Button>
+        <Button onClick={openPostInNewTab} className="flex-1">
+          Open
+        </Button>
+      </div>
+    </div>
+  )}
+</div>
         </CardFooter>
         {commentStatus !== false && (
           <CardContent>
@@ -389,6 +445,6 @@ export function PostCardSingle({
           </CardContent>
         )}
       </Card>
-    </>
+    </div>
   );
 };

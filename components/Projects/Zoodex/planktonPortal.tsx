@@ -7,7 +7,7 @@ import ClassificationForm from "@/components/Projects/(classifications)/PostForm
 import { Anomaly } from "../Telescopes/Transiting";
 
 interface ZoodexProps {
-    anomalyId: string;
+    anomalyId: string; 
 };
 
 export const PlanktonPortalTutorial: React.FC<ZoodexProps> = ({ anomalyId }) => {
@@ -128,7 +128,7 @@ export const PlanktonPortalTutorial: React.FC<ZoodexProps> = ({ anomalyId }) => 
     );
 };
 
-export function PlanktonPortal() {
+export function PlanktonPortalFrame() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
