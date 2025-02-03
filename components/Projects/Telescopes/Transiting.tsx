@@ -134,7 +134,7 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
                 )} */}
                 {selectedAnomaly && (
                     <ImageAnnotator
-                        otherAssets={imageUrls}
+                        // otherAssets={imageUrls}
                         anomalyType='planet'
                         missionNumber={1372001}
                         structureItemId={3103}

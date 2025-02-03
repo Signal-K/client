@@ -12,7 +12,7 @@ interface Mission {
     description: string;
     icon: React.ElementType;
     points: number;
-    completedCount: number;
+    completedCount?: number;
     internalComponent?: React.ElementType | (() => JSX.Element);
     color: string;
 };
@@ -159,7 +159,6 @@ const PlanetFour = () => {
             "This mission will guide you through the basics of documenting & tracking anomalous behaviour on planetary surfaces",
         icon: HelpCircle,
         points: 0,
-        completedCount: 0,
         internalComponent: () => (
             <StarterPlanetFour anomalyid={46366425} />
         ),

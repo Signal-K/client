@@ -7,6 +7,8 @@ import { Props } from "@/types/Anomalies";
 
 import { Anomaly } from "../Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { PreferredGaseousClassifications } from "@/components/Structures/Missions/PickPlanet";
+import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL; 
 
@@ -138,7 +140,11 @@ export function StarterJovianVortexHunter({
     );
 };
 
-export function LidarJVHSatellite() {
+interface SelectedAnomProps {
+    anomalyid?: number;
+}
+
+export function LidarJVHSatellite({ anomalyid }: SelectedAnomProps) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -235,13 +241,24 @@ export function LidarJVHSatellite() {
                         {imageUrl && <img src={imageUrl} alt="Vortex" className="w-64 h-64 contained" />}
                     </div>
                     {imageUrl && (
-                        <ClassificationForm
+                        <>
+                        <ImageAnnotator
                             anomalyId={anomaly.id.toString()}
                             anomalyType="lidar-jovianVortexHunter"
                             missionNumber={200000072}
                             assetMentioned={imageUrl}
                             structureItemId={3105}
+                            initialImageUrl={imageUrl}
+                            annotationType="AI4M"//JVH"
                         />
+                        {/* <ClassificationForm
+                            anomalyId={anomaly.id.toString()}
+                            anomalyType="lidar-jovianVortexHunter"
+                            missionNumber={200000072}
+                            assetMentioned={imageUrl}
+                            structureItemId={3105}
+                        /> */}
+                        </>
                     )}
                 </>
             )}
@@ -251,6 +268,21 @@ export function LidarJVHSatellite() {
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             {content}
+        </div>
+    );
+};
+
+export function JVHWrapper() {
+    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+
+    return (
+        <div className="space-y-8">
+            {!selectedAnomaly && (
+                <PreferredGaseousClassifications onSelectAnomaly={setSelectedAnomaly} />
+            )}
+            {selectedAnomaly && 
+                <LidarJVHSatellite anomalyid={selectedAnomaly} />
+            }
         </div>
     );
 };

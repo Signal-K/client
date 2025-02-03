@@ -12,7 +12,7 @@ interface MissionConfig {
   title: string;
   description: string;
   icon: React.ElementType;
-  points: number;
+  points?: number;
   internalComponent?: React.ElementType;
   color: string;
   action?: () => void;

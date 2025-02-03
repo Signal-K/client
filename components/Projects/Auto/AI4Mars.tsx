@@ -288,7 +288,6 @@ export function AiForMarsProject({
                             /> */}
                         </>
                     )}
-                    <p>Selected Anomaly ID: {anomalyid}</p>
                     <button
                         onClick={startTutorial}
                         className="mt-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
@@ -308,7 +307,7 @@ export function AI4MWrapper() {
         <div className="space-y-8">
             {!selectedAnomaly && (
                 <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
-            )}
+            )} 
             {selectedAnomaly && 
                 <AiForMarsProject anomalyid={selectedAnomaly}
             />}
