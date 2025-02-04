@@ -269,6 +269,15 @@ export function PostCardSingle({
     };
   };  
 
+  useEffect(() => {
+    console.log('FUCK');
+    console.log({images});
+  }, []);
+
+  useEffect(() => {
+    console.log("Images prop received:", images);
+  }, [images]);  
+
   return (
     <div ref={shareCardRef}>
       <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
@@ -284,6 +293,9 @@ export function PostCardSingle({
           </div>
         </CardHeader>
         <CardContent>
+        <p>{images}</p>
+        {images.length}
+
           <Badge variant="secondary">{category}</Badge>
           <p>{content}</p>
           {images.length > 0 && (

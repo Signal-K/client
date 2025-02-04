@@ -31,7 +31,7 @@ export default function AllAutomatonsOnActivePlanet() {
     const handleOverlayClick = (event: React.MouseEvent) => {
         if (event.target === event.currentTarget) {
             closeModal();
-        }
+        };
     };
 
     useEffect(() => {
@@ -42,7 +42,7 @@ export default function AllAutomatonsOnActivePlanet() {
                 setInventoryItems(data);
             } catch (error) {
                 console.error("Error fetching inventory items:", error);
-            }
+            };
         };
 
         fetchInventoryItems();

@@ -8,7 +8,7 @@ import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, ChevronRight, Camera } from 'lucide-react';
+import { Upload, ChevronRight, Camera, ChevronDown } from 'lucide-react';
 
 const STRUCTURE_OPTIONS: Record<string, string[]> = {
     Telescope: ["Sunspot", "Asteroid", "Planet", "Star", "Nebula", "Crater"],
@@ -33,6 +33,7 @@ const FreeformUploadData = () => {
     const [structure, setStructure] = useState<string>("");
     const [uploads, setUploads] = useState<string[]>([]);
     const [showForm, setShowForm] = useState(false);
+    const [showMoreContext, setShowMoreContext] = useState(false);  // Controls visibility of additional context
 
     const takeScreenshot = async () => {
         if (loadingContent || buttonPressed) return;
@@ -179,53 +180,67 @@ const FreeformUploadData = () => {
                         </div>
                         <Input
                             type="text"
-                            placeholder="Name of data point/content/post"
-                            value={cloudName}
-                            onChange={(e) => setCloudName(e.target.value)}
-                            className="bg-white text-[#2C4F64] placeholder:text-[#2C4F64]/70"
-                        />
-                        <Input
-                            type="text"
-                            placeholder="Location"
-                            value={location}
-                            onChange={(e) => setLocation(e.target.value)}
-                            className="bg-white text-[#2C4F64] placeholder:text-[#2C4F64]/70"
-                        />
-                        <div className="grid grid-cols-1 gap-4">
-                            <Label htmlFor="anomalyType" className="text-white">Structure/Project group</Label>
-                            <select
-                                id="anomalyType"
-                                value={anomalyType}
-                                onChange={(e) => setAnomalyType(e.target.value)}
-                                className="bg-white text-[#2C4F64] rounded p-2"
-                            >
-                                <option value="" disabled>Select Structure</option>
-                                {Object.keys(STRUCTURE_OPTIONS).map((structure) => (
-                                    <option key={structure} value={structure}>{structure}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="grid grid-cols-1 gap-4">
-                            <Label htmlFor="structure" className="text-white">Anomaly</Label>
-                            <select
-                                id="structure"
-                                value={structure}
-                                onChange={(e) => setStructure(e.target.value)}
-                                className="bg-white text-[#2C4F64] rounded p-2"
-                                disabled={!anomalyType}
-                            >
-                                <option value="" disabled>Select anomaly/entity type</option>
-                                {anomalyType && STRUCTURE_OPTIONS[anomalyType].map((struct) => (
-                                    <option key={struct} value={struct}>{struct}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <textarea
-                            placeholder="Add additional comments (optional)"
+                            placeholder="Add description"
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
-                            className="bg-white text-[#2C4F64] placeholder:text-[#2C4F64]/70 p-2 rounded-md w-full flex-grow"
+                            className="bg-white text-[#2C4F64] placeholder:text-[#2C4F64]/70"
                         />
+                        <Button 
+                            type="button" 
+                            onClick={() => setShowMoreContext(!showMoreContext)} 
+                            className="text-white"
+                        >
+                            {showMoreContext ? <ChevronDown /> : 'Add More Context'}
+                        </Button>
+
+                        {showMoreContext && (
+                            <>
+                                <Input
+                                    type="text"
+                                    placeholder="Name of data point/content/post"
+                                    value={cloudName}
+                                    onChange={(e) => setCloudName(e.target.value)}
+                                    className="bg-white text-[#2C4F64] placeholder:text-[#2C4F64]/70"
+                                />
+                                <Input
+                                    type="text"
+                                    placeholder="Location"
+                                    value={location}
+                                    onChange={(e) => setLocation(e.target.value)}
+                                    className="bg-white text-[#2C4F64] placeholder:text-[#2C4F64]/70"
+                                />
+                                <div className="grid grid-cols-1 gap-4">
+                                    <Label htmlFor="anomalyType" className="text-white">Structure/Project group</Label>
+                                    <select
+                                        id="anomalyType"
+                                        value={anomalyType}
+                                        onChange={(e) => setAnomalyType(e.target.value)}
+                                        className="bg-white text-[#2C4F64] rounded p-2"
+                                    >
+                                        <option value="" disabled>Select Structure</option>
+                                        {Object.keys(STRUCTURE_OPTIONS).map((structure) => (
+                                            <option key={structure} value={structure}>{structure}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="grid grid-cols-1 gap-4">
+                                    <Label htmlFor="structure" className="text-white">Anomaly</Label>
+                                    <select
+                                        id="structure"
+                                        value={structure}
+                                        onChange={(e) => setStructure(e.target.value)}
+                                        className="bg-white text-[#2C4F64] rounded p-2"
+                                        disabled={!anomalyType}
+                                    >
+                                        <option value="" disabled>Select anomaly/entity type</option>
+                                        {anomalyType && STRUCTURE_OPTIONS[anomalyType].map((struct) => (
+                                            <option key={struct} value={struct}>{struct}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </>
+                        )}
+
                         <Button type="submit" className="w-full bg-[#2C4F64] text-white hover:bg-[#1E3D4F]">
                             <ChevronRight className="mr-2 h-4 w-4" />
                             Submit
@@ -264,4 +279,3 @@ function convertBase64ToFile(base64Str: string, filename: string): Promise<File>
         .then((res) => res.arrayBuffer())
         .then((buf) => new File([buf], filename, { type: 'image/jpeg' }));
 };
-

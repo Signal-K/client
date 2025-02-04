@@ -7,7 +7,7 @@ interface ClassificationConfiguration {
   classificationOptions: { [key: string]: any };
   temperature?: string;
   parentPlanetLocation?: number;
-}
+};
 
 interface Classification {
   author: string;
@@ -22,7 +22,7 @@ interface Classification {
   images?: string[];
   anomalyContent?: string;
   relatedClassifications?: Classification[];
-}
+};
 
 export default function MySettlementsLocations() {
   const supabase = useSupabaseClient();

@@ -8,6 +8,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryItem } from "@/types/Items";
 import BiomassStats from "./BiomassOnPlanet";
 import StationModal from "./StationModal";
+import ClassificationStats from "../Milestones/ClassificationNumber";
 
 const initialStations: Station[] = [
   {
@@ -69,7 +70,7 @@ const initialMilestones: Milestone[] = [
     type: "stations",
   },
   {
-    id: "3",
+    id: "3", 
     title: "Biome Explorer",
     description: "Research different environmental biomes",
     current: 1,
@@ -95,7 +96,7 @@ export function GreenhouseResearchStations() {
     if (!session || !activePlanet) {
       setLoading(false);
       return;
-    }
+    };
 
     setLoading(true);
 
@@ -226,7 +227,8 @@ export function GreenhouseResearchStations() {
           </div>
 
           <div className="lg:border-l lg:border-gray-800 lg:pl-8">
-            <Milestones milestones={milestones} />
+            {/* <Milestones milestones={milestones} /> */}
+            <ClassificationStats />
           </div>
         </div>
       </div>
