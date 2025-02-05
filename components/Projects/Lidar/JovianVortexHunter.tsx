@@ -250,6 +250,7 @@ export function LidarJVHSatellite({ anomalyid }: SelectedAnomProps) {
                             structureItemId={3105}
                             initialImageUrl={imageUrl}
                             annotationType="AI4M"//JVH"
+                            parentPlanetLocation='Null'
                         />
                         {/* <ClassificationForm
                             anomalyId={anomaly.id.toString()}

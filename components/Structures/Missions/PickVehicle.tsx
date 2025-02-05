@@ -33,7 +33,7 @@ const automatons: Vehicle[] = [
       },
       cost: 1,
       quantity: 0,
-    },
+    }, //points also show storms/clouds
 ];
 
 export default function PickAutomatonForPickPlanet({

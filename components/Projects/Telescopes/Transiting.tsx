@@ -142,6 +142,7 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
                         annotationType='PH'
                         initialImageUrl={imageUrls[1]}
                         anomalyId={selectedAnomaly.id.toString()}
+                        //parentPlanetLocation...
                     />
                     // <ClassificationForm
                     //     anomalyId={selectedAnomaly.id.toString()}

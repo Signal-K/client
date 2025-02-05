@@ -280,8 +280,9 @@ export function AiForMarsProject({
                                 anomalyType="automaton-aiForMars"
                                 missionNumber={200000062}
                                 assetMentioned={imageUrl}
-                                structureItemId={3102}
+                                structureItemId={3102} 
                                 annotationType="AI4M"
+                                parentPlanetLocation={anomalyid?.toString()}
                             />
                             {/* <ClassificationForm
                                 

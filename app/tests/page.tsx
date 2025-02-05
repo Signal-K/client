@@ -1,12 +1,16 @@
 "use client";
 
 import { BasicPopupModal } from "@/components/Layout/Modal";
+import { useSession } from "@supabase/auth-helpers-react";
 
 export default function TestPage() {
+  const session = useSession();
+
     return (
         // <StarnetLayout>
           <>
             <BasicPopupModal />
+            <p>{session?.user.id}</p>
           </>
         // {/* </StarnetLayout> */}
     );

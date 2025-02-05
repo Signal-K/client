@@ -83,11 +83,36 @@ export default function Home() {
     return <LoginPage />;
   };
 
-  if (activePlanet?.id === 69) {
-    return (
-      <EarthScene />
-    );
-  };
-
-  return planetViews[activePlanet?.id] || <Onboarding />;
+  return (
+    <EarthViewLayout>
+      <div className="w-full">
+        <Navbar />
+        <div className="flex flex-row space-y-4"></div>
+        <div className="py-3">
+          <div className="py-1">
+            {/* <EnhancedWeatherEvents /> */}
+          </div>
+          <center> 
+            <OrbitalStructuresOnPlanet />
+          </center>
+        </div>
+      </div>
+      <div className="w-full">
+        <div className="py-2">
+          <center>
+            <AtmosphereStructuresOnPlanet />
+          </center>
+        </div>
+      </div>
+      <div className="w-full py-2">
+        <center>
+          <StructuresOnPlanet />
+          <AllAutomatonsOnActivePlanet />
+        </center>
+      </div>
+      {/* <div className="w-full py-2"><StructureMissionGuide /> */}
+      <div className="w-full py-2"><SimpleeMissionGuide />
+  </div>
+    </EarthViewLayout>
+  )
 };
