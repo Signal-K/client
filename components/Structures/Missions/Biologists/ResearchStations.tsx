@@ -7,7 +7,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryItem } from "@/types/Items";
 import BiomassStats from "./BiomassOnPlanet";
-import StationModal from "./StationModal";
+import StationModal from "./StationModal"; 
 import ClassificationStats from "../Milestones/ClassificationNumber";
 
 const initialStations: Station[] = [
@@ -228,7 +228,8 @@ export function GreenhouseResearchStations() {
 
           <div className="lg:border-l lg:border-gray-800 lg:pl-8">
             {/* <Milestones milestones={milestones} /> */}
-            <ClassificationStats />
+            {/* <div className="py-2"><ClassificationStats /></div> */}
+            <div className="py-2"><BiomassStats /></div>
           </div>
         </div>
       </div>

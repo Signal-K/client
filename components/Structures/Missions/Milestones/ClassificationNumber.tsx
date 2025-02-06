@@ -44,7 +44,7 @@ export default function ClassificationStats() {
   }, [session, supabase]);
 
   return (
-    <div className="bg-white/30 backdrop-blur-lg border border-white/20 shadow-lg p-4 rounded-lg text-white text-center">
+    <div className="bg-card backdrop-blur-lg border border-white/20 shadow-lg p-4 rounded-lg text-white text-center">
       <h2 className="text-lg font-bold">Classification Stats</h2>
       <p className="mt-2">Your Classifications: {userWeekly} this week, {userTotal} total</p>
       <p className="mt-1">All Users: {globalWeekly} this week, {globalTotal} total</p>
