@@ -25,10 +25,10 @@ import { SciFiPanel } from '@/components/ui/styles/sci-fi/panel';
 interface ImageAnnotatorProps {
   initialImageUrl: string;
   otherAssets?: string[];
-  anomalyType: string;
-  anomalyId: string;
-  missionNumber: number;
-  assetMentioned: string | string[];
+  anomalyType?: string;
+  anomalyId?: string;
+  missionNumber?: number;
+  assetMentioned?: string | string[];
   structureItemId?: number;
   parentPlanetLocation?: string;
   annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'Custom';
@@ -216,7 +216,8 @@ export default function ImageAnnotator({
           )}
           {isFormVisible && (
             <SciFiPanel className="p-4">
-              <ClassificationForm
+              {anomalyId && anomalyType && missionNumber && (
+                <ClassificationForm
                 anomalyId={anomalyId}
                 anomalyType={anomalyType}
                 missionNumber={missionNumber}
@@ -229,6 +230,7 @@ export default function ImageAnnotator({
                 structureItemId={structureItemId}
                 annotationOptions={annotationOptions}
               />
+              )}
             </SciFiPanel>
           )}
         </div>

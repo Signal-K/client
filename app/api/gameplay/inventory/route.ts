@@ -46,6 +46,16 @@ const inventoryItems: InventoryItem[] = [
     itemLevel: 1, 
     gif: "/assets/Items/Roover.gif", },  // https://cdn.dribbble.com/users/107759/screenshots/4248752/rover.gif
   
+  {
+    id: 24,
+    name: 'Satellite 1',
+    description: '',
+    cost: 1,
+    icon_url: '/assets/Automatons/Sat.png',
+    ItemCategory: 'Automaton',
+    itemLevel: 1,
+  },
+  
 
   // Structures
   {

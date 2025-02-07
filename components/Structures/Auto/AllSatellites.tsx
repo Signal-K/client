@@ -1,22 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-component";
 
 interface InventoryItem {
     id: number;
     icon_url: string;
 };
 
-export default function AllAutomatonsOnActivePlanet() {
+export default function AllSatellitesOnActivePlanet() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
     const { activePlanet } = useActivePlanet();
 
-    const [automatons, setAutomatons] = useState<{ id: number; iconUrl: string }[]>([]);
+    const [satellites, setSatellites] = useState<{ id: number; iconUrl: string }[]>([]);
     const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -51,7 +50,7 @@ export default function AllAutomatonsOnActivePlanet() {
     }, []); 
 
     useEffect(() => {
-        const fetchAutomatons = async () => {
+        const fetchSatellites = async () => {
             if (!activePlanet || !session) return;
 
             try {
@@ -62,28 +61,28 @@ export default function AllAutomatonsOnActivePlanet() {
                     .select("id, item")
                     .eq("anomaly", activePlanet.id)
                     .eq("owner", session.user.id)
-                    .eq("item", 23); 
+                    .eq("item", 24); 
 
                 if (error) throw error;
 
                 const automatonsData = data || [];
-                const automatonsWithIcons = automatonsData.map((automaton: any) => {
-                    const iconUrl = inventoryItems.find(item => item.id === 23)?.icon_url || '';
+                const satellitesWithIcons = automatonsData.map((automaton: any) => {
+                    const iconUrl = inventoryItems.find(item => item.id === 24)?.icon_url || '';
                     return {
                         id: automaton.id,
                         iconUrl
                     };
                 });
 
-                setAutomatons(automatonsWithIcons);
+                setSatellites(satellitesWithIcons);
             } catch (error) {
-                console.error("Error fetching automatons: ", error);
+                console.error("Error fetching satellites: ", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchAutomatons();
+        fetchSatellites();
     }, [activePlanet, session, supabase, inventoryItems]);
 
     if (loading) {
@@ -93,35 +92,17 @@ export default function AllAutomatonsOnActivePlanet() {
     return (
         <div className="p-3">
             <div className="grid grid-cols-3 gap-4">
-                {automatons.map((automaton) => (
-                    <div key={automaton.id} className="flex flex-col items-center">
+                {satellites.map((satellite) => (
+                    <div key={satellite.id} className="flex flex-col items-center">
                         <img 
-                            src={automaton.iconUrl} 
-                            alt={`Automaton ${automaton.id}`} 
+                            src={satellite.iconUrl} 
+                            alt={`Automaton ${satellite.id}`} 
                             className="w-16 h-16 object-cover cursor-pointer" 
                             onClick={handleAutomatonClick} 
                         />
                     </div>
                 ))}
             </div>
-
-            {/* {isModalVisible && (
-                <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-                    onClick={handleOverlayClick}
-                >
-                    <div className="relative bg-white w-1/2 h-1/2 p-4 overflow-y-auto">
-                        <button
-                            className="absolute top-2 right-2 text-2xl font-bold"
-                            onClick={closeModal}
-                        >
-                            &times;
-                        </button>
-
-                        <MiningComponentComponent />
-                    </div>
-                </div>
-            )} */}
         </div>
-    );
+    )
 };

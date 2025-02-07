@@ -1,15 +1,11 @@
 "use client";
 
-import { BasicPopupModal } from "@/components/Layout/Modal";
-import PlanetTempCalculator from "@/components/Structures/Missions/Astronomers/PlanetHunters/TemperatureCalc";
-
 export default function TestPage() {
 
     return (
         // <StarnetLayout>
           <>
-            <BasicPopupModal />
-            <PlanetTempCalculator />
+            
           </>
         // {/* </StarnetLayout> */}
     );

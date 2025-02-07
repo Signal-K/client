@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, ChevronRight, Camera, ChevronDown } from 'lucide-react';
+import ImageAnnotator from './Annotating/Annotator';
 
 const STRUCTURE_OPTIONS: Record<string, string[]> = {
     Telescope: ["Sunspot", "Asteroid", "Planet", "Star", "Nebula", "Crater"],
@@ -175,7 +176,8 @@ const FreeformUploadData = () => {
                     <form onSubmit={handleSubmitClassification} className="space-y-4 h-full flex flex-col">
                         <div className="bg-[#5FCBC3] rounded-lg p-4 h-40 mb-4">
                             {captureImage && (
-                                <img src={captureImage} alt="Captured" className="w-full h-full object-cover rounded" />
+                                // <img src={captureImage} alt="Captured" className="w-full h-full object-cover rounded" /> 
+                                <ImageAnnotator initialImageUrl={captureImage} annotationType='Custom' /> 
                             )}
                         </div>
                         <Input

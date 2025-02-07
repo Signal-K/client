@@ -16,6 +16,7 @@ import Onboarding from "./scenes/onboarding/page";
 import VerticalToolbar from "@/components/Layout/Toolbar";
 import SimpleeMissionGuide from "./tests/singleMissionGuide";
 import Navbar from "@/components/Layout/Navbar";
+import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatellites";
 
 export default function Home() {
   const session = useSession();
@@ -54,6 +55,7 @@ export default function Home() {
       <div className="w-full">
         <div className="py-2">
           <center>
+            <AllSatellitesOnActivePlanet />
             <AtmosphereStructuresOnPlanet />
           </center>
         </div>
@@ -100,6 +102,7 @@ export default function Home() {
       <div className="w-full">
         <div className="py-2">
           <center>
+            <AllSatellitesOnActivePlanet />
             <AtmosphereStructuresOnPlanet />
           </center>
         </div>
