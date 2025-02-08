@@ -1,16 +1,15 @@
 "use client";
 
 import { BasicPopupModal } from "@/components/Layout/Modal";
-import { useSession } from "@supabase/auth-helpers-react";
+import PlanetTempCalculator from "@/components/Structures/Missions/Astronomers/PlanetHunters/TemperatureCalc";
 
 export default function TestPage() {
-  const session = useSession();
 
     return (
         // <StarnetLayout>
           <>
             <BasicPopupModal />
-            <p>{session?.user.id}</p>
+            <PlanetTempCalculator />
           </>
         // {/* </StarnetLayout> */}
     );

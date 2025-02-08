@@ -40,7 +40,7 @@ const FreeformUploadData = () => {
         setButtonPressed(true); 
         setTimeout(() => {
             setButtonPressed(false);
-            setLoadingContent(true);
+            setLoadingContent(true); 
         }, 200);
 
         const imageSrc = webcamRef.current?.getScreenshot();
