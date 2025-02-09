@@ -9,7 +9,7 @@ interface Classification {
     created_at: string;
     content: string | null; 
     author: string | null;
-    anomaly: number | null;
+    anomaly: number | string | null;
     media: any | null; 
     classificationtype: string | null;
     classificationConfiguration: any | null; 
