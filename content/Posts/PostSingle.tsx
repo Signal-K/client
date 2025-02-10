@@ -17,6 +17,7 @@ interface CommentProps {
   author: string;
   content: string;
   created_at: string;
+  isSurveyor?: boolean;
   configuration?: {
     planetType?: string;
   };
@@ -66,6 +67,9 @@ export function PostCardSingle({
   const [isSharing, setIsSharing] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
+  const [surveyorComments, setSurveyorComments] = useState<any[]>([]);
+  const [nonSurveyorComments, setNonSurveyorComments] = useState<any[]>([]);
+
   useEffect(() => {
     fetchComments();
   }, [classificationId]);
@@ -78,6 +82,13 @@ export function PostCardSingle({
         .select("*")
         .eq("classification_id", classificationId)
         .order("created_at", { ascending: false });
+
+        if (classificationConfig?.classificationType === "telescope-minorPlanet" || classificationConfig?.classificationType === "planet") {
+          const surveyor = comments.filter((comment) => comment.isSurveyor);
+          const nonSurveyor = comments.filter((comment) => !comment.isSurveyor);
+          setSurveyorComments(surveyor);
+          setNonSurveyorComments(nonSurveyor);
+        }
 
       if (error) throw error;
       setComments(data);
@@ -113,7 +124,6 @@ export function PostCardSingle({
     if (onVote) onVote();
   };
   
-
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
@@ -269,6 +279,15 @@ export function PostCardSingle({
     };
   };  
 
+  useEffect(() => {
+    console.log('FUCK');
+    console.log({images});
+  }, []);
+
+  useEffect(() => {
+    console.log("Images prop received:", images);
+  }, [images]);  
+
   return (
     <div ref={shareCardRef}>
       <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
@@ -284,6 +303,9 @@ export function PostCardSingle({
           </div>
         </CardHeader>
         <CardContent>
+        <p>{images}</p>
+        {images.length}
+
           <Badge variant="secondary">{category}</Badge>
           <p>{content}</p>
           {images.length > 0 && (
@@ -420,6 +442,7 @@ export function PostCardSingle({
                     createdAt={comment.created_at}
                     replyCount={0}
                     parentCommentId={classificationId}
+                    isSurveyor={comment.isSurveyor}
                   >
                     {enableNewCommentingMethod && (
                       <div className="flex justify-between items-center">

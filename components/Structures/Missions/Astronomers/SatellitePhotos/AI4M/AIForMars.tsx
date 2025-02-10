@@ -11,8 +11,8 @@ interface Mission {
     title: string;
     description: string;
     icon: React.ElementType;
-    points: number;
-    completedCount: number;
+    points?: number;
+    completedCount?: number;
     internalComponent?: React.ElementType | (() => JSX.Element);
     color: string;
 };
@@ -158,8 +158,6 @@ const AI4M = () => {
         description: 
             "This mission will get you up to speed with how your rovers should be trained and how we can find anomalies from their photos",
         icon: HelpCircle,
-        points: 0,
-        completedCount: 0,
         internalComponent: () => {
             return <StarterAiForMars anomalyid={69592674} />
         },

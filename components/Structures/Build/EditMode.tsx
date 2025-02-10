@@ -34,14 +34,14 @@ export function UnownedSurfaceStructures() {
         };
 
         try {
-            const { data: researchedStructures, error: researchError } = await supabase
-                .from('researched')
-                .select('tech_type')
-                .eq('user_id', session.user.id);
+            // const { data: researchedStructures, error: researchError } = await supabase
+            //     .from('researched')
+            //     .select('tech_type')
+            //     .eq('user_id', session.user.id);
             
-            if (researchError) throw researchError;
+            // if (researchError) throw researchError;
 
-            const researchedIds = researchedStructures.map((item: { tech_type: string }) => Number(item.tech_type));
+            // const researchedIds = researchedStructures.map((item: { tech_type: string }) => Number(item.tech_type));
 
             const { data: userInventory, error: inventoryError } = await supabase
                 .from('inventory')
@@ -57,7 +57,7 @@ export function UnownedSurfaceStructures() {
             const inventoryItems: InventoryItem[] = await response.json();
 
             const surfaceStructures = inventoryItems.filter(item =>
-                item.ItemCategory === 'Structure' && item.locationType === 'Surface' && researchedIds.includes(item.id)
+                item.ItemCategory === 'Structure' && item.locationType === 'Surface' // && researchedIds.includes(item.id)
             );
 
             const unowned = surfaceStructures.filter(structure => !ownedItems.includes(structure.id));

@@ -20,6 +20,7 @@ interface Classification {
 
 export default function SinglePostPage({ params }: { params: { id: string } }) {
   const supabase = useSupabaseClient();
+  
   const [classification, setClassification] = useState<Classification | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +32,7 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
         setError("Invalid classification ID.");
         setLoading(false);
         return;
-      }
+      };
 
       try {
         const { data, error } = await supabase

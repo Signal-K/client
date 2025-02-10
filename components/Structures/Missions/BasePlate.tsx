@@ -12,7 +12,7 @@ interface MissionConfig {
   title: string;
   description: string;
   icon: React.ElementType;
-  points: number;
+  points?: number;
   internalComponent?: React.ElementType;
   color: string;
   action?: () => void;
@@ -104,11 +104,39 @@ const MissionShell = ({
         <div className="ml-4">
           <h2 className={`text-lg font-bold ${mission.color}`}>{mission.title}</h2>
           <p className={`text-sm ${mission.color}`}>{mission.description}</p>
-          <p className={`text-sm ${mission.color}`}>Points: {mission.points}</p>
+          {mission.points && (
+            <p className={`text-sm ${mission.color}`}>Points: {mission.points}</p>
+          )}
         </div>
         <div className="ml-auto text-right">
           <p className="text-xs">Completed: {completedCount}</p>
           <p className="text-xl font-bold">{completedCount}</p>
+        </div>
+      </div>
+    );
+  };
+
+  const renderTutorialMission = (mission: MissionConfig) => {
+    const completedCount = mission.completedCount ?? 0;
+
+    return (
+      <div
+        key={mission.id}
+        className={`flex items-center p-6 rounded-2xl cursor-pointer${
+          mission.id > 2
+            ? "bg-[#74859A]"
+            : mission.id < 3
+            ? "bg-gray-000"
+            : completedCount > 0
+            ? "bg-gray-700"
+            : ""
+        }`}
+        onClick={() => setSelectedMission(mission)}
+      >
+        <mission.icon className={`w-10 h-10 ${mission.color}`} />
+        <div className="ml-4">
+          <h2 className={`text-lg font-bold ${mission.color}`}>{mission.title}</h2>
+          <p className={`text-sm ${mission.color}`}>{mission.description}</p>
         </div>
       </div>
     );
@@ -174,7 +202,7 @@ const MissionShell = ({
       {/* Display tutorial mission when Chapter 1 is selected */}
       {currentChapter === 1 && tutorialMission && !selectedMission && (
   <div className="mt-6">
-    {renderMission(tutorialMission)}
+    {renderTutorialMission(tutorialMission)}
   </div>
 )}
 

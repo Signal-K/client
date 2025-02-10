@@ -25,10 +25,10 @@ import { SciFiPanel } from '@/components/ui/styles/sci-fi/panel';
 interface ImageAnnotatorProps {
   initialImageUrl: string;
   otherAssets?: string[];
-  anomalyType: string;
-  anomalyId: string;
-  missionNumber: number;
-  assetMentioned: string | string[];
+  anomalyType?: string;
+  anomalyId?: string;
+  missionNumber?: number;
+  assetMentioned?: string | string[];
   structureItemId?: number;
   parentPlanetLocation?: string;
   annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'Custom';
@@ -88,7 +88,7 @@ export default function ImageAnnotator({
       } else if (data) {
         const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
         setUploads((prev) => [...prev, url]);
-        setIsFormVisible(true); // Show the form after a successful upload
+        setIsFormVisible(true);
       }
     } catch (err) {
       console.error('Unexpected error during canvas upload:', err);
@@ -97,17 +97,38 @@ export default function ImageAnnotator({
     }
   };
 
+  const renderCanvas = () => {
+    if (!canvasRef.current || !imageRef.current) return;
+    const ctx = canvasRef.current.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      ctx.drawImage(imageRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+    };
+  };  
+
   useEffect(() => {
-    if (initialImageUrl) {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        setSelectedImage(initialImageUrl);
-        imageRef.current = img;
-      };
-      img.src = initialImageUrl;
+    if (!initialImageUrl) return;
+  
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      imageRef.current = img;
+      setSelectedImage(initialImageUrl);
+      renderCanvas();
+    };
+    img.src = initialImageUrl;
+  }, [initialImageUrl]);  
+  
+  useEffect(() => {
+    if (imageRef.current && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        renderCanvas(); 
+      }
     }
-  }, [initialImageUrl]);
+  }, [selectedImage]);
 
   useEffect(() => {
     const options = drawings.reduce((acc, drawing) => {
@@ -195,7 +216,8 @@ export default function ImageAnnotator({
           )}
           {isFormVisible && (
             <SciFiPanel className="p-4">
-              <ClassificationForm
+              {anomalyId && anomalyType && missionNumber && (
+                <ClassificationForm
                 anomalyId={anomalyId}
                 anomalyType={anomalyType}
                 missionNumber={missionNumber}
@@ -208,6 +230,7 @@ export default function ImageAnnotator({
                 structureItemId={structureItemId}
                 annotationOptions={annotationOptions}
               />
+              )}
             </SciFiPanel>
           )}
         </div>

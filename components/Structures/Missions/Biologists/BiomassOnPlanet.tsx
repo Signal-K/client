@@ -15,7 +15,7 @@ const BiomassStats = () => {
     const [totalBio, setTotalBio] = useState(0);
     const [recentBio, setRecentBio] = useState(0);
     const [onlyMine, setOnlyMine] = useState(false);
-    const [onPlanet, setOnPlanet] = useState(false);
+    const [onPlanet, setOnPlanet] = useState(false); 
 
     useEffect(() => {
         if (!session) {
@@ -26,7 +26,12 @@ const BiomassStats = () => {
             const query = supabase
                 .from("classifications")
                 .select("id, created_at")
-                .eq("classificationtype", "zoodex-planktonPortal") // add others
+                .in("classificationtype", [
+                    "zoodex-planktonPortal",
+                    "zoodex-southCoastFaunaRecovery",
+                    "zoodex-iguanasFromAbove",
+                    "zoodex-burrowingOwl"
+                ])                
 
             if (onlyMine) {
                 query.eq("author", session.user.id);
@@ -51,7 +56,7 @@ const BiomassStats = () => {
         };
 
         fetchBioCount();
-    })
+    }, []);
 
     const bioScore = Math.min(100, (recentBio / 50) * 100); // Update this to be based on biomass weight, not quantity
     const biomassLevel = bioScore > 5 ? "Intelligent Life" : bioScore > 3 ? "Fauna" : bioScore > 2 ? "Flora" : bioScore > 0 ? "Bacterium" : "Null";
@@ -63,14 +68,14 @@ const BiomassStats = () => {
                     <h2 className="text-lg font-semibold text-blue-500 clex items-center gap-2">
                         <TreeDeciduousIcon className="w-5 h-5" /> Total biomass
                     </h2>
-                    <div className="flex items-center gap-2 text-sm">
+                    {/* <div className="flex items-center gap-2 text-sm">
                         <span className="text-gray-600">Only my discoveries</span>
                         <Switch checked={onlyMine} onCheckedChange={setOnlyMine} />
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                        <span className="text-gray-600">Only on Planet: {activePlanet}</span>
+                        <span className="text-gray-600">Only on Planet: {activePlanet?.id}</span>
                         <Switch checked={onPlanet} onCheckedChange={setOnPlanet} />
-                    </div>
+                    </div> */}
                 </div>
                 <p className="text-xl font-bold text-green-400">{totalBio}</p>
                 <div>

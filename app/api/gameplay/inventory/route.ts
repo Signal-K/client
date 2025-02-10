@@ -19,6 +19,8 @@ export interface InventoryItem {
 };
 
 const inventoryItems: InventoryItem[] = [
+
+  // Items/Minerals
   { id: 11, name: 'Coal', description: 'You can burn this to create power', cost: 1, icon_url: '/assets/Items/Coal.png', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1 },
   { id: 12, name: 'Telescope Signal Receiver', description: 'This tool is used to receive transmissions from your transiting telescope and decode them into readable data. It is also the first component of your main telescope array', cost: 1, icon_url: 'https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/Telescope2.png?raw=true', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '13': 3, '15': 2 }, }, // Originally pointed towards 2 alloy
   { id: 13, name: 'Silicon', description: '', cost: 1, icon_url: '/assets/Items/Silicon.png', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
@@ -30,8 +32,32 @@ const inventoryItems: InventoryItem[] = [
   { id: 19, name: 'Copper', description: '', cost: 1, icon_url: '/assets/Items/Copper.png', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
   { id: 20, name: 'Chromium', description: '/assets/Items/Chromite.png', cost: 1, icon_url: '', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
   { id: 21, name: 'Water-Ice', description: '/assets/Items/Ice.png', cost: 1, icon_url: '', ItemCategory: 'Minerals', parentItem: null, itemLevel: 1},
-  { id: 23, name: 'Rover 1', description: '', cost: 1, icon_url: 'https://static-00.iconduck.com/assets.00/mars-rover-illustration-2048x2048-czfy73zy.png', ItemCategory: 'Automaton', parentItem: 22, itemLevel: 1, gif: "/assets/Items/Roover.gif", },  // https://cdn.dribbble.com/users/107759/screenshots/4248752/rover.gif
   { id: 32, name: 'Camera Receiver', description: 'Keep track of all the photos your anomalies have taken', cost: 1, icon_url: 'https://cdn-icons-png.flaticon.com/512/5169/5169909.png', ItemCategory: 'Structure', parentItem: null, itemLevel: 1, recipe: { '11': 1 }, locationType: 'Orbit' },
+  
+  // Automatons
+  { 
+    id: 23, 
+    name: 'Rover 1', 
+    description: '', 
+    cost: 1, 
+    icon_url: '/assets/Automatons/ExploreRover1.png',
+    ItemCategory: 'Automaton', 
+    // parentItem: 22, 
+    itemLevel: 1, 
+    gif: "/assets/Items/Roover.gif", },  // https://cdn.dribbble.com/users/107759/screenshots/4248752/rover.gif
+  
+  {
+    id: 24,
+    name: 'Satellite 1',
+    description: '',
+    cost: 1,
+    icon_url: '/assets/Automatons/Sat.png',
+    ItemCategory: 'Automaton',
+    itemLevel: 1,
+  },
+  
+
+  // Structures
   {
     id: 3102, name: 'Automaton station', description: 'View, control and upgrade all your automatons and rovers here', cost: 1, icon_url: '/assets/Items/AutoController.png', ItemCategory: 'Structure', parentItem: 30, itemLevel: 1, locationType: 'Surface'
   },

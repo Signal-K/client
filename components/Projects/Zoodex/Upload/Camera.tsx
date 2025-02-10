@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, ChevronRight } from "lucide-react";
+import ImageAnnotator from '../../(classifications)/Annotating/Annotator';
 
 const CameraComponent = () => {
     const supabase = useSupabaseClient();
@@ -190,7 +191,7 @@ const CameraComponent = () => {
             </>
           ) : (
             <form onSubmit={handleSubmitClassification} className="space-y-4">
-              <img src={captureImage || undefined} alt="Captured" className="w-full h-full object-cover rounded" />
+              {captureImage && ( <ImageAnnotator initialImageUrl={captureImage} annotationType='Custom' />  )}
               <Input
                 type="text"
                 placeholder="Add a comment (optional)"

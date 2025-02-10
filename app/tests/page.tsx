@@ -1,12 +1,11 @@
 "use client";
 
-import { BasicPopupModal } from "@/components/Layout/Modal";
-
 export default function TestPage() {
+
     return (
         // <StarnetLayout>
           <>
-            <BasicPopupModal />
+            
           </>
         // {/* </StarnetLayout> */}
     );

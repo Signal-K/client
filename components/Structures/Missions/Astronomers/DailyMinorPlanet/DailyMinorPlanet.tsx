@@ -6,7 +6,17 @@ import { DailyMinorPlanet, StarterDailyMinorPlanet } from "@/components/Projects
 import VoteDMPClassifications from "./DMPVote";
 import DMPGenerator from "./AsteroidMaker";
 
-import { Mission } from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudspottingOnMars";
+interface Mission {
+  id: number;
+  chapter: number;
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  points?: number;
+  completedCount?: number;
+  internalComponent: React.ElementType | (() => JSX.Element);
+  color: string;
+};
 
 const DailyMinorPlanetMissions = () => {
   const supabase = useSupabaseClient();
@@ -125,9 +135,8 @@ const DailyMinorPlanetMissions = () => {
     description: 
       "This mission will guide you through the basics of hunting and discovering asteroids",
     icon: HelpCircle,
-    points: 0,
+
     color: 'text-yellow-500',
-    completedCount: 0,
     internalComponent: () => {
       return <StarterDailyMinorPlanet anomalyid={90670192} />;
     }

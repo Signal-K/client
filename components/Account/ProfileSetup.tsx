@@ -2,6 +2,7 @@ import React, { useEffect, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useActivePlanet } from "@/context/ActivePlanet";
 
 interface ProfileSetupFormProps {
   onProfileUpdate: () => void | null;
@@ -10,7 +11,9 @@ interface ProfileSetupFormProps {
 export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
-  const router = useRouter(); 
+
+  const { activePlanet } = useActivePlanet();
+  const router = useRouter();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +22,8 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
   const [firstName, setFirstName] = useState("");
   const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  const [inventoryItems, setInventoryItems] = useState<{ item: number }[] | null>(null);
 
   useEffect(() => {
     let ignore = false;
@@ -45,11 +50,30 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
 
     if (session?.user?.id) {
       getProfile();
-    };
+    }
 
     return () => {
       ignore = true;
     };
+  }, [session, supabase]);
+
+  useEffect(() => {
+    async function fetchInventory() {
+      if (!session?.user?.id) return;
+      const { data, error } = await supabase
+        .from("inventory")
+        .select("item")
+        .eq("owner", session?.user?.id)
+        .in("item", [23, 24]);
+
+      if (error) {
+        console.warn(error);
+      } else {
+        setInventoryItems(data);
+      }
+    }
+
+    fetchInventory();
   }, [session, supabase]);
 
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -69,10 +93,49 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
     if (!username || !session?.user?.email) {
       setError("Username and email are required.");
       return;
-    };
+    }
 
     setLoading(true);
     setError(null);
+
+    // Check and add missing items to inventory
+    if (inventoryItems) {
+      const userHasItem23 = inventoryItems.some(item => item.item === 23);
+      const userHasItem24 = inventoryItems.some(item => item.item === 24);
+
+      const itemsToAdd = [];
+
+      if (!userHasItem23) {
+        itemsToAdd.push({
+          item: 23,
+          owner: session?.user?.id,
+          anomay: activePlanet?.id,
+          quantity: 1,
+          time_of_deploy: new Date(),
+        });
+      }
+
+      if (!userHasItem24) {
+        itemsToAdd.push({
+          item: 24,
+          owner: session?.user?.id,
+          anomay: activePlanet?.id,
+          quantity: 1,
+          time_of_deploy: new Date(),
+        });
+      }
+
+      // Insert missing items into the inventory
+      if (itemsToAdd.length > 0) {
+        const { error: insertError } = await supabase.from("inventory").insert(itemsToAdd);
+
+        if (insertError) {
+          setError(insertError.message);
+          setLoading(false);
+          return;
+        }
+      }
+    }
 
     let avatar_url = avatarPreview;
 
@@ -106,12 +169,12 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
     if (error) {
       alert(error.message);
     } else {
-      router.push("/"); 
+      router.push("/");
       onProfileUpdate();
     }
 
     setLoading(false);
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1D2833] p-4 bg-[url('/game-background.jpg')] bg-cover bg-center">

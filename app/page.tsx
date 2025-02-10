@@ -16,6 +16,7 @@ import Onboarding from "./scenes/onboarding/page";
 import VerticalToolbar from "@/components/Layout/Toolbar";
 import SimpleeMissionGuide from "./tests/singleMissionGuide";
 import Navbar from "@/components/Layout/Navbar";
+import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatellites";
 
 export default function Home() {
   const session = useSession();
@@ -54,6 +55,7 @@ export default function Home() {
       <div className="w-full">
         <div className="py-2">
           <center>
+            <AllSatellitesOnActivePlanet />
             <AtmosphereStructuresOnPlanet />
           </center>
         </div>
@@ -83,11 +85,37 @@ export default function Home() {
     return <LoginPage />;
   };
 
-  if (activePlanet?.id === 69) {
-    return (
-      <EarthScene />
-    );
-  };
-
-  return planetViews[activePlanet?.id] || <Onboarding />;
+  return (
+    <EarthViewLayout>
+      <div className="w-full">
+        <Navbar />
+        <div className="flex flex-row space-y-4"></div>
+        <div className="py-3">
+          <div className="py-1">
+            {/* <EnhancedWeatherEvents /> */}
+          </div>
+          <center> 
+            <OrbitalStructuresOnPlanet />
+          </center>
+        </div>
+      </div>
+      <div className="w-full">
+        <div className="py-2">
+          <center>
+            <AllSatellitesOnActivePlanet />
+            <AtmosphereStructuresOnPlanet />
+          </center>
+        </div>
+      </div>
+      <div className="w-full py-2">
+        <center>
+          <StructuresOnPlanet />
+          <AllAutomatonsOnActivePlanet />
+        </center>
+      </div>
+      {/* <div className="w-full py-2"><StructureMissionGuide /> */}
+      <div className="w-full py-2"><SimpleeMissionGuide />
+  </div>
+    </EarthViewLayout>
+  )
 };

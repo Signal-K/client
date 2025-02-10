@@ -11,8 +11,8 @@ interface PlanetMeshProps {
     radius: number
     density: number
     type: 'terrestrial' | 'gaseous'
-  }
-}
+  };
+};
 
 export function PlanetMesh({ stats }: PlanetMeshProps) {
   const meshRef = useRef<THREE.Mesh>(null)
@@ -394,8 +394,8 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
     if (cloudRef.current) {
       cloudRef.current.rotation.y += 0.0005
       cloudMaterial.uniforms.time.value = state.clock.elapsedTime
-    }
-  })
+    };
+  });
 
   return (
     <>
@@ -412,8 +412,8 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
         </Sphere>
       )}
     </>
-  )
-}
+  );
+};
 import { determineLiquidType } from "@/utils/planet-physics"
 
 interface PlanetMeshLiquidProps {
@@ -423,8 +423,8 @@ interface PlanetMeshLiquidProps {
     density: number
     type: "terrestrial" | "gaseous"
     temperature: number
-  }
-}
+  };
+};
 
 export function PlanetMeshWithLiquid({ stats }: PlanetMeshLiquidProps) {
   const meshRef = useRef<THREE.Mesh>(null)
@@ -840,5 +840,5 @@ export function PlanetMeshWithLiquid({ stats }: PlanetMeshLiquidProps) {
         </Sphere>
       )}
     </>
-  )
-}
+  );
+};

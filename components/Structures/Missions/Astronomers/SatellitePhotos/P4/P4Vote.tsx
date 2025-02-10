@@ -44,18 +44,21 @@ export default function VoteP4Classifications() {
       
           const processedData = data.map((classification) => {
             const media = classification.media;
+            console.log('FUCK');
+            console.log(classification.media);
             let images: string[] = [];
-      
-            if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
-              images.push(media[1]);
-            } else if (media && media.uploadUrl) {
-              images.push(media.uploadUrl);
+          
+            if (Array.isArray(media)) {
+              images = media.map((item) => item.url); 
+            } else if (media?.url) {
+              images = [media.url]; 
             }
-      
-            const votes = classification.classificationConfiguration?.votes || 0;
-      
-            return { ...classification, images, votes };
-          });
+          
+            return {
+              ...classification,
+              images, 
+            };
+          });          
       
           setClassifications(processedData);
         } catch (error) {
@@ -108,21 +111,19 @@ export default function VoteP4Classifications() {
               <p>{error}</p>
             ) : (
               classifications.map((classification) => (
-                <PostCardSingle
-                  key={classification.id}
-                  classificationId={classification.id}
-                  title={classification.title}
-                  author={classification.author}
-                  content={classification.content}
-                  votes={classification.votes || 0}
-                  category={classification.category}
-                  tags={classification.tags || []}
-                  images={classification.images || []}
-                  anomalyId={classification.anomaly}
-                  classificationConfig={classification.classificationConfiguration}
-                  classificationType={classification.classificationtype}
-                  onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
-                />
+<PostCardSingle
+  classificationId={classification.id}
+  title={classification.title || "Untitled"}
+  author={classification.author || "Anonymous"}
+  content={classification.content || ""}
+  votes={classification.votes || 0}
+  category="Satellite"
+  anomalyId={classification.anomaly?.toString() || ""}
+  images={classification.images || []}
+  classificationType={classification.classificationtype || ""}
+  classificationConfig={classification.classificationConfiguration}
+  enableNewCommentingMethod
+/>
               ))
             )}
           </div>

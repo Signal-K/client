@@ -110,7 +110,7 @@ export function SimplePostSingle({
 
   return (
     <div className="flex items-center justify-center" ref={shareCardRef}>
-      <Card className="w-full max-w-lg bg-white/30 backdrop-blur-md border border-white/10 shadow-lg rounded-lg relative">
+      <Card className="w-full max-w-lg backdrop-blur-md border border-white/10 shadow-lg rounded-lg relative">
         <div
           className="absolute top-2 right-2 z-10"
           ref={dropdownRef}

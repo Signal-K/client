@@ -134,7 +134,7 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
                 )} */}
                 {selectedAnomaly && (
                     <ImageAnnotator
-                        otherAssets={imageUrls}
+                        // otherAssets={imageUrls}
                         anomalyType='planet'
                         missionNumber={1372001}
                         structureItemId={3103}
@@ -142,6 +142,7 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
                         annotationType='PH'
                         initialImageUrl={imageUrls[1]}
                         anomalyId={selectedAnomaly.id.toString()}
+                        //parentPlanetLocation...
                     />
                     // <ClassificationForm
                     //     anomalyId={selectedAnomaly.id.toString()}

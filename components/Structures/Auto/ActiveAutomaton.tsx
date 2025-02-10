@@ -12,7 +12,7 @@ import "../../../styles/Structures/MapHighlight.css";
 
 interface ActiveAutomatonForMiningProps {
   deposit: MineralDeposit;
-}
+};
 
 type SpeedLevel = 1 | 2 | 3;
 export type CapacityLevel = 1 | 2 | 3;

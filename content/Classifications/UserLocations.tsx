@@ -2,18 +2,18 @@
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface ClassificationConfiguration {
   classificationOptions: { [key: string]: any };
   temperature?: string;
   parentPlanetLocation?: number;
-}
+};
 
 interface Classification {
   author: string;
   id: number;
   content: string;
-  title: string;
   classificationtype: string;
   anomaly: number;
   media: (string | { uploadUrl?: string })[] | null;
@@ -22,11 +22,12 @@ interface Classification {
   images?: string[];
   anomalyContent?: string;
   relatedClassifications?: Classification[];
-}
+};
 
 export default function MySettlementsLocations() {
   const supabase = useSupabaseClient();
   const session = useSession();
+  const router = useRouter();
 
   const [myLocations, setMyLocations] = useState<Classification[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -37,7 +38,7 @@ export default function MySettlementsLocations() {
       setError("User is not logged in.");
       setLoading(false);
       return;
-    }
+    };
 
     try {
       const { data: locationClassificationData, error: lcError } = await supabase
@@ -89,7 +90,7 @@ export default function MySettlementsLocations() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     fetchUserLocationClassifications();
@@ -114,14 +115,13 @@ export default function MySettlementsLocations() {
           key={location.id}
           className="p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]"
         >
-          <h3 className="font-bold text-lg">{location.title || `Location #${location.id}`}</h3>
-          <p>{location.content || "No description available."}</p>
-          {location.anomalyContent && (
-            <p className="mt-2 text-sm text-gray-300">
-              Related Anomaly: {location.anomalyContent}
-            </p>
-          )}
-          {location.relatedClassifications && location.relatedClassifications.length > 0 && (
+          <h3 className="font-bold text-lg">
+            {location.anomalyContent || `Location #${location.id}`}
+          </h3>
+          <p>{location.content || ""}</p>
+          {location.images && location.images.length > 0 && (
+            <div className="mt-2">
+              {location.relatedClassifications && location.relatedClassifications.length > 0 && (
             <div className="mt-4">
               <h4 className="font-semibold text-md">Related Classifications:</h4>
               <ul className="list-disc list-inside text-sm text-gray-300">
@@ -133,8 +133,6 @@ export default function MySettlementsLocations() {
               </ul>
             </div>
           )}
-          {location.images && location.images.length > 0 && (
-            <div className="mt-2">
               {location.images.map((image, index) => (
                 <img
                   key={index}
@@ -145,6 +143,12 @@ export default function MySettlementsLocations() {
               ))}
             </div>
           )}
+          <button
+            onClick={() => router.push(`/planets/${location.id}`)}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
+          >
+            View Classification
+          </button>
         </div>
       ))}
     </div>

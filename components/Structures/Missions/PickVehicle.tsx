@@ -12,7 +12,7 @@ const automatons: Vehicle[] = [
       id: "1",
       name: "Visual Satellite",
       description: "Use this to find landmarks and sites on the planet you chose. Recommended for Planet Four & Cloudspotting",
-      icon: "truck",
+      image: '/assets/Automatons/ExploreRover1.png', // Need to find a new asset for satellites; link to automaton entry in db table and api route
       stats: {
         speed: 65,
         armor: 30,
@@ -21,11 +21,11 @@ const automatons: Vehicle[] = [
       cost: 1,
       quantity: 0,
     },
-    {
+    { 
       id: "2",
       name: "Scout Rover",
       description: "Help train these rovers to better understand their surroundings and find deposits and terrain. Recommended for AI For Mars",
-      icon: "scout",
+      image: '/assets/Automatons/ExploreRover1.png',
       stats: {
         speed: 65,
         armor: 30,
@@ -33,7 +33,7 @@ const automatons: Vehicle[] = [
       },
       cost: 1,
       quantity: 0,
-    },
+    }, //points also show storms/clouds
 ];
 
 export default function PickAutomatonForPickPlanet({
@@ -41,16 +41,9 @@ export default function PickAutomatonForPickPlanet({
 }: PickAutomatonForPickPlanetProps) {
   const formatNumber = (num: number) => new Intl.NumberFormat().format(num);
 
-  const renderIcon = (iconName: string) => {
-    switch (iconName) {
-      case "truck":
-        return <Rocket className="w-24 h-24 text-primary" />;
-      case "scout":
-        return <Search className="w-24 h-24 text-accent" />;
-      default:
-        return <Truck className="w-24 h-24 text-muted" />;
-    };
-  };
+  const renderVehicleImage = (imageSrc: string) => (
+    <img src={imageSrc} alt="Vehicle" className="w-24 h-24 object-contain" />
+  );  
 
   const [pointsData, setPointsData] = useState<{
     planetHuntersPoints: number;
@@ -98,11 +91,10 @@ export default function PickAutomatonForPickPlanet({
             className="rounded-lg shadow overflow-hidden group hover:shadow-lg transition-shadow"
           >
             <div className="relative h-48 bg-gradient-to-br from-muted/80 to-muted flex items-center justify-center p-6 border-b">
-              <div className="transform group-hover:scale-110 transition-transform">
-                {renderIcon(vehicle.icon)}
-              </div>
-            </div>
-
+  <div className="transform group-hover:scale-110 transition-transform">
+    {renderVehicleImage(vehicle.image)}
+  </div>
+</div>
             <div className="p-6 space-y-2">
               <div className="flex items-start justify-between">
                 <div>

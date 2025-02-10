@@ -6,6 +6,7 @@ import { FirstTelescopeClassification, StarterTelescopeTess } from "@/components
 import VotePlanetClassifictions from "./PHVote";
 import PHClassificationGenerator from "./PlanetMaker";
 import PlanetTemperatureForm from "./PlanetTemperature";
+import PlanetHuntersTemperatureWrapper from "./PlanetTemperature";
 
 interface MissionStep {
   id: number;
@@ -48,16 +49,16 @@ const PlanetHuntersSteps = () => {
           .select("*")
           .eq("classificationtype", "planet")
           .eq("author", session.user.id);
-
+    
         if (classificationsError) throw classificationsError;
-
+    
         const mission1CompletedCount = classificationsData?.length || 0;
-
+    
         const mission2Data =
           classificationsData?.filter((classification) => {
             const config = classification.classificationConfiguration;
             if (!config) return false;
-
+    
             const options = config.classificationOptions?.[""] || {};
             return (
               !options["1"] &&
@@ -65,25 +66,25 @@ const PlanetHuntersSteps = () => {
             );
           }) || [];
         const mission2CompletedCount = mission2Data.length;
-
+    
         const { data: commentsData, error: commentsError } = await supabase
           .from("comments")
           .select("*")
           .eq("author", session.user.id);
-
+    
         if (commentsError) throw commentsError;
-
+    
         const mission3CompletedCount = commentsData?.filter(
           (comment) => comment.configuration?.planetType
         ).length || 0;
-
+    
         const { data: votesData, error: votesError } = await supabase
           .from("votes")
           .select("*")
           .eq("user_id", session.user.id);
-
+    
         if (votesError) throw votesError;
-
+    
         const planetVotes = votesData?.filter((vote) =>
           classificationsData?.some(
             (classification) =>
@@ -92,17 +93,12 @@ const PlanetHuntersSteps = () => {
           )
         ) || [];
         const mission4CompletedCount = planetVotes.length;
-
+    
         const mission5CompletedCount = commentsData?.filter(
           (comment) =>
-            comment.classification_id &&
-            classificationsData?.some(
-              (classification) =>
-                classification.id === comment.classification_id &&
-                classification.classificationtype === "planet"
-            )
+            comment.configuration?.temperature
         ).length || 0;
-
+    
         const totalPoints = (
           mission1CompletedCount * missionPoints[1] +
           mission2CompletedCount * missionPoints[2] +
@@ -110,11 +106,11 @@ const PlanetHuntersSteps = () => {
           mission4CompletedCount * missionPoints[4] +
           mission5CompletedCount * missionPoints[5]
         );
-
+    
         const newLevel = Math.floor(totalPoints / 9) + 1;
         setLevel(newLevel);
         setExperiencePoints(totalPoints);
-
+    
         setSteps([
           {
             id: 1,
@@ -161,11 +157,10 @@ const PlanetHuntersSteps = () => {
             title: "Calculate planetary temperatures",
             description: "Use satellite data to help determine the temperature of planets you've discovered",
             action: () => {},
-            // completedCount: mission4CompletedCount
             color: 'text-yellow-700',
-            chapter: 1,
+            chapter: 2,
             icon: "symbol",
-            completedCount: 0
+            completedCount: mission5CompletedCount,
           },
           {
             id: 6,
@@ -178,13 +173,13 @@ const PlanetHuntersSteps = () => {
             chapter: 2,
           },
         ]);
-
+    
         setLoading(false);
       } catch (error) {
         console.error("Error fetching mission data:", error);
         setLoading(false);
-      }
-    };
+      };
+    };    
 
     fetchMissionData();
   }, [supabase, session?.user]);
@@ -207,7 +202,7 @@ const PlanetHuntersSteps = () => {
               {selectedMission.id === 2 && <StarterTelescopeTess />}
               {selectedMission.id === 3 && <PlanetTypeCommentForm />}
               {selectedMission.id === 4 && <VotePlanetClassifictions />}
-              {selectedMission.id === 5 && <PlanetTemperatureForm />}
+              {selectedMission.id === 5 && <PlanetHuntersTemperatureWrapper />}
               {selectedMission.id === 6 && <PHClassificationGenerator />}
               {selectedMission.id === 1000 && <FirstTelescopeClassification anomalyid={"6"} />}
             </center>
@@ -248,8 +243,8 @@ const PlanetHuntersSteps = () => {
           <p className="text-xl font-bold">{completedCount}</p>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const filteredSteps = steps.filter((step) => step.chapter === currentChapter);
 
