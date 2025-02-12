@@ -45,6 +45,7 @@ export function SurveyorComments({
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
   const [newComment, setNewComment] = useState<string>("");
   const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
+  const [temperatureInput, setTemperatureInput] = useState<string>("");
   const [isSharing, setIsSharing] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
@@ -102,15 +103,17 @@ export function SurveyorComments({
       fetchComments();
     } catch (error) {
       console.error("Error adding comment:", error);
-    }
+    };
   };
 
   const handleProposePlanetType = async (planetType: "Terrestrial" | "Gaseous") => {
     const commentInput = commentInputs[classificationId];
+
     if (!commentInput) {
       console.error("Comment input is required");
       return;
-    }
+    };
+
     try {
       const { error } = await supabase
         .from("comments")
@@ -120,6 +123,7 @@ export function SurveyorComments({
             classification_id: classificationId,
             author: session?.user?.id,
             configuration: { planetType },
+            surveyor: "TRUE",
           },
         ]);
       if (error) throw error;
@@ -128,6 +132,30 @@ export function SurveyorComments({
     } catch (error) {
       console.error("Error inserting comment:", error);
     };
+  };
+
+  const handleAddTemperatureComment = async () => {
+    if (!temperatureInput.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: temperatureInput,
+            classification_id: classificationId,
+            author: session?.user?.id,
+            configuration: { temperature: temperatureInput },
+            surveyor: "TRUE",
+          },
+        ]);
+
+      if (error) throw error;
+      setTemperatureInput("");
+      fetchComments();
+    } catch (error) {
+      console.error("Error adding temperature comment:", error);
+    }
   };
 
   const handleSelectPreferredComment = async (commentId: number) => {
@@ -182,6 +210,19 @@ export function SurveyorComments({
                     Propose Gaseous
                   </Button>
                 </div>
+
+                <Textarea
+                  value={temperatureInput}
+                  onChange={(e) => setTemperatureInput(e.target.value)}
+                  placeholder="Suggest a temperature..."
+                  rows={3}
+                  className="w-full"
+                />
+                <div className="flex space-x-2">
+                  <Button onClick={handleAddTemperatureComment}>
+                    Propose Temperature
+                  </Button>
+                </div>
               </div>
             <div className="mt-4 space-y-2">
               {loadingComments ? (
@@ -196,6 +237,7 @@ export function SurveyorComments({
                     replyCount={0}
                     parentCommentId={classificationId}
                     isSurveyor={comment.isSurveyor}
+                    configuration={comment.configuration}
                   >
                       <div className="flex justify-between items-center">
                         <p className="text-xs text-gray-600">

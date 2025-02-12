@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
@@ -20,70 +20,45 @@ import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatelli
 
 export default function Home() {
   const session = useSession();
-
+  const supabase = useSupabaseClient();
   const { activePlanet } = useActivePlanet();
+  const [hasRequiredItems, setHasRequiredItems] = useState<boolean | null>(null);
 
   useEffect(() => {
-    console.log(session?.user.id);
-  });
+    if (!session) return;
 
-  const planetViews: Record<number, JSX.Element> = {
-    // 30: <EarthScene
-    //   topSection={
-    //     <EnhancedWeatherEvents />
-    //   }
-    //   middleSection={
-    //     <StructuresOnPlanet />
-    //   }
-    //   middleSectionTwo={
-    //     <AllAutomatonsOnActivePlanet />
-    //   }
-    // />,
-    30: <EarthViewLayout>
-      <div className="w-full">
-        <Navbar />
-        <div className="flex flex-row space-y-4"></div>
-        <div className="py-3">
-          <div className="py-1">
-            {/* <EnhancedWeatherEvents /> */}
-          </div>
-          <center> 
-            <OrbitalStructuresOnPlanet />
-          </center>
-        </div>
-      </div>
-      <div className="w-full">
-        <div className="py-2">
-          <center>
-            <AllSatellitesOnActivePlanet />
-            <AtmosphereStructuresOnPlanet />
-          </center>
-        </div>
-      </div>
-      <div className="w-full py-2">
-        <center>
-          <StructuresOnPlanet />
-          <AllAutomatonsOnActivePlanet />
-        </center>
-      </div>
-      {/* <div className="w-full py-2"><StructureMissionGuide /> */}
-      <div className="w-full py-2"><SimpleeMissionGuide />
-  </div>
-    </EarthViewLayout>
-    // 60: <SaturnView />,
-    // 62: <TitanView />,
-    // 61: <EnceladusView />,
-    // 70: <UranusView />,
-    // 71: <MirandaView />,
-    // 80: <NeptuneView />,
-    // 81: <TritonView />,
-    // 90: <PlutoView />,
-    // <MiningView />,
-  };
+    const checkInventory = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("inventory")
+          .select("id, quantity")
+          .eq("owner", session.user.id)
+          .in("item", [3105, 3104, 3103])
+          .gt("quantity", 0);
+
+        if (error) throw error;
+
+        setHasRequiredItems(data.length > 0);
+      } catch (error: any) {
+        console.error("Error checking inventory:", error.message);
+        setHasRequiredItems(false);
+      }
+    };
+
+    checkInventory();
+  }, [session, supabase]);
 
   if (!session) {
     return <LoginPage />;
-  };
+  }
+
+  if (hasRequiredItems === null) {
+    return <div>Loading...</div>;
+  }
+
+  if (!hasRequiredItems) {
+    return <Onboarding />;
+  }
 
   return (
     <EarthViewLayout>
@@ -113,9 +88,7 @@ export default function Home() {
           <AllAutomatonsOnActivePlanet />
         </center>
       </div>
-      {/* <div className="w-full py-2"><StructureMissionGuide /> */}
-      <div className="w-full py-2"><SimpleeMissionGuide />
-      </div>
+      <div className="w-full py-2"><SimpleeMissionGuide /></div>
     </EarthViewLayout>
   );
 };

@@ -348,7 +348,7 @@ export function PostCardSingle({
                   Submit Comment
                 </Button>
                 <Button onClick={() => setShowStats(!showStats)} variant="outline">
-                  Show Stats
+                  Propose new stats
                 </Button>
               </CardFooter>
             </div>

@@ -43,21 +43,41 @@ export default function VotePlanetClassifictions() {
       
           if (error) throw error;
       
+          // const processedData = data.map((classification) => {
+          //   const media = classification.media;
+          //   let images: string[] = [];
+      
+          //   if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
+          //     images.push(media[1]);
+          //   } else if (media && media.uploadUrl) {
+          //     images.push(media.uploadUrl);
+          //   }
+      
+          //   const votes = classification.classificationConfiguration?.votes || 0;
+      
+          //   return { ...classification, images, votes };
+          // });
+      
           const processedData = data.map((classification) => {
             const media = classification.media;
-            let images: string[] = [];
-      
-            if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
-              images.push(media[1]);
-            } else if (media && media.uploadUrl) {
-              images.push(media.uploadUrl);
+            let image: string | null = null;
+        
+            if (Array.isArray(media)) {
+                for (const subArray of media) {
+                    if (Array.isArray(subArray) && subArray.length > 0) {
+                        image = subArray[0];
+                        break;
+                    }
+                }
+            } else if (media && typeof media.uploadUrl === "string") {
+                image = media.uploadUrl;
             }
-      
+        
             const votes = classification.classificationConfiguration?.votes || 0;
-      
-            return { ...classification, images, votes };
-          });
-      
+        
+            return { ...classification, image, votes };
+        });
+        
           setClassifications(processedData);
         } catch (error) {
           console.error("Error fetching classifications:", error);
@@ -118,7 +138,8 @@ export default function VotePlanetClassifictions() {
                   votes={classification.votes || 0}
                   category={classification.category}
                   tags={classification.tags || []}
-                  images={classification.images || []}
+                  images={classification.image ? [classification.image] : []}
+                  // images={classification.images || []}
                   anomalyId={classification.anomaly}
                   classificationConfig={classification.classificationConfiguration}
                   classificationType={classification.classificationtype}
