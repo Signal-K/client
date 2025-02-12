@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
 import { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
-import type { PlanetStats } from '../utils/planet-physics'
+import type { PlanetStats } from '@/utils/planet-physics';
 
 interface PlanetVisualizationProps {
   stats: PlanetStats
@@ -152,5 +152,4 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
       <svg ref={svgRef} />
     </div>
   )
-}
-
+};

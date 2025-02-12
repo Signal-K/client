@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { Slider } from "@/components/ui/slider"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { determineLiquidType } from "../utils/planet-physics"
-import type { PlanetStats } from "../utils/planet-physics"
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { determineLiquidType } from "@/utils/planet-physics";
+import type { PlanetStats } from "@/utils/planet-physics";
 
 interface PlanetControlsProps {
   stats: PlanetStats
@@ -17,7 +17,7 @@ interface PlanetControlsProps {
   onOrbitalPeriodChange: (value: number) => void
   onTypeOverride: (type: "terrestrial" | "gaseous" | null) => void
   onShowLiquidChange: (value: boolean) => void
-}
+};
 
 function calculateBiomeTemperatures(stats: PlanetStats) {
   const baseTemp = stats.temperature ?? 300 // Default to 300K if undefined
@@ -28,8 +28,8 @@ function calculateBiomeTemperatures(stats: PlanetStats) {
     beach: Math.round(baseTemp),
     ground: Math.round(baseTemp + 5),
     mountain: Math.round(baseTemp - 15),
-  }
-}
+  };
+};
 
 export function PlanetControls({
   stats,
@@ -106,13 +106,13 @@ export function PlanetControls({
           </div>
         )}
 
-        <div className="space-y-1">
+        {/* <div className="space-y-1">
           <Label>Biome Temperatures</Label>
           <div className="text-sm">Ocean: {biomeTemperatures.ocean}K</div>
           <div className="text-sm">Beach: {biomeTemperatures.beach}K</div>
           <div className="text-sm">Ground: {biomeTemperatures.ground}K</div>
           <div className="text-sm">Mountain: {biomeTemperatures.mountain}K</div>
-        </div>
+        </div> */}
 
         <div className="flex space-x-2">
           <Button
@@ -127,6 +127,5 @@ export function PlanetControls({
         </div>
       </CardContent>
     </Card>
-  )
-}
-
+  );
+};

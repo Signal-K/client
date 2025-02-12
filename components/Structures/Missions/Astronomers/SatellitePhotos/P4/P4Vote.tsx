@@ -44,7 +44,6 @@ export default function VoteP4Classifications() {
       
           const processedData = data.map((classification) => {
             const media = classification.media;
-            console.log('FUCK');
             console.log(classification.media);
             let images: string[] = [];
           

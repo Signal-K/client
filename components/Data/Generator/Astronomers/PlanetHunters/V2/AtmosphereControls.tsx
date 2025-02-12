@@ -1,10 +1,10 @@
 "use client"
 
-import { Slider } from "@/components/ui/slider"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { Button } from "@/components/ui/button"
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 
 interface AtmosphereControlsProps {
   atmosphereOpacity: number
@@ -88,6 +88,5 @@ export function AtmosphereControls({
         )}
       </CardContent>
     </Card>
-  )
-}
-
+  );
+};

@@ -4,7 +4,7 @@ import { useRef, useEffect } from "react"
 import { Canvas, useThree } from "@react-three/fiber"
 import { OrbitControls, Stars } from "@react-three/drei"
 import { PlanetMesh } from "./planet-mesh"
-import type { PlanetStats } from "../utils/planet-physics"
+import type { PlanetStats } from "@/utils/planet-physics";
 
 interface PlanetSceneProps {
   stats: PlanetStats
@@ -84,5 +84,4 @@ export function PlanetScene({
       </Canvas>
     </div>
   )
-}
-
+};
