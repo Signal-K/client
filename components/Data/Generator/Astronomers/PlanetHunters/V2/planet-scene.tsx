@@ -43,15 +43,19 @@ function Scene({
 
   return (
     <>
-<PlanetMesh
-  stats={{ ...stats, temperature: stats.temperature ?? 0 }}
-  atmosphereOpacity={atmosphereOpacity}
-  showAtmosphere={showAtmosphere}
-  showLiquid={showLiquid}
-  atmosphereOffset={atmosphereOffset}
-  splitMeshes={splitMeshes}
-  storms={storms}
-/>
+      <PlanetMesh
+        stats={{
+          ...stats,
+          temperature: stats.temperature ?? 0,
+          type: stats.type ?? "terrestrial", // Ensure type is defined, fallback to "terrestrial"
+        }}
+        atmosphereOpacity={atmosphereOpacity}
+        showAtmosphere={showAtmosphere}
+        showLiquid={showLiquid}
+        atmosphereOffset={atmosphereOffset}
+        splitMeshes={splitMeshes}
+        storms={storms}
+      />
       <OrbitControls ref={controlsRef} enablePan={false} />
     </>
   )

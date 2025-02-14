@@ -12,7 +12,7 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
   const svgRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
-    if (!svgRef.current) return
+    if (!svgRef.current || !stats.type) return // Add check for undefined type
 
     const width = 500
     const height = 500

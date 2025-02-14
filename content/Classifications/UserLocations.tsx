@@ -3,6 +3,7 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import ClassificationComments from "./ClassificationStats";
 
 interface ClassificationConfiguration {
   classificationOptions: { [key: string]: any };
@@ -110,47 +111,54 @@ export default function MySettlementsLocations() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {myLocations.map((location) => (
-        <div
-          key={location.id}
-          className="p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]"
-        >
-          <h3 className="font-bold text-lg">
-            {location.anomalyContent || `Location #${location.id}`}
-          </h3>
-          <p>{location.content || ""}</p>
-          {location.images && location.images.length > 0 && (
-            <div className="mt-2">
-              {location.relatedClassifications && location.relatedClassifications.length > 0 && (
-            <div className="mt-4">
-              <h4 className="font-semibold text-md">Related Classifications:</h4>
-              <ul className="list-disc list-inside text-sm text-gray-300">
-                {location.relatedClassifications.map((related) => (
-                  <li key={related.id}>
-                    {related.content || `Classification #${related.id}`}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-              {location.images.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Location ${location.id} - Image ${index + 1}`}
-                  className="w-full h-auto rounded-md"
-                />
-              ))}
-            </div>
-          )}
-          <button
-            onClick={() => router.push(`/planets/${location.id}`)}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
+      {myLocations
+         // Ensure only "planet" classifications are shown
+        .map((location) => (
+          <div
+            key={location.id}
+            className="p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]"
           >
-            View Classification
-          </button>
-        </div>
-      ))}
+            <h3 className="font-bold text-lg">
+              {location.anomalyContent || `Location #${location.id}`}
+            </h3>
+            <p>{location.content || ""}</p>
+  
+            {location.images && location.images.length > 0 && (
+              <div className="mt-2">
+                {location.relatedClassifications && location.relatedClassifications.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-md">Related Classifications:</h4>
+                    <ul className="list-disc list-inside text-sm text-gray-300">
+                      {location.relatedClassifications.map((related) => (
+                        <li key={related.id}>
+                          {related.content || `Classification #${related.id}`}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {location.images.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Location ${location.id} - Image ${index + 1}`}
+                    className="w-full h-auto rounded-md"
+                  />
+                ))}
+              </div>
+            )}
+  
+          {/* <ClassificationComments classification={location} /> */}
+  
+            <button
+              onClick={() => router.push(`/planets/${location.id}`)}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
+            >
+              View Classification
+            </button>
+          </div>
+        ))}
+        Show asteroids and non-planet location anomalies here (below)
     </div>
-  );
+  );  
 };
