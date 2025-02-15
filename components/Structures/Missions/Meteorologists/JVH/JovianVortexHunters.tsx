@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../BasePlate";
+import { JVHWrapper } from "@/components/Projects/Lidar/JovianVortexHunter";
 import { CloudCogIcon, CloudHail, HelpCircle, ShovelIcon } from "lucide-react";
 import { LidarJVHSatellite, StarterJovianVortexHunter } from "@/components/Projects/Lidar/JovianVortexHunter";
 import VoteJVH from "./JVHVote";
@@ -43,7 +44,7 @@ const JovianVortexHunters = () => {
             icon: CloudCogIcon,
             points: 2,
             completedCount: 0,
-            internalComponent: () => <LidarJVHSatellite />,
+            internalComponent: () => <LidarJVHSatellite anomalyid={4} />, // <JVHWrapper />
             color: "text-blue-500",
         },
         {
