@@ -98,30 +98,35 @@ export default function AllAutomatonsOnActivePlanet() {
                         <img 
                             src={automaton.iconUrl} 
                             alt={`Automaton ${automaton.id}`} 
-                            className="w-16 h-16 object-cover cursor-pointer" 
+                            className="w-16 h-16 object-cover cursor-pointer"
+                            style={{ 
+                                position: 'absolute', 
+                                right: '10%',  
+                                transform: 'translateX(50%)'  
+                            }}  
                             onClick={handleAutomatonClick} 
                         />
                     </div>
                 ))}
             </div>
-
-            {/* {isModalVisible && (
-                <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-                    onClick={handleOverlayClick}
-                >
-                    <div className="relative bg-white w-1/2 h-1/2 p-4 overflow-y-auto">
-                        <button
-                            className="absolute top-2 right-2 text-2xl font-bold"
-                            onClick={closeModal}
-                        >
-                            &times;
-                        </button>
-
-                        <MiningComponentComponent />
-                    </div>
-                </div>
-            )} */}
         </div>
     );
 };
+
+ {/* {isModalVisible && (
+    <div 
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+        onClick={handleOverlayClick}
+    >
+        <div className="relative bg-white w-1/2 h-1/2 p-4 overflow-y-auto">
+            <button
+                className="absolute top-2 right-2 text-2xl font-bold"
+                onClick={closeModal}
+            >
+                &times;
+            </button>
+
+            <MiningComponentComponent />
+        </div>
+    </div>
+)} */}

@@ -115,7 +115,7 @@ export default function Home() {
       </div>
       {/* <div className="w-full py-2"><StructureMissionGuide /> */}
       <div className="w-full py-2"><SimpleeMissionGuide />
-  </div>
+      </div>
     </EarthViewLayout>
-  )
+  );
 };

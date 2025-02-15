@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +32,7 @@ interface StationCardProps {
   station: Station;
   onBuild: (id: string) => void;
   onView: (id: string) => void;
-}
+};
 
 export const iconMap = {
   Anchor,
@@ -86,7 +87,19 @@ function GameButton({
 }
 
 export function StationCard({ station, onBuild, onView }: StationCardProps) {
+  const router = useRouter(); // Initialize useRouter for navigation
   const StationIcon = iconMap[station.icon as keyof typeof iconMap];
+
+  // Function to handle view redirection based on biome
+  const handleView = (id: string, biome: string) => {
+    if (biome === "Desert") {
+      router.push("/scenes/desert");
+    } else if (biome === "Ocean") {
+      router.push("/scenes/ocean");
+    } else {
+      onView(id); // fallback to default onView action if biome is not Desert or Ocean
+    }
+  };
 
   return (
     <Card
@@ -162,7 +175,7 @@ export function StationCard({ station, onBuild, onView }: StationCardProps) {
 
           <div className="flex gap-2">
             {station.built && (
-              <GameButton onClick={() => onView(station.id)}>
+              <GameButton onClick={() => handleView(station.id, station.biome.name)}>
                 View Station
               </GameButton>
             )}

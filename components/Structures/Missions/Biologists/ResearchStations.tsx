@@ -89,7 +89,7 @@ export function GreenhouseResearchStations() {
   const [milestones, setMilestones] = useState<Milestone[]>(initialMilestones)
   const [loading, setLoading] = useState<boolean | null>(false);
   const [activeStation, setActiveStation] = useState<Station | null>(null);
-
+ 
   const closeModal = () => setActiveStation(null);
 
   const fetchStations = useCallback(async () => {

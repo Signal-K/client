@@ -241,31 +241,23 @@ export const StructuresConfig: StructureConfig = {
       ],
       buttons: [
         // {
-        //   icon: <TreePalmIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Greenhouse",
+        //   icon: <BriefcaseIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Burrowing Owls",
+        //   dynamicComponent: <BurrowingOwl />,
+        //   sizePercentage: 60,
         // },
         // {
-        //   icon: <PhoneIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Upload media"
-        // }
-        {
-          icon: <BriefcaseIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Burrowing Owls",
-          dynamicComponent: <BurrowingOwl />,
-          sizePercentage: 60,
-        },
-        {
-          icon: <SaladIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Iguanas",
-          dynamicComponent: <ZoodexIguanas />,
-          sizePercentage: 60,
-        },
-        {
-          icon: <FishIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Plankton",
-          dynamicComponent: <PlanktonPortal />,
-          sizePercentage: 80,
-        },
+        //   icon: <SaladIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Iguanas",
+        //   dynamicComponent: <ZoodexIguanas />,
+        //   sizePercentage: 60,
+        // },
+        // {
+        //   icon: <FishIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Plankton",
+        //   dynamicComponent: <PlanktonPortal />,
+        //   sizePercentage: 80,
+        // },
         {
           icon: <BeanIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "My Greenhouse Stations",
