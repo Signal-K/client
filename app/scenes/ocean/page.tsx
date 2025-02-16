@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { Bird, PawPrint } from "lucide-react";
-import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
-import { ZoodexIguanas } from "@/components/Projects/Zoodex/iguanasFromAbove";
+import { Fish } from "lucide-react";
+import { PlanktonPortalFrame } from "@/components/Projects/Zoodex/planktonPortal";
 import { BiomePattern } from "@/components/Structures/Missions/Biologists/BiomePattern";
 import { iconMap } from "@/components/Structures/Missions/Biologists/StationCard";
 import Navbar from "@/components/Layout/Navbar";
@@ -28,38 +27,27 @@ const fetchProjects = (): Project[] => {
   return [
     {
       id: 1,
-      station: 3104001,
-      biome: "Desert",
-      title: "Burrowing Owls",
-      icon: Bird,
+      station: 3104002,
+      biome: "Ocean",
+      title: "Plankton Portal",
+      icon: Fish,
       completedCount: 0,
-      internalComponent: () => <BurrowingOwl />,
-      color: "text-green-400",
-    },
-    {
-      id: 2,
-      station: 3104001,
-      biome: "Desert",
-      title: "Iguanas from Above",
-      icon: PawPrint,
-      completedCount: 5,
-      internalComponent: () => <ZoodexIguanas />,
-      color: "text-green-700",
+      internalComponent: () => <PlanktonPortalFrame />,
+      color: "text-blue-400",
     },
   ];
 };
 
-const DesertBaseEarthScene = () => {
+const OceanBaseEarthScene = () => {
   const [activeStation] = useState<any | null>({
-    id: 3104001,
-    name: "Desert Station",
-    description: "A station located in the desert biome.",
-    biome: "Desert",
+    id: 3104002,
+    name: "Ocean Station",
+    description: "A station located in the ocean biome focused on plankton research.",
+    biome: "Ocean",
     animals: [
-      { name: "Burrowing Owl", icon: "Bird" },
-      { name: "Iguana", icon: "PawPrint" },
+      { name: "Plankton", icon: "Fish" },
     ],
-    location: { coordinates: "23.6345° N, 46.8475° E", depth: "30m", altitude: "500m" },
+    location: { coordinates: "3.123° N, 51.567° W", depth: "200m" },
   });
   const [projects, setProjects] = useState<Project[]>([]);
 
@@ -76,12 +64,12 @@ const DesertBaseEarthScene = () => {
     <div className="relative h-screen w-full grid grid-rows-[auto_1fr_auto]">
       <img
         className="absolute inset-0 w-full h-full object-cover"
-        src="/assets/Backdrops/Earth.png"
-        alt="Earth Background"
+        src="/assets/Backdrops/Ocean.png"
+        alt="Ocean Background"
       />
       <Navbar />
       <div className="relative z-10 flex flex-col bg-black bg-opacity-60 p-5 md:p-10 rounded-lg overflow-hidden">
-        {/* <h1 className="text-3xl font-bold text-white text-center">Desert Station</h1> */}
+        <h1 className="text-3xl font-bold text-white text-center">Ocean Station</h1>
 
         <div className="mt-8 bg-gray-800 p-8 rounded-lg overflow-auto">
           <h2 className="text-3xl font-bold text-white">{activeStation.name} | {activeStation.id}</h2>
@@ -110,17 +98,6 @@ const DesertBaseEarthScene = () => {
             </div>
           </div>
 
-          {/* <div className="mt-6">
-            <h3 className="text-lg font-semibold text-blue-400">Location</h3>
-            <p className="text-white">{activeStation.location.coordinates}</p>
-            {activeStation.location.depth && (
-              <p className="text-white">{activeStation.location.depth}</p>
-            )}
-            {activeStation.location.altitude && (
-              <p className="text-white">{activeStation.location.altitude}</p>
-            )}
-          </div> */}
-
           <div className="mt-6">
             <h3 className="text-xl font-semibold text-white">Projects</h3>
             {projects.length > 0 ? (
@@ -144,4 +121,4 @@ const DesertBaseEarthScene = () => {
   );
 };
 
-export default DesertBaseEarthScene;
+export default OceanBaseEarthScene;

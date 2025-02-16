@@ -97,12 +97,17 @@ export default function AllSatellitesOnActivePlanet() {
                         <img 
                             src={satellite.iconUrl} 
                             alt={`Automaton ${satellite.id}`} 
-                            className="w-16 h-16 object-cover cursor-pointer" 
+                            className="w-16 h-16 object-cover cursor-pointer"
+                            style={{
+                                position: 'absolute',
+                                right: '30%', 
+                                transform: 'translateX(50%)' 
+                            }} 
                             onClick={handleAutomatonClick} 
                         />
                     </div>
                 ))}
             </div>
         </div>
-    )
+    );
 };

@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
 import { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
-import type { PlanetStats } from '@/utils/planet-physics'
+import type { PlanetStats } from '@/utils/planet-physics';
 
 interface PlanetVisualizationProps {
   stats: PlanetStats
@@ -12,7 +12,7 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
   const svgRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
-    if (!svgRef.current) return
+    if (!svgRef.current || !stats.type) return // Add check for undefined type
 
     const width = 500
     const height = 500
@@ -52,7 +52,7 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
           },
           properties: {
             elevation,
-            color: getColor(elevation, stats.density, stats.type || 'terrestrial') // Default to 'terrestrial' if type is undefined
+            color: getColor(elevation, stats.density, stats.type)
           }
         })
       }
@@ -152,4 +152,4 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
       <svg ref={svgRef} />
     </div>
   )
-}
+};

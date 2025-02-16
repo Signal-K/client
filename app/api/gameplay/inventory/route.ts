@@ -59,7 +59,7 @@ const inventoryItems: InventoryItem[] = [
 
   // Structures
   {
-    id: 3102, name: 'Automaton station', description: 'View, control and upgrade all your automatons and rovers here', cost: 1, icon_url: '/assets/Items/AutoController.png', ItemCategory: 'Structure', parentItem: 30, itemLevel: 1, locationType: 'Surface'
+    id: 3102, name: 'Automaton station', description: 'Control and upgrade your automatons here', cost: 1, icon_url: '/assets/Items/AutoController.png', ItemCategory: 'Structure', parentItem: 30, itemLevel: 1, locationType: 'Surface'
   },
   {
     id: 3103, name: 'Telescope', description: 'Space-based observations & classifications', icon_url: '/assets/Items/Telescope.png', ItemCategory: 'Structure', locationType: 'Surface'
@@ -83,33 +83,33 @@ const inventoryItems: InventoryItem[] = [
     ItemCategory: "Structure",
     locationType: 'Surface',
   },
-  {
-    id: 3107,
-    name: "Launchpad",
-    description: "Launch rockets and satellites",
-    icon_url: "/assets/Items/Launchpad.jpg",
-    ItemCategory: "Structure",
-    locationType: 'Surface',
-  },
-  {
-    id: 3108,
-    name: "First rocket",
-    description: "Travel the solar-system",
-    icon_url: "/assets/Items/Rocket.png",
-    ItemCategory: "Structure",
-    locationType: 'Atmosphere',
-  },
+  // {
+  //   id: 3107,
+  //   name: "Launchpad",
+  //   description: "Launch rockets and satellites",
+  //   icon_url: "/assets/Items/Launchpad.jpg", 
+  //   ItemCategory: "Structure",
+  //   locationType: 'Surface',
+  // },
+  // {
+  //   id: 3108,
+  //   name: "First rocket",
+  //   description: "Travel the solar-system",
+  //   icon_url: "/assets/Items/Rocket.png",
+  //   ItemCategory: "Structure",
+  //   locationType: 'Atmosphere',
+  // },
 
 
   // Classification structures introduced in C2
-  {
-    id: 31010,
-    name: "Physics Lab",
-    description: "Catalogue results from different particle experiments across the universe",
-    icon_url: "/assets/Items/PhysicsLab.png",
-    ItemCategory: "Structure",
-    locationType: 'Surface',
-  },
+  // {
+  //   id: 31010,
+  //   name: "Physics Lab",
+  //   description: "Catalogue results from different particle experiments across the universe",
+  //   icon_url: "/assets/Items/PhysicsLab.png",
+  //   ItemCategory: "Structure",
+  //   locationType: 'Surface',
+  // },
 
   // Community stations
   {

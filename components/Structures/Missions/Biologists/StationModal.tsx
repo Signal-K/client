@@ -10,7 +10,7 @@ import { ZoodexIguanas } from "@/components/Projects/Zoodex/iguanasFromAbove";
 interface Animal {
   name: string;
   icon: string;
-}
+};
 
 interface Project {
   id: number;
@@ -21,7 +21,7 @@ interface Project {
   completedCount: number;
   internalComponent?: React.ElementType;
   color: string;
-}
+};
 
 const fetchProjects = (): Project[] => {
   return [
@@ -61,7 +61,7 @@ const fetchProjects = (): Project[] => {
 interface StationModalProps {
   station: any;
   setActiveStation: (station: any | null) => void;
-}
+};
 
 export default function StationModal({ station, setActiveStation }: StationModalProps) {
   const [projects, setProjects] = useState<Project[]>([]);

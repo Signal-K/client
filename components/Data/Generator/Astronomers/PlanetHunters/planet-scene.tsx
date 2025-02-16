@@ -12,20 +12,19 @@ interface PlanetSceneProps {
 };
 
 export function PlanetScene({ stats, type }: PlanetSceneProps) {
+  const planetType = stats.type ?? "terrestrial"; // Fallback to "terrestrial" if undefined
+
   return (
     <div className="w-full h-[500px] bg-black rounded-lg overflow-hidden">
-            {type && (
-          <Button
-              variant="link"
-              className="mt-2 text-blue-500"
-              >
-              {type} Planet
-          </Button>
-        )}
+      {type && (
+        <Button variant="link" className="mt-2 text-blue-500">
+          {type} Planet
+        </Button>
+      )}
       <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
-        <PlanetMesh stats={stats} />
+        <PlanetMesh stats={{ ...stats, type: planetType }} />
         <Stars radius={300} depth={50} count={5000} factor={4} />
         <OrbitControls 
           enableZoom={false}

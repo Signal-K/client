@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
-import type { PlanetStats } from '@/utils/planet-physics'
+import type { PlanetStats } from '../utils/planet-physics'
 
 interface PlanetVisualizationProps {
   stats: PlanetStats
@@ -50,10 +50,6 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
             type: 'Point',
             coordinates: [lon, lat]
           },
-          properties: {
-            elevation,
-            color: getColor(elevation, stats.density, stats.type || 'terrestrial') // Default to 'terrestrial' if type is undefined
-          }
         })
       }
     }
@@ -153,3 +149,4 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
     </div>
   )
 }
+

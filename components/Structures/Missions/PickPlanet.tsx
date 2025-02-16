@@ -212,9 +212,10 @@ export function PreferredGaseousClassifications({
       const classificationIds = comments.map((comment) => comment.classification_id).filter(Boolean);
 
       if (classificationIds.length === 0) {
-        setClassifications([]);
+        // Set anomaly ID to "4" if no classifications found
+        setSelectedAnomaly(4);
         return;
-      }
+      };
 
       const { data: classificationsData, error: classificationsError } = await supabase
         .from("classifications")
@@ -261,7 +262,7 @@ export function PreferredGaseousClassifications({
       setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
-    }
+    };
   };
 
   useEffect(() => {
@@ -271,7 +272,7 @@ export function PreferredGaseousClassifications({
   const handleConfirmSelection = () => {
     if (selectedAnomaly && selectedVehicle) {
       onSelectAnomaly(selectedAnomaly, selectedVehicle);
-    }
+    };
   };
 
   return (
@@ -281,7 +282,7 @@ export function PreferredGaseousClassifications({
       ) : error ? (
         <p>{error}</p>
       ) : classifications.length === 0 ? (
-        <p>No classifications found for preferred terrestrial planets.</p>
+        <p>No classifications found for preferred gaseous planets.</p>
       ) : (
         <div
           className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ${

@@ -12,9 +12,13 @@ interface CommentCardProps {
   parentCommentId?: number | null;
   children?: React.ReactNode;
   isSurveyor?: boolean;
-};
+  configuration?: {
+    planetType?: string;
+    preferred?: boolean;
+  };
+}
   
-export function CommentCard({ author, content, createdAt, replyCount, parentCommentId, isSurveyor }: CommentCardProps) {
+export function CommentCard({ author, content, createdAt, replyCount, parentCommentId, isSurveyor, configuration }: CommentCardProps) {
   return (
     <Card className="w-full max-w-2xl mx-auto my-4 squiggly-connector bg-card text-card-foreground border-primary">
       <CardHeader>
@@ -24,6 +28,9 @@ export function CommentCard({ author, content, createdAt, replyCount, parentComm
             <CardTitle>{author}</CardTitle>
             {isSurveyor && (
               <p className="text-red-800">{isSurveyor}</p>
+            )}
+            {configuration?.planetType && (
+              <p className="text-green-200">{configuration.planetType}</p>
             )}
             {/* <p className="text-sm text-muted-foreground">Posted at {new Date(createdAt).toLocaleString()}</p> */}
           </div>

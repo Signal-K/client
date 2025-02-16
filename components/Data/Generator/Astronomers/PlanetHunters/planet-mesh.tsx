@@ -414,6 +414,7 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
     </>
   );
 };
+
 import { determineLiquidType } from "@/utils/planet-physics"
 
 interface PlanetMeshLiquidProps {

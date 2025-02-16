@@ -166,46 +166,46 @@ export default function StructuresOnPlanet({ author }: Props) {
   }; 
 
   return (
-    <div className="relative">
-            <div className={`grid grid-cols-4 gap-1 gap-y-3 relative ${userStructuresOnPlanet.length === 1 ? 'justify-center' : ''}`}>
-                {userStructuresOnPlanet.map((structure) => {
-                    const itemDetail = itemDetails.get(structure.item);
-
-                    return itemDetail ? (
-                        <div key={structure.id} className={`flex flex-col items-center space-y-2 ${userStructuresOnPlanet.length === 1 ? 'mx-auto' : ''}`}>
-                            <img
-                                src={itemDetail.icon_url}
-                                alt={itemDetail.name}
-                                className={`w-24 h-24 object-cover cursor-pointer ${structure.item === missionStructureId ? 'bouncing-structure' : 'moving-structure'}`}
-                                onClick={() => handleIconClick(itemDetail.id, structure.id)}
-                            />
-                            {!author && (
-                              <p className="text-white text-sm mt-2">{itemDetail.name}</p>
-                            )}
-                        </div>
-                    ) : null;
-                })}
-            </div>
-
-            {selectedStructure && (
-                <IndividualStructure
-                    key={selectedStructure.name}
-                    name={selectedStructure.name}
-                    title={selectedStructure.title}
-                    labels={selectedStructure.labels}
-                    imageSrc={selectedStructure.imageSrc}
-                    actions={selectedStructure.actions}
-                    buttons={selectedStructure.buttons}
-                    structureId={selectedStructure.structureId}
-                    onClose={handleClose}
-                />
-            )}
-            {!author && (
-              <UnownedSurfaceStructures />
-            )}
-            {/* <CreateCommunityStation /> */}
-            {/* <StationsOnPlanetOpen /> */}
+<div className="relative">
+  <div className={`grid px-11 grid-cols-4 gap-1 gap-y-3 relative ${userStructuresOnPlanet.length === 1 ? 'justify-center' : 'justify-between'}`}>
+    {userStructuresOnPlanet.map((structure, index) => {
+      const itemDetail = itemDetails.get(structure.item);
+      return itemDetail ? (
+        <div 
+          key={structure.id} 
+          className={`flex flex-col items-center space-y-2 ${index === 1 ? 'justify-self-center' : ''}`}
+        >
+          <img
+            src={itemDetail.icon_url}
+            alt={itemDetail.name}
+            className={`w-24 h-24 object-cover cursor-pointer ${structure.item === missionStructureId ? 'bouncing-structure' : 'moving-structure'}`}
+            onClick={() => handleIconClick(itemDetail.id, structure.id)}
+          />
+          {!author && (
+            <p className="text-white text-sm mt-2">{itemDetail.name}</p>
+          )}
         </div>
+      ) : null;
+    })}
+  </div>
+
+  {selectedStructure && (
+    <IndividualStructure
+      key={selectedStructure.name}
+      name={selectedStructure.name}
+      title={selectedStructure.title}
+      labels={selectedStructure.labels}
+      imageSrc={selectedStructure.imageSrc}
+      actions={selectedStructure.actions}
+      buttons={selectedStructure.buttons}
+      structureId={selectedStructure.structureId}
+      onClose={handleClose}
+    />
+  )}
+  {!author && (
+    <UnownedSurfaceStructures />
+  )}
+</div>
   );
 };
 
@@ -440,7 +440,7 @@ export function AtmosphereStructuresOnPlanet() {
 
   return (
     <div className="relative">
-      <div className="grid grid-cols-4 gap-1 gap-y-3 relative">
+      <div className="grid grid-cols-1 gap-4 justify-items-center" style={{ marginLeft: "-14%" }}>
         {userStructuresOnPlanet.map((structure) => {
           const itemDetail = itemDetails.get(structure.item);
 
@@ -473,4 +473,4 @@ export function AtmosphereStructuresOnPlanet() {
       )}
     </div>
   );
-}
+};

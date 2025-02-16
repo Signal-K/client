@@ -13,7 +13,7 @@ const Register = () => {
     useEffect(() => {
         if (session) {
             router.push('/');
-        }
+        };
     }, [session, router]);
 
     return (

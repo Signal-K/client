@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
 import { AvatarGenerator } from '@/components/Account/Avatar';
-import html2canvas from 'html2canvas'
+import html2canvas from 'html2canvas';
+import { SurveyorComments } from "./Surveyor/SurveyorPostCard";
 
 interface CommentProps {
   id: number;
@@ -66,6 +67,7 @@ export function PostCardSingle({
   const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
   const [isSharing, setIsSharing] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
+  const [showStats, setShowStats] = useState(false);
 
   const [surveyorComments, setSurveyorComments] = useState<any[]>([]);
   const [nonSurveyorComments, setNonSurveyorComments] = useState<any[]>([]);
@@ -147,60 +149,6 @@ export function PostCardSingle({
     }
   };
 
-  const handleProposePlanetType = async (planetType: "Terrestrial" | "Gaseous") => {
-    const commentInput = commentInputs[classificationId];
-    if (!commentInput) {
-      console.error("Comment input is required");
-      return;
-    }
-    try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: commentInput,
-            classification_id: classificationId,
-            author: session?.user?.id,
-            configuration: { planetType },
-          },
-        ]);
-      if (error) throw error;
-      setCommentInputs((prev) => ({ ...prev, [classificationId]: "" }));
-      fetchComments();
-    } catch (error) {
-      console.error("Error inserting comment:", error);
-    };
-  };
-
-  const handleSelectPreferredComment = async (commentId: number) => {
-    const selectedComment = comments.find((comment) => comment.id === commentId);
-    if (!selectedComment) return;
-
-    const planetType = selectedComment.configuration?.planetType;
-    if (!planetType) return;
-
-    try {
-      const { error } = await supabase
-        .from("classifications")
-        .update({
-          classificationConfiguration: {
-            ...classificationConfig,
-            classificationOptions: {
-              ...classificationConfig?.classificationOptions,
-              planetType: [...(classificationConfig?.classificationOptions?.planetType || []), planetType],
-            },
-          },
-        })
-        .eq("id", classificationId);
-
-      if (error) throw error;
-
-      console.log("Preferred planet type updated:", planetType);
-    } catch (error) {
-      console.error("Error updating preferred comment:", error);
-    };
-  };
-
   const [currentIndex, setCurrentIndex] = React.useState(0);
 
   const goToNextImage = () => {
@@ -280,11 +228,6 @@ export function PostCardSingle({
   };  
 
   useEffect(() => {
-    console.log('FUCK');
-    console.log({images});
-  }, []);
-
-  useEffect(() => {
     console.log("Images prop received:", images);
   }, [images]);  
 
@@ -293,9 +236,7 @@ export function PostCardSingle({
       <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
         <CardHeader>
           <div className="flex items-center space-x-4">
-            {session && (
-              <AvatarGenerator author={session?.user.id} />
-            )}
+            {session && <AvatarGenerator author={session?.user.id} />}
             <div>
               <CardTitle>{title}</CardTitle>
               <p className="text-sm text-muted-foreground">by {author}</p>
@@ -303,9 +244,6 @@ export function PostCardSingle({
           </div>
         </CardHeader>
         <CardContent>
-        <p>{images}</p>
-        {images.length}
-
           <Badge variant="secondary">{category}</Badge>
           <p>{content}</p>
           {images.length > 0 && (
@@ -355,116 +293,105 @@ export function PostCardSingle({
             </Button>
           </div>
           <div className="relative" ref={dropdownRef}>
-  <Button
-    onClick={() => {
-      toggleDropdown();
-      handleShare();
-    }}
-    size="sm"
-    disabled={isSharing}
-    variant="outline"
-    className="flex items-center gap-2"
-  >
-    <Share2 className="mr-2" />
-    {isSharing ? "Sharing..." : "Share"}
-  </Button>
-  {dropdownOpen && (
-    <div className="absolute right-0 mt-2 w-72 bg-card border rounded shadow-md z-50 p-4">
-      <p className="text-sm mb-2">
-        Share this post:{" "}
-        <a
-          href={`https://starsailors.space/posts/${classificationId}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 underline"
-        >
-          starsailors.space/posts/{classificationId}
-        </a>
-      </p>
-      <div className="flex gap-2">
-        <Button onClick={handleCopyLink} className="flex-1">
-          Copy Link
-        </Button>
-        <Button onClick={handleShare}> Download postcard </Button>
-        <Button onClick={openPostInNewTab} className="flex-1">
-          Open
-        </Button>
-      </div>
-    </div>
-  )}
-</div>
-        </CardFooter>
-        {commentStatus !== false && (
-          <CardContent>
-            {enableNewCommentingMethod ? (
-              <div className="space-y-4">
-                <Textarea
-                  value={commentInputs[classificationId] || ""}
-                  onChange={(e) =>
-                    setCommentInputs((prev) => ({ ...prev, [classificationId]: e.target.value }))
-                  }
-                  placeholder="Propose a planet type..."
-                  rows={3}
-                  className="w-full"
-                />
-                <div className="flex space-x-2">
-                  <Button onClick={() => handleProposePlanetType("Terrestrial")}>
-                    Propose Terrestrial
+            <Button
+              onClick={() => {
+                toggleDropdown();
+                handleShare();
+              }}
+              size="sm"
+              disabled={isSharing}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Share2 className="mr-2" />
+              {isSharing ? "Sharing..." : "Share"}
+            </Button>
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-72 bg-card border rounded shadow-md z-50 p-4">
+                <p className="text-sm mb-2">
+                  Share this post:{" "}
+                  <a
+                    href={`https://starsailors.space/posts/${classificationId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    starsailors.space/posts/{classificationId}
+                  </a>
+                </p>
+                <div className="flex gap-2">
+                  <Button onClick={handleCopyLink} className="flex-1">
+                    Copy Link
                   </Button>
-                  <Button onClick={() => handleProposePlanetType("Gaseous")}>
-                    Propose Gaseous
+                  <Button onClick={handleShare}>Download postcard</Button>
+                  <Button onClick={openPostInNewTab} className="flex-1">
+                    Open
                   </Button>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-4">
-                <Textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Add your comment..."
-                  rows={3}
-                  className="w-full"
-                />
+            )}
+          </div>
+        </CardFooter>
+  
+        {commentStatus !== false && (
+          <CardContent>
+            <div className="space-y-4">
+              <Textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Add your comment..."
+                rows={3}
+                className="w-full"
+              />
+              <CardFooter className="flex flex-col gap-2">
                 <Button onClick={handleAddComment} className="w-full">
                   Submit Comment
                 </Button>
+                <Button onClick={() => setShowStats(!showStats)} variant="outline">
+                  Propose new stats
+                </Button>
+              </CardFooter>
+            </div>
+  
+            {!showStats ? (
+              <div className="mt-4 space-y-2">
+                {loadingComments ? (
+                  <p>Loading comments...</p>
+                ) : comments.length > 0 ? (
+                  comments.map((comment) => (
+                    <CommentCard
+                      key={comment.id}
+                      author={comment.author}
+                      content={comment.content}
+                      createdAt={comment.created_at}
+                      replyCount={0}
+                      parentCommentId={classificationId}
+                      isSurveyor={comment.isSurveyor}
+                    >
+                      {enableNewCommentingMethod && (
+                        <div className="flex justify-between items-center">
+                          <p className="text-xs text-gray-600">
+                            {comment.configuration?.planetType || "Unknown"}
+                          </p>
+                        </div>
+                      )}
+                    </CommentCard>
+                  ))
+                ) : (
+                  <p>No comments yet. Be the first to comment!</p>
+                )}
+              </div>
+            ) : (
+              <div className="mt-4 space-y-2">
+                <SurveyorComments
+                  classificationId={classificationId}
+                  author={author}
+                  anomalyId={anomalyId}
+                  classificationConfig={classificationConfig}
+                  commentStatus={commentStatus}
+                />
               </div>
             )}
-            <div className="mt-4 space-y-2">
-              {loadingComments ? (
-                <p>Loading comments...</p>
-              ) : comments.length > 0 ? (
-                comments.map((comment) => (
-                  <CommentCard
-                    key={comment.id}
-                    author={comment.author}
-                    content={comment.content}
-                    createdAt={comment.created_at}
-                    replyCount={0}
-                    parentCommentId={classificationId}
-                    isSurveyor={comment.isSurveyor}
-                  >
-                    {enableNewCommentingMethod && (
-                      <div className="flex justify-between items-center">
-                        <p className="text-xs text-gray-600">
-                          {comment.configuration?.planetType || "Unknown"}
-                        </p>
-                        {author === session?.user?.id && (
-                          <button
-                            onClick={() => handleSelectPreferredComment(comment.id)}
-                            className="text-blue-500 mt-2"
-                          >
-                            Mark as Preferred
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </CommentCard>
-                ))
-              ) : (
-                <p>No comments yet. Be the first to comment!</p>
-              )}
-            </div>
           </CardContent>
         )}
       </Card>

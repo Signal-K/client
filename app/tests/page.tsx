@@ -1,11 +1,14 @@
 "use client";
 
+import PlanetGenerator2 from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/PlanetGenerator2";
+import MySettlementsLocations from "@/content/Classifications/UserLocations";
+
 export default function TestPage() {
 
     return (
         // <StarnetLayout>
           <>
-            
+            <MySettlementsLocations />
           </>
         // {/* </StarnetLayout> */}
     );

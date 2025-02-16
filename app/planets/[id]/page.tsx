@@ -5,6 +5,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 import Navbar from "@/components/Layout/Navbar";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
+import ClassificationComments from "@/content/Classifications/ClassificationStats";
 
 interface Classification {
   id: number;
@@ -21,7 +22,7 @@ interface Classification {
   tags?: string[];
   images?: string[];
   relatedClassifications?: Classification[];
-}
+};
 
 type Anomaly = {
   id: number;
@@ -129,7 +130,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           classificationType={classification.classificationtype || "Unknown"}
         />
       )}
-      {anomaly && (
+      {/* {anomaly && (
         <div className="mt-6 p-4 bg-[#1E3A47] border border-gray-300 rounded-md">
           <h2 className="text-xl font-bold">Related Planet</h2>
           <p className="mt-2 text-sm">{anomaly.content || `Anomaly #${anomaly.id}`}</p>
@@ -149,6 +150,9 @@ export default function ClassificationDetail({ params }: { params: { id: string 
             />
           )}
         </div>
+      )} */}
+      {classification && (
+        <ClassificationComments classification={classification} />
       )}
       {classification.relatedClassifications && classification.relatedClassifications.length > 0 && (
         <div className="mt-6">

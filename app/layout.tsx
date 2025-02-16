@@ -18,16 +18,20 @@ interface RootLayoutProps {
   children: ReactNode;
 };
 
-export default function RootLayout({ children }: RootLayoutProps) {
-  const [supabaseClient] = useState(() => createPagesBrowserClient());
-
+function LayoutContent({ children }: { children: ReactNode }) {
   const { activePlanet } = useActivePlanet();
 
-  if (activePlanet) {
-    useEffect(() => {
+  useEffect(() => {
+    if (activePlanet) {
       console.log("Active Planet: ", activePlanet);
-    }, [activePlanet]);
-  }
+    }
+  }, [activePlanet]);
+
+  return <>{children}</>;
+};
+
+export default function RootLayout({ children }: RootLayoutProps) {
+  const [supabaseClient] = useState(() => createPagesBrowserClient());
 
   return (
     <html lang="en">
@@ -76,7 +80,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 {/* <MissionProvider> */}
                     <UserAnomaliesProvider>
                       <InventoryProvider>
-                        <div className="sci-fi-overlay">
+                        <LayoutContent>
+                          <div className="sci-fi-overlay">
                     <svg className="sci-fi-shape sci-fi-shape-1" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                       <path d="M100,10 L190,50 L190,150 L100,190 L10,150 L10,50 Z" fill="none" stroke="#5FCBC3" strokeWidth="2" />
                       <path d="M100,30 L170,60 L170,140 L100,170 L30,140 L30,60 Z" fill="none" stroke="#85DDA2" strokeWidth="2" />
@@ -103,6 +108,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   <div className="relative min-h-screen w-full flex flex-col">
                           {children}
                           </div>
+                          </LayoutContent>
                     <Analytics />
                   </InventoryProvider>
                 </UserAnomaliesProvider>

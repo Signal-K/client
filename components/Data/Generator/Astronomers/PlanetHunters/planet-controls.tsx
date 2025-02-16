@@ -58,13 +58,13 @@ export function PlanetControls({ stats, onMassChange, onRadiusChange, onTypeOver
           <div className="text-sm">Type: {stats.type}</div>
         </div>
 
-        <div className="space-y-1">
+        {/* <div className="space-y-1">
           <Label>Biome Temperatures</Label>
           <div className="text-sm">Ocean: {biomeTemperatures.ocean}°C</div>
           <div className="text-sm">Beach: {biomeTemperatures.beach}°C</div>
           <div className="text-sm">Ground: {biomeTemperatures.ground}°C</div>
           <div className="text-sm">Mountain: {biomeTemperatures.mountain}°C</div>
-        </div>
+        </div> */}
 
         <div className="flex space-x-2">
           <Button onClick={() => onTypeOverride('terrestrial')} variant={stats.type === 'terrestrial' ? 'default' : 'outline'}>

@@ -14,7 +14,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-3">
-            <Link legacyBehavior href="/">
+            <Link href="/" legacyBehavior>
               <a>
                 <img
                   src="/planet.svg"
@@ -61,46 +61,49 @@ export default function Navbar() {
                     static
                     className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                   >
-                    <Link legacyBehavior href="/">
+                    <Link href="/" passHref>
                       <Menu.Item>
                         {({ active }) => (
                           <a
                             className={`block px-4 py-2 text-sm text-gray-700 ${
                               active ? "bg-gray-100" : ""
                             }`}
+                            role="menuitem"
                           >
                             My Settlements
                           </a>
                         )}
                       </Menu.Item>
                     </Link>
-                    <Link legacyBehavior href="/scenes/desert">
+                    <Link href="/scenes/desert" passHref>
                       <Menu.Item>
                         {({ active }) => (
                           <a
                             className={`block px-4 py-2 text-sm text-gray-700 ${
                               active ? "bg-gray-100" : ""
                             }`}
+                            role="menuitem"
                           >
                             Desert Base
                           </a>
                         )}
                       </Menu.Item>
                     </Link>
-                    <Link legacyBehavior href="/scenes/ocean">
+                    <Link href="/scenes/ocean" passHref>
                       <Menu.Item>
                         {({ active }) => (
                           <a
                             className={`block px-4 py-2 text-sm text-gray-700 ${
                               active ? "bg-gray-100" : ""
                             }`}
+                            role="menuitem"
                           >
                             Ocean Base
                           </a>
                         )}
                       </Menu.Item>
                     </Link>
-                    <Link legacyBehavior href="/scenes/space">
+                    {/* <Link legacyBehavior href="/scenes/space">
                       <Menu.Item>
                         {({ active }) => (
                           <a
@@ -112,7 +115,7 @@ export default function Navbar() {
                           </a>
                         )}
                       </Menu.Item>
-                    </Link>
+                    </Link> */}
                   </Menu.Items>
                 </Transition>
               </Menu>
@@ -142,13 +145,14 @@ export default function Navbar() {
                 static
                 className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
               >
-                <Link legacyBehavior href="/account">
+                <Link href="/account" passHref>
                   <Menu.Item>
                     {({ active }) => (
                       <a
                         className={`block px-4 py-2 text-sm text-gray-700 ${
                           active ? "bg-gray-100" : ""
                         }`}
+                        role="menuitem"
                       >
                         Edit Profile
                       </a>
@@ -161,6 +165,7 @@ export default function Navbar() {
                       className={`block px-4 py-2 text-sm text-gray-700 ${
                         active ? "bg-gray-100" : ""
                       }`}
+                      role="menuitem"
                     >
                       Settings
                     </a>
@@ -172,6 +177,7 @@ export default function Navbar() {
                       className={`block px-4 py-2 text-sm text-gray-700 ${
                         active ? "bg-gray-100" : ""
                       }`}
+                      role="menuitem"
                     >
                       Logout
                     </a>

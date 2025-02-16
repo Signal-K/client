@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react"; 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ClassificationForm from "../(classifications)/PostForm";
-import { Props } from "@/types/Anomalies";
 
 import { Anomaly } from "../Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
@@ -140,11 +139,11 @@ export function StarterJovianVortexHunter({
     );
 };
 
-interface SelectedAnomProps {
-    anomalyid?: number;
-}
+interface Props {
+    anomalyid: number;
+};
 
-export function LidarJVHSatellite({ anomalyid }: SelectedAnomProps) {
+export function LidarJVHSatellite({ anomalyid }: Props) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -165,7 +164,7 @@ export function LidarJVHSatellite({ anomalyid }: SelectedAnomProps) {
                     .from("missions")
                     .select("*")
                     .eq("mission", 20000007)
-                    .eq("owner", session.user.id)
+                    .eq("user", session.user.id)
                     .limit(1);
 
                 if (missionError) {
@@ -230,7 +229,7 @@ export function LidarJVHSatellite({ anomalyid }: SelectedAnomProps) {
     };
 
     const content = !hasMission20000007
-    ? <StarterJovianVortexHunter anomalyid={anomaly.id} />
+    ? <StarterJovianVortexHunter anomalyid={anomalyid} />
     : (
         <>
             {loading && <p>Loading...</p>}
@@ -275,15 +274,14 @@ export function LidarJVHSatellite({ anomalyid }: SelectedAnomProps) {
 
 export function JVHWrapper() {
     const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
-
+    const [part, setPart] = useState(1);
+  
     return (
-        <div className="space-y-8">
-            {!selectedAnomaly && (
-                <PreferredGaseousClassifications onSelectAnomaly={setSelectedAnomaly} />
-            )}
-            {selectedAnomaly && 
-                <LidarJVHSatellite anomalyid={selectedAnomaly} />
-            }
-        </div>
+      <div className="space-y-8">
+        {!selectedAnomaly && part !== 1 && (
+          <PreferredGaseousClassifications onSelectAnomaly={setSelectedAnomaly} />
+        )}
+        {selectedAnomaly && <LidarJVHSatellite anomalyid={selectedAnomaly} />}
+      </div>
     );
-};
+};  
