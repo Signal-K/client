@@ -5,6 +5,7 @@ import { CloudDrizzleIcon, LightbulbIcon, Telescope, ArrowUpIcon, ArrowDownIcon 
 import { motion, AnimatePresence } from "framer-motion";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import JournalPage from "@/components/Structures/Missions/Stardust/Journal";
+import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
 
 export interface Mission {
   id: number;
@@ -92,7 +93,8 @@ const defaultMission: Mission = {
   id: 0,
   name: "Welcome to Star Sailors",
   description: "You've been given some basic structures to start your journey. Click on their icons to classify the data they've collected for you. New data & projects are being added weekly.",
-  additionalDescription: "You'll get to explore various missions, starting with basic tasks such as classifying objects in the sky and on Earth. Each task you complete unlocks new insights.", // <JournalPage />
+  // additionalDescription: "You'll get to explore various missions, starting with basic tasks such as classifying objects in the sky and on Earth. Each task you complete unlocks new insights.", // <JournalPage />
+  additionalDescription: <MilestoneCard />,
   icon: LightbulbIcon,
   color: "text-blue-400",
   identifier: "default-starting-mission",
@@ -133,7 +135,7 @@ const SimpleeMissionGuide = () => {
                   <h3 className="text-lg font-semibold text-gray-200">{defaultMission.name}</h3>
                   <p className="text-sm text-gray-400">{defaultMission.description}</p>
                   <Button className="mt-2" variant="outline" onClick={openModal}>
-                    Read More
+                    Weekly goals
                   </Button>
                 </div>
               </CardContent>

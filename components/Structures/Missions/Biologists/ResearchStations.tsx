@@ -9,6 +9,7 @@ import { InventoryItem } from "@/types/Items";
 import BiomassStats from "./BiomassOnPlanet";
 import StationModal from "./StationModal"; 
 import ClassificationStats from "../Milestones/ClassificationNumber";
+import MilestoneCard from "../Milestones/MilestoneCard";
 
 const initialStations: Station[] = [
   {
@@ -230,6 +231,7 @@ export function GreenhouseResearchStations() {
             {/* <Milestones milestones={milestones} /> */}
             {/* <div className="py-2"><ClassificationStats /></div> */}
             <div className="py-2"><BiomassStats /></div>
+            <div className="py-2"><MilestoneCard /></div>
           </div>
         </div>
       </div>

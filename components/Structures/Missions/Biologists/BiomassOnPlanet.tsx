@@ -46,7 +46,7 @@ const BiomassStats = () => {
             if ( error ) {
                 return;
             } ;
-
+ 
             setTotalBio(data.length);
 
             const oneYearAgo = new Date();
