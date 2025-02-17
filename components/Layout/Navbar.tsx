@@ -6,6 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 
 export default function Navbar() {
   const { activePlanet } = useActivePlanet();
+  
   const [menuOpen, setMenuOpen] = useState(false);
   const [settlementsOpen, setSettlementsOpen] = useState(false);
 

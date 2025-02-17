@@ -15,8 +15,8 @@ interface PlanetMeshProps {
     temperature: number
     atmosphereStrength: number
     cloudCount: number
-  }
-}
+  };
+};
 
 export function PlanetMesh({ stats }: PlanetMeshProps) {
   const meshRef = useRef<THREE.Mesh>(null)
