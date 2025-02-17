@@ -1,15 +1,15 @@
 export interface PlanetStats {
-  mass: number
-  radius: number
-  temperature?: number // Make optional
-  orbitalPeriod?: number // Make optional
-  atmosphereStrength: number
-  cloudCount: number
-  waterLevel: number
-  surfaceRoughness: number
-  density: number
-  type?: "terrestrial" | "gaseous"
-};
+  mass: number // Earth masses
+  radius: number // Earth radii
+  density: number // g/cm³
+  type: "terrestrial" | "gaseous"
+  temperature: number // Kelvin
+  orbitalPeriod: number // Earth days
+  atmosphereStrength: number // 0 to 1
+  cloudCount: number // 0 to 100
+  waterLevel: number // 0 to 1
+  surfaceRoughness: number // 0 to 1
+}
 
 export interface LiquidInfo {
   type: "water" | "methane" | "nitrogen" | "none"
@@ -20,38 +20,38 @@ export interface LiquidInfo {
 export function calculatePlanetStats(
   mass: number,
   radius: number,
-  temperature: number = 0, // Default value
-  orbitalPeriod: number = 1, // Default value
+  temperature = 288, // Default Earth-like temperature
+  orbitalPeriod = 365, // Default Earth-like orbital period
   typeOverride: "terrestrial" | "gaseous" | null = null,
   atmosphereStrength = 0.5,
   cloudCount = 50,
   waterLevel = 0.5,
   surfaceRoughness = 0.5,
+  density?: number,
 ): PlanetStats {
   const earthDensity = 5.51 // g/cm³
-  const density = (mass / Math.pow(radius, 3)) * earthDensity
+  const calculatedDensity = density || (mass / Math.pow(radius, 3)) * earthDensity
 
-  let type: "terrestrial" | "gaseous" = "terrestrial";
-
+  let type: "terrestrial" | "gaseous"
   if (typeOverride) {
-    type = typeOverride;
+    type = typeOverride
   } else {
-    type = mass > 7.5 || radius > 2.0 ? "gaseous" : "terrestrial";
+    type = mass > 7.5 || radius > 2.0 ? "gaseous" : "terrestrial"
   }
 
   return {
     mass,
     radius,
-    density,
+    density: calculatedDensity,
     type,
-    temperature, // Always included
-    orbitalPeriod, // Always included
+    temperature,
+    orbitalPeriod,
     atmosphereStrength,
     cloudCount,
     waterLevel,
     surfaceRoughness,
   }
-};
+}
 
 export function determineLiquidType(temperature: number): LiquidInfo {
   if (temperature >= 273 && temperature <= 373) {
@@ -79,3 +79,4 @@ export function determineLiquidType(temperature: number): LiquidInfo {
     temperatureRange: "N/A",
   }
 }
+

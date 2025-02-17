@@ -6,21 +6,11 @@ on:
   push:
     branches:
       - main
-
 jobs:
   Deploy-Production:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Check if commit message contains SSG-142
-        id: check_commit
-        run: |
-          if [[ "${{ github.event.head_commit.message }}" == *"SSG-142"* ]]; then
-            echo "Commit message contains SSG-142, proceeding with deployment."
-          else
-            echo "Commit message does not contain SSG-142, skipping deployment."
-            exit 0
-        continue-on-error: true
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
       - name: Pull Vercel Environment Information

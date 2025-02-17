@@ -3,22 +3,12 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-
-interface PlanetStats {
-  mass: number;
-  radius: number;
-  temperature?: number;  
-  orbitalPeriod?: number;
-  atmosphereStrength: number;
-  cloudCount: number;
-  waterLevel: number;
-  density: number;
-}
+import type { PlanetStats } from "@/utils/planet-physics"
 
 interface FullPlanetImportExportProps {
   stats: PlanetStats
   onImport: (importedStats: Partial<PlanetStats>) => void
-};
+}
 
 export function FullPlanetImportExport({ stats, onImport }: FullPlanetImportExportProps) {
   const [importExportText, setImportExportText] = useState("")
@@ -47,7 +37,10 @@ density: ${stats.density?.toFixed(2) ?? "N/A"}`
           key,
         )
       ) {
-        importedStats[key as keyof PlanetStats] = Number.parseFloat(value)
+        const parsedValue = Number.parseFloat(value)
+        if (!isNaN(parsedValue)) {
+          ;(importedStats as any)[key] = parsedValue
+        }
       }
     })
 
@@ -80,4 +73,3 @@ density: ${stats.density?.toFixed(2) ?? "N/A"}`
     </div>
   )
 }
-

@@ -7,7 +7,7 @@ import type { PlanetStats } from "@/utils/planet-physics"
 
 interface SimplePlanetSceneProps {
   stats: PlanetStats
-}
+};
 
 export function SimplePlanetScene({ stats }: SimplePlanetSceneProps) {
   return (
@@ -27,6 +27,5 @@ export function SimplePlanetScene({ stats }: SimplePlanetSceneProps) {
         />
       </Canvas>
     </div>
-  )
-}
-
+  );
+};

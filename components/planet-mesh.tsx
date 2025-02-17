@@ -15,8 +15,10 @@ interface PlanetMeshProps {
     temperature: number
     atmosphereStrength: number
     cloudCount: number
-  };
-};
+    waterLevel: number
+    surfaceRoughness: number
+  }
+}
 
 export function PlanetMesh({ stats }: PlanetMeshProps) {
   const meshRef = useRef<THREE.Mesh>(null)
@@ -28,11 +30,8 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
     const shader = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
-        color1: { value: new THREE.Color(0x000000) },
-        color2: { value: new THREE.Color(0x000000) },
-        color3: { value: new THREE.Color(0x000000) },
-        waterLevel: { value: 0.0 },
-        distortAmount: { value: stats.type === "gaseous" ? 0.05 : 0.135 },
+        waterLevel: { value: stats.waterLevel * 1.2 }, // Increase water level by 20%
+        distortAmount: { value: stats.type === "gaseous" ? 0.15 : 0.05 },
         noiseScale: { value: stats.type === "gaseous" ? 2.0 : 1.0 },
         density: { value: stats.density },
         mass: { value: stats.mass },
@@ -41,6 +40,8 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
         liquidColor: { value: new THREE.Color(liquidInfo.color) },
         hasLiquid: { value: stats.type === "terrestrial" && liquidInfo.type !== "none" ? 1.0 : 0.0 },
         temperature: { value: stats.temperature },
+        surfaceRoughness: { value: stats.surfaceRoughness },
+        radius: { value: stats.radius },
       },
       vertexShader: `
         varying vec2 vUv;
@@ -54,6 +55,7 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
         uniform float density;
         uniform float isGaseous;
         uniform float mass;
+        uniform float surfaceRoughness;
         
         // Simplex 3D Noise
         vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
@@ -120,6 +122,13 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
                                       dot(p2,x2), dot(p3,x3) ) );
         }
 
+        float ridgedNoise(vec3 p) {
+          float n = abs(snoise(p));
+          n = 1.0 - n; // invert the ridges
+          n = n * n;   // sharpen the ridges
+          return n;
+        }
+
         void main() {
           vUv = uv;
           vNormal = normal;
@@ -148,12 +157,35 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
             
             float mountains = pow(max(0.0, baseNoise), 3.0) * 1.5;
             float plains = snoise(pos * noiseScale * 2.0 + time * 0.1) * 0.1;
-            float craters = -abs(snoise(pos * noiseScale * 4.0)) * 0.05;
             
-            elevation = mix(0.0, mountains + plains + craters, landmass);
+            // Add craters
+            float craters = 0.0;
+            for (int i = 0; i < 5; i++) {
+              vec3 craterPos = vec3(sin(float(i) * 1.618) * 100.0, cos(float(i) * 1.618) * 100.0, sin(float(i) * 1.618 * 0.5) * 100.0);
+              float crater = length(pos - normalize(craterPos)) * 10.0;
+              crater = 1.0 - smoothstep(0.0, 0.2 + float(i) * 0.05, crater);
+              craters -= crater * 0.1;
+            }
+            
+            // Add ridges
+            float ridges = ridgedNoise(pos * 5.0) * 0.2;
+            
+            // Add volcanoes
+            float volcanoes = 0.0;
+            for (int i = 0; i < 3; i++) {
+              vec3 volcanoPos = vec3(sin(float(i) * 2.618) * 100.0, cos(float(i) * 2.618) * 100.0, sin(float(i) * 2.618 * 0.5) * 100.0);
+              float volcano = 1.0 - length(pos - normalize(volcanoPos)) * 10.0;
+              volcano = max(0.0, volcano);
+              volcanoes += pow(volcano, 5.0) * 0.5;
+            }
+            
+            // Add more bumpiness
+            float bumpiness = snoise(pos * 20.0) * 0.02;
+            
+            elevation = mix(0.0, mountains + plains + craters + ridges + volcanoes + bumpiness, landmass);
           }
           
-          elevation *= distortAmount;
+          elevation *= distortAmount * surfaceRoughness;
           vElevation = elevation;
           
           // Apply displacement
@@ -168,9 +200,6 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
         varying vec3 vPosition;
         varying float vElevation;
         
-        uniform vec3 color1;
-        uniform vec3 color2;
-        uniform vec3 color3;
         uniform float time;
         uniform float waterLevel;
         uniform float density;
@@ -180,6 +209,7 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
         uniform vec3 liquidColor;
         uniform float hasLiquid;
         uniform float temperature;
+        uniform float radius;
         
         float rand(vec2 co) {
           return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
@@ -247,13 +277,13 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
           vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
           m = m * m;
           return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), 
-                                      dot(p2,x2), dot(p3,x3) ) );
+                                        dot(p2,x2), dot(p3,x3) ) );
         }
 
         vec3 getLiquidColor(float temp) {
-          vec3 waterColor = vec3(0.0, 0.4, 0.8);
-          vec3 methaneColor = vec3(1.0, 0.85, 0.0);
-          vec3 nitrogenColor = vec3(0.56, 0.93, 0.56);
+          vec3 waterColor = vec3(0.0, 0.2, 0.5);
+          vec3 methaneColor = vec3(0.2, 0.4, 0.6);
+          vec3 nitrogenColor = vec3(0.4, 0.6, 0.8);
 
           if (temp >= 273.0 && temp <= 373.0) {
             return mix(waterColor, methaneColor, smoothstep(273.0, 373.0, temp));
@@ -277,12 +307,19 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
             float storms = smoothstep(0.4, 0.6, snoise(vPosition * 2.0 + time * 0.15));
             float cyclones = smoothstep(0.3, 0.7, snoise(vPosition * vec3(4.0, 1.0, 4.0) + time * 0.05));
             
-            color = mix(color1, color2, bands);
-            color = mix(color, color3, storms * 0.5);
-            color = mix(color, vec3(1.0), cyclones * 0.2);
+            vec3 baseColor = mix(vec3(0.6, 0.4, 0.2), vec3(0.8, 0.6, 0.4), bands);
+            vec3 stormColor = vec3(1.0, 0.9, 0.8);
+            vec3 cycloneColor = vec3(0.9, 0.7, 0.5);
+            
+            color = mix(baseColor, stormColor, storms * 0.5);
+            color = mix(color, cycloneColor, cyclones * 0.2);
             
             float atmosphere = pow(1.0 - abs(dot(normal, vec3(0.0, 0.0, 1.0))), 2.0);
             color += vec3(0.1, 0.15, 0.25) * atmosphere;
+            
+            // Add translucency
+            float translucency = pow(1.0 - abs(dot(normal, sunDirection)), 4.0) * 0.2;
+            color += vec3(0.8, 0.6, 0.4) * translucency;
           } else {
             // Terrestrial coloring
             float baseNoise = snoise(vPosition * 2.0);
@@ -290,30 +327,51 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
             float landCoverage = smoothstep(0.5, 2.0, mass) * smoothstep(3.5, 7.0, density);
             landmass = smoothstep(1.0 - landCoverage, 1.0, landmass);
 
-            // Use elevation to determine liquid placement
+            // Use elevation to determine biomes and textures
             float elevationFactor = smoothstep(-0.1, 0.1, vElevation);
             
-            if (landmass < 0.5 && hasLiquid > 0.5 && elevationFactor < 0.5) {
-              // Liquid in low areas only
-              float liquidDepth = 1.0 - elevationFactor;
+            vec3 waterColor = vec3(0.0, 0.2, 0.5);
+            vec3 lowlandColor = vec3(0.76, 0.70, 0.50); // Sandy color
+            vec3 highlandColor = vec3(0.55, 0.27, 0.07); // Brown
+            vec3 mountainColor = vec3(0.4, 0.2, 0.1); // Dark brown
+            vec3 polarColor = vec3(0.95, 0.95, 1.0); // Ice caps
+
+            if (landmass < 0.5 && hasLiquid > 0.5 && elevationFactor < waterLevel) {
+              // Liquid areas
+              float liquidDepth = 1.0 - elevationFactor / waterLevel;
               vec3 currentLiquidColor = getLiquidColor(temperature);
               color = mix(currentLiquidColor * 0.8, currentLiquidColor, liquidDepth);
               float shine = pow(fresnel, 4.0) * 0.3;
               color += vec3(shine);
             } else {
-              // Land
-              float mountainHeight = smoothstep(0.7, 1.0, landmass);
-              float beachArea = smoothstep(0.5, 0.55, landmass);
+              // Land areas
+              color = mix(waterColor, lowlandColor, smoothstep(waterLevel - 0.02, waterLevel + 0.02, elevationFactor));
+              color = mix(color, highlandColor, smoothstep(0.4, 0.6, elevationFactor));
+              color = mix(color, mountainColor, smoothstep(0.7, 0.9, elevationFactor));
+
+              // Add polar ice caps
+              color = mix(color, polarColor, smoothstep(0.8, 1.0, abs(vPosition.y)));
               
-              vec3 beachColor = mix(color1, color2, 0.7);
-              vec3 groundColor = color2;
-              vec3 mountainColor = color3;
-              
-              color = mix(beachColor, groundColor, beachArea);
-              color = mix(color, mountainColor, mountainHeight);
-              
-              float textureNoise = snoise(vPosition * 10.0) * 0.1;
+              // Add some texture variation
+              float textureNoise = snoise(vPosition * 20.0) * 0.1;
               color += vec3(textureNoise);
+
+
+              // Check if the planet is Earth-like
+              bool isEarthLike = abs(radius - 1.0) < 0.2 && temperature > 273.0 && temperature < 313.0;
+              
+              if (isEarthLike) {
+                lowlandColor = vec3(0.76, 0.70, 0.50); // Sandy color
+                highlandColor = vec3(0.8, 0.7, 0.3); // Yellow-brown
+                mountainColor = vec3(0.5, 0.3, 0.1); // Dark brown
+                
+                color = mix(vec3(0.0, 0.2, 0.5), vec3(0.0, 0.4, 0.8), elevationFactor / waterLevel);
+                if (elevationFactor > waterLevel) {
+                  float landHeight = (elevationFactor - waterLevel) / (1.0 - waterLevel);
+                  color = mix(lowlandColor, highlandColor, smoothstep(0.2, 0.6, landHeight));
+                  color = mix(color, mountainColor, smoothstep(0.6, 0.8, landHeight));
+                }
+              }
             }
           }
           
@@ -324,28 +382,11 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
           float rimLight = pow(1.0 - max(0.0, dot(normal, normalize(vec3(0.0, 0.0, 1.0)))), 4.0);
           color += rimLight * vec3(0.1, 0.1, 0.2);
           
-          gl_FragColor = vec4(color, 1.0);
+          gl_FragColor = vec4(color, isGaseous > 0.5 ? 0.9 : 1.0);
         }
       `,
       transparent: true,
     })
-
-    // Set colors based on planet type and density
-    if (stats.type === "gaseous") {
-      if (stats.density > 1.5) {
-        shader.uniforms.color1.value.setStyle("#7B3F00")
-        shader.uniforms.color2.value.setStyle("#D2691E")
-        shader.uniforms.color3.value.setStyle("#FFB90F")
-      } else {
-        shader.uniforms.color1.value.setStyle("#A7C6DA")
-        shader.uniforms.color2.value.setStyle("#E6E6FA")
-        shader.uniforms.color3.value.setStyle("#B8E2F2")
-      }
-    } else {
-      shader.uniforms.color1.value.setStyle("#1E4D6B") // Deep water
-      shader.uniforms.color2.value.setStyle("#CD853F") // Lowland
-      shader.uniforms.color3.value.setStyle("#8B4513") // Highland
-    }
 
     const cloudShader = new THREE.ShaderMaterial({
       uniforms: {
@@ -422,6 +463,7 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
       uniforms: {
         atmosphereStrength: { value: stats.atmosphereStrength },
         liquidColor: { value: new THREE.Color(liquidInfo.color) },
+        isGaseous: { value: stats.type === "gaseous" ? 1.0 : 0.0 },
       },
       vertexShader: `
         uniform float atmosphereStrength;
@@ -436,12 +478,16 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
       fragmentShader: `
         uniform float atmosphereStrength;
         uniform vec3 liquidColor;
+        uniform float isGaseous;
         varying vec3 vNormal;
 
         void main() {
           float intensity = pow(0.7 - dot(vNormal, vec3(0, 0, 1.0)), 2.0);
           vec3 atmosphereColor = mix(vec3(0.3, 0.6, 1.0), liquidColor, 0.3);
-          gl_FragColor = vec4(atmosphereColor, intensity * atmosphereStrength);
+          if (isGaseous > 0.5) {
+            atmosphereColor = mix(vec3(0.8, 0.6, 0.4), vec3(0.4, 0.2, 0.1), intensity);
+          }
+          gl_FragColor = vec4(atmosphereColor, intensity * atmosphereStrength * (isGaseous > 0.5 ? 0.8 : 1.0));
         }
       `,
       side: THREE.BackSide,
@@ -458,6 +504,8 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
     stats.temperature,
     stats.atmosphereStrength,
     stats.cloudCount,
+    stats.waterLevel,
+    stats.surfaceRoughness,
   ])
 
   useFrame((state) => {

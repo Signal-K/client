@@ -191,7 +191,7 @@ export default function LandingSS() {
               <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-black">
                 <img src={member.img} alt={member.name} className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-lg font-semibold mt-4">{member.name}</h3>
+              <h3 className="text-lg text-blue-500 font-semibold mt-4">{member.name}</h3>
               <p className="text-gray-500">{member.role}</p>
               <p className="text-sm text-gray-700 mt-2">{member.bio}</p>
               <div className="mt-3 flex space-x-3">

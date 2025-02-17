@@ -33,7 +33,7 @@ export function PlanetControls({
   onSurfaceRoughnessChange,
   showExtendedControls,
 }: PlanetControlsProps) {
-  const liquidInfo = determineLiquidType(stats.temperature ?? 0)
+  const liquidInfo = determineLiquidType(stats.temperature)
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -44,7 +44,7 @@ export function PlanetControls({
           min={0.1}
           max={10}
           step={0.1}
-          value={[stats.mass ?? 0]}  
+          value={[stats.mass]}
           onValueChange={([value]) => onMassChange(value)}
         />
         <div className="text-sm text-white">{stats.mass?.toFixed(2) ?? "N/A"}</div>
@@ -57,7 +57,7 @@ export function PlanetControls({
           min={0.1}
           max={3}
           step={0.1}
-          value={[stats.radius ?? 0]} 
+          value={[stats.radius]}
           onValueChange={([value]) => onRadiusChange(value)}
         />
         <div className="text-sm text-white">{stats.radius?.toFixed(2) ?? "N/A"}</div>
@@ -72,7 +72,7 @@ export function PlanetControls({
               min={50}
               max={400}
               step={1}
-              value={[stats.temperature ?? 0]} 
+              value={[stats.temperature]}
               onValueChange={([value]) => onTemperatureChange(value)}
             />
             <div className="text-sm text-white">{stats.temperature ?? "N/A"}</div>
@@ -85,7 +85,7 @@ export function PlanetControls({
               min={1}
               max={1000}
               step={1}
-              value={[stats.orbitalPeriod ?? 0]} 
+              value={[stats.orbitalPeriod]}
               onValueChange={([value]) => onOrbitalPeriodChange(value)}
             />
             <div className="text-sm text-white">{stats.orbitalPeriod ?? "N/A"}</div>
@@ -111,7 +111,7 @@ export function PlanetControls({
               min={0}
               max={100}
               step={1}
-              value={[stats.cloudCount ?? 0]} 
+              value={[stats.cloudCount ?? 0]}
               onValueChange={([value]) => onCloudCountChange(value)}
             />
             <div className="text-sm text-white">{stats.cloudCount ?? "N/A"}</div>
@@ -124,7 +124,7 @@ export function PlanetControls({
               min={0}
               max={1}
               step={0.01}
-              value={[stats.waterLevel ?? 0]} 
+              value={[stats.waterLevel ?? 0]}
               onValueChange={([value]) => onWaterLevelChange(value)}
             />
             <div className="text-sm text-white">{stats.waterLevel?.toFixed(2) ?? "N/A"}</div>
@@ -137,7 +137,7 @@ export function PlanetControls({
               min={0}
               max={1}
               step={0.01}
-              value={[stats.surfaceRoughness ?? 0]} 
+              value={[stats.surfaceRoughness ?? 0]}
               onValueChange={([value]) => onSurfaceRoughnessChange(value)}
             />
             <div className="text-sm text-white">{stats.surfaceRoughness?.toFixed(2) ?? "N/A"}</div>
@@ -176,3 +176,4 @@ export function PlanetControls({
     </div>
   )
 }
+

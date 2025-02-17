@@ -7,17 +7,7 @@ import { FullPlanetImportExport } from "./full-planet-import-export"
 import { calculatePlanetStats } from "@/utils/planet-physics"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-
-interface PlanetStats {
-  mass: number;
-  radius: number;
-  temperature: number;
-  orbitalPeriod: number;
-  atmosphereStrength: number;
-  cloudCount: number;
-  waterLevel: number;
-  density: number;
-}
+import type { PlanetStats } from "@/utils/planet-physics"
 
 const LOW_MASS_THRESHOLD = 0.2
 
@@ -35,25 +25,26 @@ export function FullPlanetGenerator() {
   const stats = calculatePlanetStats(
     mass,
     radius,
-    temperature ?? 288, 
+    temperature,
     orbitalPeriod,
     typeOverride,
     atmosphereStrength,
     cloudCount,
     waterLevel,
     surfaceRoughness,
-  )  
+  )
 
   const handleImport = (importedStats: Partial<PlanetStats>) => {
     if (importedStats.mass !== undefined) setMass(importedStats.mass)
     if (importedStats.radius !== undefined) setRadius(importedStats.radius)
-    if (importedStats.temperature !== undefined) setTemperature(importedStats.temperature || 288)  // Default value if undefined
+    if (importedStats.temperature !== undefined) setTemperature(importedStats.temperature)
     if (importedStats.orbitalPeriod !== undefined) setOrbitalPeriod(importedStats.orbitalPeriod)
     if (importedStats.atmosphereStrength !== undefined) setAtmosphereStrength(importedStats.atmosphereStrength)
     if (importedStats.cloudCount !== undefined) setCloudCount(importedStats.cloudCount)
     if (importedStats.waterLevel !== undefined) setWaterLevel(importedStats.waterLevel)
+    if (importedStats.surfaceRoughness !== undefined) setSurfaceRoughness(importedStats.surfaceRoughness)
     setTypeOverride(null)
-  };  
+  }
 
   return (
     <div className="rounded-lg overflow-hidden bg-[#1E1E1E] border border-[#2A2A2A]">
@@ -93,4 +84,5 @@ export function FullPlanetGenerator() {
       </div>
     </div>
   )
-};
+}
+

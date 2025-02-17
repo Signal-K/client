@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import type { PlanetStats } from "@/utils/planet-physics"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import type { PlanetStats } from "@/utils/planet-physics";
 
 interface SimplePlanetImportExportProps {
   stats: PlanetStats
@@ -16,8 +16,8 @@ export function SimplePlanetImportExport({ stats, onImport }: SimplePlanetImport
   const handleExport = () => {
     const exportText = `mass: ${stats.mass.toFixed(2)}
 radius: ${stats.radius.toFixed(2)}
-density: ${stats.density.toFixed(2)}`
-    setImportExportText(exportText)
+${stats.density !== undefined ? `density: ${stats.density.toFixed(2)}` : ""}`
+    setImportExportText(exportText.trim())
   }
 
   const handleImport = () => {
@@ -26,8 +26,11 @@ density: ${stats.density.toFixed(2)}`
 
     lines.forEach((line) => {
       const [key, value] = line.split(":").map((part) => part.trim())
-      if (["mass", "radius"].includes(key)) {
-        // importedStats[key as keyof PlanetStats] = Number.parseFloat(value)
+      if (["mass", "radius", "density"].includes(key)) {
+        const parsedValue = Number.parseFloat(value)
+        if (!isNaN(parsedValue)) {
+          ;(importedStats as any)[key] = parsedValue
+        }
       }
     })
 
@@ -58,6 +61,5 @@ density: ${stats.density.toFixed(2)}`
         </Button>
       </div>
     </div>
-  )
-}
-
+  );
+};

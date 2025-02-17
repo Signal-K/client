@@ -18,6 +18,7 @@ export function SimplePlanetGenerator() {
   const handleImport = (importedStats: Partial<PlanetStats>) => {
     if (importedStats.mass !== undefined) setMass(importedStats.mass)
     if (importedStats.radius !== undefined) setRadius(importedStats.radius)
+    // If density is not provided, it will be calculated in calculatePlanetStats
   }
 
   return (
