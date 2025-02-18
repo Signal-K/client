@@ -3,12 +3,26 @@ import { Menu, Transition } from "@headlessui/react";
 import { Avatar } from "../Account/Avatar";
 import Link from "next/link";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 
 export default function Navbar() {
+  const supabase = useSupabaseClient();
+
   const { activePlanet } = useActivePlanet();
   
   const [menuOpen, setMenuOpen] = useState(false);
   const [settlementsOpen, setSettlementsOpen] = useState(false);
+
+  // Sign out function
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error signing out:", error.message);
+    } else {
+      // Handle post-sign-out logic (e.g., redirect or notify user)
+      console.log("User signed out successfully");
+    }
+  };
 
   return (
     <div className="fixed top-0 left-0 w-full z-50 backdrop-blur-lg bg-white/30 border-b border-white/20 shadow-lg">
@@ -104,19 +118,6 @@ export default function Navbar() {
                         )}
                       </Menu.Item>
                     </Link>
-                    {/* <Link legacyBehavior href="/scenes/space">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            className={`block px-4 py-2 text-sm text-gray-700 ${
-                              active ? "bg-gray-100" : ""
-                            }`}
-                          >
-                            Space Base
-                          </a>
-                        )}
-                      </Menu.Item>
-                    </Link> */}
                   </Menu.Items>
                 </Transition>
               </Menu>
@@ -179,6 +180,7 @@ export default function Navbar() {
                         active ? "bg-gray-100" : ""
                       }`}
                       role="menuitem"
+                      onClick={signOut}  // Trigger the sign-out on click
                     >
                       Logout
                     </a>

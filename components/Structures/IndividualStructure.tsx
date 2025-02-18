@@ -219,7 +219,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
 {activeComponent && (
   <DialogContent
     className={`p-4 rounded-3xl text-white mx-auto 
-      w-[90%] h-[90%] max-w-full max-h-[95%] fixed top-1/2 left-1/2 
+      w-[95%] h-[95%] max-w-full max-h-[95%] fixed top-1/2 left-1/2 
       transform -translate-x-1/2 -translate-y-1/2 
       overflow-y-auto bg-[#1D2833]/90`}
   >

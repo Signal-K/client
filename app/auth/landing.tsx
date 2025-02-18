@@ -115,7 +115,7 @@ export default function LandingSS() {
                 Discover the world around you and contribute to real scientific research in Star Sailors
               </p>
               <div className="flex flex-wrap gap-6">
-                <Link href="https://starsailors.space/auth">
+                <Link href="/auth">
                     <Button
                         size="lg"
                         className="bg-blue-300 text-white hover:bg-aqua-400 hover:translate-y-[-2px] hover:translate-x-[2px] text-lg px-8 py-6 rounded-md border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:shadow-none"
