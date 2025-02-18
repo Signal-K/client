@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { useRef, useMemo } from "react"
-import { useFrame } from "@react-three/fiber"
-import { Sphere } from "@react-three/drei"
-import * as THREE from "three"
+import { useRef, useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import { Sphere } from "@react-three/drei";
+import * as THREE from "three";
 
 interface SimplePlanetMeshProps {
   stats: {
-    mass: number
-    radius: number
-    density: number
+    mass: number;
+    radius: number;
+    density: number;
     type: "terrestrial" | "gaseous"
-  }
-}
+  };
+};
 
 export function SimplePlanetMesh({ stats }: SimplePlanetMeshProps) {
   const meshRef = useRef<THREE.Mesh>(null)
@@ -295,20 +295,19 @@ export function SimplePlanetMesh({ stats }: SimplePlanetMeshProps) {
         }
       `,
       transparent: true,
-    })
-  }, [stats.type, stats.density, stats.mass])
+    });
+  }, [stats.type, stats.density, stats.mass]);
 
   useFrame((state) => {
     if (meshRef.current) {
       meshRef.current.rotation.y += 0.001
       material.uniforms.time.value = state.clock.elapsedTime
-    }
-  })
+    };
+  });
 
   return (
     <Sphere ref={meshRef} args={[1, 64, 64]} scale={stats.radius}>
       <primitive object={material} attach="material" />
     </Sphere>
-  )
-}
-
+  );
+};

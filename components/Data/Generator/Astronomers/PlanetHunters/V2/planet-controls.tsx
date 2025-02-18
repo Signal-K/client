@@ -3,129 +3,176 @@
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { determineLiquidType } from "@/utils/planet-physics";
 import type { PlanetStats } from "@/utils/planet-physics";
 
 interface PlanetControlsProps {
-  stats: PlanetStats
-  showLiquid: boolean
-  onMassChange: (value: number) => void
-  onRadiusChange: (value: number) => void
-  onTemperatureChange: (value: number) => void
-  onOrbitalPeriodChange: (value: number) => void
-  onTypeOverride: (type: "terrestrial" | "gaseous" | null) => void
-  onShowLiquidChange: (value: boolean) => void
-};
-
-function calculateBiomeTemperatures(stats: PlanetStats) {
-  const baseTemp = stats.temperature ?? 300 // Default to 300K if undefined
-  const massEffect = (stats.mass - 1) * 10
-
-  return {
-    ocean: Math.round(baseTemp - 5),
-    beach: Math.round(baseTemp),
-    ground: Math.round(baseTemp + 5),
-    mountain: Math.round(baseTemp - 15),
-  };
+  stats: PlanetStats;
+  onMassChange: (value: number) => void;
+  onRadiusChange: (value: number) => void;
+  onTemperatureChange: (value: number) => void;
+  onOrbitalPeriodChange: (value: number) => void;
+  onTypeOverride: (type: "terrestrial" | "gaseous" | null) => void;
+  onAtmosphereStrengthChange: (value: number) => void;
+  onCloudCountChange: (value: number) => void;
+  onWaterLevelChange: (value: number) => void;
+  onSurfaceRoughnessChange: (value: number) => void;
+  showExtendedControls: boolean;
 };
 
 export function PlanetControls({
   stats,
-  showLiquid,
   onMassChange,
   onRadiusChange,
   onTemperatureChange,
   onOrbitalPeriodChange,
   onTypeOverride,
-  onShowLiquidChange,
+  onAtmosphereStrengthChange,
+  onCloudCountChange,
+  onWaterLevelChange,
+  onSurfaceRoughnessChange,
+  showExtendedControls,
 }: PlanetControlsProps) {
-  const biomeTemperatures = calculateBiomeTemperatures(stats)
-  const liquidInfo = determineLiquidType(stats.temperature ?? 300);
+  const liquidInfo = determineLiquidType(stats.temperature);
 
   return (
-    <Card className="w-80">
-      <CardContent className="p-6 space-y-4">
-        <div className="space-y-2">
-          <Label>Mass (Earth masses)</Label>
-          <Slider min={0.1} max={10} step={0.1} value={[stats.mass]} onValueChange={([value]) => onMassChange(value)} />
-          <div className="text-sm text-muted-foreground">{stats.mass.toFixed(1)} M⊕</div>
-        </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="space-y-2">
+        <Label className="text-base text-white">Mass (M⊕)</Label>
+        <Slider
+          className="w-full"
+          min={0.1}
+          max={10}
+          step={0.1}
+          value={[stats.mass]}
+          onValueChange={([value]) => onMassChange(value)}
+        />
+        <div className="text-sm text-white">{stats.mass?.toFixed(2) ?? "N/A"}</div>
+      </div>
 
-        <div className="space-y-2">
-          <Label>Radius (Earth radii)</Label>
-          <Slider
-            min={0.1}
-            max={3}
-            step={0.1}
-            value={[stats.radius]}
-            onValueChange={([value]) => onRadiusChange(value)}
-          />
-          <div className="text-sm text-muted-foreground">{stats.radius.toFixed(1)} R⊕</div>
-        </div>
+      <div className="space-y-2">
+        <Label className="text-base text-white">Radius (R⊕)</Label>
+        <Slider
+          className="w-full"
+          min={0.1}
+          max={3}
+          step={0.1}
+          value={[stats.radius]}
+          onValueChange={([value]) => onRadiusChange(value)}
+        />
+        <div className="text-sm text-white">{stats.radius?.toFixed(2) ?? "N/A"}</div>
+      </div>
 
-        <div className="space-y-2">
-          <Label>Temperature (Kelvin)</Label>
-          <Slider
-            min={50}
-            max={400}
-            step={1}
-            value={[stats.temperature ?? 300]} // Defaults to 300K
-            onValueChange={([value]) => onTemperatureChange(value)}
-          />
-          <div className="text-sm text-muted-foreground">{stats.temperature}K</div>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Orbital Period (Earth days)</Label>
-          <Slider
-            min={1}
-            max={1000}
-            step={1}
-            value={[stats.orbitalPeriod ?? 365]} // Defaults to 365 days
-            onValueChange={([value]) => onOrbitalPeriodChange(value)}
-          />
-          <div className="text-sm text-muted-foreground">{stats.orbitalPeriod} days</div>
-        </div>
-
-        <div className="space-y-1">
-          <div className="text-sm">Density: {stats.density.toFixed(2)} g/cm³</div>
-          <div className="text-sm">Type: {stats.type}</div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <Label htmlFor="show-liquid">Show Liquid Solvent</Label>
-          <Switch id="show-liquid" checked={showLiquid} onCheckedChange={onShowLiquidChange} />
-        </div>
-
-        {showLiquid && (
-          <div className="space-y-1">
-            <div className="text-sm">Liquid Solvent: {liquidInfo.type}</div>
-            <div className="text-sm">Temperature Range: {liquidInfo.temperatureRange}</div>
+      {showExtendedControls && (
+        <>
+          <div className="space-y-2">
+            <Label className="text-base text-white">Temp (K)</Label>
+            <Slider
+              className="w-full"
+              min={50}
+              max={400}
+              step={1}
+              value={[stats.temperature]}
+              onValueChange={([value]) => onTemperatureChange(value)}
+            />
+            <div className="text-sm text-white">{stats.temperature ?? "N/A"}</div>
           </div>
-        )}
 
-        {/* <div className="space-y-1">
-          <Label>Biome Temperatures</Label>
-          <div className="text-sm">Ocean: {biomeTemperatures.ocean}K</div>
-          <div className="text-sm">Beach: {biomeTemperatures.beach}K</div>
-          <div className="text-sm">Ground: {biomeTemperatures.ground}K</div>
-          <div className="text-sm">Mountain: {biomeTemperatures.mountain}K</div>
-        </div> */}
+          <div className="space-y-2">
+            <Label className="text-base text-white">Orbit (days)</Label>
+            <Slider
+              className="w-full"
+              min={1}
+              max={1000}
+              step={1}
+              value={[stats.orbitalPeriod]}
+              onValueChange={([value]) => onOrbitalPeriodChange(value)}
+            />
+            <div className="text-sm text-white">{stats.orbitalPeriod ?? "N/A"}</div>
+          </div>
 
-        <div className="flex space-x-2">
-          <Button
-            onClick={() => onTypeOverride("terrestrial")}
-            variant={stats.type === "terrestrial" ? "default" : "outline"}
-          >
-            Terrestrial
-          </Button>
-          <Button onClick={() => onTypeOverride("gaseous")} variant={stats.type === "gaseous" ? "default" : "outline"}>
-            Gaseous
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+          <div className="space-y-2">
+            <Label className="text-base text-white">Atmosphere</Label>
+            <Slider
+              className="w-full"
+              min={0}
+              max={1}
+              step={0.01}
+              value={[stats.atmosphereStrength ?? 0]}
+              onValueChange={([value]) => onAtmosphereStrengthChange(value)}
+            />
+            <div className="text-sm text-white">{stats.atmosphereStrength?.toFixed(2) ?? "N/A"}</div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-base text-white">Clouds</Label>
+            <Slider
+              className="w-full"
+              min={0}
+              max={100}
+              step={1}
+              value={[stats.cloudCount ?? 0]}
+              onValueChange={([value]) => onCloudCountChange(value)}
+            />
+            <div className="text-sm text-white">{stats.cloudCount ?? "N/A"}</div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-base text-white">Water Level</Label>
+            <Slider
+              className="w-full"
+              min={0}
+              max={1}
+              step={0.01}
+              value={[stats.waterLevel ?? 0]}
+              onValueChange={([value]) => onWaterLevelChange(value)}
+            />
+            <div className="text-sm text-white">{stats.waterLevel?.toFixed(2) ?? "N/A"}</div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-base text-white">Roughness</Label>
+            <Slider
+              className="w-full"
+              min={0}
+              max={1}
+              step={0.01}
+              value={[stats.surfaceRoughness ?? 0]}
+              onValueChange={([value]) => onSurfaceRoughnessChange(value)}
+            />
+            <div className="text-sm text-white">{stats.surfaceRoughness?.toFixed(2) ?? "N/A"}</div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-base text-white">Type</Label>
+            <div className="flex space-x-2">
+              <Button
+                onClick={() => onTypeOverride("terrestrial")}
+                variant={stats.type === "terrestrial" ? "default" : "outline"}
+                size="sm"
+              >
+                Terrestrial
+              </Button>
+              <Button
+                onClick={() => onTypeOverride("gaseous")}
+                variant={stats.type === "gaseous" ? "default" : "outline"}
+                size="sm"
+              >
+                Gaseous
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-base text-white">Info</Label>
+            <div className="text-sm text-white">
+              <div>Density: {stats.density?.toFixed(2) ?? "N/A"} g/cm³</div>
+              <div>Type: {stats.type ?? "N/A"}</div>
+              <div>Liquid: {liquidInfo.type}</div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   );
 };

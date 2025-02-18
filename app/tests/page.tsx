@@ -1,7 +1,7 @@
 "use client";
 
-import { FullPlanetGenerator } from "@/components/full-planet-generator"
-import { SimplePlanetGenerator } from "@/components/simple-planet-generator"
+import { FullPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
+import { SimplePlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/Simple/simple-planet-generator";
 
 export default function TestPage() {
   return (

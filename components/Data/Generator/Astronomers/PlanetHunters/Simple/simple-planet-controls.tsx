@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { Slider } from "@/components/ui/slider"
-import { Label } from "@/components/ui/label"
-import type { PlanetStats } from "@/utils/planet-physics"
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import type { PlanetStats } from "@/utils/planet-physics";
 
 interface SimplePlanetControlsProps {
-  stats: PlanetStats
-  onMassChange: (value: number) => void
-  onRadiusChange: (value: number) => void
-}
+  stats: PlanetStats;
+  onMassChange: (value: number) => void;
+  onRadiusChange: (value: number) => void;
+};
 
 export function SimplePlanetControls({ stats, onMassChange, onRadiusChange }: SimplePlanetControlsProps) {
   return (
@@ -56,6 +56,5 @@ export function SimplePlanetControls({ stats, onMassChange, onRadiusChange }: Si
         </div>
       </div>
     </div>
-  )
-}
-
+  );
+};

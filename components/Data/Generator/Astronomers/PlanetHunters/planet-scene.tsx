@@ -5,7 +5,7 @@ import { OrbitControls, Stars } from '@react-three/drei';
 import { PlanetMesh } from './planet-mesh';
 import type { PlanetStats } from '@/utils/planet-physics';
 import { Button } from '@/components/ui/button';
-import { SimplePlanetMesh } from '@/components/simple-planet-mesh';
+import { SimplePlanetMesh } from './Simple/simple-planet-mesh';
 
 interface PlanetSceneProps { 
   stats: PlanetStats

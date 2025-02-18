@@ -1,16 +1,16 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import type { PlanetStats } from "../utils/planet-physics"
+import type { PlanetStats } from "@/utils/planet-physics"
 
-interface PlanetImportExportProps {
+interface FullPlanetImportExportProps {
   stats: PlanetStats
   onImport: (importedStats: Partial<PlanetStats>) => void
-};
+}
 
-export function PlanetImportExport({ stats, onImport }: PlanetImportExportProps) {
+export function FullPlanetImportExport({ stats, onImport }: FullPlanetImportExportProps) {
   const [importExportText, setImportExportText] = useState("")
 
   const handleExport = () => {
@@ -56,16 +56,21 @@ density: ${stats.density?.toFixed(2) ?? "N/A"}`
         onChange={(e) => setImportExportText(e.target.value)}
         placeholder="Paste settings here to import, or click Export to get current settings"
         rows={8}
-        className="w-full text-white bg-gray-800"
+        className="font-mono text-white bg-[#2A2A2A] border-[#3A3A3A]"
       />
-      <div className="flex justify-between">
-        <Button onClick={handleExport} size="default">
+      <div className="flex justify-between gap-4">
+        <Button onClick={handleExport} className="flex-1 bg-[#FF4B39] hover:bg-[#FF4B39]/90 text-white">
           Export
         </Button>
-        <Button onClick={handleImport} size="default">
+        <Button
+          onClick={handleImport}
+          variant="outline"
+          className="flex-1 border-[#FF4B39] text-[#FF4B39] hover:bg-[#FF4B39] hover:text-white"
+        >
           Import
         </Button>
       </div>
     </div>
-  );
-};
+  )
+}
+

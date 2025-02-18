@@ -10,8 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import type { PlanetStats } from "@/utils/planet-physics"
 
 const LOW_MASS_THRESHOLD = 0.2
-const TERRESTRIAL_THRESHOLD = 7.5 // Earth masses
-const GASEOUS_THRESHOLD = 2.0 // Earth radii
 
 export function FullPlanetGenerator() {
   const [mass, setMass] = useState(1)
@@ -158,5 +156,5 @@ export function FullPlanetGenerator() {
         </Dialog>
       </div>
     </div>
-  )
-}
+  );
+};

@@ -8,17 +8,17 @@ import type { PlanetStats } from "@/utils/planet-physics";
 interface SimplePlanetImportExportProps {
   stats: PlanetStats
   onImport: (importedStats: Partial<PlanetStats>) => void
-}
+};
 
 export function SimplePlanetImportExport({ stats, onImport }: SimplePlanetImportExportProps) {
   const [importExportText, setImportExportText] = useState("")
 
   const handleExport = () => {
     const exportText = `mass: ${stats.mass.toFixed(2)}
-radius: ${stats.radius.toFixed(2)}
-${stats.density !== undefined ? `density: ${stats.density.toFixed(2)}` : ""}`
-    setImportExportText(exportText.trim())
-  }
+        radius: ${stats.radius.toFixed(2)}
+        ${stats.density !== undefined ? `density: ${stats.density.toFixed(2)}` : ""}`
+            setImportExportText(exportText.trim())
+  };
 
   const handleImport = () => {
     const lines = importExportText.split("\n")
@@ -30,14 +30,14 @@ ${stats.density !== undefined ? `density: ${stats.density.toFixed(2)}` : ""}`
         const parsedValue = Number.parseFloat(value)
         if (!isNaN(parsedValue)) {
           ;(importedStats as any)[key] = parsedValue
-        }
-      }
-    })
+        };
+      };
+    });
 
     if (Object.keys(importedStats).length > 0) {
       onImport(importedStats)
-    }
-  }
+    };
+  };
 
   return (
     <div className="space-y-4">
