@@ -113,9 +113,9 @@ export default function PlanetGenerator({ classificationConfig, author, classifi
     <div className="min-h-screen bg-black p-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-8">Procedural Planet Generator</h1>
-        <div className="flex flex-col md:flex-row gap-8 items-start">
+        <div className="flex flex-col gap-8 items-center">
           <PlanetScene stats={stats} />
-          <div className="space-y-8">
+          <div className="w-full space-y-8">
             <PlanetControls
               stats={stats}
               onMassChange={handleMassChange}
@@ -124,7 +124,7 @@ export default function PlanetGenerator({ classificationConfig, author, classifi
             />
             <PlanetImportExport stats={stats} onImport={handleImport} onSave={handleSave} />
             {author === session?.user.id && (
-                <button
+              <button
                 onClick={handleSave}
                 className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
               >
@@ -135,5 +135,5 @@ export default function PlanetGenerator({ classificationConfig, author, classifi
         </div>
       </div>
     </div>
-  );
+  );  
 };

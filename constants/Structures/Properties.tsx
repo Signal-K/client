@@ -17,7 +17,7 @@ import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
 import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
 import PlanktonPortal from "@/components/Structures/Missions/Biologists/Plankton/PlanktonPortal";
 import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
-import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
+// import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
 import { AiForMarsProject } from "@/components/Projects/Auto/AI4Mars";
 import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
 import { PlanetFourProject } from "@/components/Projects/Satellite/PlanetFour";
@@ -186,12 +186,6 @@ export const StructuresConfig: StructureConfig = {
           sizePercentage: 95,
           showInNoModal: true,
         },
-        // {
-        //   icon: <EarthIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Find new worlds",
-        //   dynamicComponent: <ExoplanetTransitHunter />,
-        //   sizePercentage: 80,
-        // },
         {
           icon: <SunIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Sunspot data",

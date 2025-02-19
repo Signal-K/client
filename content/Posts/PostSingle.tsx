@@ -90,7 +90,7 @@ export function PostCardSingle({
           const nonSurveyor = comments.filter((comment) => !comment.isSurveyor);
           setSurveyorComments(surveyor);
           setNonSurveyorComments(nonSurveyor);
-        }
+        };
 
       if (error) throw error;
       setComments(data);
@@ -227,9 +227,9 @@ export function PostCardSingle({
     };
   };  
 
-  useEffect(() => {
-    console.log("Images prop received:", images);
-  }, [images]);  
+  // useEffect(() => {
+  //   console.log("Images prop received:", images);
+  // }, [images]);  
 
   return (
     <div ref={shareCardRef}>
@@ -361,10 +361,12 @@ export function PostCardSingle({
                   comments.map((comment) => (
                     <CommentCard
                       key={comment.id}
+                      id={comment.id}
                       author={comment.author}
                       content={comment.content}
                       createdAt={comment.created_at}
                       replyCount={0}
+                      classificationId={classificationId}
                       parentCommentId={classificationId}
                       isSurveyor={comment.isSurveyor}
                     >

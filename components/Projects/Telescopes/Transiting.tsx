@@ -76,9 +76,9 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
                     };
 
                     if (randomAnomaly?.id) {
-                        const binnedUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Binned.png`;
+                        // const binnedUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Binned.png`;
                         const sectorUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Sector1.png`;
-                        imageList.push(binnedUrl, sectorUrl); 
+                        imageList.push(sectorUrl);  // binnedUrl, 
                     };
 
                     setImageUrls(imageList);
