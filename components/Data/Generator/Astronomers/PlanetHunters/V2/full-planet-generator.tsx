@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react"
 import { PlanetScene } from "./planet-scene"
@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import type { PlanetStats } from "@/utils/planet-physics"
 
 const LOW_MASS_THRESHOLD = 0.2
+const TERRESTRIAL_THRESHOLD = 7.5 // Earth masses
+const GASEOUS_THRESHOLD = 2.0 // Earth radii
 
 export function FullPlanetGenerator() {
   const [mass, setMass] = useState(1)
@@ -40,6 +42,8 @@ export function FullPlanetGenerator() {
   const [biome, setBiome] = useState("Rocky Highlands")
   const [cloudTypes, setCloudTypes] = useState<string[]>(["Cumulus"])
   const [cloudDensity, setCloudDensity] = useState(0.5)
+  const [atmosphereVisibility, setAtmosphereVisibility] = useState(1)
+  const [atmosphereHeight, setAtmosphereHeight] = useState(1)
 
   const stats = calculatePlanetStats(
     mass,
@@ -69,9 +73,11 @@ export function FullPlanetGenerator() {
     biome,
     cloudTypes,
     cloudDensity,
+    // atmosphereVisibility,
+    // atmosphereHeight,
   )
 
-  const terrainHeight = calculateTerrainHeight(stats)
+  const terrainHeight = calculateTerrainHeight(stats);
 
   const handleImport = (importedStats: Partial<PlanetStats>) => {
     if (importedStats.mass !== undefined) setMass(importedStats.mass)
@@ -99,13 +105,15 @@ export function FullPlanetGenerator() {
     if (importedStats.biome !== undefined) setBiome(importedStats.biome)
     if (importedStats.cloudTypes !== undefined) setCloudTypes(importedStats.cloudTypes)
     if (importedStats.cloudDensity !== undefined) setCloudDensity(importedStats.cloudDensity)
+    // if (importedStats.atmosphereVisibility !== undefined) setAtmosphereVisibility(importedStats.atmosphereVisibility)
+    // if (importedStats.atmosphereHeight !== undefined) setAtmosphereHeight(importedStats.atmosphereHeight)
     setTypeOverride(null)
-  }
+  };
 
   return (
     <div className="rounded-lg overflow-hidden bg-[#1E1E1E] border border-[#2A2A2A]">
       <div className="h-[400px] relative">
-        <PlanetScene stats={stats} terrainHeight={terrainHeight} />
+        <PlanetScene terrainHeight={terrainHeight} stats={stats} />
       </div>
       <div className="p-6 space-y-6">
         <FullPlanetControls
@@ -136,6 +144,8 @@ export function FullPlanetGenerator() {
           onBiomeChange={setBiome}
           onCloudTypesChange={setCloudTypes}
           onCloudDensityChange={setCloudDensity}
+          onAtmosphereVisibilityChange={setAtmosphereVisibility}
+          onAtmosphereHeightChange={setAtmosphereHeight}
           showExtendedControls={mass >= LOW_MASS_THRESHOLD}
         />
         <Dialog>

@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { determineLiquidType } from "@/utils/planet-physics";
 import type { PlanetStats } from "@/utils/planet-physics";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 
 interface FullPlanetControlsProps {
   stats: PlanetStats
@@ -36,6 +36,8 @@ interface FullPlanetControlsProps {
   showExtendedControls: boolean
   onCloudTypesChange: (value: string[]) => void
   onCloudDensityChange: (value: number) => void
+  onAtmosphereVisibilityChange: (value: number) => void
+  onAtmosphereHeightChange: (value: number) => void
 }
 
 export function FullPlanetControls({
@@ -67,6 +69,8 @@ export function FullPlanetControls({
   showExtendedControls,
   onCloudTypesChange,
   onCloudDensityChange,
+  onAtmosphereVisibilityChange,
+  onAtmosphereHeightChange,
 }: FullPlanetControlsProps) {
   const liquidInfo = determineLiquidType(stats.temperature)
 
@@ -75,14 +79,14 @@ export function FullPlanetControls({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Label className="text-base text-[#5FCBC3]">Mass (M⊕)</Label>
-          <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">{stats.mass.toFixed(2)}</span>
+          <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">{stats.mass?.toFixed(2) ?? "N/A"}</span>
         </div>
         <Slider
           className="w-full [&_[role=slider]]:bg-[#5FCBC3]"
           min={0.1}
           max={10}
           step={0.1}
-          value={[stats.mass]}
+          value={[stats.mass ?? 0]}
           onValueChange={([value]) => onMassChange(value)}
         />
       </div>
@@ -90,14 +94,14 @@ export function FullPlanetControls({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Label className="text-base text-[#5FCBC3]">Radius (R⊕)</Label>
-          <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">{stats.radius.toFixed(2)}</span>
+          <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">{stats.radius?.toFixed(2) ?? "N/A"}</span>
         </div>
         <Slider
           className="w-full [&_[role=slider]]:bg-[#5FCBC3]"
           min={0.1}
           max={3}
           step={0.1}
-          value={[stats.radius]}
+          value={[stats.radius ?? 0]}
           onValueChange={([value]) => onRadiusChange(value)}
         />
       </div>
@@ -107,14 +111,16 @@ export function FullPlanetControls({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Temperature (K)</Label>
-              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">{stats.temperature}</span>
+              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
+                {stats.temperature?.toFixed(0) ?? "N/A"}
+              </span>
             </div>
             <Slider
               className="w-full [&_[role=slider]]:bg-[#5FCBC3]"
               min={50}
               max={400}
               step={1}
-              value={[stats.temperature]}
+              value={[stats.temperature ?? 0]}
               onValueChange={([value]) => onTemperatureChange(value)}
             />
           </div>
@@ -122,14 +128,16 @@ export function FullPlanetControls({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Water Height</Label>
-              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">{stats.waterHeight.toFixed(2)}</span>
+              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
+                {stats.waterHeight?.toFixed(2) ?? "N/A"}
+              </span>
             </div>
             <Slider
               className="w-full [&_[role=slider]]:bg-[#5FCBC3]"
               min={0}
               max={1}
               step={0.01}
-              value={[stats.waterHeight]}
+              value={[stats.waterHeight ?? 0]}
               onValueChange={([value]) => onWaterHeightChange(value)}
             />
           </div>
@@ -138,7 +146,7 @@ export function FullPlanetControls({
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Surface Roughness</Label>
               <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
-                {stats.surfaceRoughness.toFixed(2)}
+                {stats.surfaceRoughness?.toFixed(2) ?? "N/A"}
               </span>
             </div>
             <Slider
@@ -146,7 +154,7 @@ export function FullPlanetControls({
               min={0}
               max={2}
               step={0.01}
-              value={[stats.surfaceRoughness]}
+              value={[stats.surfaceRoughness ?? 0]}
               onValueChange={([value]) => onSurfaceRoughnessChange(value)}
             />
           </div>
@@ -155,7 +163,7 @@ export function FullPlanetControls({
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Terrain Erosion</Label>
               <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
-                {stats.terrainErosion.toFixed(2)}
+                {stats.terrainErosion?.toFixed(2) ?? "N/A"}
               </span>
             </div>
             <Slider
@@ -163,7 +171,7 @@ export function FullPlanetControls({
               min={0}
               max={1}
               step={0.01}
-              value={[stats.terrainErosion]}
+              value={[stats.terrainErosion ?? 0]}
               onValueChange={([value]) => onTerrainErosionChange(value)}
             />
           </div>
@@ -172,7 +180,7 @@ export function FullPlanetControls({
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Plate Tectonics</Label>
               <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
-                {stats.plateTectonics.toFixed(2)}
+                {stats.plateTectonics?.toFixed(2) ?? "N/A"}
               </span>
             </div>
             <Slider
@@ -180,7 +188,7 @@ export function FullPlanetControls({
               min={0}
               max={1}
               step={0.01}
-              value={[stats.plateTectonics]}
+              value={[stats.plateTectonics ?? 0]}
               onValueChange={([value]) => onPlateTectonicsChange(value)}
             />
           </div>
@@ -206,14 +214,16 @@ export function FullPlanetControls({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Biomass Level</Label>
-              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">{stats.biomassLevel.toFixed(2)}</span>
+              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
+                {stats.biomassLevel?.toFixed(2) ?? "N/A"}
+              </span>
             </div>
             <Slider
               className="w-full [&_[role=slider]]:bg-[#5FCBC3]"
               min={0}
               max={1}
               step={0.01}
-              value={[stats.biomassLevel]}
+              value={[stats.biomassLevel ?? 0]}
               onValueChange={([value]) => onBiomassLevelChange(value)}
             />
           </div>
@@ -221,14 +231,16 @@ export function FullPlanetControls({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Water Level</Label>
-              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">{stats.waterLevel.toFixed(2)}</span>
+              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
+                {stats.waterLevel?.toFixed(2) ?? "N/A"}
+              </span>
             </div>
             <Slider
               className="w-full [&_[role=slider]]:bg-[#5FCBC3]"
               min={0}
               max={1}
               step={0.01}
-              value={[stats.waterLevel]}
+              value={[stats.waterLevel ?? 0]}
               onValueChange={([value]) => onWaterLevelChange(value)}
             />
           </div>
@@ -236,14 +248,16 @@ export function FullPlanetControls({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Salinity</Label>
-              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">{stats.salinity.toFixed(2)}</span>
+              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
+                {stats.salinity?.toFixed(2) ?? "N/A"}
+              </span>
             </div>
             <Slider
               className="w-full [&_[role=slider]]:bg-[#5FCBC3]"
               min={0}
               max={1}
               step={0.01}
-              value={[stats.salinity]}
+              value={[stats.salinity ?? 0]}
               onValueChange={([value]) => onSalinityChange(value)}
             />
           </div>
@@ -252,7 +266,7 @@ export function FullPlanetControls({
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Subsurface Water</Label>
               <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
-                {stats.subsurfaceWater.toFixed(2)}
+                {stats.subsurfaceWater?.toFixed(2) ?? "N/A"}
               </span>
             </div>
             <Slider
@@ -260,7 +274,7 @@ export function FullPlanetControls({
               min={0}
               max={1}
               step={0.01}
-              value={[stats.subsurfaceWater]}
+              value={[stats.subsurfaceWater ?? 0]}
               onValueChange={([value]) => onSubsurfaceWaterChange(value)}
             />
           </div>
@@ -269,7 +283,7 @@ export function FullPlanetControls({
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Atmospheric Density</Label>
               <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
-                {stats.atmosphericDensity.toFixed(2)}
+                {stats.atmosphericDensity?.toFixed(2) ?? "N/A"}
               </span>
             </div>
             <Slider
@@ -277,7 +291,7 @@ export function FullPlanetControls({
               min={0}
               max={1}
               step={0.01}
-              value={[stats.atmosphericDensity]}
+              value={[stats.atmosphericDensity ?? 0]}
               onValueChange={([value]) => onAtmosphericDensityChange(value)}
             />
           </div>
@@ -286,7 +300,7 @@ export function FullPlanetControls({
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Weather Variability</Label>
               <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
-                {stats.weatherVariability.toFixed(2)}
+                {stats.weatherVariability?.toFixed(2) ?? "N/A"}
               </span>
             </div>
             <Slider
@@ -294,7 +308,7 @@ export function FullPlanetControls({
               min={0}
               max={1}
               step={0.01}
-              value={[stats.weatherVariability]}
+              value={[stats.weatherVariability ?? 0]}
               onValueChange={([value]) => onWeatherVariabilityChange(value)}
             />
           </div>
@@ -303,7 +317,7 @@ export function FullPlanetControls({
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Storm Frequency</Label>
               <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
-                {stats.stormFrequency.toFixed(2)}
+                {stats.stormFrequency?.toFixed(2) ?? "N/A"}
               </span>
             </div>
             <Slider
@@ -311,7 +325,7 @@ export function FullPlanetControls({
               min={0}
               max={1}
               step={0.01}
-              value={[stats.stormFrequency]}
+              value={[stats.stormFrequency ?? 0]}
               onValueChange={([value]) => onStormFrequencyChange(value)}
             />
           </div>
@@ -320,7 +334,7 @@ export function FullPlanetControls({
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Volcanic Activity</Label>
               <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
-                {stats.volcanicActivity.toFixed(2)}
+                {stats.volcanicActivity?.toFixed(2) ?? "N/A"}
               </span>
             </div>
             <Slider
@@ -328,7 +342,7 @@ export function FullPlanetControls({
               min={0}
               max={1}
               step={0.01}
-              value={[stats.volcanicActivity]}
+              value={[stats.volcanicActivity ?? 0]}
               onValueChange={([value]) => onVolcanicActivityChange(value)}
             />
           </div>
@@ -408,23 +422,59 @@ export function FullPlanetControls({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-base text-[#5FCBC3]">Cloud Density</Label>
-              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">{stats.cloudDensity.toFixed(2)}</span>
+              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
+                {stats.cloudDensity?.toFixed(2) ?? "N/A"}
+              </span>
             </div>
             <Slider
               className="w-full [&_[role=slider]]:bg-[#5FCBC3]"
               min={0}
               max={1}
               step={0.01}
-              value={[stats.cloudDensity]}
+              value={[stats.cloudDensity ?? 0]}
               onValueChange={([value]) => onCloudDensityChange(value)}
             />
           </div>
+
+          {/* <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base text-[#5FCBC3]">Atmosphere Visibility</Label>
+              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
+                {stats.atmosphereVisibility?.toFixed(2) ?? "N/A"}
+              </span>
+            </div>
+            <Slider
+              className="w-full [&_[role=slider]]:bg-[#5FCBC3]"
+              min={0}
+              max={1}
+              step={0.01}
+              value={[stats.atmosphereVisibility ?? 0]}
+              onValueChange={([value]) => onAtmosphereVisibilityChange(value)}
+            />
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base text-[#5FCBC3]">Atmosphere Height</Label>
+              <span className="text-sm text-white bg-[#2C4F64] px-2 py-1 rounded">
+                {stats.atmosphereHeight?.toFixed(2) ?? "N/A"}
+              </span>
+            </div>
+            <Slider
+              className="w-full [&_[role=slider]]:bg-[#5FCBC3]"
+              min={0}
+              max={2}
+              step={0.01}
+              value={[stats.atmosphereHeight ?? 0]}
+              onValueChange={([value]) => onAtmosphereHeightChange(value)}
+            />
+          </div> */}
 
           <div className="p-4 bg-[#2C4F64] rounded-lg">
             <div className="text-sm text-white space-y-2">
               <div className="flex justify-between">
                 <span className="text-[#5FCBC3]">Density:</span>
-                <span>{stats.density.toFixed(2)} g/cm³</span>
+                <span>{stats.density?.toFixed(2) ?? "N/A"} g/cm³</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#5FCBC3]">Type:</span>
@@ -439,6 +489,5 @@ export function FullPlanetControls({
         </>
       )}
     </div>
-  )
-}
-
+  );
+};

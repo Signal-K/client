@@ -2,12 +2,18 @@
 
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { Anomaly } from "../Telescopes/ExoplanetC23";
+// import { Anomaly } from "../Telescopes/ExoplanetC23";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 
 interface ZoodexProps {
   anomalyId: number | bigint;
+};
+
+interface Anomaly {
+    id: bigint;
+    content: string;
+    avatar_url?: string; 
 };
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

@@ -26,7 +26,7 @@ export interface PlanetStats {
   biome: string
   cloudTypes: string[]
   cloudDensity: number
-}
+};
 
 export interface LiquidInfo {
   type: "water" | "methane" | "nitrogen" | "none"
