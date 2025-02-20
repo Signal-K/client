@@ -32,7 +32,7 @@ export interface LiquidInfo {
   type: "water" | "methane" | "nitrogen" | "none"
   color: string
   temperatureRange: string
-}
+};
 
 export function calculatePlanetStats(
   mass: number,
