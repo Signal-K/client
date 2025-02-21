@@ -7,17 +7,17 @@ import { determineLiquidType } from "@/utils/planet-physics";
 import type { PlanetStats } from "@/utils/planet-physics";
 
 interface PlanetControlsProps {
-  stats: PlanetStats;
-  onMassChange: (value: number) => void;
-  onRadiusChange: (value: number) => void;
-  onTemperatureChange: (value: number) => void;
-  onOrbitalPeriodChange: (value: number) => void;
-  onTypeOverride: (type: "terrestrial" | "gaseous" | null) => void;
-  onAtmosphereStrengthChange: (value: number) => void;
-  onCloudCountChange: (value: number) => void;
-  onWaterLevelChange: (value: number) => void;
-  onSurfaceRoughnessChange: (value: number) => void;
-  showExtendedControls: boolean;
+  stats: PlanetStats
+  onMassChange: (value: number) => void
+  onRadiusChange: (value: number) => void
+  onTemperatureChange: (value: number) => void
+  onOrbitalPeriodChange: (value: number) => void
+  onTypeOverride: (type: "terrestrial" | "gaseous" | null) => void
+  onAtmosphereStrengthChange: (value: number) => void
+  onCloudCountChange: (value: number) => void
+  onWaterLevelChange: (value: number) => void
+  onSurfaceRoughnessChange: (value: number) => void
+  showExtendedControls: boolean
 };
 
 export function PlanetControls({
@@ -33,7 +33,7 @@ export function PlanetControls({
   onSurfaceRoughnessChange,
   showExtendedControls,
 }: PlanetControlsProps) {
-  const liquidInfo = determineLiquidType(stats.temperature);
+  const liquidInfo = determineLiquidType(stats.temperature)
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

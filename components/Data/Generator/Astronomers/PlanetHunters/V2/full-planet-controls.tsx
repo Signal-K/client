@@ -123,7 +123,14 @@ export function FullPlanetControls({
                   min={0.1}
                   max={10}
                   step={0.1}
-                  onChange={onMassChange}
+                  onChange={(value) => {
+                    onMassChange(value)
+                    if (value > 7.5) {
+                      onTypeOverride("gaseous")
+                    } else {
+                      onTypeOverride(null) // Let the physics determine type
+                    }
+                  }}
                 />
                 <SliderControl
                   label="Radius (R⊕)"
@@ -131,14 +138,25 @@ export function FullPlanetControls({
                   min={0.1}
                   max={3}
                   step={0.1}
-                  onChange={onRadiusChange}
+                  onChange={(value) => {
+                    onRadiusChange(value)
+                    if (value > 2) {
+                      onTypeOverride("gaseous")
+                    } else {
+                      onTypeOverride(null) // Let the physics determine type
+                    }
+                  }}
                 />
                 <div className="space-y-2">
                   <Label className="text-sm text-[#5FCBC3]">Planet Type</Label>
                   <div className="flex gap-2">
                     <Button
                       size="sm"
-                      onClick={() => onTypeOverride("terrestrial")}
+                      onClick={() => {
+                        onTypeOverride("terrestrial")
+                        onMassChange(1) // Earth-like mass
+                        onRadiusChange(1) // Earth-like radius
+                      }}
                       variant={stats.type === "terrestrial" ? "default" : "outline"}
                       className={
                         stats.type === "terrestrial"
@@ -150,7 +168,11 @@ export function FullPlanetControls({
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => onTypeOverride("gaseous")}
+                      onClick={() => {
+                        onTypeOverride("gaseous")
+                        onMassChange(8) // Gas giant mass
+                        onRadiusChange(2.5) // Gas giant radius
+                      }}
                       variant={stats.type === "gaseous" ? "default" : "outline"}
                       className={
                         stats.type === "gaseous"
