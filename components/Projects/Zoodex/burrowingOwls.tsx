@@ -211,6 +211,8 @@ export function BurrowingOwl() {
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [showTutorial, setShowTutorial] = useState(false);
+
     const [loading, setLoading] = useState(true);
 
     // Check tutorial mission
@@ -256,41 +258,40 @@ export function BurrowingOwl() {
         fetchAnomaly();
     }, [session, supabase, activePlanet]);
 
-    // Check tutorial mission
-    useEffect(() => {
-        const checkTutorialMission = async () => {
-            if (!session) return;
+    // useEffect(() => {
+    //     const checkTutorialMission = async () => {
+    //         if (!session) return;
 
-            try {
-                const { data: missionData, error: missionError } = await supabase
-                    .from("missions")
-                    .select("id")
-                    .eq("user", session.user.id)
-                    .eq("mission", "3000002");
+    //         try {
+    //             const { data: missionData, error: missionError } = await supabase
+    //                 .from("missions")
+    //                 .select("id")
+    //                 .eq("user", session.user.id)
+    //                 .eq("mission", "3000002");
 
-                if (missionError) throw missionError;
+    //             if (missionError) throw missionError;
 
-                setHasMission3000002(missionData.length > 0);
-            } catch (error: any) {
-                console.error("Error checking user mission: ", error.message || error);
-                setHasMission3000002(false);
-            } finally {
-                setMissionLoading(false);
-            };
-        };
+    //             setHasMission3000002(missionData.length > 0);
+    //         } catch (error: any) {
+    //             console.error("Error checking user mission: ", error.message || error);
+    //             setHasMission3000002(false);
+    //         } finally {
+    //             setMissionLoading(false);
+    //         };
+    //     };
 
-        checkTutorialMission();
-    }, [session, supabase]);
+    //     checkTutorialMission();
+    // }, [session, supabase]);
 
-    if (missionLoading) {
-        return <div>Loading mission status...</div>;
-    };
+    // if (missionLoading) {
+    //     return <div>Loading mission status...</div>;
+    // };
 
-    if (!hasMission3000002) {
-        return (
-            <BurrowingOwlTutorial anomalyId={anomaly?.id.toString() || "4567867"} />
-        );
-    };
+    // if (!hasMission3000002) {
+    //     return (
+    //         <BurrowingOwlTutorial anomalyId={anomaly?.id.toString() || "4567867"} />
+    //     );
+    // };
 
     if (loading) {
         return (
@@ -311,16 +312,29 @@ export function BurrowingOwl() {
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="pb-4 rounded-md relative w-full">
-                {imageUrl && (
-                    <img src={imageUrl} alt={anomaly.content} className="w-full h-64 object-cover" />
-                )}
-                <ClassificationForm
-                    anomalyId={anomaly.id.toString()}
-                    anomalyType="zoodex-burrowingOwl"
-                    missionNumber={100000035}
-                    assetMentioned={imageUrl || ""}
-                    structureItemId={3104}
-                />
+                <center>
+                    <button
+                        onClick={() => setShowTutorial((prev) => !prev)}
+                        className="mb-4 px-4 py-2 bg-[#D689E3] text-white rounded"
+                    >
+                        {showTutorial ? "Close Tutorial" : "Show Tutorial"}
+                    </button>
+
+                    {showTutorial && anomaly && <BurrowingOwlTutorial anomalyId={anomaly.id.toString()} />}
+
+                    {!showTutorial && (
+                        <>
+                            <img src={imageUrl || ''} alt={anomaly.content} className="w-full h-64 object-cover" />
+                            <ClassificationForm
+                                anomalyId={anomaly.id.toString()}
+                                anomalyType="zoodex-burrowingOwl"
+                                missionNumber={100000035}
+                                assetMentioned={imageUrl || ""}
+                                structureItemId={3104}
+                            />
+                        </>
+                    )}
+                </center>
             </div>
         </div>
     );
