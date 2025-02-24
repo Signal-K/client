@@ -44,7 +44,7 @@ export function CommentCard({ author, classificationConfig, classificationId, co
       console.log("Confirmed comment configuration:", configuration);
     } catch (error) {
       console.error("Error confirming comment:", error);
-    }
+    };
   };
 
   return (

@@ -11,7 +11,7 @@ interface SimplePlanetMeshProps {
     radius: number;
     density: number;
     type: "terrestrial" | "gaseous"
-  };
+  }; 
 };
 
 export function SimplePlanetMesh({ stats }: SimplePlanetMeshProps) {
