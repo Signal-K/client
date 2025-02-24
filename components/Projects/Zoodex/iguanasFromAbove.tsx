@@ -185,6 +185,8 @@ export function ZoodexIguanas() {
 
   const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
+  
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -226,39 +228,39 @@ export function ZoodexIguanas() {
     fetchAnomaly();
   }, [session, supabase, activePlanet]);
 
-  const [hasMission3000004, setHasMission3000004] = useState<boolean>(false);
-  useEffect(() => {
-    const checkTutorialMission = async () => {
-      if (!session) {
-        return;
-      }
+  // const [hasMission3000004, setHasMission3000004] = useState<boolean>(false);
+  // useEffect(() => {
+  //   const checkTutorialMission = async () => {
+  //     if (!session) {
+  //       return;
+  //     }
 
-      try {
-        const { data: missionData, error: missionError } = await supabase
-          .from('missions')
-          .select('id')
-          .eq('user', session.user.id)
-          .eq('mission', 3000004);
+  //     try {
+  //       const { data: missionData, error: missionError } = await supabase
+  //         .from('missions')
+  //         .select('id')
+  //         .eq('user', session.user.id)
+  //         .eq('mission', 3000004);
 
-        if (missionError) {
-          throw missionError;
-        }
+  //       if (missionError) {
+  //         throw missionError;
+  //       }
 
-        setHasMission3000004(missionData.length > 0);
-      } catch (error: any) {
-        console.error('Error checking iguana mission: ', error.message);
-        setHasMission3000004(false);
-      }
-    };
+  //       setHasMission3000004(missionData.length > 0);
+  //     } catch (error: any) {
+  //       console.error('Error checking iguana mission: ', error.message);
+  //       setHasMission3000004(false);
+  //     }
+  //   };
 
-    checkTutorialMission();
-  }, [session, supabase]);
+  //   checkTutorialMission();
+  // }, [session, supabase]);
 
-  if (!hasMission3000004) {
-    return (
-      <IguanasFromAboveTutorial anomalyId={anomaly?.id?.toString() || '5757557437553254'} />
-    );
-  }
+  // if (!hasMission3000004) {
+  //   return (
+  //     <IguanasFromAboveTutorial anomalyId={anomaly?.id?.toString() || '5757557437553254'} />
+  //   );
+  // }
 
   if (loading) {
     return (
@@ -277,19 +279,22 @@ export function ZoodexIguanas() {
   }
 
   return (
-    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-      <div className="p-4 rounded-md relative w-full">
-        {imageUrl && (
-          <img src={imageUrl} alt={anomaly.content} className="w-full h-64 object-cover" />
-        )}
-        <ClassificationForm
-          anomalyId={anomaly.id.toString()}
-          anomalyType="zoodex-iguanasFromAbove"
-          missionNumber={100000036}
-          assetMentioned={imageUrl || ''}
-          structureItemId={3104}
-        />
-      </div>
+    <div className="flex flex-col items-center">
+      <button
+        onClick={() => setShowTutorial((prev) => !prev)}
+        className="mb-4 px-4 py-2 bg-[#D689E3] text-white rounded"
+      >
+        {showTutorial ? "Close Tutorial" : "Show Tutorial"}
+      </button>
+
+      {showTutorial ? (
+        <IguanasFromAboveTutorial anomalyId={anomaly.id.toString()} />
+      ) : (
+        <div className="max-w-4xl mx-auto bg-[#1D2833] text-[#F7F5E9] rounded-md">
+          <img src={imageUrl!} alt="Iguana" className="w-64 h-64 object-contain" />
+          <ClassificationForm anomalyId={anomaly.id.toString()} anomalyType="zoodex-iguanasFromAbove" missionNumber={3000004} assetMentioned={imageUrl!} />
+        </div>
+      )}
     </div>
   );
 };

@@ -27,6 +27,5 @@ export function SimplePlanetScene({ stats }: SimplePlanetSceneProps) {
         />
       </Canvas>
     </div>
-  )
-}
-
+  );
+};

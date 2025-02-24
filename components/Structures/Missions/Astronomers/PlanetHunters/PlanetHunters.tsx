@@ -251,81 +251,54 @@ const PlanetHuntersSteps = () => {
   const maxChapter = Math.max(...steps.map(step => step.chapter));
 
   return (
-    <div className="flex flex-col items-center width-[100%] text-white rounded-2xl p-6">
-      <div className="w-full mb-6">
-        <h1 className="text-xl font-bold mb-2">Chapter {currentChapter}</h1>
-        <div className="h-2 bg-gray-600 rounded-full w-full mb-4">
+    <div className="flex flex-col items-center w-full text-white rounded-2xl p-6 max-w-3xl mx-auto">
+      <div className="w-full mb-4">
+        <h1 className="text-xl font-bold mb-2 text-center">Chapter {currentChapter}</h1>
+        <div className="h-2 bg-gray-600 rounded-full w-full">
           <div
             className="h-full bg-[#5FCBC3] rounded-full"
-            style={{ width: `${(experiencePoints / (maxChapter * 9)) * 100}%` }}
+            style={{ width: `${(experiencePoints / (steps.length * 9)) * 100}%` }}
           />
         </div>
-        <p className="text-sm text-center">{`Level ${level} - ${experiencePoints} XP`}</p>
+        <p className="text-sm text-center mt-2">{`Level ${level} - ${experiencePoints} XP`}</p>
       </div>
 
-      <div className="flex justify-between w-full mb-6">
+      <div className="flex flex-col sm:flex-row justify-between w-full mb-4">
         <button
-          className="px-4 py-2 bg-gray-800 rounded-full"
+          className="px-4 py-2 bg-gray-800 rounded-full w-full sm:w-auto mb-2 sm:mb-0"
           onClick={() => setCurrentChapter(Math.max(currentChapter - 1, 1))}
           disabled={currentChapter === 1}
         >
           Previous Chapter
         </button>
         <button
-          className="px-4 py-2 bg-gray-800 rounded-full"
-          onClick={() => setCurrentChapter(Math.min(currentChapter + 1, maxChapter))}
-          disabled={currentChapter === maxChapter}
+          className="px-4 py-2 bg-gray-800 rounded-full w-full sm:w-auto"
+          onClick={() => setCurrentChapter(Math.min(currentChapter + 1, 2))}
+          disabled={currentChapter === 2}
         >
           Next Chapter
         </button>
       </div>
 
-      <div className="bg-gray-700 p-6 rounded-2xl w-full mb-6">
-        <div className="grid grid-cols-2 gap-4 w-full">
-          {filteredSteps.slice(0, 2).map((step) => (
-            <div
-              key={step.id}
-              className={`flex items-center p-6 rounded-2xl cursor-pointer ${
-                step.completedCount > 0 ? "bg-gray-700" : "bg-blue-500"
-              }`}
-              onClick={() => setSelectedMission(step)}
-            >
-              <step.icon className={`h-10 w-10 ${step.color}`} />
-              <div className="ml-4">
-                <h2 className={`text-lg font-bold ${step.color}`}>{step.title}</h2>
-                <p className={`text-sm ${step.color}`}>{step.description}</p>
+      <div className="bg-gray-700 p-6 rounded-2xl w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {steps
+            .filter((step) => step.chapter === currentChapter)
+            .map((step) => (
+              <div
+                key={step.id}
+                className="flex items-center p-4 rounded-2xl bg-gray-800 hover:bg-gray-700 cursor-pointer"
+                onClick={() => setSelectedMission(step)}
+              >
+                <step.icon className={`w-8 h-8 ${step.color}`} />
+                <div className="ml-4 flex-1">
+                  <h2 className={`text-lg font-bold ${step.color}`}>{step.title}</h2>
+                  <p className="text-sm">{step.description}</p>
+                </div>
               </div>
-              <div className="ml-auto text-right">
-                <p className="text-xs">Completed</p>
-                <p className="text-xl font-bold">{step.completedCount}</p>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
-
-      <div className="grid gap-4 w-full mt-6">
-        {filteredSteps.slice(2).map((step) => (
-          <div
-            key={step.id}
-            className={`flex items-center p-6 rounded-2xl shadow-md cursor-pointer ${
-              step.completedCount > 0 ? "bg-gray-700" : "bg-blue-500"
-            }`}
-            onClick={() => setSelectedMission(step)}
-          >
-            <step.icon className={`h-10 w-10 ${step.color}`} />
-            <div className="ml-4">
-              <h2 className={`text-lg font-bold ${step.color}`}>{step.title}</h2>
-              <p className={`text-sm ${step.color}`}>{step.description}</p>
-            </div>
-            <div className="ml-auto text-right">
-              <p className="text-xs">Completed</p>
-              <p className="text-xl font-bold">{step.completedCount}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
       <div className="mt-6">
         {renderMission(tutorialMission)}
       </div>

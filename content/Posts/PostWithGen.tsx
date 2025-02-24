@@ -30,7 +30,7 @@ interface PostCardSingleProps {
   votes: number;
   category: string;
   tags?: string[];
-  classificationConfig?: any;
+  classificationConfig?: any; 
   images: string[];
   classificationType: string;
   onVote?: () => void;
@@ -116,11 +116,14 @@ export function PostCardSingleWithGenerator({
               comments.map((comment) => (
                 <CommentCard
                   key={comment.id}
+                  id={comment.id}
                   author={comment.author}
+                  classificationId={classificationId}
                   content={comment.content}
                   createdAt={comment.created_at}
                   replyCount={0}
                   parentCommentId={classificationId}
+                  isSurveyor={false}
                 />
               ))
             ) : (

@@ -69,14 +69,14 @@ const MissionShell = ({
           setUsername(data.username);
           setFirstName(data?.full_name);
           setAvatarPreview(data?.avatar_url || "");
-        }
-      }
+        };
+      };
       setLoading(false);
-    }
+    };
   
     if (session?.user?.id) {
       getProfile();
-    }
+    };
   
     return () => {
       ignore = true;
@@ -183,11 +183,11 @@ const MissionShell = ({
           {currentChapter === 1 ? (
             <>
               <div className="bg-gray-700 p-6 rounded-2xl w-full mb-6">
-                <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                   {missions.slice(0, 2).map((mission) => renderMission(mission))}
                 </div>
               </div>
-              <div className="grid gap-4 w-full mt-6 overflow-y-auto max-h-[calc(100vh-200px)]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mt-6 overflow-y-auto max-h-[calc(100vh-200px)]">
                 {missions.slice(2).map((mission) => renderMission(mission))}
               </div>
             </>
@@ -209,7 +209,7 @@ const MissionShell = ({
       <AnimatePresence>
         {selectedMission && (
           <motion.div
-            className="flex flex-col bg-[#1D2833] rounded-2xl p-6 w-full max-w-4xl mx-auto"
+            className="flex flex-col bg-[#1D2833] rounded-2xl p-6 w-full max-w-5xl mx-auto"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -219,7 +219,11 @@ const MissionShell = ({
               <Button onClick={() => setSelectedMission(null)}>Back</Button>
             </div>
             <div className="flex-1 overflow-y-auto max-h-[calc(100vh-150px)]">
-              {selectedMission.internalComponent && <selectedMission.internalComponent />}
+              {selectedMission.internalComponent && (
+                <div className="overflow-x-auto w-full">{/* Add this wrapper */}
+                  <selectedMission.internalComponent />
+                </div>
+              )}
             </div>
           </motion.div>
         )}

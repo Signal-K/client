@@ -218,33 +218,6 @@ export function AiForMarsProject({
     };
 
     useEffect(() => {
-        // async function fetchAnomaly() {
-        //     if (!session) {
-        //         setLoading(false);
-        //         return;
-        //     };
-
-        //     try {
-        //         const { data: anomalyData, error: anomalyError } = await supabase
-        //             .from("anomalies")
-        //             .select("*")
-        //             .eq("anomalySet", "automaton-aiForMars");
-
-        //         if (anomalyError) throw anomalyError;
-
-        //         const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
-        //         setAnomaly(randomAnomaly);
-        //         setImageUrl(
-        //             `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${randomAnomaly.id}.jpeg`
-        //         );
-        //     } catch (error: any) {
-        //         console.error("Error fetching anomaly", error.message);
-        //         setAnomaly(null);
-        //     } finally {
-        //         setLoading(false);
-        //     }
-        // }
-
         fetchAnomaly();
     }, [session, supabase]);
 
@@ -267,23 +240,25 @@ export function AiForMarsProject({
     const startTutorial = () => setShowTutorial(true);
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full overflow-y-auto max-h-[90vh] rounded-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full overflow-y-auto max-h-[90vh] rounded-lg overflow-x-hidden">
             {!hasMission20000006 ? (
                 <StarterAiForMars anomalyid={anomaly.id || 69592674} />
             ) : (
                 <>
                     {imageUrl && (
                         <>
-                            <ImageAnnotator
-                                initialImageUrl={imageUrl}
-                                anomalyId={anomaly.id.toString()}
-                                anomalyType="automaton-aiForMars"
-                                missionNumber={200000062}
-                                assetMentioned={imageUrl}
-                                structureItemId={3102} 
-                                annotationType="AI4M"
-                                parentPlanetLocation={anomalyid?.toString()}
-                            />
+                            <div className="w-full overflow-x-auto">
+                                <ImageAnnotator
+                                    initialImageUrl={imageUrl}
+                                    anomalyId={anomaly.id.toString()}
+                                    anomalyType="automaton-aiForMars"
+                                    missionNumber={200000062}
+                                    assetMentioned={imageUrl}
+                                    structureItemId={3102} 
+                                    annotationType="AI4M"
+                                    parentPlanetLocation={anomalyid?.toString()}
+                                />
+                            </div>
                             {/* <ClassificationForm
                                 
                             /> */}

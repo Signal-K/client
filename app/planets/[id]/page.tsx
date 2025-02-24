@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
+// import SimplePlanetGenerator, { SimpleMeshPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
+import { SimpleMeshPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 import Navbar from "@/components/Layout/Navbar";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
 import ClassificationComments from "@/content/Classifications/ClassificationStats";
@@ -108,7 +109,8 @@ export default function ClassificationDetail({ params }: { params: { id: string 
       <div className="py-5"></div>
       <h1 className="text-2xl font-bold">{classification.content || `Planet #${classification.id}`}</h1>
       {classification.author && (
-        <SimplePlanetGenerator
+        <SimpleMeshPlanetGenerator
+        // <SimplePlanetGenerator
           classificationId={String(classification.id)}
           classificationConfig={classification.classificationConfiguration}
           author={classification.author}

@@ -41,6 +41,7 @@ export function SurveyorComments({
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
+
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
   const [newComment, setNewComment] = useState<string>("");
@@ -55,6 +56,28 @@ export function SurveyorComments({
   useEffect(() => {
     fetchComments();
   }, [classificationId]);
+
+  const handleConfirmComment = async (comment: CommentProps) => {
+    if (!comment.configuration) return;
+  
+    try {
+      const updatedConfig = {
+        ...classificationConfig,
+        ...comment.configuration,
+      };
+  
+      const { error } = await supabase
+        .from("classifications")
+        .update({ classificationConfiguration: updatedConfig })
+        .eq("id", classificationId);
+  
+      if (error) throw error;
+  
+      console.log("Confirmed comment configuration added:", comment.configuration);
+    } catch (error) {
+      console.error("Error confirming comment:", error);
+    };
+  };  
 
   const fetchComments = async () => {
     setLoadingComments(true);
@@ -231,28 +254,37 @@ export function SurveyorComments({
                 comments.map((comment) => (
                   <CommentCard
                     key={comment.id}
+                    id={comment.id}
                     author={comment.author}
                     content={comment.content}
                     createdAt={comment.created_at}
                     replyCount={0}
-                    parentCommentId={classificationId}
                     isSurveyor={comment.isSurveyor}
                     configuration={comment.configuration}
-                  >
-                      <div className="flex justify-between items-center">
-                        <p className="text-xs text-gray-600">
-                          {comment.configuration?.planetType || "Unknown"}
-                        </p>
-                        {author === session?.user?.id && (
-                          <button
-                            onClick={() => handleSelectPreferredComment(comment.id)}
-                            className="text-blue-500 mt-2"
-                          >
-                            Mark as Preferred
-                          </button>
-                        )}
-                      </div>
-                  </CommentCard>
+                    classificationId={classificationId}
+                    classificationConfig={classificationConfig}
+                  />
+                      // <div className="flex justify-between items-center">
+                      //   <p className="text-xs text-gray-600">
+                      //     {comment.configuration?.planetType || "Unknown"}
+                      //   </p>
+                      //   {/* {author === session?.user?.id && (
+                      //     <button
+                      //       onClick={() => handleSelectPreferredComment(comment.id)}
+                      //       className="text-blue-500 mt-2"
+                      //     >
+                      //       Mark as Preferred
+                      //     </button>
+                      //   )} */}
+                      //   {author === session?.user?.id && comment.configuration && (
+                      //     <button
+                      //       onClick={() => handleConfirmComment(comment)}
+                      //       className="text-green-500 mt-2"
+                      //     >
+                      //       Confirm
+                      //     </button>
+                      //   )}
+                      // </div>
                 ))
               ) : (
                 <p>No comments yet. Be the first to comment!</p>

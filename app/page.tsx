@@ -9,7 +9,7 @@ import {
 } from './scenes';
 import { EarthScene } from "./scenes/earth/scene";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
-import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
+// import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import Onboarding from "./scenes/onboarding/page";
@@ -17,11 +17,13 @@ import VerticalToolbar from "@/components/Layout/Toolbar";
 import SimpleeMissionGuide from "./tests/singleMissionGuide";
 import Navbar from "@/components/Layout/Navbar";
 import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatellites";
+import LandingSS from "./auth/landing";
 
 export default function Home() {
   const session = useSession();
   const supabase = useSupabaseClient();
   const { activePlanet } = useActivePlanet();
+
   const [hasRequiredItems, setHasRequiredItems] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -42,23 +44,26 @@ export default function Home() {
       } catch (error: any) {
         console.error("Error checking inventory:", error.message);
         setHasRequiredItems(false);
-      }
+      };
     };
 
     checkInventory();
   }, [session, supabase]);
 
   if (!session) {
-    return <LoginPage />;
-  }
+    // return <LoginPage />;
+    return (
+      <LandingSS />
+    );
+  };
 
   if (hasRequiredItems === null) {
     return <div>Loading...</div>;
-  }
+  };
 
   if (!hasRequiredItems) {
     return <Onboarding />;
-  }
+  };
 
   return (
     <EarthViewLayout>
