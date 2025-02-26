@@ -117,20 +117,22 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         />
       )}
       {anomaly && classification.author === session?.user?.id && (
-        <PostCardSingleWithGenerator
-          key={classification.id}
-          classificationId={classification.id}
-          title={classification.title || "Untitled"}
-          author={classification.author || "Unknown"}
-          content={classification.content || "No content available"}
-          votes={classification.votes || 0}
-          category={classification.category || "Uncategorized"}
-          tags={classification.tags || []}
-          images={classification.images || []}
-          anomalyId={classification.anomaly ? String(classification.anomaly.id) : ""}
-          classificationConfig={classification.classificationConfiguration}
-          classificationType={classification.classificationtype || "Unknown"}
-        />
+        <div>
+          <PostCardSingleWithGenerator
+            key={classification.id}
+            classificationId={classification.id}
+            title={classification.title || "Untitled"}
+            author={classification.author || "Unknown"}
+            content={classification.content || "No content available"}
+            votes={classification.votes || 0}
+            category={classification.category || "Uncategorized"}
+            tags={classification.tags || []}
+            images={classification.images || []}
+            anomalyId={classification.anomaly ? String(classification.anomaly.id) : ""}
+            classificationConfig={classification.classificationConfiguration}
+            classificationType={classification.classificationtype || "Unknown"}
+          />
+        </div>
       )}
       {/* {anomaly && (
         <div className="mt-6 p-4 bg-[#1E3A47] border border-gray-300 rounded-md">

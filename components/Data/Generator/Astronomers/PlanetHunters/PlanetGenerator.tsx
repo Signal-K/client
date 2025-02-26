@@ -123,14 +123,14 @@ export default function PlanetGenerator({ classificationConfig, author, classifi
               onTypeOverride={handleTypeOverride}
             />
             <PlanetImportExport stats={stats} onImport={handleImport} onSave={handleSave} />
-            {author === session?.user.id && (
+            {/* {author === session?.user.id && (
               <button
                 onClick={handleSave}
                 className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
               >
                 Save Configuration
               </button>
-            )}
+            )} */}
           </div>
         </div>
       </div>
