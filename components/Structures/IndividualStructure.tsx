@@ -169,27 +169,28 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               ))}
             </div>
             <div className="grid grid-cols-2 gap-4 mt-6">
-              <div className="flex flex-col items-center my-4 space-y-4">
-                {buttons.map((button, index) => (
-                  button.showInNoModal !== false && (
-                    <div
-                      key={index}
-                      className="flex items-center justify-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
-                      onClick={() => handleButtonClick(button.text, button.dynamicComponent, button.sizePercentage)}
-                      style={{ width: "100%", maxWidth: "200px" }}
-                    >
-                      <div className="flex items-center justify-center w-full">
-                        <div className="flex-shrink-0">
-                          {button.icon}
-                        </div>
-                        <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
-                      </div>
-                    </div>
-                  )
-                ))}
-              </div>
-              <MilestoneCard />
+  <div className="flex flex-col items-center my-4 space-y-4">
+    {buttons.map((button, index) => (
+      button.showInNoModal !== false && (
+        <div
+          key={index}
+          className="flex items-center justify-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
+          onClick={() => handleButtonClick(button.text, button.dynamicComponent, button.sizePercentage)}
+          style={{ width: "100%", maxWidth: "200px" }}
+        >
+          <div className="flex items-center justify-center w-full">
+            <div className="flex-shrink-0">
+              {button.icon}
             </div>
+            <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
+          </div>
+        </div>
+      )
+    ))}
+  </div>
+  <MilestoneCard className="hidden sm:block" />
+</div>
+
             <div className="flex flex-col items-center my-4 space-y-4">
   {modals && modals.length > 0 && modals.map((modal, index) => (
     <div
