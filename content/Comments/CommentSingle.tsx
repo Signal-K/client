@@ -12,6 +12,8 @@ interface CommentCardProps {
   createdAt: string;
   children?: React.ReactNode;
   parentCommentId?: number | null;
+  category?: string;
+  value?: string | null;
   replyCount: number;
   isSurveyor?: boolean;
   configuration?: {
@@ -22,7 +24,19 @@ interface CommentCardProps {
   classificationConfig?: any;
 };
 
-export function CommentCard({ author, classificationConfig, classificationId, content, createdAt, replyCount, parentCommentId, isSurveyor, configuration }: CommentCardProps) {
+export function CommentCard({ 
+  author, 
+  classificationConfig, 
+  category, 
+  classificationId, 
+  content, 
+  createdAt, 
+  value, 
+  replyCount, 
+  parentCommentId, 
+  isSurveyor, 
+  configuration 
+}: CommentCardProps) {
   const supabase = useSupabaseClient();
 
   const handleConfirmComment = async () => {
@@ -55,12 +69,17 @@ export function CommentCard({ author, classificationConfig, classificationId, co
           <div>
             <CardTitle>{author}</CardTitle>
             {isSurveyor && <p className="text-red-800">Surveyor</p>}
-            {configuration?.planetType && <p className="text-green-200">{configuration.planetType}</p>}
+            <p className="text-green-300">{category}</p>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <p>{content}</p>
+        {value && category && (
+          <div className="mt-2 p-2 bg-gray-800 text-gray-200 rounded-md text-sm">
+            <strong>{category}</strong> = {value}
+          </div>
+        )}
         {configuration && (
           <Button onClick={handleConfirmComment} className="text-green-500 mt-2">
             Confirm

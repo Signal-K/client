@@ -52,7 +52,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     if (!params.id) return;
 
     const fetchClassification = async () => {
-      if (!params.id || !session) return; // Check if session is available
+      if (!params.id || !session) return;
 
       const { data, error } = await supabase
         .from("classifications")

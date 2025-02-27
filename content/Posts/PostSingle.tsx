@@ -12,6 +12,7 @@ import { CommentCard } from "../Comments/CommentSingle";
 import { AvatarGenerator } from '@/components/Account/Avatar';
 import html2canvas from 'html2canvas';
 import { SurveyorComments } from "./Surveyor/SurveyorPostCard";
+import PlanetTempCalculator from "@/components/Structures/Missions/Astronomers/PlanetHunters/TemperatureCalc";
 
 interface CommentProps {
   id: number;
@@ -233,7 +234,7 @@ export function PostCardSingle({
 
   return (
     <div ref={shareCardRef}>
-      <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
+      <Card className="w-full mx-auto my-8 bg-card text-card-foreground border-primary">
         <CardHeader>
           <div className="flex items-center space-x-4">
             {session && <AvatarGenerator author={session?.user.id} />}
@@ -247,43 +248,52 @@ export function PostCardSingle({
           <Badge variant="secondary">{category}</Badge>
           <p>{content}</p>
           {images.length > 0 && (
-            <div className="relative mt-4">
-              <img
-                src={images[currentIndex]}
-                alt={`Image ${currentIndex + 1}`}
-                className="rounded-lg w-full"
-              />
-              {images.length > 1 && (
-                <>
-                  <button
-                    onClick={goToPreviousImage}
-                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2"
-                  >
-                    &#8592;
-                  </button>
-                  <button
-                    onClick={goToNextImage}
-                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2"
-                  >
-                    &#8594;
-                  </button>
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                    {images.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentIndex(index)}
-                        className={`h-2 w-2 rounded-full ${
-                          currentIndex === index ? "bg-white" : "bg-gray-400"
-                        }`}
-                      ></button>
-                    ))}
-                  </div>
-                </>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+              <div className="relative col-span-1">
+                <img
+                  src={images[currentIndex]}
+                  alt={`Image ${currentIndex + 1}`}
+                  className="rounded-lg w-full h-auto"
+                />
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={goToPreviousImage}
+                      className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2"
+                    >
+                      &#8592;
+                    </button>
+                    <button
+                      onClick={goToNextImage}
+                      className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2"
+                    >
+                      &#8594;
+                    </button>
+                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                      {images.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentIndex(index)}
+                          className={`h-2 w-2 rounded-full ${
+                            currentIndex === index ? "bg-white" : "bg-gray-400"
+                          }`}
+                        ></button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+  
+              {/* Grid cell for the PlanetTempCalculator */}
+              {classificationType === 'planet' && (
+                <div className="col-span-1">
+                  <PlanetTempCalculator />
+                </div>
               )}
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex items-center justify-between">
+        <CardFooter className="flex items-center justify-between space-x-2">
           <div className="flex gap-2">
             <Button onClick={handleVoteClick} size="sm">
               <ThumbsUp className="mr-2" /> {voteCount}
@@ -292,67 +302,40 @@ export function PostCardSingle({
               <MessageSquare className="mr-2" /> {comments.length}
             </Button>
           </div>
-          <div className="relative" ref={dropdownRef}>
-            <Button
-              onClick={() => {
-                toggleDropdown();
-                handleShare();
-              }}
-              size="sm"
-              disabled={isSharing}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Share2 className="mr-2" />
-              {isSharing ? "Sharing..." : "Share"}
-            </Button>
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-card border rounded shadow-md z-50 p-4">
-                <p className="text-sm mb-2">
-                  Share this post:{" "}
-                  <a
-                    href={`https://starsailors.space/posts/${classificationId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline"
-                  >
-                    starsailors.space/posts/{classificationId}
-                  </a>
-                </p>
-                <div className="flex gap-2">
-                  <Button onClick={handleCopyLink} className="flex-1">
-                    Copy Link
-                  </Button>
-                  <Button onClick={handleShare}>Download postcard</Button>
-                  <Button onClick={openPostInNewTab} className="flex-1">
-                    Open
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
+          <Button
+            onClick={() => {
+              handleShare();
+            }}
+            size="sm"
+            disabled={isSharing}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Share2 className="mr-2" />
+            {isSharing ? "Sharing..." : "Share"}
+          </Button>
         </CardFooter>
-  
         {commentStatus !== false && (
           <CardContent>
-            <div className="space-y-4">
-              <Textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add your comment..."
-                rows={3}
-                className="w-full"
-              />
-              <CardFooter className="flex flex-col gap-2">
-                <Button onClick={handleAddComment} className="w-full">
-                  Submit Comment
-                </Button>
-                <Button onClick={() => setShowStats(!showStats)} variant="outline">
-                  Propose new stats
-                </Button>
-              </CardFooter>
-            </div>
-  
+            {!showStats && (
+              <div className="space-y-4">
+                <Textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Add your comment..."
+                  rows={3}
+                  className="w-full"
+                />
+                <CardFooter className="flex flex-col gap-2">
+                  <Button onClick={handleAddComment} className="w-full">
+                    Submit Comment
+                  </Button>
+                  <Button onClick={() => setShowStats(!showStats)} variant="outline">
+                    Propose new stats
+                  </Button>
+                </CardFooter>
+              </div>
+            )}
             {!showStats ? (
               <div className="mt-4 space-y-2">
                 {loadingComments ? (
@@ -369,15 +352,7 @@ export function PostCardSingle({
                       classificationId={classificationId}
                       parentCommentId={classificationId}
                       isSurveyor={comment.isSurveyor}
-                    >
-                      {enableNewCommentingMethod && (
-                        <div className="flex justify-between items-center">
-                          <p className="text-xs text-gray-600">
-                            {comment.configuration?.planetType || "Unknown"}
-                          </p>
-                        </div>
-                      )}
-                    </CommentCard>
+                    />
                   ))
                 ) : (
                   <p>No comments yet. Be the first to comment!</p>
@@ -399,4 +374,5 @@ export function PostCardSingle({
       </Card>
     </div>
   );
+  
 };
