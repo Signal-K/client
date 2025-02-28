@@ -374,5 +374,4 @@ export function PostCardSingle({
       </Card>
     </div>
   );
-  
 };
