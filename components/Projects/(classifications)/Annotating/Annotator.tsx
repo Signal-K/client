@@ -26,6 +26,7 @@ interface ImageAnnotatorProps {
   initialImageUrl: string;
   otherAssets?: string[];
   anomalyType?: string;
+  parentClassificationId?: number;
   anomalyId?: string;
   missionNumber?: number;
   assetMentioned?: string | string[];
@@ -36,6 +37,7 @@ interface ImageAnnotatorProps {
 
 export default function ImageAnnotator({
   initialImageUrl,
+  parentClassificationId,
   anomalyType,
   anomalyId,
   missionNumber,
@@ -167,6 +169,7 @@ export default function ImageAnnotator({
       {selectedImage && (
         <div className="space-y-4">
           <SciFiPanel className="p-4">
+            <p>FUCK FUCK{parentClassificationId}</p>
             <AnnotationCanvas
               canvasRef={canvasRef}
               imageRef={imageRef}
@@ -222,6 +225,7 @@ export default function ImageAnnotator({
                 anomalyType={anomalyType}
                 missionNumber={missionNumber}
                 parentPlanetLocation={parentPlanetLocation}
+                parentClassificationId={parentClassificationId}
                 assetMentioned={[
                   ...uploads,
                   ...(otherAssets || []),

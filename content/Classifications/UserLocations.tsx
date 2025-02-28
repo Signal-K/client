@@ -34,6 +34,7 @@ export default function MySettlementsLocations() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [showAllUsers, setShowAllUsers] = useState<boolean>(false); // State to toggle view
+  const [selectedRelatedClassification, setSelectedRelatedClassification] = useState<Classification | null>(null); // State to toggle media and configuration view
 
   async function fetchUserLocationClassifications() {
     if (!session) {
@@ -43,7 +44,6 @@ export default function MySettlementsLocations() {
     };
 
     try {
-      // Fetch classifications based on the toggle (whether to include all users or just the current user)
       const query = supabase
         .from("classifications")
         .select("*, anomalies(content)")
@@ -72,7 +72,6 @@ export default function MySettlementsLocations() {
 
           const anomalyContent = classification.anomalies?.content || null;
 
-          // Fetch related classifications based on `parentPlanetLocation` matching `anomaly`
           let relatedClassifications: Classification[] = [];
           const parentPlanetLocation = classification.anomaly;
           if (parentPlanetLocation) {
@@ -102,7 +101,7 @@ export default function MySettlementsLocations() {
 
   useEffect(() => {
     fetchUserLocationClassifications();
-  }, [session, showAllUsers]); // Trigger fetch when `showAllUsers` changes
+  }, [session, showAllUsers]);
 
   if (loading) {
     return <p>Loading locations...</p>;
@@ -116,7 +115,6 @@ export default function MySettlementsLocations() {
     return <p>No locations found.</p>;
   }
 
-  // Track the anomalies we've already displayed
   const displayedAnomalies = new Set<number>();
 
   return (
@@ -132,14 +130,13 @@ export default function MySettlementsLocations() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {myLocations
-          // Filter out classifications with no related classifications or with duplicate anomaly values
-          .filter(location => 
-            location.relatedClassifications && 
+          .filter(location =>
+            location.relatedClassifications &&
             location.relatedClassifications.length > 0 &&
-            !displayedAnomalies.has(location.anomaly) // Ensure anomaly is unique
+            !displayedAnomalies.has(location.anomaly)
           )
           .map((location) => {
-            displayedAnomalies.add(location.anomaly); // Mark this anomaly as displayed
+            displayedAnomalies.add(location.anomaly);
 
             return (
               <div
@@ -159,7 +156,15 @@ export default function MySettlementsLocations() {
                         <ul className="list-disc list-inside text-sm text-gray-300">
                           {location.relatedClassifications.map((related) => (
                             <li key={related.id}>
-                              {related.content || `Classification #${related.id}`}
+                              <button
+                                onClick={() => {
+                                  console.log('Selected related classification:', related);
+                                  setSelectedRelatedClassification(related);
+                                }}
+                                className="text-blue-400 hover:underline"
+                              >
+                                {related.content || `Classification #${related.id}`}
+                              </button>
                             </li>
                           ))}
                         </ul>
@@ -186,6 +191,33 @@ export default function MySettlementsLocations() {
             );
           })}
       </div>
+
+      {selectedRelatedClassification && (
+        <div className="mt-4 p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
+          <h3 className="font-bold text-lg">Selected Related Classification #{selectedRelatedClassification.id}</h3>
+          <p>{selectedRelatedClassification.content}</p>
+          <div className="mt-2">
+            {selectedRelatedClassification.media && selectedRelatedClassification.media.length > 0 && (
+              <div>
+                <h4 className="font-semibold text-md">Media URLs:</h4>
+                <ul className="list-disc list-inside text-sm text-gray-300">
+                  {selectedRelatedClassification.media.map((media, index) => (
+                    <li key={index}>{typeof media === "string" ? media : media.uploadUrl}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {selectedRelatedClassification.classificationConfiguration && (
+              <div className="mt-2">
+                <h4 className="font-semibold text-md">Classification Configuration:</h4>
+                <pre className="bg-gray-800 text-white p-2 rounded-md">
+                  {JSON.stringify(selectedRelatedClassification.classificationConfiguration, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
-  );  
+  );
 };

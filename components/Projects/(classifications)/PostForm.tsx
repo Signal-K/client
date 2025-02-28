@@ -33,6 +33,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
   assetMentioned,
   parentPlanetLocation,
   structureItemId,
+  parentClassificationId,
   annotationOptions,
 }) => {
   const supabase = useSupabaseClient();
@@ -235,6 +236,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       parentPlanetLocation: parentPlanetLocation || null,
       activePlanet: activePlanet?.id,
       createdBy: inventoryItemId ?? null,
+      classificationParent: parentClassificationId ?? null,
       annotationOptions: annotationOptions,
     };
 

@@ -147,10 +147,12 @@ export function StarterAiForMars({ anomalyid }: Props) {
 
 interface SelectedAnomProps {
     anomalyid?: number;
+    parentClassificationId?: number;
 }; 
 
 export function AiForMarsProject({
-    anomalyid
+    anomalyid,
+    parentClassificationId,
 }: SelectedAnomProps) {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -255,6 +257,7 @@ export function AiForMarsProject({
                                     missionNumber={200000062}
                                     assetMentioned={imageUrl}
                                     structureItemId={3102} 
+                                    parentClassificationId={parentClassificationId}
                                     annotationType="AI4M"
                                     parentPlanetLocation={anomalyid?.toString()}
                                 />
@@ -282,11 +285,18 @@ export function AI4MWrapper() {
     return (
         <div className="space-y-8">
             {!selectedAnomaly && (
-                <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
+                <PreferredTerrestrialClassifications
+                    onSelectAnomaly={(anomalyId: number | null, selectedVehicle: string | null) => {
+                        setSelectedAnomaly(anomalyId);
+                    }}
+                />
             )} 
             {selectedAnomaly && 
-                <AiForMarsProject anomalyid={selectedAnomaly}
-            />}
+                <AiForMarsProject
+                    parentClassificationId={selectedAnomaly}
+                    anomalyid={selectedAnomaly}
+                />
+            }
         </div>
     );
 };
