@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Navbar from "@/components/Layout/Navbar";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
 import ClassificationComments from "@/content/Classifications/ClassificationStats";
+import CloudClassificationSummary from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudAggregator";
 
 interface Classification {
   id: number;
@@ -21,7 +22,7 @@ interface Classification {
   tags?: string[];
   images?: string[];
   relatedClassifications?: Classification[];
-};
+}
 
 type Anomaly = {
   id: number;
@@ -67,7 +68,6 @@ export default function ClassificationDetail({ params }: { params: { id: string 
       setClassification(data);
       setAnomaly(data.anomaly);
 
-      // Debugging step: Log the fetched classification
       console.log("Fetched classification:", data);
 
       const parentPlanetLocation = data.anomaly?.id;
@@ -84,7 +84,6 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           return;
         }
 
-        // Debugging step: Log the related classifications
         console.log("Related classifications:", relatedData);
 
         if (relatedData) {
@@ -110,6 +109,11 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   if (error) return <p className="text-red-500">{error}</p>;
   if (!classification) return <p>Classification not found.</p>;
 
+  // Filter out only the classifications with classificationtype = "cloud"
+  const cloudClassifications = classification.relatedClassifications?.filter(
+    (related) => related.classificationtype === "cloud"
+  );
+
   return (
     <div className="p-6 bg-black text-white border border-gray-200 rounded-md shadow-md">
       <Navbar />
@@ -131,42 +135,42 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           classificationType={classification.classificationtype || "Unknown"}
         />
       )}
-      
-      {classification.relatedClassifications && classification.relatedClassifications.length > 0 && (
+
+      {/* Pass only cloud classifications to the CloudClassificationSummary component */}
+      {cloudClassifications && cloudClassifications.length > 0 && (
+        <CloudClassificationSummary
+          classifications={cloudClassifications}
+        />
+      )}
+
+      {/* Other related classifications section */}
+      {classification.relatedClassifications && (
         <div className="mt-6">
           <h3 className="text-xl font-bold">Related Classifications</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-            {classification.relatedClassifications.map((related: Classification) => (
-              <div
-                key={related.id}
-                className="p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]"
-              >
-                <h4 className="font-bold text-lg">Classification #{related.id}</h4>
-                <p className="mt-2 text-sm">{related.anomaly?.content || "No anomaly content"}</p>
+          {classification.relatedClassifications.map((related) => (
+            <div key={related.id} className="mt-4">
+              <h4 className="text-lg font-semibold">{related.classificationtype}</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+                <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
+                  <h4 className="font-bold text-lg">Classification #{related.id}</h4>
+                  <p className="mt-2 text-sm">{related.anomaly?.content || "No anomaly content"}</p>
 
-                {/* Displaying media */}
-                {related.media && related.media.length > 0 && (
-                  <div className="mt-2">
-                    {related.media.map((media, index) => (
-                      <img
-                        key={index}
-                        src={typeof media === "string" ? media : media.uploadUrl}
-                        alt={`Related Classification #${related.id} - Image ${index + 1}`}
-                        className="w-full h-auto rounded-md"
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {/* Displaying classification configuration */}
-                {related.classificationConfiguration && (
-                  <div className="mt-2 p-2 bg-gray-800 text-white rounded-md">
-                    <pre>{JSON.stringify(related.classificationConfiguration, null, 2)}</pre>
-                  </div>
-                )}
+                  {related.media && related.media.length > 0 && (
+                    <div className="mt-2">
+                      {related.media.map((media, index) => (
+                        <img
+                          key={index}
+                          src={typeof media === "string" ? media : media.uploadUrl}
+                          alt={`Related Classification #${related.id} - Image ${index + 1}`}
+                          className="w-full h-auto rounded-md"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       )}
 

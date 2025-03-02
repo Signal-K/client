@@ -15,3 +15,6 @@ down-full:
 
 deploy-test:
 	docker-compose build && yarn build && vercel
+
+up-light:
+	docker-compose up -d
