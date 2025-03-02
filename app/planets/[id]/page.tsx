@@ -22,7 +22,7 @@ interface Classification {
   tags?: string[];
   images?: string[];
   relatedClassifications?: Classification[];
-}
+};
 
 type Anomaly = {
   id: number;

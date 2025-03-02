@@ -42,6 +42,8 @@ export const P4CATEGORIES: Record<P4Category, CategoryConfig> = {
   },
 };
 
+export type CACCategory = 'antipathes atlantica';
+
 export type PHCategory = 'Noise' | 'Clear dip' | 'Missing' | 'Custom';
 export const PHCATEGORIES: Record<PHCategory, CategoryConfig> = {
   Noise: {
