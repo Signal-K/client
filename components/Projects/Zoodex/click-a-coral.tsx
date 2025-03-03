@@ -5,6 +5,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Anomaly } from "../Telescopes/Transiting";
+import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
 interface ZoodexProps {
     anomalyid: string;
@@ -92,16 +93,22 @@ export function ClickACoral() {
 
                     {!showTutorial && (
                         <>
-                            <img src={imageUrl || ''} alt={anomaly.content} className="w-full h-64 object-cover" />
-
-                            <p>{imageUrl}</p>
-                            <ClassificationForm
+                            {/* <img src={imageUrl || ''} alt={anomaly.content} className="w-full h-64 object-cover" /> */}
+                            <ImageAnnotator
+                                initialImageUrl={imageUrl || ''}
+                                anomalyId={anomaly.id.toString()}
+                                anomalyType="zoodex-clickACoral"
+                                assetMentioned={imageUrl || ""}
+                                structureItemId={3104}
+                                annotationType="CAC"
+                            />
+                            {/* <ClassificationForm
                                 anomalyId={anomaly.id.toString()}
                                 anomalyType="zoodex-clickACoral"
                                 missionNumber={100000039}
                                 assetMentioned={imageUrl || ""}
                                 structureItemId={3104}
-                            />
+                            /> */}
                         </>
                     )}
                 </center>

@@ -77,6 +77,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return "Describe the number and behaviour of the penguins...";
       case "zoodex-planktonPortal":
         return "Describe the plankton you see and their behaviour...";
+      case 'zoodex-clickACoral':
+        return 'Describe the coral you see...';
       case "satellite-planetFour":
         return 'Describe any additional details you notice about the terrain. How could these features impact future construction or exploration efforts?';
       case "lidar-earthCloudRead":

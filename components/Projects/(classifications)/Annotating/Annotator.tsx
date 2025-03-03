@@ -11,7 +11,9 @@ import {
   AI4MCATEGORIES,
   P4CATEGORIES,
   PHCATEGORIES,
+  CACCategories,
   type AI4MCategory,
+  type CACCategory,
   type P4Category,
   type PHCategory,
   type CoMCategory,
@@ -32,7 +34,7 @@ interface ImageAnnotatorProps {
   assetMentioned?: string | string[];
   structureItemId?: number;
   parentPlanetLocation?: string;
-  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'Custom';
+  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'Custom';
 };
 
 export default function ImageAnnotator({
@@ -72,6 +74,8 @@ export default function ImageAnnotator({
       ? CoMCATEGORIES
       : annotationType === 'PH'
       ? PHCATEGORIES
+      : annotationType === 'CAC'
+      ? CACCategories
       : {} as Record<string, CategoryConfig>;
 
   const addMedia = async () => {
