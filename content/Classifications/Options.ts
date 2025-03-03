@@ -148,14 +148,15 @@ export const initialCloudClassificationOptions: ClassificationOption[] = [
     { id: 7, text: "Faint cloud" },
     { id: 8, text: "Distinct cloud" },
     { id: 9, text: "Very distinct cloud" },
-    
+];
+export const cloudSpottingOnMarsShapesOptions: ClassificationOption[] = [
     // Cloudspotting on Mars: Shapes classifications
-    { id: 10, text: "Long and straight" },
-    { id: 11, text: "Curved" },
-    { id: 12, text: "Wavy" },
-    { id: 13, text: "Blob" },
-    { id: 14, text: "Streaky" },
-    { id: 15, text: "Multiple shapes" },
+    { id: 1, text: "Long and straight" },
+    { id: 2, text: "Curved" },
+    { id: 3, text: "Wavy" },
+    { id: 4, text: "Blob" },
+    { id: 5, text: "Streaky" },
+    { id: 6, text: "Multiple shapes" },
 ];
 
 

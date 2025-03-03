@@ -18,6 +18,8 @@ import {
   DailyMinorPlanetOptions,
   PlanetFourOptions,
   jvhOptions,
+  initialCloudClassificationOptions,
+  cloudSpottingOnMarsShapesOptions,
 } from "@/content/Classifications/Options";
 import { useRouter } from "next/navigation";
 import { Button } from "antd";
@@ -102,9 +104,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return [roverImgClassificationOptions];
       case "cloud":
         return [
-          cloudClassificationOptionsOne,
-          cloudClassificationOptionsTwo,
-          cloudClassificationOptionsThree,
+          // cloudClassificationOptionsOne,
+          // cloudClassificationOptionsTwo,
+          // cloudClassificationOptionsThree,
+          initialCloudClassificationOptions,
+          cloudSpottingOnMarsShapesOptions,
         ];
       case "zoodex-burrowingOwl":
         return [zoodexBurrowingOwlClassificationOptions];

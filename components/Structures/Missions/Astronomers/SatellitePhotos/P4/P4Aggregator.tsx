@@ -40,7 +40,7 @@ export interface SatellitePlanetFourClassification extends Classification {
 
 interface SatellitePlanetFourAggregatorProps {
   classifications: SatellitePlanetFourClassification[];
-}
+};
 
 const SatellitePlanetFourAggregator: React.FC<SatellitePlanetFourAggregatorProps> = ({ classifications }) => {
   return (

@@ -173,7 +173,7 @@ export default function ImageAnnotator({
       {selectedImage && (
         <div className="space-y-4">
           <SciFiPanel className="p-4">
-            <p>FUCK FUCK{parentClassificationId}</p>
+            <p>{parentClassificationId}</p>
             <AnnotationCanvas
               canvasRef={canvasRef}
               imageRef={imageRef}
