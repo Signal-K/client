@@ -138,27 +138,25 @@ export const roverImgClassificationOptions: ClassificationOption[] = [
 ];
 
 export const initialCloudClassificationOptions: ClassificationOption[] = [
-    {
-        id: 1,
-        text: "Narrow arch",
-    },
-    {
-        id: 2,
-        text: "Wide arch",
-    },
-    {
-        id: 3,
-        text: "1 cloud",
-    },
-    {
-        id: 4, text: "2 clouds",
-    },
-    {
-        id: 5, text: "3 clouds",
-    },
-    {
-        id: 6, text: "4+ clouds",
-    },
+    // Cloudspotting on Mars main classifications
+    { id: 1, text: "Narrow arch" },
+    { id: 2, text: "Wide arch" },
+    { id: 3, text: "1 cloud" },
+    { id: 4, text: "2 clouds" },
+    { id: 5, text: "3 clouds" },
+    { id: 6, text: "4+ clouds" },
+    { id: 7, text: "Faint cloud" },
+    { id: 8, text: "Distinct cloud" },
+    { id: 9, text: "Very distinct cloud" },
+];
+export const cloudSpottingOnMarsShapesOptions: ClassificationOption[] = [
+    // Cloudspotting on Mars: Shapes classifications
+    { id: 1, text: "Long and straight" },
+    { id: 2, text: "Curved" },
+    { id: 3, text: "Wavy" },
+    { id: 4, text: "Blob" },
+    { id: 5, text: "Streaky" },
+    { id: 6, text: "Multiple shapes" },
 ];
 
 

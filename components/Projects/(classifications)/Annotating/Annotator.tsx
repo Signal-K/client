@@ -11,7 +11,9 @@ import {
   AI4MCATEGORIES,
   P4CATEGORIES,
   PHCATEGORIES,
+  CACCategories,
   type AI4MCategory,
+  type CACCategory,
   type P4Category,
   type PHCategory,
   type CoMCategory,
@@ -26,16 +28,18 @@ interface ImageAnnotatorProps {
   initialImageUrl: string;
   otherAssets?: string[];
   anomalyType?: string;
+  parentClassificationId?: number;
   anomalyId?: string;
   missionNumber?: number;
   assetMentioned?: string | string[];
   structureItemId?: number;
   parentPlanetLocation?: string;
-  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'Custom';
+  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'Custom';
 };
 
 export default function ImageAnnotator({
   initialImageUrl,
+  parentClassificationId,
   anomalyType,
   anomalyId,
   missionNumber,
@@ -70,6 +74,8 @@ export default function ImageAnnotator({
       ? CoMCATEGORIES
       : annotationType === 'PH'
       ? PHCATEGORIES
+      : annotationType === 'CAC'
+      ? CACCategories
       : {} as Record<string, CategoryConfig>;
 
   const addMedia = async () => {
@@ -167,6 +173,7 @@ export default function ImageAnnotator({
       {selectedImage && (
         <div className="space-y-4">
           <SciFiPanel className="p-4">
+            <p>{parentClassificationId}</p>
             <AnnotationCanvas
               canvasRef={canvasRef}
               imageRef={imageRef}
@@ -222,6 +229,7 @@ export default function ImageAnnotator({
                 anomalyType={anomalyType}
                 missionNumber={missionNumber}
                 parentPlanetLocation={parentPlanetLocation}
+                parentClassificationId={parentClassificationId}
                 assetMentioned={[
                   ...uploads,
                   ...(otherAssets || []),

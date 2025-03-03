@@ -1,12 +1,11 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-// import SimplePlanetGenerator, { SimpleMeshPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
-import { SimpleMeshPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 import Navbar from "@/components/Layout/Navbar";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
 import ClassificationComments from "@/content/Classifications/ClassificationStats";
+import CloudClassificationSummary from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudAggregator";
 
 interface Classification {
   id: number;
@@ -52,11 +51,11 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     if (!params.id) return;
 
     const fetchClassification = async () => {
-      if (!params.id || !session) return; // Check if session is available
+      if (!params.id || !session) return;
 
       const { data, error } = await supabase
         .from("classifications")
-        .select("*, anomaly:anomalies(*)")
+        .select("*, anomaly:anomalies(*), classificationConfiguration, media")
         .eq("id", params.id)
         .single();
 
@@ -66,21 +65,28 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         return;
       }
 
-      // Set the fetched classification data
       setClassification(data);
       setAnomaly(data.anomaly);
 
-      // Fetch related classifications if anomaly is available
-      const parentPlanetLocation = data.anomaly;
+      console.log("Fetched classification:", data);
+
+      const parentPlanetLocation = data.anomaly?.id;
       if (parentPlanetLocation) {
         const { data: relatedData, error: relatedError } = await supabase
           .from("classifications")
-          .select("*")
+          .select("*, anomaly:anomalies(*), classificationConfiguration, media")
           .eq("classificationConfiguration->>parentPlanetLocation", parentPlanetLocation.toString())
           .eq("author", session.user.id);
 
-        if (!relatedError && relatedData) {
-          // Ensure we're safely updating the classification state
+        if (relatedError) {
+          setError("Failed to fetch related classifications.");
+          setLoading(false);
+          return;
+        }
+
+        console.log("Related classifications:", relatedData);
+
+        if (relatedData) {
           setClassification((prevState) => {
             if (prevState) {
               return {
@@ -103,20 +109,17 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   if (error) return <p className="text-red-500">{error}</p>;
   if (!classification) return <p>Classification not found.</p>;
 
+  // Filter out only the classifications with classificationtype = "cloud"
+  const cloudClassifications = classification.relatedClassifications?.filter(
+    (related) => related.classificationtype === "cloud"
+  );
+
   return (
     <div className="p-6 bg-black text-white border border-gray-200 rounded-md shadow-md">
       <Navbar />
       <div className="py-5"></div>
       <h1 className="text-2xl font-bold">{classification.content || `Planet #${classification.id}`}</h1>
       {classification.author && (
-        <SimpleMeshPlanetGenerator
-        // <SimplePlanetGenerator
-          classificationId={String(classification.id)}
-          classificationConfig={classification.classificationConfiguration}
-          author={classification.author}
-        />
-      )}
-      {anomaly && classification.author === session?.user?.id && (
         <PostCardSingleWithGenerator
           key={classification.id}
           classificationId={classification.id}
@@ -132,56 +135,51 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           classificationType={classification.classificationtype || "Unknown"}
         />
       )}
-      {/* {anomaly && (
-        <div className="mt-6 p-4 bg-[#1E3A47] border border-gray-300 rounded-md">
-          <h2 className="text-xl font-bold">Related Planet</h2>
-          <p className="mt-2 text-sm">{anomaly.content || `Anomaly #${anomaly.id}`}</p>
-          <p className="mt-1 text-sm">Type: {anomaly.anomalytype || "Unknown"}</p>
-          <p className="mt-1 text-sm">Mass: {anomaly.mass ? `${anomaly.mass} kg` : "N/A"}</p>
-          <p className="mt-1 text-sm">Radius: {anomaly.radius ? `${anomaly.radius} km` : "N/A"}</p>
-          <p className="mt-1 text-sm">Density: {anomaly.density || "N/A"}</p>
-          <p className="mt-1 text-sm">Gravity: {anomaly.gravity || "N/A"}</p>
-          <p className="mt-1 text-sm">Orbital Period: {anomaly.orbital_period || "N/A"}</p>
-          <p className="mt-1 text-sm">Temperature: {anomaly.temperature || "N/A"}K</p>
-          <p className="mt-1 text-sm">Created At: {new Date(anomaly.created_at).toLocaleString()}</p>
-          {anomaly.avatar_url && (
-            <img
-              src={anomaly.avatar_url}
-              alt="Anomaly Avatar"
-              className="mt-4 w-32 h-32 object-cover rounded-md border"
-            />
-          )}
-        </div>
-      )} */}
-      {classification && (
-        <ClassificationComments classification={classification} />
+
+      {/* Pass only cloud classifications to the CloudClassificationSummary component */}
+      {cloudClassifications && cloudClassifications.length > 0 && (
+        <CloudClassificationSummary
+          classifications={cloudClassifications}
+        />
       )}
-      {classification.relatedClassifications && classification.relatedClassifications.length > 0 && (
+
+      {/* Other related classifications section */}
+      {classification.relatedClassifications && (
         <div className="mt-6">
           <h3 className="text-xl font-bold">Related Classifications</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-            {classification.relatedClassifications.map((related: Classification) => (
-              <div
-                key={related.id}
-                className="p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]"
-              >
-                <h4 className="font-bold text-lg">Classification #{related.id}</h4>
-                <p className="mt-2 text-sm">{related.anomaly?.content || "No anomaly content"}</p>
-                {related.media && related.media.length > 0 && (
-                  <div className="mt-2">
-                    {related.media.map((media, index) => (
-                      <img
-                        key={index}
-                        src={typeof media === "string" ? media : media.uploadUrl}
-                        alt={`Related Classification #${related.id} - Image ${index + 1}`}
-                        className="w-full h-auto rounded-md"
-                      />
-                    ))}
-                  </div>
-                )}
+          {classification.relatedClassifications.map((related) => (
+            <div key={related.id} className="mt-4">
+              <h4 className="text-lg font-semibold">{related.classificationtype}</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+                <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
+                  <h4 className="font-bold text-lg">Classification #{related.id}</h4>
+                  <p className="mt-2 text-sm">{related.anomaly?.content || "No anomaly content"}</p>
+
+                  {related.media && related.media.length > 0 && (
+                    <div className="mt-2">
+                      {related.media.map((media, index) => (
+                        <img
+                          key={index}
+                          src={typeof media === "string" ? media : media.uploadUrl}
+                          alt={`Related Classification #${related.id} - Image ${index + 1}`}
+                          className="w-full h-auto rounded-md"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {classification.classificationConfiguration && (
+        <div className="mt-6 p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
+          <h3 className="text-xl font-bold">Classification Configuration</h3>
+          <pre className="bg-gray-800 text-white p-2 rounded-md">
+            {JSON.stringify(classification.classificationConfiguration, null, 2)}
+          </pre>
         </div>
       )}
     </div>

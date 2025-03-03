@@ -22,6 +22,7 @@ export interface ClassificationFormProps {
   // structureItemId?: number;
   structureItemId?: number;
   annotationOptions?: string[];
+  parentClassificationId?: number;
 };
 
 const defaultConfig: FormConfig = {

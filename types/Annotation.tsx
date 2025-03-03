@@ -42,6 +42,89 @@ export const P4CATEGORIES: Record<P4Category, CategoryConfig> = {
   },
 };
 
+export type CACCategory = 
+  | 'Antipathes Atlantica' 
+  | 'Antipathes Furcata' 
+  | 'Bebryce Sp.' 
+  | 'Ellisellidae' 
+  | 'Madracis Sp.' 
+  | 'Madrepora Sp.' 
+  | 'Muricea Pendula' 
+  | 'Paramuriciade Sp' 
+  | 'Stichopathes' 
+  | 'Swiftia exserta' 
+  | 'Thesea nivea' 
+  | 'Sponge' 
+  | 'Fish';
+
+export const CACCategories: Record<CACCategory, CategoryConfig> = {
+  'Antipathes Atlantica': {
+    name: 'Antipathes Atlantica',
+    color: '#1E88E5',
+    description: 'Deep-sea black coral species with intricate branching structures.'
+  },
+  'Antipathes Furcata': {
+    name: 'Antipathes Furcata',
+    color: '#673AB7',
+    description: 'A black coral species with a forked branching pattern.'
+  },
+  'Bebryce Sp.': {
+    name: 'Bebryce Sp.',
+    color: '#F57C00',
+    description: 'A soft coral genus known for its feathery polyps.'
+  },
+  'Ellisellidae': {
+    name: 'Ellisellidae',
+    color: '#4DB6AC',
+    description: 'Family of deep-sea gorgonian corals with flexible, whip-like structures.'
+  },
+  'Madracis Sp.': {
+    name: 'Madracis Sp.',
+    color: '#FBC02D',
+    description: 'Colonial stony coral with small, tightly packed polyps.'
+  },
+  'Madrepora Sp.': {
+    name: 'Madrepora Sp.',
+    color: '#E91E63',
+    description: 'A cold-water coral species forming complex reef structures.'
+  },
+  'Muricea Pendula': {
+    name: 'Muricea Pendula',
+    color: '#8D6E63',
+    description: 'A gorgonian coral species with long, pendulous branches.'
+  },
+  'Paramuriciade Sp': {
+    name: 'Paramuriciade Sp',
+    color: '#9C27B0',
+    description: 'Deep-sea coral family with tree-like branching patterns.'
+  },
+  'Stichopathes': {
+    name: 'Stichopathes',
+    color: '#388E3C',
+    description: 'A black coral genus characterized by spiral growth patterns.'
+  },
+  'Swiftia exserta': {
+    name: 'Swiftia exserta',
+    color: '#D32F2F',
+    description: 'A bright red gorgonian coral with delicate, branching arms.'
+  },
+  'Thesea nivea': {
+    name: 'Thesea nivea',
+    color: '#03A9F4',
+    description: 'A white, fan-like gorgonian coral species.'
+  },
+  'Sponge': {
+    name: 'Sponge',
+    color: '#795548',
+    description: 'Porous marine organisms that filter water and provide habitat.'
+  },
+  'Fish': {
+    name: 'Fish',
+    color: '#FF9800',
+    description: 'Various fish species observed in the coral reef ecosystem.'
+  }
+};
+
 export type PHCategory = 'Noise' | 'Clear dip' | 'Missing' | 'Custom';
 export const PHCATEGORIES: Record<PHCategory, CategoryConfig> = {
   Noise: {

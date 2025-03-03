@@ -18,6 +18,8 @@ import {
   DailyMinorPlanetOptions,
   PlanetFourOptions,
   jvhOptions,
+  initialCloudClassificationOptions,
+  cloudSpottingOnMarsShapesOptions,
 } from "@/content/Classifications/Options";
 import { useRouter } from "next/navigation";
 import { Button } from "antd";
@@ -33,6 +35,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
   assetMentioned,
   parentPlanetLocation,
   structureItemId,
+  parentClassificationId,
   annotationOptions,
 }) => {
   const supabase = useSupabaseClient();
@@ -76,6 +79,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return "Describe the number and behaviour of the penguins...";
       case "zoodex-planktonPortal":
         return "Describe the plankton you see and their behaviour...";
+      case 'zoodex-clickACoral':
+        return 'Describe the coral you see...';
       case "satellite-planetFour":
         return 'Describe any additional details you notice about the terrain. How could these features impact future construction or exploration efforts?';
       case "lidar-earthCloudRead":
@@ -99,9 +104,11 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return [roverImgClassificationOptions];
       case "cloud":
         return [
-          cloudClassificationOptionsOne,
-          cloudClassificationOptionsTwo,
-          cloudClassificationOptionsThree,
+          // cloudClassificationOptionsOne,
+          // cloudClassificationOptionsTwo,
+          // cloudClassificationOptionsThree,
+          initialCloudClassificationOptions,
+          cloudSpottingOnMarsShapesOptions,
         ];
       case "zoodex-burrowingOwl":
         return [zoodexBurrowingOwlClassificationOptions];
@@ -235,6 +242,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       parentPlanetLocation: parentPlanetLocation || null,
       activePlanet: activePlanet?.id,
       createdBy: inventoryItemId ?? null,
+      classificationParent: parentClassificationId ?? null,
       annotationOptions: annotationOptions,
     };
 

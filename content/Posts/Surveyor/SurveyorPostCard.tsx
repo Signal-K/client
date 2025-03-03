@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ThumbsUp, MessageSquare } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "@/content/Comments/CommentSingle";
+import PlanetTempCalculator from "@/components/Structures/Missions/Astronomers/PlanetHunters/TemperatureCalc";
 
 interface CommentProps {
   id: number;
@@ -17,6 +18,8 @@ interface CommentProps {
   configuration?: {
     planetType?: string;
   };
+  category?: string;
+  value?: string;
 };
 
 interface PostCardSingleProps {
@@ -45,8 +48,11 @@ export function SurveyorComments({
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
   const [newComment, setNewComment] = useState<string>("");
-  const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
-  const [temperatureInput, setTemperatureInput] = useState<string>("");
+
+  const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
+  const [temperatureInputs, setTemperatureInputs] = useState<Record<string, string>>({});  
+  const [densityInputs, setDensityInputs] = useState<Record<string, string>>({});  
+
   const [isSharing, setIsSharing] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
@@ -131,12 +137,12 @@ export function SurveyorComments({
 
   const handleProposePlanetType = async (planetType: "Terrestrial" | "Gaseous") => {
     const commentInput = commentInputs[classificationId];
-
-    if (!commentInput) {
-      console.error("Comment input is required");
+  
+    if (!commentInput?.trim()) {
+      console.error("Comment input must be filled");
       return;
-    };
-
+    }
+  
     try {
       const { error } = await supabase
         .from("comments")
@@ -147,123 +153,271 @@ export function SurveyorComments({
             author: session?.user?.id,
             configuration: { planetType },
             surveyor: "TRUE",
+            category: 'PlanetType'
           },
         ]);
+  
       if (error) throw error;
-      setCommentInputs((prev) => ({ ...prev, [classificationId]: "" }));
+  
+      setCommentInputs((prev) => ({
+        ...prev,
+        [classificationId]: "",
+      }));
+  
       fetchComments();
     } catch (error) {
       console.error("Error inserting comment:", error);
-    };
-  };
+    }
+  };  
 
   const handleAddTemperatureComment = async () => {
-    if (!temperatureInput.trim()) return;
+    const temperatureInput1 = temperatureInputs[`${classificationId}-1`];
+    const temperatureInput2 = temperatureInputs[`${classificationId}-2`];
+
+    if (!temperatureInput1?.trim() || !temperatureInput2?.trim()) {
+      console.error("Both text areas must be filled");
+      return;
+    }
 
     try {
       const { error } = await supabase
         .from("comments")
         .insert([
           {
-            content: temperatureInput,
+            content: `${temperatureInput1}\n\n${temperatureInput2}`,
             classification_id: classificationId,
             author: session?.user?.id,
-            configuration: { temperature: temperatureInput },
+            configuration: { temperature: `${temperatureInput1}, ${temperatureInput2}` },
             surveyor: "TRUE",
+            value: temperatureInput2,
+            category: 'Temperature'
           },
         ]);
 
       if (error) throw error;
-      setTemperatureInput("");
+      setTemperatureInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-1`]: "",
+        [`${classificationId}-2`]: "",
+      }));
       fetchComments();
     } catch (error) {
       console.error("Error adding temperature comment:", error);
-    }
-  };
-
-  const handleSelectPreferredComment = async (commentId: number) => {
-    const selectedComment = comments.find((comment) => comment.id === commentId);
-    if (!selectedComment) return;
-
-    const planetType = selectedComment.configuration?.planetType;
-    if (!planetType) return;
-
-    try {
-      const { error } = await supabase
-        .from("classifications")
-        .update({
-          classificationConfiguration: {
-            ...classificationConfig,
-            classificationOptions: {
-              ...classificationConfig?.classificationOptions,
-              planetType: [...(classificationConfig?.classificationOptions?.planetType || []), planetType],
-            },
-          },
-        })
-        .eq("id", classificationId);
-
-      if (error) throw error;
-
-      console.log("Preferred planet type updated:", planetType);
-    } catch (error) {
-      console.error("Error updating preferred comment:", error);
     };
   };
 
-  return (
-    <div ref={shareCardRef}>
-      <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground">
-        {commentStatus !== false && (
-          <CardContent>
-              <div className="space-y-4">
-                <Textarea
-                  value={commentInputs[classificationId] || ""}
-                  onChange={(e) =>
-                    setCommentInputs((prev) => ({ ...prev, [classificationId]: e.target.value }))
-                  }
-                  placeholder="Propose a planet type..."
-                  rows={3}
-                  className="w-full"
-                />
-                <div className="flex space-x-2">
-                  <Button onClick={() => handleProposePlanetType("Terrestrial")}>
-                    Propose Terrestrial
-                  </Button>
-                  <Button onClick={() => handleProposePlanetType("Gaseous")}>
-                    Propose Gaseous
-                  </Button>
-                </div>
+  const handleAddDensityComment = async () => {
+    const densityInput1 = densityInputs[`${classificationId}-1`];
+    const densityInput2 = densityInputs[`${classificationId}-2`];
+  
+    if (!densityInput1?.trim() || !densityInput2?.trim()) {
+      console.error("Both text areas must be filled");
+      return;
+    }
+  
+    try {
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: `${densityInput1}\n\n${densityInput2}`,
+            classification_id: classificationId,
+            author: session?.user?.id,
+            configuration: { density: `${densityInput1}, ${densityInput2}` },
+            surveyor: "TRUE",
+            value: densityInput2,
+            category: "Density",
+          },
+        ]);
+  
+      if (error) throw error;
+  
+      setDensityInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-1`]: "",
+        [`${classificationId}-2`]: "",
+      }));
+  
+      fetchComments();
+    } catch (error) {
+      console.error("Error adding density comment:", error);
+    }
+  };  
 
-                <Textarea
-                  value={temperatureInput}
-                  onChange={(e) => setTemperatureInput(e.target.value)}
-                  placeholder="Suggest a temperature..."
-                  rows={3}
-                  className="w-full"
-                />
-                <div className="flex space-x-2">
-                  <Button onClick={handleAddTemperatureComment}>
-                    Propose Temperature
-                  </Button>
-                </div>
-              </div>
-            <div className="mt-4 space-y-2">
-              {loadingComments ? (
-                <p>Loading comments...</p>
-              ) : comments.length > 0 ? (
-                comments.map((comment) => (
-                  <CommentCard
-                    key={comment.id}
-                    id={comment.id}
-                    author={comment.author}
-                    content={comment.content}
-                    createdAt={comment.created_at}
-                    replyCount={0}
-                    isSurveyor={comment.isSurveyor}
-                    configuration={comment.configuration}
-                    classificationId={classificationId}
-                    classificationConfig={classificationConfig}
-                  />
+  // const handleSelectPreferredComment = async (commentId: number) => {
+  //   const selectedComment = comments.find((comment) => comment.id === commentId);
+  //   if (!selectedComment) return;
+
+  //   const planetType = selectedComment.configuration?.planetType;
+  //   if (!planetType) return;
+
+  //   try {
+  //     const { error } = await supabase
+  //       .from("classifications")
+  //       .update({
+  //         classificationConfiguration: {
+  //           ...classificationConfig,
+  //           classificationOptions: {
+  //             ...classificationConfig?.classificationOptions,
+  //             planetType: [...(classificationConfig?.classificationOptions?.planetType || []), planetType],
+  //           },
+  //         },
+  //       })
+  //       .eq("id", classificationId);
+
+  //     if (error) throw error;
+
+  //     console.log("Preferred planet type updated:", planetType);
+  //   } catch (error) {
+  //     console.error("Error updating preferred comment:", error);
+  //   };
+  // };
+
+  return (
+    <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground">
+    {commentStatus !== false && (
+      <CardContent>
+        {/* <PlanetTempCalculator /> */}
+        <div className="py-4 space-y-6">
+          {/* Planet Type Proposal */}
+          <div className="space-y-2">
+            <div className="flex space-x-2">
+              <Textarea
+                value={commentInputs[`${classificationId}-1`] || ""}
+                onChange={(e) =>
+                  setCommentInputs((prev) => ({
+                    ...prev,
+                    [`${classificationId}-1`]: e.target.value,
+                  }))
+                }
+                placeholder="Discuss planet type"
+                rows={3}
+              />
+              {/* <Textarea
+                value={commentInputs[`${classificationId}-2`] || ""}
+                onChange={(e) =>
+                  setCommentInputs((prev) => ({
+                    ...prev,
+                    [`${classificationId}-2`]: e.target.value,
+                  }))
+                }
+                placeholder="Propose a planet type (part 2)..."
+                rows={3}
+                className="w-1/2"
+              /> */}
+            </div>
+            <div className="flex space-x-2">
+              <Button onClick={() => handleProposePlanetType("Terrestrial")}>
+                Propose Terrestrial
+              </Button>
+              <Button onClick={() => handleProposePlanetType("Gaseous")}>
+                Propose Gaseous
+              </Button>
+            </div>
+          </div>
+
+          {/* Temperature Proposal */}
+          <div className="space-y-2">
+            <div className="flex space-x-2">
+              <Textarea
+                value={temperatureInputs[`${classificationId}-1`] || ""}
+                onChange={(e) =>
+                  setTemperatureInputs((prev) => ({
+                    ...prev,
+                    [`${classificationId}-1`]: e.target.value,
+                  }))
+                }
+                placeholder="Discuss temperature"
+                rows={3}
+                className="w-1/2"
+              />
+              <Textarea
+                value={temperatureInputs[`${classificationId}-2`] || ""}
+                onChange={(e) =>
+                  setTemperatureInputs((prev) => ({
+                    ...prev,
+                    [`${classificationId}-2`]: e.target.value,
+                  }))
+                }
+                placeholder="Temperature value"
+                rows={3}
+                className="w-1/2"
+              />
+            </div>
+            <div className="flex space-x-2">
+              <Button onClick={handleAddTemperatureComment}>
+                Propose Temperature
+              </Button>
+            </div>
+          </div>
+
+          {/* Density */}
+          <div className="space-y-2">
+            <div className="flex space-x-2">
+              <Textarea
+                value={densityInputs[`${classificationId}-1`] || ""}
+                onChange={(e) =>
+                  setDensityInputs((prev) => ({
+                    ...prev,
+                    [`${classificationId}-1`]: e.target.value,
+                  }))
+                }
+                placeholder="Discuss density"
+                rows={3}
+                className="w-1/2"
+              />
+              <Textarea
+                value={densityInputs[`${classificationId}-2`] || ""}
+                onChange={(e) =>
+                  setDensityInputs((prev) => ({
+                    ...prev,
+                    [`${classificationId}-2`]: e.target.value,
+                  }))
+                }
+                placeholder="Density value"
+                rows={3}
+                className="w-1/2"
+              />
+            </div>
+            <div className="flex space-x-2">
+              <Button onClick={handleAddDensityComment}>
+                Propose Density
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Comments Section */}
+        <div className="mt-6 space-y-2">
+          {loadingComments ? (
+            <p>Loading comments...</p>
+          ) : comments.length > 0 ? (
+            comments.map((comment) => (
+              <CommentCard
+                key={comment.id}
+                id={comment.id}
+                author={comment.author}
+                category={comment.category}
+                content={comment.content}
+                value={comment.value}
+                createdAt={comment.created_at}
+                replyCount={0}
+                isSurveyor={comment.isSurveyor}
+                configuration={comment.configuration}
+                classificationId={classificationId}
+                classificationConfig={classificationConfig}
+              />
+            ))
+          ) : (
+            <p>No comments yet. Be the first to comment!</p>
+          )}
+        </div>
+      </CardContent>
+    )}
+  </Card>
+  );
+};
+
                       // <div className="flex justify-between items-center">
                       //   <p className="text-xs text-gray-600">
                       //     {comment.configuration?.planetType || "Unknown"}
@@ -285,14 +439,3 @@ export function SurveyorComments({
                       //     </button>
                       //   )}
                       // </div>
-                ))
-              ) : (
-                <p>No comments yet. Be the first to comment!</p>
-              )}
-            </div>
-          </CardContent>
-        )}
-      </Card>
-    </div>
-  );
-};

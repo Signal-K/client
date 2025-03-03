@@ -6,7 +6,7 @@ import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomat
 import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import { BarChart, BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, FishIcon, FlagIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, Trophy, WebcamIcon } from "lucide-react";
-import StructureRepair from "@/components/Structures/Config/RepairStructure";
+// import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
 import ModernTechTree from "@/components/Structures/Research/TechTree";
@@ -81,7 +81,7 @@ export const StructuresConfig: StructureConfig = {
       imageSrc: "/forest.svg",
       actions: [
         { icon: <PickaxeIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Explore" },
-        { icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Repair", dynamicComponent: <StructureRepair inventoryId={3102} /> },
+        // { icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />, text: "Repair", dynamicComponent: <StructureRepair inventoryId={3102} /> },
         {
           icon: <MicroscopeIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Research",
@@ -364,11 +364,11 @@ export const StructuresConfig: StructureConfig = {
       ],
       imageSrc: '/assets/Items/Launchpad.jpg',
       actions: [
-        {
-          icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Repair",
-          dynamicComponent: <StructureRepair inventoryId={3107} />,
-        },
+        // {
+        //   icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Repair",
+        //   dynamicComponent: <StructureRepair inventoryId={3107} />,
+        // },
       ],
       buttons: [
         // {

@@ -12,7 +12,7 @@ const automatons: Vehicle[] = [
       id: "1",
       name: "Visual Satellite",
       description: "Use this to find landmarks and sites on the planet you chose. Recommended for Planet Four & Cloudspotting",
-      image: '/assets/Automatons/ExploreRover1.png', // Need to find a new asset for satellites; link to automaton entry in db table and api route
+      image: '/assets/Automatons/Sat.png', // Need to find a new asset for satellites; link to automaton entry in db table and api route
       stats: {
         speed: 65,
         armor: 30,

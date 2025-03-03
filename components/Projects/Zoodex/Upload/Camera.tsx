@@ -20,7 +20,7 @@ const CameraComponent = () => {
     const webcamRef = useRef<Webcam>(null);
     const [loadingContent, setLoadingContent] = useState(false);
     const [buttonPressed, setButtonPressed] = useState(false);
-    const [captureImage, setCaptureImage] = useState<string | null>(null);
+    const [captureImage, setCaptureImage] = useState<string | null>(null); 
     const [uploadData, setUploadData] = useState(null); 
     const [isUploading, setIsUploading] = useState(false);
     const [comment, setComment] = useState<string>("");

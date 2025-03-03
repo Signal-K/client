@@ -16,13 +16,14 @@ interface Classification {
     classificationConfiguration: any | null; 
 };
 
-export default function VotePlanetClassifictions() {
+export default function VotePlanetClassifications() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
     const [classifications, setClassifications] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [currentIndex, setCurrentIndex] = useState<number>(0);
 
     const fetchClassifications = async () => {
         if (!session?.user) {
@@ -30,38 +31,22 @@ export default function VotePlanetClassifictions() {
           setLoading(false);
           return; 
         };
-      
+
         setLoading(true);
         setError(null);
         try {
           const { data, error } = await supabase
             .from('classifications')
             .select('*')
-            // .eq('author', session.user.id)
             .eq('classificationtype', 'planet')
             .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
-      
+
           if (error) throw error;
-      
-          // const processedData = data.map((classification) => {
-          //   const media = classification.media;
-          //   let images: string[] = [];
-      
-          //   if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
-          //     images.push(media[1]);
-          //   } else if (media && media.uploadUrl) {
-          //     images.push(media.uploadUrl);
-          //   }
-      
-          //   const votes = classification.classificationConfiguration?.votes || 0;
-      
-          //   return { ...classification, images, votes };
-          // });
-      
+
           const processedData = data.map((classification) => {
             const media = classification.media;
             let image: string | null = null;
-        
+
             if (Array.isArray(media)) {
                 for (const subArray of media) {
                     if (Array.isArray(subArray) && subArray.length > 0) {
@@ -72,12 +57,12 @@ export default function VotePlanetClassifictions() {
             } else if (media && typeof media.uploadUrl === "string") {
                 image = media.uploadUrl;
             }
-        
+
             const votes = classification.classificationConfiguration?.votes || 0;
-        
+
             return { ...classification, image, votes };
-        });
-        
+          });
+
           setClassifications(processedData);
         } catch (error) {
           console.error("Error fetching classifications:", error);
@@ -85,26 +70,26 @@ export default function VotePlanetClassifictions() {
         } finally {
           setLoading(false);
         };
-    };  
+    };
 
     useEffect(() => {
         fetchClassifications();
-    }, [session])
+    }, [session]);
 
     const handleVote = async (classificationId: number, currentConfig: any) => {
         try {
           const currentVotes = currentConfig?.votes || 0;
-    
+
           const updatedConfig = {
             ...currentConfig,
             votes: currentVotes + 1,
           };
-    
+
           const { error } = await supabase
             .from("classifications")
             .update({ classificationConfiguration: updatedConfig })
             .eq("id", classificationId);
-    
+
           if (error) {
             console.error("Error updating classificationConfiguration:", error);
           } else {
@@ -121,32 +106,65 @@ export default function VotePlanetClassifictions() {
         }
     };
 
+    const nextPost = () => {
+        setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, classifications.length - 1));
+    };
+
+    const prevPost = () => {
+        setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+    };
+
     return (
-          <div className="space-y-8">
+      <div className="relative">
+        <div className="flex overflow-x-scroll space-x-4 py-4">
             {loading ? (
               <p>Loading classifications...</p>
             ) : error ? (
               <p>{error}</p>
             ) : (
-              classifications.map((classification) => (
-                <PostCardSingle
+              classifications.map((classification, index) => (
+                <div
                   key={classification.id}
-                  classificationId={classification.id}
-                  title={classification.title}
-                  author={classification.author}
-                  content={classification.content}
-                  votes={classification.votes || 0}
-                  category={classification.category}
-                  tags={classification.tags || []}
-                  images={classification.image ? [classification.image] : []}
-                  // images={classification.images || []}
-                  anomalyId={classification.anomaly}
-                  classificationConfig={classification.classificationConfiguration}
-                  classificationType={classification.classificationtype}
-                  onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
-                />
+                  className={`flex-shrink-0 w-full max-w-screen-md ${index === currentIndex ? "block" : "hidden"}`}
+                >
+                  <PostCardSingle
+                    classificationId={classification.id}
+                    title={classification.title}
+                    author={classification.author}
+                    content={classification.content}
+                    votes={classification.votes || 0}
+                    category={classification.category}
+                    tags={classification.tags || []}
+                    images={classification.image ? [classification.image] : []}
+                    anomalyId={classification.anomaly}
+                    classificationConfig={classification.classificationConfiguration}
+                    classificationType={classification.classificationtype}
+                    onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
+                  />
+                </div>
               ))
             )}
-          </div>
+        </div>
+        
+        <div className="absolute top-1/2 left-0 transform -translate-y-1/2">
+            <button
+                onClick={prevPost}
+                className="bg-gray-800 text-white p-2 rounded-l-md hover:bg-gray-600"
+                disabled={currentIndex === 0}
+            >
+                Prev
+            </button>
+        </div>
+
+        <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
+            <button
+                onClick={nextPost}
+                className="bg-gray-800 text-white p-2 rounded-r-md hover:bg-gray-600"
+                disabled={currentIndex === classifications.length - 1}
+            >
+                Next
+            </button>
+        </div>
+      </div>
     );
 };

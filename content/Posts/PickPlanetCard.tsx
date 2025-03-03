@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PostAvatar } from "@/components/Account/Avatar";
 import { Button } from "@/components/ui/button";
 import { Share2 } from "lucide-react";
 
@@ -120,15 +118,6 @@ export default function PickPlanetCard({
 
   return (
     <div className="flex flex-col items-start space-y-4 p-4 bg-white/10 rounded-lg shadow-md">
-      {/* <div className="flex items-center space-x-4">
-        <PostAvatar author={author} />
-        <div>
-          <CardTitle>{content}</CardTitle>
-          <p className="text-sm text-gray-500">
-            Discovered by {username || author}
-          </p>
-        </div>
-      </div> */}
         <Link href={`/posts/${id}`} passHref>
             <Button variant="link" className="text-blue-500 flex items-center space-x-2">
                 <Share2 size={16} />
@@ -147,7 +136,20 @@ export default function PickPlanetCard({
   );
 };
 
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// import { PostAvatar } from "@/components/Account/Avatar";
+
             {/* <div className="h-16">
                 <PostAvatar author={author} />
                 <p className="text-sm text-muted-foreground">discovered by {author}</p>
             </div> */}
+
+                  {/* <div className="flex items-center space-x-4">
+        <PostAvatar author={author} />
+        <div>
+          <CardTitle>{content}</CardTitle>
+          <p className="text-sm text-gray-500">
+            Discovered by {username || author}
+          </p>
+        </div>
+      </div> */}

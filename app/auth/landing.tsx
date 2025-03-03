@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Microscope, Users, Book, Menu, Github, Linkedin, Instagram, Twitter, PaintBucket } from "lucide-react";
+import { TimelinePoint, TimelineSection } from "./landing/timeline"
+import { RoadmapPoint, RoadmapSection } from "./landing/roadmap"
 
 const teamMembers = [
     {
@@ -58,6 +60,57 @@ const teamMembers = [
     //   url: "https://rsv.org.au",
     // },
   ];
+
+  const timelinePoints: TimelinePoint[] = [
+    {
+      date: "September 2021",
+      title: "Incorporation",
+      description: "After over a year of building small microservices in the citizen science sector, Star Sailors was officially incorporated in Australia and received its first round of investment.",
+      image: "/placeholder.svg?height=300&width=400",
+    },
+    {
+      date: "January 2023",
+      title: "First releases",
+      description: "Star Sailors went into 'General Availability' after the completion of the Nights & Weekends S3 Incubator, marking the first time the public could interface with the Star Sailors engine.",
+      image: "/placeholder.svg?height=300&width=400",
+    },
+    {
+      date: "June 2024",
+      title: "Version 2 hits GA",
+      description: "Version 2 was released to our users, with the goal to create a product that was more game and less 'webapp'.",
+      image: "/placeholder.svg?height=300&width=400",
+    },
+    {
+      date: "April 2025",
+      title: "Development of V3 begins",
+      description: "The final release for Star Sailors V2 is scheduled for April 2025.",
+      image: "/placeholder.svg?height=300&width=400",
+    },
+  ];
+
+  const roadmapPoints: RoadmapPoint[] = [
+    {
+      quarter: "Q2 2024",
+      title: "Enhanced Data Visualization",
+      description: "Implementing advanced visualization tools to help users better understand complex datasets.",
+    },
+    {
+      quarter: "Q3 2024",
+      title: "Mobile Application",
+      description: "Launching our dedicated mobile app for iOS and Android to enable on-the-go scientific contributions.",
+    },
+    {
+      quarter: "Q4 2024",
+      title: "AI-Assisted Discovery",
+      description: "Integrating machine learning algorithms to help identify patterns and potential discoveries.",
+    },
+    {
+      quarter: "Q1 2025",
+      title: "Global Research Network",
+      description:
+        "Expanding our partnerships to create a worldwide network of citizen scientists and research institutions.",
+    },
+];
 
 export default function LandingSS() {
   return (
@@ -123,13 +176,13 @@ export default function LandingSS() {
                         Login
                     </Button>
                 </Link>
-                {/* <Button
+                <Button
                   size="lg"
                   variant="outline"
                   className="bg-[#FDFBF7] text-black hover:bg-[#FDFBF7] hover:translate-y-[-2px] hover:translate-x-[2px] text-lg px-8 py-6 rounded-md border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:shadow-none"
                 >
                   View Discoveries
-                </Button> */}
+                </Button>
               </div>
             </div>
             <div className="relative aspect-square">
@@ -145,8 +198,6 @@ export default function LandingSS() {
           </div>
         </div>
       </section>
-
-
 
       {/* About Section */}
       <section className="bg-gray-50 py-20">
@@ -223,16 +274,19 @@ export default function LandingSS() {
         />
         <h3 className="text-lg font-semibold mt-4 text-gray-900">{partner.name}</h3>
         <p className="text-sm text-gray-700 mt-2">{partner.description}</p>
-        {/* <Link href={partner.url} className="mt-4 text-blue-500 hover:underline">
+        <Link href={partner.url} className="mt-4 text-blue-500 hover:underline">
           Learn More
-        </Link> */}
+        </Link>
       </Card>
     ))}
   </div>
 </section>
 
-      {/* Screenshots */}
-      {/* <section className="py-20">
+<TimelineSection points={timelinePoints} />
+
+      {/* Roadmap Section */}
+      {/* <RoadmapSection points={roadmapPoints} /> */}
+ {/* <section className="py-20">
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-bold text-center">Game Screenshots</h2>
           <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">

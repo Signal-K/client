@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { GlassWaterIcon, PawPrintIcon, SnowflakeIcon } from "lucide-react";
@@ -16,7 +14,11 @@ const categoryMap = {
     Greenhouse: "Biological",
 };
 
-const MilestoneCard = () => {
+interface MilestoneCardProps {
+    className?: string;
+}
+
+const MilestoneCard: React.FC<MilestoneCardProps> = ({ className }) => {
     const [milestones, setMilestones] = useState<{ weekStart: string; data: any[] }[]>([]);
     const [communityMilestones, setCommunityMilestones] = useState<{ weekStart: string; data: any[] }[]>([]);
     const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
@@ -56,11 +58,10 @@ const MilestoneCard = () => {
     const milestonesToDisplay = activeTab === "player" ? milestones : communityMilestones;
 
     return (
-        <Card className="p-4 w-full max-w-md bg-card border shadow-md rounded-lg">
-            <CardContent className="flex flex-col gap-2 min-h-[180px]"> {/* Reduced min-height */}
-                <h1 className="text-lg font-semibold text-blue-600">Weekly Missions</h1> {/* Reduced font size */}
+        <Card className={`p-4 w-full max-w-md bg-card border shadow-md rounded-lg ${className}`}>
+            <CardContent className="flex flex-col gap-2 min-h-[180px]">
+                <h1 className="text-lg font-semibold text-blue-600">Weekly Missions</h1>
 
-                {/* Tab Buttons */}
                 <div className="flex gap-3 mb-3">
                     <button
                         onClick={() => setActiveTab("player")}
@@ -78,7 +79,7 @@ const MilestoneCard = () => {
 
                 {milestonesToDisplay.length > 0 ? (
                     <>
-                        <h2 className="text-sm text-gray-700">Week of {milestonesToDisplay[currentWeekIndex].weekStart}</h2> {/* Reduced font size */}
+                        <h2 className="text-sm text-gray-700">Week of {milestonesToDisplay[currentWeekIndex].weekStart}</h2>
                         <ul className="space-y-1">
                             {milestonesToDisplay[currentWeekIndex].data.map((milestone, index) => (
                                 <li key={index} className="flex items-center gap-2 text-green-700 text-sm">
@@ -90,7 +91,7 @@ const MilestoneCard = () => {
                                 </li>
                             ))}
                         </ul>
-                        <div className="flex justify-between mt-2"> {/* Reduced margin */}
+                        <div className="flex justify-between mt-2">
                             <button
                                 onClick={handlePrevWeek}
                                 disabled={currentWeekIndex === milestonesToDisplay.length - 1}

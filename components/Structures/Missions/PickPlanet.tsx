@@ -52,7 +52,7 @@ export default function PreferredTerrestrialClassifications({
       if (classificationIds.length === 0) {
         setClassifications([]);
         return;
-      }
+      };
 
       const { data: classificationsData, error: classificationsError } = await supabase
         .from("classifications")
@@ -79,7 +79,7 @@ export default function PreferredTerrestrialClassifications({
           let temperature = null;
           if (randomTempComment?.configuration?.temperature) {
             temperature = randomTempComment.configuration.temperature;
-          }
+          };
 
           let images: string[] = [];
           if (classification.media) {
@@ -87,8 +87,8 @@ export default function PreferredTerrestrialClassifications({
               images = classification.media.filter((url: any) => typeof url === "string");
             } else if (typeof classification.media === "object" && classification.media.uploadUrl) {
               images.push(classification.media.uploadUrl);
-            }
-          }
+            };
+          };
 
           return { ...classification, images, temperature };
         })
@@ -99,7 +99,7 @@ export default function PreferredTerrestrialClassifications({
       setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
-    }
+    };
   };
 
   useEffect(() => {
@@ -109,7 +109,7 @@ export default function PreferredTerrestrialClassifications({
   const handleConfirmSelection = () => {
     if (selectedAnomaly && selectedVehicle) {
       onSelectAnomaly(selectedAnomaly, selectedVehicle);
-    }
+    };
   };
 
   return (
