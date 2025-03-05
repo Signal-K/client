@@ -10,20 +10,20 @@ import { calculateTerrainHeight } from "@/utils/planet-physics";
 interface PlanetStats {
   mass: number;
   radius: number;
-  density: number;
-  type: "terrestrial" | "gaseous";
-  temperature: number;
-  atmosphereStrength: number;
-  cloudCount: number;
-  waterHeight: number;
-  surfaceRoughness: number;
-  biomeFactor: number;
-  cloudContribution: number;
-  terrainVariation: "flat" | "moderate" | "chaotic";
-  orbitalPeriod: number;
-  terrainErosion: number;
-  plateTectonics: number;
-  soilType: string;
+  density?: number;
+  type?: "terrestrial" | "gaseous";
+  temperature?: number;
+  atmosphereStrength?: number;
+  cloudCount?: number;
+  waterHeight?: number;
+  surfaceRoughness?: number;
+  biomeFactor?: number;
+  cloudContribution?: number;
+  terrainVariation?: "flat" | "moderate" | "chaotic";
+  orbitalPeriod?: number;
+  terrainErosion?: number;
+  plateTectonics?: number;
+  soilType?: string;
 };
 
 interface PlanetMeshProps {
@@ -38,7 +38,7 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
   // const terrainHeight = calculateTerrainHeight(stats)
 
   const { material, cloudMaterial, atmosphereMaterial } = useMemo(() => {
-    const liquidInfo = determineLiquidType(stats.temperature)
+    const liquidInfo = determineLiquidType(stats.temperature || 0)
     const shader = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },

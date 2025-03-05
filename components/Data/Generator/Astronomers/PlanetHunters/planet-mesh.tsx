@@ -7,10 +7,10 @@ import * as THREE from 'three'
 
 interface PlanetMeshProps {
   stats: {
-    mass: number
-    radius: number
-    density: number
-    type: 'terrestrial' | 'gaseous'
+    mass: number;
+    radius: number;
+    density?: number; 
+    type: 'terrestrial' | 'gaseous';
   };
 };
 
@@ -303,20 +303,21 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
 
     // Set colors based on planet type and density
     if (stats.type === 'gaseous') {
-      if (stats.density > 1.5) {
-        shader.uniforms.color1.value.setStyle('#7B3F00')
-        shader.uniforms.color2.value.setStyle('#D2691E')
-        shader.uniforms.color3.value.setStyle('#FFB90F')
+      const density = stats.density ?? 4.0; 
+      if (density > 1.5) {
+        shader.uniforms.color1.value.setStyle('#7B3F00');
+        shader.uniforms.color2.value.setStyle('#D2691E');
+        shader.uniforms.color3.value.setStyle('#FFB90F');
       } else {
-        shader.uniforms.color1.value.setStyle('#A7C6DA')
-        shader.uniforms.color2.value.setStyle('#E6E6FA')
-        shader.uniforms.color3.value.setStyle('#B8E2F2')
+        shader.uniforms.color1.value.setStyle('#A7C6DA');
+        shader.uniforms.color2.value.setStyle('#E6E6FA');
+        shader.uniforms.color3.value.setStyle('#B8E2F2');
       }
     } else {
-      shader.uniforms.color1.value.setStyle('#1E4D6B') // Deep water
-      shader.uniforms.color2.value.setStyle('#CD853F') // Lowland
-      shader.uniforms.color3.value.setStyle('#8B4513') // Highland
-    }
+      shader.uniforms.color1.value.setStyle('#1E4D6B'); // Deep water
+      shader.uniforms.color2.value.setStyle('#CD853F'); // Lowland
+      shader.uniforms.color3.value.setStyle('#8B4513'); // Highland
+    }    
 
     const cloudShader = new THREE.ShaderMaterial({
       uniforms: {

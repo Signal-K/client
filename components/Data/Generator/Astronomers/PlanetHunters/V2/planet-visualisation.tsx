@@ -54,7 +54,7 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
           },
           properties: {
             elevation,
-            color: getColor(elevation, stats.density, stats.type),
+            color: getColor(elevation, stats.density ?? 3, stats.type ?? 'terrestrial'),
           },
         })
       }
@@ -74,7 +74,7 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
       atmosphere
         .append("stop")
         .attr("offset", "85%")
-        .attr("stop-color", stats.density > 1.5 ? "#FFB90F" : "#B8E2F2")
+        .attr("stop-color", stats.density ?? 3 > 1.5 ? "#FFB90F" : "#B8E2F2")
         .attr("stop-opacity", 0.2)
 
       atmosphere.append("stop").attr("offset", "100%").attr("stop-color", "#000").attr("stop-opacity", 0)

@@ -54,7 +54,7 @@ export function PlanetControls({ stats, onMassChange, onRadiusChange, onTypeOver
         </div>
 
         <div className="space-y-1">
-          <div className="text-sm">Density: {stats.density.toFixed(2)} g/cm³</div>
+          {stats.density != null && ( <div className="text-sm">Density: {stats.density.toFixed(2)} g/cm³</div> )}
           <div className="text-sm">Type: {stats.type}</div>
         </div>
 

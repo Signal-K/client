@@ -15,7 +15,7 @@ export interface PlanetGeneratorProps {
   classificationId: string;
   author: string;
   type?: string;
-};
+}; 
 
 export default function PlanetGenerator({ classificationConfig, author, classificationId }: PlanetGeneratorProps) {
   const supabase = useSupabaseClient();

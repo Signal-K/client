@@ -13,6 +13,8 @@ import CloudSignal from "@/components/Structures/Missions/Meteorologists/Cloudsp
 import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import AsteroidViewer from "@/components/Data/Generator/Astronomers/DailyMinorPlanet/asteroid-viewer";
 import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
+import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
+import { FullPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
 
 interface CommentProps {
   id: number;
@@ -97,6 +99,16 @@ export function PostCardSingleWithGenerator({
           classificationConfig={classificationConfig}
           author={author}
         />;
+        // return (
+        //   <PlanetScene
+        //     classificationId={String(classificationId)}
+        //     classificationConfig={classificationConfig}
+        //     terrainHeight={1}
+        //     author={author}
+        //     stats={{ mass: 1, radius: 1 }}
+        //   />
+        //   // <FullPlanetGenerator />
+        // )
       case "telescope-minorPlanet":
         return <AsteroidViewer 
           classificationId={String(classificationId)} 

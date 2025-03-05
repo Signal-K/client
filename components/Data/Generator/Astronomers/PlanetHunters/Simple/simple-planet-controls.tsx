@@ -47,7 +47,8 @@ export function SimplePlanetControls({ stats, onMassChange, onRadiusChange }: Si
         <div className="text-sm text-white">
           <div className="flex justify-between mb-2">
             <span className="text-[#FFE3BA]">Density:</span>
-            <span>{stats.density.toFixed(2)} g/cm³</span>
+            {/* Added check for undefined density */}
+            <span>{stats.density ? stats.density.toFixed(2) : "N/A"} g/cm³</span>
           </div>
           <div className="flex justify-between">
             <span className="text-[#FFE3BA]">Type:</span>

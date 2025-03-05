@@ -1,31 +1,31 @@
 export interface PlanetStats {
   mass: number // Earth masses
   radius: number // Earth radii
-  density: number // g/cm³
-  type: "terrestrial" | "gaseous"
-  temperature: number // Kelvin
-  orbitalPeriod: number // Earth days
-  atmosphereStrength: number // 0 to 1
-  cloudCount: number // 0 to 100
-  waterHeight: number // 0 to 1
-  surfaceRoughness: number // 0 to 2
-  biomeFactor: number // 0.5 to 2.0
-  cloudContribution: number // 0.8 to 1.2
-  terrainVariation: "flat" | "moderate" | "chaotic"
-  terrainErosion: number // 0 to 1
-  plateTectonics: number // 0 to 1
-  soilType: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy"
-  biomassLevel: number // 0 to 1
-  waterLevel: number // 0 to 1
-  salinity: number // 0 to 1
-  subsurfaceWater: number // 0 to 1
-  atmosphericDensity: number // 0 to 1
-  weatherVariability: number // 0 to 1
-  stormFrequency: number // 0 to 1
-  volcanicActivity: number // 0 to 1
-  biome: string
-  cloudTypes: string[]
-  cloudDensity: number
+  density?: number // g/cm³
+  type?: "terrestrial" | "gaseous"
+  temperature?: number // Kelvin
+  orbitalPeriod?: number // Earth days
+  atmosphereStrength?: number // 0 to 1
+  cloudCount?: number // 0 to 100
+  waterHeight?: number // 0 to 1
+  surfaceRoughness?: number // 0 to 2
+  biomeFactor?: number // 0.5 to 2.0
+  cloudContribution?: number // 0.8 to 1.2
+  terrainVariation?: "flat" | "moderate" | "chaotic"
+  terrainErosion?: number // 0 to 1
+  plateTectonics?: number // 0 to 1
+  soilType?: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy"
+  biomassLevel?: number // 0 to 1
+  waterLevel?: number // 0 to 1
+  salinity?: number // 0 to 1
+  subsurfaceWater?: number // 0 to 1
+  atmosphericDensity?: number // 0 to 1
+  weatherVariability?: number // 0 to 1
+  stormFrequency?: number // 0 to 1
+  volcanicActivity?: number // 0 to 1
+  biome?: string
+  cloudTypes?: string[]
+  cloudDensity?: number
 };
 
 export interface LiquidInfo {
@@ -160,7 +160,7 @@ export function calculateTerrainHeight(stats: PlanetStats): number {
   const S_mod = stats.type === "terrestrial" ? 1.0 : 0.5
   const T_var = stats.terrainVariation === "flat" ? 0.9 : stats.terrainVariation === "chaotic" ? 1.2 : 1.0
   return (
-    stats.biomeFactor * stats.cloudContribution * S_mod * T_var * stats.surfaceRoughness * (1 - stats.terrainErosion)
+    (stats.biomeFactor ?? 1) * (stats.cloudContribution ?? 1) * S_mod * T_var * (stats.surfaceRoughness ?? 1) * (1 - (stats.terrainErosion ?? 0))
   );
 };
 
