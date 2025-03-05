@@ -6,6 +6,7 @@ import Navbar from "@/components/Layout/Navbar";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
 import ClassificationComments from "@/content/Classifications/ClassificationStats";
 import CloudClassificationSummary from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudAggregator";
+import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
 
 interface Classification {
   id: number;
@@ -22,7 +23,7 @@ interface Classification {
   tags?: string[];
   images?: string[];
   relatedClassifications?: Classification[];
-};
+}
 
 type Anomaly = {
   id: number;
@@ -38,6 +39,13 @@ type Anomaly = {
   created_at: string;
 };
 
+interface AggregatedCloud {
+  annotationOptions: Record<string, number>;
+  classificationOptions: Record<string, Record<string, number>>;
+  additionalFields: Record<string, Set<string>>;
+  cloudColours?: Record<string, number>; // Add cloudColours to the type
+}
+
 export default function ClassificationDetail({ params }: { params: { id: string } }) {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -46,6 +54,8 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [cloudSummary, setCloudSummary] = useState<AggregatedCloud | null>(null); // Update to AggregatedCloud type
+  const [relatedClassifications, setRelatedClassifications] = useState<Classification[]>([]);
 
   useEffect(() => {
     if (!params.id) return;
@@ -68,8 +78,6 @@ export default function ClassificationDetail({ params }: { params: { id: string 
       setClassification(data);
       setAnomaly(data.anomaly);
 
-      console.log("Fetched classification:", data);
-
       const parentPlanetLocation = data.anomaly?.id;
       if (parentPlanetLocation) {
         const { data: relatedData, error: relatedError } = await supabase
@@ -84,18 +92,8 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           return;
         }
 
-        console.log("Related classifications:", relatedData);
-
         if (relatedData) {
-          setClassification((prevState) => {
-            if (prevState) {
-              return {
-                ...prevState,
-                relatedClassifications: relatedData,
-              };
-            }
-            return prevState;
-          });
+          setRelatedClassifications(relatedData);
         }
       }
 
@@ -109,10 +107,13 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   if (error) return <p className="text-red-500">{error}</p>;
   if (!classification) return <p>Classification not found.</p>;
 
-  // Filter out only the classifications with classificationtype = "cloud"
-  const cloudClassifications = classification.relatedClassifications?.filter(
+  const cloudClassifications = relatedClassifications.filter(
     (related) => related.classificationtype === "cloud"
   );
+
+  const handleCloudSummaryUpdate = (summary: AggregatedCloud) => {
+    setCloudSummary(summary); // Now correctly set the full AggregatedCloud type
+  };
 
   return (
     <div className="p-6 bg-black text-white border border-gray-200 rounded-md shadow-md">
@@ -136,52 +137,38 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         />
       )}
 
-      {/* Pass only cloud classifications to the CloudClassificationSummary component */}
+      {/* Cloud Classification Summary */}
       {cloudClassifications && cloudClassifications.length > 0 && (
-        <CloudClassificationSummary
-          classifications={cloudClassifications}
-        />
+        <>
+          <CloudClassificationSummary
+            classifications={cloudClassifications}
+            onSummaryUpdate={handleCloudSummaryUpdate}
+          />
+        </>
       )}
 
-      {/* Other related classifications section */}
-      {classification.relatedClassifications && (
+      {/* Biome Aggregation */}
+      {cloudSummary && Object.keys(cloudSummary.annotationOptions).length > 0 && (
+        <BiomeAggregator cloudSummary={cloudSummary} />
+      )}
+
+      {/* Related Classifications Section */}
+      {relatedClassifications && relatedClassifications.length > 0 && (
         <div className="mt-6">
           <h3 className="text-xl font-bold">Related Classifications</h3>
-          {classification.relatedClassifications.map((related) => (
+          {relatedClassifications.map((related) => (
             <div key={related.id} className="mt-4">
               <h4 className="text-lg font-semibold">{related.classificationtype}</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
                 <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
                   <h4 className="font-bold text-lg">Classification #{related.id}</h4>
                   <p className="mt-2 text-sm">{related.anomaly?.content || "No anomaly content"}</p>
-
-                  {related.media && related.media.length > 0 && (
-                    <div className="mt-2">
-                      {related.media.map((media, index) => (
-                        <img
-                          key={index}
-                          src={typeof media === "string" ? media : media.uploadUrl}
-                          alt={`Related Classification #${related.id} - Image ${index + 1}`}
-                          className="w-full h-auto rounded-md"
-                        />
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
-
-      {classification.classificationConfiguration && (
-        <div className="mt-6 p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
-          <h3 className="text-xl font-bold">Classification Configuration</h3>
-          <pre className="bg-gray-800 text-white p-2 rounded-md">
-            {JSON.stringify(classification.classificationConfiguration, null, 2)}
-          </pre>
-        </div>
-      )}
     </div>
   );
-};
+}
