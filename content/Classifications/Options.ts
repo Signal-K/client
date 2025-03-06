@@ -6,7 +6,7 @@ interface ClassificationOption {
 
 export const jvhOptions: ClassificationOption[] = [
     {
-        id: 1,
+        id: 1, 
         text: "Vortex",
     },
     {

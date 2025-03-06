@@ -94,11 +94,13 @@ export function PostCardSingleWithGenerator({
           classificationId={String(classificationId)} 
         />
       case "planet":
-        return <PlanetGenerator
-          classificationId={String(classificationId)} 
-          classificationConfig={classificationConfig}
-          author={author}
-        />;
+        return (
+          <PlanetGenerator
+            classificationId={String(classificationId)} 
+            classificationConfig={classificationConfig}
+            author={author}
+          />
+        );
         // return (
         //   <PlanetScene
         //     classificationId={String(classificationId)}
