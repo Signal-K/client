@@ -110,12 +110,12 @@ export default function PlanetGenerator({ classificationConfig, author, classifi
   };
 
   return (
-    <div className="min-h-screen bg-black p-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold text-white mb-8">Procedural Planet Generator</h1>
-        <div className="flex flex-col gap-8 items-center">
+    <div className="bg-black p-6">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-bold text-white mb-6">Procedural Planet Generator</h1>
+        <div className="flex flex-row gap-6 items-start">
           <PlanetScene stats={stats} />
-          <div className="w-full space-y-8">
+          <div className="flex flex-col gap-4 w-full">
             <PlanetControls
               stats={stats}
               onMassChange={handleMassChange}
@@ -123,17 +123,9 @@ export default function PlanetGenerator({ classificationConfig, author, classifi
               onTypeOverride={handleTypeOverride}
             />
             <PlanetImportExport stats={stats} onImport={handleImport} onSave={handleSave} />
-            {/* {author === session?.user.id && (
-              <button
-                onClick={handleSave}
-                className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
-              >
-                Save Configuration
-              </button>
-            )} */}
           </div>
         </div>
       </div>
     </div>
-  );  
+  );
 };

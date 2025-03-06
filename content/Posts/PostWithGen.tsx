@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
 
 import CloudSignal from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudSignal";
@@ -15,6 +15,7 @@ import AsteroidViewer from "@/components/Data/Generator/Astronomers/DailyMinorPl
 import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
 import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
 import { FullPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
+import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 
 interface CommentProps {
   id: number;
@@ -55,6 +56,8 @@ export function PostCardSingleWithGenerator({
   onVote,
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
+  const session = useSession();
+
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
   const [voteCount, setVoteCount] = useState(votes);
@@ -93,24 +96,27 @@ export function PostCardSingleWithGenerator({
           classificationConfig={classificationConfig}
           classificationId={String(classificationId)} 
         />
-      case "planet":
-        return (
-          <PlanetGenerator
-            classificationId={String(classificationId)} 
-            classificationConfig={classificationConfig}
-            author={author}
-          />
-        );
-        // return (
-        //   <PlanetScene
-        //     classificationId={String(classificationId)}
-        //     classificationConfig={classificationConfig}
-        //     terrainHeight={1}
-        //     author={author}
-        //     stats={{ mass: 1, radius: 1 }}
-        //   />
-        //   // <FullPlanetGenerator />
-        // )
+
+        case "planet":
+          return (
+            <>
+              {session?.user?.id === author && (
+                <PlanetGenerator
+                  classificationId={String(classificationId)} 
+                  classificationConfig={classificationConfig}
+                  author={author}
+                />
+                        //   // <FullPlanetGenerator />
+              )}
+              {session?.user?.id !== author && (
+                <SimplePlanetGenerator
+                  classificationId={String(classificationId)}
+                  classificationConfig={classificationConfig}
+                  author={author}
+                />
+              )}
+            </>
+          );
       case "telescope-minorPlanet":
         return <AsteroidViewer 
           classificationId={String(classificationId)} 
@@ -170,6 +176,7 @@ export function PostCardSingleWithGenerator({
             <img src={images[0]} alt="Post Image" />
           </div>
         )}
+        {renderDynamicComponent()}
       </CardContent>
       <CardFooter className="flex items-center justify-between">
         <Button onClick={handleVoteClick} size="sm">
@@ -179,7 +186,6 @@ export function PostCardSingleWithGenerator({
           <MessageSquare className="mr-2" /> {comments.length}
         </Button>
       </CardFooter>
-      <CardContent>{renderDynamicComponent()}</CardContent>
     </Card>
   );
 };

@@ -112,12 +112,17 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   );
 
   const handleCloudSummaryUpdate = (summary: AggregatedCloud) => {
-    setCloudSummary(summary); // Now correctly set the full AggregatedCloud type
+    setCloudSummary(summary); 
   };
 
   return (
     <div className="p-6 bg-black text-white border border-gray-200 rounded-md shadow-md">
       <Navbar />
+      <img
+        className="absolute inset-0 w-full h-full object-cover opacity-20 z-[-1]"
+        src="/assets/Backdrops/Venus.png"
+        alt="Barren (default planet type) background"
+      />
       <div className="py-5"></div>
       <h1 className="text-2xl font-bold">{classification.content || `Planet #${classification.id}`}</h1>
       {classification.author && (
@@ -128,7 +133,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           author={classification.author || "Unknown"}
           content={classification.content || "No content available"}
           votes={classification.votes || 0}
-          category={classification.category || "Uncategorized"}
+          category={classification.classificationtype || "Uncategorized"}
           tags={classification.tags || []}
           images={classification.images || []}
           anomalyId={classification.anomaly ? String(classification.anomaly.id) : ""}

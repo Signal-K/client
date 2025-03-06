@@ -94,7 +94,7 @@ export default function CloudDetails({
                         author={classification.author || "Unknown"}
                         content={classification.content || "No content available"}
                         votes={classification.votes || 0}
-                        category={classification.category || "Uncategorized"}
+                        category={classification.classificationtype || "Uncategorized"}
                         tags={classification.tags || []}
                         images={classification.images || []}
                         anomalyId={classification.anomaly ? String(classification.anomaly.id) : ""}
