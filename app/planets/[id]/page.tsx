@@ -8,7 +8,7 @@ import ClassificationComments from "@/content/Classifications/ClassificationStat
 import CloudClassificationSummary from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudAggregator";
 import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
 
-interface Classification {
+export interface Classification {
   id: number;
   content: string | null;
   author: string | null;
@@ -23,9 +23,9 @@ interface Classification {
   tags?: string[];
   images?: string[];
   relatedClassifications?: Classification[];
-}
+};
 
-type Anomaly = {
+export type Anomaly = {
   id: number;
   content: string | null;
   anomalytype: string | null;
@@ -39,12 +39,12 @@ type Anomaly = {
   created_at: string;
 };
 
-interface AggregatedCloud {
+export interface AggregatedCloud {
   annotationOptions: Record<string, number>;
   classificationOptions: Record<string, Record<string, number>>;
   additionalFields: Record<string, Set<string>>;
-  cloudColours?: Record<string, number>; // Add cloudColours to the type
-}
+  cloudColours?: Record<string, number>;
+};
 
 export default function ClassificationDetail({ params }: { params: { id: string } }) {
   const supabase = useSupabaseClient();
@@ -52,8 +52,10 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   const [classification, setClassification] = useState<Classification | null>(null);
   const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [cloudSummary, setCloudSummary] = useState<AggregatedCloud | null>(null); // Update to AggregatedCloud type
   const [relatedClassifications, setRelatedClassifications] = useState<Classification[]>([]);
 
@@ -73,7 +75,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         setError("Failed to fetch classification.");
         setLoading(false);
         return;
-      }
+      };
 
       setClassification(data);
       setAnomaly(data.anomaly);
