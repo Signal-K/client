@@ -41,7 +41,7 @@ export default function CloudDetails({
 }: {
     params: {
         id: string;
-    }
+    };
 }) {
     const supabase = useSupabaseClient();
     const session = useSession();

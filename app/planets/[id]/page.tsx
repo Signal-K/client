@@ -8,6 +8,7 @@ import CloudClassificationSummary from "@/components/Structures/Missions/Meteoro
 import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
 import SatellitePlanetFourAggregator, { SatellitePlanetFourClassification } from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/P4Aggregator";
 import AI4MAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AI4MAggregator";
+import SimpleeMissionGuide from "@/app/tests/singleMissionGuide";
 
 export interface Classification {
   id: number;
@@ -102,23 +103,21 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         setError("Failed to fetch classification.");
         setLoading(false);
         return;
-      }
+      };
 
       setClassification(data);
       setAnomaly(data.anomaly);
 
       const parentPlanetLocation = data.anomaly?.id;
       if (parentPlanetLocation) {
-        // Apply author filter based on the toggle state
         const query = supabase
           .from("classifications")
           .select("*, anomaly:anomalies(*), classificationConfiguration, media")
           .eq("classificationConfiguration->>parentPlanetLocation", parentPlanetLocation.toString());
         
-        // Only add the author filter if `showCurrentUser` is true
         if (showCurrentUser) {
           query.eq("author", session.user.id);
-        }
+        };
 
         const { data: relatedData, error: relatedError } = await query;
 
@@ -126,18 +125,18 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           setError("Failed to fetch related classifications.");
           setLoading(false);
           return;
-        }
+        };
 
         if (relatedData) {
           setRelatedClassifications(relatedData);
-        }
-      }
+        };
+      };
 
       setLoading(false);
     };
 
     fetchClassification();
-  }, [params.id, supabase, session, showCurrentUser]); // Include `showCurrentUser` in the dependency array
+  }, [params.id, supabase, session, showCurrentUser]); 
 
   if (loading) return <p>Loading classification data...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -151,11 +150,11 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     .filter(
       (related): related is Classification & SatellitePlanetFourClassification =>
         related.classificationtype === "satellite-planetFour" &&
-        Array.isArray(related.classificationConfiguration?.annotationOptions) // Ensures annotationOptions is an array
+        Array.isArray(related.classificationConfiguration?.annotationOptions) 
     )
     .map((related) => ({
       id: related.id,
-      annotationOptions: related.classificationConfiguration?.annotationOptions || [], // Defaults to empty array
+      annotationOptions: related.classificationConfiguration?.annotationOptions || [],
       classificationConfiguration: related.classificationConfiguration || {}
     }));
 
@@ -164,7 +163,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   ).map((related) => ({
     id: related.id,
     classificationConfiguration: related.classificationConfiguration || {},
-    annotationOptions: related.classificationConfiguration?.annotationOptions || []  // Ensure annotationOptions is included
+    annotationOptions: related.classificationConfiguration?.annotationOptions || [] 
   }));
 
   const handleCloudSummaryUpdate = (summary: AggregatedCloud) => {
@@ -187,16 +186,30 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     setShowMetadata((prev) => !prev);
   };
 
+  const getBackgroundImage = (planetType: string | null) => {
+    switch (planetType) {
+      case "Terrestrial":
+        return "url('/assets/Backdrops/Venus.png')";
+      case "Gaseous":
+        return "url('/assets/Backdrops/gasgiant.jpeg')";
+      default:
+        return "url('/assets/Backdrops/Earth.png')";
+    }
+  };
+
   return (
-    <div className="p-6 bg-black text-white border border-gray-200 rounded-md shadow-md">
+    <div
+      className="p-6 bg-black text-white border rounded-md opacity-80 shadow-md relative"
+      style={{
+        backgroundImage: getBackgroundImage(classification.classificationConfiguration?.planetType || null),
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       <Navbar />
-      <img
-        className="absolute inset-0 w-full h-full object-cover opacity-20 z-[-1]"
-        src="/assets/Backdrops/Venus.png"
-        alt="Barren (default planet type) background"
-      />
       <div className="py-5"></div>
-      <h1 className="text-2xl font-bold">{classification.content || `Planet #${classification.id}`}</h1>
+      <h1 className="text-2xl font-bold">{classification.classificationConfiguration?.planetType || classification.content || `Planet #${classification.id}`}</h1>
       {classification.author && (
         <PostCardSingleWithGenerator
           key={classification.id}
@@ -267,20 +280,24 @@ export default function ClassificationDetail({ params }: { params: { id: string 
             <div className="mt-6">
               <h3 className="text-xl font-bold">Related Classifications</h3>
               {relatedClassifications.map((related) => (
-                <div key={related.id} className="mt-4">
-                  <h4 className="text-lg font-semibold">{related.classificationtype}</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-                    <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
-                      <h4 className="font-bold text-lg">Classification #{related.id}</h4>
-                      <p className="mt-2 text-sm">{related.anomaly?.content || "No anomaly content"}</p>
-                    </div>
-                  </div>
+                <div key={related.id} className="relative mt-4 p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
+                  <h4 className="font-bold text-lg">{related.classificationtype}</h4>
+                  <p className="mt-2 text-sm">{related.anomaly?.content || "No anomaly content"}</p>
+                  {related.classificationtype === "cloud" && (
+                    <a
+                      href={`/planets/clouds/${related.id}`}
+                      className="absolute bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-700"
+                    >
+                      View Cloud Classification
+                    </a>
+                  )}
                 </div>
               ))}
             </div>
           )}
         </>
       )}
+      {/* <SimpleeMissionGuide /> */}
     </div>
   );
 };

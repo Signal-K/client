@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, MessageSquare } from "lucide-react";
+import { ThumbsUp, MessageSquare, FeatherIcon, PencilLineIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
@@ -16,6 +16,7 @@ import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/clou
 import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
 import { FullPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
 import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
+import Link from "next/link";
 
 interface CommentProps {
   id: number;
@@ -175,6 +176,16 @@ export function PostCardSingleWithGenerator({
         <Button size="sm">
           <MessageSquare className="mr-2" /> {comments.length}
         </Button>
+        <Link href={`/planets/edit/${classificationId}`}>
+          <Button size="sm">
+            <FeatherIcon className="text-green-500" /> Edit
+          </Button>
+        </Link>
+        <Link href={`/posts/${classificationId}`}>
+          <Button size='sm'>
+            <PencilLineIcon className="text-green-500" /> Expand
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );
