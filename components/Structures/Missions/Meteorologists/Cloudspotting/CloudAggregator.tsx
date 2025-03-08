@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from "react";
 interface Classification {
   id: number;
   classificationConfiguration?: ClassificationConfiguration;
-}
+};
 
 interface ClassificationConfiguration {
   createdBy?: number | null;
@@ -14,7 +14,7 @@ interface ClassificationConfiguration {
   annotationOptions?: string[];
   parentPlanetLocation?: string;
   classificationOptions?: Record<string, Record<string, boolean>>;
-}
+};
 
 interface AggregatedCloud {
   annotationOptions: Record<string, number>;
@@ -22,7 +22,7 @@ interface AggregatedCloud {
   additionalFields: Record<string, Set<string>>;
   colourClassifications?: Record<string, Record<string, number>>;
   cloudColours?: Record<string, number>;
-}
+};
 
 const aggregateCloudClassifications = (
   classifications: Classification[]

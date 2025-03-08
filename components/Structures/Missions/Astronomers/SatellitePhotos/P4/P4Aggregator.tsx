@@ -1,65 +1,86 @@
 import React from "react";
+import { AggregatedP4 } from "@/app/planets/[id]/page";
 
-type Anomaly = {
-    id: number;
-    content: string | null;
-    anomalytype: string | null;
-    mass: number | null;
-    radius: number | null;
-    density: number | null;
-    gravity: number | null;
-    temperature: number | null;
-    orbital_period: number | null;
-    avatar_url: string | null;
-    created_at: string;
-  };
-
-interface Classification {
-    id: number;
-    content: string | null;
-    author: string | null;
-    anomaly: Anomaly | null;
-    media: (string | { uploadUrl?: string })[] | null;
-    classificationtype: string | null;
-    classificationConfiguration?: any;
-    created_at: string;
-    title?: string;
-    votes?: number;
-    category?: string;
-    tags?: string[];
-    images?: string[];
-    relatedClassifications?: Classification[];
-    annotationOptions?: any[];  // Add annotationOptions to the Classification type to avoid errors
-};
-
-export interface SatellitePlanetFourClassification extends Classification {
-    annotationOptions: any[];
-    classificationConfiguration?: any; // Ensure it's optional here if required
+interface ClassificationOption {
+  id: number;
+  text: string;
 }
-  
+
+export const PlanetFourOptions: ClassificationOption[] = [
+  { id: 1, text: "Dust Deposits" },
+  { id: 2, text: "Surface Cracks" },
+  { id: 3, text: "Spider-like Features" },
+  { id: 4, text: "Rocky Outcrops" },
+  { id: 5, text: "Smooth Terrain" },
+];
+
+export interface SatellitePlanetFourClassification {
+  id: number;
+  annotationOptions: string[];
+  classificationConfiguration?: {
+    "": Record<number, boolean>;
+  };
+};
 
 interface SatellitePlanetFourAggregatorProps {
   classifications: SatellitePlanetFourClassification[];
+  onSummaryUpdate?: (summary: AggregatedP4) => void;
 };
 
 const SatellitePlanetFourAggregator: React.FC<SatellitePlanetFourAggregatorProps> = ({ classifications }) => {
+  const aggregateClassifications = () => {
+    let fanCount = 0;
+    let blotchCount = 0;
+    let classificationCounts: Record<string, number> = {};
+
+    classifications.forEach((classification) => {
+      // Count fans and blotches
+      classification.annotationOptions.forEach((option) => {
+        if (option.includes("Fan")) {
+          const match = option.match(/\(x(\d+)\)/);
+          fanCount += match ? parseInt(match[1]) : 1;
+        } else if (option.includes("Blotch")) {
+          const match = option.match(/\(x(\d+)\)/);
+          blotchCount += match ? parseInt(match[1]) : 1;
+        }
+      });
+
+      // Count classification options (surface features)
+      if (classification.classificationConfiguration?.[""]) {
+        Object.keys(classification.classificationConfiguration[""]).forEach((key) => {
+          const id = parseInt(key);
+          const option = PlanetFourOptions.find((opt) => opt.id === id);
+          if (option) {
+            classificationCounts[option.text] = (classificationCounts[option.text] || 0) + 1;
+          }
+        });
+      }
+    });
+
+    return { fanCount, blotchCount, classificationCounts };
+  };
+
+  const { fanCount, blotchCount, classificationCounts } = aggregateClassifications();
+
   return (
     <div className="mt-6">
       <h3 className="text-xl font-bold">Satellite Planet Four Classifications</h3>
       {classifications.length === 0 ? (
         <p>No satellite classifications available.</p>
       ) : (
-        classifications.map((classification) => (
-          <div key={classification.id} className="mt-4 p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
-            <h4 className="font-bold text-lg">Classification #{classification.id}</h4>
-            <p className="mt-2 text-sm">Annotation Options: {classification.annotationOptions.join(", ")}</p>
-            {classification.classificationConfiguration && (
-              <pre className="bg-gray-800 text-white p-2 rounded-md">
-                {JSON.stringify(classification.classificationConfiguration, null, 2)}
-              </pre>
-            )}
-          </div>
-        ))
+        <div className="mt-4 p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
+          <h4 className="font-bold text-lg">Aggregated Classification Data</h4>
+          <p className="mt-2 text-sm">Total Fans: {fanCount}</p>
+          <p className="mt-2 text-sm">Total Blotches: {blotchCount}</p>
+          <h4 className="mt-4 font-bold">Surface Features:</h4>
+          <ul className="mt-2">
+            {Object.entries(classificationCounts).map(([feature, count]) => (
+              <li key={feature} className="text-sm">
+                {feature}: {count}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

@@ -136,8 +136,8 @@ export function SurveyorComments({
   };
 
   const handleProposePlanetType = async (planetType: "Terrestrial" | "Gaseous") => {
-    const commentInput = commentInputs[classificationId];
-  
+    const commentInput = commentInputs[`${classificationId}-1`]; 
+    
     if (!commentInput?.trim()) {
       console.error("Comment input must be filled");
       return;
@@ -148,10 +148,10 @@ export function SurveyorComments({
         .from("comments")
         .insert([
           {
-            content: commentInput,
+            content: commentInput || planetType,
             classification_id: classificationId,
             author: session?.user?.id,
-            configuration: { planetType },
+            configuration: { planetType, commentInput },
             surveyor: "TRUE",
             category: 'PlanetType'
           },
@@ -161,7 +161,7 @@ export function SurveyorComments({
   
       setCommentInputs((prev) => ({
         ...prev,
-        [classificationId]: "",
+        [`${classificationId}-1`]: "",  // Reset input after submit
       }));
   
       fetchComments();

@@ -4,9 +4,10 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Navbar from "@/components/Layout/Navbar";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
-import ClassificationComments from "@/content/Classifications/ClassificationStats";
 import CloudClassificationSummary from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudAggregator";
 import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
+import SatellitePlanetFourAggregator, { SatellitePlanetFourClassification } from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/P4Aggregator";
+import AI4MAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AI4MAggregator";
 
 export interface Classification {
   id: number;
@@ -15,7 +16,7 @@ export interface Classification {
   anomaly: Anomaly | null;
   media: (string | { uploadUrl?: string })[] | null;
   classificationtype: string | null;
-  classificationConfiguration?: any;
+  classificationConfiguration?: any; // classificationConfiguration is now optional
   created_at: string;
   title?: string;
   votes?: number;
@@ -44,7 +45,28 @@ export interface AggregatedCloud {
   classificationOptions: Record<string, Record<string, number>>;
   additionalFields: Record<string, Set<string>>;
   cloudColours?: Record<string, number>;
-};
+}
+
+export interface AggregatedP4 {
+  fanCount: number;
+  blotchCount: number;
+  classificationCounts: Record<string, number>;
+}
+
+export interface AggregatedAI4M {
+  sandCount: number;
+  soilCount: number;
+  bedrockCount: number;
+  rockCount: number;
+  unlabelledCount: number;
+  classificationCounts: Record<string, number>;
+}
+
+export interface AI4MClassification {
+  id: number;
+  classificationConfiguration: any;
+  annotationOptions: any[];  // Ensure annotationOptions is an array, as required by the aggregator
+}
 
 export default function ClassificationDetail({ params }: { params: { id: string } }) {
   const supabase = useSupabaseClient();
@@ -56,7 +78,9 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [cloudSummary, setCloudSummary] = useState<AggregatedCloud | null>(null); // Update to AggregatedCloud type
+  const [cloudSummary, setCloudSummary] = useState<AggregatedCloud | null>(null);
+  const [p4Summary, setP4Summary] = useState<AggregatedP4 | null>(null);
+  const [ai4MSummary, setAI4MSummary] = useState<AggregatedAI4M | null>(null);
   const [relatedClassifications, setRelatedClassifications] = useState<Classification[]>([]);
 
   useEffect(() => {
@@ -75,7 +99,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         setError("Failed to fetch classification.");
         setLoading(false);
         return;
-      };
+      }
 
       setClassification(data);
       setAnomaly(data.anomaly);
@@ -113,8 +137,36 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     (related) => related.classificationtype === "cloud"
   );
 
+  const satelliteP4Classifications: SatellitePlanetFourClassification[] = relatedClassifications
+    .filter(
+      (related): related is Classification & SatellitePlanetFourClassification =>
+        related.classificationtype === "satellite-planetFour" &&
+        Array.isArray(related.classificationConfiguration?.annotationOptions) // Ensures annotationOptions is an array
+    )
+    .map((related) => ({
+      id: related.id,
+      annotationOptions: related.classificationConfiguration?.annotationOptions || [], // Defaults to empty array
+      classificationConfiguration: related.classificationConfiguration || {}
+    }));
+
+  const ai4MClassifications: AI4MClassification[] = relatedClassifications.filter(
+    (related) => related.classificationtype === "automaton-aiForMars"
+  ).map((related) => ({
+    id: related.id,
+    classificationConfiguration: related.classificationConfiguration || {},
+    annotationOptions: related.classificationConfiguration?.annotationOptions || []  // Ensure annotationOptions is included
+  }));
+
   const handleCloudSummaryUpdate = (summary: AggregatedCloud) => {
-    setCloudSummary(summary); 
+    setCloudSummary(summary);
+  };
+
+  const handleP4SummaryUpdate = (summary: AggregatedP4) => {
+    setP4Summary(summary);
+  };
+
+  const handleAI4MSummaryUpdate = (summary: AggregatedAI4M) => {
+    setAI4MSummary(summary);
   };
 
   return (
@@ -145,13 +197,11 @@ export default function ClassificationDetail({ params }: { params: { id: string 
       )}
 
       {/* Cloud Classification Summary */}
-      {cloudClassifications && cloudClassifications.length > 0 && (
-        <>
-          <CloudClassificationSummary
-            classifications={cloudClassifications}
-            onSummaryUpdate={handleCloudSummaryUpdate}
-          />
-        </>
+      {cloudClassifications.length > 0 && (
+        <CloudClassificationSummary
+          classifications={cloudClassifications}
+          onSummaryUpdate={handleCloudSummaryUpdate}
+        />
       )}
 
       {/* Biome Aggregation */}
@@ -159,8 +209,24 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         <BiomeAggregator cloudSummary={cloudSummary} />
       )}
 
+      {/* SP4 Classification Summary */}
+      {satelliteP4Classifications.length > 0 && (
+        <SatellitePlanetFourAggregator
+          classifications={satelliteP4Classifications}
+          onSummaryUpdate={handleP4SummaryUpdate}
+        />
+      )}
+
+      {/* AI4M Classification Summary */}
+      {ai4MClassifications.length > 0 && (
+        <AI4MAggregator
+          classifications={ai4MClassifications}
+          onSummaryUpdate={handleAI4MSummaryUpdate}
+        />
+      )}
+
       {/* Related Classifications Section */}
-      {relatedClassifications && relatedClassifications.length > 0 && (
+      {relatedClassifications.length > 0 && (
         <div className="mt-6">
           <h3 className="text-xl font-bold">Related Classifications</h3>
           {relatedClassifications.map((related) => (
@@ -178,4 +244,4 @@ export default function ClassificationDetail({ params }: { params: { id: string 
       )}
     </div>
   );
-}
+};

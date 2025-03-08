@@ -43,7 +43,8 @@ export default function PreferredTerrestrialClassifications({
       const { data: comments, error: commentsError } = await supabase
         .from("comments")
         .select("classification_id, configuration")
-        .filter("configuration", "cs", '{"preferred":true,"planetType":"Terrestrial"}');
+        .filter("configuration", "cs", '{"planetType":"Terrestrial"}');
+        // .filter("configuration", "cs", '{"preferred":true,"planetType":"Terrestrial"}');
 
       if (commentsError) throw commentsError;
 

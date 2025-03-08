@@ -56,8 +56,8 @@ export default function EditPlanetAnomaly({ params }: { params: { id: string } }
                     if (isMounted) setError("Failed to fetch related classifications.");
                 } else if (relatedData && isMounted) {
                     setRelatedClassifications(relatedData);
-                }
-            }
+                };
+            };
 
             setLoading(false);
         };
