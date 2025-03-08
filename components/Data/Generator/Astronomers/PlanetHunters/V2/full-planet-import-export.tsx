@@ -53,12 +53,12 @@ export function FullPlanetImportExport({ stats, onImport }: FullPlanetImportExpo
             }
           } else if (key === "soilType") {
             const soilValue = value.replace(/"/g, "") as PlanetStats["soilType"]
-            if (["rocky", "sandy", "volcanic", "organic", "dusty", "frozen", "muddy"].includes(soilValue)) {
+            if (["rocky", "sandy", "volcanic", "organic", "dusty", "frozen", "muddy"].includes(soilValue ?? 'sandy')) {
               importedStats.soilType = soilValue
             }
           } else if (key === "terrainVariation") {
             const terrainValue = value.replace(/"/g, "") as PlanetStats["terrainVariation"]
-            if (["flat", "moderate", "chaotic"].includes(terrainValue)) {
+            if (["flat", "moderate", "chaotic"].includes(terrainValue ?? 'flat')) {
               importedStats.terrainVariation = terrainValue
             }
           } else {

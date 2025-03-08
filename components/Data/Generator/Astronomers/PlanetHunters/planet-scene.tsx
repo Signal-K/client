@@ -13,7 +13,7 @@ interface PlanetSceneProps {
 };
 
 export function PlanetScene({ stats, type }: PlanetSceneProps) {
-  const planetType = stats.type ?? "terrestrial"; // Fallback to "terrestrial" if undefined
+  const planetType = stats.type ?? "terrestrial";
 
   return (
     <div className="w-full h-[500px] bg-black rounded-lg overflow-hidden">

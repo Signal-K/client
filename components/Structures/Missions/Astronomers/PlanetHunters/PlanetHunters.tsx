@@ -90,7 +90,7 @@ const PlanetHuntersSteps = () => {
             (classification) =>
               classification.id === vote.classification_id &&
               classification.classificationtype === "planet"
-          )
+          ),
         ) || [];
         const mission4CompletedCount = planetVotes.length;
     

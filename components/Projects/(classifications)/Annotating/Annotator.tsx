@@ -12,7 +12,9 @@ import {
   P4CATEGORIES,
   PHCATEGORIES,
   CACCategories,
+  JVHCATEGORIES,
   type AI4MCategory,
+  type JVHCategory,
   type CACCategory,
   type P4Category,
   type PHCategory,
@@ -34,7 +36,7 @@ interface ImageAnnotatorProps {
   assetMentioned?: string | string[];
   structureItemId?: number;
   parentPlanetLocation?: string;
-  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'Custom';
+  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'Custom';
 };
 
 export default function ImageAnnotator({
@@ -74,6 +76,8 @@ export default function ImageAnnotator({
       ? CoMCATEGORIES
       : annotationType === 'PH'
       ? PHCATEGORIES
+      : annotationType === 'JVH'
+      ? JVHCATEGORIES
       : annotationType === 'CAC'
       ? CACCategories
       : {} as Record<string, CategoryConfig>;

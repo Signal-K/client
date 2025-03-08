@@ -6,7 +6,7 @@ interface ClassificationOption {
 
 export const jvhOptions: ClassificationOption[] = [
     {
-        id: 1,
+        id: 1, 
         text: "Vortex",
     },
     {
@@ -160,7 +160,16 @@ export const cloudSpottingOnMarsShapesOptions: ClassificationOption[] = [
 ];
 
 
-
+export const ClickACoralClassificationOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Coral",
+    },
+    {
+        id: 2,
+        text: "Fish/Animals"
+    },
+];
 
 
 export const lidarEarthCloudsReadClassificationOptions: ClassificationOption[] = [

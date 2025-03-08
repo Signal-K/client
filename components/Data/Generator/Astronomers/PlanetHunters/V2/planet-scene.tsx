@@ -6,11 +6,18 @@ import { PlanetMesh } from "./planet-mesh";
 import type { PlanetStats } from "@/utils/planet-physics";
 
 interface PlanetSceneProps {
-  stats: PlanetStats
-  terrainHeight: number
+  stats: PlanetStats;
+  terrainHeight: number;
+  classificationConfig?: any;
+  content?: any;
+  classificationId: string;
+  author: string;
+  type?: string;
 };
 
-export function PlanetScene({ stats, terrainHeight }: PlanetSceneProps) {
+export function PlanetScene({ stats, classificationConfig, classificationId, terrainHeight }: PlanetSceneProps) {
+  console.log(classificationConfig);
+
   return (
     <div className="w-full h-full bg-black">
       <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>

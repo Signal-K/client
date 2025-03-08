@@ -9,8 +9,8 @@ interface SimplePlanetMeshProps {
   stats: {
     mass: number;
     radius: number;
-    density: number;
-    type: "terrestrial" | "gaseous"
+    density?: number;
+    type?: "terrestrial" | "gaseous" | undefined;
   }; 
 };
 

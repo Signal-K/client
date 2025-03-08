@@ -8,6 +8,7 @@ import { Anomaly } from "../Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { PreferredGaseousClassifications } from "@/components/Structures/Missions/PickPlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import { Button } from "@/components/ui/button";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL; 
 
@@ -149,37 +150,38 @@ export function LidarJVHSatellite({ anomalyid }: Props) {
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const [hasMission20000007, setHasMission20000007] = useState<boolean>(false);
+    // const [hasMission20000007, setHasMission20000007] = useState<boolean>(false);
 
     const [loading, setLoading] = useState<boolean>(true);
+    const [showTutorial, setShowTutorial] = useState(false);
 
-    useEffect(() => {
-        const checkTutorialMission = async () => {
-            if (!session) {
-                return;
-            };
+    // useEffect(() => {
+    //     const checkTutorialMission = async () => {
+    //         if (!session) {
+    //             return;
+    //         };
 
-            try {
-                const { data: missionData, error: missionError } = await supabase
-                    .from("missions")
-                    .select("*")
-                    .eq("mission", 20000007)
-                    .eq("user", session.user.id)
-                    .limit(1);
+    //         try {
+    //             const { data: missionData, error: missionError } = await supabase
+    //                 .from("missions")
+    //                 .select("*")
+    //                 .eq("mission", 20000007)
+    //                 .eq("user", session.user.id)
+    //                 .limit(1);
 
-                if (missionError) {
-                    throw missionError;
-                };
+    //             if (missionError) {
+    //                 throw missionError;
+    //             };
 
-                setHasMission20000007(missionData && missionData.length > 0);
-            } catch (error: any) {
-                console.error("Error fetching mission data:", error);
-                setHasMission20000007(false);
-            };
-        };
+    //             setHasMission20000007(missionData && missionData.length > 0);
+    //         } catch (error: any) {
+    //             console.error("Error fetching mission data:", error);
+    //             setHasMission20000007(false);
+    //         };
+    //     };
 
-        checkTutorialMission();
-    }, [session]);
+    //     checkTutorialMission();
+    // }, [session]);
 
     useEffect(() => {
         async function fetchAnomaly() {
@@ -200,7 +202,7 @@ export function LidarJVHSatellite({ anomalyid }: Props) {
 
                 const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
                 setAnomaly(randomAnomaly);
-                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${randomAnomaly.id}.jpeg`);
+                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${randomAnomaly.id}.png`);
             } catch (error: any) {
                 console.error("Error fetching anomaly", error.message);
                 setAnomaly(null);
@@ -212,7 +214,45 @@ export function LidarJVHSatellite({ anomalyid }: Props) {
         if (session) {
             fetchAnomaly();
         };
-    }, [session, hasMission20000007]);
+    }, [session]);
+
+    const handleShowTutorial = () => {
+        setShowTutorial(true);
+    };
+
+        const fetchAnomaly = async () => {
+            if (!session) {
+                console.error("No session found");
+                setLoading(false);
+                return;
+            };
+        
+            setLoading(true);
+        
+            try {
+                const { data: anomalies, error } = await supabase
+                    .from('anomalies')
+                    .select('*')
+                    .eq('anomalySet', 'lidar-jovianVortexHunter');
+        
+                if (error) throw error;
+        
+                if (!anomalies || anomalies.length === 0) {
+                    console.error("No anomalies found for the given type");
+                    setAnomaly(null);
+                } else {
+                    const randomIndex = Math.floor(Math.random() * anomalies.length);
+                    const anomaly = anomalies[randomIndex];
+                    setAnomaly(anomaly);
+                    setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${anomaly.id}.png`);
+                }
+            } catch (error) {
+                console.error("Error fetching anomaly", error);
+                setAnomaly(null);
+            } finally {
+                setLoading(false);
+            };    
+    };   
 
     if (loading) {
         return (
@@ -228,46 +268,74 @@ export function LidarJVHSatellite({ anomalyid }: Props) {
         );
     };
 
-    const content = !hasMission20000007
-    ? <StarterJovianVortexHunter anomalyid={anomalyid} />
-    : (
-        <>
-            {loading && <p>Loading...</p>}
-            {!loading && !anomaly && <p>No anomaly found.</p>}
-            {!loading && anomaly && (
-                <>
-                    <div className="p-4 rounded-md relative w-full">
-                        {imageUrl && <img src={imageUrl} alt="Vortex" className="w-64 h-64 contained" />}
-                    </div>
-                    {imageUrl && (
-                        <>
-                        <ImageAnnotator
-                            anomalyId={anomaly.id.toString()}
-                            anomalyType="lidar-jovianVortexHunter"
-                            missionNumber={200000072}
-                            assetMentioned={imageUrl}
-                            structureItemId={3105}
-                            initialImageUrl={imageUrl}
-                            annotationType="AI4M"//JVH"
-                            parentPlanetLocation='Null'
-                        />
-                        {/* <ClassificationForm
-                            anomalyId={anomaly.id.toString()}
-                            anomalyType="lidar-jovianVortexHunter"
-                            missionNumber={200000072}
-                            assetMentioned={imageUrl}
-                            structureItemId={3105}
-                        /> */}
-                        </>
-                    )}
-                </>
-            )}
-        </>
-    );
+    // const content = !hasMission20000007
+    // ? <StarterJovianVortexHunter anomalyid={anomalyid} />
+    // : (
+    //     <>
+    //         {loading && <p>Loading...</p>}
+    //         {!loading && !anomaly && <p>No anomaly found.</p>}
+    //         {!loading && anomaly && (
+    //             <>
+    //                 <div className="p-4 rounded-md relative w-full">
+    //                     {imageUrl && <img src={imageUrl} alt="Vortex" className="w-64 h-64 contained" />}
+    //                 </div>
+    //                 {imageUrl && (
+    //                     <>
+    //                     <ImageAnnotator
+    //                         anomalyId={anomaly.id.toString()}
+    //                         anomalyType="lidar-jovianVortexHunter"
+    //                         missionNumber={200000072}
+    //                         assetMentioned={imageUrl}
+    //                         structureItemId={3105}
+    //                         initialImageUrl={imageUrl}
+    //                         annotationType="AI4M"//JVH"
+    //                         parentPlanetLocation='Null'
+    //                     />
+    //                     {/* <ClassificationForm
+    //                         anomalyId={anomaly.id.toString()}
+    //                         anomalyType="lidar-jovianVortexHunter"
+    //                         missionNumber={200000072}
+    //                         assetMentioned={imageUrl}
+    //                         structureItemId={3105}
+    //                     /> */}
+    //                     </>
+    //                 )}
+    //             </>
+    //         )}
+    //     </>
+    // );
+
+    // return (
+    //     <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+    //         {content}
+    //     </div>
+    // );
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-            {content}
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg"> 
+            {imageUrl && (
+                <ImageAnnotator
+                    anomalyId={anomaly.id.toString()}
+                    anomalyType="lidar-jovianVortexHunter"
+                    missionNumber={200000072}
+                    assetMentioned={imageUrl}
+                    structureItemId={3105}
+                    initialImageUrl={imageUrl}
+                    annotationType="JVH"
+                    // parentPlanetLocation='Null' 
+                />
+            )}
+            {!showTutorial && (
+                <Button
+                    className="mb-4"
+                    onClick={handleShowTutorial}
+                >
+                    Show Tutorial
+                </Button>
+            )}
+            {showTutorial && (
+                <StarterJovianVortexHunter anomalyid={anomalyid} />
+            )}
         </div>
     );
 };

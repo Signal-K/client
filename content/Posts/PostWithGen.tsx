@@ -4,15 +4,19 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, MessageSquare } from "lucide-react";
+import { ThumbsUp, MessageSquare, FeatherIcon, PencilLineIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
 
 import CloudSignal from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudSignal";
 import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import AsteroidViewer from "@/components/Data/Generator/Astronomers/DailyMinorPlanet/asteroid-viewer";
 import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
+import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
+import { FullPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
+import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
+import Link from "next/link";
 
 interface CommentProps {
   id: number;
@@ -44,7 +48,7 @@ export function PostCardSingleWithGenerator({
   content,
   votes,
   category,
-  tags,
+  tags, 
   anomalyId,
   classificationConfig,
   images,
@@ -53,6 +57,8 @@ export function PostCardSingleWithGenerator({
   onVote,
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
+  const session = useSession();
+
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
   const [voteCount, setVoteCount] = useState(votes);
@@ -79,9 +85,33 @@ export function PostCardSingleWithGenerator({
     }
   };
 
-  const handleVoteClick = () => {
+  const handleVoteClick = async () => {
+    if (!session) {
+      return;
+    };
+
+    try {
+      const { error } = await supabase
+        .from("votes")
+        .insert([
+          {
+            user_id: session.user.id,
+            classification_id: classificationId,
+            anomaly_id: anomalyId,
+          },
+        ]);
+
+        if (error) {
+          console.error('Error inserting vote: ', error);
+          return;
+        };
+
+        setVoteCount((prev) => prev + 1);
+    } catch (error) {
+      console.error('Error inserting vote: ', error);
+    };
+
     if (onVote) onVote();
-    setVoteCount((prev) => prev + 1);
   };
 
   const renderDynamicComponent = () => {
@@ -91,12 +121,17 @@ export function PostCardSingleWithGenerator({
           classificationConfig={classificationConfig}
           classificationId={String(classificationId)} 
         />
-      case "planet":
-        return <PlanetGenerator
-          classificationId={String(classificationId)} 
-          classificationConfig={classificationConfig}
-          author={author}
-        />;
+
+        case "planet":
+          return (
+            <>
+              <SimplePlanetGenerator
+                classificationId={String(classificationId)}
+                classificationConfig={classificationConfig}
+                author={author}
+              />
+            </>
+          );
       case "telescope-minorPlanet":
         return <AsteroidViewer 
           classificationId={String(classificationId)} 
@@ -156,6 +191,168 @@ export function PostCardSingleWithGenerator({
             <img src={images[0]} alt="Post Image" />
           </div>
         )}
+        {renderDynamicComponent()}
+      </CardContent>
+      <CardFooter className="flex items-center justify-between">
+        <Button onClick={handleVoteClick} size="sm">
+          <ThumbsUp className="mr-2" /> {voteCount}
+        </Button>
+        <Button size="sm">
+          <MessageSquare className="mr-2" /> {comments.length}
+        </Button>
+        <Link href={`/planets/edit/${classificationId}`}>
+          <Button size="sm">
+            <FeatherIcon className="text-green-500" /> Edit
+          </Button>
+        </Link>
+        <Link href={`/posts/${classificationId}`}>
+          <Button size='sm'>
+            <PencilLineIcon className="text-green-500" /> Expand
+          </Button>
+        </Link>
+      </CardFooter>
+    </Card>
+  );
+};
+
+
+export function PostCardSingleWithGeneratorEditMode({
+  classificationId,
+  title,
+  author,
+  content,
+  votes,
+  category,
+  tags,
+  anomalyId,
+  classificationConfig,
+  images,
+  classificationType,
+  commentStatus,
+  onVote,
+}: PostCardSingleProps) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const [comments, setComments] = useState<CommentProps[]>([]);
+  const [loadingComments, setLoadingComments] = useState<boolean>(true);
+  const [voteCount, setVoteCount] = useState(votes);
+
+  useEffect(() => {
+    fetchComments();
+  }, [classificationId]);
+
+  const fetchComments = async () => {
+    setLoadingComments(true);
+    try {
+      const { data, error } = await supabase
+        .from("comments")
+        .select("*")
+        .eq("classification_id", classificationId)
+        .order("created_at", { ascending: false }); 
+
+      if (error) throw error;
+      setComments(data);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  const handleVoteClick = () => {
+    if (onVote) onVote();
+    setVoteCount((prev) => prev + 1);
+  };
+
+  const renderDynamicComponent = () => {
+    switch (classificationType) {
+      case "cloud":
+        return <CloudSignal
+          classificationConfig={classificationConfig}
+          classificationId={String(classificationId)} 
+        />
+
+        case "planet":
+          return (
+            <>
+              {session?.user?.id === author && (
+                <PlanetGenerator
+                  classificationId={String(classificationId)} 
+                  classificationConfig={classificationConfig}
+                  author={author}
+                />
+                        //   // <FullPlanetGenerator />
+              )}
+              {session?.user?.id !== author && (
+                <SimplePlanetGenerator
+                  classificationId={String(classificationId)}
+                  classificationConfig={classificationConfig}
+                  author={author}
+                />
+              )}
+            </>
+          );
+      case "telescope-minorPlanet":
+        return <AsteroidViewer 
+          classificationId={String(classificationId)} 
+          classificationConfig={classificationConfig}
+        />;
+      case "lidar-jovianVortexHunter":
+        return <CloudClassifier
+          classificationId={String(classificationId)} 
+          classificationConfig={classificationConfig}
+        />;
+      default:
+        return (
+          <div>
+            {loadingComments ? (
+              <p>Loading comments...</p>
+            ) : comments.length > 0 ? (
+              comments.map((comment) => (
+                <CommentCard
+                  key={comment.id}
+                  id={comment.id}
+                  author={comment.author}
+                  classificationId={classificationId}
+                  content={comment.content}
+                  createdAt={comment.created_at}
+                  replyCount={0}
+                  parentCommentId={classificationId}
+                  isSurveyor={false}
+                />
+              ))
+            ) : (
+              <p>No comments yet. Be the first to comment!</p>
+            )}
+          </div>
+        );
+    }
+  };
+
+  return (
+    <Card className="w-full max-w-2xl mx-auto my-8 bg-card text-card-foreground border-primary">
+      <CardHeader>
+        <div className="flex items-center space-x-4">
+          <Avatar>
+            <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${author}`} />
+            <AvatarFallback>{author[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <CardTitle>{title}</CardTitle>
+            <p className="text-sm text-muted-foreground">by {author}</p>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Badge variant="secondary">{category}</Badge>
+        <p>{content}</p>
+        {images.length > 0 && (
+          <div>
+            <img src={images[0]} alt="Post Image" />
+          </div>
+        )}
+        {renderDynamicComponent()}
       </CardContent>
       <CardFooter className="flex items-center justify-between">
         <Button onClick={handleVoteClick} size="sm">
@@ -165,7 +362,6 @@ export function PostCardSingleWithGenerator({
           <MessageSquare className="mr-2" /> {comments.length}
         </Button>
       </CardFooter>
-      <CardContent>{renderDynamicComponent()}</CardContent>
     </Card>
   );
 };

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Share2 } from "lucide-react";
-
 import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
@@ -15,7 +14,7 @@ interface PickPlanetCardProps {
   images: string[];
   anomaly: string;
   classificationConfiguration?: any;
-}
+};
 
 export default function PickPlanetCard({
   id,
@@ -28,11 +27,9 @@ export default function PickPlanetCard({
   anomaly,
 }: PickPlanetCardProps) {
   const supabase = useSupabaseClient();
-
   const [fullName, setFullName] = useState<string | null>("");
   const [username, setUsername] = useState<string | null>("");
   const [loading, setLoading] = useState(false);
-
   const [planetName, setPlanetName] = useState<string | null>('');
 
   useEffect(() => {
@@ -60,7 +57,7 @@ export default function PickPlanetCard({
     };
 
     fetchAnomalyInfo();
-  }, [supabase])
+  }, [supabase]);
 
   useEffect(() => {
     async function fetchAvatar() {
@@ -117,7 +114,7 @@ export default function PickPlanetCard({
   }
 
   return (
-    <div className="flex flex-col items-start space-y-4 p-4 bg-white/10 rounded-lg shadow-md">
+    <div className="flex flex-col items-start space-y-4 p-4 bg-white/10 rounded-lg shadow-md h-full max-w-xs w-full">
         <Link href={`/posts/${id}`} passHref>
             <Button variant="link" className="text-blue-500 flex items-center space-x-2">
                 <Share2 size={16} />
@@ -135,21 +132,3 @@ export default function PickPlanetCard({
     </div>
   );
 };
-
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { PostAvatar } from "@/components/Account/Avatar";
-
-            {/* <div className="h-16">
-                <PostAvatar author={author} />
-                <p className="text-sm text-muted-foreground">discovered by {author}</p>
-            </div> */}
-
-                  {/* <div className="flex items-center space-x-4">
-        <PostAvatar author={author} />
-        <div>
-          <CardTitle>{content}</CardTitle>
-          <p className="text-sm text-gray-500">
-            Discovered by {username || author}
-          </p>
-        </div>
-      </div> */}

@@ -113,7 +113,7 @@ export function FullPlanetGenerator() {
   return (
     <div className="rounded-lg overflow-hidden bg-[#1E1E1E] border border-[#2A2A2A]">
       <div className="h-[400px] relative">
-        <PlanetScene terrainHeight={terrainHeight} stats={stats} />
+        <PlanetScene terrainHeight={terrainHeight} stats={stats} classificationId={""} author={""} />
       </div>
       <div className="p-6 space-y-6">
         <FullPlanetControls

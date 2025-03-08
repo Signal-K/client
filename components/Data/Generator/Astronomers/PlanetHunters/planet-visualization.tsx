@@ -29,7 +29,7 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
 
     // Create sphere projection
     const projection = d3.geoOrthographic()
-      .scale(stats.radius * 180)
+      .scale((stats.radius ?? 0) * 180) // Default to 0 if undefined
       .translate([0, 0])
       .clipAngle(90)
 
@@ -70,7 +70,7 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
       // Gas giant atmosphere
       atmosphere.append('stop')
         .attr('offset', '85%')
-        .attr('stop-color', stats.density > 1.5 ? '#FFB90F' : '#B8E2F2')
+        .attr('stop-color', stats.density && stats.density > 1.5 ? '#FFB90F' : '#B8E2F2') // Use density if defined
         .attr('stop-opacity', 0.2)
       
       atmosphere.append('stop')
@@ -114,7 +114,7 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
 
     // Draw atmosphere
     svg.append('circle')
-      .attr('r', stats.radius * 190)
+      .attr('r', (stats.radius ?? 0) * 190) // Default to 0 if undefined
       .attr('fill', 'url(#atmosphere)')
 
     // Draw planet surface with elevation-based shadows
@@ -137,9 +137,10 @@ export function PlanetVisualization({ stats }: PlanetVisualizationProps) {
 
   }, [stats])
 
-  function getColor(elevation: number, density: number, type: 'terrestrial' | 'gaseous'): string {
+  function getColor(elevation: number, density: number | undefined, type: 'terrestrial' | 'gaseous'): string {
+    const densityValue = density ?? 1; // Default to 1 if undefined
     if (type === 'gaseous') {
-      return density > 1.5 ? `rgb(${255 * elevation}, ${165 * elevation}, ${0})` : `rgb(${183 * elevation}, ${226 * elevation}, ${242 * elevation})`
+      return densityValue > 1.5 ? `rgb(${255 * elevation}, ${165 * elevation}, ${0})` : `rgb(${183 * elevation}, ${226 * elevation}, ${242 * elevation})`
     } else {
       if (elevation < 0.3) return `rgb(${30 * elevation}, ${77 * elevation}, ${107 * elevation})` // Deep water
       if (elevation < 0.5) return `rgb(${205 * elevation}, ${133 * elevation}, ${63 * elevation})` // Beach

@@ -33,7 +33,7 @@ export function PlanetControls({
   onSurfaceRoughnessChange,
   showExtendedControls,
 }: PlanetControlsProps) {
-  const liquidInfo = determineLiquidType(stats.temperature)
+  const liquidInfo = determineLiquidType(stats.temperature ?? 50)
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -72,7 +72,7 @@ export function PlanetControls({
               min={50}
               max={400}
               step={1}
-              value={[stats.temperature]}
+              value={[stats.temperature ?? 50]}
               onValueChange={([value]) => onTemperatureChange(value)}
             />
             <div className="text-sm text-white">{stats.temperature ?? "N/A"}</div>
@@ -85,7 +85,7 @@ export function PlanetControls({
               min={1}
               max={1000}
               step={1}
-              value={[stats.orbitalPeriod]}
+              value={[stats.orbitalPeriod ?? 5]}
               onValueChange={([value]) => onOrbitalPeriodChange(value)}
             />
             <div className="text-sm text-white">{stats.orbitalPeriod ?? "N/A"}</div>

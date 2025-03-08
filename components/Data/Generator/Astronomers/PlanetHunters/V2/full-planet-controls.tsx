@@ -40,7 +40,7 @@ interface FullPlanetControlsProps {
   onCloudDensityChange: (value: number) => void
   onAtmosphereVisibilityChange: (value: number) => void
   onAtmosphereHeightChange: (value: number) => void
-}
+};
 
 function SliderControl({
   label,
@@ -107,7 +107,7 @@ export function FullPlanetControls({
   onAtmosphereVisibilityChange,
   onAtmosphereHeightChange,
 }: FullPlanetControlsProps) {
-  const liquidInfo = determineLiquidType(stats.temperature)
+  const liquidInfo = stats.temperature !== undefined ? determineLiquidType(stats.temperature) : { type: "Unknown" };
 
   return (
     <ScrollArea className="h-[600px] pr-4">
@@ -196,7 +196,7 @@ export function FullPlanetControls({
                   <div className="grid gap-4">
                     <SliderControl
                       label="Temperature (K)"
-                      value={stats.temperature}
+                      value={stats.temperature ?? 50}
                       min={50}
                       max={400}
                       step={1}
@@ -222,7 +222,7 @@ export function FullPlanetControls({
                     </div>
                     <SliderControl
                       label="Biomass Level"
-                      value={stats.biomassLevel}
+                      value={stats.biomassLevel ?? 0}
                       min={0}
                       max={1}
                       onChange={onBiomassLevelChange}
@@ -237,21 +237,21 @@ export function FullPlanetControls({
                   <div className="grid gap-4">
                     <SliderControl
                       label="Surface Roughness"
-                      value={stats.surfaceRoughness}
+                      value={stats.surfaceRoughness ?? 0}
                       min={0}
                       max={2}
                       onChange={onSurfaceRoughnessChange}
                     />
                     <SliderControl
                       label="Terrain Erosion"
-                      value={stats.terrainErosion}
+                      value={stats.terrainErosion ?? 0}
                       min={0}
                       max={1}
                       onChange={onTerrainErosionChange}
                     />
                     <SliderControl
                       label="Plate Tectonics"
-                      value={stats.plateTectonics}
+                      value={stats.plateTectonics ?? 0}
                       min={0}
                       max={1}
                       onChange={onPlateTectonicsChange}
@@ -275,7 +275,7 @@ export function FullPlanetControls({
                     </div>
                     <SliderControl
                       label="Volcanic Activity"
-                      value={stats.volcanicActivity}
+                      value={stats.volcanicActivity ?? 0}
                       min={0}
                       max={1}
                       onChange={onVolcanicActivityChange}
@@ -290,7 +290,7 @@ export function FullPlanetControls({
                   <div className="grid gap-4">
                     <SliderControl
                       label="Atmosphere Strength"
-                      value={stats.atmosphereStrength}
+                      value={stats.atmosphereStrength ?? 0}
                       min={0}
                       max={1}
                       onChange={onAtmosphereStrengthChange}
@@ -311,7 +311,7 @@ export function FullPlanetControls({
                     /> */}
                     <SliderControl
                       label="Atmospheric Density"
-                      value={stats.atmosphericDensity}
+                      value={stats.atmosphericDensity ?? 0}
                       min={0}
                       max={1}
                       onChange={onAtmosphericDensityChange}
@@ -332,17 +332,15 @@ export function FullPlanetControls({
                             key={type}
                             size="sm"
                             onClick={() => {
-                              const newTypes = stats.cloudTypes.includes(type)
-                                ? stats.cloudTypes.filter((t) => t !== type)
-                                : [...stats.cloudTypes, type]
+                              const newTypes = (stats.cloudTypes ?? []).includes(type)
+                              ? (stats.cloudTypes ?? []).filter((t) => t !== type)
+                              : [...(stats.cloudTypes ?? []), type];                            
                               onCloudTypesChange(newTypes)
                             }}
-                            variant={stats.cloudTypes.includes(type) ? "default" : "outline"}
+                            variant={(stats.cloudTypes ?? []).includes(type) ? "default" : "outline"}
                             className={
-                              stats.cloudTypes.includes(type)
-                                ? "bg-[#5FCBC3] hover:bg-[#5FCBC3]/90"
-                                : "border-[#5FCBC3] text-[#5FCBC3] hover:bg-[#5FCBC3] hover:text-white"
-                            }
+                              (stats.cloudTypes ?? []).includes(type) ? "bg-[#5FCBC3] hover:bg-[#5FCBC3]/90 border-[#5FCBC3] text-[#5FCBC3] hover:bg-[#5FCBC3] hover:text-white" : ""
+                            }                            
                           >
                             {type}
                           </Button>
@@ -351,21 +349,21 @@ export function FullPlanetControls({
                     </div>
                     <SliderControl
                       label="Cloud Density"
-                      value={stats.cloudDensity}
+                      value={stats.cloudDensity ?? 0}
                       min={0}
                       max={1}
                       onChange={onCloudDensityChange}
                     />
                     <SliderControl
                       label="Weather Variability"
-                      value={stats.weatherVariability}
+                      value={stats.weatherVariability ?? 0}
                       min={0}
                       max={1}
                       onChange={onWeatherVariabilityChange}
                     />
                     <SliderControl
                       label="Storm Frequency"
-                      value={stats.stormFrequency}
+                      value={stats.stormFrequency ?? 0}
                       min={0}
                       max={1}
                       onChange={onStormFrequencyChange}
@@ -380,28 +378,28 @@ export function FullPlanetControls({
                   <div className="grid gap-4">
                     <SliderControl
                       label="Water Height"
-                      value={stats.waterHeight}
+                      value={stats.waterHeight ?? 0.5}
                       min={0}
                       max={1}
                       onChange={onWaterHeightChange}
                     />
                     <SliderControl
                       label="Water Level"
-                      value={stats.waterLevel}
+                      value={stats.waterLevel ?? 0.5}
                       min={0}
                       max={1}
                       onChange={onWaterLevelChange}
                     />
                     <SliderControl
                       label="Salinity"
-                      value={stats.salinity}
+                      value={stats.salinity ?? 0.1}
                       min={0}
                       max={1}
                       onChange={onSalinityChange}
                     />
                     <SliderControl
                       label="Subsurface Water"
-                      value={stats.subsurfaceWater}
+                      value={stats.subsurfaceWater ?? 0.02}
                       min={0}
                       max={1}
                       onChange={onSubsurfaceWaterChange}

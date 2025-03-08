@@ -23,6 +23,30 @@ export const CoMCATEGORIES: Record<CoMCategory, CategoryConfig> = {
   },
 };
 
+export type JVHCategory = 'Vortex' | 'TurbulentRegion' | 'CloudBands' | 'Null';
+export const JVHCATEGORIES: Record<JVHCategory, CategoryConfig> = {
+  Vortex: {
+    name: 'Vortex',
+    color: '#00BCD4',
+    description: 'Atmospheric feature that is generally round/elliptical in shape',
+  },
+  TurbulentRegion: {
+    name: 'Turbulent region',
+    color: '#4CAF50',
+    description: "Cloud structures that don't have a definite shape, but form lots of curls and swirls",
+  },
+  CloudBands: {
+    name: 'Cloud bands',
+    color: '#FFC107',
+    description: "Gradients in color that are mostly horizontal in direction",
+  },
+  Null: {
+    name: 'Null',
+    color: '#FF0000',
+    description: 'None of the above/content too blurry',
+  },
+};
+
 export type P4Category = 'fan' | 'blotch' | 'Custom';
 export const P4CATEGORIES: Record<P4Category, CategoryConfig> = {
   fan: {
