@@ -42,7 +42,6 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
     let classificationCounts: Record<string, number> = {};
 
     classifications.forEach((classification) => {
-      // Count the annotation options (e.g., Sand, Soil, Bedrock)
       classification.annotationOptions.forEach((option) => {
         const match = option.match(/([a-zA-Z\s]+)\(x(\d+)\)/);
         if (match) {
@@ -71,13 +70,19 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
         }
       });
 
-      // Count the classification options (mapping to Mars features)
       if (classification.classificationConfiguration?.[""]) {
         Object.keys(classification.classificationConfiguration[""]).forEach((key) => {
           const id = parseInt(key);
           const option = automatonaiForMarsOptions.find((opt) => opt.id === id);
           if (option) {
-            classificationCounts[option.text] = (classificationCounts[option.text] || 0) + 1;
+            const featureText = option.text.trim().toLowerCase();
+            const matchedFeature = classification.annotationOptions.find((option) =>
+              option.toLowerCase().includes(featureText)
+            );
+            if (matchedFeature) {
+              const featureName = matchedFeature.split(' (')[0]; // Get the feature name without count
+              classificationCounts[featureName] = (classificationCounts[featureName] || 0) + 1;
+            }
           }
         });
       }
@@ -93,16 +98,17 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
     };
   };
 
-  // Call the aggregation logic and update the state
   useEffect(() => {
     const data = aggregateClassifications();
-    setAggregatedData(data);
 
-    // Pass the summary data to the parent component if a handler is provided
+    if (JSON.stringify(data) !== JSON.stringify(aggregatedData)) {
+      setAggregatedData(data);
+    }
+
     if (onSummaryUpdate) {
       onSummaryUpdate(data);
     }
-  }, [classifications, onSummaryUpdate]);
+  }, []);
 
   return (
     <div className="mt-6">
