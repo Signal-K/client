@@ -115,14 +115,14 @@ export function PostCardSingle({
       ]);
   
       if (error) {
-        console.error("Error inserting vote:", error);
+        console.error("Error inserting vote: ", error);
         return;
       };
   
       setVoteCount((prev) => prev + 1);
     } catch (error) {
       console.error("Error handling vote:", error);
-    }
+    };
   
     if (onVote) onVote();
   };

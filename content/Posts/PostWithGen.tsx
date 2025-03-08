@@ -48,7 +48,7 @@ export function PostCardSingleWithGenerator({
   content,
   votes,
   category,
-  tags,
+  tags, 
   anomalyId,
   classificationConfig,
   images,
@@ -85,9 +85,33 @@ export function PostCardSingleWithGenerator({
     }
   };
 
-  const handleVoteClick = () => {
+  const handleVoteClick = async () => {
+    if (!session) {
+      return;
+    };
+
+    try {
+      const { error } = await supabase
+        .from("votes")
+        .insert([
+          {
+            user_id: session.user.id,
+            classification_id: classificationId,
+            anomaly_id: anomalyId,
+          },
+        ]);
+
+        if (error) {
+          console.error('Error inserting vote: ', error);
+          return;
+        };
+
+        setVoteCount((prev) => prev + 1);
+    } catch (error) {
+      console.error('Error inserting vote: ', error);
+    };
+
     if (onVote) onVote();
-    setVoteCount((prev) => prev + 1);
   };
 
   const renderDynamicComponent = () => {

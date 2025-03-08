@@ -46,13 +46,13 @@ export interface AggregatedCloud {
   classificationOptions: Record<string, Record<string, number>>;
   additionalFields: Record<string, Set<string>>;
   cloudColours?: Record<string, number>;
-}
+};
 
 export interface AggregatedP4 {
   fanCount: number;
   blotchCount: number;
   classificationCounts: Record<string, number>;
-}
+};
 
 export interface AggregatedAI4M {
   sandCount: number;
@@ -61,13 +61,13 @@ export interface AggregatedAI4M {
   rockCount: number;
   unlabelledCount: number;
   classificationCounts: Record<string, number>;
-}
+};
 
 export interface AI4MClassification {
   id: number;
   classificationConfiguration: any;
   annotationOptions: any[]; 
-}
+};
 
 export default function ClassificationDetail({ params }: { params: { id: string } }) {
   const supabase = useSupabaseClient();
@@ -83,60 +83,77 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   const [p4Summary, setP4Summary] = useState<AggregatedP4 | null>(null);
   const [ai4MSummary, setAI4MSummary] = useState<AggregatedAI4M | null>(null);
   const [relatedClassifications, setRelatedClassifications] = useState<Classification[]>([]);
+    
 
   const [showCurrentUser, setShowCurrentUser] = useState<boolean>(true);
   const [showMetadata, setShowMetadata] = useState<boolean>(false);
 
   useEffect(() => {
     if (!params.id) return;
-
+  
     const fetchClassification = async () => {
       if (!params.id || !session) return;
-
+  
       const { data, error } = await supabase
         .from("classifications")
         .select("*, anomaly:anomalies(*), classificationConfiguration, media")
         .eq("id", params.id)
         .single();
-
+  
       if (error) {
         setError("Failed to fetch classification.");
         setLoading(false);
         return;
-      };
-
+      }
+  
       setClassification(data);
       setAnomaly(data.anomaly);
-
+  
       const parentPlanetLocation = data.anomaly?.id;
       if (parentPlanetLocation) {
         const query = supabase
           .from("classifications")
           .select("*, anomaly:anomalies(*), classificationConfiguration, media")
           .eq("classificationConfiguration->>parentPlanetLocation", parentPlanetLocation.toString());
-        
+  
         if (showCurrentUser) {
           query.eq("author", session.user.id);
-        };
-
+        }
+  
         const { data: relatedData, error: relatedError } = await query;
-
+  
         if (relatedError) {
           setError("Failed to fetch related classifications.");
           setLoading(false);
           return;
-        };
-
+        }
+  
         if (relatedData) {
-          setRelatedClassifications(relatedData);
-        };
-      };
-
+          // Fetch votes for related classifications
+          const votePromises = relatedData.map(async (related) => {
+            const { count, error: votesError } = await supabase
+              .from("votes")
+              .select("*", { count: "exact" })
+              .eq("classification_id", related.id);
+  
+            if (votesError) {
+              console.error("Error fetching votes:", votesError);
+              return { ...related, votes: 0 };
+            }
+  
+            return { ...related, votes: count };
+          });
+  
+          const relatedClassificationsWithVotes = await Promise.all(votePromises);
+          setRelatedClassifications(relatedClassificationsWithVotes);
+        }
+      }
+  
       setLoading(false);
     };
-
+  
     fetchClassification();
-  }, [params.id, supabase, session, showCurrentUser]); 
+  }, [params.id, supabase, session, showCurrentUser]);  
 
   if (loading) return <p>Loading classification data...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
