@@ -65,7 +65,7 @@ export interface AggregatedAI4M {
 export interface AI4MClassification {
   id: number;
   classificationConfiguration: any;
-  annotationOptions: any[];  // Ensure annotationOptions is an array, as required by the aggregator
+  annotationOptions: any[]; 
 }
 
 export default function ClassificationDetail({ params }: { params: { id: string } }) {
@@ -82,6 +82,9 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   const [p4Summary, setP4Summary] = useState<AggregatedP4 | null>(null);
   const [ai4MSummary, setAI4MSummary] = useState<AggregatedAI4M | null>(null);
   const [relatedClassifications, setRelatedClassifications] = useState<Classification[]>([]);
+
+  const [showCurrentUser, setShowCurrentUser] = useState<boolean>(true);
+  const [showMetadata, setShowMetadata] = useState<boolean>(false);
 
   useEffect(() => {
     if (!params.id) return;
@@ -106,11 +109,18 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
       const parentPlanetLocation = data.anomaly?.id;
       if (parentPlanetLocation) {
-        const { data: relatedData, error: relatedError } = await supabase
+        // Apply author filter based on the toggle state
+        const query = supabase
           .from("classifications")
           .select("*, anomaly:anomalies(*), classificationConfiguration, media")
-          .eq("classificationConfiguration->>parentPlanetLocation", parentPlanetLocation.toString())
-          .eq("author", session.user.id);
+          .eq("classificationConfiguration->>parentPlanetLocation", parentPlanetLocation.toString());
+        
+        // Only add the author filter if `showCurrentUser` is true
+        if (showCurrentUser) {
+          query.eq("author", session.user.id);
+        }
+
+        const { data: relatedData, error: relatedError } = await query;
 
         if (relatedError) {
           setError("Failed to fetch related classifications.");
@@ -127,7 +137,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     };
 
     fetchClassification();
-  }, [params.id, supabase, session]);
+  }, [params.id, supabase, session, showCurrentUser]); // Include `showCurrentUser` in the dependency array
 
   if (loading) return <p>Loading classification data...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -169,6 +179,14 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     setAI4MSummary(summary);
   };
 
+  const toggleUserClassifications = () => {
+    setShowCurrentUser((prev) => !prev);
+  };
+
+  const toggleMetadataVisibility = () => {
+    setShowMetadata((prev) => !prev);
+  };
+
   return (
     <div className="p-6 bg-black text-white border border-gray-200 rounded-md shadow-md">
       <Navbar />
@@ -196,51 +214,72 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         />
       )}
 
-      {/* Cloud Classification Summary */}
-      {cloudClassifications.length > 0 && (
-        <CloudClassificationSummary
-          classifications={cloudClassifications}
-          onSummaryUpdate={handleCloudSummaryUpdate}
-        />
-      )}
-
-      {/* Biome Aggregation */}
+      {/* Biome Aggregation - moved directly below PostCard */}
       {cloudSummary && Object.keys(cloudSummary.annotationOptions).length > 0 && (
         <BiomeAggregator cloudSummary={cloudSummary} />
       )}
 
-      {/* SP4 Classification Summary */}
-      {satelliteP4Classifications.length > 0 && (
-        <SatellitePlanetFourAggregator
-          classifications={satelliteP4Classifications}
-          onSummaryUpdate={handleP4SummaryUpdate}
-        />
-      )}
+      {/* Toggle Buttons */}
+      <div className="mt-4">
+        <button 
+          className="px-4 py-2 bg-blue-500 text-white rounded-md"
+          onClick={toggleUserClassifications}
+        >
+          {showCurrentUser ? "Show All Classifications" : "Show My Classifications"}
+        </button>
+        <button 
+          className="ml-4 px-4 py-2 bg-green-500 text-white rounded-md"
+          onClick={toggleMetadataVisibility}
+        >
+          {showMetadata ? "Hide Metadata" : "Show Metadata"}
+        </button>
+      </div>
 
-      {/* AI4M Classification Summary */}
-      {ai4MClassifications.length > 0 && (
-        <AI4MAggregator
-          classifications={ai4MClassifications}
-          onSummaryUpdate={handleAI4MSummaryUpdate}
-        />
-      )}
+      {/* Show Metadata (if toggle is on) */}
+      {showMetadata && (
+        <>
+          {/* Cloud Classification Summary */}
+          {cloudClassifications.length > 0 && (
+            <CloudClassificationSummary
+              classifications={cloudClassifications}
+              onSummaryUpdate={handleCloudSummaryUpdate}
+            />
+          )}
 
-      {/* Related Classifications Section */}
-      {relatedClassifications.length > 0 && (
-        <div className="mt-6">
-          <h3 className="text-xl font-bold">Related Classifications</h3>
-          {relatedClassifications.map((related) => (
-            <div key={related.id} className="mt-4">
-              <h4 className="text-lg font-semibold">{related.classificationtype}</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-                <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
-                  <h4 className="font-bold text-lg">Classification #{related.id}</h4>
-                  <p className="mt-2 text-sm">{related.anomaly?.content || "No anomaly content"}</p>
+          {/* SP4 Classification Summary */}
+          {satelliteP4Classifications.length > 0 && (
+            <SatellitePlanetFourAggregator
+              classifications={satelliteP4Classifications}
+              onSummaryUpdate={handleP4SummaryUpdate}
+            />
+          )}
+
+          {/* AI4M Classification Summary */}
+          {ai4MClassifications.length > 0 && (
+            <AI4MAggregator
+              classifications={ai4MClassifications}
+              onSummaryUpdate={handleAI4MSummaryUpdate}
+            />
+          )}
+
+          {/* Related Classifications Section */}
+          {relatedClassifications.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-xl font-bold">Related Classifications</h3>
+              {relatedClassifications.map((related) => (
+                <div key={related.id} className="mt-4">
+                  <h4 className="text-lg font-semibold">{related.classificationtype}</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+                    <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
+                      <h4 className="font-bold text-lg">Classification #{related.id}</h4>
+                      <p className="mt-2 text-sm">{related.anomaly?.content || "No anomaly content"}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );
