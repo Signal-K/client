@@ -1,12 +1,13 @@
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Card } from "@/components/ui/card"
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Microscope, Users, Book, Menu, Github, Linkedin, Instagram, Twitter, PaintBucket } from "lucide-react";
-import { TimelinePoint, TimelineSection } from "./landing/timeline"
-import { RoadmapPoint, RoadmapSection } from "./landing/roadmap"
+import { TimelinePoint, TimelineSection } from "./landing/timeline";
+import { RoadmapPoint, RoadmapSection } from "./landing/roadmap";
+import Footer from "./landing/footer";
 
 const teamMembers = [
     {
@@ -90,25 +91,19 @@ const teamMembers = [
 
   const roadmapPoints: RoadmapPoint[] = [
     {
-      quarter: "Q2 2024",
-      title: "Enhanced Data Visualization",
-      description: "Implementing advanced visualization tools to help users better understand complex datasets.",
+      quarter: "Q2 2025",
+      title: "Early access to V3",
+      description: "Star Sailors V3 will have better graphics, more content and improved social features. We hope to offer passionate users early access during Q2.",
     },
     {
-      quarter: "Q3 2024",
-      title: "Mobile Application",
-      description: "Launching our dedicated mobile app for iOS and Android to enable on-the-go scientific contributions.",
+      quarter: "Q4 2025",
+      title: "First release of V3",
+      description: "The first release of V3 will include a mobile application for iOS and Android, and even more ways to contribute things you see and interact with in your daily life.",
     },
     {
-      quarter: "Q4 2024",
-      title: "AI-Assisted Discovery",
-      description: "Integrating machine learning algorithms to help identify patterns and potential discoveries.",
-    },
-    {
-      quarter: "Q1 2025",
-      title: "Global Research Network",
-      description:
-        "Expanding our partnerships to create a worldwide network of citizen scientists and research institutions.",
+      quarter: "Q1 2026",
+      title: "Multimedia side-projects",
+      description: "The 'Star Sailors Cinematic Universe' will commence with short stories and guidebooks aimed to equip early users with the tools required to enjoy Star Sailors.",
     },
 ];
 
@@ -285,7 +280,7 @@ export default function LandingSS() {
 <TimelineSection points={timelinePoints} />
 
       {/* Roadmap Section */}
-      {/* <RoadmapSection points={roadmapPoints} /> */}
+      <RoadmapSection points={roadmapPoints} />
  {/* <section className="py-20">
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-bold text-center">Game Screenshots</h2>
@@ -306,72 +301,7 @@ export default function LandingSS() {
       </section> */}
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white">
-        <div className="container mx-auto px-6 py-12">
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <div className="flex items-center space-x-2">
-                <Microscope className="h-6 w-6" />
-                <span className="text-lg font-bold">Star Sailors</span>
-              </div>
-              <p className="mt-4 text-gray-400">
-                Making scientific discovery & contribution accessible to everyone.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold">Resources</h3>
-              <ul className="mt-4 space-y-2">
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    Documentation
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    API Reference
-                  </Link>
-                </li>
-                <li>
-                  <Link href="https://zooniverse.org" className="text-gray-400 hover:text-white">
-                    Data Sources
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold">Community</h3>
-              <ul className="mt-4 space-y-2">
-                <li>
-                  <Link href="https://github.com/signal-k/client" className="disabled text-gray-400 hover:text-white">
-                    {/* Discord */}
-                    <PaintBucket />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="https://twitter.com/TheMrScrooby" className="text-gray-400 hover:text-white">
-                    <Twitter />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="https://github.com/gizmotronn" className="text-gray-400 hover:text-white">
-                    <Github /> 
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold">Stay Updated</h3>
-              <div className="mt-4 flex gap-2">
-                <Input type="email" placeholder="Enter your email" className="bg-gray-800 border-gray-700" />
-                <Button>Subscribe</Button>
-              </div>
-            </div>
-          </div>
-          <div className="mt-12 border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>© 2021 - {new Date().getFullYear()}. Star Sailors - built in Melbourne</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
