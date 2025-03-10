@@ -7,6 +7,7 @@ export interface CategoryConfig {
   name: string;
   color: string;
   description: string;
+  iconUrl?: string;
 };
 
 export type CoMCategory = 'Peak' | 'Custom';
@@ -85,17 +86,20 @@ export const CACCategories: Record<CACCategory, CategoryConfig> = {
   'Antipathes Atlantica': {
     name: 'Antipathes Atlantica',
     color: '#1E88E5',
-    description: 'Deep-sea black coral species with intricate branching structures.'
+    description: 'Deep-sea black coral species with intricate branching structures.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Antipathes-Atlantica.jpeg',
   },
   'Antipathes Furcata': {
     name: 'Antipathes Furcata',
     color: '#673AB7',
-    description: 'A black coral species with a forked branching pattern.'
+    description: 'A black coral species with a forked branching pattern.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Antipathes-Furcata.jpeg'
   },
   'Bebryce Sp.': {
     name: 'Bebryce Sp.',
     color: '#F57C00',
-    description: 'A soft coral genus known for its feathery polyps.'
+    description: 'A soft coral genus known for its feathery polyps.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Bebryce-Sp.jpg',
   },
   'Ellisellidae': {
     name: 'Ellisellidae',

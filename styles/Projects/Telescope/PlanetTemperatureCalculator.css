@@ -6,7 +6,7 @@
 };
 
 .planet-temp-calculator-card {
-    max-width: 24rem;
+    max-width: 28rem;
     padding: 1rem;
     border-radius: 1rem;
     border-width: 3px;
@@ -85,7 +85,7 @@
 	top: -0.75rem;
 	font-size: 0.75rem;
 	color: #5fcbc3;
-}
+};
 
 /* Ensure output field formatting */
 .planet-temp-calculator-output-container {
