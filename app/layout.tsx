@@ -13,6 +13,7 @@ import { bgImage, backgroundImages } from "@/constants/backgrounds";
 import { Analytics } from "@vercel/analytics/react"
 import { MissionProvider } from "@/context/MissionContext";
 import Header from "@/components/ui/Header";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -110,6 +111,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                           </div>
                           </LayoutContent>
                     <Analytics />
+                    <SpeedInsights />
                   </InventoryProvider>
                 </UserAnomaliesProvider>
                 {/* </MissionProvider> */}

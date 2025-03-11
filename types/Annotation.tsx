@@ -104,52 +104,62 @@ export const CACCategories: Record<CACCategory, CategoryConfig> = {
   'Ellisellidae': {
     name: 'Ellisellidae',
     color: '#4DB6AC',
-    description: 'Family of deep-sea gorgonian corals with flexible, whip-like structures.'
+    description: 'Family of deep-sea gorgonian corals with flexible, whip-like structures.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Ellisellidae.jpeg',
   },
   'Madracis Sp.': {
     name: 'Madracis Sp.',
     color: '#FBC02D',
-    description: 'Colonial stony coral with small, tightly packed polyps.'
+    description: 'Colonial stony coral with small, tightly packed polyps.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Madracis-sp..jpg',
   },
   'Madrepora Sp.': {
     name: 'Madrepora Sp.',
     color: '#E91E63',
-    description: 'A cold-water coral species forming complex reef structures.'
+    description: 'A cold-water coral species forming complex reef structures.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Madrepora-Sp.jpeg',
   },
   'Muricea Pendula': {
     name: 'Muricea Pendula',
     color: '#8D6E63',
-    description: 'A gorgonian coral species with long, pendulous branches.'
+    description: 'A gorgonian coral species with long, pendulous branches.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Muricea-Pendula.jpg',
   },
   'Paramuriciade Sp': {
     name: 'Paramuriciade Sp',
     color: '#9C27B0',
-    description: 'Deep-sea coral family with tree-like branching patterns.'
+    description: 'Deep-sea coral family with tree-like branching patterns.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Paramuriciade.jpg',
   },
   'Stichopathes': {
     name: 'Stichopathes',
     color: '#388E3C',
-    description: 'A black coral genus characterized by spiral growth patterns.'
+    description: 'A black coral genus characterized by spiral growth patterns.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Stichopathes.jpg',
   },
   'Swiftia exserta': {
     name: 'Swiftia exserta',
     color: '#D32F2F',
-    description: 'A bright red gorgonian coral with delicate, branching arms.'
+    description: 'A bright red gorgonian coral with delicate, branching arms.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Swiftia-Exserta.jpeg',
   },
   'Thesea nivea': {
     name: 'Thesea nivea',
     color: '#03A9F4',
-    description: 'A white, fan-like gorgonian coral species.'
+    description: 'A white, fan-like gorgonian coral species.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Thesea-Nivea.jpeg',
   },
   'Sponge': {
     name: 'Sponge',
     color: '#795548',
-    description: 'Porous marine organisms that filter water and provide habitat.'
+    description: 'Porous marine organisms that filter water and provide habitat.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Spoonge.jpeg',
   },
   'Fish': {
     name: 'Fish',
     color: '#FF9800',
-    description: 'Various fish species observed in the coral reef ecosystem.'
+    description: 'Various fish species observed in the coral reef ecosystem.',
+    iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Fish.jpeg',
   }
 };
 
