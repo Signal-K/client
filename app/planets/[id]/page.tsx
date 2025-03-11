@@ -9,6 +9,8 @@ import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
 import SatellitePlanetFourAggregator, { SatellitePlanetFourClassification } from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/P4Aggregator";
 import AI4MAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AI4MAggregator";
 import SimpleeMissionGuide from "@/app/tests/singleMissionGuide";
+import BuildTerrariumStructures from "@/components/Structures/Build/BuildOnTerrariums";
+import StructuresOnTerrarium from "@/components/Structures/StructuresOnTerrarium";
 
 export interface Classification {
   id: number;
@@ -17,7 +19,7 @@ export interface Classification {
   anomaly: Anomaly | null;
   media: (string | { uploadUrl?: string })[] | null;
   classificationtype: string | null;
-  classificationConfiguration?: any; // classificationConfiguration is now optional
+  classificationConfiguration?: any;
   created_at: string;
   title?: string;
   votes?: number;
@@ -211,7 +213,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         return "url('/assets/Backdrops/gasgiant.jpeg')";
       default:
         return "url('/assets/Backdrops/Earth.png')";
-    }
+    };
   };
 
   return (
@@ -243,6 +245,9 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           classificationType={classification.classificationtype || "Unknown"}
         />
       )}
+
+      <BuildTerrariumStructures location={classification.id} />
+      <StructuresOnTerrarium location={classification.id} />
 
       {/* Biome Aggregation - moved directly below PostCard */}
       {cloudSummary && Object.keys(cloudSummary.annotationOptions).length > 0 && (

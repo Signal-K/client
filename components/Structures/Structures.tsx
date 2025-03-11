@@ -63,7 +63,7 @@ export default function StructuresOnPlanet({ author }: Props) {
       if (inventoryError) throw inventoryError;
 
       const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
-      inventoryData.forEach((structure: InventoryStructureItem) => {
+      inventoryData.forEach(( structure: InventoryStructureItem ) => {
         const itemDetail = itemMap.get(structure.item);
         if (itemDetail && itemDetail.locationType === 'Surface' && !uniqueStructuresMap.has(structure.item)) {
           uniqueStructuresMap.set(structure.item, structure);
@@ -72,8 +72,8 @@ export default function StructuresOnPlanet({ author }: Props) {
 
       const uniqueStructures = Array.from(uniqueStructuresMap.values());
       setUserStructuresOnPlanet(uniqueStructures || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+    } catch (error: any) {
+      console.error('Error fetching data: ', error);
     } finally {
       setLoading(false);
     };
@@ -132,7 +132,7 @@ export default function StructuresOnPlanet({ author }: Props) {
     };
   }, [fetchStructures]);
 
-  const handleIconClick = (itemId: number, inventoryId: number) => {
+  const handleIconClick = ( itemId: number, inventoryId: number ) => {
     const itemDetail = itemDetails.get(itemId);
     if (itemDetail) {
       const config = StructuresConfig[itemDetail.id] || {};
@@ -168,7 +168,7 @@ export default function StructuresOnPlanet({ author }: Props) {
   return (
 <div className="relative">
   <div className={`grid px-11 grid-cols-4 gap-1 gap-y-3 relative ${userStructuresOnPlanet.length === 1 ? 'justify-center' : 'justify-between'}`}>
-    {userStructuresOnPlanet.map((structure, index) => {
+    {userStructuresOnPlanet.map(( structure, index ) => {
       const itemDetail = itemDetails.get(structure.item);
       return itemDetail ? (
         <div 
