@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { GlassWaterIcon, PawPrintIcon, SnowflakeIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 const iconMap = {
     GlassWaterIcon: <GlassWaterIcon className="w-5 h-5" />,
@@ -16,7 +20,7 @@ const categoryMap = {
 
 interface MilestoneCardProps {
     className?: string;
-}
+};
 
 const MilestoneCard: React.FC<MilestoneCardProps> = ({ className }) => {
     const [milestones, setMilestones] = useState<{ weekStart: string; data: any[] }[]>([]);
@@ -58,61 +62,83 @@ const MilestoneCard: React.FC<MilestoneCardProps> = ({ className }) => {
     const milestonesToDisplay = activeTab === "player" ? milestones : communityMilestones;
 
     return (
-        <Card className={`p-4 w-full max-w-md bg-card border shadow-md rounded-lg ${className}`}>
-            <CardContent className="flex flex-col gap-2 min-h-[180px]">
-                <h1 className="text-lg font-semibold text-blue-600">Weekly Missions</h1>
-
-                <div className="flex gap-3 mb-3">
-                    <button
-                        onClick={() => setActiveTab("player")}
-                        className={`text-md font-medium ${activeTab === "player" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500"}`}
-                    >
-                        Player
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("community")}
-                        className={`text-md font-medium ${activeTab === "community" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500"}`}
-                    >
-                        Community
-                    </button>
+        <div className="w-full max-w-4xl mx-auto p-4 bg-gradient-to-b from-[#0f172a] to-[#020617] text-white rounded-lg shadow-[0_0_15px_rgba(124,58,237,0.5)] border border-[#581c87]">
+            <Tabs
+                defaultValue="player"
+                onValueChange={(value) => setActiveTab(value as "player" | "community")}
+                className="w-full"
+            >
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7]">
+                        Weekly Missions
+                    </h2>
+                    <TabsList className="bg-[#1e293b] border border-[#6b21a8]">
+                        <TabsTrigger value="player" className="data-[state=active]:bg-[#581c87] data-[state=active]:text-white">
+                            Yours
+                        </TabsTrigger>
+                        <TabsTrigger value="community" className="data-[state=active]:bg-[#581c87] data-[state=active]:text-white">
+                            Community
+                        </TabsTrigger>
+                    </TabsList>
                 </div>
 
-                {milestonesToDisplay.length > 0 ? (
-                    <>
-                        <h2 className="text-sm text-gray-700">Week of {milestonesToDisplay[currentWeekIndex].weekStart}</h2>
-                        <ul className="space-y-1">
-                            {milestonesToDisplay[currentWeekIndex].data.map((milestone, index) => (
-                                <li key={index} className="flex items-center gap-2 text-green-700 text-sm">
-                                    {iconMap[milestone.icon as keyof typeof iconMap]}
-                                    <p>{milestone.name}</p>
-                                    <span className="text-xs text-gray-500">
-                                        ({categoryMap[milestone.structure as keyof typeof categoryMap] || "Unknown"})
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-                        <div className="flex justify-between mt-2">
-                            <button
-                                onClick={handlePrevWeek}
-                                disabled={currentWeekIndex === milestonesToDisplay.length - 1}
-                                className="text-blue-500 disabled:text-gray-400"
-                            >
-                                Previous
-                            </button>
-                            <button
-                                onClick={handleNextWeek}
-                                disabled={currentWeekIndex === 0}
-                                className="text-blue-500 disabled:text-gray-400"
-                            >
-                                Next
-                            </button>
-                        </div>
-                    </>
-                ) : (
-                    <p className="text-gray-500">Loading milestones...</p>
-                )}
-            </CardContent>
-        </Card>
+                <div className="flex items-center justify-between mb-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handlePrevWeek}
+                        className="border-[#7e22ce] bg-[#1e293b] hover:bg-[#581c87] hover:text-white"
+                    >
+                        <ChevronLeft className="w-4 h-4 mr-1" /> Previous
+                    </Button>
+                    <div className="text-lg font-semibold text-[#67e8f9]">
+                        {milestonesToDisplay.length > 0 ? (
+                            <>
+                                {new Date(milestonesToDisplay[currentWeekIndex].weekStart).toLocaleDateString("en-US", {
+                                    weekday: "short",
+                                    month: "short",
+                                    day: "numeric",
+                                })} - {new Date(milestonesToDisplay[currentWeekIndex].weekStart).toLocaleDateString("en-US", {
+                                    weekday: "short",
+                                    month: "short",
+                                    day: "numeric",
+                                })}
+                            </>
+                        ) : (
+                            "Loading Week"
+                        )}
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleNextWeek}
+                        className="border-[#7e22ce] bg-[#1e293b] hover:bg-[#581c87] hover:text-white"
+                    >
+                        Next <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                </div>
+
+                <TabsContent value={activeTab} className="mt-0">
+                    {milestonesToDisplay.length > 0 ? (
+                        <>
+                            <ul className="space-y-1">
+                                {milestonesToDisplay[currentWeekIndex].data.map((milestone, index) => (
+                                    <li key={index} className="flex items-center gap-2 text-green-700 text-sm">
+                                        {iconMap[milestone.icon as keyof typeof iconMap]}
+                                        <p>{milestone.name}</p>
+                                        <span className="text-xs text-gray-500">
+                                            ({categoryMap[milestone.structure as keyof typeof categoryMap] || "Unknown"})
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </>
+                    ) : (
+                        <p className="text-center">Loading milestones...</p>
+                    )}
+                </TabsContent>
+            </Tabs>
+        </div>
     );
 };
 

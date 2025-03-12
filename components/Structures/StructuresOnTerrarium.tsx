@@ -111,7 +111,7 @@ export default function StructuresOnTerrarium({
 
     return (
         <div className="relative">
-            <div className={`grid px-11 grid-cols-4 gap-1 gap-y-3 relative ${userStructuresOnTerrarium.length === 1 ? 'justify-center' : 'justify-between'}`}>
+            <div className={`/grid px-11 grid-cols-4 gap-1 gap-y-3 relative ${userStructuresOnTerrarium.length === 1 ? 'justify-center' : 'justify-between'}`}>
                 {userStructuresOnTerrarium.map(( structure, index ) => {
                     const itemDetail = itemDetails.get(structure.item);
                     return itemDetail ? (
