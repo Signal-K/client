@@ -14,7 +14,7 @@ import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunte
 import AsteroidViewer from "@/components/Data/Generator/Astronomers/DailyMinorPlanet/asteroid-viewer";
 import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
 import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
-import { FullPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
+import { FullPlanetGenerator, FullPlanetGeneratorNoControl } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
 import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 import Link from "next/link";
 
@@ -282,7 +282,7 @@ export function PostCardSingleWithGeneratorEditMode({
                   classificationConfig={classificationConfig}
                   author={author}
                 />
-                        //   // <FullPlanetGenerator />
+                        //   // <FullPlanetGenerator /> --> we need to be able to pass the stats in, too (as a prop)
               )}
               {session?.user?.id !== author && (
                 <SimplePlanetGenerator
@@ -290,6 +290,7 @@ export function PostCardSingleWithGeneratorEditMode({
                   classificationConfig={classificationConfig}
                   author={author}
                 />
+                // <FullPlanetGeneratorNoControl />
               )}
             </>
           );

@@ -188,7 +188,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       )
     ))}
   </div>
-  <MilestoneCard className="hidden sm:block" />
+  <MilestoneCard />
 </div>
 
             <div className="flex flex-col items-center my-4 space-y-4">

@@ -13,6 +13,79 @@ const LOW_MASS_THRESHOLD = 0.2;
 const TERRESTRIAL_THRESHOLD = 7.5; // Earth masses
 const GASEOUS_THRESHOLD = 2.0; // Earth radii
 
+export function FullPlanetGeneratorNoControl() {
+  const [mass, setMass] = useState(1);
+  const [radius, setRadius] = useState(1);
+  const [temperature, setTemperature] = useState(288);
+  const [orbitalPeriod, setOrbitalPeriod] = useState(365);
+  const [typeOverride, setTypeOverride] = useState<"terrestrial" | "gaseous" | null>(null);
+  const [atmosphereStrength, setAtmosphereStrength] = useState(0.5);
+  const [cloudCount, setCloudCount] = useState(50);
+  const [waterHeight, setWaterHeight] = useState(0.5);
+  const [surfaceRoughness, setSurfaceRoughness] = useState(0.5);
+  const [biomeFactor, setBiomeFactor] = useState(1.0);
+  const [cloudContribution, setCloudContribution] = useState(1.0);
+  const [terrainVariation, setTerrainVariation] = useState<"flat" | "moderate" | "chaotic">("moderate");
+  const [terrainErosion, setTerrainErosion] = useState(0.5);
+  const [plateTectonics, setPlateTectonics] = useState(0.5);
+  const [soilType, setSoilType] = useState<"rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy">(
+    "rocky",
+  );
+  const [biomassLevel, setBiomassLevel] = useState(0.0);
+  const [waterLevel, setWaterLevel] = useState(0.3);
+  const [salinity, setSalinity] = useState(0.5);
+  const [subsurfaceWater, setSubsurfaceWater] = useState(0.2);
+  const [atmosphericDensity, setAtmosphericDensity] = useState(0.5);
+  const [weatherVariability, setWeatherVariability] = useState(0.5);
+  const [stormFrequency, setStormFrequency] = useState(0.2);
+  const [volcanicActivity, setVolcanicActivity] = useState(0.2);
+  const [biome, setBiome] = useState("Rocky Highlands");
+  const [cloudTypes, setCloudTypes] = useState<string[]>(["Cumulus"]);
+  const [cloudDensity, setCloudDensity] = useState(0.5);
+  const [atmosphereVisibility, setAtmosphereVisibility] = useState(1);
+  const [atmosphereHeight, setAtmosphereHeight] = useState(1);
+
+  const stats = calculatePlanetStats(
+    mass,
+    radius,
+    temperature,
+    orbitalPeriod,
+    typeOverride,
+    atmosphereStrength,
+    cloudCount,
+    waterHeight,
+    surfaceRoughness,
+    undefined,
+    biomeFactor,
+    cloudContribution,
+    terrainVariation,
+    terrainErosion,
+    plateTectonics,
+    soilType,
+    biomassLevel,
+    waterLevel,
+    salinity,
+    subsurfaceWater,
+    atmosphericDensity,
+    weatherVariability,
+    stormFrequency,
+    volcanicActivity,
+    biome,
+    cloudTypes,
+    cloudDensity,
+    // atmosphereVisibility,
+    // atmosphereHeight,
+  );
+
+  return (
+    <div className="rounded-lg overflow-hidden bg-[#1E1E1E] border border-[#2A2A2A]">
+      <div className="h-[400px] relative">
+        <PlanetScene stats={stats} />
+      </div>
+    </div>
+  );
+};
+
 export function FullPlanetGenerator() {
   const [mass, setMass] = useState(1);
   const [radius, setRadius] = useState(1);
