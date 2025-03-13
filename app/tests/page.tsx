@@ -6,14 +6,14 @@ import FileOrWebcamUpload from "@/components/Projects/Zoodex/Upload/GptClassific
 import ChatGPTComponent from "./pleaseWork";
 import PlanetRadiusCalculator from "@/components/Structures/Missions/Astronomers/PlanetHunters/RadiusCalc";
 import WeeklyClassifications from "@/components/Structures/Missions/Milestones/WeeklyClassifications";
-import AdvancedPlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-scene";
+import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
 
 export default function TestPage() {
   return (
     <div className="min-h-screen bg-black text-white p-4 space-y-8">
       {/* <PlanetRadiusCalculator /> */}
-      {/* <WeeklyClassifications /> */}
-      <AdvancedPlanetGenerator />
+      <WeeklyClassifications />
+      <MilestoneCard />
     </div>
   );
 };

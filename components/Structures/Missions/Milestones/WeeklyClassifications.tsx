@@ -14,7 +14,7 @@ interface Comment {
   author: string;
   classification_id: number | null;
   category: string | null;
-}
+};
 
 interface Classification {
   id: number;
@@ -23,7 +23,7 @@ interface Classification {
   author: string | null;
   classificationtype: string | null;
   comments: Comment[];
-}
+};
 
 export default function WeeklyClassifications() {
   const supabase = useSupabaseClient();
