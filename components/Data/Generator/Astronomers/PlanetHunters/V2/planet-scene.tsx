@@ -7,17 +7,10 @@ import type { PlanetStats } from "@/utils/planet-physics";
 
 interface PlanetSceneProps {
   stats: PlanetStats;
-  terrainHeight: number;
-  classificationConfig?: any;
-  content?: any;
-  classificationId: string;
-  author: string;
-  type?: string;
+  classificationId?: string;
 };
 
-export function PlanetScene({ stats, classificationConfig, classificationId, terrainHeight }: PlanetSceneProps) {
-  console.log(classificationConfig);
-
+export function PlanetScene({ stats, classificationId }: PlanetSceneProps) {
   return (
     <div className="w-full h-full bg-black">
       <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>

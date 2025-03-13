@@ -5,30 +5,41 @@ import { useFrame } from "@react-three/fiber";
 import { Sphere } from "@react-three/drei";
 import * as THREE from "three";
 import { determineLiquidType } from "@/utils/planet-physics";
-import { calculateTerrainHeight } from "@/utils/planet-physics";
 
-interface PlanetStats {
-  mass: number;
-  radius: number;
-  density?: number;
-  type?: "terrestrial" | "gaseous";
-  temperature?: number;
-  atmosphereStrength?: number;
-  cloudCount?: number;
-  waterHeight?: number;
-  surfaceRoughness?: number;
-  biomeFactor?: number;
-  cloudContribution?: number;
-  terrainVariation?: "flat" | "moderate" | "chaotic";
-  orbitalPeriod?: number;
-  terrainErosion?: number;
-  plateTectonics?: number;
-  soilType?: string;
-};
+export interface PlanetStats {
+  mass: number // Earth masses
+  radius: number // Earth radii
+  density: number // g/cm³
+  type: "terrestrial" | "gaseous" | undefined
+  temperature: number // Kelvin
+  orbitalPeriod: number // Earth days
+  atmosphereStrength: number // 0 to 1
+  cloudCount: number // 0 to 100
+  waterHeight: number // 0 to 1
+  surfaceRoughness: number // 0 to 2
+  biomeFactor: number // 0.5 to 2.0
+  cloudContribution: number // 0.8 to 1.2
+  terrainVariation: "flat" | "moderate" | "chaotic"
+  terrainErosion: number // 0 to 1
+  plateTectonics: number // 0 to 1
+  soilType: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy" | undefined
+  biomassLevel: number // 0 to 1
+  waterLevel: number // 0 to 1
+  salinity: number // 0 to 1
+  subsurfaceWater: number // 0 to 1
+  atmosphericDensity: number // 0 to 1
+  weatherVariability: number // 0 to 1
+  stormFrequency: number // 0 to 1
+  volcanicActivity: number // 0 to 1
+  biome: string
+  cloudTypes: string[]
+  cloudDensity: number
+  surfaceDeposits?: string[] // New field for surface deposits
+}
 
 interface PlanetMeshProps {
-  stats: PlanetStats;
-};
+  stats: PlanetStats
+}
 
 export function PlanetMesh({ stats }: PlanetMeshProps) {
   const meshRef = useRef<THREE.Mesh>(null)
@@ -38,7 +49,7 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
   // const terrainHeight = calculateTerrainHeight(stats)
 
   const { material, cloudMaterial, atmosphereMaterial } = useMemo(() => {
-    const liquidInfo = determineLiquidType(stats.temperature || 0)
+    const liquidInfo = determineLiquidType(stats.temperature)
     const shader = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
@@ -557,7 +568,7 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
     stats.biomeFactor,
     stats.cloudContribution,
     stats.terrainVariation,
-  ]);
+  ])
 
   useFrame((state) => {
     if (meshRef.current) {
