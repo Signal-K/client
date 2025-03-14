@@ -274,7 +274,7 @@ export const AI4MCATEGORIES: Record<AI4MCategory, CategoryConfig> = {
     name: 'Custom',
     color: '#FF0000',
     description: 'Custom annotation'
-  }
+  },
 };
 
 export type DrawingMode = 'freehand' | 'rectangle' | 'circle';
