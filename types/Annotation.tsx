@@ -67,6 +67,67 @@ export const P4CATEGORIES: Record<P4Category, CategoryConfig> = {
   },
 };
 
+export type CoMShapesCategory = 'CloudyRegion' | 'Ozone' | 'CanyonCrater' | 'Twilightzonecloud' | 'Streakcloud' | 'Diskcloud' | 'Vortexcloud' | 'Dottedcloud' | 'Gravitywavecloud' | 'Othercloudtype'
+export const CoMSCategories: Record<CoMShapesCategory, CategoryConfig> = {
+  "CloudyRegion": {
+    name: "Cloudy Region",
+    color: '#00BCD4',
+    description: "A cloudy area without distinct or multiple cloud types",
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/other-general.png'
+  },
+  "Ozone": {
+    name: "Ozone",
+    description: "Pink region on the map",
+    color: "#ff3398",
+  },
+  "CanyonCrater": {
+    name: "Canyon / Crater",
+    color: "#1a13dc",
+    description: "Depressed region on the map with a blue tint",
+  },
+  "Twilightzonecloud": {
+    name: "Twilight zone cloud",
+    color: '#f20c26',
+    description: 'A cloud near the red terminator line',
+  },
+  "Streakcloud": {
+    name: 'Streak cloud',
+    color: '#770cf2',
+    description: 'Long, narrow and straight feature',
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/streak.png',
+  },
+  "Diskcloud": {
+    name: 'Disk cloud',
+    color: '#44ba25',
+    description: "Small round circles that resemble disks or caps",
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/disk.png',
+  },
+  "Vortexcloud": {
+    name: "Vortex Cloud",
+    color: '#dcc40e',
+    description: 'A cloud that turns in on itself, with a spiral shape',
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/vortex.png',
+  },
+  "Dottedcloud": {
+    name: 'Dotted cloud',
+    color: '#7bb9d1',
+    description: 'Small patches of clouds without strict direction or structure',
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/dotted.png',
+  },
+  'Gravitywavecloud': {
+    name: 'Gravity wave cloud',
+    description: 'A rippled cloud pattern with a preferred direction where the cloud disappears and reappears',
+    color: '#0c749d',
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/gravitywave.png',
+  },
+  "Othercloudtype": {
+    name: 'Other cloud type',
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/other-general.png',
+    color: '#340a65',
+    description: "A cloud that doesn't fit into the other categories",
+  },
+};
+
 export type CACCategory = 
   | 'Antipathes Atlantica' 
   | 'Antipathes Furcata' 
