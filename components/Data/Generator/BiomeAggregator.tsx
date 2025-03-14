@@ -27,6 +27,7 @@ interface BiomeAggregatorProps {
   cloudSummary: AggregatedCloud | null;
   p4Summary: AggregatedP4 | null;
   ai4MSummary: AggregatedAI4M | null;
+  onBiomeUpdate?: (biome: string) => void; // Add callback for biome update
 }
 
 const biomeScores: Record<string, Record<string, number>> = {
@@ -105,7 +106,7 @@ const getDominantBiome = (
   return sortedBiomes.length > 0 ? String(sortedBiomes[0][0]) : "Unknown";
 };
 
-const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary, p4Summary, ai4MSummary }) => {
+const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary, p4Summary, ai4MSummary, onBiomeUpdate }) => {
   const [dominantBiome, setDominantBiome] = useState<string>("Unknown");
 
   useEffect(() => {
@@ -113,8 +114,12 @@ const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary, p4Summa
       console.log("Full Aggregated Summary:", { cloudSummary, p4Summary, ai4MSummary });
       const biome = getDominantBiome(cloudSummary, p4Summary, ai4MSummary);
       setDominantBiome(biome);
+      // Pass the dominant biome back to the parent
+      if (onBiomeUpdate) {
+        onBiomeUpdate(biome);
+      }
     }
-  }, []);
+  }, [cloudSummary, p4Summary, ai4MSummary, onBiomeUpdate]);
 
   return (
     <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#4A665A] text-white">

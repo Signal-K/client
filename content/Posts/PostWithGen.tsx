@@ -38,6 +38,7 @@ interface PostCardSingleProps {
   images: string[];
   classificationType: string;
   onVote?: () => void;
+  biome?: string;
   commentStatus?: boolean;
 };
 
@@ -51,6 +52,7 @@ export function PostCardSingleWithGenerator({
   tags, 
   anomalyId,
   classificationConfig,
+  biome,
   images,
   classificationType,
   commentStatus,
@@ -129,6 +131,7 @@ export function PostCardSingleWithGenerator({
                 classificationId={String(classificationId)}
                 classificationConfig={classificationConfig}
                 author={author}
+                biome={biome}
               />
             </>
           );
