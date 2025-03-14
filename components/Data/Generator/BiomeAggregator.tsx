@@ -8,8 +8,25 @@ interface AggregatedCloud {
   cloudColours?: Record<string, number>;
 }
 
+interface AggregatedP4 {
+  fanCount: number;
+  blotchCount: number;
+  classificationCounts: Record<string, number>;
+}
+
+interface AggregatedAI4M {
+  sandCount: number;
+  soilCount: number;
+  bedrockCount: number;
+  rockCount: number;
+  unlabelledCount: number;
+  classificationCounts: Record<string, number>;
+}
+
 interface BiomeAggregatorProps {
   cloudSummary: AggregatedCloud | null;
+  p4Summary: AggregatedP4 | null;
+  ai4MSummary: AggregatedAI4M | null;
 }
 
 const biomeScores: Record<string, Record<string, number>> = {
@@ -35,35 +52,42 @@ const biomeScores: Record<string, Record<string, number>> = {
   }
 };
 
-const getDominantBiome = (cloudSummary: AggregatedCloud): string => {
+const getDominantBiome = (
+  cloudSummary: AggregatedCloud | null,
+  p4Summary: AggregatedP4 | null,
+  ai4MSummary: AggregatedAI4M | null
+): string => {
   const biomeTotals: Record<string, number> = {};
   const debugInfo: string[] = [];
 
   debugInfo.push("=== Biome Calculation Debug ===");
-  debugInfo.push(`Full Cloud Summary: ${JSON.stringify(cloudSummary, null, 2)}`);
 
-  // Helper function to normalize keys
-  const normalizeKey = (key: string) => key.toLowerCase().trim();
-
-  // Process Cloud Colours
-  debugInfo.push("\n--- Processing Cloud Colours ---");
-  if (cloudSummary.cloudColours) {
+  // Cloud Colours Processing
+  if (cloudSummary?.cloudColours) {
+    debugInfo.push("\n--- Processing Cloud Colours ---");
     Object.entries(cloudSummary.cloudColours).forEach(([colour, count]) => {
-      const normalizedColour = normalizeKey(colour);
-      debugInfo.push(`Colour: ${normalizedColour}, Count: ${count}`);
-      
+      const normalizedColour = colour.toLowerCase().trim();
       if (biomeScores[normalizedColour]) {
         Object.entries(biomeScores[normalizedColour]).forEach(([biome, score]) => {
-          const biomeValue = score * count;
-          biomeTotals[biome] = (biomeTotals[biome] || 0) + biomeValue;
-          debugInfo.push(`  - Biome: ${biome}, Score: ${biomeValue}`);
+          biomeTotals[biome] = (biomeTotals[biome] || 0) + score * count;
         });
-      } else {
-        debugInfo.push(`  ! No scores found for colour: ${normalizedColour}`);
       }
     });
-  } else {
-    debugInfo.push("! No cloud colours found");
+  }
+
+  // P4 Classifications Processing
+  if (p4Summary) {
+    debugInfo.push("\n--- Processing P4 Data ---");
+    biomeTotals["wind-affected terrain"] = (biomeTotals["wind-affected terrain"] || 0) + p4Summary.fanCount * 0.2;
+    biomeTotals["dusty surface"] = (biomeTotals["dusty surface"] || 0) + p4Summary.blotchCount * 0.1;
+  }
+
+  // AI4M Classifications Processing
+  if (ai4MSummary) {
+    debugInfo.push("\n--- Processing AI4M Data ---");
+    biomeTotals["sandy desert"] = (biomeTotals["sandy desert"] || 0) + ai4MSummary.sandCount * 0.15;
+    biomeTotals["rocky terrain"] = (biomeTotals["rocky terrain"] || 0) + ai4MSummary.rockCount * 0.2;
+    biomeTotals["consolidated soil"] = (biomeTotals["consolidated soil"] || 0) + ai4MSummary.soilCount * 0.1;
   }
 
   // Determine the dominant biome
@@ -78,25 +102,19 @@ const getDominantBiome = (cloudSummary: AggregatedCloud): string => {
   // Log the full debug information
   console.log(debugInfo.join('\n'));
 
-  // Return dominant biome or default
   return sortedBiomes.length > 0 ? String(sortedBiomes[0][0]) : "Unknown";
 };
 
-const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary }) => {
+const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary, p4Summary, ai4MSummary }) => {
   const [dominantBiome, setDominantBiome] = useState<string>("Unknown");
-  const [debugInfo, setDebugInfo] = useState<string>("");
 
   useEffect(() => {
-    if (cloudSummary) {
-      console.log("Cloud Summary Received:", cloudSummary);
-      
-      // Explicitly convert to string
-      const biome = getDominantBiome(cloudSummary);
+    if (cloudSummary || p4Summary || ai4MSummary) {
+      console.log("Full Aggregated Summary:", { cloudSummary, p4Summary, ai4MSummary });
+      const biome = getDominantBiome(cloudSummary, p4Summary, ai4MSummary);
       setDominantBiome(biome);
-    } else {
-      console.log("No cloud summary provided");
     }
-  }, [cloudSummary]);
+  }, []);
 
   return (
     <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#4A665A] text-white">

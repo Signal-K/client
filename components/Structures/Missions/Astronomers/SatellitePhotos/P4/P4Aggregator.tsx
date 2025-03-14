@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { AggregatedP4 } from "@/app/planets/[id]/page";
 
 interface ClassificationOption {
@@ -20,14 +20,17 @@ export interface SatellitePlanetFourClassification {
   classificationConfiguration?: {
     "": Record<number, boolean>;
   };
-};
+}
 
 interface SatellitePlanetFourAggregatorProps {
   classifications: SatellitePlanetFourClassification[];
   onSummaryUpdate?: (summary: AggregatedP4) => void;
-};
+}
 
-const SatellitePlanetFourAggregator: React.FC<SatellitePlanetFourAggregatorProps> = ({ classifications }) => {
+const SatellitePlanetFourAggregator: React.FC<SatellitePlanetFourAggregatorProps> = ({
+  classifications,
+  onSummaryUpdate,
+}) => {
   const aggregateClassifications = () => {
     let fanCount = 0;
     let blotchCount = 0;
@@ -61,6 +64,17 @@ const SatellitePlanetFourAggregator: React.FC<SatellitePlanetFourAggregatorProps
   };
 
   const { fanCount, blotchCount, classificationCounts } = aggregateClassifications();
+
+  // Call onSummaryUpdate when classifications are updated
+  useEffect(() => {
+    if (onSummaryUpdate) {
+      onSummaryUpdate({
+        fanCount,
+        blotchCount,
+        classificationCounts,
+      });
+    }
+  }, [fanCount, blotchCount, classificationCounts, onSummaryUpdate]);
 
   return (
     <div className="mt-6">

@@ -8,12 +8,12 @@ export interface AI4MClassification {
   classificationConfiguration?: {
     "": Record<number, boolean>;
   };
-}
+};
 
 interface AI4MAggregatorProps {
   classifications: AI4MClassification[];
   onSummaryUpdate?: (summary: AggregatedAI4M) => void;
-}
+};
 
 export interface AggregatedAI4M {
   sandCount: number;
@@ -22,7 +22,7 @@ export interface AggregatedAI4M {
   rockCount: number;
   unlabelledCount: number;
   classificationCounts: Record<string, number>;
-}
+};
 
 const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSummaryUpdate }) => {
   const [aggregatedData, setAggregatedData] = useState<AggregatedAI4M>({
@@ -33,10 +33,6 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
     unlabelledCount: 0,
     classificationCounts: {},
   });
-
-  useEffect(() => {
-    console.log("TEST", classifications);
-  }, [classifications]);
 
   useEffect(() => {
     const aggregateClassifications = () => {

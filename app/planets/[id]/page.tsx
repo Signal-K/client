@@ -249,9 +249,8 @@ export default function ClassificationDetail({ params }: { params: { id: string 
       <BuildTerrariumStructures location={classification.id} />
       <StructuresOnTerrarium location={classification.id} />
 
-      {/* Biome Aggregation - moved directly below PostCard */}
-      {cloudSummary && Object.keys(cloudSummary.annotationOptions).length > 0 && (
-        <BiomeAggregator cloudSummary={cloudSummary} />
+      {(cloudSummary || p4Summary || ai4MSummary) && (
+        <BiomeAggregator cloudSummary={cloudSummary} p4Summary={p4Summary} ai4MSummary={ai4MSummary} />
       )}
 
       {/* Toggle Buttons */}
