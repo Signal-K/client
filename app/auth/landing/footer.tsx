@@ -44,7 +44,7 @@ export default function Footer() {
 
           {/* Newsletter Signup */}
           <div>
-            <h3 className="font-bold text-xl text-gray-300">Stay Updated</h3>
+            {/* <h3 className="font-bold text-xl text-gray-300">Stay Updated</h3>
             <div className="mt-4 flex">
               <input
                 type="email"
@@ -54,27 +54,27 @@ export default function Footer() {
               <button className="px-4 py-2 bg-blue-500 rounded-r-md hover:bg-blue-600">
                 Subscribe
               </button>
-            </div>
+            </div> */}
+          </div>
+
+          {/* Data Submission */}
+          <div>
+            {/* <h3 className="font-bold text-xl text-gray-300">Submit Data</h3>
+            <p className="mt-4 text-gray-400">
+              Contribute datasets and help expand our research.
+            </p>
+            <button className="mt-4 px-4 py-2 bg-green-500 rounded-md hover:bg-green-600">
+              Submit
+            </button> */}
           </div>
 
           {/* Signup/Login */}
           <div>
             <h3 className="font-bold text-xl text-gray-300">Account</h3>
             <ul className="mt-4 space-y-2 text-gray-400">
-              <li><Link href="#" className="hover:text-blue-400">Sign Up</Link></li>
-              <li><Link href="#" className="hover:text-blue-400">Login</Link></li>
+              <li><Link href="auth" className="hover:text-blue-400">Sign Up</Link></li>
+              <li><Link href="auth" className="hover:text-blue-400">Login</Link></li>
             </ul>
-          </div>
-
-          {/* Data Submission */}
-          <div>
-            <h3 className="font-bold text-xl text-gray-300">Submit Data</h3>
-            <p className="mt-4 text-gray-400">
-              Contribute datasets and help expand our research.
-            </p>
-            <button className="mt-4 px-4 py-2 bg-green-500 rounded-md hover:bg-green-600">
-              Submit
-            </button>
           </div>
         </div>
 
