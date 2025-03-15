@@ -61,6 +61,7 @@ export function PostCardSingle({
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
+  
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
   const [voteCount, setVoteCount] = useState(votes);

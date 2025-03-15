@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { PostCardSingle } from "@/content/Posts/PostSingle";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import StarnetLayout from "@/components/Layout/Starnet";
+import PostCard from "@/content/Posts/TestPostCard";
 
 interface Classification {
     id: number;
@@ -103,7 +104,7 @@ export default function VotePlanetClassifications() {
           }
         } catch (error) {
           console.error("Error voting:", error);
-        }
+        };
     };
 
     const nextPost = () => {
@@ -127,12 +128,27 @@ export default function VotePlanetClassifications() {
                   key={classification.id}
                   className={`flex-shrink-0 w-full max-w-screen-md ${index === currentIndex ? "block" : "hidden"}`}
                 >
-                  <PostCardSingle
+                  {/* <PostCardSingle
                     classificationId={classification.id}
                     title={classification.title}
                     author={classification.author}
                     content={classification.content}
                     votes={classification.votes || 0}
+                    category={classification.category}
+                    tags={classification.tags || []}
+                    images={classification.image ? [classification.image] : []}
+                    anomalyId={classification.anomaly}
+                    classificationConfig={classification.classificationConfiguration}
+                    classificationType={classification.classificationtype}
+                    onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
+                  /> */}
+                  <PostCard
+                    key={classification.id}
+                    classificationId={classification.id}
+                    title={classification.title}
+                    author={classification.author}
+                    content={classification.content}
+                    votes={classification.votes}
                     category={classification.category}
                     tags={classification.tags || []}
                     images={classification.image ? [classification.image] : []}
