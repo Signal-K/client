@@ -12,12 +12,12 @@ interface Milestone {
     field: "classificationtype" | "category";
     value: string;
     requiredCount: number;
-}
+};
 
 interface WeekMilestones {
     weekStart: string;
     data: Milestone[];
-}
+};
 
 export default function MilestoneCard() {
     const supabase = useSupabaseClient();
