@@ -148,7 +148,7 @@ export function PostCardSingle({
       fetchComments();
     } catch (error) {
       console.error("Error adding comment:", error);
-    }
+    };
   };
 
   const [currentIndex, setCurrentIndex] = React.useState(0);

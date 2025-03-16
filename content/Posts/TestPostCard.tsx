@@ -89,15 +89,33 @@ export default function PostCard({
     const [error, setError] = useState<string | null>();
   
     const calculatePlanetRadius = (stellarRadius: string, fluxDifferential: string) => {
-        const R_star = Number.parseFloat(stellarRadius);
-        const F_planet = Number.parseFloat(fluxDifferential);
-      
-        if (isNaN(R_star) || isNaN(F_planet) || F_planet <= 0) {
-          return "Invalid input";
-        }
-      
-        return (R_star * Math.sqrt(F_planet)).toFixed(2);
-      };
+      const R_star = Number.parseFloat(stellarRadius);
+      const F_planet = Number.parseFloat(fluxDifferential);
+    
+      if (isNaN(R_star) || isNaN(F_planet) || F_planet <= 0) {
+        return { radius: "", planetType: "" };
+      }
+    
+      const radius = R_star * Math.sqrt(F_planet);
+      const planetType = radius > 2.4 ? "Gaseous" : "Terrestrial";
+    
+      return { radius: radius.toFixed(2), planetType };
+    };
+    
+    const handleRadiusInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const value = e.target.value;
+      setRadiusInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-1`]: value,
+      }));
+    
+      const { radius, planetType } = calculatePlanetRadius(value, "1");
+      setRadiusInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-2`]: radius,
+        [`${classificationId}-3`]: planetType,
+      }));
+    };
       
     const calculatePlanetTemperature = (starTemp: string, period: string) => {
         const T_star = Number.parseFloat(starTemp);
@@ -105,7 +123,7 @@ export default function PostCard({
       
         if (isNaN(T_star) || isNaN(P) || P <= 0) {
           return "Invalid input";
-        }
+        };
       
         return (T_star * Math.pow(P, -0.5)).toFixed(2);
     };      
@@ -218,6 +236,161 @@ export default function PostCard({
         );
     };
 
+  // const handleProposePlanetType = async (planetType: "Terrestrial" | "Gaseous") => {
+  //   const commentInput = commentInputs[`${classificationId}-1`]; 
+    
+  //   if (!commentInput?.trim()) {
+  //     console.error("Comment input must be filled");
+  //     return;
+  //   }
+  
+  //   try {
+  //     const { error } = await supabase
+  //       .from("comments")
+  //       .insert([
+  //         {
+  //           content: commentInput || planetType,
+  //           classification_id: classificationId,
+  //           author: session?.user?.id,
+  //           configuration: { planetType, commentInput },
+  //           surveyor: "TRUE",
+  //           category: 'PlanetType'
+  //         },
+  //       ]);
+  
+  //     if (error) throw error;
+  
+  //     setCommentInputs((prev) => ({
+  //       ...prev,
+  //       [`${classificationId}-1`]: "",
+  //     }));
+  
+  //     fetchComments();
+  //   } catch (error) {
+  //     console.error("Error inserting comment:", error);
+  //   };
+  // };  
+
+  const [temperatureInputs, setTemperatureInputs] = useState<Record<string, string>>({});  
+  const [densityInputs, setDensityInputs] = useState<Record<string, string>>({});
+  const [radiusInputs, setRadiusInputs] = useState<Record<string, string>>({});
+
+  const handleAddRadiusComment = async () => {
+    const radiusInput1 = radiusInputs[`${classificationId}-1`];
+    const radiusInput2 = radiusInputs[`${classificationId}-2`];
+    const radiusInput3 = radiusInputs[`${classificationId}-3`];
+  
+    if (!radiusInput1?.trim() || !radiusInput2?.trim()) {
+      console.error("Both text areas must be filled");
+      return;
+    }
+  
+    try {
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: radiusInput1,
+            classification_id: classificationId,
+            author: session?.user.id,
+            configuration: { planetType: radiusInput3, radius: radiusInput2 },
+            surveyor: "TRUE",
+            category: "PlanetType",
+            value: radiusInput3,
+          },
+        ]);
+  
+      if (error) {
+        throw error;
+      }
+  
+      setRadiusInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-1`]: "",
+        [`${classificationId}-2`]: "",
+        [`${classificationId}-3`]: "",
+      }));
+  
+      fetchComments();
+    } catch (error: any) {
+      console.error("Error inserting comment: ", error);
+    }
+  };
+
+  const handleAddTemperatureComment = async () => {
+    const temperatureInput1 = temperatureInputs[`${classificationId}-1`];
+    const temperatureInput2 = temperatureInputs[`${classificationId}-2`];
+
+    if (!temperatureInput1?.trim() || !temperatureInput2?.trim()) {
+      console.error("Both text areas must be filled");
+      return;
+    };
+
+    try {
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: `${temperatureInput1}\n\n${temperatureInput2}`,
+            classification_id: classificationId,
+            author: session?.user?.id,
+            configuration: { temperature: `${temperatureInput1}, ${temperatureInput2}` },
+            surveyor: "TRUE",
+            value: temperatureInput2,
+            category: 'Temperature'
+          },
+        ]);
+
+      if (error) throw error;
+      setTemperatureInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-1`]: "",
+        [`${classificationId}-2`]: "",
+      }));
+      fetchComments();
+    } catch (error) {
+      console.error("Error adding temperature comment:", error);
+    };
+  };
+
+  const handleAddDensityComment = async () => {
+    const densityInput1 = densityInputs[`${classificationId}-1`];
+    const densityInput2 = densityInputs[`${classificationId}-2`];
+  
+    if (!densityInput1?.trim() || !densityInput2?.trim()) {
+      console.error("Both text areas must be filled");
+      return;
+    }
+  
+    try {
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: `${densityInput1}\n\n${densityInput2}`,
+            classification_id: classificationId,
+            author: session?.user?.id,
+            configuration: { density: `${densityInput1}, ${densityInput2}` },
+            surveyor: "TRUE",
+            value: densityInput2,
+            category: "Density",
+          },
+        ]);
+  
+      if (error) throw error;
+  
+      setDensityInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-1`]: "",
+        [`${classificationId}-2`]: "",
+      }));
+  
+      fetchComments();
+    } catch (error) {
+      console.error("Error adding density comment:", error);
+    };
+  };  
+
     // For sharing
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -291,10 +464,6 @@ export default function PostCard({
             <Card className="w-full overflow-hidden border-2 border-[#5FCBC3]/30 bg-[#hhhhhh]">
               <div className="bg-[#9d22bf] p-4">
                 <CardHeader className="flex flex-row items-center gap-3 p-4 border-b border-[#5FCBC3]/20">
-                    {/* <Avatar className="h-10 w-10 border-2 border-[#B9E678]">
-                        <AvatarImage src="/placeholder.svg" />
-                        <AvatarFallback className="bg-[#1e2834] text-[#F7F5E9]">AS</AvatarFallback>
-                    </Avatar> */}
                     {session && <AvatarGenerator author={session?.user?.id} />}
                     <div className="flex flex-col">
                         <p className="text-sm font-medium text-[#F7F5E9]">{session?.user.id}</p>
@@ -318,15 +487,6 @@ export default function PostCard({
                                 {/* <span className="text-xs text-[#F7F5E9] bg-[#2C3A4A]/70 px-2 py-1 rounded">Click to expand</span> */}
                             </>
                         )}
-                        {/* <Image
-                            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-cMApdWa6w7mhYAXbGn2rLgWQNb4ZHh.png"
-                            alt="Stellar temperature graph showing flux variations over time"
-                            fill
-                            className="object-cover hover:scale-105 transition-transform duration-300"
-                            sizes="100vw"
-                        />
-                        <div className="absolute inset-0 bg-[#5FCBC3]/10 hover:bg-transparent transition-colors duration-300 flex items-center justify-center">
-                        */}
                     </div>
                     <div className="p-4 space-y-2 bg-gradient-to-b from-[#2C3A4A] to-[#1e2834]">
                         <p className="text-sm text-[#F7F5E9]">
@@ -408,261 +568,201 @@ export default function PostCard({
                 value="comments"
                 className="data-[state=active]:bg-[#5FCBC3] data-[state=active]:text-[#2C3A4A] text-[#F7F5E9]"
               >
-                Comments
+                Comments & Stats
               </TabsTrigger>
-              <TabsTrigger
-                value="stats"
-                className="data-[state=active]:bg-[#5FCBC3] data-[state=active]:text-[#2C3A4A] text-[#F7F5E9]"
-              >
-                Classification Stats
-              </TabsTrigger>
-              <TabsTrigger
+              {classificationType === 'planet' && (
+                <TabsTrigger
                 value="calculator"
                 className="data-[state=active]:bg-[#5FCBC3] data-[state=active]:text-[#2C3A4A] text-[#F7F5E9]"
               >
                 Calculate Stats
               </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="comments" className="p-4 space-y-4">
-              {/* <div className="space-y-4">
-                <div className="flex gap-3">
-                  <Avatar className="h-8 w-8 border border-[#B9E678]">
-                    <AvatarFallback className="bg-[#1e2834] text-[#F7F5E9] text-xs">JD</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-[#F7F5E9]">JDoe_Astro</p>
-                      <span className="text-xs text-[#F7F5E9]/70">2d ago</span>
+                        <div className="p-4 space-y-4">
+                {loading ? (
+                  <p>Loading comments...</p>
+                ) : error ? ( 
+                  <p className="text-red-500">{error}</p>
+                ) : comments.length === 0 ? (
+                  <p>No comments yet. Be the first to comment!</p>
+                ) : (
+                  comments.map((comment) => (
+                    <div key={comment.id} className="flex gap-3">
+                      <Avatar className="h-8 w-8 border border-[#B9E678]">
+                        <AvatarFallback className="bg-[#1e2834] text-[#F7F5E9] text-xs">
+                          {comment.username ? comment.username[0].toUpperCase() : "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium text-[#F7F5E9]">{comment.username}</p>
+                          <span className="text-xs text-[#F7F5E9]/70">
+                            {/* {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })} */}
+                          </span>
+                        </div>
+                        <p className="text-sm text-[#F7F5E9] mt-1">{comment.content}</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-[#F7F5E9] mt-1">
-                      The periodic dips are consistent with a transiting exoplanet. Have you checked for phase folding?
-                    </p>
-                  </div>
+                  ))
+                )}
                 </div>
-
-                <div className="flex gap-3">
-                  <Avatar className="h-8 w-8 border border-[#B9E678]">
-                    <AvatarFallback className="bg-[#1e2834] text-[#F7F5E9] text-xs">SK</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-[#F7F5E9]">StellarKid</p>
-                      <span className="text-xs text-[#F7F5E9]/70">1d ago</span>
-                    </div>
-                    <p className="text-sm text-[#F7F5E9] mt-1">
-                      Could also be stellar activity. The temperature is in the range where we'd expect significant spot
-                      coverage.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <Avatar className="h-8 w-8 border border-[#B9E678]">
-                    <AvatarFallback className="bg-[#1e2834] text-[#F7F5E9] text-xs">AS</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-[#F7F5E9]">AstroScientist</p>
-                      <span className="text-xs text-[#F7F5E9]/70">12h ago</span>
-                    </div>
-                    <p className="text-sm text-[#F7F5E9] mt-1">
-                      @JDoe_Astro Yes, I've done phase folding and found a potential period of 3.2 days. Working on a
-                      follow-up analysis now.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 mt-4">
-                  <Avatar className="h-8 w-8 border border-[#B9E678]">
-                    <AvatarFallback className="bg-[#1e2834] text-[#F7F5E9] text-xs">ME</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 flex">
-                    <Input
-                      placeholder="Add a comment..."
-                      className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#F7F5E9] rounded-r-none"
-                    />
-                    <Button size="sm" className="rounded-l-none bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90">
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div> */}
-              <div className="p-4 space-y-4">
-      {loading ? (
-        <p>Loading comments...</p>
-      ) : error ? (
-        <p className="text-red-500">{error}</p>
-      ) : comments.length === 0 ? (
-        <p>No comments yet. Be the first to comment!</p>
-      ) : (
-        comments.map((comment) => (
-          <div key={comment.id} className="flex gap-3">
-            <Avatar className="h-8 w-8 border border-[#B9E678]">
-              <AvatarFallback className="bg-[#1e2834] text-[#F7F5E9] text-xs">
-                {comment.username ? comment.username[0].toUpperCase() : "U"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-[#F7F5E9]">{comment.username}</p>
-                <span className="text-xs text-[#F7F5E9]/70">
-                  {/* {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })} */}
-                </span>
-              </div>
-              <p className="text-sm text-[#F7F5E9] mt-1">{comment.content}</p>
-            </div>
-          </div>
-        ))
-      )}
-      </div>
             </TabsContent>
-
-            {/* <TabsContent value="stats" className="p-4 space-y-4">
-              <div className="space-y-3">
+            <TabsContent value="calculator" className="p-4 space-y-4">
+              <div className="space-y-4">
                 <div className="bg-[#2C3A4A] p-3 rounded-md border border-[#5FCBC3]/20">
-                  <h4 className="text-sm font-medium text-[#F7F5E9]">Classification Results</h4>
-                  <div className="mt-2 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-[#F7F5E9]">Exoplanet Transit</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-32 h-2 bg-[#1e2834] rounded-full overflow-hidden">
-                          <div className="h-full bg-[#B9E678]" style={{ width: "68%" }}></div>
-                        </div>
-                        <span className="text-xs text-[#F7F5E9]">68%</span>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Calculator className="h-4 w-4 text-[#B9E678]" />
+                    <h4 className="text-sm font-medium text-[#1e2834]">Planet Calculator</h4>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Select
+                      value={selectedCalculator}
+                      onValueChange={(val) => setSelectedCalculator(val as "radius" | "temperature")}
+                    >
+                      <SelectTrigger className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#1e2834]">
+                        <SelectValue placeholder="Select calculator" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#1e2834]">
+                        <SelectItem value="radius" className="focus:bg-[#1e2834] focus:text-[#1e2834]">
+                          Planet Radius
+                        </SelectItem>
+                        <SelectItem value="temperature" className="focus:bg-[#1e2834] focus:text-[#1e2834]">
+                          Planet Temperature
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <label className="text-xs text-[#1e2834]/70">
+                          {selectedCalculator === "radius" ? "Stellar Radius (R☉)" : "Star Temperature (K)"}
+                        </label>
+                        <Input
+                          value={calculatorInputs.input1}
+                          onChange={(e) => setCalculatorInputs({ ...calculatorInputs, input1: e.target.value })}
+                          className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#1e2834] h-8"
+                          type="number"
+                          step="0.01"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs text-[#1e2834]/70">
+                          {selectedCalculator === "radius" ? "Flux Differential" : "Orbital Period (Days)"}
+                        </label>
+                        <Input
+                          value={calculatorInputs.input2}
+                          onChange={(e) => setCalculatorInputs({ ...calculatorInputs, input2: e.target.value })}
+                          className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#1e2834] h-8"
+                          type="number"
+                          step="0.01"
+                        />
                       </div>
                     </div>
+                    <Button
+  onClick={() => {
+    if (selectedCalculator === "radius") {
+      const result = calculatePlanetRadius(calculatorInputs.input1, calculatorInputs.input2);
+      setCalculatorResult(result.radius); 
+      setRadiusInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-2`]: result.radius, 
+        [`${classificationId}-3`]: result.planetType, 
+      }));
+    } else {
+      const result = calculatePlanetTemperature(calculatorInputs.input1, calculatorInputs.input2);
+      setCalculatorResult(result);
+    }
+  }}
+  className="w-full bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90"
+>
+  Calculate
+</Button>
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-[#F7F5E9]">Stellar Variability</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-32 h-2 bg-[#1e2834] rounded-full overflow-hidden">
-                          <div className="h-full bg-[#5FCBC3]" style={{ width: "24%" }}></div>
-                        </div>
-                        <span className="text-xs text-[#F7F5E9]">24%</span>
-                      </div>
-                    </div>
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-[#F7F5E9]">Instrumental Artifact</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-32 h-2 bg-[#1e2834] rounded-full overflow-hidden">
-                          <div className="h-full bg-[#F7F5E9]/30" style={{ width: "8%" }}></div>
-                        </div>
-                        <span className="text-xs text-[#F7F5E9]">8%</span>
-                      </div>
+                    <div className="bg-[#1e2834] p-2 rounded border border-[#5FCBC3]/20 flex justify-between items-center">
+                      <span className="text-xs text-[#F7F5E9]/70">Result:</span>
+                      <span className="text-sm font-medium text-[#2C3A4A] font-mono">{calculatorResult || "—"}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-[#2C3A4A] p-3 rounded-md border border-[#5FCBC3]/20">
-                  <h4 className="text-sm font-medium text-[#F7F5E9]">Signal Properties</h4>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    <div>
-                      <p className="text-xs text-[#F7F5E9]/70">Period</p>
-                      <p className="text-sm text-[#F7F5E9]">3.2 ± 0.1 days</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#F7F5E9]/70">Depth</p>
-                      <p className="text-sm text-[#F7F5E9]">0.8% ± 0.1%</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#F7F5E9]/70">Duration</p>
-                      <p className="text-sm text-[#F7F5E9]">2.4 ± 0.3 hours</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#F7F5E9]/70">SNR</p>
-                      <p className="text-sm text-[#F7F5E9]">12.6</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent> */}
-
-<TabsContent value="calculator" className="p-4 space-y-4">
-  <div className="space-y-4">
-    <div className="bg-[#2C3A4A] p-3 rounded-md border border-[#5FCBC3]/20">
-      <div className="flex items-center gap-2 mb-3">
-        <Calculator className="h-4 w-4 text-[#B9E678]" />
-        <h4 className="text-sm font-medium text-[#F7F5E9]">Planet Calculator</h4>
-      </div>
-
-      <div className="space-y-3">
-        <Select
-          value={selectedCalculator}
-          onValueChange={(val) => setSelectedCalculator(val as "radius" | "temperature")}
-        >
-          <SelectTrigger className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#F7F5E9]">
-            <SelectValue placeholder="Select calculator" />
-          </SelectTrigger>
-          <SelectContent className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#F7F5E9]">
-            <SelectItem value="radius" className="focus:bg-[#1e2834] focus:text-[#F7F5E9]">
-              Planet Radius
-            </SelectItem>
-            <SelectItem value="temperature" className="focus:bg-[#1e2834] focus:text-[#F7F5E9]">
-              Planet Temperature
-            </SelectItem>
-          </SelectContent>
-        </Select>
-
-        <div className="grid grid-cols-2 gap-2">
-          <div className="space-y-1">
-            <label className="text-xs text-[#F7F5E9]/70">
-              {selectedCalculator === "radius" ? "Stellar Radius (R☉)" : "Star Temperature (K)"}
-            </label>
-            <Input
-              value={calculatorInputs.input1}
-              onChange={(e) => setCalculatorInputs({ ...calculatorInputs, input1: e.target.value })}
-              className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#F7F5E9] h-8"
-              type="number"
-              step="0.01"
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs text-[#F7F5E9]/70">
-              {selectedCalculator === "radius" ? "Flux Differential" : "Orbital Period (Days)"}
-            </label>
-            <Input
-              value={calculatorInputs.input2}
-              onChange={(e) => setCalculatorInputs({ ...calculatorInputs, input2: e.target.value })}
-              className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#F7F5E9] h-8"
-              type="number"
-              step="0.01"
-            />
-          </div>
-        </div>
-
-        <Button
-          onClick={() => {
-            const result =
-              selectedCalculator === "radius"
-                ? calculatePlanetRadius(calculatorInputs.input1, calculatorInputs.input2)
-                : calculatePlanetTemperature(calculatorInputs.input1, calculatorInputs.input2);
-            setCalculatorResult(result);
-          }}
-          className="w-full bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90"
-        >
-          Calculate
-        </Button>
-
-        <div className="bg-[#1e2834] p-2 rounded border border-[#5FCBC3]/20 flex justify-between items-center">
-          <span className="text-xs text-[#F7F5E9]/70">Result:</span>
-          <span className="text-sm font-medium text-[#F7F5E9] font-mono">{calculatorResult || "—"}</span>
-        </div>
-      </div>
-    </div>
-
-    <div className="space-y-2">
+                <div className="space-y-2">
+  {selectedCalculator === "temperature" ? (
+    <>
       <Textarea
-        placeholder="Share your analysis or findings..."
-        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#F7F5E9] min-h-[80px]"
+        placeholder="Observations"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+        value={temperatureInputs[`${classificationId}-1`] || ""}
+        // onChange={(e) =>
+        //   setTemperatureInputs((prev) => ({
+        //     ...prev,
+        //     [`${classificationId}-1`]: e.target.value,
+        //   }))
+        // }
       />
-      <div className="flex justify-end">
-        <Button className="bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90">Post Analysis</Button>
-      </div>
-    </div>
+      <Textarea
+        placeholder="Value"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+        value={temperatureInputs[`${classificationId}-2`] || ""}
+        onChange={(e) =>
+          setTemperatureInputs((prev) => ({
+            ...prev,
+            [`${classificationId}-2`]: e.target.value,
+          }))
+        }
+      />
+    </>
+  ) : selectedCalculator === "radius" ? (
+    <>
+      <Textarea
+        placeholder="Enter Stellar Radius (R☉)..."
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+        value={radiusInputs[`${classificationId}-1`] || ""}
+        onChange={handleRadiusInputChange}
+      />
+      <Textarea
+        placeholder="Calculated Planet Radius"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px] opacity-50"
+        value={radiusInputs[`${classificationId}-2`] || ""}
+        readOnly
+      />
+      <Textarea
+        placeholder="Determined Planet Type"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px] opacity-50"
+        value={radiusInputs[`${classificationId}-3`] || ""}
+        readOnly
+      />
+    </>
+  ) : (
+    <Textarea
+      placeholder="Share your analysis or findings..."
+      className="bg-[#2C3A4A] border-[#2C3A4A]/30 text-[#2C3A4A] min-h-[80px]"
+      value={newComment}
+      onChange={(e) => setNewComment(e.target.value)}
+    />
+  )}
+  <div className="flex justify-end">
+    <Button
+      onClick={
+        selectedCalculator === "temperature"
+          ? handleAddTemperatureComment
+          : selectedCalculator === "radius"
+          ? handleAddRadiusComment
+          : handleAddComment
+      }
+      className="bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90"
+    >
+      Post Analysis {selectedCalculator}
+    </Button>
   </div>
-</TabsContent>
+</div>
+
+              </div>
+            </TabsContent>
           </Tabs>
         </div>
       )}

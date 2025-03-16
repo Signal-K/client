@@ -110,30 +110,6 @@ export function SurveyorComments({
       setLoadingComments(false);
     }
   };
-  
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return;
-
-    try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: newComment,
-            classification_id: classificationId,
-            author: session?.user?.id,
-            surveyor: "TRUE",
-          },
-        ]);
-
-      if (error) throw error;
-
-      setNewComment("");
-      fetchComments();
-    } catch (error) {
-      console.error("Error adding comment:", error);
-    };
-  };
 
   const handleProposePlanetType = async (planetType: "Terrestrial" | "Gaseous") => {
     const commentInput = commentInputs[`${classificationId}-1`]; 
@@ -141,7 +117,7 @@ export function SurveyorComments({
     if (!commentInput?.trim()) {
       console.error("Comment input must be filled");
       return;
-    }
+    };
   
     try {
       const { error } = await supabase
@@ -167,7 +143,7 @@ export function SurveyorComments({
       fetchComments();
     } catch (error) {
       console.error("Error inserting comment:", error);
-    }
+    };
   };  
 
   const handleAddTemperatureComment = async () => {
@@ -177,7 +153,7 @@ export function SurveyorComments({
     if (!temperatureInput1?.trim() || !temperatureInput2?.trim()) {
       console.error("Both text areas must be filled");
       return;
-    }
+    };
 
     try {
       const { error } = await supabase
@@ -241,7 +217,7 @@ export function SurveyorComments({
       fetchComments();
     } catch (error) {
       console.error("Error adding density comment:", error);
-    }
+    };
   };  
 
   // const handleSelectPreferredComment = async (commentId: number) => {

@@ -5,19 +5,13 @@ import { SimplePlanetGenerator } from "@/components/Data/Generator/Astronomers/P
 import FileOrWebcamUpload from "@/components/Projects/Zoodex/Upload/GptClassification";
 import ChatGPTComponent from "./pleaseWork";
 import PlanetRadiusCalculator from "@/components/Structures/Missions/Astronomers/PlanetHunters/RadiusCalc";
-import WeeklyClassifications from "@/components/Structures/Missions/Milestones/WeeklyClassifications";
-import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
 import VotePlanetClassifications from "@/components/Structures/Missions/Astronomers/PlanetHunters/PHVote";
-import JournalPage from "@/components/Structures/Missions/Stardust/Journal";
 
 export default function TestPage() {
   return (
     <div className="min-h-screen bg-black text-white p-4 space-y-8">
       {/* <PlanetRadiusCalculator /> */}
-      <WeeklyClassifications />
-      <MilestoneCard />
-      {/* <VotePlanetClassifications /> */}
-      <JournalPage />
+      <VotePlanetClassifications />
     </div>
   );
 };
