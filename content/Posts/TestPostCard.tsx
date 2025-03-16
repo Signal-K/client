@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { Calculator, ChevronDown, MessageSquare, Send, Share2, ThumbsUp, X } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -25,6 +25,7 @@ interface CommentProps {
     configuration?: {
         planetType?: string;
     };
+    username?: string;
 };
 
 interface PostCardSingleProps {
@@ -81,7 +82,11 @@ export default function PostCard({
 
     const [calculatorInputs, setCalculatorInputs] = useState({ input1: "", input2: "" })
     const [calculatorResult, setCalculatorResult] = useState("")
-    const [selectedStat, setSelectedStat] = useState("transit")
+    const [selectedStat, setSelectedStat] = useState("transit");
+    const [selectedCalculator, setSelectedCalculator] = useState<string>('');
+
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>();
   
     const calculatePlanetRadius = (stellarRadius: string, fluxDifferential: string) => {
         const R_star = Number.parseFloat(stellarRadius);
@@ -106,31 +111,39 @@ export default function PostCard({
     };      
 
     const fetchComments = async () => {
-        setLoadingComments(true);
-        try {
-            const { data, error } = await supabase
-                .from("comments")
-                .select("*")
-                .eq("classification_id", classificationId)
-                .order('created_at', { ascending: false });
+      setLoading(true);
+      try {
+        const { data: commentsData, error: commentsError } = await supabase
+          .from("comments")
+          .select("id, content, created_at, author, classification_id")
+          .eq("classification_id", classificationId)
+          .order("created_at", { ascending: false });
 
-            if (classificationConfig?.classificationType === 'telescope-minorPlanet' || classificationConfig?.classificationType === 'planet') {
-                const surveyor = comments.filter((comment) => comment.isSurveyor);
-                const nonSurveyor = comments.filter((comment) => !comment.isSurveyor);
-                setSurveyorComments(surveyor);
-                setNonSurveyorComments(nonSurveyor);
-            };
+        if (commentsError) throw commentsError;
 
-            if (error) {
-                throw error;
-            };
+        // Fetch usernames from profiles
+        const authorIds = [...new Set(commentsData.map((c) => c.author))];
+        const { data: profilesData, error: profilesError } = await supabase
+          .from("profiles")
+          .select("id, username")
+          .in("id", authorIds);
 
-            setComments(data);
-        } catch (error: any) {
-            console.error("Error fetching comments: ", error);
-        } finally {
-            setLoadingComments(false);
-        };
+        if (profilesError) throw profilesError;
+
+        // Map usernames to comments
+        const profileMap = Object.fromEntries(profilesData.map((p) => [p.id, p.username]));
+        const enrichedComments = commentsData.map((comment) => ({
+          ...comment,
+          username: profileMap[comment.author] || "Unknown",
+        }));
+
+        setComments(enrichedComments);
+      } catch (error: any) {
+        setError("Error fetching comments.");
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     const handleVoteClick = async () => {
@@ -161,6 +174,10 @@ export default function PostCard({
 
         if (onVote) onVote();
     };
+
+    useEffect(() => {
+      fetchComments();
+    }, []);
 
     const handleAddComment = async () => {
         if (!newComment.trim()) {
@@ -270,8 +287,9 @@ export default function PostCard({
     };
   
     return (
-        <div className="" ref={shareCardRef}>
-            <Card className="w-full overflow-hidden border-2 border-[#5FCBC3]/30 bg-[#2C3A4A] shadow-lg">
+        <div className="bg-[#9d22bf]" ref={shareCardRef}>
+            <Card className="w-full overflow-hidden border-2 border-[#5FCBC3]/30 bg-[#hhhhhh]">
+              <div className="bg-[#9d22bf] p-4">
                 <CardHeader className="flex flex-row items-center gap-3 p-4 border-b border-[#5FCBC3]/20">
                     {/* <Avatar className="h-10 w-10 border-2 border-[#B9E678]">
                         <AvatarImage src="/placeholder.svg" />
@@ -297,7 +315,7 @@ export default function PostCard({
                                     className="object-cover hover:scale-105 transition-transform duration-300"
                                     sizes='100vw'
                                 />
-                                <span className="text-xs text-[#F7F5E9] bg-[#2C3A4A]/70 px-2 py-1 rounded">Click to expand</span>
+                                {/* <span className="text-xs text-[#F7F5E9] bg-[#2C3A4A]/70 px-2 py-1 rounded">Click to expand</span> */}
                             </>
                         )}
                         {/* <Image
@@ -308,7 +326,7 @@ export default function PostCard({
                             sizes="100vw"
                         />
                         <div className="absolute inset-0 bg-[#5FCBC3]/10 hover:bg-transparent transition-colors duration-300 flex items-center justify-center">
-                        <span className="text-xs text-[#F7F5E9] bg-[#2C3A4A]/70 px-2 py-1 rounded">Click to expand</span> */}
+                        */}
                     </div>
                     <div className="p-4 space-y-2 bg-gradient-to-b from-[#2C3A4A] to-[#1e2834]">
                         <p className="text-sm text-[#F7F5E9]">
@@ -336,9 +354,9 @@ export default function PostCard({
                 <Popover>
                     <PopoverTrigger asChild>
                     <Button
-                        onClick={() => {
-                        handleShare()
-                        }}
+                        // onClick={() => {
+                        // handleShare()
+                        // }}
                         size="sm"
                         disabled={isSharing}
                         variant="outline"
@@ -396,18 +414,18 @@ export default function PostCard({
                 value="stats"
                 className="data-[state=active]:bg-[#5FCBC3] data-[state=active]:text-[#2C3A4A] text-[#F7F5E9]"
               >
-                Classification
+                Classification Stats
               </TabsTrigger>
               <TabsTrigger
                 value="calculator"
                 className="data-[state=active]:bg-[#5FCBC3] data-[state=active]:text-[#2C3A4A] text-[#F7F5E9]"
               >
-                Calculate Anomaly
+                Calculate Stats
               </TabsTrigger>
             </TabsList>
 
-            {/* <TabsContent value="comments" className="p-4 space-y-4">
-              <div className="space-y-4">
+            <TabsContent value="comments" className="p-4 space-y-4">
+              {/* <div className="space-y-4">
                 <div className="flex gap-3">
                   <Avatar className="h-8 w-8 border border-[#B9E678]">
                     <AvatarFallback className="bg-[#1e2834] text-[#F7F5E9] text-xs">JD</AvatarFallback>
@@ -469,8 +487,36 @@ export default function PostCard({
                     </Button>
                   </div>
                 </div>
+              </div> */}
+              <div className="p-4 space-y-4">
+      {loading ? (
+        <p>Loading comments...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : comments.length === 0 ? (
+        <p>No comments yet. Be the first to comment!</p>
+      ) : (
+        comments.map((comment) => (
+          <div key={comment.id} className="flex gap-3">
+            <Avatar className="h-8 w-8 border border-[#B9E678]">
+              <AvatarFallback className="bg-[#1e2834] text-[#F7F5E9] text-xs">
+                {comment.username ? comment.username[0].toUpperCase() : "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-[#F7F5E9]">{comment.username}</p>
+                <span className="text-xs text-[#F7F5E9]/70">
+                  {/* {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })} */}
+                </span>
               </div>
-            </TabsContent> */}
+              <p className="text-sm text-[#F7F5E9] mt-1">{comment.content}</p>
+            </div>
+          </div>
+        ))
+      )}
+      </div>
+            </TabsContent>
 
             {/* <TabsContent value="stats" className="p-4 space-y-4">
               <div className="space-y-3">
@@ -533,81 +579,90 @@ export default function PostCard({
               </div>
             </TabsContent> */}
 
-            {/* <TabsContent value="calculator" className="p-4 space-y-4">
-      <div className="space-y-4">
-        <div className="bg-[#2C3A4A] p-3 rounded-md border border-[#5FCBC3]/20">
-          <div className="flex items-center gap-2 mb-3">
-            <Calculator className="h-4 w-4 text-[#B9E678]" />
-            <h4 className="text-sm font-medium text-[#F7F5E9]">Planet Calculator</h4>
+<TabsContent value="calculator" className="p-4 space-y-4">
+  <div className="space-y-4">
+    <div className="bg-[#2C3A4A] p-3 rounded-md border border-[#5FCBC3]/20">
+      <div className="flex items-center gap-2 mb-3">
+        <Calculator className="h-4 w-4 text-[#B9E678]" />
+        <h4 className="text-sm font-medium text-[#F7F5E9]">Planet Calculator</h4>
+      </div>
+
+      <div className="space-y-3">
+        <Select
+          value={selectedCalculator}
+          onValueChange={(val) => setSelectedCalculator(val as "radius" | "temperature")}
+        >
+          <SelectTrigger className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#F7F5E9]">
+            <SelectValue placeholder="Select calculator" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#F7F5E9]">
+            <SelectItem value="radius" className="focus:bg-[#1e2834] focus:text-[#F7F5E9]">
+              Planet Radius
+            </SelectItem>
+            <SelectItem value="temperature" className="focus:bg-[#1e2834] focus:text-[#F7F5E9]">
+              Planet Temperature
+            </SelectItem>
+          </SelectContent>
+        </Select>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
+            <label className="text-xs text-[#F7F5E9]/70">
+              {selectedCalculator === "radius" ? "Stellar Radius (R☉)" : "Star Temperature (K)"}
+            </label>
+            <Input
+              value={calculatorInputs.input1}
+              onChange={(e) => setCalculatorInputs({ ...calculatorInputs, input1: e.target.value })}
+              className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#F7F5E9] h-8"
+              type="number"
+              step="0.01"
+            />
           </div>
-
-          <div className="space-y-3">
-            <Select value={selectedCalculator} onValueChange={(val) => setSelectedCalculator(val as "radius" | "temperature")}>
-              <SelectTrigger className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#F7F5E9]">
-                <SelectValue placeholder="Select calculator" />
-              </SelectTrigger>
-              <SelectContent className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#F7F5E9]">
-                <SelectItem value="radius" className="focus:bg-[#1e2834] focus:text-[#F7F5E9]">
-                  Planet Radius
-                </SelectItem>
-                <SelectItem value="temperature" className="focus:bg-[#1e2834] focus:text-[#F7F5E9]">
-                  Planet Temperature
-                </SelectItem>
-              </SelectContent>
-            </Select>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <label className="text-xs text-[#F7F5E9]/70">
-                  {selectedCalculator === "radius" ? "Stellar Radius (R☉)" : "Star Temperature (K)"}
-                </label>
-                <Input
-                  value={calculatorInputs.input1}
-                  onChange={(e) => setCalculatorInputs({ ...calculatorInputs, input1: e.target.value })}
-                  className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#F7F5E9] h-8"
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-[#F7F5E9]/70">
-                  {selectedCalculator === "radius" ? "Flux Differential" : "Orbital Period (Days)"}
-                </label>
-                <Input
-                  value={calculatorInputs.input2}
-                  onChange={(e) => setCalculatorInputs({ ...calculatorInputs, input2: e.target.value })}
-                  className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#F7F5E9] h-8"
-                  type="number"
-                  step="0.01"
-                />
-              </div>
-            </div>
-
-            <Button
-              onClick={selectedCalculator === "radius" ? calculateRadius : calculateTemperature}
-              className="w-full bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90"
-            >
-              Calculate
-            </Button>
-
-            <div className="bg-[#1e2834] p-2 rounded border border-[#5FCBC3]/20 flex justify-between items-center">
-              <span className="text-xs text-[#F7F5E9]/70">Result:</span>
-              <span className="text-sm font-medium text-[#F7F5E9] font-mono">{calculatorResult || "—"}</span>
-            </div>
+          <div className="space-y-1">
+            <label className="text-xs text-[#F7F5E9]/70">
+              {selectedCalculator === "radius" ? "Flux Differential" : "Orbital Period (Days)"}
+            </label>
+            <Input
+              value={calculatorInputs.input2}
+              onChange={(e) => setCalculatorInputs({ ...calculatorInputs, input2: e.target.value })}
+              className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#F7F5E9] h-8"
+              type="number"
+              step="0.01"
+            />
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Textarea
-            placeholder="Share your analysis or findings..."
-            className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#F7F5E9] min-h-[80px]"
-          />
-          <div className="flex justify-end">
-            <Button className="bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90">Post Analysis</Button>
-          </div>
+        <Button
+          onClick={() => {
+            const result =
+              selectedCalculator === "radius"
+                ? calculatePlanetRadius(calculatorInputs.input1, calculatorInputs.input2)
+                : calculatePlanetTemperature(calculatorInputs.input1, calculatorInputs.input2);
+            setCalculatorResult(result);
+          }}
+          className="w-full bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90"
+        >
+          Calculate
+        </Button>
+
+        <div className="bg-[#1e2834] p-2 rounded border border-[#5FCBC3]/20 flex justify-between items-center">
+          <span className="text-xs text-[#F7F5E9]/70">Result:</span>
+          <span className="text-sm font-medium text-[#F7F5E9] font-mono">{calculatorResult || "—"}</span>
         </div>
       </div>
-    </TabsContent> */}
+    </div>
+
+    <div className="space-y-2">
+      <Textarea
+        placeholder="Share your analysis or findings..."
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#F7F5E9] min-h-[80px]"
+      />
+      <div className="flex justify-end">
+        <Button className="bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90">Post Analysis</Button>
+      </div>
+    </div>
+  </div>
+</TabsContent>
           </Tabs>
         </div>
       )}
@@ -640,6 +695,7 @@ export default function PostCard({
           </div>
         </DialogContent>
       </Dialog>
+      </div>
     </Card>
     </div>
   );

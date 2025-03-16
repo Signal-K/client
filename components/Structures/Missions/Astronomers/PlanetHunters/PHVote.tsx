@@ -116,19 +116,32 @@ export default function VotePlanetClassifications() {
     };
 
     return (
-      <div className="relative">
-        <div className="flex overflow-x-scroll space-x-4 py-4">
-            {loading ? (
-              <p>Loading classifications...</p>
-            ) : error ? (
-              <p>{error}</p>
-            ) : (
-              classifications.map((classification, index) => (
-                <div
-                  key={classification.id}
-                  className={`flex-shrink-0 w-full max-w-screen-md ${index === currentIndex ? "block" : "hidden"}`}
-                >
-                  {/* <PostCardSingle
+        <div className="container mx-auto p-4 max-w-md">
+      <div className="space-y-6">
+        {loading ? (
+          <p className="text-center text-gray-400">Loading classifications...</p>
+        ) : error ? (
+          <p className="text-center text-red-500">{error}</p>
+        ) : classifications.length === 0 ? (
+          <p className="text-center text-gray-400">No classifications available.</p>
+        ) : (
+          classifications.map((classification) => (
+            <PostCard
+              key={classification.id}
+              classificationId={classification.id}
+              title={classification.title}
+              author={classification.author}
+              content={classification.content}
+              votes={classification.votes}
+              category={classification.category}
+              tags={classification.tags || []}
+              images={classification.image ? [classification.image] : []}
+              anomalyId={classification.anomaly}
+              classificationConfig={classification.classificationConfiguration}
+              classificationType={classification.classificationtype}
+              onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
+            />
+                              /* <PostCardSingle
                     classificationId={classification.id}
                     title={classification.title}
                     author={classification.author}
@@ -141,28 +154,12 @@ export default function VotePlanetClassifications() {
                     classificationConfig={classification.classificationConfiguration}
                     classificationType={classification.classificationtype}
                     onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
-                  /> */}
-                  <PostCard
-                    key={classification.id}
-                    classificationId={classification.id}
-                    title={classification.title}
-                    author={classification.author}
-                    content={classification.content}
-                    votes={classification.votes}
-                    category={classification.category}
-                    tags={classification.tags || []}
-                    images={classification.image ? [classification.image] : []}
-                    anomalyId={classification.anomaly}
-                    classificationConfig={classification.classificationConfiguration}
-                    classificationType={classification.classificationtype}
-                    onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
-                  />
-                </div>
-              ))
-            )}
-        </div>
+                  /> */
+          ))
+        )}
+      </div>
         
-        <div className="absolute top-1/2 left-0 transform -translate-y-1/2">
+        {/* <div className="absolute top-1/2 left-0 transform -translate-y-1/2">
             <button
                 onClick={prevPost}
                 className="bg-gray-800 text-white p-2 rounded-l-md hover:bg-gray-600"
@@ -180,7 +177,7 @@ export default function VotePlanetClassifications() {
             >
                 Next
             </button>
-        </div>
+        </div> */}
       </div>
     );
 };

@@ -7,6 +7,8 @@ import ChatGPTComponent from "./pleaseWork";
 import PlanetRadiusCalculator from "@/components/Structures/Missions/Astronomers/PlanetHunters/RadiusCalc";
 import WeeklyClassifications from "@/components/Structures/Missions/Milestones/WeeklyClassifications";
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
+import VotePlanetClassifications from "@/components/Structures/Missions/Astronomers/PlanetHunters/PHVote";
+import JournalPage from "@/components/Structures/Missions/Stardust/Journal";
 
 export default function TestPage() {
   return (
@@ -14,6 +16,8 @@ export default function TestPage() {
       {/* <PlanetRadiusCalculator /> */}
       <WeeklyClassifications />
       <MilestoneCard />
+      {/* <VotePlanetClassifications /> */}
+      <JournalPage />
     </div>
   );
 };

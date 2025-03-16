@@ -100,7 +100,7 @@ export function PostCardSingle({
       console.error("Error fetching comments:", error);
     } finally {
       setLoadingComments(false);
-    }
+    };
   };
 
   const handleVoteClick = async () => {

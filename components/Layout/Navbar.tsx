@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import MilestoneCard from "../Structures/Missions/Milestones/MilestoneCard";
+import JournalPage from "../Structures/Missions/Stardust/Journal";
 
 export default function Navbar() {
   const supabase = useSupabaseClient();
@@ -13,6 +14,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [settlementsOpen, setSettlementsOpen] = useState(false);
   const [milestonesOpen, setMilestonesOpen] = useState(false);
+  const [isMilestoneView, setIsMilestoneView] = useState(true);
 
   // Sign out function
   const signOut = async () => {
@@ -110,7 +112,23 @@ export default function Navbar() {
               </button>
               {milestonesOpen && (
                 <div className="absolute left-0 mt-2 w-[350px] sm:w-[400px] bg-white/90 backdrop-blur-lg rounded-lg shadow-lg border border-white/20">
-                  <MilestoneCard />
+                  {/* Add a button to toggle between the views */}
+                  <div className="px-4 py-2 text-sm font-bold text-gray-800">
+                    <button
+                      className={`w-full text-left px-2 py-1 rounded-lg ${isMilestoneView ? 'bg-[#5FCBC3]/60' : 'bg-gray-100'}`}
+                      onClick={() => setIsMilestoneView(true)}
+                    >
+                      Weekly Milestones
+                    </button>
+                    <button
+                      className={`w-full text-left px-2 py-1 rounded-lg ${!isMilestoneView ? 'bg-[#5FCBC3]/60' : 'bg-gray-100'}`}
+                      onClick={() => setIsMilestoneView(false)}
+                    >
+                      Classifications Journal
+                    </button>
+                  </div>
+
+                  {isMilestoneView ? <MilestoneCard /> : <JournalPage />}
                 </div>
               )}
             </div>

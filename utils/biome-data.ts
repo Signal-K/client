@@ -212,7 +212,7 @@ export interface BiomeRanges {
       volcanicActivity: [0.0, 0.3],
       surfaceDeposits: ["Fine Sand", "Wind-Driven Erosion"],
     },
-  }
+  };
   
   export function getSurfaceDeposits(biome: string): string[] {
     return biomeData[biome]?.surfaceDeposits || ["Unknown"]

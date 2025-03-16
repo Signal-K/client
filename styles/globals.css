@@ -104,7 +104,7 @@ body {
   background-color: hsl(var(--accent));
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   transform: translate(-50%, -50%) rotate(45deg);
-}
+};
 
 .sci-fi-background {
   background-color: #1D2833;
