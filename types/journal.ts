@@ -11,7 +11,7 @@ export interface Mission {
 export interface Project {
   id: string
   name: string
-  missions: Mission[]
+  missions?: Mission[]
   totalProgress: number
 };
 

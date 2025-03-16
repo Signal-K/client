@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GreenhouseResearchStations } from "./Missions/Biologists/ResearchStations";
 import MilestoneCard from "./Missions/Milestones/MilestoneCard";
+import MySettlementsLocations from "@/content/Classifications/UserLocations";
 
 export interface IndividualStructureProps {
   name: string;
@@ -50,10 +51,6 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
   const [modalSizePercentage, setModalSizePercentage] = useState(100); 
   const [tooltip, setTooltip] = useState<{ visible: boolean; text: string } | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    console.warn(structureId)
-  }, [])
 
   const handleActionClick = (actionText: string, component: React.ReactNode, sizePercentage: number = 100) => {
     setActiveComponent(component);
@@ -188,26 +185,31 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       )
     ))}
   </div>
-  <MilestoneCard className="hidden sm:block" />
+  {/* <p>{name}</p> */}
+  {name !== 'Telescope' ? (
+    <MilestoneCard />
+  ) : (
+    <MySettlementsLocations />
+  )}
 </div>
 
             <div className="flex flex-col items-center my-4 space-y-4">
-  {modals && modals.length > 0 && modals.map((modal, index) => (
-    <div
-      key={index}
-      className="flex items-center justify-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
-      onClick={() => handleModalClick(modal.component, modal.text || '')}
-      style={{ width: "100%", maxWidth: "200px" }}
-    >
-      <div className="flex items-center justify-center w-full">
-        <div className="flex-shrink-0">
-          {modal.icon}
-        </div>
-        <p className="ml-2 text-xs text-[#d8dee9]">{modal.text}</p>
-      </div>
-    </div>
-  ))}
-</div>
+              {modals && modals.length > 0 && modals.map((modal, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
+                  onClick={() => handleModalClick(modal.component, modal.text || '')}
+                  style={{ width: "100%", maxWidth: "200px" }}
+                >
+                  <div className="flex items-center justify-center w-full">
+                    <div className="flex-shrink-0">
+                      {modal.icon}
+                    </div>
+                    <p className="ml-2 text-xs text-[#d8dee9]">{modal.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
             <Button
               variant="outline"
               className="rounded-full p-2 text-[#d8dee9] hover:bg-[#3b4a5a] mt-8"

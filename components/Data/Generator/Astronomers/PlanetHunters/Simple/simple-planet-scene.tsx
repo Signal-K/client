@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { Canvas } from "@react-three/fiber"
-import { OrbitControls, Stars } from "@react-three/drei"
-import { SimplePlanetMesh } from "./simple-planet-mesh"
-import type { PlanetStats } from "@/utils/planet-physics"
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Stars } from "@react-three/drei";
+import { SimplePlanetMesh } from "./simple-planet-mesh";
+import type { PlanetStats } from "@/utils/planet-physics";
 
 interface SimplePlanetSceneProps {
-  stats: PlanetStats
-}
+  stats: PlanetStats;
+};
 
 export function SimplePlanetScene({ stats }: SimplePlanetSceneProps) {
   return (

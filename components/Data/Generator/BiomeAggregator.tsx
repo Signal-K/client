@@ -8,8 +8,26 @@ interface AggregatedCloud {
   cloudColours?: Record<string, number>;
 }
 
+interface AggregatedP4 {
+  fanCount: number;
+  blotchCount: number;
+  classificationCounts: Record<string, number>;
+}
+
+interface AggregatedAI4M {
+  sandCount: number;
+  soilCount: number;
+  bedrockCount: number;
+  rockCount: number;
+  unlabelledCount: number;
+  classificationCounts: Record<string, number>;
+}
+
 interface BiomeAggregatorProps {
   cloudSummary: AggregatedCloud | null;
+  p4Summary: AggregatedP4 | null;
+  ai4MSummary: AggregatedAI4M | null;
+  onBiomeUpdate?: (biome: string) => void;
 }
 
 const biomeScores: Record<string, Record<string, number>> = {
@@ -35,73 +53,84 @@ const biomeScores: Record<string, Record<string, number>> = {
   }
 };
 
-const getDominantBiome = (cloudSummary: AggregatedCloud): string => {
+const weatherByBiome: Record<string, string[]> = {
+  "rocky highlands": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "rocky terrain": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "consolidated soil": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "wind-affected terrain": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "barren wasteland": ["Acid Rain", "Dust Storms", "Ion Storms", "Impact Events"],
+  "arid dunes": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "dusty surface": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "sandy desert": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "frigid expanse": ["Snow", "Sleet", "Ice Storms", "Cryovolcanism"],
+  "volcanic terrain": ["Volcanic Eruptions", "Geysers", "Seismic Activity", "Acid Rain"],
+  "temperate highlands": ["Rain", "Thunderstorms", "Hail", "Hurricanes"],
+  "oceanic world": ["Rain", "Hurricanes", "Tsunamis", "Deep Ocean Storms"],
+  "tropical jungle": ["Rain", "Superstorms", "Flooding", "Thunderstorms"],
+};
+
+const getDominantBiome = (
+  cloudSummary: AggregatedCloud | null,
+  p4Summary: AggregatedP4 | null,
+  ai4MSummary: AggregatedAI4M | null
+): string => {
   const biomeTotals: Record<string, number> = {};
-  const debugInfo: string[] = [];
 
-  debugInfo.push("=== Biome Calculation Debug ===");
-  debugInfo.push(`Full Cloud Summary: ${JSON.stringify(cloudSummary, null, 2)}`);
-
-  // Helper function to normalize keys
-  const normalizeKey = (key: string) => key.toLowerCase().trim();
-
-  // Process Cloud Colours
-  debugInfo.push("\n--- Processing Cloud Colours ---");
-  if (cloudSummary.cloudColours) {
+  if (cloudSummary?.cloudColours) {
     Object.entries(cloudSummary.cloudColours).forEach(([colour, count]) => {
-      const normalizedColour = normalizeKey(colour);
-      debugInfo.push(`Colour: ${normalizedColour}, Count: ${count}`);
-      
+      const normalizedColour = colour.toLowerCase().trim();
       if (biomeScores[normalizedColour]) {
         Object.entries(biomeScores[normalizedColour]).forEach(([biome, score]) => {
-          const biomeValue = score * count;
-          biomeTotals[biome] = (biomeTotals[biome] || 0) + biomeValue;
-          debugInfo.push(`  - Biome: ${biome}, Score: ${biomeValue}`);
+          biomeTotals[biome] = (biomeTotals[biome] || 0) + score * count;
         });
-      } else {
-        debugInfo.push(`  ! No scores found for colour: ${normalizedColour}`);
       }
     });
-  } else {
-    debugInfo.push("! No cloud colours found");
   }
 
-  // Determine the dominant biome
-  debugInfo.push("\n--- Biome Totals ---");
-  const sortedBiomes = Object.entries(biomeTotals)
-    .sort((a, b) => b[1] - a[1])
-    .map(([biome, score]) => {
-      debugInfo.push(`${biome}: ${score}`);
-      return [biome, score];
-    });
+  if (p4Summary) {
+    biomeTotals["wind-affected terrain"] = (biomeTotals["wind-affected terrain"] || 0) + p4Summary.fanCount * 0.2;
+    biomeTotals["dusty surface"] = (biomeTotals["dusty surface"] || 0) + p4Summary.blotchCount * 0.1;
+  }
 
-  // Log the full debug information
-  console.log(debugInfo.join('\n'));
+  if (ai4MSummary) {
+    biomeTotals["sandy desert"] = (biomeTotals["sandy desert"] || 0) + ai4MSummary.sandCount * 0.15;
+    biomeTotals["rocky terrain"] = (biomeTotals["rocky terrain"] || 0) + ai4MSummary.rockCount * 0.2;
+    biomeTotals["consolidated soil"] = (biomeTotals["consolidated soil"] || 0) + ai4MSummary.soilCount * 0.1;
+  }
 
-  // Return dominant biome or default
+  const sortedBiomes = Object.entries(biomeTotals).sort((a, b) => b[1] - a[1]);
   return sortedBiomes.length > 0 ? String(sortedBiomes[0][0]) : "Unknown";
 };
 
-const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary }) => {
+const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary, p4Summary, ai4MSummary, onBiomeUpdate }) => {
   const [dominantBiome, setDominantBiome] = useState<string>("Unknown");
-  const [debugInfo, setDebugInfo] = useState<string>("");
+  const [weatherEvents, setWeatherEvents] = useState<string[]>([]);
 
   useEffect(() => {
-    if (cloudSummary) {
-      console.log("Cloud Summary Received:", cloudSummary);
-      
-      // Explicitly convert to string
-      const biome = getDominantBiome(cloudSummary);
+    if (cloudSummary || p4Summary || ai4MSummary) {
+      const biome = getDominantBiome(cloudSummary, p4Summary, ai4MSummary);
       setDominantBiome(biome);
-    } else {
-      console.log("No cloud summary provided");
+      setWeatherEvents(weatherByBiome[biome] || []);
+      if (onBiomeUpdate) {
+        onBiomeUpdate(biome);
+      }
     }
-  }, [cloudSummary]);
+  }, [cloudSummary, p4Summary, ai4MSummary, onBiomeUpdate]);
 
   return (
     <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#4A665A] text-white">
       <h3 className="text-xl font-bold">Biome Aggregation</h3>
       <p>Dominant Biome: <strong>{dominantBiome}</strong></p>
+      {weatherEvents.length > 0 && (
+        <div className="mt-2">
+          <h4 className="text-lg font-semibold">Likely Weather Events:</h4>
+          <ul className="list-disc list-inside">
+            {weatherEvents.map((event, index) => (
+              <li key={index}>{event}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

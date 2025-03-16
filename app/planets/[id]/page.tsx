@@ -8,7 +8,8 @@ import CloudClassificationSummary from "@/components/Structures/Missions/Meteoro
 import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
 import SatellitePlanetFourAggregator, { SatellitePlanetFourClassification } from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/P4Aggregator";
 import AI4MAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AI4MAggregator";
-import SimpleeMissionGuide from "@/app/tests/singleMissionGuide";
+import BuildTerrariumStructures from "@/components/Structures/Build/BuildOnTerrariums";
+import StructuresOnTerrarium from "@/components/Structures/StructuresOnTerrarium";
 
 export interface Classification {
   id: number;
@@ -17,7 +18,7 @@ export interface Classification {
   anomaly: Anomaly | null;
   media: (string | { uploadUrl?: string })[] | null;
   classificationtype: string | null;
-  classificationConfiguration?: any; // classificationConfiguration is now optional
+  classificationConfiguration?: any;
   created_at: string;
   title?: string;
   votes?: number;
@@ -78,82 +79,81 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dominantBiome, setDominantBiome] = useState<string | null>('Jungle');
 
   const [cloudSummary, setCloudSummary] = useState<AggregatedCloud | null>(null);
   const [p4Summary, setP4Summary] = useState<AggregatedP4 | null>(null);
   const [ai4MSummary, setAI4MSummary] = useState<AggregatedAI4M | null>(null);
   const [relatedClassifications, setRelatedClassifications] = useState<Classification[]>([]);
-    
 
   const [showCurrentUser, setShowCurrentUser] = useState<boolean>(true);
   const [showMetadata, setShowMetadata] = useState<boolean>(false);
 
   useEffect(() => {
     if (!params.id) return;
-  
+
     const fetchClassification = async () => {
       if (!params.id || !session) return;
-  
+
       const { data, error } = await supabase
         .from("classifications")
         .select("*, anomaly:anomalies(*), classificationConfiguration, media")
         .eq("id", params.id)
         .single();
-  
+
       if (error) {
         setError("Failed to fetch classification.");
         setLoading(false);
         return;
-      }
-  
+      };
+
       setClassification(data);
       setAnomaly(data.anomaly);
-  
+
       const parentPlanetLocation = data.anomaly?.id;
       if (parentPlanetLocation) {
         const query = supabase
           .from("classifications")
           .select("*, anomaly:anomalies(*), classificationConfiguration, media")
           .eq("classificationConfiguration->>parentPlanetLocation", parentPlanetLocation.toString());
-  
+
         if (showCurrentUser) {
           query.eq("author", session.user.id);
         }
-  
+
         const { data: relatedData, error: relatedError } = await query;
-  
+
         if (relatedError) {
           setError("Failed to fetch related classifications.");
           setLoading(false);
           return;
         }
-  
+
         if (relatedData) {
-          // Fetch votes for related classifications
           const votePromises = relatedData.map(async (related) => {
             const { count, error: votesError } = await supabase
               .from("votes")
               .select("*", { count: "exact" })
               .eq("classification_id", related.id);
-  
+
             if (votesError) {
               console.error("Error fetching votes:", votesError);
               return { ...related, votes: 0 };
             }
-  
+
             return { ...related, votes: count };
           });
-  
+
           const relatedClassificationsWithVotes = await Promise.all(votePromises);
           setRelatedClassifications(relatedClassificationsWithVotes);
         }
       }
-  
+
       setLoading(false);
     };
-  
+
     fetchClassification();
-  }, [params.id, supabase, session, showCurrentUser]);  
+  }, [params.id, supabase, session, showCurrentUser]);
 
   if (loading) return <p>Loading classification data...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -167,7 +167,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     .filter(
       (related): related is Classification & SatellitePlanetFourClassification =>
         related.classificationtype === "satellite-planetFour" &&
-        Array.isArray(related.classificationConfiguration?.annotationOptions) 
+        Array.isArray(related.classificationConfiguration?.annotationOptions)
     )
     .map((related) => ({
       id: related.id,
@@ -180,7 +180,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   ).map((related) => ({
     id: related.id,
     classificationConfiguration: related.classificationConfiguration || {},
-    annotationOptions: related.classificationConfiguration?.annotationOptions || [] 
+    annotationOptions: related.classificationConfiguration?.annotationOptions || []
   }));
 
   const handleCloudSummaryUpdate = (summary: AggregatedCloud) => {
@@ -211,7 +211,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         return "url('/assets/Backdrops/gasgiant.jpeg')";
       default:
         return "url('/assets/Backdrops/Earth.png')";
-    }
+    };
   };
 
   return (
@@ -228,7 +228,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
       <div className="py-5"></div>
       <h1 className="text-2xl font-bold">{classification.classificationConfiguration?.planetType || classification.content || `Planet #${classification.id}`}</h1>
       {classification.author && (
-        <PostCardSingleWithGenerator
+        <><PostCardSingleWithGenerator
           key={classification.id}
           classificationId={classification.id}
           title={classification.title || "Untitled"}
@@ -236,17 +236,27 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           content={classification.content || "No content available"}
           votes={classification.votes || 0}
           category={classification.classificationtype || "Uncategorized"}
-          tags={classification.tags || []}
-          images={classification.images || []}
+          // images={classification.images || []}
           anomalyId={classification.anomaly ? String(classification.anomaly.id) : ""}
           classificationConfig={classification.classificationConfiguration}
           classificationType={classification.classificationtype || "Unknown"}
+          tags={classification.tags || []}
+          images={classification.images || []} 
+          biome={dominantBiome || ''}
         />
+        </>
       )}
 
-      {/* Biome Aggregation - moved directly below PostCard */}
-      {cloudSummary && Object.keys(cloudSummary.annotationOptions).length > 0 && (
-        <BiomeAggregator cloudSummary={cloudSummary} />
+      <BuildTerrariumStructures location={classification.id} />
+      <StructuresOnTerrarium location={classification.id} />
+
+      {(cloudSummary || p4Summary || ai4MSummary) && (
+        <BiomeAggregator
+          cloudSummary={cloudSummary}
+          p4Summary={p4Summary}
+          ai4MSummary={ai4MSummary}
+          onBiomeUpdate={(biome) => setDominantBiome(biome)}
+        />
       )}
 
       {/* Toggle Buttons */}
@@ -291,30 +301,29 @@ export default function ClassificationDetail({ params }: { params: { id: string 
               onSummaryUpdate={handleAI4MSummaryUpdate}
             />
           )}
-
-          {/* Related Classifications Section */}
-          {relatedClassifications.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-xl font-bold">Related Classifications</h3>
-              {relatedClassifications.map((related) => (
-                <div key={related.id} className="relative mt-4 p-4 border border-gray-200 rounded-md shadow-md bg-[#2C4F64]">
-                  <h4 className="font-bold text-lg">{related.classificationtype}</h4>
-                  <p className="mt-2 text-sm">{related.anomaly?.content || "No anomaly content"}</p>
-                  {related.classificationtype === "cloud" && (
-                    <a
-                      href={`/planets/clouds/${related.id}`}
-                      className="absolute bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-700"
-                    >
-                      View Cloud Classification
-                    </a>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
         </>
       )}
-      {/* <SimpleeMissionGuide /> */}
+
+      {/* Related Classifications */}
+      {/* {relatedClassifications.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold">Related Classifications</h3>
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            {relatedClassifications.map((related) => (
+              <PostCardSingleWithGenerator
+                key={related.id}
+                classificationId={related.id}
+                title={related.title || "Untitled"}
+                author={related.author || "Unknown"}
+                content={related.content || "No content available"}
+                votes={related.votes || 0}
+                category={related.classificationtype || "Uncategorized"}
+                tags={related.tags || []}
+                images={related.images || []} anomalyId={""} classificationType={""}              />
+            ))}
+          </div>
+        </div>
+      )} */}
     </div>
   );
-};
+}

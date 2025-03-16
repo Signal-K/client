@@ -40,24 +40,40 @@ export default function EditPlanetAnomaly({ params }: { params: { id: string } }
                 return;
             }
 
-            if (isMounted) {
-                setClassification(data);
+            if (data && isMounted) {
+                // Extract media URLs correctly
+                let images: string[] = [];
+
+                if (Array.isArray(data.media)) {
+                    images = data.media
+                        .map((item: { uploadUrl: any; }) => (typeof item === "string" ? item : item?.uploadUrl))
+                        .filter(Boolean);
+                } else if (data.media?.uploadUrl) {
+                    images.push(data.media.uploadUrl);
+                }
+
+                setClassification({
+                    ...data,
+                    images,
+                    votes: data.classificationConfiguration?.votes || 0,
+                });
+
+                // Fetch related classifications
+                const parentPlanetLocation = data.anomaly?.id;
+                if (parentPlanetLocation) {
+                    const { data: relatedData, error: relatedError } = await supabase
+                        .from("classifications")
+                        .select("*, anomaly:anomalies(*), classificationConfiguration, media")
+                        .eq("classificationConfiguration->>parentPlanetLocation", parentPlanetLocation.toString())
+                        .eq("author", session.user.id);
+
+                    if (relatedError) {
+                        if (isMounted) setError("Failed to fetch related classifications.");
+                    } else if (relatedData && isMounted) {
+                        setRelatedClassifications(relatedData);
+                    }
+                }
             }
-
-            const parentPlanetLocation = data.anomaly?.id;
-            if (parentPlanetLocation) {
-                const { data: relatedData, error: relatedError } = await supabase
-                    .from("classifications")
-                    .select("*, anomaly:anomalies(*), classificationConfiguration, media")
-                    .eq("classificationConfiguration->>parentPlanetLocation", parentPlanetLocation.toString())
-                    .eq("author", session.user.id);
-
-                if (relatedError) {
-                    if (isMounted) setError("Failed to fetch related classifications.");
-                } else if (relatedData && isMounted) {
-                    setRelatedClassifications(relatedData);
-                };
-            };
 
             setLoading(false);
         };

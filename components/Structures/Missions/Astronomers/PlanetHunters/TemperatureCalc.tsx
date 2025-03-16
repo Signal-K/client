@@ -20,10 +20,10 @@ export default function PlanetTempCalculator() {
         setPlanetTemp(Number(Tp.toFixed(2)));
       } else {
         setPlanetTemp(null);
-      }
+      };
     } else {
       setPlanetTemp(null);
-    }
+    };
   }, [starTemp, period]);
 
   const handleButtonClick = (value: string) => {
@@ -39,7 +39,7 @@ export default function PlanetTempCalculator() {
       setStarTemp("");
     } else {
       setPeriod("");
-    }
+    };
   };
 
   const handleAllClear = () => {
@@ -58,26 +58,26 @@ export default function PlanetTempCalculator() {
         <div className="space-y-4 mb-6">
           <div className="planet-temp-calculator-input-container">
           <Input
-  type="text"
-  value={starTemp}
-  onChange={(e) => setStarTemp(e.target.value)}
-  className="planet-temp-calculator-input"
-  placeholder=" "
-  onFocus={() => setActiveInput("starTemp")}
-/>
+            type="text"
+            value={starTemp}
+            onChange={(e) => setStarTemp(e.target.value)}
+            className="planet-temp-calculator-input"
+            placeholder=" "
+            onFocus={() => setActiveInput("starTemp")}
+          />
             <label className={`planet-temp-calculator-placeholder ${starTemp ? "active" : ""}`}>
               Temperature of Parent Star (Kelvin)
             </label>
           </div>
           <div className="planet-temp-calculator-input-container">
-          <Input
-  type="text"
-  value={period}
-  onChange={(e) => setPeriod(e.target.value)}
-  className="planet-temp-calculator-input"
-  placeholder=" "
-  onFocus={() => setActiveInput("period")}
-/>
+            <Input
+              type="text"
+              value={period}
+              onChange={(e) => setPeriod(e.target.value)}
+              className="planet-temp-calculator-input"
+              placeholder=" "
+              onFocus={() => setActiveInput("period")}
+            />
             <label className={`planet-temp-calculator-placeholder ${period ? "active" : ""}`}>
               Orbital Period (Days)
             </label>

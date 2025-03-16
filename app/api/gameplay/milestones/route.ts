@@ -1,70 +1,102 @@
+import { Telescope } from "lucide-react";
 import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
     {
-        weekStart: "2025-02-18",
+        weekStart: '2025-03-09',
         data: [
-            { 
-                name: "Find 3 desert creatures", 
-                structure: "Greenhouse", 
+            {
+                name: 'Make 3 Temperature Classifications',
+                structure: 'Telescope',
+                icon: "Telescope",
+                extendedDescription: "",
+                xp: null,
+                completionInfo: '',
+                rewardInfo: '',
+                table: "comments",
+                field: "category",
+                value: "Temperature",
+                requiredCount: 3,
+            },
+            {
+                name: 'Make 2 Animal Classifications',
+                structure: "Greenhouse",
                 icon: "PawPrintIcon",
-                extendedDescription: "",
+                extendedDescription: '',
                 xp: null,
-                completionInfo: "",
-                rewardInfo: ""
-            },
-            { 
-                name: "Find ice on a planet", 
-                structure: "WeatherBalloon", 
-                icon: "SnowflakeIcon",
-                extendedDescription: "",
-                xp: null,
-                completionInfo: "",
-                rewardInfo: ""
-            },
-            { 
-                name: "Find a planet in the habitable zone", 
-                structure: "Telescope", 
-                icon: "GlassWaterIcon",
-                extendedDescription: "",
-                xp: null,
-                completionInfo: "",
-                rewardInfo: ""
+                completionInfo: '',
+                rewardInfo: '',
+                table: "classifications",
+                field: "classificationtype",
+                value: "planet",
+                requiredCount: 2,
             },
         ],
     },
-    {
-        weekStart: "2025-02-11",
-        data: [
-            { 
-                name: "Discover a new microbial species", 
-                structure: "Greenhouse", 
-                icon: "PawPrintIcon",
-                extendedDescription: "",
-                xp: null,
-                completionInfo: "",
-                rewardInfo: ""
-            },
-            { 
-                name: "Detect a storm with a weather balloon", 
-                structure: "WeatherBalloon", 
-                icon: "SnowflakeIcon",
-                extendedDescription: "",
-                xp: null,
-                completionInfo: "",
-                rewardInfo: ""
-            },
-            { 
-                name: "Observe a distant exoplanet", 
-                structure: "Telescope", 
-                icon: "GlassWaterIcon",
-                extendedDescription: "",
-                xp: null,
-                completionInfo: "",
-                rewardInfo: ""
-            },
-        ],
-    },
+    // {
+    //     weekStart: "2025-02-18",
+    //     data: [
+    //         { 
+    //             name: "Find 3 desert creatures", 
+    //             structure: "Greenhouse", 
+    //             icon: "PawPrintIcon",
+    //             extendedDescription: "",
+    //             xp: null,
+    //             completionInfo: "",
+    //             rewardInfo: ""
+    //         },
+    //         { 
+    //             name: "Find ice on a planet", 
+    //             structure: "WeatherBalloon", 
+    //             icon: "SnowflakeIcon",
+    //             extendedDescription: "",
+    //             xp: null,
+    //             completionInfo: "",
+    //             rewardInfo: ""
+    //         },
+    //         { 
+    //             name: "Find a planet in the habitable zone", 
+    //             structure: "Telescope", 
+    //             icon: "GlassWaterIcon",
+    //             extendedDescription: "",
+    //             xp: null,
+    //             completionInfo: "",
+    //             rewardInfo: ""
+    //         },
+    //     ],
+    // },
+    // {
+    //     weekStart: "2025-02-11",
+    //     data: [
+    //         { 
+    //             name: "Discover a new microbial species", 
+    //             structure: "Greenhouse", 
+    //             icon: "PawPrintIcon",
+    //             extendedDescription: "",
+    //             xp: null,
+    //             completionInfo: "",
+    //             rewardInfo: ""
+    //         },
+    //         { 
+    //             name: "Detect a storm with a weather balloon", 
+    //             structure: "WeatherBalloon", 
+    //             icon: "SnowflakeIcon",
+    //             extendedDescription: "",
+    //             xp: null,
+    //             completionInfo: "",
+    //             rewardInfo: ""
+    //         },
+    //         { 
+    //             name: "Observe a distant exoplanet", 
+    //             structure: "Telescope", 
+    //             icon: "GlassWaterIcon",
+    //             extendedDescription: "",
+    //             xp: null,
+    //             completionInfo: "",
+    //             rewardInfo: ""
+    //         },
+    //     ],
+    // },
 ];
 
 const communityMilestones = [
@@ -100,38 +132,38 @@ const communityMilestones = [
             },
         ],
     },
-    {
-        weekStart: "2025-02-11",
-        data: [
-            { 
-                name: "Community discovers 50 new microbial species", 
-                structure: "Greenhouse", 
-                icon: "PawPrintIcon",
-                extendedDescription: "The community works together to discover a total of 50 new microbial species.",
-                xp: null,
-                completionInfo: "The community has collectively discovered 50 microbial species.",
-                rewardInfo: "Unlocks the 'Microbial Pioneer' badge for all players."
-            },
-            { 
-                name: "Community detects 30 storms with weather balloons", 
-                structure: "WeatherBalloon", 
-                icon: "SnowflakeIcon",
-                extendedDescription: "The community makes groundbreaking discoveries, detecting 30 storms across planets.",
-                xp: null,
-                completionInfo: "30 storms detected by the collective community.",
-                rewardInfo: "Unlocks the 'Storm Tracker' badge for all players."
-            },
-            { 
-                name: "Community observes 100 distant exoplanets", 
-                structure: "Telescope", 
-                icon: "GlassWaterIcon",
-                extendedDescription: "The community works to observe and catalog 100 distant exoplanets.",
-                xp: null,
-                completionInfo: "A total of 100 exoplanets observed by the community.",
-                rewardInfo: "Unlocks the 'Exoplanet Explorer' badge for all players."
-            },
-        ],
-    },
+    // {
+    //     weekStart: "2025-02-11",
+    //     data: [
+    //         { 
+    //             name: "Community discovers 50 new microbial species", 
+    //             structure: "Greenhouse", 
+    //             icon: "PawPrintIcon",
+    //             extendedDescription: "The community works together to discover a total of 50 new microbial species.",
+    //             xp: null,
+    //             completionInfo: "The community has collectively discovered 50 microbial species.",
+    //             rewardInfo: "Unlocks the 'Microbial Pioneer' badge for all players."
+    //         },
+    //         { 
+    //             name: "Community detects 30 storms with weather balloons", 
+    //             structure: "WeatherBalloon", 
+    //             icon: "SnowflakeIcon",
+    //             extendedDescription: "The community makes groundbreaking discoveries, detecting 30 storms across planets.",
+    //             xp: null,
+    //             completionInfo: "30 storms detected by the collective community.",
+    //             rewardInfo: "Unlocks the 'Storm Tracker' badge for all players."
+    //         },
+    //         { 
+    //             name: "Community observes 100 distant exoplanets", 
+    //             structure: "Telescope", 
+    //             icon: "GlassWaterIcon",
+    //             extendedDescription: "The community works to observe and catalog 100 distant exoplanets.",
+    //             xp: null,
+    //             completionInfo: "A total of 100 exoplanets observed by the community.",
+    //             rewardInfo: "Unlocks the 'Exoplanet Explorer' badge for all players."
+    //         },
+    //     ],
+    // },
 ];
 
 export async function GET(req: NextRequest) {

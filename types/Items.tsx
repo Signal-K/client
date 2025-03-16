@@ -76,7 +76,35 @@ export interface InventoryStructureItem {
     locationType: string | null;
 };
 
+export interface TerrariumInventoryStructureItem {
+    configuration: {};
+    itemDetail: any;
+    id: number;
+    item: number;
+    owner: string;
+    quantity: number;
+    notes: string | null;
+    time_of_deploy: string | null;
+    // anomaly: number | null;
+    terrarium: number;
+    parentItem: number | null;
+    locationType: string | null;
+};
+
 export interface StructureItemDetail {
+    id: number;
+    name: string;
+    description: string;
+    cost: number;
+    icon_url: string;
+    ItemCategory: string;
+    locationType: string | null;
+    parentItem: number | null;
+    itemLevel: number;
+    recipe?: Record<string, number>;
+};
+
+export interface TerrariumStructureItemDetail {
     id: number;
     name: string;
     description: string;

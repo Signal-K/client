@@ -1,29 +1,49 @@
-"use client"
+"\"use client"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea";
-import type { PlanetStats } from "@/utils/planet-physics";
+import { Textarea } from "@/components/ui/textarea"
+import type { PlanetStats } from "@/utils/planet-physics"
 
 interface FullPlanetImportExportProps {
   stats: PlanetStats
   onImport: (importedStats: Partial<PlanetStats>) => void
 }
 
-// Type guard to check if a string is a valid key of PlanetStats
-function isPlanetStatsKey(key: string): key is keyof PlanetStats {
-  return key in ({} as PlanetStats)
-}
-
 export function FullPlanetImportExport({ stats, onImport }: FullPlanetImportExportProps) {
   const [importExportText, setImportExportText] = useState("")
 
   const handleExport = () => {
-    const exportText = Object.entries(stats)
-      .map(([key, value]) => `${key}: ${typeof value === "number" ? value.toFixed(2) : JSON.stringify(value)}`)
-      .join("\n")
+    const exportText = `mass: ${stats.mass.toFixed(2)}
+radius: ${stats.radius.toFixed(2)}
+temperature: ${stats.temperature?.toFixed(2) ?? "N/A"}
+orbitalPeriod: ${stats.orbitalPeriod?.toFixed(2) ?? "N/A"}
+atmosphereStrength: ${stats.atmosphereStrength?.toFixed(2) ?? "N/A"}
+cloudCount: ${stats.cloudCount ?? "N/A"}
+waterHeight: ${stats.waterHeight?.toFixed(2) ?? "N/A"}
+surfaceRoughness: ${stats.surfaceRoughness?.toFixed(2) ?? "N/A"}
+biomeFactor: ${stats.biomeFactor?.toFixed(2) ?? "N/A"}
+cloudContribution: ${stats.cloudContribution?.toFixed(2) ?? "N/A"}
+terrainVariation: ${stats.terrainVariation ?? "N/A"}
+terrainErosion: ${stats.terrainErosion?.toFixed(2) ?? "N/A"}
+plateTectonics: ${stats.plateTectonics?.toFixed(2) ?? "N/A"}
+
+biomassLevel: ${stats.biomassLevel?.toFixed(2) ?? "N/A"}
+waterLevel: ${stats.waterLevel?.toFixed(2) ?? "N/A"}
+salinity: ${stats.salinity?.toFixed(2) ?? "N/A"}
+subsurfaceWater: ${stats.subsurfaceWater?.toFixed(2) ?? "N/A"}
+atmosphericDensity: ${stats.atmosphericDensity?.toFixed(2) ?? "N/A"}
+weatherVariability: ${stats.weatherVariability?.toFixed(2) ?? "N/A"}
+stormFrequency: ${stats.stormFrequency?.toFixed(2) ?? "N/A"}
+volcanicActivity: ${stats.volcanicActivity?.toFixed(2) ?? "N/A"}
+biome: ${stats.biome ?? "N/A"}
+cloudTypes: ${JSON.stringify(stats.cloudTypes) ?? "N/A"}
+cloudDensity: ${stats.cloudDensity?.toFixed(2) ?? "N/A"}`
     setImportExportText(exportText)
   }
+// soilType: ${stats.soilType ?? "N/A"} ------GOES ABOVE-----
+//// GOES ABOVE^^^^^
+
 
   const handleImport = () => {
     const lines = importExportText.split("\n")
@@ -31,55 +51,60 @@ export function FullPlanetImportExport({ stats, onImport }: FullPlanetImportExpo
 
     lines.forEach((line) => {
       const [key, value] = line.split(":").map((part) => part.trim())
-
-      if (key && value && isPlanetStatsKey(key)) {
-        try {
-          // Handle different types of values
-          if (key === "type") {
-            const typeValue = value.replace(/"/g, "") as "terrestrial" | "gaseous"
-            if (typeValue === "terrestrial" || typeValue === "gaseous") {
-              importedStats.type = typeValue
-            }
-          } else if (key === "biome") {
-            importedStats.biome = value.replace(/"/g, "")
-          } else if (key === "cloudTypes") {
-            try {
-              const cloudTypes = JSON.parse(value)
-              if (Array.isArray(cloudTypes)) {
-                importedStats.cloudTypes = cloudTypes
-              }
-            } catch (e) {
-              console.warn(`Failed to parse cloud types: ${value}`)
-            }
-          } else if (key === "soilType") {
-            const soilValue = value.replace(/"/g, "") as PlanetStats["soilType"]
-            if (["rocky", "sandy", "volcanic", "organic", "dusty", "frozen", "muddy"].includes(soilValue ?? 'sandy')) {
-              importedStats.soilType = soilValue
-            }
-          } else if (key === "terrainVariation") {
-            const terrainValue = value.replace(/"/g, "") as PlanetStats["terrainVariation"]
-            if (["flat", "moderate", "chaotic"].includes(terrainValue ?? 'flat')) {
-              importedStats.terrainVariation = terrainValue
-            }
-          } else {
-            // Handle numeric values
-            const numValue = Number.parseFloat(value)
-            if (!isNaN(numValue)) {
-              importedStats[key] = numValue
-            }
+      if (value !== "N/A") {
+        if (
+          [
+            "mass",
+            "radius",
+            "temperature",
+            "orbitalPeriod",
+            "atmosphereStrength",
+            "cloudCount",
+            "waterHeight",
+            "surfaceRoughness",
+            "biomeFactor",
+            "cloudContribution",
+            "terrainErosion",
+            "plateTectonics",
+            "biomassLevel",
+            "waterLevel",
+            "salinity",
+            "subsurfaceWater",
+            "atmosphericDensity",
+            "weatherVariability",
+            "stormFrequency",
+            "volcanicActivity",
+            "cloudDensity",
+          ].includes(key)
+        ) {
+          const parsedValue = Number.parseFloat(value)
+          if (!isNaN(parsedValue)) {
+            ;(importedStats as any)[key] = parsedValue
           }
-        } catch (e) {
-          console.warn(`Failed to parse value for ${key}: ${value}`)
+        } else if (key === "terrainVariation") {
+          if (value === "flat" || value === "moderate" || value === "chaotic") {
+            ;(importedStats as any)[key] = value
+          }
+        // } else if (key === "soilType") {
+        //   if (["rocky", "sandy", "volcanic", "organic", "dusty", "frozen", "muddy"].includes(value)) {
+        //     ;(importedStats as any)[key] = value
+        //   }
+        } else if (key === "biome") {
+          ;(importedStats as any)[key] = value
+        } else if (key === "cloudTypes") {
+          try {
+            const parsedValue = JSON.parse(value)
+            if (Array.isArray(parsedValue)) {
+              ;(importedStats as any)[key] = parsedValue
+            }
+          } catch (e) {
+            console.error("Failed to parse cloudTypes", e)
+          }
         }
       }
     })
 
     if (Object.keys(importedStats).length > 0) {
-      // Ensure minimum required inputs are present
-      if (!importedStats.mass) importedStats.mass = 1
-      if (!importedStats.radius) importedStats.radius = 1
-      if (!importedStats.biome) importedStats.biome = "Rocky Highlands"
-
       onImport(importedStats)
     }
   }
@@ -90,11 +115,11 @@ export function FullPlanetImportExport({ stats, onImport }: FullPlanetImportExpo
         value={importExportText}
         onChange={(e) => setImportExportText(e.target.value)}
         placeholder="Paste settings here to import, or click Export to get current settings"
-        rows={12}
+        rows={8}
         className="font-mono text-white bg-[#2A2A2A] border-[#3A3A3A]"
       />
       <div className="flex justify-between gap-4">
-        <Button onClick={handleExport} className="flex-1 bg-[#FF4B39] hover:bg-[#FF4B39]/90 text-white">
+        <Button onClick={handleExport} className="flex-1 bg-[#FF4B39] hover:bg-[#D64031] text-white">
           Export
         </Button>
         <Button

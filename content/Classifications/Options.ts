@@ -151,12 +151,36 @@ export const initialCloudClassificationOptions: ClassificationOption[] = [
 ];
 export const cloudSpottingOnMarsShapesOptions: ClassificationOption[] = [
     // Cloudspotting on Mars: Shapes classifications
-    { id: 1, text: "Long and straight" },
-    { id: 2, text: "Curved" },
-    { id: 3, text: "Wavy" },
-    { id: 4, text: "Blob" },
-    { id: 5, text: "Streaky" },
-    { id: 6, text: "Multiple shapes" },
+    // { id: 1, text: "Long and straight" },
+    // { id: 2, text: "Curved" },
+    // { id: 3, text: "Wavy" },
+    // { id: 4, text: "Blob" },
+    // { id: 5, text: "Streaky" },
+    // { id: 6, text: "Multiple shapes" },
+    // {
+    //     id: 1,
+    //     text: "Cloudy region",
+    // },
+    // {
+    //     id: 2,
+    //     text: "Other cloud type",
+    // },
+    // {
+    //     id: 3,
+    //     text: "Canyon/Crater",
+    // },
+    // {
+    //     id: 4,
+    //     text: ""
+    // }
+    {
+        id: 1,
+        text: "Cloudy region",
+    },
+    {
+        id: 2,
+        text: "Other clouds",
+    },
 ];
 
 

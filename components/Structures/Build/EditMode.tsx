@@ -18,9 +18,11 @@ interface InventoryItem {
 export function UnownedSurfaceStructures() {
     const supabase = useSupabaseClient();
     const session = useSession();
+
     const { activePlanet } = useActivePlanet();
 
     const [unownedStructures, setUnownedStructures] = useState<InventoryItem[]>([]);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
@@ -95,7 +97,7 @@ export function UnownedSurfaceStructures() {
 
     if (unownedStructures.length === 0) {
         return <></>; // Do not show anything if no structures available
-    }
+    };
 
     return (
         <div className="relative">
@@ -128,7 +130,7 @@ export function UnownedSurfaceStructures() {
                                     className="w-full max-w-md bg-[#7aa2f7] text-[#1a1b26] hover:bg-[#89b4fa]"
                                     onClick={() => addToInventory(selectedStructure)}
                                 >
-                                    Place
+                                    Build
                                 </Button>
                             </motion.div>
                         ) : (

@@ -25,9 +25,12 @@ export default function Home() {
   const { activePlanet } = useActivePlanet();
 
   const [hasRequiredItems, setHasRequiredItems] = useState<boolean | null>(null);
+  const [userClassifications, setUserClassifications] = useState<boolean | null>(false);
 
   useEffect(() => {
-    if (!session) return;
+    if (!session) {
+      return;
+    };
 
     const checkInventory = async () => {
       try {
@@ -47,6 +50,23 @@ export default function Home() {
       };
     };
 
+    const checkClassifications = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("classifications")
+          .select("*")
+          .eq("author", session.user.id)
+
+        if (error) setUserClassifications(false);
+        if (data) {
+          setUserClassifications(true);
+        };
+      } catch (error: any) {
+        console.error(error);
+      };
+    };
+
+    checkClassifications();
     checkInventory();
   }, [session, supabase]);
 
@@ -93,7 +113,9 @@ export default function Home() {
           <AllAutomatonsOnActivePlanet />
         </center>
       </div>
-      <div className="w-full py-2"><SimpleeMissionGuide /></div>
+      {!userClassifications && (
+        <div className="w-full py-2"><SimpleeMissionGuide /></div>
+      )}
     </EarthViewLayout>
   );
 };

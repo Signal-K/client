@@ -61,6 +61,7 @@ export function PostCardSingle({
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
+  
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
   const [voteCount, setVoteCount] = useState(votes);
@@ -99,7 +100,7 @@ export function PostCardSingle({
       console.error("Error fetching comments:", error);
     } finally {
       setLoadingComments(false);
-    }
+    };
   };
 
   const handleVoteClick = async () => {
@@ -147,7 +148,7 @@ export function PostCardSingle({
       fetchComments();
     } catch (error) {
       console.error("Error adding comment:", error);
-    }
+    };
   };
 
   const [currentIndex, setCurrentIndex] = React.useState(0);

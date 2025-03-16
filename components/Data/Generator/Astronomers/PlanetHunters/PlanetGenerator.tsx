@@ -15,6 +15,7 @@ export interface PlanetGeneratorProps {
   classificationId: string;
   author: string;
   type?: string;
+  biome?: string;
 }; 
 
 export default function PlanetGenerator({ classificationConfig, author, classificationId }: PlanetGeneratorProps) {
