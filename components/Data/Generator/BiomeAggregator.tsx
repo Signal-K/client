@@ -27,7 +27,7 @@ interface BiomeAggregatorProps {
   cloudSummary: AggregatedCloud | null;
   p4Summary: AggregatedP4 | null;
   ai4MSummary: AggregatedAI4M | null;
-  onBiomeUpdate?: (biome: string) => void; // Add callback for biome update
+  onBiomeUpdate?: (biome: string) => void;
 }
 
 const biomeScores: Record<string, Record<string, number>> = {
@@ -53,19 +53,30 @@ const biomeScores: Record<string, Record<string, number>> = {
   }
 };
 
+const weatherByBiome: Record<string, string[]> = {
+  "rocky highlands": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "rocky terrain": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "consolidated soil": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "wind-affected terrain": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "barren wasteland": ["Acid Rain", "Dust Storms", "Ion Storms", "Impact Events"],
+  "arid dunes": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "dusty surface": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "sandy desert": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "frigid expanse": ["Snow", "Sleet", "Ice Storms", "Cryovolcanism"],
+  "volcanic terrain": ["Volcanic Eruptions", "Geysers", "Seismic Activity", "Acid Rain"],
+  "temperate highlands": ["Rain", "Thunderstorms", "Hail", "Hurricanes"],
+  "oceanic world": ["Rain", "Hurricanes", "Tsunamis", "Deep Ocean Storms"],
+  "tropical jungle": ["Rain", "Superstorms", "Flooding", "Thunderstorms"],
+};
+
 const getDominantBiome = (
   cloudSummary: AggregatedCloud | null,
   p4Summary: AggregatedP4 | null,
   ai4MSummary: AggregatedAI4M | null
 ): string => {
   const biomeTotals: Record<string, number> = {};
-  const debugInfo: string[] = [];
 
-  debugInfo.push("=== Biome Calculation Debug ===");
-
-  // Cloud Colours Processing
   if (cloudSummary?.cloudColours) {
-    debugInfo.push("\n--- Processing Cloud Colours ---");
     Object.entries(cloudSummary.cloudColours).forEach(([colour, count]) => {
       const normalizedColour = colour.toLowerCase().trim();
       if (biomeScores[normalizedColour]) {
@@ -76,45 +87,30 @@ const getDominantBiome = (
     });
   }
 
-  // P4 Classifications Processing
   if (p4Summary) {
-    debugInfo.push("\n--- Processing P4 Data ---");
     biomeTotals["wind-affected terrain"] = (biomeTotals["wind-affected terrain"] || 0) + p4Summary.fanCount * 0.2;
     biomeTotals["dusty surface"] = (biomeTotals["dusty surface"] || 0) + p4Summary.blotchCount * 0.1;
   }
 
-  // AI4M Classifications Processing
   if (ai4MSummary) {
-    debugInfo.push("\n--- Processing AI4M Data ---");
     biomeTotals["sandy desert"] = (biomeTotals["sandy desert"] || 0) + ai4MSummary.sandCount * 0.15;
     biomeTotals["rocky terrain"] = (biomeTotals["rocky terrain"] || 0) + ai4MSummary.rockCount * 0.2;
     biomeTotals["consolidated soil"] = (biomeTotals["consolidated soil"] || 0) + ai4MSummary.soilCount * 0.1;
   }
 
-  // Determine the dominant biome
-  debugInfo.push("\n--- Biome Totals ---");
-  const sortedBiomes = Object.entries(biomeTotals)
-    .sort((a, b) => b[1] - a[1])
-    .map(([biome, score]) => {
-      debugInfo.push(`${biome}: ${score}`);
-      return [biome, score];
-    });
-
-  // Log the full debug information
-  console.log(debugInfo.join('\n'));
-
+  const sortedBiomes = Object.entries(biomeTotals).sort((a, b) => b[1] - a[1]);
   return sortedBiomes.length > 0 ? String(sortedBiomes[0][0]) : "Unknown";
 };
 
 const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary, p4Summary, ai4MSummary, onBiomeUpdate }) => {
   const [dominantBiome, setDominantBiome] = useState<string>("Unknown");
+  const [weatherEvents, setWeatherEvents] = useState<string[]>([]);
 
   useEffect(() => {
     if (cloudSummary || p4Summary || ai4MSummary) {
-      console.log("Full Aggregated Summary:", { cloudSummary, p4Summary, ai4MSummary });
       const biome = getDominantBiome(cloudSummary, p4Summary, ai4MSummary);
       setDominantBiome(biome);
-      // Pass the dominant biome back to the parent
+      setWeatherEvents(weatherByBiome[biome] || []);
       if (onBiomeUpdate) {
         onBiomeUpdate(biome);
       }
@@ -125,6 +121,16 @@ const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary, p4Summa
     <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#4A665A] text-white">
       <h3 className="text-xl font-bold">Biome Aggregation</h3>
       <p>Dominant Biome: <strong>{dominantBiome}</strong></p>
+      {weatherEvents.length > 0 && (
+        <div className="mt-2">
+          <h4 className="text-lg font-semibold">Likely Weather Events:</h4>
+          <ul className="list-disc list-inside">
+            {weatherEvents.map((event, index) => (
+              <li key={index}>{event}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
