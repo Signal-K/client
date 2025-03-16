@@ -10,6 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { getParameterRange, biomeData } from "@/utils/biome-data";
 import { useEffect } from "react";
+import { CloudCategories } from "@/utils/cloud-types";
 
 interface FullPlanetControlsProps {
   stats: PlanetStats
@@ -27,7 +28,7 @@ interface FullPlanetControlsProps {
   onTerrainVariationChange: (value: "flat" | "moderate" | "chaotic") => void
   onTerrainErosionChange: (value: number) => void
   onPlateTectonicsChange: (value: number) => void
-  onSoilTypeChange: (value: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy") => void
+  // onSoilTypeChange: (value: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy") => void
   onBiomassLevelChange: (value: number) => void
   onWaterLevelChange: (value: number) => void
   onSalinityChange: (value: number) => void
@@ -42,7 +43,7 @@ interface FullPlanetControlsProps {
   onCloudDensityChange: (value: number) => void
   onAtmosphereVisibilityChange: (value: number) => void
   onAtmosphereHeightChange: (value: number) => void
-}
+};
 
 function SliderControl({
   label,
@@ -100,7 +101,7 @@ export function FullPlanetControls({
   onTerrainVariationChange,
   onTerrainErosionChange,
   onPlateTectonicsChange,
-  onSoilTypeChange,
+  // onSoilTypeChange,
   onBiomassLevelChange,
   onWaterLevelChange,
   onSalinityChange,
@@ -133,52 +134,62 @@ export function FullPlanetControls({
       const salinityRange = getParameterRange(stats.biome, "salinity")
       const volcanicActivityRange = getParameterRange(stats.biome, "volcanicActivity")
 
+      // Special handling for oceanic worlds
+      if (stats.biome === "Oceanic World") {
+        // Force very high water level for oceanic worlds
+        onWaterHeightChange(0.95)
+        onWaterLevelChange(0.95)
+        // Reduce surface roughness for oceanic worlds
+        onSurfaceRoughnessChange(Math.min(surfaceRoughnessRange[0], 0.2))
+      } else {
+        // Normal adjustments for other biomes
+        if (stats.waterHeight < waterHeightRange[0] || stats.waterHeight > waterHeightRange[1]) {
+          onWaterHeightChange(Math.min(Math.max(stats.waterHeight, waterHeightRange[0]), waterHeightRange[1]))
+        };
+
+        if (stats.waterLevel < waterLevelRange[0] || stats.waterLevel > waterLevelRange[1]) {
+          onWaterLevelChange(Math.min(Math.max(stats.waterLevel, waterLevelRange[0]), waterLevelRange[1]))
+        };
+
+        if (stats.surfaceRoughness < surfaceRoughnessRange[0] || stats.surfaceRoughness > surfaceRoughnessRange[1]) {
+          onSurfaceRoughnessChange(
+            Math.min(Math.max(stats.surfaceRoughness, surfaceRoughnessRange[0]), surfaceRoughnessRange[1]),
+          );
+        };
+      };
+
       // Adjust values to fit within ranges
       if (stats.temperature < temperatureRange[0] || stats.temperature > temperatureRange[1]) {
         onTemperatureChange(Math.min(Math.max(stats.temperature, temperatureRange[0]), temperatureRange[1]))
-      }
+      };
 
       if (stats.atmosphereStrength < atmosphereRange[0] || stats.atmosphereStrength > atmosphereRange[1]) {
         onAtmosphereStrengthChange(Math.min(Math.max(stats.atmosphereStrength, atmosphereRange[0]), atmosphereRange[1]))
-      }
+      };
 
       if (stats.cloudCount < cloudCountRange[0] || stats.cloudCount > cloudCountRange[1]) {
         onCloudCountChange(Math.min(Math.max(stats.cloudCount, cloudCountRange[0]), cloudCountRange[1]))
-      }
-
-      if (stats.waterHeight < waterHeightRange[0] || stats.waterHeight > waterHeightRange[1]) {
-        onWaterHeightChange(Math.min(Math.max(stats.waterHeight, waterHeightRange[0]), waterHeightRange[1]))
-      }
-
-      if (stats.surfaceRoughness < surfaceRoughnessRange[0] || stats.surfaceRoughness > surfaceRoughnessRange[1]) {
-        onSurfaceRoughnessChange(
-          Math.min(Math.max(stats.surfaceRoughness, surfaceRoughnessRange[0]), surfaceRoughnessRange[1]),
-        )
-      }
+      };
 
       if (stats.plateTectonics < plateTectonicsRange[0] || stats.plateTectonics > plateTectonicsRange[1]) {
         onPlateTectonicsChange(Math.min(Math.max(stats.plateTectonics, plateTectonicsRange[0]), plateTectonicsRange[1]))
-      }
+      };
 
       if (stats.biomassLevel < biomassLevelRange[0] || stats.biomassLevel > biomassLevelRange[1]) {
         onBiomassLevelChange(Math.min(Math.max(stats.biomassLevel, biomassLevelRange[0]), biomassLevelRange[1]))
-      }
-
-      if (stats.waterLevel < waterLevelRange[0] || stats.waterLevel > waterLevelRange[1]) {
-        onWaterLevelChange(Math.min(Math.max(stats.waterLevel, waterLevelRange[0]), waterLevelRange[1]))
-      }
+      };
 
       if (stats.salinity < salinityRange[0] || stats.salinity > salinityRange[1]) {
         onSalinityChange(Math.min(Math.max(stats.salinity, salinityRange[0]), salinityRange[1]))
-      }
+      };
 
       if (stats.volcanicActivity < volcanicActivityRange[0] || stats.volcanicActivity > volcanicActivityRange[1]) {
         onVolcanicActivityChange(
           Math.min(Math.max(stats.volcanicActivity, volcanicActivityRange[0]), volcanicActivityRange[1]),
-        )
-      }
-    }
-  }, [stats.biome])
+        );
+      };
+    };
+  }, [stats.biome]);
 
   return (
     <div className="space-y-4 pb-6">
@@ -338,7 +349,7 @@ export function FullPlanetControls({
                     max={getParameterRange(stats.biome, "plateTectonics")[1]}
                     onChange={onPlateTectonicsChange}
                   />
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <Label className="text-sm text-[#5FCBC3]">Soil Type</Label>
                     <Select value={stats.soilType} onValueChange={onSoilTypeChange}>
                       <SelectTrigger className="w-full bg-[#2C4F64] text-white border-[#5FCBC3]">
@@ -354,7 +365,7 @@ export function FullPlanetControls({
                         <SelectItem value="muddy">Muddy</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
                   <SliderControl
                     label="Volcanic Activity"
                     value={stats.volcanicActivity ?? 0}
@@ -392,10 +403,10 @@ export function FullPlanetControls({
               <AccordionTrigger className="text-[#5FCBC3] hover:text-[#5FCBC3]/90">Weather</AccordionTrigger>
               <AccordionContent>
                 <div className="grid gap-4">
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <Label className="text-sm text-[#5FCBC3]">Cloud Types</Label>
                     <div className="flex flex-wrap gap-2">
-                      {["Cumulus", "Stratus", "Cirrus", "Cumulonimbus"].map((type) => (
+                      {Object.entries(CloudCategories).map(([type, cloudInfo]) => (
                         <Button
                           key={type}
                           size="sm"
@@ -406,17 +417,18 @@ export function FullPlanetControls({
                             onCloudTypesChange(newTypes)
                           }}
                           variant={(stats.cloudTypes ?? []).includes(type) ? "default" : "outline"}
-                          className={
-                            (stats.cloudTypes ?? []).includes(type)
-                              ? "bg-[#5FCBC3] hover:bg-[#5FCBC3]/90 text-white"
-                              : "border-[#5FCBC3] text-[#5FCBC3] hover:bg-[#5FCBC3] hover:text-white"
-                          }
+                          style={{
+                            backgroundColor: (stats.cloudTypes ?? []).includes(type) ? cloudInfo.color : "transparent",
+                            borderColor: cloudInfo.color,
+                            color: (stats.cloudTypes ?? []).includes(type) ? "white" : cloudInfo.color,
+                          }}
+                          title={cloudInfo.description}
                         >
-                          {type}
+                          {cloudInfo.name}
                         </Button>
                       ))}
                     </div>
-                  </div>
+                  </div> */}
                   <SliderControl
                     label="Cloud Count"
                     value={stats.cloudCount ?? 0}

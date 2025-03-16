@@ -61,7 +61,7 @@ export function FullPlanetGeneratorNoControl() {
     terrainVariation,
     terrainErosion,
     plateTectonics,
-    soilType,
+    // soilType,
     biomassLevel,
     waterLevel,
     salinity,
@@ -71,8 +71,8 @@ export function FullPlanetGeneratorNoControl() {
     stormFrequency,
     volcanicActivity,
     biome,
-    cloudTypes,
-    cloudDensity,
+    // cloudTypes,
+    // cloudDensity,
     // atmosphereVisibility,
     // atmosphereHeight,
   );
@@ -101,9 +101,9 @@ export function FullPlanetGenerator() {
   const [terrainVariation, setTerrainVariation] = useState<"flat" | "moderate" | "chaotic">("moderate");
   const [terrainErosion, setTerrainErosion] = useState(0.5);
   const [plateTectonics, setPlateTectonics] = useState(0.5);
-  const [soilType, setSoilType] = useState<"rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy">(
-    "rocky",
-  );
+  // const [soilType, setSoilType] = useState<"rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy">(
+  //   "rocky",
+  // );
   const [biomassLevel, setBiomassLevel] = useState(0.0);
   const [waterLevel, setWaterLevel] = useState(0.3);
   const [salinity, setSalinity] = useState(0.5);
@@ -134,7 +134,7 @@ export function FullPlanetGenerator() {
     terrainVariation,
     terrainErosion,
     plateTectonics,
-    soilType,
+    // soilType,
     biomassLevel,
     waterLevel,
     salinity,
@@ -144,8 +144,8 @@ export function FullPlanetGenerator() {
     stormFrequency,
     volcanicActivity,
     biome,
-    cloudTypes,
-    cloudDensity,
+    // cloudTypes,
+    // cloudDensity,
     // atmosphereVisibility,
     // atmosphereHeight,
   );
@@ -166,7 +166,7 @@ export function FullPlanetGenerator() {
     if (importedStats.terrainVariation !== undefined) setTerrainVariation(importedStats.terrainVariation);
     if (importedStats.terrainErosion !== undefined) setTerrainErosion(importedStats.terrainErosion);
     if (importedStats.plateTectonics !== undefined) setPlateTectonics(importedStats.plateTectonics);
-    if (importedStats.soilType !== undefined) setSoilType(importedStats.soilType);
+    // if (importedStats.soilType !== undefined) setSoilType(importedStats.soilType);
     if (importedStats.biomassLevel !== undefined) setBiomassLevel(importedStats.biomassLevel);
     if (importedStats.waterLevel !== undefined) setWaterLevel(importedStats.waterLevel);
     if (importedStats.salinity !== undefined) setSalinity(importedStats.salinity);
@@ -176,8 +176,8 @@ export function FullPlanetGenerator() {
     if (importedStats.stormFrequency !== undefined) setStormFrequency(importedStats.stormFrequency);
     if (importedStats.volcanicActivity !== undefined) setVolcanicActivity(importedStats.volcanicActivity);
     if (importedStats.biome !== undefined) setBiome(importedStats.biome);
-    if (importedStats.cloudTypes !== undefined) setCloudTypes(importedStats.cloudTypes);
-    if (importedStats.cloudDensity !== undefined) setCloudDensity(importedStats.cloudDensity);
+    // if (importedStats.cloudTypes !== undefined) setCloudTypes(importedStats.cloudTypes);
+    // if (importedStats.cloudDensity !== undefined) setCloudDensity(importedStats.cloudDensity);
     // if (importedStats.atmosphereVisibility !== undefined) setAtmosphereVisibility(importedStats.atmosphereVisibility)
     // if (importedStats.atmosphereHeight !== undefined) setAtmosphereHeight(importedStats.atmosphereHeight)
     setTypeOverride(null);
@@ -205,7 +205,7 @@ export function FullPlanetGenerator() {
           onTerrainVariationChange={setTerrainVariation}
           onTerrainErosionChange={setTerrainErosion}
           onPlateTectonicsChange={setPlateTectonics}
-          onSoilTypeChange={setSoilType}
+          // onSoilTypeChange={setSoilType}
           onBiomassLevelChange={setBiomassLevel}
           onWaterLevelChange={setWaterLevel}
           onSalinityChange={setSalinity}

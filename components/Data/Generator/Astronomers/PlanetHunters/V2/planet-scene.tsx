@@ -10,7 +10,7 @@ interface PlanetSceneProps {
   classificationId?: string;
 };
 
-export function PlanetScene({ stats, classificationId }: PlanetSceneProps) {
+export function PlanetScene({ stats }: PlanetSceneProps) {
   return (
     <div className="w-full h-full bg-black">
       <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
@@ -28,5 +28,5 @@ export function PlanetScene({ stats, classificationId }: PlanetSceneProps) {
         />
       </Canvas>
     </div>
-  );
+  )
 };

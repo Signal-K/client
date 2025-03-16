@@ -1,12 +1,13 @@
 "use client"
 
 import { getSurfaceDeposits } from "./biome-data"
+import type { CloudCategory } from "./cloud-types"
 
 export interface PlanetStats {
   mass: number // Earth masses
   radius: number // Earth radii
   density: number // g/cm³
-  type: "terrestrial" | "gaseous" | undefined
+  type: "terrestrial" | "gaseous"
   temperature: number // Kelvin
   orbitalPeriod: number // Earth days
   atmosphereStrength: number // 0 to 1
@@ -18,7 +19,7 @@ export interface PlanetStats {
   terrainVariation: "flat" | "moderate" | "chaotic"
   terrainErosion: number // 0 to 1
   plateTectonics: number // 0 to 1
-  soilType: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy" | undefined
+  // soilType: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy" | undefined
   biomassLevel: number // 0 to 1
   waterLevel: number // 0 to 1
   salinity: number // 0 to 1
@@ -28,10 +29,10 @@ export interface PlanetStats {
   stormFrequency: number // 0 to 1
   volcanicActivity: number // 0 to 1
   biome: string
-  cloudTypes: string[]
+  cloudTypes: CloudCategory[]
   cloudDensity: number
   surfaceDeposits?: string[] // New field for surface deposits
-}
+};
 
 export interface LiquidInfo {
   type: "water" | "methane" | "nitrogen" | "none"
@@ -64,7 +65,7 @@ export function calculatePlanetStats(
   terrainVariation: "flat" | "moderate" | "chaotic" = "moderate",
   terrainErosion = 0.5,
   plateTectonics = 0.5,
-  soilType: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy" = "rocky",
+  // soilType: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy" = "rocky",
   biomassLevel = 0.0,
   waterLevel = 0.3,
   salinity = 0.5,
@@ -74,7 +75,7 @@ export function calculatePlanetStats(
   stormFrequency = 0.2,
   volcanicActivity = 0.2,
   biome = "Rocky Highlands",
-  cloudTypes: string[] = ["Cumulus"],
+  cloudTypes: CloudCategory[] = ["Cumulus"].map(type => type as CloudCategory),
   cloudDensity = 0.5,
 ): PlanetStats {
   const earthDensity = 5.51 // g/cm³
@@ -106,7 +107,7 @@ export function calculatePlanetStats(
     terrainVariation,
     terrainErosion,
     plateTectonics,
-    soilType,
+    // soilType,
     biomassLevel,
     waterLevel,
     salinity,
@@ -182,5 +183,4 @@ export function calculateTerrainHeight(stats: PlanetStats): number {
   }
 
   return baseHeight
-}
-
+};

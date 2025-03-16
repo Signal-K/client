@@ -27,7 +27,7 @@ cloudContribution: ${stats.cloudContribution?.toFixed(2) ?? "N/A"}
 terrainVariation: ${stats.terrainVariation ?? "N/A"}
 terrainErosion: ${stats.terrainErosion?.toFixed(2) ?? "N/A"}
 plateTectonics: ${stats.plateTectonics?.toFixed(2) ?? "N/A"}
-soilType: ${stats.soilType ?? "N/A"}
+
 biomassLevel: ${stats.biomassLevel?.toFixed(2) ?? "N/A"}
 waterLevel: ${stats.waterLevel?.toFixed(2) ?? "N/A"}
 salinity: ${stats.salinity?.toFixed(2) ?? "N/A"}
@@ -41,6 +41,9 @@ cloudTypes: ${JSON.stringify(stats.cloudTypes) ?? "N/A"}
 cloudDensity: ${stats.cloudDensity?.toFixed(2) ?? "N/A"}`
     setImportExportText(exportText)
   }
+// soilType: ${stats.soilType ?? "N/A"} ------GOES ABOVE-----
+//// GOES ABOVE^^^^^
+
 
   const handleImport = () => {
     const lines = importExportText.split("\n")
@@ -82,10 +85,10 @@ cloudDensity: ${stats.cloudDensity?.toFixed(2) ?? "N/A"}`
           if (value === "flat" || value === "moderate" || value === "chaotic") {
             ;(importedStats as any)[key] = value
           }
-        } else if (key === "soilType") {
-          if (["rocky", "sandy", "volcanic", "organic", "dusty", "frozen", "muddy"].includes(value)) {
-            ;(importedStats as any)[key] = value
-          }
+        // } else if (key === "soilType") {
+        //   if (["rocky", "sandy", "volcanic", "organic", "dusty", "frozen", "muddy"].includes(value)) {
+        //     ;(importedStats as any)[key] = value
+        //   }
         } else if (key === "biome") {
           ;(importedStats as any)[key] = value
         } else if (key === "cloudTypes") {

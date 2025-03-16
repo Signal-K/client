@@ -59,7 +59,7 @@ export default function AdvancedPlanetGenerator() {
     terrainVariation,
     terrainErosion,
     plateTectonics,
-    soilType,
+    // soilType,
     biomassLevel,
     waterLevel,
     salinity,
@@ -69,8 +69,8 @@ export default function AdvancedPlanetGenerator() {
     stormFrequency,
     volcanicActivity,
     biome,
-    cloudTypes,
-    cloudDensity,
+    // cloudTypes,
+    // cloudDensity,
   )
 
   const terrainHeight = calculateTerrainHeight(stats)
@@ -94,7 +94,7 @@ export default function AdvancedPlanetGenerator() {
     if (importedStats.terrainVariation !== undefined) setTerrainVariation(importedStats.terrainVariation)
     if (importedStats.terrainErosion !== undefined) setTerrainErosion(importedStats.terrainErosion)
     if (importedStats.plateTectonics !== undefined) setPlateTectonics(importedStats.plateTectonics)
-    if (importedStats.soilType !== undefined) setSoilType(importedStats.soilType)
+    // if (importedStats.soilType !== undefined) setSoilType(importedStats.soilType)
     if (importedStats.biomassLevel !== undefined) setBiomassLevel(importedStats.biomassLevel)
     if (importedStats.waterLevel !== undefined) setWaterLevel(importedStats.waterLevel)
     if (importedStats.salinity !== undefined) setSalinity(importedStats.salinity)
@@ -104,8 +104,8 @@ export default function AdvancedPlanetGenerator() {
     if (importedStats.stormFrequency !== undefined) setStormFrequency(importedStats.stormFrequency)
     if (importedStats.volcanicActivity !== undefined) setVolcanicActivity(importedStats.volcanicActivity)
     if (importedStats.biome !== undefined) setBiome(importedStats.biome)
-    if (importedStats.cloudTypes !== undefined) setCloudTypes(importedStats.cloudTypes)
-    if (importedStats.cloudDensity !== undefined) setCloudDensity(importedStats.cloudDensity)
+    // if (importedStats.cloudTypes !== undefined) setCloudTypes(importedStats.cloudTypes)
+    // if (importedStats.cloudDensity !== undefined) setCloudDensity(importedStats.cloudDensity)
     setTypeOverride(null)
   }
 
@@ -146,8 +146,8 @@ export default function AdvancedPlanetGenerator() {
       )
       setTerrainErosion(Math.random())
 
-      const soilTypes = ["rocky", "sandy", "volcanic", "organic", "dusty", "frozen", "muddy"]
-      setSoilType(soilTypes[Math.floor(Math.random() * soilTypes.length)] as any)
+      // const soilTypes = ["rocky", "sandy", "volcanic", "organic", "dusty", "frozen", "muddy"]
+      // setSoilType(soilTypes[Math.floor(Math.random() * soilTypes.length)] as any)
 
       setSubsurfaceWater(Math.random())
       setAtmosphericDensity(Math.random())
@@ -223,7 +223,7 @@ export default function AdvancedPlanetGenerator() {
                   onTerrainVariationChange={setTerrainVariation}
                   onTerrainErosionChange={setTerrainErosion}
                   onPlateTectonicsChange={setPlateTectonics}
-                  onSoilTypeChange={setSoilType}
+                  // onSoilTypeChange={setSoilType}
                   onBiomassLevelChange={setBiomassLevel}
                   onWaterLevelChange={setWaterLevel}
                   onSalinityChange={setSalinity}

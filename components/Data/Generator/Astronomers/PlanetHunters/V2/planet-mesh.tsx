@@ -5,51 +5,80 @@ import { useFrame } from "@react-three/fiber";
 import { Sphere } from "@react-three/drei";
 import * as THREE from "three";
 import { determineLiquidType } from "@/utils/planet-physics";
+import {
+  type CloudCategory,
+  CloudCategories,
+  hexToRgb,
+  getCloudPattern,
+  getPatternFunctionName,
+} from "@/utils/cloud-types";
 
-export interface PlanetStats {
-  mass: number // Earth masses
-  radius: number // Earth radii
-  density: number // g/cm³
-  type: "terrestrial" | "gaseous" | undefined
-  temperature: number // Kelvin
-  orbitalPeriod: number // Earth days
-  atmosphereStrength: number // 0 to 1
-  cloudCount: number // 0 to 100
-  waterHeight: number // 0 to 1
-  surfaceRoughness: number // 0 to 2
-  biomeFactor: number // 0.5 to 2.0
-  cloudContribution: number // 0.8 to 1.2
+interface PlanetStats {
+  mass: number
+  radius: number
+  density: number
+  type: "terrestrial" | "gaseous"
+  temperature: number
+  atmosphereStrength: number
+  cloudCount: number
+  waterHeight: number
+  surfaceRoughness: number
+  biomeFactor: number
+  cloudContribution: number
   terrainVariation: "flat" | "moderate" | "chaotic"
-  terrainErosion: number // 0 to 1
-  plateTectonics: number // 0 to 1
-  soilType: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy" | undefined
-  biomassLevel: number // 0 to 1
-  waterLevel: number // 0 to 1
-  salinity: number // 0 to 1
-  subsurfaceWater: number // 0 to 1
-  atmosphericDensity: number // 0 to 1
-  weatherVariability: number // 0 to 1
-  stormFrequency: number // 0 to 1
-  volcanicActivity: number // 0 to 1
+  orbitalPeriod: number
+  terrainErosion: number
+  plateTectonics: number
+  // soilType: string;
+  biomassLevel: number
+  waterLevel: number
+  salinity: number
+  subsurfaceWater: number
+  atmosphericDensity: number
+  weatherVariability: number
+  stormFrequency: number
+  volcanicActivity: number
   biome: string
   cloudTypes: string[]
   cloudDensity: number
-  surfaceDeposits?: string[] // New field for surface deposits
+  surfaceDeposits?: string[]
 }
 
 interface PlanetMeshProps {
   stats: PlanetStats
+  terrainHeight?: number
+  classificationId?: string
+  author?: string
 }
 
-export function PlanetMesh({ stats }: PlanetMeshProps) {
+export function PlanetMesh({ stats, terrainHeight = 5 }: PlanetMeshProps) {
   const meshRef = useRef<THREE.Mesh>(null)
   const cloudRef = useRef<THREE.Mesh>(null)
   const atmosphereRef = useRef<THREE.Mesh>(null)
 
-  // const terrainHeight = calculateTerrainHeight(stats)
+  // Convert string cloud types to CloudCategory types
+  const cloudCategories = useMemo(() => {
+    return (stats.cloudTypes || []).filter((type) => Object.keys(CloudCategories).includes(type)) as CloudCategory[]
+  }, [stats.cloudTypes])
+
+  // If no valid cloud types, use CloudyRegion as default
+  const effectiveCloudTypes = cloudCategories.length > 0 ? cloudCategories : (["CloudyRegion"] as CloudCategory[])
 
   const { material, cloudMaterial, atmosphereMaterial } = useMemo(() => {
     const liquidInfo = determineLiquidType(stats.temperature)
+
+    // Generate cloud pattern functions for each cloud type
+    const cloudPatternFunctions = effectiveCloudTypes.map(getCloudPattern).join("\n")
+
+    // Get cloud colors for each type
+    const cloudColors = effectiveCloudTypes.map((type) => {
+      const color = CloudCategories[type]?.color || "#FFFFFF"
+      return hexToRgb(color)
+    })
+
+    // Create uniform arrays for cloud colors
+    const cloudColorsFlat = cloudColors.flat()
+
     const shader = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
@@ -59,18 +88,14 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
         density: { value: stats.density },
         mass: { value: stats.mass },
         isGaseous: { value: stats.type === "gaseous" ? 1.0 : 0.0 },
+        isOceanicWorld: { value: stats.biome === "Oceanic World" ? 1.0 : 0.0 },
         sunDirection: { value: new THREE.Vector3(1, 0.5, 1).normalize() },
         liquidColor: { value: new THREE.Color(liquidInfo.color) },
         hasLiquid: { value: stats.type === "terrestrial" && liquidInfo.type !== "none" ? 1.0 : 0.0 },
         temperature: { value: stats.temperature },
         surfaceRoughness: { value: stats.surfaceRoughness },
         radius: { value: stats.radius },
-        // FIX
-        // FIX
-        // terrainHeight: { value: terrainHeight },
-        terrainHeight: { value: 5 }, // FIX
-        // FIX
-        // FIX
+        terrainHeight: { value: terrainHeight },
         biomeFactor: { value: stats.biomeFactor },
         cloudContribution: { value: stats.cloudContribution },
         terrainVariation: {
@@ -94,6 +119,7 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
         uniform float biomeFactor;
         uniform float cloudContribution;
         uniform float terrainVariation;
+        uniform float isOceanicWorld;
         
         // Simplex 3D Noise
         vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
@@ -191,6 +217,12 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
             
             // Adjust land coverage based on mass and density
             float landCoverage = smoothstep(0.5, 2.0, mass) * smoothstep(3.5, 7.0, density);
+            
+            // For oceanic worlds, reduce terrain height significantly
+            if (isOceanicWorld > 0.5) {
+              elevation *= 0.2; // Reduce elevation for oceanic worlds
+            }
+            
             landmass = smoothstep(1.0 - landCoverage, 1.0, landmass);
             
             float mountains = pow(max(0.0, baseNoise), 3.0) * 1.5;
@@ -229,6 +261,11 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
           // Apply biome factor
           elevation *= biomeFactor;
           
+          // For oceanic worlds, reduce elevation further
+          if (isOceanicWorld > 0.5) {
+            elevation *= 0.3;
+          }
+          
           vElevation = elevation;
           
           // Apply displacement
@@ -248,6 +285,7 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
         uniform float density;
         uniform float mass;
         uniform float isGaseous;
+        uniform float isOceanicWorld;
         uniform vec3 sunDirection;
         uniform vec3 liquidColor;
         uniform float hasLiquid;
@@ -371,7 +409,15 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
             float baseNoise = snoise(vPosition * 2.0);
             float landmass = smoothstep(-0.3, 0.3, baseNoise);
             float landCoverage = smoothstep(0.5, 2.0, mass) * smoothstep(3.5, 7.0, density);
-            landmass = smoothstep(1.0 - landCoverage, 1.0, landmass);
+            
+            // For oceanic worlds, reduce land coverage to near zero
+            float oceanicWaterHeight = waterHeight;
+            if (isOceanicWorld > 0.5) {
+              landmass = smoothstep(0.9, 1.0, landmass); // Only the highest peaks might show
+              oceanicWaterHeight = 0.95; // Set water height very high for oceanic worlds
+            } else {
+              landmass = smoothstep(1.0 - landCoverage, 1.0, landmass);
+            }
 
             // Use elevation to determine biomes and textures
             float elevationFactor = smoothstep(-0.1, 0.1, vElevation);
@@ -382,16 +428,16 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
             vec3 mountainColor = vec3(0.4, 0.2, 0.1); // Dark brown
             vec3 polarColor = vec3(0.95, 0.95, 1.0); // Ice caps
 
-            if (landmass < 0.5 && hasLiquid > 0.5 && elevationFactor < waterHeight) {
+            if (landmass < 0.5 && hasLiquid > 0.5 && elevationFactor < oceanicWaterHeight) {
               // Liquid areas
-              float liquidDepth = 1.0 - elevationFactor / waterHeight;
+              float liquidDepth = 1.0 - elevationFactor / oceanicWaterHeight;
               vec3 currentLiquidColor = getLiquidColor(temperature);
               color = mix(currentLiquidColor * 0.8, currentLiquidColor, liquidDepth);
               float shine = pow(fresnel, 4.0) * 0.3;
               color += vec3(shine);
             } else {
               // Land areas
-              color = mix(waterColor, lowlandColor, smoothstep(waterHeight - 0.02, waterHeight + 0.02, elevationFactor));
+              color = mix(waterColor, lowlandColor, smoothstep(oceanicWaterHeight - 0.02, oceanicWaterHeight + 0.02, elevationFactor));
               color = mix(color, highlandColor, smoothstep(0.4, 0.6, elevationFactor * terrainHeight));
               color = mix(color, mountainColor, smoothstep(0.7, 0.9, elevationFactor * terrainHeight));
 
@@ -413,9 +459,9 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
                 highlandColor = vec3(0.8, 0.7, 0.3); // Yellow-brown
                 mountainColor = vec3(0.5, 0.3, 0.1); // Dark brown
                 
-                color = mix(vec3(0.0, 0.2, 0.5), vec3(0.0, 0.4, 0.8), elevationFactor / waterHeight);
-                if (elevationFactor > waterHeight) {
-                  float landHeight = (elevationFactor - waterHeight) / (1.0 - waterHeight);
+                color = mix(vec3(0.0, 0.2, 0.5), vec3(0.0, 0.4, 0.8), elevationFactor / oceanicWaterHeight);
+                if (elevationFactor > oceanicWaterHeight) {
+                  float landHeight = (elevationFactor - oceanicWaterHeight) / (1.0 - oceanicWaterHeight);
                   color = mix(lowlandColor, highlandColor, smoothstep(0.2, 0.6, landHeight));
                   color = mix(color, mountainColor, smoothstep(0.6, 0.8, landHeight));
                 }
@@ -439,34 +485,46 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
       transparent: true,
     })
 
+    // Create enhanced cloud shader with support for different cloud types
     const cloudShader = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
         planetRadius: { value: stats.radius },
         cloudCount: { value: stats.cloudCount },
         cloudContribution: { value: stats.cloudContribution },
+        cloudDensity: { value: stats.cloudDensity || 0.5 },
+        cloudColors: { value: cloudColorsFlat },
+        cloudTypesCount: { value: effectiveCloudTypes.length },
       },
       vertexShader: `
         uniform float time;
         uniform float planetRadius;
         uniform float cloudCount;
         uniform float cloudContribution;
+        uniform float cloudDensity;
         varying vec2 vUv;
         varying vec3 vNormal;
+        varying vec3 vPosition;
 
         void main() {
           vUv = uv;
           vNormal = normal;
+          vPosition = position;
           
           // Position clouds just above the planet surface
-          vec3 pos = position * (planetRadius + 0.001);
+          vec3 pos = position * (planetRadius + 0.01);
           
           // Add some movement to the clouds
-          pos += normal * sin(pos.x * 10.0 + time * 0.5) * 0.005;
+          float cloudHeight = 0.01 + cloudDensity * 0.02;
+          pos += normal * cloudHeight;
+          
+          // Add some variation based on position and time
+          pos += normal * sin(position.x * 10.0 + time * 0.2) * 0.005;
+          pos += normal * cos(position.z * 8.0 + time * 0.15) * 0.005;
           
           // Adjust cloud distribution based on cloudCount and cloudContribution
-          float cloudDensity = smoothstep(0.0, 100.0, cloudCount) * cloudContribution;
-          pos += normal * (1.0 - cloudDensity) * 0.01;
+          float cloudFactor = smoothstep(0.0, 100.0, cloudCount) * cloudContribution;
+          pos += normal * (1.0 - cloudFactor) * 0.01;
           
           gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
         }
@@ -475,57 +533,108 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
         uniform float time;
         uniform float cloudCount;
         uniform float cloudContribution;
+        uniform float cloudDensity;
+        uniform float cloudTypesCount;
+        uniform float cloudColors[30]; // Support up to 10 cloud types (3 values per color)
         varying vec2 vUv;
         varying vec3 vNormal;
+        varying vec3 vPosition;
 
         float rand(vec2 co) {
-          return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+          return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
         }
+
+        // Cloud pattern functions for different cloud types
+        ${cloudPatternFunctions}
 
         void main() {
           vec2 uv = vUv;
+          float totalPattern = 0.0;
+          vec3 cloudColor = vec3(1.0);
           
-          // Create cloud-like patterns
-          float noise = rand(uv + time * 0.1) * 0.5 + 0.5;
-          noise += rand(uv * 2.0 - time * 0.05) * 0.25;
-          noise += rand(uv * 4.0 + time * 0.1) * 0.125;
-          noise /= 1.875;
+          // Apply different cloud patterns based on cloud types
+          ${effectiveCloudTypes
+            .map(
+              (type, index) => `
+            // ${CloudCategories[type].name} pattern
+            float pattern${index} = ${getPatternFunctionName(type)}(uv, time);
+            totalPattern += pattern${index} * (1.0 / cloudTypesCount);
+            
+            // Apply cloud color with increased saturation and brightness
+            vec3 color${index} = vec3(
+              cloudColors[${index * 3}], 
+              cloudColors[${index * 3 + 1}], 
+              cloudColors[${index * 3 + 2}]
+            );
+            // Enhance color saturation and brightness
+            color${index} = color${index} * 1.5;
+            cloudColor = mix(cloudColor, color${index}, pattern${index} * (1.0 / cloudTypesCount) * 3.0);
+          `,
+            )
+            .join("\n")}
           
-          // Add some variation to cloud density
-          noise = smoothstep(0.4, 0.6, noise);
+          // Base cloud noise
+          float noise = rand(uv + time * 0.1) * 0.3 + 0.7;
+          
+          // Combine patterns with base noise
+          float cloudPattern = totalPattern * noise;
           
           // Create holes in the clouds
           float holes = rand(uv * 8.0 - time * 0.02);
-          noise *= smoothstep(0.4, 0.6, holes);
+          cloudPattern *= smoothstep(0.3, 0.7, holes);
           
           // Fade out at the edges for a more natural look
           float fadeEdges = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.0);
-          noise *= fadeEdges;
+          cloudPattern *= fadeEdges;
           
-          // Adjust cloud opacity based on cloudCount and cloudContribution
-          float cloudOpacity = smoothstep(0.0, 100.0, cloudCount) * cloudContribution * 0.5;
-          
-          gl_FragColor = vec4(1.0, 1.0, 1.0, noise * cloudOpacity);
+          // Adjust cloud opacity based on cloudCount, cloudContribution and cloudDensity
+          float cloudOpacity = smoothstep(0.0, 100.0, cloudCount) * cloudContribution * cloudDensity * 1.5;
+
+          // Apply lighting
+          vec3 lightDir = normalize(vec3(1.0, 0.5, 1.0));
+          float lightIntensity = max(0.6, dot(vNormal, lightDir));
+          cloudColor *= lightIntensity;
+
+          // Add some depth and volume to clouds with increased contrast
+          float depth = pow(cloudPattern, 1.2) * cloudDensity * 1.5;
+
+          gl_FragColor = vec4(cloudColor, cloudPattern * cloudOpacity * depth);
         }
       `,
       transparent: true,
       depthWrite: false,
+      blending: THREE.AdditiveBlending,
     })
 
-    // Create atmosphere material
+    // Create atmosphere material with enhanced visuals
     const atmosphereShader = new THREE.ShaderMaterial({
       uniforms: {
         atmosphereStrength: { value: stats.atmosphereStrength },
         liquidColor: { value: new THREE.Color(liquidInfo.color) },
         isGaseous: { value: stats.type === "gaseous" ? 1.0 : 0.0 },
+        time: { value: 0 },
+        cloudColors: { value: cloudColorsFlat },
+        cloudTypesCount: { value: effectiveCloudTypes.length },
       },
       vertexShader: `
         uniform float atmosphereStrength;
+        uniform float time;
         varying vec3 vNormal;
+        varying vec2 vUv;
+        varying vec3 vPosition;
 
         void main() {
           vNormal = normalize(normalMatrix * normal);
-          vec3 pos = position * (1.0 + atmosphereStrength * 0.1);
+          vUv = uv;
+          vPosition = position;
+          
+          // Make atmosphere size based on strength
+          float atmosphereSize = 1.0 + atmosphereStrength * 0.15;
+          vec3 pos = position * atmosphereSize;
+          
+          // Add some subtle movement to the atmosphere
+          pos += normal * sin(position.y * 5.0 + time * 0.1) * 0.01;
+          
           gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
         }
       `,
@@ -533,20 +642,67 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
         uniform float atmosphereStrength;
         uniform vec3 liquidColor;
         uniform float isGaseous;
+        uniform float time;
+        uniform float cloudTypesCount;
+        uniform float cloudColors[30]; // Support up to 10 cloud types (3 values per color)
         varying vec3 vNormal;
+        varying vec2 vUv;
+        varying vec3 vPosition;
 
         void main() {
+          // Calculate atmosphere intensity based on viewing angle
           float intensity = pow(0.7 - dot(vNormal, vec3(0, 0, 1.0)), 2.0);
-          vec3 atmosphereColor = mix(vec3(0.3, 0.6, 1.0), liquidColor, 0.3);
+          
+          // Base atmosphere color with increased saturation
+          vec3 atmosphereColor = mix(vec3(0.4, 0.7, 1.2), liquidColor * 1.2, 0.3);
+          
+          // For gas giants, use more vibrant coloring
           if (isGaseous > 0.5) {
-            atmosphereColor = mix(vec3(0.8, 0.6, 0.4), vec3(0.4, 0.2, 0.1), intensity);
+            atmosphereColor = mix(vec3(0.9, 0.7, 0.5), vec3(0.5, 0.3, 0.2), intensity);
           }
-          gl_FragColor = vec4(atmosphereColor, intensity * atmosphereStrength * (isGaseous > 0.5 ? 0.8 : 1.0));
+          
+          // Add more pronounced color variation from cloud types
+          vec3 cloudInfluence = vec3(0.0);
+          
+          // Mix in colors from cloud types with increased influence
+          for (int i = 0; i < 10; i++) {
+            if (float(i) >= cloudTypesCount) break;
+            
+            vec3 cloudTypeColor = vec3(
+              cloudColors[i * 3], 
+              cloudColors[i * 3 + 1], 
+              cloudColors[i * 3 + 2]
+            );
+            
+            // Add stronger influence from each cloud type
+            cloudInfluence += cloudTypeColor * 0.2;
+          }
+          
+          // Mix cloud colors into atmosphere with increased influence
+          atmosphereColor = mix(atmosphereColor, cloudInfluence, 0.4);
+          
+          // Add more dynamic variation based on position
+          float variation = sin(vPosition.x * 12.0 + vPosition.y * 10.0 + time * 0.3) * 0.15 + 0.95;
+          atmosphereColor *= variation;
+          
+          // Add some swirling patterns for more visual interest
+          float swirl = sin(vPosition.x * 5.0 + vPosition.y * 7.0 + time * 0.2) * 
+                 cos(vPosition.y * 3.0 + vPosition.z * 4.0 + time * 0.15) * 0.1;
+          atmosphereColor += vec3(swirl, swirl * 0.7, swirl * 0.5);
+          
+          // Calculate final opacity with increased base value
+          float opacity = intensity * atmosphereStrength * (isGaseous > 0.5 ? 0.9 : 1.2);
+          
+          // Add more pronounced pulsing effect
+          opacity *= 0.8 + sin(time * 0.3) * 0.15;
+          
+          gl_FragColor = vec4(atmosphereColor, opacity);
         }
       `,
       side: THREE.BackSide,
       transparent: true,
       depthWrite: false,
+      blending: THREE.AdditiveBlending,
     })
 
     return { material: shader, cloudMaterial: cloudShader, atmosphereMaterial: atmosphereShader }
@@ -560,14 +716,13 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
     stats.cloudCount,
     stats.waterHeight,
     stats.surfaceRoughness,
-    // FIX
-    // FIX
-    // terrainHeight,
-    // FIX
-    // FIX
+    terrainHeight,
     stats.biomeFactor,
     stats.cloudContribution,
     stats.terrainVariation,
+    stats.cloudDensity,
+    effectiveCloudTypes,
+    stats.biome,
   ])
 
   useFrame((state) => {
@@ -579,13 +734,15 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
         .normalize()
     }
     if (cloudRef.current) {
-      cloudRef.current.rotation.y += 0.0005
+      cloudRef.current.rotation.y += 0.0015 // Slightly faster than planet rotation
       cloudMaterial.uniforms.time.value = state.clock.elapsedTime
       cloudMaterial.uniforms.cloudCount.value = stats.cloudCount
       cloudMaterial.uniforms.cloudContribution.value = stats.cloudContribution
+      cloudMaterial.uniforms.cloudDensity.value = stats.cloudDensity || 0.5
     }
     if (atmosphereRef.current) {
       atmosphereMaterial.uniforms.atmosphereStrength.value = stats.atmosphereStrength
+      atmosphereMaterial.uniforms.time.value = state.clock.elapsedTime
     }
   })
 
@@ -594,14 +751,16 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
       <Sphere ref={meshRef} args={[1, 128, 128]} scale={stats.radius}>
         <primitive object={material} attach="material" />
       </Sphere>
-      {stats.type === "terrestrial" && stats.mass >= 0.3 && (
-        <Sphere ref={cloudRef} args={[1.001, 64, 64]} scale={stats.radius}>
+      {stats.cloudCount > 0 && (
+        <Sphere ref={cloudRef} args={[1.01, 64, 64]} scale={stats.radius}>
           <primitive object={cloudMaterial} attach="material" />
         </Sphere>
       )}
-      <Sphere ref={atmosphereRef} args={[1.1, 64, 64]} scale={stats.radius}>
-        <primitive object={atmosphereMaterial} attach="material" />
-      </Sphere>
+      {stats.atmosphereStrength > 0 && (
+        <Sphere ref={atmosphereRef} args={[1.1, 64, 64]} scale={stats.radius}>
+          <primitive object={atmosphereMaterial} attach="material" />
+        </Sphere>
+      )}
     </>
   );
 };
