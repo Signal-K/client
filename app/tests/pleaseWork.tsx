@@ -3,13 +3,22 @@
 import { useState, useRef } from "react";
 import Webcam from "react-webcam";
 import axios from "axios";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useActivePlanet } from "@/context/ActivePlanet";
 
 export default function ChatGPTImageClassifier() {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const { activePlanet } = useActivePlanet();
+
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [response, setResponse] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [useWebcam, setUseWebcam] = useState(false);
+  const [location, setLocation] = useState<string>("");
+  const [comment, setComment] = useState<string>("");
   const webcamRef = useRef<Webcam | null>(null);
 
   // Handle file upload
@@ -36,12 +45,12 @@ export default function ChatGPTImageClassifier() {
   // Send image for classification
   const sendImage = async () => {
     if (!preview) return;
-  
+
     setLoading(true);
     setResponse(null);
-  
+
     const formData = new FormData();
-  
+
     if (image) {
       // If file upload is used
       formData.append("file", image);
@@ -50,17 +59,17 @@ export default function ChatGPTImageClassifier() {
       const blob = await fetch(preview).then((res) => res.blob());
       formData.append("file", blob);
     }
-  
+
     try {
       const res = await axios.post("/api/zoodex/upload-image/gpt", formData);
-      
+
       console.log("Full API Response:", res.data); // Log full response
-  
+
       if (res.data.refresh) {
         window.location.reload();
         return;
       }
-      
+
       setResponse(res.data);
     } catch (error) {
       console.error("Error fetching classification:", error);
@@ -69,7 +78,51 @@ export default function ChatGPTImageClassifier() {
       setLoading(false);
     }
   };
-  
+
+  // Upload image to Supabase
+  const uploadImageToSupabase = async (file: File) => {
+    if (!image) return;
+    setLoading(true);
+
+    const fileName = `${Date.now()}-${file.name}`;
+
+    try {
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("uploads")
+        .upload(fileName, file);
+
+      if (uploadError) {
+        console.error("Upload error:", uploadError.message);
+        return;
+      };
+
+      if (uploadData) {
+        const fileUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${uploadData.path}`;
+        
+        const { data: uploadEntry, error: entryError } = await supabase
+          .from("uploads")
+          .insert({
+            author: session?.user?.id,
+            location: activePlanet?.id || 30,
+            content: comment,
+            file_url: fileUrl,
+            configuration: response,
+            source: "Webcam",
+          })
+          .single();
+
+        if (entryError) {
+          console.error("Entry error:", entryError.message);
+        } else {
+          console.log("Upload entry:", uploadEntry);
+        };
+      };
+    } catch (err) {
+      console.error("Unexpected error during file upload:", err);
+    } finally {
+      setLoading(false);
+    };
+  };
 
   return (
     <div className="max-w-lg mx-auto p-4 bg-gray-800 text-white rounded-lg shadow-lg">
@@ -171,6 +224,29 @@ export default function ChatGPTImageClassifier() {
 )}
 
       {response?.error && <p className="mt-4 text-red-500">{response.error}</p>}
+      <div className="mt-4">
+        <input
+          type="text"
+          placeholder="Enter your location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded-md"
+        />
+        <textarea
+          placeholder="Add a comment (optional)"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          className="w-full mt-2 p-2 bg-gray-900 text-white border border-gray-700 rounded-md"
+        />
+      </div>
+
+      <button
+        onClick={() => uploadImageToSupabase(image!)}
+        disabled={loading}
+        className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md disabled:opacity-50"
+      >
+        {loading ? "Uploading..." : "Upload Image"}
+      </button>
     </div>
   );
 };
