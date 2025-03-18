@@ -7,7 +7,7 @@ import axios from "axios";
 export default function ChatGPTImageClassifier() {
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [useWebcam, setUseWebcam] = useState(false);
   const webcamRef = useRef<Webcam | null>(null);
@@ -36,12 +36,12 @@ export default function ChatGPTImageClassifier() {
   // Send image for classification
   const sendImage = async () => {
     if (!preview) return;
-
+  
     setLoading(true);
-    setResponse("");
-
+    setResponse(null);
+  
     const formData = new FormData();
-
+  
     if (image) {
       // If file upload is used
       formData.append("file", image);
@@ -50,16 +50,26 @@ export default function ChatGPTImageClassifier() {
       const blob = await fetch(preview).then((res) => res.blob());
       formData.append("file", blob);
     }
-
+  
     try {
       const res = await axios.post("/api/zoodex/upload-image/gpt", formData);
-      setResponse(res.data.reply);
+      
+      console.log("Full API Response:", res.data); // Log full response
+  
+      if (res.data.refresh) {
+        window.location.reload();
+        return;
+      }
+      
+      setResponse(res.data);
     } catch (error) {
-      setResponse("Error: Unable to get classification.");
+      console.error("Error fetching classification:", error);
+      setResponse({ error: "Error: Unable to get classification." });
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="max-w-lg mx-auto p-4 bg-gray-800 text-white rounded-lg shadow-lg">
@@ -67,13 +77,17 @@ export default function ChatGPTImageClassifier() {
 
       <div className="mb-4 flex justify-between">
         <button
-          className={`px-4 py-2 rounded-md ${useWebcam ? "bg-gray-600" : "bg-blue-600 hover:bg-blue-700"} text-white`}
+          className={`px-4 py-2 rounded-md ${
+            useWebcam ? "bg-gray-600" : "bg-blue-600 hover:bg-blue-700"
+          } text-white`}
           onClick={() => setUseWebcam(false)}
         >
           Upload Image
         </button>
         <button
-          className={`px-4 py-2 rounded-md ${useWebcam ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600"} text-white`}
+          className={`px-4 py-2 rounded-md ${
+            useWebcam ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600"
+          } text-white`}
           onClick={() => setUseWebcam(true)}
         >
           Use Webcam
@@ -118,11 +132,45 @@ export default function ChatGPTImageClassifier() {
         {loading ? "Processing..." : "Classify Image"}
       </button>
 
-      {response && (
-        <div className="mt-4 p-3 bg-gray-700 rounded-md">
-          <strong>GPT-4 Classification:</strong> {response}
-        </div>
-      )}
+      {response && !response.error && (
+  <div className="mt-4 p-3 bg-gray-700 rounded-md">
+    <strong>Common Name:</strong> {response.common_name} <br />
+    <strong>Scientific Name:</strong> {response.genus} {response.species} <br />
+    <strong>Kingdom:</strong> {response.kingdom} <br />
+    <strong>Phylum:</strong> {response.phylum} <br />
+    <strong>Class:</strong> {response.class} <br />
+    <strong>Order:</strong> {response.order} <br />
+    <strong>Family:</strong> {response.family} <br />
+
+    {response.traits && (
+      <>
+        <strong>Traits:</strong>
+        <ul className="list-disc pl-4">
+        {Object.entries(response.traits).map(([trait, value]) => (
+  <li key={trait}>
+    <strong>{trait}:</strong> {String(value)}
+  </li>
+))}
+        </ul>
+      </>
+    )}
+
+    {response.compatible_biomes && response.compatible_biomes.length > 0 && (
+      <>
+        <strong>Compatible Biomes:</strong>
+        <ul className="list-disc pl-4">
+          {response.compatible_biomes.map((biome: string, index: number) => (
+            <li key={index}>{biome}</li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    <strong>Conservation Status:</strong> {response.conservation_status}
+  </div>
+)}
+
+      {response?.error && <p className="mt-4 text-red-500">{response.error}</p>}
     </div>
   );
 };

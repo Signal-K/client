@@ -14,33 +14,33 @@ import html2canvas from 'html2canvas';
 import { SurveyorComments } from "./Surveyor/SurveyorPostCard";
 import PlanetTempCalculator from "@/components/Structures/Missions/Astronomers/PlanetHunters/TemperatureCalc";
 
-interface CommentProps {
+export interface CommentProps {
   id: number;
   author: string;
   content: string;
   created_at: string;
   isSurveyor?: boolean;
   configuration?: {
-    planetType?: string;
+      planetType?: string;
   };
+  username?: string;
 };
 
-interface PostCardSingleProps {
-  classificationId: number;
-  title: string;
-  anomalyId: string;
-  author: string;
-  content: string;
-  votes: number;
-  category: string;
-  tags?: string[];
-  classificationConfig?: any; 
-  images: string[];
-  classificationType: string;
-  onVote?: () => void;
-  enableNewCommentingMethod?: boolean;
-  children?: React.ReactNode;
-  commentStatus?: boolean;
+export interface PostCardSingleProps {
+    classificationId: number;
+    title: string;
+    anomalyId: string;
+    author: string;
+    content: string;
+    votes: number;
+    category: string;
+    tags?: string[];
+    classificationConfig?: any;
+    images: string[];
+    classificationType: string;
+    onVote?: () => void;
+    children?: React.ReactNode;
+    commentStatus?: boolean;
 };
 
 export function PostCardSingle({
@@ -57,7 +57,7 @@ export function PostCardSingle({
   classificationType,
   commentStatus,
   onVote,
-  enableNewCommentingMethod = false,
+  // enableNewCommentingMethod = false,
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
   const session = useSession();

@@ -27,12 +27,12 @@ export async function POST(req: NextRequest) {
           {
             role: "system",
             content:
-              "You are a professional biologist AI. Classify the organism in the image with as much detail as possible, including its kingdom, phylum, class, order, family, genus, and species if identifiable.",
+              "You are a professional biologist AI. Classify the organism in the image with as much detail as possible, including its kingdom, species, bio, traits, and compatible biomes. Ensure the response is formatted as pure JSON without markdown or code block syntax.",
           },
           {
             role: "user",
             content: [
-              { type: "text", text: "What organism is in this image? Provide a detailed classification." },
+              { type: "text", text: "What organism is in this image? Provide a detailed classification in pure JSON format." },
               { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } },
             ],
           },
@@ -47,13 +47,16 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    console.log("OpenAI response:", openaiRes.data);
+    console.log("Raw OpenAI response:", openaiRes.data);
 
-    const classification = openaiRes.data.choices[0].message.content;
+    let classification = openaiRes.data.choices[0].message.content;
 
-    return NextResponse.json({ reply: classification });
+    // Strip markdown formatting if present
+    classification = classification.replace(/```json|```/g, "").trim();
+
+    return NextResponse.json(JSON.parse(classification));
   } catch (error: any) {
     console.error("Error in API route:", error.response?.data || error.message);
     return NextResponse.json({ error: "Failed to classify image" }, { status: 500 });
   }
-}
+};

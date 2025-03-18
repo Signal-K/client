@@ -15,35 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import html2canvas from "html2canvas"
 import { AvatarGenerator } from "@/components/Account/Avatar"
-
-interface CommentProps {
-    id: number;
-    author: string;
-    content: string;
-    created_at: string;
-    isSurveyor?: boolean;
-    configuration?: {
-        planetType?: string;
-    };
-    username?: string;
-};
-
-interface PostCardSingleProps {
-    classificationId: number;
-    title: string;
-    anomalyId: string;
-    author: string;
-    content: string;
-    votes: number;
-    category: string;
-    tags?: string[];
-    classificationConfig?: any;
-    images: string[];
-    classificationType: string;
-    onVote?: () => void;
-    children?: React.ReactNode;
-    commentStatus?: boolean;
-};
+import { PostCardSingleProps, CommentProps } from "./PostSingle"
 
 export default function PostCard({
     classificationId,
@@ -65,12 +37,7 @@ export default function PostCard({
 
     // Post content
     const [comments, setComments] = useState<CommentProps[]>([]);
-    const [loadingComments, setLoadingComments] = useState<boolean>(true);
     const [newComment, setNewComment] = useState<string>("");
-    const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
-
-    const [surveyorComments, setSurveyorComments] = useState<any[]>([]);
-    const [nonSurveyorComments, setNonSurveyorComments] = useState<any[]>([]);
 
     const [voteCount, setVoteCount] = useState(votes);
     const [isSharing, setIsSharing] = useState<boolean>(false);
@@ -78,11 +45,9 @@ export default function PostCard({
 
     const [isLightboxOpen, setIsLightboxOpen] = useState(false)
     const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-    const [showStats, setShowStats] = useState<boolean>(false);
 
     const [calculatorInputs, setCalculatorInputs] = useState({ input1: "", input2: "" })
     const [calculatorResult, setCalculatorResult] = useState("")
-    const [selectedStat, setSelectedStat] = useState("transit");
     const [selectedCalculator, setSelectedCalculator] = useState<string>('');
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -94,7 +59,7 @@ export default function PostCard({
     
       if (isNaN(R_star) || isNaN(F_planet) || F_planet <= 0) {
         return { radius: "", planetType: "" };
-      }
+      };
     
       const radius = R_star * Math.sqrt(F_planet);
       const planetType = radius > 2.4 ? "Gaseous" : "Terrestrial";
@@ -225,51 +190,6 @@ export default function PostCard({
     };
 
     const [currentIndex, setCurrentIndex] = React.useState(0);
-    
-    const goToNextImage = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    };
-
-    const goToPreviousImage = () => {
-        setCurrentIndex((prevIndex) =>
-            prevIndex === 0 ? images.length - 1 : prevIndex - 1,
-        );
-    };
-
-  // const handleProposePlanetType = async (planetType: "Terrestrial" | "Gaseous") => {
-  //   const commentInput = commentInputs[`${classificationId}-1`]; 
-    
-  //   if (!commentInput?.trim()) {
-  //     console.error("Comment input must be filled");
-  //     return;
-  //   }
-  
-  //   try {
-  //     const { error } = await supabase
-  //       .from("comments")
-  //       .insert([
-  //         {
-  //           content: commentInput || planetType,
-  //           classification_id: classificationId,
-  //           author: session?.user?.id,
-  //           configuration: { planetType, commentInput },
-  //           surveyor: "TRUE",
-  //           category: 'PlanetType'
-  //         },
-  //       ]);
-  
-  //     if (error) throw error;
-  
-  //     setCommentInputs((prev) => ({
-  //       ...prev,
-  //       [`${classificationId}-1`]: "",
-  //     }));
-  
-  //     fetchComments();
-  //   } catch (error) {
-  //     console.error("Error inserting comment:", error);
-  //   };
-  // };  
 
   const [temperatureInputs, setTemperatureInputs] = useState<Record<string, string>>({});  
   const [densityInputs, setDensityInputs] = useState<Record<string, string>>({});
@@ -484,7 +404,6 @@ export default function PostCard({
                                     className="object-cover hover:scale-105 transition-transform duration-300"
                                     sizes='100vw'
                                 />
-                                {/* <span className="text-xs text-[#F7F5E9] bg-[#2C3A4A]/70 px-2 py-1 rounded">Click to expand</span> */}
                             </>
                         )}
                     </div>
@@ -514,9 +433,6 @@ export default function PostCard({
                 <Popover>
                     <PopoverTrigger asChild>
                     <Button
-                        // onClick={() => {
-                        // handleShare()
-                        // }}
                         size="sm"
                         disabled={isSharing}
                         variant="outline"
@@ -558,8 +474,6 @@ export default function PostCard({
                     </PopoverContent>
                 </Popover>
                 </CardFooter>
-        
-                {/* Comments Section (Embedded) */}
       {isCommentsOpen && (
         <div className="border-t border-[#5FCBC3]/20 bg-[#1e2834]/50">
           <Tabs defaultValue="comments" className="w-full">
