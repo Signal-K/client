@@ -79,8 +79,8 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
   const [dominantBiome, setDominantBiome] = useState<string | null>('Jungle');
-
   const [cloudSummary, setCloudSummary] = useState<AggregatedCloud | null>(null);
   const [p4Summary, setP4Summary] = useState<AggregatedP4 | null>(null);
   const [ai4MSummary, setAI4MSummary] = useState<AggregatedAI4M | null>(null);

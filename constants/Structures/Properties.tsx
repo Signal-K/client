@@ -5,7 +5,7 @@ import AutomatonUpgrade from "@/components/Structures/Config/AutomatonUpgradeBox
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
-import { BarChart, BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, FishIcon, FlagIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, Trophy, WebcamIcon } from "lucide-react";
+import { BarChart, BeanIcon, BellElectric, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, FishIcon, FlagIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, Trophy, WebcamIcon } from "lucide-react";
 // import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
@@ -36,6 +36,7 @@ import AI4M from "@/components/Structures/Missions/Astronomers/SatellitePhotos/A
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 import { GreenhouseResearchStations } from "@/components/Structures/Missions/Biologists/ResearchStations";
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
+import CloudspottingOnMarsShapes from "@/components/Structures/Missions/Meteorologists/Cloudspotting/Shapes/ShapesOnMars";
 
 interface IndividualStructureProps {
     name?: string;
@@ -313,6 +314,12 @@ export const StructuresConfig: StructureConfig = {
           text: "Identify landmarks on terrestrial planets",
           dynamicComponent: <AI4M />,
           sizePercentage: 50,
+        },
+        {
+          icon: <BellElectric className="w-6 h-6 text-[#6e856h]" />,
+          text: 'Identify unique cloud shapes on your planets',
+          dynamicComponent: <CloudspottingOnMarsShapes />,
+          sizePercentage: 60,
         },
         {
           icon: <CameraOffIcon className="w-6 h-6 text-[#5e81ac]" />,
