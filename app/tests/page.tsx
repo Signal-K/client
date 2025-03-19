@@ -2,7 +2,6 @@
 
 import { FullPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
 import { SimplePlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/Simple/simple-planet-generator";
-import FileOrWebcamUpload from "@/components/Projects/Zoodex/Upload/GptClassification";
 import ChatGPTComponent from "./pleaseWork";
 
 export default function TestPage() {

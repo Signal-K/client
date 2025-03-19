@@ -5,6 +5,8 @@ import Webcam from "react-webcam";
 import axios from "axios";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { Button } from "@/components/ui/button";
+import { MailIcon, RecycleIcon } from "lucide-react";
 
 export default function ChatGPTImageClassifier() {
   const supabase = useSupabaseClient();
@@ -124,6 +126,28 @@ export default function ChatGPTImageClassifier() {
     };
   };
 
+  const saveLifeEntity = async () => {
+    if (!session) {
+      return;
+    };
+
+    try {
+      const {
+        data: entityEntry, error: entityError
+      } = await supabase
+        .from('zoo')
+        .insert({
+          author: session?.user?.id,
+          owner: session?.user?.id,
+          location: activePlanet.id, // fill this in
+          configuration: null, // fill this in
+          uploaded: '' // fill this in
+        })
+    } catch (err: any) {
+      
+    }
+  }
+
   return (
     <div className="max-w-lg mx-auto p-4 bg-gray-800 text-white rounded-lg shadow-lg">
       <h2 className="text-xl font-semibold mb-4">AI Image Classifier</h2>
@@ -186,45 +210,46 @@ export default function ChatGPTImageClassifier() {
       </button>
 
       {response && !response.error && (
-  <div className="mt-4 p-3 bg-gray-700 rounded-md">
-    <strong>Common Name:</strong> {response.common_name} <br />
-    <strong>Scientific Name:</strong> {response.genus} {response.species} <br />
-    <strong>Kingdom:</strong> {response.kingdom} <br />
-    <strong>Phylum:</strong> {response.phylum} <br />
-    <strong>Class:</strong> {response.class} <br />
-    <strong>Order:</strong> {response.order} <br />
-    <strong>Family:</strong> {response.family} <br />
+        <div className="mt-4 p-3 bg-gray-700 rounded-md">
+          <strong>Common Name:</strong> {response.common_name} <br />
+          <strong>Scientific Name:</strong> {response.genus} {response.species} <br />
+          <strong>Kingdom:</strong> {response.kingdom} <br />
+          <strong>Phylum:</strong> {response.phylum} <br />
+          <strong>Class:</strong> {response.class} <br />
+          <strong>Order:</strong> {response.order} <br />
+          <strong>Family:</strong> {response.family} <br />
 
-    {response.traits && (
-      <>
-        <strong>Traits:</strong>
-        <ul className="list-disc pl-4">
-        {Object.entries(response.traits).map(([trait, value]) => (
-  <li key={trait}>
-    <strong>{trait}:</strong> {String(value)}
-  </li>
-))}
-        </ul>
-      </>
-    )}
+          {response.traits && (
+            <>
+              <strong>Traits:</strong>
+              <ul className="list-disc pl-4">
+              {Object.entries(response.traits).map(([trait, value]) => (
+                <li key={trait}>
+                  <strong>{trait}:</strong> {String(value)}
+                </li>
+              ))}
+          </ul>
+        </>
+      )}
 
-    {response.compatible_biomes && response.compatible_biomes.length > 0 && (
-      <>
-        <strong>Compatible Biomes:</strong>
-        <ul className="list-disc pl-4">
-          {response.compatible_biomes.map((biome: string, index: number) => (
-            <li key={index}>{biome}</li>
-          ))}
-        </ul>
-      </>
-    )}
+      {response.compatible_biomes && response.compatible_biomes.length > 0 && (
+        <>
+          <strong>Compatible Biomes:</strong>
+          <ul className="list-disc pl-4">
+            {response.compatible_biomes.map((biome: string, index: number) => (
+              <li key={index}>{biome}</li>
+            ))}
+          </ul>
+        </>
+      )}
 
-    <strong>Conservation Status:</strong> {response.conservation_status}
-  </div>
-)}
+      <strong>Conservation Status:</strong> {response.conservation_status}
+    </div>
+  )}
 
-      {response?.error && <p className="mt-4 text-red-500">{response.error}</p>}
+    {response?.error && <p className="mt-4 text-red-500">{response.error}</p>}
       <div className="mt-4">
+        <p className="text-blue-300">Your location</p>
         <input
           type="text"
           placeholder="Enter your location"
@@ -232,6 +257,7 @@ export default function ChatGPTImageClassifier() {
           onChange={(e) => setLocation(e.target.value)}
           className="w-full p-2 bg-gray-900 text-white border border-gray-700 rounded-md"
         />
+        <p className='text-blue-300'>Any additional comments</p>
         <textarea
           placeholder="Add a comment (optional)"
           value={comment}
@@ -247,6 +273,29 @@ export default function ChatGPTImageClassifier() {
       >
         {loading ? "Uploading..." : "Upload Image"}
       </button>
+
+      {/* After we add the entry to uploads */}
+      <div className="mt-4">
+        <h3 className="text-md text-blue-400">Decision time (rename this)</h3>
+        <Button
+          variant='outline'
+          className="border-2 border-black hover:translate-y-[-2px] hover:translate-x-[2px] transitio-all hover:shadow-none"
+          // onClick={}
+          // Functionality - add a new value to the 'zoo' table
+        >
+          Send entity to your greenhouse (first station, then go from there)
+          <MailIcon className="h-8 w-8 text-blue-200" />
+        </Button>
+        <Button
+          variant='outline'
+          className="border-2 border-black hover:translate-y-[-2px] hover:translate-x-[2px] transition-all hover:shadow-none"
+          // onClick={}
+          // Functionality - update entry in `uploads` table to set `Archived` to True (boolean)
+        >
+          Release "KINGDOM"
+          <RecycleIcon className="h-8 w-8 text-blue-200" />
+        </Button>
+      </div>
     </div>
   );
 };

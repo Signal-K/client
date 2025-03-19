@@ -8,7 +8,7 @@ import { DailyMinorPlanet } from '../Projects/Telescopes/DailyMinorPlanet';
 import { PlanetFourProject } from '../Projects/Satellite/PlanetFour';
 import { TelescopeSunspotDetector } from '../Projects/Telescopes/Sunspots';
 import { TelescopeDiskDetector } from '../Projects/Telescopes/DiskDetector';
-import CameraComponent from '../Projects/Zoodex/Upload/Camera';
+// import CameraComponent from '../Projects/Zoodex/Upload/Camera';
 import { DataSourcesModal } from './unlockNewDataSources';
 import { BurrowingOwl } from '../Projects/Zoodex/burrowingOwls';
 import { PenguinWatch } from '../Projects/Zoodex/penguinWatch';

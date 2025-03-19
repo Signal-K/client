@@ -21,11 +21,11 @@ const DesertCounter = () => {
           .order('created_at', { ascending: false });
 
         if (error) {
-          console.error('Error fetching classifications:', error);
+          console.error('Error fetching classifications: ', error);
         } else {
           setClassifications(data || []);
-        }
-      }
+        };
+      };
     };
 
     fetchClassifications();
@@ -43,13 +43,13 @@ const DesertCounter = () => {
         const thirdRecentTime = new Date(thirdRecentClassification.created_at).getTime();
         const timeLeft = thirdRecentTime + 24 * 60 * 60 * 1000 - new Date().getTime();
         setCountdown(timeLeft > 0 ? timeLeft : 0); // Set the countdown to the remaining time or 0 if passed
-      }
+      };
     };
 
     checkRecentClassifications();
   }, [classifications]);
 
-  const formatTime = (time: number) => {
+  const formatTime = ( time: number ) => {
     const hours = Math.floor(time / 1000 / 60 / 60);
     const minutes = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((time % (1000 * 60)) / 1000);

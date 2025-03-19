@@ -19,6 +19,7 @@ export function ClickACoral() {
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+
     const [showTutorial, setShowTutorial] = useState<boolean>(false);
 
     const [loading, setLoading] = useState(true);
@@ -111,6 +112,91 @@ export function ClickACoral() {
                             /> */}
                         </>
                     )}
+                </center>
+            </div>
+        </div>
+    );
+};
+
+interface ClickACoralPassedProps {
+    anomalyid: string;
+};
+
+export function ClickACoralPassed ( { anomalyid }: ClickACoralPassedProps ) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchAnomaly() {
+            if (!session) {
+                setLoading(false);
+                return;
+            };
+
+            try {
+                const {
+                    data: anomalyData,
+                    error: anomalyError,
+                } = await supabase
+                    .from("anomalies")
+                    .select("*")
+                    .eq("id", anomalyid)
+
+                if (anomalyError) {
+                    throw anomalyError;
+                };
+
+                if (!anomalyData) {
+                    setLoading(false);
+                    setImageUrl('');
+                    return;
+                };
+
+                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-clickACoral/${anomalyid}.png`)
+            } catch (err: any) {
+                throw err;
+                console.error(err);
+                setLoading(false);
+            } finally {
+                setLoading(false);
+            };
+        };
+
+        fetchAnomaly();
+    }, [session, supabase]);
+
+    if (loading) {
+        return (
+            <div>
+                <p>Loading...</p>
+            </div>
+        );
+    };
+
+    if (!imageUrl) {
+        return (
+            <div>
+                <p>The requested coral couldn't be found, please try again later</p>
+            </div>
+        );
+    };
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+            <div className="pb-4 rounded-md relative w-full">
+                <center>
+                    <ImageAnnotator
+                        initialImageUrl={imageUrl || ''}
+                        anomalyId={anomalyid}
+                        anomalyType='zoodex-clickACoral'
+                        assetMentioned={imageUrl || ''}
+                        structureItemId={3104}
+                        annotationType="CAC"
+                    />
                 </center>
             </div>
         </div>

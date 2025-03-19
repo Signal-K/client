@@ -3,7 +3,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
 import { SciFiPanel } from "@/components/ui/styles/sci-fi/panel";
 import PickPlanet from "../../PickPlanetStandalone";
-import PlanetTempCalculator from "./TemperatureCalc";
+// import PlanetTempCalculator from "./TemperatureCalc";
 import { SciFiButton } from "@/components/ui/styles/sci-fi/button";
 
 interface ClassificationConfiguration {
@@ -213,7 +213,7 @@ function PlanetTemperatureForm({ anomalyid }: FormProps) {
               category={currentClassification.classificationtype || "Planet"}
               images={currentClassification.images || []}
             />
-            <PlanetTempCalculator />
+            {/* <PlanetTempCalculator /> */}
           <SciFiPanel>
           <div className="flex flex-col items-center mt-4 gap-4">
               <textarea

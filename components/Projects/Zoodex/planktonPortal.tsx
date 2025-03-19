@@ -257,3 +257,26 @@ export function PlanktonPortalFrame() {
         </div>
     );
 };
+
+interface PlanktonPortalPass {
+    anomalyid: string;
+};
+
+export function PlanktonPortalPass ( { anomalyid }: PlanktonPortalPass ) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-planktonPortal/${anomalyid}.jpeg`;
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+            <div className="pb-4 rounded-md relative w-full">
+                <ClassificationForm
+                    anomalyId={anomalyid || ""}
+                    anomalyType="zoodex-planktonPortal"
+                    missionNumber={200000012}
+                    assetMentioned={imageUrl || ""}
+                    structureItemId={3104}
+                />
+            </div>
+        </div>
+    );
+};

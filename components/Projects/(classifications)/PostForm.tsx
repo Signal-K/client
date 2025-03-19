@@ -206,24 +206,24 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
     }));
   };
 
-  const handleMissionComplete = async () => {
-    try {
-      const missionData = {
-        user: session?.user?.id,
-        time_of_completion: new Date().toISOString(),
-        mission: missionNumber,
-        configuration: null,
-      };
-      await supabase.from("missions").insert([missionData]);
-      // const newAnomalyData = {
-      //   user_id: session?.user?.id,
-      //   anomaly_id: activePlanet?.id,
-      // };
-      // await supabase.from("user_anomalies").insert([newAnomalyData]);
-    } catch (error: any) {
-      console.error(error);
-    };
-  };
+  // const handleMissionComplete = async () => {
+  //   try {
+  //     const missionData = {
+  //       user: session?.user?.id,
+  //       time_of_completion: new Date().toISOString(),
+  //       mission: missionNumber,
+  //       configuration: null,
+  //     };
+  //     await supabase.from("missions").insert([missionData]);
+  //     // const newAnomalyData = {
+  //     //   user_id: session?.user?.id,
+  //     //   anomaly_id: activePlanet?.id,
+  //     // };
+  //     // await supabase.from("user_anomalies").insert([newAnomalyData]);
+  //   } catch (error: any) {
+  //     console.error(error);
+  //   };
+  // };
 
   const createPost = async () => {
     const flattenedOptions = classificationOptions.flat();
@@ -302,7 +302,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         setPostSubmitted(true);
       };
 
-      await handleMissionComplete();
+      // await handleMissionComplete();
 
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")

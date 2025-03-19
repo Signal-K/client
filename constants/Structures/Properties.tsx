@@ -14,7 +14,7 @@ import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
 import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
 import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
-import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
+// import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
 import PlanktonPortal from "@/components/Structures/Missions/Biologists/Plankton/PlanktonPortal";
 import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
 // import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
@@ -235,7 +235,7 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Capture animals",
-          dynamicComponent: <CameraComponent />,
+          // dynamicComponent: <CameraComponent />,
           sizePercentage: 60,
         },
       ],

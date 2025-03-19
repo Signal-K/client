@@ -12,7 +12,6 @@ import { CommentCard } from "../Comments/CommentSingle";
 import { AvatarGenerator } from '@/components/Account/Avatar';
 import html2canvas from 'html2canvas';
 import { SurveyorComments } from "./Surveyor/SurveyorPostCard";
-import PlanetTempCalculator from "@/components/Structures/Missions/Astronomers/PlanetHunters/TemperatureCalc";
 
 export interface CommentProps {
   id: number;
@@ -284,13 +283,6 @@ export function PostCardSingle({
                   </>
                 )}
               </div>
-  
-              {/* Grid cell for the PlanetTempCalculator */}
-              {classificationType === 'planet' && (
-                <div className="col-span-1">
-                  <PlanetTempCalculator />
-                </div>
-              )}
             </div>
           )}
         </CardContent>
