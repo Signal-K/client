@@ -1,108 +1,164 @@
 'use client';
 
-import { useEffect, useState } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import React, { useState, useEffect } from "react";
 
-interface Comment {
-  id: number;
-  content: string;
-  author: string;
-  configuration?: Record<string, any>;
-  surveyor: boolean;
+interface AggregatedCloud {
+  annotationOptions: Record<string, number>;
+  classificationOptions: Record<string, Record<string, number>>;
+  cloudColours?: Record<string, number>;
+}
+
+interface AggregatedP4 {
+  fanCount: number;
+  blotchCount: number;
+  classificationCounts: Record<string, number>;
+}
+
+interface AggregatedAI4M {
+  sandCount: number;
+  soilCount: number;
+  bedrockCount: number;
+  rockCount: number;
+  unlabelledCount: number;
+  classificationCounts: Record<string, number>;
+}
+
+interface BiomeAggregatorProps {
+  cloudSummary: AggregatedCloud | null;
+  p4Summary: AggregatedP4 | null;
+  ai4MSummary: AggregatedAI4M | null;
+  onBiomeUpdate?: (biome: string) => void;
+}
+
+const biomeScores: Record<string, Record<string, number>> = {
+  "white": {
+    "barren wasteland": 0.0,
+    "arid dunes": 0.05,
+    "frigid expanse": 0.1,
+    "volcanic terrain": 0.1,
+    "tundra basin": 0.2,
+    "temperate highlands": 0.3,
+    "oceanic world": 0.4,
+    "tropical jungle": 0.5
+  },
+  "blue": {
+    "barren wasteland": -0.05,
+    "arid dunes": -0.1,
+    "frigid expanse": -0.2,
+    "volcanic terrain": -0.05,
+    "tundra basin": 0.0,
+    "temperate highlands": 0.05,
+    "oceanic world": 0.1,
+    "tropical jungle": 0.2
+  }
 };
 
-interface Classification {
-  id: number;
-  content: string | null;
-  author: string | null;
-  classificationConfiguration?: Record<string, any>;
-  anomaly: Anomaly | null;
-  media: (string | { uploadUrl?: string })[] | null;
-  classificationtype: string | null;
-  created_at: string;
-  title?: string;
-  votes?: number;
-  category?: string;
-  tags?: string[];
-  images?: string[];
-  relatedClassifications?: Classification[];
+const weatherByBiome: Record<string, string[]> = {
+  "rocky highlands": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "rocky terrain": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "consolidated soil": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "wind-affected terrain": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "barren wasteland": ["Acid Rain", "Dust Storms", "Ion Storms", "Impact Events"],
+  "arid dunes": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "dusty surface": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "sandy desert": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "frigid expanse": ["Snow", "Sleet", "Ice Storms", "Cryovolcanism"],
+  "volcanic terrain": ["Volcanic Eruptions", "Geysers", "Seismic Activity", "Acid Rain"],
+  "temperate highlands": ["Rain", "Thunderstorms", "Hail", "Hurricanes"],
+  "oceanic world": ["Rain", "Hurricanes", "Tsunamis", "Deep Ocean Storms"],
+  "tropical jungle": ["Rain", "Superstorms", "Flooding", "Thunderstorms"],
 };
 
-type Anomaly = {
-    id: number;
-    content: string | null;
-    anomalytype: string | null;
-    mass: number | null;
-    radius: number | null;
-    density: number | null;
-    gravity: number | null;
-    temperature: number | null;
-    orbital_period: number | null;
-    avatar_url: string | null;
-    created_at: string;
+const biomeTraits: Record<string, string[]> = {
+  "barren wasteland": ["slow", "nocturnal", "poisonous"],
+  "arid dunes": ["slow", "nocturnal", "scaly"],
+  "frigid expanse": ["slow", "scaly", "hairy", "nocturnal"],
+  "volcanic terrain": ["slow", "poisonous", "scaly"],
+  "temperate highlands": ["fast", "social", "feathered"],
+  "oceanic world": ["amphibious", "social", "fast", "intelligent"],
+  "tropical jungle": ["fast", "social", "feathered", "intelligent"],
+  "rocky highlands": ["slow", "scaled", "nocturnal"],
+  "flood basin": ["amphibious", "social", "intelligent"],
 };
 
-interface ClassificationCommentsProps {
-  classification: Classification;
+const getDominantBiome = (
+  cloudSummary: AggregatedCloud | null,
+  p4Summary: AggregatedP4 | null,
+  ai4MSummary: AggregatedAI4M | null
+): string => {
+  const biomeTotals: Record<string, number> = {};
+
+  if (cloudSummary?.cloudColours) {
+    Object.entries(cloudSummary.cloudColours).forEach(([colour, count]) => {
+      const normalizedColour = colour.toLowerCase().trim();
+      if (biomeScores[normalizedColour]) {
+        Object.entries(biomeScores[normalizedColour]).forEach(([biome, score]) => {
+          biomeTotals[biome] = (biomeTotals[biome] || 0) + Number(score) * Number(count);
+        });
+      }
+    });
+  }
+
+  if (p4Summary) {
+    biomeTotals["wind-affected terrain"] = (biomeTotals["wind-affected terrain"] || 0) + p4Summary.fanCount * 0.2;
+    biomeTotals["dusty surface"] = (biomeTotals["dusty surface"] || 0) + p4Summary.blotchCount * 0.1;
+  }
+
+  if (ai4MSummary) {
+    biomeTotals["sandy desert"] = (biomeTotals["sandy desert"] || 0) + ai4MSummary.sandCount * 0.15;
+    biomeTotals["rocky terrain"] = (biomeTotals["rocky terrain"] || 0) + ai4MSummary.rockCount * 0.2;
+    biomeTotals["consolidated soil"] = (biomeTotals["consolidated soil"] || 0) + ai4MSummary.soilCount * 0.1;
+  }
+
+  const sortedBiomes = Object.entries(biomeTotals).sort((a, b) => b[1] - a[1]);
+  return sortedBiomes.length > 0 ? String(sortedBiomes[0][0]) : "Unknown";
 };
 
-export default function ClassificationComments({ classification }: ClassificationCommentsProps) {
-  const supabase = useSupabaseClient();
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [showOnlyAuthor, setShowOnlyAuthor] = useState(false);
+const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary, p4Summary, ai4MSummary, onBiomeUpdate }) => {
+  const [dominantBiome, setDominantBiome] = useState<string>("Unknown");
+  const [weatherEvents, setWeatherEvents] = useState<string[]>([]);
+  const [traits, setTraits] = useState<string[]>([]);
 
   useEffect(() => {
-    async function fetchComments() {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("id, content, author, configuration, surveyor")
-        .eq("classification_id", classification.id)
-        .eq("surveyor", "TRUE");
-
-      if (!error && data) {
-        setComments(data);
-      };
-    };
-
-    fetchComments();
-  }, [classification.id, supabase]);
-
-  const filteredComments = showOnlyAuthor
-    ? comments.filter((comment) => comment.author === classification.author)
-    : comments;
+    if (cloudSummary || p4Summary || ai4MSummary) {
+      const biome = getDominantBiome(cloudSummary, p4Summary, ai4MSummary);
+      setDominantBiome(biome);
+      setWeatherEvents(weatherByBiome[biome] || []);
+      setTraits(biomeTraits[biome] || []);
+      console.log('Biome:', biome);
+      console.log('Traits:', biomeTraits[biome]);
+      if (onBiomeUpdate) {
+        onBiomeUpdate(biome);
+      }
+    }
+  }, [cloudSummary, p4Summary, ai4MSummary, onBiomeUpdate]);
 
   return (
-    <div className="p-4 border border-gray-200 rounded-md bg-gray-800 text-white">
-      <h3 className="text-lg font-bold">Comments</h3>
-      <label className="flex items-center mt-2">
-        <input
-          type="checkbox"
-          checked={showOnlyAuthor}
-          onChange={() => setShowOnlyAuthor(!showOnlyAuthor)}
-          className="mr-2"
-        />
-        Show only classification author's comments
-      </label>
-      <div className="mt-2">
-        {filteredComments.length > 0 ? (
-          filteredComments.map((comment) => (
-            <div key={comment.id} className="p-2 border border-gray-600 rounded-md mt-2">
-              <p className="text-sm">{comment.content}</p>
-              {comment.configuration && (
-                <pre className="text-xs bg-gray-700 p-2 rounded mt-1">{JSON.stringify(comment.configuration, null, 2)}</pre>
-              )}
-            </div>
-          ))
-        ) : (
-          <p className="text-sm">No comments available.</p>
-        )}
-      </div>
-      {classification.classificationConfiguration && (
-        <div className="mt-4 p-2 border border-gray-600 rounded-md">
-          <h4 className="text-md font-semibold">Classification Configuration</h4>
-          <pre className="text-xs bg-gray-700 p-2 rounded">{JSON.stringify(classification.classificationConfiguration, null, 2)}</pre>
+    <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#4A665A] text-white">
+      <h3 className="text-xl font-bold">Biome Aggregation</h3>
+      <p>Dominant Biome: <strong>{dominantBiome}</strong></p>
+      {traits.length > 0 && (
+        <div className="mt-2">
+          <h4 className="text-lg font-semibold">Potential Traits for Lifeforms:</h4>
+          <ul className="list-disc list-inside">
+            {traits.map((trait, index) => (
+              <li key={index}>{trait}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {weatherEvents.length > 0 && (
+        <div className="mt-2">
+          <h4 className="text-lg font-semibold">Likely Weather Events:</h4>
+          <ul className="list-disc list-inside">
+            {weatherEvents.map((event, index) => (
+              <li key={index}>{event}</li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
   );
 };
+
+export default BiomeAggregator;
