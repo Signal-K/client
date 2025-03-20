@@ -128,6 +128,20 @@ export const CoMSCategories: Record<CoMShapesCategory, CategoryConfig> = {
   },
 };
 
+export type SunspotsCategory = 'Sunspot' | 'Other';
+export const SunspotsCategories: Record<SunspotsCategory, CategoryConfig> = {
+  'Sunspot': {
+    name: 'Sunspot',
+    color: '#1E88E5',
+    description: 'Used to indicate a sunspot'
+  },
+  'Other': {
+    name: 'Other',
+    color: '#F57C00',
+    description: 'Use this to mark an interesting point',
+  },
+};
+
 export type CACCategory = 
   | 'Antipathes Atlantica' 
   | 'Antipathes Furcata' 

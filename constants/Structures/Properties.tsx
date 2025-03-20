@@ -11,7 +11,7 @@ import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
 import ModernTechTree from "@/components/Structures/Research/TechTree";
 import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
-import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
+import { SunspotsWrapper } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
 import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
 // import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
@@ -37,6 +37,7 @@ import MySettlementsLocations from "@/content/Classifications/UserLocations";
 import { GreenhouseResearchStations } from "@/components/Structures/Missions/Biologists/ResearchStations";
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
 import CloudspottingOnMarsShapes from "@/components/Structures/Missions/Meteorologists/Cloudspotting/Shapes/ShapesOnMars";
+import SunspotSteps from "@/components/Projects/Telescopes/Sunspots/SunspotShell";
 
 interface IndividualStructureProps {
     name?: string;
@@ -190,7 +191,8 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <SunIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Sunspot data",
-          dynamicComponent: <TelescopeSunspotDetector />,
+          dynamicComponent: <SunspotSteps />,
+          // ^^ Integrate to create electrical interference or cool "troughs"?
           sizePercentage: 60,
         },
         {

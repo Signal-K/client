@@ -9,7 +9,7 @@ import { CloudspottingOnMarsTutorial } from "./cloudspottingOnMars";
 import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
-interface SelectedAnomProps {
+export interface SelectedAnomProps {
     anomalyid?: number;
 };
 

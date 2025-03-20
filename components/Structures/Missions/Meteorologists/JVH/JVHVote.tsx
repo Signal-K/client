@@ -20,6 +20,7 @@ export default function VoteJVH() {
     const session = useSession();
 
     const [classifications, setClassifications] = useState<any[]>([]);
+
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -32,6 +33,7 @@ export default function VoteJVH() {
         
         setLoading(true);
         setError(null);
+        
         try {
             const { data, error } = await supabase
             .from('classifications')

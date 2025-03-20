@@ -14,8 +14,10 @@ import {
   CACCategories,
   JVHCATEGORIES,
   CoMSCategories,
+  SunspotsCategories,
   type CoMShapesCategory,
   type AI4MCategory,
+  type SunspotsCategory,
   type JVHCategory,
   type CACCategory,
   type P4Category,
@@ -38,13 +40,13 @@ interface ImageAnnotatorProps {
   assetMentioned?: string | string[];
   structureItemId?: number;
   parentPlanetLocation?: string;
-  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'CoMS' | 'Custom';
+  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'CoMS' | 'Sunspots' | 'Custom';
 };
 
 export default function ImageAnnotator({
   initialImageUrl,
   parentClassificationId,
-  anomalyType,
+  anomalyType, 
   anomalyId,
   missionNumber,
   assetMentioned,
@@ -81,6 +83,8 @@ export default function ImageAnnotator({
       : annotationType === 'JVH'
       ? JVHCATEGORIES
       : annotationType === 'CAC'
+      ? SunspotsCategories
+      : annotationType === 'Sunspots'
       ? CACCategories
       : annotationType === 'CoMS'
       ? CoMSCategories

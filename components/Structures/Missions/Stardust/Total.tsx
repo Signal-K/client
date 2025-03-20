@@ -153,7 +153,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
       } catch (error) {
         console.error("Error fetching Daily Minor Planet points:", error);
       }
-    };
+    }; 
 
     const fetchAi4MPoints = async () => {
       const { data: classifications } = await supabase

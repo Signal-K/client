@@ -6,7 +6,7 @@ import { FishIcon } from '../../content/Icons/FishIcon';
 import { StarterTelescopeTess } from '../Projects/Telescopes/Transiting';
 import { DailyMinorPlanet } from '../Projects/Telescopes/DailyMinorPlanet';
 import { PlanetFourProject } from '../Projects/Satellite/PlanetFour';
-import { TelescopeSunspotDetector } from '../Projects/Telescopes/Sunspots';
+import { StarterSunspot } from '../Projects/Telescopes/Sunspots';
 import { TelescopeDiskDetector } from '../Projects/Telescopes/DiskDetector';
 // import CameraComponent from '../Projects/Zoodex/Upload/Camera';
 import { DataSourcesModal } from './unlockNewDataSources';
@@ -172,7 +172,7 @@ export const telescopeDataSources = [
                 activeStructure: 3103,
                 researched: 'telescope-sunspots',
                 techId: 5,
-                dynamicComponent: <TelescopeSunspotDetector />
+                dynamicComponent: <StarterSunspot anomalyid={40} />
             }
         ] 
     },
@@ -193,9 +193,9 @@ export const telescopeDataSources = [
                 researched: 'telescope-diskDetective',
                 techId: 5,
                 dynamicComponent: <TelescopeDiskDetector />
-            }
-        ]
-    }
+            },
+        ],
+    },
 ];
 
 

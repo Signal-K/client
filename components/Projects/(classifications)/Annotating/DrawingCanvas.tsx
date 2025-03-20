@@ -33,8 +33,8 @@ export function AnnotationCanvas({
   setCurrentDrawing,
   currentCategory,
 }: AnnotationCanvasProps) {
-  const CANVAS_WIDTH = 400; 
-  const CANVAS_HEIGHT = 300;
+  const CANVAS_WIDTH = 500; 
+  const CANVAS_HEIGHT = 400;
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;

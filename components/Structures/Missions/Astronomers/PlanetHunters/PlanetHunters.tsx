@@ -8,7 +8,7 @@ import PHClassificationGenerator from "./PlanetMaker";
 import PlanetTemperatureForm from "./PlanetTemperature";
 import PlanetHuntersTemperatureWrapper from "./PlanetTemperature";
 
-interface MissionStep {
+export interface MissionStep {
   id: number;
   title: string;
   description: string;
@@ -25,7 +25,7 @@ const PlanetHuntersSteps = () => {
   const session = useSession();
 
   const [steps, setSteps] = useState<MissionStep[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedMission, setSelectedMission] = useState<MissionStep | null>(null);
   const [currentChapter, setCurrentChapter] = useState<number>(1);
   const [experiencePoints, setExperiencePoints] = useState<number>(0);
