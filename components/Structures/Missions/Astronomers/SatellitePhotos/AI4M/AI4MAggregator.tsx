@@ -4,16 +4,16 @@ import { AI4MCATEGORIES } from "@/types/Annotation";
 
 export interface AI4MClassification {
   id: number;
-  annotationOptions: string[];
+  annotationOptions?: string[]; // Made optional to avoid crashing
   classificationConfiguration?: {
     "": Record<number, boolean>;
   };
-};
+}
 
 interface AI4MAggregatorProps {
   classifications: AI4MClassification[];
   onSummaryUpdate?: (summary: AggregatedAI4M) => void;
-};
+}
 
 export interface AggregatedAI4M {
   sandCount: number;
@@ -22,7 +22,7 @@ export interface AggregatedAI4M {
   rockCount: number;
   unlabelledCount: number;
   classificationCounts: Record<string, number>;
-};
+}
 
 const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSummaryUpdate }) => {
   const [aggregatedData, setAggregatedData] = useState<AggregatedAI4M>({
@@ -44,11 +44,14 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
       let classificationCounts: Record<string, number> = {};
 
       classifications.forEach((classification) => {
-        classification.annotationOptions.forEach((option) => {
+        // Ensure annotationOptions exists and is an array
+        const options = classification.annotationOptions || [];
+
+        options.forEach((option) => {
           const match = option.match(/([a-zA-Z\s-]+) \(x(\d+)\)/);
           if (match) {
             const feature = match[1].trim();
-            const count = parseInt(match[2]);
+            const count = parseInt(match[2], 10);
 
             switch (feature) {
               case AI4MCATEGORIES.sand.name:
@@ -73,15 +76,15 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
           }
         });
 
+        // Process classification configuration for additional options
         if (classification.classificationConfiguration?.[""]) {
           Object.keys(classification.classificationConfiguration[""]).forEach((key) => {
-            const id = parseInt(key);
+            const id = parseInt(key, 10);
             const option = automatonaiForMarsOptions.find((opt) => opt.id === id);
             if (option) {
               const featureText = option.text.trim();
-              const matchedFeature = classification.annotationOptions.find((opt) =>
-                opt.includes(featureText)
-              );
+              const matchedFeature = options.find((opt) => opt.includes(featureText));
+
               if (matchedFeature) {
                 const featureName = matchedFeature.split(" (")[0]; // Extract feature name
                 classificationCounts[featureName] = (classificationCounts[featureName] || 0) + 1;

@@ -50,18 +50,7 @@ const biomeScores: Record<string, Record<string, number>> = {
     "temperate highlands": 0.05,
     "oceanic world": 0.1,
     "tropical jungle": 0.2
-  }
-};
-
-const weatherByBiome: Record<string, string[]> = {
-  "rocky highlands": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
-  "barren wasteland": ["Acid Rain", "Dust Storms", "Ion Storms", "Impact Events"],
-  "arid dunes": ["Dust Storms", "Ion Storms", "Occasional Rain"],
-  "frigid expanse": ["Snow", "Sleet", "Ice Storms", "Cryovolcanism"],
-  "volcanic terrain": ["Volcanic Eruptions", "Geysers", "Seismic Activity", "Acid Rain"],
-  "temperate highlands": ["Rain", "Thunderstorms", "Hail", "Hurricanes"],
-  "oceanic world": ["Rain", "Hurricanes", "Tsunamis", "Deep Ocean Storms"],
-  "tropical jungle": ["Rain", "Superstorms", "Flooding", "Thunderstorms"],
+  },
 };
 
 const traitsByBiome: Record<string, string[]> = {
@@ -73,6 +62,35 @@ const traitsByBiome: Record<string, string[]> = {
   "temperate highlands": ["Hairy", "Social", "Intelligent", "Fast", "Feathered"],
   "rocky highlands": ["Scaled", "Fast", "Bald", "Intelligent"],
   "barren wasteland": ["Slow", "Bald", "Poisonous", "Nocturnal"],
+};
+
+const weatherByBiome: Record<string, string[]> = {
+  "rocky highlands": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "rocky terrain": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "consolidated soil": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "wind-affected terrain": ["Rain", "Thunderstorms", "Dust Storms", "Seismic Activity"],
+  "barren wasteland": ["Acid Rain", "Dust Storms", "Ion Storms", "Impact Events"],
+  "arid dunes": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "dusty surface": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "sandy desert": ["Dust Storms", "Ion Storms", "Occasional Rain"],
+  "frigid expanse": ["Snow", "Sleet", "Ice Storms", "Cryovolcanism"],
+  "volcanic terrain": ["Volcanic Eruptions", "Geysers", "Seismic Activity", "Acid Rain"],
+  "temperate highlands": ["Rain", "Thunderstorms", "Hail", "Hurricanes"],
+  "oceanic world": ["Rain", "Hurricanes", "Tsunamis", "Deep Ocean Storms"],
+  "tropical jungle": ["Rain", "Superstorms", "Flooding", "Thunderstorms"],
+};
+
+const biomeTraits: Record<string, string[]> = {
+  "barren wasteland": ["slow", "nocturnal", "poisonous"],
+  "arid dunes": ["fast", "scaled", "bald", "nocturnal"],
+  "frigid expanse": ["slow", "scaled", "hairy", "nocturnal"],
+  "volcanic terrain": ["slow", "poisonous", "scaled"],
+  "temperate highlands": ["fast", "social", "feathered"],
+  "oceanic world": ["amphibious", "social", "fast", "intelligent"],
+  "tropical jungle": ["fast", "social", "feathered", "intelligent"],
+  "rocky highlands": ["scaled", "fast", "bald", "intelligent"],
+  "wind-affected terrain": ["scaled", "fast", "bald", "intelligent"],
+  "flood basin": ["amphibious", "social", "intelligent"],
 };
 
 const getDominantBiome = (
@@ -87,7 +105,7 @@ const getDominantBiome = (
       const normalizedColour = colour.toLowerCase().trim();
       if (biomeScores[normalizedColour]) {
         Object.entries(biomeScores[normalizedColour]).forEach(([biome, score]) => {
-          biomeTotals[biome] = (biomeTotals[biome] || 0) + score * count;
+          biomeTotals[biome] = (biomeTotals[biome] || 0) + Number(score) * Number(count);
         });
       }
     });
@@ -96,18 +114,15 @@ const getDominantBiome = (
   if (p4Summary) {
     biomeTotals["wind-affected terrain"] = (biomeTotals["wind-affected terrain"] || 0) + p4Summary.fanCount * 0.2;
     biomeTotals["dusty surface"] = (biomeTotals["dusty surface"] || 0) + p4Summary.blotchCount * 0.1;
-  }
+  };
 
   if (ai4MSummary) {
     biomeTotals["sandy desert"] = (biomeTotals["sandy desert"] || 0) + ai4MSummary.sandCount * 0.15;
     biomeTotals["rocky terrain"] = (biomeTotals["rocky terrain"] || 0) + ai4MSummary.rockCount * 0.2;
     biomeTotals["consolidated soil"] = (biomeTotals["consolidated soil"] || 0) + ai4MSummary.soilCount * 0.1;
-  }
-
-  console.log('Biome Totals:', biomeTotals); // Log biome totals to verify the calculation
+  };
 
   const sortedBiomes = Object.entries(biomeTotals).sort((a, b) => b[1] - a[1]);
-  console.log('Sorted Biomes:', sortedBiomes);  // Log sorted biomes
   return sortedBiomes.length > 0 ? String(sortedBiomes[0][0]) : "Unknown";
 };
 
@@ -119,19 +134,11 @@ const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary, p4Summa
   useEffect(() => {
     if (cloudSummary || p4Summary || ai4MSummary) {
       const biome = getDominantBiome(cloudSummary, p4Summary, ai4MSummary);
-      console.log('Dominant Biome:', biome);  // Log to verify the biome
-
       setDominantBiome(biome);
-      
-      const biomeWeather = weatherByBiome[biome];
-      const biomeTraits = traitsByBiome[biome];
-      
-      console.log('Weather Events:', biomeWeather);  // Log to verify weather events
-      console.log('Traits:', biomeTraits);  // Log to verify traits
-
-      setWeatherEvents(biomeWeather || []);
-      setTraits(biomeTraits || []);
-      
+      setWeatherEvents(weatherByBiome[biome] || []);
+      setTraits(biomeTraits[biome] || []);
+      console.log('Biome:', biome);
+      console.log('Traits:', biomeTraits[biome]);
       if (onBiomeUpdate) {
         onBiomeUpdate(biome);
       }
@@ -142,24 +149,22 @@ const BiomeAggregator: React.FC<BiomeAggregatorProps> = ({ cloudSummary, p4Summa
     <div className="p-4 border border-gray-200 rounded-md shadow-md bg-[#4A665A] text-white">
       <h3 className="text-xl font-bold">Biome Aggregation</h3>
       <p>Dominant Biome: <strong>{dominantBiome}</strong></p>
-      
+      {traits.length > 0 && (
+        <div className="mt-2">
+          <h4 className="text-lg font-semibold">Potential Traits for Lifeforms:</h4>
+          <ul className="list-disc list-inside">
+            {traits.map((trait, index) => (
+              <li key={index}>{trait}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       {weatherEvents.length > 0 && (
         <div className="mt-2">
           <h4 className="text-lg font-semibold">Likely Weather Events:</h4>
           <ul className="list-disc list-inside">
             {weatherEvents.map((event, index) => (
               <li key={index}>{event}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {traits.length > 0 && (
-        <div className="mt-2">
-          <h4 className="text-lg font-semibold">Expected Lifeform Traits:</h4>
-          <ul className="list-disc list-inside">
-            {traits.map((trait, index) => (
-              <li key={index}>{trait}</li>
             ))}
           </ul>
         </div>
