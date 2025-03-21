@@ -28,9 +28,9 @@ export function FullPlanetGeneratorNoControl() {
   const [terrainVariation, setTerrainVariation] = useState<"flat" | "moderate" | "chaotic">("moderate");
   const [terrainErosion, setTerrainErosion] = useState(0.5);
   const [plateTectonics, setPlateTectonics] = useState(0.5);
-  const [soilType, setSoilType] = useState<"rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy">(
-    "rocky",
-  );
+  // const [soilType, setSoilType] = useState<"rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy">(
+  //   "rocky",
+  // );
   const [biomassLevel, setBiomassLevel] = useState(0.0);
   const [waterLevel, setWaterLevel] = useState(0.3);
   const [salinity, setSalinity] = useState(0.5);
@@ -62,7 +62,6 @@ export function FullPlanetGeneratorNoControl() {
     terrainErosion,
     plateTectonics,
     // soilType,
-    biomassLevel,
     waterLevel,
     salinity,
     subsurfaceWater,
@@ -70,7 +69,7 @@ export function FullPlanetGeneratorNoControl() {
     weatherVariability,
     stormFrequency,
     volcanicActivity,
-    biome,
+    // biome,
     // cloudTypes,
     // cloudDensity,
     // atmosphereVisibility,

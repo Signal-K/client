@@ -16,7 +16,7 @@ export function PlanetScene({ stats }: PlanetSceneProps) {
       <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
-        <PlanetMesh stats={stats} />
+        <PlanetMesh stats={{ ...stats, type: stats.type || "terrestrial" }} /> {/*  soilType: stats.soilType || "default"  */}
         <Stars radius={300} depth={50} count={7500} factor={4} />
         <OrbitControls
           enableZoom={true}

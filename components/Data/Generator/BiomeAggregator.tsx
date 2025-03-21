@@ -107,9 +107,9 @@ const getDominantBiome = (
         Object.entries(biomeScores[normalizedColour]).forEach(([biome, score]) => {
           biomeTotals[biome] = (biomeTotals[biome] || 0) + Number(score) * Number(count);
         });
-      }
+      };
     });
-  }
+  };
 
   if (p4Summary) {
     biomeTotals["wind-affected terrain"] = (biomeTotals["wind-affected terrain"] || 0) + p4Summary.fanCount * 0.2;
