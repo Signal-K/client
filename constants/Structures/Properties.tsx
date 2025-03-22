@@ -25,6 +25,7 @@ import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunte
 import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
 // import TutorialPopup from "@/content/Dialogue/helpButton";
 import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
+import ChatGPTImageClassifier from "@/app/tests/pleaseWork";
 import { ZoodexIguanas } from "@/components/Projects/Zoodex/iguanasFromAbove";
 import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters";
 import { useRouter } from 'next/router';
@@ -266,6 +267,12 @@ export const StructuresConfig: StructureConfig = {
           text: "My Greenhouse Stations",
           dynamicComponent: <GreenhouseResearchStations />,
           sizePercentage: 80,
+        },
+        {
+          icon: <CameraIcon className="w-6 h-6 text-[#5e86ht]" />,
+          text: 'Scan animals around you',
+          dynamicComponent: <ChatGPTImageClassifier />,
+          sizePercentage: 90,
         },
       ],
     },

@@ -9,7 +9,7 @@ export interface PlanetStats {
   mass: number // Earth masses
   radius: number // Earth radii
   density: number // g/cm³
-  type: "terrestrial" | "gaseous" | undefined
+  type: "terrestrial" | "gaseous" | undefined;
   temperature: number // Kelvin
   orbitalPeriod: number // Earth days
   atmosphereStrength: number // 0 to 1

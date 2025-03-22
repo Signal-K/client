@@ -187,7 +187,7 @@ export default function ChatGPTImageClassifier() {
             className="w-6 h-6 bg-white rounded-full mr-3"
             style={{ boxShadow: "0 0 10px rgba(255,255,255,0.7)" }}
           ></div>
-          <h2 className="text-2xl font-bold text-white tracking-wider">Pokédex</h2>
+          <h2 className="text-2xl font-bold text-white tracking-wider">Scanner</h2>
         </div>
 
         {/* Status lights */}

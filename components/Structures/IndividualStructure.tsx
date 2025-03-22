@@ -97,10 +97,10 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
     <Dialog defaultOpen>
       <div className="relative transition-all duration-500 ease-in-out">
         {!activeComponent && (
-         <DialogContent
-         className="p-6 rounded-3xl text-white max-w-3xl mx-auto"
-         style={{ background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))' }}
-       >
+          <DialogContent
+            className="p-6 rounded-3xl text-white max-w-3xl mx-auto"
+            style={{ background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))' }}
+          >
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />
@@ -126,6 +126,22 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                   {tooltip.text}
                 </div>
               )}
+              { name === "Biodome" && (
+  <div 
+    className="absolute top-0 right-0 w-6 h-6 bg-[#85DDA2] rounded-full flex items-center justify-center cursor-pointer"
+    onMouseEnter={() => setTooltip({ visible: true, text: "Sustainable, self-contained ecosystem!" })}
+    onMouseLeave={() => setTooltip(null)}
+  >
+    <span className="text-[#1D2833] text-lg font-bold">...</span>
+  </div>
+)}
+
+// Ensure tooltip still works for the bubble
+{tooltip?.visible && (
+  <div className="absolute top-0 right-8 transform -translate-y-1/2 bg-[#2C3A4A] text-white text-xs p-1 rounded-md shadow-lg">
+    {tooltip.text}
+  </div>
+)}
             </div>
             <div className="flex justify-center space-x-4">
               {labels.map((label, index) => {
@@ -227,7 +243,6 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       transform -translate-x-1/2 -translate-y-1/2 
       overflow-y-auto bg-[#1D2833]/90`}
   >
-    <DialogTitle></DialogTitle>
     <div className="relative flex flex-col items-center justify-center h-full">
       <button
         className="absolute top-4 right-4 text-white hover:text-red-500"

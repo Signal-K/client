@@ -136,7 +136,7 @@ export const SunspotsCategories: Record<SunspotsCategory, CategoryConfig> = {
   'Sunspot': {
     name: 'Sunspot',
     color: '#1E88E5',
-    description: 'Used to indicate a sunspot'
+    description: 'Used to indicate a sunspot',
   },
   'Other': {
     name: 'Other',

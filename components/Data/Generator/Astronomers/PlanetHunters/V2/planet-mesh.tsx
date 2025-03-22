@@ -57,7 +57,7 @@ interface Landmark {
   position: { x: number; y: number }
   elevation?: number
   color?: string
-}
+};
 
 // Add onClick prop to PlanetMeshProps and add support for raycasting
 interface PlanetMeshProps {
@@ -72,8 +72,8 @@ interface PlanetMeshProps {
     temperature: number
     region: number
   }) => void
-  selectedLandmarkId?: string // Add this line
-}
+  selectedLandmarkId?: string
+};
 
 // Update the function signature to include the new prop
 export function PlanetMesh({ stats, terrainHeight = 5, onClick, selectedLandmarkId }: PlanetMeshProps) {
