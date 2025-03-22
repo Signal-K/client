@@ -79,16 +79,19 @@ export const CoMSCategories: Record<CoMShapesCategory, CategoryConfig> = {
     name: "Ozone",
     description: "Pink region on the map",
     color: "#ff3398",
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/ozone.png',
   },
   "CanyonCrater": {
     name: "Canyon / Crater",
     color: "#1a13dc",
     description: "Depressed region on the map with a blue tint",
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/crater.png',
   },
   "Twilightzonecloud": {
     name: "Twilight zone cloud",
     color: '#f20c26',
     description: 'A cloud near the red terminator line',
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/twilight.png',
   },
   "Streakcloud": {
     name: 'Streak cloud',

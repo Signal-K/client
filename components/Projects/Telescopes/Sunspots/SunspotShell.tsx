@@ -12,7 +12,6 @@ const SunspotSteps = () => {
     const session = useSession();
 
     const [steps, setSteps] = useState<MissionStep[]>([]);
-    const [missions, setMissions] = useState<Mission[]>([]);
     const [selectedMission, setSelectedMission] = useState<MissionStep | null>(null);
     const [currentChapter, setCurrentChapter] = useState<number>(1);
     const [experiencePoints, setExperiencePoints] = useState<number>(0);
@@ -26,27 +25,21 @@ const SunspotSteps = () => {
         3: 1,
     };
 
-    const fetchMissions = (): Mission[] => {
-        return [
-            {
-                id: 1,
-                chapter: 1,
-                title: "Annotate a photograph of a star to find sunspots",
-                description:
-                    "Help us understand how stars & suns develop sunspots and the effects these have on exoplanets",
-                icon: Sun,
-                points: 2,
-                completedCount: 0,
-                internalComponent: () => <SunspotsWrapper />,
-                color: 'text-yellow-500',
-            },
-            // comments, voting, etc...
-        ];
-    };
-
-    useEffect(() => {
-        fetchMissions();
-    }, [session]);
+    const [missions, setMissions] = useState([
+        {
+            id: 1,
+            chapter: 1,
+            title: "Annotate a photograph of a star to find sunspots",
+            description:
+                "Help us understand how stars & suns develop sunspots and the effects these have on exoplanets",
+            icon: Sun,
+            points: 2,
+            completedCount: 0,
+            internalComponent: () => <SunspotsWrapper />,
+            color: 'text-yellow-500',
+        },
+        // comments, voting, etc...
+    ])
 
     useEffect(() => {
         if (!session) {
@@ -132,16 +125,18 @@ const SunspotSteps = () => {
     };
 
     return (
-        <MissionShell
-            missions={missions.filter((mission) => mission.chapter === currentChapter)}
-            experiencePoints={experiencePoints}
-            level={level}
-            currentChapter={currentChapter}
-            maxUnlockedChapter={maxUnlockedChapter}
-            onPreviousChapter={handlePreviousChapter}
-            onNextChapter={handleNextChapter}
-            // tutorial mission
-        />
+        <div className="py-1">
+            <MissionShell
+                missions={missions.filter((mission) => mission.chapter === currentChapter)}
+                experiencePoints={experiencePoints}
+                level={level}
+                currentChapter={currentChapter}
+                maxUnlockedChapter={maxUnlockedChapter}
+                onPreviousChapter={handlePreviousChapter}
+                onNextChapter={handleNextChapter}
+                // tutorial mission
+            />
+        </div>
     );
 };
 

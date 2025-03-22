@@ -83,9 +83,9 @@ export default function ImageAnnotator({
       : annotationType === 'JVH'
       ? JVHCATEGORIES
       : annotationType === 'CAC'
-      ? SunspotsCategories
-      : annotationType === 'Sunspots'
       ? CACCategories
+      : annotationType === 'Sunspots'
+      ? SunspotsCategories
       : annotationType === 'CoMS'
       ? CoMSCategories
       : {} as Record<string, CategoryConfig>;
@@ -237,19 +237,19 @@ export default function ImageAnnotator({
             <SciFiPanel className="p-4">
               {anomalyId && anomalyType && missionNumber && (
                 <ClassificationForm
-                anomalyId={anomalyId}
-                anomalyType={anomalyType}
-                missionNumber={missionNumber}
-                parentPlanetLocation={parentPlanetLocation}
-                parentClassificationId={parentClassificationId}
-                assetMentioned={[
-                  ...uploads,
-                  ...(otherAssets || []),
-                  ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]),
-                ].filter((item): item is string => typeof item === 'string')}
-                structureItemId={structureItemId}
-                annotationOptions={annotationOptions}
-              />
+                  anomalyId={anomalyId}
+                  anomalyType={anomalyType}
+                  missionNumber={missionNumber}
+                  parentPlanetLocation={parentPlanetLocation}
+                  parentClassificationId={parentClassificationId}
+                  assetMentioned={[
+                    ...uploads,
+                    ...(otherAssets || []),
+                    ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]),
+                  ].filter((item): item is string => typeof item === 'string')}
+                  structureItemId={structureItemId}
+                  annotationOptions={annotationOptions}
+                />
               )}
             </SciFiPanel>
           )}
