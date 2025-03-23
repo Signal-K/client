@@ -106,7 +106,7 @@ export default function ImageAnnotator({
       } else if (data) {
         const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
         setUploads((prev) => [...prev, url]);
-        setIsFormVisible(true);
+        setIsFormVisible(annotationType === 'CoMS' || true);
       }
     } catch (err) {
       console.error('Unexpected error during canvas upload:', err);
@@ -233,7 +233,7 @@ export default function ImageAnnotator({
               ))}
             </SciFiPanel>
           )}
-          {isFormVisible && (
+          {/* {isFormVisible && ( */}
             <SciFiPanel className="p-4">
               {anomalyId && anomalyType && missionNumber && (
                 <ClassificationForm
@@ -252,7 +252,7 @@ export default function ImageAnnotator({
                 />
               )}
             </SciFiPanel>
-          )}
+          {/* // )} */}
         </div>
       )}
     </div>

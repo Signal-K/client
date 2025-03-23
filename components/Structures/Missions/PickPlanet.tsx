@@ -4,6 +4,8 @@ import PickPlanetCard from "@/content/Posts/PickPlanetCard";
 import PickAutomatonForPickPlanet from "./PickVehicle";
 import { Card, CardHeader } from "@/components/ui/card";
 import { SciFiButton } from "@/components/ui/styles/sci-fi/button";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface Classification {
   id: number;
@@ -182,6 +184,12 @@ export default function PreferredTerrestrialClassifications({
           </div>
         </div>
       )}
+
+      <Link href='/planets/mars'><Button
+        className="bg-blue-400"
+      >
+        View aggregate of classifications
+      </Button></Link>
     </div>
   );
 };

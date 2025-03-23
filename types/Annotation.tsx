@@ -72,7 +72,7 @@ export const CoMSCategories: Record<CoMShapesCategory, CategoryConfig> = {
   "CloudyRegion": {
     name: "Cloudy Region",
     color: '#00BCD4',
-    description: "A cloudy area without distinct or multiple cloud types",
+    description: "A cloudy area without distinct or with   multiple cloud types",
     iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/other-general.png'
   },
   "Ozone": {

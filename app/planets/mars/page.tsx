@@ -61,7 +61,7 @@ export default function MarsClassifications() {
         setBalloonClassifications(data.filter(c => c.classificationtype === 'balloon-marsCloudShapes'));
 
       } catch (err: any) {
-        console.error("Error fetching classifications:", err.message);
+        console.error("Error fetching classifications: ", err.message);
         setError("Failed to fetch classifications");
       } finally {
         setLoading(false);
