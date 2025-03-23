@@ -297,7 +297,17 @@ export function FullPlanetControls({
                 <div className="grid gap-4">
                   <div className="space-y-2">
                     <Label className="text-sm text-[#5FCBC3]">Biome</Label>
-                    <Select value={stats.biome} onValueChange={onBiomeChange}>
+                    <Select 
+  value={stats.biome} 
+  onValueChange={(newBiome) => {
+    // Prevent setting Oceanic World when density > 1.9
+    if (newBiome === "Oceanic World" && stats.density && stats.density > 1.9) {
+      alert("Oceanic World biome cannot be set when density is greater than 1.9 g/cm³");
+      return;
+    }
+    onBiomeChange(newBiome);
+  }}
+>
                       <SelectTrigger className="w-full bg-[#2C4F64] text-white border-[#5FCBC3]">
                         <SelectValue placeholder="Select biome" />
                       </SelectTrigger>

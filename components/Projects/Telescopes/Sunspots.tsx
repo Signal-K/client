@@ -249,6 +249,7 @@ export function StarterSunspot({ anomalyid }: SelectedAnomalyProps ) {
                         anomalyType="sunspot"
                         assetMentioned={imageUrl}
                         structureItemId={3103}
+                        missionNumber={5055655555}
                         parentPlanetLocation={anomalyid?.toString() || ''}
                         annotationType="Sunspots"
                     />

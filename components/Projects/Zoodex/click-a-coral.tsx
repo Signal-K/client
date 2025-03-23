@@ -101,6 +101,7 @@ export function ClickACoral() {
                                 anomalyType="zoodex-clickACoral"
                                 assetMentioned={imageUrl || ""}
                                 structureItemId={3104}
+                                missionNumber={585858585}
                                 annotationType="CAC"
                             />
                             {/* <ClassificationForm

@@ -78,7 +78,7 @@ export default function AdvancedPlanetGenerator() {
   const handleBiomeChange = (newBiome: string) => {
     setBiome(newBiome)
     // The parameters will be adjusted by the useEffect in FullPlanetControls
-  }
+  };
 
   const handleImport = (importedStats: Partial<PlanetStats>) => {
     if (importedStats.mass !== undefined) setMass(importedStats.mass)
