@@ -31,12 +31,12 @@ export interface PlanetStats {
   stormFrequency: number // 0 to 1
   volcanicActivity: number // 0 to 1
   biome: string
-  cloudTypes: CloudCategory[]
-  cloudDensity: number
+  // cloudTypes: CloudCategory[]
+  // cloudDensity: number
   surfaceDeposits?: string[] // New field for surface deposits
   precipitationCompound?: "none" | "water" | "co2" | "snow" | "methane" // New field for precipitation compound
   landmarks?: Landmark[] // New field for landmarks
-}
+};
 
 export interface LiquidInfo {
   type: "water" | "methane" | "nitrogen" | "none"
@@ -79,9 +79,9 @@ export function calculatePlanetStats(
   stormFrequency = 0.2,
   volcanicActivity = 0.2,
   biome = "Rocky Highlands",
-  cloudTypes: CloudCategory[] = ["Cumulus" as CloudCategory],
-  cloudDensity = 0.5,
-  precipitationCompound: "none" | "water" | "co2" | "snow" | "methane" = "water",
+  // cloudTypes: CloudCategory[] = ["Cumulus" as CloudCategory],
+  // cloudDensity = 0.5,
+  // precipitationCompound: "none" | "water" | "co2" | "snow" | "methane" = "water",
   landmarks?: Landmark[],
   terrainData?: Array<{ x: number; y: number; elevation: number }>,
 ): PlanetStats {
@@ -99,16 +99,16 @@ export function calculatePlanetStats(
   const surfaceDeposits = getSurfaceDeposits(biome)
 
   // Determine default precipitation compound based on temperature if none is specified
-  let effectivePrecipitationCompound = precipitationCompound
-  if (precipitationCompound === "water" && temperature < 273) {
-    effectivePrecipitationCompound = "snow"
-  } else if (precipitationCompound === "water" && temperature > 373) {
-    effectivePrecipitationCompound = "none" // Too hot for water precipitation
-  } else if (precipitationCompound === "methane" && temperature > 112) {
-    effectivePrecipitationCompound = "none" // Too hot for methane precipitation
-  } else if (precipitationCompound === "co2" && temperature > 195) {
-    effectivePrecipitationCompound = "none" // Too hot for CO2 precipitation
-  }
+  // let effectivePrecipitationCompound = precipitationCompound
+  // if (precipitationCompound === "water" && temperature < 273) {
+  //   effectivePrecipitationCompound = "snow"
+  // } else if (precipitationCompound === "water" && temperature > 373) {
+  //   effectivePrecipitationCompound = "none" // Too hot for water precipitation
+  // } else if (precipitationCompound === "methane" && temperature > 112) {
+  //   effectivePrecipitationCompound = "none" // Too hot for methane precipitation
+  // } else if (precipitationCompound === "co2" && temperature > 195) {
+  //   effectivePrecipitationCompound = "none" // Too hot for CO2 precipitation
+  // }
 
   // Generate landmarks if not provided and terrain data is available
   let effectiveLandmarks = landmarks
@@ -152,10 +152,10 @@ export function calculatePlanetStats(
     stormFrequency,
     volcanicActivity,
     biome,
-    cloudTypes: cloudTypes as CloudCategory[],
-    cloudDensity,
+    // cloudTypes: cloudTypes as CloudCategory[],
+    // cloudDensity,
     surfaceDeposits,
-    precipitationCompound: effectivePrecipitationCompound,
+    // precipitationCompound: effectivePrecipitationCompound,
     landmarks: effectiveLandmarks,
   }
 }

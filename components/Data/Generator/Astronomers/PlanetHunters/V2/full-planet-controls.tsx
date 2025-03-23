@@ -487,13 +487,13 @@ export function FullPlanetControls({
                     max={getParameterRange(stats.biome, "cloudCount")[1]}
                     onChange={onCloudCountChange}
                   />
-                  <SliderControl
+                  {/* <SliderControl
                     label="Cloud Density"
                     value={stats.cloudDensity ?? 0}
                     min={0}
                     max={1}
                     onChange={onCloudDensityChange}
-                  />
+                  /> */}
                   <SliderControl
                     label="Weather Variability"
                     value={stats.weatherVariability ?? 0}

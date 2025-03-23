@@ -77,7 +77,7 @@ export function FullPlanetGenerator() {
     // atmosphereHeight,
   )
 
-  const terrainHeight = calculateTerrainHeight(stats)
+  const terrainHeight = calculateTerrainHeight(stats);
 
   const handleImport = (importedStats: Partial<PlanetStats>) => {
     if (importedStats.mass !== undefined) setMass(importedStats.mass)
@@ -103,8 +103,8 @@ export function FullPlanetGenerator() {
     if (importedStats.stormFrequency !== undefined) setStormFrequency(importedStats.stormFrequency)
     if (importedStats.volcanicActivity !== undefined) setVolcanicActivity(importedStats.volcanicActivity)
     if (importedStats.biome !== undefined) setBiome(importedStats.biome)
-    if (importedStats.cloudTypes !== undefined) setCloudTypes(importedStats.cloudTypes)
-    if (importedStats.cloudDensity !== undefined) setCloudDensity(importedStats.cloudDensity)
+    // if (importedStats.cloudTypes !== undefined) setCloudTypes(importedStats.cloudTypes)
+    // if (importedStats.cloudDensity !== undefined) setCloudDensity(importedStats.cloudDensity)
     // if (importedStats.atmosphereVisibility !== undefined) setAtmosphereVisibility(importedStats.atmosphereVisibility)
     // if (importedStats.atmosphereHeight !== undefined) setAtmosphereHeight(importedStats.atmosphereHeight)
     setTypeOverride(null)

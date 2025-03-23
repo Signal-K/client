@@ -7,6 +7,8 @@ import CloudClassificationSummary from "@/components/Structures/Missions/Meteoro
 import SatellitePlanetFourAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/P4Aggregator";
 import AI4MAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AI4MAggregator";
 import { AggregatedCloud, AggregatedAI4M, AggregatedP4 } from "../[id]/page";
+import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
+import { calculatePlanetStats, calculateTerrainHeight } from "@/utils/planet-physics";
 
 export default function MarsClassifications() {
   const supabase = useSupabaseClient();
@@ -69,8 +71,8 @@ export default function MarsClassifications() {
     fetchClassifications();
   }, [supabase]);
 
-  if (loading) return <div>Loading classifications...</div>;
-  if (error) return <div>Error: {error}</div>;
+  // if (loading) return <div>Loading classifications...</div>;
+  // if (error) return <div>Error: {error}</div>;
 
   // Summary update handlers
   const handleCloudSummaryUpdate = (summary: AggregatedCloud) => setCloudSummary(summary);
@@ -126,11 +128,76 @@ export default function MarsClassifications() {
     );
   };
 
+  const [mass, setMass] = useState(0.107);
+  const [radius, setRadius] = useState(0.532);
+  const [temperature, setTemperature] = useState(210.0);
+  const [orbitalPeriod, setOrbitalPeriod] = useState(687.0);
+  const [typeOverride, setTypeOverride] = useState<"terrestrial" | "gaseous" | null>("terrestrial");
+  const [atmosphereStrength, setAtmosphereStrength] = useState(0.01);
+  const [cloudCount, setCloudCount] = useState(5.412);
+  const [waterHeight, setWaterHeight] = useState(0.02);
+  const [surfaceRoughness, setSurfaceRoughness] = useState(0.72);
+  const [biomeFactor, setBiomeFactor] = useState(0.14);
+  const [cloudContribution, setCloudContribution] = useState(0.12);
+  const [terrainVariation, setTerrainVariation] = useState<"flat" | "moderate" | "chaotic">("chaotic");
+  const [terrainErosion, setTerrainErosion] = useState(0.03);
+  const [plateTectonics, setPlateTectonics] = useState(0.01);
+  const [soilType, setSoilType] = useState<"rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy">("dusty");
+  const [biomassLevel, setBiomassLevel] = useState(0.0);
+  const [waterLevel, setWaterLevel] = useState(0.01);
+  const [salinity, setSalinity] = useState(0.22);
+  const [subsurfaceWater, setSubsurfaceWater] = useState(0.38);
+  const [atmosphericDensity, setAtmosphericDensity] = useState(0.02);
+  const [weatherVariability, setWeatherVariability] = useState(0.41);
+  const [stormFrequency, setStormFrequency] = useState(0.14);
+  const [volcanicActivity, setVolcanicActivity] = useState(0.001);
+  const [biome, setBiome] = useState("Barren Wasteland");
+  const [cloudTypes, setCloudTypes] = useState<string[]>([""]);
+  const [cloudDensity, setCloudDensity] = useState(0.5);
+  const [atmosphereVisibility, setAtmosphereVisibility] = useState(1);
+  const [atmosphereHeight, setAtmosphereHeight] = useState(1);  
+  
+  const stats = calculatePlanetStats(
+    mass,
+    radius,
+    temperature,
+    orbitalPeriod,
+    typeOverride,
+    atmosphereStrength,
+    cloudCount,
+    waterHeight,
+    surfaceRoughness,
+    undefined,
+    biomeFactor,
+    cloudContribution,
+    terrainVariation,
+    terrainErosion,
+    plateTectonics,
+    biomassLevel,
+    waterLevel,
+    salinity,
+    subsurfaceWater,
+    atmosphericDensity,
+    weatherVariability,
+    stormFrequency,
+    volcanicActivity,
+    biome,
+  );  
+
+  const terrainHeight = calculateTerrainHeight(stats);
+
   return (
     <div className="p-6 bg-black text-white border rounded-md opacity-80 shadow-md relative">
       <Navbar />
-      <div className="py-5">
+      <div className="py-10">
         <h1 className="text-xl font-bold mb-4">Mars Classifications</h1>
+        <PlanetScene
+          stats={
+            stats
+          }
+          terrainHeight={terrainHeight}
+
+        />
         <button
           onClick={toggleMetadataVisibility}
           className="ml-4 px-4 bg-green-500 text-white rounded-md"

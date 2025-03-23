@@ -43,8 +43,8 @@ interface PlanetStats {
   stormFrequency: number
   volcanicActivity: number
   biome: string
-  cloudTypes: string[]
-  cloudDensity: number
+  // cloudTypes: string[]
+  // cloudDensity: number
   surfaceDeposits?: string[]
   precipitationCompound?: "none" | "water" | "co2" | "snow" | "methane"
   landmarks?: Landmark[]
@@ -86,27 +86,27 @@ export function PlanetMesh({ stats, terrainHeight = 5, onClick, selectedLandmark
   const [clickable, setClickable] = useState<boolean>(!!onClick)
 
   // Convert string cloud types to CloudCategory types
-  const cloudCategories = useMemo(() => {
-    return (stats.cloudTypes || []).filter((type) => Object.keys(CloudCategories).includes(type)) as CloudCategory[]
-  }, [stats.cloudTypes])
+  // const cloudCategories = useMemo(() => {
+  //   return (stats.cloudTypes || []).filter((type) => Object.keys(CloudCategories).includes(type)) as CloudCategory[]
+  // }, [stats.cloudTypes])
 
   // If no valid cloud types, use CloudyRegion as default
-  const effectiveCloudTypes = cloudCategories.length > 0 ? cloudCategories : (["CloudyRegion"] as CloudCategory[])
+  // const effectiveCloudTypes = cloudCategories.length > 0 ? cloudCategories : (["CloudyRegion"] as CloudCategory[])
 
   const { material, cloudMaterial, atmosphereMaterial } = useMemo(() => {
     const liquidInfo = determineLiquidType(stats.temperature)
 
     // Generate cloud pattern functions for each cloud type
-    const cloudPatternFunctions = effectiveCloudTypes.map(getCloudPattern).join("\n")
+    // const cloudPatternFunctions = effectiveCloudTypes.map(getCloudPattern).join("\n")
 
     // Get cloud colors for each type
-    const cloudColors = effectiveCloudTypes.map((type) => {
-      const color = CloudCategories[type]?.color || "#FFFFFF"
-      return hexToRgb(color)
-    })
+    // const cloudColors = effectiveCloudTypes.map((type) => {
+    //   const color = CloudCategories[type]?.color || "#FFFFFF"
+    //   return hexToRgb(color)
+    // })
 
     // Create uniform arrays for cloud colors
-    const cloudColorsFlat = cloudColors.flat()
+    // const cloudColorsFlat = cloudColors.flat()
 
     const shader = new THREE.ShaderMaterial({
       uniforms: {
@@ -535,9 +535,9 @@ export function PlanetMesh({ stats, terrainHeight = 5, onClick, selectedLandmark
         planetRadius: { value: stats.radius },
         cloudCount: { value: stats.cloudCount },
         cloudContribution: { value: stats.cloudContribution },
-        cloudDensity: { value: stats.cloudDensity || 0.5 },
-        cloudColors: { value: cloudColorsFlat },
-        cloudTypesCount: { value: effectiveCloudTypes.length },
+        // cloudDensity: { value: stats.cloudDensity || 0.5 },
+        // cloudColors: { value: cloudColorsFlat },
+        // cloudTypesCount: { value: effectiveCloudTypes.length },
       },
       vertexShader: `
         uniform float time;
@@ -587,8 +587,7 @@ export function PlanetMesh({ stats, terrainHeight = 5, onClick, selectedLandmark
           return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
         }
 
-        // Cloud pattern functions for different cloud types
-        ${cloudPatternFunctions}
+        // Cloud pattern functions for different cloud types {$ ... {cloudPatternFunctions}
 
         void main() {
           vec2 uv = vUv;
@@ -596,23 +595,6 @@ export function PlanetMesh({ stats, terrainHeight = 5, onClick, selectedLandmark
           vec3 cloudColor = vec3(1.0);
           
           // Apply different cloud patterns based on cloud types
-          ${effectiveCloudTypes
-            .map(
-              (type, index) => `
-            // ${CloudCategories[type].name} pattern
-            float pattern${index} = ${getPatternFunctionName(type)}(uv, time);
-            totalPattern += pattern${index} * (1.0 / cloudTypesCount);
-            
-            // Apply cloud color with increased saturation and brightness
-            vec3 color${index} = vec3(
-              cloudColors[${index * 3}], 
-              cloudColors[${index * 3 + 1}], 
-              cloudColors[${index * 3 + 2}]
-            );
-            // Enhance color saturation and brightness
-            color${index} = color${index} * 1.5;
-            cloudColor = mix(cloudColor, color${index}, pattern${index} * (1.0 / cloudTypesCount) * 3.0);
-          `,
             )
             .join("\n")}
           
@@ -656,8 +638,8 @@ export function PlanetMesh({ stats, terrainHeight = 5, onClick, selectedLandmark
         liquidColor: { value: new THREE.Color(liquidInfo.color) },
         isGaseous: { value: stats.type === "gaseous" ? 1.0 : 0.0 },
         time: { value: 0 },
-        cloudColors: { value: cloudColorsFlat },
-        cloudTypesCount: { value: effectiveCloudTypes.length },
+        // cloudColors: { value: cloudColorsFlat },
+        // cloudTypesCount: { value: effectiveCloudTypes.length },
         precipitationCompound: {
           value:
             stats.precipitationCompound === "none"
@@ -839,9 +821,9 @@ export function PlanetMesh({ stats, terrainHeight = 5, onClick, selectedLandmark
     stats.biomeFactor,
     stats.cloudContribution,
     stats.terrainVariation,
-    effectiveCloudTypes,
+    // effectiveCloudTypes,
     stats.cloudCount,
-    stats.cloudDensity,
+    // stats.cloudDensity,
     stats.atmosphereStrength,
     stats.precipitationCompound,
     stats.weatherVariability,
@@ -863,7 +845,7 @@ export function PlanetMesh({ stats, terrainHeight = 5, onClick, selectedLandmark
       cloudMaterial.uniforms.time.value = state.clock.elapsedTime
       cloudMaterial.uniforms.cloudCount.value = stats.cloudCount
       cloudMaterial.uniforms.cloudContribution.value = stats.cloudContribution
-      cloudMaterial.uniforms.cloudDensity.value = stats.cloudDensity || 0.5
+      // cloudMaterial.uniforms.cloudDensity.value = stats.cloudDensity || 0.5
     }
     if (atmosphereRef.current) {
       atmosphereMaterial.uniforms.atmosphereStrength.value = stats.atmosphereStrength

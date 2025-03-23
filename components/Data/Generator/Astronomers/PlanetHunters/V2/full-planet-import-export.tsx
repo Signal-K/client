@@ -36,8 +36,6 @@ weatherVariability: ${stats.weatherVariability?.toFixed(2) ?? "N/A"}
 stormFrequency: ${stats.stormFrequency?.toFixed(2) ?? "N/A"}
 volcanicActivity: ${stats.volcanicActivity?.toFixed(2) ?? "N/A"}
 biome: ${stats.biome ?? "N/A"}
-cloudTypes: ${JSON.stringify(stats.cloudTypes) ?? "N/A"}
-cloudDensity: ${stats.cloudDensity?.toFixed(2) ?? "N/A"}
 precipitationCompound: ${stats.precipitationCompound ?? "water"}
 landmarks: ${JSON.stringify(stats.landmarks) ?? "[]"}`
     setImportExportText(exportText)
