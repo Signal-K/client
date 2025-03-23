@@ -64,6 +64,14 @@ export interface AggregatedAI4M {
   classificationCounts: Record<string, number>;
 };
 
+export interface AggregatedBalloon {
+  shapeCount: number;
+  vortexCount: number;
+  streakCount: number;
+  unlabelledCount: number;
+  classificationCounts: Record<string, number>;
+};
+
 export interface AI4MClassification {
   id: number;
   classificationConfiguration: any;

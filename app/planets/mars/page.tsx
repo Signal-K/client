@@ -6,9 +6,10 @@ import Navbar from "@/components/Layout/Navbar";
 import CloudClassificationSummary from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudAggregator";
 import SatellitePlanetFourAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/P4Aggregator";
 import AI4MAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AI4MAggregator";
-import { AggregatedCloud, AggregatedAI4M, AggregatedP4 } from "../[id]/page";
+import { AggregatedCloud, AggregatedBalloon, AggregatedAI4M, AggregatedP4 } from "../[id]/page";
 import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
 import { calculatePlanetStats, calculateTerrainHeight } from "@/utils/planet-physics";
+import MarsCloudsShapesAggregator from "@/components/Structures/Missions/Meteorologists/Cloudspotting/Shapes/ShapesAggregator";
 
 export default function MarsClassifications() {
   const supabase = useSupabaseClient();
@@ -24,6 +25,7 @@ export default function MarsClassifications() {
   const [cloudSummary, setCloudSummary] = useState<AggregatedCloud | null>(null);
   const [p4Summary, setP4Summary] = useState<AggregatedP4 | null>(null);
   const [ai4MSummary, setAI4MSummary] = useState<AggregatedAI4M | null>(null);
+  const [balloonSummary, setBalloonSummary] = useState<AggregatedBalloon | null>(null);
 
   // Individual classification type states
   const [cloudClassifications, setCloudClassifications] = useState<any[]>([]);
@@ -78,6 +80,7 @@ export default function MarsClassifications() {
   const handleCloudSummaryUpdate = (summary: AggregatedCloud) => setCloudSummary(summary);
   const handleP4SummaryUpdate = (summary: AggregatedP4) => setP4Summary(summary);
   const handleAI4MSummaryUpdate = (summary: AggregatedAI4M) => setAI4MSummary(summary);
+  const handleBalloonSummaryUpdate = (summary: AggregatedBalloon) => setBalloonSummary(summary);
 
   // Classification content rendering
   const renderClassificationList = (typeClassifications: any[], title: string) => {
@@ -227,6 +230,13 @@ export default function MarsClassifications() {
             classifications={ai4MClassifications}
             onSummaryUpdate={handleAI4MSummaryUpdate}
           />
+        )}
+
+        {balloonClassifications.length > 0 && (
+          <MarsCloudsShapesAggregator
+            classifications={balloonClassifications}
+            onSummaryUpdate={handleBalloonSummaryUpdate}
+          />        
         )}
 
         {/* Metadata Section */}

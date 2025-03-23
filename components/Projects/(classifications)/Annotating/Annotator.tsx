@@ -106,7 +106,7 @@ export default function ImageAnnotator({
       } else if (data) {
         const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
         setUploads((prev) => [...prev, url]);
-        setIsFormVisible(annotationType === 'CoMS' || true);
+        setIsFormVisible(true);
       }
     } catch (err) {
       console.error('Unexpected error during canvas upload:', err);

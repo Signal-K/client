@@ -89,8 +89,10 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return "What surface types do you see from your rover?";
       case 'lidar-jovianVortexHunter':
         return "Describe the patterns in the clouds you see...";
-    case "telescope-minorPlanet":
+      case "telescope-minorPlanet":
         return "Does the highlighted object move smoothly through the images? What do you see...?"
+      case 'balloon-marsCloudShapes':
+        return 'What cloud shapes do you see?...';
       default:
         return "Enter your classification details...";
     }
@@ -132,11 +134,13 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return [DailyMinorPlanetOptions];
       case "automaton-aiForMars":
         return [automatonaiForMarsOptions];
+      case 'balloon-marsCloudShapes':
+        return [cloudSpottingOnMarsShapesOptions];
       case "zoodex-nestQuestGo":
         return [];
       default:
         return [];
-    }
+    };
   })();
 
   const showTextArea = classificationOptions.length === 0;

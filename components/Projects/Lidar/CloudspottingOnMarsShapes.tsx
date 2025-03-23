@@ -73,8 +73,10 @@ export function StarterCoMShapes({ anomalyid }: SelectedAnomProps) {
                         initialImageUrl={imageUrl}
                         anomalyId={anomaly.id.toString()}
                         anomalyType='balloon-marsCloudShapes'
+                        missionNumber={2000000555}
                         assetMentioned={imageUrl}
                         structureItemId={3105}
+                        parentClassificationId={anomalyid}
                         parentPlanetLocation={anomalyid?.toString() || ''}
                         annotationType="CoMS"
                     />
