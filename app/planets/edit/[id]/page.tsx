@@ -6,7 +6,6 @@ import Navbar from "@/components/Layout/Navbar";
 import { PostCardSingleWithGeneratorEditMode } from "@/content/Posts/PostWithGen";
 import CloudClassificationSummary from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudAggregator";
 import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
-import ClassificationComments from "@/content/Classifications/ClassificationStats";
 
 import { Classification } from "../../[id]/page";
 

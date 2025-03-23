@@ -51,3 +51,33 @@ export default function ClassificationStats() {
     </div>
   );
 };
+
+interface LastWeekProps {
+  classificationType: string;
+};
+
+export function ClassificationsLastWeek({ classificationType }: LastWeekProps) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const [typeCount, setTypeCount] = useState(0);
+
+  useEffect(() => {
+    const fetchTypeStats = async () => {
+      if (!session?.user?.id || !classificationType) return;
+
+      const { data: typeCountData } = await supabase
+        .from("classifications")
+        .select("id", { count: "exact" })
+        .eq("author", session.user.id)
+        .eq("classificationtype", classificationType)
+        .gte("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+
+      setTypeCount(typeCountData?.length || 0);
+    };
+
+    fetchTypeStats();
+  }, [session, supabase, classificationType]);
+
+  return <p>Your {classificationType} classifications this week: {typeCount}</p>;
+};

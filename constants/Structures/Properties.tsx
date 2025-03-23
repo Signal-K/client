@@ -57,6 +57,7 @@ interface IndividualStructureProps {
       dynamicComponent?: React.ReactNode;
       sizePercentage?: number;
       showInNoModal?: boolean;
+      classificationtype?: string;
     }[];
     modals?: {
       icon: React.ReactNode;
@@ -186,6 +187,7 @@ export const StructuresConfig: StructureConfig = {
           // dynamicComponent: <StarterTelescope />,
           // dynamicComponent: <StarterTelescopeTess />,
           dynamicComponent: <PlanetHuntersSteps />,
+          classificationtype: 'planet',
           sizePercentage: 95,
           showInNoModal: true,
         },
@@ -193,6 +195,7 @@ export const StructuresConfig: StructureConfig = {
           icon: <SunIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Sunspot data",
           dynamicComponent: <SunspotSteps />,
+          classificationtype: "sunspot",
           // ^^ Integrate to create electrical interference or cool "troughs"?
           sizePercentage: 60,
         },
@@ -311,6 +314,7 @@ export const StructuresConfig: StructureConfig = {
           text: "Search your clouds",
           dynamicComponent: <CloudspottingOnMars />,
           sizePercentage: 60,
+          classificationtype: 'cloud',
         },
         {
           icon: <CloudDrizzleIcon className="w-6 h-6 text-[#5e81ac]" />,
@@ -334,6 +338,7 @@ export const StructuresConfig: StructureConfig = {
           icon: <CameraOffIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: 'Map the surface of planets',
           dynamicComponent: <PlanetFour />,
+          classificationtype: 'cloud',
           sizePercentage: 50,
         },
       ],

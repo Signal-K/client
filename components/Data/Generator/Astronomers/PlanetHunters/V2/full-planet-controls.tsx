@@ -179,7 +179,7 @@ export function FullPlanetControls({
 
       if (stats.plateTectonics < plateTectonicsRange[0] || stats.plateTectonics > plateTectonicsRange[1]) {
         onPlateTectonicsChange(Math.min(Math.max(stats.plateTectonics, plateTectonicsRange[0]), plateTectonicsRange[1]))
-      }
+      };
 
       if (stats.biomassLevel < biomassLevelRange[0] || stats.biomassLevel > biomassLevelRange[1]) {
         onBiomassLevelChange(Math.min(Math.max(stats.biomassLevel, biomassLevelRange[0]), biomassLevelRange[1]))
