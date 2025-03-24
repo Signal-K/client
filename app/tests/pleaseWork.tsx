@@ -43,10 +43,12 @@ export default function ChatGPTImageClassifier() {
   // Handle file upload
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null
-    setImage(file)
-
-    if (file) {
+    if (file && file.type.startsWith("image/")) {
+      setImage(file)
       setPreview(URL.createObjectURL(file))
+    } else {
+      setImage(null)
+      setPreview(null)
     }
   }
 
@@ -244,7 +246,7 @@ export default function ChatGPTImageClassifier() {
                 }}
               />
             ) : preview ? (
-              <img src={preview || "/placeholder.svg"} alt="Preview" className="w-full h-full object-cover" />
+              <img src={preview ? preview : "/placeholder.svg"} alt="Preview" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-200">
                 <div className="text-gray-500 text-center p-4 flex flex-col items-center">
