@@ -211,13 +211,13 @@ export function BurrowingOwl() {
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const [showTutorial, setShowTutorial] = useState(false);
 
-    const [loading, setLoading] = useState(true);
+    const [showTutorial, setShowTutorial] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     // Check tutorial mission
-    const [hasMission3000002, setHasMission3000002] = useState<boolean | null>(null);
-    const [missionLoading, setMissionLoading] = useState<boolean>(true);
+    // const [hasMission3000002, setHasMission3000002] = useState<boolean | null>(null);
+    // const [missionLoading, setMissionLoading] = useState<boolean>(true);
 
     useEffect(() => {
         async function fetchAnomaly() {
@@ -335,6 +335,33 @@ export function BurrowingOwl() {
                         </>
                     )}
                 </center>
+            </div>
+        </div>
+    );
+};
+
+interface BurrowingOwlPassProps {
+    anomalyid: string;
+};
+
+export function BurrowingOwlPassed ( { anomalyid}: BurrowingOwlPassProps ) {
+    const supabase = useSupabaseClient();
+    const session = useSession();            
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-burrowingOwl/${anomalyid}.jpeg`
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+            <div className="pb-4 rounded-md relative w-full">
+            <img src={imageUrl || ''} alt={anomalyid} className="w-full h-64 object-cover" />
+                <ClassificationForm
+                    anomalyId={anomalyid}
+                    anomalyType="zoodex-burrowingOwl"
+                    missionNumber={100000035}
+                    assetMentioned={imageUrl || ""}
+                    structureItemId={3104}
+                />
             </div>
         </div>
     );

@@ -5,16 +5,16 @@ import AutomatonUpgrade from "@/components/Structures/Config/AutomatonUpgradeBox
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
 import { StarterLidar } from "@/components/Projects/Lidar/Clouds";
-import { BarChart, BeanIcon, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, FishIcon, FlagIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, Trophy, WebcamIcon } from "lucide-react";
+import { BarChart, BeanIcon, BellElectric, BookAIcon, BookAudioIcon, BookCopy, BookDashedIcon, BriefcaseIcon, CameraIcon, CameraOffIcon, CaravanIcon, CloudCogIcon, CloudDrizzleIcon, CogIcon, ConstructionIcon, DogIcon, DotSquare, EarthIcon, FishIcon, FlagIcon, GemIcon, GlassesIcon, HeartIcon, LockIcon, LucideSalad, MehIcon, MicroscopeIcon, MoonStarIcon, PenBox, PhoneIcon, PickaxeIcon, PowerIcon, RssIcon, SaladIcon, StarIcon, SunIcon, SwitchCamera, TelescopeIcon, TestTubeDiagonal, TestTubeDiagonalIcon, TreePalmIcon, Trophy, WebcamIcon } from "lucide-react";
 // import StructureRepair from "@/components/Structures/Config/RepairStructure";
 import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
 import ModernTechTree from "@/components/Structures/Research/TechTree";
 import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
-import { TelescopeSunspotDetector } from "@/components/Projects/Telescopes/Sunspots";
+import { SunspotsWrapper } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
 import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
-import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
+// import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
 import PlanktonPortal from "@/components/Structures/Missions/Biologists/Plankton/PlanktonPortal";
 import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
 // import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
@@ -25,6 +25,7 @@ import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunte
 import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
 // import TutorialPopup from "@/content/Dialogue/helpButton";
 import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";
+import ChatGPTImageClassifier from "@/app/tests/pleaseWork";
 import { ZoodexIguanas } from "@/components/Projects/Zoodex/iguanasFromAbove";
 import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters";
 import { useRouter } from 'next/router';
@@ -36,6 +37,8 @@ import AI4M from "@/components/Structures/Missions/Astronomers/SatellitePhotos/A
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 import { GreenhouseResearchStations } from "@/components/Structures/Missions/Biologists/ResearchStations";
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
+import CloudspottingOnMarsShapes from "@/components/Structures/Missions/Meteorologists/Cloudspotting/Shapes/ShapesOnMars";
+import SunspotSteps from "@/components/Projects/Telescopes/Sunspots/SunspotShell";
 
 interface IndividualStructureProps {
     name?: string;
@@ -54,6 +57,7 @@ interface IndividualStructureProps {
       dynamicComponent?: React.ReactNode;
       sizePercentage?: number;
       showInNoModal?: boolean;
+      classificationtype?: string;
     }[];
     modals?: {
       icon: React.ReactNode;
@@ -183,13 +187,16 @@ export const StructuresConfig: StructureConfig = {
           // dynamicComponent: <StarterTelescope />,
           // dynamicComponent: <StarterTelescopeTess />,
           dynamicComponent: <PlanetHuntersSteps />,
+          classificationtype: 'planet',
           sizePercentage: 95,
           showInNoModal: true,
         },
         {
           icon: <SunIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Sunspot data",
-          dynamicComponent: <TelescopeSunspotDetector />,
+          dynamicComponent: <SunspotSteps />,
+          classificationtype: "sunspot",
+          // ^^ Integrate to create electrical interference or cool "troughs"?
           sizePercentage: 60,
         },
         {
@@ -235,7 +242,7 @@ export const StructuresConfig: StructureConfig = {
         {
           icon: <CameraIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: "Capture animals",
-          dynamicComponent: <CameraComponent />,
+          // dynamicComponent: <CameraComponent />,
           sizePercentage: 60,
         },
       ],
@@ -263,6 +270,12 @@ export const StructuresConfig: StructureConfig = {
           text: "My Greenhouse Stations",
           dynamicComponent: <GreenhouseResearchStations />,
           sizePercentage: 80,
+        },
+        {
+          icon: <CameraIcon className="w-6 h-6 text-[#5e86ht]" />,
+          text: 'Scan animals around you',
+          dynamicComponent: <ChatGPTImageClassifier />,
+          sizePercentage: 90,
         },
       ],
     },
@@ -301,6 +314,7 @@ export const StructuresConfig: StructureConfig = {
           text: "Search your clouds",
           dynamicComponent: <CloudspottingOnMars />,
           sizePercentage: 60,
+          classificationtype: 'cloud',
         },
         {
           icon: <CloudDrizzleIcon className="w-6 h-6 text-[#5e81ac]" />,
@@ -315,9 +329,16 @@ export const StructuresConfig: StructureConfig = {
           sizePercentage: 50,
         },
         {
+          icon: <BellElectric className="w-6 h-6 text-[#6e856h]" />,
+          text: 'Identify unique cloud shapes on your planets',
+          dynamicComponent: <CloudspottingOnMarsShapes />,
+          sizePercentage: 60,
+        },
+        {
           icon: <CameraOffIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: 'Map the surface of planets',
           dynamicComponent: <PlanetFour />,
+          classificationtype: 'cloud',
           sizePercentage: 50,
         },
       ],

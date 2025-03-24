@@ -2,12 +2,14 @@
 
 import { getSurfaceDeposits } from "./biome-data"
 import type { CloudCategory } from "./cloud-types"
+import type { Landmark } from "./landmark-types"
+import { generateLandmarks } from "./landmark-types"
 
 export interface PlanetStats {
   mass: number // Earth masses
   radius: number // Earth radii
   density: number // g/cm³
-  type: "terrestrial" | "gaseous"
+  type: "terrestrial" | "gaseous" | undefined;
   temperature: number // Kelvin
   orbitalPeriod: number // Earth days
   atmosphereStrength: number // 0 to 1
@@ -19,7 +21,7 @@ export interface PlanetStats {
   terrainVariation: "flat" | "moderate" | "chaotic"
   terrainErosion: number // 0 to 1
   plateTectonics: number // 0 to 1
-  // soilType: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy" | undefined
+  // soilType?: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy" | undefined
   biomassLevel: number // 0 to 1
   waterLevel: number // 0 to 1
   salinity: number // 0 to 1
@@ -29,9 +31,11 @@ export interface PlanetStats {
   stormFrequency: number // 0 to 1
   volcanicActivity: number // 0 to 1
   biome: string
-  cloudTypes: CloudCategory[]
-  cloudDensity: number
+  // cloudTypes: CloudCategory[]
+  // cloudDensity: number
   surfaceDeposits?: string[] // New field for surface deposits
+  precipitationCompound?: "none" | "water" | "co2" | "snow" | "methane" // New field for precipitation compound
+  landmarks?: Landmark[] // New field for landmarks
 };
 
 export interface LiquidInfo {
@@ -75,8 +79,11 @@ export function calculatePlanetStats(
   stormFrequency = 0.2,
   volcanicActivity = 0.2,
   biome = "Rocky Highlands",
-  cloudTypes: CloudCategory[] = ["Cumulus"].map(type => type as CloudCategory),
-  cloudDensity = 0.5,
+  // cloudTypes: CloudCategory[] = ["Cumulus" as CloudCategory],
+  // cloudDensity = 0.5,
+  // precipitationCompound: "none" | "water" | "co2" | "snow" | "methane" = "water",
+  landmarks?: Landmark[],
+  terrainData?: Array<{ x: number; y: number; elevation: number }>,
 ): PlanetStats {
   const earthDensity = 5.51 // g/cm³
   const calculatedDensity = density || (mass / Math.pow(radius, 3)) * earthDensity
@@ -90,6 +97,34 @@ export function calculatePlanetStats(
 
   // Get surface deposits based on biome
   const surfaceDeposits = getSurfaceDeposits(biome)
+
+  // Determine default precipitation compound based on temperature if none is specified
+  // let effectivePrecipitationCompound = precipitationCompound
+  // if (precipitationCompound === "water" && temperature < 273) {
+  //   effectivePrecipitationCompound = "snow"
+  // } else if (precipitationCompound === "water" && temperature > 373) {
+  //   effectivePrecipitationCompound = "none" // Too hot for water precipitation
+  // } else if (precipitationCompound === "methane" && temperature > 112) {
+  //   effectivePrecipitationCompound = "none" // Too hot for methane precipitation
+  // } else if (precipitationCompound === "co2" && temperature > 195) {
+  //   effectivePrecipitationCompound = "none" // Too hot for CO2 precipitation
+  // }
+
+  // Generate landmarks if not provided and terrain data is available
+  let effectiveLandmarks = landmarks
+  if (!effectiveLandmarks && terrainData) {
+    effectiveLandmarks = generateLandmarks(
+      {
+        type: type as "terrestrial" | "gaseous",
+        surfaceRoughness,
+        waterLevel,
+        temperature,
+        volcanicActivity,
+      },
+      terrainData,
+      15, // Generate 15 landmarks by default
+    )
+  }
 
   return {
     mass,
@@ -117,9 +152,11 @@ export function calculatePlanetStats(
     stormFrequency,
     volcanicActivity,
     biome,
-    cloudTypes,
-    cloudDensity,
+    // cloudTypes: cloudTypes as CloudCategory[],
+    // cloudDensity,
     surfaceDeposits,
+    // precipitationCompound: effectivePrecipitationCompound,
+    landmarks: effectiveLandmarks,
   }
 }
 

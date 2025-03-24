@@ -72,23 +72,26 @@ export const CoMSCategories: Record<CoMShapesCategory, CategoryConfig> = {
   "CloudyRegion": {
     name: "Cloudy Region",
     color: '#00BCD4',
-    description: "A cloudy area without distinct or multiple cloud types",
+    description: "A cloudy area without distinct or with   multiple cloud types",
     iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/other-general.png'
   },
   "Ozone": {
     name: "Ozone",
     description: "Pink region on the map",
     color: "#ff3398",
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/ozone.png',
   },
   "CanyonCrater": {
     name: "Canyon / Crater",
     color: "#1a13dc",
     description: "Depressed region on the map with a blue tint",
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/crater.png',
   },
   "Twilightzonecloud": {
     name: "Twilight zone cloud",
     color: '#f20c26',
     description: 'A cloud near the red terminator line',
+    iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/twilight.png',
   },
   "Streakcloud": {
     name: 'Streak cloud',
@@ -125,6 +128,20 @@ export const CoMSCategories: Record<CoMShapesCategory, CategoryConfig> = {
     iconUrl: '/assets/Docs/LIDAR/lidar-martianClouds/other-general.png',
     color: '#340a65',
     description: "A cloud that doesn't fit into the other categories",
+  },
+};
+
+export type SunspotsCategory = 'Sunspot' | 'Other';
+export const SunspotsCategories: Record<SunspotsCategory, CategoryConfig> = {
+  'Sunspot': {
+    name: 'Sunspot',
+    color: '#1E88E5',
+    description: 'Used to indicate a sunspot',
+  },
+  'Other': {
+    name: 'Other',
+    color: '#F57C00',
+    description: 'Use this to mark an interesting point',
   },
 };
 

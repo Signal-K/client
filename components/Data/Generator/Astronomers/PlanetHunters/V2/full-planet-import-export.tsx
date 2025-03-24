@@ -1,4 +1,4 @@
-"\"use client"
+"use client"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -27,7 +27,6 @@ cloudContribution: ${stats.cloudContribution?.toFixed(2) ?? "N/A"}
 terrainVariation: ${stats.terrainVariation ?? "N/A"}
 terrainErosion: ${stats.terrainErosion?.toFixed(2) ?? "N/A"}
 plateTectonics: ${stats.plateTectonics?.toFixed(2) ?? "N/A"}
-
 biomassLevel: ${stats.biomassLevel?.toFixed(2) ?? "N/A"}
 waterLevel: ${stats.waterLevel?.toFixed(2) ?? "N/A"}
 salinity: ${stats.salinity?.toFixed(2) ?? "N/A"}
@@ -37,13 +36,11 @@ weatherVariability: ${stats.weatherVariability?.toFixed(2) ?? "N/A"}
 stormFrequency: ${stats.stormFrequency?.toFixed(2) ?? "N/A"}
 volcanicActivity: ${stats.volcanicActivity?.toFixed(2) ?? "N/A"}
 biome: ${stats.biome ?? "N/A"}
-cloudTypes: ${JSON.stringify(stats.cloudTypes) ?? "N/A"}
-cloudDensity: ${stats.cloudDensity?.toFixed(2) ?? "N/A"}`
+precipitationCompound: ${stats.precipitationCompound ?? "water"}
+landmarks: ${JSON.stringify(stats.landmarks) ?? "[]"}`
     setImportExportText(exportText)
   }
-// soilType: ${stats.soilType ?? "N/A"} ------GOES ABOVE-----
-//// GOES ABOVE^^^^^
-
+  //soilType: ${stats.soilType ?? "N/A"}
 
   const handleImport = () => {
     const lines = importExportText.split("\n")
@@ -85,10 +82,10 @@ cloudDensity: ${stats.cloudDensity?.toFixed(2) ?? "N/A"}`
           if (value === "flat" || value === "moderate" || value === "chaotic") {
             ;(importedStats as any)[key] = value
           }
-        // } else if (key === "soilType") {
-        //   if (["rocky", "sandy", "volcanic", "organic", "dusty", "frozen", "muddy"].includes(value)) {
-        //     ;(importedStats as any)[key] = value
-        //   }
+        } else if (key === "soilType") {
+          if (["rocky", "sandy", "volcanic", "organic", "dusty", "frozen", "muddy"].includes(value)) {
+            ;(importedStats as any)[key] = value
+          }
         } else if (key === "biome") {
           ;(importedStats as any)[key] = value
         } else if (key === "cloudTypes") {
@@ -99,6 +96,19 @@ cloudDensity: ${stats.cloudDensity?.toFixed(2) ?? "N/A"}`
             }
           } catch (e) {
             console.error("Failed to parse cloudTypes", e)
+          }
+        } else if (key === "precipitationCompound") {
+          if (["none", "water", "co2", "snow", "methane"].includes(value)) {
+            ;(importedStats as any)[key] = value
+          }
+        } else if (key === "landmarks") {
+          try {
+            const parsedValue = JSON.parse(value)
+            if (Array.isArray(parsedValue)) {
+              ;(importedStats as any)[key] = parsedValue
+            }
+          } catch (e) {
+            console.error("Failed to parse landmarks", e)
           }
         }
       }

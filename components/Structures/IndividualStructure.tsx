@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { GreenhouseResearchStations } from "./Missions/Biologists/ResearchStations";
 import MilestoneCard from "./Missions/Milestones/MilestoneCard";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
+import { ClassificationsLastWeek } from "./Missions/Milestones/ClassificationNumber";
 
 export interface IndividualStructureProps {
   name: string;
@@ -23,6 +24,7 @@ export interface IndividualStructureProps {
     text: string;
     dynamicComponent?: React.ReactNode;
     sizePercentage?: number;
+    classificationtype?: string;
   }[];
   modals?: {
     component: React.ReactNode;
@@ -97,10 +99,10 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
     <Dialog defaultOpen>
       <div className="relative transition-all duration-500 ease-in-out">
         {!activeComponent && (
-         <DialogContent
-         className="p-6 rounded-3xl text-white max-w-3xl mx-auto"
-         style={{ background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))' }}
-       >
+          <DialogContent
+            className="p-6 rounded-3xl text-white max-w-3xl mx-auto"
+            style={{ background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))' }}
+          >
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <BuildingIcon className="w-8 h-8 text-[#a3be8c]" />
@@ -123,6 +125,21 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               />
               {tooltip?.visible && (
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-[#2C3A4A] text-white text-xs p-1 rounded-md shadow-lg">
+                  {tooltip.text}
+                </div>
+              )}
+              { name === "Biodome" && (
+                <div 
+                  className="absolute top-0 right-0 w-6 h-6 bg-[#85DDA2] rounded-full flex items-center justify-center cursor-pointer"
+                  onMouseEnter={() => setTooltip({ visible: true, text: "Sustainable, self-contained ecosystem!" })}
+                  onMouseLeave={() => setTooltip(null)}
+                >
+                  <span className="text-[#1D2833] text-lg font-bold">...</span>
+                </div>
+              )}
+
+              {tooltip?.visible && (
+                <div className="absolute top-0 right-8 transform -translate-y-1/2 bg-[#2C3A4A] text-white text-xs p-1 rounded-md shadow-lg">
                   {tooltip.text}
                 </div>
               )}
@@ -166,33 +183,37 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               ))}
             </div>
             <div className="grid grid-cols-2 gap-4 mt-6">
-  <div className="flex flex-col items-center my-4 space-y-4">
-    {buttons.map((button, index) => (
-      button.showInNoModal !== false && (
-        <div
-          key={index}
-          className="flex items-center justify-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
-          onClick={() => handleButtonClick(button.text, button.dynamicComponent, button.sizePercentage)}
-          style={{ width: "100%", maxWidth: "200px" }}
-        >
-          <div className="flex items-center justify-center w-full">
-            <div className="flex-shrink-0">
-              {button.icon}
+              <div className="flex flex-col items-center my-4 space-y-4">
+                {buttons.map((button, index) => (
+                  button.showInNoModal !== false && (
+                    <div
+                      key={index}
+                      className="flex items-center justify-center bg-[#85DDA2]/40 text-white font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#85DDA2]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
+                      onClick={() => handleButtonClick(button.text, button.dynamicComponent, button.sizePercentage)}
+                      style={{ width: "100%", maxWidth: "200px" }}
+                    >
+                      <div className="flex items-center justify-center w-full">
+                        <div className="flex-shrink-0">
+                          {button.icon}
+                        </div>
+                        <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
+                        {button.classificationtype && (
+                          <p className="ml-2 text-xs text-[#d8eee9]">
+                            <ClassificationsLastWeek classificationType={button.classificationtype} />
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )
+                ))}
+              </div>
+              {/* <p>{name}</p> */}
+              {name !== 'Telescope' ? (
+                <MilestoneCard />
+              ) : (
+                <MySettlementsLocations />
+              )}
             </div>
-            <p className="ml-2 text-xs text-[#d8dee9]">{button.text}</p>
-          </div>
-        </div>
-      )
-    ))}
-  </div>
-  {/* <p>{name}</p> */}
-  {name !== 'Telescope' ? (
-    <MilestoneCard />
-  ) : (
-    <MySettlementsLocations />
-  )}
-</div>
-
             <div className="flex flex-col items-center my-4 space-y-4">
               {modals && modals.length > 0 && modals.map((modal, index) => (
                 <div
@@ -219,33 +240,30 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
             </Button>
           </DialogContent>
         )}
+        {activeComponent && (
+          <DialogContent
+            className={`p-4 rounded-3xl text-white mx-auto 
+              w-[95%] h-[95%] max-w-full max-h-[95%] fixed top-1/2 left-1/2 
+              transform -translate-x-1/2 -translate-y-1/2 
+              overflow-y-auto bg-[#1D2833]/90`}
+          >
+            <div className="relative flex flex-col items-center justify-center h-full">
+              <button
+                className="absolute top-4 right-4 text-white hover:text-red-500"
+                onClick={() => setActiveComponent(null)}
+              >
+                Close
+              </button>
+              <div className="flex-grow flex justify-center items-center overflow-y-auto w-full">
+                {activeComponent}
+              </div>
+            </div>
+          </DialogContent>
+        )}
 
-{activeComponent && (
-  <DialogContent
-    className={`p-4 rounded-3xl text-white mx-auto 
-      w-[95%] h-[95%] max-w-full max-h-[95%] fixed top-1/2 left-1/2 
-      transform -translate-x-1/2 -translate-y-1/2 
-      overflow-y-auto bg-[#1D2833]/90`}
-  >
-    <DialogTitle></DialogTitle>
-    <div className="relative flex flex-col items-center justify-center h-full">
-      <button
-        className="absolute top-4 right-4 text-white hover:text-red-500"
-        onClick={() => setActiveComponent(null)}
-      >
-        Close
-      </button>
-      <div className="flex-grow flex justify-center items-center overflow-y-auto w-full">
-        {activeComponent}
-      </div>
-    </div>
-  </DialogContent>
-)}
-
-{structureId === 3104 && (
-  <GreenhouseResearchStations />
-)}
-
+        {structureId === 3104 && (
+          <GreenhouseResearchStations />
+        )}
       </div>
     </Dialog>
   );

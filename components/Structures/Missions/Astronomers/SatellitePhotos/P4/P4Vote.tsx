@@ -121,7 +121,7 @@ export default function VoteP4Classifications() {
   images={classification.images || []}
   classificationType={classification.classificationtype || ""}
   classificationConfig={classification.classificationConfiguration}
-  enableNewCommentingMethod
+  // enableNewCommentingMethod
 />
               ))
             )}

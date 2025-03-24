@@ -1,17 +1,54 @@
-"use client";
+"use client"
 
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { determineLiquidType } from "@/utils/planet-physics";
-import type { PlanetStats } from "@/utils/planet-physics";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
-import { getParameterRange, biomeData } from "@/utils/biome-data";
-import { useEffect } from "react";
-import { CloudCategories } from "@/utils/cloud-types";
+import { Slider } from "@/components/ui/slider"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { determineLiquidType } from "@/utils/planet-physics"
+import type { PlanetStats } from "@/utils/planet-physics"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Badge } from "@/components/ui/badge"
+import { getParameterRange, biomeData } from "@/utils/biome-data"
+import { useEffect } from "react"
+import { CloudCategories } from "@/utils/cloud-types"
+import { LandmarkManager } from "./landmarks/manager"
+import type { Landmark } from "@/utils/landmark-types"
 
+interface SliderControlProps {
+  label: string
+  value: number
+  min: number
+  max: number
+  step?: number
+  onChange: (value: number) => void
+  disabled?: boolean
+}
+
+function SliderControl({ label, value, min, max, step = 0.01, onChange, disabled = false }: SliderControlProps) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label className={`text-sm ${disabled ? "text-gray-500" : "text-[#5FCBC3]"}`}>{label}</Label>
+        <span className="text-xs text-white bg-[#2C4F64] px-2 py-0.5 rounded">{value?.toFixed(2) ?? "N/A"}</span>
+      </div>
+      <Slider
+        className={`w-full ${disabled ? "opacity-50" : ""} [&_[role=slider]]:bg-[#5FCBC3]`}
+        min={min}
+        max={max}
+        step={step}
+        value={[value ?? 0]}
+        onValueChange={([v]) => onChange(v)}
+        disabled={disabled}
+      />
+      <div className="flex justify-between text-xs text-gray-500">
+        <span>{min}</span>
+        <span>{max}</span>
+      </div>
+    </div>
+  );
+};
+
+// Add the precipitationCompound property to the FullPlanetControlsProps interface
 interface FullPlanetControlsProps {
   stats: PlanetStats
   onMassChange: (value: number) => void
@@ -43,48 +80,13 @@ interface FullPlanetControlsProps {
   onCloudDensityChange: (value: number) => void
   onAtmosphereVisibilityChange: (value: number) => void
   onAtmosphereHeightChange: (value: number) => void
-};
-
-function SliderControl({
-  label,
-  value,
-  min,
-  max,
-  step = 0.01,
-  onChange,
-  disabled = false,
-}: {
-  label: string
-  value: number
-  min: number
-  max: number
-  step?: number
-  onChange: (value: number) => void
-  disabled?: boolean
-}) {
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label className={`text-sm ${disabled ? "text-gray-500" : "text-[#5FCBC3]"}`}>{label}</Label>
-        <span className="text-xs text-white bg-[#2C4F64] px-2 py-0.5 rounded">{value?.toFixed(2) ?? "N/A"}</span>
-      </div>
-      <Slider
-        className={`w-full ${disabled ? "opacity-50" : ""} [&_[role=slider]]:bg-[#5FCBC3]`}
-        min={min}
-        max={max}
-        step={step}
-        value={[value ?? 0]}
-        onValueChange={([v]) => onChange(v)}
-        disabled={disabled}
-      />
-      <div className="flex justify-between text-xs text-gray-500">
-        <span>{min}</span>
-        <span>{max}</span>
-      </div>
-    </div>
-  )
+  onPrecipitationCompoundChange?: (value: "none" | "water" | "co2" | "snow" | "methane") => void
+  onLandmarksChange?: (landmarks: Landmark[]) => void
+  selectedLandmark?: Landmark
+  onLandmarkSelect?: (landmark: Landmark) => void
 }
 
+// Add the precipitation compound control to the component
 export function FullPlanetControls({
   stats,
   onMassChange,
@@ -116,6 +118,10 @@ export function FullPlanetControls({
   onCloudDensityChange,
   onAtmosphereVisibilityChange,
   onAtmosphereHeightChange,
+  onPrecipitationCompoundChange,
+  onLandmarksChange,
+  selectedLandmark,
+  onLandmarkSelect,
 }: FullPlanetControlsProps) {
   const liquidInfo = stats.temperature !== undefined ? determineLiquidType(stats.temperature) : { type: "Unknown" }
 
@@ -145,31 +151,31 @@ export function FullPlanetControls({
         // Normal adjustments for other biomes
         if (stats.waterHeight < waterHeightRange[0] || stats.waterHeight > waterHeightRange[1]) {
           onWaterHeightChange(Math.min(Math.max(stats.waterHeight, waterHeightRange[0]), waterHeightRange[1]))
-        };
+        }
 
         if (stats.waterLevel < waterLevelRange[0] || stats.waterLevel > waterLevelRange[1]) {
           onWaterLevelChange(Math.min(Math.max(stats.waterLevel, waterLevelRange[0]), waterLevelRange[1]))
-        };
+        }
 
         if (stats.surfaceRoughness < surfaceRoughnessRange[0] || stats.surfaceRoughness > surfaceRoughnessRange[1]) {
           onSurfaceRoughnessChange(
             Math.min(Math.max(stats.surfaceRoughness, surfaceRoughnessRange[0]), surfaceRoughnessRange[1]),
-          );
-        };
-      };
+          )
+        }
+      }
 
       // Adjust values to fit within ranges
       if (stats.temperature < temperatureRange[0] || stats.temperature > temperatureRange[1]) {
         onTemperatureChange(Math.min(Math.max(stats.temperature, temperatureRange[0]), temperatureRange[1]))
-      };
+      }
 
       if (stats.atmosphereStrength < atmosphereRange[0] || stats.atmosphereStrength > atmosphereRange[1]) {
         onAtmosphereStrengthChange(Math.min(Math.max(stats.atmosphereStrength, atmosphereRange[0]), atmosphereRange[1]))
-      };
+      }
 
       if (stats.cloudCount < cloudCountRange[0] || stats.cloudCount > cloudCountRange[1]) {
         onCloudCountChange(Math.min(Math.max(stats.cloudCount, cloudCountRange[0]), cloudCountRange[1]))
-      };
+      }
 
       if (stats.plateTectonics < plateTectonicsRange[0] || stats.plateTectonics > plateTectonicsRange[1]) {
         onPlateTectonicsChange(Math.min(Math.max(stats.plateTectonics, plateTectonicsRange[0]), plateTectonicsRange[1]))
@@ -177,23 +183,23 @@ export function FullPlanetControls({
 
       if (stats.biomassLevel < biomassLevelRange[0] || stats.biomassLevel > biomassLevelRange[1]) {
         onBiomassLevelChange(Math.min(Math.max(stats.biomassLevel, biomassLevelRange[0]), biomassLevelRange[1]))
-      };
+      }
 
       if (stats.salinity < salinityRange[0] || stats.salinity > salinityRange[1]) {
         onSalinityChange(Math.min(Math.max(stats.salinity, salinityRange[0]), salinityRange[1]))
-      };
+      }
 
       if (stats.volcanicActivity < volcanicActivityRange[0] || stats.volcanicActivity > volcanicActivityRange[1]) {
         onVolcanicActivityChange(
           Math.min(Math.max(stats.volcanicActivity, volcanicActivityRange[0]), volcanicActivityRange[1]),
-        );
-      };
-    };
-  }, [stats.biome]);
+        )
+      }
+    }
+  }, [stats.biome])
 
   return (
     <div className="space-y-4 pb-6">
-      <Accordion type="multiple" defaultValue={["basic", "environment"]}>
+      <Accordion type="multiple" defaultValue={["basic", "environment", "landmarks"]}>
         <AccordionItem value="basic" className="border-[#2C4F64]">
           <AccordionTrigger className="text-[#5FCBC3] hover:text-[#5FCBC3]/90">Basic Properties</AccordionTrigger>
           <AccordionContent>
@@ -271,13 +277,37 @@ export function FullPlanetControls({
 
         {showExtendedControls && (
           <>
+            <AccordionItem value="landmarks" className="border-[#2C4F64]">
+              <AccordionTrigger className="text-[#5FCBC3] hover:text-[#5FCBC3]/90">Landmarks</AccordionTrigger>
+              <AccordionContent>
+                {onLandmarksChange && (
+                  <LandmarkManager
+                    landmarks={stats.landmarks || []}
+                    onLandmarksChange={onLandmarksChange}
+                    onLandmarkSelect={onLandmarkSelect}
+                    selectedLandmarkId={selectedLandmark?.id}
+                  />
+                )}
+              </AccordionContent>
+            </AccordionItem>
+
             <AccordionItem value="environment" className="border-[#2C4F64]">
               <AccordionTrigger className="text-[#5FCBC3] hover:text-[#5FCBC3]/90">Environment</AccordionTrigger>
               <AccordionContent>
                 <div className="grid gap-4">
                   <div className="space-y-2">
                     <Label className="text-sm text-[#5FCBC3]">Biome</Label>
-                    <Select value={stats.biome} onValueChange={onBiomeChange}>
+                    <Select 
+                      value={stats.biome} 
+                      onValueChange={(newBiome) => {
+                        // Prevent setting Oceanic World when density > 1.9
+                        if (newBiome === "Oceanic World" && stats.density && stats.density > 1.9) {
+                          alert("Oceanic World biome cannot be set when density is greater than 1.9 g/cm³");
+                          return;
+                        }
+                        onBiomeChange(newBiome);
+                      }}
+                    >
                       <SelectTrigger className="w-full bg-[#2C4F64] text-white border-[#5FCBC3]">
                         <SelectValue placeholder="Select biome" />
                       </SelectTrigger>
@@ -320,6 +350,37 @@ export function FullPlanetControls({
                     max={getParameterRange(stats.biome, "biomassLevel")[1]}
                     onChange={onBiomassLevelChange}
                   />
+
+                  {/* Add precipitation compound selector */}
+                  <div className="space-y-2">
+                    <Label className="text-sm text-[#5FCBC3]">Precipitation Compound</Label>
+                    <Select
+                      value={stats.precipitationCompound || "water"}
+                      onValueChange={(value) =>
+                        onPrecipitationCompoundChange?.(value as "none" | "water" | "co2" | "snow" | "methane")
+                      }
+                    >
+                      <SelectTrigger className="w-full bg-[#2C4F64] text-white border-[#5FCBC3]">
+                        <SelectValue placeholder="Select precipitation compound" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#2C4F64] text-white border-[#5FCBC3]">
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="water">Water (H₂O)</SelectItem>
+                        <SelectItem value="co2">Carbon Dioxide (CO₂)</SelectItem>
+                        <SelectItem value="snow">Snow (Frozen H₂O)</SelectItem>
+                        <SelectItem value="methane">Liquid Methane (CH₄)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {stats.precipitationCompound && stats.precipitationCompound !== "none" && (
+                      <div className="mt-2 text-xs text-gray-400">
+                        {stats.precipitationCompound === "water" &&
+                          "Liquid water precipitation occurs between 273K and 373K"}
+                        {stats.precipitationCompound === "co2" && "CO₂ precipitation occurs below 195K"}
+                        {stats.precipitationCompound === "snow" && "Snow precipitation occurs below 273K"}
+                        {stats.precipitationCompound === "methane" && "Methane precipitation occurs below 112K"}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -436,13 +497,13 @@ export function FullPlanetControls({
                     max={getParameterRange(stats.biome, "cloudCount")[1]}
                     onChange={onCloudCountChange}
                   />
-                  <SliderControl
+                  {/* <SliderControl
                     label="Cloud Density"
                     value={stats.cloudDensity ?? 0}
                     min={0}
                     max={1}
                     onChange={onCloudDensityChange}
-                  />
+                  /> */}
                   <SliderControl
                     label="Weather Variability"
                     value={stats.weatherVariability ?? 0}
@@ -512,6 +573,14 @@ export function FullPlanetControls({
                   <div className="flex justify-between">
                     <span className="text-[#5FCBC3]">Liquid:</span>
                     <span className="text-white">{liquidInfo.type}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#5FCBC3]">Precipitation:</span>
+                    <span className="text-white">{stats.precipitationCompound || "None"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#5FCBC3]">Landmarks:</span>
+                    <span className="text-white">{stats.landmarks?.length || 0}</span>
                   </div>
                 </div>
               </AccordionContent>

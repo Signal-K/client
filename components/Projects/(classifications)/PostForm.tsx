@@ -89,8 +89,10 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return "What surface types do you see from your rover?";
       case 'lidar-jovianVortexHunter':
         return "Describe the patterns in the clouds you see...";
-    case "telescope-minorPlanet":
+      case "telescope-minorPlanet":
         return "Does the highlighted object move smoothly through the images? What do you see...?"
+      case 'balloon-marsCloudShapes':
+        return 'What cloud shapes do you see?...';
       default:
         return "Enter your classification details...";
     }
@@ -132,11 +134,13 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return [DailyMinorPlanetOptions];
       case "automaton-aiForMars":
         return [automatonaiForMarsOptions];
+      case 'balloon-marsCloudShapes':
+        return [cloudSpottingOnMarsShapesOptions];
       case "zoodex-nestQuestGo":
         return [];
       default:
         return [];
-    }
+    };
   })();
 
   const showTextArea = classificationOptions.length === 0;
@@ -206,24 +210,24 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
     }));
   };
 
-  const handleMissionComplete = async () => {
-    try {
-      const missionData = {
-        user: session?.user?.id,
-        time_of_completion: new Date().toISOString(),
-        mission: missionNumber,
-        configuration: null,
-      };
-      await supabase.from("missions").insert([missionData]);
-      // const newAnomalyData = {
-      //   user_id: session?.user?.id,
-      //   anomaly_id: activePlanet?.id,
-      // };
-      // await supabase.from("user_anomalies").insert([newAnomalyData]);
-    } catch (error: any) {
-      console.error(error);
-    };
-  };
+  // const handleMissionComplete = async () => {
+  //   try {
+  //     const missionData = {
+  //       user: session?.user?.id,
+  //       time_of_completion: new Date().toISOString(),
+  //       mission: missionNumber,
+  //       configuration: null,
+  //     };
+  //     await supabase.from("missions").insert([missionData]);
+  //     // const newAnomalyData = {
+  //     //   user_id: session?.user?.id,
+  //     //   anomaly_id: activePlanet?.id,
+  //     // };
+  //     // await supabase.from("user_anomalies").insert([newAnomalyData]);
+  //   } catch (error: any) {
+  //     console.error(error);
+  //   };
+  // };
 
   const createPost = async () => {
     const flattenedOptions = classificationOptions.flat();
@@ -302,7 +306,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         setPostSubmitted(true);
       };
 
-      await handleMissionComplete();
+      // await handleMissionComplete();
 
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")

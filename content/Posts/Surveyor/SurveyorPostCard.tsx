@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { ThumbsUp, MessageSquare } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "@/content/Comments/CommentSingle";
-import PlanetTempCalculator from "@/components/Structures/Missions/Astronomers/PlanetHunters/TemperatureCalc";
 
 interface CommentProps {
   id: number;

@@ -10,17 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-export type MineralDeposit = {
-  id: string;
-  name: string;
-  mineral: string;
-  amount: number;
-  position: { x: number; y: number };
-  icon_url: string;
-  level: number;
-  uses: any[];
-};
+import { MineralDeposit } from './mineral-deposit-list';
 
 type Landmark = {
   id: string

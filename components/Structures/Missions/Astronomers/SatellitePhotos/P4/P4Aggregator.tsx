@@ -16,7 +16,7 @@ export const PlanetFourOptions: ClassificationOption[] = [
 
 export interface SatellitePlanetFourClassification {
   id: number;
-  annotationOptions: string[];
+  annotationOptions?: string[]; // Made optional to handle undefined/null safely
   classificationConfiguration?: {
     "": Record<number, boolean>;
   };
@@ -37,14 +37,19 @@ const SatellitePlanetFourAggregator: React.FC<SatellitePlanetFourAggregatorProps
     let classificationCounts: Record<string, number> = {};
 
     classifications.forEach((classification) => {
-      // Count fans and blotches
-      classification.annotationOptions.forEach((option) => {
-        if (option.includes("Fan")) {
-          const match = option.match(/\(x(\d+)\)/);
-          fanCount += match ? parseInt(match[1]) : 1;
-        } else if (option.includes("Blotch")) {
-          const match = option.match(/\(x(\d+)\)/);
-          blotchCount += match ? parseInt(match[1]) : 1;
+      // Ensure annotationOptions is valid before looping
+      const options = classification.annotationOptions || [];
+      options.forEach((option) => {
+        const match = option.match(/([a-zA-Z\s-]+) \(x(\d+)\)/);
+        if (match) {
+          const feature = match[1].trim();
+          const count = parseInt(match[2], 10);
+
+          if (feature.includes("Fan")) {
+            fanCount += count;
+          } else if (feature.includes("Blotch")) {
+            blotchCount += count;
+          }
         }
       });
 
@@ -74,7 +79,7 @@ const SatellitePlanetFourAggregator: React.FC<SatellitePlanetFourAggregatorProps
         classificationCounts,
       });
     }
-  }, [fanCount, blotchCount, classificationCounts, onSummaryUpdate]);
+  }, [fanCount]);
 
   return (
     <div className="mt-6">

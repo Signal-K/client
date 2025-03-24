@@ -14,8 +14,10 @@ import {
   CACCategories,
   JVHCATEGORIES,
   CoMSCategories,
+  SunspotsCategories,
   type CoMShapesCategory,
   type AI4MCategory,
+  type SunspotsCategory,
   type JVHCategory,
   type CACCategory,
   type P4Category,
@@ -38,13 +40,13 @@ interface ImageAnnotatorProps {
   assetMentioned?: string | string[];
   structureItemId?: number;
   parentPlanetLocation?: string;
-  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'CoMS' | 'Custom';
+  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'CoMS' | 'Sunspots' | 'Custom';
 };
 
 export default function ImageAnnotator({
   initialImageUrl,
   parentClassificationId,
-  anomalyType,
+  anomalyType, 
   anomalyId,
   missionNumber,
   assetMentioned,
@@ -82,6 +84,8 @@ export default function ImageAnnotator({
       ? JVHCATEGORIES
       : annotationType === 'CAC'
       ? CACCategories
+      : annotationType === 'Sunspots'
+      ? SunspotsCategories
       : annotationType === 'CoMS'
       ? CoMSCategories
       : {} as Record<string, CategoryConfig>;
@@ -229,26 +233,26 @@ export default function ImageAnnotator({
               ))}
             </SciFiPanel>
           )}
-          {isFormVisible && (
+          {/* {isFormVisible && ( */}
             <SciFiPanel className="p-4">
               {anomalyId && anomalyType && missionNumber && (
                 <ClassificationForm
-                anomalyId={anomalyId}
-                anomalyType={anomalyType}
-                missionNumber={missionNumber}
-                parentPlanetLocation={parentPlanetLocation}
-                parentClassificationId={parentClassificationId}
-                assetMentioned={[
-                  ...uploads,
-                  ...(otherAssets || []),
-                  ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]),
-                ].filter((item): item is string => typeof item === 'string')}
-                structureItemId={structureItemId}
-                annotationOptions={annotationOptions}
-              />
+                  anomalyId={anomalyId}
+                  anomalyType={anomalyType}
+                  missionNumber={missionNumber}
+                  parentPlanetLocation={parentPlanetLocation}
+                  parentClassificationId={parentClassificationId}
+                  assetMentioned={[
+                    ...uploads,
+                    ...(otherAssets || []),
+                    ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]),
+                  ].filter((item): item is string => typeof item === 'string')}
+                  structureItemId={structureItemId}
+                  annotationOptions={annotationOptions}
+                />
               )}
             </SciFiPanel>
-          )}
+          {/* // )} */}
         </div>
       )}
     </div>

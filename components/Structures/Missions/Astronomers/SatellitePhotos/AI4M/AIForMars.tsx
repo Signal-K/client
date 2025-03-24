@@ -5,7 +5,7 @@ import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-r
 import { AI4MWrapper, AiForMarsProject, StarterAiForMars } from "@/components/Projects/Auto/AI4Mars";
 import VoteAI4MClassifications from "./AI4MVote";
 
-interface Mission {
+export interface Mission {
     id: number;
     chapter: number;
     title: string;

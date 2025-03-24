@@ -5,6 +5,10 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 
+interface SelectedAnomalyProps {
+    anomalyid: number;
+};
+
 interface TelescopeProps {
     anomalyId: string;
 };
@@ -13,7 +17,7 @@ const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
     anomalyId,
 }) => {
     const supabase = useSupabaseClient();
-    const session = useSession();
+    const session = useSession(); 
 
     const { activePlanet } = useActivePlanet();
 
@@ -163,17 +167,17 @@ const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
 };
 
 import { Anomaly } from "./Transiting";
+import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
+import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
-export function TelescopeSunspotDetector() {
+export function StarterSunspot({ anomalyid }: SelectedAnomalyProps ) {
     const supabase = useSupabaseClient();
     const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         async function fetchAnomaly() {
@@ -181,76 +185,43 @@ export function TelescopeSunspotDetector() {
                 setLoading(false);
                 return;
             };
-    
+
             try {
-                const { data: anomalyData, error: anomalyError } = await supabase
+                const {
+                    data: anomalyData,
+                    error: anomalyError,
+                } = await supabase
                     .from("anomalies")
                     .select("*")
                     .eq("anomalySet", "sunspot")
-                    .limit(1)
-                    .maybeSingle();
-    
+
                 if (anomalyError) {
                     throw anomalyError;
                 };
-    
+
                 if (!anomalyData) {
-                    setLoading(false);
                     setAnomaly(null);
+                    setLoading(false);
                     return;
                 };
-    
-                const fetchedAnomaly = anomalyData as Anomaly;
-                setAnomaly(fetchedAnomaly);
-    
+
+                const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
+                
+                setAnomaly(randomAnomaly);
+                
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${fetchedAnomaly.id}.png`);
-            } catch (error: any) {
-                console.error("Error fetching sunspot: ", error.message);
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${randomAnomaly.id}.png`);
+            } catch ( error: any ) {
+                console.error("Error fetching sunspot data: ", error.message);
                 setAnomaly(null);
+                setLoading(false);
             } finally {
                 setLoading(false);
             };
         };
-    
+
         fetchAnomaly();
-    }, [session, supabase, activePlanet]);
-    
-
-    const [hasMission3000003, setHasMission3000003] = useState<boolean>(false);
-    useEffect(() => {
-        const checkTutorialMission = async () => {
-            if (!session) {
-                return;
-            };
-
-            try {
-                const { data: missionData, error: missionError } = await supabase
-                    .from("missions")
-                    .select("id")
-                    .eq("user", session.user.id)
-                    .eq("mission", "3000003")
-                    .single();
-                
-                if (missionError) {
-                    throw missionError;
-                };
-
-                if (missionData) {
-                    setHasMission3000003(true);
-                };
-            } catch (error: any) {
-                console.error("Error checking tutorial mission: ", error.message);
-                setHasMission3000003(false);
-            };
-        };
-
-        checkTutorialMission();
-    }, [session, supabase]);
-
-    if (!hasMission3000003) {
-        return <SunspotDetectorTutorial anomalyId={anomaly?.id?.toString() || "101266259"} />;
-    };
+    }, [session]);
 
     if (loading) {
         return (
@@ -263,25 +234,46 @@ export function TelescopeSunspotDetector() {
     if (!anomaly) {
         return (
             <div>
-                <p>Looks like the sun's inactive at the moment. Check back when we have more data!</p>
+                <p>No sunspots available now</p>
             </div>
         );
     };
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh]">
             <div className="p-4 rounded-md relative w-full">
                 {imageUrl && (
-                    <img src={imageUrl} alt="Sunspot" className="w-full h-full object-cover" />
+                    <ImageAnnotator
+                        initialImageUrl={imageUrl}
+                        anomalyId={anomaly.id.toString()}
+                        anomalyType="sunspot"
+                        assetMentioned={imageUrl}
+                        structureItemId={3103}
+                        missionNumber={5055655555}
+                        parentPlanetLocation={anomalyid?.toString() || ''}
+                        annotationType="Sunspots"
+                    />
                 )}
-                <ClassificationForm
-                    anomalyId={anomaly.id.toString()}
-                    anomalyType="sunspot"
-                    missionNumber={100000032}
-                    assetMentioned={imageUrl || ""}
-                    structureItemId={3103}
-                />
             </div>
+        </div>
+    );
+};
+
+export function SunspotsWrapper() {
+    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+
+    return (
+        <div className="space-y-8">
+            {!selectedAnomaly && (
+                <PreferredTerrestrialClassifications
+                    onSelectAnomaly={setSelectedAnomaly}
+                />
+            )}
+            {selectedAnomaly && (
+                <StarterSunspot 
+                    anomalyid={selectedAnomaly}
+                />
+            )}
         </div>
     );
 };

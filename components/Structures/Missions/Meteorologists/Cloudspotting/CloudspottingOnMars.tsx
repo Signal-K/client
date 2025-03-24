@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import MissionShell from "../../BasePlate";
+import MissionShell from "@/components/Structures/Missions/BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 import { CloudspottingWrapper, StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import VoteCoMClassifications from "./CoMVote";

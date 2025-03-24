@@ -51,7 +51,7 @@ const CloudUploadEarthCameraComponent = () => {
             setLoadingContent(true);
         }, 200);
         const files = e.target.files;
-        if (files && files.length > 0) {
+        if (files && files.length > 0) { 
             const fileArray = Array.from(files);
             for (const file of fileArray) {
                 await uploadImageToSupabase(file);
