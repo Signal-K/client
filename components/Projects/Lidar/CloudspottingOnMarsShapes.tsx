@@ -10,6 +10,40 @@ interface SelectedAnomProps {
     anomalyid: number;
 };
 
+export function ShapesOnMarsWithId({ anomalyid }: SelectedAnomProps) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+    const [loading, setLoading] = useState<boolean>(true);
+
+    async function fetchAnomaly() {
+        if (!session) {
+            setLoading(false);
+            return;
+        };
+
+        const {
+            data: anomalyData,
+            error,
+        } = await supabase
+            .from("anomalies")
+            .select("*")
+            .eq("anomalySet", 'balloon-marsCloudShapes')
+            .eq('id', anomalyid);
+
+        if (error) {
+            setAnomaly(null);
+            return;
+            setLoading(false);
+        } else {
+            setAnomaly(anomalyData[0]);
+        }
+    };
+};
+
 export function StarterCoMShapes({ anomalyid }: SelectedAnomProps) {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -17,6 +51,7 @@ export function StarterCoMShapes({ anomalyid }: SelectedAnomProps) {
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [baseImageUrl, setBaseImageUrl] = useState<string | null>(null);
+
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -24,7 +59,7 @@ export function StarterCoMShapes({ anomalyid }: SelectedAnomProps) {
             if (!session) {
                 setLoading(false);
                 return;
-            }
+            };
 
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
@@ -67,7 +102,7 @@ export function StarterCoMShapes({ anomalyid }: SelectedAnomProps) {
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh]">
-            <div className="p-4 rounded-md relative w-full">
+            <div className="p-4 rounded-md relative w-full"> {/* Add base image with grid (1*2) format */}
                 {imageUrl && (
                     <ImageAnnotator
                         initialImageUrl={imageUrl}
