@@ -54,51 +54,59 @@ export default function ChatGPTImageClassifier() {
 
   // Capture image from webcam
   const captureWebcamImage = () => {
+    console.log('Capture button clicked');
     if (webcamRef.current) {
-      const imageSrc = webcamRef.current.getScreenshot()
+      const imageSrc = webcamRef.current.getScreenshot();
       if (imageSrc) {
-        setPreview(imageSrc)
-        setImage(null) // Prevent file-based upload conflict
-      }
-    }
-  }
+        console.log('Image captured:', imageSrc);
+        setPreview(imageSrc);
+        setImage(null);
+      };
+    };
+  };
 
   // Send image for classification
   const sendImage = async () => {
-    if (!preview) return
-
-    setLoading(true)
-    setResponse(null)
-
-    const formData = new FormData()
-
+    if (!preview) return;
+    console.log("Sending image...");
+    
+    // Logging image format
+    console.log("Preview image base64 format: ", preview);
+  
+    setLoading(true);
+    setResponse(null);
+  
+    const formData = new FormData();
+  
     if (image) {
       // If file upload is used
-      formData.append("file", image)
+      console.log("Uploading image file...");
+      formData.append("file", image);
     } else {
       // Convert base64 to Blob for webcam image
-      const blob = await fetch(preview).then((res) => res.blob())
-      formData.append("file", blob)
+      console.log("Converting base64 to Blob...");
+      const blob = await fetch(preview).then((res) => res.blob());
+      formData.append("file", blob);
     }
-
+  
     try {
-      const res = await axios.post("/api/zoodex/upload-image/gpt", formData)
-
-      console.log("Full API Response:", res.data) // Log full response
-
+      console.log("Sending API request...");
+      const res = await axios.post("/api/zoodex/upload-image/gpt", formData);
+      console.log("Full API Response:", res.data); // Log full response
+  
       if (res.data.refresh) {
-        window.location.reload()
-        return
+        window.location.reload();
+        return;
       }
-
-      setResponse(res.data)
+  
+      setResponse(res.data);
     } catch (error) {
-      console.error("Error fetching classification:", error)
-      setResponse({ error: "Error: Unable to get classification." })
+      console.error("Error fetching classification:", error);
+      setResponse({ error: "Error: Unable to get classification." });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Upload image to Supabase
   const uploadImageToSupabase = async (file: File) => {
