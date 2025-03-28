@@ -45,7 +45,7 @@ export function StarterTelescopeTessWithId({ anomalyid }: SelectedAnomProps) {
         console.log(error);
         setLoading(false);
         return;
-      }
+      };
 
       setAnomaly(anomalyData[0]);
       setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyid}/Sector1.png`);

@@ -159,6 +159,88 @@ export function StarterLidar({ anomalyid }: SelectedAnomProps) {
     );
 };
 
+export function CloudspottingOnMarsWithId({ anomalyid }: SelectedAnomProps) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+
+    const [loading, setLoading] = useState<boolean>(true);
+
+    async function fetchAnomaly() {
+        if (!session) {
+            setLoading(false);
+            return;
+        };
+
+        try {
+            const {
+                data: anomalyData,
+                error,
+            } = await supabase
+                .from("anomalies")
+                .select("*")
+                .eq("anomalySet", 'cloudspottingOnMars')
+                .eq('id', anomalyid);
+
+            if (error) {
+                setAnomaly(null);
+                return;
+                setLoading(false);
+            } else {
+                setAnomaly(anomalyData[0]);
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/clouds/${anomalyid}.png`);
+            };
+        } catch (error: any) {
+            console.error("Error fetching cloud: ", error.message);
+            setAnomaly(null);
+        } finally {
+            setLoading(false);
+        };
+    };
+
+    useEffect(() => {
+        fetchAnomaly();
+    }, [session, supabase]);
+
+    if (loading) {
+        return (
+            <div>
+                <p>Loading...</p>
+            </div>
+        );
+    };
+
+    if (!anomalyid) {
+        return (
+            <div>
+                Loading...
+            </div>
+        );
+    };
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+            <div className="p-4 rounded-md relative w-full">
+                {imageUrl && (
+                    <ImageAnnotator
+                        initialImageUrl={imageUrl}
+                        anomalyId={anomalyid.toString() || ''} 
+                        anomalyType="cloud"
+                        missionNumber={100000034}
+                        assetMentioned={imageUrl}
+                        structureItemId={3105}
+                        parentPlanetLocation={anomalyid?.toString() || ''}
+                        annotationType="CoM"
+                    />
+                )}
+            </div>
+        </div>
+    );
+};
+
 export function CloudspottingWrapper() {
     const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
 

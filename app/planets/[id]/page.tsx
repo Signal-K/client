@@ -10,6 +10,8 @@ import SatellitePlanetFourAggregator, { SatellitePlanetFourClassification } from
 import AI4MAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AI4MAggregator";
 import BuildTerrariumStructures from "@/components/Structures/Build/BuildOnTerrariums";
 import StructuresOnTerrarium from "@/components/Structures/StructuresOnTerrarium";
+import { Badge } from "@/components/ui/badge";
+import { Camera, Clock } from "lucide-react";
 
 export interface Classification {
   id: number;
@@ -96,6 +98,34 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   const [showCurrentUser, setShowCurrentUser] = useState<boolean>(true);
   const [showMetadata, setShowMetadata] = useState<boolean>(false);
+
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+
+  const getTimeUntilNextSunday = () => {
+    const now = new Date();
+    const nextSunday = new Date(now);
+    nextSunday.setDate(now.getDate() + (7 - now.getDay()) % 7); 
+    nextSunday.setHours(10, 1, 0, 0); 
+    return nextSunday.getTime() - now.getTime(); 
+  };
+
+  const formatTime = (timeInSeconds: number) => {
+    const hours = String(Math.floor(timeInSeconds / 3600)).padStart(2, "0");
+    const minutes = String(Math.floor((timeInSeconds % 3600) / 60)).padStart(2, "0");
+    const seconds = String(timeInSeconds % 60).padStart(2, "0");
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+    useEffect(() => {
+      const timer = setInterval(() => {
+        setTimeLeft(prev => {
+          const time = Math.max(getTimeUntilNextSunday() / 1000, 300); // Ensure it's always at least 5 minutes
+          return Math.floor(time);
+        });
+      }, 1000);
+  
+      return () => clearInterval(timer);
+    }, []);
 
   useEffect(() => {
     if (!params.id) return;
@@ -252,6 +282,19 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           images={classification.images || []} 
           biome={dominantBiome || ''}
         />
+        <div className="flex flex-col">
+
+      <div className="flex items-center gap-3 mt-2">
+        <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1">
+          <Clock className="h-4 w-4" />
+          <span className="text-sm">Next: {formatTime(timeLeft)}</span>
+        </Badge>
+        <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
+          <Camera className="h-4 w-4" />
+          <span className="text-sm">12 Active</span>
+        </Badge>
+      </div>
+    </div>
         </>
       )}
 
