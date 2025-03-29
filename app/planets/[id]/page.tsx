@@ -116,16 +116,16 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     return `${hours}:${minutes}:${seconds}`;
   };
 
-    useEffect(() => {
-      const timer = setInterval(() => {
-        setTimeLeft(prev => {
-          const time = Math.max(getTimeUntilNextSunday() / 1000, 300); // Ensure it's always at least 5 minutes
-          return Math.floor(time);
-        });
-      }, 1000);
-  
-      return () => clearInterval(timer);
-    }, []);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        const time = Math.max(getTimeUntilNextSunday() / 1000, 300); // Ensure it's always at least 5 minutes
+        return Math.floor(time);
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (!params.id) return;

@@ -22,7 +22,8 @@ export default function ChatGPTImageClassifier() {
   const [location, setLocation] = useState<string>("")
   const [comment, setComment] = useState<string>("")
   const webcamRef = useRef<Webcam | null>(null)
-  const [scanPosition, setScanPosition] = useState(0)
+  const [scanPosition, setScanPosition] = useState(0);
+  const [fileUrlTO, setFileUrlTo] = useState<string | null>(null)
 
   // Animation for scanner line
   useEffect(() => {
@@ -52,120 +53,157 @@ export default function ChatGPTImageClassifier() {
     }
   }
 
-  // Capture image from webcam
-  const captureWebcamImage = () => {
-    console.log('Capture button clicked');
-    if (webcamRef.current) {
-      const imageSrc = webcamRef.current.getScreenshot();
-      if (imageSrc) {
-        console.log('Image captured:', imageSrc);
-        setPreview(imageSrc);
-        setImage(null);
-      };
-    };
-  };
+// Capture image from webcam
+const captureWebcamImage = () => {
+  console.log('Capture button clicked');
+  if (webcamRef.current) {
+    const imageSrc = webcamRef.current.getScreenshot();
+    if (imageSrc) {
+      console.log('Image captured:', imageSrc);
+      setPreview(imageSrc);
+      setImage(null); // Clear the image file
+      // Convert base64 image to Blob (File)
+      const byteString = atob(imageSrc.split(',')[1]);
+      const arrayBuffer = new ArrayBuffer(byteString.length);
+      const view = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < byteString.length; i++) {
+        view[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+      const file = new File([blob], `webcam-image-${Date.now()}.jpg`, { type: 'image/jpeg' });
+      setImage(file); // Set the file for upload
+      // Stop webcam stream after capture
+      const videoStream = webcamRef.current.video?.srcObject;
+      if (videoStream) {
+        const tracks = (videoStream as MediaStream).getTracks();
+        tracks.forEach(track => track.stop());
+      }
+      setUseWebcam(false); // Optionally toggle off webcam if you don't want it to continue
+    }
+  }
+};
 
-  // Send image for classification
-  const sendImage = async () => {
-    if (!preview) return;
-    console.log("Sending image...");
-    
-    // Logging image format
-    console.log("Preview image base64 format: ", preview);
+// Upload image to Supabase
+const uploadImageToSupabase = async (file: File) => {
+  if (!file) return;
+  setLoading(true);
+
+  const fileName = `${Date.now()}-${file.name}`;
+
+  try {
+    const { data: uploadData, error: uploadError } = await supabase.storage.from("uploads").upload(fileName, file);
+
+    if (uploadError) {
+      console.error("Upload error:", uploadError.message);
+      return;
+    }
+
+    if (uploadData) {
+      const fileUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${uploadData.path}`;
+      setFileUrlTo(fileUrl);
+
+      const { data: uploadEntry, error: entryError } = await supabase
+        .from("uploads")
+        .insert({
+          author: session?.user?.id,
+          location: activePlanet?.id || 30,
+          content: comment,
+          file_url: fileUrl,
+          configuration: response,
+          source: "Webcam",
+        })
+        .single();
+
+      if (entryError) {
+        console.error("Entry error:", entryError.message);
+      } else {
+        console.log("Upload entry:", uploadEntry);
+        saveLifeEntity();
+      }
+    }
+  } catch (err) {
+    console.error("Unexpected error during file upload:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Send image for classification
+const sendImage = async () => {
+  if (!preview && !image) {
+      console.log("No image selected or captured.");
+      return;
+  }
+
+  console.log("Sending image...");
   
-    setLoading(true);
-    setResponse(null);
-  
-    const formData = new FormData();
-  
-    if (image) {
+  // Logging image format
+  console.log("Preview image base64 format: ", preview);
+
+  setLoading(true);
+  setResponse(null);
+
+  const formData = new FormData();
+
+  if (image) {
       // If file upload is used
       console.log("Uploading image file...");
       formData.append("file", image);
-    } else {
+  } else {
       // Convert base64 to Blob for webcam image
       console.log("Converting base64 to Blob...");
+      if (!preview) {
+          console.error("Preview is null. Cannot fetch image.");
+          return;
+      }
       const blob = await fetch(preview).then((res) => res.blob());
       formData.append("file", blob);
-    }
-  
-    try {
+  }
+
+  try {
       console.log("Sending API request...");
       const res = await axios.post("/api/zoodex/upload-image/gpt", formData);
       console.log("Full API Response:", res.data); // Log full response
-  
+
       if (res.data.refresh) {
-        window.location.reload();
-        return;
+          window.location.reload();
+          return;
       }
-  
+
       setResponse(res.data);
-    } catch (error) {
+  } catch (error) {
       console.error("Error fetching classification:", error);
       setResponse({ error: "Error: Unable to get classification." });
-    } finally {
+  } finally {
       setLoading(false);
-    }
-  };
+  }
+};
 
-  // Upload image to Supabase
-  const uploadImageToSupabase = async (file: File) => {
-    if (!image) return
-    setLoading(true)
-
-    const fileName = `${Date.now()}-${file.name}`
-
-    try {
-      const { data: uploadData, error: uploadError } = await supabase.storage.from("uploads").upload(fileName, file)
-
-      if (uploadError) {
-        console.error("Upload error:", uploadError.message)
-        return
-      }
-
-      if (uploadData) {
-        const fileUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${uploadData.path}`
-
-        const { data: uploadEntry, error: entryError } = await supabase
-          .from("uploads")
-          .insert({
-            author: session?.user?.id,
-            location: activePlanet?.id || 30,
-            content: comment,
-            file_url: fileUrl,
-            configuration: response,
-            source: "Webcam",
-          })
-          .single()
-
-        if (entryError) {
-          console.error("Entry error:", entryError.message)
-        } else {
-          console.log("Upload entry:", uploadEntry)
-        }
-      }
-    } catch (err) {
-      console.error("Unexpected error during file upload:", err)
-    } finally {
-      setLoading(false)
-    }
+const saveLifeEntity = async () => {
+  if (!session) {
+    return
   }
 
-  const saveLifeEntity = async () => {
-    if (!session) {
-      return
-    }
+  try {
+    // Save a new entry to the "zoo" table with reference to the image and data
+    const { data: entityEntry, error: entityError } = await supabase.from("zoo").insert({
+      author: session?.user?.id,
+      file_url: fileUrlTO || '',
+      owner: session?.user?.id,
+      // location: activePlanet?.id || 30,
+      configuration: response, // Ensure that the classification data is saved
+      // uploaded: "", // You can store the URL or other related information
+    })
 
-    try {
-      const { data: entityEntry, error: entityError } = await supabase.from("zoo").insert({
-        author: session?.user?.id,
-        owner: session?.user?.id,
-        location: activePlanet.id, // fill this in
-        configuration: null, // fill this in
-        uploaded: "", // fill this in
-      })
-    } catch (err: any) {}
+    if (entityError) {
+      console.error("Entity error:", entityError.message)
+    } else {
+      console.log("Entity saved:", entityEntry)
+    }
+  } catch (err: any) {
+    console.error("Error saving entity:", err)
   }
+}
 
   return (
     <div className="fixed inset-0 w-full h-full flex flex-col bg-gradient-to-b from-red-700 to-red-900 overflow-hidden">
@@ -299,37 +337,36 @@ export default function ChatGPTImageClassifier() {
         </div>
 
         {/* Scan button with mechanical housing */}
-        <div className="mt-8 mb-4 relative">
-          <div className="absolute inset-0 translate-x-1 translate-y-1 rounded-full bg-gray-900"></div>
-          {useWebcam ? (
-            <button
-              onClick={captureWebcamImage}
-              className="relative w-24 h-24 rounded-full bg-gradient-to-br from-white to-gray-200 text-black font-medium flex items-center justify-center shadow-lg hover:from-gray-100 hover:to-gray-300 transition-colors border-4 border-gray-300 z-10"
-            >
-              <span className="text-lg">scan</span>
-            </button>
-          ) : preview ? (
-            <button
-              onClick={sendImage}
-              disabled={loading}
-              className="relative w-24 h-24 rounded-full bg-gradient-to-br from-white to-gray-200 text-black font-medium flex items-center justify-center shadow-lg hover:from-gray-100 hover:to-gray-300 transition-colors border-4 border-gray-300 z-10 disabled:opacity-50"
-            >
-              <span className="text-lg">{loading ? "..." : "scan"}</span>
-            </button>
-          ) : (
-            <label className="relative w-24 h-24 rounded-full bg-gradient-to-br from-white to-gray-200 text-black font-medium flex items-center justify-center shadow-lg hover:from-gray-100 hover:to-gray-300 transition-colors border-4 border-gray-300 z-10 cursor-pointer">
-              <span className="text-lg">upload</span>
-              <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-            </label>
-          )}
-        </div>
-            <button
-              onClick={sendImage}
-              className="relative w-24 h-24 rounded-full bg-gradient-to-br from-white to-gray-200 text-black font-medium flex items-center justify-center shadow-lg hover:from-gray-100 hover:to-gray-300 transition-colors border-4 border-gray-300 z-10 disabled:opacity-50"
-            >
-              <span className="text-lg">Scan</span>
-            </button>
-      </div>
+        <div className="mt-8 mb-4 relative flex space-x-4">
+  <div className="absolute inset-0 translate-x-1 translate-y-1 rounded-full bg-gray-900"></div>
+  {useWebcam ? (
+    <button
+      onClick={captureWebcamImage}
+      className="relative w-24 h-24 rounded-full bg-gradient-to-br from-white to-gray-200 text-black font-medium flex items-center justify-center shadow-lg hover:from-gray-100 hover:to-gray-300 transition-colors border-4 border-gray-300 z-10"
+    >
+      <span className="text-lg">Capture</span>
+    </button>
+  ) : preview ? (
+    <button
+      onClick={sendImage}
+      disabled={loading}
+      className="relative w-24 h-24 rounded-full bg-gradient-to-br from-white to-gray-200 text-black font-medium flex items-center justify-center shadow-lg hover:from-gray-100 hover:to-gray-300 transition-colors border-4 border-gray-300 z-10 disabled:opacity-50"
+    >
+      <span className="text-lg">{loading ? "..." : "Uploaded"}</span>
+    </button>
+  ) : (
+    <label className="relative w-24 h-24 rounded-full bg-gradient-to-br from-white to-gray-200 text-black font-medium flex items-center justify-center shadow-lg hover:from-gray-100 hover:to-gray-300 transition-colors border-4 border-gray-300 z-10 cursor-pointer">
+      <span className="text-lg">upload</span>
+      <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+    </label>
+  )}
+  <button
+    onClick={sendImage}
+    className="relative w-24 h-24 rounded-full bg-gradient-to-br from-white to-gray-200 text-black font-medium flex items-center justify-center shadow-lg hover:from-gray-100 hover:to-gray-300 transition-colors border-4 border-gray-300 z-10 disabled:opacity-50"
+  >
+    <span className="text-lg">Scann</span>
+  </button>
+</div></div>
 
       {/* Camera toggle with mechanical look */}
       <div className="p-6 flex justify-center">
@@ -449,23 +486,22 @@ export default function ChatGPTImageClassifier() {
               />
 
               <div className="flex space-x-3">
-                <button
-                  onClick={() => {
-                    if (image) uploadImageToSupabase(image)
-                    setResponse(null)
-                  }}
-                  disabled={loading}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-md disabled:opacity-50 hover:from-blue-500 hover:to-blue-600 transition-colors"
-                >
-                  {loading ? "Uploading..." : "Save"}
-                </button>
+              <button
+  onClick={() => {
+    if (image) {
+      // Ensure the image is uploaded if it's a valid file
+      uploadImageToSupabase(image);
+    } else {
+      console.log("No image selected or captured.");
+    }
+    setResponse(null); // Reset the response after saving
+  }}
+  disabled={loading}
+  className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-md disabled:opacity-50 hover:from-blue-500 hover:to-blue-600 transition-colors"
+>
+  {loading ? "Uploading..." : "Save"}
+</button>
 
-                <button
-                  onClick={() => setResponse(null)}
-                  className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-md hover:bg-gray-700 transition-colors"
-                >
-                  Close
-                </button>
               </div>
             </div>
           </div>
