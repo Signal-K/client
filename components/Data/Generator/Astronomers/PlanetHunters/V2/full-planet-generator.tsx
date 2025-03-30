@@ -30,7 +30,7 @@ export function FullPlanetGenerator() {
   const [plateTectonics, setPlateTectonics] = useState(0.5)
   const [soilType, setSoilType] = useState<"rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy">(
     "rocky",
-  )
+  );
   const [biomassLevel, setBiomassLevel] = useState(0.0)
   const [waterLevel, setWaterLevel] = useState(0.3)
   const [salinity, setSalinity] = useState(0.5)

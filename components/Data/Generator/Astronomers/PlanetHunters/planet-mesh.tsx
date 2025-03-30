@@ -403,7 +403,8 @@ export function PlanetMesh({ stats }: PlanetMeshProps) {
       <Sphere 
         ref={meshRef} 
         args={[1, 128, 128]} 
-        scale={stats.radius}
+        // scale={stats.radius}§
+        scale={2}
       >
         <primitive object={material} attach="material" />
       </Sphere>

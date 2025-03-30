@@ -16,7 +16,7 @@ export function PlanetScene({ stats, type }: PlanetSceneProps) {
   const planetType = stats.type ?? "terrestrial";
 
   return (
-    <div className="w-full h-[500px] bg-black rounded-lg overflow-hidden">
+    <div className="w-full h-[500px] rounded-lg overflow-hidden"> {/* bg-black  */}
       {type && (
         <Button variant="link" className="mt-2 text-blue-500">
           {type} Planet
