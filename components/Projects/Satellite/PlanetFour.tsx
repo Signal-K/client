@@ -142,6 +142,109 @@ interface SelectedAnomProps {
     anomalyid?: number;
 }; 
 
+export function PlanetFourProjectWithAnomalyId({
+    anomalyid
+}: SelectedAnomProps) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);    
+    const [imageUrl, setImageUrl] = useState<string | null>(null);    
+    const [showTutorial, setShowTutorial] = useState(false);
+    
+    const [loading, setLoading] = useState(true);
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    const handleShowTutorial = () => {
+        setShowTutorial(true);
+    };
+
+    const fetchAnomaly = async () => {
+        if (!session) {
+            setLoading(false);
+            return;
+        };
+
+        try {
+            const {
+                data: anomalyfromid,
+                error,
+            } = await supabase
+                .from("anomalies")
+                .select("*")
+                .eq('anomalySet', 'satellite-planetFour')
+                .eq('id', anomalyid);
+
+            if (error) {
+                throw error;
+            };
+
+            if (!anomalyfromid) {
+                console.error("No anomaly with that id found");
+            } else {
+                setAnomaly(anomalyfromid[0]);
+                setImageUrl(`${supabaseUrl}/storage/v1/objects/public/telescope/satellite-planetFour/${anomalyid}.jpeg`);
+            };
+        } catch (error: any) {
+            console.error('Error fetching anomaly: ', error);
+        } finally {
+            setLoading(false);
+        };
+    };
+
+    useEffect(() => {
+        fetchAnomaly();
+    }, [session]);
+
+    if (loading) {
+        return (
+            <p>
+                Loading...
+            </p>
+        );
+    };
+
+    if (!anomaly) {
+        return (
+            <p>No anomaly with that id found</p>
+        );
+    };
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+            {!showTutorial ? (
+                <>
+                    <Button
+                        className="mb-4"
+                        onClick={handleShowTutorial}
+                    >
+                        Show Tutorial
+                    </Button>
+                    {imageUrl && (
+                        <ImageAnnotator
+                            anomalyId={anomaly.id.toString()}
+                            anomalyType="satellite-planetFour"
+                            missionNumber={200000052}
+                            assetMentioned={imageUrl}
+                            structureItemId={3103}
+                            annotationType="P4"
+                            initialImageUrl={imageUrl}
+                            parentPlanetLocation={anomalyid?.toString()}
+                        />
+                    )}
+                    {imageUrl}
+                </>
+            ) : (
+                <div>
+                    <StarterPlanetFour anomalyid={anomaly.id} />
+                </div>
+            )}
+            <p>Selected Anomaly ID: {anomalyid}</p>
+        </div>
+    );
+};
+
 export function PlanetFourProject({ anomalyid }: SelectedAnomProps) { 
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -185,7 +288,7 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
                     setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomaly.id}.jpeg`);
                 }
             } catch (error) {
-                console.error("Error fetching anomaly", error);
+                console.error("Error fetching anomaly: ", error);
                 setAnomaly(null);
             } finally {
                 setLoading(false);

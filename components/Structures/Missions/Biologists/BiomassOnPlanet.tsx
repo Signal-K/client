@@ -31,7 +31,7 @@ const BiomassStats = () => {
                     "zoodex-southCoastFaunaRecovery",
                     "zoodex-iguanasFromAbove",
                     "zoodex-burrowingOwl"
-                ])                
+                ]);                
 
             if (onlyMine) {
                 query.eq("author", session.user.id);
@@ -43,48 +43,61 @@ const BiomassStats = () => {
 
             const { data, error } = await query;
             
-            if ( error ) {
+            if (error) {
                 return;
-            } ;
- 
-            setTotalBio(data.length);
+            };
+
+            const classificationCount = data.length;
 
             const oneYearAgo = new Date();
             oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
             const recentCount = data.filter((entry) => new Date(entry.created_at) > oneYearAgo).length;
             setRecentBio(recentCount);
+
+            const { count: uploadCount } = await supabase
+                .from("uploads")
+                .select("id", { count: "exact" });
+
+            setTotalBio(classificationCount + (uploadCount ?? 0));
         };
 
         fetchBioCount();
-    }, []);
+    }, [session, onlyMine, onPlanet, activePlanet]);
 
     const bioScore = Math.min(100, (recentBio / 50) * 100); // Update this to be based on biomass weight, not quantity
     const biomassLevel = bioScore > 5 ? "Intelligent Life" : bioScore > 3 ? "Fauna" : bioScore > 2 ? "Flora" : bioScore > 0 ? "Bacterium" : "Null";
 
     return (
-        <Card className="p-4 w-full max-w-md bg-card border shadow-md rounded-lg">
-            <CardContent className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-blue-500 clex items-center gap-2">
-                        <TreeDeciduousIcon className="w-5 h-5" /> Total biomass
-                    </h2>
-                    {/* <div className="flex items-center gap-2 text-sm">
-                        <span className="text-gray-600">Only my discoveries</span>
-                        <Switch checked={onlyMine} onCheckedChange={setOnlyMine} />
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                        <span className="text-gray-600">Only on Planet: {activePlanet?.id}</span>
-                        <Switch checked={onPlanet} onCheckedChange={setOnPlanet} />
-                    </div> */}
-                </div>
-                <p className="text-xl font-bold text-green-400">{totalBio}</p>
-                <div>
-                    <p className="text-sm text-gray-500">Biomass score: {biomassLevel}</p>
-                    <Progress value={bioScore} className="h-2 bg-green-500" />
-                </div>
-            </CardContent>
-        </Card>
-    )
+        <div className="flex items-center gap-2 text-green-400 text-lg font-semibold">
+            <TreeDeciduousIcon className="w-5 h-5" />
+            <span>{biomassLevel}</span>
+        </div>
+        
+    );
+
+    // return (
+    //     <Card className="p-4 w-full max-w-md bg-card border shadow-md rounded-lg">
+    //         <CardContent className="flex items-center justify-between gap-4">
+    //             <div className="flex items-center gap-2 text-blue-500">
+    //                 <TreeDeciduousIcon className="w-5 h-5" />
+    //                 <h2 className="text-lg font-semibold">Total biomass</h2>
+    //             </div>
+    //             <p className="text-xl font-bold text-green-400">{totalBio}</p>
+    //             <div className="flex flex-col items-center">
+    //                 <p className="text-sm text-gray-500">Biomass score: {biomassLevel}</p>
+    //                 <Progress value={bioScore} className="h-2 bg-green-500 w-24" />
+    //             </div>
+    //         </CardContent>
+    //     </Card>
+    //                 /* <div className="flex items-center gap-2 text-sm">
+    //                     <span className="text-gray-600">Only my discoveries</span>
+    //                     <Switch checked={onlyMine} onCheckedChange={setOnlyMine} />
+    //                 </div>
+    //                 <div className="flex items-center gap-2 text-sm">
+    //                     <span className="text-gray-600">Only on Planet: {activePlanet?.id}</span>
+    //                     <Switch checked={onPlanet} onCheckedChange={setOnPlanet} />
+    //                 </div> */
+    // );
 };
 
 export default BiomassStats;

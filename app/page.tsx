@@ -26,11 +26,13 @@ export default function Home() {
 
   const [hasRequiredItems, setHasRequiredItems] = useState<boolean | null>(null);
   const [userClassifications, setUserClassifications] = useState<boolean | null>(false);
+  
+  const [planetData, setPlanetData] = useState<any | null>(null);
+  const [zoodexCount, setZoodexCount] = useState<number | null>(null);
+  const biomass = zoodexCount !== null ? 0.831 * 0.001 * zoodexCount : null;
 
   useEffect(() => {
-    if (!session) {
-      return;
-    };
+    if (!session) return;
 
     const checkInventory = async () => {
       try {
@@ -47,7 +49,7 @@ export default function Home() {
       } catch (error: any) {
         console.error("Error checking inventory:", error.message);
         setHasRequiredItems(false);
-      };
+      }
     };
 
     const checkClassifications = async () => {
@@ -55,35 +57,72 @@ export default function Home() {
         const { data, error } = await supabase
           .from("classifications")
           .select("*")
-          .eq("author", session.user.id)
+          .eq("author", session.user.id);
 
         if (error) setUserClassifications(false);
-        if (data) {
-          setUserClassifications(true);
-        };
+        if (data) setUserClassifications(true);
       } catch (error: any) {
         console.error(error);
-      };
+      }
     };
 
     checkClassifications();
     checkInventory();
   }, [session, supabase]);
 
+  useEffect(() => {
+    if (!activePlanet) return;
+
+    async function fetchPlanetData() {
+      try {
+        const { data, error } = await supabase
+          .from("anomalies")
+          .select("*")
+          .eq("id", activePlanet.id);
+
+        if (error) {
+          console.error("Error fetching planet data: ", error);
+        } else {
+          setPlanetData(data[0]);
+        }
+      } catch (error: any) {
+        console.error("Error fetching planet data: ", error);
+      }
+    }
+
+    fetchPlanetData();
+  }, [activePlanet, supabase]);
+
+  useEffect(() => {
+    const fetchZoodexCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from("classifications")
+          .select("id", { count: "exact" })
+          .like("classificationtype", "%zoodex%");
+
+        if (error) throw error;
+        setZoodexCount(count);
+      } catch (err: any) {
+        console.error("Error fetching Zoodex classifications:", err.message);
+        setZoodexCount(0);
+      }
+    };
+
+    fetchZoodexCount();
+  }, [supabase]);
+
   if (!session) {
-    // return <LoginPage />;
-    return (
-      <LandingSS />
-    );
-  };
+    return <LandingSS />;
+  }
 
   if (hasRequiredItems === null) {
     return <div>Loading...</div>;
-  };
+  }
 
   if (!hasRequiredItems) {
     return <Onboarding />;
-  };
+  }
 
   return (
     <EarthViewLayout>
@@ -91,10 +130,17 @@ export default function Home() {
         <Navbar />
         <div className="flex flex-row space-y-4"></div>
         <div className="py-3">
-          <div className="py-1">
-            {/* <EnhancedWeatherEvents /> */}
+          <div className="py-6 my-10 px-6">
+            <p className="text-[#2C4F65]">Temperature:</p>
+            <p className="text-blue-200">{planetData?.temperatureEq} K</p>
+            {planetData?.id === 30 && (
+              <>
+                <p className="text-[#2C4F65]">Biomass:</p>
+                <p className="text-blue-200">{biomass !== null ? biomass.toFixed(6) : "Loading..."}</p>
+              </>
+            )}
           </div>
-          <center> 
+          <center>
             <OrbitalStructuresOnPlanet />
           </center>
         </div>

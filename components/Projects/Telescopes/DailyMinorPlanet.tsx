@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ClassificationForm from "../(classifications)/PostForm";
 
-import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
 import { Button } from "@/components/ui/button";
 interface Props {
     anomalyid: number | bigint; 
@@ -149,6 +148,125 @@ export function StarterDailyMinorPlanet({
     );
 };
 
+type Anomaly = {
+  id: string;
+  name: string;
+  details?: string;
+};
+
+interface DailyMinorPlanetProps {
+  anomalyid: string;
+}
+
+export function DailyMinorPlanetWithId({ anomalyid }: DailyMinorPlanetProps) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchAnomaly = async () => {
+    try {
+      const { data: anomalyData, error: anomalyError } = await supabase
+        .from('anomalies')
+        .select('*')
+        .eq('anomalySet', 'telescope-minorPlanet')
+        .eq('id', anomalyid);
+
+      if (anomalyError) throw anomalyError;
+
+      setAnomaly(anomalyData[0]);
+
+      const images = [1, 2, 3, 4].map(
+        (i) =>
+          `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/${i}.png`
+      );
+
+      setImageUrls(images);
+    } catch (error: any) {
+      console.error('Error fetching anomaly:', error.message);
+      setAnomaly(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnomaly();
+  }, [session]);
+
+  const handlePrevious = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNext = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  if (loading) return <p>Loading...</p>;
+
+  if (!anomaly) return <p>No anomaly found.</p>;
+
+  return (
+    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+      <div className="p-4 rounded-md relative w-full">
+        {imageUrls.length > 0 && (
+          <div className="relative">
+            <img
+              src={imageUrls[currentImageIndex]}
+              alt={`Anomaly ${currentImageIndex + 1}`}
+              className="w-full h-full object-contain"
+            />
+            <button onClick={handlePrevious} className="absolute left-0 top-1/2 -translate-y-1/2 p-2 bg-gray-600 rounded-full">
+              ❮
+            </button>
+            <button onClick={handleNext} className="absolute right-0 top-1/2 -translate-y-1/2 p-2 bg-gray-600 rounded-full">
+              ❯
+            </button>
+            <div className="flex justify-center mt-2">
+              {imageUrls.map((_, index) => (
+                <span key={index} className={`h-2 w-2 rounded-full mx-1 ${index === currentImageIndex ? 'bg-blue-500' : 'bg-gray-300'}`} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      {imageUrls.length > 0 && (
+        <div className="flex w-full gap-2 mt-4">
+          {imageUrls.map((url, index) => (
+            <img
+              key={index}
+              src={url}
+              alt={`Thumbnail ${index + 1}`}
+              onClick={() => setCurrentImageIndex(index)}
+              className={`flex-1 h-16 object-cover cursor-pointer border-2 ${index === currentImageIndex ? 'border-blue-500' : 'border-gray-300'}`}
+            />
+          ))}
+        </div>
+      )}
+
+      {imageUrls.length > 0 && (
+        <ClassificationForm
+          anomalyId={anomaly?.id || '90670192'}
+          anomalyType="telescope-minorPlanet"
+          missionNumber={20000003}
+          assetMentioned={imageUrls}
+          structureItemId={3103}
+        />
+      )}
+    </div>
+  );
+}
+
+
 export function DailyMinorPlanet() {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -156,47 +274,20 @@ export function DailyMinorPlanet() {
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+    
     const [loading, setLoading] = useState<boolean>(true);
-    const [missionLoading, setMissionLoading] = useState<boolean>(true);
-    const [hasMission20000003, setHasMission20000003] = useState<boolean | null>(false);
+
+    if (loading) {
+        return (
+            <p>
+                Loading...
+            </p>
+        );
+    };
+
     const [showTutorial, setShowTutorial] = useState(false);
 
-    // useEffect(() => {
-    //     const checkTutorialMission = async () => {
-    //         if (!session) {
-    //             setLoading(false);
-    //             return;
-    //         };
-
-    //         try {
-    //             const { data: missionData, error: missionError } = await supabase
-    //                 .from("missions")
-    //                 .select("*")
-    //                 .eq("user", session.user.id)
-    //                 .eq("mission", 20000003)
-    //                 .limit(1); // Limiting the result to 1 row
-
-    //             if (missionError) {
-    //                 throw missionError;
-    //             };
-
-    //             // Even if there are multiple rows, we just care about one row.
-    //             const hasMission = missionData && missionData.length > 0;
-    //             setHasMission20000003(hasMission);
-    //         } catch (error: any) {
-    //             console.error("Mission error:", error);
-    //             setHasMission20000003(false);
-    //         } finally {
-    //             setMissionLoading(false);
-    //         };
-    //     };
-
-    //     checkTutorialMission();
-    // }, [session, supabase]);
-
-    useEffect(() => {
-        // if (!hasMission20000003 || missionLoading || !session) return;
-    
+    useEffect(() => {    
         const fetchAnomaly = async () => {
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
@@ -241,10 +332,6 @@ export function DailyMinorPlanet() {
     const handleNext = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1));
     };
-
-    // if (!hasMission20000003 || showTutorial) {
-    //     return <StarterDailyMinorPlanet anomalyid={anomaly?.id || 90670192} />;
-    // };
 
     if (!anomaly) {
         return (

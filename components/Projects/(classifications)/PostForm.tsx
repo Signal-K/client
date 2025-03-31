@@ -368,7 +368,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
   const additionalTextAreaConfig = (() => {
     switch (anomalyType) {
       case "planet":
-        return { count: 1, placeholders: ["Enter details about the planet"] };
+        return { count: 1, placeholders: ["Planet period"] };
       case "roverImg":
         return {
           count: 2,

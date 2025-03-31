@@ -18,9 +18,74 @@ interface SelectedAnomProps {
     anomalyid?: number;
 }; 
 
+export function StarterTelescopeTessWithId({ anomalyid }: SelectedAnomProps) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchAnomalies = async () => {
+    if (!session) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data: anomalyData, error } = await supabase
+        .from('anomalies')
+        .select('*')
+        .eq('anomalySet', 'telescope-tess')
+        .eq('id', anomalyid);
+
+      if (error) {
+        console.log(error);
+        setLoading(false);
+        return;
+      };
+
+      setAnomaly(anomalyData[0]);
+      setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyid}/Sector1.png`);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnomalies();
+  }, [session]);
+
+  if (loading) return <p>Loading...</p>;
+
+  return (
+    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+      <div className="p-4 rounded-md relative w-full">
+        <ImageAnnotator
+          anomalyType="planet"
+          missionNumber={1372001}
+          structureItemId={3103}
+          assetMentioned={anomalyid?.toString()}
+          annotationType="PH"
+          initialImageUrl={imageUrl || ''}
+          anomalyId={anomalyid?.toString()}
+        />
+      </div>
+    </div>
+  );
+}
+
+
 export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
     const supabase = useSupabaseClient();
     const session = useSession();
+
     const { activePlanet } = useActivePlanet();
 
     const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
@@ -57,7 +122,8 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
             if (!session) {
                 setLoading(false);
                 return;
-            }
+            };
+
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")

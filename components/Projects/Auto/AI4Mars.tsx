@@ -150,12 +150,92 @@ interface SelectedAnomProps {
     parentClassificationId?: number;
 }; 
 
+export function AiForMarsProjectWithID({
+    anomalyid
+}: SelectedAnomProps) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+    const [showTutorial, setShowTutorial] = useState(false);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    
+    const [loading, setLoading] = useState(true);
+
+    const fetchAnomaly = async () => {
+        if (!session) {
+            setLoading(false);
+            return;
+        };
+
+        try {
+            const {
+                data: anomalyData,
+                error,
+            } = await supabase
+                .from("anomalies")
+                .select("*")
+                .eq("anomalySet", "automaton-aiForMars")
+                .eq('id', anomalyid);
+
+            if (error) {
+                console.log('error');
+                setLoading(false);
+            } else {
+                setAnomaly(anomalyData[0]);
+                setImageUrl(
+                    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${anomalyid}.jpeg`
+                );
+            };
+        } catch (error: any) {
+            setLoading(false);
+            console.error(error);
+        } finally {
+            setLoading(false);
+        };
+    };
+
+    useEffect(() => {
+        fetchAnomaly();
+    }, [session]);
+
+    if (loading) {
+        return (
+            <p>Loading...</p>
+        );
+    };
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full overflow-y-auto max-h-[90vh] rounded-lg overflow-x-hidden">
+                <>
+                    {imageUrl && (
+                        <>
+                            <div className="w-full overflow-x-auto">
+                                <ImageAnnotator
+                                    initialImageUrl={imageUrl}
+                                    anomalyId={anomalyid?.toString()}
+                                    anomalyType="automaton-aiForMars"
+                                    missionNumber={200000062}
+                                    assetMentioned={imageUrl}
+                                    structureItemId={3102} 
+                                    annotationType="AI4M"
+                                    parentPlanetLocation={anomalyid?.toString()}
+                                />
+                            </div>
+                        </>
+                    )}
+                </>
+        </div>
+    );
+};
+
 export function AiForMarsProject({
     anomalyid,
     parentClassificationId,
 }: SelectedAnomProps) {
     const supabase = useSupabaseClient();
     const session = useSession();
+
     const { activePlanet } = useActivePlanet();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
