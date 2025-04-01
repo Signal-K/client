@@ -48,7 +48,9 @@ export default function Navbar() {
                   className="text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition"
                   onClick={() => setSettlementsOpen((prev) => !prev)}
                 >
-                  <span>Star Sailors: {activePlanet?.content || "..."}</span>
+                  <span>Star Sailors: 
+                    {/* {activePlanet?.content || "..."} */}
+                    </span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
