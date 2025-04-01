@@ -100,6 +100,15 @@ export default function Navbar() {
                       )}
                     </Menu.Item>
                   </Link>
+                  <Link href="/scenes/uploads" passHref>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                          Conservation
+                        </a>
+                      )}
+                    </Menu.Item>
+                  </Link>
                 </Menu.Items>
               </Transition>
             </Menu>
