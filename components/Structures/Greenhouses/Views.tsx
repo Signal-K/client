@@ -258,7 +258,7 @@ export function MainView({ projects, archiveImages, onProjectClick }: MainViewPr
   );
   
   export const BoltedCard = ({ children, className = "" }: BoltedCardProps): ReactElement => (
-    <Card className={`relative border-border ${className}`}>
+    <Card className={`relative border-border bg-card bg-[repeating-linear-gradient(45deg,#000,#000_1px,transparent_1px,transparent_10px)]${className}`}>
       <Bolt className="absolute top-3 left-3" />
       <Bolt className="absolute top-3 right-3" />
       <Bolt className="absolute bottom-3 left-3" />
