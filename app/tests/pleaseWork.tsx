@@ -121,6 +121,7 @@ const uploadImageToSupabase = async (file: File) => {
         console.error("Entry error:", entryError.message);
       } else {
         console.log("Upload entry:", uploadEntry);
+        window.location.reload();
         // saveLifeEntity();
       }
     }

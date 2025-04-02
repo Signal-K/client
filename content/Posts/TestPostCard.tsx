@@ -81,6 +81,20 @@ export default function PostCard({
         [`${classificationId}-3`]: planetType,
       }));
     };
+
+    const handlePeriodInputChange = ( e: React.ChangeEvent<HTMLTextAreaElement> ) => {
+        const value = e.target.value;
+        setPeriodInputs((prev) => ({
+            ...prev,
+            [`${classificationId}-1`]: value,
+        }));
+
+        const period = calculatePlanetTemperature("1", value);
+        setPeriodInputs((prev) => ({
+            ...prev,
+            [`${classificationId}-2`]: period,
+        }));
+    };
       
     const calculatePlanetTemperature = (starTemp: string, period: string) => {
         const T_star = Number.parseFloat(starTemp);
@@ -194,6 +208,7 @@ export default function PostCard({
   const [temperatureInputs, setTemperatureInputs] = useState<Record<string, string>>({});  
   const [densityInputs, setDensityInputs] = useState<Record<string, string>>({});
   const [radiusInputs, setRadiusInputs] = useState<Record<string, string>>({});
+  const [periodInputs, setPeriodInputs] = useState<Record<string, string>>({});
 
   const handleAddRadiusComment = async () => {
     const radiusInput1 = radiusInputs[`${classificationId}-1`];
@@ -254,7 +269,7 @@ export default function PostCard({
             content: `${temperatureInput1}\n\n${temperatureInput2}`,
             classification_id: classificationId,
             author: session?.user?.id,
-            configuration: { temperature: `${temperatureInput1}, ${temperatureInput2}` },
+            configuration: { temperature: `${temperatureInput2}` },
             surveyor: "TRUE",
             value: temperatureInput2,
             category: 'Temperature'
@@ -262,6 +277,7 @@ export default function PostCard({
         ]);
 
       if (error) throw error;
+
       setTemperatureInputs((prev) => ({
         ...prev,
         [`${classificationId}-1`]: "",
@@ -272,6 +288,42 @@ export default function PostCard({
       console.error("Error adding temperature comment:", error);
     };
   };
+
+  const handleAddPeriodComment = async () => {
+    const periodInput1 = periodInputs[`${classificationId}-1`];
+    const periodInput2 = periodInputs[`${classificationId}-2`];
+
+    try {
+        const { error } = await supabase
+            .from("comments")
+            .insert([
+                {
+                    content: `${periodInput1}`,
+                    classification_id: classificationId,
+                    author: session?.user?.id,
+                    configuration: {
+                        period: `${periodInput1}`,
+                    },
+                    surveyor: "TRUE",
+                    value: periodInput1,
+                    category: "OrbitalPeriod",
+                },
+            ]);
+
+        if (error) {
+            throw error;
+        };
+
+        setPeriodInputs((prev) => ({
+            ...prev,
+            [`${classificationId}-1`]: "",
+            [`${classificationId}-2`]: "",
+        }));
+        fetchComments();
+    } catch (error: any) {
+        console.error("Error inserting comment: ", error);
+    };
+};
 
   const handleAddDensityComment = async () => {
     const densityInput1 = densityInputs[`${classificationId}-1`];
@@ -529,72 +581,75 @@ export default function PostCard({
                 <div className="bg-[#2C3A4A] p-3 rounded-md border border-[#5FCBC3]/20">
                   <div className="flex items-center gap-2 mb-3">
                     <Calculator className="h-4 w-4 text-[#B9E678]" />
-                    <h4 className="text-sm font-medium text-[#1e2834]">Planet Calculator</h4>
+                    <h4 className="text-sm font-medium text-black">Planet Calculator</h4>
                   </div>
 
                   <div className="space-y-3">
                     <Select
                       value={selectedCalculator}
-                      onValueChange={(val) => setSelectedCalculator(val as "radius" | "temperature")}
+                      onValueChange={(val) => setSelectedCalculator(val as "radius" | "temperature" | 'period')}
                     >
-                      <SelectTrigger className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#1e2834]">
+                      <SelectTrigger className="bg-[#1e2834] border-[#5FCBC3]/30 text-black">
                         <SelectValue placeholder="Select calculator" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#1e2834]">
-                        <SelectItem value="radius" className="focus:bg-[#1e2834] focus:text-[#1e2834]">
+                      <SelectContent className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-black">
+                        <SelectItem value="radius" className="focus:bg-[#1e2834] focus:text-black">
                           Planet Radius
                         </SelectItem>
-                        <SelectItem value="temperature" className="focus:bg-[#1e2834] focus:text-[#1e2834]">
+                        <SelectItem value="temperature" className="focus:bg-[#1e2834] focus:text-black">
                           Planet Temperature
+                        </SelectItem>
+                        <SelectItem value="period" className="focus:bg-[#1e2834] focus:text-black">
+                          Planet Orbital Period
                         </SelectItem>
                       </SelectContent>
                     </Select>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1">
-                        <label className="text-xs text-[#1e2834]/70">
+                        <label className="text-xs text-black/70">
                           {selectedCalculator === "radius" ? "Stellar Radius (R☉)" : "Star Temperature (K)"}
                         </label>
                         <Input
                           value={calculatorInputs.input1}
                           onChange={(e) => setCalculatorInputs({ ...calculatorInputs, input1: e.target.value })}
-                          className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#1e2834] h-8"
+                          className="bg-[#1e2834] border-[#5FCBC3]/30 text-black h-8"
                           type="number"
                           step="0.01"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs text-[#1e2834]/70">
+                        <label className="text-xs text-black/70">
                           {selectedCalculator === "radius" ? "Flux Differential" : "Orbital Period (Days)"}
                         </label>
                         <Input
                           value={calculatorInputs.input2}
                           onChange={(e) => setCalculatorInputs({ ...calculatorInputs, input2: e.target.value })}
-                          className="bg-[#1e2834] border-[#5FCBC3]/30 text-[#1e2834] h-8"
+                          className="bg-[#1e2834] border-[#5FCBC3]/30 text-black h-8"
                           type="number"
                           step="0.01"
                         />
                       </div>
                     </div>
                     <Button
-  onClick={() => {
-    if (selectedCalculator === "radius") {
-      const result = calculatePlanetRadius(calculatorInputs.input1, calculatorInputs.input2);
-      setCalculatorResult(result.radius); 
-      setRadiusInputs((prev) => ({
-        ...prev,
-        [`${classificationId}-2`]: result.radius, 
-        [`${classificationId}-3`]: result.planetType, 
-      }));
-    } else {
-      const result = calculatePlanetTemperature(calculatorInputs.input1, calculatorInputs.input2);
-      setCalculatorResult(result);
-    }
-  }}
-  className="w-full bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90"
->
-  Calculate
-</Button>
+                      onClick={() => {
+                        if (selectedCalculator === "radius") {
+                          const result = calculatePlanetRadius(calculatorInputs.input1, calculatorInputs.input2);
+                          setCalculatorResult(result.radius); 
+                          setRadiusInputs((prev) => ({
+                            ...prev,
+                            [`${classificationId}-2`]: result.radius, 
+                            [`${classificationId}-3`]: result.planetType, 
+                          }));
+                        } else {
+                          const result = calculatePlanetTemperature(calculatorInputs.input1, calculatorInputs.input2);
+                          setCalculatorResult(result);
+                        }
+                      }}
+                      className="w-full bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90"
+                    >
+                      Calculate
+                    </Button>
 
 
                     <div className="bg-[#1e2834] p-2 rounded border border-[#5FCBC3]/20 flex justify-between items-center">
@@ -611,12 +666,12 @@ export default function PostCard({
         placeholder="Observations"
         className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
         value={temperatureInputs[`${classificationId}-1`] || ""}
-        // onChange={(e) =>
-        //   setTemperatureInputs((prev) => ({
-        //     ...prev,
-        //     [`${classificationId}-1`]: e.target.value,
-        //   }))
-        // }
+        onChange={(e) =>
+          setTemperatureInputs((prev) => ({
+            ...prev,
+            [`${classificationId}-1`]: e.target.value,
+          }))
+        }
       />
       <Textarea
         placeholder="Value"
@@ -651,6 +706,15 @@ export default function PostCard({
         readOnly
       />
     </>
+  ) : selectedCalculator ==='period' ? (
+    <>
+      <Textarea
+        placeholder="General period discussion points."
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+        value={periodInputs[`${classificationId}-1`] || ""}
+        onChange={handlePeriodInputChange}
+      />
+    </>
   ) : (
     <Textarea
       placeholder="Share your analysis or findings..."
@@ -666,6 +730,8 @@ export default function PostCard({
           ? handleAddTemperatureComment
           : selectedCalculator === "radius"
           ? handleAddRadiusComment
+          : selectedCalculator === 'period'
+          ? handleAddPeriodComment
           : handleAddComment
       }
       className="bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90"

@@ -145,7 +145,10 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   const [currentPlanet, setCurrentPlanet] = useState<string>("orionis")
   const [currentView, setCurrentView] = useState<FocusView>("planet")
-  const planet = planets[currentPlanet]
+  const planet = planets[currentPlanet];
+
+  const [surveyorPeriod, setSurveyorPeriod] = useState<string>("")
+  const [comments, setComments] = useState<any[]>([]);
 
   const [timeLeft, setTimeLeft] = useState<number>(0);
 
@@ -163,6 +166,35 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     const seconds = String(timeInSeconds % 60).padStart(2, "0");
     return `${hours}:${minutes}:${seconds}`;
   };
+
+  const fetchComments = async () => {
+    if (!classification) return;
+  
+    const { data, error } = await supabase
+      .from("comments")
+      .select("*")
+      .eq("classification_id", classification.id)
+      .order("created_at", { ascending: false });
+  
+    if (error) {
+      console.error("Error fetching comments:", error);
+    } else {
+      setComments(data || []);
+  
+      // Find the first comment by the author with type 'OrbitalPeriod'
+      const orbitalPeriodComment = data?.find(
+        (comment) => comment.category === "OrbitalPeriod" && comment.author === classification.author
+      );
+      
+      if (orbitalPeriodComment) {
+        setSurveyorPeriod(orbitalPeriodComment.value || ""); // Assuming 'value' holds the period
+      }
+    }
+  };  
+
+  useEffect(() => {
+    fetchComments();
+  }, [classification, supabase]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -662,7 +694,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           </div>
           <div>
             <div className="text-sm uppercase tracking-wider text-white/70">Period:</div>
-            <div className="text-lg">{period}</div>
+            <div className="text-lg">{surveyorPeriod}</div>
           </div>
           {/* <div>
             <div className="text-sm uppercase tracking-wider text-white/70"></div>
