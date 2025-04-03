@@ -144,8 +144,11 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   const [showMetadata, setShowMetadata] = useState<boolean>(false);
 
   const [currentPlanet, setCurrentPlanet] = useState<string>("orionis")
-  const [currentView, setCurrentView] = useState<FocusView>("planet")
+  const [currentView, setCurrentView] = useState<FocusView>("planet");
+  const [density, setDensity] = useState<number | null>(null);
+  const [temperature, setTemperature] = useState<number | null>(null);
   const planet = planets[currentPlanet];
+  const [biomassScore, setBiomassScore] = useState<number>(0);
 
   const [surveyorPeriod, setSurveyorPeriod] = useState<string>("")
   const [comments, setComments] = useState<any[]>([]);
@@ -159,6 +162,19 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     nextSunday.setHours(10, 1, 0, 0); 
     return nextSunday.getTime() - now.getTime(); 
   };
+
+  const calculateBiomass = (temperature?: number, radius?: number, orbitalPeriod?: number): number => {
+    const T = temperature ?? 300;
+    const R = radius ?? 1;
+    const P = orbitalPeriod ?? 1.5;
+
+    return (
+      0.1 *
+      (T / (T + 300)) *
+      (1 / (1 + Math.exp(-(R - 1.2)))) *
+      (1 / (1 + Math.exp(-(1.5 - P))))
+    );
+  };  
 
   const formatTime = (timeInSeconds: number) => {
     const hours = String(Math.floor(timeInSeconds / 3600)).padStart(2, "0");
@@ -185,11 +201,29 @@ export default function ClassificationDetail({ params }: { params: { id: string 
       const orbitalPeriodComment = data?.find(
         (comment) => comment.category === "OrbitalPeriod" && comment.author === classification.author
       );
+
+      const radiusComment = data?.find(
+        (comment) => comment.category === "PlanetType" && comment.author === classification.author
+      );
+
+      const temperatureComment = data?.find(
+        (comment) => comment.category === "Temperature" && comment.author === classification.author
+      )
       
       if (orbitalPeriodComment) {
-        setSurveyorPeriod(orbitalPeriodComment.value || ""); // Assuming 'value' holds the period
-      }
-    }
+        setSurveyorPeriod(orbitalPeriodComment.value || ""); 
+      };
+
+      if (radiusComment) {
+        setDensity(radiusComment.content || null); 
+      };
+
+      if (temperatureComment) {
+        setTemperature(temperatureComment.value || null); 
+      };
+
+      setBiomassScore(calculateBiomass(temperature ?? undefined, density ?? undefined, parseFloat(surveyorPeriod) || undefined));
+    };
   };  
 
   useEffect(() => {
@@ -322,9 +356,9 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     setP4Summary(summary);
   };
 
-  const handleAI4MSummaryUpdate = useCallback((summary: AggregatedAI4M) => {
-    setAI4MSummary(summary);
-  }, []);  
+  // const handleAI4MSummaryUpdate = useCallback((summary: AggregatedAI4M) => {
+  //   setAI4MSummary(summary);
+  // }, []);  
 
   const toggleUserClassifications = () => {
     setShowCurrentUser((prev) => !prev);
@@ -411,12 +445,12 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           )}
 
           {/* AI4M Classification Summary */}
-          {ai4MClassifications.length > 0 && (
+          {/* {ai4MClassifications.length > 0 && (
             <AI4MAggregator
   classifications={ai4MClassifications}
   onSummaryUpdate={handleAI4MSummaryUpdate}
 />
-          )}
+          )} */}
         </>
     </div>
   )
@@ -514,7 +548,8 @@ export default function ClassificationDetail({ params }: { params: { id: string 
               defaultValue={planet.diameter}
               className="w-full bg-white/10 border border-white/20 rounded-md px-3 py-2 text-white"
             /> */}
-            <BiomassStats />
+            {/* <BiomassStats /> */}
+            {biomassScore}
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Day Length</label>
@@ -682,11 +717,12 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         <div className="hidden md:flex justify-center mt-8 space-x-12 text-center">
           <div>
             <div className="text-sm uppercase tracking-wider text-white/70">Biomass:</div>
-            <BiomassStats />
+            {/* <BiomassStats /> */}
+            {biomassScore}
           </div>
           <div>
-            <div className="text-sm uppercase tracking-wider text-white/70">Density:</div>
-            <div className="text-lg">{planet.diameter}</div>
+            <div className="text-sm uppercase tracking-wider text-white/70">Radius:</div>
+            <div className="text-lg">{density} Earth radii</div>
           </div>
           <div>
             <div className="text-sm uppercase tracking-wider text-white/70">Biome:</div>

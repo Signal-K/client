@@ -688,7 +688,7 @@ export default function PostCard({
   ) : selectedCalculator === "radius" ? (
     <>
       <Textarea
-        placeholder="Enter Stellar Radius (R☉)..."
+        placeholder="Enter Planet Radius (pR☉)..."
         className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
         value={radiusInputs[`${classificationId}-1`] || ""}
         onChange={handleRadiusInputChange}
