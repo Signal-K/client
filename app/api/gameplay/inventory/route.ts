@@ -155,6 +155,14 @@ const inventoryItems: InventoryItem[] = [
     ItemCategory: 'BioDomeStation',
     locationType: 'Surface', // Maybe underwater?
   },
+  {
+    id: 31040001,
+    name: "Uploads observatory",
+    description: 'Keep track of all animals and plants that have been uploaded to the database',
+    icon_url: '/assets/Archive/Inventory/Items/Coal.png',
+    ItemCategory: 'BioDomeStation',
+    locationType: 'Surface',
+  },
 
   
   // Tests

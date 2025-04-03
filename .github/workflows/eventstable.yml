@@ -1,0 +1,26 @@
+name: Check Supabase Events Table
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  check-table:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check if "events" table exists
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if PGPASSWORD=$(echo $SUPABASE_DB_URL | sed -n 's/.*password=\([^ ]*\).*/\1/p') \
+            psql "$SUPABASE_DB_URL" -tAc "SELECT to_regclass('public.events');" | grep -q 'public.events'; then
+            echo "✅ Events table exists!"
+          else
+            echo "❌ Events table does not exist!" >&2
+            exit 1
+          fi

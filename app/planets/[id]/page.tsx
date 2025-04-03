@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Navbar from "@/components/Layout/Navbar";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
@@ -322,9 +322,9 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     setP4Summary(summary);
   };
 
-  const handleAI4MSummaryUpdate = (summary: AggregatedAI4M) => {
+  const handleAI4MSummaryUpdate = useCallback((summary: AggregatedAI4M) => {
     setAI4MSummary(summary);
-  };
+  }, []);  
 
   const toggleUserClassifications = () => {
     setShowCurrentUser((prev) => !prev);
@@ -413,9 +413,9 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           {/* AI4M Classification Summary */}
           {ai4MClassifications.length > 0 && (
             <AI4MAggregator
-              classifications={ai4MClassifications}
-              onSummaryUpdate={handleAI4MSummaryUpdate}
-            />
+  classifications={ai4MClassifications}
+  onSummaryUpdate={handleAI4MSummaryUpdate}
+/>
           )}
         </>
     </div>

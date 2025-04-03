@@ -8,12 +8,12 @@ export interface AI4MClassification {
   classificationConfiguration?: {
     "": Record<number, boolean>;
   };
-}
+};
 
 interface AI4MAggregatorProps {
   classifications: AI4MClassification[];
   onSummaryUpdate?: (summary: AggregatedAI4M) => void;
-}
+};
 
 export interface AggregatedAI4M {
   sandCount: number;
@@ -22,7 +22,7 @@ export interface AggregatedAI4M {
   rockCount: number;
   unlabelledCount: number;
   classificationCounts: Record<string, number>;
-}
+};
 
 const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSummaryUpdate }) => {
   const [aggregatedData, setAggregatedData] = useState<AggregatedAI4M>({
@@ -42,17 +42,17 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
       let rockCount = 0;
       let unlabelledCount = 0;
       let classificationCounts: Record<string, number> = {};
-
+  
       classifications.forEach((classification) => {
         // Ensure annotationOptions exists and is an array
         const options = classification.annotationOptions || [];
-
+  
         options.forEach((option) => {
           const match = option.match(/([a-zA-Z\s-]+) \(x(\d+)\)/);
           if (match) {
             const feature = match[1].trim();
             const count = parseInt(match[2], 10);
-
+  
             switch (feature) {
               case AI4MCATEGORIES.sand.name:
                 sandCount += count;
@@ -75,7 +75,7 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
             }
           }
         });
-
+  
         // Process classification configuration for additional options
         if (classification.classificationConfiguration?.[""]) {
           Object.keys(classification.classificationConfiguration[""]).forEach((key) => {
@@ -84,7 +84,7 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
             if (option) {
               const featureText = option.text.trim();
               const matchedFeature = options.find((opt) => opt.includes(featureText));
-
+  
               if (matchedFeature) {
                 const featureName = matchedFeature.split(" (")[0]; // Extract feature name
                 classificationCounts[featureName] = (classificationCounts[featureName] || 0) + 1;
@@ -93,7 +93,7 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
           });
         }
       });
-
+  
       return {
         sandCount,
         soilCount,
@@ -106,11 +106,15 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
 
     const data = aggregateClassifications();
 
-    if (JSON.stringify(data) !== JSON.stringify(aggregatedData)) {
-      setAggregatedData(data);
-      onSummaryUpdate?.(data);
-    }
-  }, [classifications, onSummaryUpdate, aggregatedData]);
+    // Only update if data is different
+    setAggregatedData(prevData => {
+      if (JSON.stringify(data) !== JSON.stringify(prevData)) {
+        onSummaryUpdate?.(data); // Update the summary
+        return data;
+      }
+      return prevData; // No change
+    });
+  }, [classifications, onSummaryUpdate]);
 
   return (
     <div className="mt-6">
@@ -137,6 +141,13 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
           </ul>
         </div>
       )}
+      <ul>
+        {classifications.map((classification) => (
+          <li key={classification.id}>
+            ID: {classification.id}, Options: {classification.annotationOptions?.join(", ") || "None"}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
