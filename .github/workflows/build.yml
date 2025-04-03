@@ -1,36 +1,40 @@
-name: Check Supabase Events Table
+name: Build Next.js Application
 
 on:
   push:
     branches:
-      - '**'
+      - '**' 
   pull_request:
     branches:
       - '**'
 
 jobs:
-  check-table:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Check if "events" table exists
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: yarn install
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-        run: |
-          RESPONSE=$(curl -s \
-            -H "apikey: $NEXT_PUBLIC_SUPABASE_ANON_KEY" \
-            -H "Authorization: Bearer $NEXT_PUBLIC_SUPABASE_ANON_KEY" \
-            "$NEXT_PUBLIC_SUPABASE_URL/rest/v1/rpc/exists_table" \
-            -X POST \
-            -H "Content-Type: application/json" \
-            --data '{"table_name": "events"}')
-          
-          if [[ "$RESPONSE" == "true" ]]; then
-            echo "✅ Events table exists!"
-          else
-            echo "❌ Events table does not exist!" >&2
-            exit 1
-          fi
+
+      - name: Build the app
+        run: yarn build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-

@@ -3,24 +3,67 @@ name: Check Supabase Events Table
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   check-table:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: yarn install
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
       - name: Check if "events" table exists
         env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         run: |
-          if PGPASSWORD=$(echo $SUPABASE_DB_URL | sed -n 's/.*password=\([^ ]*\).*/\1/p') \
-            psql "$SUPABASE_DB_URL" -tAc "SELECT to_regclass('public.events');" | grep -q 'public.events'; then
+          echo "Checking table existence in Supabase..."
+          echo "Supabase URL: $NEXT_PUBLIC_SUPABASE_URL"
+
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+            -H "apikey: $NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            --data '{"table_name": "events"}' \
+            "$NEXT_PUBLIC_SUPABASE_URL/rest/v1/rpc/exists_table")
+
+          HTTP_STATUS=$(echo "$RESPONSE" | sed -n 's/.*HTTP_STATUS:\([0-9]*\)$/\1/p')
+          RESPONSE_BODY=$(echo "$RESPONSE" | sed 's/HTTP_STATUS:[0-9]*$//')
+
+          echo "Response: $RESPONSE_BODY"
+          echo "HTTP Status: $HTTP_STATUS"
+
+          if [[ "$HTTP_STATUS" -ne 200 ]]; then
+            echo "❌ API request failed with status $HTTP_STATUS" >&2
+            exit 1
+          fi
+
+          if [[ "$RESPONSE_BODY" == "true" ]]; then
             echo "✅ Events table exists!"
           else
             echo "❌ Events table does not exist!" >&2
             exit 1
           fi
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
