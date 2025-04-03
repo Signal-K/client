@@ -1,4 +1,4 @@
-name: Check Supabase Events Table
+name: Check Supabase Events and Zoo Tables
 
 on:
   push:
@@ -9,61 +9,30 @@ on:
       - '**'
 
 jobs:
-  check-table:
+  check-tables:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '20'
+      - name: Set up PostgreSQL client
+        run: sudo apt-get install postgresql-client
 
-      - name: Install dependencies
-        run: yarn install
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-
-      - name: Check if "events" table exists
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      - name: Query Supabase tables (events and zoo)
         run: |
-          echo "Checking table existence in Supabase..."
-          echo "Supabase URL: $NEXT_PUBLIC_SUPABASE_URL"
+          # Set the Supabase credentials as environment variables
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          
+          # Get the PostgreSQL connection string for Supabase
+          DB_HOST="${SUPABASE_URL.replace('https://', '')}"
+          DB_NAME="postgres"
+          DB_USER="postgres"
+          DB_PASSWORD="${SUPABASE_ANON_KEY}"
 
-          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
-            -H "apikey: $NEXT_PUBLIC_SUPABASE_ANON_KEY" \
-            -H "Authorization: Bearer $NEXT_PUBLIC_SUPABASE_ANON_KEY" \
-            -X POST \
-            -H "Content-Type: application/json" \
-            --data '{"table_name": "events"}' \
-            "$NEXT_PUBLIC_SUPABASE_URL/rest/v1/rpc/exists_table")
+          # Connect to the Supabase database and query the events and zoo tables
+          PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -U $DB_USER -d $DB_NAME -c "SELECT * FROM events;"
+          PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -U $DB_USER -d $DB_NAME -c "SELECT * FROM zoo;"
 
-          HTTP_STATUS=$(echo "$RESPONSE" | sed -n 's/.*HTTP_STATUS:\([0-9]*\)$/\1/p')
-          RESPONSE_BODY=$(echo "$RESPONSE" | sed 's/HTTP_STATUS:[0-9]*$//')
-
-          echo "Response: $RESPONSE_BODY"
-          echo "HTTP Status: $HTTP_STATUS"
-
-          if [[ "$HTTP_STATUS" -ne 200 ]]; then
-            echo "❌ API request failed with status $HTTP_STATUS" >&2
-            exit 1
-          fi
-
-          if [[ "$RESPONSE_BODY" == "true" ]]; then
-            echo "✅ Events table exists!"
-          else
-            echo "❌ Events table does not exist!" >&2
-            exit 1
-          fi
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+      - name: Post job cleanup
+        run: echo "Job completed"
