@@ -88,8 +88,8 @@ const AI4MAggregator: React.FC<AI4MAggregatorProps> = ({ classifications, onSumm
               if (matchedFeature) {
                 const featureName = matchedFeature.split(" (")[0]; // Extract feature name
                 classificationCounts[featureName] = (classificationCounts[featureName] || 0) + 1;
-              }
-            }
+              };
+            };
           });
         }
       });

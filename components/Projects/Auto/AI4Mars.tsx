@@ -353,7 +353,7 @@ export function AiForMarsProject({
                     >
                         Reopen Tutorial
                     </button>
-                </>
+                </> 
             )}
         </div>
     );
@@ -375,6 +375,33 @@ export function AI4MWrapper() {
                 <AiForMarsProject
                     parentClassificationId={selectedAnomaly}
                     anomalyid={selectedAnomaly}
+                />
+            }
+        </div>
+    );
+};
+
+interface AI4MWWHCProps {
+    anomalyId: number;
+};
+
+export function AI4MWrapperWithHardcode({
+    anomalyId
+}: AI4MWWHCProps) {
+    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+
+    return (
+        <div className="space-y-8">
+            {!selectedAnomaly && (
+                <PreferredTerrestrialClassifications
+                    onSelectAnomaly={(anomalyId: number | null, selectedVehicle: string | null) => {
+                        setSelectedAnomaly(anomalyId);
+                    }}
+                />
+            )} 
+            {selectedAnomaly && 
+                <AiForMarsProjectWithID
+                    anomalyid={anomalyId}
                 />
             }
         </div>
