@@ -10,11 +10,11 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
 
 import CloudSignal from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudSignal";
-import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import AsteroidViewer from "@/components/Data/Generator/Astronomers/DailyMinorPlanet/asteroid-viewer";
 import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
-import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
-import { FullPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
+// import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
+// import { FullPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
 import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 import Link from "next/link";
 import { Textarea } from "@/components/ui/textarea";
@@ -333,17 +333,18 @@ export function PostCardSingleWithGeneratorEditMode({
             <>
               {session?.user?.id === author && (
                 <PlanetGenerator
-                  classificationId={String(classificationId)} 
-                  classificationConfig={classificationConfig}
-                  author={author}
+                  // classificationId={String(classificationId)} 
+                  // classificationConfig={classificationConfig}
+                  // author={author}
                 />
                         //   // <FullPlanetGenerator /> --> we need to be able to pass the stats in, too (as a prop)
               )}
               {session?.user?.id !== author && (
-                <SimplePlanetGenerator
-                  classificationId={String(classificationId)}
-                  classificationConfig={classificationConfig}
-                  author={author}
+                // <SimplePlanetGenerator
+                //   classificationId={String(classificationId)}
+                //   classificationConfig={classificationConfig}
+                //   author={author}
+                <PlanetGenerator 
                 />
                 // <FullPlanetGeneratorNoControl />
               )}

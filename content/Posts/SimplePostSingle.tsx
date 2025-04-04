@@ -5,7 +5,7 @@ import StructuresOnPlanet from '@/components/Structures/Structures';
 import { AvatarGenerator } from '@/components/Account/Avatar';
 import { Button } from '@/components/ui/button';
 import { Share2, ThumbsUpIcon } from 'lucide-react';
-import PlanetGenerator from '@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator';
+// import PlanetGenerator from '@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator';
 import html2canvas from 'html2canvas';
 
 interface SimplePostSingleProps {

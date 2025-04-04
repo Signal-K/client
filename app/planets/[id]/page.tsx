@@ -17,6 +17,8 @@ import { Edit, Map, ArrowLeft, Info, FileText, Droplets, Thermometer, Globe } fr
 import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 import { Button } from "@/components/ui/button"
 import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnPlanet";
+import WeatherGenerator from "@/components/Data/Generator/Weather/SimpleWeatherEvents";
+import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 
 export interface Classification {
   id: number;
@@ -408,7 +410,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         </div>
       </div>
     </div>
-  )
+  );
 
   // Component for the Climate information
   const ClimateComponent = () => (
@@ -422,7 +424,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         />
       )}
     </div>
-  )
+  );
 
   // Component for the atmosphere information
   const AtmosphereComponent = () => (
@@ -587,12 +589,13 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     <div>
         {classification && (
             <>
-                <SimplePlanetGenerator
+                {/* <SimplePlanetGenerator
                 classificationId={String(classification.id)}
                 classificationConfig={classification.classificationConfiguration}
                 author={classification.author || ''}
                 biome={dominantBiome ?? undefined}
-              />
+              /> */}
+              <PlanetGenerator />
               </>
         )}
     </div>
@@ -617,8 +620,8 @@ export default function ClassificationDetail({ params }: { params: { id: string 
       default:
         return <PlanetComponent />
     }
+  };
 
-  }
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-black text-white">
       <Navbar />
@@ -632,6 +635,10 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         />
         <div className="absolute inset-0 bg-black/30" />
       </div>
+
+      {dominantBiome && (
+        <><WeatherGenerator biome={dominantBiome} /></>
+      )}
 
       {/* Navigation */}
       {/* <header className="relative z-10 p-4 md:p-6">

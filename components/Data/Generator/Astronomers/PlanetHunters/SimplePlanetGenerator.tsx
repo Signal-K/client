@@ -2,8 +2,17 @@ import { useState, useEffect } from "react";
 import { PlanetScene, SimplePlanetScene } from "./planet-scene";
 import { calculatePlanetStats } from "@/utils/planet-physics"; 
 import type { PlanetStats } from "@/utils/planet-physics";
-import { PlanetGeneratorProps } from "./PlanetGenerator";
+// import { PlanetGeneratorProps } from "./PlanetGenerator";
 import { Button } from "@/components/ui/button";
+
+export interface PlanetGeneratorProps {
+    classificationConfig?: any;
+    content?: string;
+    classificationId: string;
+    author: string;
+    type?: string;
+    biome?: string;
+}; 
 
 export default function SimplePlanetGenerator({ type, classificationConfig, biome }: PlanetGeneratorProps) {
     const initialMass = classificationConfig?.exportedValue?.mass ?? 1;

@@ -37,8 +37,8 @@ interface Project {
   title: string
   icon: React.ElementType
   completedCount: number
-  internalComponent?: React.ElementType
-  color: string
+  internalComponent?: React.ComponentType<Record<string, never>>
+  color: string; // Ensure this is explicitly typed as a string
   images?: string[]
   stats?: {
     cameras: number
@@ -277,7 +277,7 @@ function MainView({ projects, archiveImages, onProjectClick }: MainViewProps): R
                   <CardHeader className="p-4 pb-2 pt-4">
                     <CardTitle className="text-lg flex items-center justify-between">
                       <div className="flex items-center">
-                        <Icon className={`h-5 w-5 ${project.color}`} />
+                        {/* <Icon className={`h-5 w-5 ${project.color as string}`} /> */}
                         <span className="ml-2">{project.title}</span>
                         {project.completedCount > 0 && (
                           <Badge variant="secondary" className="ml-2 text-xs">
@@ -391,7 +391,7 @@ function ProjectDetailView({ project, onBack }: ProjectDetailViewProps): ReactEl
               <ChevronLeft className="h-5 w-5" />
             </Button>
             <h2 className="text-lg font-semibold flex items-center">
-              <Icon className={`h-5 w-5 ${project.color}`} />
+              {/* <Icon className={`h-5 w-5 ${project.color}`} /> */}
               <span className="ml-2">{project.title}</span>
             </h2>
           </div>
