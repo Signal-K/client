@@ -8,6 +8,7 @@ import MilestoneCard from "../Structures/Missions/Milestones/MilestoneCard";
 import JournalPage from "../Structures/Missions/Stardust/Journal";
 import AlertComponent from "../Structures/Missions/Milestones/Alerts/Alerts";
 import { BellDotIcon } from "lucide-react";
+import MySettlementsLocations from "@/content/Classifications/UserLocations";
 
 export default function Navbar() {
   const supabase = useSupabaseClient();
@@ -18,6 +19,7 @@ export default function Navbar() {
   const [milestonesOpen, setMilestonesOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [isMilestoneView, setIsMilestoneView] = useState(true);
+  const [isTerrariumOpen, setIsTerrariumOpen] = useState(true);
   const [hasNewAlert, setHasNewAlert] = useState(false); // Track if there's a new alert
 
   // Simulate new alert every 30 seconds for demonstration (replace with real alert logic)
@@ -156,6 +158,20 @@ export default function Navbar() {
               )}
             </div>
 
+            <div className="relative">
+              <button
+                className="text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition"
+                onClick={() => setIsTerrariumOpen((prev) => !prev)}
+              >
+                Travel
+              </button>
+              {isTerrariumOpen && (
+                <div className="absolute left-0 mt-2 w-[350px] sm:w-[400px] bg-white/90 backdrop-blur-lg rounded-lg shadow-lg border border-white/20">
+                  <MySettlementsLocations />
+                </div>
+              )}
+            </div>
+
             {/* Notifications Dropdown */}
             <div className="relative">
               <button
@@ -226,6 +242,40 @@ export default function Navbar() {
           </Menu>
         </div>
       </div>
+
+      {/* Modal for Settlements/Locations */}
+      {/* {settlementsOpen && (
+        <div className="fixed inset-0 z-40 bg-gray-500 bg-opacity-75 flex items-center justify-center">
+          <div className="bg-white w-full sm:w-[400px] rounded-lg shadow-lg p-4">
+            <h3 className="text-xl font-bold mb-4">Select a Location</h3>
+            <ul>
+              <li>
+                <Link href="/locations/earth" legacyBehavior passHref>
+                  <a className="block py-2 text-lg text-blue-500 hover:underline">Earth</a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/locations/mars" legacyBehavior passHref>
+                  <a className="block py-2 text-lg text-blue-500 hover:underline">Mars</a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/locations/jupiter" legacyBehavior passHref>
+                  <a className="block py-2 text-lg text-blue-500 hover:underline">Jupiter</a>
+                </Link>
+              </li>
+            </ul>
+            <div className="mt-4 text-center">
+              <button
+                className="py-2 px-4 bg-gray-500 text-white rounded-lg"
+                onClick={() => setSettlementsOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )} */}
     </div>
   );
 };
