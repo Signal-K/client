@@ -118,7 +118,7 @@ export default function PreferredTerrestrialClassifications({
   return (
     <div>
       {loading ? (
-        <p>Loading classifications...</p>
+        <p>Loading planets...</p>
       ) : error ? (
         <p>{error}</p>
       ) : classifications.length === 0 ? (
@@ -147,11 +147,11 @@ export default function PreferredTerrestrialClassifications({
                   classificationConfiguration={classification.classificationConfiguration}
                   anomaly={classification.anomaly.toString()}
                 />
-                {classification.temperature && (
+                {/* {classification.temperature && (
                   <p className="text-gray-500 mt-2">
                     Estimated Temperature: {classification.temperature}°C
                   </p>
-                )}
+                )} */}
                 <SciFiButton
                   onClick={() => {
                     setSelectedAnomaly(classification.anomaly);

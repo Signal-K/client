@@ -96,11 +96,12 @@ const uploadImageToSupabase = async (file: File) => {
     if (uploadError) {
       console.error("Upload error:", uploadError.message);
       return;
-    }
+    };
 
     if (uploadData) {
       const fileUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${uploadData.path}`;
       setFileUrlTo(fileUrl);
+      console.log('test')
 
       const { data: uploadEntry, error: entryError } = await supabase
         .from("uploads")
@@ -114,11 +115,14 @@ const uploadImageToSupabase = async (file: File) => {
         })
         .single();
 
+        console.log(uploadData);
+
       if (entryError) {
         console.error("Entry error:", entryError.message);
       } else {
         console.log("Upload entry:", uploadEntry);
-        saveLifeEntity();
+        window.location.reload();
+        // saveLifeEntity();
       }
     }
   } catch (err) {

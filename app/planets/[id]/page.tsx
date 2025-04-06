@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Navbar from "@/components/Layout/Navbar";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
@@ -17,6 +17,8 @@ import { Edit, Map, ArrowLeft, Info, FileText, Droplets, Thermometer, Globe } fr
 import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 import { Button } from "@/components/ui/button"
 import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnPlanet";
+import WeatherGenerator from "@/components/Data/Generator/Weather/SimpleWeatherEvents";
+import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 
 export interface Classification {
   id: number;
@@ -133,7 +135,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const [dominantBiome, setDominantBiome] = useState<string | null>('Jungle');
+  const [dominantBiome, setDominantBiome] = useState<string | null>('Barren (Pending)');
   const [cloudSummary, setCloudSummary] = useState<AggregatedCloud | null>(null);
   const [p4Summary, setP4Summary] = useState<AggregatedP4 | null>(null);
   const [ai4MSummary, setAI4MSummary] = useState<AggregatedAI4M | null>(null);
@@ -144,8 +146,14 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   const [showMetadata, setShowMetadata] = useState<boolean>(false);
 
   const [currentPlanet, setCurrentPlanet] = useState<string>("orionis")
-  const [currentView, setCurrentView] = useState<FocusView>("planet")
-  const planet = planets[currentPlanet]
+  const [currentView, setCurrentView] = useState<FocusView>("planet");
+  const [density, setDensity] = useState<number | null>(null);
+  const [temperature, setTemperature] = useState<number | null>(null);
+  const planet = planets[currentPlanet];
+  const [biomassScore, setBiomassScore] = useState<number>(0);
+
+  const [surveyorPeriod, setSurveyorPeriod] = useState<string>("")
+  const [comments, setComments] = useState<any[]>([]);
 
   const [timeLeft, setTimeLeft] = useState<number>(0);
 
@@ -157,12 +165,75 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     return nextSunday.getTime() - now.getTime(); 
   };
 
+  const calculateBiomass = (temperature?: number, radius?: number, orbitalPeriod?: number): number => {
+    const T = temperature ?? 300;
+    const R = radius ?? 1;
+    const P = orbitalPeriod ?? 1.5;
+
+    return (
+      0.1 *
+      (T / (T + 300)) *
+      (1 / (1 + Math.exp(-(R - 1.2)))) *
+      (1 / (1 + Math.exp(-(1.5 - P))))
+    );
+  };  
+
   const formatTime = (timeInSeconds: number) => {
     const hours = String(Math.floor(timeInSeconds / 3600)).padStart(2, "0");
     const minutes = String(Math.floor((timeInSeconds % 3600) / 60)).padStart(2, "0");
     const seconds = String(timeInSeconds % 60).padStart(2, "0");
     return `${hours}:${minutes}:${seconds}`;
   };
+
+  const fetchComments = async () => {
+    if (!classification) return;
+  
+    const { data, error } = await supabase
+      .from("comments")
+      .select("*")
+      .eq("classification_id", classification.id)
+      .order("created_at", { ascending: false });
+  
+    if (error) {
+      console.error("Error fetching comments:", error);
+    } else {
+      setComments(data || []);
+  
+      // Find the first comment by the author with type 'OrbitalPeriod'
+      const orbitalPeriodComment = data?.find(
+        (comment) => comment.category === "OrbitalPeriod" && comment.author === classification.author
+      );
+
+      const radiusComment = data?.find(
+        (comment) => comment.category === "PlanetType" && comment.author === classification.author
+      );
+
+      const temperatureComment = data?.find(
+        (comment) => comment.category === "Temperature" && comment.author === classification.author
+      )
+      
+      if (orbitalPeriodComment) {
+        setSurveyorPeriod(orbitalPeriodComment.value || ""); 
+      };
+
+      if (radiusComment) {
+        setDensity(radiusComment.content || null); 
+      };
+
+      if (temperatureComment) {
+        setTemperature(temperatureComment.value || null); 
+      };
+
+      setBiomassScore(calculateBiomass(temperature ?? undefined, density ?? undefined, parseFloat(surveyorPeriod) || undefined));
+    };
+  };  
+
+  useEffect(() => {
+    fetchComments();
+    {cloudSummary && p4Summary && ai4MSummary && (
+      console.log(cloudSummary, p4Summary, ai4MSummary) 
+  )}
+  }, [classification, supabase]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -284,15 +355,16 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   const handleCloudSummaryUpdate = (summary: AggregatedCloud) => {
     setCloudSummary(summary);
+    console.log("Cloud Summary:", summary);
   };
 
   const handleP4SummaryUpdate = (summary: AggregatedP4) => {
     setP4Summary(summary);
   };
 
-  const handleAI4MSummaryUpdate = (summary: AggregatedAI4M) => {
-    setAI4MSummary(summary);
-  };
+  // const handleAI4MSummaryUpdate = useCallback((summary: AggregatedAI4M) => {
+  //   setAI4MSummary(summary);
+  // }, []);  
 
   const toggleUserClassifications = () => {
     setShowCurrentUser((prev) => !prev);
@@ -342,7 +414,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         </div>
       </div>
     </div>
-  )
+  );
 
   // Component for the Climate information
   const ClimateComponent = () => (
@@ -352,11 +424,10 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           cloudSummary={cloudSummary}
           p4Summary={p4Summary}
           ai4MSummary={ai4MSummary}
-          onBiomeUpdate={(biome) => setDominantBiome(biome)}
-        />
+          onBiomeUpdate={(biome) => setDominantBiome(biome)} biomassVersion={biomassScore}        />
       )}
     </div>
-  )
+  );
 
   // Component for the atmosphere information
   const AtmosphereComponent = () => (
@@ -379,12 +450,12 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           )}
 
           {/* AI4M Classification Summary */}
-          {ai4MClassifications.length > 0 && (
+          {/* {ai4MClassifications.length > 0 && (
             <AI4MAggregator
-              classifications={ai4MClassifications}
-              onSummaryUpdate={handleAI4MSummaryUpdate}
-            />
-          )}
+  classifications={ai4MClassifications}
+  onSummaryUpdate={handleAI4MSummaryUpdate}
+/>
+          )} */}
         </>
     </div>
   )
@@ -482,7 +553,8 @@ export default function ClassificationDetail({ params }: { params: { id: string 
               defaultValue={planet.diameter}
               className="w-full bg-white/10 border border-white/20 rounded-md px-3 py-2 text-white"
             /> */}
-            <BiomassStats />
+            {/* <BiomassStats /> */}
+            {biomassScore}
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Day Length</label>
@@ -520,12 +592,13 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     <div>
         {classification && (
             <>
-                <SimplePlanetGenerator
+                {/* <SimplePlanetGenerator
                 classificationId={String(classification.id)}
                 classificationConfig={classification.classificationConfiguration}
                 author={classification.author || ''}
                 biome={dominantBiome ?? undefined}
-              />
+              /> */}
+              <PlanetGenerator />
               </>
         )}
     </div>
@@ -550,8 +623,8 @@ export default function ClassificationDetail({ params }: { params: { id: string 
       default:
         return <PlanetComponent />
     }
+  };
 
-  }
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-black text-white">
       <Navbar />
@@ -565,6 +638,10 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         />
         <div className="absolute inset-0 bg-black/30" />
       </div>
+
+      {dominantBiome && (
+        <><WeatherGenerator biome={dominantBiome} /></>
+      )}
 
       {/* Navigation */}
       {/* <header className="relative z-10 p-4 md:p-6">
@@ -650,11 +727,12 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         <div className="hidden md:flex justify-center mt-8 space-x-12 text-center">
           <div>
             <div className="text-sm uppercase tracking-wider text-white/70">Biomass:</div>
-            <BiomassStats />
+            {/* <BiomassStats /> */}
+            {biomassScore}
           </div>
           <div>
-            <div className="text-sm uppercase tracking-wider text-white/70">Density:</div>
-            <div className="text-lg">{planet.diameter}</div>
+            <div className="text-sm uppercase tracking-wider text-white/70">Radius:</div>
+            <div className="text-lg">{density} Earth radii</div>
           </div>
           <div>
             <div className="text-sm uppercase tracking-wider text-white/70">Biome:</div>
@@ -662,7 +740,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           </div>
           <div>
             <div className="text-sm uppercase tracking-wider text-white/70">Period:</div>
-            <div className="text-lg">{period}</div>
+            <div className="text-lg">{surveyorPeriod}</div>
           </div>
           {/* <div>
             <div className="text-sm uppercase tracking-wider text-white/70"></div>

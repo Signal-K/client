@@ -7,7 +7,7 @@ import CloudClassificationSummary from "@/components/Structures/Missions/Meteoro
 import SatellitePlanetFourAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/P4Aggregator";
 import AI4MAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AI4MAggregator";
 import { AggregatedCloud, AggregatedBalloon, AggregatedAI4M, AggregatedP4 } from "../[id]/page";
-import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
+// import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
 import { calculatePlanetStats, calculateTerrainHeight } from "@/utils/planet-physics";
 import MarsCloudsShapesAggregator from "@/components/Structures/Missions/Meteorologists/Cloudspotting/Shapes/ShapesAggregator";
 
@@ -194,13 +194,13 @@ export default function MarsClassifications() {
       <Navbar />
       <div className="py-10">
         <h1 className="text-xl font-bold mb-4">Mars Classifications</h1>
-        <PlanetScene
+        {/* <PlanetScene
           stats={
             stats
           }
           terrainHeight={terrainHeight}
 
-        />
+        /> */}
         <button
           onClick={toggleMetadataVisibility}
           className="ml-4 px-4 bg-green-500 text-white rounded-md"

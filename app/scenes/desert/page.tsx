@@ -37,8 +37,8 @@ interface Project {
   title: string
   icon: React.ElementType
   completedCount: number
-  internalComponent?: React.ElementType
-  color: string
+  internalComponent?: React.ComponentType<Record<string, never>>
+  color: string; // Ensure this is explicitly typed as a string
   images?: string[]
   stats?: {
     cameras: number
@@ -152,7 +152,7 @@ const DesertBaseEarthScene = () => {
   </div>
 
   <div className="flex items-center gap-4">
-    <div className="relative bg-primary/10 p-3 rounded-full">
+    <div className="relative bg-card p-3 rounded-full">
       <Sprout className="h-20 w-20 text-primary" />
     </div>
 
@@ -265,11 +265,11 @@ function MainView({ projects, archiveImages, onProjectClick }: MainViewProps): R
               Active Projects
             </h2>
             <Badge variant="outline" className="text-sm px-3 py-1">
-              <Leaf className="h-4 w-4 mr-1" />3 Stations
+              <Leaf className="h-4 w-4 mr-1" />2 Stations
             </Badge>
           </div>
   
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col bg-[repeating-linear-gradient(45deg,#000,#000_1px,transparent_1px,transparent_10px)] gap-4">
             {projects.map((project: Project) => {
               const Icon = project.icon
               return (
@@ -277,7 +277,7 @@ function MainView({ projects, archiveImages, onProjectClick }: MainViewProps): R
                   <CardHeader className="p-4 pb-2 pt-4">
                     <CardTitle className="text-lg flex items-center justify-between">
                       <div className="flex items-center">
-                        <Icon className={`h-5 w-5 ${project.color}`} />
+                        {/* <Icon className={`h-5 w-5 ${project.color as string}`} /> */}
                         <span className="ml-2">{project.title}</span>
                         {project.completedCount > 0 && (
                           <Badge variant="secondary" className="ml-2 text-xs">
@@ -294,7 +294,7 @@ function MainView({ projects, archiveImages, onProjectClick }: MainViewProps): R
                   <CardContent className="p-4 pt-2">
                     <div className="flex gap-3 justify-start">
                       {project.images?.map((img: string, idx: number) => (
-                        <div key={idx} className="w-16 h-16 rounded-sm overflow-hidden bg-muted border border-border">
+                        <div key={idx} className="w-16 h-16 rounded-sm overflow-hidden bg-[repeating-linear-gradient(45deg,#000,#000_1px,transparent_1px,transparent_10px)] border border-border">
                           <img
                             src={img || "/placeholder.svg"}
                             alt={`Capture ${idx + 1}`}
@@ -384,14 +384,14 @@ function ProjectDetailView({ project, onBack }: ProjectDetailViewProps): ReactEl
     const InternalComponent = project.internalComponent
   
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 bg-card">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Button variant="ghost" size="icon" onClick={onBack} className="mr-2">
               <ChevronLeft className="h-5 w-5" />
             </Button>
             <h2 className="text-lg font-semibold flex items-center">
-              <Icon className={`h-5 w-5 ${project.color}`} />
+              {/* <Icon className={`h-5 w-5 ${project.color}`} /> */}
               <span className="ml-2">{project.title}</span>
             </h2>
           </div>

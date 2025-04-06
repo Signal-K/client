@@ -1,13 +1,11 @@
 "use client";
 
-import { FullPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
-import { SimplePlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/Simple/simple-planet-generator";
-import ChatGPTComponent from "./pleaseWork";
+import AlertComponent from "@/components/Structures/Missions/Milestones/Alerts/Alerts";
 
 export default function TestPage() {
   return (
     <div className="min-h-screen bg-black text-white p-4 space-y-8">
-      <ChatGPTComponent />
+      <AlertComponent />
     </div>
   );
 };

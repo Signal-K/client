@@ -253,5 +253,26 @@ export function CloudspottingWrapper() {
                 <StarterLidar anomalyid={selectedAnomaly} />
             )}
         </div>
+    );
+};
+
+interface CWWHProps {
+    anomalyId: number;
+};
+
+export function CloudspottingWrapperWithHardcode({
+    anomalyId
+}: CWWHProps) {
+    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+
+    return (
+        <div className="space-y-8">
+            {!selectedAnomaly && (
+                <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
+            )}
+            {selectedAnomaly && (
+                <StarterLidar anomalyid={anomalyId} />
+            )}
+        </div>
     )
 }

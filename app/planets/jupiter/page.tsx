@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Navbar from "@/components/Layout/Navbar";
-import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
+// import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
 import { calculatePlanetStats, calculateTerrainHeight } from "@/utils/planet-physics";
 import Link from "next/link";
 import JVHCloudAggregator from "@/components/Structures/Missions/Meteorologists/JVH/JVHCloudAggregator";
@@ -158,10 +158,10 @@ export default function JupiterClassifications() {
             <Navbar />
             <div className="py-10">
                 <h1 className="text-xl font-bold mb-4">Jupiter Discoveries</h1>
-                <PlanetScene
+                {/* <PlanetScene
                     stats={stats}
                     terrainHeight={terrainHeight}
-                />
+                /> */}
                 <button
                     onClick={toggleMetadataVisibility}
                     className="ml-4 px-4 bg-green-500 text-white rounded-sm"

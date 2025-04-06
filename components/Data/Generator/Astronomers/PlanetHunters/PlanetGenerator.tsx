@@ -1,132 +1,60 @@
-import { useState, useEffect } from 'react';
-import { PlanetScene } from './planet-scene'; 
-import { PlanetControls } from './planet-controls';
-import { PlanetImportExport } from './planet-import-export';
-import { calculatePlanetStats } from '@/utils/planet-physics';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import type { PlanetStats } from '@/utils/planet-physics';
+"use client"
 
-const TERRESTRIAL_THRESHOLD = 7.5; // Earth masses
-const GASEOUS_THRESHOLD = 2.0; // Earth radii
+import { useState, useEffect } from "react"
+import { Canvas } from "@react-three/fiber"
+import { OrbitControls, Stars, Environment } from "@react-three/drei"
+import { PlanetShader } from "./PlanetShader"
+import { SettingsPanel } from "./SettingsPanel";
+import { Cog } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { type PlanetStats, calculateDensity, defaultPlanetStats } from "@/lib/planet-physics"
 
 export interface PlanetGeneratorProps {
-  classificationConfig?: any;
-  content?: string;
-  classificationId: string;
-  author: string;
-  type?: string;
-  biome?: string;
-}; 
+  classificationId?: string;
+  author?: string;
+  classificationConfig?: JSON;
+};
 
-export default function PlanetGenerator({ classificationConfig, author, classificationId }: PlanetGeneratorProps) {
-  const supabase = useSupabaseClient();
-  const session = useSession(); 
+export function PlanetGenerator() {
+  const [showSettings, setShowSettings] = useState(false)
+  const [planetStats, setPlanetStats] = useState<PlanetStats>(defaultPlanetStats)
 
-  const initialMass = classificationConfig?.exportedValue?.mass ?? 1;
-  const initialRadius = classificationConfig?.exportedValue?.radius ?? 1;
-
-  const [mass, setMass] = useState(initialMass);
-  const [radius, setRadius] = useState(initialRadius);
-  const [typeOverride, setTypeOverride] = useState<'terrestrial' | 'gaseous' | null>(null);
-
-  const stats = calculatePlanetStats(mass, radius, undefined, undefined, typeOverride);
-
-  const handleMassChange = (newMass: number) => {
-    if (typeOverride === 'terrestrial' && newMass > TERRESTRIAL_THRESHOLD) {
-      setMass(TERRESTRIAL_THRESHOLD);
-    } else if (typeOverride === 'gaseous' && newMass <= TERRESTRIAL_THRESHOLD) {
-      setMass(TERRESTRIAL_THRESHOLD + 0.1);
-    } else {
-      setMass(newMass);
-    }
-  };
-
-  const handleRadiusChange = (newRadius: number) => {
-    if (typeOverride === 'terrestrial' && newRadius > GASEOUS_THRESHOLD) {
-      setRadius(GASEOUS_THRESHOLD);
-    } else if (typeOverride === 'gaseous' && newRadius <= GASEOUS_THRESHOLD) {
-      setRadius(GASEOUS_THRESHOLD + 0.1);
-    } else {
-      setRadius(newRadius);
-    }
-  };
-
-  const handleTypeOverride = (type: 'terrestrial' | 'gaseous' | null) => {
-    setTypeOverride(type);
-    if (type === 'terrestrial') {
-      if (mass > TERRESTRIAL_THRESHOLD) setMass(TERRESTRIAL_THRESHOLD);
-      if (radius > GASEOUS_THRESHOLD) setRadius(GASEOUS_THRESHOLD);
-    } else if (type === 'gaseous') {
-      if (mass <= TERRESTRIAL_THRESHOLD) setMass(TERRESTRIAL_THRESHOLD + 0.1);
-      if (radius <= GASEOUS_THRESHOLD) setRadius(GASEOUS_THRESHOLD + 0.1);
-    };
-  };
-
-  const handleImport = (importedStats: Partial<PlanetStats>) => {
-    if (importedStats.mass !== undefined) {
-      setMass(importedStats.mass);
-    };
-    if (importedStats.radius !== undefined) {
-      setRadius(importedStats.radius);
-    };
-
-    setTypeOverride(null);
-  };
-
-  const handleSave = async () => {
-    if (!classificationId) {
-      console.error('Classification ID is missing.');
-      return;
-    };
-
-    const idToQuery = typeof classificationId === 'string' ? classificationId : String(classificationId);
-
-    try {
-      const { data, error } = await supabase
-        .from('classifications')
-        .select('classificationConfiguration')
-        .eq('id', idToQuery)
-        .single();
-
-      if (error) throw error;
-
-      const currentConfig = data?.classificationConfiguration || {};
-      const newConfig = {
-        ...currentConfig,
-        exportedValue: { mass, radius },
-      };
-
-      const { error: updateError } = await supabase
-        .from('classifications')
-        .update({ classificationConfiguration: newConfig })
-        .eq('id', idToQuery); 
-
-      if (updateError) throw updateError;
-
-      alert('Planet configuration saved successfully!');
-    } catch (err) {
-      console.error('Error saving planet configuration:', err);
-      alert('Failed to save planet configuration.');
-    };
-  };
+  // Update density when mass or radius changes
+  useEffect(() => {
+    setPlanetStats((prev) => ({
+      ...prev,
+      density: calculateDensity(prev.mass, prev.radius),
+    }))
+  }, [planetStats.mass, planetStats.radius])
 
   return (
-    <div className="bg-black p-6">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-6">Procedural Planet Generator</h1>
-        <div className="flex flex-row gap-6 items-start">
-          <PlanetScene stats={stats} />
-          <div className="flex flex-col gap-4 w-full">
-            <PlanetControls
-              stats={stats}
-              onMassChange={handleMassChange}
-              onRadiusChange={handleRadiusChange}
-              onTypeOverride={handleTypeOverride}
-            />
-            <PlanetImportExport stats={stats} onImport={handleImport} onSave={handleSave} />
-          </div>
-        </div>
-      </div>
+    <div className="w-full h-screen relative">
+      <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
+        {/* <color attach="background" args={["#020209"]} /> */}
+        <ambientLight intensity={0.4} />
+        <pointLight position={[10, 10, 10]} intensity={2} />
+        <pointLight position={[-10, -10, -10]} intensity={0.5} color="#b0c4de" />
+        <directionalLight position={[5, 5, 5]} intensity={1.5} castShadow />
+        <Environment preset="sunset" />
+        <PlanetShader planetStats={planetStats} />
+        <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+        <OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
+        <mesh position={[0, 0, -15]}>
+          <sphereGeometry args={[5, 32, 32]} />
+          <meshBasicMaterial color="#4060ff" transparent opacity={0.03} />
+        </mesh>
+      </Canvas>
+
+      <Button
+        variant="outline"
+        size="icon"
+        className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white"
+        onClick={() => setShowSettings(!showSettings)}
+      >
+        <Cog className="h-4 w-4" />
+      </Button>
+
+      {showSettings && <SettingsPanel planetStats={planetStats} setPlanetStats={setPlanetStats} />}
     </div>
-  );
-};
+  )
+}
