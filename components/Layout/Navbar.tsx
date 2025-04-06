@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { Avatar } from "../Account/Avatar";
 import Link from "next/link";
@@ -6,6 +6,8 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import MilestoneCard from "../Structures/Missions/Milestones/MilestoneCard";
 import JournalPage from "../Structures/Missions/Stardust/Journal";
+import AlertComponent from "../Structures/Missions/Milestones/Alerts/Alerts";
+import { BellDotIcon } from "lucide-react";
 
 export default function Navbar() {
   const supabase = useSupabaseClient();
@@ -14,7 +16,17 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [settlementsOpen, setSettlementsOpen] = useState(false);
   const [milestonesOpen, setMilestonesOpen] = useState(false);
+  const [alertsOpen, setAlertsOpen] = useState(false);
   const [isMilestoneView, setIsMilestoneView] = useState(true);
+  const [hasNewAlert, setHasNewAlert] = useState(false); // Track if there's a new alert
+
+  // Simulate new alert every 30 seconds for demonstration (replace with real alert logic)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHasNewAlert((prev) => !prev); // Toggle new alert every 30 seconds for demonstration
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Sign out function
   const signOut = async () => {
@@ -23,7 +35,7 @@ export default function Navbar() {
       console.error("Error signing out:", error.message);
     } else {
       console.log("User signed out successfully");
-    }
+    };
   };
 
   return (
@@ -140,6 +152,24 @@ export default function Navbar() {
                   </div>
 
                   {isMilestoneView ? <MilestoneCard /> : <JournalPage />}
+                </div>
+              )}
+            </div>
+
+            {/* Notifications Dropdown */}
+            <div className="relative">
+              <button
+                className={`text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition ${hasNewAlert ? "animate-pulse" : ""}`}
+                onClick={() => setAlertsOpen((prev) => !prev)}
+              >
+                <BellDotIcon className="w-6 h-6 text-white" />
+                {hasNewAlert && (
+                  <span className="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                )}
+              </button>
+              {alertsOpen && (
+                <div className="absolute left-0 mt-2 w-[350px] sm:w-[400px] bg-white/90 backdrop-blur-lg rounded-lg shadow-lg border border-white/20">
+                  <AlertComponent />
                 </div>
               )}
             </div>

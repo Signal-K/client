@@ -31,6 +31,7 @@ export interface IndividualStructureProps {
     text: string;
     icon: React.ReactNode;
   }[];
+  alerts?: { icon: React.ReactNode; message: string }[];
   structureId?: number;
   onActionClick?: (action: string) => void;
   onClose?: () => void;
@@ -44,6 +45,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
   actions,
   buttons,
   modals,
+  alerts,
   onActionClick,
   onClose,
   structureId,
@@ -144,6 +146,21 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                 </div>
               )}
             </div>
+            {alerts?.map((alert, index) => (
+                <div key={index} className="absolute top-0 left-1/2 transform -translate-x-1/2 cursor-pointer">
+                  <div 
+                    className="relative flex items-center justify-center"
+                    onClick={() => alert.message}
+                  >
+                    <div className="bg-[#FF7B7B] text-white p-2 rounded-full">
+                      {alert.icon}
+                    </div>
+                    <div className="absolute top-0 left-0 bg-[#2C3A4A] text-white text-xs p-1 rounded-md shadow-lg">
+                      {alert.message}
+                    </div>
+                  </div>
+                </div>
+              ))}
             <div className="flex justify-center space-x-4">
               {labels.map((label, index) => {
                 let bgColor = "";

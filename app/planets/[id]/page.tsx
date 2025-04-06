@@ -135,7 +135,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const [dominantBiome, setDominantBiome] = useState<string | null>('Jungle');
+  const [dominantBiome, setDominantBiome] = useState<string | null>('Barren (Pending)');
   const [cloudSummary, setCloudSummary] = useState<AggregatedCloud | null>(null);
   const [p4Summary, setP4Summary] = useState<AggregatedP4 | null>(null);
   const [ai4MSummary, setAI4MSummary] = useState<AggregatedAI4M | null>(null);
@@ -230,6 +230,9 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   useEffect(() => {
     fetchComments();
+    {cloudSummary && p4Summary && ai4MSummary && (
+      console.log(cloudSummary, p4Summary, ai4MSummary) 
+  )}
   }, [classification, supabase]);
 
   useEffect(() => {
@@ -352,6 +355,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   const handleCloudSummaryUpdate = (summary: AggregatedCloud) => {
     setCloudSummary(summary);
+    console.log("Cloud Summary:", summary);
   };
 
   const handleP4SummaryUpdate = (summary: AggregatedP4) => {
@@ -420,8 +424,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           cloudSummary={cloudSummary}
           p4Summary={p4Summary}
           ai4MSummary={ai4MSummary}
-          onBiomeUpdate={(biome) => setDominantBiome(biome)}
-        />
+          onBiomeUpdate={(biome) => setDominantBiome(biome)} biomassVersion={biomassScore}        />
       )}
     </div>
   );
