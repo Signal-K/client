@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button"
 import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnPlanet";
 import WeatherGenerator from "@/components/Data/Generator/Weather/SimpleWeatherEvents";
 import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+import PlanetProgress from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetCompletion";
 
 export interface Classification {
   id: number;
@@ -44,7 +45,7 @@ type PlanetData = {
   dayLength: string
   temperature: string
   climate: string
-}
+};
 
 const planets: Record<string, PlanetData> = {
   orionis: {
@@ -385,37 +386,6 @@ export default function ClassificationDetail({ params }: { params: { id: string 
     };
   };
 
-  // Component for the overview information
-  const OverviewComponent = () => (
-    <div className="w-full max-w-lg bg-black/40 backdrop-blur-sm rounded-xl p-6 text-white">
-      <h2 className="text-2xl font-light mb-4">Planet Overview</h2>
-      <div className="space-y-4">
-        <p>
-          {planet.name} is a remarkable exoplanet located in the {planet.galaxy} galaxy, approximately 42 light-years
-          from Earth. With a diameter of {planet.diameter}, it's roughly similar to Earth but with unique
-          characteristics that make it a subject of intense scientific interest.
-        </p>
-        <p>
-          The planet completes a full rotation in just {planet.dayLength}, creating a dynamic day-night cycle that
-          influences its weather patterns and ecosystem development. Its {planet.climate} climate supports a variety of
-          unique atmospheric phenomena.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          <div className="bg-white/10 p-4 rounded-lg">
-            <h3 className="font-medium mb-2">Orbital Position</h3>
-            <p className="text-sm text-white/80">
-              Third planet from its star, with an orbital period of 267 Earth days.
-            </p>
-          </div>
-          <div className="bg-white/10 p-4 rounded-lg">
-            <h3 className="font-medium mb-2">Surface Area</h3>
-            <p className="text-sm text-white/80">510.1 million km², with 71% covered by liquid water oceans.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   // Component for the Climate information
   const ClimateComponent = () => (
     <div className="w-full max-w-lg bg-black/40 backdrop-blur-sm rounded-xl p-6 text-white">
@@ -426,6 +396,12 @@ export default function ClassificationDetail({ params }: { params: { id: string 
           ai4MSummary={ai4MSummary}
           onBiomeUpdate={(biome) => setDominantBiome(biome)} biomassVersion={biomassScore}        />
       )}
+                    <PlanetProgress
+                  temperature={temperature}
+                  radius={density}
+                  biomassScore={biomassScore}
+                  period={surveyorPeriod}
+                />
     </div>
   );
 
@@ -598,11 +574,11 @@ export default function ClassificationDetail({ params }: { params: { id: string 
                 author={classification.author || ''}
                 biome={dominantBiome ?? undefined}
               /> */}
-              <PlanetGenerator />
+                <PlanetGenerator />
               </>
         )}
     </div>
-  )
+  );
 
   const renderFocusComponent = () => {
     switch (currentView) {
@@ -622,7 +598,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         return <EditComponent />
       default:
         return <PlanetComponent />
-    }
+    };
   };
 
   return (
