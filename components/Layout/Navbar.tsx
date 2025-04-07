@@ -19,25 +19,23 @@ export default function Navbar() {
   const [milestonesOpen, setMilestonesOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [isMilestoneView, setIsMilestoneView] = useState(true);
-  const [isTerrariumOpen, setIsTerrariumOpen] = useState(true);
-  const [hasNewAlert, setHasNewAlert] = useState(false); // Track if there's a new alert
+  const [isTerrariumOpen, setIsTerrariumOpen] = useState(false);
+  const [hasNewAlert, setHasNewAlert] = useState(false);
 
-  // Simulate new alert every 30 seconds for demonstration (replace with real alert logic)
   useEffect(() => {
     const interval = setInterval(() => {
-      setHasNewAlert((prev) => !prev); // Toggle new alert every 30 seconds for demonstration
+      setHasNewAlert((prev) => !prev);
     }, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  // Sign out function
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Error signing out:", error.message);
     } else {
       console.log("User signed out successfully");
-    };
+    }
   };
 
   return (
@@ -47,24 +45,17 @@ export default function Navbar() {
           <div className="flex items-center space-x-3">
             <Link href="/" legacyBehavior>
               <a>
-                <img
-                  src="/planet.svg"
-                  alt="Logo"
-                  className="h-8 w-8 ml-1"
-                />
+                <img src="/planet.svg" alt="Logo" className="h-8 w-8 ml-1" />
               </a>
             </Link>
 
-            {/* Star Sailors Dropdown */}
             <Menu as="div" className="relative inline-block text-left">
               <div>
                 <Menu.Button
                   className="text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition"
                   onClick={() => setSettlementsOpen((prev) => !prev)}
                 >
-                  <span>Star Sailors: 
-                    {/* {activePlanet?.content || "..."} */}
-                    </span>
+                  <span>Star Sailors:</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -127,7 +118,6 @@ export default function Navbar() {
               </Transition>
             </Menu>
 
-            {/* Milestones Dropdown */}
             <div className="relative">
               <button
                 className="text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition"
@@ -137,7 +127,6 @@ export default function Navbar() {
               </button>
               {milestonesOpen && (
                 <div className="absolute left-0 mt-2 w-[350px] sm:w-[400px] bg-white/90 backdrop-blur-lg rounded-lg shadow-lg border border-white/20">
-                  {/* Add a button to toggle between the views */}
                   <div className="px-4 py-2 text-sm font-bold text-gray-800">
                     <button
                       className={`w-full text-left px-2 py-1 rounded-lg ${isMilestoneView ? 'bg-[#5FCBC3]/60' : 'bg-gray-100'}`}
@@ -152,7 +141,6 @@ export default function Navbar() {
                       Classifications Journal
                     </button>
                   </div>
-
                   {isMilestoneView ? <MilestoneCard /> : <JournalPage />}
                 </div>
               )}
@@ -172,15 +160,14 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Notifications Dropdown */}
             <div className="relative">
               <button
-                className={`text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition ${hasNewAlert ? "animate-pulse" : ""}`}
+                className={`relative text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition ${hasNewAlert ? "animate-pulse" : ""}`}
                 onClick={() => setAlertsOpen((prev) => !prev)}
               >
                 <BellDotIcon className="w-6 h-6 text-white" />
                 {hasNewAlert && (
-                  <span className="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                  <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-red-500 rounded-full ring-2 ring-white" />
                 )}
               </button>
               {alertsOpen && (
@@ -191,7 +178,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Profile Menu */}
           <Menu as="div" className="relative">
             <div>
               <Menu.Button
@@ -242,40 +228,6 @@ export default function Navbar() {
           </Menu>
         </div>
       </div>
-
-      {/* Modal for Settlements/Locations */}
-      {/* {settlementsOpen && (
-        <div className="fixed inset-0 z-40 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white w-full sm:w-[400px] rounded-lg shadow-lg p-4">
-            <h3 className="text-xl font-bold mb-4">Select a Location</h3>
-            <ul>
-              <li>
-                <Link href="/locations/earth" legacyBehavior passHref>
-                  <a className="block py-2 text-lg text-blue-500 hover:underline">Earth</a>
-                </Link>
-              </li>
-              <li>
-                <Link href="/locations/mars" legacyBehavior passHref>
-                  <a className="block py-2 text-lg text-blue-500 hover:underline">Mars</a>
-                </Link>
-              </li>
-              <li>
-                <Link href="/locations/jupiter" legacyBehavior passHref>
-                  <a className="block py-2 text-lg text-blue-500 hover:underline">Jupiter</a>
-                </Link>
-              </li>
-            </ul>
-            <div className="mt-4 text-center">
-              <button
-                className="py-2 px-4 bg-gray-500 text-white rounded-lg"
-                onClick={() => setSettlementsOpen(false)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 };

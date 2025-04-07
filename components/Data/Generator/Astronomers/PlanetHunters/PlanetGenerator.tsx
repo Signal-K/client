@@ -28,8 +28,8 @@ export function PlanetGenerator() {
   }, [planetStats.mass, planetStats.radius])
 
   return (
-    <div className="w-full h-screen relative">
-      <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
+    <div className="w-screen h-screen relative">
+      <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
         {/* <color attach="background" args={["#020209"]} /> */}
         <ambientLight intensity={0.4} />
         <pointLight position={[10, 10, 10]} intensity={2} />
