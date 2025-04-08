@@ -21,6 +21,7 @@ import {
 } from "@/lib/planet-physics";
 import { Download, Upload, Copy, Palette, Plus, Trash2, AlertCircle } from "lucide-react"
 import { getAllBiomes, adjustParametersForBiome, getParameterRange, type BiomeRanges } from "@/lib/biome-data"
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 
 interface SettingsPanelProps {
   planetStats: PlanetStats
@@ -35,6 +36,9 @@ export function SettingsPanel({
   classificationId = "UNCLASSIFIED",
   author = "UNKNOWN",
 }: SettingsPanelProps) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
   const planetType = determinePlanetType(planetStats.mass, planetStats.radius)
   const [importExportText, setImportExportText] = useState("")
   const [selectedBiome, setSelectedBiome] = useState(planetStats.biome || "Rocky Highlands")
@@ -61,8 +65,8 @@ export function SettingsPanel({
       ...planetStats,
       [key]: value,
       ...(key === "liquidEnabled" && value === true ? { waterLevel: Math.max(planetStats.waterLevel || 0, 0.5) } : {}),
-    })
-  }
+    });
+  };
 
   // Apply biome constraints when biome changes
   useEffect(() => {
@@ -111,46 +115,61 @@ export function SettingsPanel({
       setNewLandmark({ ...newLandmark, coordinates: { ...newLandmark.coordinates, ...value } })
     } else {
       setNewLandmark({ ...newLandmark, [field]: value })
-    }
-  }
+    };
+  };
 
-  // Export planet configuration
-  const exportPlanetConfig = () => {
-    // Create a metadata object with classification info
-    const metadata = {
-      classificationId,
-      author,
-      type: planetStats.type || "Unknown",
-      biome: planetStats.biome || "Unknown",
-      exportDate: new Date().toISOString(),
-    }
-
-    // Start with metadata
-    let config = `// Planet Configuration Export\n`
-    config += `// Classification: ${metadata.classificationId}\n`
-    config += `// Author: ${metadata.author}\n`
-    config += `// Export Date: ${metadata.exportDate}\n\n`
-
-    // Add planet stats
+  const exportPlanetConfig = async () => {
+    const exportObject: Record<string, any> = {};
+  
     Object.entries(planetStats).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        if (key === "customColors" && value && Object.keys(value).length > 0) {
-          config += `${key}: ${JSON.stringify(value)}\n`
-        } else if (key === "landmarks" && Array.isArray(value) && value.length > 0) {
-          config += `${key}: ${JSON.stringify(value)}\n`
-        } else if (typeof value === "number") {
-          config += `${key}: ${value.toFixed(2)}\n`
+        if (typeof value === "number") {
+          exportObject[key] = Number(value.toFixed(2));
         } else if (typeof value === "boolean") {
-          config += `${key}: ${value ? "true" : "false"}\n`
-        } else if (typeof value === "object" && key !== "customColors" && key !== "landmarks") {
-          config += `${key}: ${JSON.stringify(value)}\n`
-        } else if (typeof value !== "object") {
-          config += `${key}: ${value}\n`
+          exportObject[key] = value;
+        } else if (typeof value === "object" && !Array.isArray(value)) {
+          exportObject[key] = value;
+        } else {
+          exportObject[key] = value;
         }
       }
-    })
-    setImportExportText(config)
-  }
+    });
+  
+    const exportText = Object.entries(exportObject)
+      .map(([key, value]) =>
+        typeof value === "object" ? `${key}: ${JSON.stringify(value)}` : `${key}: ${value}`
+      )
+      .join("\n");
+  
+    setImportExportText(exportText);
+  
+    const idAsNumber = parseInt(classificationId);
+    if (isNaN(idAsNumber)) return;
+  
+    const { data, error: fetchError } = await supabase
+      .from("classifications")
+      .select("classificationConfiguration")
+      .eq("id", idAsNumber)
+      .single();
+  
+    if (fetchError || !data?.classificationConfiguration) {
+      console.error("Failed to fetch existing configuration:", fetchError);
+      return;
+    }
+  
+    const updatedConfig = {
+      ...data.classificationConfiguration,
+      exportedValue: exportObject,
+    };
+  
+    const { error: updateError } = await supabase
+      .from("classifications")
+      .update({ classificationConfiguration: updatedConfig })
+      .eq("id", idAsNumber);
+  
+    if (updateError) console.error("Failed to export config:", updateError);
+  };
+  
 
   // Import planet configuration
   const importPlanetConfig = () => {
@@ -190,13 +209,13 @@ export function SettingsPanel({
       if (completeStats.customColors) setCustomColors(completeStats.customColors as any)
     } catch (error) {
       console.error("Error importing planet configuration:", error)
-    }
-  }
+    };
+  };
 
   // Get parameter range for the current biome
   const getRange = (parameter: keyof BiomeRanges): [number, number] => {
     return getParameterRange(selectedBiome, parameter)
-  }
+  };
 
   return (
     <div className="absolute top-0 left-0 h-full w-96 bg-black/90 text-green-400 p-6 overflow-y-auto font-mono border-r border-green-500/30">
