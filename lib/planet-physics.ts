@@ -1,4 +1,5 @@
 export interface PlanetStats {
+  type: string
   mass: number
   radius: number
   density?: number
@@ -21,13 +22,26 @@ export interface PlanetStats {
   volcanicActivity?: number
   waterHeight?: number
   liquidEnabled?: boolean
+  landmarks?: Landmark[]
   customColors?: {
     oceanFloor?: string
     beach?: string
     regular?: string
     mountain?: string
-  }
-}
+  };
+};
+
+export interface Landmark {
+  classification_id: string
+  type: string
+  visual_effect: string
+  image_link: string
+  coordinates: {
+    x: number
+    y: number
+    z: number
+  };
+};
 
 export const defaultPlanetStats: PlanetStats = {
   mass: 1,
@@ -52,6 +66,7 @@ export const defaultPlanetStats: PlanetStats = {
   volcanicActivity: 0.3,
   waterHeight: 0.65,
   liquidEnabled: true,
+  type: ""
 }
 
 export function calculateDensity(mass: number, radius: number): number {

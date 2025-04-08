@@ -388,7 +388,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   // Component for the Climate information
   const ClimateComponent = () => (
-    <div className="w-full max-w-lg bg-black/40 backdrop-blur-sm rounded-xl p-6 text-white">
+    <div className="w-full max-w-4xl bg-black/10 backdrop-blur-sm rounded-xl p-6 text-white mx-auto">
       {(cloudSummary || p4Summary || ai4MSummary) && (
         <BiomeAggregator
           cloudSummary={cloudSummary}
@@ -407,7 +407,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   // Component for the atmosphere information
   const AtmosphereComponent = () => (
-    <div className="w-full max-w-lg bg-black/40 backdrop-blur-sm rounded-xl p-6 text-white">
+    <div className="w-full max-w-4xl bg-black/10 backdrop-blur-sm rounded-xl p-6 text-white mx-auto">
       <>
        {/* Cloud Classification Summary */}
          {cloudClassifications.length > 0 && (
@@ -438,7 +438,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   // Component for the exploration information
   const ExplorationComponent = () => (
-    <div className="w-full max-w-lg bg-black/40 backdrop-blur-sm rounded-xl p-6 text-white">
+    <div className="w-full max-w-4xl bg-black/10 backdrop-blur-sm rounded-xl p-6 text-white mx-auto">
       <PostCardSingleWithGenerator
           key={classification.id}
           classificationId={classification.id}
@@ -460,7 +460,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   // Component for the map view
   const MapComponent = () => (
-    <div className="w-full max-w-lg bg-black/40 backdrop-blur-sm rounded-xl p-6 text-white">
+    <div className="w-full max-w-4xl bg-black/10 backdrop-blur-sm rounded-xl p-6 text-white mx-auto">
       <h2 className="text-2xl font-light mb-4">Planet Map</h2>
       <div className="space-y-4">
         <div className="relative h-80 bg-blue-900/50 rounded-lg overflow-hidden">
@@ -502,7 +502,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
 
   // Component for the edit view
   const EditComponent = () => (
-    <div className="w-full max-w-lg bg-black/40 backdrop-blur-sm rounded-xl p-6 text-white">
+    <div className="w-full max-w-4xl bg-black/10 backdrop-blur-sm rounded-xl p-6 text-white mx-auto">
       <h2 className="text-2xl font-light mb-4">Edit Planet Data</h2>
       <div className="space-y-4">
         <div className="grid grid-cols-1 gap-4">
@@ -565,7 +565,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   )
 
   const PlanetComponent = () => (
-    <div>
+    <div className="flex w-full h-screen">
         {classification && (
             <>
                 {/* <SimplePlanetGenerator
@@ -574,7 +574,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
                 author={classification.author || ''}
                 biome={dominantBiome ?? undefined}
               /> */}
-                <PlanetGenerator />
+                <PlanetGenerator classificationId={""} author={""} />
               </>
         )}
     </div>
@@ -602,8 +602,9 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-black text-white">
+    <div className="relative min-h-screen w-screen overflow-hidden bg-black text-white">
       <Navbar />
+  
       <div className="absolute inset-0 z-0">
         <Image
           src="https://images.unsplash.com/photo-1454789591675-556c287e39e2?q=80&w=2344&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -614,42 +615,15 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         />
         <div className="absolute inset-0 bg-black/30" />
       </div>
-
+  
       {dominantBiome && (
-        <><WeatherGenerator biome={dominantBiome} /></>
+        <div className="absolute top-0 left-0 w-screen z-10">
+          <WeatherGenerator biome={dominantBiome} />
+        </div>
       )}
-
-      {/* Navigation */}
-      {/* <header className="relative z-10 p-4 md:p-6">
-        <nav className="hidden md:flex justify-between items-center">
-          <div className="flex space-x-6 invisible">
-            <button className="text-sm font-light hover:text-white/80">Home</button>
-            <button className="text-sm font-light hover:text-white/80">About</button>
-            <button className="text-sm font-light hover:text-white/80">Contact</button>
-          </div>
-          <div className="text-xl font-light tracking-widest">METEORA</div>
-          <div className="flex space-x-6 invisible">
-            <button className="text-sm font-light hover:text-white/80">Galaxies</button>
-            <button className="text-sm font-light hover:text-white/80">Solar System</button>
-            <button className="text-sm font-light hover:text-white/80">Earth</button>
-          </div>
-        </nav>
-        <div className="md:hidden flex justify-between items-center">
-          <div className="text-xl font-light tracking-widest">METEORA</div>
-          <Button variant="ghost" size="icon" className="text-white">
-            <Globe className="h-5 w-5" />
-          </Button>
-        </div>
-      </header> */}
-
-      {/* Main content */}
-      <main className="relative z-10 h-[calc(100vh-80px)] flex flex-col">
-        {/* Planet name */}
-        <div className="text-center mt-8 py-8 md:mt-8">
-          {/* <h1 className="text-4xl md:text-6xl font-light tracking-widest">{planet.name}</h1> */}
-        </div>
-
-        {/* Back button - only visible when not on planet view */}
+  
+      <main className="relative z-10 h-[100vh] flex flex-col justify-start pt-12">
+        {/* Back button */}
         {currentView !== "planet" && (
           <div className="absolute top-4 left-4 z-20">
             <Button
@@ -662,9 +636,9 @@ export default function ClassificationDetail({ params }: { params: { id: string 
             </Button>
           </div>
         )}
-
+  
         {/* Action buttons - Desktop */}
-        <div className="hidden md:flex justify-center mt-6 space-x-4">
+        <div className="hidden md:flex justify-center mt-4 space-x-4">
           <Button
             variant={currentView === "overview" ? "secondary" : "ghost"}
             className="text-white border border-white/30 hover:bg-white/10"
@@ -698,12 +672,11 @@ export default function ClassificationDetail({ params }: { params: { id: string 
             Exploration
           </Button>
         </div>
-
-        {/* Planet stats - Desktop */}
-        <div className="hidden md:flex justify-center mt-8 space-x-12 text-center">
+  
+        {/* Stats - Desktop */}
+        <div className="hidden md:flex justify-center mt-6 space-x-12 text-center">
           <div>
             <div className="text-sm uppercase tracking-wider text-white/70">Biomass:</div>
-            {/* <BiomassStats /> */}
             {biomassScore}
           </div>
           <div>
@@ -718,46 +691,14 @@ export default function ClassificationDetail({ params }: { params: { id: string 
             <div className="text-sm uppercase tracking-wider text-white/70">Period:</div>
             <div className="text-lg">{surveyorPeriod}</div>
           </div>
-          {/* <div>
-            <div className="text-sm uppercase tracking-wider text-white/70"></div>
-            <div className="text-lg">{planet.climate}</div>
-          </div> */}
         </div>
-
-        {/* Planet visualization or focused component */}
-        <div className="flex-1 relative flex items-center justify-center">
+  
+        {/* Planet generator or view */}
+        <div className="flex-1 flex items-start justify-center mt-2">
           {renderFocusComponent()}
-
-          {/* Planet selector - Mobile only */}
-          {/* <div className="md:hidden absolute bottom-4 left-0 right-0 flex justify-center space-x-4">
-            <Button
-              variant={currentPlanet === "theronix" ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => setCurrentPlanet("theronix")}
-              className="text-xs"
-            >
-              THERONIX
-            </Button>
-            <Button
-              variant={currentPlanet === "orionis" ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => setCurrentPlanet("orionis")}
-              className="text-xs"
-            >
-              ORIONIS
-            </Button>
-            <Button
-              variant={currentPlanet === "etheron" ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => setCurrentPlanet("etheron")}
-              className="text-xs"
-            >
-              ETHERON
-            </Button>
-          </div> */}
         </div>
-
-        {/* Planet stats - Mobile */}
+  
+        {/* Stats - Mobile */}
         <div className="md:hidden p-4 space-y-2">
           <div className="flex justify-between">
             <div className="text-purple-400 uppercase text-xs">Galaxy</div>
@@ -775,12 +716,8 @@ export default function ClassificationDetail({ params }: { params: { id: string 
             <div className="text-purple-400 uppercase text-xs">Avg Temperature</div>
             <div className="text-sm">{planet.temperature}</div>
           </div>
-          {/* <div className="flex justify-between">
-            <div className="text-purple-400 uppercase text-xs">Climate</div>
-            <div className="text-sm">{planet.climate}</div>
-          </div> */}
         </div>
-
+  
         {/* Action buttons - Mobile */}
         <div className="md:hidden flex justify-center mt-2 mb-4 space-x-2">
           <Button
@@ -816,153 +753,8 @@ export default function ClassificationDetail({ params }: { params: { id: string 
             <Thermometer className="h-4 w-4" />
           </Button>
         </div>
-
-        {/* Edit and Map buttons
-        <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 flex space-x-2">
-          <Button
-            variant={currentView === "edit" ? "secondary" : "outline"}
-            size="icon"
-            className="rounded-full bg-black/50 border-white/30 text-white hover:bg-white/20"
-            onClick={() => handleViewChange("edit")}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={currentView === "map" ? "secondary" : "outline"}
-            size="icon"
-            className="rounded-full bg-black/50 border-white/30 text-white hover:bg-white/20"
-            onClick={() => handleViewChange("map")}
-          >
-            <Map className="h-4 w-4" />
-          </Button>
-        </div> */}
       </main>
     </div>
   );
-
-  // return (
-  //   <div
-  //     className="p-6 bg-black text-white border rounded-md opacity-80 shadow-md relative"
-  //     style={{
-  //       backgroundImage: getBackgroundImage(classification.classificationConfiguration?.planetType || null),
-  //       backgroundSize: "cover",
-  //       backgroundPosition: "center",
-  //       backgroundRepeat: "no-repeat",
-  //     }}
-  //   >
-  //     <Navbar />
-  //     <div className="py-5"></div>
-  //     <h1 className="text-2xl font-bold">{classification.classificationConfiguration?.planetType || classification.content || `Planet #${classification.id}`}</h1>
-  //     {classification.author && (
-  //       <><PostCardSingleWithGenerator
-  //         key={classification.id}
-  //         classificationId={classification.id}
-  //         title={classification.title || "Untitled"}
-  //         author={classification.author || "Unknown"}
-  //         content={classification.content || "No content available"}
-  //         votes={classification.votes || 0}
-  //         category={classification.classificationtype || "Uncategorized"}
-  //         // images={classification.images || []}
-  //         anomalyId={classification.anomaly ? String(classification.anomaly.id) : ""}
-  //         classificationConfig={classification.classificationConfiguration}
-  //         classificationType={classification.classificationtype || "Unknown"}
-  //         tags={classification.tags || []}
-  //         images={classification.images || []} 
-  //         biome={dominantBiome || ''}
-  //       />
-  //       <div className="flex flex-col">
-
-  //     <div className="flex items-center gap-3 mt-2">
-  //       <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1">
-  //         <Clock className="h-4 w-4" />
-  //         <span className="text-sm">Next: {formatTime(timeLeft)}</span>
-  //       </Badge>
-  //       <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
-  //         <Camera className="h-4 w-4" />
-  //         <span className="text-sm">12 Active</span>
-  //       </Badge>
-  //     </div>
-  //   </div>
-  //       </>
-  //     )}
-
-  //     <BuildTerrariumStructures location={classification.id} />
-  //     <StructuresOnTerrarium location={classification.id} />
-
-  //     {(cloudSummary || p4Summary || ai4MSummary) && (
-  //       <BiomeAggregator
-  //         cloudSummary={cloudSummary}
-  //         p4Summary={p4Summary}
-  //         ai4MSummary={ai4MSummary}
-  //         onBiomeUpdate={(biome) => setDominantBiome(biome)}
-  //       />
-  //     )}
-
-  //     {/* Toggle Buttons */}
-  //     <div className="mt-4">
-  //       <button 
-  //         className="px-4 py-2 bg-blue-500 text-white rounded-md"
-  //         onClick={toggleUserClassifications}
-  //       >
-  //         {showCurrentUser ? "Show All Classifications" : "Show My Classifications"}
-  //       </button>
-  //       <button 
-  //         className="ml-4 px-4 py-2 bg-green-500 text-white rounded-md"
-  //         onClick={toggleMetadataVisibility}
-  //       >
-  //         {showMetadata ? "Hide Metadata" : "Show Metadata"}
-  //       </button>
-  //     </div>
-
-  //     {/* Show Metadata (if toggle is on) */}
-  //     {showMetadata && (
-  //       <>
-  //         {/* Cloud Classification Summary */}
-  //         {cloudClassifications.length > 0 && (
-  //           <CloudClassificationSummary
-  //             classifications={cloudClassifications}
-  //             onSummaryUpdate={handleCloudSummaryUpdate}
-  //           />
-  //         )}
-
-  //         {/* SP4 Classification Summary */}
-  //         {satelliteP4Classifications.length > 0 && (
-  //           <SatellitePlanetFourAggregator
-  //             classifications={satelliteP4Classifications}
-  //             onSummaryUpdate={handleP4SummaryUpdate}
-  //           />
-  //         )}
-
-  //         {/* AI4M Classification Summary */}
-  //         {ai4MClassifications.length > 0 && (
-  //           <AI4MAggregator
-  //             classifications={ai4MClassifications}
-  //             onSummaryUpdate={handleAI4MSummaryUpdate}
-  //           />
-  //         )}
-  //       </>
-  //     )}
-
-  //     {/* Related Classifications */}
-  //     {/* {relatedClassifications.length > 0 && (
-  //       <div className="mt-8">
-  //         <h3 className="text-xl font-semibold">Related Classifications</h3>
-  //         <div className="grid grid-cols-2 gap-4 mt-4">
-  //           {relatedClassifications.map((related) => (
-  //             <PostCardSingleWithGenerator
-  //               key={related.id}
-  //               classificationId={related.id}
-  //               title={related.title || "Untitled"}
-  //               author={related.author || "Unknown"}
-  //               content={related.content || "No content available"}
-  //               votes={related.votes || 0}
-  //               category={related.classificationtype || "Uncategorized"}
-  //               tags={related.tags || []}
-  //               images={related.images || []} anomalyId={""} classificationType={""}              />
-  //           ))}
-  //         </div>
-  //       </div>
-  //     )} */}
-  //   </div>
-  // );
+  
 }

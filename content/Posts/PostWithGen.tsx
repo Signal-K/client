@@ -139,6 +139,11 @@ export function PostCardSingleWithGenerator({
                 author={author}
                 biome={biome}
               />
+              <PlanetGenerator
+                classificationId={String(classificationId)}
+                classificationConfig={classificationConfig}
+                author={author}
+              />
             </>
           );
       case "telescope-minorPlanet":
@@ -332,8 +337,7 @@ export function PostCardSingleWithGeneratorEditMode({
           return (
             <>
               {session?.user?.id === author && (
-                <PlanetGenerator
-                  // classificationId={String(classificationId)} 
+                <PlanetGenerator classificationId={""} author={""}                  // classificationId={String(classificationId)} 
                   // classificationConfig={classificationConfig}
                   // author={author}
                 />
@@ -344,8 +348,7 @@ export function PostCardSingleWithGeneratorEditMode({
                 //   classificationId={String(classificationId)}
                 //   classificationConfig={classificationConfig}
                 //   author={author}
-                <PlanetGenerator 
-                />
+                <PlanetGenerator classificationId={""} author={""}                />
                 // <FullPlanetGeneratorNoControl />
               )}
             </>
