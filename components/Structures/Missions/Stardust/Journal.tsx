@@ -460,7 +460,7 @@ function MinimalJournalPage({
   
     const toggleCategory = (categoryId: number) => {
       setOpenCategories((prev) =>
-        prev.includes(categoryId)
+        prev.includes(categoryId) 
           ? prev.filter((id) => id !== categoryId)
           : [...prev, categoryId]
       );
