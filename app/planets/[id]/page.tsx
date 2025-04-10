@@ -72,7 +72,7 @@ const planets: Record<string, PlanetData> = {
     temperature: "-20°C to 15°C",
     climate: "Arctic",
   },
-}
+};
 
 type FocusView = "planet" | "overview" | "Climate" | "atmosphere" | "exploration" | "map" | "edit"
 
@@ -607,7 +607,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
   
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://images.unsplash.com/photo-1454789591675-556c287e39e2?q=80&w=2344&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          src="/assets/Backdrops/background1.jpg"
           alt="Space background"
           fill
           priority
@@ -680,7 +680,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
             {biomassScore}
           </div>
           <div>
-            <div className="text-sm uppercase tracking-wider text-white/70">Radius:</div>
+            <div className="text-sm uppercase tracking-wider text-white/70">Density:</div>
             <div className="text-lg">{density} Earth radii</div>
           </div>
           <div>
@@ -755,6 +755,5 @@ export default function ClassificationDetail({ params }: { params: { id: string 
         </div>
       </main>
     </div>
-  );
-  
-}
+  ); 
+};
