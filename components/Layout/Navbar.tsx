@@ -7,7 +7,7 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import MilestoneCard from "../Structures/Missions/Milestones/MilestoneCard";
 import JournalPage from "../Structures/Missions/Stardust/Journal";
 import AlertComponent from "../Structures/Missions/Milestones/Alerts/Alerts";
-import { BellDotIcon } from "lucide-react";
+import { BellDotIcon, TrophyIcon } from "lucide-react";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 
 export default function Navbar() {
@@ -118,9 +118,9 @@ export default function Navbar() {
               </Transition>
             </Menu>
 
-            <div className="relative">
+            <div className="relative hidden sm:block">
               <button
-                className="text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition"
+                className="text-lg font-bold text-white items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition"
                 onClick={() => setMilestonesOpen((prev) => !prev)}
               >
                 Milestones
@@ -146,9 +146,9 @@ export default function Navbar() {
               )}
             </div>
 
-            <div className="relative">
+            <div className="relative hidden sm:block">
               <button
-                className="text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition"
+                className="text-lg font-bold text-white items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition"
                 onClick={() => setIsTerrariumOpen((prev) => !prev)}
               >
                 Travel
@@ -160,9 +160,9 @@ export default function Navbar() {
               )}
             </div>
 
-            <div className="relative">
+            <div className="relative sm:hidden">
               <button
-                className={`relative text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition ${hasNewAlert ? "animate-pulse" : ""}`}
+                className={`p-2 rounded-full bg-[#5FCBC3]/60 hover:bg-[#5FCBC3]/80 transition ${hasNewAlert ? "animate-pulse" : ""}`}
                 onClick={() => setAlertsOpen((prev) => !prev)}
               >
                 <BellDotIcon className="w-6 h-6 text-white" />
@@ -171,8 +171,36 @@ export default function Navbar() {
                 )}
               </button>
               {alertsOpen && (
-                <div className="absolute left-0 mt-2 w-[350px] sm:w-[400px] bg-white/90 backdrop-blur-lg rounded-lg shadow-lg border border-white/20">
+                <div className="absolute left-0 mt-2 w-[350px] bg-white/90 backdrop-blur-lg rounded-lg shadow-lg border border-white/20">
                   <AlertComponent />
+                </div>
+              )}
+            </div>
+
+            <div className="relative sm:hidden">
+              <button
+                className="p-2 rounded-full bg-[#5FCBC3]/60 hover:bg-[#5FCBC3]/80 transition"
+                onClick={() => setMilestonesOpen((prev) => !prev)}
+              >
+                <TrophyIcon className="w-6 h-6 text-white" />
+              </button>
+              {milestonesOpen && (
+                <div className="absolute left-0 mt-2 w-[350px] bg-white/90 backdrop-blur-lg rounded-lg shadow-lg border border-white/20">
+                  <div className="px-4 py-2 text-sm font-bold text-gray-800">
+                    <button
+                      className={`w-full text-left px-2 py-1 rounded-lg ${isMilestoneView ? 'bg-[#5FCBC3]/60' : 'bg-gray-100'}`}
+                      onClick={() => setIsMilestoneView(true)}
+                    >
+                      Weekly Milestones
+                    </button>
+                    <button
+                      className={`w-full text-left px-2 py-1 rounded-lg ${!isMilestoneView ? 'bg-[#5FCBC3]/60' : 'bg-gray-100'}`}
+                      onClick={() => setIsMilestoneView(false)}
+                    >
+                      Classifications Journal
+                    </button>
+                  </div>
+                  {isMilestoneView ? <MilestoneCard /> : <JournalPage />}
                 </div>
               )}
             </div>
