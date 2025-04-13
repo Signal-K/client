@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Droplets, FileText, Info, Thermometer } from "lucide-react";
 import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
 
 export interface Classification {
   id: number;
@@ -332,7 +333,12 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
 
     const AtmosphereComponent = () => (
         <div className="w-full max-w-4xl bg-black/10 backdrop-blur-sm rounded-xl p-6 text-white mx-auto">
-
+          {classification?.id !== undefined && (
+            <WeatherEventStatus 
+              classificationId={classification.id} 
+              biome={dominantBiome || 'RockyHighlands'}
+            />
+          )}
         </div>
     );
 
