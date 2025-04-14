@@ -35,7 +35,7 @@ const BiodomeStructureBase = () => {
 
   if (!session) {
     return <p>Please log in to view your uploads.</p>;
-  }
+  };
 
   return (
     <div className="p-6">

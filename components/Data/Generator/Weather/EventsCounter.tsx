@@ -27,49 +27,70 @@ const biomeToStormMap: Record<string, string> = {
   "Dune Fields": "Heatwave",
 };
 
-export default function WeatherEventStatus({ classificationId, biome }: { classificationId: number, biome: string }) {
+export default function WeatherEventStatus({
+  classificationId,
+  biome,
+  biomass,
+}: {
+  classificationId: number;
+  biome: string;
+  biomass: number;
+}) {
   const supabase = useSupabaseClient();
   const [hasEventThisWeek, setHasEventThisWeek] = useState<boolean | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [upcomingStormType, setUpcomingStormType] = useState<string | null>(null);
+  const [bacteriumVisible, setBacteriumVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const checkWeatherEvent = async () => {
-        const startOfWeekMelbourne = startOfWeek(toZonedTime(new Date(), TIMEZONE), { weekStartsOn: 1 });
-        startOfWeekMelbourne.setHours(0, 1, 0, 0);
-      
-        const { data: events, error: eventsError } = await supabase
-          .from("events")
-          .select("*")
-          .eq("classification_location", classificationId)
-          .or("type.ilike.weather,type.ilike.storm")
-          .gte("time", startOfWeekMelbourne.toISOString());
-      
-        if (eventsError) {
-          console.error("Error fetching weather events:", eventsError);
-          return;
-        }
-      
-        const hasEvent = events.length > 0;
-        setHasEventThisWeek(hasEvent);
-      
-        const pendingStorm = events.find(e =>
-          e.status === 'pending' &&
-          (e.type?.toLowerCase().includes('storm') || e.type?.toLowerCase().includes('weather'))
-        );
-      
-        if (pendingStorm && biomeToStormMap[biome]) {
-          setUpcomingStormType(biomeToStormMap[biome]);
-        } else if (!hasEvent && biomeToStormMap[biome]) {
-          // Fallback: show expected storm even if no event yet
-          setUpcomingStormType(biomeToStormMap[biome]);
-        } else {
-          setUpcomingStormType(null);
-        }
-      };      
+      const startOfWeekMelbourne = startOfWeek(toZonedTime(new Date(), TIMEZONE), { weekStartsOn: 1 });
+      startOfWeekMelbourne.setHours(0, 1, 0, 0);
+
+      const { data: events, error: eventsError } = await supabase
+        .from("events")
+        .select("*")
+        .eq("classification_location", classificationId)
+        .gte("time", startOfWeekMelbourne.toISOString());
+
+      if (eventsError) {
+        console.error("Error fetching weather events:", eventsError);
+        return;
+      }
+
+      const hasEvent = events.length > 0;
+      setHasEventThisWeek(hasEvent);
+
+      const pendingStorm = events.find(e =>
+        e.status === 'pending' &&
+        (e.type?.toLowerCase().includes('storm') || e.type?.toLowerCase().includes('weather'))
+      );
+
+      const lightningEvent = events.find(e =>
+        e.type?.toLowerCase().includes('lightning')
+      );
+
+      // Handle bacteria spawn logic
+      if (
+        classificationId === 40 ||
+        (lightningEvent && biomass > 0.01 && biomass < 0.2)
+      ) {
+        setBacteriumVisible(true);
+      } else {
+        setBacteriumVisible(false);
+      }
+
+      if (pendingStorm && biomeToStormMap[biome]) {
+        setUpcomingStormType(biomeToStormMap[biome]);
+      } else if (!hasEvent && biomeToStormMap[biome]) {
+        setUpcomingStormType(biomeToStormMap[biome]);
+      } else {
+        setUpcomingStormType(null);
+      }
+    };
 
     checkWeatherEvent();
-  }, [classificationId, biome]);
+  }, [classificationId, biome, biomass]);
 
   useEffect(() => {
     if (hasEventThisWeek === false) return;
@@ -102,16 +123,25 @@ export default function WeatherEventStatus({ classificationId, biome }: { classi
   }
 
   return (
-    <div className="flex flex-col items-center justify-center gap-2">
+    <div className="flex flex-col items-center justify-center gap-4">
+      {bacteriumVisible && (
+        <div className="relative p-4 rounded-lg bg-green-900/70 border border-green-400 text-green-200 text-center shadow-lg">
+          <svg className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+            <defs>
+              <pattern id="bacterium" patternUnits="userSpaceOnUse" width="30" height="30">
+                <circle cx="15" cy="15" r="6" fill="limegreen" />
+                <circle cx="18" cy="18" r="2" fill="white" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#bacterium)" />
+          </svg>
+          <div className="relative z-10 font-semibold text-sm">Bacterial microcolonies are stirring...</div>
+        </div>
+      )}
+
       <Button className="bg-yellow-400 text-black hover:bg-yellow-500">
         Upcoming storm...view {upcomingStormType}
-        {/* {biome} */}
       </Button>
-      {/* {upcomingStormType && (
-        <div className="text-white bg-black/60 px-4 py-2 rounded-md text-sm">
-          Most likely: <strong>{upcomingStormType}</strong>
-        </div>
-      )} */}
     </div>
   );
 };
