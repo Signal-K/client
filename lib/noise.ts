@@ -1,3 +1,7 @@
+// Simplex Noise implementation
+// Based on Stefan Gustavson's implementation
+
+// Permutation table
 const perm = new Uint8Array(512)
 const p = new Uint8Array(256)
 
@@ -71,6 +75,5 @@ export function noise(x: number, y: number, z: number): number {
       v,
     ),
     w,
-  )
-}
-
+  );
+};
