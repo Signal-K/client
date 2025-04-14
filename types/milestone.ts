@@ -5,5 +5,4 @@ export interface Milestone {
   current: number
   target: number
   type: "animals" | "stations" | "biomes"
-}
-
+};

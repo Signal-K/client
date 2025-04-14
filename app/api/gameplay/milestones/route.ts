@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
     {
-        weekStart: '2025-03-09',
+        weekStart: '2025-04-07',
         data: [
             {
                 name: 'Make 3 Temperature Classifications',
@@ -19,8 +19,8 @@ const milestones = [
                 requiredCount: 3,
             },
             {
-                name: 'Make 2 Animal Classifications',
-                structure: "Greenhouse",
+                name: 'Discover 2 planets',
+                structure: "Telescope",
                 icon: "PawPrintIcon",
                 extendedDescription: '',
                 xp: null,
@@ -30,6 +30,18 @@ const milestones = [
                 field: "classificationtype",
                 value: "planet",
                 requiredCount: 2,
+            },
+            {
+                name: "Create a storm on a gas giant",
+                structure: "WeatherBalloon",
+                icon: "SnowflakeIcon",
+                extendedDescription: "",
+                completionInfo: "",
+                rewardInfo: "",
+                table: 'events',
+                field: 'eventtype',
+                value: 'vortex-storm',
+                requiredCount: 1,
             },
         ],
     },

@@ -71,7 +71,7 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
         <div className="md:w-1/2 w-full flex flex-col justify-center items-center bg-gray-100 p-10">
           <div className="w-full h-full relative">
             <Image
-              src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/garden.png"
+              src="assets/Backdrops/background1.jpg"
               alt="Application UI"
               layout="fill"
               objectFit="cover"

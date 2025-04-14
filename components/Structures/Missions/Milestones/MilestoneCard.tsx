@@ -108,16 +108,16 @@ export default function MilestoneCard() {
             <Tabs defaultValue="player" onValueChange={(val) => setActiveTab(val as "player" | "community")}>
                 <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-2">
                     <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7]">
-                        Weekly Missions
+                        Weekly Milestones
                     </h2>
-                    <TabsList className="bg-[#1e293b] border border-[#6b21a8] w-full sm:w-auto">
+                    {/* <TabsList className="bg-[#1e293b] border border-[#6b21a8] w-full sm:w-auto">
                         <TabsTrigger value="player" className="data-[state=active]:bg-[#581c87] data-[state=active]:text-white w-1/2 sm:w-auto">
                             Yours
                         </TabsTrigger>
                         <TabsTrigger value="community" className="data-[state=active]:bg-[#581c87] data-[state=active]:text-white w-1/2 sm:w-auto">
                             Community
                         </TabsTrigger>
-                    </TabsList>
+                    </TabsList> */}
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between mb-4 gap-2">

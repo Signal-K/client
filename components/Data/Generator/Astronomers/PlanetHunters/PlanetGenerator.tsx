@@ -13,7 +13,7 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react"
 export interface PlanetGeneratorProps {
   classificationConfig?: any
   content?: string
-  classificationId: string
+  classificationId: string;
   author: string
   type?: string
   biome?: string
