@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { PlanetStats } from "@/lib/planet-physics"
-import { PhysicalTab } from "./Settings/physical-tab"
-import { SurfaceTab } from "./Settings/surface-tab"
-import { BiomeTab } from "./Settings/biome-tab"
-import { LandmarksTab } from "./Settings/landmarks-tab"
-import { ImportExportTab } from "./Settings/import-export-tab"
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { PlanetStats } from "@/lib/planet-physics";
+import { PhysicalTab } from "./Settings/physical-tab";
+import { SurfaceTab } from "./Settings/surface-tab";
+import { BiomeTab } from "./Settings/biome-tab";
+import { LandmarksTab } from "./Settings/landmarks-tab";
+import { ImportExportTab } from "./Settings/import-export-tab";
 
 interface SettingsPanelProps {
   planetStats: PlanetStats
   setPlanetStats: (stats: PlanetStats) => void
   classificationId?: string
   author?: string
-};
+}
 
 export function SettingsPanel({
   planetStats,
@@ -109,5 +109,5 @@ export function SettingsPanel({
         </TabsContent>
       </Tabs>
     </div>
-  );
+  )
 };
