@@ -14,7 +14,7 @@ interface SettingsPanelProps {
   setPlanetStats: (stats: PlanetStats) => void
   classificationId?: string
   author?: string
-}
+};
 
 export function SettingsPanel({
   planetStats,
