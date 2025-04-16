@@ -155,10 +155,24 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
 
   const MemoizedPlanetGenerator = useMemo(() => {
     return classification?.id && classification.author ? (
-      <PlanetGenerator
-        classificationId={classification.id.toString()}
-        author={classification.author}
-      />
+            // <PostCardSingleWithGenerator
+            //   key={classification.id}
+            //   classificationId={classification.id}
+            //   title={classification.title || "Untitled"}
+            //   author={classification.author || "Unknown"}
+            //   content={classification.content || "No content available"}
+            //   votes={classification.votes || 0}
+            //   category={classification.classificationtype || "Uncategorized"}
+            //   // images={classification.images || []}
+            //   anomalyId={classification.anomaly ? String(classification.anomaly.id) : ""}
+            //   classificationConfig={classification.classificationConfiguration}
+            //   classificationType={classification.classificationtype || "Unknown"}
+            //   tags={classification.tags || []}
+            //   images={classification.images || []} 
+            //   biome={dominantBiome || ''}
+            //   toggle={true}
+            // />
+            <PlanetGenerator         classificationId={classification.id.toString()}         author={classification.author}       />
     ) : null;
   }, [classification?.id, classification?.author]);  
 

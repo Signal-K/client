@@ -9,7 +9,6 @@ export default function TestPage() {
     <div className="min-h-screen bg-black text-white p-4 space-y-8">
       {/* <AlertComponent /> */}
       {/* <MySettlementsLocations /> */}
-      <PlanetGenerator classificationId='40' author='' />
     </div>
   );
 };

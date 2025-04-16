@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "@/components/Structures/Missions/BasePlate";
-import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
+import { CloudCogIcon, FolderCog, HelpCircle, Paintbrush2Icon, PaintBucket, Vote } from "lucide-react";
 import { CloudspottingWrapper, StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import VoteCoMClassifications from "./CoMVote";
 import CloudClassificationGenerator from "./CloudMaker";
 import { CloudspottingOnMarsTutorial } from "@/components/Projects/Lidar/cloudspottingOnMars";
+import { CloudspottingShapesWrapper } from "@/components/Projects/Lidar/CloudspottingOnMarsShapes";
 
 export interface Mission {
     id: number;
@@ -81,6 +82,17 @@ const CloudspottingOnMars = () => {
                 internalComponent: () => <CloudClassificationGenerator />,
                 color: 'text-green-300',
             },
+            {
+                id: 5,
+                chapter: 2,
+                title: "Identify shapes in cloud classifications",
+                description: 'Use your LIDAR to identify shapes in the cloud classification',
+                icon: Paintbrush2Icon,
+                points: 2,
+                completedCount: 0,
+                internalComponent: () => <CloudspottingShapesWrapper />,
+                color: 'text-green-200',
+            }
         ];
     };
 
@@ -130,11 +142,23 @@ const CloudspottingOnMars = () => {
             const mission3Points = comments?.filter((comment: any) =>
                 classificationIds.includes(comment.classification_id)
             ).length || 0;
+
+            const {
+                data: classificationsB
+            } = await supabase
+                .from("classifications")
+                .select("id, classificationtype, classificationConfiguration")
+                .eq("author", session.user.id)
+                .eq("classificationtype", 'balloon-marsCloudShapes');
+
+            const mission4Points = classifications?.length || 0;
     
             return {
                 1: mission1Points,
                 2: mission2Points,
                 3: mission3Points,
+                4: mission4Points,
+                5: mission4Points,
             };
         };
     
@@ -146,7 +170,7 @@ const CloudspottingOnMars = () => {
                 return { ...mission, completedCount };
             });
     
-            setExperiencePoints(points[1] + points[2] + points[3]);
+            setExperiencePoints(points[1] + points[2] + points[3] + points[4]);
             setMissions(updatedMissions);
         };
     

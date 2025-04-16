@@ -35,6 +35,7 @@ export default function SimplePlanetGenerator({ type, classificationConfig, biom
             <div className="w-full h-full flex items-center justify-center">
                 {/* <PlanetScene stats={stats} type={type} /> */}
                 {/* <p>{biome}</p> */}
+                <SimplePlanetScene stats={stats} />
             </div>
         </>
     );

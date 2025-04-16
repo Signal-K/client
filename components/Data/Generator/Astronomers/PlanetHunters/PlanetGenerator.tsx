@@ -145,11 +145,11 @@ export function PlanetGenerator({
         )}
       </div>
 
-      {classificationConfig && (
+      {/* {classificationConfig && (
         <pre className="text-xs text-white/70">
           {JSON.stringify(classificationConfig, null, 2)}
         </pre>
-      )}
+      )} */}
 
       <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
         <ambientLight intensity={0.4} />
