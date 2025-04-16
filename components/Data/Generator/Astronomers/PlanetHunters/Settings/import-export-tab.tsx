@@ -1,26 +1,27 @@
 "use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Download, Upload, Copy } from "lucide-react"
-import { type PlanetStats, mergeWithDefaults } from "@/lib/planet-physics"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Download, Upload, Copy } from "lucide-react";
+import { type PlanetStats, mergeWithDefaults } from "@/lib/planet-physics";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface ImportExportTabProps {
-  planetStats: PlanetStats
-  setPlanetStats: (stats: PlanetStats) => void
-  classificationId: string
-  author: string
-  setSelectedBiome: (biome: string) => void
+  planetStats: PlanetStats;
+  setPlanetStats: (stats: PlanetStats) => void;
+  classificationId: string;
+  author: string;
+  setSelectedBiome: (biome: string) => void;
   setCustomColors: (colors: {
-    oceanFloor: string
-    beach: string
-    regular: string
-    mountain: string
-  }) => void
-}
+    oceanFloor: string;
+    beach: string;
+    regular: string;
+    mountain: string;
+  }) => void;
+};
 
 export function ImportExportTab({
   planetStats,
@@ -30,50 +31,62 @@ export function ImportExportTab({
   setSelectedBiome,
   setCustomColors,
 }: ImportExportTabProps) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
   const [importExportText, setImportExportText] = useState("")
 
-  // Update the exportPlanetConfig function to ensure all landmark data is included
-  const exportPlanetConfig = () => {
-    // Create a metadata object with classification info
-    const metadata = {
-      classificationId,
-      author,
-      type: planetStats.type || "Unknown",
-      biome: planetStats.biome || "Unknown",
-      exportDate: new Date().toISOString(),
-    }
-
-    // Start with metadata
-    let config = `// Planet Configuration Export\n`
-    config += `// Classification: ${metadata.classificationId}\n`
-    config += `// Author: ${metadata.author}\n`
-    config += `// Export Date: ${metadata.exportDate}\n\n`
-
-    // Add planet stats
+  const exportPlanetConfig = async () => {
+    const exportObject: Record<string, any> = {};
+  
     Object.entries(planetStats).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        if (key === "customColors" && value && Object.keys(value).length > 0) {
-          config += `${key}: ${JSON.stringify(value)}\n`
-        } else if (key === "landmarks" && Array.isArray(value) && value.length > 0) {
-          // Ensure complete landmark data is exported
-          const landmarksJson = JSON.stringify(value, null, 2)
-            .split("\n")
-            .map((line, i) => (i === 0 ? line : "  " + line))
-            .join("\n")
-          config += `${key}: ${landmarksJson}\n`
-        } else if (typeof value === "number") {
-          config += `${key}: ${value.toFixed(2)}\n`
+        if (typeof value === "number") {
+          exportObject[key] = Number(value.toFixed(2));
         } else if (typeof value === "boolean") {
-          config += `${key}: ${value ? "true" : "false"}\n`
-        } else if (typeof value === "object" && key !== "customColors" && key !== "landmarks") {
-          config += `${key}: ${JSON.stringify(value)}\n`
-        } else if (typeof value !== "object") {
-          config += `${key}: ${value}\n`
+          exportObject[key] = value;
+        } else if (typeof value === "object" && !Array.isArray(value)) {
+          exportObject[key] = value;
+        } else {
+          exportObject[key] = value;
         }
       }
-    })
-    setImportExportText(config)
-  }
+    });
+  
+    const exportText = Object.entries(exportObject)
+      .map(([key, value]) =>
+        typeof value === "object" ? `${key}: ${JSON.stringify(value)}` : `${key}: ${value}`
+      )
+      .join("\n");
+  
+    setImportExportText(exportText);
+  
+    const idAsNumber = parseInt(classificationId);
+    if (isNaN(idAsNumber)) return;
+  
+    const { data, error: fetchError } = await supabase
+      .from("classifications")
+      .select("classificationConfiguration")
+      .eq("id", idAsNumber)
+      .single();
+  
+    if (fetchError || !data?.classificationConfiguration) {
+      console.error("Failed to fetch existing configuration:", fetchError);
+      return;
+    }
+  
+    const updatedConfig = {
+      ...data.classificationConfiguration,
+      exportedValue: exportObject,
+    };
+  
+    const { error: updateError } = await supabase
+      .from("classifications")
+      .update({ classificationConfiguration: updatedConfig })
+      .eq("id", idAsNumber);
+  
+    if (updateError) console.error("Failed to export config:", updateError);
+  };
 
   // Import planet configuration
   const importPlanetConfig = () => {
@@ -113,8 +126,10 @@ export function ImportExportTab({
       if (completeStats.customColors) setCustomColors(completeStats.customColors as any)
     } catch (error) {
       console.error("Error importing planet configuration:", error)
-    }
-  }
+    };
+  };
+
+
 
   return (
     <div className="space-y-6">

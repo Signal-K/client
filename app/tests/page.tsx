@@ -1,5 +1,6 @@
 "use client";
 
+import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import AlertComponent from "@/components/Structures/Missions/Milestones/Alerts/Alerts";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 
@@ -7,7 +8,8 @@ export default function TestPage() {
   return (
     <div className="min-h-screen bg-black text-white p-4 space-y-8">
       {/* <AlertComponent /> */}
-      <MySettlementsLocations />
+      {/* <MySettlementsLocations /> */}
+      <PlanetGenerator classificationId='40' author='' />
     </div>
   );
 };
