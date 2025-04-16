@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, useMemo } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
 import Image from "next/image";
@@ -151,7 +151,16 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
     if (!isNaN(orbital) && rad !== undefined && temp !== undefined) {
       setBiomassScore(calculateBiomass(temp, rad, orbital));
     }
-  }, [surveyorPeriod, density, temperature]);    
+  }, [supabase]);    
+
+  const MemoizedPlanetGenerator = useMemo(() => {
+    return classification?.id && classification.author ? (
+      <PlanetGenerator
+        classificationId={classification.id.toString()}
+        author={classification.author}
+      />
+    ) : null;
+  }, [classification?.id, classification?.author]);  
 
   useEffect(() => {
       if (!params.id) return;
@@ -264,7 +273,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
       }, 1000);
   
       return () => clearInterval(timer);
-  }, []);
+  }, [supabase]);
   
   const handleViewChange = (view: FocusView) => {
       setCurrentView(view)
@@ -275,18 +284,11 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
   };
 
     // Planet generator content
-    const PlanetComponent = () => (
-        <div className="flex w-full h-screen">
-            {classification && (
-                <>
-                    <PlanetGenerator
-                        classificationId={classification.id.toString()}
-                        author={classification.author || ''}
-                    />
-                </>
-            )}
-        </div>
-    );
+    const PlanetComponent = useMemo(() => (
+      <div className="flex w-full h-screen flex justify-center items-center">
+        {classification && !loading && MemoizedPlanetGenerator}
+      </div>
+    ), [classification, loading, MemoizedPlanetGenerator]);    
 
     const ClimateComponent = () => (
         <div className="w-full max-w-6xl bg-black/20 backdrop-blur-md rounded-2xl p-6 text-white mx-auto space-y-6 overflow-y-auto max-h-[80vh]">
@@ -384,9 +386,9 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
     const renderFocusComponent = () => {
         switch (currentView) {
           case "planet":
-            return <PlanetComponent />
+            return PlanetComponent
           case "overview":
-            return <PlanetComponent />
+            return PlanetComponent
           case "Climate":
             return <ClimateComponent />
           case "atmosphere":
@@ -398,7 +400,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
           case "edit":
             return <EditComponent />
           default:
-            return <PlanetComponent />
+            return PlanetComponent
         };
     };
 

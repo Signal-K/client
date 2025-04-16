@@ -38,36 +38,54 @@ export function PlanetGenerator({
 }: PlanetGeneratorProps) {
   const supabase = useSupabaseClient();
 
-  const initialPlanetStats = planetConfiguration
-    ? mergeWithDefaults(planetConfiguration)
-    : {
-        ...defaultPlanetStats,
-        ...(biome ? { biome } : {}),
-        ...(type ? { type } : {}),
-      };
-
-  if (!initialPlanetStats.landmarks || initialPlanetStats.landmarks.length === 0) {
-    initialPlanetStats.landmarks = generateDefaultLandmarks(initialPlanetStats);
-  } else {
-    const hasTerrestrial = initialPlanetStats.landmarks.some((l) => l.category === "terrestrial");
-    const hasGaseous = initialPlanetStats.landmarks.some((l) => l.category === "gaseous");
-
-    if (!hasTerrestrial || !hasGaseous) {
-      const defaultLandmarks = generateDefaultLandmarks(initialPlanetStats);
-      if (!hasTerrestrial) {
-        const terrestrial = defaultLandmarks.find((l) => l.category === "terrestrial");
-        if (terrestrial) initialPlanetStats.landmarks.push(terrestrial);
-      }
-      if (!hasGaseous) {
-        const gaseous = defaultLandmarks.find((l) => l.category === "gaseous");
-        if (gaseous) initialPlanetStats.landmarks.push(gaseous);
-      }
-    }
-  }
-
   const [showSettings, setShowSettings] = useState(false);
   const [useShader, setUseShader] = useState(true);
-  const [planetStats, setPlanetStats] = useState<PlanetStats>(initialPlanetStats);
+  const [planetStats, setPlanetStats] = useState<PlanetStats>(() => {
+    const initialStats = planetConfiguration
+      ? mergeWithDefaults(planetConfiguration)
+      : {
+          ...defaultPlanetStats,
+          ...(biome ? { biome } : {}),
+          ...(type ? { type } : {}),
+        };
+
+    if (!initialStats.landmarks || initialStats.landmarks.length === 0) {
+      initialStats.landmarks = generateDefaultLandmarks(initialStats);
+    }
+
+    return initialStats;
+  });
+
+  useEffect(() => {
+    const updatedStats = planetConfiguration
+      ? mergeWithDefaults(planetConfiguration)
+      : {
+          ...defaultPlanetStats,
+          ...(biome ? { biome } : {}),
+          ...(type ? { type } : {}),
+        };
+
+    if (!updatedStats.landmarks || updatedStats.landmarks.length === 0) {
+      updatedStats.landmarks = generateDefaultLandmarks(updatedStats);
+    } else {
+      const hasTerrestrial = updatedStats.landmarks.some((l) => l.category === "terrestrial");
+      const hasGaseous = updatedStats.landmarks.some((l) => l.category === "gaseous");
+
+      if (!hasTerrestrial || !hasGaseous) {
+        const defaultLandmarks = generateDefaultLandmarks(updatedStats);
+        if (!hasTerrestrial) {
+          const terrestrial = defaultLandmarks.find((l) => l.category === "terrestrial");
+          if (terrestrial) updatedStats.landmarks.push(terrestrial);
+        }
+        if (!hasGaseous) {
+          const gaseous = defaultLandmarks.find((l) => l.category === "gaseous");
+          if (gaseous) updatedStats.landmarks.push(gaseous);
+        }
+      }
+    }
+
+    setPlanetStats(updatedStats);
+  }, [planetConfiguration, biome, type]);
 
   useEffect(() => {
     const fetchExportedValues = async () => {
@@ -134,7 +152,6 @@ export function PlanetGenerator({
       )}
 
       <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
-        {/* <color attach="background" args={["#020209"]} /> */}
         <ambientLight intensity={0.4} />
         <pointLight position={[10, 10, 10]} intensity={2} />
         <pointLight position={[-10, -10, -10]} intensity={0.5} color="#b0c4de" />
