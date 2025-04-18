@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 interface Recipe {
   [key: string]: number;
-}
+};
 
 export interface InventoryItem {
   id: number;

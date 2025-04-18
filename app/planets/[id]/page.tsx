@@ -11,6 +11,7 @@ import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounte
 import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnPlanet";
 import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
 import PlanetProgress from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetCompletion";
+import WeatherGenerator from "@/components/Data/Generator/Weather/SimpleWeatherEvents";
 
 export interface Classification {
   id: number;
@@ -433,7 +434,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
 
             {dominantBiome && (
                 <div className="absolute top-0 left-0 w-screen z-10">
-                    {/* Weather generator goes here */}
+                    <WeatherGenerator biome={dominantBiome} />
                 </div>
             )}
 

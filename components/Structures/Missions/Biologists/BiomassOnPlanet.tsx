@@ -70,7 +70,8 @@ const BiomassStats = () => {
     return (
         <div className="flex items-center gap-2 text-green-400 text-lg font-semibold">
             <TreeDeciduousIcon className="w-5 h-5" />
-            <span>{biomassLevel}</span>
+            <span>{biomassLevel}</span> - 
+            <p>{bioScore} active entities</p>
         </div>
         
     );
