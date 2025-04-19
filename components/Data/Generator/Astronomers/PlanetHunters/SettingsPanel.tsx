@@ -31,7 +31,7 @@ export function SettingsPanel({
   })
 
   return (
-    <div className="absolute top-0 left-0 h-full w-96 bg-black/90 text-green-400 p-6 overflow-y-auto font-mono border-r border-green-500/30">
+    <div className="absolute top-0 left-0 bottom-0 w-96 bg-black/90 text-green-400 p-6 overflow-y-auto font-mono border-r border-green-500/30">
       <h2 className="text-2xl font-bold mb-6 tracking-wider border-b border-green-500/30 pb-2">PLANET SETTINGS</h2>
 
       <div className="mb-6 p-3 bg-black/60 border border-green-500/30 rounded-md">

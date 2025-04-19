@@ -12,6 +12,7 @@ import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnP
 import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
 import PlanetProgress from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetCompletion";
 import WeatherGenerator from "@/components/Data/Generator/Weather/SimpleWeatherEvents";
+import GameNavbar from "@/components/Layout/Tes";
 
 export interface Classification {
   id: number;
@@ -420,7 +421,9 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
     };
 
     return (
-        <div className="relative min-h-screen w-screen overflow-hidden bg-black text-white">
+      <div className="min-h-screen w-screen">
+        <GameNavbar />
+        <div className="relative py-1 overflow-hidden bg-black text-white">
             <div className="absolute inset-0 z-0">
                 <Image
                     src="/assets/Backdrops/background1.jpg"
@@ -495,7 +498,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
                     <div>
                         <div className="text-sm uppercase tracking-wider text-white/70">Density:</div>
                         {/* {density} */}
-                        Density
+                        g/cm^3
                     </div>
                     <div>
                         <div className="text-sm uppercase tracking-wider text-white/70">Main biome:</div>
@@ -507,7 +510,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
                     </div>
                 </div>
 
-                <div className="flex-1 flex items-start justify-center mt-2">
+                <div className="flex-1 overflow-y-auto px-4 pb-6">
                     {renderFocusComponent()}
                 </div>
 
@@ -565,6 +568,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
                     </Button>
                 </div>
             </main>
+        </div>
         </div>
     );
 };

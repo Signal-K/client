@@ -120,8 +120,8 @@ export function PlanetGenerator({
   }, [planetStats.mass, planetStats.radius]);
 
   return (
-    <div className="flex-1 w-full h-screen relative">
-      <div className="absolute top-4 left-4 z-10 bg-black/70 text-green-400 font-mono p-2 rounded border border-green-500/30 text-sm">
+    <div className="relative w-full h-screen overflow-hidden">
+      {/* <div className="absolute top-4 left-4 z-10 bg-black/70 text-green-400 font-mono p-2 rounded border border-green-500/30 text-sm">
         <div>
           <span className="text-green-500/70">ID:</span> {classificationId}
         </div>
@@ -143,7 +143,7 @@ export function PlanetGenerator({
             <span className="text-green-500/70">LANDMARKS:</span> {planetStats.landmarks.length}
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* {classificationConfig && (
         <pre className="text-xs text-white/70">
@@ -167,14 +167,14 @@ export function PlanetGenerator({
       </Canvas>
 
       <div className="absolute top-4 right-4 flex gap-2">
-        <Button
+        {/* <Button
           variant="outline"
           size="sm"
           className="bg-black/50 hover:bg-black/70 text-white"
           onClick={() => setUseShader(!useShader)}
         >
           {useShader ? "Standard Render" : "Shader Render"}
-        </Button>
+        </Button> */}
         <Button
           variant="outline"
           size="icon"

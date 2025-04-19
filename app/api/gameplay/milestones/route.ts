@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
     {
-        weekStart: '2025-04-07',
+        weekStart: '2025-04-15',
         data: [
             {
                 name: 'Make 3 Temperature Classifications',
