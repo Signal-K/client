@@ -5,7 +5,7 @@ import { formatDistanceToNow, startOfDay, addDays } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const classificationTypes = [
-  "zoodex-burrowingOwl",
+  "zoodex-burrowingOwl", 
   "telescope-minorPlanet",
   "sunspot",
   "satellite-planetFour",

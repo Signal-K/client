@@ -15,6 +15,7 @@ export interface Landmark {
   id: string
   name: string
   type: LandmarkType
+  biome?: string;
   position: {
     x: number // 0-1 normalized position on map
     y: number // 0-1 normalized position on map
@@ -23,7 +24,7 @@ export interface Landmark {
   elevation: number // Elevation value at this point
   description?: string
   color?: string // Optional custom color
-}
+};
 
 export const LANDMARK_COLORS: Record<LandmarkType, string> = {
   mountain: "#8B4513", // Brown
@@ -37,7 +38,7 @@ export const LANDMARK_COLORS: Record<LandmarkType, string> = {
   desert: "#F4A460", // Sandy brown
   glacier: "#E0FFFF", // Light cyan
   island: "#DEB887", // Burlywood
-}
+};
 
 export const LANDMARK_ICONS: Record<LandmarkType, string> = {
   mountain: "▲",
@@ -51,7 +52,7 @@ export const LANDMARK_ICONS: Record<LandmarkType, string> = {
   desert: "∴",
   glacier: "❄",
   island: "⬤",
-}
+};
 
 export const LANDMARK_DESCRIPTIONS: Record<LandmarkType, string> = {
   mountain: "An elevated landform rising prominently above the surrounding terrain",
@@ -216,10 +217,10 @@ export function generateLandmarks(
             color: LANDMARK_COLORS[type],
           })
           break
-        }
-      }
-    }
-  }
+        };
+      };
+    };
+  };
 
   // Add landmarks of each type
   addLandmarks("mountain", mountainCount)

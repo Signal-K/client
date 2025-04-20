@@ -18,6 +18,7 @@ import SimpleeMissionGuide from "./tests/singleMissionGuide";
 import Navbar from "@/components/Layout/Navbar";
 import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatellites";
 import LandingSS from "./auth/landing";
+import GameNavbar from "@/components/Layout/Tes";
 
 export default function Home() {
   const session = useSession();
@@ -127,7 +128,8 @@ export default function Home() {
   return (
     <EarthViewLayout>
       <div className="w-full">
-        <Navbar />
+        {/* <Navbar /> */}
+        <GameNavbar />
         <div className="flex flex-row space-y-4"></div>
         <div className="py-3">
           <div className="py-6 my-10 px-6">

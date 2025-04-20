@@ -33,7 +33,7 @@ const getBiomassStage = (score: number) => {
       description: "Complex ecosystems and adaptive traits emerging.",
       color: "from-emerald-400 to-emerald-700",
     };
-  }
+  };
 };
 
 export default function PlanetProgress({

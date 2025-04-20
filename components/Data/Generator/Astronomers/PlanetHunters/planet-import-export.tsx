@@ -8,7 +8,7 @@ interface PlanetImportExportProps {
   stats: PlanetStats;
   onImport: (importedStats: Partial<PlanetStats>) => void;
   onSave: (updatedConfig: any) => void;
-}
+};
 
 export function PlanetImportExport({ stats, onImport, onSave }: PlanetImportExportProps) {
   const [importExportText, setImportExportText] = useState('');

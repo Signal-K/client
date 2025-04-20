@@ -4,6 +4,51 @@ import { ChevronDown, ChevronRight, Award, Star } from 'lucide-react';
 import { Category, Project, Mission } from '@/types/journal';
 import { JournalProgressBar } from "@/components/ui/progress";
 
+function OverallCategoryPoints({
+  planetHuntersPoints,
+  dailyMinorPlanetPoints,
+  ai4mPoints,
+  planetFourPoints,
+  jvhPoints,
+  cloudspottingPoints,
+}: {
+  planetHuntersPoints: number;
+  dailyMinorPlanetPoints: number;
+  ai4mPoints: number;
+  planetFourPoints: number;
+  jvhPoints: number;
+  cloudspottingPoints: number;
+}) {
+  const astronomyTotal =
+    planetHuntersPoints + dailyMinorPlanetPoints;
+  const meteorologyTotal =
+    ai4mPoints + planetFourPoints + jvhPoints + cloudspottingPoints;
+  const biologyTotal = 0; // No point input yet for biology project
+
+  return (
+    <div className="w-full max-w-xl mx-auto mb-8">
+      <h2 className="text-xl font-bold mb-4 text-[#5FCBC3] flex items-center gap-2">
+        <Star className="w-5 h-5 text-[#FFD700]" />
+        Category Points Overview
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-4 bg-[#1D2833] rounded-lg border border-[#2C4F64]/30">
+          <div className="text-sm text-[#5FCBC3]">Astronomy</div>
+          <div className="text-2xl font-bold text-[#FFD700]">{astronomyTotal}</div>
+        </div>
+        <div className="p-4 bg-[#1D2833] rounded-lg border border-[#2C4F64]/30">
+          <div className="text-sm text-[#5FCBC3]">Meteorology</div>
+          <div className="text-2xl font-bold text-[#FFD700]">{meteorologyTotal}</div>
+        </div>
+        <div className="p-4 bg-[#1D2833] rounded-lg border border-[#2C4F64]/30">
+          <div className="text-sm text-[#5FCBC3]">Biology</div>
+          <div className="text-2xl font-bold text-[#FFD700]">{biologyTotal}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function JournalPage() {
   const [pointsData, setPointsData] = useState<{
     planetHuntersPoints: number;
@@ -33,7 +78,7 @@ export default function JournalPage() {
           
           {pointsData && (
             // <JournalAchievement
-            <MinimalJournalPage
+            <><MinimalJournalPage
               planetHuntersPoints={pointsData.planetHuntersPoints}
               dailyMinorPlanetPoints={pointsData.dailyMinorPlanetPoints}
               ai4mPoints={pointsData.ai4mPoints}
@@ -41,6 +86,14 @@ export default function JournalPage() {
               jvhPoints={pointsData.jvhPoints}
               cloudspottingPoints={pointsData.cloudspottingPoints}
             />
+            <OverallCategoryPoints
+            planetHuntersPoints={pointsData.planetHuntersPoints}
+            dailyMinorPlanetPoints={pointsData.dailyMinorPlanetPoints}
+            ai4mPoints={pointsData.ai4mPoints}
+            planetFourPoints={pointsData.planetFourPoints}
+            jvhPoints={pointsData.jvhPoints}
+            cloudspottingPoints={pointsData.cloudspottingPoints}
+          /></>
           )}
     </div>
   );

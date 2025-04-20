@@ -1,0 +1,568 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
+import { Bell, ChevronDown, HammerIcon, LogOut, Settings, Star, Trophy, User, X, Zap } from "lucide-react"
+import { formatDistanceToNow, startOfDay, addDays } from "date-fns"
+import { Avatar } from "../Account/Avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Progress } from "@/components/ui/progress"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Menu, Transition } from "@headlessui/react"
+import TotalPoints from "../Structures/Missions/Stardust/Total"
+
+// Sample data - replace with actual data in your implementation
+const techTree = [
+  { id: 1, name: "Cameras", level: 1, maxLevel: 5, progress: 10 },
+  { id: 2, name: "Navigation", level: 1, maxLevel: 3, progress: 10 },
+  { id: 3, name: "Probe distance", level: 0, maxLevel: 4, progress: 10 },
+  { id: 4, name: "Weather identification", level: 0, maxLevel: 4, progress: 10 },
+]
+
+export default function GameNavbar() {
+  const supabase = useSupabaseClient()
+  const session = useSession()
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string>("");
+  const [settlementsOpen, setSettlementsOpen] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [milestones, setMilestones] = useState<any[]>([]);
+  const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
+  const [userProgress, setUserProgress] = useState<{ [key: string]: number }>({});
+  const [hasNewAlert, setHasNewAlert] = useState(false);
+  const [newNotificationsCount, setNewNotificationsCount] = useState(0);
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error signing out:", error.message);
+    } else {
+      console.log("User signed out successfully");
+    }
+  };
+
+  // Fetch alerts
+  useEffect(() => {
+    const fetchAlert = async () => {
+      if (!session?.user) return
+
+      const userId = session.user.id
+
+      // Fetch current milestones
+      const milestoneRes = await fetch("/api/gameplay/milestones")
+      const milestoneData = await milestoneRes.json()
+
+      const currentMilestones = milestoneData.playerMilestones[0]?.data || []
+
+      // Filter to classification-based milestones only
+      const classificationMilestones = currentMilestones.filter(
+        (m: any) => m.table === "classifications" && m.field === "classificationtype",
+      )
+
+      const oneWeekAgo = new Date()
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+
+      const { data: classifications, error } = await supabase
+        .from("classifications")
+        .select("classificationtype, created_at")
+        .gte("created_at", oneWeekAgo.toISOString())
+        .eq("author", userId)
+
+      if (error) {
+        console.error("Error fetching classifications", error)
+        return
+      }
+
+      const typeCounts: Record<string, number> = {}
+      classifications?.forEach((item) => {
+        const type = item.classificationtype
+        typeCounts[type] = (typeCounts[type] || 0) + 1
+      })
+
+      // Find the first incomplete classification milestone
+      const incompleteMilestone = classificationMilestones.find((m: any) => {
+        const count = typeCounts[m.value] || 0
+        return count < m.requiredCount
+      })
+
+      if (incompleteMilestone) {
+        let message = ""
+
+        const { value, structure } = incompleteMilestone
+
+        if (value === "planet" && structure === "Telescope") {
+          message = "New planet candidate discovered by your telescope."
+          setHasNewAlert(true)
+          setNewNotificationsCount((prev) => prev + 1)
+        } else if (value === "sunspot" && structure === "Telescope") {
+          message = "Sunspot activity detected — help us classify."
+          setHasNewAlert(true)
+          setNewNotificationsCount((prev) => prev + 1)
+        } else if (value === "cloud" && structure === "WeatherBalloon") {
+          message = "Unusual cloud formations need your attention."
+          setHasNewAlert(true)
+          setNewNotificationsCount((prev) => prev + 1)
+        } else {
+          message = `Incomplete discovery: ${value} via ${structure}`
+        }
+
+        setAlertMessage(message)
+      } else {
+        setAlertMessage("You've completed all classification goals this week!")
+      }
+    }
+
+    fetchAlert()
+  }, [session, supabase])
+
+  // Calculate time remaining
+  useEffect(() => {
+    const calculateTimeRemaining = () => {
+      const now = new Date()
+      const melbourneTime = new Date(now.toLocaleString("en-US", { timeZone: "Australia/Melbourne" }))
+      const nextMidnight = startOfDay(addDays(melbourneTime, 1))
+      const remaining = formatDistanceToNow(nextMidnight, { addSuffix: true })
+      setTimeRemaining(remaining)
+    }
+
+    const interval = setInterval(calculateTimeRemaining, 60000)
+    calculateTimeRemaining()
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // Fetch milestones
+  useEffect(() => {
+    fetch("/api/gameplay/milestones")
+      .then((res) => res.json())
+      .then((data) => {
+        setMilestones(data.playerMilestones)
+        setCurrentWeekIndex(data.playerMilestones.length - 1) // Default to latest week
+      })
+  }, [])
+
+  // Fetch milestone progress
+  useEffect(() => {
+    if (!session || milestones.length === 0) return
+
+    const fetchProgress = async () => {
+      const progress: { [key: string]: number } = {}
+      if (!milestones[currentWeekIndex]) return
+
+      const { weekStart, data } = milestones[currentWeekIndex]
+
+      const startDate = new Date(weekStart)
+      const endDate = new Date(startDate)
+      endDate.setDate(startDate.getDate() + 6)
+
+      for (const milestone of data) {
+        const { table, field, value, name } = milestone
+
+        let query = supabase
+          .from(table)
+          .select("*", { count: "exact" })
+          .gte("created_at", startDate.toISOString())
+          .lte("created_at", endDate.toISOString())
+          .eq(field, value)
+
+        if (session.user.id) {
+          query = query.eq("author", session.user.id)
+        }
+
+        const { count, error } = await query
+        if (!error && count !== null) {
+          progress[name] = count
+        }
+      }
+
+      setUserProgress(progress)
+    }
+
+    fetchProgress()
+  }, [session, milestones, currentWeekIndex, supabase])
+
+  const formatWeekDisplay = (index: number) => {
+    const diff = milestones.length - 1 - index
+    if (diff === 0) return "Current Week"
+    if (diff === 1) return "Last Week"
+    return `${diff} Weeks Ago`
+  }
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-2">
+      <div className="relative flex items-center justify-between rounded-lg backdrop-blur-md bg-black/30 border border-white/10 shadow-lg px-4 py-2">
+        {/* Logo */}
+        <Link href="/" legacyBehavior>
+              <a>
+                <img src="/planet.svg" alt="Logo" className="h-8 w-8 ml-1" />
+              </a>
+            </Link>
+
+            <Menu as="div" className="relative inline-block text-left">
+              <div>
+                <Button
+                  className="text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition"
+                  onClick={() => setSettlementsOpen((prev) => !prev)}
+                >
+                  <span>Star Sailors:</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 9l-7.5 7.5L4.5 9" />
+                  </svg>
+                </Button>
+              </div>
+              <Transition
+                show={settlementsOpen}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <Link href="/" passHref>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                          My Settlements
+                        </a>
+                      )}
+                    </Menu.Item>
+                  </Link>
+                  <Link href="/scenes/desert" passHref>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                          Desert Base
+                        </a>
+                      )}
+                    </Menu.Item>
+                  </Link>
+                  <Link href="/scenes/ocean" passHref>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                          Ocean Base
+                        </a>
+                      )}
+                    </Menu.Item>
+                  </Link>
+                  <Link href="/scenes/uploads" passHref>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                          Conservation
+                        </a>
+                      )}
+                    </Menu.Item>
+                  </Link>
+                </Menu.Items>
+              </Transition>
+            </Menu>
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-4">
+          {/* Stardust Balance */}
+          <div className="flex items-center bg-white/5 rounded-full px-3 py-1 border border-yellow-500/30">
+            <Star className="h-4 w-4 text-yellow-400 mr-1" />
+            <span className="text-yellow-100 font-medium"><TotalPoints /></span>
+          </div>
+
+          {/* Missions Button */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" className="relative group">
+                <Trophy className="h-5 w-5 text-amber-400 group-hover:text-amber-300 transition-colors" />
+                <span className="ml-2 text-white">Missions</span>
+                <Badge className="ml-1 bg-amber-600 hover:bg-amber-600 text-white">3</Badge>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[400px] p-0 bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border border-[#581c87] shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+              <div className="p-4">
+                <h3 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] mb-4">
+                  Weekly Milestones
+                </h3>
+
+                <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentWeekIndex(Math.max(0, currentWeekIndex - 1))}
+                    className="border-[#7e22ce] bg-[#1e293b] hover:bg-[#581c87] hover:text-white"
+                    disabled={currentWeekIndex === 0}
+                  >
+                    <ChevronDown className="w-4 h-4 mr-1 rotate-90" /> Previous
+                  </Button>
+                  <div className="text-lg font-semibold text-[#67e8f9] text-center">
+                    {milestones.length > 0 ? formatWeekDisplay(currentWeekIndex) : "Loading Week"}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentWeekIndex(Math.min(milestones.length - 1, currentWeekIndex + 1))}
+                    className="border-[#7e22ce] bg-[#1e293b] hover:bg-[#581c87] hover:text-white"
+                    disabled={currentWeekIndex >= milestones.length - 1}
+                  >
+                    Next <ChevronDown className="w-4 h-4 ml-1 -rotate-90" />
+                  </Button>
+                </div>
+
+                {milestones.length > 0 ? (
+                  <ul className="space-y-2">
+                    {milestones[currentWeekIndex]?.data.map((milestone: any, index: number) => (
+                      <li
+                        key={index}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between text-white gap-1"
+                      >
+                        <p className="truncate">{milestone.name}</p>
+                        <div className="text-xs text-gray-500 whitespace-nowrap">
+                          {userProgress[milestone.name] || 0}/{milestone.requiredCount} completed
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-center text-white">Loading milestones...</p>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Notifications Button */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" className="relative group">
+                <Bell className="h-5 w-5 text-blue-400 group-hover:text-blue-300 transition-colors" />
+                <span className="ml-2 text-white">Alerts</span>
+                {hasNewAlert && (
+                  <Badge className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-500 text-white h-5 w-5 flex items-center justify-center p-0 text-xs">
+                    {newNotificationsCount}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[400px] p-0 bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border border-[#581c87] shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+              <div className="p-4">
+                <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] mb-4">
+                  Daily Alert
+                </h2>
+                <div className="mt-4 text-center text-[#67e8f9] font-semibold">
+                  <p>{alertMessage}</p>
+                  <p className="mt-2 text-xs text-gray-500">Time remaining until next event: {timeRemaining}</p>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Tech Tree Button */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" className="relative group">
+                <Zap className="h-5 w-5 text-purple-400 group-hover:text-purple-300 transition-colors" />
+                <span className="ml-2 text-white">Tech Tree</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-0 bg-black/80 backdrop-blur-md border border-purple-500/20">
+              <div className="p-4 space-y-4">
+                <h3 className="text-lg font-bold text-purple-400">Technology</h3>
+                <div className="grid gap-3">
+                  {techTree.map((tech) => (
+                    <div key={tech.id} className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors">
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-medium text-white">{tech.name}</h4>
+                        <div className="text-purple-400 text-sm font-bold">
+                          Lvl {tech.level}/{tech.maxLevel}
+                        </div>
+                      </div>
+                      <Progress value={tech.progress} className="h-1.5 mt-2 bg-white/10" />
+                    </div>
+                  ))}
+                </div>
+                <Button className="w-full bg-purple-600 hover:bg-purple-500 text-white">Full Tech Tree (Soon)</Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Profile Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative flex items-center gap-2 pl-2 pr-3">
+                <div className="h-8 w-8 rounded-full overflow-hidden">
+                    <div
+                                    className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-[#5FCBC3]/60 hover:bg-[#5FCBC3]/80 transition"
+                                  >
+                    <Avatar />
+                    </div>
+                </div>
+                <ChevronDown className="h-4 w-4 text-white/70" />
+            </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-black/80 backdrop-blur-md border border-white/10 text-white">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuGroup>
+                <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer flex items-center">
+                  <Link href='/account' className="flex items-center">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer text-red-400">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Mobile Menu Button */}
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="md:hidden text-white">
+              <HammerIcon className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            side="right"
+            className="w-[85%] bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border-white/10 p-0"
+          >
+            <div className="flex flex-col h-full">
+              <div className="flex items-center justify-between p-4 border-b border-white/10">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-[#5FCBC3]/60 hover:bg-[#5FCBC3]/80 transition">
+                  <Avatar />
+                  <div>
+                    <h3 className="font-bold text-white">Commander</h3>
+                    <p className="text-sm text-gray-400">Level 24</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-white">
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+
+              <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                <div className="flex items-center bg-white/5 rounded-full px-3 py-1 border border-yellow-500/30">
+                  <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                  <span className="text-yellow-100 font-medium"><TotalPoints /></span>
+                </div>
+                <Button variant="outline" size="sm" className="border-white/20 text-white hover:bg-white/10">
+                  Collect Bonus
+                </Button>
+              </div>
+
+              <div className="flex-1 overflow-auto">
+                <div className="p-4 space-y-6">
+                  {/* Mobile Alerts */}
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] flex items-center">
+                      <Bell className="h-5 w-5 mr-2 text-[#67e8f9]" />
+                      Daily Alert
+                      {hasNewAlert && (
+                        <Badge className="ml-2 bg-red-500 hover:bg-red-500 text-white">{newNotificationsCount}</Badge>
+                      )}
+                    </h3>
+                    <div className="bg-[#1e293b] rounded-lg p-3 border border-[#581c87]">
+                      <p className="text-[#67e8f9] font-semibold">{alertMessage}</p>
+                      <p className="mt-2 text-xs text-gray-500">Time remaining until next event: {timeRemaining}</p>
+                    </div>
+                  </div>
+
+                  {/* Mobile Missions */}
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] flex items-center">
+                      <Trophy className="h-5 w-5 mr-2 text-[#67e8f9]" />
+                      Weekly Milestones
+                    </h3>
+
+                    {milestones.length > 0 &&
+                      milestones[currentWeekIndex]?.data.slice(0, 2).map((milestone: any, index: number) => (
+                        <div key={index} className="bg-[#1e293b] rounded-lg p-3 border border-[#581c87]">
+                          <div className="flex justify-between items-center">
+                            <p className="text-white truncate">{milestone.name}</p>
+                            <div className="text-xs text-gray-500 whitespace-nowrap">
+                              {userProgress[milestone.name] || 0}/{milestone.requiredCount}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+
+                    <Button variant="link" className="text-[#67e8f9] p-0 h-auto">
+                      View All Milestones
+                    </Button>
+                  </div>
+
+                  {/* Mobile Tech Tree */}
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-bold text-purple-400 flex items-center">
+                      <Zap className="h-5 w-5 mr-2" />
+                      Tech Tree
+                    </h3>
+                    <div className="grid gap-2">
+                      {techTree.slice(0, 2).map((tech) => (
+                        <div key={tech.id} className="bg-white/5 rounded-lg p-3">
+                          <div className="flex justify-between items-center">
+                            <h4 className="font-medium text-white">{tech.name}</h4>
+                            <div className="text-purple-400 text-sm font-bold">
+                              Lvl {tech.level}/{tech.maxLevel}
+                            </div>
+                          </div>
+                          <Progress value={tech.progress} className="h-1.5 mt-2 bg-white/10" />
+                        </div>
+                      ))}
+                    </div>
+                    <Button variant="link" className="text-purple-400 p-0 h-auto">
+                      Full Tech Tree
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border-t border-white/10 space-y-2">
+                <Button className="w-full justify-start" variant="ghost">
+                  <User className="mr-2 h-5 w-5" />
+                  Profile
+                </Button>
+                <Link href='/account' passHref>
+                    <Button className="w-full justify-start" variant="ghost">
+                        <Settings className="mr-2 h-5 w-5" />
+                        Settings
+                    </Button>
+                </Link>
+                <Button className="w-full justify-start text-red-400" variant="ghost" onClick={signOut}>
+                  <LogOut className="mr-2 h-5 w-5" />
+                  Log out
+                </Button>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </nav>
+  );
+};

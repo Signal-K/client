@@ -72,11 +72,10 @@ export function Avatar() {
           console.warn("Error fetching avatar: ", error.message);
         } else if (data) {
           setAvatarUrl(data.avatar_url || null);
-        };
-
+        }
         setLoading(false);
-      };
-    };
+      }
+    }
 
     fetchAvatar();
 
@@ -86,26 +85,23 @@ export function Avatar() {
   }, [session, supabase]);
 
   if (loading) {
-    return (
-      <div className="w-16 h-16 rounded-full bg-gray-300 animate-pulse" />
-    );
-  };
+    return <div className="w-10 h-10 rounded-full bg-gray-300 animate-pulse" />;
+  }
 
   return (
-    <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-300 border-2 border-gray-400 shadow-md">
+    <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-300 border-2 border-gray-400 shadow-md relative">
       {avatarUrl ? (
         <Image
           src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatarUrl}`}
           alt="User Avatar"
-          layout="fill"
-          objectFit="cover"
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
         />
       ) : (
-        <div className="flex items-center justify-center h-full text-gray-500">
+        <div className="flex items-center justify-center w-full h-full text-gray-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-8 w-8"
+            className="h-5 w-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

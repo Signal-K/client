@@ -11,6 +11,7 @@ interface TotalPointsProps {
     jvhPoints: number;
     cloudspottingPoints: number;
     planktonPoints: number;
+    milestonePoints: number;
     totalPoints: number;
   }) => void;
 };
@@ -26,9 +27,41 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
   const [jvhPoints, setJvhPoints] = useState(0);
   const [planktonPoints, setPlanktonPoints] = useState(0);
   const [cloudspottingPoints, setCloudspottingPoints] = useState(0);
+  const [milestonePoints, setMilestonePoints] = useState(0);
 
   useEffect(() => {
     if (!session?.user) return;
+
+    const fetchMilestonePoints = async () => {
+      try {
+        const res = await fetch("/api/gameplay/milestones");
+        const data = await res.json();
+        const { playerMilestones } = data;
+        const userId = session.user.id;
+
+        const currentWeek = playerMilestones[playerMilestones.length - 1];
+        const startDate = new Date(currentWeek.weekStart);
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+
+        let total = 0;
+        for (const milestone of currentWeek.data) {
+          const { table, field, value, name } = milestone;
+          const { count } = await supabase
+            .from(table)
+            .select("*", { count: "exact" })
+            .gte("created_at", startDate.toISOString())
+            .lte("created_at", endDate.toISOString())
+            .eq(field, value)
+            .eq("author", userId);
+          total += count || 0;
+        }
+
+        setMilestonePoints(total);
+      } catch (error) {
+        console.error("Error fetching milestone points:", error);
+      }
+    };
 
     const fetchPlanetHuntersPoints = async () => {
       try {
@@ -153,7 +186,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
       } catch (error) {
         console.error("Error fetching Daily Minor Planet points:", error);
       }
-    }; 
+    };
 
     const fetchAi4MPoints = async () => {
       const { data: classifications } = await supabase
@@ -161,21 +194,21 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
         .select("id, classificationtype, classificationConfiguration")
         .eq("author", session.user.id)
         .eq("classificationtype", "automaton-aiForMars");
-    
+
       const mission1Points = classifications?.length || 0;
-    
+
       const { data: comments } = await supabase
         .from("comments")
         .select("id, classification_id")
         .eq("author", session.user.id);
-    
+
       const classificationIds = classifications?.map((c: any) => c.id) || [];
       const mission2Points = comments?.filter((comment: any) =>
         classificationIds.includes(comment.classification_id)
       ).length || 0;
-    
+
       setAi4mPoints(mission1Points + mission2Points);
-    };;    
+    };
 
     const fetchPlanetFourPoints = async () => {
       try {
@@ -203,7 +236,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
         setPlanetFourPoints(totalPoints);
       } catch (error) {
         console.error("Error fetching Planet Four points:", error);
-      };
+      }
     };
 
     const fetchJvhPoints = async () => {
@@ -214,7 +247,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
         .eq("classificationtype", "lidar-jovianVortexHunter");
 
       const mission1Points = classifications?.length || 0;
-      
+
       const { data: comments } = await supabase
         .from("comments")
         .select("id, classification_id")
@@ -236,7 +269,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
         .eq("classificationtype", "cloud");
 
       const mission1Points = classifications?.length || 0;
-      
+
       const mission2Points = classifications?.filter((classification: any) => {
         const config = classification.classificationConfiguration || {};
         const options = config?.classificationOptions?.[""] || {};
@@ -250,7 +283,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
 
       const classificationIds = classifications?.map((c: any) => c.id) || [];
       const mission3Points = comments?.filter((comment: any) =>
-          classificationIds.includes(comment.classification_id)
+        classificationIds.includes(comment.classification_id)
       ).length || 0;
 
       setCloudspottingPoints(mission1Points + mission2Points + mission3Points);
@@ -262,7 +295,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
     fetchPlanetFourPoints();
     fetchJvhPoints();
     fetchCloudspottingPoints();
-    // fetchPlanktonPoints();
+    fetchMilestonePoints();
   }, [supabase, session?.user]);
 
   const totalPoints =
@@ -272,12 +305,11 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
     planetFourPoints +
     jvhPoints +
     cloudspottingPoints +
-    planktonPoints;
+    planktonPoints +
+    milestonePoints;
 
   useEffect(() => {
-    if (onPointsUpdate) {
-      onPointsUpdate(totalPoints);
-    }
+    if (onPointsUpdate) onPointsUpdate(totalPoints);
 
     if (onExport) {
       onExport({
@@ -288,6 +320,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
         jvhPoints,
         cloudspottingPoints,
         planktonPoints,
+        milestonePoints,
         totalPoints,
       });
     }
@@ -301,21 +334,40 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
     planetFourPoints,
     jvhPoints,
     cloudspottingPoints,
+    planktonPoints,
+    milestonePoints,
   ]);
 
   return (
-    <></>
-    // <div className="bg-gray-900 p-6 rounded-lg text-white">
-    //   <h1 className="text-xl font-bold mb-4">Total Points</h1>
-    //   <p>Planet Hunters Points: {planetHuntersPoints}</p>
-    //   <p>Daily Minor Planet Points: {dailyMinorPlanetPoints}</p>
-    //   <p>AI4M Points: {ai4mPoints}</p>
-    //   <p>Planet Four Points: {planetFourPoints}</p>
-    //   <p>Jovian Vortex Hunters Points: {jvhPoints}</p>
-    //   <p>Cloudspotting Points: {cloudspottingPoints}</p>
-    //   <p className="mt-4 text-lg font-semibold">Total: {totalPoints}</p>
-    // </div>
-  );
+    // <div className="bg-gray-900 p-6 rounded-lg text-white space-y-6">
+      <h1 className="text-md">{totalPoints}</h1>
+    );
+
+      {/* <div>
+        <h2 className="text-lg font-semibold text-indigo-400 mb-2">Astronomy</h2>
+        <ul className="space-y-1 pl-4">
+          <li>🔭 Planet Hunters: {planetHuntersPoints}</li>
+          <li>🌌 Daily Minor Planets: {dailyMinorPlanetPoints}</li>
+          <li>🧠 AI4M (AI for Mars): {ai4mPoints}</li>
+          <li>🪐 Planet Four: {planetFourPoints}</li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 className="text-lg font-semibold text-blue-400 mb-2">Meteorology</h2>
+        <ul className="space-y-1 pl-4">
+          <li>☁️ Cloudspotting: {cloudspottingPoints}</li>
+          <li>🌀 Jovian Vortex Hunter: {jvhPoints}</li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 className="text-lg font-semibold text-green-400 mb-2">Biology</h2>
+        <ul className="space-y-1 pl-4">
+          <li>🧫 Plankton Detectives: {planktonPoints}</li>
+        </ul>
+      </div>
+    </div> */}
 };
 
 export default TotalPoints;

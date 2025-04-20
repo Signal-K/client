@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, useMemo } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
 import Image from "next/image";
@@ -11,6 +11,8 @@ import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounte
 import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnPlanet";
 import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
 import PlanetProgress from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetCompletion";
+import WeatherGenerator from "@/components/Data/Generator/Weather/SimpleWeatherEvents";
+import GameNavbar from "@/components/Layout/Tes";
 
 export interface Classification {
   id: number;
@@ -123,18 +125,18 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
       return nextSunday.getTime() - now.getTime(); 
   };
 
-  const calculateBiomass = (temperature?: number, radius?: number, orbitalPeriod?: number): number => {
-      const T = temperature ?? 300;
-      const R = radius ?? 1;
-      const P = orbitalPeriod ?? 1.5;
+  const calculateBiomass = (temperature?: number, radius?: number, surveyorPeriod?: number): number => {
+    const T = temperature ?? 300;
+    const R = radius ?? 1;
+    const P = surveyorPeriod ?? 1.5; // default to 1.5 if undefined or invalid
 
-      return (
-          0.1 *
-          (T / (T + 300)) *
-          (1 / (1 + Math.exp(-(R - 1.2)))) *
-          (1 / (1 + Math.exp(-(1.5 - P))))
-      );
-  };  
+    return (
+        0.1 *
+        (T / (T + 300)) *
+        (1 / (1 + Math.exp(-(R - 1.2)))) *
+        (1 / (1 + Math.exp(-(1.5 - P))))
+    );
+};
 
   const formatTime = (timeInSeconds: number) => {
       const hours = String(Math.floor(timeInSeconds / 3600)).padStart(2, "0");
@@ -144,14 +146,40 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
   };
 
   useEffect(() => {
+    // Ensure all parameters are parsed correctly
     const orbital = parseFloat(surveyorPeriod);
-    const rad = density !== null ? Number(density) : undefined;
-    const temp = temperature !== null ? temperature : undefined;
-  
-    if (!isNaN(orbital) && rad !== undefined && temp !== undefined) {
-      setBiomassScore(calculateBiomass(temp, rad, orbital));
-    }
-  }, [surveyorPeriod, density, temperature]);    
+    const rad = density !== null && !isNaN(density) ? density : 1;  // Default to 1 if density is invalid
+    const temp = temperature !== null && !isNaN(temperature) ? temperature : 300;  // Default to 300 if temperature is invalid
+
+    // Ensure orbital is a valid number, fallback to a default value if invalid
+    const validOrbital = !isNaN(orbital) ? orbital : 1.5;
+
+    // Calculate biomass score with valid parameters
+    setBiomassScore(calculateBiomass(temp, rad, validOrbital));
+}, [density, temperature, surveyorPeriod]); // Re-run when these values change  
+
+  const MemoizedPlanetGenerator = useMemo(() => {
+    return classification?.id && classification.author ? (
+            // <PostCardSingleWithGenerator
+            //   key={classification.id}
+            //   classificationId={classification.id}
+            //   title={classification.title || "Untitled"}
+            //   author={classification.author || "Unknown"}
+            //   content={classification.content || "No content available"}
+            //   votes={classification.votes || 0}
+            //   category={classification.classificationtype || "Uncategorized"}
+            //   // images={classification.images || []}
+            //   anomalyId={classification.anomaly ? String(classification.anomaly.id) : ""}
+            //   classificationConfig={classification.classificationConfiguration}
+            //   classificationType={classification.classificationtype || "Unknown"}
+            //   tags={classification.tags || []}
+            //   images={classification.images || []} 
+            //   biome={dominantBiome || ''}
+            //   toggle={true}
+            // />
+            <PlanetGenerator         classificationId={classification.id.toString()}         author={classification.author}       />
+    ) : null;
+  }, [classification?.id, classification?.author]);  
 
   useEffect(() => {
       if (!params.id) return;
@@ -264,7 +292,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
       }, 1000);
   
       return () => clearInterval(timer);
-  }, []);
+  }, [supabase]);
   
   const handleViewChange = (view: FocusView) => {
       setCurrentView(view)
@@ -275,18 +303,11 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
   };
 
     // Planet generator content
-    const PlanetComponent = () => (
-        <div className="flex w-full h-screen">
-            {classification && (
-                <>
-                    <PlanetGenerator
-                        classificationId={classification.id.toString()}
-                        author={classification.author || ''}
-                    />
-                </>
-            )}
-        </div>
-    );
+    const PlanetComponent = useMemo(() => (
+      <div className="flex w-full h-screen flex justify-center items-center">
+        {classification && !loading && MemoizedPlanetGenerator}
+      </div>
+    ), [classification, loading, MemoizedPlanetGenerator]);    
 
     const ClimateComponent = () => (
         <div className="w-full max-w-6xl bg-black/20 backdrop-blur-md rounded-2xl p-6 text-white mx-auto space-y-6 overflow-y-auto max-h-[80vh]">
@@ -384,9 +405,9 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
     const renderFocusComponent = () => {
         switch (currentView) {
           case "planet":
-            return <PlanetComponent />
+            return PlanetComponent
           case "overview":
-            return <PlanetComponent />
+            return PlanetComponent
           case "Climate":
             return <ClimateComponent />
           case "atmosphere":
@@ -398,12 +419,14 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
           case "edit":
             return <EditComponent />
           default:
-            return <PlanetComponent />
+            return PlanetComponent
         };
     };
 
     return (
-        <div className="relative min-h-screen w-screen overflow-hidden bg-black text-white">
+      <div className="min-h-screen w-screen">
+        <GameNavbar />
+        <div className="relative py-4 overflow-hidden bg-black text-white">
             <div className="absolute inset-0 z-0">
                 <Image
                     src="/assets/Backdrops/background1.jpg"
@@ -417,7 +440,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
 
             {dominantBiome && (
                 <div className="absolute top-0 left-0 w-screen z-10">
-                    {/* Weather generator goes here */}
+                    <WeatherGenerator biome={dominantBiome} />
                 </div>
             )}
 
@@ -478,7 +501,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
                     <div>
                         <div className="text-sm uppercase tracking-wider text-white/70">Density:</div>
                         {/* {density} */}
-                        Density
+                        g/cm^3
                     </div>
                     <div>
                         <div className="text-sm uppercase tracking-wider text-white/70">Main biome:</div>
@@ -486,11 +509,11 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
                     </div>
                     <div>
                         <div className="text-sm uppercase tracking-wider text-white/70">Period:</div>
-                        {period} Days {/* // or surveyorPeriod */}
+                        {surveyorPeriod} Days {/* // or {period}  */}
                     </div>
                 </div>
 
-                <div className="flex-1 flex items-start justify-center mt-2">
+                <div className="flex-1 overflow-y-auto px-4 pb-6">
                     {renderFocusComponent()}
                 </div>
 
@@ -548,6 +571,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
                     </Button>
                 </div>
             </main>
+        </div>
         </div>
     );
 };

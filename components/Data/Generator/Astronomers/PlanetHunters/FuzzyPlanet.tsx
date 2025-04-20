@@ -1,5 +1,7 @@
-import type React from "react"
-import { motion } from "framer-motion"
+'use client';
+
+import type React from "react";
+import { motion } from "framer-motion";
 
 const FuzzyPlanet: React.FC = () => {
   return (
@@ -22,8 +24,7 @@ const FuzzyPlanet: React.FC = () => {
         }}
       ></div>
     </motion.div>
-  )
-}
+  );
+};
 
-export default FuzzyPlanet
-
+export default FuzzyPlanet;

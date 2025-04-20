@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useRef, useMemo } from "react"
 import { useFrame } from "@react-three/fiber"
@@ -441,7 +441,7 @@ export function Planet({ planetStats }: { planetStats: PlanetStats }) {
 
   // Generate atmosphere mesh
   const { atmosphereGeometry, atmosphereMaterial } = useMemo(() => {
-    const geometry = new THREE.IcosahedronGeometry(planetStats.radius * 1.05, 9)
+    const geometry = new THREE.IcosahedronGeometry(planetStats.radius * 1.1, 9)
     let material
 
     if (planetType === "terrestrial") {
@@ -553,6 +553,5 @@ export function Planet({ planetStats }: { planetStats: PlanetStats }) {
         ))}
       </group>
     </group>
-  )
-}
-
+  );
+};

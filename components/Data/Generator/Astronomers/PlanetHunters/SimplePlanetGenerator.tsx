@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PlanetScene, SimplePlanetScene } from "./planet-scene";
+import { SimplePlanetScene } from "./planet-scene";
 import { calculatePlanetStats } from "@/utils/planet-physics"; 
 import type { PlanetStats } from "@/utils/planet-physics";
 // import { PlanetGeneratorProps } from "./PlanetGenerator";
@@ -33,8 +33,9 @@ export default function SimplePlanetGenerator({ type, classificationConfig, biom
     return (
         <>
             <div className="w-full h-full flex items-center justify-center">
-                <PlanetScene stats={stats} type={type} />
+                {/* <PlanetScene stats={stats} type={type} /> */}
                 {/* <p>{biome}</p> */}
+                <SimplePlanetScene stats={stats} />
             </div>
         </>
     );
