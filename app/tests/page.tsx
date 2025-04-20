@@ -3,6 +3,7 @@
 import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import AlertComponent from "@/components/Structures/Missions/Milestones/Alerts/Alerts";
 import MilestoneTotalCompleted from "@/components/Structures/Missions/Milestones/Completed";
+import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 
 export default function TestPage() {
@@ -11,6 +12,7 @@ export default function TestPage() {
       {/* <AlertComponent /> */}
       {/* <MySettlementsLocations /> */}
       <MilestoneTotalCompleted />
+      <TotalPoints />
     </div>
   );
 };

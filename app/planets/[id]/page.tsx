@@ -423,7 +423,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
     return (
       <div className="min-h-screen w-screen">
         <GameNavbar />
-        <div className="relative py-1 overflow-hidden bg-black text-white">
+        <div className="relative py-4 overflow-hidden bg-black text-white">
             <div className="absolute inset-0 z-0">
                 <Image
                     src="/assets/Backdrops/background1.jpg"

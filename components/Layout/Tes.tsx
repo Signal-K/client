@@ -21,12 +21,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Progress } from "@/components/ui/progress"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, Transition } from "@headlessui/react"
+import TotalPoints from "../Structures/Missions/Stardust/Total"
 
 // Sample data - replace with actual data in your implementation
 const techTree = [
-  { id: 1, name: "Mining", level: 2, maxLevel: 5, progress: 40 },
-  { id: 2, name: "Navigation", level: 1, maxLevel: 3, progress: 30 },
-  { id: 3, name: "Defense", level: 0, maxLevel: 4, progress: 10 },
+  { id: 1, name: "Cameras", level: 1, maxLevel: 5, progress: 10 },
+  { id: 2, name: "Navigation", level: 1, maxLevel: 3, progress: 10 },
+  { id: 3, name: "Probe distance", level: 0, maxLevel: 4, progress: 10 },
+  { id: 4, name: "Weather identification", level: 0, maxLevel: 4, progress: 10 },
 ]
 
 export default function GameNavbar() {
@@ -283,7 +285,7 @@ export default function GameNavbar() {
           {/* Stardust Balance */}
           <div className="flex items-center bg-white/5 rounded-full px-3 py-1 border border-yellow-500/30">
             <Star className="h-4 w-4 text-yellow-400 mr-1" />
-            <span className="text-yellow-100 font-medium">12,450</span>
+            <span className="text-yellow-100 font-medium"><TotalPoints /></span>
           </div>
 
           {/* Missions Button */}
@@ -396,7 +398,7 @@ export default function GameNavbar() {
                     </div>
                   ))}
                 </div>
-                <Button className="w-full bg-purple-600 hover:bg-purple-500 text-white">Full Tech Tree</Button>
+                <Button className="w-full bg-purple-600 hover:bg-purple-500 text-white">Full Tech Tree (Soon)</Button>
               </div>
             </PopoverContent>
           </Popover>
@@ -423,9 +425,11 @@ export default function GameNavbar() {
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer flex items-center">
+                  <Link href='/account' className="flex items-center">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator className="bg-white/10" />
@@ -465,7 +469,7 @@ export default function GameNavbar() {
               <div className="p-4 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center bg-white/5 rounded-full px-3 py-1 border border-yellow-500/30">
                   <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                  <span className="text-yellow-100 font-medium">12,450</span>
+                  <span className="text-yellow-100 font-medium"><TotalPoints /></span>
                 </div>
                 <Button variant="outline" size="sm" className="border-white/20 text-white hover:bg-white/10">
                   Collect Bonus
