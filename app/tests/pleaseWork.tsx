@@ -368,7 +368,7 @@ const saveLifeEntity = async () => {
     onClick={sendImage}
     className="relative w-24 h-24 rounded-full bg-gradient-to-br from-white to-gray-200 text-black font-medium flex items-center justify-center shadow-lg hover:from-gray-100 hover:to-gray-300 transition-colors border-4 border-gray-300 z-10 disabled:opacity-50"
   >
-    <span className="text-lg">Scann</span>
+    <span className="text-lg">Scan</span>
   </button>
 </div></div>
 

@@ -22,6 +22,8 @@ import { Progress } from "@/components/ui/progress"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, Transition } from "@headlessui/react"
 import TotalPoints from "../Structures/Missions/Stardust/Total"
+import { MissionsPopover } from "./Navigation/MissionDropdown"
+import AlertsDropdown from "./Navigation/AlertsDropdown"
 
 // Sample data - replace with actual data in your implementation
 const techTree = [
@@ -29,7 +31,7 @@ const techTree = [
   { id: 2, name: "Navigation", level: 1, maxLevel: 3, progress: 10 },
   { id: 3, name: "Probe distance", level: 0, maxLevel: 4, progress: 10 },
   { id: 4, name: "Weather identification", level: 0, maxLevel: 4, progress: 10 },
-]
+];
 
 export default function GameNavbar() {
   const supabase = useSupabaseClient()
@@ -152,7 +154,7 @@ export default function GameNavbar() {
         setMilestones(data.playerMilestones)
         setCurrentWeekIndex(data.playerMilestones.length - 1) // Default to latest week
       })
-  }, [])
+  }, []);
 
   // Fetch milestone progress
   useEffect(() => {
@@ -194,17 +196,9 @@ export default function GameNavbar() {
     fetchProgress()
   }, [session, milestones, currentWeekIndex, supabase])
 
-  const formatWeekDisplay = (index: number) => {
-    const diff = milestones.length - 1 - index
-    if (diff === 0) return "Current Week"
-    if (diff === 1) return "Last Week"
-    return `${diff} Weeks Ago`
-  }
-
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-2">
       <div className="relative flex items-center justify-between rounded-lg backdrop-blur-md bg-black/30 border border-white/10 shadow-lg px-4 py-2">
-        {/* Logo */}
         <Link href="/" legacyBehavior>
               <a>
                 <img src="/planet.svg" alt="Logo" className="h-8 w-8 ml-1" />
@@ -288,91 +282,16 @@ export default function GameNavbar() {
             <span className="text-yellow-100 font-medium"><TotalPoints /></span>
           </div>
 
-          {/* Missions Button */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" className="relative group">
-                <Trophy className="h-5 w-5 text-amber-400 group-hover:text-amber-300 transition-colors" />
-                <span className="ml-2 text-white">Missions</span>
-                <Badge className="ml-1 bg-amber-600 hover:bg-amber-600 text-white">3</Badge>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0 bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border border-[#581c87] shadow-[0_0_15px_rgba(124,58,237,0.5)]">
-              <div className="p-4">
-                <h3 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] mb-4">
-                  Weekly Milestones
-                </h3>
+          <MissionsPopover 
+            userProgress={userProgress}
+          />
 
-                <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentWeekIndex(Math.max(0, currentWeekIndex - 1))}
-                    className="border-[#7e22ce] bg-[#1e293b] hover:bg-[#581c87] hover:text-white"
-                    disabled={currentWeekIndex === 0}
-                  >
-                    <ChevronDown className="w-4 h-4 mr-1 rotate-90" /> Previous
-                  </Button>
-                  <div className="text-lg font-semibold text-[#67e8f9] text-center">
-                    {milestones.length > 0 ? formatWeekDisplay(currentWeekIndex) : "Loading Week"}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentWeekIndex(Math.min(milestones.length - 1, currentWeekIndex + 1))}
-                    className="border-[#7e22ce] bg-[#1e293b] hover:bg-[#581c87] hover:text-white"
-                    disabled={currentWeekIndex >= milestones.length - 1}
-                  >
-                    Next <ChevronDown className="w-4 h-4 ml-1 -rotate-90" />
-                  </Button>
-                </div>
-
-                {milestones.length > 0 ? (
-                  <ul className="space-y-2">
-                    {milestones[currentWeekIndex]?.data.map((milestone: any, index: number) => (
-                      <li
-                        key={index}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between text-white gap-1"
-                      >
-                        <p className="truncate">{milestone.name}</p>
-                        <div className="text-xs text-gray-500 whitespace-nowrap">
-                          {userProgress[milestone.name] || 0}/{milestone.requiredCount} completed
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-center text-white">Loading milestones...</p>
-                )}
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          {/* Notifications Button */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" className="relative group">
-                <Bell className="h-5 w-5 text-blue-400 group-hover:text-blue-300 transition-colors" />
-                <span className="ml-2 text-white">Alerts</span>
-                {hasNewAlert && (
-                  <Badge className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-500 text-white h-5 w-5 flex items-center justify-center p-0 text-xs">
-                    {newNotificationsCount}
-                  </Badge>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0 bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border border-[#581c87] shadow-[0_0_15px_rgba(124,58,237,0.5)]">
-              <div className="p-4">
-                <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] mb-4">
-                  Daily Alert
-                </h2>
-                <div className="mt-4 text-center text-[#67e8f9] font-semibold">
-                  <p>{alertMessage}</p>
-                  <p className="mt-2 text-xs text-gray-500">Time remaining until next event: {timeRemaining}</p>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <AlertsDropdown
+            hasNewAlert={hasNewAlert}
+            newNotificationsCount={newNotificationsCount}
+            timeRemaining={timeRemaining}
+            alertMessage={alertMessage}
+          />
 
           {/* Tech Tree Button */}
           <Popover>

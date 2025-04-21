@@ -1,6 +1,7 @@
 "use client";
 
 import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
 import AlertComponent from "@/components/Structures/Missions/Milestones/Alerts/Alerts";
 import MilestoneTotalCompleted from "@/components/Structures/Missions/Milestones/Completed";
 import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
@@ -13,6 +14,12 @@ export default function TestPage() {
       {/* <MySettlementsLocations /> */}
       <MilestoneTotalCompleted />
       <TotalPoints />
+                  <WeatherEventStatus
+                    classificationId={40} 
+                    biome={'RockyHighlands'}
+                    biomass={0.01}
+                    density={3.5}
+                  />
     </div>
   );
 };
