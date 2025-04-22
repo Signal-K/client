@@ -24,6 +24,7 @@ import { Menu, Transition } from "@headlessui/react"
 import TotalPoints from "../Structures/Missions/Stardust/Total"
 import { MissionsPopover } from "./Navigation/MissionDropdown"
 import AlertsDropdown from "./Navigation/AlertsDropdown"
+import { StardustDropdown } from "./Navigation/StardustDropdown"
 
 // Sample data - replace with actual data in your implementation
 const techTree = [
@@ -277,10 +278,7 @@ export default function GameNavbar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-4">
           {/* Stardust Balance */}
-          <div className="flex items-center bg-white/5 rounded-full px-3 py-1 border border-yellow-500/30">
-            <Star className="h-4 w-4 text-yellow-400 mr-1" />
-            <span className="text-yellow-100 font-medium"><TotalPoints /></span>
-          </div>
+            <StardustDropdown />
 
           <MissionsPopover 
             userProgress={userProgress}

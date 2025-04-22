@@ -86,7 +86,7 @@ const AlertComponent = () => {
         setAlertMessage(message);
       } else {
         setAlertMessage("You've completed all classification goals this week!");
-      }
+      };
     };
 
     fetchAlert();

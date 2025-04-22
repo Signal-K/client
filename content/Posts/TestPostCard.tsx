@@ -66,6 +66,32 @@ export default function PostCard({
     
       return { radius: radius.toFixed(2), planetType };
     };
+
+    const calculatePlanetDensity = (stellarRadius: string, fluxDifferential: string) => {
+      const R_star = parseFloat(stellarRadius);
+      const deltaF = parseFloat(fluxDifferential);
+    
+      if (isNaN(R_star) || isNaN(deltaF) || deltaF <= 0) {
+        return { density: "", unit: "kg/m³" };
+      }
+    
+      const K = 0.414; // empirical constant for gas giants
+      const alpha = 2.06;
+      const pi = Math.PI;
+    
+      const M_earth = 5.972e24; // kg
+      const R_earth = 6.371e6; // m
+      const R_sun = 6.957e8; // m
+    
+      const Rp_solar = R_star * Math.sqrt(deltaF);
+      const Rp_meters = Rp_solar * R_sun;
+      const mass_earth = K * Math.pow((Rp_meters / R_earth), alpha);
+      const mass_kg = mass_earth * M_earth;
+      const volume = (4 / 3) * pi * Math.pow(Rp_meters, 3);
+      const density = mass_kg / volume;
+    
+      return { density: density.toFixed(2), unit: "kg/m³" };
+    };    
     
     const handleRadiusInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const value = e.target.value;
@@ -249,7 +275,45 @@ export default function PostCard({
       fetchComments();
     } catch (error: any) {
       console.error("Error inserting comment: ", error);
-    }
+    };
+  };
+
+  const handleAddDensityComment = async () => {
+    const densityInput1 = densityInputs[`${classificationId}-1`];
+    const densityInput2 = densityInputs[`${classificationId}-2`];
+
+    if (!densityInput1?.trim() || !densityInput2?.trim()) {
+      console.error("Both text areas must be filled");
+      return;
+    };
+
+    try {
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: `${densityInput1}\n\n${densityInput2}`,
+            classification_id: classificationId,
+            author: session?.user?.id,
+            configuration: { density: `${densityInput2}` },
+            surveyor: "TRUE",
+            value: densityInput2,
+            category: "Density",
+          },
+        ]);
+
+      if (error) throw error;
+
+      setDensityInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-1`]: "",
+        [`${classificationId}-2`]: "",
+      }));
+
+      fetchComments();
+    } catch (error) {
+      console.error("Error adding density comment:", error);
+    };
   };
 
   const handleAddTemperatureComment = async () => {
@@ -283,6 +347,7 @@ export default function PostCard({
         [`${classificationId}-1`]: "",
         [`${classificationId}-2`]: "",
       }));
+
       fetchComments();
     } catch (error) {
       console.error("Error adding temperature comment:", error);
@@ -324,45 +389,6 @@ export default function PostCard({
         console.error("Error inserting comment: ", error);
     };
 };
-
-  const handleAddDensityComment = async () => {
-    const densityInput1 = densityInputs[`${classificationId}-1`];
-    const densityInput2 = densityInputs[`${classificationId}-2`];
-  
-    if (!densityInput1?.trim() || !densityInput2?.trim()) {
-      console.error("Both text areas must be filled");
-      return;
-    }
-  
-    try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: `${densityInput1}\n\n${densityInput2}`,
-            classification_id: classificationId,
-            author: session?.user?.id,
-            configuration: { density: `${densityInput1}, ${densityInput2}` },
-            surveyor: "TRUE",
-            value: densityInput2,
-            category: "Density",
-          },
-        ]);
-  
-      if (error) throw error;
-  
-      setDensityInputs((prev) => ({
-        ...prev,
-        [`${classificationId}-1`]: "",
-        [`${classificationId}-2`]: "",
-      }));
-  
-      fetchComments();
-    } catch (error) {
-      console.error("Error adding density comment:", error);
-    };
-  };  
-
     // For sharing
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -602,6 +628,9 @@ export default function PostCard({
                         <SelectItem value="period" className="focus:bg-[#1e2834] focus:text-black">
                           Planet Orbital Period
                         </SelectItem>
+                        <SelectItem value="density" className="focus:bg-[#1e2834] focus:text-black">
+                          Planet Density
+                        </SelectItem>
                       </SelectContent>
                     </Select>
 
@@ -730,6 +759,8 @@ export default function PostCard({
           ? handleAddTemperatureComment
           : selectedCalculator === "radius"
           ? handleAddRadiusComment
+          : selectedCalculator === "density"
+          ? handleAddDensityComment
           : selectedCalculator === 'period'
           ? handleAddPeriodComment
           : handleAddComment

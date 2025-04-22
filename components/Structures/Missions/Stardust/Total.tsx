@@ -56,7 +56,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
             .eq("author", userId);
           total += count || 0;
         }
-
+ 
         setMilestonePoints(total);
       } catch (error) {
         console.error("Error fetching milestone points:", error);

@@ -35,7 +35,7 @@ export function MissionsPopover({
             <PopoverTrigger asChild>
                 <Button variant="ghost" className="text-white px-2">
                 <Trophy className="h-5 w-5 text-amber-400 group-hover:text-amber-300 transition-colors" />
-                <span className="ml-2 text-white">Missions</span>
+                <span className="ml-2 text-white">Milestones</span>
                 <Badge className="ml-1 bg-amber-600 hover:bg-amber-600 text-white">3</Badge>
                 </Button>
             </PopoverTrigger>
@@ -44,6 +44,9 @@ export function MissionsPopover({
                     <h3 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] mb-4">
                         Weekly Milestones    
                     </h3>
+                    <p className="text-sm text-gray-500 mb-2">
+                        Use the points you earn from these milestones to unlock new tech & upgrade your structures
+                    </p>
                     <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
                         <Button
                             variant='outline'
