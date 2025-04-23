@@ -92,6 +92,14 @@ export default function PostCard({
     
       return { density: density.toFixed(2), unit: "kg/m³" };
     };    
+
+    const handleDensityInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const value = e.target.value;
+      setDensityInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-1`]: value,
+      }));
+    }
     
     const handleRadiusInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const value = e.target.value;
@@ -637,7 +645,7 @@ export default function PostCard({
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1">
                         <label className="text-xs text-black/70">
-                          {selectedCalculator === "radius" ? "Stellar Radius (R☉)" : "Star Temperature (K)"}
+                          {selectedCalculator === "radius" || "density" ? "Stellar Radius (R☉)" : "Star Temperature (K)"}
                         </label>
                         <Input
                           value={calculatorInputs.input1}
@@ -649,7 +657,7 @@ export default function PostCard({
                       </div>
                       <div className="space-y-1">
                         <label className="text-xs text-black/70">
-                          {selectedCalculator === "radius" ? "Flux Differential" : "Orbital Period (Days)"}
+                          {selectedCalculator === "radius" || "density" ? "Flux Differential" : "Orbital Period (Days)"}
                         </label>
                         <Input
                           value={calculatorInputs.input2}
@@ -714,6 +722,37 @@ export default function PostCard({
         }
       />
     </>
+  )   : selectedCalculator === "density" ? (
+    <>
+      <Textarea
+        placeholder="Planet Mass (in Earth Masses)"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+        value={densityInputs[`${classificationId}-1`] || ""}
+        onChange={(e) =>
+          setDensityInputs((prev) => ({
+            ...prev,
+            [`${classificationId}-1`]: e.target.value,
+          }))
+        }
+      />
+      <Textarea
+        placeholder="Planet Radius (in Earth Radii)"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+        value={densityInputs[`${classificationId}-2`] || ""}
+        onChange={(e) =>
+          setDensityInputs((prev) => ({
+            ...prev,
+            [`${classificationId}-2`]: e.target.value,
+          }))
+        }
+      />
+      <Textarea
+        placeholder="Calculated Density (g/cm³)"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px] opacity-50"
+        value={densityInputs[`${classificationId}-3`] || ""}
+        readOnly
+      />
+    </>
   ) : selectedCalculator === "radius" ? (
     <>
       <Textarea
@@ -744,6 +783,15 @@ export default function PostCard({
         onChange={handlePeriodInputChange}
       />
     </>
+   ) : selectedCalculator ==='radius' ? (
+      <>
+        <Textarea
+          placeholder="General period discussion points."
+          className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+          value={periodInputs[`${classificationId}-1`] || ""}
+          onChange={handlePeriodInputChange}
+        />
+      </>
   ) : (
     <Textarea
       placeholder="Share your analysis or findings..."
