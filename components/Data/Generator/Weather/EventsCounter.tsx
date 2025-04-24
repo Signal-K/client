@@ -82,18 +82,20 @@ export default function WeatherEventStatus({
 
       const planetType = getPlanetType(density);
 
+      let newEventType: string | null = null;
+
       if (
         planetType === "terrestrial" &&
         biomass >= 0.000001 &&
         biomass <= 0.02 &&
         !lightningEventExists
       ) {
-        setNextEventType("lightning-kickoff");
-      } else if (hasEvent) {
-        setNextEventType(null);
-      } else {
-        setNextEventType("rain-general");
+        newEventType = "lightning-kickoff";
+      } else if (!hasEvent) {
+        newEventType = "rain-general";
       }
+
+      setNextEventType(newEventType);
 
       if (
         classificationId === 40 ||
@@ -110,6 +112,18 @@ export default function WeatherEventStatus({
         setUpcomingStormType(biomeToStormMap[biome]);
       } else {
         setUpcomingStormType(null);
+      }
+
+      // Create new event if needed
+      if (!hasEvent && (newEventType || biomeToStormMap[biome])) {
+        const eventType = newEventType ?? biomeToStormMap[biome];
+        await supabase.from("events").insert({
+          type: eventType,
+          classification_location: classificationId,
+          status: "pending",
+          time: new Date().toISOString(),
+        });
+        setHasEventThisWeek(true);
       }
     };
 
