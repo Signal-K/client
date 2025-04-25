@@ -431,5 +431,4 @@ export function getBiomeColors(biome: string): BiomeColors {
       mountain: "#E0E0E0", // Light gray
     }
   )
-}
-
+};

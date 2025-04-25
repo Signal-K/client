@@ -75,5 +75,5 @@ export function noise(x: number, y: number, z: number): number {
       v,
     ),
     w,
-  );
+  )
 };

@@ -11,7 +11,7 @@ interface UpgradeItemProps {
   onUpgrade: () => void;
   color: string;
   disabled?: boolean;
-}
+};
 
 export const UpgradeItem: React.FC<UpgradeItemProps> = ({
   title,
