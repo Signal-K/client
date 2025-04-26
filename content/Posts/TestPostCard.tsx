@@ -678,10 +678,18 @@ export default function PostCard({
                             [`${classificationId}-2`]: result.radius, 
                             [`${classificationId}-3`]: result.planetType, 
                           }));
+                        } else if (selectedCalculator === "density") {
+                          const result = calculatePlanetDensity(calculatorInputs.input1, calculatorInputs.input2);
+                          setCalculatorResult(result.density);
+                          setDensityInputs((prev) => ({
+                            ...prev,
+                            [`${classificationId}-2`]: result.density,
+                          }));
                         } else {
                           const result = calculatePlanetTemperature(calculatorInputs.input1, calculatorInputs.input2);
                           setCalculatorResult(result);
                         }
+                        
                       }}
                       className="w-full bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90"
                     >
@@ -774,6 +782,21 @@ export default function PostCard({
         readOnly
       />
     </>
+  ) : selectedCalculator === 'density' ? (
+    <>
+      <Textarea
+        placeholder="Enter Planet Mass (pM☉)..."
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+        value={densityInputs[`${classificationId}-1`] || ""}
+        onChange={handleDensityInputChange}
+      />
+      <Textarea
+        placeholder="Calculated Density"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px] opacity-50"
+        value={densityInputs[`${classificationId}-2`] || ""}
+        readOnly
+      />
+      </>
   ) : selectedCalculator ==='period' ? (
     <>
       <Textarea

@@ -7,6 +7,7 @@ import { StatCard } from "@/components/Research/StatCard";
 import { TechSection } from "@/components/Research/TechSection";
 import { UpgradeItem } from "@/components/Research/UpgradeItem";
 import { LockedItem } from "@/components/Research/LockedItem";
+import GameNavbar from "@/components/Layout/Tes";
 
 type CapacityKey =
   | "probeCount"
@@ -45,8 +46,10 @@ export default function TechTreeResearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a1929] text-[#c5d5e6] font-mono">
-      <header className="sticky top-0 z-10 bg-[#0a1929] border-b border-[#1e3a5f] p-4">
+    <div className="min-h-screen bg-[#0a1929] ">
+      <GameNavbar />
+    <div className="text-[#c5d5e6] font-mono">
+      <header className="sticky top-0 z-10 bg-[#0a1929] border-b border-[#1e3a5f] my-12 py-12 p-4">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold text-[#4cc9f0] tracking-wider">RESEARCH LAB</h1>
           <div className="flex items-center gap-4">
@@ -205,6 +208,7 @@ export default function TechTreeResearchPage() {
           </TechSection>
         </div>
       </main>
+    </div>
     </div>
   );
 };
