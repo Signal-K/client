@@ -65,8 +65,8 @@ export default function WeatherEventStatus({
 
       if (eventsError) {
         console.error("Error fetching weather events:", eventsError);
-        return;
-      }
+        return; 
+      };
 
       const hasEvent = events.length > 0;
       setHasEventThisWeek(hasEvent);
