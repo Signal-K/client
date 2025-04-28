@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export interface ResearchLevelInfo {
   level: number;
   description: string;
-}
+};
 
 const researchMappings: Record<string, ResearchLevelInfo[]> = {
   probecount: [
