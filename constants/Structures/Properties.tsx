@@ -39,6 +39,7 @@ import { GreenhouseResearchStations } from "@/components/Structures/Missions/Bio
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
 import CloudspottingOnMarsShapes from "@/components/Structures/Missions/Meteorologists/Cloudspotting/Shapes/ShapesOnMars";
 import SunspotSteps from "@/components/Projects/Telescopes/Sunspots/SunspotShell";
+import AstronomyResearch from "@/components/Research/AstronomyItems";
 
 interface IndividualStructureProps {
     name?: string;
@@ -165,8 +166,8 @@ export const StructuresConfig: StructureConfig = {
         },
         {
           icon: <Trophy className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Weekly goals",
-          dynamicComponent: <MilestoneCard />
+          text: "Upgrades",
+          dynamicComponent: <AstronomyResearch />
         },
         // {
         //   icon: <BarChart className="w-6 h-6 text-[#5e81ac]" />,

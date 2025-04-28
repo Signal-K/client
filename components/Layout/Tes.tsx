@@ -200,6 +200,7 @@ export default function GameNavbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-2">
       <div className="relative flex items-center justify-between rounded-lg backdrop-blur-md bg-black/30 border border-white/10 shadow-lg px-4 py-2">
+      <div className="flex items-center space-x-2">
         <Link href="/" legacyBehavior>
               <a>
                 <img src="/planet.svg" alt="Logo" className="h-8 w-8 ml-1" />
@@ -274,6 +275,7 @@ export default function GameNavbar() {
                 </Menu.Items>
               </Transition>
             </Menu>
+          </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-4">
@@ -315,7 +317,7 @@ export default function GameNavbar() {
                     </div>
                   ))}
                 </div>
-                <Button className="w-full bg-purple-600 hover:bg-purple-500 text-white">Full Tech Tree (Soon)</Button>
+                <Link href='/research'><Button className="w-full bg-purple-600 hover:bg-purple-500 text-white">Full Tech Tree</Button></Link>
               </div>
             </PopoverContent>
           </Popover>

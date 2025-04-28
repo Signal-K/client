@@ -6,6 +6,7 @@ import { GreenhouseResearchStations } from "./Missions/Biologists/ResearchStatio
 import MilestoneCard from "./Missions/Milestones/MilestoneCard";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 import { ClassificationsLastWeek } from "./Missions/Milestones/ClassificationNumber";
+import AstronomyResearch from "../Research/AstronomyItems";
 
 export interface IndividualStructureProps {
   name: string;
@@ -228,7 +229,10 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
               {name !== 'Telescope' ? (
                 <MilestoneCard />
               ) : (
-                <MySettlementsLocations />
+                <>
+                  <MySettlementsLocations />
+                  {/* <AstronomyResearch /> */}
+                </>
               )}
             </div>
             <div className="flex flex-col items-center my-4 space-y-4">

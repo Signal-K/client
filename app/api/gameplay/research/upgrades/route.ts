@@ -1,22 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export interface ItemUpgrade {
-  id: number;
-  name: string;
+export interface ResearchLevelInfo {
+  level: number;
   description: string;
-  cost?: number;
-  icon_url: string;
-  parentItem?: number | null;
-  locationType?: string;
-  gif?: string;
+}
+
+const researchMappings: Record<string, ResearchLevelInfo[]> = {
+  probecount: [
+    { level: 1, description: '1 Probe' },
+    { level: 2, description: '2 Probes' },
+    { level: 3, description: '3 Probes' },
+  ],
+  proberange: [
+    { level: 1, description: '100 Lightyears' },
+    { level: 2, description: '500 Lightyears' },
+    { level: 3, description: '1,000 Lightyears' },
+    { level: 4, description: '5,000 Lightyears' },
+    { level: 5, description: '10,000 Lightyears' },
+  ],
+  telescopepower: [
+    { level: 1, description: 'Basic Magnification' },
+    { level: 2, description: 'Medium Magnification' },
+    { level: 3, description: 'High Magnification' },
+    { level: 4, description: 'Ultra Deep Field' },
+  ],
 };
 
-const itemUpgrades: ItemUpgrade[] = [
-    { id: 1, name: 'Telescope', description: 'A basic telescope for observing celestial objects.', cost: 100, icon_url: '/assets/Items/Telescope.png', parentItem: null, locationType: 'Orbit' },
-    { id: 2, name: 'Advanced Telescope', description: 'An advanced telescope with enhanced capabilities.', cost: 500, icon_url: '/assets/Items/AdvancedTelescope.png', parentItem: 1, locationType: 'Orbit' },
-    { id: 3, name: 'Space Probe', description: 'A probe designed for deep space exploration.', cost: 1000, icon_url: '/assets/Items/SpaceProbe.png', parentItem: null, locationType: 'Orbit' },
-];
-
 export async function GET(req: NextRequest) {
-  return NextResponse.json(itemUpgrades);
+  const { searchParams } = new URL(req.url);
+  const techType = searchParams.get('techType');
+  const countStr = searchParams.get('count');
+
+  if (!techType || !countStr) {
+    return NextResponse.json({ error: 'Missing techType or count' }, { status: 400 });
+  }
+
+  const count = parseInt(countStr, 10);
+  const levels = researchMappings[techType];
+
+  if (!levels) {
+    return NextResponse.json({ error: 'Invalid techType' }, { status: 400 });
+  }
+
+  const matchedLevel = levels.find((l) => l.level === count) || levels[levels.length - 1];
+
+  return NextResponse.json({
+    techType,
+    count,
+    description: matchedLevel.description,
+  });
 };
