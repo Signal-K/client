@@ -7,7 +7,7 @@ import { differenceInSeconds, startOfWeek } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import EventList from "./RecentEvents";
 
-const TIMEZONE = 'Australia/Melbourne';
+const TIMEZONE = 'Australia/Melbourne'; 
 
 const biomeToStormMap: Record<string, string> = {
   "RockyHighlands": "Dust Storm",

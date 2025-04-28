@@ -44,8 +44,8 @@ export default function AstronomyResearch() {
           },
         ]);
         fetchResearchData(); // Re-fetch after upgrade
-      }
-    }
+      };
+    };
   };
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function AstronomyResearch() {
       setProbeRangeDescription(data.description);
     } catch (err) {
       console.error("Error fetching research data:", err);
-    }
+    };
   };
 
   return (

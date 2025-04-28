@@ -37,7 +37,7 @@ interface EventData {
   eventCount: number;
   redeemed: boolean;
   nextEventType: string | null;
-}
+};
 
 export default function WeatherEventsOverview({
   classificationInfo,
@@ -65,7 +65,7 @@ export default function WeatherEventsOverview({
       if (error) {
         console.error("Error fetching events:", error);
         return;
-      }
+      };
 
       const grouped: Record<number, { count: number; redeemed: boolean; nextEventType: string | null }> = {};
 
