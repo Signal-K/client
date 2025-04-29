@@ -126,3 +126,12 @@ export default function MeteorologyResearch() {
         </>
     );
 };
+
+/*
+Add weather balloons to monitor atmospheric conditions
+
+Weather Balloons on Settlements
+
+Deploy weather monitoring on your settlements
+
+*/

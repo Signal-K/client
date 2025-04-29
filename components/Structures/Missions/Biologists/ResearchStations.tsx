@@ -190,12 +190,13 @@ export function GreenhouseResearchStations() {
 
   return (
 <div className="min-h-screen bg-gray-900">
- {!activeStation &&  (   <div className="container mx-auto px-4 py-8">
+ {!activeStation &&  (   <div className="flex justify-center px-4 py-8">
+  <div className="w-full max-w-5xl space-y-8">
+
         {/* Other content */}
-        <div className="grid lg:grid-cols-[2fr,1fr] gap-8">
           <div className="space-y-8">
             {/* Available Stations */}
-            <section>
+            <section className=""> 
               <h2 className="text-2xl font-semibold mb-4 text-blue-400">Available Stations</h2>
               <div className="grid gap-6">
                 {buildableStations.map((station) => (
@@ -225,14 +226,15 @@ export function GreenhouseResearchStations() {
                 </div>
               </section>
             )}
+
+            <div className="py-2"><BiomassStats /></div>
           </div>
 
-          <div className="lg:border-l lg:border-gray-800 lg:pl-8">
+          {/* <div className="lg:border-l lg:border-gray-800 lg:pl-8"> */}
             {/* <Milestones milestones={milestones} /> */}
             {/* <div className="py-2"><ClassificationStats /></div> */}
-            <div className="py-2"><BiomassStats /></div>
-            <div className="py-2"><MilestoneCard /></div>
-          </div>
+            
+          {/* </div> */}
         </div>
       </div>
   )}
