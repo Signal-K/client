@@ -6,6 +6,8 @@ import AstronomyResearch from "@/components/Research/AstronomyItems";
 import MeteorologyResearch from "@/components/Research/MeteorologyItems";
 import BiologyResearch from "@/components/Research/BiologyItems";
 import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 type CapacityKey =
   | "probeCount"
@@ -70,6 +72,11 @@ export default function TechTreeResearchPage() {
             <MeteorologyResearch />
             <BiologyResearch />
           </div>
+          <Link href='/'><Button
+                className="text-white border-[#1e3a5f]"
+            >
+                Home
+            </Button></Link>
         </main>
       </div>
     </div>
