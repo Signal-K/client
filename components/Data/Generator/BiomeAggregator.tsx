@@ -91,6 +91,13 @@ const weatherByBiome: Record<string, string[]> = {
   "barren jungle": ["Sparse Rain", "Occasional Winds"],
   "sparse desert": ["Dust Storms", "Occasional Winds"],
   "empty ocean": ["Calm Seas", "Occasional Winds"],
+  "basalt plains": ["Rain", "Dust Storms", "Occasional Thunder"],
+  "sediment flats": ["Rain", "Flash Floods", "Hail"],
+  "cratered terrain": ["Dust Storms", "Impact Events", "Seismic Activity"],
+  "tundra basin": ["Snow", "Permafrost Winds", "Ice Storms"],
+  "flood basin": ["Flooding", "Heavy Rain", "Thunderstorms"],
+  "coral reefs": ["Tropical Storms", "Tsunamis", "Heavy Rain"],
+  "dune fields": ["Sandstorms", "Ion Storms", "High Wind Gusts"],
 };
 
 const biomeTraits: Record<string, string[]> = {

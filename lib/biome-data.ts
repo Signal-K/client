@@ -14,7 +14,7 @@ export interface BiomeRanges {
 
 export interface BiomeData {
   [key: string]: BiomeRanges
-}
+};
 
 export const biomeData: BiomeData = {
   "Rocky Highlands": {
@@ -212,11 +212,11 @@ export const biomeData: BiomeData = {
     volcanicActivity: [0.0, 0.3],
     surfaceDeposits: ["Fine Sand", "Wind-Driven Erosion"],
   },
-}
+};
 
 export function getSurfaceDeposits(biome: string): string[] {
   return biomeData[biome]?.surfaceDeposits || ["Unknown"]
-}
+};
 
 export function getParameterRange(biome: string, parameter: keyof BiomeRanges): [number, number] {
   if (!biomeData[biome] || !biomeData[biome][parameter]) {
