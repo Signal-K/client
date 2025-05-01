@@ -15,12 +15,12 @@ interface WeatherSettings {
   clouds: boolean
   sun: boolean
   lightning: boolean
-}
+};
 
 interface WeatherGeneratorProps {
   biome?: string
   settings?: WeatherSettings
-}
+};
 
 const defaultSettings: WeatherSettings = {
   rain: false,
@@ -29,7 +29,7 @@ const defaultSettings: WeatherSettings = {
   clouds: true,
   sun: true,
   lightning: false,
-}
+};
 
 // Convert kebab-case to Title Case
 function formatBiomeName(name: string): string {
@@ -38,12 +38,12 @@ function formatBiomeName(name: string): string {
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ")
-}
+};
 
 // Convert Title Case to kebab-case
 function kebabCase(name: string): string {
   return name.toLowerCase().replace(/\s+/g, "-")
-}
+};
 
 // Function to determine weather settings based on biome data
 function getWeatherSettingsForBiome(biomeName: string): WeatherSettings {

@@ -28,9 +28,34 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
   const [planktonPoints, setPlanktonPoints] = useState(0);
   const [cloudspottingPoints, setCloudspottingPoints] = useState(0);
   const [milestonePoints, setMilestonePoints] = useState(0);
+  const [researchedPenalty, setResearchedPenalty] = useState(0);
 
   useEffect(() => {
     if (!session?.user) return;
+
+    const fetchResearchedPenalty = async () => {
+      try {
+        const { data: researchedEntries, error } = await supabase
+          .from("researched")
+          .select("*")
+          .eq("user_id", session.user.id);
+
+        if (error) {
+          console.error("Error fetching researched entries:", error);
+          return;
+        }
+
+        const penalty = (researchedEntries?.length || 0) * 2;
+
+        researchedEntries?.forEach((entry) => {
+          console.log(`Researched entry ${entry.id}: subtracting 2 points.`);
+        });
+
+        setResearchedPenalty(penalty);
+      } catch (err) {
+        console.error("Error in researched penalty calculation:", err);
+      }
+    };
 
     const fetchMilestonePoints = async () => {
       try {
@@ -46,7 +71,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
 
         let total = 0;
         for (const milestone of currentWeek.data) {
-          const { table, field, value, name } = milestone;
+          const { table, field, value } = milestone;
           const { count } = await supabase
             .from(table)
             .select("*", { count: "exact" })
@@ -56,7 +81,6 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
             .eq("author", userId);
           total += count || 0;
         }
-
         setMilestonePoints(total);
       } catch (error) {
         console.error("Error fetching milestone points:", error);
@@ -71,23 +95,14 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
           .eq("classificationtype", "planet")
           .eq("author", session.user.id);
 
-        const missionPoints = {
-          1: 2,
-          2: 1,
-          3: 2,
-          4: 1,
-          5: 1,
-        };
+        const missionPoints = { 1: 2, 2: 1, 3: 2, 4: 1, 5: 1 };
 
         const mission1CompletedCount = classificationsData?.length ?? 0;
         const mission2CompletedCount = classificationsData?.filter((classification) => {
           const config = classification.classificationConfiguration;
           if (!config) return false;
           const options = config.classificationOptions?.[""] || {};
-          return (
-            !options["1"] &&
-            (options["2"] || options["3"] || options["4"])
-          );
+          return !options["1"] && (options["2"] || options["3"] || options["4"]);
         }).length ?? 0;
 
         const { data: commentsData } = await supabase
@@ -289,6 +304,7 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
       setCloudspottingPoints(mission1Points + mission2Points + mission3Points);
     };
 
+    fetchResearchedPenalty();
     fetchPlanetHuntersPoints();
     fetchDailyMinorPlanetPoints();
     fetchAi4MPoints();
@@ -306,7 +322,8 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
     jvhPoints +
     cloudspottingPoints +
     planktonPoints +
-    milestonePoints;
+    milestonePoints -
+    researchedPenalty;
 
   useEffect(() => {
     if (onPointsUpdate) onPointsUpdate(totalPoints);
@@ -339,35 +356,8 @@ const TotalPoints: React.FC<TotalPointsProps> = ({ onPointsUpdate, onExport }) =
   ]);
 
   return (
-    // <div className="bg-gray-900 p-6 rounded-lg text-white space-y-6">
-      <h1 className="text-md">{totalPoints}</h1>
-    );
-
-      {/* <div>
-        <h2 className="text-lg font-semibold text-indigo-400 mb-2">Astronomy</h2>
-        <ul className="space-y-1 pl-4">
-          <li>🔭 Planet Hunters: {planetHuntersPoints}</li>
-          <li>🌌 Daily Minor Planets: {dailyMinorPlanetPoints}</li>
-          <li>🧠 AI4M (AI for Mars): {ai4mPoints}</li>
-          <li>🪐 Planet Four: {planetFourPoints}</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2 className="text-lg font-semibold text-blue-400 mb-2">Meteorology</h2>
-        <ul className="space-y-1 pl-4">
-          <li>☁️ Cloudspotting: {cloudspottingPoints}</li>
-          <li>🌀 Jovian Vortex Hunter: {jvhPoints}</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2 className="text-lg font-semibold text-green-400 mb-2">Biology</h2>
-        <ul className="space-y-1 pl-4">
-          <li>🧫 Plankton Detectives: {planktonPoints}</li>
-        </ul>
-      </div>
-    </div> */}
+    <h1 className="text-md">{totalPoints}</h1>
+  );
 };
 
 export default TotalPoints;

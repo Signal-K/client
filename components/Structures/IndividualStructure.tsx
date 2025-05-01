@@ -6,6 +6,7 @@ import { GreenhouseResearchStations } from "./Missions/Biologists/ResearchStatio
 import MilestoneCard from "./Missions/Milestones/MilestoneCard";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 import { ClassificationsLastWeek } from "./Missions/Milestones/ClassificationNumber";
+import AstronomyResearch from "../Research/AstronomyItems";
 
 export interface IndividualStructureProps {
   name: string;
@@ -199,7 +200,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                 </div>
               ))}
             </div>
-            <div className="grid grid-cols-2 gap-4 mt-6">
+            <div className="gap-4 mt-6">
               <div className="flex flex-col items-center my-4 space-y-4">
                 {buttons.map((button, index) => (
                   button.showInNoModal !== false && (
@@ -224,12 +225,6 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
                   )
                 ))}
               </div>
-              {/* <p>{name}</p> */}
-              {name !== 'Telescope' ? (
-                <MilestoneCard />
-              ) : (
-                <MySettlementsLocations />
-              )}
             </div>
             <div className="flex flex-col items-center my-4 space-y-4">
               {modals && modals.length > 0 && modals.map((modal, index) => (

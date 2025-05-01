@@ -66,6 +66,40 @@ export default function PostCard({
     
       return { radius: radius.toFixed(2), planetType };
     };
+
+    const calculatePlanetDensity = (stellarRadius: string, fluxDifferential: string) => {
+      const R_star = parseFloat(stellarRadius);
+      const deltaF = parseFloat(fluxDifferential);
+    
+      if (isNaN(R_star) || isNaN(deltaF) || deltaF <= 0) {
+        return { density: "", unit: "kg/m³" };
+      }
+    
+      const K = 0.414; // empirical constant for gas giants
+      const alpha = 2.06;
+      const pi = Math.PI;
+    
+      const M_earth = 5.972e24; // kg
+      const R_earth = 6.371e6; // m
+      const R_sun = 6.957e8; // m
+    
+      const Rp_solar = R_star * Math.sqrt(deltaF);
+      const Rp_meters = Rp_solar * R_sun;
+      const mass_earth = K * Math.pow((Rp_meters / R_earth), alpha);
+      const mass_kg = mass_earth * M_earth;
+      const volume = (4 / 3) * pi * Math.pow(Rp_meters, 3);
+      const density = mass_kg / volume;
+    
+      return { density: density.toFixed(2), unit: "kg/m³" };
+    };    
+
+    const handleDensityInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const value = e.target.value;
+      setDensityInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-1`]: value,
+      }));
+    }
     
     const handleRadiusInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const value = e.target.value;
@@ -249,7 +283,45 @@ export default function PostCard({
       fetchComments();
     } catch (error: any) {
       console.error("Error inserting comment: ", error);
-    }
+    };
+  };
+
+  const handleAddDensityComment = async () => {
+    const densityInput1 = densityInputs[`${classificationId}-1`];
+    const densityInput2 = densityInputs[`${classificationId}-2`];
+
+    if (!densityInput1?.trim() || !densityInput2?.trim()) {
+      console.error("Both text areas must be filled");
+      return;
+    };
+
+    try {
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: `${densityInput1}\n\n${densityInput2}`,
+            classification_id: classificationId,
+            author: session?.user?.id,
+            configuration: { density: `${densityInput2}` },
+            surveyor: "TRUE",
+            value: densityInput2,
+            category: "Density",
+          },
+        ]);
+
+      if (error) throw error;
+
+      setDensityInputs((prev) => ({
+        ...prev,
+        [`${classificationId}-1`]: "",
+        [`${classificationId}-2`]: "",
+      }));
+
+      fetchComments();
+    } catch (error) {
+      console.error("Error adding density comment:", error);
+    };
   };
 
   const handleAddTemperatureComment = async () => {
@@ -283,6 +355,7 @@ export default function PostCard({
         [`${classificationId}-1`]: "",
         [`${classificationId}-2`]: "",
       }));
+
       fetchComments();
     } catch (error) {
       console.error("Error adding temperature comment:", error);
@@ -324,45 +397,6 @@ export default function PostCard({
         console.error("Error inserting comment: ", error);
     };
 };
-
-  const handleAddDensityComment = async () => {
-    const densityInput1 = densityInputs[`${classificationId}-1`];
-    const densityInput2 = densityInputs[`${classificationId}-2`];
-  
-    if (!densityInput1?.trim() || !densityInput2?.trim()) {
-      console.error("Both text areas must be filled");
-      return;
-    }
-  
-    try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: `${densityInput1}\n\n${densityInput2}`,
-            classification_id: classificationId,
-            author: session?.user?.id,
-            configuration: { density: `${densityInput1}, ${densityInput2}` },
-            surveyor: "TRUE",
-            value: densityInput2,
-            category: "Density",
-          },
-        ]);
-  
-      if (error) throw error;
-  
-      setDensityInputs((prev) => ({
-        ...prev,
-        [`${classificationId}-1`]: "",
-        [`${classificationId}-2`]: "",
-      }));
-  
-      fetchComments();
-    } catch (error) {
-      console.error("Error adding density comment:", error);
-    };
-  };  
-
     // For sharing
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -602,13 +636,16 @@ export default function PostCard({
                         <SelectItem value="period" className="focus:bg-[#1e2834] focus:text-black">
                           Planet Orbital Period
                         </SelectItem>
+                        <SelectItem value="density" className="focus:bg-[#1e2834] focus:text-black">
+                          Planet Density
+                        </SelectItem>
                       </SelectContent>
                     </Select>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1">
                         <label className="text-xs text-black/70">
-                          {selectedCalculator === "radius" ? "Stellar Radius (R☉)" : "Star Temperature (K)"}
+                          {selectedCalculator === "radius" || "density" ? "Stellar Radius (R☉)" : "Star Temperature (K)"}
                         </label>
                         <Input
                           value={calculatorInputs.input1}
@@ -620,7 +657,7 @@ export default function PostCard({
                       </div>
                       <div className="space-y-1">
                         <label className="text-xs text-black/70">
-                          {selectedCalculator === "radius" ? "Flux Differential" : "Orbital Period (Days)"}
+                          {selectedCalculator === "radius" || "density" ? "Flux Differential" : "Orbital Period (Days)"}
                         </label>
                         <Input
                           value={calculatorInputs.input2}
@@ -641,10 +678,18 @@ export default function PostCard({
                             [`${classificationId}-2`]: result.radius, 
                             [`${classificationId}-3`]: result.planetType, 
                           }));
+                        } else if (selectedCalculator === "density") {
+                          const result = calculatePlanetDensity(calculatorInputs.input1, calculatorInputs.input2);
+                          setCalculatorResult(result.density);
+                          setDensityInputs((prev) => ({
+                            ...prev,
+                            [`${classificationId}-2`]: result.density,
+                          }));
                         } else {
                           const result = calculatePlanetTemperature(calculatorInputs.input1, calculatorInputs.input2);
                           setCalculatorResult(result);
                         }
+                        
                       }}
                       className="w-full bg-[#5FCBC3] text-[#2C3A4A] hover:bg-[#5FCBC3]/90"
                     >
@@ -685,6 +730,37 @@ export default function PostCard({
         }
       />
     </>
+  )   : selectedCalculator === "density" ? (
+    <>
+      <Textarea
+        placeholder="Planet Mass (in Earth Masses)"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+        value={densityInputs[`${classificationId}-1`] || ""}
+        onChange={(e) =>
+          setDensityInputs((prev) => ({
+            ...prev,
+            [`${classificationId}-1`]: e.target.value,
+          }))
+        }
+      />
+      <Textarea
+        placeholder="Planet Radius (in Earth Radii)"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+        value={densityInputs[`${classificationId}-2`] || ""}
+        onChange={(e) =>
+          setDensityInputs((prev) => ({
+            ...prev,
+            [`${classificationId}-2`]: e.target.value,
+          }))
+        }
+      />
+      <Textarea
+        placeholder="Calculated Density (g/cm³)"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px] opacity-50"
+        value={densityInputs[`${classificationId}-3`] || ""}
+        readOnly
+      />
+    </>
   ) : selectedCalculator === "radius" ? (
     <>
       <Textarea
@@ -706,6 +782,21 @@ export default function PostCard({
         readOnly
       />
     </>
+  ) : selectedCalculator === 'density' ? (
+    <>
+      <Textarea
+        placeholder="Enter Planet Mass (pM☉)..."
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+        value={densityInputs[`${classificationId}-1`] || ""}
+        onChange={handleDensityInputChange}
+      />
+      <Textarea
+        placeholder="Calculated Density"
+        className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px] opacity-50"
+        value={densityInputs[`${classificationId}-2`] || ""}
+        readOnly
+      />
+      </>
   ) : selectedCalculator ==='period' ? (
     <>
       <Textarea
@@ -715,6 +806,15 @@ export default function PostCard({
         onChange={handlePeriodInputChange}
       />
     </>
+   ) : selectedCalculator ==='radius' ? (
+      <>
+        <Textarea
+          placeholder="General period discussion points."
+          className="bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#2C3A4A] min-h-[80px]"
+          value={periodInputs[`${classificationId}-1`] || ""}
+          onChange={handlePeriodInputChange}
+        />
+      </>
   ) : (
     <Textarea
       placeholder="Share your analysis or findings..."
@@ -730,6 +830,8 @@ export default function PostCard({
           ? handleAddTemperatureComment
           : selectedCalculator === "radius"
           ? handleAddRadiusComment
+          : selectedCalculator === "density"
+          ? handleAddDensityComment
           : selectedCalculator === 'period'
           ? handleAddPeriodComment
           : handleAddComment

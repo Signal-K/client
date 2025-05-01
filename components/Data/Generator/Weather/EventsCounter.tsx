@@ -5,8 +5,9 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Button } from "@/components/ui/button";
 import { differenceInSeconds, startOfWeek } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import EventList from "./RecentEvents";
 
-const TIMEZONE = 'Australia/Melbourne';
+const TIMEZONE = 'Australia/Melbourne'; 
 
 const biomeToStormMap: Record<string, string> = {
   "RockyHighlands": "Dust Storm",
@@ -27,20 +28,29 @@ const biomeToStormMap: Record<string, string> = {
   "Dune Fields": "Heatwave",
 };
 
+function getPlanetType(density: number): "terrestrial" | "gaseous" | "ocean" {
+  if (density >= 3.5) return "terrestrial";
+  if (density < 1.5) return "gaseous";
+  return "ocean";
+};
+
 export default function WeatherEventStatus({
   classificationId,
   biome,
   biomass,
+  density,
 }: {
   classificationId: number;
+  density: number;
   biome: string;
   biomass: number;
 }) {
   const supabase = useSupabaseClient();
   const [hasEventThisWeek, setHasEventThisWeek] = useState<boolean | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(0);
-  const [upcomingStormType, setUpcomingStormType] = useState<string | null>(null);
+  const [nextEventType, setNextEventType] = useState<string | null>(null);
   const [bacteriumVisible, setBacteriumVisible] = useState<boolean>(false);
+  const [upcomingStormType, setUpcomingStormType] = useState<string | null>(null);
 
   useEffect(() => {
     const checkWeatherEvent = async () => {
@@ -55,25 +65,41 @@ export default function WeatherEventStatus({
 
       if (eventsError) {
         console.error("Error fetching weather events:", eventsError);
-        return;
-      }
+        return; 
+      };
 
       const hasEvent = events.length > 0;
       setHasEventThisWeek(hasEvent);
 
+      const lightningEventExists = events.some(e =>
+        e.type?.toLowerCase().includes("lightning")
+      );
+
       const pendingStorm = events.find(e =>
-        e.status === 'pending' &&
-        (e.type?.toLowerCase().includes('storm') || e.type?.toLowerCase().includes('weather'))
+        e.status === "pending" &&
+        (e.type?.toLowerCase().includes("storm") || e.type?.toLowerCase().includes("weather"))
       );
 
-      const lightningEvent = events.find(e =>
-        e.type?.toLowerCase().includes('lightning')
-      );
+      const planetType = getPlanetType(density);
 
-      // Handle bacteria spawn logic
+      let newEventType: string | null = null;
+
+      if (
+        planetType === "terrestrial" &&
+        biomass >= 0.000001 &&
+        biomass <= 0.02 &&
+        !lightningEventExists
+      ) {
+        newEventType = "lightning-kickoff";
+      } else if (!hasEvent) {
+        newEventType = "rain-general";
+      }
+
+      setNextEventType(newEventType);
+
       if (
         classificationId === 40 ||
-        (lightningEvent && biomass > 0.01 && biomass < 0.2)
+        (lightningEventExists && biomass > 0.01 && biomass < 0.2)
       ) {
         setBacteriumVisible(true);
       } else {
@@ -87,13 +113,25 @@ export default function WeatherEventStatus({
       } else {
         setUpcomingStormType(null);
       }
+
+      // Create new event if needed
+      if (!hasEvent && (newEventType || biomeToStormMap[biome])) {
+        const eventType = newEventType ?? biomeToStormMap[biome];
+        await supabase.from("events").insert({
+          type: eventType,
+          classification_location: classificationId,
+          status: "pending",
+          time: new Date().toISOString(),
+        });
+        setHasEventThisWeek(true);
+      }
     };
 
     checkWeatherEvent();
-  }, [classificationId, biome, biomass]);
+  }, [classificationId, biome, biomass, density]);
 
   useEffect(() => {
-    if (hasEventThisWeek === false) return;
+    if (hasEventThisWeek !== true) return;
 
     const interval = setInterval(() => {
       const now = toZonedTime(new Date(), TIMEZONE);
@@ -120,7 +158,7 @@ export default function WeatherEventStatus({
         Wait {h}:{m}:{s} for new weather event
       </div>
     );
-  }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
@@ -139,9 +177,21 @@ export default function WeatherEventStatus({
         </div>
       )}
 
-      <Button className="bg-yellow-400 text-black hover:bg-yellow-500">
-        Upcoming storm...view {upcomingStormType}
-      </Button>
+      {nextEventType && (
+        <Button className="bg-yellow-400 text-black hover:bg-yellow-500">
+          Next event: {nextEventType}
+        </Button>
+      )}
+
+      {upcomingStormType && (
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          Upcoming storm...view {upcomingStormType}
+        </Button>
+      )}
+
+      {biomass}
+
+      <EventList classificationId={classificationId} />
     </div>
   );
 };

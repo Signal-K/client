@@ -12,12 +12,12 @@ interface Milestone {
     field: "classificationtype" | "category";
     value: string;
     requiredCount: number;
-};
+}
 
 interface WeekMilestones {
     weekStart: string;
     data: Milestone[];
-};
+}
 
 export default function MilestoneCard() {
     const supabase = useSupabaseClient();
@@ -36,7 +36,7 @@ export default function MilestoneCard() {
             .then((data) => {
                 setMilestones(data.playerMilestones);
                 setCommunityMilestones(data.communityMilestones);
-                setCurrentWeekIndex(data.playerMilestones.length - 1); // Default to latest week
+                setCurrentWeekIndex(data.playerMilestones.length - 1);
             });
     }, []);
 
@@ -81,8 +81,8 @@ export default function MilestoneCard() {
             }
         };
 
-        fetchProgress(false); // Player milestones
-        fetchProgress(true);  // Community milestones
+        fetchProgress(false);
+        fetchProgress(true);
     }, [session, milestones, communityMilestones, currentWeekIndex]);
 
     const handleNextWeek = () => {
@@ -105,19 +105,19 @@ export default function MilestoneCard() {
 
     return (
         <div className="w-full max-w-4xl mx-auto p-4 bg-gradient-to-b from-[#0f172a] to-[#020617] text-white rounded-lg shadow-[0_0_15px_rgba(124,58,237,0.5)] border border-[#581c87]">
-            <Tabs defaultValue="player" onValueChange={(val) => setActiveTab(val as "player" | "community")}>
+            <Tabs defaultValue="player" value={activeTab} onValueChange={(val) => setActiveTab(val as "player" | "community")}>
                 <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-2">
                     <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7]">
                         Weekly Milestones
                     </h2>
-                    {/* <TabsList className="bg-[#1e293b] border border-[#6b21a8] w-full sm:w-auto">
+                    <TabsList className="bg-[#1e293b] border border-[#6b21a8] w-full sm:w-auto">
                         <TabsTrigger value="player" className="data-[state=active]:bg-[#581c87] data-[state=active]:text-white w-1/2 sm:w-auto">
                             Yours
                         </TabsTrigger>
                         <TabsTrigger value="community" className="data-[state=active]:bg-[#581c87] data-[state=active]:text-white w-1/2 sm:w-auto">
                             Community
                         </TabsTrigger>
-                    </TabsList> */}
+                    </TabsList>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
@@ -147,7 +147,7 @@ export default function MilestoneCard() {
                 <TabsContent value="player" className="mt-0">
                     {milestones.length > 0 ? (
                         <ul className="space-y-2">
-                            {milestones[currentWeekIndex].data.map((milestone, index) => (
+                            {milestones[currentWeekIndex]?.data.map((milestone, index) => (
                                 <li key={index} className="flex flex-col sm:flex-row sm:items-center justify-between text-white gap-1">
                                     <p className="truncate">{milestone.name}</p>
                                     <div className="text-xs text-gray-500 whitespace-nowrap">
@@ -164,7 +164,7 @@ export default function MilestoneCard() {
                 <TabsContent value="community" className="mt-0">
                     {communityMilestones.length > 0 ? (
                         <ul className="space-y-2">
-                            {communityMilestones[currentWeekIndex].data.map((milestone, index) => (
+                            {communityMilestones[currentWeekIndex]?.data.map((milestone, index) => (
                                 <li key={index} className="flex flex-col sm:flex-row sm:items-center justify-between text-white gap-1">
                                     <p className="truncate">{milestone.name}</p>
                                     <div className="text-xs text-gray-500 whitespace-nowrap">

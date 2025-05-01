@@ -1,4 +1,4 @@
-import * as THREE from "three"
+import * as THREE from "three";
 
 export interface Landmark {
   classification_id: string
@@ -11,6 +11,7 @@ export interface Landmark {
     z: number
   }
   events?: LandmarkEvent[] // New field for replayable events
+  structures?: LandmarkStructure[] // New field for 3D structures
   influence_type?:
     | "crater"
     | "mountain"
@@ -30,10 +31,13 @@ export interface Landmark {
     | "canyon"
     | "ocean_ridge"
     | "trench"
+    | "ice_patch"
+    | "lava_flow"
   influence_radius?: number
   influence_strength?: number
   influence_roughness?: number
   category?: "terrestrial" | "gaseous" // New field to categorize landmarks
+  isActive?: boolean
 }
 
 export interface LandmarkEvent {
@@ -45,8 +49,25 @@ export interface LandmarkEvent {
   // Additional fields can be added for event configuration
 }
 
-export interface PlanetStats {
+// Add this interface after the LandmarkEvent interface
+export interface LandmarkStructure {
+  id: string
   type: string
+  name: string
+  description?: string
+  scale: { x: number; y: number; z: number }
+  position: { x: number; y: number; z: number }
+  rotation: { x: number; y: number; z: number }
+  color: string
+  emissive?: string
+  emissiveIntensity?: number
+  metalness?: number
+  roughness?: number
+  opacity?: number
+  wireframe?: boolean
+}
+
+export interface PlanetStats {
   mass: number
   radius: number
   density?: number
@@ -116,7 +137,6 @@ export const defaultPlanetStats: PlanetStats = {
       category: "terrestrial", // Add category
     },
   ],
-  type: ""
 }
 
 export function calculateDensity(mass: number, radius: number): number {
@@ -156,7 +176,7 @@ export enum TerrainType {
   Beach = 1,
   Regular = 2,
   Mountain = 3,
-};
+}
 
 export function getSoilTextureParams(texture: string): {
   scale: number
@@ -164,7 +184,7 @@ export function getSoilTextureParams(texture: string): {
   irregularity: number
   pattern: "noise" | "cracks" | "layers" | "crystals" | "pores" | "grains"
 } {
-  const params: Record<string, { scale: number; depth: number; irregularity: number; pattern: "noise" | "cracks" | "layers" | "crystals" | "pores" | "grains" }> = {
+  const params: Record<string, { scale: number; depth: number; irregularity: number; pattern: "layers" | "noise" | "cracks" | "crystals" | "pores" | "grains" }> = {
     smooth: { scale: 5, depth: 0.01, irregularity: 0.1, pattern: "noise" },
     rough: { scale: 15, depth: 0.05, irregularity: 0.7, pattern: "noise" },
     cracked: { scale: 20, depth: 0.08, irregularity: 0.6, pattern: "cracks" },
@@ -463,5 +483,5 @@ export function calculateLandmarkTerrainInfluence(
   return {
     height: totalHeightInfluence,
     roughness: totalRoughnessInfluence,
-  };
+  }
 };

@@ -179,7 +179,7 @@ export default function PreferredTerrestrialClassifications({
               disabled={!selectedAnomaly || !selectedVehicle}
               className="text-blue-500"
             >
-              Confirm Selection
+              Confirm Selection 
             </SciFiButton>
           </div>
         </div>

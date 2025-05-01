@@ -73,7 +73,6 @@ export default function LaunchpadStructure() {
 
     const [rocketParts, setRocketParts] = useState<any[]>([]);
 
-
     useEffect(() => {
         fetchRocketParts();
     }, [session, activePlanet]);

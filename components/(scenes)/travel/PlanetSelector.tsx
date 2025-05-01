@@ -66,7 +66,7 @@ const initialPlanets: Planet[] = [
     orbitPosition: 3,
     available: false
   },
-]
+];
 
 const getParentStarColor = (type: 'intra-solar' | 'interstellar') => {
   if (type === 'intra-solar') {
@@ -109,7 +109,7 @@ export default function PlanetSelector({ user, onSelect }: PlanetSelectorProps) 
               if (anomalyIds.length === 0) {
                 console.warn('No anomalies found for the user.');
                 return;
-              }
+              };
           
               // Fetch anomalies using the anomaly IDs
               const { data, error } = await supabase
@@ -153,32 +153,32 @@ export default function PlanetSelector({ user, onSelect }: PlanetSelectorProps) 
   
     const filteredPlanets = planets.filter((planet) => planet.type === selectedType);
   
-    const handlePlanetSelect = (planet: Planet) => {
-      if (planet.available) {
-        setSelectedPlanet(planet);
-        setIsBooked(false);
-      }
-    };
-  
-    const handleBook = () => {
-      setIsBooked(true);
-      onSelect(selectedPlanet);
-    };
-  
-    const handleBeginTrip = () => {
-      console.log('Beginning trip to', selectedPlanet.name);
-    };
-  
-    if (isBooked) {
-      return (
-        <BoardingPass
-          planet={selectedPlanet}
-          user={user}
-          onBeginTrip={handleBeginTrip}
-          onCancelBooking={() => setIsBooked(false)}
-        />
-      );
+  const handlePlanetSelect = (planet: Planet) => {
+    if (planet.available) {
+      setSelectedPlanet(planet);
+      setIsBooked(false);
     }
+  };
+
+  const handleBook = () => {
+    setIsBooked(true);
+    onSelect(selectedPlanet);
+  };
+
+  const handleBeginTrip = () => {
+    console.log('Beginning trip to', selectedPlanet.name);
+  };
+
+  if (isBooked) {
+    return (
+      <BoardingPass
+        planet={selectedPlanet}
+        user={user}
+        onBeginTrip={handleBeginTrip}
+        onCancelBooking={() => setIsBooked(false)}
+      />
+    );
+  };
 
   return (
     <div className="min-h-screen p-6 sm:p-8 md:p-10 flex flex-col">

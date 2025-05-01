@@ -32,12 +32,12 @@ export interface Classification {
 };
 
 type PlanetData = {
-  name: string
-  galaxy: string
-  diameter: string
-  dayLength: string
-  temperature: string
-  climate: string
+  name: string;
+  galaxy: string;
+  diameter: string;
+  dayLength: string;
+  temperature: string;
+  climate: string;
 };
 
 type FocusView = "planet" | "overview" | "Climate" | "atmosphere" | "exploration" | "map" | "edit"
@@ -345,7 +345,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
           ai4MSummary={ai4MSummary}
           onBiomeUpdate={(biome) => setDominantBiome(biome)} biomassVersion={biomassScore}        />
       )}
-                    <PlanetProgress
+                <PlanetProgress
                   temperature={temperature}
                   radius={density}
                   biomassScore={biomassScore}
@@ -359,6 +359,7 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
         <div className="w-full max-w-4xl bg-black/10 backdrop-blur-sm rounded-xl p-6 text-white mx-auto">
           {classification?.id !== undefined && (
             <WeatherEventStatus 
+              density={density || 1}
               classificationId={classification.id} 
               biome={dominantBiome || 'RockyHighlands'}
               biomass={biomassScore}

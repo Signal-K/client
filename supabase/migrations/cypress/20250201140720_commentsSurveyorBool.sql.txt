@@ -1,2 +1,0 @@
-ALTER TABLE public.comments
-ADD COLUMN surveyor BOOLEAN DEFAULT FALSE;
