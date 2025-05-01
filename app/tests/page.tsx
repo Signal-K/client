@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 export default function TestPage() {
   const supabase = useSupabaseClient();
   const session = useSession();
-  const [locationIds, setLocationIds] = useState<{ id: number; biome: string; biomass: number; density: number }[]>([]);
+  const [locationIds, setLocationIds] = useState<{ id: number; biome: string; biomass: number; density: number; anomaly_id: number }[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function TestPage() {
       if (!session) return;
       const { data, error } = await supabase
         .from("classifications")
-        .select("id")
+        .select("id, anomaly")
         .eq("author", session.user.id)
         .in("classificationtype", ["planet", "telescope-minorPlanet"]);
 
@@ -32,6 +32,7 @@ export default function TestPage() {
           biome: "RockyHighlands",// biome: item.biome ?? "Unknown",
           biomass: 0.01, //item.biomass ?? 0,
           density: 3.5, // item.density ?? 1,
+          anomaly_id: item.anomaly,
         }));
         setLocationIds(parsedData);
       }
@@ -54,7 +55,7 @@ export default function TestPage() {
                     density={3.5}
                   />
                   <MyLocationIds /> */}
-      <WeatherEventsOverview classificationInfo={locationIds} />
+      <WeatherEventsOverview />
     </div>
   );
 };

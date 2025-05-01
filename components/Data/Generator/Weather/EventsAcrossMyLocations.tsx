@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { startOfWeek } from "date-fns";
+import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { startOfWeek, addWeeks, differenceInSeconds } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import { Button } from "@/components/ui/button";
 
 const TIMEZONE = 'Australia/Melbourne';
 
@@ -30,67 +31,92 @@ function getPlanetType(density: number): "terrestrial" | "gaseous" | "ocean" {
   if (density >= 3.5) return "terrestrial";
   if (density < 1.5) return "gaseous";
   return "ocean";
-};
+}
 
 interface EventData {
   classificationId: number;
   eventCount: number;
+  hasEvent: boolean;
   redeemed: boolean;
   nextEventType: string | null;
-};
+  anomalyId: number;
+  countdown: string;
+}
 
-export default function WeatherEventsOverview({
-  classificationInfo,
-}: {
-  classificationInfo: { id: number; biome: string; biomass: number; density: number }[];
-}) {
+function formatCountdown(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return `${h}h ${m}m ${s}s`;
+}
+
+export default function WeatherEventsOverview() {
   const supabase = useSupabaseClient();
+  const session = useSession();
   const [eventsData, setEventsData] = useState<EventData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-    if (!classificationInfo || classificationInfo.length === 0) return;
+    async function fetchData() {
+      if (!session) return;
 
-      const startOfWeekMelbourne = startOfWeek(toZonedTime(new Date(), TIMEZONE), { weekStartsOn: 1 });
+      // Step 1: Fetch classifications
+      const { data: classifications, error: classError } = await supabase
+        .from("classifications")
+        .select("id, anomaly")
+        .eq("author", session.user.id)
+        .in("classificationtype", ["planet", "telescope-minorPlanet"]);
+
+      if (classError || !classifications) {
+        console.error("Error fetching classifications:", classError);
+        setLoading(false);
+        return;
+      }
+
+      const classificationInfo = classifications.map((item) => ({
+        id: item.id,
+        biome: "RockyHighlands", // Placeholder
+        biomass: 0.01,
+        density: 3.5,
+        anomaly_id: item.anomaly,
+      }));
+
+      // Step 2: Fetch events
+      const now = new Date();
+      const startOfWeekMelbourne = startOfWeek(toZonedTime(now, TIMEZONE), { weekStartsOn: 1 });
       startOfWeekMelbourne.setHours(0, 1, 0, 0);
+      const endOfWeekMelbourne = addWeeks(startOfWeekMelbourne, 1);
 
       const classificationIds = classificationInfo.map(c => c.id);
 
-      const { data: events, error } = await supabase
+      const { data: events, error: eventsError } = await supabase
         .from("events")
         .select("*")
         .in("classification_location", classificationIds)
         .gte("time", startOfWeekMelbourne.toISOString());
 
-      if (error) {
-        console.error("Error fetching events:", error);
+      if (eventsError) {
+        console.error("Error fetching events:", eventsError);
+        setLoading(false);
         return;
-      };
+      }
 
-      const grouped: Record<number, { count: number; redeemed: boolean; nextEventType: string | null }> = {};
+      const grouped: Record<number, EventData> = {};
 
       for (const info of classificationInfo) {
-        const { id, biome, biomass, density } = info;
+        const { id, biome, biomass, density, anomaly_id } = info;
         const planetType = getPlanetType(density);
 
-        grouped[id] = { count: 0, redeemed: false, nextEventType: null };
-
         const eventsForLocation = events.filter(e => e.classification_location === id);
+        const hasEventThisWeek = eventsForLocation.length > 0;
+        const redeemed = eventsForLocation.some(e => e.status === "redeemed");
+        const lightningEventExists = eventsForLocation.some(e =>
+          e.type?.toLowerCase().includes("lightning")
+        );
 
-        for (const event of eventsForLocation) {
-          grouped[id].count += 1;
-          if (event.status === "redeemed") {
-            grouped[id].redeemed = true;
-          }
-        }
+        let newEventType: string | null = null;
 
-        if (!grouped[id].redeemed) {
-          const lightningEventExists = eventsForLocation.some(e =>
-            e.type?.toLowerCase().includes("lightning")
-          );
-
-          let newEventType: string | null = null;
-
+        if (!hasEventThisWeek) {
           if (
             planetType === "terrestrial" &&
             biomass >= 0.000001 &&
@@ -101,45 +127,88 @@ export default function WeatherEventsOverview({
           } else {
             newEventType = biomeToStormMap[biome] || "rain-general";
           }
-
-          grouped[id].nextEventType = newEventType;
         }
+
+        const secondsLeft = differenceInSeconds(endOfWeekMelbourne, toZonedTime(now, TIMEZONE));
+        grouped[id] = {
+          classificationId: id,
+          eventCount: eventsForLocation.length,
+          hasEvent: hasEventThisWeek,
+          redeemed,
+          nextEventType: newEventType,
+          anomalyId: anomaly_id,
+          countdown: formatCountdown(secondsLeft),
+        };
       }
 
-      const newData: EventData[] = classificationInfo.map(info => ({
-        classificationId: info.id,
-        eventCount: grouped[info.id]?.count || 0,
-        redeemed: grouped[info.id]?.redeemed || false,
-        nextEventType: grouped[info.id]?.nextEventType || null,
-      }));
+      setEventsData(Object.values(grouped));
+      setLoading(false);
+    }
 
-      setEventsData(newData);
-    };
+    fetchData();
+  }, [session]);
 
-    fetchEvents();
-  }, [classificationInfo]);
+  const handleCreateEvent = async (classificationId: number, anomalyId: number, type: string) => {
+    const { error } = await supabase.from("events").insert({
+      classification_location: classificationId,
+      location: anomalyId,
+      type,
+      configuration: {},
+      completed: false,
+    });
 
-  if (eventsData.length === 0) return null;
+    if (error) {
+      console.error("Error creating event:", error);
+    } else {
+      window.location.reload();
+    }
+  };
+
+  if (loading) return <div className="text-white p-4">Loading weather events...</div>;
+  if (eventsData.length === 0) return <div className="text-white p-4">No planets found.</div>;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {eventsData.map(event => (
-        <div
-          key={event.classificationId}
-          className="bg-black/60 text-white p-4 rounded-lg shadow-md flex flex-col items-center"
-        >
-          <div className="text-lg font-semibold">Location ID: {event.classificationId}</div>
-          <div className="text-sm">Events this week: {event.eventCount}</div>
-          <div className={`text-sm ${event.redeemed ? 'text-green-400' : 'text-red-400'}`}>
-            {event.redeemed ? 'Redeemed' : 'Not redeemed'}
+    <div className="min-h-screen bg-black text-white p-4 space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {eventsData.map(event => (
+          <div
+            key={event.classificationId}
+            className="bg-gradient-to-br from-cyan-900 to-black text-white p-6 rounded-2xl shadow-lg space-y-2 border border-white/10"
+          >
+            <h2 className="text-xl font-bold text-cyan-300">
+              Planet #{event.classificationId}
+            </h2>
+            <p className="text-sm text-gray-300">
+              Events this week: <span className="font-semibold">{event.eventCount}</span>
+            </p>
+            <p className={`text-sm font-semibold ${event.redeemed ? 'text-green-400' : 'text-red-400'}`}>
+              {event.redeemed ? 'Redeemed' : 'Not Redeemed'}
+            </p>
+            {event.hasEvent ? (
+              <p className="text-sm text-yellow-200">
+                Next event in: <span className="font-mono">{event.countdown}</span>
+              </p>
+            ) : (
+              event.nextEventType && (
+                <>
+                  <p className="text-sm text-yellow-300">
+                    Next Suggested Event: <strong>{event.nextEventType}</strong>
+                  </p>
+                  <Button
+                    variant="secondary"
+                    className="mt-2 text-sm"
+                    onClick={() =>
+                      handleCreateEvent(event.classificationId, event.anomalyId, event.nextEventType!)
+                    }
+                  >
+                    Create Event
+                  </Button>
+                </>
+              )
+            )}
           </div>
-          {!event.redeemed && event.nextEventType && (
-            <div className="text-yellow-400 text-sm mt-2">
-              Next event: {event.nextEventType}
-            </div>
-          )}
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
