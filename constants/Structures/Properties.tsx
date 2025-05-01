@@ -336,12 +336,12 @@ export const StructuresConfig: StructureConfig = {
           dynamicComponent: <AI4M />,
           sizePercentage: 50,
         },
-        {
-          icon: <BellElectric className="w-6 h-6 text-[#6e856h]" />,
-          text: 'Identify unique cloud shapes on your planets',
-          dynamicComponent: <CloudspottingOnMarsShapes />,
-          sizePercentage: 60,
-        },
+        // {
+        //   icon: <BellElectric className="w-6 h-6 text-[#6e856h]" />,
+        //   text: 'Identify unique cloud shapes on your planets',
+        //   dynamicComponent: <CloudspottingOnMarsShapes />,
+        //   sizePercentage: 60,
+        // },
         {
           icon: <CameraOffIcon className="w-6 h-6 text-[#5e81ac]" />,
           text: 'Map the surface of planets',
