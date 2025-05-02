@@ -1,20 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { Button } from "@/components/ui/button";
-import { formatDistanceToNow, startOfDay, addDays } from "date-fns";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const classificationTypes = [
-  "zoodex-burrowingOwl", 
-  "telescope-minorPlanet",
-  "sunspot",
-  "satellite-planetFour",
-  "planet",
-  "lidar-jovianVortexHunter",
-  "cloud",
-  "balloon-marsCloudShapes",
-  "automaton-aiForMars",
-];
+import { formatDistanceToNow } from "date-fns";
 
 const AlertComponent = () => {
   const supabase = useSupabaseClient();
@@ -29,99 +15,59 @@ const AlertComponent = () => {
 
       const userId = session.user.id;
 
-      // Fetch current milestones
+      // Fetch milestone data
       const milestoneRes = await fetch("/api/gameplay/milestones");
       const milestoneData = await milestoneRes.json();
+      const currentWeek = milestoneData.playerMilestones[0];
+      if (!currentWeek) return;
 
-      const currentMilestones = milestoneData.playerMilestones[0]?.data || [];
+      const { weekStart, data: milestones } = currentWeek;
+      const startDate = new Date(weekStart);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 6);
 
-      // Filter to classification-based milestones only
-      const classificationMilestones = currentMilestones.filter(
-        (m: any) =>
-          m.table === "classifications" &&
-          m.field === "classificationtype"
+      // Track progress per milestone
+      const progressChecks = await Promise.all(
+        milestones.map(async (m: any) => {
+          let query = supabase
+            .from(m.table)
+            .select("*", { count: "exact" })
+            .gte("created_at", startDate.toISOString())
+            .lte("created_at", endDate.toISOString())
+            .eq(m.field, m.value)
+            .eq("author", userId);
+
+          const { count, error } = await query;
+          if (error) return null;
+          return {
+            name: m.name,
+            completed: count !== null && count >= m.requiredCount,
+          };
+        })
       );
 
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const incomplete = progressChecks.filter((p) => p && !p.completed);
 
-      const { data: classifications, error } = await supabase
-        .from("classifications")
-        .select("classificationtype, created_at")
-        .gte("created_at", oneWeekAgo.toISOString())
-        .eq("author", userId);
-
-      if (error) {
-        console.error("Error fetching classifications", error);
-        return;
+      if (incomplete.length > 0) {
+        setAlertMessage(`You have ${incomplete.length} incomplete milestone${incomplete.length > 1 ? "s" : ""} for this week.`);
       }
 
-      const typeCounts: Record<string, number> = {};
-      classifications?.forEach((item) => {
-        const type = item.classificationtype;
-        typeCounts[type] = (typeCounts[type] || 0) + 1;
-      });
-
-      // Find the first incomplete classification milestone
-      const incompleteMilestone = classificationMilestones.find((m: any) => {
-        const count = typeCounts[m.value] || 0;
-        return count < m.requiredCount;
-      });
-
-      if (incompleteMilestone) {
-        let message = "";
-
-        const { value, structure } = incompleteMilestone;
-
-        if (value === "planet" && structure === "Telescope") {
-          message = "New planet candidate discovered by your telescope.";
-        } else if (value === "sunspot" && structure === "Telescope") {
-          message = "Sunspot activity detected — help us classify.";
-        } else if (value === "cloud" && structure === "WeatherBalloon") {
-          message = "Unusual cloud formations need your attention.";
-        } else {
-          message = `Incomplete discovery: ${value} via ${structure}`;
-        }
-
-        setAlertMessage(message);
-      } else {
-        setAlertMessage("You've completed all classification goals this week!");
-      };
+      // Optional: show time until next week
+      const now = new Date();
+      const nextWeek = new Date(endDate);
+      nextWeek.setDate(nextWeek.getDate() + 1);
+      setTimeRemaining(formatDistanceToNow(nextWeek, { addSuffix: true }));
     };
 
     fetchAlert();
   }, [session]);
 
-  useEffect(() => {
-    const calculateTimeRemaining = () => {
-      const now = new Date();
-      const melbourneTime = new Date(
-        now.toLocaleString("en-US", { timeZone: "Australia/Melbourne" })
-      );
-      const nextMidnight = startOfDay(addDays(melbourneTime, 1));
-      const remaining = formatDistanceToNow(nextMidnight, { addSuffix: true });
-      setTimeRemaining(remaining);
-    };
-
-    const interval = setInterval(calculateTimeRemaining, 60000);
-    calculateTimeRemaining();
-
-    return () => clearInterval(interval);
-  }, []);
+  if (!alertMessage) return null;
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 bg-gradient-to-b from-[#0f172a] to-[#020617] text-white rounded-lg shadow-[0_0_15px_rgba(124,58,237,0.5)] border border-[#581c87]">
-      <div className="flex flex-col items-center mb-4">
-        <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7]">
-          Daily Alert
-        </h2>
-        <div className="mt-4 text-center text-[#67e8f9] font-semibold">
-          <p>{alertMessage}</p>
-          <p className="mt-2 text-xs text-gray-500">
-            Time remaining until next event: {timeRemaining}
-          </p>
-        </div>
-      </div>
+    <div className="bg-yellow-200 text-black p-4 rounded-md shadow-md mb-4">
+      <p className="font-semibold">{alertMessage}</p>
+      <p className="text-sm">Time left: {timeRemaining}</p>
     </div>
   );
 };

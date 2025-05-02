@@ -65,6 +65,7 @@
     "framer-motion": "^12.0.5",
     "html2canvas": "^1.4.1",
     "input-otp": "^1.2.4",
+    "js-cookie": "^3.0.5",
     "konva": "^9.3.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.394.0",
@@ -106,6 +107,7 @@
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.7.8",
     "@types/react": "^18.2.22",
     "@types/react-dom": "^18.2.7",

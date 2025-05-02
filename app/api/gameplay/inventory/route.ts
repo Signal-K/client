@@ -80,7 +80,7 @@ const inventoryItems: InventoryItem[] = [
     name: "Research Station",
     description: "Unlock new technology and research",
     icon_url: "/assets/Items/Research.png",
-    ItemCategory: "Structure",
+    ItemCategory: "StructureResearch",
     locationType: 'Surface',
   },
   // {

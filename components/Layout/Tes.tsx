@@ -27,6 +27,7 @@ import AlertsDropdown from "./Navigation/AlertsDropdown"
 import { StardustDropdown } from "./Navigation/StardustDropdown"
 import { LocationsDropdown } from "./Navigation/LocationsDropdown"
 import TechnologyPopover, { TechnologySection } from "./Navigation/TechTreeDropdown"
+import { Alert } from "antd"
 
 // Sample data - replace with actual data in your implementation
 const techTree = [
@@ -58,80 +59,6 @@ export default function GameNavbar() {
       console.log("User signed out successfully");
     }
   };
-
-  // Fetch alerts
-  useEffect(() => {
-    const fetchAlert = async () => {
-      if (!session?.user) return
-
-      const userId = session.user.id
-
-      // Fetch current milestones
-      const milestoneRes = await fetch("/api/gameplay/milestones")
-      const milestoneData = await milestoneRes.json()
-
-      const currentMilestones = milestoneData.playerMilestones[0]?.data || []
-
-      // Filter to classification-based milestones only
-      const classificationMilestones = currentMilestones.filter(
-        (m: any) => m.table === "classifications" && m.field === "classificationtype",
-      )
-
-      const oneWeekAgo = new Date()
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-
-      const { data: classifications, error } = await supabase
-        .from("classifications")
-        .select("classificationtype, created_at")
-        .gte("created_at", oneWeekAgo.toISOString())
-        .eq("author", userId)
-
-      if (error) {
-        console.error("Error fetching classifications", error)
-        return
-      }
-
-      const typeCounts: Record<string, number> = {}
-      classifications?.forEach((item) => {
-        const type = item.classificationtype
-        typeCounts[type] = (typeCounts[type] || 0) + 1
-      })
-
-      // Find the first incomplete classification milestone
-      const incompleteMilestone = classificationMilestones.find((m: any) => {
-        const count = typeCounts[m.value] || 0
-        return count < m.requiredCount
-      })
-
-      if (incompleteMilestone) {
-        let message = ""
-
-        const { value, structure } = incompleteMilestone
-
-        if (value === "planet" && structure === "Telescope") {
-          message = "New planet candidate discovered by your telescope."
-          setHasNewAlert(true)
-          setNewNotificationsCount((prev) => prev + 1)
-        } else if (value === "sunspot" && structure === "Telescope") {
-          message = "Sunspot activity detected — help us classify."
-          setHasNewAlert(true)
-          setNewNotificationsCount((prev) => prev + 1)
-        } else if (value === "cloud" && structure === "WeatherBalloon") {
-          message = "Unusual cloud formations need your attention."
-          setHasNewAlert(true)
-          setNewNotificationsCount((prev) => prev + 1)
-        } else {
-          message = `Incomplete discovery: ${value} via ${structure}`
-        }
-
-        setAlertMessage(message)
-      } else {
-        setAlertMessage("You've completed all classification goals this week!")
-      }
-    }
-
-    fetchAlert()
-  }, [session, supabase])
 
   // Calculate time remaining
   useEffect(() => {
@@ -289,10 +216,7 @@ export default function GameNavbar() {
           />
 
           <AlertsDropdown
-            hasNewAlert={hasNewAlert}
-            newNotificationsCount={newNotificationsCount}
-            timeRemaining={timeRemaining}
-            alertMessage={alertMessage}
+            
           />
 
           {/* Tech Tree Button */}
@@ -358,7 +282,7 @@ export default function GameNavbar() {
             <Avatar />
           </div>
           <div>
-            {/* User's profile name */}
+            {/* User's profile */}
           </div>
         </div>
       </div>
@@ -373,21 +297,7 @@ export default function GameNavbar() {
         <div className="p-4 space-y-6">
           {/* Alerts Section */}
           <div className="space-y-2">
-            <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] flex items-center">
-              <Bell className="h-5 w-5 mr-2 text-[#67e8f9]" />
-              Daily Alert
-              {hasNewAlert && (
-                <Badge className="ml-2 bg-red-500 hover:bg-red-500 text-white">
-                  {newNotificationsCount}
-                </Badge>
-              )}
-            </h3>
-            <div className="bg-[#1e293b] rounded-lg p-3 border border-[#581c87]">
-              <p className="text-[#67e8f9] font-semibold">{alertMessage}</p>
-              <p className="mt-2 text-xs text-gray-500">
-                Time remaining until next event: {timeRemaining}
-              </p>
-            </div>
+            <AlertsDropdown />
           </div>
 
           {/* Milestones Section */}
