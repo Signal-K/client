@@ -88,8 +88,8 @@ export default function Home() {
         }
       } catch (error: any) {
         console.error("Error fetching planet data: ", error);
-      }
-    }
+      };
+    };
 
     fetchPlanetData();
   }, [activePlanet, supabase]);
@@ -115,15 +115,15 @@ export default function Home() {
 
   if (!session) {
     return <LandingSS />;
-  }
+  };
 
   if (hasRequiredItems === null) {
     return <div>Loading...</div>;
-  }
+  };
 
   if (!hasRequiredItems) {
     return <Onboarding />;
-  }
+  };
 
   return (
     <EarthViewLayout>

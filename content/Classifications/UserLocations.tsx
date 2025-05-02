@@ -104,7 +104,7 @@ export default function MySettlementsLocations() {
 
   if (loading) return <p>Loading locations...</p>;
   if (error) return <p>{error}</p>;
-  if (!myLocations || myLocations.length === 0) return <p>No locations found.</p>;
+  if (!myLocations || myLocations.length === 0) return <p>No locations found. Discover some asteroids or planets using your telescope!</p>;
 
   return (
     <div className="w-full max-w-4xl mx-auto p-3 bg-gradient-to-b from-[#0f172a] to-[#020617] text-white rounded-lg shadow-[0_0_15px_rgba(124,58,237,0.5)] border border-[#581c87]">

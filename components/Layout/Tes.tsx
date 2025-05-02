@@ -26,7 +26,7 @@ import { MissionsPopover } from "./Navigation/MissionDropdown"
 import AlertsDropdown from "./Navigation/AlertsDropdown"
 import { StardustDropdown } from "./Navigation/StardustDropdown"
 import { LocationsDropdown } from "./Navigation/LocationsDropdown"
-import TechnologyPopover from "./Navigation/TechTreeDropdown"
+import TechnologyPopover, { TechnologySection } from "./Navigation/TechTreeDropdown"
 
 // Sample data - replace with actual data in your implementation
 const techTree = [
@@ -340,125 +340,105 @@ export default function GameNavbar() {
 
         {/* Mobile Menu Button */}
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden text-white">
-              <HammerIcon className="h-6 w-6" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent
-            side="right"
-            className="w-[85%] bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border-white/10 p-0"
-          >
-            <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-4 border-b border-white/10">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-[#5FCBC3]/60 hover:bg-[#5FCBC3]/80 transition">
-                  <Avatar />
-                  <div>
-                    <h3 className="font-bold text-white">Commander</h3>
-                    <p className="text-sm text-gray-400">Level 24</p>
-                  </div>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-white">
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
+  <SheetTrigger asChild>
+    <Button variant="ghost" size="icon" className="md:hidden text-white">
+      <HammerIcon className="h-6 w-6" />
+    </Button>
+  </SheetTrigger>
 
-              <div className="p-4 border-b border-white/10 flex items-center justify-between">
-                <div className="flex items-center bg-white/5 rounded-full px-3 py-1 border border-yellow-500/30">
-                  <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                  <span className="text-yellow-100 font-medium"><TotalPoints /></span>
-                </div>
-                <Button variant="outline" size="sm" className="border-white/20 text-white hover:bg-white/10">
-                  Collect Bonus
-                </Button>
-              </div>
+  <SheetContent
+    side="right"
+    className="w-[85%] bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border-white/10 p-0"
+  >
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-white/10">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-[#5FCBC3]/60 hover:bg-[#5FCBC3]/80 transition flex items-center justify-center">
+            <Avatar />
+          </div>
+          <div>
+            {/* User's profile name */}
+          </div>
+        </div>
+      </div>
 
-              <div className="flex-1 overflow-auto">
-                <div className="p-4 space-y-6">
-                  {/* Mobile Alerts */}
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] flex items-center">
-                      <Bell className="h-5 w-5 mr-2 text-[#67e8f9]" />
-                      Daily Alert
-                      {hasNewAlert && (
-                        <Badge className="ml-2 bg-red-500 hover:bg-red-500 text-white">{newNotificationsCount}</Badge>
-                      )}
-                    </h3>
-                    <div className="bg-[#1e293b] rounded-lg p-3 border border-[#581c87]">
-                      <p className="text-[#67e8f9] font-semibold">{alertMessage}</p>
-                      <p className="mt-2 text-xs text-gray-500">Time remaining until next event: {timeRemaining}</p>
-                    </div>
-                  </div>
+      {/* Stardust Section */}
+      <div className="p-4 border-b border-white/10 flex items-center justify-between">
+        <StardustDropdown />
+      </div>
 
-                  {/* Mobile Missions */}
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] flex items-center">
-                      <Trophy className="h-5 w-5 mr-2 text-[#67e8f9]" />
-                      Weekly Milestones
-                    </h3>
-
-                    {milestones.length > 0 &&
-                      milestones[currentWeekIndex]?.data.slice(0, 2).map((milestone: any, index: number) => (
-                        <div key={index} className="bg-[#1e293b] rounded-lg p-3 border border-[#581c87]">
-                          <div className="flex justify-between items-center">
-                            <p className="text-white truncate">{milestone.name}</p>
-                            <div className="text-xs text-gray-500 whitespace-nowrap">
-                              {userProgress[milestone.name] || 0}/{milestone.requiredCount}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-
-                    <Button variant="link" className="text-[#67e8f9] p-0 h-auto">
-                      View All Milestones
-                    </Button>
-                  </div>
-
-                  {/* Mobile Tech Tree */}
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-bold text-purple-400 flex items-center">
-                      <Zap className="h-5 w-5 mr-2" />
-                      Tech Tree
-                    </h3>
-                    <div className="grid gap-2">
-                      {techTree.slice(0, 2).map((tech) => (
-                        <div key={tech.id} className="bg-white/5 rounded-lg p-3">
-                          <div className="flex justify-between items-center">
-                            <h4 className="font-medium text-white">{tech.name}</h4>
-                            <div className="text-purple-400 text-sm font-bold">
-                              Lvl {tech.level}/{tech.maxLevel}
-                            </div>
-                          </div>
-                          <Progress value={tech.progress} className="h-1.5 mt-2 bg-white/10" />
-                        </div>
-                      ))}
-                    </div>
-                    <Button variant="link" className="text-purple-400 p-0 h-auto">
-                      Full Tech Tree
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 border-t border-white/10 space-y-2">
-                <Button className="w-full justify-start" variant="ghost">
-                  <User className="mr-2 h-5 w-5" />
-                  Profile
-                </Button>
-                <Link href='/account' passHref>
-                    <Button className="w-full justify-start" variant="ghost">
-                        <Settings className="mr-2 h-5 w-5" />
-                        Settings
-                    </Button>
-                </Link>
-                <Button className="w-full justify-start text-red-400" variant="ghost" onClick={signOut}>
-                  <LogOut className="mr-2 h-5 w-5" />
-                  Log out
-                </Button>
-              </div>
+      {/* Scrollable Body */}
+      <div className="flex-1 overflow-auto">
+        <div className="p-4 space-y-6">
+          {/* Alerts Section */}
+          <div className="space-y-2">
+            <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] flex items-center">
+              <Bell className="h-5 w-5 mr-2 text-[#67e8f9]" />
+              Daily Alert
+              {hasNewAlert && (
+                <Badge className="ml-2 bg-red-500 hover:bg-red-500 text-white">
+                  {newNotificationsCount}
+                </Badge>
+              )}
+            </h3>
+            <div className="bg-[#1e293b] rounded-lg p-3 border border-[#581c87]">
+              <p className="text-[#67e8f9] font-semibold">{alertMessage}</p>
+              <p className="mt-2 text-xs text-gray-500">
+                Time remaining until next event: {timeRemaining}
+              </p>
             </div>
-          </SheetContent>
-        </Sheet>
+          </div>
+
+          {/* Milestones Section */}
+          <div className="space-y-2">
+            <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] flex items-center">
+              <Trophy className="h-5 w-5 mr-2 text-[#67e8f9]" />
+              Weekly Milestones
+            </h3>
+            {milestones.length > 0 &&
+              milestones[currentWeekIndex]?.data.slice(0, 2).map((milestone: any, index: number) => (
+                <div key={index} className="bg-[#1e293b] rounded-lg p-3 border border-[#581c87]">
+                  <div className="flex justify-between items-center">
+                    <p className="text-white truncate">{milestone.name}</p>
+                    <div className="text-xs text-gray-500 whitespace-nowrap">
+                      {userProgress[milestone.name] || 0}/{milestone.requiredCount}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            <Button variant="link" className="text-[#67e8f9] p-0 h-auto">
+              View All Milestones
+            </Button>
+          </div>
+
+          {/* Technology Section */}
+          <div className="space-y-2">
+            <TechnologySection />
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="p-4 border-t border-white/10 space-y-2">
+        <Button className="w-full justify-start" variant="ghost">
+          <User className="mr-2 h-5 w-5" />
+          Profile
+        </Button>
+        <Link href="/account" passHref>
+          <Button className="w-full justify-start" variant="ghost">
+            <Settings className="mr-2 h-5 w-5" />
+            Settings
+          </Button>
+        </Link>
+        <Button className="w-full justify-start text-red-400" variant="ghost" onClick={signOut}>
+          <LogOut className="mr-2 h-5 w-5" />
+          Log out
+        </Button>
+      </div>
+    </div>
+  </SheetContent>
+</Sheet>
       </div>
     </nav>
   );

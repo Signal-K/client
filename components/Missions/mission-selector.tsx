@@ -194,129 +194,27 @@ const combineCategories = (): Category[] => {
 };
 
 export default function MissionSelector() {
+  const { activePlanet, updatePlanetLocation } = useActivePlanet();
   const supabase = useSupabaseClient();
   const session = useSession();
 
-  const { activePlanet, updatePlanetLocation } = useActivePlanet();
-
   const [selectedStructure, setSelectedStructure] = useState<Structure | null>(null);
-  const [selectedProject, setSelectedProject] = useState<Mission | null>(null);
-  const [stage, setStage] = useState<'structure' | 'project' | 'confirm'>('structure');
-
-  const handleStructureSelect = ( structure: Structure ) => {
-    setSelectedStructure(structure);
-    setStage('project');
-  };
-
-  const handleProjectSelect = ( project: Mission ) => {
-    setSelectedProject(project);
-    setStage('confirm');
-  };
-
-  const handleBack = () => {
-    if (stage === 'project') {
-      setSelectedStructure(null);
-      setStage('structure');
-    } else if (stage === 'confirm') {
-      setSelectedProject(null);
-      setStage('project');
-    };
-  };
-
-  const handleConfirm = async () => {
-    console.log('Starting project: ', selectedProject?.name);
-
-    if (!session || !selectedProject) return;
-
-    const initialiseUserMissionData = {
-      user: session.user.id,
-      time_of_completion: new Date().toISOString(),
-      mission: 10000001,
-    };
-
-    const chooseFirstClassificationMissionData = {
-      user: session.user.id,
-      time_of_completion: new Date().toISOString(),
-      mission: 10000002,
-    };
-
-    const structureCreationData = {
-      owner: session.user.id,
-      item: selectedProject.activeStructure,
-      anomaly: activePlanet?.id || 30,
-      quantity: 1,
-      notes: "Created for user's first classification mission",
-      configuration: {
-        "Uses": 10,
-        "missions unlocked": [selectedProject.identifier],
-      },
-    };
-
-    const researchedStructureData = {
-      user_id: session?.user.id,
-      tech_type: selectedProject.activeStructure,
-      tech_id: selectedProject.techId,
-      created_at: new Date().toISOString(),
-    };
-
-    try {
-      updatePlanetLocation(30);
-      const { error: missionError1 } = await supabase
-        .from('missions')
-        .insert([initialiseUserMissionData]);
-      
-      const { error: missionError2 } = await supabase
-        .from('missions')
-        .insert([chooseFirstClassificationMissionData]);
-
-      const { error: inventoryError } = await supabase
-        .from("inventory")
-        .insert([structureCreationData]);
-
-      const { error: researchedError } = await supabase
-        .from("researched")
-        .insert([researchedStructureData]);
-
-      setConfirmationMessage("Mission confirmed and added successfully!");
-    } catch (error: any) {
-      setConfirmationMessage(`Error: ${error.message}`);
-    };
-  };
-
-  const [step, setStep] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [confirmationMessage, setConfirmationMessage] = useState('');
 
-  const introSteps = [
-    "Welcome, future scientist!",
-    "Your journey into the world of scientific discovery begins now.",
-    "Choose your field of study and embark on an exciting mission!",
-  ];
+  const handleStructureClick = (structure: Structure) => {
+    setSelectedStructure(structure);
+    setSelectedMission(null);
+    setConfirmationMessage('');
+  };
 
-  const categories = combineCategories();
-
-  useEffect(() => {
-    if (step < introSteps.length) {
-      const timer = setTimeout(() => setStep(step + 1), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [step]);
+  const handleMissionClick = (mission: Mission) => {
+    setSelectedMission(mission);
+    setConfirmationMessage('');
+  };
 
   const handleConfirmMission = async () => {
     if (!session || !selectedMission) return;
-
-    const initialiseUserMissionData = {
-      user: session.user.id,
-      time_of_completion: new Date().toISOString(),
-      mission: 10000001,
-    };
-
-    const chooseFirstClassificationMissionData = {
-      user: session.user.id,
-      time_of_completion: new Date().toISOString(),
-      mission: 10000002,
-    };
 
     const structureCreationData = {
       owner: session.user.id,
@@ -330,168 +228,58 @@ export default function MissionSelector() {
       },
     };
 
-    const researchedStructureData = {
-      user_id: session?.user.id,
-      tech_type: selectedMission.activeStructure,
-      tech_id: selectedMission.techId,
-      created_at: new Date().toISOString(),
-    };
-
     try {
       updatePlanetLocation(30);
-      const { error: missionError1 } = await supabase
-          .from('missions')
-          .insert([initialiseUserMissionData]);
+      await supabase.from("inventory").insert([structureCreationData]);
 
-      if (missionError1) {
-          throw missionError1;
-      };
-
-      const { error: missionError2 } = await supabase
-          .from('missions')
-          .insert([chooseFirstClassificationMissionData]);
-
-      if (missionError2) {
-          throw missionError2;
-      };
-
-      const { error: inventoryError } = await supabase
-          .from("inventory")
-          .insert([structureCreationData]);
-
-      if (inventoryError) {
-          throw inventoryError;
-      };
-
-      const { error: researchedError } = await supabase
-          .from("researched")
-          .insert([researchedStructureData]);
-
-      setConfirmationMessage("Mission confirmed and added successfully!");
-  } catch (error: any) {
+      setConfirmationMessage(`Mission "${selectedMission.name}" confirmed!`);
+    } catch (error: any) {
       setConfirmationMessage(`Error: ${error.message}`);
+    }
   };
-
-    if (selectedMission) {
-      setConfirmationMessage(`Congratulations! You've embarked on the "${selectedMission.name}" mission. Your scientific adventure begins now!`);
-    };
-  };
-
-  const MissionIcon = ({ icon, isSelected }: { icon: string; isSelected: boolean }) => (
-    <motion.div
-      className="text-4xl"
-      animate={{ scale: isSelected ? [1, 1.2, 1] : 1 }}
-      transition={{ duration: 0.5, repeat: isSelected ? Infinity : 0, repeatType: "reverse" }}
-    >
-      {icon}
-    </motion.div>
-  );
 
   return (
-    <div className='p-6 max-w-4xl mx-auto font-mono'>
-      <Card className='overflow-hidden relative bg-gradient-to-br from-gray-900  via-gray-800 to-gray-900 border-2 border-gray-700'>
-        <CardContent className='p-6 min-h-[600px]'>
-          <div className='flex flex-col h-full text-gray-300'>
-            <div className='mb-6'>
-              <h1 className='text-3xl font-bold text-center mb-2 text-gray-100 tracking-wider'>
-                Welcome to Star Sailors!
-              </h1>
-              <div className='text-center text-gray-400'>
-                {stage === 'structure' && "Select a structure that interests you to begin adding and classifying data for various projects."}
-                {stage === 'project' && "Choose a project that this structure offers"}
-                {stage === 'confirm' && "Confirm this project to be given this structure and begin classifying the data it provides"}
-              </div>
-            </div>
+    <div className="p-6 space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {structures.map((structure) => (
+          <Card key={structure.name} onClick={() => handleStructureClick(structure)} className={`cursor-pointer relative ${structure.bgColor}`}>
+            <CardContent className="p-4 text-white">
+              {structure.shape}
+              <structure.icon className={`w-8 h-8 ${structure.accentColor}`} />
+              <h3 className="text-lg font-semibold mt-2">{structure.name}</h3>
+              <p className="text-sm opacity-80">{structure.description}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-            <div className='flex-grow'>
-              <AnimatePresence mode='wait'>
-                <motion.div
-                  key={stage}
-                  initial = {{ opacity: 0 }}
-                  animate = {{ opacity: 1 }}
-                  exit = {{ opacity: 0 }}
-                  transition = {{ duration: 0.3 }}
-                  className='h-full flex flex-col'
-                >
-                  <div className='grid grid-cols-1 gap-4 h-full'>
-                    {stage === 'structure' && structures.map((structure) => (
-                      <Card
-                        key={structure.name}
-                        className={`cursor-pointer hover:shadow-lg transition-all duration-300 flex ${structure.bgColor} border border-gray-600 relative overflow-hidden`}
-                        onClick={() => handleStructureSelect(structure)}
-                      >
-                        <CardContent className='p-4 flex items-center z-10'>
-                          <structure.icon className={`w-12 h-12 mr-4 ${structure.accentColor}`} />
-                          <div>
-                            <h2 className={`text-xl font-semibold mb-2 ${structure.accentColor}`}>{structure.name}</h2>
-                            <p className="text-sm text-gray-300">{structure.description}</p>
-                          </div>
-                        </CardContent>
-                        {structure.shape}
-                      </Card>
-                    ))}
-                    {stage === 'project' && selectedStructure?.name && projects[selectedStructure.name]?.map((project) => (
-                      <Card
-                        key={project.identifier}
-                        className="cursor-pointer hover:shadow-lg transition-shadow"
-                        onClick={() => handleProjectSelect(project)}
-                      >
-                        <CardContent>
-                          <h3>{project.name}</h3>
-                          <p>{project.description}</p>
-                        </CardContent>
-                      </Card>
-                    ))}
-                    {stage === 'confirm' && (
-                      <Card className={`${selectedStructure?.bgColor} border border-gray-600 relative overflow-hidden`}>
-                        <CardContent className="p-4 z-10">
-                          <h2 className={`text-2xl font-semibold mb-4 ${selectedStructure?.accentColor}`}>Confirm Your Mission</h2>
-                          <div className="space-y-2 text-gray-300">
-                            <p><strong>Facility:</strong> {selectedStructure?.name}</p>
-                            <p><strong>Project:</strong> {selectedProject?.name}</p>
-                            <p><strong>Objective:</strong> {selectedProject?.description}</p>
-                            <p><strong>Mission ID:</strong> {selectedProject?.identifier}</p>
-                            <p><strong>Databank:</strong> <a href={selectedProject?.sourceLink} target="_blank" rel="noopener noreferrer" className={`${selectedStructure?.accentColor} hover:underline`}>Access Files</a></p>
-                          </div>
-                        </CardContent>
-                        {selectedStructure?.shape}
-                      </Card>
-                    )}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            <div className='mt-6 flex justify-between items-center'>
-              {selectedStructure && stage !== 'confirm' && (
-                <div className="flex items-center">
-                  <selectedStructure.icon className={`w-12 h-12 mr-2 ${selectedStructure.accentColor}`} />
-                  <span className={`${selectedStructure.accentColor} font-semibold`}>{selectedStructure.name}</span>
-                </div>
-              )}
-              <div className="space-x-4 ml-auto">
-                {stage !== 'structure' && (
-                  <Button onClick={handleBack} variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
-                    Back
-                  </Button>
-                )}
-                {stage === 'confirm' && (
-                  <Button onClick={handleConfirm} className={`${selectedStructure?.bgColor} ${selectedStructure?.accentColor} hover:bg-opacity-80`}>
-                    Launch Mission
-                  </Button>
-                )}
-            </div>
-            </div>
+      {selectedStructure && (
+        <div className="border-t pt-4">
+          <h2 className="text-xl font-bold mb-2">Missions for {selectedStructure.name}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {projects[selectedStructure.name]?.map((mission) => (
+              <Card key={mission.identifier} onClick={() => handleMissionClick(mission)} className="cursor-pointer">
+                <CardContent className="p-4">
+                  <h4 className="text-md font-medium">{mission.name}</h4>
+                  <p className="text-sm">{mission.description}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
+        </div>
+      )}
 
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwMDAwMDAiPjwvcmVjdD4KPHBhdGggZD0iTTAgNUw1IDBaTTYgNEw0IDZaTS0xIDFMMSAtMVoiIHN0cm9rZT0iIzMzMzMzMzEwIiBzdHJva2Utd2lkdGg9IjEiPjwvcGF0aD4KPC9zdmc+')] opacity-20"></div>
-            <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-gray-400 rounded-full animate-pulse"></div>
-            <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-gray-400 rounded-full animate-pulse delay-150"></div>
-            <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-gray-400 rounded-full animate-pulse delay-300"></div>
-          </div>
-        </CardContent>
-      </Card>
+      {selectedMission && (
+        <div className="border-t pt-4">
+          <h3 className="text-lg font-semibold mb-2">Confirm Mission</h3>
+          <p className="mb-2">{selectedMission.name}: {selectedMission.description}</p>
+          <Button onClick={handleConfirmMission}>Confirm & Begin</Button>
+        </div>
+      )}
+
+      {confirmationMessage && (
+        <div className="text-green-500 mt-4 font-medium">{confirmationMessage}</div>
+      )}
     </div>
   );
 };

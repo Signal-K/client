@@ -28,7 +28,7 @@ export default function MyLocationIds() {
   }, [session]);
 
   if (loading) return <p>Loading IDs...</p>;
-  if (locationIds.length === 0) return <p>No locations found.</p>;
+  if (locationIds.length === 0) return <p>No locations found. Discover some asteroids or planets using your telescope!</p>;
 
   return <p>{locationIds.join(", ")}</p>;
 };

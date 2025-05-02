@@ -6,17 +6,20 @@ import InventoryPage from "@/components/Inventory/Grid/Grid";
 import MissionSelector from "@/components/Missions/mission-selector";
 import VerticalToolbar from "@/components/Layout/Toolbar";
 import Navbar from "@/components/Layout/Navbar";
+import GameNavbar from "@/components/Layout/Tes";
 
 export default function Onboarding () {
     return (
         <>
-            <Navbar />
-            <EarthScene
-                topSection={<></>}
-                middleSection={<MissionSelector />}
-                // toolbar={<VerticalToolbar />}
-                // bottomSection={<InventoryPage />}
-            />
+            <GameNavbar />
+            <div className="py-5">
+                <EarthScene
+                    topSection={<></>}
+                    middleSection={<MissionSelector />}
+                    // toolbar={<VerticalToolbar />}
+                    // bottomSection={<InventoryPage />}
+                />
+            </div>
         </>
     ); 
 };
