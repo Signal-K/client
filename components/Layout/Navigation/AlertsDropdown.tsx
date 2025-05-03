@@ -18,7 +18,7 @@ interface Milestone {
   field: string;
   value: string;
   requiredCount: number;
-}
+};
 
 export default function AlertsDropdown() {
   const supabase = useSupabaseClient();
@@ -42,26 +42,27 @@ export default function AlertsDropdown() {
     const fetchAlerts = async () => {
       if (!session?.user) return;
       const userId = session.user.id;
-
+  
       const milestoneRes = await fetch("/api/gameplay/milestones");
       const milestoneData = await milestoneRes.json();
       const thisWeekMilestones = milestoneData.playerMilestones.at(-1);
-
+  
       if (!thisWeekMilestones) return;
-
+  
       const { weekStart, data } = thisWeekMilestones;
       const startDate = new Date(weekStart);
       const endDate = addDays(startDate, 6);
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const cookieKey = getCookieKey(userId, weekStart);
       const dismissedIds = JSON.parse(Cookies.get(cookieKey) || "[]");
-
-      const alertMessages: string[] = [];
-
+  
+      const milestoneAlerts: string[] = [];
+  
       for (const milestone of data as Milestone[]) {
         if (dismissedIds.includes(milestone.id)) continue;
-
+  
         const actualField = FIELD_ALIASES[milestone.table]?.[milestone.field] ?? milestone.field;
-
+  
         const { count, error } = await supabase
           .from(milestone.table)
           .select("*", { count: "exact" })
@@ -69,39 +70,94 @@ export default function AlertsDropdown() {
           .lte("created_at", endDate.toISOString())
           .eq(actualField, milestone.value)
           .eq("author", userId);
-
+  
         if (error) {
           console.error("Error checking milestone:", error);
           continue;
         }
-
-        if ((count ?? 0) < milestone.requiredCount) {
-          // Custom or fallback message
-          let msg = `Mission incomplete: ${milestone.name} — visit the ${milestone.structure} to contribute.`;
-          if (milestone.value === "planet" && milestone.structure === "Telescope") {
-            msg = "New planet candidate discovered by your telescope.";
-          } else if (milestone.value === "sunspot" && milestone.structure === "Telescope") {
-            msg = "Sunspot activity detected — help us classify.";
-          } else if (milestone.value === "cloud" && milestone.structure === "WeatherBalloon") {
-            msg = "Unusual cloud formations need your attention.";
+  
+        if ((count ?? 0) >= milestone.requiredCount) continue;
+  
+        let msg = `Mission incomplete: ${milestone.name} — visit the ${milestone.structure} to contribute.`;
+  
+        if (milestone.structure === 'WeatherBalloon') {
+          switch (milestone.value) {
+            case 'sunspot':
+              msg = "Sunspot activity detected — deploy Weather Balloon.";
+              break;
+            case 'satellite-planetFour':
+              msg = "Dust storm approaching — assist in image classification.";
+              break;
+            case 'automaton-aiForMars':
+              msg = "Rover anomaly reported — initiate diagnostics.";
+              break;
+            case 'lidar-jovianVortexHunter':
+              msg = "Cyclonic activity spotted — help verify data.";
+              break;
+            case 'cloud':
+            case 'balloon-marsCloudShapes':
+              msg = "Unusual cloud formations detected — your analysis is needed.";
+              break;
           }
-
-          alertMessages.push(msg);
+        }
+  
+        if (milestone.structure === 'Greenhouse') {
+          msg = "Sensor trigger from your desert/ocean pod — investigate recent anomaly.";
+        }
+  
+        milestoneAlerts.push(msg);
+      }
+  
+      // If no milestones left, add a discovery message (planet, asteroid, sunspot, etc.)
+      if (milestoneAlerts.length === 0) {
+        const discoveryOptions = [
+          { structure: 'Telescope', type: 'telescope-minorPlanet', message: 'A new asteroid has been detected by your telescope.' },
+          { structure: 'Telescope', type: 'planet', message: 'A planet candidate has been spotted by your telescope.' },
+          { structure: 'WeatherBalloon', type: 'sunspot', message: 'Your Weather Balloon has recorded intense sunspot activity.' },
+          { structure: 'WeatherBalloon', type: 'automaton-aiForMars', message: 'Rover anomaly reported — assist analysis via Weather Balloon.' },
+          { structure: 'WeatherBalloon', type: 'lidar-jovianVortexHunter', message: 'Cyclone-like structures seen from orbit — verify data.' },
+          { structure: 'Greenhouse', type: null, message: 'Sensor event detected from your Greenhouse pod — check for changes in terrain.' }
+        ];
+  
+        const eligibleDiscoveries = [];
+  
+        for (const option of discoveryOptions) {
+          if (!option.type) {
+            eligibleDiscoveries.push(option);
+            continue;
+          }
+  
+          const { data: existing, error } = await supabase
+            .from('classifications')
+            .select('id')
+            .eq('classificationtype', option.type)
+            .gte('created_at', sevenDaysAgo.toISOString());
+  
+          if (error) {
+            console.error('Discovery check failed:', error);
+            continue;
+          }
+  
+          if ((existing?.length ?? 0) === 0) {
+            eligibleDiscoveries.push(option);
+          }
+        }
+  
+        if (eligibleDiscoveries.length > 0) {
+          const randomDiscovery = eligibleDiscoveries[Math.floor(Math.random() * eligibleDiscoveries.length)];
+          milestoneAlerts.push(randomDiscovery.message);
+        } else {
+          milestoneAlerts.push("You've completed all milestone goals this week!");
         }
       }
-
-      if (alertMessages.length === 0) {
-        alertMessages.push("You've completed all milestone goals this week!");
-      } else {
-        setHasNewAlert(true);
-        setNewNotificationsCount(alertMessages.length);
-      }
-
-      setAlerts(alertMessages);
+  
+      setAlerts(milestoneAlerts);
+      setHasNewAlert(milestoneAlerts.length > 0);
+      setNewNotificationsCount(milestoneAlerts.length);
     };
-
+  
     fetchAlerts();
-  }, [session, supabase]);
+  }, [session, supabase]);  
 
   useEffect(() => {
     const calculateTimeRemaining = () => {

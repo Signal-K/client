@@ -47,7 +47,7 @@ export function UnownedSurfaceStructures() {
 
       const unowned = allItems.filter(item =>
         item.ItemCategory === 'Structure' &&
-        item.locationType === 'Surface' &&
+        (item.locationType === 'Surface' || item.locationType === 'Atmosphere') &&
         !ownedIds.includes(item.id)
       );
 
