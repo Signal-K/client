@@ -38,31 +38,44 @@ export default function AlertsDropdown() {
 
   const getCookieKey = (userId: string, week: string) => `dismissed-alerts-${userId}-${week}`;
 
+  const playRandomSound = () => {
+    const soundFiles = [
+      "/assets/audio/notifs/r2d2.wav",
+      "/assets/audio/notifs/r2d21.wav",
+    //   "/assets/audio/notifs/notify3.wav",
+    //   "/assets/audio/notifs/notify4.wav"
+    ];
+
+    const randomSound = soundFiles[Math.floor(Math.random() * soundFiles.length)];
+    const audio = new Audio(randomSound);
+    audio.play().catch((err) => console.error("Failed to play sound:", err));
+  };
+
   useEffect(() => {
     const fetchAlerts = async () => {
       if (!session?.user) return;
       const userId = session.user.id;
-  
+
       const milestoneRes = await fetch("/api/gameplay/milestones");
       const milestoneData = await milestoneRes.json();
       const thisWeekMilestones = milestoneData.playerMilestones.at(-1);
-  
+
       if (!thisWeekMilestones) return;
-  
+
       const { weekStart, data } = thisWeekMilestones;
       const startDate = new Date(weekStart);
       const endDate = addDays(startDate, 6);
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const cookieKey = getCookieKey(userId, weekStart);
       const dismissedIds = JSON.parse(Cookies.get(cookieKey) || "[]");
-  
+
       const milestoneAlerts: string[] = [];
-  
+
       for (const milestone of data as Milestone[]) {
         if (dismissedIds.includes(milestone.id)) continue;
-  
+
         const actualField = FIELD_ALIASES[milestone.table]?.[milestone.field] ?? milestone.field;
-  
+
         const { count, error } = await supabase
           .from(milestone.table)
           .select("*", { count: "exact" })
@@ -70,16 +83,16 @@ export default function AlertsDropdown() {
           .lte("created_at", endDate.toISOString())
           .eq(actualField, milestone.value)
           .eq("author", userId);
-  
+
         if (error) {
           console.error("Error checking milestone:", error);
           continue;
         }
-  
+
         if ((count ?? 0) >= milestone.requiredCount) continue;
-  
+
         let msg = `Mission incomplete: ${milestone.name} — visit the ${milestone.structure} to contribute.`;
-  
+
         if (milestone.structure === 'WeatherBalloon') {
           switch (milestone.value) {
             case 'sunspot':
@@ -100,15 +113,14 @@ export default function AlertsDropdown() {
               break;
           }
         }
-  
+
         if (milestone.structure === 'Greenhouse') {
           msg = "Sensor trigger from your desert/ocean pod — investigate recent anomaly.";
         }
-  
+
         milestoneAlerts.push(msg);
       }
-  
-      // If no milestones left, add a discovery message (planet, asteroid, sunspot, etc.)
+
       if (milestoneAlerts.length === 0) {
         const discoveryOptions = [
           { structure: 'Telescope', type: 'telescope-minorPlanet', message: 'A new asteroid has been detected by your telescope.' },
@@ -118,31 +130,31 @@ export default function AlertsDropdown() {
           { structure: 'WeatherBalloon', type: 'lidar-jovianVortexHunter', message: 'Cyclone-like structures seen from orbit — verify data.' },
           { structure: 'Greenhouse', type: null, message: 'Sensor event detected from your Greenhouse pod — check for changes in terrain.' }
         ];
-  
+
         const eligibleDiscoveries = [];
-  
+
         for (const option of discoveryOptions) {
           if (!option.type) {
             eligibleDiscoveries.push(option);
             continue;
           }
-  
+
           const { data: existing, error } = await supabase
             .from('classifications')
             .select('id')
             .eq('classificationtype', option.type)
             .gte('created_at', sevenDaysAgo.toISOString());
-  
+
           if (error) {
             console.error('Discovery check failed:', error);
             continue;
           }
-  
+
           if ((existing?.length ?? 0) === 0) {
             eligibleDiscoveries.push(option);
           }
         }
-  
+
         if (eligibleDiscoveries.length > 0) {
           const randomDiscovery = eligibleDiscoveries[Math.floor(Math.random() * eligibleDiscoveries.length)];
           milestoneAlerts.push(randomDiscovery.message);
@@ -150,14 +162,14 @@ export default function AlertsDropdown() {
           milestoneAlerts.push("You've completed all milestone goals this week!");
         }
       }
-  
+
       setAlerts(milestoneAlerts);
       setHasNewAlert(milestoneAlerts.length > 0);
       setNewNotificationsCount(milestoneAlerts.length);
     };
-  
+
     fetchAlerts();
-  }, [session, supabase]);  
+  }, [session, supabase]);
 
   useEffect(() => {
     const calculateTimeRemaining = () => {
@@ -184,8 +196,7 @@ export default function AlertsDropdown() {
       const cookieKey = getCookieKey(session.user.id, weekStart);
       const dismissedIds: string[] = JSON.parse(Cookies.get(cookieKey) || "[]");
 
-      const current = data.find((_: { id: any; }, index: any) => {
-        // Match based on the alert index position
+      const current = data.find((_: { id: any }, index: any) => {
         const incompleteAndNotDismissed = data.filter((m: Milestone) => {
           const actualField = FIELD_ALIASES[m.table]?.[m.field] ?? m.field;
           return !dismissedIds.includes(m.id);
@@ -199,6 +210,10 @@ export default function AlertsDropdown() {
       }
 
       const nextIndex = currentAlertIndex + 1;
+
+      playRandomSound();
+      console.log("Alert dismissed:", current?.name);
+
       if (nextIndex < alerts.length) {
         setCurrentAlertIndex(nextIndex);
         setNewNotificationsCount(alerts.length - (nextIndex + 1));
