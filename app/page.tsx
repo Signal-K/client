@@ -23,6 +23,7 @@ import GameNavbar from "@/components/Layout/Tes";
 export default function Home() {
   const session = useSession();
   const supabase = useSupabaseClient();
+  
   const { activePlanet } = useActivePlanet();
 
   const [hasRequiredItems, setHasRequiredItems] = useState<boolean | null>(null);

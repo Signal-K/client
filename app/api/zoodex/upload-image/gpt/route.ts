@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
     const base64Image = buffer.toString("base64");
 
-    console.log("File received. Size:", buffer.length, "bytes");
+    console.log("File received. Size: ", buffer.length, " bytes");
 
     const openaiRes = await axios.post(
       "https://api.openai.com/v1/chat/completions",

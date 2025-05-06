@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { formatDistanceToNow, startOfDay, addDays } from "date-fns";
 import Cookies from "js-cookie";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -25,6 +26,7 @@ export default function AlertsDropdown() {
   const session = useSession();
 
   const [alerts, setAlerts] = useState<string[]>([]);
+  const [alertStructures, setAlertStructures] = useState<string[]>([]);
   const [currentAlertIndex, setCurrentAlertIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState("");
   const [hasNewAlert, setHasNewAlert] = useState(false);
@@ -42,10 +44,7 @@ export default function AlertsDropdown() {
     const soundFiles = [
       "/assets/audio/notifs/r2d2.wav",
       "/assets/audio/notifs/r2d21.wav",
-    //   "/assets/audio/notifs/notify3.wav",
-    //   "/assets/audio/notifs/notify4.wav"
     ];
-
     const randomSound = soundFiles[Math.floor(Math.random() * soundFiles.length)];
     const audio = new Audio(randomSound);
     audio.play().catch((err) => console.error("Failed to play sound:", err));
@@ -70,6 +69,7 @@ export default function AlertsDropdown() {
       const dismissedIds = JSON.parse(Cookies.get(cookieKey) || "[]");
 
       const milestoneAlerts: string[] = [];
+      const structureSources: string[] = [];
 
       for (const milestone of data as Milestone[]) {
         if (dismissedIds.includes(milestone.id)) continue;
@@ -119,6 +119,7 @@ export default function AlertsDropdown() {
         }
 
         milestoneAlerts.push(msg);
+        structureSources.push(milestone.structure);
       }
 
       if (milestoneAlerts.length === 0) {
@@ -158,12 +159,15 @@ export default function AlertsDropdown() {
         if (eligibleDiscoveries.length > 0) {
           const randomDiscovery = eligibleDiscoveries[Math.floor(Math.random() * eligibleDiscoveries.length)];
           milestoneAlerts.push(randomDiscovery.message);
+          structureSources.push(randomDiscovery.structure);
         } else {
           milestoneAlerts.push("You've completed all milestone goals this week!");
+          structureSources.push(""); // no structure
         }
       }
 
       setAlerts(milestoneAlerts);
+      setAlertStructures(structureSources);
       setHasNewAlert(milestoneAlerts.length > 0);
       setNewNotificationsCount(milestoneAlerts.length);
     };
@@ -187,8 +191,7 @@ export default function AlertsDropdown() {
   const dismissCurrentAlert = () => {
     if (!session?.user) return;
 
-    const milestoneRes = fetch("/api/gameplay/milestones").then((res) => res.json());
-    milestoneRes.then((milestoneData) => {
+    fetch("/api/gameplay/milestones").then((res) => res.json()).then((milestoneData) => {
       const thisWeekMilestones = milestoneData.playerMilestones.at(-1);
       if (!thisWeekMilestones) return;
 
@@ -212,19 +215,24 @@ export default function AlertsDropdown() {
       const nextIndex = currentAlertIndex + 1;
 
       playRandomSound();
-      console.log("Alert dismissed:", current?.name);
 
       if (nextIndex < alerts.length) {
         setCurrentAlertIndex(nextIndex);
         setNewNotificationsCount(alerts.length - (nextIndex + 1));
       } else {
         setAlerts(["You've completed all milestone goals this week!"]);
+        setAlertStructures([""]);
         setCurrentAlertIndex(0);
         setHasNewAlert(false);
         setNewNotificationsCount(0);
       }
     });
   };
+
+  const currentStructure = alertStructures[currentAlertIndex]?.toLowerCase();
+  const structurePath = currentStructure
+    ? `/structures/${currentStructure === "weatherballoon" ? "balloon" : currentStructure}`
+    : null;
 
   return (
     <Popover>
@@ -248,6 +256,15 @@ export default function AlertsDropdown() {
             <p>{alerts[currentAlertIndex] || "No new alerts."}</p>
             <p className="mt-2 text-xs text-gray-500">Time remaining until next event: {timeRemaining}</p>
           </div>
+
+          {structurePath && (
+            <div className="mt-4 flex justify-center">
+              <Link href={structurePath}>
+                <Button variant="default">Go to Structure</Button>
+              </Link>
+            </div>
+          )}
+
           {alerts.length > 1 && currentAlertIndex < alerts.length - 1 && (
             <div className="mt-4 flex justify-center">
               <Button variant="secondary" onClick={dismissCurrentAlert}>

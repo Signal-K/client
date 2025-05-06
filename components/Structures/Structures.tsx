@@ -8,7 +8,7 @@ import IndividualStructure, { IndividualStructureProps } from "./IndividualStruc
 import { StructuresConfig } from "@/constants/Structures/Properties";
 
 import "../../styles/Anims/StarterStructureAnimations.css";
-
+ 
 interface StructuresOnPlanetProps { 
     onStructuresFetch: (
         orbitalStructures: InventoryStructureItem[],

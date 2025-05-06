@@ -139,7 +139,7 @@ const PlanetViewLayout: React.FC<PlanetViewLayoutProps> = ({ children }) => {
         </div>
       </div>
     </div>
-  );
+  ); 
 };
 
 export default PlanetViewLayout;
