@@ -274,64 +274,67 @@ export function DailyMinorPlanet() {
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-    
     const [loading, setLoading] = useState<boolean>(true);
-
-    if (loading) {
-        return (
-            <p>
-                Loading...
-            </p>
-        );
-    };
-
     const [showTutorial, setShowTutorial] = useState(false);
 
-    useEffect(() => {    
+    useEffect(() => {
         const fetchAnomaly = async () => {
             try {
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")
                     .select("*")
                     .eq("anomalySet", "telescope-minorPlanet");
-    
+
                 if (anomalyError) {
                     throw anomalyError;
-                };
-    
+                }
+
+                if (!anomalyData || anomalyData.length === 0) {
+                    console.warn("No anomalies found for telescope-minorPlanet");
+                    setAnomaly(null);
+                    return;
+                }
+
                 const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
                 setAnomaly(randomAnomaly);
-                
+
                 const imageUrls = [
                     `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${randomAnomaly.id}/1.png`,
                     `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${randomAnomaly.id}/2.png`,
                     `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${randomAnomaly.id}/3.png`,
                     `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${randomAnomaly.id}/4.png`
                 ];
-    
+
                 setImageUrls(imageUrls);
-    
-                // Log the anomaly ID and image URLs in the console
+
                 console.log("Anomaly ID:", randomAnomaly.id);
                 console.log("Image URLs:", imageUrls);
             } catch (error: any) {
-                console.error("Error fetching anomaly ", error.message);
+                console.error("Error fetching anomaly", error.message);
                 setAnomaly(null);
             } finally {
                 setLoading(false);
-            };
+            }
         };
-    
+
         fetchAnomaly();
-    }, [session, supabase]);    
+    }, [session, supabase]);
 
     const handlePrevious = () => {
-        setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1));
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1
+        );
     };
 
     const handleNext = () => {
-        setCurrentImageIndex((prevIndex) => (prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1));
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1
+        );
     };
+
+    if (loading) {
+        return <p>Loading...</p>;
+    }
 
     if (!anomaly) {
         return (
@@ -339,7 +342,7 @@ export function DailyMinorPlanet() {
                 <p>No anomaly found.</p>
             </div>
         );
-    };
+    }
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
@@ -374,6 +377,7 @@ export function DailyMinorPlanet() {
                     </div>
                 )}
             </div>
+
             {imageUrls.length > 0 && (
                 <div className="flex w-full gap-2 mt-4">
                     {imageUrls.map((url, index) => (
@@ -400,5 +404,5 @@ export function DailyMinorPlanet() {
                 />
             )}
         </div>
-    );     
+    );
 };
