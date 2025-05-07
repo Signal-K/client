@@ -1,30 +1,34 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Stars, Environment } from "@react-three/drei";
-import { PlanetShader } from "./PlanetShader";
-import { Planet } from "./Planet/planet-main";
-import { SettingsPanel } from "./SettingsPanel";
-import { Cog } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react"
+import { Canvas } from "@react-three/fiber"
+import { OrbitControls, Stars, Environment } from "@react-three/drei"
+import { PlanetShader } from "./PlanetShader"
+import { SimplePlanet } from "./Simple/simple"
+import { StylizedPlanetShader } from "./Shader/Styliized/stylized-planet-shader"
+import { StylizedClouds } from "./Shader/Styliized/stylized-cloud-shader"
+import { Planet } from "./Planet/planet-main"
+import { SettingsPanel } from "./SettingsPanel"
+import { Cog, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
   type PlanetStats,
   calculateDensity,
   defaultPlanetStats,
   mergeWithDefaults,
   generateDefaultLandmarks,
-} from "@/lib/planet-physics";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+} from "@/lib/planet-physics"
+import { useSupabaseClient } from "@supabase/auth-helpers-react"
 
 export interface PlanetGeneratorProps {
-  classificationConfig?: any;
-  content?: string;
-  classificationId: string;
-  author: string;
-  type?: string;
-  biome?: string;
-  planetConfiguration?: any;
+  classificationConfig?: any
+  content?: string
+  classificationId: string
+  author: string
+  type?: string
+  biome?: string
+  planetConfiguration?: any
 }
 
 export function PlanetGenerator({
@@ -36,10 +40,10 @@ export function PlanetGenerator({
   classificationConfig,
   content,
 }: PlanetGeneratorProps) {
-  const supabase = useSupabaseClient();
+  const supabase = useSupabaseClient()
 
-  const [showSettings, setShowSettings] = useState(false);
-  const [useShader, setUseShader] = useState(true);
+  const [showSettings, setShowSettings] = useState(false)
+  const [renderMode, setRenderMode] = useState<"detailed" | "simple" | "stylized" | "standard">("detailed")
   const [planetStats, setPlanetStats] = useState<PlanetStats>(() => {
     const initialStats = planetConfiguration
       ? mergeWithDefaults(planetConfiguration)
@@ -47,15 +51,16 @@ export function PlanetGenerator({
           ...defaultPlanetStats,
           ...(biome ? { biome } : {}),
           ...(type ? { type } : {}),
-        };
+        }
 
     if (!initialStats.landmarks || initialStats.landmarks.length === 0) {
-      initialStats.landmarks = generateDefaultLandmarks(initialStats);
+      initialStats.landmarks = generateDefaultLandmarks(initialStats)
     }
 
-    return initialStats;
-  });
+    return initialStats
+  })
 
+  // Update planet stats when configuration changes
   useEffect(() => {
     const updatedStats = planetConfiguration
       ? mergeWithDefaults(planetConfiguration)
@@ -63,64 +68,83 @@ export function PlanetGenerator({
           ...defaultPlanetStats,
           ...(biome ? { biome } : {}),
           ...(type ? { type } : {}),
-        };
+        }
 
     if (!updatedStats.landmarks || updatedStats.landmarks.length === 0) {
-      updatedStats.landmarks = generateDefaultLandmarks(updatedStats);
+      updatedStats.landmarks = generateDefaultLandmarks(updatedStats)
     } else {
-      const hasTerrestrial = updatedStats.landmarks.some((l) => l.category === "terrestrial");
-      const hasGaseous = updatedStats.landmarks.some((l) => l.category === "gaseous");
+      const hasTerrestrial = updatedStats.landmarks.some((l) => l.category === "terrestrial")
+      const hasGaseous = updatedStats.landmarks.some((l) => l.category === "gaseous")
 
       if (!hasTerrestrial || !hasGaseous) {
-        const defaultLandmarks = generateDefaultLandmarks(updatedStats);
+        const defaultLandmarks = generateDefaultLandmarks(updatedStats)
         if (!hasTerrestrial) {
-          const terrestrial = defaultLandmarks.find((l) => l.category === "terrestrial");
-          if (terrestrial) updatedStats.landmarks.push(terrestrial);
+          const terrestrial = defaultLandmarks.find((l) => l.category === "terrestrial")
+          if (terrestrial) updatedStats.landmarks.push(terrestrial)
         }
         if (!hasGaseous) {
-          const gaseous = defaultLandmarks.find((l) => l.category === "gaseous");
-          if (gaseous) updatedStats.landmarks.push(gaseous);
+          const gaseous = defaultLandmarks.find((l) => l.category === "gaseous")
+          if (gaseous) updatedStats.landmarks.push(gaseous)
         }
       }
     }
 
-    setPlanetStats(updatedStats);
-  }, [planetConfiguration, biome, type]);
+    setPlanetStats(updatedStats)
+  }, [planetConfiguration, biome, type])
 
+  // Fetch exported values from Supabase
   useEffect(() => {
     const fetchExportedValues = async () => {
-      const idAsNumber = parseInt(classificationId);
-      if (isNaN(idAsNumber)) return;
+      const idAsNumber = Number.parseInt(classificationId)
+      if (isNaN(idAsNumber)) return
 
       const { data, error } = await supabase
         .from("classifications")
         .select("classificationConfiguration")
         .eq("id", idAsNumber)
-        .single();
+        .single()
 
-      if (error || !data?.classificationConfiguration?.exportedValue) return;
+      if (error || !data?.classificationConfiguration?.exportedValue) return
 
-      const { exportedValue } = data.classificationConfiguration;
+      const { exportedValue } = data.classificationConfiguration
 
       setPlanetStats((prev) => ({
         ...prev,
         ...(exportedValue.mass && { mass: exportedValue.mass }),
         ...(exportedValue.radius && { radius: exportedValue.radius }),
-      }));
-    };
+      }))
+    }
 
-    fetchExportedValues();
-  }, [classificationId]);
+    fetchExportedValues()
+  }, [classificationId, supabase])
 
+  // Update density when mass or radius changes
   useEffect(() => {
     setPlanetStats((prev) => ({
       ...prev,
       density: calculateDensity(prev.mass, prev.radius),
-    }));
-  }, [planetStats.mass, planetStats.radius]);
+    }))
+  }, [planetStats.mass, planetStats.radius])
+
+  // Get render mode label
+  const getRenderModeLabel = () => {
+    switch (renderMode) {
+      case "detailed":
+        return "Detailed View"
+      case "stylized":
+        return "Stylized View"
+      case "simple":
+        return "Simple View"
+      case "standard":
+        return "Standard Render"
+      default:
+        return "Detailed View"
+    }
+  }
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="w-full h-screen relative overflow-hidden">
+      {/* Classification info - kept but commented out as in original */}
       {/* <div className="absolute top-4 left-4 z-10 bg-black/70 text-green-400 font-mono p-2 rounded border border-green-500/30 text-sm">
         <div>
           <span className="text-green-500/70">ID:</span> {classificationId}
@@ -145,19 +169,31 @@ export function PlanetGenerator({
         )}
       </div> */}
 
+      {/* Classification config - kept but commented out as in original */}
       {/* {classificationConfig && (
         <pre className="text-xs text-white/70">
           {JSON.stringify(classificationConfig, null, 2)}
         </pre>
       )} */}
 
-      <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
+      {/* Use a key on the Canvas to force a complete remount when switching modes */}
+      <Canvas key={renderMode} camera={{ position: [0, 0, 10], fov: 45 }}>
         <ambientLight intensity={0.4} />
         <pointLight position={[10, 10, 10]} intensity={2} />
         <pointLight position={[-10, -10, -10]} intensity={0.5} color="#b0c4de" />
         <directionalLight position={[5, 5, 5]} intensity={1.5} castShadow />
         <Environment preset="sunset" />
-        {useShader ? <PlanetShader planetStats={planetStats} /> : <Planet planetStats={planetStats} />}
+
+        {renderMode === "detailed" && <PlanetShader planetStats={planetStats} />}
+        {renderMode === "stylized" && (
+          <>
+            <StylizedPlanetShader planetStats={planetStats} />
+            <StylizedClouds planetStats={planetStats} />
+          </>
+        )}
+        {renderMode === "simple" && <SimplePlanet planetStats={planetStats} />}
+        {renderMode === "standard" && <Planet planetStats={planetStats} />}
+
         <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
         <OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
         <mesh position={[0, 0, -15]}>
@@ -167,14 +203,40 @@ export function PlanetGenerator({
       </Canvas>
 
       <div className="absolute top-4 right-4 flex gap-2">
-        {/* <Button
-          variant="outline"
-          size="sm"
-          className="bg-black/50 hover:bg-black/70 text-white"
-          onClick={() => setUseShader(!useShader)}
-        >
-          {useShader ? "Standard Render" : "Shader Render"}
-        </Button> */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="bg-black/50 hover:bg-black/70 text-white">
+              {getRenderModeLabel()}
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-black/80 border-slate-700 text-white">
+            <DropdownMenuItem
+              className={renderMode === "detailed" ? "bg-cyan-900/40" : "hover:bg-slate-700/50"}
+              onClick={() => setRenderMode("detailed")}
+            >
+              Detailed View
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className={renderMode === "stylized" ? "bg-cyan-900/40" : "hover:bg-slate-700/50"}
+              onClick={() => setRenderMode("stylized")}
+            >
+              Stylized View
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className={renderMode === "simple" ? "bg-cyan-900/40" : "hover:bg-slate-700/50"}
+              onClick={() => setRenderMode("simple")}
+            >
+              Simple View
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className={renderMode === "standard" ? "bg-cyan-900/40" : "hover:bg-slate-700/50"}
+              onClick={() => setRenderMode("standard")}
+            >
+              Standard Render
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button
           variant="outline"
           size="icon"
@@ -194,5 +256,5 @@ export function PlanetGenerator({
         />
       )}
     </div>
-  );
+  )
 };

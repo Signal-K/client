@@ -55,7 +55,13 @@ export default function TestPage() {
                     density={3.5}
                   />
                   <MyLocationIds /> */}
-      <WeatherEventsOverview />
+      {/* <WeatherEventsOverview /> */}
+      <PlanetGenerator
+        classificationId="PLT-2025-04"
+        author="Teddy Српској"
+        type="Terrestrial"
+        biome="Rocky Highlands"
+      />
     </div>
   );
 };
