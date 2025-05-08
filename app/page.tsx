@@ -4,6 +4,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 import LoginPage from "./auth/LoginModal";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { subscribeUser, unsubscribeUser, sendNotification } from './actions'
 import {
   EarthView,
 } from './scenes';
@@ -19,6 +20,189 @@ import Navbar from "@/components/Layout/Navbar";
 import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatellites";
 import LandingSS from "./auth/landing";
 import GameNavbar from "@/components/Layout/Tes";
+
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+};
+
+function PushNotificationManager() {
+  const session = useSession();
+  const supabase = useSupabaseClient();
+  const [isSupported, setIsSupported] = useState(false);
+  const [subscription, setSubscription] = useState<PushSubscription | null>(null);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if ("serviceWorker" in navigator && "PushManager" in window) {
+      setIsSupported(true);
+      registerServiceWorker();
+    }
+  }, []);
+
+  async function registerServiceWorker() {
+    const registration = await navigator.serviceWorker.register("/sw.js", {
+      scope: "/",
+      updateViaCache: "none",
+    });
+
+    const sub = await registration.pushManager.getSubscription();
+    setSubscription(sub);
+  }
+
+  async function subscribeToPush() {
+    const registration = await navigator.serviceWorker.ready;
+  
+    const sub = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(
+        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
+      ),
+    });
+  
+    const subJSON = sub.toJSON(); // 🔥 THIS IS ESSENTIAL
+  
+    setSubscription(sub);
+  
+    // Save clean JSON to Supabase
+    const { error } = await supabase
+      .from("profiles")
+      .update({ push_subscription: subJSON })
+      .eq("id", session?.user.id);
+  
+    if (error) console.error("Error saving subscription:", error);
+  }  
+
+  async function unsubscribeFromPush() {
+    await subscription?.unsubscribe();
+    setSubscription(null);
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ push_subscription: null })
+      .eq("id", session?.user.id);
+
+    if (error) console.error("Error removing subscription:", error);
+  }
+
+  async function sendTestNotification() {
+    if (!session) return;
+  
+    try {
+      const res = await fetch("/api/send-push", {
+        method: "POST",
+        body: JSON.stringify({ userId: session.user.id, message }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      const json = await res.json();
+      console.log("Push response:", res.status, json);
+  
+      if (!res.ok) {
+        alert(`Push failed: ${json?.error || res.status}`);
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      alert("Network or server error");
+    }
+  
+    setMessage("");  
+  }  
+
+  if (!isSupported) {
+    return <p>Push notifications are not supported in this browser.</p>;
+  }
+
+  return (
+    <div>
+      <h3>Push Notifications</h3>
+      {subscription ? (
+        <>
+          <p>You are subscribed to push notifications.</p>
+          <button onClick={unsubscribeFromPush}>Unsubscribe</button>
+          <input
+            type="text"
+            placeholder="Enter notification message"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <button onClick={sendTestNotification}>Send Test</button>
+        </>
+      ) : (
+        <>
+          <p>You are not subscribed to push notifications.</p>
+          <button onClick={subscribeToPush}>Subscribe</button>
+        </>
+      )}
+    </div>
+  );
+}
+
+
+function InstallPrompt() {
+  const [isIOS, setIsIOS] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream);
+    setIsStandalone(window.matchMedia('(display-mode: standalone)').matches);
+  
+    const handler = (e: any) => {
+      // Prevent default AND store the prompt
+      e.preventDefault();
+      console.log("beforeinstallprompt event captured");
+      setDeferredPrompt(e);
+    };
+  
+    window.addEventListener("beforeinstallprompt", handler);
+  
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);  
+
+  const installApp = () => {
+    if (deferredPrompt) {
+      console.log("Prompting user to install");
+      deferredPrompt.prompt();
+  
+      deferredPrompt.userChoice.then((choiceResult: any) => {
+        console.log("User choice result:", choiceResult);
+        if (choiceResult.outcome === "accepted") {
+          console.log("User accepted the install prompt");
+        } else {
+          console.log("User dismissed the install prompt");
+        }
+        setDeferredPrompt(null);
+      });
+    } else {
+      console.log("No install prompt available");
+    }
+  };
+  
+
+  if (isStandalone) return null;
+
+  return (
+    <div>
+      <h3>Install App</h3>
+      <button onClick={installApp}>Add to Home Screen</button>
+      {isIOS && (
+        <p>
+          On iOS, tap the Share icon <span role="img" aria-label="share">⎋</span> and then
+          "Add to Home Screen" <span role="img" aria-label="add">➕</span>.
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function Home() {
   const session = useSession();
@@ -65,7 +249,7 @@ export default function Home() {
         if (data) setUserClassifications(true);
       } catch (error: any) {
         console.error(error);
-      }
+      };
     };
 
     checkClassifications();
@@ -151,6 +335,8 @@ export default function Home() {
       <div className="w-full">
         <div className="py-2">
           <center>
+            <InstallPrompt />
+            <PushNotificationManager />
             <AllSatellitesOnActivePlanet />
             <AtmosphereStructuresOnPlanet />
           </center>

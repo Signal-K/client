@@ -1,6 +1,5 @@
 "use client";
 
-import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import WeatherEventsOverview from "@/components/Data/Generator/Weather/EventsAcrossMyLocations";
 import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
 import AlertComponent from "@/components/Structures/Missions/Milestones/Alerts/Alerts";
@@ -56,12 +55,6 @@ export default function TestPage() {
                   />
                   <MyLocationIds /> */}
       {/* <WeatherEventsOverview /> */}
-      <PlanetGenerator
-        classificationId="PLT-2025-04"
-        author="Teddy Српској"
-        type="Terrestrial"
-        biome="Rocky Highlands"
-      />
     </div>
   );
 };

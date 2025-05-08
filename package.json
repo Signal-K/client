@@ -103,6 +103,7 @@
     "use-image": "^1.1.1",
     "use-sound": "^4.0.3",
     "vaul": "^0.9.9",
+    "web-push": "^3.6.7",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
