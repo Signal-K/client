@@ -12,29 +12,45 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '20'
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: yarn install
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY }}
-          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}  
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }} 
 
+      # Step 4: Debug Environment Variables (To check if they are correctly passed)
+      - name: Debug Environment Variables
+        run: |
+          echo "VAPID_PUBLIC_KEY=$VAPID_PUBLIC_KEY"
+          echo "VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY"
+
+      # Step 5: Clean the Next.js build (removes the .next folder to ensure a fresh build)
+      - name: Clean Next.js Build
+        run: rm -rf .next
+
+      # Step 6: Build the app
       - name: Build the app
         run: yarn build
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY }}
-          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }} 
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}  
+
+      # Step 7: Cache node modules (Optional: This caches your npm dependencies for faster builds)
       - name: Cache node modules
         uses: actions/cache@v3
         with:
