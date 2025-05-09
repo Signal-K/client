@@ -10,55 +10,60 @@ const supabase = createClient(
 
 // Set up VAPID details
 webpush.setVapidDetails(
-  "mailto:test@domain.com",  // You can change this to a valid email address
+  "mailto:test@domain.com",
   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
   process.env.VAPID_PRIVATE_KEY!
 );
 
 export async function POST(request: Request) {
   try {
-    // Parse request body
-    const { userId, message } = await request.json();
+    const { userIds, message } = await request.json();
 
-    // Log input to track request
-    console.log("Received request to send push notification", { userId, message });
+    if (!Array.isArray(userIds) || !message) {
+      return NextResponse.json(
+        { error: "Invalid input: userIds must be an array and message must be a string." },
+        { status: 400 }
+      );
+    }
 
-    // Retrieve push subscription from Supabase
-    const { data: userProfile, error } = await supabase
+    // Fetch all matching users with subscriptions
+    const { data: profiles, error } = await supabase
       .from("profiles")
-      .select("push_subscription")
-      .eq("id", userId)
-      .single();
+      .select("id, push_subscription")
+      .in("id", userIds);
 
-    if (error || !userProfile?.push_subscription) {
-      console.error("Failed to retrieve push subscription:", error || "No subscription found");
-      return NextResponse.json({ error: "User push subscription not found" }, { status: 400 });
+    if (error) {
+      console.error("Error fetching user subscriptions:", error);
+      return NextResponse.json({ error: "Database query failed" }, { status: 500 });
     }
 
-    // Log retrieved subscription for debugging
-    console.log("Found user push subscription:", JSON.stringify(userProfile.push_subscription, null, 2));
+    const results = [];
 
-    // Prepare the payload for the push notification
-    const payload = JSON.stringify({
-      title: message,  // Use the message as the title of the notification
-      message,  // You can include the message as well if desired
-    });
+    for (const profile of profiles) {
+      const { id, push_subscription } = profile;
 
-    // Send the push notification
-    try {
-      await webpush.sendNotification(userProfile.push_subscription, payload);
-      console.log("Push notification sent successfully");
-    } catch (pushErr) {
-      console.error("Error sending push notification:", pushErr);
-      return NextResponse.json({ error: "Error sending push notification" }, { status: 500 });
+      if (!push_subscription) {
+        results.push({ id, success: false, error: "No subscription" });
+        continue;
+      }
+
+      const payload = JSON.stringify({
+        title: message,
+        message,
+      });
+
+      try {
+        await webpush.sendNotification(push_subscription, payload);
+        results.push({ id, success: true });
+      } catch (pushErr) {
+        console.error(`Push error for user ${id}:`, pushErr);
+        results.push({ id, success: false, error: (pushErr as Error).message });
+      }
     }
 
-    // Return success response
-    return NextResponse.json({ success: true });
-
+    return NextResponse.json({ results });
   } catch (err) {
-    // Log any other unexpected errors
     console.error("Unexpected error:", err);
-    return NextResponse.json({ error: "Unexpected error occurred" }, { status: 500 });
+    return NextResponse.json({ error: "Unexpected server error" }, { status: 500 });
   }
 };
