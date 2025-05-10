@@ -17,7 +17,11 @@ webpush.setVapidDetails(
 
 export async function POST(request: Request) {
   try {
-    const { userIds, message } = await request.json();
+    const body = await request.json();
+
+    // Accept both 'userId' (single) and 'userIds' (array)
+    const userIds = body.userIds || (body.userId ? [body.userId] : null);
+    const message = body.message;
 
     if (!Array.isArray(userIds) || !message) {
       return NextResponse.json(
@@ -26,7 +30,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Fetch all matching users with subscriptions
+    // Fetch user push subscriptions
     const { data: profiles, error } = await supabase
       .from("profiles")
       .select("id, push_subscription")
@@ -47,13 +51,26 @@ export async function POST(request: Request) {
         continue;
       }
 
+      // Parse subscription if it's a string
+      let subscription;
+      try {
+        subscription =
+          typeof push_subscription === "string"
+            ? JSON.parse(push_subscription)
+            : push_subscription;
+      } catch (parseErr) {
+        console.error(`Failed to parse push_subscription for user ${id}`, parseErr);
+        results.push({ id, success: false, error: "Invalid subscription format" });
+        continue;
+      }
+
       const payload = JSON.stringify({
         title: message,
         message,
       });
 
       try {
-        await webpush.sendNotification(push_subscription, payload);
+        await webpush.sendNotification(subscription, payload);
         results.push({ id, success: true });
       } catch (pushErr) {
         console.error(`Push error for user ${id}:`, pushErr);

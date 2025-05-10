@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Droplets, FileText, Info, Thermometer } from "lucide-react";
 import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+// import { PlanetGenerator } from "starsailors-planet-generator";
 import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
 import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnPlanet";
 import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
@@ -52,7 +53,7 @@ export type Anomaly = {
   gravity: number | null;
   temperature: number | null;
   orbital_period: number | null;
-  avatar_url: string | null;
+avatar_url: string | null;
   created_at: string;
 };
 

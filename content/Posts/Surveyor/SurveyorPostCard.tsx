@@ -42,7 +42,7 @@ export function SurveyorComments({
 //   enableNewCommentingMethod = false,
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
-  const session = useSession();
+  const session = useSession(); 
 
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
