@@ -1,60 +1,48 @@
-name: Build Next.js Application
+name: Build Star Sailors
 
 on:
   push:
-    branches:
-      - '**' 
+    branches: [main]
   pull_request:
-    branches:
-      - '**'
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      # Step 1: Checkout code
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: 18
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: yarn install
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}  
-          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }} 
 
-      # Step 4: Debug Environment Variables (To check if they are correctly passed)
-      - name: Debug Environment Variables
+      - name: Debug VAPID keys
         run: |
           echo "VAPID_PUBLIC_KEY=$VAPID_PUBLIC_KEY"
           echo "VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY"
+        env:
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
 
-      # Step 5: Clean the Next.js build (removes the .next folder to ensure a fresh build)
-      - name: Clean Next.js Build
+      - name: Remove previous build output
         run: rm -rf .next
 
-      # Step 6: Build the app
       - name: Build the app
         run: yarn build
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }} 
-          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}  
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
 
-      # Step 7: Cache node modules (Optional: This caches your npm dependencies for faster builds)
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+      - name: Lint the app
+        run: yarn lint
+
+      - name: Run tests (optional)
+        run: yarn test
