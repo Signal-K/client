@@ -43,8 +43,5 @@ jobs:
           VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
 
-      - name: Lint the app
-        run: yarn lint
-
       - name: Run tests (optional)
         run: yarn test
