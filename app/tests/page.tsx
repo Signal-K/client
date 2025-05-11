@@ -42,7 +42,7 @@ export default function TestPage() {
   }, [session]);
 
   return (
-    <div className="min-h-screen bg-black text-white p-4 space-y-8">
+    <div className="min-h-screen  p-4 space-y-8">
       {/* <AlertComponent /> */}
       {/* <MySettlementsLocations /> */}
       {/* <MilestoneTotalCompleted />

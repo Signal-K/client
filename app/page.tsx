@@ -320,6 +320,8 @@ export default function Home() {
           <div className="py-6 my-10 px-6">
             <p className="text-[#2C4F65]">Temperature:</p>
             <p className="text-blue-200">{planetData?.temperatureEq} K</p>
+            <p className="text-[#2C4F65]">Humidity:</p>
+            <p className="text-blue-200">{planetData?.humidity} K</p>
             {planetData?.id === 30 && (
               <>
                 <p className="text-[#2C4F65]">Biomass:</p>

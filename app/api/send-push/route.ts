@@ -19,7 +19,6 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Accept both 'userId' (single) and 'userIds' (array)
     const userIds = body.userIds || (body.userId ? [body.userId] : null);
     const message = body.message;
 
@@ -49,9 +48,8 @@ export async function POST(request: Request) {
       if (!push_subscription) {
         results.push({ id, success: false, error: "No subscription" });
         continue;
-      }
+      };
 
-      // Parse subscription if it's a string
       let subscription;
       try {
         subscription =

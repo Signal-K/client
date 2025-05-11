@@ -3,25 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --background: 206 28% 16%;
-  --foreground: 43 33% 97%;
-  --card: 203 37% 28%;
-  --card-foreground: 43 33% 97%;
-  --popover: 203 37% 28%;
-  --popover-foreground: 43 33% 97%;
-  --primary: 174 55% 58%;
-  --primary-foreground: 206 28% 16%;
-  --secondary: 84 62% 68%;
-  --secondary-foreground: 206 28% 16%;
-  --muted: 203 37% 28%;
-  --muted-foreground: 43 33% 97%;
-  --accent: 5 100% 68%;
-  --accent-foreground: 206 28% 16%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 43 33% 97%;
-  --border: 174 55% 58%;
-  --input: 203 37% 28%;
-  --ring: 174 55% 58%;
+  /* Background & Foreground Colors */
+  --background: #ECEFF4; /* Nord Polar Night light */
+  --foreground: #2E3440; /* Nord Night text */
+  
+  /* Card & Popover */
+  --card: #E5E9F0; /* Nord Snow Storm variant */
+  --card-foreground: #2E3440; /* Nord Night text */
+  --popover: #E5E9F0; /* Nord Snow Storm variant */
+  --popover-foreground: #2E3440; /* Nord Night text */
+  
+  /* Primary Colors */
+  --primary: #B48EAD; /* Novadust cosmic lavender */
+  --primary-foreground: #ECEFF4; /* Light-on-dark */
+  
+  /* Secondary Colors */
+  --secondary: #4C566A; /* Nord Frost shade */
+  --secondary-foreground: #ECEFF4; /* Light-on-dark */
+  
+  /* Muted & Accent Colors */
+  --muted: #D8DEE9; /* Subtle border */
+  --muted-foreground: #2E3440; /* Nord Night text */
+  --accent: #B48EAD; /* Novadust cosmic lavender */
+  --accent-foreground: #ECEFF4; /* Light-on-dark */
+  
+  /* Destructive Colors */
+  --destructive: #BF616A; /* Red */
+  --destructive-foreground: #ECEFF4; /* Light-on-dark */
+  
+  /* Borders & Inputs */
+  --border: #D8DEE9; /* Subtle border */
+  --input: #FFFFFF; /* Neutral base */
+  
+  /* Ring (focus state) */
+  --ring: #B48EAD; /* Novadust cosmic lavender */
+  
+  /* Radius for rounded corners */
   --radius: 0.5rem;
 }
 
@@ -122,11 +139,6 @@ body {
   pointer-events: none;
   opacity: 0.6;
   mix-blend-mode: screen;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
 }
 
 @keyframes pulse {
