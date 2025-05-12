@@ -28,6 +28,7 @@ import { StardustDropdown } from "./Navigation/StardustDropdown"
 import { LocationsDropdown } from "./Navigation/LocationsDropdown"
 import TechnologyPopover, { TechnologySection } from "./Navigation/TechTreeDropdown"
 import { Alert } from "antd"
+import AlertBar from "./Navigation/AlertBar"
 
 // Sample data - replace with actual data in your implementation
 const techTree = [
@@ -297,7 +298,7 @@ export default function GameNavbar() {
         <div className="p-4 space-y-6">
           {/* Alerts Section */}
           <div className="space-y-2">
-            <AlertsDropdown />
+            <AlertBar />
           </div>
 
           {/* Milestones Section */}

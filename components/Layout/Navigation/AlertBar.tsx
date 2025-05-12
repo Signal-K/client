@@ -7,7 +7,6 @@ import Cookies from "js-cookie";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Bell } from "lucide-react";
 
@@ -21,13 +20,12 @@ interface Milestone {
   requiredCount: number;
 };
 
-export default function AlertsDropdown() {
+export default function AlertBar() {
   const supabase = useSupabaseClient();
   const session = useSession();
 
   const [alerts, setAlerts] = useState<string[]>([]);
   const [alertStructures, setAlertStructures] = useState<string[]>([]);
-  const [currentAlertIndex, setCurrentAlertIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState("");
   const [hasNewAlert, setHasNewAlert] = useState(false);
   const [newNotificationsCount, setNewNotificationsCount] = useState(0);
@@ -188,92 +186,48 @@ export default function AlertsDropdown() {
     return () => clearInterval(interval);
   }, []);
 
-  const dismissCurrentAlert = () => {
-    if (!session?.user) return;
-
-    fetch("/api/gameplay/milestones").then((res) => res.json()).then((milestoneData) => {
-      const thisWeekMilestones = milestoneData.playerMilestones.at(-1);
-      if (!thisWeekMilestones) return;
-
-      const { weekStart, data } = thisWeekMilestones;
-      const cookieKey = getCookieKey(session.user.id, weekStart);
-      const dismissedIds: string[] = JSON.parse(Cookies.get(cookieKey) || "[]");
-
-      const current = data.find((_: { id: any }, index: any) => {
-        const incompleteAndNotDismissed = data.filter((m: Milestone) => {
-          const actualField = FIELD_ALIASES[m.table]?.[m.field] ?? m.field;
-          return !dismissedIds.includes(m.id);
-        });
-        return incompleteAndNotDismissed[currentAlertIndex]?.id === _.id;
-      });
-
-      if (current?.id) {
-        const updated = [...new Set([...dismissedIds, current.id])];
-        Cookies.set(cookieKey, JSON.stringify(updated), { expires: 7 });
-      }
-
-      const nextIndex = currentAlertIndex + 1;
-
-      playRandomSound();
-
-      if (nextIndex < alerts.length) {
-        setCurrentAlertIndex(nextIndex);
-        setNewNotificationsCount(alerts.length - (nextIndex + 1));
-      } else {
-        setAlerts(["You've completed all milestone goals this week!"]);
-        setAlertStructures([""]);
-        setCurrentAlertIndex(0);
-        setHasNewAlert(false);
-        setNewNotificationsCount(0);
-      }
-    });
-  };
-
-  const currentStructure = alertStructures[currentAlertIndex]?.toLowerCase();
+  const currentStructure = alertStructures[0]?.toLowerCase();
   const structurePath = currentStructure
     ? `/structures/${currentStructure === "weatherballoon" ? "balloon" : currentStructure}`
     : null;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative group">
-          <Bell className="h-5 w-5 text-blue-400 group-hover:text-blue-300 transition-colors" />
+    <div className="w-full max-w-[400px] bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border border-[#581c87] shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+      <div className="flex items-center justify-between p-4">
+        <div className="flex items-center">
+          <Bell className="h-5 w-5 text-blue-400" />
           <span className="ml-2 text-white">Alerts</span>
           {hasNewAlert && (
             <Badge className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-500 text-white h-5 w-5 flex items-center justify-center p-0 text-xs">
               {newNotificationsCount}
             </Badge>
           )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[400px] p-0 bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border border-[#581c87] shadow-[0_0_15px_rgba(124,58,237,0.5)]">
-        <div className="p-4">
-          <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] mb-4">
-            Daily Alert
-          </h2>
-          <div className="mt-4 text-center text-[#67e8f9] font-semibold">
-            <p>{alerts[currentAlertIndex] || "No new alerts."}</p>
-            <p className="mt-2 text-xs text-gray-500">Time remaining until next event: {timeRemaining}</p>
-          </div>
-
-          {structurePath && (
-            <div className="mt-4 flex justify-center">
-              <Link href={structurePath}>
-                <Button variant="default">Go to Structure</Button>
-              </Link>
-            </div>
-          )}
-
-          {alerts.length > 1 && currentAlertIndex < alerts.length - 1 && (
-            <div className="mt-4 flex justify-center">
-              <Button variant="secondary" onClick={dismissCurrentAlert}>
-                Dismiss & Next
-              </Button>
-            </div>
+        </div>
+      </div>
+      <div className="p-4">
+        <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] mb-4">
+          All Alerts
+        </h2>
+        <div className="mt-4 text-center text-[#67e8f9] font-semibold">
+          {alerts.length === 0 ? (
+            <p>No new alerts.</p>
+          ) : (
+            alerts.map((alert, index) => (
+              <div key={index} className="mb-4">
+                <p>{alert}</p>
+                <p className="mt-2 text-xs text-gray-500">Time remaining until next event: {timeRemaining}</p>
+                {structurePath && (
+                  <div className="mt-4 flex justify-center">
+                    <Link href={structurePath}>
+                      <Button variant="default">Go to Structure</Button>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            ))
           )}
         </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </div>
+    </div>
   );
 };

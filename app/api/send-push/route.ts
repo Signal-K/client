@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       if (!push_subscription) {
         results.push({ id, success: false, error: "No subscription" });
         continue;
-      };
+      }
 
       let subscription;
       try {
