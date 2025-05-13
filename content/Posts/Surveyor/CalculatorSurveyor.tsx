@@ -293,7 +293,7 @@ export default function SurveyorCalculator({ classificationId }: Props) {
                       setCalculatorInputs({ ...calculatorInputs, input2: e.target.value })
                     }
                     className="bg-[#FFFFFF] border-[#D8DEE9] text-[#2E3440] h-8"
-                    type="number"
+                    type="number" 
                     step="0.01"
                   />
                 </div>

@@ -1,11 +1,10 @@
 import { ReactNode } from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import RootLayoutClient from "./RootLayoutClient";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
   description: "Catalogue the Stars",
-  themeColor: "#ffffff",
   icons: {
     icon: "/favicon.ico",
     apple: [
@@ -17,6 +16,10 @@ export const metadata: Metadata = {
     ],
   },
   manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

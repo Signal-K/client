@@ -7,11 +7,14 @@ import { GreenhouseResearchStations } from "@/components/Structures/Missions/Bio
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { BeanIcon, BuildingIcon, CameraIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useState, useRef } from "react";
 
 export default function GreenhouseBiodomeOnEarthPage() {
   const supabase = useSupabaseClient();
   const session = useSession();
+
+  const router = useRouter();
 
   const [expanded, setExpanded] = useState(false);
   const [activeComponent, setActiveComponent] = useState<React.ReactNode | null>(null);
@@ -63,7 +66,11 @@ export default function GreenhouseBiodomeOnEarthPage() {
       </div>
 
       <div className="flex flex-row space-y-4">
-        <Dialog defaultOpen>
+        <Dialog defaultOpen onOpenChange={(open) => {
+          if (!open) {
+            router.push("/")
+          }
+        }}>
           <div className="relative transition-all duration-500 ease-in-out">
             {!activeComponent && (
               <DialogContent

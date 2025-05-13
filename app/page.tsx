@@ -37,6 +37,7 @@ function PushNotificationManager() {
   const supabase = useSupabaseClient();
   const [isSupported, setIsSupported] = useState(false);
   const [subscription, setSubscription] = useState<PushSubscription | null>(null);
+  const [hasSubscribedBefore, setHasSubscribedBefore] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -45,6 +46,29 @@ function PushNotificationManager() {
       registerServiceWorker();
     }
   }, []);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      checkExistingSubscription(session.user.id);
+    }
+  }, [session]);
+
+  async function checkExistingSubscription(userId: string) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("push_subscription")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      console.error("Failed to fetch subscription info:", error);
+      return;
+    }
+
+    if (data?.push_subscription) {
+      setHasSubscribedBefore(true);
+    }
+  }
 
   async function registerServiceWorker() {
     const registration = await navigator.serviceWorker.register("/sw.js", {
@@ -58,26 +82,24 @@ function PushNotificationManager() {
 
   async function subscribeToPush() {
     const registration = await navigator.serviceWorker.ready;
-  
+
     const sub = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(
-        process.env.VAPID_PUBLIC_KEY!
-      ),
+      applicationServerKey: urlBase64ToUint8Array(process.env.VAPID_PUBLIC_KEY!),
     });
-  
-    const subJSON = sub.toJSON(); // 🔥 THIS IS ESSENTIAL
-  
+
+    const subJSON = sub.toJSON();
+
     setSubscription(sub);
-  
-    // Save clean JSON to Supabase
+
     const { error } = await supabase
       .from("profiles")
       .update({ push_subscription: subJSON })
       .eq("id", session?.user.id);
-  
+
     if (error) console.error("Error saving subscription:", error);
-  }  
+    else setHasSubscribedBefore(true);
+  }
 
   async function unsubscribeFromPush() {
     await subscription?.unsubscribe();
@@ -89,11 +111,12 @@ function PushNotificationManager() {
       .eq("id", session?.user.id);
 
     if (error) console.error("Error removing subscription:", error);
+    else setHasSubscribedBefore(false);
   }
 
   async function sendTestNotification() {
     if (!session) return;
-  
+
     try {
       const res = await fetch("/api/send-push", {
         method: "POST",
@@ -102,10 +125,10 @@ function PushNotificationManager() {
           "Content-Type": "application/json",
         },
       });
-  
+
       const json = await res.json();
       console.log("Push response:", res.status, json);
-  
+
       if (!res.ok) {
         alert(`Push failed: ${json?.error || res.status}`);
       }
@@ -113,18 +136,18 @@ function PushNotificationManager() {
       console.error("Fetch error:", err);
       alert("Network or server error");
     }
-  
-    setMessage("");  
-  }  
+
+    setMessage("");
+  }
 
   if (!isSupported) {
     return <p>Push notifications are not supported in this browser.</p>;
-  }
+  };
 
   return (
     <div>
       <h3>Push Notifications</h3>
-      {subscription ? (
+      {subscription || hasSubscribedBefore ? (
         <>
           <p>You are subscribed to push notifications.</p>
           <button onClick={unsubscribeFromPush}>Unsubscribe</button>
@@ -145,7 +168,6 @@ function PushNotificationManager() {
     </div>
   );
 }
-
 
 function InstallPrompt() {
   const [isIOS, setIsIOS] = useState(false);
@@ -337,7 +359,7 @@ export default function Home() {
       <div className="w-full">
         <div className="py-2">
           <center>
-            <InstallPrompt />
+            {/* <InstallPrompt /> */}
             <PushNotificationManager />
             <AllSatellitesOnActivePlanet />
             <AtmosphereStructuresOnPlanet />

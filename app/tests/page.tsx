@@ -2,7 +2,6 @@
 
 import WeatherEventsOverview from "@/components/Data/Generator/Weather/EventsAcrossMyLocations";
 import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
-import AlertComponent from "@/components/Structures/Missions/Milestones/Alerts/Alerts";
 import MilestoneTotalCompleted from "@/components/Structures/Missions/Milestones/Completed";
 import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
 import MyLocationIds from "@/content/Classifications/UserLocationPK";
@@ -43,7 +42,6 @@ export default function TestPage() {
 
   return (
     <div className="min-h-screen  p-4 space-y-8">
-      {/* <AlertComponent /> */}
       {/* <MySettlementsLocations /> */}
       {/* <MilestoneTotalCompleted />
       <TotalPoints />

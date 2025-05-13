@@ -93,7 +93,12 @@ export interface AI4MClassification {
   annotationOptions: any[]; 
 };
 
-export default function TestPlanetWrapper({ params }: { params: { id: string } }) {
+import { useParams } from 'next/navigation';
+
+export default function TestPlanetWrapper() {
+  const params = useParams();
+  const id = params?.id as string;
+  
   const supabase = useSupabaseClient();
   const session = useSession();
 
