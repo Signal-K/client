@@ -57,7 +57,13 @@ export default function AlertsDropdown() {
 
       const milestoneRes = await fetch("/api/gameplay/milestones");
       const milestoneData = await milestoneRes.json();
-      const thisWeekMilestones = milestoneData.playerMilestones.at(-1);
+      const thisWeekMilestones = milestoneData.playerMilestones
+        .map((week: { weekStart: string | number | Date; }) => ({
+          ...week,
+          weekStartDate: new Date(week.weekStart),
+        }))
+        .sort((a: { weekStartDate: { getTime: () => number; }; }, b: { weekStartDate: { getTime: () => number; }; }) => b.weekStartDate.getTime() - a.weekStartDate.getTime())
+      [0];
 
       if (!thisWeekMilestones) return;
 

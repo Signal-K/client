@@ -26,6 +26,7 @@ export default function AlertBar() {
 
   const [alerts, setAlerts] = useState<string[]>([]);
   const [alertStructures, setAlertStructures] = useState<string[]>([]);
+  const [currentAlertIndex, setCurrentAlertIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState("");
   const [hasNewAlert, setHasNewAlert] = useState(false);
   const [newNotificationsCount, setNewNotificationsCount] = useState(0);
@@ -62,7 +63,6 @@ export default function AlertBar() {
       const { weekStart, data } = thisWeekMilestones;
       const startDate = new Date(weekStart);
       const endDate = addDays(startDate, 6);
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const cookieKey = getCookieKey(userId, weekStart);
       const dismissedIds = JSON.parse(Cookies.get(cookieKey) || "[]");
 
@@ -120,48 +120,31 @@ export default function AlertBar() {
         structureSources.push(milestone.structure);
       }
 
+      // ✅ Additional Event Reminder Logic (Planet Events)
+      const { data: classifications } = await supabase
+        .from("classifications")
+        .select("id, classificationtype, author, created_at")
+        .eq("author", userId)
+        .in("classificationtype", ["planet", "telescope-minorPlanet"]);
+
+      if ((classifications ?? []).length > 0) {
+        const classificationIds = classifications ? classifications.map(c => c.id) : [];
+        const { data: weeklyEvents } = await supabase
+          .from("events")
+          .select("id, classification_location, created_at")
+          .in("classification_location", classificationIds)
+          .gte("created_at", startDate.toISOString())
+          .lte("created_at", endDate.toISOString());
+
+        if ((weeklyEvents?.length ?? 0) === 0) {
+          milestoneAlerts.push("Your planet awaits a storm event — create one before the week ends.");
+          structureSources.push("WeatherBalloon");
+        }
+      }
+
       if (milestoneAlerts.length === 0) {
-        const discoveryOptions = [
-          { structure: 'Telescope', type: 'telescope-minorPlanet', message: 'A new asteroid has been detected by your telescope.' },
-          { structure: 'Telescope', type: 'planet', message: 'A planet candidate has been spotted by your telescope.' },
-          { structure: 'WeatherBalloon', type: 'sunspot', message: 'Your Weather Balloon has recorded intense sunspot activity.' },
-          { structure: 'WeatherBalloon', type: 'automaton-aiForMars', message: 'Rover anomaly reported — assist analysis via Weather Balloon.' },
-          { structure: 'WeatherBalloon', type: 'lidar-jovianVortexHunter', message: 'Cyclone-like structures seen from orbit — verify data.' },
-          { structure: 'Greenhouse', type: null, message: 'Sensor event detected from your Greenhouse pod — check for changes in terrain.' }
-        ];
-
-        const eligibleDiscoveries = [];
-
-        for (const option of discoveryOptions) {
-          if (!option.type) {
-            eligibleDiscoveries.push(option);
-            continue;
-          }
-
-          const { data: existing, error } = await supabase
-            .from('classifications')
-            .select('id')
-            .eq('classificationtype', option.type)
-            .gte('created_at', sevenDaysAgo.toISOString());
-
-          if (error) {
-            console.error('Discovery check failed:', error);
-            continue;
-          }
-
-          if ((existing?.length ?? 0) === 0) {
-            eligibleDiscoveries.push(option);
-          }
-        }
-
-        if (eligibleDiscoveries.length > 0) {
-          const randomDiscovery = eligibleDiscoveries[Math.floor(Math.random() * eligibleDiscoveries.length)];
-          milestoneAlerts.push(randomDiscovery.message);
-          structureSources.push(randomDiscovery.structure);
-        } else {
-          milestoneAlerts.push("You've completed all milestone goals this week!");
-          structureSources.push(""); // no structure
-        }
+        milestoneAlerts.push("You've completed all milestone goals this week!");
+        structureSources.push("");
       }
 
       setAlerts(milestoneAlerts);
@@ -186,7 +169,43 @@ export default function AlertBar() {
     return () => clearInterval(interval);
   }, []);
 
-  const currentStructure = alertStructures[0]?.toLowerCase();
+  const dismissCurrentAlert = async () => {
+    if (!session?.user) return;
+
+    const milestoneRes = await fetch("/api/gameplay/milestones");
+    const milestoneData = await milestoneRes.json();
+    const thisWeekMilestones = milestoneData.playerMilestones.at(-1);
+
+    if (!thisWeekMilestones) return;
+
+    const { weekStart, data } = thisWeekMilestones;
+    const cookieKey = getCookieKey(session.user.id, weekStart);
+    const dismissedIds: string[] = JSON.parse(Cookies.get(cookieKey) || "[]");
+
+    const incompleteAndNotDismissed = data.filter((m: Milestone) => !dismissedIds.includes(m.id));
+    const current = incompleteAndNotDismissed[currentAlertIndex];
+
+    if (current?.id) {
+      const updated = [...new Set([...dismissedIds, current.id])];
+      Cookies.set(cookieKey, JSON.stringify(updated), { expires: 7 });
+    }
+
+    const nextIndex = currentAlertIndex + 1;
+    playRandomSound();
+
+    if (nextIndex < alerts.length) {
+      setCurrentAlertIndex(nextIndex);
+      setNewNotificationsCount(alerts.length - (nextIndex + 1));
+    } else {
+      setAlerts(["You've completed all milestone goals this week!"]);
+      setAlertStructures([""]);
+      setCurrentAlertIndex(0);
+      setHasNewAlert(false);
+      setNewNotificationsCount(0);
+    }
+  };
+
+  const currentStructure = alertStructures[currentAlertIndex]?.toLowerCase();
   const structurePath = currentStructure
     ? `/structures/${currentStructure === "weatherballoon" ? "balloon" : currentStructure}`
     : null;
@@ -206,25 +225,26 @@ export default function AlertBar() {
       </div>
       <div className="p-4">
         <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] mb-4">
-          All Alerts
+          Daily Alert
         </h2>
         <div className="mt-4 text-center text-[#67e8f9] font-semibold">
-          {alerts.length === 0 ? (
-            <p>No new alerts.</p>
-          ) : (
-            alerts.map((alert, index) => (
-              <div key={index} className="mb-4">
-                <p>{alert}</p>
-                <p className="mt-2 text-xs text-gray-500">Time remaining until next event: {timeRemaining}</p>
-                {structurePath && (
-                  <div className="mt-4 flex justify-center">
-                    <Link href={structurePath}>
-                      <Button variant="default">Go to Structure</Button>
-                    </Link>
-                  </div>
-                )}
-              </div>
-            ))
+          <p>{alerts[currentAlertIndex] || "No new alerts."}</p>
+          <p className="mt-2 text-xs text-gray-500">Time remaining until next event: {timeRemaining}</p>
+
+          {structurePath && (
+            <div className="mt-4 flex justify-center">
+              <Link href={structurePath}>
+                <Button variant="default">Go to Structure</Button>
+              </Link>
+            </div>
+          )}
+
+          {alerts.length > 1 && currentAlertIndex < alerts.length - 1 && (
+            <div className="mt-4 flex justify-center">
+              <Button variant="secondary" onClick={dismissCurrentAlert}>
+                Dismiss & Next
+              </Button>
+            </div>
           )}
         </div>
       </div>

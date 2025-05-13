@@ -32,13 +32,36 @@ export default function MilestoneCard() {
 
     useEffect(() => {
         fetch("/api/gameplay/milestones")
-            .then((res) => res.json())
-            .then((data) => {
-                setMilestones(data.playerMilestones);
-                setCommunityMilestones(data.communityMilestones);
-                setCurrentWeekIndex(data.playerMilestones.length - 1);
+          .then((res) => res.json())
+          .then((data) => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+    
+            const sortedPlayerMilestones = [...data.playerMilestones]
+              .sort((a, b) => new Date(b.weekStart).getTime() - new Date(a.weekStart).getTime());
+    
+            const sortedCommunityMilestones = [...data.communityMilestones]
+              .sort((a, b) => new Date(b.weekStart).getTime() - new Date(a.weekStart).getTime());
+    
+            const latestPlayerIndex = sortedPlayerMilestones.findIndex((group) => {
+              const start = new Date(group.weekStart);
+              const end = new Date(start);
+              end.setDate(start.getDate() + 6);
+              return today >= start && today <= end;
             });
-    }, []);
+    
+            const latestCommunityIndex = sortedCommunityMilestones.findIndex((group) => {
+              const start = new Date(group.weekStart);
+              const end = new Date(start);
+              end.setDate(start.getDate() + 6);
+              return today >= start && today <= end;
+            });
+    
+            setMilestones(sortedPlayerMilestones);
+            setCommunityMilestones(sortedCommunityMilestones);
+            setCurrentWeekIndex(latestPlayerIndex !== -1 ? latestPlayerIndex : 0);
+          });
+    }, []);    
 
     useEffect(() => {
         if (!session || milestones.length === 0) return;

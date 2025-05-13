@@ -82,10 +82,24 @@ export default function GameNavbar() {
     fetch("/api/gameplay/milestones")
       .then((res) => res.json())
       .then((data) => {
-        setMilestones(data.playerMilestones)
-        setCurrentWeekIndex(data.playerMilestones.length - 1) // Default to latest week
-      })
-  }, []);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+  
+        const sorted = [...data.playerMilestones].sort(
+          (a, b) => new Date(b.weekStart).getTime() - new Date(a.weekStart).getTime()
+        );
+  
+        const currentIndex = sorted.findIndex((group) => {
+          const start = new Date(group.weekStart);
+          const end = new Date(start);
+          end.setDate(start.getDate() + 6);
+          return today >= start && today <= end;
+        });
+  
+        setMilestones(sorted);
+        setCurrentWeekIndex(currentIndex !== -1 ? currentIndex : 0);
+      });
+  }, []);  
 
   // Fetch milestone progress
   useEffect(() => {
@@ -212,9 +226,10 @@ export default function GameNavbar() {
           {/* Stardust Balance */}
             <StardustDropdown />
 
-          <MissionsPopover 
-            userProgress={userProgress}
-          />
+            <MissionsPopover 
+  // userProgress={userProgress}
+  // milestones={milestones[currentWeekIndex]?.data || []}
+/>
 
           <AlertsDropdown
             

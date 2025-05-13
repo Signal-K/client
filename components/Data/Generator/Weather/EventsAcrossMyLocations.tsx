@@ -278,26 +278,41 @@ export default function WeatherEventsOverview() {
     const eventId = eventInsertData.id;
   
     // Step 2: Create 3 Comments (humidity, temperature, biomass)
-    const commentPayloads = ["humidity", "temperature", "biomass"].map((category) => ({
-      content: `Change in ${category}: ${stormEffect[category as keyof EnvironmentalEffect]}`,
-      author: session.user.id,
-      classification_id: classificationId,
-      category,
-      value: stormEffect[category as keyof EnvironmentalEffect].toString(),
-      configuration: JSON.stringify({
-        type: "weather-effect",
-        effect: type,
-        delta: stormEffect[category as keyof EnvironmentalEffect],
-      }),
-      event: eventId,
-    }));
+    const commentPayloads = ["humidity", "temperature", "biomass"].map((category) => {
+      const value = stormEffect[category as keyof EnvironmentalEffect];
+    
+      if (value === undefined) {
+        console.warn(`No value defined for category: ${category} in storm type: ${type}`);
+        return null;
+      }
+    
+      // Capitalize the category for the 'category' field in the comment
+      const capitalizedCategory = category.charAt(0).toUpperCase() + category.slice(1);
+    
+      return {
+        content: `Change in ${capitalizedCategory}: ${value}`,
+        author: session.user.id,
+        classification_id: classificationId,
+        category: capitalizedCategory, // Now capitalized
+        value: value.toString(),
+        configuration: JSON.stringify({
+          type: "weather-effect",
+          effect: type,
+          delta: value,
+        }),
+        event: eventId,
+      };
+    }).filter((payload) => payload !== null);    
   
-    const { error: commentError } = await supabase
-      .from("comments")
-      .insert(commentPayloads);
+    // Insert the comments only if we have valid payloads
+    if (commentPayloads.length > 0) {
+      const { error: commentError } = await supabase
+        .from("comments")
+        .insert(commentPayloads);
   
-    if (commentError) {
-      console.error("Error inserting comments:", commentError);
+      if (commentError) {
+        console.error("Error inserting comments:", commentError);
+      }
     }
   
     // Reload to show updates
