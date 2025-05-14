@@ -8,6 +8,7 @@ import MyLocationIds from "@/content/Classifications/UserLocationPK";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
+// import { PlanetGenerator } from "starsailors-planet-generator";
 
 export default function TestPage() {
   const supabase = useSupabaseClient();
@@ -53,6 +54,8 @@ export default function TestPage() {
                   />
                   <MyLocationIds /> */}
       {/* <WeatherEventsOverview /> */}
+
+      {/* <PlanetGenerator classificationId={1} biome={'RockyHighlands'} biomass={0.01} density={3.5} /> */}
     </div>
   );
 };

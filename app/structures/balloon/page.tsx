@@ -25,6 +25,7 @@ import React, { useState } from "react";
 export default function WeatherBalloonOnEarthPage() {
   const supabase = useSupabaseClient();
   const session = useSession();
+  
   const router = useRouter();
 
   const [activeComponent, setActiveComponent] = useState<React.ReactNode | null>(null);

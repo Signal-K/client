@@ -21,6 +21,134 @@ interface Milestone {
   requiredCount: number;
 }
 
+const FIELD_ALIASES: Record<string, Record<string, string>> = {
+  events: {
+    eventtype: "type",
+  },
+};
+
+const getCookieKey = (userId: string, week: string) => `dismissed-alerts-${userId}-${week}`;
+
+const playRandomSound = () => {
+  const soundFiles = [
+    "/assets/audio/notifs/r2d2.wav",
+    "/assets/audio/notifs/r2d21.wav",
+  ];
+  const randomSound = soundFiles[Math.floor(Math.random() * soundFiles.length)];
+  const audio = new Audio(randomSound);
+  audio.play().catch((err) => console.error("Failed to play sound:", err));
+};
+
+async function generateAlerts(supabase: any, session: any) {
+  if (!session?.user) return { milestoneAlerts: [], structureSources: [] };
+
+  const userId = session.user.id;
+
+  const milestoneRes = await fetch("/api/gameplay/milestones");
+  const milestoneData = await milestoneRes.json();
+  const thisWeekMilestones = milestoneData.playerMilestones
+    .map((week: { weekStart: string | number | Date; }) => ({
+      ...week,
+      weekStartDate: new Date(week.weekStart),
+    }))
+    .sort((a: { weekStartDate: { getTime: () => number; }; }, b: { weekStartDate: { getTime: () => number; }; }) => b.weekStartDate.getTime() - a.weekStartDate.getTime())
+  [0];
+
+  if (!thisWeekMilestones) return { milestoneAlerts: [], structureSources: [] };
+
+  const { weekStart, data } = thisWeekMilestones;
+  const startDate = new Date(weekStart);
+  const endDate = addDays(startDate, 6);
+  const cookieKey = getCookieKey(userId, weekStart);
+  const dismissedIds = JSON.parse(Cookies.get(cookieKey) || "[]");
+
+  const milestoneAlerts: string[] = [];
+  const structureSources: string[] = [];
+
+  for (const milestone of data as Milestone[]) {
+    if (dismissedIds.includes(milestone.id)) continue;
+
+    const actualField = FIELD_ALIASES[milestone.table]?.[milestone.field] ?? milestone.field;
+
+    const { count, error } = await supabase
+      .from(milestone.table)
+      .select("*", { count: "exact" })
+      .gte("created_at", startDate.toISOString())
+      .lte("created_at", endDate.toISOString())
+      .eq(actualField, milestone.value)
+      .eq("author", userId);
+
+    if (error) continue;
+    if ((count ?? 0) >= milestone.requiredCount) continue;
+
+    let msg = `Mission incomplete: ${milestone.name} — visit the ${milestone.structure} to contribute.`;
+
+    if (milestone.structure === 'WeatherBalloon') {
+      switch (milestone.value) {
+        case 'sunspot':
+          msg = "Sunspot activity detected — deploy Weather Balloon.";
+          break;
+        case 'satellite-planetFour':
+          msg = "Dust storm approaching — assist in image classification.";
+          break;
+        case 'automaton-aiForMars':
+          msg = "Rover anomaly reported — initiate diagnostics.";
+          break;
+        case 'lidar-jovianVortexHunter':
+          msg = "Cyclonic activity spotted — help verify data.";
+          break;
+        case 'cloud':
+        case 'upload-request':
+          msg = "Our scientists need more data - please use your phone's camera to show us what's going on in your area.";
+          break;
+        case 'balloon-marsCloudShapes':
+          msg = "Unusual cloud formations detected — your analysis is needed.";
+          break;
+      };
+    };
+
+    if (milestone.structure === 'Greenhouse') {
+      msg = "Sensor trigger from your desert/ocean pod — investigate recent anomaly.";
+    };
+
+    milestoneAlerts.push(msg);
+    structureSources.push(milestone.structure);
+  };
+
+  const { data: classifications } = await supabase
+    .from("classifications")
+    .select("id, anomaly, author, created_at")
+    .eq("author", userId)
+    .in("classificationtype", ["planet", "telescope-minorPlanet"]);
+
+  if ((classifications ?? []).length > 0) {
+    const classificationIds = classifications ? classifications.map((c: { id: any; }) => c.id) : [];
+    const { data: weeklyEvents } = await supabase
+      .from("events")
+      .select("id, classification_location, created_at")
+      .in("classification_location", classificationIds)
+      .gte("created_at", startDate.toISOString())
+      .lte("created_at", endDate.toISOString());
+
+    const userCreatedEventCount = weeklyEvents?.length ?? 0;
+
+    if (userCreatedEventCount === 0) {
+      const hasAvailablePlanetEvent = true;
+      if (hasAvailablePlanetEvent) {
+        milestoneAlerts.push("Your planet awaits a storm event — create one before the week ends.");
+        structureSources.push("WeatherBalloon");
+      }
+    }
+  }
+
+  if (milestoneAlerts.length === 0) {
+    milestoneAlerts.push("You've completed all milestone goals this week!");
+    structureSources.push("");
+  }
+
+  return { milestoneAlerts, structureSources };
+}
+
 export default function AlertsDropdown() {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -32,129 +160,9 @@ export default function AlertsDropdown() {
   const [hasNewAlert, setHasNewAlert] = useState(false);
   const [newNotificationsCount, setNewNotificationsCount] = useState(0);
 
-  const FIELD_ALIASES: Record<string, Record<string, string>> = {
-    events: {
-      eventtype: "type",
-    },
-  };
-
-  const getCookieKey = (userId: string, week: string) => `dismissed-alerts-${userId}-${week}`;
-
-  const playRandomSound = () => {
-    const soundFiles = [
-      "/assets/audio/notifs/r2d2.wav",
-      "/assets/audio/notifs/r2d21.wav",
-    ];
-    const randomSound = soundFiles[Math.floor(Math.random() * soundFiles.length)];
-    const audio = new Audio(randomSound);
-    audio.play().catch((err) => console.error("Failed to play sound:", err));
-  };
-
   useEffect(() => {
     const fetchAlerts = async () => {
-      if (!session?.user) return;
-      const userId = session.user.id;
-
-      const milestoneRes = await fetch("/api/gameplay/milestones");
-      const milestoneData = await milestoneRes.json();
-      const thisWeekMilestones = milestoneData.playerMilestones
-        .map((week: { weekStart: string | number | Date; }) => ({
-          ...week,
-          weekStartDate: new Date(week.weekStart),
-        }))
-        .sort((a: { weekStartDate: { getTime: () => number; }; }, b: { weekStartDate: { getTime: () => number; }; }) => b.weekStartDate.getTime() - a.weekStartDate.getTime())
-      [0];
-
-      if (!thisWeekMilestones) return;
-
-      const { weekStart, data } = thisWeekMilestones;
-      const startDate = new Date(weekStart);
-      const endDate = addDays(startDate, 6);
-      const cookieKey = getCookieKey(userId, weekStart);
-      const dismissedIds = JSON.parse(Cookies.get(cookieKey) || "[]");
-
-      const milestoneAlerts: string[] = [];
-      const structureSources: string[] = [];
-
-      for (const milestone of data as Milestone[]) {
-        if (dismissedIds.includes(milestone.id)) continue;
-
-        const actualField = FIELD_ALIASES[milestone.table]?.[milestone.field] ?? milestone.field;
-
-        const { count, error } = await supabase
-          .from(milestone.table)
-          .select("*", { count: "exact" })
-          .gte("created_at", startDate.toISOString())
-          .lte("created_at", endDate.toISOString())
-          .eq(actualField, milestone.value)
-          .eq("author", userId);
-
-        if (error) continue;
-        if ((count ?? 0) >= milestone.requiredCount) continue;
-
-        let msg = `Mission incomplete: ${milestone.name} — visit the ${milestone.structure} to contribute.`;
-
-        if (milestone.structure === 'WeatherBalloon') {
-          switch (milestone.value) {
-            case 'sunspot':
-              msg = "Sunspot activity detected — deploy Weather Balloon.";
-              break;
-            case 'satellite-planetFour':
-              msg = "Dust storm approaching — assist in image classification.";
-              break;
-            case 'automaton-aiForMars':
-              msg = "Rover anomaly reported — initiate diagnostics.";
-              break;
-            case 'lidar-jovianVortexHunter':
-              msg = "Cyclonic activity spotted — help verify data.";
-              break;
-            case 'cloud':
-            case 'balloon-marsCloudShapes':
-              msg = "Unusual cloud formations detected — your analysis is needed.";
-              break;
-          }
-        }
-
-        if (milestone.structure === 'Greenhouse') {
-          msg = "Sensor trigger from your desert/ocean pod — investigate recent anomaly.";
-        }
-
-        milestoneAlerts.push(msg);
-        structureSources.push(milestone.structure);
-      }
-
-      // Planet event check
-      const { data: classifications } = await supabase
-        .from("classifications")
-        .select("id, anomaly, author, created_at")
-        .eq("author", userId)
-        .in("classificationtype", ["planet", "telescope-minorPlanet"]);
-
-      if ((classifications ?? []).length > 0) {
-        const classificationIds = classifications ? classifications.map(c => c.id) : [];
-        const { data: weeklyEvents } = await supabase
-          .from("events")
-          .select("id, classification_location, created_at")
-          .in("classification_location", classificationIds)
-          .gte("created_at", startDate.toISOString())
-          .lte("created_at", endDate.toISOString());
-
-        const userCreatedEventCount = weeklyEvents?.length ?? 0;
-
-        if (userCreatedEventCount === 0) {
-          const hasAvailablePlanetEvent = true;
-          if (hasAvailablePlanetEvent) {
-            milestoneAlerts.push("Your planet awaits a storm event — create one before the week ends.");
-            structureSources.push("WeatherBalloon");
-          };
-        };
-      };
-
-      if (milestoneAlerts.length === 0) {
-        milestoneAlerts.push("You've completed all milestone goals this week!");
-        structureSources.push("");
-      }
-
+      const { milestoneAlerts, structureSources } = await generateAlerts(supabase, session);
       setAlerts(milestoneAlerts);
       setAlertStructures(structureSources);
       setHasNewAlert(milestoneAlerts.length > 0);
@@ -269,4 +277,4 @@ export default function AlertsDropdown() {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};

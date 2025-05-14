@@ -89,7 +89,7 @@ export default function AlertBar() {
 
         if ((count ?? 0) >= milestone.requiredCount) continue;
 
-        let msg = `Mission incomplete: ${milestone.name} — visit the ${milestone.structure} to contribute.`;
+        let msg = `Mission incomplete: ${milestone.name} — visit the 1${milestone.structure} to contribute.`;
 
         if (milestone.structure === 'WeatherBalloon') {
           switch (milestone.value) {
