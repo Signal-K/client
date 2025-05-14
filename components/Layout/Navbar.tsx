@@ -79,7 +79,7 @@ export default function Navbar() {
                 <Menu.Items className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                   <Link href="/" passHref>
                     <Menu.Item>
-                      {({ active }: { active: boolean }) => (
+                      {({ active }) => (
                         <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
                           My Settlements
                         </a>
@@ -88,7 +88,7 @@ export default function Navbar() {
                   </Link>
                   <Link href="/scenes/desert" passHref>
                     <Menu.Item>
-                      {({ active }: { active: boolean }) => (
+                      {({ active }) => (
                         <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
                           Desert Base
                         </a>
@@ -97,7 +97,7 @@ export default function Navbar() {
                   </Link>
                   <Link href="/scenes/ocean" passHref>
                     <Menu.Item>
-                      {({ active }: { active: boolean }) => (
+                      {({ active }) => (
                         <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
                           Ocean Base
                         </a>
@@ -106,7 +106,7 @@ export default function Navbar() {
                   </Link>
                   <Link href="/scenes/uploads" passHref>
                     <Menu.Item>
-                    {({ active }: { active: boolean }) => (
+                      {({ active }) => (
                         <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
                           Conservation
                         </a>
@@ -221,7 +221,7 @@ export default function Navbar() {
               <Menu.Items className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <Link href="/account" passHref>
                   <Menu.Item>
-                  {({ active }: { active: boolean }) => (
+                    {({ active }) => (
                       <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
                         Edit Profile
                       </a>
@@ -229,14 +229,14 @@ export default function Navbar() {
                   </Menu.Item>
                 </Link>
                 <Menu.Item>
-                  {({ active }: { active: boolean }) => (
+                  {({ active }) => (
                     <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
                       Settings
                     </a>
                   )}
                 </Menu.Item>
                 <Menu.Item>
-                  {({ active }: { active: boolean }) => (
+                  {({ active }) => (
                     <a
                       className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}
                       onClick={signOut}

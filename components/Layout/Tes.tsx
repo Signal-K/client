@@ -106,10 +106,10 @@ export default function GameNavbar() {
     if (!session || milestones.length === 0) return
 
     const fetchProgress = async () => {
-      const progress: { [key: string]: number } = {};
-      if (!milestones[currentWeekIndex]) return;
+      const progress: { [key: string]: number } = {}
+      if (!milestones[currentWeekIndex]) return
 
-      const { weekStart, data }: { weekStart: string; data: Array<{ table: string; field: string; value: any; name: string }> } = milestones[currentWeekIndex];
+      const { weekStart, data } = milestones[currentWeekIndex]
 
       const startDate = new Date(weekStart)
       const endDate = new Date(startDate)
@@ -182,7 +182,7 @@ export default function GameNavbar() {
                 <Menu.Items className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                   <Link href="/" passHref>
                     <Menu.Item>
-                    {({ active }: { active: boolean }) => (
+                      {({ active }) => (
                         <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
                           My Settlements
                         </a>
@@ -191,7 +191,7 @@ export default function GameNavbar() {
                   </Link>
                   <Link href="/scenes/desert" passHref>
                     <Menu.Item>
-                      {({ active }: { active: boolean }) => (
+                      {({ active }) => (
                         <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
                           Desert Base
                         </a>
@@ -200,7 +200,7 @@ export default function GameNavbar() {
                   </Link>
                   <Link href="/scenes/ocean" passHref>
                     <Menu.Item>
-                      {({ active }: { active: boolean }) => (
+                      {({ active }) => (
                         <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
                           Ocean Base
                         </a>
@@ -209,7 +209,7 @@ export default function GameNavbar() {
                   </Link>
                   <Link href="/scenes/uploads" passHref>
                     <Menu.Item>
-                      {({ active }: { active: boolean }) => (
+                      {({ active }) => (
                         <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
                           Conservation
                         </a>

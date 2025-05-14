@@ -17,19 +17,6 @@ interface TotalPointsProps {
   type?: string;
 };
 
-interface TotalPointsRef {
-  planetHuntersPoints: number;
-  dailyMinorPlanetPoints: number;
-  ai4mPoints: number;
-  planetFourPoints: number;
-  jvhPoints: number;
-  cloudspottingPoints: number;
-  planktonPoints: number;
-  milestonePoints: number;
-  researchedPenalty: number;
-  totalPoints: number;
-}
-
 interface Milestone {
   name: string;
   structure: string;
@@ -46,7 +33,7 @@ interface WeekMilestones {
   data: Milestone[];
 };
 
-const TotalPoints = forwardRef<TotalPointsRef, TotalPointsProps>((props, ref) => {
+const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
   const { onPointsUpdate, type } = props;
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -401,7 +388,7 @@ const TotalPoints = forwardRef<TotalPointsRef, TotalPointsProps>((props, ref) =>
     return <span>{researchedPenalty}</span>;
   };
 
-  // if (type === "groups") {
+    // if (type === "groups") {
   //   return (
 
   //   )
