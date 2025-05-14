@@ -8,6 +8,7 @@ const milestones = [
             {
                 name: 'Upload one image',
                 structure: "WeatherBalloon",
+                group: 'Meteorology',
                 icon: "PawPrintIcon",
                 extendedDescription: '',
                 xp: 2,
@@ -21,6 +22,7 @@ const milestones = [
             {
                 name: 'Make 1 Temperature Classification',
                 structure: 'Telescope',
+                group: 'Astronomy',
                 icon: "Telescope",
                 extendedDescription: "",
                 xp: 3,
@@ -39,6 +41,7 @@ const milestones = [
             {
                 name: 'Discover 2 planets',
                 structure: "Telescope",
+                group: 'Astronomy',
                 icon: "PawPrintIcon",
                 extendedDescription: '',
                 xp: 2,
@@ -109,6 +112,7 @@ const milestones = [
             {
                 name: "Create a storm on a gas giant",
                 structure: "WeatherBalloon",
+                group: 'Meteorology',
                 icon: "SnowflakeIcon",
                 xp: 1,
                 extendedDescription: "",
@@ -140,6 +144,7 @@ const milestones = [
             {
                 name: 'Discover 2 planets',
                 structure: "Telescope",
+                group: 'Astronomy',
                 icon: "PawPrintIcon",
                 extendedDescription: '',
                 xp: 2,

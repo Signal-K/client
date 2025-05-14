@@ -137,15 +137,15 @@ export default function AlertBar() {
           .lte("created_at", endDate.toISOString());
 
         if ((weeklyEvents?.length ?? 0) === 0) {
-          milestoneAlerts.push("Your planet awaits a storm event — create one before the week ends.");
+          milestoneAlerts.push("A weather event is happening this week - check your Weather Balloon");
           structureSources.push("WeatherBalloon");
-        }
-      }
+        };
+      };
 
       if (milestoneAlerts.length === 0) {
         milestoneAlerts.push("You've completed all milestone goals this week!");
         structureSources.push("");
-      }
+      };
 
       setAlerts(milestoneAlerts);
       setAlertStructures(structureSources);
