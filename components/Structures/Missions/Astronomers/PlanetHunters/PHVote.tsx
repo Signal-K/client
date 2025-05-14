@@ -11,7 +11,7 @@ interface Classification {
     created_at: string;
     content: string | null; 
     author: string | null;
-    anomaly: number | null;
+    anomaly: number | null; 
     media: any | null; 
     classificationtype: string | null;
     classificationConfiguration: any | null; 

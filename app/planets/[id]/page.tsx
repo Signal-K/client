@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Droplets, FileText, Info, Thermometer } from "lucide-react";
 import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+// import { PlanetGenerator } from "starsailors-planet-generator";
 import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
 import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnPlanet";
 import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
@@ -52,7 +53,7 @@ export type Anomaly = {
   gravity: number | null;
   temperature: number | null;
   orbital_period: number | null;
-  avatar_url: string | null;
+avatar_url: string | null;
   created_at: string;
 };
 
@@ -92,7 +93,12 @@ export interface AI4MClassification {
   annotationOptions: any[]; 
 };
 
-export default function TestPlanetWrapper({ params }: { params: { id: string } }) {
+import { useParams } from 'next/navigation';
+
+export default function TestPlanetWrapper() {
+  const params = useParams();
+  const id = params?.id as string;
+  
   const supabase = useSupabaseClient();
   const session = useSession();
 
@@ -245,35 +251,69 @@ export default function TestPlanetWrapper({ params }: { params: { id: string } }
   }, [session]);
 
   const fetchComments = async () => {
-      if (!classification) return;
-    
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*")
-        .eq("classification_id", classification.id)
-        .order("created_at", { ascending: false });
-    
-      if (error) {
-        console.error("Error fetching comments:", error);
-      } else {
-        setComments(data || []);
-    
-        const orbitalPeriodComment = data?.find(
-          (comment) => comment.category === "OrbitalPeriod" && comment.author === classification.author
-        );
+    if (!classification) return;
   
-        const radiusComment = data?.find(
-          (comment) => comment.category === "PlanetType" && comment.author === classification.author
-        );
+    const { data, error } = await supabase
+      .from("comments")
+      .select("*")
+      .eq("classification_id", classification.id)
+      .order("created_at", { ascending: false });
   
-        const temperatureComment = data?.find(
-          (comment) => comment.category === "Temperature" && comment.author === classification.author
-        );
-        
-        if (orbitalPeriodComment) setSurveyorPeriod(orbitalPeriodComment.value || ""); 
-        if (radiusComment) setDensity(radiusComment.content || null); 
-        if (temperatureComment) setTemperature(temperatureComment.value || null); 
-      }
+    if (error) {
+      console.error("Error fetching comments:", error);
+    } else {
+      let aggregatedComments: any[] = [];
+  
+      // Create a map to store the aggregated comments by category and author
+      const aggregatedMap: Record<string, any> = {};
+      let biomassSum = 0;  // Variable to track biomass sum
+  
+      data?.forEach((comment) => {
+        // Create a unique key based on category and author
+        const key = `${comment.category}-${comment.author}`;
+  
+        if (aggregatedMap[key]) {
+          // If a comment of this type exists, aggregate the values
+          if (comment.value) {
+            aggregatedMap[key].value += parseFloat(comment.value) || 0;
+          }
+        } else {
+          // If this is the first time we encounter this comment type and author, just add it
+          aggregatedMap[key] = { ...comment, value: parseFloat(comment.value) || 0 };
+        }
+  
+        // Check for "Biomass" comments and aggregate their value
+        if (comment.category === "Biomass") {
+          biomassSum += parseFloat(comment.value) || 0;
+        }
+      });
+  
+      // Convert the map back to an array
+      aggregatedComments = Object.values(aggregatedMap);
+  
+      // Now, set the aggregated comments to state
+      setComments(aggregatedComments);
+  
+      // Update the biomass score by adding the biomass sum
+      setBiomassScore(prevScore => prevScore + biomassSum);
+  
+      // Extract specific comments after aggregation for individual fields like OrbitalPeriod, PlanetType, etc.
+      const orbitalPeriodComment = aggregatedComments.find(
+        (comment) => comment.category === "OrbitalPeriod" && comment.author === classification.author
+      );
+  
+      const radiusComment = aggregatedComments.find(
+        (comment) => comment.category === "PlanetType" && comment.author === classification.author
+      );
+  
+      const temperatureComment = aggregatedComments.find(
+        (comment) => comment.category === "Temperature" && comment.author === classification.author
+      );
+  
+      if (orbitalPeriodComment) setSurveyorPeriod(orbitalPeriodComment.value || ""); 
+      if (radiusComment) setDensity(radiusComment.value || null); 
+      if (temperatureComment) setTemperature(temperatureComment.value || null);
+    }
   };  
   
   useEffect(() => {

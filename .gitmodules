@@ -1,3 +1,6 @@
 [submodule "citizen"]
 	path = citizen
 	url = https://github.com/signal-k/sytizen
+[submodule "misc/notifications"]
+	path = misc/notifications
+	url = https://github.com/signal-k/notifications

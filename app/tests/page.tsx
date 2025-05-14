@@ -1,15 +1,14 @@
 "use client";
 
-import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import WeatherEventsOverview from "@/components/Data/Generator/Weather/EventsAcrossMyLocations";
 import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
-import AlertComponent from "@/components/Structures/Missions/Milestones/Alerts/Alerts";
 import MilestoneTotalCompleted from "@/components/Structures/Missions/Milestones/Completed";
 import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
 import MyLocationIds from "@/content/Classifications/UserLocationPK";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
+// import { PlanetGenerator } from "starsailors-planet-generator";
 
 export default function TestPage() {
   const supabase = useSupabaseClient();
@@ -43,8 +42,7 @@ export default function TestPage() {
   }, [session]);
 
   return (
-    <div className="min-h-screen bg-black text-white p-4 space-y-8">
-      {/* <AlertComponent /> */}
+    <div className="min-h-screen  p-4 space-y-8">
       {/* <MySettlementsLocations /> */}
       {/* <MilestoneTotalCompleted />
       <TotalPoints />
@@ -55,7 +53,9 @@ export default function TestPage() {
                     density={3.5}
                   />
                   <MyLocationIds /> */}
-      <WeatherEventsOverview />
+      {/* <WeatherEventsOverview /> */}
+
+      {/* <PlanetGenerator classificationId={1} biome={'RockyHighlands'} biomass={0.01} density={3.5} /> */}
     </div>
   );
 };

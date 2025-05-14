@@ -27,11 +27,38 @@ const biomeToStormMap: Record<string, string> = {
   "Dune Fields": "Heatwave",
 };
 
+type EnvCategory = "biomass" | "temperature" | "humidity" | "density";
+
 function getPlanetType(density: number): "terrestrial" | "gaseous" | "ocean" {
   if (density >= 3.5) return "terrestrial";
   if (density < 1.5) return "gaseous";
   return "ocean";
+};
+
+interface EnvironmentalEffect {
+  humidity: number;
+  temperature: number;
+  biomass: number;
 }
+
+const stormEffectsMap: Record<string, EnvironmentalEffect> = {
+  "Dust Storm": { humidity: -0.05, temperature: -1, biomass: -0.005 },
+  "lightning-kickoff": { humidity: +0.05, temperature: +2, biomass: +0.01 },
+  "Radiation Storm": { humidity: -0.10, temperature: +3, biomass: -0.015 },
+  "Sandstorm": { humidity: -0.04, temperature: +2, biomass: -0.01 },
+  "Snowstorm": { humidity: +0.10, temperature: -5, biomass: -0.002 },
+  "Ashfall": { humidity: -0.02, temperature: +4, biomass: -0.01 },
+  "Windstorm": { humidity: -0.03, temperature: +1, biomass: -0.002 },
+  "Flash Flood": { humidity: +0.15, temperature: -1, biomass: +0.005 },
+  "Seismic Shock": { humidity: 0, temperature: 0, biomass: -0.02 },
+  "Ice Storm": { humidity: +0.08, temperature: -6, biomass: -0.01 },
+  "Thunderstorm": { humidity: +0.12, temperature: +1, biomass: +0.01 },
+  "Cyclone": { humidity: +0.20, temperature: -2, biomass: +0.015 },
+  "Monsoon": { humidity: +0.25, temperature: -1, biomass: +0.02 },
+  "Deluge": { humidity: +0.30, temperature: -2, biomass: +0.015 },
+  "Supercell": { humidity: +0.18, temperature: +1, biomass: +0.01 },
+  "Heatwave": { humidity: -0.20, temperature: +6, biomass: -0.02 },
+};
 
 interface EventData {
   classificationId: number;
@@ -50,6 +77,18 @@ function formatCountdown(seconds: number): string {
   return `${h}h ${m}m ${s}s`;
 }
 
+const structureTheme = {
+  background: 'bg-transparent',
+  cardBackground: 'bg-white/20 backdrop-blur',
+  cardBorder: 'border border-white/10',
+  title: 'text-[#2E3440]',
+  subtitle: 'text-[#4C566A]',
+  redeemed: 'text-green-600',
+  notRedeemed: 'text-red-500',
+  countdown: 'text-[#D08770]',
+  nextEvent: 'text-[#5E81AC]',
+};
+
 export default function WeatherEventsOverview() {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -60,10 +99,9 @@ export default function WeatherEventsOverview() {
     async function fetchData() {
       if (!session) return;
 
-      // Step 1: Fetch classifications
       const { data: classifications, error: classError } = await supabase
         .from("classifications")
-        .select("id, anomaly")
+        .select("id, anomaly") //, biome")
         .eq("author", session.user.id)
         .in("classificationtype", ["planet", "telescope-minorPlanet"]);
 
@@ -73,21 +111,12 @@ export default function WeatherEventsOverview() {
         return;
       }
 
-      const classificationInfo = classifications.map((item) => ({
-        id: item.id,
-        biome: "RockyHighlands", // Placeholder
-        biomass: 0.01,
-        density: 3.5,
-        anomaly_id: item.anomaly,
-      }));
+      const classificationIds = classifications.map(c => c.id);
 
-      // Step 2: Fetch events
       const now = new Date();
       const startOfWeekMelbourne = startOfWeek(toZonedTime(now, TIMEZONE), { weekStartsOn: 1 });
       startOfWeekMelbourne.setHours(0, 1, 0, 0);
       const endOfWeekMelbourne = addWeeks(startOfWeekMelbourne, 1);
-
-      const classificationIds = classificationInfo.map(c => c.id);
 
       const { data: events, error: eventsError } = await supabase
         .from("events")
@@ -101,42 +130,81 @@ export default function WeatherEventsOverview() {
         return;
       }
 
+      const { data: comments, error: commentError } = await supabase
+        .from("comments")
+        .select("classification_id, category, value, created_at")
+        .in("classification_id", classificationIds)
+        .order("created_at", { ascending: false });
+
+      if (commentError) {
+        console.error("Error fetching comments:", commentError);
+        setLoading(false);
+        return;
+      }
+
+      const envValues: Record<number, Partial<Record<EnvCategory, number>>> = {};
+
+      for (const comment of comments) {
+        const cid = comment.classification_id;
+        if (!envValues[cid]) envValues[cid] = {};
+
+        const rawCategory = comment.category?.toLowerCase();
+        if (["biomass", "temperature", "humidity", "density"].includes(rawCategory)) {
+          const category = rawCategory as EnvCategory;
+          if (!(category in envValues[cid])) {
+            envValues[cid][category] = parseFloat(comment.value);
+          }
+        }
+      }
+
       const grouped: Record<number, EventData> = {};
 
-      for (const info of classificationInfo) {
-        const { id, biome, biomass, density, anomaly_id } = info;
+      for (const info of classifications) {
+        const { id, anomaly } = info;// const { id, anomaly, biome } = info;
+        const env = envValues[id] || {};
+        const biomass = env.biomass ?? 0;
+        const humidity = env.humidity ?? 0;
+        const temperature = env.temperature ?? 0;
+        const density = env.density ?? 0;
+
         const planetType = getPlanetType(density);
 
         const eventsForLocation = events.filter(e => e.classification_location === id);
         const hasEventThisWeek = eventsForLocation.length > 0;
         const redeemed = eventsForLocation.some(e => e.status === "redeemed");
-        const lightningEventExists = eventsForLocation.some(e =>
-          e.type?.toLowerCase().includes("lightning")
-        );
+        const lightningEventExists = eventsForLocation.some(e => e.type?.toLowerCase().includes("lightning"));
 
         let newEventType: string | null = null;
 
         if (!hasEventThisWeek) {
-          if (
-            planetType === "terrestrial" &&
-            biomass >= 0.000001 &&
-            biomass <= 0.02 &&
-            !lightningEventExists
-          ) {
-            newEventType = "lightning-kickoff";
+          if (planetType === "gaseous") {
+            const stormTypes = Object.keys(stormEffectsMap);
+            newEventType = stormTypes[Math.floor(Math.random() * stormTypes.length)];
           } else {
-            newEventType = biomeToStormMap[biome] || "rain-general";
+            const eligibleForLightning = (
+              !lightningEventExists &&
+              biomass > 0.001 &&
+              temperature >= 10 &&
+              temperature <= 40 &&
+              humidity >= 0.10 &&
+              humidity <= 0.85
+            );
+
+            newEventType = eligibleForLightning
+              ? "lightning-kickoff"
+              : "Thunderstorm" // : biomeToStormMap[biome] || "Thunderstorm";
           }
         }
 
         const secondsLeft = differenceInSeconds(endOfWeekMelbourne, toZonedTime(now, TIMEZONE));
+
         grouped[id] = {
           classificationId: id,
           eventCount: eventsForLocation.length,
           hasEvent: hasEventThisWeek,
           redeemed,
           nextEventType: newEventType,
-          anomalyId: anomaly_id,
+          anomalyId: anomaly,
           countdown: formatCountdown(secondsLeft),
         };
       }
@@ -149,49 +217,99 @@ export default function WeatherEventsOverview() {
   }, [session]);
 
   const handleCreateEvent = async (classificationId: number, anomalyId: number, type: string) => {
-    const { error } = await supabase.from("events").insert({
-      classification_location: classificationId,
-      location: anomalyId,
-      type,
-      configuration: {},
-      completed: false,
-    });
+    if (!session) return;
 
-    if (error) {
-      console.error("Error creating event:", error);
-    } else {
-      window.location.reload();
+    const stormEffect = stormEffectsMap[type];
+    if (!stormEffect) {
+      console.warn(`No environmental effect defined for storm type: ${type}`);
+      return;
     }
+
+    const { data: eventInsertData, error: eventError } = await supabase
+      .from("events")
+      .insert({
+        classification_location: classificationId,
+        location: anomalyId,
+        type,
+        configuration: stormEffect,
+        completed: false,
+      })
+      .select("id")
+      .single();
+
+    if (eventError || !eventInsertData) {
+      console.error("Error creating event:", eventError);
+      return;
+    }
+
+    const eventId = eventInsertData.id;
+
+    const commentPayloads = ["humidity", "temperature", "biomass"].map((category) => {
+      const value = stormEffect[category as keyof EnvironmentalEffect];
+
+      if (value === undefined) {
+        console.warn(`No value defined for category: ${category} in storm type: ${type}`);
+        return null;
+      }
+
+      const capitalizedCategory = category.charAt(0).toUpperCase() + category.slice(1);
+
+      return {
+        content: `Change in ${capitalizedCategory}: ${value}`,
+        author: session.user.id,
+        classification_id: classificationId,
+        category: capitalizedCategory,
+        value: value.toString(),
+        configuration: JSON.stringify({
+          type: "weather-effect",
+          effect: type,
+          delta: value,
+        }),
+        event: eventId,
+      };
+    }).filter(Boolean);
+
+    if (commentPayloads.length > 0) {
+      const { error: commentError } = await supabase
+        .from("comments")
+        .insert(commentPayloads);
+
+      if (commentError) {
+        console.error("Error inserting comments:", commentError);
+      }
+    }
+
+    window.location.reload();
   };
 
-  if (loading) return <div className="text-white p-4">Loading weather events...</div>;
-  if (eventsData.length === 0) return <div className="text-white p-4">No planets found.</div>;
+  if (loading) return <div className="text-[#2E3440] p-4">Loading weather events...</div>;
+  if (eventsData.length === 0) return <div className="text-[#2E3440] p-4">No planets found.</div>;
 
   return (
-    <div className="min-h-screen bg-black text-white p-4 space-y-8">
+    <div className={`min-h-screen p-4 space-y-8 ${structureTheme.background}`}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {eventsData.map(event => (
           <div
             key={event.classificationId}
-            className="bg-gradient-to-br from-cyan-900 to-black text-white p-6 rounded-2xl shadow-lg space-y-2 border border-white/10"
+            className={`${structureTheme.cardBackground} ${structureTheme.cardBorder} text-[#2E3440] p-6 rounded-2xl shadow-lg space-y-2`}
           >
-            <h2 className="text-xl font-bold text-cyan-300">
+            <h2 className={`text-xl font-bold ${structureTheme.title}`}>
               Planet #{event.classificationId}
             </h2>
-            <p className="text-sm text-gray-300">
+            <p className={`text-sm ${structureTheme.subtitle}`}>
               Events this week: <span className="font-semibold">{event.eventCount}</span>
             </p>
-            <p className={`text-sm font-semibold ${event.redeemed ? 'text-green-400' : 'text-red-400'}`}>
+            <p className={`text-sm font-semibold ${event.redeemed ? structureTheme.redeemed : structureTheme.notRedeemed}`}>
               {event.redeemed ? 'Redeemed' : 'Not Redeemed'}
             </p>
             {event.hasEvent ? (
-              <p className="text-sm text-yellow-200">
+              <p className={`text-sm ${structureTheme.countdown}`}>
                 Next event in: <span className="font-mono">{event.countdown}</span>
               </p>
             ) : (
               event.nextEventType && (
                 <>
-                  <p className="text-sm text-yellow-300">
+                  <p className={`text-sm ${structureTheme.nextEvent}`}>
                     Next Suggested Event: <strong>{event.nextEventType}</strong>
                   </p>
                   <Button
@@ -212,6 +330,11 @@ export default function WeatherEventsOverview() {
     </div>
   );
 };
+
+
+
+
+
 
 /*
 'use client';

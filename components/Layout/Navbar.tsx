@@ -6,7 +6,6 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import MilestoneCard from "../Structures/Missions/Milestones/MilestoneCard";
 import JournalPage from "../Structures/Missions/Stardust/Journal";
-import AlertComponent from "../Structures/Missions/Milestones/Alerts/Alerts";
 import { BellDotIcon, TrophyIcon } from "lucide-react";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 
@@ -170,11 +169,6 @@ export default function Navbar() {
                   <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-red-500 rounded-full ring-2 ring-white" />
                 )}
               </button>
-              {alertsOpen && (
-                <div className="absolute left-0 mt-2 w-[350px] bg-white/90 backdrop-blur-lg rounded-lg shadow-lg border border-white/20">
-                  <AlertComponent />
-                </div>
-              )}
             </div>
 
             <div className="relative sm:hidden">

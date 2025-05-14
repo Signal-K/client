@@ -53,6 +53,13 @@ export default function PlanetProgress({
   const biomassPercent = Math.max(0, Math.min(biomassScore * 100, 100));
   const biomassStage = getBiomassStage(biomassScore);
 
+  const valueMap: Record<string, string> = {
+    temperature: temperature !== null ? `${temperature.toFixed(1)} °C` : "N/A",
+    radius: radius !== null ? `${radius.toFixed(1)} km` : "N/A",
+    biomass: !isNaN(biomassScore) ? biomassScore.toFixed(3) : "N/A",
+    period: period || "N/A",
+  };
+
   return (
     <div className="space-y-6 w-full max-w-xl text-sm text-gray-300 font-medium">
       <div className="flex justify-between items-center">
@@ -73,11 +80,11 @@ export default function PlanetProgress({
           <div className="uppercase tracking-wide text-xs text-gray-400 mb-1">
             Planet Data Confirmation
           </div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {Object.entries(isConfirmed).map(([key, value]) => (
               <div
                 key={key}
-                className={`flex items-center justify-center py-2 px-3 rounded-xl border text-xs uppercase tracking-wide
+                className={`flex flex-col items-center justify-center py-2 px-3 rounded-xl border text-xs uppercase tracking-wide text-center
                   ${
                     value
                       ? "border-green-400 text-green-300 bg-gradient-to-br from-green-900 to-green-700"
@@ -85,8 +92,13 @@ export default function PlanetProgress({
                   }
                 `}
               >
-                {value ? <CheckCircle className="w-4 h-4 mr-1" /> : <AlertCircle className="w-4 h-4 mr-1" />}
-                {key}
+                <div className="flex items-center justify-center space-x-1 mb-1">
+                  {value ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                  <span>{key}</span>
+                </div>
+                <div className="text-xs font-mono text-white lowercase">
+                  {valueMap[key]}
+                </div>
               </div>
             ))}
           </div>

@@ -1,42 +1,106 @@
 "use client"
 
 import React, { useState, useEffect } from "react";
+import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Badge, ChevronDown, Compass, Trophy } from "lucide-react";
+import { Badge, ChevronDown, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
-export function MissionsPopover({
-    userProgress,
-}: {
-    userProgress: { [key: string]: number }
-}) {
+export function MissionsPopover() {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
     const [currentWeekIndex, setCurrentWeekIndex] = useState<number>(0);
     const [milestones, setMilestones] = useState<any[]>([]);
-    
+    const [userProgress, setUserProgress] = useState<{ [key: string]: number }>({});
+
     const formatWeekDisplay = (index: number) => {
-        const diff = milestones.length - 1 - index
-        if (diff === 0) return "Current Week"
-        if (diff === 1) return "Last Week"
-        return `${diff} Weeks Ago`
-    };
+        if (index === 0) return "Current Week";
+        if (index === 1) return "Last Week";
+        return `${index} Weeks Ago`;
+    };    
 
     useEffect(() => {
         fetch("/api/gameplay/milestones")
             .then((res) => res.json())
             .then((data) => {
-                setMilestones(data.playerMilestones)
-                setCurrentWeekIndex(data.playerMilestones.length - 1) // Default to latest week
-            })
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const sorted = [...data.playerMilestones].sort(
+                    (a, b) => new Date(b.weekStart).getTime() - new Date(a.weekStart).getTime()
+                );
+
+                const currentIndex = sorted.findIndex((group) => {
+                    const start = new Date(group.weekStart);
+                    const end = new Date(start);
+                    end.setDate(start.getDate() + 6);
+                    return today >= start && today <= end;
+                });
+
+                setMilestones(sorted);
+                setCurrentWeekIndex(currentIndex !== -1 ? currentIndex : 0);
+            });
     }, []);
+
+    useEffect(() => {
+        if (!session || milestones.length === 0) return;
+
+        const fetchProgress = async () => {
+            const progress: { [key: string]: number } = {};
+            const weekData = milestones[currentWeekIndex];
+
+            if (!weekData) return;
+
+            const { weekStart, data } = weekData;
+
+            const startDate = new Date(weekStart);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            endDate.setHours(23, 59, 59, 999); // end of the week
+
+            for (const milestone of data) {
+                const { table, field, value } = milestone;
+
+                let query = supabase
+                    .from(table)
+                    .select("*", { count: "exact" })
+                    .gte("created_at", startDate.toISOString())
+                    .lte("created_at", endDate.toISOString())
+                    .eq(field, value);
+
+                if (session.user?.id) {
+                    query = query.eq("author", session.user.id);
+                }
+
+                const { data: rows, count, error } = await query;
+
+                console.log({
+                    name: milestone.name,
+                    query: { table, field, value, user: session.user.id },
+                    count,
+                    rows,
+                    error,
+                });
+
+                if (!error && count !== null) {
+                    progress[milestone.name] = count;
+                }
+            }
+
+            setUserProgress(progress);
+        };
+
+        fetchProgress();
+    }, [session, milestones, currentWeekIndex]);
 
     return (
         <Popover>
             <PopoverTrigger asChild>
                 <Button variant="ghost" className="text-white px-2">
-                <Trophy className="h-5 w-5 text-amber-400 group-hover:text-amber-300 transition-colors" />
-                <span className="ml-2 text-white">Milestones</span>
-                <Badge className="ml-1 bg-amber-600 hover:bg-amber-600 text-white">3</Badge>
+                    <Trophy className="h-5 w-5 text-amber-400 group-hover:text-amber-300 transition-colors" />
+                    <span className="ml-2 text-white">Milestones</span>
+                    <Badge className="ml-1 bg-amber-600 hover:bg-amber-600 text-white">3</Badge>
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[400px] p-0 bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border border-[#581c87] shadow-[0_0_15px_rgba(124,58,237,0.5)]">
@@ -67,7 +131,7 @@ export function MissionsPopover({
                             className="border-[#7e22ce] bg-[#1e293b] hover:bg-[#581c87] hover:text-white"
                             disabled={currentWeekIndex >= milestones.length - 1}
                         >
-                            Next <ChevronDown className="w-4 h-4 ml-1 -roate-90" />
+                            Next <ChevronDown className="w-4 h-4 ml-1 -rotate-90" />
                         </Button>
                     </div>
 
