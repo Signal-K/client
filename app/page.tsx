@@ -145,29 +145,48 @@ function PushNotificationManager() {
   };
 
   return (
-    <div>
-      <h3>Push Notifications</h3>
+    <div className="text-white space-y-4 text-base font-light">
+
       {subscription || hasSubscribedBefore ? (
         <>
-          <p>You are subscribed to push notifications.</p>
-          <button onClick={unsubscribeFromPush}>Unsubscribe</button>
-          <input
+          {/* <p className="text-white-400">You are subscribed to push notifications.</p> */}
+
+          {/* <button
+            onClick={unsubscribeFromPush}
+            className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 transition"
+          >
+            Unsubscribe
+          </button> */}
+
+          {/* <input
             type="text"
             placeholder="Enter notification message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-          />
-          <button onClick={sendTestNotification}>Send Test</button>
+            className="w-full px-3 py-2 border border-gray-500 rounded-md bg-transparent placeholder-gray-400 text-white"
+          /> */}
+
+          {/* <button
+            onClick={sendTestNotification}
+            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition"
+          >
+            Send Test Notification
+          </button> */}
         </>
       ) : (
         <>
-          <p>You are not subscribed to push notifications.</p>
-          <button onClick={subscribeToPush}>Subscribe</button>
+          {/* <p className="text-yellow-400">You are not subscribed to push notifications.</p> */}
+          <button
+            onClick={subscribeToPush}
+            className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 transition"
+          >
+            Subscribe
+          </button>
         </>
       )}
     </div>
   );
-}
+};
 
 function InstallPrompt() {
   const [isIOS, setIsIOS] = useState(false);
