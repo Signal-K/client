@@ -66,8 +66,7 @@ export function StarterTelescopeTessWithId({ anomalyid }: SelectedAnomProps) {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-      <div className="p-4 rounded-md relative w-full">
+
         <ImageAnnotator
           anomalyType="planet"
           missionNumber={1372001}
@@ -77,11 +76,8 @@ export function StarterTelescopeTessWithId({ anomalyid }: SelectedAnomProps) {
           initialImageUrl={imageUrl || ''}
           anomalyId={anomalyid?.toString()}
         />
-      </div>
-    </div>
   );
-}
-
+};
 
 export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
     const supabase = useSupabaseClient();
