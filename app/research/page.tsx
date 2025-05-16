@@ -58,7 +58,7 @@ export default function TechTreeResearchPage() {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 bg-[#0f2942] px-4 py-2 rounded border border-[#1e3a5f]">
                 <span className="text-[#4cc9f0]">STARDUST:</span>
-                <span className="font-bold text-[#f72585] text-xl">{availablePoints}</span>
+                <span className="font-bold text-[#f72585] text-xl"><TotalPoints /></span>
               </div>
             </div>
           </div>
