@@ -80,8 +80,8 @@ export function StarterCoMShapes({ anomalyid }: SelectedAnomProps) {
 
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
                 if (supabaseUrl && randomAnomaly?.id) {
-                    setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${randomAnomaly.id}/${randomAnomaly.id}/${randomAnomaly.id}1.png`);
-                    setBaseImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${randomAnomaly.id}/${randomAnomaly.id}/${randomAnomaly.id}2.png`);
+                    setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${randomAnomaly.id}/${randomAnomaly.id}/${randomAnomaly.id}/1.png`);
+                    setBaseImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${randomAnomaly.id}/${randomAnomaly.id}/${randomAnomaly.id}/2.png`);
                 } else {
                     console.error('Supabase URL or Anomaly ID is missing!');
                     setAnomaly(null);

@@ -17,6 +17,7 @@ import {
   automatonaiForMarsOptions,
   DailyMinorPlanetOptions,
   PlanetFourOptions,
+  activeAsteroidsOptions,
   jvhOptions,
   initialCloudClassificationOptions,
   cloudSpottingOnMarsShapesOptions,
@@ -67,6 +68,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return "Describe the terrain or objects found in the image...";
       case "cloud":
         return "Describe the cloud formations & locations...";
+      case "active-asteroid":
+        return "Describe the shapes you see...";
       case "zoodex-burrowingOwl":
         return "Describe the behavior or condition of the owls...";
       case "zoodex-iguanasFromAbove":
@@ -114,6 +117,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         ];
       case "zoodex-burrowingOwl":
         return [zoodexBurrowingOwlClassificationOptions];
+      case "active-asteroids":
+        return [activeAsteroidsOptions];
       case "zoodex-iguanasFromAbove":
         return [zoodexIguanasFromAboveClassificationOptions];
       case 'lidar-jovianVortexHunter':
@@ -367,6 +372,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
 
   const additionalTextAreaConfig = (() => {
     switch (anomalyType) {
+      case "active-asteroid":
+        return  { count: 1, placeholder: ["Describe the dust shape"]};
       case "planet":
         return { count: 1, placeholders: ["Planet period"] };
       case "roverImg":
@@ -465,7 +472,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
                     onChange={(e) => handleAdditionalFieldChange(index, e.target.value)}
                     className="p-3 h-24 text-sm text-white rounded-md border border-[#3B4252] bg-[#3B4252] focus:border-[#88C0D0] focus:ring focus:ring-[#88C0D0] outline-none"
                     placeholder={
-                      additionalTextAreaConfig.placeholders[index] ||
+                      (additionalTextAreaConfig.placeholders?.[index] ?? "") ||
                       `Additional detail ${index + 1}`
                     }
                   />

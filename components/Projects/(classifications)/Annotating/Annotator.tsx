@@ -15,7 +15,9 @@ import {
   JVHCATEGORIES,
   CoMSCategories,
   SunspotsCategories,
+  ActiveAsteroidsCategories,
   type CoMShapesCategory,
+  type ActiveAsteroidsCategory,
   type AI4MCategory,
   type SunspotsCategory,
   type JVHCategory,
@@ -40,7 +42,7 @@ interface ImageAnnotatorProps {
   assetMentioned?: string | string[];
   structureItemId?: number;
   parentPlanetLocation?: string;
-  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'CoMS' | 'Sunspots' | 'Custom';
+  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'AA' | 'CoMS' | 'Sunspots' | 'Custom';
 };
 
 export default function ImageAnnotator({
@@ -76,6 +78,8 @@ export default function ImageAnnotator({
       ? AI4MCATEGORIES
       : annotationType === 'P4'
       ? P4CATEGORIES
+      : annotationType == 'AA'
+      ? ActiveAsteroidsCategories
       : annotationType === 'CoM'
       ? CoMCATEGORIES
       : annotationType === 'PH'
@@ -252,7 +256,7 @@ export default function ImageAnnotator({
           )}
           {/* {isFormVisible && ( */}
             <SciFiPanel className="p-4 w-full max-w-md mx-auto">
-              {anomalyId && anomalyType && missionNumber && (
+              {anomalyId && anomalyType && (
                 <ClassificationForm
                   anomalyId={anomalyId}
                   anomalyType={anomalyType}

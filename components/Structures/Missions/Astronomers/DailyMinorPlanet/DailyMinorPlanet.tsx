@@ -5,6 +5,7 @@ import MissionShell from "../../BasePlate";
 import { DailyMinorPlanet, StarterDailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
 import VoteDMPClassifications from "./DMPVote";
 import DMPGenerator from "./AsteroidMaker";
+import { ActiveAsteroidWithId } from "@/components/Projects/Telescopes/ActiveAsteroids";
 
 interface Mission {
   id: number;
@@ -77,20 +78,21 @@ const DailyMinorPlanetMissions = () => {
       shadow: true,
       action: () => {},
     },
-    // {
-    //   id: 5,
-    //   chapter: 2,
-    //   title: "Make an active asteroid classification",
-    //   description:
-    //     "The next step in your asteroid research involves finding asteroids with tails, helping us find clues about water on smaller objects",
-    //   icon: Guitar,
-    //   points: 2,
-    //   completedCount: 0,
-    //   internalComponent: () => <div><DMPGenerator /></div>,
-    //   color: 'text-green-300',
-    //   shadow: true,
-    //   action: () => {},
-    // },
+    {
+      id: 5,
+      chapter: 2,
+      title: "Make an active asteroid classification",
+      description:
+        "The next step in your asteroid research involves finding asteroids with tails, helping us find clues about water on smaller objects",
+      icon: Guitar,
+      points: 2,
+      completedCount: 0,
+      // internalComponent: () => <div><DMPGenerator /></div>,
+      internalComponent: () => <div><ActiveAsteroidWithId /></div>,
+      color: 'text-green-300',
+      shadow: true,
+      action: () => {},
+    },
     // {
     //   id: 6,
     //   chapter: 2,
@@ -139,7 +141,7 @@ const DailyMinorPlanetMissions = () => {
     color: 'text-yellow-500',
     internalComponent: () => {
       return <StarterDailyMinorPlanet anomalyid={90670192} />;
-    }
+    },
   };
 
   const [experiencePoints, setExperiencePoints] = useState(0);
