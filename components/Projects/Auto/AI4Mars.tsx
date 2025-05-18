@@ -14,7 +14,7 @@ interface Props {
 
 export function StarterAiForMars({ anomalyid }: Props) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/automaton-aiForMars/${anomalyid}.jpeg`;
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/automaton-ai4Mars/${anomalyid}.jpeg`;
 
     const [part, setPart] = useState(1);
     const [line, setLine] = useState(1);
@@ -184,7 +184,7 @@ export function AiForMarsProjectWithID({
             } else {
                 setAnomaly(anomalyData[0]);
                 setImageUrl(
-                    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${anomalyid}.jpeg`
+                    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-ai4Mars/${anomalyid}.jpeg`
                 );
             };
         } catch (error: any) {
@@ -289,7 +289,7 @@ export function AiForMarsProject({
             const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
             setAnomaly(randomAnomaly);
             setImageUrl(
-                `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-aiForMars/${randomAnomaly.id}.jpeg`
+                `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-ai4Mars/${randomAnomaly.id}.jpeg`
             );
         } catch (error: any) {
             console.error("Error fetching anomaly", error.message);

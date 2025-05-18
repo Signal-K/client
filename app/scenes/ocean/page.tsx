@@ -11,6 +11,7 @@ import OceanGallery from "@/components/Structures/Missions/Biologists/gallery/oc
 import OceanCounter from "@/components/Structures/Missions/Biologists/timer/oceanTimer";
 import { Bolt, MainView, MetricItem, ProjectDetailView } from "@/components/Structures/Greenhouses/Views";
 import { Badge } from "@/components/ui/badge";
+import GameNavbar from "@/components/Layout/Tes";
 
 interface Project {
   id: number
@@ -111,74 +112,80 @@ const OceanBaseEarthScene = () => {
       return `${hours}:${minutes}:${seconds}`;
     };
 
-  return (
-    <div className="relative w-full py-10 bg-black text-white">
-      <Navbar />
-      <div className="relative py-10 flex flex-col gap-6 p-6">
-        <img
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-          src="/assets/Backdrops/Ocean.png"
-          alt="Ocean Background"
-        />
-
-        {/* Station Overview */}
-        <div className="relative flex flex-col gap-4 mb-4 bg-card rounded-md p-4 border border-border shadow-sm">
-          <Bolt className="absolute top-3 left-3" />
-          <Bolt className="absolute top-3 right-3" />
-          <Bolt className="absolute bottom-3 left-3" />
-          <Bolt className="absolute bottom-3 right-3" />
-          <div className="absolute inset-0 overflow-hidden opacity-5 pointer-events-none">
-            <div className="w-full h-full bg-[repeating-linear-gradient(45deg,#000,#000_1px,transparent_1px,transparent_10px)]"></div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="relative bg-primary/10 p-3 rounded-full">
-              <GlassWater className="h-20 w-20 text-primary" />
+    return (
+      <div className="relative w-full py-10 h-full bg-[#ECEFF4] text-[#2E3440]">
+        <GameNavbar />
+        <div className="relative py-10 flex flex-col gap-6 p-6">
+          <img
+            className="absolute inset-0 w-full h-full object-cover opacity-20"
+            src="/assets/Backdrops/Ocean.png"
+            alt="Ocean Background"
+          />
+    
+          {/* Station Overview */}
+          <div className="relative flex flex-col gap-4 mb-4 bg-[#E5E9F0] text-[#2E3440] rounded-xl p-4 border border-[#D8DEE9] shadow-md">
+            <Bolt className="absolute top-3 left-3 text-primary" />
+            <Bolt className="absolute top-3 right-3 text-primary" />
+            <Bolt className="absolute bottom-3 left-3 text-primary" />
+            <Bolt className="absolute bottom-3 right-3 text-primary" />
+            <div className="absolute inset-0 overflow-hidden opacity-5 pointer-events-none">
+              <div className="w-full h-full bg-[repeating-linear-gradient(45deg,#000,#000_1px,transparent_1px,transparent_10px)]"></div>
             </div>
-
-            <div className="flex flex-col">
-              <h1 className="text-2xl font-bold">{activeStation.name} | {activeStation.id}</h1>
-              <p className="text-base text-muted-foreground">{activeStation.description}</p>
-
-              <div className="flex items-center gap-3 mt-2">
-                <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1">
-                  <Clock className="h-4 w-4" />
-                  <span className="text-sm">Next: {formatTime(timeLeft)}</span>
-                </Badge>
-                <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
-                  <Camera className="h-4 w-4" />
-                  <span className="text-sm">12 Active</span>
-                </Badge>
+    
+            <div className="flex items-center gap-4">
+              <div className="relative bg-primary/10 p-3 rounded-full">
+                <GlassWater className="h-20 w-20 text-primary" />
+              </div>
+    
+              <div className="flex flex-col">
+                <h1 className="text-2xl font-bold">{activeStation.name} | {activeStation.id}</h1>
+                <p className="text-base text-muted-foreground">{activeStation.description}</p>
+    
+                <div className="flex items-center gap-3 mt-2">
+                  <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1">
+                    <Clock className="h-4 w-4" />
+                    <span className="text-sm">Next: {formatTime(timeLeft)}</span>
+                  </Badge>
+                  <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
+                    <Camera className="h-4 w-4" />
+                    <span className="text-sm">12 Active</span>
+                  </Badge>
+                </div>
               </div>
             </div>
+    
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <MetricItem icon={Thermometer} label="Temperature" value="22°C Average" />
+              <MetricItem icon={Droplets} label="Moisture" value="68% Humidity" />
+              <MetricItem icon={Sun} label="Light" value="12.4k lux" />
+              <MetricItem icon={Wind} label="Wind" value="8 km/h" />
+            </div>
+    
+            <div className="mt-4 flex items-center gap-4">
+              <h3 className="text-lg font-semibold text-primary">Biome</h3>
+              <BiomePattern biome={activeStation.biome} className="w-10 h-10" />
+              <span>{activeStation.biome}</span>
+            </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <MetricItem icon={Thermometer} label="Temperature" value="22°C Average" />
-            <MetricItem icon={Droplets} label="Moisture" value="68% Humidity" />
-            <MetricItem icon={Sun} label="Light" value="12.4k lux" />
-            <MetricItem icon={Wind} label="Wind" value="8 km/h" />
+    
+          <div className="flex-grow overflow-auto">
+            {activeProject === null ? (
+              <MainView projects={projects} onProjectClick={setActiveProject} />
+            ) : (
+              <ProjectDetailView
+                project={projects.find((p) => p.id === activeProject)!}
+                onBack={() => handleBack()}
+              />
+            )}
           </div>
-
-          <div className="mt-4 flex items-center gap-4">
-            <h3 className="text-lg font-semibold text-blue-400">Biome</h3>
-            <BiomePattern biome={activeStation.biome} className="w-10 h-10" />
-            <span>{activeStation.biome}</span>
-          </div>
-        </div>
-
-        <div className="flex-grow overflow-auto">
-        {activeProject === null ? (
-          <MainView projects={projects} onProjectClick={setActiveProject} /> // archiveImages={archiveImages}
-        ) : (
-          <ProjectDetailView
-            project={projects.find((p) => p.id === activeProject)!}
-            onBack={() => handleBack()} 
-          />
-        )}
       </div>
+    </div>
+  );
+};
 
-        {/* Dashboard Grid */}
+export default OceanBaseEarthScene;
+
+{/* Dashboard Grid */}
         {/* <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-gray-900 bg-opacity-80 p-6 rounded-lg shadow-lg">
             <h3 className="text-xl font-semibold text-blue-400">Animals available for study</h3>
@@ -218,10 +225,4 @@ const OceanBaseEarthScene = () => {
               <p className="mt-4 text-gray-400">No projects available</p>
             )}
           </div>
-        </div> */}
-      </div>
-    </div>
-  );
-};
-
-export default OceanBaseEarthScene;
+</div> */}

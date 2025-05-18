@@ -3,12 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
     {
-        weekStart: '2025-05-09',
+        weekStart: '2025-05-18',
         data: [
             {
-                name: 'Upload one image',
-                structure: "WeatherBalloon",
-                group: 'Meteorology',
+                name: 'Collect animals around you',
+                structure: "Greenhouse",
+                // group: 'Meteorology',
+                group: 'Bioloy',
                 icon: "PawPrintIcon",
                 extendedDescription: '',
                 xp: 2,
@@ -31,6 +32,20 @@ const milestones = [
                 table: "comments",
                 field: "category",
                 value: "Temperature",
+                requiredCount: 1,
+            },
+            {
+                name: 'Retrieve satellite images of your planets',
+                structure: 'WeatherBalloon',
+                group: 'Astronomy',
+                icon: "Telescope",
+                extendedDescription: "",
+                xp: 3,
+                completionInfo: '',
+                rewardInfo: '',
+                table: "classifications",
+                field: "classificationtype",
+                value: "satellite-planetFour",
                 requiredCount: 1,
             },
         ],

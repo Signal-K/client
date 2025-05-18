@@ -16,7 +16,7 @@ export interface ClassificationFormProps {
   onSubmit?: (data: any) => void;
   anomalyType: string;
   anomalyId: string;
-  missionNumber: number;
+  missionNumber?: number;
   assetMentioned: string | string[];
   parentPlanetLocation?: string;
   // structureItemId?: number;

@@ -38,6 +38,21 @@ export const DailyMinorPlanetOptions: ClassificationOption[] = [
     },
 ];
 
+export const activeAsteroidsOptions: ClassificationOption[] = [
+    {
+        id: 1,
+        text: "Hot – shows a tail or coma",
+    },
+    {
+        id: 2,
+        text: "Not – no visible activity",
+    },
+    {
+        id: 3,
+        text: "Can't tell / object not visible",
+    },
+];
+
 export const PlanetFourOptions: ClassificationOption[] = [
     {
         id: 1,

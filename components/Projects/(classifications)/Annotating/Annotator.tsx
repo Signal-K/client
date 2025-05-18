@@ -15,7 +15,9 @@ import {
   JVHCATEGORIES,
   CoMSCategories,
   SunspotsCategories,
+  ActiveAsteroidsCategories,
   type CoMShapesCategory,
+  type ActiveAsteroidsCategory,
   type AI4MCategory,
   type SunspotsCategory,
   type JVHCategory,
@@ -40,7 +42,7 @@ interface ImageAnnotatorProps {
   assetMentioned?: string | string[];
   structureItemId?: number;
   parentPlanetLocation?: string;
-  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'CoMS' | 'Sunspots' | 'Custom';
+  annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'AA' | 'CoMS' | 'Sunspots' | 'Custom';
 };
 
 export default function ImageAnnotator({
@@ -76,6 +78,8 @@ export default function ImageAnnotator({
       ? AI4MCATEGORIES
       : annotationType === 'P4'
       ? P4CATEGORIES
+      : annotationType == 'AA'
+      ? ActiveAsteroidsCategories
       : annotationType === 'CoM'
       ? CoMCATEGORIES
       : annotationType === 'PH'
@@ -122,7 +126,7 @@ export default function ImageAnnotator({
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       ctx.drawImage(imageRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
     };
-  };  
+  };    
 
   useEffect(() => {
     if (!initialImageUrl) return;
@@ -136,6 +140,23 @@ export default function ImageAnnotator({
     };
     img.src = initialImageUrl;
   }, [initialImageUrl]);  
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    };
+
+    const preventTouchScroll = ( e: TouchEvent ) => e.preventDefault();
+
+    canvas.addEventListener('touchstart', preventTouchScroll, { passive: false });
+    canvas.addEventListener('touchmove', preventTouchScroll, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('touchstart', preventTouchScroll);
+      canvas.removeEventListener('touchmove', preventTouchScroll);
+    };
+  }, []);
   
   useEffect(() => {
     if (imageRef.current && canvasRef.current) {
@@ -171,9 +192,9 @@ export default function ImageAnnotator({
   }, {} as Record<string, number>);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-full px-2 md:px-4 mx-auto overflow-x-hidden overflow-y-auto max-h-screen">
       <div className="flex justify-between items-center">
-        <SciFiPanel className="p-4">
+        <SciFiPanel className="p-4 w-full max-w-md mx-auto">
           <AnnotationTools
             currentTool={currentTool}
             setCurrentTool={setCurrentTool}
@@ -184,7 +205,7 @@ export default function ImageAnnotator({
       </div>
       {selectedImage && (
         <div className="space-y-4">
-          <SciFiPanel className="p-4">
+          <SciFiPanel className="p-4 w-full max-w-md mx-auto">
             <p>{parentClassificationId}</p>
             <AnnotationCanvas
               canvasRef={canvasRef}
@@ -203,7 +224,7 @@ export default function ImageAnnotator({
               currentCategory={currentCategory}
             />
           </SciFiPanel>
-          <SciFiPanel className="p-4">
+          <SciFiPanel className="p-4 w-full max-w-md mx-auto">
             <Legend
               currentCategory={currentCategory}
               setCurrentCategory={setCurrentCategory}
@@ -211,7 +232,7 @@ export default function ImageAnnotator({
               categories={CATEGORY_CONFIG as Record<AI4MCategory | P4Category, CategoryConfig>}
             />
           </SciFiPanel>
-          <SciFiPanel className="p-4">
+          <SciFiPanel className="p-4 w-full max-w-md mx-auto">
             <Button onClick={addMedia} disabled={isUploading}>
               {isUploading ? 'Uploading...' : 'Save & proceed'}
             </Button>
@@ -234,8 +255,8 @@ export default function ImageAnnotator({
             </SciFiPanel>
           )}
           {/* {isFormVisible && ( */}
-            <SciFiPanel className="p-4">
-              {anomalyId && anomalyType && missionNumber && (
+            <SciFiPanel className="p-4 w-full max-w-md mx-auto">
+              {anomalyId && anomalyType && (
                 <ClassificationForm
                   anomalyId={anomalyId}
                   anomalyType={anomalyType}

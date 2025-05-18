@@ -238,7 +238,27 @@ export const CACCategories: Record<CACCategory, CategoryConfig> = {
     color: '#FF9800',
     description: 'Various fish species observed in the coral reef ecosystem.',
     iconUrl: '/assets/Docs/Zoodex/zoodex-clickACoral/Fish.jpeg',
-  }
+  },
+};
+
+export type ActiveAsteroidsCategory = 'Tail' | 'Coma' | 'FalsePositive';
+
+export const ActiveAsteroidsCategories: Record<ActiveAsteroidsCategory, CategoryConfig> = {
+  Tail: {
+    name: 'Tail',
+    color: '#1E88E5',
+    description: 'Dust or gas tail extending away from the object. Tails may vary in shape and direction.',
+  },
+  Coma: {
+    name: 'Coma',
+    color: '#43A047',
+    description: 'A fuzzy cloud-like region around the object, often shell-like or smudged in appearance.',
+  },
+  FalsePositive: {
+    name: 'False Positive',
+    color: '#F44336',
+    description: 'Features that may mimic activity: star trails, cosmic rays, clouds, or telescope artifacts.',
+  },
 };
 
 export type PHCategory = 'Noise' | 'Clear dip' | 'Missing' | 'Custom';

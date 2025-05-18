@@ -264,7 +264,7 @@ export function DailyMinorPlanetWithId({ anomalyid }: DailyMinorPlanetProps) {
       )}
     </div>
   );
-}
+};
 
 
 export function DailyMinorPlanet() {

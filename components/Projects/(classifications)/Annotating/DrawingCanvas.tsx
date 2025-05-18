@@ -11,7 +11,7 @@ interface AnnotationCanvasProps {
   setIsDrawing: (isDrawing: boolean) => void;
   currentTool: Tool;
   currentColor: string;
-  lineWidth: number;
+  lineWidth: number; 
   drawings: DrawingObject[];
   setDrawings: (drawings: DrawingObject[]) => void;
   currentDrawing: DrawingObject | null;
@@ -55,6 +55,60 @@ export function AnnotationCanvas({
     };
     setCurrentDrawing(newDrawing);
   };
+
+  const getTouchPos = (touch: Touch, canvas: HTMLCanvasElement) => {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top,
+    };
+  };
+  
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+  
+    const touch = e.touches[0];
+    const { x, y } = getTouchPos(touch as Touch, canvas);
+  
+    setIsDrawing(true);
+    const newDrawing: DrawingObject = {
+      type: currentTool,
+      category: currentCategory,
+      color: currentColor,
+      width: lineWidth,
+      points: [{ x, y }],
+      startPoint: { x, y },
+    };
+    setCurrentDrawing(newDrawing);
+  };
+  
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDrawing || !currentDrawing || !canvasRef.current) return;
+  
+    const touch = e.touches[0];
+    const { x, y } = getTouchPos(touch as Touch, canvasRef.current);
+  
+    if (currentTool === 'pen') {
+      setCurrentDrawing({
+        ...currentDrawing,
+        points: [...currentDrawing.points, { x, y }],
+      });
+    } else {
+      setCurrentDrawing({
+        ...currentDrawing,
+        endPoint: { x, y },
+      });
+    }
+  };
+  
+  const handleTouchEnd = () => {
+    if (currentDrawing) {
+      setDrawings([...drawings, currentDrawing]);
+    }
+    setIsDrawing(false);
+    setCurrentDrawing(null);
+  };  
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing || !currentDrawing || !canvasRef.current) return;
@@ -165,6 +219,9 @@ export function AnnotationCanvas({
         onMouseMove={draw}
         onMouseUp={stopDrawing}
         onMouseOut={stopDrawing}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         className={cn("cursor-crosshair", isDrawing && "cursor-none")}
         style={{ width: `${CANVAS_WIDTH}px`, height: `${CANVAS_HEIGHT}px` }}
       />
