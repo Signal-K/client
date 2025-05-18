@@ -225,7 +225,7 @@ export default function SurveyorCalculator({ classificationId }: Props) {
         <div className="flex items-center gap-2 mb-3">
           <h4 className="text-sm font-medium text-[#2E3440]">Planet Calculator</h4>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-3 relative z-50">
           <Select
             value={selectedCalculator}
             onValueChange={(val) =>
@@ -235,12 +235,14 @@ export default function SurveyorCalculator({ classificationId }: Props) {
             <SelectTrigger className="bg-[#FFFFFF] border-[#D8DEE9] text-[#2E3440]">
               <SelectValue placeholder="Select calculator" />
             </SelectTrigger>
-            <SelectContent className="bg-[#FFFFFF] border-[#D8DEE9] text-[#2E3440]">
-              <SelectItem value="radius">Planet Radius</SelectItem>
-              <SelectItem value="density">Planet Density</SelectItem>
-              <SelectItem value="temperature">Planet Temperature</SelectItem>
-              <SelectItem value="period">Orbital Period</SelectItem>
-            </SelectContent>
+            <div className="space-y-3 relative z-50">
+              <SelectContent position="popper" className="bg-white border-[#D8DEE9] text-[#2E3440] z-50">
+                <SelectItem value="radius">Planet Radius</SelectItem>
+                <SelectItem value="density">Planet Density</SelectItem>
+                <SelectItem value="temperature">Planet Temperature</SelectItem>
+                <SelectItem value="period">Orbital Period</SelectItem>
+              </SelectContent>
+            </div>
           </Select>
 
           <div className="grid grid-cols-2 gap-2">
@@ -330,7 +332,7 @@ export default function SurveyorCalculator({ classificationId }: Props) {
 
           <Button
             onClick={handleCalculate}
-            className="w-full bg-[#B48EAD] text-[#ECEFF4] hover:bg-[#B48EAD]/90"
+            className="w-full bg-[#5E81AC] text-white hover:bg-[#5E81AC]/90"
           >
             Calculate
           </Button>
