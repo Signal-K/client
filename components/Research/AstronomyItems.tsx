@@ -88,7 +88,7 @@ export default function AstronomyResearch() {
         <StatCard
   title="PROBE DISTANCE"
   value={userCapacities.probeDistance}
-  max={5}
+  max={5} 
   description={probeRangeDescription}
   color="#4cc9f0"
 /> */}

@@ -110,9 +110,9 @@ export function StarterLidar({ anomalyid }: SelectedAnomProps) {
         checkTutorialMission();
       }, [session, supabase]);
     
-    if (!hasMission3000010) {
-    return <CloudspottingOnMarsTutorial anomalyId={anomaly?.id.toString() || "8423850802"} />;
-    };
+    // if (!hasMission3000010) {
+    // return <CloudspottingOnMarsTutorial anomalyId={anomaly?.id.toString() || "8423850802"} />;
+    // };
 
     if (loading) {
         return (

@@ -61,18 +61,6 @@ drop function if exists "storage"."delete_prefix"(_bucket_id text, _name text);
 
 drop function if exists "storage"."delete_prefix_hierarchy_trigger"();
 
-drop function if exists "storage"."get_level"(name text);
-
-drop function if exists "storage"."get_prefix"(name text);
-
-drop function if exists "storage"."get_prefixes"(name text);
-
-drop function if exists "storage"."objects_insert_prefix_trigger"();
-
-drop function if exists "storage"."objects_update_prefix_trigger"();
-
-drop function if exists "storage"."prefixes_insert_trigger"();
-
 drop function if exists "storage"."search_legacy_v1"(prefix text, bucketname text, limits integer, levels integer, offsets integer, search text, sortcolumn text, sortorder text);
 
 drop function if exists "storage"."search_v1_optimised"(prefix text, bucketname text, limits integer, levels integer, offsets integer, search text, sortcolumn text, sortorder text);
@@ -375,7 +363,7 @@ using ((bucket_id = 'telescope'::text));
 
 
 create policy "Enable read access for all users zj231d_0"
-on "storage"."objects"
+on "storage"."objects" 
 as permissive
 for select
 to public

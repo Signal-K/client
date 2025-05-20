@@ -85,6 +85,131 @@ CREATE EXTENSION IF NOT EXISTS "wrappers" WITH SCHEMA "extensions";
 
 
 
+CREATE OR REPLACE FUNCTION "public"."archive_all_automaton_anomalies"() RETURNS "void"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  UPDATE anomalies
+  SET anomalySet = 'automaton-aiForMars-archive'
+  WHERE anomalySet = 'automaton-aiForMars';
+END;
+$$;
+
+
+ALTER FUNCTION "public"."archive_all_automaton_anomalies"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."archive_missing_anomalies"() RETURNS "void"
+    LANGUAGE "plpgsql"
+    AS $$
+DECLARE
+  ids_to_keep bigint[] := ARRAY[
+    40424669, 44307415, 46881149, 46881203, 47229542, 55137778, 57159366,
+    57161224, 57161981, 57166042, 57511112, 57511636, 57514102, 57537348,
+    57538410, 69592674, 74589388, 74652652, 74652678, 74652771, 79738503, 79738567
+  ];
+  non_matching_count bigint;
+  updated_count bigint;
+BEGIN
+  -- Count non-matching rows
+  SELECT COUNT(*)
+  INTO non_matching_count
+  FROM public.anomalies
+  WHERE "anomalySet" = 'automaton-aiForMars'
+    AND id NOT IN (SELECT unnest(ids_to_keep));
+
+  -- Output the count of non-matching rows
+  RAISE NOTICE 'Non-matching rows count: %', non_matching_count;
+
+  -- Update the anomalySet for non-matching rows
+  UPDATE public.anomalies
+  SET "anomalySet" = 'automaton-aiForMars-archive'
+  WHERE "anomalySet" = 'automaton-aiForMars'
+    AND id NOT IN (SELECT unnest(ids_to_keep));
+
+  -- Count how many rows were updated
+  GET DIAGNOSTICS updated_count = ROW_COUNT;
+
+  -- Output the count of updated rows
+  RAISE NOTICE 'Updated rows count: %', updated_count;
+
+  -- Check if any rows were updated
+  IF updated_count = 0 THEN
+    RAISE NOTICE 'No rows were updated.';
+  END IF;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."archive_missing_anomalies"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."archive_old_cloud_anomalies"() RETURNS "void"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  UPDATE anomalies
+  SET anomalytype = 'cloud_archive'
+  WHERE id IN (
+    104282809,
+    104283270,
+    104283421,
+    104283590,
+    104283739,
+    104283832,
+    104283911,
+    104284601,
+    104285132,
+    104285330,
+    104285574,
+    104285644,
+    104285810,
+    104285865,
+    104286112,
+    106538942,
+    106539291,
+    8423850802,
+    8423850803,
+    9490482201,
+    9490482202,
+    9490482203,
+    9490482204
+  );
+END;
+$$;
+
+
+ALTER FUNCTION "public"."archive_old_cloud_anomalies"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."archive_unmatched_automaton_anomalies"() RETURNS "void"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  UPDATE anomalies
+  SET anomalySet = 'automaton-aiForMars-archive'
+  WHERE anomalySet = 'automaton-aiForMars'
+    AND id::text NOT IN (
+      '40424669', '44307415', '46881149', '46881203', '47229542',
+      '55137778', '57159366', '57161224', '57161981', '57166042',
+      '57511112', '57511636', '57514102', '57537348', '57538410',
+      '69592674', '74589388', '74652652', '74652678', '74652771',
+      '79738503', '79738567'
+    )
+    AND content::text NOT IN (
+      '40424669', '44307415', '46881149', '46881203', '47229542',
+      '55137778', '57159366', '57161224', '57161981', '57166042',
+      '57511112', '57511636', '57514102', '57537348', '57538410',
+      '69592674', '74589388', '74652652', '74652678', '74652771',
+      '79738503', '79738567'
+    );
+END;
+$$;
+
+
+ALTER FUNCTION "public"."archive_unmatched_automaton_anomalies"() OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."get_random_anomaly"("anomaly_type" "text", "anomaly_set" "text") RETURNS TABLE("id" bigint, "content" "text", "ticId" "text", "anomalytype" "text", "type" "text", "radius" double precision, "mass" double precision, "density" double precision, "gravity" double precision, "temperatureEq" double precision, "temperature" double precision, "smaxis" double precision, "orbital_period" double precision, "classification_status" "text", "avatar_url" "text", "created_at" timestamp with time zone, "deepnote" "text", "lightkurve" "text", "configuration" "jsonb", "parentAnomaly" bigint, "anomalySet" "text")
     LANGUAGE "sql"
     AS $_$
@@ -1341,6 +1466,30 @@ GRANT ALL ON FUNCTION "public"."vector"("public"."vector", integer, boolean) TO 
 
 
 
+
+
+
+GRANT ALL ON FUNCTION "public"."archive_all_automaton_anomalies"() TO "anon";
+GRANT ALL ON FUNCTION "public"."archive_all_automaton_anomalies"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."archive_all_automaton_anomalies"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."archive_missing_anomalies"() TO "anon";
+GRANT ALL ON FUNCTION "public"."archive_missing_anomalies"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."archive_missing_anomalies"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."archive_old_cloud_anomalies"() TO "anon";
+GRANT ALL ON FUNCTION "public"."archive_old_cloud_anomalies"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."archive_old_cloud_anomalies"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."archive_unmatched_automaton_anomalies"() TO "anon";
+GRANT ALL ON FUNCTION "public"."archive_unmatched_automaton_anomalies"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."archive_unmatched_automaton_anomalies"() TO "service_role";
 
 
 

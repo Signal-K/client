@@ -27,9 +27,9 @@ export interface PlanetGeneratorProps {
   classificationId: string
   author: string
   type?: string
-  biome?: string
+  biome?: string 
   planetConfiguration?: any
-}
+};
 
 export function PlanetGenerator({
   classificationId = "UNCLASSIFIED",
