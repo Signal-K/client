@@ -3,32 +3,201 @@
 import type React from "react";
 import { useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Telescope, AsteriskIcon as Asteroids, Sun, Star, SpaceIcon as Planet } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import {
+    Telescope,
+    AsteriskIcon as Asteroids,
+    Sun,
+    Star,
+    SpaceIcon as Planet,
+} from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-
 
 export default function TelescopeRangeSlider() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
     const [range, setRange] = useState([50]);
-    const [dropRates, setDropRates] = useState({
-        asteroids: 0,
-        sunspots: 0,
-        newStars: 0,
-        exoplanets: 0
-    });
+    const [dropRates, setDropRates] = useState<Record<string, number>>({});
+    const [fetchedAnomalies, setFetchedAnomalies] = useState<any[]>([]);
 
     useEffect(() => {
         const position = range[0];
-        setDropRates({
-            asteroids: Math.round(100 - position * 0.9),
-            sunspots: Math.round(90 - position * 0.8),
-            newStars: Math.round(100 - position * 0.8),
-            exoplanets: Math.round(100 - position * 0.9),
+        const nearWeight = 100 - position;
+        const farWeight = position;
+
+        const nearItems = [
+            {
+                key: 'asteroids',
+                label: 'Asteroids',
+                icon: <Asteroids className="h-5 w-5 text-destructive" />,
+                colorClass: 'bg-destructive',
+            },
+            {
+                key: 'sunspots',
+                label: 'Sunspots',
+                icon: <Sun className="h-5 w-5 text-secondary" />,
+                colorClass: 'bg-secondary',
+            },
+        ];
+
+        const farItems = [
+            {
+                key: 'exoplanets',
+                label: 'Exoplanet Candidates',
+                icon: <Planet className="h-5 w-5 text-primary" />,
+                colorClass: 'bg-primary',
+            },
+                 // Uncomment if enabled
+        // {
+        //     key: 'newStars',
+        //     label: 'New Stars',
+        //     icon: <Star className="h-5 w-5 text-accent" />,
+        //     colorClass: 'bg-accent',
+        // },
+        ];
+
+        const newDropRates: Record<string, number> = {};
+
+        const nearSplit = nearWeight / nearItems.length;
+        nearItems.forEach((item) => {
+            newDropRates[item.key] = Math.round(nearSplit);
         });
+
+        const farSplit = farWeight / farItems.length;
+        farItems.forEach((item) => {
+            newDropRates[item.key] = Math.round(farSplit);
+        });
+
+        setDropRates(newDropRates);
     }, [range]);
+
+    const activeDropTypes = [
+        {
+            key: 'asteroids',
+            label: 'Asteroids',
+            icon: <Asteroids className="h-5 w-5 text-destructive" />,
+            colorClass: 'bg-destructive',
+        },
+        {
+            key: 'sunspots',
+            label: 'Sunspots',
+            icon: <Sun className="h-5 w-5 text-secondary" />,
+            colorClass: 'bg-secondary',
+        },
+        // {
+        //     key: 'newStars',
+        //     label: 'New Stars',
+        //     icon: <Star className="h-5 w-5 text-accent" />,
+        //     colorClass: 'bg-accent',
+        // },
+        {
+            key: 'exoplanets',
+            label: 'Exoplanet Candidates',
+            icon: <Planet className="h-5 w-5 text-primary" />,
+            colorClass: 'bg-primary',
+        },
+    ];
+
+    const anomalyTypeMap: Record<string, string> = {
+        asteroids: "telescope-minorPlanet",
+        sunspots: "sunspot",
+        exoplanets: "telescope-tess",
+    };
+
+    const [canDeploy, setCanDeploy] = useState<boolean>(true);
+
+    const handleDeploy = async () => {
+        // Check if user has already deployed 4 or more anomalies in the last 7 days
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        const { data: recentDeployments, error: fetchError } = await supabase
+            .from("linked_anomalies")
+            .select("*")
+            .eq("author", session?.user?.id)
+            .eq("automaton", "Telescope")
+            .gte("date", oneWeekAgo.toISOString());
+
+        if (fetchError) {
+            console.error("Error fetching linked anomalies:", fetchError);
+            return;
+        };
+
+        if (recentDeployments && recentDeployments.length >= 4) {
+            alert("Telescope deployment limit reached for the week. Please try again later.");
+            return;
+        };
+
+        const totalAnomalies = 4;
+        const weightedAnomalies: string[] = [];
+
+        for (const [key, rate] of Object.entries(dropRates)) {
+            const count = Math.round((rate / 100) * totalAnomalies);
+            for (let i = 0; i < count; i++) {
+                weightedAnomalies.push(key);
+            }
+        }
+
+        while (weightedAnomalies.length < totalAnomalies) {
+            const sorted = Object.entries(dropRates).sort((a, b) => b[1] - a[1]);
+            for (const [key] of sorted) {
+                if (weightedAnomalies.length < totalAnomalies) {
+                    weightedAnomalies.push(key);
+                }
+            }
+        }
+
+        const selectedAnomalies = weightedAnomalies.slice(0, totalAnomalies);
+        console.log("Deployed anomalies:", selectedAnomalies);
+
+        const anomalies: any[] = [];
+
+        for (const anomalyKey of selectedAnomalies) {
+            const anomalySet = anomalyTypeMap[anomalyKey];
+            const { data, error } = await supabase
+                .from("anomalies")
+                .select("*")
+                .eq("anomalySet", anomalySet)
+
+            if (error) {
+                console.error(`Error fetching anomaly of type ${anomalyKey}:`, error);
+                continue;
+            }
+
+            if (data && data.length > 0) {
+                const anomaly = data[0];
+                anomalies.push(anomaly);
+
+                const { error: insertError } = await supabase
+                    .from("linked_anomalies")
+                    .insert([
+                        {
+                            author: session?.user?.id,
+                            anomaly_id: anomaly.id,
+                            classification_id: null,
+                            automaton: "Telescope",
+                        },
+                    ]);
+
+                if (insertError) {
+                    console.error("Error inserting into linked_anomalies:", insertError);
+                } else {
+                    console.log("Inserted linked anomaly:", anomaly.id);
+                }
+            }
+        }
+
+        console.log("Fetched anomalies:", anomalies);
+        setFetchedAnomalies(anomalies);
+    };
 
     return (
         <div className="container mx-auto py-2 pb-8 px-4 max-w-2xl">
@@ -56,68 +225,66 @@ export default function TelescopeRangeSlider() {
                                 </span>
                             </div>
 
-                            <Slider defaultValue={[50]} max={100} step={1} value={range} onValueChange={setRange} className="py-2" />
+                            <Slider
+                                defaultValue={[50]}
+                                max={100}
+                                step={1}
+                                value={range}
+                                onValueChange={setRange}
+                                className="py-2"
+                            />
 
                             <div className="bg-muted p-2 rounded-md">
                                 <div className="text-center mb-4">
                                     <span className="text-foreground font-medium text-sm">
-                                        Current Focus: {range[0] < 33 ? "Near Space" : range[0] < 66 ? "Mid-Range Objects" : "Deep Space"}
+                                        Current Focus: {range[0] < 33
+                                            ? "Near Space"
+                                            : range[0] < 66
+                                                ? "Mid-Range Objects"
+                                                : "Deep Space"}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="space-y-3">
-                            {/* <h3 className="text-md font-medium">
-                                Projected Discovery Rates
-                            </h3> */}
-
                             <div className="space-y-2 grid grid-cols-1">
-                                <DropRateItem
-                                    icon={<Asteroids className="h-5 w-5 text-destructive" />}
-                                    label="Asteroids"
-                                    rate={dropRates.asteroids}
-                                    colorClass="bg-destructive"
-                                />
-                                <DropRateItem
-                                    icon={<Sun className="h-5 w-5 text-secondary" />}
-                                    label="Sunspots"
-                                    rate={dropRates.sunspots}
-                                    colorClass="bg-secondary"
-                                />
-                                {/* <DropRateItem
-                                    icon={<Star className="h-5 w-5 text-accent" />}
-                                    label="New Stars"
-                                    rate={dropRates.newStars}
-                                    colorClass="bg-accent"
-                                /> */}
-                                <DropRateItem
-                                    icon={<Planet className="h-5 w-5 text-primary" />}
-                                    label="Exoplanet Candidates"
-                                    rate={dropRates.exoplanets}
-                                    colorClass="bg-primary"
-                                />
+                                {activeDropTypes.map((item) => (
+                                    <DropRateItem
+                                        key={item.key}
+                                        icon={item.icon}
+                                        label={item.label}
+                                        rate={dropRates[item.key] || 0}
+                                        colorClass={item.colorClass}
+                                    />
+                                ))}
                             </div>
+                        </div>
+
+                        <div className="pt-2">
+                            <Button className="w-full" onClick={handleDeploy}>
+                                Deploy Telescope
+                            </Button>
                         </div>
                     </div>
                 </CardContent>
             </Card>
         </div>
     );
-};
+}
 
 interface DropRateItemProps {
     icon: React.ReactNode;
     label: string;
     rate: number;
     colorClass: string;
-};
+}
 
 function DropRateItem({
     icon,
     label,
     rate,
-    colorClass
+    colorClass,
 }: DropRateItemProps) {
     return (
         <div className="space-y-2">
@@ -128,10 +295,15 @@ function DropRateItem({
                         {label}
                     </span>
                 </div>
-                <span className="text-muted-foreground font-medium">{rate}%</span>
+                <span className="text-muted-foreground font-medium">
+                    {rate}%
+                </span>
             </div>
             <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                <div className={`h-full transition-all ${colorClass}`} style={{ width: `${rate}%` }} />
+                <div
+                    className={`h-full transition-all ${colorClass}`}
+                    style={{ width: `${rate}%` }}
+                />
             </div>
         </div>
     );

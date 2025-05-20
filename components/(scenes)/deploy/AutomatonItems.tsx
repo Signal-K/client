@@ -81,12 +81,15 @@ export default function AutomatonDeploySection() {
         .from("linked_anomalies")
         .select("date")
         .eq("author", session?.user.id)
+        .eq("automaton", "Probe")
         .order("date", { ascending: false });
 
       if (error) {
         console.error("Error fetching linked anomalies:", error);
         return;
       }
+
+      console.log("linked_anomalies data:", data);
 
       if (!data || data.length === 0) {
         setDeployDisabled(false);
@@ -103,7 +106,8 @@ export default function AutomatonDeploySection() {
         const { year, week } = getISOWeekYear(d);
         return year === currentWeek.year && week === currentWeek.week;
       });
-
+      
+      setDeployDisabled(false);
       setDeployDisabled(foundThisWeek);
     }
 
@@ -330,7 +334,8 @@ export default function AutomatonDeploySection() {
   return (
     <>
       <h3 className="text-md mb-2">Available automatons</h3>
-      <div className="grid grid-cols-2 gap-4">
+      {!deployDisabled && (
+        <div className="grid grid-cols-2 gap-4">
         {automatons.map((vehicle) => {
           const isProbe = vehicle.name === "Probe";
           const count = isProbe ? userCapacities.probeCount : userCapacities.roverCount;
@@ -384,6 +389,7 @@ export default function AutomatonDeploySection() {
           );
         })}
       </div>
+      )}
 
       <div className="mt-6 text-center">
         <Button onClick={handleSubmit} disabled={deployDisabled}>
