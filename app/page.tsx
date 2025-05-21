@@ -20,6 +20,7 @@ import Navbar from "@/components/Layout/Navbar";
 import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatellites";
 import LandingSS from "./auth/landing";
 import GameNavbar from "@/components/Layout/Tes";
+import BiomassOnEarth from "@/components/Data/BiomassEarth";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -255,8 +256,6 @@ export default function Home() {
   const [userClassifications, setUserClassifications] = useState<boolean | null>(false);
   
   const [planetData, setPlanetData] = useState<any | null>(null);
-  const [zoodexCount, setZoodexCount] = useState<number | null>(null);
-  const biomass = zoodexCount !== null ? 0.831 * 0.001 * zoodexCount : null;
 
   useEffect(() => {
     if (!session) return;
@@ -320,25 +319,6 @@ export default function Home() {
     fetchPlanetData();
   }, [activePlanet, supabase]);
 
-  useEffect(() => {
-    const fetchZoodexCount = async () => {
-      try {
-        const { count, error } = await supabase
-          .from("classifications")
-          .select("id", { count: "exact" })
-          .like("classificationtype", "%zoodex%");
-
-        if (error) throw error;
-        setZoodexCount(count);
-      } catch (err: any) {
-        console.error("Error fetching Zoodex classifications:", err.message);
-        setZoodexCount(0);
-      }
-    };
-
-    fetchZoodexCount();
-  }, [supabase]);
-
   if (!session) {
     return <LandingSS />;
   };
@@ -364,10 +344,7 @@ export default function Home() {
             <p className="text-[#2C4F65]">Humidity:</p>
             <p className="text-blue-200">{planetData?.humidity} K</p>
             {planetData?.id === 30 && (
-              <>
-                <p className="text-[#2C4F65]">Biomass:</p>
-                <p className="text-blue-200">{biomass !== null ? biomass.toFixed(6) : "Loading..."}</p>
-              </>
+              <BiomassOnEarth />
             )}
           </div>
           <center>

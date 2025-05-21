@@ -55,7 +55,8 @@ export default function SelectLocationForAutomatonDeploymentDropdown({
         .from("classifications")
         .select("*, anomalies(content)")
         .in("classificationtype", ["planet", "telescope-minorPlanet"])
-        .eq("author", session.user.id);
+        .eq("author", session.user.id)
+        .limit(10);
 
       if (lcError) throw lcError;
       setMyLocations(data);

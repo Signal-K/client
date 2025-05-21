@@ -8,6 +8,9 @@ import { Building2Icon, Router } from "lucide-react";
 import { useRouter } from "next/navigation";
 import TelescopeRangeSlider from "@/components/(scenes)/deploy/TelescopeRange";
 import AutomatonDeploySection from "@/components/(scenes)/deploy/AutomatonItems";
+import BiomassOnEarth from "@/components/Data/BiomassEarth";
+import EarthStats from "@/components/Data/EarthStats";
+import BiologySectionDeploy from "@/components/(scenes)/deploy/BiodomeStationCard";
 
 export default function DeployAutomatonsPage() {
     const supabase = useSupabaseClient();
@@ -86,8 +89,16 @@ export default function DeployAutomatonsPage() {
                                     </div>
 
                                     {/* Biology Section */}
-                                    <div className="flex-1 flex items-center justify-center border border-dashed border-gray-300 rounded-lg text-gray-400">
-                                        <p>Placeholder for Biology content</p>
+                                    <div className="flex-1 flex flex-col border border-dashed border-gray-300 rounded-lg text-gray-400 p-4 space-y-2">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <BiomassOnEarth />
+                                            <EarthStats />
+                                            {/* <p>Nearby stats...</p> */}
+                                        </div>
+                                        <p className="text-blue-300">
+                                            These projects are available for observation:
+                                        </p>
+                                        <BiologySectionDeploy />
                                     </div>
                                 </div>
                             </>
