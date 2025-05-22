@@ -6,7 +6,7 @@ import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Droplets, FileText, Info, Thermometer } from "lucide-react";
-import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+// import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 // import { PlanetGenerator } from "starsailors-planet-generator";
 import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
 import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnPlanet";
@@ -183,7 +183,8 @@ export default function TestPlanetWrapper() {
             //   biome={dominantBiome || ''}
             //   toggle={true}
             // />
-            <PlanetGenerator         classificationId={classification.id.toString()}         author={classification.author}       />
+            // <PlanetGenerator         classificationId={classification.id.toString()}         author={classification.author}       />
+            <></>
     ) : null;
   }, [classification?.id, classification?.author]);  
 

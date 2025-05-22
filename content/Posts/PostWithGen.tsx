@@ -10,7 +10,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CommentCard } from "../Comments/CommentSingle";
 
 import CloudSignal from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudSignal";
-import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+// import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import AsteroidViewer from "@/components/Data/Generator/Astronomers/DailyMinorPlanet/asteroid-viewer";
 import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
 // import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
@@ -129,12 +129,13 @@ export function PostCardSingleWithGenerator({
         return <CloudSignal classificationConfig={classificationConfig} classificationId={String(classificationId)} />
       case "planet":
         return (
-          <PlanetGenerator
-            classificationId={String(classificationId)}
-            classificationConfig={classificationConfig}
-            author={author}
-            biome={biome}
-          />
+          <></>
+          // <PlanetGenerator
+          //   classificationId={String(classificationId)}
+          //   classificationConfig={classificationConfig}
+          //   author={author}
+          //   biome={biome}
+          // />
           // <SimplePlanetGenerator
 
           //   classificationId={String(classificationId)}
@@ -348,19 +349,21 @@ export function PostCardSingleWithGeneratorEditMode({
         case "planet":
           return (
             <>
-              {session?.user?.id === author && (
-                <PlanetGenerator classificationId={""} author={""}                  // classificationId={String(classificationId)} 
+              {/* {session?.user?.id === author && (
+                // <PlanetGenerator classificationId={""} author={""}                  // classificationId={String(classificationId)} 
+                
                   // classificationConfig={classificationConfig}
                   // author={author}
-                />
-                        //   // <FullPlanetGenerator /> --> we need to be able to pass the stats in, too (as a prop)
-              )}
+                /> */}
+                        {/* //   // <FullPlanetGenerator /> --> we need to be able to pass the stats in, too (as a prop) */}
+              {/* )} */}
               {session?.user?.id !== author && (
                 // <SimplePlanetGenerator
                 //   classificationId={String(classificationId)}
                 //   classificationConfig={classificationConfig}
                 //   author={author}
-                <PlanetGenerator classificationId={""} author={""}                />
+                // <PlanetGenerator classificationId={""} author={""}                />
+                <></>
                 // <FullPlanetGeneratorNoControl />
               )}
             </>

@@ -65,8 +65,8 @@ export default function SelectLocationForAutomatonDeploymentDropdown({
       setError("Error fetching locations.");
     } finally {
       setLoading(false);
-    }
-  }
+    };
+  };
 
   useEffect(() => {
     if (session) fetchUserLocationClassifications();

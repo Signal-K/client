@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Share2 } from "lucide-react";
-import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
+// import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 
@@ -123,12 +123,12 @@ export default function PickPlanetCard({
             <p>Star: {planetName}</p>
         </Link>
 
-        <SimplePlanetGenerator
+        {/* <SimplePlanetGenerator
             classificationId={id}
             classificationConfig={classificationConfiguration}
             author={author}
             type="Terrestrial"
-        />
+        /> */}
     </div>
   );
 };

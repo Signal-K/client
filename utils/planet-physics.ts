@@ -1,223 +1,197 @@
-"use client"
+export interface PlanetConfig {
+  type: "terrestrial" | "gaseous"
+  seed: number
+  radius: number
+  temperature: number // Now in Kelvin
+  biomass: number
+  mass: number
+  terrainRoughness: number
+  liquidHeight: number
+  volcanicActivity: number
+  continentSize: number
+  continentCount: number
+  noiseScale: number
+  debugMode?: boolean
+  visibleTerrains: {
+    ocean: boolean
+    beach: boolean
+    lowland: boolean
+    midland: boolean
+    highland: boolean
+    mountain: boolean
+    snow: boolean
+  }
+  colors: {
+    atmosphere: string
+    ocean: string
+    oceanPattern: string
+    beach: string
+    lowland: string
+    midland: string
+    highland: string
+    mountain: string
+    snow: string
+  }
+}
 
-import { getSurfaceDeposits } from "./biome-data"
-import type { CloudCategory } from "./cloud-types"
-import type { Landmark } from "./landmark-types"
-import { generateLandmarks } from "./landmark-types"
+export const defaultPlanetConfig: PlanetConfig = {
+  type: "terrestrial",
+  seed: Math.floor(Math.random() * 10000),
+  radius: 1.0,
+  temperature: 288, // Earth average in Kelvin (15°C)
+  biomass: 0.7,
+  mass: 1.0,
+  terrainRoughness: 0.6,
+  liquidHeight: 0.55,
+  volcanicActivity: 0.2,
+  continentSize: 0.5,
+  continentCount: 5,
+  noiseScale: 1.0,
+  debugMode: false,
+  visibleTerrains: {
+    ocean: true,
+    beach: true,
+    lowland: true,
+    midland: true,
+    highland: true,
+    mountain: true,
+    snow: true,
+  },
+  colors: {
+    atmosphere: "#87CEEB",
+    ocean: "#1E90FF",
+    oceanPattern: "#1E7FFF",
+    beach: "#F0E68C",
+    lowland: "#32CD32",
+    midland: "#228B22",
+    highland: "#8B4513",
+    mountain: "#A0A0A0",
+    snow: "#FFFFFF",
+  },
+}
 
-export interface PlanetStats {
-  mass: number // Earth masses
-  radius: number // Earth radii
-  density: number // g/cm³
-  type: "terrestrial" | "gaseous" | undefined;
-  temperature: number // Kelvin
-  orbitalPeriod: number // Earth days
-  atmosphereStrength: number // 0 to 1
-  cloudCount: number // 0 to 100
-  waterHeight: number // 0 to 1
-  surfaceRoughness: number // 0 to 2
-  biomeFactor: number // 0.5 to 2.0
-  cloudContribution: number // 0.8 to 1.2
-  terrainVariation: "flat" | "moderate" | "chaotic"
-  terrainErosion: number // 0 to 1
-  plateTectonics: number // 0 to 1
-  // soilType?: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy" | undefined
-  biomassLevel: number // 0 to 1
-  waterLevel: number // 0 to 1
-  salinity: number // 0 to 1
-  subsurfaceWater: number // 0 to 1
-  atmosphericDensity: number // 0 to 1
-  weatherVariability: number // 0 to 1
-  stormFrequency: number // 0 to 1
-  volcanicActivity: number // 0 to 1
-  biome: string
-  // cloudTypes: CloudCategory[]
-  // cloudDensity: number
-  surfaceDeposits?: string[] // New field for surface deposits
-  precipitationCompound?: "none" | "water" | "co2" | "snow" | "methane" // New field for precipitation compound
-  landmarks?: Landmark[] // New field for landmarks
-};
-
-export interface LiquidInfo {
-  type: "water" | "methane" | "nitrogen" | "none"
+// Function to determine liquid type based on temperature
+export function getLiquidType(temperature: number): {
+  name: string
   color: string
-  temperatureRange: string
-}
-
-export function calculateDensity(mass: number, radius: number): number {
-  const earthDensity = 5.51 // g/cm³
-  return (mass / Math.pow(radius, 3)) * earthDensity
-}
-
-export function determinePlanetType(mass: number, density: number): "terrestrial" | "gaseous" {
-  return mass > 7.5 || density < 1 ? "gaseous" : "terrestrial"
-}
-
-export function calculatePlanetStats(
-  mass: number,
-  radius: number,
-  temperature = 288,
-  orbitalPeriod = 365,
-  typeOverride: "terrestrial" | "gaseous" | null = null,
-  atmosphereStrength = 0.5,
-  cloudCount = 50,
-  waterHeight = 0.5,
-  surfaceRoughness = 1.0,
-  density?: number,
-  biomeFactor = 1.0,
-  cloudContribution = 1.0,
-  terrainVariation: "flat" | "moderate" | "chaotic" = "moderate",
-  terrainErosion = 0.5,
-  plateTectonics = 0.5,
-  // soilType: "rocky" | "sandy" | "volcanic" | "organic" | "dusty" | "frozen" | "muddy" = "rocky",
-  biomassLevel = 0.0,
-  waterLevel = 0.3,
-  salinity = 0.5,
-  subsurfaceWater = 0.2,
-  atmosphericDensity = 0.5,
-  weatherVariability = 0.5,
-  stormFrequency = 0.2,
-  volcanicActivity = 0.2,
-  biome = "Rocky Highlands",
-  // cloudTypes: CloudCategory[] = ["Cumulus" as CloudCategory],
-  // cloudDensity = 0.5,
-  // precipitationCompound: "none" | "water" | "co2" | "snow" | "methane" = "water",
-  landmarks?: Landmark[],
-  terrainData?: Array<{ x: number; y: number; elevation: number }>,
-): PlanetStats {
-  const earthDensity = 5.51 // g/cm³
-  const calculatedDensity = density || (mass / Math.pow(radius, 3)) * earthDensity
-
-  let type: "terrestrial" | "gaseous" | undefined
-  if (typeOverride) {
-    type = typeOverride
+  patternColor: string
+} {
+  // Temperature ranges in Kelvin
+  if (temperature < 90) {
+    // Liquid nitrogen (63K to 77K)
+    return {
+      name: "Liquid Nitrogen",
+      color: "#D6E7FF",
+      patternColor: "#C0D6FF",
+    }
+  } else if (temperature < 120) {
+    // Liquid methane (90K to 112K)
+    return {
+      name: "Liquid Methane",
+      color: "#A2CDB0",
+      patternColor: "#8EBDA0",
+    }
+  } else if (temperature < 373) {
+    // Water (273K to 373K)
+    return {
+      name: "Water",
+      color: "#1E90FF",
+      patternColor: "#1E7FFF",
+    }
+  } else if (temperature < 600) {
+    // Sulfuric acid (283K to 610K)
+    return {
+      name: "Sulfuric Acid",
+      color: "#D6C562",
+      patternColor: "#C4B250",
+    }
   } else {
-    type = mass > 7.5 || radius > 2.0 ? "gaseous" : "terrestrial"
-  }
-
-  // Get surface deposits based on biome
-  const surfaceDeposits = getSurfaceDeposits(biome)
-
-  // Determine default precipitation compound based on temperature if none is specified
-  // let effectivePrecipitationCompound = precipitationCompound
-  // if (precipitationCompound === "water" && temperature < 273) {
-  //   effectivePrecipitationCompound = "snow"
-  // } else if (precipitationCompound === "water" && temperature > 373) {
-  //   effectivePrecipitationCompound = "none" // Too hot for water precipitation
-  // } else if (precipitationCompound === "methane" && temperature > 112) {
-  //   effectivePrecipitationCompound = "none" // Too hot for methane precipitation
-  // } else if (precipitationCompound === "co2" && temperature > 195) {
-  //   effectivePrecipitationCompound = "none" // Too hot for CO2 precipitation
-  // }
-
-  // Generate landmarks if not provided and terrain data is available
-  let effectiveLandmarks = landmarks
-  if (!effectiveLandmarks && terrainData) {
-    effectiveLandmarks = generateLandmarks(
-      {
-        type: type as "terrestrial" | "gaseous",
-        surfaceRoughness,
-        waterLevel,
-        temperature,
-        volcanicActivity,
-      },
-      terrainData,
-      15, // Generate 15 landmarks by default
-    )
-  }
-
-  return {
-    mass,
-    radius,
-    density: calculatedDensity,
-    type,
-    temperature,
-    orbitalPeriod,
-    atmosphereStrength,
-    cloudCount,
-    waterHeight,
-    surfaceRoughness,
-    biomeFactor,
-    cloudContribution,
-    terrainVariation,
-    terrainErosion,
-    plateTectonics,
-    // soilType,
-    biomassLevel,
-    waterLevel,
-    salinity,
-    subsurfaceWater,
-    atmosphericDensity,
-    weatherVariability,
-    stormFrequency,
-    volcanicActivity,
-    biome,
-    // cloudTypes: cloudTypes as CloudCategory[],
-    // cloudDensity,
-    surfaceDeposits,
-    // precipitationCompound: effectivePrecipitationCompound,
-    landmarks: effectiveLandmarks,
+    // Molten silicates/lava (>1000K)
+    return {
+      name: "Molten Rock",
+      color: "#FF4500",
+      patternColor: "#FF2400",
+    }
   }
 }
 
-export function determineLiquidType(temperature: number): LiquidInfo {
-  if (temperature >= 273 && temperature <= 373) {
-    return {
-      type: "water",
-      color: "#1E4D6B",
-      temperatureRange: "273K - 373K",
-    }
-  } else if (temperature >= 91 && temperature <= 112) {
-    return {
-      type: "methane",
-      color: "#FFD700",
-      temperatureRange: "91K - 112K",
-    }
-  } else if (temperature >= 195 && temperature <= 240) {
-    return {
-      type: "nitrogen",
-      color: "#90EE90",
-      temperatureRange: "195K - 240K",
-    }
+// Function to adjust terrain colors based on temperature
+export function getTemperatureAdjustedColors(
+  temperature: number,
+  biomass: number,
+): {
+  beach: string
+  lowland: string
+  midland: string
+  highland: string
+  mountain: string
+  snow: string
+} {
+  // Base colors
+  let beach = "#F0E68C" // Default sandy beach
+  let lowland = "#32CD32" // Default green lowland
+  let midland = "#228B22" // Default forest green
+  let highland = "#8B4513" // Default brown
+  let mountain = "#A0A0A0" // Default gray
+  let snow = "#FFFFFF" // Default white
+
+  // Cold planet (< 240K)
+  if (temperature < 240) {
+    beach = "#E0E0E0" // Icy shore
+    lowland = "#E8E8F0" // Light ice
+    midland = "#C8D8E0" // Bluish ice
+    highland = "#A8B8C0" // Darker ice
+    mountain = "#889098" // Dark gray
+    snow = "#FFFFFF" // Pure white
   }
-  return {
-    type: "none",
-    color: "#8B4513",
-    temperatureRange: "N/A",
+  // Cool planet (240K to 280K)
+  else if (temperature < 280) {
+    beach = "#D8D8C0" // Cool sand
+    lowland = "#C0D8C0" // Tundra
+    midland = "#A0C0A0" // Sparse vegetation
+    highland = "#909080" // Rocky tundra
+    mountain = "#808080" // Gray rock
+    snow = "#FFFFFF" // White snow
   }
+  // Temperate planet (280K to 310K)
+  else if (temperature < 310) {
+    // Adjust based on biomass
+    const bioFactor = Math.min(biomass * 1.5, 1.0)
+
+    beach = "#F0E68C" // Sandy beach
+    lowland = bioFactor > 0.3 ? "#32CD32" : "#C2CC70" // Green if biomass, otherwise yellowish
+    midland = bioFactor > 0.3 ? "#228B22" : "#A0A060" // Forest if biomass, otherwise scrubland
+    highland = "#8B4513" // Brown
+    mountain = "#A0A0A0" // Gray
+    snow = "#FFFFFF" // White
+  }
+  // Hot planet (310K to 400K)
+  else if (temperature < 400) {
+    beach = "#F8E0A0" // Light sand
+    lowland = biomass > 0.4 ? "#74A662" : "#D8C878" // Either vegetation or desert
+    midland = biomass > 0.4 ? "#567D46" : "#C0A060" // Either vegetation or desert
+    highland = "#B89060" // Light brown
+    mountain = "#A89080" // Reddish rock
+    snow = temperature > 350 ? "#F0F0F0" : "#FFFFFF" // Slightly off-white at higher temps
+  }
+  // Very hot planet (400K to 600K)
+  else if (temperature < 600) {
+    beach = "#F8D080" // Orange sand
+    lowland = "#E0B060" // Desert
+    midland = "#C09050" // Dark desert
+    highland = "#A07040" // Reddish brown
+    mountain = "#805030" // Dark red rock
+    snow = "#E8E8E8" // Off-white (salt flats)
+  }
+  // Extremely hot planet (>600K)
+  else {
+    beach = "#FF9060" // Orange-red
+    lowland = "#E07040" // Reddish
+    midland = "#C05020" // Dark red
+    highland = "#A03010" // Very dark red
+    mountain = "#802000" // Almost black-red
+    snow = "#D0D0D0" // Light gray (ash)
+  }
+
+  return { beach, lowland, midland, highland, mountain, snow }
 }
-
-export function calculateTerrainHeight(stats: PlanetStats): number {
-  // Base terrain height depends on planet type and mass
-  let baseHeight = stats.type === "terrestrial" ? 5.0 : 2.0
-
-  // Adjust based on mass - larger planets have more dramatic terrain
-  baseHeight *= Math.sqrt(stats.mass)
-
-  // Adjust based on surface roughness
-  baseHeight *= stats.surfaceRoughness || 1.0
-
-  // Adjust based on terrain variation
-  if (stats.terrainVariation === "flat") {
-    baseHeight *= 0.5
-  } else if (stats.terrainVariation === "chaotic") {
-    baseHeight *= 1.5
-  }
-
-  // Adjust based on plate tectonics - more tectonic activity means more mountains
-  if (stats.plateTectonics) {
-    baseHeight *= 1 + stats.plateTectonics * 0.5
-  }
-
-  // Adjust based on volcanic activity
-  if (stats.volcanicActivity) {
-    baseHeight *= 1 + stats.volcanicActivity * 0.3
-  }
-
-  // Erosion reduces terrain height
-  if (stats.terrainErosion) {
-    baseHeight *= 1 - stats.terrainErosion * 0.3
-  }
-
-  return baseHeight
-};

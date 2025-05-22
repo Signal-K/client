@@ -228,6 +228,8 @@ export default function MissionSelector() {
       },
     };
 
+    // Add a function to insert the other structures and automatons (out of 3105, 3104 and 3103)
+
     try {
       updatePlanetLocation(30);
       await supabase.from("inventory").insert([structureCreationData]);
