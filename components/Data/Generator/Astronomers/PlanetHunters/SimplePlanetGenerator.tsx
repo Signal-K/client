@@ -1,73 +1,56 @@
-// import { useState, useEffect } from "react";
-// import { SimplePlanetScene } from "./planet-scene";
-// import { calculatePlanetStats } from "@/utils/planet-physics"; 
-// import type { PlanetStats } from "@/utils/planet-physics";
-// // import { PlanetGeneratorProps } from "./PlanetGenerator";
-// import { Button } from "@/components/ui/button";
+"use client"
 
-// export interface PlanetGeneratorProps {
-//     classificationConfig?: any;
-//     content?: string;
-//     classificationId: string;
-//     author: string;
-//     type?: string;
-//     biome?: string;
-// }; 
+import { useState, useEffect } from "react"
+import SimplePlanetViewer from "./planetViewer-simple"
+import { type PlanetConfig, defaultPlanetConfig } from "@/utils/planet-physics";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
 
-// export default function SimplePlanetGenerator({ type, classificationConfig, biome }: PlanetGeneratorProps) {
-//     const initialMass = classificationConfig?.exportedValue?.mass ?? 1;
-//     const initialRadius = classificationConfig?.exportedValue?.radius ?? 1;
+export default function SimplePlanetPage() {
+  const [planetConfig, setPlanetConfig] = useState<PlanetConfig>(defaultPlanetConfig)
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
+  const [exportDialogOpen, setExportDialogOpen] = useState(false)
+  const [importText, setImportText] = useState("")
+  const [importError, setImportError] = useState("")
 
-//     const [mass, setMass] = useState(initialMass);
-//     const [radius, setRadius] = useState(initialRadius);
+  const handleConfigChange = (newConfig: Partial<PlanetConfig>) => {
+    setPlanetConfig((prev) => ({ ...prev, ...newConfig }))
+  }
 
-//     const stats = calculatePlanetStats(mass, radius);
+  const handleImport = () => {
+    try {
+      const config = JSON.parse(importText)
+      setPlanetConfig(config)
+      setImportDialogOpen(false)
+      setImportError("")
+      setImportText("")
+    } catch (error) {
+      setImportError("Invalid JSON configuration")
+    }
+  }
 
-//     useEffect(() => {
-//         if (classificationConfig?.exportedValue) {
-//             setMass(classificationConfig.exportedValue.mass);
-//             setRadius(classificationConfig.exportedValue.radius);
-//         }
-//     }, [classificationConfig]);
+  // Listen for custom events from the settings panel
+  useEffect(() => {
+    const handleOpenImport = () => setImportDialogOpen(true)
+    const handleOpenExport = () => setExportDialogOpen(true)
 
-//     return (
-//         <>
-//             <div className="w-full h-full flex items-center justify-center">
-//                 {/* <PlanetScene stats={stats} type={type} /> */}
-//                 {/* <p>{biome}</p> */}
-//                 <SimplePlanetScene stats={stats} />
-//             </div>
-//         </>
-//     );
-// };
+    window.addEventListener("open-simple-import-dialog", handleOpenImport)
+    window.addEventListener("open-simple-export-dialog", handleOpenExport)
 
-// export function SimpleMeshPlanetGenerator({ type, classificationConfig }: PlanetGeneratorProps) {
-//     const initialMass = classificationConfig?.exportedValue?.mass ?? 1;
-//     const initialRadius = classificationConfig?.exportedValue?.radius ?? 1;
+    return () => {
+      window.removeEventListener("open-simple-import-dialog", handleOpenImport)
+      window.removeEventListener("open-simple-export-dialog", handleOpenExport)
+    }
+  }, [])
 
-//     const [mass, setMass] = useState(initialMass);
-//     const [radius, setRadius] = useState(initialRadius);
+  const exportConfig = JSON.stringify(planetConfig, null, 2)
 
-//     const stats = calculatePlanetStats(mass, radius);
-
-//     useEffect(() => {
-//         if (classificationConfig?.exportedValue) {
-//             setMass(classificationConfig.exportedValue.mass);
-//             setRadius(classificationConfig.exportedValue.radius);
-//         }
-//     }, [classificationConfig]);
-
-//     return (
-//         <>
-//             <div className="w-full h-full flex items-center justify-center">
-//                 <SimplePlanetScene stats={stats} />
-//             </div>
-//         </>
-//     );
-// };
-
-export default function TEST () {
-    return (
-        <></>
-    );
+  return (
+    <main className="flex-col">
+      <div className="">
+        <SimplePlanetViewer planetConfig={planetConfig} onConfigChange={handleConfigChange} />
+      </div>
+    </main>
+  );
 };

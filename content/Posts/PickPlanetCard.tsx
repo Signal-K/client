@@ -4,6 +4,7 @@ import { Share2 } from "lucide-react";
 // import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
+import SimplePlanetPage from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
 
 interface PickPlanetCardProps {
   title: string;
@@ -116,10 +117,10 @@ export default function PickPlanetCard({
   return (
     <div className="flex flex-col items-start space-y-4 p-4 bg-white/10 rounded-lg shadow-md h-full max-w-xs w-full">
         <Link href={`/posts/${id}`} passHref>
-            <Button variant="link" className="text-blue-500 flex items-center space-x-2">
+            {/* <Button variant="link" className="text-blue-500 flex items-center space-x-2">
                 <Share2 size={16} />
                 <span>Share</span>
-            </Button>
+            </Button> */}
             <p>Star: {planetName}</p>
         </Link>
 
@@ -129,6 +130,7 @@ export default function PickPlanetCard({
             author={author}
             type="Terrestrial"
         /> */}
+        <SimplePlanetPage />
     </div>
   );
 };

@@ -1,9 +1,9 @@
-import { Sun, Thermometer, Droplets } from 'lucide-react'
-import { Planet } from '@/types/greenhouse'
+import { Sun, Thermometer, Droplets } from 'lucide-react';
+import { Planet } from '@/types/greenhouse';
 
 interface PlanetInfoProps {
   planet: Planet;
-}
+};
 
 export function PlanetInfo({ planet }: PlanetInfoProps) {
   return (
@@ -42,6 +42,5 @@ export function PlanetInfo({ planet }: PlanetInfoProps) {
         </div>
       </div>
     </div>
-  )
-}
-
+  );
+};

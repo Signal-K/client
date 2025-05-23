@@ -5,6 +5,7 @@ import { OrbitControls, Stars } from '@react-three/drei';
 // import { PlanetMesh } from './planet-mesh';
 // import type { PlanetStats } from '@/utils/planet-physics';
 import { Button } from '@/components/ui/button';
+import SimplePlanetMesh from './planet-simple';
 // import { SimplePlanetMesh } from './Simple/simple-planet-mesh';
 
 interface PlanetSceneProps { 
@@ -39,16 +40,16 @@ interface PlanetSceneProps {
 // };
 
 // interface SimplePlanetSceneProps {
-//   stats: PlanetStats
+//   stats: PlanetStats;
 // };
 
-// export function SimplePlanetScene({ stats }: SimplePlanetSceneProps) {
+// export function SimplePlanetScene() {
 //   return (
 //     <div className="w-full h-full bg-black">
 //       <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
 //         <ambientLight intensity={0.5} />
 //         <pointLight position={[10, 10, 10]} intensity={1} />
-//         <SimplePlanetMesh stats={stats} />
+//         <SimplePlanetMesh /> {/*  stats={stats} */}
 //         <Stars radius={300} depth={50} count={7500} factor={4} />
 //         <OrbitControls
 //           enableZoom={true}
@@ -63,7 +64,7 @@ interface PlanetSceneProps {
 //   );
 // };
 
-export function TEST() {
+export function TEST () {
   return (
     <></>
   );
