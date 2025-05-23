@@ -11,13 +11,13 @@ import SettingsPanel from "./SettingsPanel"
 interface PlanetViewerProps {
   planetConfig: PlanetConfig
   onConfigChange: (config: Partial<PlanetConfig>) => void
-}
+};
 
 export default function PlanetViewer({ planetConfig, onConfigChange }: PlanetViewerProps) {
   const [showSettings, setShowSettings] = useState(false)
 
   return (
-    <div className="w-full h-full bg-black relative">
+    <div className="w-full h-screen relative">
       <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
         <ambientLight intensity={0.3} />
         <pointLight position={[10, 10, 10]} intensity={1.5} />

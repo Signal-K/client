@@ -6,13 +6,30 @@ import { type PlanetConfig, defaultPlanetConfig } from "@/utils/planet-physics";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
-export default function PlanetGenerator() {
+interface PlanetGeneratorProps {
+    classificationId: string;
+};
+
+interface PlanetStats {
+  mass?: number;
+  radius?: number;
+  [key: string]: any;
+};
+
+export default function PlanetGenerator({
+    classificationId,
+}: PlanetGeneratorProps) {
+    const supabase = useSupabaseClient();
+
     const [planetConfig, setPlanetConfig] = useState<PlanetConfig>(defaultPlanetConfig);
     const [importDialogOpen, setImportDialogOpen] = useState<boolean>(false);
     const [exportDialogOpen, setExportDialogOpen] = useState<boolean>(false);
     const [importText, setImportText] = useState<string>("");
     const [importError, setImportError] = useState<string>("");
+
+    const [planetStats, setPlanetStats] = useState<PlanetStats>({});
 
     const handleConfigChange = ( newConfig: Partial<PlanetConfig> ) => {
         setPlanetConfig(( prev ) => ({
@@ -32,6 +49,63 @@ export default function PlanetGenerator() {
         };
     };
 
+    const handleExport = async () => {
+        const idAsNumber = Number.parseInt(classificationId);
+        if (isNaN(idAsNumber)) return;
+
+        const { data, error: fetchError } = await supabase
+            .from("classifications")
+            .select("classificationConfiguration")
+            .eq("id", idAsNumber)
+            .single();
+
+        if (fetchError || !data) {
+            console.error("Failed to fetch planet configuration: ", fetchError);
+            return;
+        };
+
+        const currentConfig = data.classificationConfiguration || {};
+        const updatedConfig = {
+            ...currentConfig,
+            planetConfiguration: planetConfig,
+        };
+
+        const { error: updateError } = await supabase
+            .from("classifications")
+            .update({ classificationConfiguration: updatedConfig })
+            .eq("id", idAsNumber);
+        
+        if (updateError) {
+            console.error("Failed to update planet configuration, ", updateError);
+        };
+    };
+
+    // Fetch planet data
+    useEffect(() => {
+        const fetchExportedValues = async () => {
+        const idAsNumber = Number.parseInt(classificationId)
+        if (isNaN(idAsNumber)) return
+
+        const { data, error } = await supabase
+            .from("classifications")
+            .select("classificationConfiguration")
+            .eq("id", idAsNumber)
+            .single()
+
+        if (error || !data?.classificationConfiguration?.exportedValue) return
+
+        const { exportedValue } = data.classificationConfiguration
+
+        setPlanetStats((prev) => ({
+            ...prev,
+            ...(exportedValue.mass && { mass: exportedValue.mass }),
+            ...(exportedValue.radius && { radius: exportedValue.radius }),
+        }))
+        }
+
+        fetchExportedValues()
+    }, [classificationId, supabase])
+
     // Listen for custom events from the settings panel
     useEffect(() => {
         const handleOpenImport = () => setImportDialogOpen(true);
@@ -49,13 +123,15 @@ export default function PlanetGenerator() {
     const exportConfig = JSON.stringify(planetConfig, null, 2);
     
     return (
-        <main className="flex h-screen w-full bg-black relative flex-col">
+        <main className="flex w-full relative flex-col">
             <div className="w-full h-screen">
                 <PlanetViewer planetConfig={planetConfig} onConfigChange={handleConfigChange} />
             </div>
 
+            <p>{JSON.stringify(planetStats, null, 2)}</p>
+
             <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="bg-white sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Import Planet Configuration</DialogTitle>
                         <DialogDescription>Paste a previously exported planet configuration JSON below.</DialogDescription>
@@ -79,7 +155,7 @@ export default function PlanetGenerator() {
             </Dialog>
 
             <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-md bg-white">
                     <DialogHeader>
                         <DialogTitle>Export Planet Configuration</DialogTitle>
                     <DialogDescription>Copy this JSON to save your planet configuration.</DialogDescription>
@@ -93,9 +169,10 @@ export default function PlanetGenerator() {
                         />
                         <div className="flex justify-end gap-2">
                             <Button
-                                onClick={() => {
-                                navigator.clipboard.writeText(exportConfig)
-                                setExportDialogOpen(false)
+                                onClick={async () => {
+                                    await handleExport();
+                                    navigator.clipboard.writeText(exportConfig)
+                                    setExportDialogOpen(false)
                                 }}
                             >
                                 Copy & Close

@@ -1,6 +1,6 @@
 "use client";
 
-import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+// import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import WeatherEventsOverview from "@/components/Data/Generator/Weather/EventsAcrossMyLocations";
 import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
 import MilestoneTotalCompleted from "@/components/Structures/Missions/Milestones/Completed";
@@ -55,7 +55,6 @@ export default function TestPage() {
                   />
                   <MyLocationIds /> */}
       {/* <WeatherEventsOverview /> */}
-      <PlanetGenerator />
 
       {/* <PlanetGenerator classificationId={1} biome={'RockyHighlands'} biomass={0.01} density={3.5} /> */}
     </div>
