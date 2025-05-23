@@ -1,4 +1,4 @@
-import { CapacityLevel } from "@/components/Structures/Auto/ActiveAutomaton";
+// import { CapacityLevel } from "@/components/Structures/Auto/ActiveAutomaton";
 
 interface Recipe {
     [key: string]: number;
@@ -40,7 +40,7 @@ export interface Automaton {
     configuration: {
       Power: number;
       Speed: SpeedLevel; 
-      Capacity: CapacityLevel;
+      Capacity: Number;
     };
 };  
 

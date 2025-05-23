@@ -11,7 +11,6 @@ import {
 } from "@/constants/backgrounds";
 import backgroundImage from "@/public/assets/Backdrops/Negotiations.jpg";
 import Header from "@/components/ui/Header";
-import VerticalToolbar from "@/components/Layout/Toolbar";
 
 interface PlanetViewLayoutProps {
   children: React.ReactNode[];

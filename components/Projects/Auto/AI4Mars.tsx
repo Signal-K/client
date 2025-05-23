@@ -150,7 +150,7 @@ interface SelectedAnomProps {
     parentClassificationId?: number;
 }; 
 
-export function AiForMarsProjectWithID({
+function AiForMarsProjectWithID({
     anomalyid
 }: SelectedAnomProps) {
     const supabase = useSupabaseClient();
