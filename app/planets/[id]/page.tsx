@@ -12,7 +12,7 @@ import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounte
 import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnPlanet";
 import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
 import PlanetProgress from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetCompletion";
-import WeatherGenerator from "@/components/Data/Generator/Weather/SimpleWeatherEvents";
+// import WeatherGenerator from "@/components/Data/Generator/Weather/SimpleWeatherEvents";
 import GameNavbar from "@/components/Layout/Tes";
 
 export interface Classification {
@@ -94,6 +94,7 @@ export interface AI4MClassification {
 };
 
 import { useParams } from 'next/navigation';
+import Link from "next/link";
 
 export default function TestPlanetWrapper() {
   const params = useParams();
@@ -263,7 +264,7 @@ export default function TestPlanetWrapper() {
       .order("created_at", { ascending: false });
   
     if (error) {
-      console.error("Error fetching comments:", error);
+      console.error("Error fetching comments: ", error);
     } else {
       let aggregatedComments: any[] = [];
   
@@ -316,11 +317,29 @@ export default function TestPlanetWrapper() {
       if (orbitalPeriodComment) setSurveyorPeriod(orbitalPeriodComment.value || ""); 
       if (radiusComment) setDensity(radiusComment.value || null); 
       if (temperatureComment) setTemperature(temperatureComment.value || null);
-    }
+    };
   };  
+
+  const fetchDensity  = async () => {
+    if (!classification) return;
+
+    const { data, error } = await supabase
+      .from("comments")
+      .select("*")
+      .eq("classification_id", classification.id)
+      .eq("category", "Density")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching comments: ", error);
+    } else {
+      setDensity(data[0].value)
+    };
+  };
   
   useEffect(() => {
       fetchComments();
+      fetchDensity();
       if (cloudSummary && p4Summary && ai4MSummary) {
         console.log(cloudSummary, p4Summary, ai4MSummary);
       }
@@ -388,12 +407,12 @@ export default function TestPlanetWrapper() {
           ai4MSummary={ai4MSummary}
           onBiomeUpdate={(biome) => setDominantBiome(biome)} biomassVersion={biomassScore}        />
       )}
-                <PlanetProgress
-                  temperature={temperature}
-                  radius={density}
-                  biomassScore={biomassScore}
-                  period={surveyorPeriod}
-                />
+        <PlanetProgress
+          temperature={temperature}
+          radius={density}
+          biomassScore={biomassScore}
+          period={surveyorPeriod}
+        />
     </div>
         </div>
     );      
@@ -482,11 +501,11 @@ export default function TestPlanetWrapper() {
                 <div className="absolute inset-0 bg-black/30" />
             </div>
 
-            {dominantBiome && (
+            {/* {dominantBiome && (
                 <div className="absolute top-0 left-0 w-screen z-10">
                     <WeatherGenerator biome={dominantBiome} />
                 </div>
-            )}
+            )} */}
 
             <main className="relative z-10 h-[100vh] flex flex-col justify-start pt-12">
                 {currentView !== "planet" && (
@@ -502,7 +521,27 @@ export default function TestPlanetWrapper() {
                     </div>
                 )}
 
-                <div className="hidden md:flex justify-center mt-4 space-x-4">
+                <div  className="hidden md:flex justify-center mt-6 space-x-12 text-center">
+                    <div>
+                        <div className="text-sm uppercase tracking-wider text-white/70">Biomass:</div>
+                        {biomassScore}
+                    </div>
+                    <div>
+                        <div className="text-sm uppercase tracking-wider text-white/70">Density:</div>
+                        {density}
+                        g/cm^3
+                    </div>
+                    <div>
+                        <div className="text-sm uppercase tracking-wider text-white/70">Main biome:</div>
+                        {dominantBiome}
+                    </div>
+                    {/* <div>
+                        <div className="text-sm uppercase tracking-wider text-white/70">Period:</div>
+                        {surveyorPeriod} Days {/* // or {period}  
+                    </div> */}
+                </div>
+
+                                <div className="hidden md:flex justify-center mt-4 space-x-4">
                     <Button
                         variant={currentView === "overview" ? "secondary" : "ghost"}
                         className="text-white border border-white/30 hover:bg-white/10"
@@ -519,14 +558,20 @@ export default function TestPlanetWrapper() {
                         <FileText className="mr-2 h-4 w-4" />
                         Climate
                     </Button>
-                    <Button
+                    {/* <Button
                         variant={currentView === "atmosphere" ? "secondary" : "ghost"}
                         className="text-white border border-white/30 hover:bg-white/10"
                         onClick={() => handleViewChange("atmosphere")}
                     >
                         <Droplets className="mr-2 h-4 w-4" />
                         Atmosphere
-                    </Button>
+                    </Button> */}
+                    <Link href={`/posts/${id}`}><Button
+                      variant='ghost'
+                      className="text-white border border-white/30 hover:bg-white/10"
+                    >
+                      <Droplets className="mr-2 h-4 w-4" /> View Post
+                    </Button></Link>
                     <Button
                         variant={currentView === "exploration" ? "secondary" : "ghost"}
                         className="text-white border border-white/30 hover:bg-white/10"
@@ -537,27 +582,7 @@ export default function TestPlanetWrapper() {
                     </Button>
                 </div>
 
-                <div  className="hidden md:flex justify-center mt-6 space-x-12 text-center">
-                    <div>
-                        <div className="text-sm uppercase tracking-wider text-white/70">Biomass:</div>
-                        {biomassScore}
-                    </div>
-                    <div>
-                        <div className="text-sm uppercase tracking-wider text-white/70">Density:</div>
-                        {/* {density} */}
-                        g/cm^3
-                    </div>
-                    <div>
-                        <div className="text-sm uppercase tracking-wider text-white/70">Main biome:</div>
-                        {dominantBiome}
-                    </div>
-                    <div>
-                        <div className="text-sm uppercase tracking-wider text-white/70">Period:</div>
-                        {surveyorPeriod} Days {/* // or {period}  */}
-                    </div>
-                </div>
-
-                <div className="flex-1 overflow-y-auto px-4 pb-6">
+                <div className="flex-1 py-4 overflow-y-auto px-4 pb-6">
                     {renderFocusComponent()}
                 </div>
 

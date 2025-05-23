@@ -215,9 +215,49 @@ export default function SurveyorCalculator({ classificationId }: Props) {
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
 
     } catch (error) {
-      console.error("Error adding period comment:", error);
-    }
+      console.error("Error adding period comment: ", error);
+    };
   };
+
+  const handleAddRadiusComment = async () => {
+    const radiusInput1 = calculatorInputs.input1;
+    const radiusInput2 = calculatorInputs.input2;
+
+    if (!radiusInput1?.trim() || !radiusInput2?.trim()) {
+      console.error("Both text areas must be filled!");
+      return;
+    };
+
+    try {
+      const { error } = await supabase
+        .from("comments")
+        .insert([
+          {
+            content: `${newComment}`,
+            classification_id: classificationId,
+            author: session?.user.id,
+            configuration: {
+              radius: `${radiusInput2}`
+            },
+            surveyor: "TRUE",
+            value: radiusInput2,
+            category: "Radius"
+          },
+        ]);
+
+      if (error) {
+        throw error;
+      };
+
+    setCalculatorInputs({
+      input1: "",
+      input2: "",
+      input3: "",
+    });
+  } catch (error: any) {
+    console.error("Error adding your comment: ", error)
+  }
+}
 
   return (
     <div className="space-y-4">
@@ -366,6 +406,8 @@ export default function SurveyorCalculator({ classificationId }: Props) {
                 ? handleAddPeriodComment
                 : selectedCalculator === "density"
                 ? handleAddDensityComment
+                : selectedCalculator === "radius"
+                ? handleAddRadiusComment
                 : handleAddTemperatureComment
             }
             className="bg-[#B48EAD] text-[#ECEFF4] hover:bg-[#B48EAD]/90"
