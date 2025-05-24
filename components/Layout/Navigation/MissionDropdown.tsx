@@ -142,7 +142,7 @@ export function MissionsPopover() {
                                     key={index}
                                     className="flex flex-col sm:flex-row sm:items-center justify-between text-white gap-1"
                                 >
-                                    <p className="truncate">{milestone.name}</p>
+                                    <p className="text-sm break-words leading-snug">{milestone.name}</p>
                                     <div className="text-xs text-gray-500 whitespace-nowrap">
                                         {userProgress[milestone.name] || 0}/{milestone.requiredCount} completed
                                     </div>
