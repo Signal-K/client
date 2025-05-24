@@ -6,12 +6,11 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 
 interface ProfileSetupFormProps {
   onProfileUpdate: () => void | null;
-};
+}
 
 export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
-
   const { activePlanet } = useActivePlanet();
   const router = useRouter();
 
@@ -23,7 +22,7 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
   const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-  const [inventoryItems, setInventoryItems] = useState<{ item: number }[] | null>(null);
+  // const [inventoryItems, setInventoryItems] = useState<{ item: number }[] | null>(null);
 
   useEffect(() => {
     let ignore = false;
@@ -31,22 +30,20 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
       setLoading(true);
       const { data, error } = await supabase
         .from("profiles")
-        .select(`username, full_name, avatar_url`)
+        .select("username, full_name, avatar_url")
         .eq("id", session?.user?.id)
         .single();
 
-      if (!ignore) {
-        if (error) {
-          console.warn(error);
-        } else if (data) {
-          setUsername(data.username);
-          setFirstName(data?.full_name);
-          setAvatarPreview(data?.avatar_url || "");
-        };
-      };
+      if (!ignore && data) {
+        setUsername(data.username || "");
+        setFirstName(data.full_name || "");
+        setAvatarPreview(data.avatar_url || null);
+      } else if (error) {
+        console.warn(error.message);
+      }
 
       setLoading(false);
-    };
+    }
 
     if (session?.user?.id) {
       getProfile();
@@ -57,24 +54,25 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
     };
   }, [session, supabase]);
 
-  useEffect(() => {
-    async function fetchInventory() {
-      if (!session?.user?.id) return;
-      const { data, error } = await supabase
-        .from("inventory")
-        .select("item")
-        .eq("owner", session?.user?.id)
-        .in("item", [23, 24]);
+  // useEffect(() => {
+  //   async function fetchInventory() {
+  //     if (!session?.user?.id) return;
 
-      if (error) {
-        console.warn(error);
-      } else {
-        setInventoryItems(data);
-      }
-    }
+  //     const { data, error } = await supabase
+  //       .from("inventory")
+  //       .select("item")
+  //       .eq("owner", session.user.id)
+  //       .in("item", [23, 24]);
 
-    fetchInventory();
-  }, [session, supabase]);
+  //     if (error) {
+  //       console.warn(error);
+  //     } else {
+  //       setInventoryItems(data);
+  //     }
+  //   }
+
+  //   fetchInventory();
+  // }, [session, supabase]);
 
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -98,49 +96,31 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
     setLoading(true);
     setError(null);
 
-    // Check and add missing items to inventory
-    if (inventoryItems) {
-      const userHasItem23 = inventoryItems.some(item => item.item === 23);
-      const userHasItem24 = inventoryItems.some(item => item.item === 24);
+    // Ensure inventory contains items 23 and 24
+    // if (inventoryItems) {
+    //   const existingItems = inventoryItems.map((item) => item.item);
+    //   const itemsToAdd = [23, 24].filter((item) => !existingItems.includes(item)).map((item) => ({
+    //     item,
+    //     owner: session.user.id,
+    //     anomay: activePlanet?.id,
+    //     quantity: 1,
+    //     time_of_deploy: new Date(),
+    //   }));
 
-      const itemsToAdd = [];
-
-      if (!userHasItem23) {
-        itemsToAdd.push({
-          item: 23,
-          owner: session?.user?.id,
-          anomay: activePlanet?.id,
-          quantity: 1,
-          time_of_deploy: new Date(),
-        });
-      }
-
-      if (!userHasItem24) {
-        itemsToAdd.push({
-          item: 24,
-          owner: session?.user?.id,
-          anomay: activePlanet?.id,
-          quantity: 1,
-          time_of_deploy: new Date(),
-        });
-      }
-
-      // Insert missing items into the inventory
-      if (itemsToAdd.length > 0) {
-        const { error: insertError } = await supabase.from("inventory").insert(itemsToAdd);
-
-        if (insertError) {
-          setError(insertError.message);
-          setLoading(false);
-          return;
-        }
-      }
-    }
+    //   if (itemsToAdd.length > 0) {
+    //     const { error: insertError } = await supabase.from("inventory").insert(itemsToAdd);
+    //     if (insertError) {
+    //       setError(insertError.message);
+    //       setLoading(false);
+    //       return;
+    //     }
+    //   }
+    // }
 
     let avatar_url = avatarPreview;
 
     if (avatar) {
-      const fileName = `${Date.now()}-${session?.user?.id}-avatar.png`;
+      const fileName = `${Date.now()}-${session.user.id}-avatar.png`;
       const { data, error } = await supabase.storage
         .from("avatars")
         .upload(fileName, avatar, {
@@ -157,20 +137,20 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
     }
 
     const updates = {
-      id: session?.user?.id,
+      id: session.user.id,
       username,
       full_name: firstName,
       avatar_url,
       updated_at: new Date(),
     };
 
-    const { error } = await supabase.from("profiles").upsert(updates);
+    const { error: updateError } = await supabase.from("profiles").upsert(updates);
 
-    if (error) {
-      alert(error.message);
+    if (updateError) {
+      setError(updateError.message);
     } else {
       router.push("/");
-      onProfileUpdate();
+      onProfileUpdate?.();
     }
 
     setLoading(false);
@@ -183,11 +163,8 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
           My Profile
         </h1>
         <form onSubmit={updateProfile} className="space-y-6">
-          <div className="group">
-            <label
-              htmlFor="username"
-              className="block text-[#5FCBC3] mb-2 font-semibold"
-            >
+          <div>
+            <label htmlFor="username" className="block text-[#5FCBC3] mb-2 font-semibold">
               Username
             </label>
             <input
@@ -195,16 +172,13 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3 bg-[#74859A]/50 text-[#FFE3BA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF695D] transition-all duration-300 placeholder-[#FFE3BA]/50"
+              className="w-full px-4 py-3 bg-[#74859A]/50 text-[#FFE3BA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF695D] placeholder-[#FFE3BA]/50"
               required
               placeholder="Enter your username"
             />
           </div>
-          <div className="group">
-            <label
-              htmlFor="firstName"
-              className="block text-[#5FCBC3] mb-2 font-semibold"
-            >
+          <div>
+            <label htmlFor="firstName" className="block text-[#5FCBC3] mb-2 font-semibold">
               First Name
             </label>
             <input
@@ -212,44 +186,31 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
               id="firstName"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-3 bg-[#74859A]/50 text-[#FFE3BA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF695D] transition-all duration-300 placeholder-[#FFE3BA]/50"
+              className="w-full px-4 py-3 bg-[#74859A]/50 text-[#FFE3BA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF695D] placeholder-[#FFE3BA]/50"
               required
               placeholder="Enter your first name"
             />
           </div>
           <div>
-            <label
-              htmlFor="avatar"
-              className="block text-[#5FCBC3] mb-2 font-semibold"
-            >
+            <label htmlFor="avatar" className="block text-[#5FCBC3] mb-2 font-semibold">
               Avatar
             </label>
             <div className="flex items-center space-x-4">
               <div className="relative w-24 h-24 rounded-full overflow-hidden bg-[#74859A]/50 border-4 border-[#5FCBC3] shadow-lg">
                 {avatarPreview ? (
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatarPreview}` || "/placeholder.svg"}
+                    src={avatarPreview}
                     alt="Avatar preview"
                     layout="fill"
                     objectFit="cover"
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full text-[#FFE3BA]">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-12 w-12"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
-                  </div>
+                  <Image
+                    src="/placeholder.svg"
+                    alt="Default avatar"
+                    layout="fill"
+                    objectFit="cover"
+                  />
                 )}
               </div>
               <input
@@ -269,9 +230,10 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
           </div>
           <button
             type="submit"
+            disabled={loading}
             className="w-full py-4 bg-[#FF695D] text-[#FFE3BA] rounded-xl font-bold hover:bg-[#5FCBC3] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            Update your profile
+            {loading ? "Saving..." : "Update your profile"}
           </button>
         </form>
       </div>

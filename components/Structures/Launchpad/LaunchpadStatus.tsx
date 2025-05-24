@@ -115,15 +115,15 @@ export default function LaunchpadStatus() {
       mission: 200000014,
     };
 
-    if (!hasMission200000014) {
-      const { error: updateMissionError } = await supabase
-        .from("missions")
-        .insert([missionData]);
+  //   if (!hasMission200000014) {
+  //     const { error: updateMissionError } = await supabase
+  //       .from("missions")
+  //       .insert([missionData]);
 
-    if (updateMissionError) {
-      console.error("Error updating mission 200000013: ", updateMissionError);
-    };
-  };
+  //   if (updateMissionError) {
+  //     console.error("Error updating mission 200000013: ", updateMissionError);
+  //   };
+  // };
 
     try {
       // Update the launchpad fuel capacity

@@ -213,30 +213,58 @@ export default function MissionSelector() {
     setConfirmationMessage('');
   };
 
-  const handleConfirmMission = async () => {
-    if (!session || !selectedMission) return;
+  const insertAdditionalStarterItems = async (chosenId: number) => {
+    if (!session) return;
 
-    const structureCreationData = {
+    const starterItemIds = [3105, 3104, 3103];
+    const otherItemIds = starterItemIds.filter((id) => id !== chosenId);
+
+    const additionalInserts = otherItemIds.map((itemId) => ({
       owner: session.user.id,
-      item: selectedMission.activeStructure,
+      item: itemId,
       anomaly: activePlanet?.id || 30,
       quantity: 1,
-      notes: "Created for user's first classification mission",
-      configuration: {
-        "Uses": 10,
-        "missions unlocked": [selectedMission.identifier],
-      },
+      notes: "Starter item added alongside mission item",
+      configuration: { Uses: 10, "missions unlocked": [] },
+    }));
+
+    const { error } = await supabase.from("inventory").insert(additionalInserts);
+
+    if (error) {
+      console.error("Failed to insert additional items:", error.message);
     };
-
-    try {
-      updatePlanetLocation(30);
-      await supabase.from("inventory").insert([structureCreationData]);
-
-      setConfirmationMessage(`Mission "${selectedMission.name}" confirmed!`);
-    } catch (error: any) {
-      setConfirmationMessage(`Error: ${error.message}`);
-    }
   };
+
+const handleConfirmMission = async () => {
+  if (!session || !selectedMission) return;
+
+  const chosenItemId = selectedMission.activeStructure;
+
+  const structureCreationData = {
+    owner: session.user.id,
+    item: chosenItemId,
+    anomaly: activePlanet?.id || 30,
+    quantity: 1,
+    notes: "Created for user's first classification mission",
+    configuration: {
+      Uses: 10,
+      "missions unlocked": [selectedMission.identifier],
+    },
+  };
+
+  try {
+    updatePlanetLocation(30);
+
+    await supabase.from("inventory").insert([structureCreationData]);
+
+    // 🔽 Insert the other two items
+    await insertAdditionalStarterItems(chosenItemId);
+
+    setConfirmationMessage(`Mission "${selectedMission.name}" confirmed!`);
+  } catch (error: any) {
+    setConfirmationMessage(`Error: ${error.message}`);
+  }
+};
 
   return (
     <div className="p-6 space-y-6">

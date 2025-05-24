@@ -39,71 +39,72 @@ export default function PreferredTerrestrialClassifications({
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [isVehicleSelectionFocused, setIsVehicleSelectionFocused] = useState<boolean>(false);
 
-  const fetchClassifications = async () => {
-    try {
-      setLoading(true);
-      const { data: comments, error: commentsError } = await supabase
-        .from("comments")
-        .select("classification_id, configuration")
-        .filter("configuration", "cs", '{"planetType":"Terrestrial"}');
-        // .filter("configuration", "cs", '{"preferred":true,"planetType":"Terrestrial"}');
+const fetchClassifications = async () => {
+  try {
+    setLoading(true);
+    const { data: comments, error: commentsError } = await supabase
+      .from("comments")
+      .select("classification_id, configuration")
+      .filter("configuration", "cs", '{"planetType":"Terrestrial"}');
 
-      if (commentsError) throw commentsError;
+    if (commentsError) throw commentsError;
 
-      const classificationIds = comments.map((comment) => comment.classification_id).filter(Boolean);
+    const classificationIds = comments.map((comment) => comment.classification_id).filter(Boolean);
 
-      if (classificationIds.length === 0) {
-        setClassifications([]);
-        return;
-      };
+    if (classificationIds.length === 0) {
+      // 👉 No results: default to anomaly "1" and move on
+      setSelectedAnomaly(1);
+      onSelectAnomaly(1, null);
+      return;
+    }
 
-      const { data: classificationsData, error: classificationsError } = await supabase
-        .from("classifications")
-        .select("*")
-        .in("id", classificationIds);
+    const { data: classificationsData, error: classificationsError } = await supabase
+      .from("classifications")
+      .select("*")
+      .in("id", classificationIds);
 
-      if (classificationsError) throw classificationsError;
+    if (classificationsError) throw classificationsError;
 
-      const enrichedClassifications = await Promise.all(
-        classificationsData.map(async (classification) => {
-          const { data: tempComments, error: tempCommentsError } = await supabase
-            .from("comments")
-            .select("configuration")
-            .eq("classification_id", classification.id)
-            .filter("configuration->>temperature", "ilike", "%temperature%");
+    const enrichedClassifications = await Promise.all(
+      classificationsData.map(async (classification) => {
+        const { data: tempComments, error: tempCommentsError } = await supabase
+          .from("comments")
+          .select("configuration")
+          .eq("classification_id", classification.id)
+          .filter("configuration->>temperature", "ilike", "%temperature%");
 
-          if (tempCommentsError) console.error(tempCommentsError);
+        if (tempCommentsError) console.error(tempCommentsError);
 
-          const randomTempComment =
-            tempComments && tempComments.length > 0
-              ? tempComments[Math.floor(Math.random() * tempComments.length)]
-              : null;
+        const randomTempComment =
+          tempComments && tempComments.length > 0
+            ? tempComments[Math.floor(Math.random() * tempComments.length)]
+            : null;
 
-          let temperature = null;
-          if (randomTempComment?.configuration?.temperature) {
-            temperature = randomTempComment.configuration.temperature;
-          };
+        let temperature = null;
+        if (randomTempComment?.configuration?.temperature) {
+          temperature = randomTempComment.configuration.temperature;
+        }
 
-          let images: string[] = [];
-          if (classification.media) {
-            if (Array.isArray(classification.media)) {
-              images = classification.media.filter((url: any) => typeof url === "string");
-            } else if (typeof classification.media === "object" && classification.media.uploadUrl) {
-              images.push(classification.media.uploadUrl);
-            };
-          };
+        let images: string[] = [];
+        if (classification.media) {
+          if (Array.isArray(classification.media)) {
+            images = classification.media.filter((url: any) => typeof url === "string");
+          } else if (typeof classification.media === "object" && classification.media.uploadUrl) {
+            images.push(classification.media.uploadUrl);
+          }
+        }
 
-          return { ...classification, images, temperature };
-        })
-      );
+        return { ...classification, images, temperature };
+      })
+    );
 
-      setClassifications(enrichedClassifications);
-    } catch {
-      setError("An unexpected error occurred.");
-    } finally {
-      setLoading(false);
-    };
-  };
+    setClassifications(enrichedClassifications);
+  } catch {
+    setError("An unexpected error occurred.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchClassifications();
@@ -208,7 +209,7 @@ export function PreferredGaseousClassifications({
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [isVehicleSelectionFocused, setIsVehicleSelectionFocused] = useState<boolean>(false);
 
-  const fetchClassifications = async () => {
+const fetchClassifications = async () => {
     try {
       setLoading(true);
       const { data: comments, error: commentsError } = await supabase
@@ -221,10 +222,11 @@ export function PreferredGaseousClassifications({
       const classificationIds = comments.map((comment) => comment.classification_id).filter(Boolean);
 
       if (classificationIds.length === 0) {
-        // Set anomaly ID to "4" if no classifications found
-        setSelectedAnomaly(4);
+        // Set anomaly ID to "1" and proceed automatically if no classifications found
+        setSelectedAnomaly(1);
+        onSelectAnomaly(1, null);
         return;
-      };
+      }
 
       const { data: classificationsData, error: classificationsError } = await supabase
         .from("classifications")
@@ -271,7 +273,7 @@ export function PreferredGaseousClassifications({
       setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
-    };
+    }
   };
 
   useEffect(() => {

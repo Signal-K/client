@@ -5,6 +5,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 // import { Anomaly } from "../Telescopes/ExoplanetC23";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
+import { Button } from "@/components/ui/button";
 
 interface ZoodexProps {
   anomalyId: number | bigint;
@@ -219,7 +220,7 @@ export function NestQuestGo() {
     }, [session, supabase]);
 
     useEffect(() => {
-        if (!hasMission3000005 || missionLoading || !session) return;
+        // if (!hasMission3000005 || missionLoading || !session) return;
 
         const fetchAnomaly = async () => {
             try {
@@ -265,9 +266,9 @@ export function NestQuestGo() {
         return <div>Loading...</div>;
     }
 
-    if (!hasMission3000005) {
-        return <NestQuestGoStarter anomalyId={anomaly?.id || 90670192} />;
-    };
+    // if (!hasMission3000005) {
+    //     return <NestQuestGoStarter anomalyId={anomaly?.id || 90670192} />;
+    // };
 
     if (!anomaly) {
         return (
@@ -277,9 +278,20 @@ export function NestQuestGo() {
         );
     };
 
+    const [showTutorial, setShowTutorial] = useState<boolean>(false);
+
+    if (showTutorial) {
+        return (
+            <NestQuestGoStarter anomalyId={anomaly?.id || 90670192} />
+        );
+    };
+
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 rounded-md relative w-full">
+                <Button variant='default' onClick={() => setShowTutorial(!showTutorial)}>
+                    Show Tutorial
+                </Button>
                 {imageUrls.length > 0 && (
                     <div className="relative">
                         <img

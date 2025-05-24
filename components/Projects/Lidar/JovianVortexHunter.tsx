@@ -323,7 +323,7 @@ export function LidarJVHSatellite({ anomalyid }: Props) {
                     structureItemId={3105}
                     initialImageUrl={imageUrl}
                     annotationType="JVH"
-                    // parentPlanetLocation='Null' 
+                    parentPlanetLocation={anomalyid.toString()} 
                 />
             )}
             {!showTutorial && (
@@ -342,15 +342,16 @@ export function LidarJVHSatellite({ anomalyid }: Props) {
 };
 
 export function JVHWrapper() {
-    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
-    const [part, setPart] = useState(1);
-  
-    return (
-      <div className="space-y-8">
-        {!selectedAnomaly && part !== 1 && (
-          <PreferredGaseousClassifications onSelectAnomaly={setSelectedAnomaly} />
-        )}
-        {selectedAnomaly && <LidarJVHSatellite anomalyid={selectedAnomaly} />}
-      </div>
-    );
-};  
+  const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+  const [part, setPart] = useState(1);
+
+  return (
+    <div className="space-y-8">
+      {!selectedAnomaly && (
+        <PreferredGaseousClassifications onSelectAnomaly={setSelectedAnomaly} />
+      )}
+      {selectedAnomaly && <LidarJVHSatellite anomalyid={selectedAnomaly} />}
+      {/* <p>{selectedAnomaly}</p> */}
+    </div>
+  );
+};

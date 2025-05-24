@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Navbar from "@/components/Layout/Navbar";
 // import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
-import { calculatePlanetStats, calculateTerrainHeight } from "@/utils/planet-physics";
+// import { calculatePlanetStats, calculateTerrainHeight } from "@/utils/planet-physics";
 import Link from "next/link";
 import JVHCloudAggregator from "@/components/Structures/Missions/Meteorologists/JVH/JVHCloudAggregator";
 
@@ -124,34 +124,34 @@ export default function JupiterClassifications() {
     const [atmosphereVisibility, setAtmosphereVisibility] = useState(1);
     const [atmosphereHeight, setAtmosphereHeight] = useState(1);
 
-    const stats = calculatePlanetStats(
-        mass,
-        radius,
-        temperature,
-        orbitalPeriod,
-        typeOverride,
-        atmosphereStrength,
-        cloudCount,
-        waterHeight,
-        surfaceRoughness,
-        undefined,
-        biomeFactor,
-        cloudContribution,
-        terrainVariation,
-        terrainErosion,
-        plateTectonics,
-        biomassLevel,
-        waterLevel,
-        salinity,
-        subsurfaceWater,
-        atmosphericDensity,
-        weatherVariability,
-        stormFrequency,
-        volcanicActivity,
-        biome,
-    );  
+    // const stats = calculatePlanetStats(
+    //     mass,
+    //     radius,
+    //     temperature,
+    //     orbitalPeriod,
+    //     typeOverride,
+    //     atmosphereStrength,
+    //     cloudCount,
+    //     waterHeight,
+    //     surfaceRoughness,
+    //     undefined,
+    //     biomeFactor,
+    //     cloudContribution,
+    //     terrainVariation,
+    //     terrainErosion,
+    //     plateTectonics,
+    //     biomassLevel,
+    //     waterLevel,
+    //     salinity,
+    //     subsurfaceWater,
+    //     atmosphericDensity,
+    //     weatherVariability,
+    //     stormFrequency,
+    //     volcanicActivity,
+    //     biome,
+    // );  
     
-        const terrainHeight = calculateTerrainHeight(stats);
+    //     const terrainHeight = calculateTerrainHeight(stats);
 
     return (
         <div className="p-6 bg-black text-white border rounded-md opacity-80 shadow-md relative">

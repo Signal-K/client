@@ -9,7 +9,7 @@ interface Comment {
   created_at: string;
   author: string;
   classification_id: number;
-}
+};
 
 interface Classification {
   id: number;
@@ -21,11 +21,11 @@ interface Classification {
   };
   anomaly: number | null;
   media?: any;
-}
+};
 
 interface RelatedClassificationsProps {
   parentId: number;
-}
+};
 
 export default function RelatedClassifications({ parentId }: RelatedClassificationsProps) {
   const supabase = useSupabaseClient();

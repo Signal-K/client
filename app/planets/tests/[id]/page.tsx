@@ -18,7 +18,7 @@ import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/Plane
 import { Button } from "@/components/ui/button"
 import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnPlanet";
 import WeatherGenerator from "@/components/Data/Generator/Weather/SimpleWeatherEvents";
-import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+// import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import PlanetProgress from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetCompletion";
 
 export interface Classification {
@@ -574,7 +574,7 @@ export default function ClassificationDetail({ params }: { params: { id: string 
                 author={classification.author || ''}
                 biome={dominantBiome ?? undefined}
               /> */}
-                <PlanetGenerator classificationId={""} author={""} />
+                {/* <PlanetGenerator classificationId={""} author={""} /> */}
               </>
         )}
     </div>

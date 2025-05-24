@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { MiningComponentComponent } from "@/components/(scenes)/mining/mining-component";
 
 interface InventoryItem {
     id: number;
@@ -112,21 +111,3 @@ export default function AllAutomatonsOnActivePlanet() {
         </div>
     );
 };
-
- {/* {isModalVisible && (
-    <div 
-        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-        onClick={handleOverlayClick}
-    >
-        <div className="relative bg-white w-1/2 h-1/2 p-4 overflow-y-auto">
-            <button
-                className="absolute top-2 right-2 text-2xl font-bold"
-                onClick={closeModal}
-            >
-                &times;
-            </button>
-
-            <MiningComponentComponent />
-        </div>
-    </div>
-)} */}

@@ -5,6 +5,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 import { Anomaly } from "../Telescopes/Transiting";
+import { Button } from "@/components/ui/button";
 
 interface ZoodexProps {
     anomalyId: string; 
@@ -212,15 +213,15 @@ export function PlanktonPortalFrame() {
         );
     };
 
-    if (!hasMission200000012) {
-        return anomaly ? (
-            <PlanktonPortalTutorial anomalyId={anomaly.id.toString()} />
-        ) : (
-            <div>
-                Loading tutorial...
-            </div>
-        );
-    };    
+    // if (!hasMission200000012) {
+    //     return anomaly ? (
+    //         <PlanktonPortalTutorial anomalyId={anomaly.id.toString()} />
+    //     ) : (
+    //         <div>
+    //             Loading tutorial...
+    //         </div>
+    //     );
+    // };    
 
     if (loading) {
         return (
@@ -240,9 +241,18 @@ export function PlanktonPortalFrame() {
         );
     };
 
+    const [showTutorial, setShowTutorial] = useState<boolean>(false);
+
+    if (showTutorial) {
+        return (
+            <PlanktonPortalTutorial anomalyId={anomaly.id.toString()} />
+        );
+    };
+
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="pb-4 rounded-md relative w-full">
+                <Button variant="default" onClick={() => setShowTutorial(!showTutorial)}>Show tutorial</Button>
                 {imageUrl && (
                     <img src={imageUrl} alt={anomaly?.content} className="w-full h-64 object-cover" />
                 )}

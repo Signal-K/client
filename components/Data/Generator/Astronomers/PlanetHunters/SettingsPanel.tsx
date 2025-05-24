@@ -1,103 +1,635 @@
 "use client"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import type { PlanetConfig } from "@/utils/planet-physics"
+import { getLiquidType, getTemperatureAdjustedColors } from "@/utils/planet-physics";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { PlanetStats } from "@/lib/planet-physics"
-import { PhysicalTab } from "./Settings/physical-tab"
-import { SurfaceTab } from "./Settings/surface-tab"
-import { BiomeTab } from "./Settings/biome-tab"
-import { LandmarksTab } from "./Settings/landmarks-tab"
-import { ImportExportTab } from "./Settings/import-export-tab"
+import { Slider } from "@/components/ui/slider"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Download, Upload, RefreshCw } from "lucide-react"
+import ColorPicker from "@/utils/Generators/PH/color-picker"
 
 interface SettingsPanelProps {
-  planetStats: PlanetStats
-  setPlanetStats: (stats: PlanetStats) => void
-  classificationId?: string
-  author?: string
+  planetConfig: PlanetConfig
+  onChange: (config: Partial<PlanetConfig>) => void
 }
 
-export function SettingsPanel({
-  planetStats,
-  setPlanetStats,
-  classificationId = "UNCLASSIFIED",
-  author = "UNKNOWN",
-}: SettingsPanelProps) {
-  const [selectedBiome, setSelectedBiome] = useState(planetStats.biome || "Rocky Highlands")
-  const [customColors, setCustomColors] = useState({
-    oceanFloor: planetStats.customColors?.oceanFloor || "",
-    beach: planetStats.customColors?.beach || "",
-    regular: planetStats.customColors?.regular || "",
-    mountain: planetStats.customColors?.mountain || "",
-  })
+export default function SettingsPanel({ planetConfig, onChange }: SettingsPanelProps) {
+  const [showImportExport, setShowImportExport] = useState(false)
+
+  // Update liquid type based on temperature
+  useEffect(() => {
+    const liquidType = getLiquidType(planetConfig.temperature)
+
+    // Only update if the colors don't match the expected liquid type
+    if (
+      planetConfig.colors.ocean !== liquidType.color ||
+      planetConfig.colors.oceanPattern !== liquidType.patternColor
+    ) {
+      onChange({
+        colors: {
+          ...planetConfig.colors,
+          ocean: liquidType.color,
+          oceanPattern: liquidType.patternColor,
+        },
+      })
+    }
+  }, [planetConfig.temperature])
+
+  // Update terrain colors based on temperature
+  useEffect(() => {
+    const terrainColors = getTemperatureAdjustedColors(planetConfig.temperature, planetConfig.biomass)
+
+    // Only update if colors have changed
+    if (
+      planetConfig.colors.beach !== terrainColors.beach ||
+      planetConfig.colors.lowland !== terrainColors.lowland ||
+      planetConfig.colors.midland !== terrainColors.midland ||
+      planetConfig.colors.highland !== terrainColors.highland ||
+      planetConfig.colors.mountain !== terrainColors.mountain ||
+      planetConfig.colors.snow !== terrainColors.snow
+    ) {
+      onChange({
+        colors: {
+          ...planetConfig.colors,
+          ...terrainColors,
+        },
+      })
+    }
+  }, [planetConfig.temperature, planetConfig.biomass])
+
+  // Check if planet should be gaseous or terrestrial based on mass and radius
+  useEffect(() => {
+    if ((planetConfig.mass > 7.5 || planetConfig.radius > 2.5) && planetConfig.type !== "gaseous") {
+      onChange({ type: "gaseous" })
+    } else if (planetConfig.mass <= 7.5 && planetConfig.radius <= 2.5 && planetConfig.type === "gaseous") {
+      onChange({ type: "terrestrial" })
+    }
+  }, [planetConfig.mass, planetConfig.radius, planetConfig.type])
+
+  const regenerateSeed = () => {
+    onChange({ seed: Math.floor(Math.random() * 10000) })
+  }
+
+  // Get current liquid type name
+  const liquidType = getLiquidType(planetConfig.temperature)
 
   return (
-    <div className="absolute top-0 left-0 h-full w-96 bg-slate-800/90 text-blue-100 p-6 overflow-y-auto font-mono border-r border-slate-600/60">
-      <h2 className="text-2xl font-bold mb-6 tracking-wider border-b border-slate-600/60 pb-2">PLANET SETTINGS</h2>
-
-      {/* Hidden but not removed */}
-      <div className="mb-6 p-3 bg-slate-700/60 border border-slate-600/60 rounded-md hidden">
-        <div className="grid grid-cols-2 gap-2 text-sm">
-          <div className="text-slate-400">CLASSIFICATION:</div>
-          <div>{classificationId}</div>
-          <div className="text-slate-400">AUTHOR:</div>
-          <div>{author}</div>
-        </div>
+    <div className="space-y-6 bg-slate-900 text-slate-100">
+      <div className="flex justify-between items-center">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowImportExport(!showImportExport)}
+          className="flex items-center gap-2 bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700"
+        >
+          {showImportExport ? "Hide" : "Show"} Import/Export
+          {showImportExport ? <Download className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
+        </Button>
       </div>
 
-      <Tabs defaultValue="physical" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-700 border border-slate-600">
-          <TabsTrigger value="physical" className="data-[state=active]:bg-cyan-800/40 data-[state=active]:text-cyan-50">
-            PHYSICAL
+      {showImportExport && (
+        <div className="p-4 bg-slate-800 rounded-md space-y-4 border border-slate-700">
+          <h3 className="text-sm font-medium text-slate-200">Import/Export Configuration</h3>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                const event = new CustomEvent("open-import-dialog")
+                window.dispatchEvent(event)
+              }}
+              className="flex-1 bg-slate-700 text-slate-200 hover:bg-slate-600"
+            >
+              Import
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                const event = new CustomEvent("open-export-dialog")
+                window.dispatchEvent(event)
+              }}
+              className="flex-1 bg-slate-700 text-slate-200 hover:bg-slate-600"
+            >
+              Export
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <Tabs defaultValue="basic" className="w-full">
+        <TabsList className="w-full grid grid-cols-3 mb-4 bg-slate-800">
+          <TabsTrigger value="basic" className="data-[state=active]:bg-slate-700">
+            Basic
           </TabsTrigger>
-          <TabsTrigger value="surface" className="data-[state=active]:bg-cyan-800/40 data-[state=active]:text-cyan-50">
-            SURFACE
+          <TabsTrigger value="terrain" className="data-[state=active]:bg-slate-700">
+            Terrain
           </TabsTrigger>
-          <TabsTrigger value="biome" className="data-[state=active]:bg-cyan-800/40 data-[state=active]:text-cyan-50">
-            BIOME
-          </TabsTrigger>
-          <TabsTrigger
-            value="landmarks"
-            className="data-[state=active]:bg-cyan-800/40 data-[state=active]:text-cyan-50"
-          >
-            LANDMARKS
+          <TabsTrigger value="colors" className="data-[state=active]:bg-slate-700">
+            Colors
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="physical">
-          <PhysicalTab planetStats={planetStats} setPlanetStats={setPlanetStats} />
+        <TabsContent value="basic" className="space-y-6">
+          <div className="space-y-4">
+            <div className="bg-slate-800 p-4 rounded-md border border-slate-700">
+              <h3 className="text-sm font-medium mb-3 text-slate-200">Planet Type</h3>
+              <div className="flex gap-2">
+                <Button
+                  variant={planetConfig.type === "terrestrial" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onChange({ type: "terrestrial" })}
+                  className="flex-1"
+                >
+                  Terrestrial
+                </Button>
+                <Button
+                  variant={planetConfig.type === "gaseous" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onChange({ type: "gaseous" })}
+                  className="flex-1"
+                >
+                  Gaseous
+                </Button>
+              </div>
+              {(planetConfig.mass > 7.5 || planetConfig.radius > 2.5) && planetConfig.type === "gaseous" && (
+                <p className="text-xs text-amber-400 mt-2">
+                  Note: High mass or radius has automatically set this to a gas giant
+                </p>
+              )}
+              {planetConfig.mass <= 7.5 && planetConfig.radius <= 2.5 && planetConfig.type === "terrestrial" && (
+                <p className="text-xs text-slate-400 mt-2">Note: Values are in Earth radii/mass units</p>
+              )}
+            </div>
 
-          {/* Export section moved to Physical tab */}
-          <div className="mt-6">
-            <ImportExportTab
-              planetStats={planetStats}
-              setPlanetStats={setPlanetStats}
-              classificationId={classificationId}
-              author={author}
-              setSelectedBiome={setSelectedBiome}
-              setCustomColors={setCustomColors}
-            />
+            <div className="bg-slate-800 p-4 rounded-md space-y-4 border border-slate-700">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium text-slate-200">Seed: {planetConfig.seed}</h3>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={regenerateSeed}
+                  className="bg-slate-700 border-slate-600"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="radius" className="text-slate-200">
+                    Radius (Earth radii)
+                  </Label>
+                  <span className="text-sm text-slate-400">{planetConfig.radius.toFixed(1)}</span>
+                </div>
+                <Slider
+                  id="radius"
+                  min={0.5}
+                  max={5}
+                  step={0.1}
+                  value={[planetConfig.radius]}
+                  onValueChange={(value) => onChange({ radius: value[0] })}
+                  className="[&_[role=slider]]:bg-slate-200"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="temperature" className="text-slate-200">
+                    Temperature
+                  </Label>
+                  <span className="text-sm text-slate-400">
+                    {planetConfig.temperature.toFixed(0)}K ({(planetConfig.temperature - 273.15).toFixed(0)}°C)
+                  </span>
+                </div>
+                <Slider
+                  id="temperature"
+                  min={50}
+                  max={700}
+                  step={1}
+                  value={[planetConfig.temperature]}
+                  onValueChange={(value) => onChange({ temperature: value[0] })}
+                  className="[&_[role=slider]]:bg-slate-200"
+                />
+                <div className="text-xs text-slate-400">Liquid Solvent: {liquidType.name}</div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="mass" className="text-slate-200">
+                    Mass (Earth masses)
+                  </Label>
+                  <span className="text-sm text-slate-400">{planetConfig.mass.toFixed(1)} M⊕</span>
+                </div>
+                <Slider
+                  id="mass"
+                  min={0.1}
+                  max={10}
+                  step={0.1}
+                  value={[planetConfig.mass]}
+                  onValueChange={(value) => onChange({ mass: value[0] })}
+                  className="[&_[role=slider]]:bg-slate-200"
+                />
+              </div>
+
+              <div className="pt-2 border-t border-slate-700">
+                <div className="flex justify-between">
+                  <Label className="text-slate-200">Density</Label>
+                  <span className="text-sm text-slate-400">
+                    {(planetConfig.mass / ((planetConfig.radius ** 3 * Math.PI * 4) / 3)).toFixed(2)} g/cm³
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </TabsContent>
 
-        <TabsContent value="surface">
-          <SurfaceTab planetStats={planetStats} setPlanetStats={setPlanetStats} selectedBiome={selectedBiome} />
+        <TabsContent value="terrain" className="space-y-6">
+          {planetConfig.type === "terrestrial" && (
+            <div className="bg-slate-800 p-4 rounded-md space-y-4 border border-slate-700">
+              <h3 className="text-sm font-medium text-slate-200">Terrain Properties</h3>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="terrainRoughness" className="text-slate-200">
+                    Terrain Roughness
+                  </Label>
+                  <span className="text-sm text-slate-400">{planetConfig.terrainRoughness.toFixed(2)}</span>
+                </div>
+                <Slider
+                  id="terrainRoughness"
+                  min={0.1}
+                  max={1}
+                  step={0.01}
+                  value={[planetConfig.terrainRoughness]}
+                  onValueChange={(value) => onChange({ terrainRoughness: value[0] })}
+                  className="[&_[role=slider]]:bg-slate-200"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="liquidHeight" className="text-slate-200">
+                    Ocean Level
+                  </Label>
+                  <span className="text-sm text-slate-400">{planetConfig.liquidHeight.toFixed(2)}</span>
+                </div>
+                <Slider
+                  id="liquidHeight"
+                  min={0.3}
+                  max={0.8}
+                  step={0.01}
+                  value={[planetConfig.liquidHeight]}
+                  onValueChange={(value) => onChange({ liquidHeight: value[0] })}
+                  className="[&_[role=slider]]:bg-slate-200"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="continentSize" className="text-slate-200">
+                    Continent Size
+                  </Label>
+                  <span className="text-sm text-slate-400">{planetConfig.continentSize.toFixed(2)}</span>
+                </div>
+                <Slider
+                  id="continentSize"
+                  min={0.1}
+                  max={1}
+                  step={0.01}
+                  value={[planetConfig.continentSize]}
+                  onValueChange={(value) => onChange({ continentSize: value[0] })}
+                  className="[&_[role=slider]]:bg-slate-200"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="continentCount" className="text-slate-200">
+                    Continent Count
+                  </Label>
+                  <span className="text-sm text-slate-400">{planetConfig.continentCount.toFixed(0)}</span>
+                </div>
+                <Slider
+                  id="continentCount"
+                  min={1}
+                  max={10}
+                  step={1}
+                  value={[planetConfig.continentCount]}
+                  onValueChange={(value) => onChange({ continentCount: value[0] })}
+                  className="[&_[role=slider]]:bg-slate-200"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="noiseScale" className="text-slate-200">
+                    Detail Level
+                  </Label>
+                  <span className="text-sm text-slate-400">{planetConfig.noiseScale.toFixed(2)}</span>
+                </div>
+                <Slider
+                  id="noiseScale"
+                  min={0.5}
+                  max={2}
+                  step={0.1}
+                  value={[planetConfig.noiseScale]}
+                  onValueChange={(value) => onChange({ noiseScale: value[0] })}
+                  className="[&_[role=slider]]:bg-slate-200"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="volcanicActivity" className="text-slate-200">
+                    Volcanic Activity
+                  </Label>
+                  <span className="text-sm text-slate-400">{planetConfig.volcanicActivity.toFixed(2)}</span>
+                </div>
+                <Slider
+                  id="volcanicActivity"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={[planetConfig.volcanicActivity]}
+                  onValueChange={(value) => onChange({ volcanicActivity: value[0] })}
+                  className="[&_[role=slider]]:bg-slate-200"
+                />
+                <div className="text-xs text-slate-400 italic">Note: Volcanic activity is currently a static value</div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="biomass" className="text-slate-200">
+                    Biomass
+                  </Label>
+                  <span className="text-sm text-slate-400">{planetConfig.biomass.toFixed(2)}</span>
+                </div>
+                <Slider
+                  id="biomass"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={[planetConfig.biomass]}
+                  onValueChange={(value) => onChange({ biomass: value[0] })}
+                  className="[&_[role=slider]]:bg-slate-200"
+                />
+                <div className="text-xs text-slate-400 italic">Note: Biomass is currently a static value</div>
+              </div>
+            </div>
+          )}
+
+          <div className="bg-slate-800 p-4 rounded-md space-y-4 border border-slate-700">
+            <div className="flex justify-between items-center">
+              <h3 className="text-sm font-medium text-slate-200">Debug Mode</h3>
+              <Switch
+                checked={planetConfig.debugMode || false}
+                onCheckedChange={(checked) => onChange({ debugMode: checked })}
+              />
+            </div>
+
+            {planetConfig.debugMode && (
+              <div className="pt-2 border-t border-slate-700 space-y-2">
+                <p className="text-xs text-slate-400">Show/hide specific terrain types:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-ocean"
+                      checked={planetConfig.visibleTerrains.ocean}
+                      onCheckedChange={(checked) =>
+                        onChange({
+                          visibleTerrains: {
+                            ...planetConfig.visibleTerrains,
+                            ocean: !!checked,
+                          },
+                        })
+                      }
+                    />
+                    <Label htmlFor="show-ocean" className="text-xs cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: planetConfig.colors.ocean }}
+                        ></div>
+                        <span>Ocean</span>
+                      </div>
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-beach"
+                      checked={planetConfig.visibleTerrains.beach}
+                      onCheckedChange={(checked) =>
+                        onChange({
+                          visibleTerrains: {
+                            ...planetConfig.visibleTerrains,
+                            beach: !!checked,
+                          },
+                        })
+                      }
+                    />
+                    <Label htmlFor="show-beach" className="text-xs cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: planetConfig.colors.beach }}
+                        ></div>
+                        <span>Beach</span>
+                      </div>
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-lowland"
+                      checked={planetConfig.visibleTerrains.lowland}
+                      onCheckedChange={(checked) =>
+                        onChange({
+                          visibleTerrains: {
+                            ...planetConfig.visibleTerrains,
+                            lowland: !!checked,
+                          },
+                        })
+                      }
+                    />
+                    <Label htmlFor="show-lowland" className="text-xs cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: planetConfig.colors.lowland }}
+                        ></div>
+                        <span>Lowland</span>
+                      </div>
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-midland"
+                      checked={planetConfig.visibleTerrains.midland}
+                      onCheckedChange={(checked) =>
+                        onChange({
+                          visibleTerrains: {
+                            ...planetConfig.visibleTerrains,
+                            midland: !!checked,
+                          },
+                        })
+                      }
+                    />
+                    <Label htmlFor="show-midland" className="text-xs cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: planetConfig.colors.midland }}
+                        ></div>
+                        <span>Midland</span>
+                      </div>
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-highland"
+                      checked={planetConfig.visibleTerrains.highland}
+                      onCheckedChange={(checked) =>
+                        onChange({
+                          visibleTerrains: {
+                            ...planetConfig.visibleTerrains,
+                            highland: !!checked,
+                          },
+                        })
+                      }
+                    />
+                    <Label htmlFor="show-highland" className="text-xs cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: planetConfig.colors.highland }}
+                        ></div>
+                        <span>Highland</span>
+                      </div>
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-mountain"
+                      checked={planetConfig.visibleTerrains.mountain}
+                      onCheckedChange={(checked) =>
+                        onChange({
+                          visibleTerrains: {
+                            ...planetConfig.visibleTerrains,
+                            mountain: !!checked,
+                          },
+                        })
+                      }
+                    />
+                    <Label htmlFor="show-mountain" className="text-xs cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: planetConfig.colors.mountain }}
+                        ></div>
+                        <span>Mountain</span>
+                      </div>
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-snow"
+                      checked={planetConfig.visibleTerrains.snow}
+                      onCheckedChange={(checked) =>
+                        onChange({
+                          visibleTerrains: {
+                            ...planetConfig.visibleTerrains,
+                            snow: !!checked,
+                          },
+                        })
+                      }
+                    />
+                    <Label htmlFor="show-snow" className="text-xs cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: planetConfig.colors.snow }}
+                        ></div>
+                        <span>Snow</span>
+                      </div>
+                    </Label>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </TabsContent>
 
-        <TabsContent value="biome">
-          <BiomeTab
-            planetStats={planetStats}
-            setPlanetStats={setPlanetStats}
-            selectedBiome={selectedBiome}
-            setSelectedBiome={setSelectedBiome}
-            customColors={customColors}
-            setCustomColors={setCustomColors}
-          />
-        </TabsContent>
+        <TabsContent value="colors" className="space-y-6">
+          <div className="bg-slate-800 p-4 rounded-md space-y-4 border border-slate-700">
+            <h3 className="text-sm font-medium text-slate-200">Planet Colors</h3>
 
-        <TabsContent value="landmarks">
-          <LandmarksTab planetStats={planetStats} setPlanetStats={setPlanetStats} />
+            <div className="grid grid-cols-2 gap-4">
+              <ColorPicker
+                label="Atmosphere"
+                color={planetConfig.colors.atmosphere}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, atmosphere: color } })}
+              />
+
+              <ColorPicker
+                label={`${liquidType.name}`}
+                color={planetConfig.colors.ocean}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, ocean: color } })}
+              />
+
+              <ColorPicker
+                label={`${liquidType.name} Pattern`}
+                color={planetConfig.colors.oceanPattern}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, oceanPattern: color } })}
+              />
+
+              <ColorPicker
+                label="Beach"
+                color={planetConfig.colors.beach}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, beach: color } })}
+              />
+
+              <ColorPicker
+                label="Lowland"
+                color={planetConfig.colors.lowland}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, lowland: color } })}
+              />
+
+              <ColorPicker
+                label="Midland"
+                color={planetConfig.colors.midland}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, midland: color } })}
+              />
+
+              <ColorPicker
+                label="Highland"
+                color={planetConfig.colors.highland}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, highland: color } })}
+              />
+
+              <ColorPicker
+                label="Mountain"
+                color={planetConfig.colors.mountain}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, mountain: color } })}
+              />
+
+              <ColorPicker
+                label="Snow"
+                color={planetConfig.colors.snow}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, snow: color } })}
+              />
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 };

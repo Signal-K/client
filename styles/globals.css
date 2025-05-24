@@ -226,3 +226,8 @@ body {
   bottom: 10%;
   left: 10%;
 }
+
+.writing-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}

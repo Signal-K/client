@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import type { Station } from "@/types/station";
 import { BiomePattern } from "./BiomePattern";
 import {
-  Anchor,
+  Anchor, 
   Trees,
   Snowflake,
   Sun,

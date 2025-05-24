@@ -8,7 +8,7 @@ import SatellitePlanetFourAggregator from "@/components/Structures/Missions/Astr
 import AI4MAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AI4MAggregator";
 import { AggregatedCloud, AggregatedBalloon, AggregatedAI4M, AggregatedP4 } from "../[id]/page";
 // import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
-import { calculatePlanetStats, calculateTerrainHeight } from "@/utils/planet-physics";
+// import { calculatePlanetStats, calculateTerrainHeight } from "@/utils/planet-physics";
 import MarsCloudsShapesAggregator from "@/components/Structures/Missions/Meteorologists/Cloudspotting/Shapes/ShapesAggregator";
 
 export default function MarsClassifications() {
@@ -160,34 +160,34 @@ export default function MarsClassifications() {
   const [atmosphereVisibility, setAtmosphereVisibility] = useState(1);
   const [atmosphereHeight, setAtmosphereHeight] = useState(1);  
   
-  const stats = calculatePlanetStats(
-    mass,
-    radius,
-    temperature,
-    orbitalPeriod,
-    typeOverride,
-    atmosphereStrength,
-    cloudCount,
-    waterHeight,
-    surfaceRoughness,
-    undefined,
-    biomeFactor,
-    cloudContribution,
-    terrainVariation,
-    terrainErosion,
-    plateTectonics,
-    biomassLevel,
-    waterLevel,
-    salinity,
-    subsurfaceWater,
-    atmosphericDensity,
-    weatherVariability,
-    stormFrequency,
-    volcanicActivity,
-    biome,
-  );  
+  // const stats = calculatePlanetStats(
+  //   mass,
+  //   radius,
+  //   temperature,
+  //   orbitalPeriod,
+  //   typeOverride,
+  //   atmosphereStrength,
+  //   cloudCount,
+  //   waterHeight,
+  //   surfaceRoughness,
+  //   undefined,
+  //   biomeFactor,
+  //   cloudContribution,
+  //   terrainVariation,
+  //   terrainErosion,
+  //   plateTectonics,
+  //   biomassLevel,
+  //   waterLevel,
+  //   salinity,
+  //   subsurfaceWater,
+  //   atmosphericDensity,
+  //   weatherVariability,
+  //   stormFrequency,
+  //   volcanicActivity,
+  //   biome,
+  // );  
 
-  const terrainHeight = calculateTerrainHeight(stats);
+  // const terrainHeight = calculateTerrainHeight(stats);
 
   return (
     <div className="p-6 bg-black text-white border rounded-md opacity-80 shadow-md relative">

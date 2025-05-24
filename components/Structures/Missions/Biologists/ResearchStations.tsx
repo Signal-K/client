@@ -35,7 +35,7 @@ const initialStations: Station[] = [
   {
     id: "3104002",
     name: "Ocean Observatory",
-    icon: "Waves",
+    icon: "Waves", 
     biome: {
       name: "Ocean",
       color: "rgb(22, 163, 255)",

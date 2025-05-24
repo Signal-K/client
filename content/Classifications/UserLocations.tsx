@@ -34,9 +34,11 @@ interface Classification {
 export default function MySettlementsLocations() {
   const supabase = useSupabaseClient();
   const session = useSession();
+
   const router = useRouter();
 
   const [myLocations, setMyLocations] = useState<Classification[] | null>(null);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [showAllUsers, setShowAllUsers] = useState<boolean>(false);
@@ -95,8 +97,8 @@ export default function MySettlementsLocations() {
       console.error(err);
     } finally {
       setLoading(false);
-    }
-  }
+    };
+  };
 
   useEffect(() => {
     fetchUserLocationClassifications();

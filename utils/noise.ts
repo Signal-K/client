@@ -106,5 +106,5 @@ Math.seedrandom = (seed: string) => {
   return () => {
     state = (state * 1664525 + 1013904223) & 0xffffffff
     return state / 0xffffffff
-  };
+  }
 };

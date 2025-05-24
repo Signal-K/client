@@ -2,6 +2,26 @@ import { Telescope } from "lucide-react";
 import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
+        {
+        weekStart: '2025-05-25',
+        data: [
+            {
+                name: 'Propose 5 planet candidates',
+                structure: "Telescope",
+                // group: 'Meteorology',
+                group: 'Astronomy',
+                icon: "Telescope",
+                extendedDescription: '',
+                xp: 5,
+                completionInfo: '',
+                rewardInfo: '',
+                table: "classifications",
+                field: "classificationtype",
+                value: "planet",
+                requiredCount: 5,
+            },
+        ],
+    },
     {
         weekStart: '2025-05-18',
         data: [

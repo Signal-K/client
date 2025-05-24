@@ -110,9 +110,9 @@ export function StarterLidar({ anomalyid }: SelectedAnomProps) {
         checkTutorialMission();
       }, [session, supabase]);
     
-    if (!hasMission3000010) {
-    return <CloudspottingOnMarsTutorial anomalyId={anomaly?.id.toString() || "8423850802"} />;
-    };
+    // if (!hasMission3000010) {
+    // return <CloudspottingOnMarsTutorial anomalyId={anomaly?.id.toString() || "8423850802"} />;
+    // };
 
     if (loading) {
         return (
@@ -140,7 +140,7 @@ export function StarterLidar({ anomalyid }: SelectedAnomProps) {
                         anomalyId={anomaly.id.toString()}
                         anomalyType="cloud"
                         missionNumber={100000034}
-                        assetMentioned={imageUrl}
+                        assetMentioned={imageUrl} 
                         structureItemId={3105}
                         parentPlanetLocation={anomalyid?.toString() || ''}
                         annotationType="CoM"

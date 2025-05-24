@@ -3,23 +3,21 @@
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 import LoginPage from "./auth/LoginModal";
+import { useRouter} from "next/navigation";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { subscribeUser, unsubscribeUser, sendNotification } from './actions'
-import {
-  EarthView,
-} from './scenes';
-import { EarthScene } from "./scenes/earth/scene";
 import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 // import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import Onboarding from "./scenes/onboarding/page";
-import VerticalToolbar from "@/components/Layout/Toolbar";
 import SimpleeMissionGuide from "./tests/singleMissionGuide";
-import Navbar from "@/components/Layout/Navbar";
 import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatellites";
 import LandingSS from "./auth/landing";
 import GameNavbar from "@/components/Layout/Tes";
+import BiomassOnEarth from "@/components/Data/BiomassEarth";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -243,20 +241,19 @@ function InstallPrompt() {
       )}
     </div>
   );
-}
+};
 
 export default function Home() {
   const session = useSession();
   const supabase = useSupabaseClient();
-  
   const { activePlanet } = useActivePlanet();
+  const router = useRouter();
 
   const [hasRequiredItems, setHasRequiredItems] = useState<boolean | null>(null);
   const [userClassifications, setUserClassifications] = useState<boolean | null>(false);
-  
   const [planetData, setPlanetData] = useState<any | null>(null);
-  const [zoodexCount, setZoodexCount] = useState<number | null>(null);
-  const biomass = zoodexCount !== null ? 0.831 * 0.001 * zoodexCount : null;
+
+  const [showDeployModal, setShowDeployModal] = useState(false);
 
   useEffect(() => {
     if (!session) return;
@@ -286,15 +283,43 @@ export default function Home() {
           .select("*")
           .eq("author", session.user.id);
 
-        if (error) setUserClassifications(false);
-        if (data) setUserClassifications(true);
+        if (error) {
+          setUserClassifications(false);
+        } else {
+          setUserClassifications(data && data.length > 0);
+        }
       } catch (error: any) {
         console.error(error);
-      };
+      }
+    };
+
+    const checkLinkedAnomaliesLastWeek = async () => {
+      const now = new Date();
+      const oneWeekAgo = new Date(now);
+      oneWeekAgo.setDate(now.getDate() - 7);
+      const fromDate = oneWeekAgo.toISOString();
+      const toDate = now.toISOString();
+
+      const { data, error } = await supabase
+        .from("linked_anomalies")
+        .select("id")
+        .eq("author", session.user.id)
+        .gte("date", fromDate)
+        .lte("date", toDate);
+
+      if (error) {
+        console.error("Error checking linked anomalies:", error);
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        setShowDeployModal(true);
+      }
     };
 
     checkClassifications();
     checkInventory();
+    checkLinkedAnomaliesLastWeek();
   }, [session, supabase]);
 
   useEffect(() => {
@@ -314,47 +339,51 @@ export default function Home() {
         }
       } catch (error: any) {
         console.error("Error fetching planet data: ", error);
-      };
-    };
+      }
+    }
 
     fetchPlanetData();
   }, [activePlanet, supabase]);
 
-  useEffect(() => {
-    const fetchZoodexCount = async () => {
-      try {
-        const { count, error } = await supabase
-          .from("classifications")
-          .select("id", { count: "exact" })
-          .like("classificationtype", "%zoodex%");
-
-        if (error) throw error;
-        setZoodexCount(count);
-      } catch (err: any) {
-        console.error("Error fetching Zoodex classifications:", err.message);
-        setZoodexCount(0);
-      }
-    };
-
-    fetchZoodexCount();
-  }, [supabase]);
-
   if (!session) {
     return <LandingSS />;
-  };
+  }
 
   if (hasRequiredItems === null) {
     return <div>Loading...</div>;
-  };
+  }
 
   if (!hasRequiredItems) {
     return <Onboarding />;
-  };
+  }
+
+  function handleDeployConfirm() {
+    setShowDeployModal(false);
+    router.push("/deploy");
+  }
+
+  async function handleDeployCancel() {
+    setShowDeployModal(false);
+    try {
+      const { error } = await supabase.from("linked_anomalies").insert([
+        {
+          author: session?.user.id,
+          anomaly_id: 1,
+          automaton: "Empty/Cancel"
+        },
+      ]);
+
+      if (error) {
+        console.error("Error inserting linked anomaly:", error.message);
+      }
+    } catch (error: any) {
+      console.error("Unexpected error inserting linked anomaly:", error.message);
+    }
+  }
 
   return (
     <EarthViewLayout>
       <div className="w-full">
-        {/* <Navbar /> */}
         <GameNavbar />
         <div className="flex flex-row space-y-4"></div>
         <div className="py-3">
@@ -363,13 +392,40 @@ export default function Home() {
             <p className="text-blue-200">{planetData?.temperatureEq} K</p>
             <p className="text-[#2C4F65]">Humidity:</p>
             <p className="text-blue-200">{planetData?.humidity} K</p>
-            {planetData?.id === 30 && (
-              <>
-                <p className="text-[#2C4F65]">Biomass:</p>
-                <p className="text-blue-200">{biomass !== null ? biomass.toFixed(6) : "Loading..."}</p>
-              </>
-            )}
+            {planetData?.id === 30 && <BiomassOnEarth />}
           </div>
+          {showDeployModal && (
+            <Dialog open={showDeployModal} onOpenChange={setShowDeployModal}>
+              <DialogContent
+                style={{
+                  background: "linear-gradient(135deg, rgba(191, 223, 245, 0.9), rgba(158, 208, 218, 0.85)",
+                  color: "#2E3440",
+                }}
+              >
+                <DialogHeader>
+                  <DialogTitle className="text-nord-aurora-5">No Anomaly Records Last Week</DialogTitle>
+                  <DialogDescription className="text-nord-frost-4">
+                    You have no anomaly records from the previous week. Would you like to deploy your automatons to gather more data?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="flex justify-end space-x-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleDeployCancel}
+                    className="text-nord-frost-3 border-nord-frost-3 hover:bg-nord-frost-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleDeployConfirm}
+                    className="bg-nord-aurora-6 hover:bg-nord-aurora-5 text-white"
+                  >
+                    Deploy Automatons
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
           <center>
             <OrbitalStructuresOnPlanet />
           </center>
@@ -378,7 +434,6 @@ export default function Home() {
       <div className="w-full">
         <div className="py-2">
           <center>
-            {/* <InstallPrompt /> */}
             <PushNotificationManager />
             <AllSatellitesOnActivePlanet />
             <AtmosphereStructuresOnPlanet />
@@ -392,7 +447,9 @@ export default function Home() {
         </center>
       </div>
       {!userClassifications && (
-        <div className="w-full py-2"><SimpleeMissionGuide /></div>
+        <div className="w-full py-2">
+          <SimpleeMissionGuide />
+        </div>
       )}
     </EarthViewLayout>
   );

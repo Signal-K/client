@@ -44,7 +44,8 @@ const JovianVortexHunters = () => {
             icon: CloudCogIcon,
             points: 2,
             completedCount: 0,
-            internalComponent: () => <LidarJVHSatellite anomalyid={4} />, // <JVHWrapper />
+            // internalComponent: () => <LidarJVHSatellite anomalyid={4} />, // <JVHWrapper />
+            internalComponent: () => <JVHWrapper />,
             color: "text-blue-500",
         },
         {
