@@ -27,7 +27,9 @@ export default function TelescopeRangeSlider() {
     const [range, setRange] = useState([50]);
     const [dropRates, setDropRates] = useState<Record<string, number>>({});
     const [fetchedAnomalies, setFetchedAnomalies] = useState<any[]>([]);
+    const [alreadyDeployed, setAlreadyDeployed] = useState<boolean>(false);
 
+    // Calculate weighted anomaly drop rates whenever the slider changes
     useEffect(() => {
         const position = range[0];
         const nearWeight = 100 - position;
@@ -55,13 +57,13 @@ export default function TelescopeRangeSlider() {
                 icon: <Planet className="h-5 w-5 text-primary" />,
                 colorClass: 'bg-primary',
             },
-                 // Uncomment if enabled
-        // {
-        //     key: 'newStars',
-        //     label: 'New Stars',
-        //     icon: <Star className="h-5 w-5 text-accent" />,
-        //     colorClass: 'bg-accent',
-        // },
+            // Uncomment if enabled
+            // {
+            //     key: 'newStars',
+            //     label: 'New Stars',
+            //     icon: <Star className="h-5 w-5 text-accent" />,
+            //     colorClass: 'bg-accent',
+            // },
         ];
 
         const newDropRates: Record<string, number> = {};
@@ -78,6 +80,31 @@ export default function TelescopeRangeSlider() {
 
         setDropRates(newDropRates);
     }, [range]);
+
+    // Check on mount if telescope was already deployed this week
+    useEffect(() => {
+        const checkDeployment = async () => {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+            const { data: recentDeployments, error } = await supabase
+                .from("linked_anomalies")
+                .select("*")
+                .eq("automaton", "Telescope")
+                .gte("date", oneWeekAgo.toISOString());
+
+            if (error) {
+                console.error("Error checking telescope deployment:", error);
+                return;
+            }
+
+            if (recentDeployments && recentDeployments.length > 0) {
+                setAlreadyDeployed(true);
+            }
+        };
+
+        checkDeployment();
+    }, [supabase]);
 
     const activeDropTypes = [
         {
@@ -112,29 +139,27 @@ export default function TelescopeRangeSlider() {
         exoplanets: "telescope-tess",
     };
 
-    const [canDeploy, setCanDeploy] = useState<boolean>(true);
-
     const handleDeploy = async () => {
-        // Check if user has already deployed 4 or more anomalies in the last 7 days
+        // This code block should never run if alreadyDeployed is true,
+        // but is retained for logic completeness.
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-        const { data: recentDeployments, error: fetchError } = await supabase
+        const { data: userDeployments, error: userFetchError } = await supabase
             .from("linked_anomalies")
             .select("*")
             .eq("author", session?.user?.id)
             .eq("automaton", "Telescope")
             .gte("date", oneWeekAgo.toISOString());
 
-        if (fetchError) {
-            console.error("Error fetching linked anomalies:", fetchError);
+        if (userFetchError) {
+            console.error("Error fetching linked anomalies:", userFetchError);
             return;
-        };
+        }
 
-        if (recentDeployments && recentDeployments.length >= 4) {
-            alert("Telescope deployment limit reached for the week. Please try again later.");
+        if (userDeployments && userDeployments.length >= 4) {
             return;
-        };
+        }
 
         const totalAnomalies = 4;
         const weightedAnomalies: string[] = [];
@@ -165,7 +190,7 @@ export default function TelescopeRangeSlider() {
             const { data, error } = await supabase
                 .from("anomalies")
                 .select("*")
-                .eq("anomalySet", anomalySet)
+                .eq("anomalySet", anomalySet);
 
             if (error) {
                 console.error(`Error fetching anomaly of type ${anomalyKey}:`, error);
@@ -199,6 +224,18 @@ export default function TelescopeRangeSlider() {
         setFetchedAnomalies(anomalies);
     };
 
+    // If already deployed this week, show only a message
+    if (alreadyDeployed) {
+        return (
+            <div className="container mx-auto py-8 px-4 max-w-2xl text-center text-sm text-muted-foreground">
+                <p className="bg-muted border border-border p-6 rounded-lg shadow-sm">
+                    The Telescope has already been deployed this week. You’ll be able to recalibrate and search again next week.
+                </p>
+            </div>
+        );
+    }
+
+    // Main UI if not yet deployed
     return (
         <div className="container mx-auto py-2 pb-8 px-4 max-w-2xl">
             <Card className="text-sm">
@@ -208,7 +245,7 @@ export default function TelescopeRangeSlider() {
                         Telescope Range Calibration
                     </CardTitle>
                     <CardDescription>
-                        Adjust the slider to determine how far your telescope will look into space (for this week)
+                        Adjust the slider to determine how far your telescope will look into space (for this week). This will determine the anomalies that are visible to your structures
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -244,20 +281,6 @@ export default function TelescopeRangeSlider() {
                                                 : "Deep Space"}
                                     </span>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-3">
-                            <div className="space-y-2 grid grid-cols-1">
-                                {activeDropTypes.map((item) => (
-                                    <DropRateItem
-                                        key={item.key}
-                                        icon={item.icon}
-                                        label={item.label}
-                                        rate={dropRates[item.key] || 0}
-                                        colorClass={item.colorClass}
-                                    />
-                                ))}
                             </div>
                         </div>
 

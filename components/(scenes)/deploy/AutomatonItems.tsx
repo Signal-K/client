@@ -322,7 +322,7 @@ export default function AutomatonDeploySection() {
       .from("linked_anomalies")
       .insert(entriesToInsert);
 
-    if (insertError) {
+    if (insertError) { 
       console.error("Error inserting into linked_anomalies:", insertError);
       alert("Deployment failed. Please try again.");
     } else {
