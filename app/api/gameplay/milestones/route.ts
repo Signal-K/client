@@ -8,7 +8,6 @@ const milestones = [
             {
                 name: 'Propose 5 planet candidates',
                 structure: "Telescope",
-                // group: 'Meteorology',
                 group: 'Astronomy',
                 icon: "Telescope",
                 extendedDescription: '',

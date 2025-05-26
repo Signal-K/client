@@ -16,7 +16,7 @@ export function MissionsPopover() {
 
     const formatWeekDisplay = (index: number) => {
         if (index === 0) return "Current Week";
-        if (index === 1) return "Last Week";
+        if (index === 1) return "Last Week"; 
         return `${index} Weeks Ago`;
     };    
 
@@ -71,7 +71,7 @@ export function MissionsPopover() {
 
                 if (session.user?.id) {
                     query = query.eq("author", session.user.id);
-                }
+                };
 
                 const { data: rows, count, error } = await query;
 
@@ -85,8 +85,8 @@ export function MissionsPopover() {
 
                 if (!error && count !== null) {
                     progress[milestone.name] = count;
-                }
-            }
+                };
+            };
 
             setUserProgress(progress);
         };
