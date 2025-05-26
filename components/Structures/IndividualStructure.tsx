@@ -103,7 +103,7 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
       <div className="relative transition-all duration-500 ease-in-out">
         {!activeComponent && (
           <DialogContent
-            className="p-6 rounded-3xl text-white max-w-3xl mx-auto"
+            className="rounded-3xl text-white w-full max-w-screen-md lg:max-w-[1000px] h-[80vh] overflow-y-auto p-8 shadow-xl"
             style={{ background: 'linear-gradient(135deg, rgba(44, 79, 100, 0.7), rgba(95, 203, 195, 0.7))' }}
           >
             <div className="flex justify-between items-center">

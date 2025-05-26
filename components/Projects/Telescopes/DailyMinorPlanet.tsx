@@ -268,7 +268,7 @@ export function DailyMinorPlanetWithId({ anomalyid }: DailyMinorPlanetProps) {
 
 
 export function DailyMinorPlanet() {
-    const supabase = useSupabaseClient();
+    const supabase = useSupabaseClient(); 
     const session = useSession();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);

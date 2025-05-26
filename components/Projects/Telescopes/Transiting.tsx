@@ -146,13 +146,13 @@ export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
     }
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+        <div className="w-full flex flex-col items-center gap-4 pb-4 relative overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="mt-6 w-full flex justify-center">
                 <Button variant="outline" onClick={() => setShowTutorial(true)}>
                     Want a walkthrough? Start the tutorial
                 </Button>
             </div>
-            <div className="p-4 rounded-md relative w-full">
+            <div className="p-4 w-full rounded-md relative max-w-4xl mx-auto">
                 {selectedAnomaly && (
                     <ImageAnnotator
                         anomalyType='planet'

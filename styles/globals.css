@@ -4,40 +4,40 @@
 
 :root {
   /* Background & Foreground Colors */
-  --background: #ECEFF4; /* Nord Polar Night light */
-  --foreground: #2E3440; /* Nord Night text */
-  
+  --background: 220 16% 96%; /* Nord Polar Night light */
+  --foreground: 220 16% 22%; /* Nord Night text */
+
   /* Card & Popover */
-  --card: #E5E9F0; /* Nord Snow Storm variant */
-  --card-foreground: #2E3440; /* Nord Night text */
-  --popover: #E5E9F0; /* Nord Snow Storm variant */
-  --popover-foreground: #2E3440; /* Nord Night text */
-  
+  --card: 218 27% 92%; /* Nord Snow Storm variant */
+  --card-foreground: 220 16% 22%; /* Nord Night text */
+  --popover: 218 27% 92%; /* Nord Snow Storm variant */
+  --popover-foreground: 220 16% 22%; /* Nord Night text */
+
   /* Primary Colors */
-  --primary: #B48EAD; /* Novadust cosmic lavender */
-  --primary-foreground: #ECEFF4; /* Light-on-dark */
-  
+  --primary: 311 20% 63%; /* Novadust cosmic lavender */
+  --primary-foreground: 220 16% 96%; /* Light-on-dark */
+
   /* Secondary Colors */
-  --secondary: #4C566A; /* Nord Frost shade */
-  --secondary-foreground: #ECEFF4; /* Light-on-dark */
-  
+  --secondary: 220 13% 35%; /* Nord Frost shade */
+  --secondary-foreground: 220 16% 96%; /* Light-on-dark */
+
   /* Muted & Accent Colors */
-  --muted: #D8DEE9; /* Subtle border */
-  --muted-foreground: #2E3440; /* Nord Night text */
-  --accent: #B48EAD; /* Novadust cosmic lavender */
-  --accent-foreground: #ECEFF4; /* Light-on-dark */
-  
+  --muted: 218 27% 88%; /* Subtle border */
+  --muted-foreground: 220 16% 22%; /* Nord Night text */
+  --accent: 311 20% 63%; /* Novadust cosmic lavender */
+  --accent-foreground: 220 16% 96%; /* Light-on-dark */
+
   /* Destructive Colors */
-  --destructive: #BF616A; /* Red */
-  --destructive-foreground: #ECEFF4; /* Light-on-dark */
-  
+  --destructive: 354 42% 56%; /* Red */
+  --destructive-foreground: 220 16% 96%; /* Light-on-dark */
+
   /* Borders & Inputs */
-  --border: #D8DEE9; /* Subtle border */
-  --input: #FFFFFF; /* Neutral base */
-  
+  --border: 218 27% 88%; /* Subtle border */
+  --input: 0 0% 100%; /* Neutral base */
+
   /* Ring (focus state) */
-  --ring: #B48EAD; /* Novadust cosmic lavender */
-  
+  --ring: 311 20% 63%; /* Novadust cosmic lavender */
+
   /* Radius for rounded corners */
   --radius: 0.5rem;
 }
