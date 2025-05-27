@@ -5,9 +5,11 @@ import Link from "next/link"
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
 import { Bell, ChevronDown, HammerIcon, LogOut, Settings, Star, Trophy, User, X, Zap } from "lucide-react"
 import { formatDistanceToNow, startOfDay, addDays } from "date-fns"
-import { Avatar } from "../Account/Avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Avatar } from "../Account/Avatar";
+import { Moon, Sun } from "lucide-react"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import UseDarkMode from "@/hooks/useDarkMode";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,6 +46,8 @@ export default function GameNavbar() {
   const session = useSession();
 
   const router = useRouter();
+
+  const { isDark, toggleDarkMode } = UseDarkMode();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string>("");
@@ -242,6 +246,15 @@ export default function GameNavbar() {
           <TechnologyPopover />
 
           <LocationsDropdown />
+
+          <Button
+            variant="ghost"
+            size="icon"
+           onClick={toggleDarkMode}
+  className="text-white"
+>
+  {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </Button>
 
           {/* Profile Dropdown */}
           <DropdownMenu>

@@ -2,6 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+.dark {
+  --background: 220 16% 12%; /* Nord Polar Night darkest */
+  --foreground: 220 16% 90%; /* Nord Snow Storm light text */
+
+  --card: 220 16% 16%; /* Deep night */
+  --card-foreground: 220 16% 90%;
+
+  --popover: 220 16% 16%;
+  --popover-foreground: 220 16% 90%;
+
+  --primary: 311 20% 70%;
+  --primary-foreground: 220 16% 12%;
+
+  --secondary: 220 13% 45%;
+  --secondary-foreground: 220 16% 96%;
+
+  --muted: 220 16% 20%;
+  --muted-foreground: 220 16% 60%;
+
+  --accent: 311 20% 70%;
+  --accent-foreground: 220 16% 12%;
+
+  --destructive: 354 42% 56%;
+  --destructive-foreground: 220 16% 96%;
+
+  --border: 220 16% 30%;
+  --input: 220 16% 20%;
+
+  --ring: 311 20% 70%;
+}
+
 :root {
   /* Background & Foreground Colors */
   --background: 220 16% 96%; /* Nord Polar Night light */
