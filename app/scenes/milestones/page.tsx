@@ -11,6 +11,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 export default function MilestonesPage() {
     const supabase = useSupabaseClient();
     const session = useSession();
+    
     const router = useRouter();
 
     const [currentWeekIndex, setCurrentWeekIndex] = useState<number>(0);

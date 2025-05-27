@@ -157,9 +157,9 @@ export default function BiologyResearch() {
                             color="#4cc9f0"
                         />
                     </div>
-                    <div className="">
+                    {/* <div className="">
                         <GreenhouseResearchStations />
-                    </div>
+                    </div> */}
                 </div>
             </TechSection>
         </>

@@ -134,9 +134,10 @@ const PlanetHuntersSteps = () => {
         const mission4CompletedCount = (commentsData?.length || 0) + (votesData?.length || 0);
 
         const { data: temperatureData, error: tempError } = await supabase
-          .from("planet_temperatures")
+          .from("comments")
           .select("id")
-          .eq("user_id", session.user.id);
+          .eq("user_id", session.user.id)
+          .eq("category", "Temperature");
         if (tempError) throw tempError;
 
         const mission5CompletedCount = temperatureData?.length || 0;
