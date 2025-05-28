@@ -419,14 +419,14 @@ export default function TestPlanetWrapper() {
 
     const AtmosphereComponent = () => (
         <div className="w-full max-w-4xl bg-black/10 backdrop-blur-sm rounded-xl p-6 text-white mx-auto">
-          {classification?.id !== undefined && (
+          {/* {classification?.id !== undefined && (
             <WeatherEventStatus 
               density={density || 1}
               classificationId={classification.id} 
               biome={dominantBiome || 'RockyHighlands'}
               biomass={biomassScore}
             />
-          )}
+          )} */}
         </div>
     );
 

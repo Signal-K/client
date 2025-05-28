@@ -304,11 +304,11 @@ export const StructuresConfig: StructureConfig = {
           text: "Research",
           dynamicComponent: <DataSourcesModal structureId="3105" structure="LIDAR" />,
         },
-        {
-          icon: <UmbrellaIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Upcoming weather events",
-          dynamicComponent: <WeatherEventsOverview />,
-        }
+        // {
+        //   icon: <UmbrellaIcon className="w-6 h-6 text-[#5e81ac]" />,
+        //   text: "Upcoming weather events",
+        //   dynamicComponent: <WeatherEventsOverview />,
+        // }
         // {
         //   icon: <BookAudioIcon className="w-6 h-6 text-[#5e81ac]" />,
         //   text: "My discoveries", 

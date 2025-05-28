@@ -121,25 +121,25 @@ async function generateAlerts(supabase: any, session: any) {
     .eq("author", userId)
     .in("classificationtype", ["planet", "telescope-minorPlanet"]);
 
-  if ((classifications ?? []).length > 0) {
-    const classificationIds = classifications ? classifications.map((c: { id: any; }) => c.id) : [];
-    const { data: weeklyEvents } = await supabase
-      .from("events")
-      .select("id, classification_location, created_at")
-      .in("classification_location", classificationIds)
-      .gte("created_at", startDate.toISOString())
-      .lte("created_at", endDate.toISOString());
+  // if ((classifications ?? []).length > 0) {
+  //   const classificationIds = classifications ? classifications.map((c: { id: any; }) => c.id) : [];
+  //   const { data: weeklyEvents } = await supabase
+  //     .from("events")
+  //     .select("id, classification_location, created_at")
+  //     .in("classification_location", classificationIds)
+  //     .gte("created_at", startDate.toISOString())
+  //     .lte("created_at", endDate.toISOString());
 
-    const userCreatedEventCount = weeklyEvents?.length ?? 0;
+  //   const userCreatedEventCount = weeklyEvents?.length ?? 0;
 
-    if (userCreatedEventCount === 0) {
-      const hasAvailablePlanetEvent = true;
-      if (hasAvailablePlanetEvent) {
-        milestoneAlerts.push("Your planet awaits a storm event — create one before the week ends.");
-        structureSources.push("WeatherBalloon");
-      }
-    }
-  }
+  //   if (userCreatedEventCount === 0) {
+  //     const hasAvailablePlanetEvent = true;
+  //     if (hasAvailablePlanetEvent) {
+  //       milestoneAlerts.push("Your planet awaits a storm event — create one before the week ends.");
+  //       structureSources.push("WeatherBalloon");
+  //     }
+  //   }
+  // }
 
   if (milestoneAlerts.length === 0) {
     milestoneAlerts.push("You've completed all milestone goals this week!");

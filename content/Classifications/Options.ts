@@ -312,28 +312,28 @@ export const diskDetectorClassificationOptions: ClassificationOption[] = [
     },
 ];
 
-export const penguinWatchClassificationOptions: ClassificationOption[] = [
-    {
-        id: 1,
-        text: "Adult penguin",
-    },
-    {
-        id: 2,
-        text: "Penguin chicks",
-    },
-    {
-        id: 3,
-        text: "Penguin eggs",
-    },
-    {
-        id: 4,
-        text: "Nesting pair with eggs",
-    },
-    {
-        id: 5,
-        text: "No penguins/too blurry"
-    },
-];
+// export const penguinWatchClassificationOptions: ClassificationOption[] = [
+//     {
+//         id: 1,
+//         text: "Adult penguin",
+//     },
+//     {
+//         id: 2,
+//         text: "Penguin chicks",
+//     },
+//     {
+//         id: 3,
+//         text: "Penguin eggs",
+//     },
+//     {
+//         id: 4,
+//         text: "Nesting pair with eggs",
+//     },
+//     {
+//         id: 5,
+//         text: "No penguins/too blurry"
+//     },
+// ];
 
 export const zoodexBurrowingOwlClassificationOptions: ClassificationOption[] = [
     {

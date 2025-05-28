@@ -7,6 +7,7 @@ import MilestoneTotalCompleted from "@/components/Structures/Missions/Milestones
 import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
 import MyLocationIds from "@/content/Classifications/UserLocationPK";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
+import NPSPopup from "@/lib/helper/nps-popup";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 // import { PlanetGenerator } from "starsailors-planet-generator";
@@ -44,6 +45,7 @@ export default function TestPage() {
 
   return (
     <div className="min-h-screen  p-4 space-y-8">
+      <NPSPopup userId={session?.user.id} onClose={() => {}} isOpen={true} />
       {/* <MySettlementsLocations /> */}
       {/* <MilestoneTotalCompleted />
       <TotalPoints />

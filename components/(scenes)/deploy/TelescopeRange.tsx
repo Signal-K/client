@@ -91,6 +91,7 @@ export default function TelescopeRangeSlider() {
                 .from("linked_anomalies")
                 .select("*")
                 .eq("automaton", "Telescope")
+                .eq("author", session?.user.id)
                 .gte("date", oneWeekAgo.toISOString());
 
             if (error) {
