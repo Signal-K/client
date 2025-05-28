@@ -262,6 +262,7 @@ export default function Home() {
   const [hasCheckedNps, setHasCheckedNps] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log(hasCheckedNps);
     if (!session || hasCheckedNps) return;
 
     const timer = setTimeout(async () => {
@@ -274,8 +275,10 @@ export default function Home() {
 
         if (!error && Array.isArray(data) && data.length === 0) {
           setShowNpsModal(true);
+          console.log(showNpsModal)
         }
         setHasCheckedNps(true);
+        console.log(hasCheckedNps)
       } catch (err: any) {
         console.error("Error checking NPS Survey Status: ", err);
       };
@@ -424,7 +427,11 @@ export default function Home() {
             {planetData?.id === 30 && <BiomassOnEarth />}
           </div>
           {showNpsModal && (
-            <NPSPopup userId={session.user.id} isOpen={true} onClose={() => {}} />
+            <NPSPopup
+              userId={session.user.id}
+              isOpen={true}
+              onClose={() => setShowNpsModal(false)}
+            />
           )}
           {showDeployModal && (
             <Dialog open={showDeployModal} onOpenChange={setShowDeployModal}>

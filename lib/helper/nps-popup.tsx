@@ -44,6 +44,9 @@ export default function NPSPopup({ isOpen, onClose, userId }: NPSPopupProps) {
     }
 
     setIsSubmitted(true);
+    setTimeout(() => {
+        onClose();
+    }, 2300);
   };
 
   const getScoreLabel = (score: number) => {
