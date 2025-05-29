@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
-import { Anomaly } from "../Zoodex/ClassifyOthersAnimals";
+import { Anomaly } from "@/app/planets/[id]/page";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 

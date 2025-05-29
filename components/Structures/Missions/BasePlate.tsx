@@ -220,9 +220,9 @@ const MissionShell = ({
             </div>
             <div className="flex-1 overflow-y-auto max-h-[calc(100vh-150px)]">
               {selectedMission.internalComponent && (
-                <div className="overflow-x-auto w-full">{/* Add this wrapper */}
+                // <div className="overflow-x-auto w-full">{/* Add this wrapper */}
                   <selectedMission.internalComponent />
-                </div>
+                // </div>
               )}
             </div>
           </motion.div>

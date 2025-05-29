@@ -5,9 +5,11 @@ import Link from "next/link"
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
 import { Bell, ChevronDown, HammerIcon, LogOut, Settings, Star, Trophy, User, X, Zap } from "lucide-react"
 import { formatDistanceToNow, startOfDay, addDays } from "date-fns"
-import { Avatar } from "../Account/Avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Avatar } from "../Account/Avatar";
+import { Moon, Sun } from "lucide-react"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import UseDarkMode from "@/hooks/useDarkMode";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +31,7 @@ import { LocationsDropdown } from "./Navigation/LocationsDropdown"
 import TechnologyPopover, { TechnologySection } from "./Navigation/TechTreeDropdown"
 import { Alert } from "antd"
 import AlertBar from "./Navigation/AlertBar"
+import { useRouter } from "next/navigation"
 
 // Sample data - replace with actual data in your implementation
 const techTree = [
@@ -39,8 +42,12 @@ const techTree = [
 ];
 
 export default function GameNavbar() {
-  const supabase = useSupabaseClient()
-  const session = useSession()
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const router = useRouter();
+
+  const { isDark, toggleDarkMode } = UseDarkMode();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string>("");
@@ -240,6 +247,15 @@ export default function GameNavbar() {
 
           <LocationsDropdown />
 
+          <Button
+            variant="ghost"
+            size="icon"
+           onClick={toggleDarkMode}
+  className="text-white"
+>
+  {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </Button>
+
           {/* Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -323,7 +339,7 @@ export default function GameNavbar() {
               Weekly Milestones
             </h3>
             {milestones.length > 0 &&
-              milestones[currentWeekIndex]?.data.slice(0, 2).map((milestone: any, index: number) => (
+              milestones[currentWeekIndex]?.data.slice(0, 3).map((milestone: any, index: number) => (
                 <div key={index} className="bg-[#1e293b] rounded-lg p-3 border border-[#581c87]">
                   <div className="flex justify-between items-center">
                     <p className="text-white truncate">{milestone.name}</p>
@@ -333,7 +349,7 @@ export default function GameNavbar() {
                   </div>
                 </div>
               ))}
-            <Button variant="link" className="text-[#67e8f9] p-0 h-auto">
+            <Button variant="link" className="text-[#67e8f9] p-0 h-auto" onClick={() => router.push('/scenes/milestones')}>
               View All Milestones
             </Button>
           </div>

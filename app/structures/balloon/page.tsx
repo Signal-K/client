@@ -38,11 +38,11 @@ export default function WeatherBalloonOnEarthPage() {
       text: "Research",
       dynamicComponent: <DataSourcesModal structureId="3105" structure="LIDAR" />,
     },
-    {
-      icon: <UmbrellaIcon className="w-6 h-6 text-[#A3BE8C]" />,
-      text: "Upcoming weather events",
-      dynamicComponent: <WeatherEventsOverview />,
-    },
+    // {
+    //   icon: <UmbrellaIcon className="w-6 h-6 text-[#A3BE8C]" />,
+    //   text: "Upcoming weather events",
+    //   dynamicComponent: <WeatherEventsOverview />,
+    // },
   ];
 
   const buttons = [

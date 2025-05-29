@@ -35,6 +35,7 @@ interface WeekMilestones {
 
 const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
   const { onPointsUpdate, type } = props;
+
   const supabase = useSupabaseClient();
   const session = useSession();
 
@@ -52,6 +53,7 @@ const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
   const userId = session?.user?.id;
 
   useImperativeHandle(ref, () => ({
+    refreshPoints: fetchAllPoints,
     planetHuntersPoints,
     dailyMinorPlanetPoints,
     ai4mPoints,
@@ -79,60 +81,6 @@ const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
     bonusMeteorology: 0,
   });  
 
-  const [milestones, setMilestones] = useState<WeekMilestones[]>([]);
-  const [userProgress, setUserProgress] = useState<{
-      [weekKey: string]: { [milestoneName: string]: number };
-    }>({});
-  
-    useEffect(() => {
-      const fetchData = async () => {
-        const res = await fetch("/api/gameplay/milestones");
-        const data = await res.json();
-  
-        const sorted = [...data.playerMilestones].sort(
-          (a: WeekMilestones, b: WeekMilestones) =>
-            new Date(b.weekStart).getTime() - new Date(a.weekStart).getTime()
-        );
-  
-        setMilestones(sorted);
-  
-        if (!session?.user?.id) return;
-  
-        const progressMap: {
-          [weekKey: string]: { [milestoneName: string]: number };
-        } = {};
-  
-        for (const week of sorted) {
-          const startDate = new Date(week.weekStart);
-          const endDate = new Date(startDate);
-          endDate.setDate(startDate.getDate() + 6);
-  
-          const weekKey = week.weekStart;
-          progressMap[weekKey] = {};
-  
-          for (const milestone of week.data) {
-            const { table, field, value } = milestone;
-  
-            const { count } = await supabase
-              .from(table)
-              .select("*", { count: "exact" })
-              .eq(field, value)
-              .eq("author", session.user.id)
-              .gte("created_at", startDate.toISOString())
-              .lte("created_at", endDate.toISOString());
-  
-            progressMap[weekKey][milestone.name] = count || 0;
-          }
-        }
-  
-        setUserProgress(progressMap);
-      };
-  
-      fetchData();
-    }, [session]);
-
-  useEffect(() => {
-    if (!userId) return;
 
     const fetchAllPoints = async () => {
       setLoading(true);
@@ -333,6 +281,61 @@ const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
       setLoading(false);
       if (onPointsUpdate) onPointsUpdate(totalPoints);
     };
+
+  const [milestones, setMilestones] = useState<WeekMilestones[]>([]);
+  const [userProgress, setUserProgress] = useState<{
+      [weekKey: string]: { [milestoneName: string]: number };
+    }>({});
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        const res = await fetch("/api/gameplay/milestones");
+        const data = await res.json();
+  
+        const sorted = [...data.playerMilestones].sort(
+          (a: WeekMilestones, b: WeekMilestones) =>
+            new Date(b.weekStart).getTime() - new Date(a.weekStart).getTime()
+        );
+  
+        setMilestones(sorted);
+  
+        if (!session?.user?.id) return;
+  
+        const progressMap: {
+          [weekKey: string]: { [milestoneName: string]: number };
+        } = {};
+  
+        for (const week of sorted) {
+          const startDate = new Date(week.weekStart);
+          const endDate = new Date(startDate);
+          endDate.setDate(startDate.getDate() + 6);
+  
+          const weekKey = week.weekStart;
+          progressMap[weekKey] = {};
+  
+          for (const milestone of week.data) {
+            const { table, field, value } = milestone;
+  
+            const { count } = await supabase
+              .from(table)
+              .select("*", { count: "exact" })
+              .eq(field, value)
+              .eq("author", session.user.id)
+              .gte("created_at", startDate.toISOString())
+              .lte("created_at", endDate.toISOString());
+  
+            progressMap[weekKey][milestone.name] = count || 0;
+          }
+        }
+  
+        setUserProgress(progressMap);
+      };
+  
+      fetchData();
+    }, [session]);
+
+  useEffect(() => {
+    if (!userId) return;
 
     fetchAllPoints();
   }, [userId, supabase]);

@@ -193,7 +193,7 @@ export default function StructuresOnPlanet({ author }: Props) {
     <IndividualStructure
       key={selectedStructure.name}
       name={selectedStructure.name}
-      title={selectedStructure.title}
+      title={selectedStructure.title} 
       labels={selectedStructure.labels}
       imageSrc={selectedStructure.imageSrc}
       actions={selectedStructure.actions}

@@ -127,20 +127,20 @@ export default function AlertBar() {
         .eq("author", userId)
         .in("classificationtype", ["planet", "telescope-minorPlanet"]);
 
-      if ((classifications ?? []).length > 0) {
-        const classificationIds = classifications ? classifications.map(c => c.id) : [];
-        const { data: weeklyEvents } = await supabase
-          .from("events")
-          .select("id, classification_location, created_at")
-          .in("classification_location", classificationIds)
-          .gte("created_at", startDate.toISOString())
-          .lte("created_at", endDate.toISOString());
+      // if ((classifications ?? []).length > 0) {
+      //   const classificationIds = classifications ? classifications.map(c => c.id) : [];
+      //   const { data: weeklyEvents } = await supabase
+      //     .from("events")
+      //     .select("id, classification_location, created_at")
+      //     .in("classification_location", classificationIds)
+      //     .gte("created_at", startDate.toISOString())
+      //     .lte("created_at", endDate.toISOString());
 
-        if ((weeklyEvents?.length ?? 0) === 0) {
-          milestoneAlerts.push("A weather event is happening this week - check your Weather Balloon");
-          structureSources.push("WeatherBalloon");
-        };
-      };
+      //   if ((weeklyEvents?.length ?? 0) === 0) {
+      //     milestoneAlerts.push("A weather event is happening this week - check your Weather Balloon");
+      //     structureSources.push("WeatherBalloon");
+      //   };
+      // };
 
       if (milestoneAlerts.length === 0) {
         milestoneAlerts.push("You've completed all milestone goals this week!");

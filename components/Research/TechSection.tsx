@@ -7,7 +7,7 @@ interface TechSectionProps {
   color: string;
   glowColor: string;
   children: React.ReactNode;
-};
+}
 
 export const TechSection: React.FC<TechSectionProps> = ({
   title,
@@ -17,10 +17,13 @@ export const TechSection: React.FC<TechSectionProps> = ({
   children,
 }) => (
   <div className="relative z-10 flex justify-center mb-24">
-    <Card className="bg-[#0f2942] border-[#1e3a5f] p-6 w-full max-w-3xl relative overflow-hidden">
+    <Card className="bg-transparent border-[#1e3a5f] p-6 w-full max-w-3xl relative overflow-hidden">
+      {/* Optional glow background – subtle and matches card theme */}
       <div
-        className="absolute inset-0 bg-gradient-to-br to-transparent"
-        style={{ backgroundImage: `linear-gradient(to bottom right, ${color}0D, transparent)` }} // 0D = ~5% opacity
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(to bottom right, ${color}0D, transparent)`,
+        }}
       ></div>
 
       <div className="relative z-10">
@@ -34,10 +37,7 @@ export const TechSection: React.FC<TechSectionProps> = ({
           >
             {icon}
           </div>
-          <h2
-            className="text-2xl font-bold tracking-wider"
-            style={{ color }}
-          >
+          <h2 className="text-2xl font-bold tracking-wider" style={{ color }}>
             {title}
           </h2>
         </div>

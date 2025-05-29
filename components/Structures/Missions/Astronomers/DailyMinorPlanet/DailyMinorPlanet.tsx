@@ -16,7 +16,7 @@ interface Mission {
   points?: number;
   completedCount?: number;
   internalComponent: React.ElementType | (() => JSX.Element);
-  color: string;
+  color: string; 
 };
 
 const DailyMinorPlanetMissions = () => {

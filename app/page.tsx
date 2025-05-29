@@ -18,6 +18,7 @@ import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatelli
 import LandingSS from "./auth/landing";
 import GameNavbar from "@/components/Layout/Tes";
 import BiomassOnEarth from "@/components/Data/BiomassEarth";
+import NPSPopup from "@/lib/helper/nps-popup";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -246,7 +247,9 @@ function InstallPrompt() {
 export default function Home() {
   const session = useSession();
   const supabase = useSupabaseClient();
+
   const { activePlanet } = useActivePlanet();
+
   const router = useRouter();
 
   const [hasRequiredItems, setHasRequiredItems] = useState<boolean | null>(null);
@@ -254,6 +257,35 @@ export default function Home() {
   const [planetData, setPlanetData] = useState<any | null>(null);
 
   const [showDeployModal, setShowDeployModal] = useState(false);
+
+  const [showNpsModal, setShowNpsModal] = useState<boolean>(false);
+  const [hasCheckedNps, setHasCheckedNps] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log(hasCheckedNps);
+    if (!session || hasCheckedNps) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        console.log("NPSSSING")
+        const { data, error } = await supabase
+          .from("nps_surveys")
+          .select("id")
+          .eq("user_id", session.user.id);
+
+        if (!error && Array.isArray(data) && data.length === 0) {
+          setShowNpsModal(true);
+          console.log(showNpsModal)
+        }
+        setHasCheckedNps(true);
+        console.log(hasCheckedNps)
+      } catch (err: any) {
+        console.error("Error checking NPS Survey Status: ", err);
+      };
+    }, 15000);
+
+    return () => clearTimeout(timer);
+  }, [session])
 
   useEffect(() => {
     if (!session) return;
@@ -394,6 +426,13 @@ export default function Home() {
             <p className="text-blue-200">{planetData?.humidity} K</p>
             {planetData?.id === 30 && <BiomassOnEarth />}
           </div>
+          {showNpsModal && (
+            <NPSPopup
+              userId={session.user.id}
+              isOpen={true}
+              onClose={() => setShowNpsModal(false)}
+            />
+          )}
           {showDeployModal && (
             <Dialog open={showDeployModal} onOpenChange={setShowDeployModal}>
               <DialogContent

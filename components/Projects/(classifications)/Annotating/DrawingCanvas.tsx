@@ -69,7 +69,7 @@ export function AnnotationCanvas({
     if (!canvas) return;
   
     const touch = e.touches[0];
-    const { x, y } = getTouchPos(touch as Touch, canvas);
+    const { x, y } = getTouchPos(touch as unknown as Touch, canvas);
   
     setIsDrawing(true);
     const newDrawing: DrawingObject = {
@@ -87,7 +87,7 @@ export function AnnotationCanvas({
     if (!isDrawing || !currentDrawing || !canvasRef.current) return;
   
     const touch = e.touches[0];
-    const { x, y } = getTouchPos(touch as Touch, canvasRef.current);
+    const { x, y } = getTouchPos(touch as unknown as Touch, canvasRef.current);
   
     if (currentTool === 'pen') {
       setCurrentDrawing({
@@ -197,13 +197,17 @@ export function AnnotationCanvas({
   };  
 
   useEffect(() => {
-    if (imageRef.current) {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        canvas.width = CANVAS_WIDTH; 
-        canvas.height = CANVAS_HEIGHT; 
-        renderCanvas();
-      }
+    const canvas = canvasRef.current;
+    const img = imageRef.current;
+
+    if (canvas && img) {
+      // Ensure actual canvas size matches styled size to avoid scaling issues
+      canvas.width = CANVAS_WIDTH;
+      canvas.height = CANVAS_HEIGHT;
+      canvas.style.width = `${CANVAS_WIDTH}px`;
+      canvas.style.height = `${CANVAS_HEIGHT}px`;
+
+      renderCanvas();
     }
   }, [imageRef.current]);
 
@@ -223,7 +227,6 @@ export function AnnotationCanvas({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         className={cn("cursor-crosshair", isDrawing && "cursor-none")}
-        style={{ width: `${CANVAS_WIDTH}px`, height: `${CANVAS_HEIGHT}px` }}
       />
     </div>
   );
