@@ -109,7 +109,7 @@ export default function NPSPopup({ isOpen, onClose, userId }: NPSPopupProps) {
 
               <div className="space-y-3">
                 <Label htmlFor="projects" className="text-sm font-medium">
-                  What projects interest you most or would you like to see?
+                  Why? What would you like to see?
                 </Label>
                 <Textarea
                   id="projects"
