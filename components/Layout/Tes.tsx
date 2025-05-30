@@ -247,14 +247,14 @@ export default function GameNavbar() {
 
           <LocationsDropdown />
 
-          <Button
+          {/* <Button
             variant="ghost"
             size="icon"
            onClick={toggleDarkMode}
   className="text-white"
 >
   {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </Button>
+          </Button> */}
 
           {/* Profile Dropdown */}
           <DropdownMenu>
@@ -287,8 +287,10 @@ export default function GameNavbar() {
               </DropdownMenuGroup>
               <DropdownMenuSeparator className="bg-white/10" />
               <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer text-red-400">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <Button onClick={signOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
