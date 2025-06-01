@@ -257,35 +257,8 @@ export default function Home() {
   const [planetData, setPlanetData] = useState<any | null>(null);
 
   const [showDeployModal, setShowDeployModal] = useState(false);
-
   const [showNpsModal, setShowNpsModal] = useState<boolean>(false);
   const [hasCheckedNps, setHasCheckedNps] = useState<boolean>(false);
-
-  useEffect(() => {
-    console.log(hasCheckedNps);
-    if (!session || hasCheckedNps) return;
-
-    const timer = setTimeout(async () => {
-      try {
-        console.log("NPSSSING")
-        const { data, error } = await supabase
-          .from("nps_surveys")
-          .select("id")
-          .eq("user_id", session.user.id);
-
-        if (!error && Array.isArray(data) && data.length === 0) {
-          setShowNpsModal(true);
-          console.log(showNpsModal)
-        }
-        setHasCheckedNps(true);
-        console.log(hasCheckedNps)
-      } catch (err: any) {
-        console.error("Error checking NPS Survey Status: ", err);
-      };
-    }, 15000);
-
-    return () => clearTimeout(timer);
-  }, [session])
 
   useEffect(() => {
     if (!session) return;
@@ -300,7 +273,6 @@ export default function Home() {
           .gt("quantity", 0);
 
         if (error) throw error;
-
         setHasRequiredItems(data.length > 0);
       } catch (error: any) {
         console.error("Error checking inventory:", error.message);
@@ -312,16 +284,19 @@ export default function Home() {
       try {
         const { data, error } = await supabase
           .from("classifications")
-          .select("*")
+          .select("id")
           .eq("author", session.user.id);
 
-        if (error) {
-          setUserClassifications(false);
-        } else {
-          setUserClassifications(data && data.length > 0);
+        const hasClassified = !error && Array.isArray(data) && data.length > 0;
+        setUserClassifications(hasClassified);
+
+        if (hasClassified) {
+          await checkLinkedAnomaliesLastWeek();
+          scheduleNpsCheck();
         }
       } catch (error: any) {
-        console.error(error);
+        console.error("Error checking classifications:", error);
+        setUserClassifications(false);
       }
     };
 
@@ -349,9 +324,30 @@ export default function Home() {
       }
     };
 
-    checkClassifications();
+    const scheduleNpsCheck = () => {
+      if (hasCheckedNps) return;
+
+      const timer = setTimeout(async () => {
+        try {
+          const { data, error } = await supabase
+            .from("nps_surveys")
+            .select("id")
+            .eq("user_id", session.user.id);
+
+          if (!error && Array.isArray(data) && data.length === 0) {
+            setShowNpsModal(true);
+          }
+          setHasCheckedNps(true);
+        } catch (err: any) {
+          console.error("Error checking NPS Survey Status: ", err);
+        }
+      }, 15000);
+
+      return () => clearTimeout(timer);
+    };
+
     checkInventory();
-    checkLinkedAnomaliesLastWeek();
+    checkClassifications();
   }, [session, supabase]);
 
   useEffect(() => {
@@ -401,7 +397,7 @@ export default function Home() {
         {
           author: session?.user.id,
           anomaly_id: 1,
-          automaton: "Empty/Cancel"
+          automaton: "Empty/Cancel",
         },
       ]);
 
@@ -437,14 +433,18 @@ export default function Home() {
             <Dialog open={showDeployModal} onOpenChange={setShowDeployModal}>
               <DialogContent
                 style={{
-                  background: "linear-gradient(135deg, rgba(191, 223, 245, 0.9), rgba(158, 208, 218, 0.85)",
+                  background:
+                    "linear-gradient(135deg, rgba(191, 223, 245, 0.9), rgba(158, 208, 218, 0.85)",
                   color: "#2E3440",
                 }}
               >
                 <DialogHeader>
-                  <DialogTitle className="text-nord-aurora-5">No Anomaly Records Last Week</DialogTitle>
+                  <DialogTitle className="text-nord-aurora-5">
+                    No Anomaly Records Last Week
+                  </DialogTitle>
                   <DialogDescription className="text-nord-frost-4">
-                    You have no anomaly records from the previous week. Would you like to deploy your automatons to gather more data?
+                    You have no anomaly records from the previous week. Would you
+                    like to deploy your automatons to gather more data?
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="flex justify-end space-x-4">
@@ -473,7 +473,6 @@ export default function Home() {
       <div className="w-full">
         <div className="py-2">
           <center>
-            <PushNotificationManager />
             <AllSatellitesOnActivePlanet />
             <AtmosphereStructuresOnPlanet />
           </center>
