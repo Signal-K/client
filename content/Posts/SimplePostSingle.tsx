@@ -1,11 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import StructuresOnPlanet from '@/components/Structures/Structures';
 import { AvatarGenerator } from '@/components/Account/Avatar';
 import { Button } from '@/components/ui/button';
-import { Share2, ThumbsUpIcon } from 'lucide-react';
-// import PlanetGenerator from '@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator';
+import { Share2, ThumbsUpIcon, MessageCircle } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
 interface SimplePostSingleProps {
@@ -16,7 +13,7 @@ interface SimplePostSingleProps {
   category: string;
   images: string[];
   classificationConfiguration?: any;
-};
+}
 
 export function SimplePostSingle({
   id,
@@ -28,32 +25,24 @@ export function SimplePostSingle({
   classificationConfiguration,
 }: SimplePostSingleProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isSharing, setIsSharing] = useState<boolean>(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const goToNextImage = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    setCurrentIndex((prev) => (prev + 1) % images.length);
   };
 
   const goToPreviousImage = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    );
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
-  // For sharing
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
-  };
+  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
   const handleCopyLink = () => {
     const link = `https://starsailors.space/posts/${id}`;
-    navigator.clipboard.writeText(link).then(() => {
-      alert('Link copied to clipboard!');
-    });
+    navigator.clipboard.writeText(link).then(() => alert('Link copied to clipboard!'));
   };
 
   const openPostInNewTab = () => {
@@ -61,23 +50,15 @@ export function SimplePostSingle({
   };
 
   const handleShare = async () => {
-    if (!shareCardRef.current) {
-      return;
-    };
-
+    if (!shareCardRef.current) return;
     setIsSharing(true);
-
-    const safeTitle = title || 'post';
 
     const images = Array.from(shareCardRef.current.querySelectorAll('img'));
     const imagePromises = images.map((img: HTMLImageElement) =>
       new Promise<void>((resolve, reject) => {
-        if (img.complete) {
-          resolve();
-        } else {
-          img.onload = () => resolve();
-          img.onerror = () => reject(new Error("image failed to load"));
-        };
+        if (img.complete) return resolve();
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error("image failed to load"));
       })
     );
 
@@ -89,53 +70,24 @@ export function SimplePostSingle({
         scrollY: -window.scrollY,
       });
 
-      canvas.toBlob(
-        (blob) => {
-          if (blob) {
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `${safeTitle.toLowerCase().replace(/\s+/g, "-")}-share.png`;
-            link.click();
-          }
-        },
-        "image/png",
-        1.0,
-      );
-    } catch (error: any) {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = `${title.toLowerCase().replace(/\s+/g, "-")}-share.png`;
+          link.click();
+        }
+      }, "image/png");
+    } catch (error) {
       console.error("Error sharing post: ", error);
     } finally {
       setIsSharing(false);
-    };
+    }
   };
 
   return (
-    <div className="flex items-center justify-center" ref={shareCardRef}>
-      <Card className="w-full max-w-lg backdrop-blur-md border border-white/10 shadow-lg rounded-lg relative">
-        <div
-          className="absolute top-2 right-2 z-10"
-          ref={dropdownRef}
-        >
-          <Button
-            onClick={toggleDropdown}
-            className="flex items-center gap-2 justify-center"
-          >
-            <Share2 className="mr-2" /> Share
-          </Button>
-          {dropdownOpen && (
-            <div className="absolute top-10 right-0 bg-white/30 backdrop-blur-md border border-white/10 shadow-lg rounded-lg p-4">
-              <Button onClick={handleCopyLink} className="w-full mb-2">
-                Copy Link
-              </Button>
-              <Button onClick={openPostInNewTab} className="w-full">
-                Open
-              </Button>
-              <Button onClick={handleShare} className="w-full mt-2">
-                Download Post
-              </Button>
-            </div>
-          )}
-        </div>
-
+    <div className="flex items-center justify-center w-full px-4" ref={shareCardRef}>
+      <Card className="w-full max-w-4xl md:w-4/5 backdrop-blur-md bg-white/90 border border-white/10 shadow-2xl rounded-xl relative overflow-hidden">
         <CardHeader>
           <div className="flex items-center space-x-4">
             <AvatarGenerator author={author} />
@@ -145,28 +97,30 @@ export function SimplePostSingle({
             </div>
           </div>
         </CardHeader>
+
         <CardContent>
           <p className="text-sm font-medium text-muted-foreground mb-2">{category}</p>
           <p className="mb-4">{content}</p>
+
           {images.length > 0 && (
-            <div className="relative">
+            <div className="relative mb-4">
               <img
                 src={images[currentIndex]}
                 alt={`Image ${currentIndex + 1}`}
-                className="rounded-lg w-full"
+                className="rounded-lg w-full max-h-[500px] object-cover"
               />
 
               {images.length > 1 && (
                 <>
                   <button
                     onClick={goToPreviousImage}
-                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2 focus:outline-none"
+                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black/60 text-white rounded-full p-2"
                   >
                     &#8592;
                   </button>
                   <button
                     onClick={goToNextImage}
-                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2 focus:outline-none"
+                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black/60 text-white rounded-full p-2"
                   >
                     &#8594;
                   </button>
@@ -178,7 +132,7 @@ export function SimplePostSingle({
                         className={`h-2 w-2 rounded-full ${
                           currentIndex === index ? 'bg-white' : 'bg-gray-400'
                         }`}
-                      ></button>
+                      />
                     ))}
                   </div>
                 </>
@@ -186,9 +140,46 @@ export function SimplePostSingle({
             </div>
           )}
         </CardContent>
-        {/* <PlanetGenerator classificationId={String(id)} classificationConfig={classificationConfiguration} author={author} /> */}
-        {/* <StructuresOnPlanet author={author} /> */}
+
+        {/* Bottom Action Bar */}
+        <div className="w-full flex justify-between items-center px-6 pb-4 pt-2 border-t border-white/10 text-white text-sm">
+          <div className="flex items-center space-x-6">
+            <button className="flex items-center gap-1 hover:text-blue-400 transition">
+              <ThumbsUpIcon className="w-5 h-5" />
+              Vote
+            </button>
+            <button className="flex items-center gap-1 hover:text-green-400 transition">
+              <MessageCircle className="w-5 h-5" />
+              Comment
+            </button>
+          </div>
+
+          {/* Share Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={toggleDropdown}
+              className="flex items-center gap-1 hover:text-yellow-300 transition"
+            >
+              <Share2 className="w-5 h-5" />
+              Share
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute bottom-10 right-0 bg-white/30 backdrop-blur-md border border-white/10 shadow-xl rounded-lg p-4 z-20">
+                <Button onClick={handleCopyLink} className="w-full mb-2">
+                  Copy Link
+                </Button>
+                <Button onClick={openPostInNewTab} className="w-full mb-2">
+                  Open
+                </Button>
+                <Button onClick={handleShare} className="w-full">
+                  Download Post
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
       </Card>
     </div>
   );
-};
+}''

@@ -1,5 +1,6 @@
 "use client";
 
+import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 // import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import WeatherEventsOverview from "@/components/Data/Generator/Weather/EventsAcrossMyLocations";
 import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
@@ -45,7 +46,7 @@ export default function TestPage() {
   }, [session]);
 
   return (
-    <div className="min-h-screen  p-4 space-y-8">
+    <div className="min-h-screen bg-black  p-4 space-y-8">
       {/* <NPSPopup userId={session?.user.id} onClose={() => {}} isOpen={true} /> */}
       {/* <MySettlementsLocations /> */}
       {/* <MilestoneTotalCompleted />
@@ -59,7 +60,7 @@ export default function TestPage() {
                   <MyLocationIds /> */}
       {/* <WeatherEventsOverview /> */}
       <MilestoneCard />
-
+      <PlanetGenerator classificationId="1" />  
       {/* <PlanetGenerator classificationId={1} biome={'RockyHighlands'} biomass={0.01} density={3.5} /> */}
     </div>
   );
