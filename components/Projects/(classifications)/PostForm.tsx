@@ -100,6 +100,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return "Enter your classification details...";
     }
   })();
+
+  const [showDialog, setShowDialog] = useState(false);
  
   const classificationOptions = (() => {
     switch (anomalyType) {
@@ -294,6 +296,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
             classificationtype: anomalyType,
             classificationConfiguration,
           })
+          .select()
           .single();
 
       if (classificationError) {
@@ -304,11 +307,13 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         alert("Failed to create classification. Please try again.");
         return;
       } else {
+        const newClassificationId = classificationData.id;
         setClassificationOutput(classificationConfiguration);
         setContent("");
         setSelectedOptions({});
         setUploads([]);
         setPostSubmitted(true);
+        router.push(`/next/${newClassificationId}`);
       };
 
       // await handleMissionComplete();
@@ -330,13 +335,9 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         .eq("id", session?.user?.id);
 
       if (updatePointsError) throw updatePointsError;
-      router.refresh();
-      window.location.reload();
     } catch (error: any) {
       console.error("Unexpected error:", error);
     };
-
-    router.refresh();
   };
 
   const addMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {

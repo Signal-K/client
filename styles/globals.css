@@ -3,25 +3,25 @@
 @tailwind utilities;
 
 .dark {
-  --background: 220 16% 12%; /* Nord Polar Night darkest */
-  --foreground: 220 16% 90%; /* Nord Snow Storm light text */
+  --background: 220 16% 12%;
+  --foreground: 220 16% 90%;
 
-  --card: 220 16% 16%; /* Deep night */
+  --card: 220 16% 16%;
   --card-foreground: 220 16% 90%;
 
   --popover: 220 16% 16%;
   --popover-foreground: 220 16% 90%;
 
-  --primary: 311 20% 70%;
+  --primary: 184 51% 58%; /* #5FCBC3 teal-glow */
   --primary-foreground: 220 16% 12%;
 
-  --secondary: 220 13% 45%;
+  --secondary: 196 34% 50%; /* soft sci-fi blue */
   --secondary-foreground: 220 16% 96%;
 
   --muted: 220 16% 20%;
   --muted-foreground: 220 16% 60%;
 
-  --accent: 311 20% 70%;
+  --accent: 196 44% 69%; /* #88c0d0 holographic blue */
   --accent-foreground: 220 16% 12%;
 
   --destructive: 354 42% 56%;
@@ -30,46 +30,37 @@
   --border: 220 16% 30%;
   --input: 220 16% 20%;
 
-  --ring: 311 20% 70%;
+  --ring: 184 51% 58%;
 }
 
 :root {
-  /* Background & Foreground Colors */
-  --background: 220 16% 96%; /* Nord Polar Night light */
-  --foreground: 220 16% 22%; /* Nord Night text */
+  --background: 220 16% 96%;
+  --foreground: 220 16% 22%;
 
-  /* Card & Popover */
-  --card: 218 27% 92%; /* Nord Snow Storm variant */
-  --card-foreground: 220 16% 22%; /* Nord Night text */
-  --popover: 218 27% 92%; /* Nord Snow Storm variant */
-  --popover-foreground: 220 16% 22%; /* Nord Night text */
+  --card: 218 27% 92%;
+  --card-foreground: 220 16% 22%;
+  --popover: 218 27% 92%;
+  --popover-foreground: 220 16% 22%;
 
-  /* Primary Colors */
-  --primary: 311 20% 63%; /* Novadust cosmic lavender */
-  --primary-foreground: 220 16% 96%; /* Light-on-dark */
+  --primary: 184 51% 58%; /* #5FCBC3 */
+  --primary-foreground: 220 16% 96%;
 
-  /* Secondary Colors */
-  --secondary: 220 13% 35%; /* Nord Frost shade */
-  --secondary-foreground: 220 16% 96%; /* Light-on-dark */
+  --secondary: 196 34% 50%;
+  --secondary-foreground: 220 16% 96%;
 
-  /* Muted & Accent Colors */
-  --muted: 218 27% 88%; /* Subtle border */
-  --muted-foreground: 220 16% 22%; /* Nord Night text */
-  --accent: 311 20% 63%; /* Novadust cosmic lavender */
-  --accent-foreground: 220 16% 96%; /* Light-on-dark */
+  --muted: 218 27% 88%;
+  --muted-foreground: 220 16% 22%;
+  --accent: 196 44% 69%; /* #88c0d0 */
+  --accent-foreground: 220 16% 96%;
 
-  /* Destructive Colors */
-  --destructive: 354 42% 56%; /* Red */
-  --destructive-foreground: 220 16% 96%; /* Light-on-dark */
+  --destructive: 354 42% 56%;
+  --destructive-foreground: 220 16% 96%;
 
-  /* Borders & Inputs */
-  --border: 218 27% 88%; /* Subtle border */
-  --input: 0 0% 100%; /* Neutral base */
+  --border: 218 27% 88%;
+  --input: 0 0% 100%;
 
-  /* Ring (focus state) */
-  --ring: 311 20% 63%; /* Novadust cosmic lavender */
+  --ring: 184 51% 58%;
 
-  /* Radius for rounded corners */
   --radius: 0.5rem;
 }
 
@@ -152,7 +143,7 @@ body {
   background-color: hsl(var(--accent));
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   transform: translate(-50%, -50%) rotate(45deg);
-};
+}
 
 .sci-fi-background {
   background-color: #1D2833;
