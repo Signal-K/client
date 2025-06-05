@@ -87,20 +87,22 @@ export function SimplePostSingle({
 
   return (
     <div className="flex items-center justify-center w-full px-4" ref={shareCardRef}>
-      <Card className="w-full max-w-4xl md:w-4/5 backdrop-blur-md bg-white/90 border border-white/10 shadow-2xl rounded-xl relative overflow-hidden">
+      <Card className="w-full max-w-4xl md:w-4/5 bg-white border border-[#D8DEE9] shadow-2xl rounded-xl relative overflow-hidden transition-all">
         <CardHeader>
           <div className="flex items-center space-x-4">
             <AvatarGenerator author={author} />
             <div>
-              <CardTitle>{title}</CardTitle>
-              <p className="text-sm text-muted-foreground">by {author}</p>
+              <CardTitle className="text-[#2E3440]">{title}</CardTitle>
+              <p className="text-sm text-[#4C566A]">by {author}</p>
             </div>
           </div>
         </CardHeader>
 
         <CardContent>
-          <p className="text-sm font-medium text-muted-foreground mb-2">{category}</p>
-          <p className="mb-4">{content}</p>
+          <p className="text-xs font-semibold text-[#5E81AC] uppercase mb-1 tracking-wide">
+            {category}
+          </p>
+          <p className="text-[#2E3440] mb-4">{content}</p>
 
           {images.length > 0 && (
             <div className="relative mb-4">
@@ -114,13 +116,13 @@ export function SimplePostSingle({
                 <>
                   <button
                     onClick={goToPreviousImage}
-                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black/60 text-white rounded-full p-2"
+                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-[#4C566A]/60 text-white rounded-full p-2"
                   >
                     &#8592;
                   </button>
                   <button
                     onClick={goToNextImage}
-                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black/60 text-white rounded-full p-2"
+                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-[#4C566A]/60 text-white rounded-full p-2"
                   >
                     &#8594;
                   </button>
@@ -129,8 +131,8 @@ export function SimplePostSingle({
                       <button
                         key={index}
                         onClick={() => setCurrentIndex(index)}
-                        className={`h-2 w-2 rounded-full ${
-                          currentIndex === index ? 'bg-white' : 'bg-gray-400'
+                        className={`h-2 w-2 rounded-full transition ${
+                          currentIndex === index ? 'bg-[#5E81AC]' : 'bg-[#D8DEE9]'
                         }`}
                       />
                     ))}
@@ -142,13 +144,13 @@ export function SimplePostSingle({
         </CardContent>
 
         {/* Bottom Action Bar */}
-        <div className="w-full flex justify-between items-center px-6 pb-4 pt-2 border-t border-white/10 text-white text-sm">
+        <div className="w-full flex justify-between items-center px-6 pb-4 pt-2 border-t border-[#D8DEE9] text-[#2E3440] text-sm bg-white/80">
           <div className="flex items-center space-x-6">
-            <button className="flex items-center gap-1 hover:text-blue-400 transition">
+            <button className="flex items-center gap-1 text-[#4C566A] hover:text-[#88C0D0] transition">
               <ThumbsUpIcon className="w-5 h-5" />
               Vote
             </button>
-            <button className="flex items-center gap-1 hover:text-green-400 transition">
+            <button className="flex items-center gap-1 text-[#4C566A] hover:text-[#A3BE8C] transition">
               <MessageCircle className="w-5 h-5" />
               Comment
             </button>
@@ -158,21 +160,30 @@ export function SimplePostSingle({
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
-              className="flex items-center gap-1 hover:text-yellow-300 transition"
+              className="flex items-center gap-1 text-[#4C566A] hover:text-[#EBCB8B] transition"
             >
               <Share2 className="w-5 h-5" />
               Share
             </button>
 
             {dropdownOpen && (
-              <div className="absolute bottom-10 right-0 bg-white/30 backdrop-blur-md border border-white/10 shadow-xl rounded-lg p-4 z-20">
-                <Button onClick={handleCopyLink} className="w-full mb-2">
+              <div className="absolute bottom-10 right-0 bg-white/90 backdrop-blur-md border border-[#D8DEE9] shadow-xl rounded-lg p-4 z-20">
+                <Button
+                  onClick={handleCopyLink}
+                  className="w-full mb-2 bg-[#88C0D0] text-white hover:bg-[#81A1C1]"
+                >
                   Copy Link
                 </Button>
-                <Button onClick={openPostInNewTab} className="w-full mb-2">
+                <Button
+                  onClick={openPostInNewTab}
+                  className="w-full mb-2 bg-[#5E81AC] text-white hover:bg-[#4C566A]"
+                >
                   Open
                 </Button>
-                <Button onClick={handleShare} className="w-full">
+                <Button
+                  onClick={handleShare}
+                  className="w-full bg-[#A3BE8C] text-white hover:bg-[#8FBC8F]"
+                >
                   Download Post
                 </Button>
               </div>
@@ -182,4 +193,4 @@ export function SimplePostSingle({
       </Card>
     </div>
   );
-}''
+};

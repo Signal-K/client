@@ -141,43 +141,9 @@ export default function VotePlanetClassifications() {
               classificationType={classification.classificationtype}
               onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
             />
-                              /* <PostCardSingle
-                    classificationId={classification.id}
-                    title={classification.title}
-                    author={classification.author}
-                    content={classification.content}
-                    votes={classification.votes || 0}
-                    category={classification.category}
-                    tags={classification.tags || []}
-                    images={classification.image ? [classification.image] : []}
-                    anomalyId={classification.anomaly}
-                    classificationConfig={classification.classificationConfiguration}
-                    classificationType={classification.classificationtype}
-                    onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
-                  /> */
           ))
         )}
       </div>
-        
-        {/* <div className="absolute top-1/2 left-0 transform -translate-y-1/2">
-            <button
-                onClick={prevPost}
-                className="bg-gray-800 text-white p-2 rounded-l-md hover:bg-gray-600"
-                disabled={currentIndex === 0}
-            >
-                Prev
-            </button>
-        </div>
-
-        <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
-            <button
-                onClick={nextPost}
-                className="bg-gray-800 text-white p-2 rounded-r-md hover:bg-gray-600"
-                disabled={currentIndex === classifications.length - 1}
-            >
-                Next
-            </button>
-        </div> */}
       </div>
     );
 };

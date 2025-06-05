@@ -216,188 +216,193 @@ export default function PostCard({
         };
     };
   
-    return (
-        <div className="bg-[#9d22bf]" ref={shareCardRef}>
-            <Card className="w-full overflow-hidden border-2 border-[#5FCBC3]/30 bg-[#hhhhhh]">
-              <div className="bg-[#9d22bf] p-4">
-                <CardHeader className="flex flex-row items-center gap-3 p-4 border-b border-[#5FCBC3]/20">
-                    {session && <AvatarGenerator author={session?.user?.id} />}
-                    <div className="flex flex-col">
-                        <p className="text-sm font-medium text-[#F7F5E9]">{session?.user.id}</p>
-                        <p className="text-xs text-[#B9E678]">{classificationType.toUpperCase()} Classification</p>
-                    </div>
-                </CardHeader>
-                <CardContent className="p-0">
-                    <div
-                        className="relative aspect-[16/9] overflow-hidden bg-[#1e2834] cursor-pointer"
-                        onClick={() => setIsLightboxOpen(true)}
-                    >
-                        {images.length > 0 && (
-                            <>
-                                <Image
-                                    src={images[currentIndex]}
-                                    alt={`Image ${currentIndex + 1}`}
-                                    fill
-                                    className="object-cover hover:scale-105 transition-transform duration-300"
-                                    sizes='100vw'
-                                />
-                            </>
-                        )}
-                    </div>
-                    <div className="p-4 space-y-2 bg-gradient-to-b from-[#2C3A4A] to-[#1e2834]">
-                        <p className="text-sm text-[#F7F5E9]">
-                            {content}
-                        </p>
-                    </div>
-                </CardContent>
-                <CardFooter className="p-3 pt-0 flex justify-between">
-                <Button variant="ghost" size="sm" className="text-[#F7F5E9] hover:text-[#B9E678] hover:bg-[#1e2834]">
-                    <ThumbsUp className="h-4 w-4 mr-2" />
-                    <span className="text-xs">{votes}</span>
-                </Button>
-        
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-[#F7F5E9] hover:text-[#B9E678] hover:bg-[#1e2834]"
-                    onClick={() => setIsCommentsOpen(!isCommentsOpen)}
-                >
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    <span className="text-xs">{comments.length}</span>
-                    <ChevronDown className={`h-3 w-3 ml-1 transition-transform ${isCommentsOpen ? "rotate-180" : ""}`} />
-                </Button>
-        
-                <Popover>
-                    <PopoverTrigger asChild>
-                    <Button
-                        size="sm"
-                        disabled={isSharing}
-                        variant="outline"
-                        className="flex items-center gap-2 bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#F7F5E9] hover:bg-[#1e2834]"
-                    >
-                        <Share2 className="h-4 w-4" />
-                        {isSharing ? "Sharing..." : "Share"}
-                    </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-60 bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#F7F5E9]">
-                    <div className="space-y-2">
-                        <h4 className="font-medium text-sm">Share this post</h4>
-                        <div className="flex flex-col gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="justify-start bg-[#2C3A4A] text-[#F7F5E9] border-[#5FCBC3]/30 hover:bg-[#1e2834]"
-                        >
-                            Copy Link
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="justify-start bg-[#2C3A4A] text-[#F7F5E9] border-[#5FCBC3]/30 hover:bg-[#1e2834]"
-                        >
-                            Share to Research Network
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleShare}
-                            disabled={isSharing}
-                            className="justify-start bg-[#2C3A4A] text-[#F7F5E9] border-[#5FCBC3]/30 hover:bg-[#1e2834]"
-                        >
-                            Export Citation
-                        </Button>
-                        </div>
-                    </div>
-                    </PopoverContent>
-                </Popover>
-                </CardFooter>
-      {isCommentsOpen && (
-        <div className="border-t border-[#5FCBC3]/20 bg-[#1e2834]/50">
-          <Tabs defaultValue="comments" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-[#1e2834] rounded-none border-b border-[#5FCBC3]/20">
-              <TabsTrigger
-                value="comments"
-                className="data-[state=active]:bg-[#5FCBC3] data-[state=active]:text-[#2C3A4A] text-[#F7F5E9]"
-              >
-                Comments & Stats
-              </TabsTrigger>
-              {classificationType === 'planet' && (
-                <TabsTrigger
-                value="calculator"
-                className="data-[state=active]:bg-[#5FCBC3] data-[state=active]:text-[#2C3A4A] text-[#F7F5E9]"
-              >
-                Calculate Stats
-              </TabsTrigger>
-              )}
-            </TabsList>
+return (
+  <div className="bg-white" ref={shareCardRef}>
+    <Card className="w-full overflow-hidden border border-gray-300">
+      <div className="bg-gray-50 p-4">
+        <CardHeader className="flex flex-row items-center gap-3 p-4 border-b border-gray-200">
+          {session && <AvatarGenerator author={session?.user?.id} />}
+          <div className="flex flex-col">
+            <p className="text-sm font-medium text-gray-800">{session?.user.id}</p>
+            <p className="text-xs text-green-600">{classificationType.toUpperCase()} Classification</p>
+          </div>
+        </CardHeader>
 
-            <TabsContent value="comments" className="p-4 space-y-4">
-                        <div className="p-4 space-y-4">
+        <CardContent className="p-0">
+          <div
+            className="relative aspect-[16/9] overflow-hidden bg-white cursor-pointer"
+            onClick={() => setIsLightboxOpen(true)}
+          >
+            {images.length > 0 && (
+              <Image
+                src={images[currentIndex]}
+                alt={`Image ${currentIndex + 1}`}
+                fill
+                className="object-cover hover:scale-105 transition-transform duration-300"
+                sizes="100vw"
+              />
+            )}
+          </div>
+          <div className="p-4 space-y-2 bg-gradient-to-b from-gray-50 to-white">
+            <p className="text-sm text-gray-800">{content}</p>
+          </div>
+        </CardContent>
+
+        <CardFooter className="p-3 pt-0 flex justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-700 hover:text-green-600 hover:bg-gray-100"
+          >
+            <ThumbsUp className="h-4 w-4 mr-2" />
+            <span className="text-xs">{votes}</span>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-700 hover:text-green-600 hover:bg-gray-100"
+            onClick={() => setIsCommentsOpen(!isCommentsOpen)}
+          >
+            <MessageSquare className="h-4 w-4 mr-2" />
+            <span className="text-xs">{comments.length}</span>
+            <ChevronDown
+              className={`h-3 w-3 ml-1 transition-transform ${isCommentsOpen ? "rotate-180" : ""}`}
+            />
+          </Button>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                size="sm"
+                disabled={isSharing}
+                variant="outline"
+                className="flex items-center gap-2 bg-white border-gray-300 text-gray-800 hover:bg-gray-100"
+              >
+                <Share2 className="h-4 w-4" />
+                {isSharing ? "Sharing..." : "Share"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-60 bg-white border-gray-300 text-gray-800">
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Share this post</h4>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="justify-start bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
+                  >
+                    Copy Link
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="justify-start bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
+                  >
+                    Share to Research Network
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleShare}
+                    disabled={isSharing}
+                    className="justify-start bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
+                  >
+                    Export Citation
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </CardFooter>
+
+        {isCommentsOpen && (
+          <div className="border-t border-gray-200 bg-white">
+            <Tabs defaultValue="comments" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 bg-white rounded-none border-b border-gray-200">
+                <TabsTrigger
+                  value="comments"
+                  className="data-[state=active]:bg-green-500 data-[state=active]:text-white text-gray-700"
+                >
+                  Comments & Stats
+                </TabsTrigger>
+                {classificationType === "planet" && (
+                  <TabsTrigger
+                    value="calculator"
+                    className="data-[state=active]:bg-green-500 data-[state=active]:text-white text-gray-700"
+                  >
+                    Calculate Stats
+                  </TabsTrigger>
+                )}
+              </TabsList>
+
+              <TabsContent value="comments" className="p-4 space-y-4">
                 {loading ? (
-                  <p>Loading comments...</p>
-                ) : error ? ( 
+                  <p className="text-gray-600">Loading comments...</p>
+                ) : error ? (
                   <p className="text-red-500">{error}</p>
                 ) : comments.length === 0 ? (
-                  <p>No comments yet. Be the first to comment!</p>
+                  <p className="text-gray-500">No comments yet. Be the first to comment!</p>
                 ) : (
                   comments.map((comment) => (
                     <div key={comment.id} className="flex gap-3">
-                      <Avatar className="h-8 w-8 border border-[#B9E678]">
-                        <AvatarFallback className="bg-[#1e2834] text-[#F7F5E9] text-xs">
+                      <Avatar className="h-8 w-8 border border-green-500">
+                        <AvatarFallback className="bg-white text-gray-800 text-xs">
                           {comment.username ? comment.username[0].toUpperCase() : "U"}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium text-[#F7F5E9]">{comment.username}</p>
-                          <span className="text-xs text-[#F7F5E9]/70">
-                            {/* {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })} */}
+                          <p className="text-sm font-medium text-gray-800">{comment.username}</p>
+                          <span className="text-xs text-gray-500">
+                            {/* Time formatting */}
                           </span>
                         </div>
-                        <p className="text-sm text-[#F7F5E9] mt-1">{comment.content}</p>
+                        <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
                       </div>
                     </div>
                   ))
                 )}
-                </div>
-            </TabsContent>
-            <TabsContent value="calculator" className="p-4 space-y-4">
-              <SurveyorCalculator classificationId={classificationId.toString()} />
-            </TabsContent>
-          </Tabs>
-        </div>
-      )}
+              </TabsContent>
 
-      {/* Image Lightbox */}
-      <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
-        <DialogContent className="max-w-4xl bg-[#2C3A4A] border-[#5FCBC3]/30 text-[#F7F5E9]">
-          <DialogHeader className="flex flex-row justify-between items-center">
-            <DialogTitle className="text-[#F7F5E9]">{content} by {session?.user.id}</DialogTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsLightboxOpen(false)}
-              className="text-[#F7F5E9] hover:text-[#B9E678] hover:bg-[#1e2834]"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </DialogHeader>
-          <div className="relative aspect-video w-full">
-            <Image
-              src={images[currentIndex]}
-              alt=""
-              fill
-              className="object-contain"
-              sizes="(max-width: 1200px) 100vw, 1200px"
-            />
+              <TabsContent value="calculator" className="p-4 space-y-4">
+                <SurveyorCalculator classificationId={classificationId.toString()} />
+              </TabsContent>
+            </Tabs>
           </div>
-          <div className="text-sm text-[#F7F5E9]">
-            <p className="font-medium">{content}</p>
-          </div>
-        </DialogContent>
-      </Dialog>
+        )}
+
+        <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
+          <DialogContent className="max-w-4xl bg-white border-gray-300 text-gray-800">
+            <DialogHeader className="flex flex-row justify-between items-center">
+              <DialogTitle className="text-gray-800">
+                {content} by {session?.user.id}
+              </DialogTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsLightboxOpen(false)}
+                className="text-gray-800 hover:text-green-600 hover:bg-gray-100"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogHeader>
+            <div className="relative aspect-video w-full">
+              <Image
+                src={images[currentIndex]}
+                alt=""
+                fill
+                className="object-contain"
+                sizes="(max-width: 1200px) 100vw, 1200px"
+              />
+            </div>
+            <div className="text-sm text-gray-800">
+              <p className="font-medium">{content}</p>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </Card>
-    </div>
-  );
+  </div>
+);
 };
