@@ -6,7 +6,7 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 
 interface ProfileSetupFormProps {
   onProfileUpdate: () => void | null;
-}
+};
 
 export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormProps) {
   const supabase = useSupabaseClient();

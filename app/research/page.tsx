@@ -11,6 +11,7 @@ import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
 import BiologyResearch from "@/components/Research/BiologyItems";
 import AstronomyResearch from "@/components/Research/AstronomyItems";
 import MeteorologyResearch from "@/components/Research/MeteorologyItems";
+import ReferralCodePanel from "@/components/Account/Referrals";
 
 type CapacityKey =
   | "probeCount"
@@ -79,6 +80,10 @@ export default function ResearchPage() {
                 <AstronomyResearch />
                 <MeteorologyResearch />
                 <BiologyResearch />
+              </div>
+
+              <div className="my-4">
+                <ReferralCodePanel />
               </div>
             </main>
           </DialogContent>

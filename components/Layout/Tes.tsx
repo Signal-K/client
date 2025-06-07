@@ -82,7 +82,33 @@ export default function GameNavbar() {
     calculateTimeRemaining()
 
     return () => clearInterval(interval)
-  }, [])
+  }, []);
+
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!session) {
+      setReferralCode(null);
+      return;
+    }
+
+    const fetchReferralCode = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("referral_code")
+        .eq("id", session.user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching referral code:", error);
+        setReferralCode(null);
+      } else {
+        setReferralCode(data?.referral_code ?? null);
+      }
+    };
+
+    fetchReferralCode();
+  }, [session, supabase]);
 
   // Fetch milestones
   useEffect(() => {
@@ -285,6 +311,14 @@ export default function GameNavbar() {
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
+              {referralCode && (
+    <>
+      <DropdownMenuSeparator className="bg-white/10" />
+      <DropdownMenuItem className="cursor-default select-text" disabled>
+        <span className="font-mono text-sm">Referral: {referralCode}</span>
+      </DropdownMenuItem>
+    </>
+  )}
               <DropdownMenuSeparator className="bg-white/10" />
               <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer text-red-400">
                 <Button onClick={signOut}>
@@ -365,6 +399,11 @@ export default function GameNavbar() {
 
       {/* Footer */}
       <div className="p-4 border-t border-white/10 space-y-2">
+      <div className="justify-start p-4">
+    {referralCode && (
+      <p className="text-sm font-mono text-white select-text">Referral: {referralCode}</p>
+    )}
+  </div>
         <Button className="w-full justify-start" variant="ghost">
           <User className="mr-2 h-5 w-5" />
           Profile
