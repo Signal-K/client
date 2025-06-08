@@ -13,6 +13,7 @@ import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transitin
 import PlanetTypeCommentForm from "./PlanetType";
 import VotePlanetClassifications from "./PHVote";
 import PlanetHuntersTemperatureWrapper from "./PlanetTemperature";
+import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 
 const PlanetHuntersSteps = () => {
   const supabase = useSupabaseClient();
@@ -71,19 +72,19 @@ const PlanetHuntersSteps = () => {
       action: () => {},
       chapter: 1,
     },
-    {
-      id: 5,
-      title: "Calculate planetary temperatures",
-      description: "Use satellite data to help determine the temperature of planets you've discovered.",
-      icon: PersonStandingIcon,
-      points: 1,
-      completedCount: 0,
-      internalComponent: () => <PlanetHuntersTemperatureWrapper />,
-      color: "text-yellow-700",
-      shadow: true,
-      action: () => {},
-      chapter: 2,
-    },
+    // {
+    //   id: 5,
+    //   title: "Calculate planetary temperatures",
+    //   description: "Use satellite data to help determine the temperature of planets you've discovered.",
+    //   icon: PersonStandingIcon,
+    //   points: 1,
+    //   completedCount: 0,
+    //   internalComponent: () => <PlanetHuntersTemperatureWrapper />,
+    //   color: "text-yellow-700",
+    //   shadow: true,
+    //   action: () => {},
+    //   chapter: 2,
+    // },
   ]);
 
   const [experiencePoints, setExperiencePoints] = useState<number>(0);
@@ -96,52 +97,66 @@ const PlanetHuntersSteps = () => {
   );
 
   useEffect(() => {
-    if (!session?.user) return;
+    if (!session?.user?.id) {
+      console.warn("No user session found.");
+      return;
+    }
 
     const fetchMissionData = async () => {
       try {
+        console.log("Fetching mission data for user:", session.user.id);
+
+        // Classifications where classificationtype is "planet"
         const { data: classificationsData, error: classificationsError } = await supabase
           .from("classifications")
-          .select("id, classificationConfiguration")
-          .eq("classificationtype", "planet")
-          .eq("author", session.user.id);
+          .select("id, classificationConfiguration, classificationtype, author")
+          .eq("author", session.user.id)
+          .ilike("classificationtype", "planet");
 
         if (classificationsError) throw classificationsError;
+        console.log("Planet classifications fetched:", classificationsData);
 
         const mission1CompletedCount = classificationsData?.length || 0;
 
         const mission2CompletedCount =
           classificationsData?.filter(({ classificationConfiguration }) => {
             const options = classificationConfiguration?.classificationOptions?.[""] || {};
-            const hasValidOptions = ["2", "3", "4"].some((option) => options[option]);
-            const hasInvalidOption = options["1"];
+            const hasValidOptions = ["2", "3", "4"].some((option) => options?.[option]);
+            const hasInvalidOption = options?.["1"];
             return hasValidOptions && !hasInvalidOption;
           }).length || 0;
 
+        // Comments by the user
         const { data: commentsData, error: commentsError } = await supabase
           .from("comments")
           .select("classification_id")
           .eq("author", session.user.id);
         if (commentsError) throw commentsError;
+        console.log("Comments fetched:", commentsData);
 
+        // Votes by the user
         const { data: votesData, error: votesError } = await supabase
           .from("votes")
           .select("classification_id")
           .eq("user_id", session.user.id);
         if (votesError) throw votesError;
+        console.log("Votes fetched:", votesData);
 
         const mission3CompletedCount = commentsData?.length || 0;
         const mission4CompletedCount = (commentsData?.length || 0) + (votesData?.length || 0);
 
+        // Temperature comments
         const { data: temperatureData, error: tempError } = await supabase
           .from("comments")
           .select("id")
-          .eq("user_id", session.user.id)
+          .eq("author", session.user.id)
           .eq("category", "Temperature");
         if (tempError) throw tempError;
+        console.log("Temperature comments fetched:", temperatureData);
 
         const mission5CompletedCount = temperatureData?.length || 0;
 
+        // Update completed counts
         const updatedMissions = missions.map((mission) => {
           switch (mission.id) {
             case 1:
@@ -175,7 +190,7 @@ const PlanetHuntersSteps = () => {
     };
 
     fetchMissionData();
-  }, [supabase, session?.user]);
+  }, [supabase, session?.user?.id]);
 
   const handlePreviousChapter = () => {
     if (currentChapter > 1) setCurrentChapter(currentChapter - 1);

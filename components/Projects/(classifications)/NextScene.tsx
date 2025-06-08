@@ -134,9 +134,9 @@ export default function ClientClassificationPage({ id }: Props) {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#D8DEE9]">
-            <Button variant="secondary" onClick={() => router.push(studyUrl)}>
+            {/* <Button variant="secondary" onClick={() => router.push(studyUrl)}>
               🔍 Continue Studying
-            </Button>
+            </Button> */}
             <Button variant="outline" onClick={() => router.push(`/structures/${structure}`)}>
               🧬 Back to Structure
             </Button>
