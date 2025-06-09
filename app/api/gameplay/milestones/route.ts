@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
         {
-        weekStart: '2025-05-25',
+        weekStart: '2025-06-09',
         data: [
             {
                 name: 'Propose 5 planet candidates',
@@ -338,8 +338,18 @@ const communityMilestones = [
 ];
 
 export async function GET(req: NextRequest) {
+    const today = new Date();
+    
+    // Sort milestones descending by weekStart
+    const sortedMilestones = milestones
+        .map(m => ({ ...m, weekStartDate: new Date(m.weekStart) }))
+        .filter(m => m.weekStartDate <= today)
+        .sort((a, b) => b.weekStartDate.getTime() - a.weekStartDate.getTime());
+
+    const mostRecentMilestone = sortedMilestones[0];
+
     return NextResponse.json({
-        playerMilestones: milestones,
-        communityMilestones: communityMilestones,
+        playerMilestones: mostRecentMilestone ? [mostRecentMilestone] : [],
+        communityMilestones: communityMilestones, // or filter this too if needed
     });
-};
+}

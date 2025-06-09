@@ -109,7 +109,7 @@ export default function MeteorologyResearch() {
                         </h3>
                         <UpgradeItem
                             title="Probe Count ++"
-                            description="Increase your probe count to explore more terrariums simultaneously"
+                            description="Build additional probes to expand climate data collection capabilities"
                             current={userCapacities.probeCount}
                             max={3}
                             cost={getUpgradeCost(userCapacities.probeCount)}
