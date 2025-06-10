@@ -30,8 +30,8 @@ import { StardustDropdown } from "./Navigation/StardustDropdown"
 import { LocationsDropdown } from "./Navigation/LocationsDropdown"
 import TechnologyPopover, { TechnologySection } from "./Navigation/TechTreeDropdown"
 import { Alert } from "antd"
-import AlertBar from "./Navigation/AlertBar"
 import { useRouter } from "next/navigation"
+import ResponsiveAlerts from "./Navigation/AlertsDropdown"
 
 // Sample data - replace with actual data in your implementation
 const techTree = [
@@ -264,9 +264,7 @@ export default function GameNavbar() {
   // milestones={milestones[currentWeekIndex]?.data || []}
 />
 
-          <AlertsDropdown
-            
-          />
+          <ResponsiveAlerts />
 
           {/* Tech Tree Button */}
           <TechnologyPopover />
@@ -365,7 +363,7 @@ export default function GameNavbar() {
         <div className="p-4 space-y-6">
           {/* Alerts Section */}
           <div className="space-y-2">
-            <AlertBar />
+            <ResponsiveAlerts />
           </div>
 
           {/* Milestones Section */}
