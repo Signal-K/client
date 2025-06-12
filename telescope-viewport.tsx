@@ -7,12 +7,12 @@ import type { Anomaly, ViewMode } from "@/types/Structures/telescope"
 import { projects } from "@/data/projects"
 import { missions } from "@/data/missions"
 import { generateSectorName, generateStars, generateSectorAnomalies } from "@/utils/Structures/Telescope/sector-utils"
-import { ViewportHeader } from "@/components/viewport-header"
-import { ProjectPanel } from "@/components/project-panel"
-import { TelescopeView } from "@/components/telescope-view"
-import { DiscoveriesView } from "@/components/discoveries-view"
-import { AnomalyDialog } from "@/components/anomaly-dialog"
-import { AnomalyDetailDialog } from "@/components/anomaly-detail-dialog"
+import { ViewportHeader } from "@/components/Structures/Telescope/viewport-header"
+import { ProjectPanel } from "@/components/Structures/Telescope/project-panel"
+import { TelescopeView } from "@/components/Structures/Telescope/telescope-view"
+import { DiscoveriesView } from "@/components/Structures/Telescope/discoveries-view"
+import { AnomalyDialog } from "@/components/Structures/Telescope/anomaly-dialog"
+import { AnomalyDetailDialog } from "@/components/Structures/Telescope/anomaly-detail-dialog"
 
 export default function TelescopeViewport() {
   const [currentSector, setCurrentSector] = useState({ x: 0, y: 0 })

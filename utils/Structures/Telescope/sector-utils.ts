@@ -81,7 +81,12 @@ export const generateSectorAnomalies = (sectorX: number, sectorY: number): Anoma
   const seed = Math.abs(sectorX * 1000 + sectorY)
 
   // Get base anomalies from all projects
-  const allBaseAnomalies: BaseAnomaly[] = Object.values(baseAnomalies).flat()
+  const allBaseAnomalies: BaseAnomaly[] = Object.values(baseAnomalies)
+    .flat()
+    .map(anomaly => ({
+      ...anomaly,
+      type: anomaly.type as BaseAnomaly["type"],
+    }))
 
   // Shuffle and select a subset based on the sector
   const shuffledAnomalies = [...allBaseAnomalies].sort(() => seededRandom(seed, 0) - 0.5)

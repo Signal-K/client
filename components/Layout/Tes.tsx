@@ -383,9 +383,9 @@ export default function GameNavbar() {
                   </div>
                 </div>
               ))}
-            <Button variant="link" className="text-[#67e8f9] p-0 h-auto" onClick={() => router.push('/scenes/milestones')}>
+            {/* <Button variant="link" className="text-[#67e8f9] p-0 h-auto" onClick={() => router.push('/scenes/milestones')}>
               View All Milestones
-            </Button>
+            </Button> */}
           </div>
 
           {/* Technology Section */}

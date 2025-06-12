@@ -49,6 +49,8 @@ const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
   const [milestonePoints, setMilestonePoints] = useState(0);
   const [researchedPenalty, setResearchedPenalty] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [referralPoints, setReferralPoints] = useState(0);
+  const [showBreakdown, setShowBreakdown] = useState<boolean>(false);
 
   const userId = session?.user?.id;
 
@@ -74,6 +76,37 @@ const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
       milestonePoints -
       researchedPenalty,
   }));
+
+  const fetchReferralPoints = async () => {
+  // First, get the user's referral code from profiles
+  const { data: profileData, error: profileError } = await supabase
+    .from('profiles')
+    .select('referral_code')
+    .eq('id', userId)
+    .single();
+
+  if (profileError || !profileData?.referral_code) {
+    setReferralPoints(0);
+    return;
+  }
+
+  const referralCode = profileData.referral_code;
+
+  // Count rows in referrals where referral_code = user's referral_code
+  const { count: referralsCount, error: referralCountError } = await supabase
+    .from('referrals')
+    .select('id', { count: 'exact', head: true })
+    .eq('referral_code', referralCode);
+
+  if (referralCountError) {
+    setReferralPoints(0);
+    return;
+  }
+
+  // Calculate points: 5 per referral
+  const points = (referralsCount || 0) * 5;
+  setReferralPoints(points);
+};
 
   const [bonusPoints, setBonusPoints] = useState({
     bonusBiology: 0,
@@ -265,6 +298,7 @@ const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
         fetchPlanetFourPoints(),
         fetchJvhPoints(),
         fetchCloudspottingPoints(),
+        fetchReferralPoints(),
       ]);
 
       const totalPoints =
@@ -275,6 +309,7 @@ const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
         jvhPoints +
         cloudspottingPoints +
         planktonPoints +
+        referralPoints +
         milestonePoints -
         researchedPenalty;
 
@@ -351,6 +386,7 @@ const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
     planetFourPoints +
     jvhPoints +
     cloudspottingPoints +
+    referralPoints +
     planktonPoints +
     milestonePoints -
     researchedPenalty;
@@ -391,15 +427,30 @@ const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
     return <span>{researchedPenalty}</span>;
   };
 
-    // if (type === "groups") {
+  // if (type === "groups") {
   //   return (
-
   //   )
   // }
 
+  const breakdown = (
+    <div className="text-sm mt-2 space-y-1">
+      <div>🪐 Planet Hunters: {planetHuntersPoints}</div>
+      <div>📷 Daily Minor Planets: {dailyMinorPlanetPoints}</div>
+      <div>🤖 AI4Mars: {ai4mPoints}</div>
+      <div>🛰️ Planet Four: {planetFourPoints}</div>
+      <div>🌪️ Jovian Vortex Hunter: {jvhPoints}</div>
+      <div>☁️ Cloudspotting: {cloudspottingPoints}</div>
+      <div>🌊 Plankton: {planktonPoints}</div>
+      <div>🎯 Milestones: {milestonePoints}</div>
+      <div>🎁 Referrals: {referralPoints}</div>
+      <div>❌ Researched Penalty: -{researchedPenalty}</div>
+    </div>
+  );
+
   return (
-    <div>
-      {totalPoints}
+    <div className="cursor-pointer" onClick={() => setShowBreakdown(!showBreakdown)}>
+      <div className="text-lg font-bold">Total Points: {totalPoints}</div>
+      {showBreakdown && breakdown}
     </div>
   );
 });

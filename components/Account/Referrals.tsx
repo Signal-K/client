@@ -75,7 +75,7 @@ export default function ReferralCodePanel() {
         // 3. Fetch profiles of all referred users
         const { data: usersData, error: usersError } = await supabase
           .from("profiles")
-          .select("id, email, username")
+          .select("id, username")
           .in("id", referredUserIds);
 
         if (usersError) {
@@ -83,7 +83,22 @@ export default function ReferralCodePanel() {
           setError("Failed to load referred users' profiles.");
           setReferredUsers([]);
         } else {
-          setReferredUsers(usersData || []);
+          // Optional: Merge in emails from auth.users
+          const { data: authUsers, error: authError } = await supabase
+            .from("users")
+            .select("id, email")
+            .in("id", referredUserIds);
+
+          if (authError) {
+            console.warn("Could not fetch emails from auth.users:", authError);
+          }
+
+          const merged = usersData.map((user) => ({
+            ...user,
+            email: authUsers?.find((u) => u.id === user.id)?.email ?? null,
+          }));
+
+          setReferredUsers(merged);
         }
       } catch (err) {
         console.error("Unexpected error:", err);

@@ -10,6 +10,7 @@ import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
 import MyLocationIds from "@/content/Classifications/UserLocationPK";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 import NPSPopup from "@/lib/helper/nps-popup";
+import TelescopeViewport from "@/telescope-viewport";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 // import { PlanetGenerator } from "starsailors-planet-generator";
@@ -59,8 +60,8 @@ export default function TestPage() {
                   />
                   <MyLocationIds /> */}
       {/* <WeatherEventsOverview /> */}
-      <MilestoneCard />
-      <PlanetGenerator classificationId="1" />  
+      <TelescopeViewport />
+      {/* <PlanetGenerator classificationId="1" />   */}
       {/* <PlanetGenerator classificationId={1} biome={'RockyHighlands'} biomass={0.01} density={3.5} /> */}
     </div>
   );
