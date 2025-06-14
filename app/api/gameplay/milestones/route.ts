@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
         {
-        weekStart: '2025-06-09',
+        weekStart: '2025-06-06',
         data: [
             {
                 name: 'Propose 5 planet candidates',

@@ -449,7 +449,7 @@ const TotalPoints = forwardRef((props: TotalPointsProps, ref,) => {
 
   return (
     <div className="cursor-pointer" onClick={() => setShowBreakdown(!showBreakdown)}>
-      <div className="text-lg font-bold">Total Points: {totalPoints}</div>
+      <div className="text-lg font-bold">{totalPoints}</div>
       {showBreakdown && breakdown}
     </div>
   );

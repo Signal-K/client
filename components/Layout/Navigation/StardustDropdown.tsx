@@ -39,11 +39,11 @@ export function StardustDropdown() {
       <div className="flex flex-col items-start w-full px-4 py-2">
         <Button variant="ghost" className="text-yellow-100 font-semibold">
           <Star className="h-5 w-5 text-yellow-400 mr-2" />
-          Your Stardust: <TotalPoints />
+          <TotalPoints />
         </Button>
       </div>
     );
-  }
+  };
 
   return (
     <Popover>
@@ -51,7 +51,7 @@ export function StardustDropdown() {
         <Button variant="ghost" className="relative group">
           <Star className="h-5 w-5 text-yellow-400 group-hover:text-yellow-300 transition-colors" />
           <span className="text-yellow-100 font-semibold ml-2">
-            Your Stardust: <TotalPoints />
+            <TotalPoints />
           </span>
         </Button>
       </PopoverTrigger>
