@@ -8,38 +8,85 @@ import type { Anomaly, Mission, Project } from "@/types/Structures/telescope"
 import { projects } from "@/data/projects"
 
 interface DiscoveriesViewProps {
-  classifiedAnomalies: Anomaly[]
+  classifications: any[]
+  allClassifications: any[]
   projectMissions: Mission[]
   selectedProject: Project | null
   onBack: () => void
   onViewAnomaly: (anomaly: Anomaly) => void
   showAllDiscoveries: boolean
+  anomalies: Anomaly[]
 }
 
 export function DiscoveriesView({
-  classifiedAnomalies,
+  classifications,
+  allClassifications,
   projectMissions,
   selectedProject,
   onBack,
   onViewAnomaly,
   showAllDiscoveries,
+  anomalies,
 }: DiscoveriesViewProps) {
-  // Simulate other users' discoveries when showAllDiscoveries is true
-  const allUsersAnomalies = showAllDiscoveries
-    ? [
-        ...classifiedAnomalies,
-        // Add some sample "other users" discoveries
-        ...classifiedAnomalies.slice(0, 5).map((anomaly, index) => ({
-          ...anomaly,
-          id: `other-user-${anomaly.id}`,
-          name: `${anomaly.name}-ALT`,
-          discoveredBy: `User${index + 1}`,
-          discoveryDate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-        })),
-      ]
-    : classifiedAnomalies
+  // Convert classifications to anomaly format for display
+  const convertClassificationsToAnomalies = (classificationData: any[]): Anomaly[] => {
+    return classificationData.map((classification) => {
+      // Find the corresponding anomaly from our anomalies list
+      const dbAnomalyId = `db-${classification.anomaly}`
+      const anomaly = anomalies.find((a) => a.id === dbAnomalyId)
 
-  const filteredAnomalies = allUsersAnomalies.filter((a) => !selectedProject || a.project === selectedProject.id)
+      if (anomaly) {
+        return {
+          ...anomaly,
+          classified: true,
+          discoveryDate: new Date(classification.created_at).toLocaleDateString(),
+          classificationId: classification.id,
+          classificationContent: classification.content,
+          discoveredBy: showAllDiscoveries ? `User${classification.author?.slice(-4)}` : undefined,
+        }
+      }
+
+      // Fallback if anomaly not found in our list
+      return {
+        id: `classification-${classification.id}`,
+        name: `ANOMALY-${classification.anomaly}`,
+        type:
+          classification.classificationtype === "planet"
+            ? "exoplanet"
+            : classification.classificationtype === "sunspot"
+              ? "sunspot"
+              : classification.classificationtype === "asteroid"
+                ? "asteroid"
+                : "exoplanet",
+        project:
+          classification.classificationtype === "planet"
+            ? "planet-hunters"
+            : classification.classificationtype === "sunspot"
+              ? "sunspots"
+              : classification.classificationtype === "asteroid"
+                ? "daily-minor-planet"
+                : "planet-hunters",
+        x: 50,
+        y: 50,
+        brightness: 1,
+        size: 1,
+        color: "#4FC3F7",
+        sector: "Unknown Sector",
+        shape: "circle" as const,
+        pulseSpeed: 2,
+        glowIntensity: 0.5,
+        classified: true,
+        discoveryDate: new Date(classification.created_at).toLocaleDateString(),
+        classificationId: classification.id,
+        classificationContent: classification.content,
+        discoveredBy: showAllDiscoveries ? `User${classification.author?.slice(-4)}` : undefined,
+      } as Anomaly & { classificationId: number; classificationContent: string; discoveredBy?: string }
+    })
+  }
+
+  const displayClassifications = showAllDiscoveries ? allClassifications : classifications
+  const classifiedAnomalies = convertClassificationsToAnomalies(displayClassifications)
+  const filteredAnomalies = classifiedAnomalies.filter((a) => !selectedProject || a.project === selectedProject.id)
   const availableMissions = projectMissions.filter((m) => !m.completed)
 
   const getAnomalyIcon = (type: string) => {
@@ -123,7 +170,8 @@ export function DiscoveriesView({
               <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
                 {filteredAnomalies.map((anomaly) => {
                   const project = projects.find((p) => p.id === anomaly.project)
-                  const isOtherUser = "discoveredBy" in anomaly
+                  const isOtherUser = showAllDiscoveries && "discoveredBy" in anomaly && anomaly.discoveredBy
+
                   return (
                     <Card
                       key={anomaly.id}
@@ -141,11 +189,11 @@ export function DiscoveriesView({
                             <div>
                               <CardTitle className="text-sm text-[#ECEFF4] flex items-center gap-2">
                                 {anomaly.name}
-                                {isOtherUser && (
+                                {/* {isOtherUser && (
                                   <Badge variant="outline" className="text-xs border-[#B48EAD] text-[#B48EAD]">
                                     {(anomaly as any).discoveredBy}
                                   </Badge>
-                                )}
+                                )} */}
                               </CardTitle>
                               <CardDescription className="text-xs text-[#D8DEE9] flex items-center gap-2">
                                 <Badge variant="outline" className="text-xs border-[#5E81AC] text-[#88C0D0]">
@@ -169,6 +217,11 @@ export function DiscoveriesView({
                           <span>Classified: {anomaly.discoveryDate}</span>
                           <span>{project?.name}</span>
                         </div>
+                        {(anomaly as any).classificationContent && (
+                          <div className="text-xs text-[#D8DEE9] mt-2 p-2 bg-[#2E3440] rounded">
+                            {(anomaly as any).classificationContent}
+                          </div>
+                        )}
                       </CardHeader>
                     </Card>
                   )
@@ -244,4 +297,4 @@ export function DiscoveriesView({
       </div>
     </div>
   )
-}
+};
