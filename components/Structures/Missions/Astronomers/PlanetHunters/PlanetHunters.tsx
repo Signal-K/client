@@ -7,6 +7,7 @@ import {
   SpeakerIcon,
   DiscAlbum,
   PersonStandingIcon,
+  Paintbrush2Icon,
 } from "lucide-react";
 
 import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
@@ -72,6 +73,19 @@ const PlanetHuntersSteps = () => {
       action: () => {},
       chapter: 1,
     },
+    {
+      id: 5,
+      title: "Paint a planet",
+      description: "Now comes the fun part - you can explore and customise planet candidates you've discovered",
+      icon: Paintbrush2Icon,
+      points: 1,
+      completedCount: 0,
+      internalComponent: () => <></>,
+      color: 'text-green-300',
+      shadow: true,
+      action: () => {},
+      chapter: 2,
+    },
     // {
     //   id: 5,
     //   title: "Calculate planetary temperatures",
@@ -92,7 +106,7 @@ const PlanetHuntersSteps = () => {
   const [currentChapter, setCurrentChapter] = useState<number>(1);
 
   const maxUnlockedChapter = Math.max(
-    Math.floor(experiencePoints / 9) + 1,
+    Math.floor(experiencePoints / 5) + 1,
     Math.max(...missions.map((m) => m.chapter))
   );
 

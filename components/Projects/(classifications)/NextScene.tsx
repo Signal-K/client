@@ -178,7 +178,6 @@ export default function ClientClassificationPage({ id }: Props) {
             <h1 className="text-xl font-semibold text-[#2E3440]">Discovery Summary</h1>
             <p className="text-md text-[#4C566A]">{classification.content}</p>
           </div>
-
           {mediaUrl && (
             <div className="relative group rounded-md overflow-hidden border border-[#D8DEE9]">
               <Dialog>
@@ -188,12 +187,16 @@ export default function ClientClassificationPage({ id }: Props) {
                     alt="Annotated Media"
                     width={600}
                     height={300}
-                    className="w-full h-auto cursor-zoom-in transition-transform duration-200 group-hover:scale-105"
+                    className="w-full h-[300px] object-contain cursor-zoom-in transition-transform duration-200 group-hover:scale-105"
                   />
                 </DialogTrigger>
-                <DialogContent className="p-0 bg-transparent shadow-none border-none max-w-4xl">
-                  <img src={mediaUrl} alt="Full View" className="w-full h-auto rounded-lg" />
-                </DialogContent>
+                {/* <DialogContent className="p-0 bg-transparent shadow-none border-none max-w-4xl">
+                  <img
+                    src={mediaUrl}
+                    alt="Full View"
+                    className="w-full max-h-[6000px] rounded-lg object-contain"
+                  />
+                </DialogContent> */}
               </Dialog>
             </div>
           )}
@@ -208,7 +211,9 @@ export default function ClientClassificationPage({ id }: Props) {
             {milestones === null ? (
               <div className="text-sm text-[#4C566A]">Checking milestones...</div>
             ) : milestones.length === 0 ? (
-              <div className="text-sm text-[#4C566A] italic">No related milestones for this classification type.</div>
+              <div className="text-sm text-[#4C566A] italic">
+                No related milestones for this classification type.
+              </div>
             ) : (
               milestones.map((m) => (
                 <div
@@ -238,18 +243,20 @@ export default function ClientClassificationPage({ id }: Props) {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#D8DEE9]">
-            {/* <Button variant="secondary" onClick={() => router.push(studyUrl)}>
-              🔍 Continue Studying
-            </Button> */}
             <Button variant="outline" onClick={() => router.push(`/structures/${structure}`)}>
               🧬 Back to Structure
             </Button>
             <Button variant="ghost" onClick={() => router.push('/')}>
               🏠 Home
             </Button>
-            <Button variant="default" onClick={() => router.push('/research')}>
+            {/* <Button variant="default" onClick={() => router.push('/research')}>
               🌟 View Stardust / Research
-            </Button>
+            </Button> */}
+            {type === 'planet' && (
+              <Button variant="default" onClick={() => router.push(`/planets/${classification.id}`)}>
+                🪐 Customise planet
+              </Button>
+            )}
           </div>
         </div>
       </div>

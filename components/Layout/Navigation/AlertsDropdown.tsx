@@ -114,7 +114,8 @@ async function generateAlerts(supabase: any, session: any): Promise<AlertItem[]>
       alerts.push({
         id: `anomaly-${linkedAnomaly.id}`,
         type: 'anomaly',
-        message: `New ${anomalyType} discovered, classify it for bonus stardust`,
+        // message: `New ${anomalyType} discovered, classify it for bonus stardust`,
+        message: `New anomaly discovered, classify it for bonus stardust`,
         anomalyId: linkedAnomaly.anomaly.id,
         anomaly: { anomalytype: anomalyType },  // attach anomalytype for routing
       });
@@ -280,7 +281,7 @@ export default function ResponsiveAlerts() {
     <>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] md:from-[#81A1C1] md:to-[#B48EAD]">
-          Daily Alert
+          Notifications
         </h2>
         {alerts.length > 1 && (
           <span className="text-xs text-gray-500 md:text-[#A3BE8C]">
@@ -335,7 +336,7 @@ export default function ResponsiveAlerts() {
           </div>
         )}
 
-        {currentAlert?.type !== 'completion' && (
+        {/* {currentAlert?.type !== 'completion' && (
           <div className="flex justify-center">
             <Button
               variant="secondary"
@@ -346,7 +347,7 @@ export default function ResponsiveAlerts() {
               Dismiss
             </Button>
           </div>
-        )}
+        )} */}
       </div>
     </>
   );
