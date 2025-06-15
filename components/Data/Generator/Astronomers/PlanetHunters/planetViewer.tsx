@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect} from "react"
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls, Stars } from "@react-three/drei"
 import { Cog } from "lucide-react"
@@ -10,11 +10,18 @@ import SettingsPanel from "./SettingsPanel"
 
 interface PlanetViewerProps {
   planetConfig: PlanetConfig
-  onConfigChange: (config: Partial<PlanetConfig>) => void
+  onConfigChange: (config: Partial<PlanetConfig>) => void;
+  editMode?: boolean;
 };
 
-export default function PlanetViewer({ planetConfig, onConfigChange }: PlanetViewerProps) {
+export default function PlanetViewer({ planetConfig, onConfigChange, editMode }: PlanetViewerProps) {
   const [showSettings, setShowSettings] = useState(false)
+
+  useEffect(() => {
+    if (editMode) {
+      setShowSettings(true)
+    }
+  }, [editMode])
 
   return (
     <div className="w-full h-screen relative">

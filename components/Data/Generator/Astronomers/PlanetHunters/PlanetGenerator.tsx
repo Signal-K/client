@@ -10,6 +10,7 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface PlanetGeneratorProps {
     classificationId: string;
+    editMode?: boolean;
 };
 
 interface PlanetStats {
@@ -20,7 +21,8 @@ interface PlanetStats {
 
 export default function PlanetGenerator({
     classificationId,
-}: PlanetGeneratorProps) {
+    editMode,
+}: PlanetGeneratorProps) { 
     const supabase = useSupabaseClient();
 
     const [planetConfig, setPlanetConfig] = useState<PlanetConfig>(defaultPlanetConfig);
@@ -125,7 +127,7 @@ export default function PlanetGenerator({
     return (
         <main className="flex w-full relative flex-col">
             <div className="w-full h-screen">
-                <PlanetViewer planetConfig={planetConfig} onConfigChange={handleConfigChange} />
+                <PlanetViewer planetConfig={planetConfig} onConfigChange={handleConfigChange} editMode={editMode} />
             </div>
 
             <p>{JSON.stringify(planetStats, null, 2)}</p>
