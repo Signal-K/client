@@ -13,10 +13,10 @@ import ModernTechTree from "@/components/Structures/Research/TechTree";
 import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
 import { SunspotsWrapper } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
-import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
+// import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
 // import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";
 import PlanktonPortal from "@/components/Structures/Missions/Biologists/Plankton/PlanktonPortal";
-import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
+// import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
 // import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
 import { AiForMarsProject } from "@/components/Projects/Auto/AI4Mars";
 import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
@@ -382,38 +382,38 @@ export const StructuresConfig: StructureConfig = {
         // },
       ],
     },
-    3107: {
-      name: "Launchpad",
-      title: "Rocket Launchpad",
-      labels: [
-        {
-          text: "Manned Vehicles",
-          variant: "default",
-        },
-      ],
-      imageSrc: '/assets/Items/Launchpad.jpg',
-      actions: [
-        // {
-        //   icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Repair",
-        //   dynamicComponent: <StructureRepair inventoryId={3107} />,
-        // },
-      ],
-      buttons: [
-        // {
-        //   icon: <CaravanIcon className="w-6 h-6 text-[#5e81ac]" />,
-        //   text: "Build a rocket",
-        // },
-        {
-          icon: <PowerIcon className="w-6 h-6 text-[#5e81ac]" />,
-          text: "Launch a rocket (travel)",
-          // dynamicComponent: <LaunchpadStructure />,
-          dynamicComponent: <SwitchPlanet />,
-          sizePercentage: 60,
+    // 3107: {
+    //   name: "Launchpad",
+    //   title: "Rocket Launchpad",
+    //   labels: [
+    //     {
+    //       text: "Manned Vehicles",
+    //       variant: "default",
+    //     },
+    //   ],
+    //   imageSrc: '/assets/Items/Launchpad.jpg',
+    //   actions: [
+    //     // {
+    //     //   icon: <CogIcon className="w-6 h-6 text-[#5e81ac]" />,
+    //     //   text: "Repair",
+    //     //   dynamicComponent: <StructureRepair inventoryId={3107} />,
+    //     // },
+    //   ],
+    //   buttons: [
+    //     // {
+    //     //   icon: <CaravanIcon className="w-6 h-6 text-[#5e81ac]" />,
+    //     //   text: "Build a rocket",
+    //     // },
+    //     {
+    //       icon: <PowerIcon className="w-6 h-6 text-[#5e81ac]" />,
+    //       text: "Launch a rocket (travel)",
+    //       // dynamicComponent: <LaunchpadStructure />,
+    //       dynamicComponent: <SwitchPlanet />,
+    //       sizePercentage: 60,
 
-        },
-      ]
-    },
+    //     },
+    //   ]
+    // },
     10600: {
       name: "Helicopter (test)",
       labels: [],

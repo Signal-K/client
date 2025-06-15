@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { Anomaly } from "../Telescopes/Transiting";
-import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
 interface SelectedAnomProps {
@@ -126,9 +125,9 @@ export function CloudspottingShapesWrapper() {
 
     return (
         <div className="space-y-8">
-            {!selectedAnomaly && (
+            {/* {!selectedAnomaly && (
                 <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
-            )}
+            )} */}
             {selectedAnomaly && (
                 <StarterCoMShapes anomalyid={selectedAnomaly} />
             )}

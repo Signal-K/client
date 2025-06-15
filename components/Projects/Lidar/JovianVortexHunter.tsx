@@ -6,7 +6,6 @@ import ClassificationForm from "../(classifications)/PostForm";
 
 import { Anomaly } from "../Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { PreferredGaseousClassifications } from "@/components/Structures/Missions/PickPlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 import { Button } from "@/components/ui/button";
 
@@ -347,9 +346,9 @@ export function JVHWrapper() {
 
   return (
     <div className="space-y-8">
-      {!selectedAnomaly && (
+      {/* {!selectedAnomaly && (
         <PreferredGaseousClassifications onSelectAnomaly={setSelectedAnomaly} />
-      )}
+      )} */}
       {selectedAnomaly && <LidarJVHSatellite anomalyid={selectedAnomaly} />}
       {/* <p>{selectedAnomaly}</p> */}
     </div>

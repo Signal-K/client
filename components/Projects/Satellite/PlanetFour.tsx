@@ -11,7 +11,6 @@ import * as markerjs2 from "markerjs2";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
-import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 
 interface Props {
     anomalyid: number | bigint;
@@ -346,9 +345,9 @@ export function P4Wrapper () {
 
     return (
         <div className="space-y-8">
-            {!selectedAnomaly && (
+            {/* {!selectedAnomaly && (
                 <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
-            )}
+            )} */}
             {selectedAnomaly && (
                 <PlanetFourProject anomalyid={selectedAnomaly} />
             )}

@@ -8,7 +8,7 @@ import VoteJVH from "./JVHVote";
 import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
 import JVHCloudClassificationGenerator from "./GaseousPlanetCloudMaker";
 import ClassificationOptionsCounter from "@/content/Posts/ClassificationOptionsCounter";
-import { PreferredGaseousClassifications } from "../../PickPlanet";
+// import { PreferredGaseousClassifications } from "../../PickPlanet";
 
 interface Mission {
     id: number;

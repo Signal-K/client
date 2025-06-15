@@ -5,7 +5,7 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet'; 
 import ClassificationForm from '@/components/Projects/(classifications)/PostForm';
 import { planetClassificationConfig } from '@/components/Projects/(classifications)/FormConfigurations';
-import PreferredTerrestrialClassifications from '@/components/Structures/Missions/PickPlanet';
+// import PreferredTerrestrialClassifications from '@/components/Structures/Missions/PickPlanet';
 import ImageAnnotator from '../(classifications)/Annotating/Annotator';
 import { Button } from "@/components/ui/button";
 

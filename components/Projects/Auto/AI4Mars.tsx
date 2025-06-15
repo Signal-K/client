@@ -6,7 +6,6 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Anomaly } from "@/app/planets/[id]/page";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
-import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 
 interface Props {
     anomalyid: number | bigint;
@@ -364,13 +363,13 @@ export function AI4MWrapper() {
 
     return (
         <div className="space-y-8">
-            {!selectedAnomaly && (
+            {/* {!selectedAnomaly && (
                 <PreferredTerrestrialClassifications
                     onSelectAnomaly={(anomalyId: number | null, selectedVehicle: string | null) => {
                         setSelectedAnomaly(anomalyId);
                     }}
                 />
-            )} 
+            )}  */}
             {selectedAnomaly && 
                 <AiForMarsProject
                     parentClassificationId={selectedAnomaly}
@@ -392,13 +391,13 @@ export function AI4MWrapperWithHardcode({
 
     return (
         <div className="space-y-8">
-            {!selectedAnomaly && (
+            {/* {!selectedAnomaly && (
                 <PreferredTerrestrialClassifications
                     onSelectAnomaly={(anomalyId: number | null, selectedVehicle: string | null) => {
                         setSelectedAnomaly(anomalyId);
                     }}
                 />
-            )} 
+            )}  */}
             {selectedAnomaly && 
                 <AiForMarsProjectWithID
                     anomalyid={anomalyId}

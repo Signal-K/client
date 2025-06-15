@@ -6,7 +6,6 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
 import { Anomaly } from "../Telescopes/Transiting";
 import { CloudspottingOnMarsTutorial } from "./cloudspottingOnMars"; 
-import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
 export interface SelectedAnomProps {
@@ -246,9 +245,9 @@ export function CloudspottingWrapper() {
 
     return (
         <div className="space-y-8">
-            {!selectedAnomaly && (
+            {/* {!selectedAnomaly && (
                 <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
-            )}
+            )} */}
             {selectedAnomaly && (
                 <StarterLidar anomalyid={selectedAnomaly} />
             )}
@@ -267,9 +266,9 @@ export function CloudspottingWrapperWithHardcode({
 
     return (
         <div className="space-y-8">
-            {!selectedAnomaly && (
+            {/* {!selectedAnomaly && (
                 <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
-            )}
+            )} */}
             {selectedAnomaly && (
                 <StarterLidar anomalyid={anomalyId} />
             )}

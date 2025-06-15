@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
 import { SciFiPanel } from "@/components/ui/styles/sci-fi/panel";
-import PickPlanet from "../../PickPlanetStandalone";
+// import PickPlanet from "../../PickPlanetStandalone";
 // import PlanetTempCalculator from "./TemperatureCalc";
 import { SciFiButton } from "@/components/ui/styles/sci-fi/button";
 
@@ -104,7 +104,7 @@ export default function PlanetHuntersTemperatureWrapper() {
 
   return (
     <div className="space-y-8">
-      {!selectedAnomaly && <PickPlanet onSelectAnomaly={setSelectedAnomaly} />}
+      {/* {!selectedAnomaly && <PickPlanet onSelectAnomaly={setSelectedAnomaly} />} */}
       {selectedAnomaly && <PlanetTemperatureForm anomalyid={selectedAnomaly} />}
     </div>
   );

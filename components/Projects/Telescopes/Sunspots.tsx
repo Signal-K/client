@@ -167,7 +167,6 @@ const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
 };
 
 import { Anomaly } from "./Transiting";
-import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
 export function StarterSunspot({ anomalyid }: SelectedAnomalyProps ) {
@@ -264,11 +263,11 @@ export function SunspotsWrapper() {
 
     return (
         <div className="space-y-8">
-            {!selectedAnomaly && (
+            {/* {!selectedAnomaly && (
                 <PreferredTerrestrialClassifications
                     onSelectAnomaly={setSelectedAnomaly}
                 />
-            )}
+            )} */}
             {selectedAnomaly && (
                 <StarterSunspot 
                     anomalyid={selectedAnomaly}
