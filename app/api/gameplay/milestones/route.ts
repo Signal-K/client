@@ -2,6 +2,39 @@ import { Telescope } from "lucide-react";
 import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
+            {
+        weekStart: '2025-06-15',
+        data: [
+            {
+                name: 'Propose 3 planet candidates',
+                structure: "Telescope",
+                group: 'Astronomy',
+                icon: "Telescope",
+                extendedDescription: '',
+                xp: 3,
+                completionInfo: '',
+                rewardInfo: '',
+                table: "classifications",
+                field: "classificationtype",
+                value: "planet",
+                requiredCount: 3,
+            },
+            {
+                name: 'Review satellite data',
+                structure: "WeatherBalloon",
+                group: 'Meteorology',
+                icon: "SnowflakeIcon",
+                extendedDescription: '',
+                xp: 2,
+                completionInfo: '',
+                rewardInfo: '',
+                table: "classifications",
+                field: "classificationtype",
+                value: "satellite-planetFour",
+                requiredCount: 2,
+            },
+        ],
+    },
         {
         weekStart: '2025-06-06',
         data: [
@@ -18,20 +51,6 @@ const milestones = [
                 field: "classificationtype",
                 value: "planet",
                 requiredCount: 5,
-            },
-            {
-                name: 'Review satellite data',
-                structure: "WeatherBalloon",
-                group: 'Meteorology',
-                icon: "SnowflakeIcon",
-                extendedDescription: '',
-                xp: 2,
-                completionInfo: '',
-                rewardInfo: '',
-                table: "classifications",
-                field: "classificationtype",
-                value: "satellite-planetFour",
-                requiredCount: 2,
             },
         ],
     },
