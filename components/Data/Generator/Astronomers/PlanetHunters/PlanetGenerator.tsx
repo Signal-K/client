@@ -127,7 +127,7 @@ export default function PlanetGenerator({
     return (
         <main className="flex w-full relative flex-col">
             <div className="w-full h-screen">
-                <PlanetViewer planetConfig={planetConfig} onConfigChange={handleConfigChange} editMode={editMode} />
+                <PlanetViewer planetConfig={planetConfig} onConfigChange={handleConfigChange} classificationId={classificationId} editMode={editMode} />
             </div>
 
             <p>{JSON.stringify(planetStats, null, 2)}</p>

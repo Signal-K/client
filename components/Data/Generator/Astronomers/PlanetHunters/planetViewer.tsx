@@ -12,9 +12,10 @@ interface PlanetViewerProps {
   planetConfig: PlanetConfig
   onConfigChange: (config: Partial<PlanetConfig>) => void;
   editMode?: boolean;
+  classificationId?: string;
 };
 
-export default function PlanetViewer({ planetConfig, onConfigChange, editMode }: PlanetViewerProps) {
+export default function PlanetViewer({ planetConfig, onConfigChange, editMode, classificationId }: PlanetViewerProps) {
   const [showSettings, setShowSettings] = useState(false)
 
   useEffect(() => {
@@ -66,7 +67,11 @@ export default function PlanetViewer({ planetConfig, onConfigChange, editMode }:
               </svg>
             </button>
           </div>
-          <SettingsPanel planetConfig={planetConfig} onChange={onConfigChange} />
+          <SettingsPanel
+            planetConfig={planetConfig}
+            classificationId={classificationId ? Number(classificationId) : undefined}
+            onChange={onConfigChange}
+          />
         </div>
       )}
     </div>

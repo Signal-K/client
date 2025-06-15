@@ -253,7 +253,7 @@ export default function ClientClassificationPage({ id }: Props) {
               🌟 View Stardust / Research
             </Button> */}
             {type === 'planet' && (
-              <Button variant="default" onClick={() => router.push(`/planets/${classification.id}`)}>
+              <Button variant="default" onClick={() => router.push(`/planets/paint/${classification.id}`)}>
                 🪐 Customise planet
               </Button>
             )}
