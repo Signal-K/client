@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
 import StructuresOnPlanet from "@/components/Structures/Structures";
-// import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import Navbar from "@/components/Layout/Navbar";
 
 interface Classification {
@@ -16,11 +15,10 @@ interface Classification {
   media: string[] | null;
   classificationtype: string | null;
   classificationConfig?: any | null;
-};
+}
 
 export default function SinglePostPage({ params }: { params: { id: string } }) {
   const supabase = useSupabaseClient();
-  
   const [classification, setClassification] = useState<Classification | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +30,7 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
         setError("Invalid classification ID.");
         setLoading(false);
         return;
-      };
+      }
 
       try {
         const { data, error } = await supabase
@@ -46,9 +44,7 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
         } else {
           const flattenedMedia = (data.media || [])
             .flat()
-            .filter(
-              (url: string) => typeof url === "string" && url.startsWith("http")
-            );
+            .filter((url: string) => typeof url === "string" && url.startsWith("http"));
 
           setClassification({
             ...data,
@@ -68,32 +64,29 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
 
   if (loading)
     return (
-      <div className="min-h-screen w-full flex flex-col">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <img
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover z-0"
           src="/assets/Backdrops/Earth.png"
           alt="Backdrop"
         />
-        <div className="relative min-h-screen container mx-auto py-8">
-          <p>Loading classification...</p>
-        </div>
+        <div className="relative z-10 text-white text-lg">Loading classification...</div>
       </div>
     );
 
-  if (error) return <p>{error}</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
   if (!classification) return <p>No classification found.</p>;
 
   return (
-    <div className="min-h-screen w-full flex flex-col">
-      <Navbar />
+    <div className="relative min-h-screen w-full overflow-hidden">
       <img
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover z-0"
         src="/assets/Backdrops/Earth.png"
         alt="Backdrop"
       />
-      <div className="relative flex items-center justify-center min-h-screen container mx-auto">
+      <div className="relative z-10 flex items-center justify-center px-4 py-12 min-h-screen">
         {classification.author && (
-          <div className="w-1/2">
+          <div className="w-full max-w-3xl">
             <SimplePostSingle
               id={classification.id.toString()}
               title={`Classification #${classification.id}`}
@@ -101,8 +94,11 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
               content={classification.content || "No content available"}
               category={classification.classificationtype || "Unknown"}
               images={classification.media || []}
+              classificationConfiguration={classification.classificationConfig}
             />
-            <StructuresOnPlanet author={classification.author} />
+            {/* <div className="mt-8">
+              <StructuresOnPlanet author={classification.author} />
+            </div> */}
           </div>
         )}
       </div>

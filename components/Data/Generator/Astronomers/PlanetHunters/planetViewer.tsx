@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect} from "react"
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls, Stars } from "@react-three/drei"
 import { Cog } from "lucide-react"
@@ -10,11 +10,19 @@ import SettingsPanel from "./SettingsPanel"
 
 interface PlanetViewerProps {
   planetConfig: PlanetConfig
-  onConfigChange: (config: Partial<PlanetConfig>) => void
+  onConfigChange: (config: Partial<PlanetConfig>) => void;
+  editMode?: boolean;
+  classificationId?: string;
 };
 
-export default function PlanetViewer({ planetConfig, onConfigChange }: PlanetViewerProps) {
+export default function PlanetViewer({ planetConfig, onConfigChange, editMode, classificationId }: PlanetViewerProps) {
   const [showSettings, setShowSettings] = useState(false)
+
+  useEffect(() => {
+    if (editMode) {
+      setShowSettings(true)
+    }
+  }, [editMode])
 
   return (
     <div className="w-full h-screen relative">
@@ -59,7 +67,11 @@ export default function PlanetViewer({ planetConfig, onConfigChange }: PlanetVie
               </svg>
             </button>
           </div>
-          <SettingsPanel planetConfig={planetConfig} onChange={onConfigChange} />
+          <SettingsPanel
+            planetConfig={planetConfig}
+            classificationId={classificationId ? Number(classificationId) : undefined}
+            onChange={onConfigChange}
+          />
         </div>
       )}
     </div>

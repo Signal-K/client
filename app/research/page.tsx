@@ -11,6 +11,7 @@ import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
 import BiologyResearch from "@/components/Research/BiologyItems";
 import AstronomyResearch from "@/components/Research/AstronomyItems";
 import MeteorologyResearch from "@/components/Research/MeteorologyItems";
+import ReferralCodePanel from "@/components/Account/Referrals";
 
 type CapacityKey =
   | "probeCount"
@@ -24,16 +25,87 @@ type UserCapacities = Record<CapacityKey, number>;
 
 export default function ResearchPage() {
   const router = useRouter();
-  const [availablePoints, setAvailablePoints] = useState(0);
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-  const totalPointsRef = useRef<any>(null); // Ref to TotalPoints
+  const [availablePoints, setAvailablePoints] = useState(0);
+  const totalPointsRef = useRef<any>(null);
+
+  // Referral related states
+  const [userHasReferral, setUserHasReferral] = useState<boolean | null>(null);
+  const [referralCodeInput, setReferralCodeInput] = useState("");
+  const [referralError, setReferralError] = useState<string | null>(null);
+  const [isSubmittingReferral, setIsSubmittingReferral] = useState(false);
+  const [referralSuccess, setReferralSuccess] = useState<string | null>(null);
+
+  // Check if user already has a referral code
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    const checkReferral = async () => {
+      const { data, error } = await supabase
+        .from("referrals")
+        .select("id")
+        .eq("referree_id", session.user.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking referral:", error.message);
+        setUserHasReferral(false);
+      } else {
+        setUserHasReferral(!!data);
+      }
+    };
+
+    checkReferral();
+  }, [session, supabase]);
 
   const handleDivClick = () => {
     setTimeout(() => {
       if (totalPointsRef.current?.refreshPoints) {
         totalPointsRef.current.refreshPoints();
       }
-    }, 3000); // Wait 3 seconds before triggering refresh
+    }, 3000);
+  };
+
+  // Submit referral code for user
+  const handleReferralSubmit = async () => {
+    setReferralError(null);
+    setReferralSuccess(null);
+
+    if (!session?.user?.id) {
+      setReferralError("You must be logged in to submit a referral code.");
+      return;
+    }
+
+    if (!referralCodeInput.trim()) {
+      setReferralError("Please enter a valid referral code.");
+      return;
+    }
+
+    setIsSubmittingReferral(true);
+
+    try {
+      const { error } = await supabase.from("referrals").insert({
+        referree_id: session.user.id,
+        referral_code: referralCodeInput.trim(),
+      });
+
+      if (error) {
+        setReferralError("Failed to submit referral code. Please try again.");
+        setIsSubmittingReferral(false);
+        return;
+      }
+
+      setReferralSuccess("Referral code added successfully!");
+      setUserHasReferral(true);
+      setReferralCodeInput("");
+    } catch (e) {
+      setReferralError("An unexpected error occurred.");
+    } finally {
+      setIsSubmittingReferral(false);
+    }
   };
 
   return (
@@ -80,6 +152,43 @@ export default function ResearchPage() {
                 <MeteorologyResearch />
                 <BiologyResearch />
               </div>
+
+              <div className="my-4">
+                <ReferralCodePanel />
+              </div>
+
+              {/* NEW referral input section if user has no referral yet */}
+              {userHasReferral === false && (
+                <div className="max-w-md mx-auto mt-8 p-6 bg-[#2E3440] rounded-md border border-[#5E81AC] shadow-md">
+                  <h4 className="text-lg font-semibold text-[#81A1C1] mb-2">
+                    Add Your Referral Code
+                  </h4>
+                  <p className="text-[#D8DEE9] mb-4">
+                    If someone referred you to Star Sailors, add their code to get some bonus stardust!
+                  </p>
+                  <input
+                    type="text"
+                    value={referralCodeInput}
+                    onChange={(e) => setReferralCodeInput(e.target.value)}
+                    placeholder="Enter your referral code"
+                    disabled={isSubmittingReferral}
+                    className="w-full mb-3 px-3 py-2 rounded border border-[#81A1C1] bg-[#3B4252] text-[#ECEFF4] focus:outline-none focus:ring-2 focus:ring-[#88C0D0]"
+                  />
+                  {referralError && (
+                    <p className="text-red-400 mb-2">{referralError}</p>
+                  )}
+                  {referralSuccess && (
+                    <p className="text-green-400 mb-2">{referralSuccess}</p>
+                  )}
+                  <Button
+                    onClick={handleReferralSubmit}
+                    disabled={isSubmittingReferral}
+                    className="w-full bg-[#81A1C1] text-[#2E3440] hover:bg-[#88C0D0]"
+                  >
+                    {isSubmittingReferral ? "Submitting..." : "Submit Referral"}
+                  </Button>
+                </div>
+              )}
             </main>
           </DialogContent>
         </Dialog>

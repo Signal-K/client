@@ -10,14 +10,49 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Download, Upload, RefreshCw } from "lucide-react"
 import ColorPicker from "@/utils/Generators/PH/color-picker"
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface SettingsPanelProps {
-  planetConfig: PlanetConfig
-  onChange: (config: Partial<PlanetConfig>) => void
-}
+  planetConfig: PlanetConfig;
+  onChange: (config: Partial<PlanetConfig>) => void;
+  classificationId?: number;
+};
 
-export default function SettingsPanel({ planetConfig, onChange }: SettingsPanelProps) {
-  const [showImportExport, setShowImportExport] = useState(false)
+export default function SettingsPanel({ planetConfig, onChange, classificationId }: SettingsPanelProps) {
+  const supabase = useSupabaseClient();
+
+  const [showImportExport, setShowImportExport] = useState(false);
+
+useEffect(() => {
+  async function loadPlanetConfigFromClassification() {
+    if (!classificationId) return
+
+    try {
+      const { data, error } = await supabase
+        .from("classifications")
+        .select("id, classificationConfiguration")
+        .eq("id", classificationId)
+        .single()
+
+      if (error) {
+        console.error("Failed to fetch classification:", error)
+        return
+      }
+
+      const planetConfig = data?.classificationConfiguration?.planetConfiguration
+
+      if (planetConfig) {
+        onChange(planetConfig)
+      } else {
+        console.warn("No planetConfiguration found in classification")
+      }
+    } catch (err) {
+      console.error("Error loading classification:", err)
+    }
+  }
+
+  loadPlanetConfigFromClassification()
+}, [classificationId])
 
   // Update liquid type based on temperature
   useEffect(() => {

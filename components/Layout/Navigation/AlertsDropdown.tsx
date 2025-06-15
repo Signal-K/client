@@ -1,31 +1,48 @@
-'use client';
+import { useState, useEffect } from 'react';
+import { Bell } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
+import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
+import { formatDistanceToNow, startOfDay, addDays, subDays } from 'date-fns';
+import Cookies from 'js-cookie';
 
-import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { formatDistanceToNow, startOfDay, addDays } from "date-fns";
-import Cookies from "js-cookie";
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Bell } from "lucide-react";
-
-interface Milestone {
+interface LinkedAnomaly {
   id: string;
-  name: string;
-  structure: string;
-  table: string;
-  field: string;
-  value: string;
-  requiredCount: number;
+  anomaly: {
+    id: number;
+    anomalytype: string;
+    content: string;
+    classification_status: string;
+  };
+  date: string; // updated from created_at to date
 }
 
-const FIELD_ALIASES: Record<string, Record<string, string>> = {
-  events: {
-    eventtype: "type",
-  },
-};
+interface UpcomingEvent {
+  id: number;
+  type: string;
+  time: string;
+  location: {
+    id: number;
+    content: string;
+  };
+  classification_location: {
+    id: number;
+  };
+}
+
+interface AlertItem {
+  id: string;
+  type: 'anomaly' | 'event' | 'completion';
+  message: string;
+  anomalyId?: number;
+  eventId?: number;
+  classificationId?: number;
+  anomaly?: {
+    anomalytype?: string; // added to easily access anomalytype
+  };
+}
 
 const getCookieKey = (userId: string, week: string) => `dismissed-alerts-${userId}-${week}`;
 
@@ -39,122 +56,127 @@ const playRandomSound = () => {
   audio.play().catch((err) => console.error("Failed to play sound:", err));
 };
 
-async function generateAlerts(supabase: any, session: any) {
-  if (!session?.user) return { milestoneAlerts: [], structureSources: [] };
+async function generateAlerts(supabase: any, session: any): Promise<AlertItem[]> {
+  if (!session?.user) return [];
 
   const userId = session.user.id;
+  const weekAgo = subDays(new Date(), 7);
+  const alerts: AlertItem[] = [];
 
-  const milestoneRes = await fetch("/api/gameplay/milestones");
-  const milestoneData = await milestoneRes.json();
-  const thisWeekMilestones = milestoneData.playerMilestones
-    .map((week: { weekStart: string | number | Date; }) => ({
-      ...week,
-      weekStartDate: new Date(week.weekStart),
-    }))
-    .sort((a: { weekStartDate: { getTime: () => number; }; }, b: { weekStartDate: { getTime: () => number; }; }) => b.weekStartDate.getTime() - a.weekStartDate.getTime())
-  [0];
+  try {
+    // Get linked anomalies from the last 7 days
+    const { data: linkedAnomalies, error: linkedError } = await supabase
+      .from('linked_anomalies')
+      .select(`
+        id,
+        date,
+        anomaly:anomalies(
+          id,
+          anomalytype,
+          content,
+          classification_status
+        )
+      `)
+      .eq('author', userId)
+      .gte('date', weekAgo.toISOString())
+      .order('date', { ascending: false });
 
-  if (!thisWeekMilestones) return { milestoneAlerts: [], structureSources: [] };
+    if (linkedError) {
+      console.error('Error fetching linked anomalies:', linkedError);
+      return [];
+    }
 
-  const { weekStart, data } = thisWeekMilestones;
-  const startDate = new Date(weekStart);
-  const endDate = addDays(startDate, 6);
-  const cookieKey = getCookieKey(userId, weekStart);
-  const dismissedIds = JSON.parse(Cookies.get(cookieKey) || "[]");
+    // Get existing classifications for these anomalies
+    const linkedAnomalyIds = linkedAnomalies?.map((la: { anomaly: { id: any; }; }) => la.anomaly.id) || [];
+    
+    const { data: existingClassifications } = await supabase
+      .from('classifications')
+      .select('anomaly')
+      .eq('author', userId)
+      .in('anomaly', linkedAnomalyIds);
 
-  const milestoneAlerts: string[] = [];
-  const structureSources: string[] = [];
+    const classifiedAnomalyIds = new Set(existingClassifications?.map((c: { anomaly: any; }) => c.anomaly) || []);
 
-  for (const milestone of data as Milestone[]) {
-    if (dismissedIds.includes(milestone.id)) continue;
+    // Get dismissed alerts
+    const currentWeek = new Date().toISOString().split('T')[0];
+    const cookieKey = getCookieKey(userId, currentWeek);
+    const dismissedIds = JSON.parse(Cookies.get(cookieKey) || "[]");
 
-    const actualField = FIELD_ALIASES[milestone.table]?.[milestone.field] ?? milestone.field;
+    // Filter unclassified anomalies that haven't been dismissed
+    const unclassifiedAnomalies = linkedAnomalies?.filter((la: { anomaly: { id: unknown; }; id: any; }) => 
+      !classifiedAnomalyIds.has(la.anomaly.id) && 
+      !dismissedIds.includes(`anomaly-${la.id}`)
+    ) || [];
 
-    const { count, error } = await supabase
-      .from(milestone.table)
-      .select("*", { count: "exact" })
-      .gte("created_at", startDate.toISOString())
-      .lte("created_at", endDate.toISOString())
-      .eq(actualField, milestone.value)
-      .eq("author", userId);
+    // Add anomaly alerts
+    for (const linkedAnomaly of unclassifiedAnomalies) {
+      const anomalyType = linkedAnomaly.anomaly.anomalytype || 'unknown object';
+      alerts.push({
+        id: `anomaly-${linkedAnomaly.id}`,
+        type: 'anomaly',
+        // message: `New ${anomalyType} discovered, classify it for bonus stardust`,
+        message: `New anomaly discovered, classify it for bonus stardust`,
+        anomalyId: linkedAnomaly.anomaly.id,
+        anomaly: { anomalytype: anomalyType },  // attach anomalytype for routing
+      });
+    }
 
-    if (error) continue;
-    if ((count ?? 0) >= milestone.requiredCount) continue;
+    // Get upcoming events
+    const { data: upcomingEvents, error: eventsError } = await supabase
+      .from('events')
+      .select(`
+        id,
+        type,
+        time,
+        completed,
+        location:anomalies(id, content),
+        classification_location:classifications(id)
+      `)
+      .eq('classifications.author', userId)
+      .eq('completed', false)
+      .gte('time', new Date().toISOString())
+      .order('time', { ascending: true })
+      .limit(5);
 
-    let msg = `Mission incomplete: ${milestone.name} — visit the ${milestone.structure} to contribute.`;
+    if (!eventsError && upcomingEvents) {
+      for (const event of upcomingEvents) {
+        if (!dismissedIds.includes(`event-${event.id}`)) {
+          alerts.push({
+            id: `event-${event.id}`,
+            type: 'event',
+            message: `Upcoming ${event.type} event on planet ${event.location?.content || 'Unknown'}`,
+            eventId: event.id,
+            classificationId: event.classification_location?.id
+          });
+        }
+      }
+    }
 
-    if (milestone.structure === 'WeatherBalloon') {
-      switch (milestone.value) {
-        case 'sunspot':
-          msg = "Sunspot activity detected — deploy Weather Balloon.";
-          break;
-        case 'satellite-planetFour':
-          msg = "Dust storm approaching — assist in image classification.";
-          break;
-        case 'automaton-aiForMars':
-          msg = "Rover anomaly reported — initiate diagnostics.";
-          break;
-        case 'lidar-jovianVortexHunter':
-          msg = "Cyclonic activity spotted — help verify data.";
-          break;
-        case 'cloud':
-        case 'upload-request':
-          msg = "Our scientists need more data - please use your phone's camera to show us what's going on in your area.";
-          break;
-        case 'balloon-marsCloudShapes':
-          msg = "Unusual cloud formations detected — your analysis is needed.";
-          break;
-      };
-    };
+    // If no alerts, show completion message
+    if (alerts.length === 0) {
+      alerts.push({
+        id: 'completion',
+        type: 'completion',
+        message: "No primary objects left to classify. Great work!"
+      });
+    }
 
-    if (milestone.structure === 'Greenhouse') {
-      msg = "Sensor trigger from your desert/ocean pod — investigate recent anomaly.";
-    };
-
-    milestoneAlerts.push(msg);
-    structureSources.push(milestone.structure);
-  };
-
-  const { data: classifications } = await supabase
-    .from("classifications")
-    .select("id, anomaly, author, created_at")
-    .eq("author", userId)
-    .in("classificationtype", ["planet", "telescope-minorPlanet"]);
-
-  // if ((classifications ?? []).length > 0) {
-  //   const classificationIds = classifications ? classifications.map((c: { id: any; }) => c.id) : [];
-  //   const { data: weeklyEvents } = await supabase
-  //     .from("events")
-  //     .select("id, classification_location, created_at")
-  //     .in("classification_location", classificationIds)
-  //     .gte("created_at", startDate.toISOString())
-  //     .lte("created_at", endDate.toISOString());
-
-  //   const userCreatedEventCount = weeklyEvents?.length ?? 0;
-
-  //   if (userCreatedEventCount === 0) {
-  //     const hasAvailablePlanetEvent = true;
-  //     if (hasAvailablePlanetEvent) {
-  //       milestoneAlerts.push("Your planet awaits a storm event — create one before the week ends.");
-  //       structureSources.push("WeatherBalloon");
-  //     }
-  //   }
-  // }
-
-  if (milestoneAlerts.length === 0) {
-    milestoneAlerts.push("You've completed all milestone goals this week!");
-    structureSources.push("");
+    return alerts;
+  } catch (error) {
+    console.error('Error generating alerts:', error);
+    return [{
+      id: 'error',
+      type: 'completion',
+      message: "Unable to load alerts at this time."
+    }];
   }
-
-  return { milestoneAlerts, structureSources };
 }
 
-export default function AlertsDropdown() {
+export default function ResponsiveAlerts() {
   const supabase = useSupabaseClient();
   const session = useSession();
 
-  const [alerts, setAlerts] = useState<string[]>([]);
-  const [alertStructures, setAlertStructures] = useState<string[]>([]);
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [currentAlertIndex, setCurrentAlertIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState("");
   const [hasNewAlert, setHasNewAlert] = useState(false);
@@ -162,11 +184,10 @@ export default function AlertsDropdown() {
 
   useEffect(() => {
     const fetchAlerts = async () => {
-      const { milestoneAlerts, structureSources } = await generateAlerts(supabase, session);
-      setAlerts(milestoneAlerts);
-      setAlertStructures(structureSources);
-      setHasNewAlert(milestoneAlerts.length > 0);
-      setNewNotificationsCount(milestoneAlerts.length);
+      const alertItems = await generateAlerts(supabase, session);
+      setAlerts(alertItems);
+      setHasNewAlert(alertItems.length > 0 && alertItems[0].type !== 'completion');
+      setNewNotificationsCount(alertItems.filter(a => a.type !== 'completion').length);
     };
 
     fetchAlerts();
@@ -186,95 +207,190 @@ export default function AlertsDropdown() {
   }, []);
 
   const dismissCurrentAlert = () => {
-    if (!session?.user) return;
+    if (!session?.user || alerts.length === 0) return;
 
-    fetch("/api/gameplay/milestones").then(res => res.json()).then(milestoneData => {
-      const thisWeekMilestones = milestoneData.playerMilestones.at(-1);
-      if (!thisWeekMilestones) return;
+    const currentAlert = alerts[currentAlertIndex];
+    if (currentAlert.type === 'completion') return;
 
-      const { weekStart, data } = thisWeekMilestones;
-      const cookieKey = getCookieKey(session.user.id, weekStart);
-      const dismissedIds: string[] = JSON.parse(Cookies.get(cookieKey) || "[]");
+    const currentWeek = new Date().toISOString().split('T')[0];
+    const cookieKey = getCookieKey(session.user.id, currentWeek);
+    const dismissedIds: string[] = JSON.parse(Cookies.get(cookieKey) || "[]");
+    const updated = [...new Set([...dismissedIds, currentAlert.id])];
+    Cookies.set(cookieKey, JSON.stringify(updated), { expires: 7 });
 
-      const current = data.find((_: { id: any }, index: any) => {
-        const incompleteAndNotDismissed = data.filter((m: Milestone) => {
-          const actualField = FIELD_ALIASES[m.table]?.[m.field] ?? m.field;
-          return !dismissedIds.includes(m.id);
-        });
-        return incompleteAndNotDismissed[currentAlertIndex]?.id === _.id;
-      });
+    playRandomSound();
 
-      if (current?.id) {
-        const updated = [...new Set([...dismissedIds, current.id])];
-        Cookies.set(cookieKey, JSON.stringify(updated), { expires: 7 });
-      }
-
-      const nextIndex = currentAlertIndex + 1;
-      playRandomSound();
-
-      if (nextIndex < alerts.length) {
-        setCurrentAlertIndex(nextIndex);
-        setNewNotificationsCount(alerts.length - (nextIndex + 1));
-      } else {
-        setAlerts(["You've completed all milestone goals this week!"]);
-        setAlertStructures([""]);
+    const nextIndex = currentAlertIndex + 1;
+    if (nextIndex < alerts.length) {
+      setCurrentAlertIndex(nextIndex);
+      setNewNotificationsCount(Math.max(0, newNotificationsCount - 1));
+    } else {
+      generateAlerts(supabase, session).then(alertItems => {
+        setAlerts(alertItems);
         setCurrentAlertIndex(0);
         setHasNewAlert(false);
         setNewNotificationsCount(0);
-      }
-    });
+      });
+    }
   };
 
-  const currentStructure = alertStructures[currentAlertIndex]?.toLowerCase();
-  const structurePath = currentStructure
-    ? `/structures/${currentStructure === "weatherballoon" ? "balloon" : currentStructure}`
-    : null;
+  const goToPrevious = () => {
+    if (currentAlertIndex > 0) {
+      setCurrentAlertIndex(currentAlertIndex - 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (currentAlertIndex < alerts.length - 1) {
+      setCurrentAlertIndex(currentAlertIndex + 1);
+    }
+  };
+
+  const currentAlert = alerts[currentAlertIndex];
+
+  const getActionPath = () => {
+    if (!currentAlert) return null;
+
+    if (currentAlert.type === 'anomaly' && currentAlert.anomalyId) {
+      const type = currentAlert.anomaly?.anomalytype || '';
+
+      if (
+        type === 'automatonSatellitePhoto' ||
+        type === 'satellitePics' ||
+        type === 'gaseousMapping' ||
+        type === 'cloud'
+      ) {
+        return '/structures/balloon';
+      } else if (type === 'zoodexOthers') {
+        return '/structures/greenhouse';
+      } else {
+        return '/structures/telescope';
+      }
+    }
+
+    if (currentAlert.type === 'event' && currentAlert.classificationId) {
+      return `/classification/${currentAlert.classificationId}`;
+    }
+
+    return null;
+  };
+
+  const actionPath = getActionPath();
+
+  const AlertContent = () => (
+    <>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#22d3ee] to-[#a855f7] md:from-[#81A1C1] md:to-[#B48EAD]">
+          Notifications
+        </h2>
+        {alerts.length > 1 && (
+          <span className="text-xs text-gray-500 md:text-[#A3BE8C]">
+            {currentAlertIndex + 1} of {alerts.length}
+          </span>
+        )}
+      </div>
+      
+      <div className="text-center font-semibold">
+        <p className="text-[#67e8f9] md:text-[#D8DEE9] mb-2">
+          {currentAlert?.message || "No new alerts."}
+        </p>
+        <p className="text-xs text-gray-500 md:text-[#A3BE8C]">
+          Time remaining until next event: {timeRemaining}
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-2 mt-4">
+        {actionPath && (
+          <div className="flex justify-center">
+            <Link href={actionPath}>
+              <Button 
+                variant="default" 
+                className="md:bg-[#88C0D0] md:hover:bg-[#81A1C1] md:text-[#2E3440]"
+              >
+                {currentAlert?.type === 'anomaly' ? 'Classify Object' : 'View Event'}
+              </Button>
+            </Link>
+          </div>
+        )}
+
+        {alerts.length > 1 && (
+          <div className="flex justify-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToPrevious}
+              disabled={currentAlertIndex === 0}
+              className="md:bg-[#4C566A] md:hover:bg-[#5E81AC] md:text-[#ECEFF4] md:border-[#5E81AC]"
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToNext}
+              disabled={currentAlertIndex === alerts.length - 1}
+              className="md:bg-[#4C566A] md:hover:bg-[#5E81AC] md:text-[#ECEFF4] md:border-[#5E81AC]"
+            >
+              Next
+            </Button>
+          </div>
+        )}
+
+        {/* {currentAlert?.type !== 'completion' && (
+          <div className="flex justify-center">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="md:bg-[#5E81AC] md:hover:bg-[#4C566A] md:text-[#ECEFF4]"
+              onClick={dismissCurrentAlert}
+            >
+              Dismiss
+            </Button>
+          </div>
+        )} */}
+      </div>
+    </>
+  );
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative group">
-          <Bell className="h-5 w-5 text-[#81A1C1] group-hover:text-[#88C0D0] transition-colors" />
-          <span className="ml-2 text-[#ECEFF4]">Alerts</span>
-          {hasNewAlert && (
-            <Badge className="absolute -top-1 -right-1 bg-[#BF616A] text-white h-5 w-5 flex items-center justify-center p-0 text-xs">
-              {newNotificationsCount}
-            </Badge>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[400px] p-0 bg-gradient-to-b from-[#2E3440] to-[#3B4252] backdrop-blur-md border border-[#B48EAD] shadow-[0_0_15px_rgba(191,97,106,0.3)]">
-        <div className="p-4">
-          <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#81A1C1] to-[#B48EAD] mb-4">
-            Daily Alert
-          </h2>
-          <div className="mt-4 text-center text-[#D8DEE9] font-semibold">
-            <p>{alerts[currentAlertIndex] || "No new alerts."}</p>
-            <p className="mt-2 text-xs text-[#A3BE8C]">Time remaining until next event: {timeRemaining}</p>
+    <>
+      {/* Mobile Layout */}
+      <div className="block md:hidden w-full max-w-[400px] bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border border-[#581c87] shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center relative">
+            <Bell className="h-5 w-5 text-blue-400" />
+            <span className="ml-2 text-white">Alerts</span>
+            {hasNewAlert && (
+              <Badge className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-500 text-white h-5 w-5 flex items-center justify-center p-0 text-xs">
+                {newNotificationsCount}
+              </Badge>
+            )}
           </div>
-
-          {structurePath && (
-            <div className="mt-4 flex justify-center">
-              <Link href={structurePath}>
-                <Button className="bg-[#88C0D0] hover:bg-[#81A1C1] text-[#2E3440]">
-                  Go to Structure
-                </Button>
-              </Link>
-            </div>
-          )}
-
-          {alerts.length > 1 && currentAlertIndex < alerts.length - 1 && (
-            <div className="mt-4 flex justify-center">
-              <Button
-                className="bg-[#5E81AC] hover:bg-[#4C566A] text-[#ECEFF4]"
-                onClick={dismissCurrentAlert}
-              >
-                Dismiss & Next
-              </Button>
-            </div>
-          )}
         </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <div className="p-4">
+          <AlertContent />
+        </div>
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden md:block">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative group">
+              <Bell className="h-5 w-5 text-[#81A1C1] group-hover:text-[#88C0D0] transition-colors" />
+              <span className="ml-2 text-[#ECEFF4]">Alerts</span>
+              {hasNewAlert && (
+                <Badge className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-500 text-white h-5 w-5 flex items-center justify-center p-0 text-xs">
+                  {newNotificationsCount}
+                </Badge>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[400px] max-h-[400px] overflow-y-auto bg-[#2E3440] border border-[#5E81AC] shadow-md rounded-md p-4">
+            <AlertContent />
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </>
   );
 };

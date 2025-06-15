@@ -119,7 +119,7 @@ export default function BiologyResearch() {
                         </h3>
                         <UpgradeItem
                             title="Camera Count ++"
-                            description="Increase observation capabilities"
+                            description="Add more field cameras to capture diverse lifeforms and behavioral patterns"
                             current={userCapacities.cameraCount}
                             max={3}
                             cost={getUpgradeCost(userCapacities.cameraCount)}
@@ -132,7 +132,7 @@ export default function BiologyResearch() {
                         />
                         <UpgradeItem
                             title="Sensor Count ++"
-                            description="Increase sensor capabilities"
+                            description="Install additional sensors to gather increased environmental and biological data."
                             current={userCapacities.sensorCount}
                             max={3}
                             cost={getUpgradeCost(userCapacities.sensorCount)}
@@ -145,7 +145,7 @@ export default function BiologyResearch() {
                         />
                         <UpgradeItem
                             title="Station Size ++"
-                            description="Increase the size of your research station"
+                            description="Expand your research stations to support more experiments and equipment"
                             current={userCapacities.stationSize}
                             max={3}
                             cost={getUpgradeCost(userCapacities.stationSize)}

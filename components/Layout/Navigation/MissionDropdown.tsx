@@ -75,14 +75,6 @@ export function MissionsPopover() {
 
                 const { data: rows, count, error } = await query;
 
-                console.log({
-                    name: milestone.name,
-                    query: { table, field, value, user: session.user.id },
-                    count,
-                    rows,
-                    error,
-                });
-
                 if (!error && count !== null) {
                     progress[milestone.name] = count;
                 };
