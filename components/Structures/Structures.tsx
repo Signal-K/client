@@ -5,7 +5,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 import IndividualStructure, { IndividualStructureProps } from "./IndividualStructure";
-import { StructuresConfig } from "@/constants/Structures/Properties";
+// import { StructuresConfig } from "@/constants/Structures/Properties";
 
 import "../../styles/Anims/StarterStructureAnimations.css";
 
