@@ -46,15 +46,15 @@ type FocusView = "planet" | "overview" | "Climate" | "atmosphere" | "exploration
 export type Anomaly = {
   id: number;
   content: string | null;
-  anomalytype: string | null;
-  mass: number | null;
-  radius: number | null;
-  density: number | null;
-  gravity: number | null;
-  temperature: number | null;
-  orbital_period: number | null;
-avatar_url: string | null;
-  created_at: string;
+  anomalytype?: string | null;
+  mass?: number | null;
+  radius?: number | null;
+  density?: number | null;
+  gravity?: number | null;
+  temperature?: number | null;
+  orbital_period?: number | null;
+avatar_url?: string | null;
+  created_at?: string;
 };
 
 export interface AggregatedCloud {

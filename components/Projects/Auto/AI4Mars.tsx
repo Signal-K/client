@@ -4,11 +4,246 @@ import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
-import { Anomaly } from "@/app/planets/[id]/page";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
 interface Props {
     anomalyid: number | bigint;
+};
+
+type AnomalyRecord = {
+    id: number;
+    anomalySet: string;
+    content: string | null;
+};
+
+type LinkedAnomaly = {
+    id: number;
+    anomaly_id: number;
+    classification_id: number | null;
+    anomalies: AnomalyRecord[];
+};
+
+type Anomaly = AnomalyRecord;
+
+interface SelectedAnomProps {
+    anomalyid?: number;
+    parentClassificationId?: number;
+}; 
+
+export function AiForMarsProjectWithID() {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [anomaly, setAnomaly] = useState<AnomalyRecord | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [parentClassificationId, setParentClassificationId] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
+
+const fetchAnomaly = async () => {
+    if (!session?.user?.id) {
+        setLoading(false);
+        return;
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from("linked_anomalies")
+            .select(`
+                id,
+                anomaly_id,
+                classification_id,
+                anomalies (
+                    id,
+                    anomalySet,
+                    content
+                )
+            `)
+            .eq("author", session.user.id)
+            ;
+
+        if (error) throw error;
+
+        console.log("Raw fetched linked_anomalies data:", data);
+
+        const validEntries = (data ?? []).filter((entry): entry is LinkedAnomaly => {
+            const anomaly = entry.anomalies;
+            return anomaly &&
+                typeof anomaly === "object" &&
+                "anomalySet" in anomaly &&
+                anomaly.anomalySet === "automaton-aiForMars";
+        });
+
+        console.log("Filtered valid linked anomalies:", validEntries);
+
+        if (validEntries.length > 0) {
+            const randomEntry = validEntries[Math.floor(Math.random() * validEntries.length)];
+            const singleAnomaly = randomEntry.anomalies as unknown as AnomalyRecord;
+
+            setAnomaly(singleAnomaly);
+            setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-ai4Mars/${randomEntry.anomaly_id}.jpeg`);
+            setParentClassificationId(randomEntry.classification_id);
+        } else {
+            setAnomaly(null);
+        }
+    } catch (err: any) {
+        console.error("Error fetching anomaly:", err.message);
+        setAnomaly(null);
+    } finally {
+        setLoading(false);
+    }
+};
+    useEffect(() => {
+        fetchAnomaly();
+    }, [session]);
+
+    if (loading) return <p>Loading...</p>;
+    if (!anomaly || !imageUrl) return <p>No anomaly found for this user in AI4Mars project.</p>;
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full overflow-y-auto max-h-[90vh] rounded-lg overflow-x-hidden">
+            <div className="w-full overflow-x-auto">
+                <ImageAnnotator
+                    initialImageUrl={imageUrl}
+                    anomalyId={anomaly.id.toString()}
+                    anomalyType="automaton-aiForMars"
+                    missionNumber={200000062}
+                    assetMentioned={imageUrl}
+                    structureItemId={3102}
+                    annotationType="AI4M"
+                    parentPlanetLocation={parentClassificationId?.toString() ?? ""}
+                />
+            </div>
+        </div>
+    );
+}
+
+export function AiForMarsProject({
+    anomalyid,
+    parentClassificationId,
+}: SelectedAnomProps) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const { activePlanet } = useActivePlanet();
+
+    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+    const [showTutorial, setShowTutorial] = useState(false);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    const fetchAnomaly = async () => {
+        if (!session || !anomalyid) {
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const { data, error } = await supabase
+                .from("linked_anomalies")
+                .select(`
+                    id,
+                    anomaly_id,
+                    anomalies (
+                        id,
+                        anomalySet,
+                        content
+                    )
+                `)
+                .eq("author", session.user.id)
+                .eq("anomaly_id", anomalyid)
+                .filter("anomalies.anomalySet", "eq", "automaton-aiForMars")
+                .single();
+
+            if (error) throw error;
+
+            if (data?.anomalies) {
+                setAnomaly(Array.isArray(data.anomalies) ? data.anomalies[0] : data.anomalies);
+                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-ai4Mars/${data.anomaly_id}.jpeg`);
+            }
+        } catch (error: any) {
+            console.error("Error fetching specific joined anomaly:", error.message);
+            setAnomaly(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAnomaly();
+    }, [session, supabase]);
+
+    if (loading) {
+        return (
+            <div>
+                <p>Loading...</p>
+            </div>
+        );
+    }
+
+    if (!anomaly) {
+        return (
+            <div>
+                <p>No anomaly found.</p>
+            </div>
+        );
+    }
+
+    const startTutorial = () => setShowTutorial(true);
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full overflow-y-auto max-h-[90vh] rounded-lg overflow-x-hidden">
+            <>
+                {imageUrl && (
+                    <>
+                        <div className="w-full overflow-x-auto">
+                            <ImageAnnotator
+                                initialImageUrl={imageUrl}
+                                anomalyId={anomaly.id.toString()}
+                                anomalyType="automaton-aiForMars"
+                                assetMentioned={imageUrl}
+                                structureItemId={3102}
+                                parentClassificationId={parentClassificationId}
+                                annotationType="AI4M"
+                                parentPlanetLocation={anomalyid?.toString()}
+                            />
+                        </div>
+                        {/* <ClassificationForm
+                            
+                        /> */}
+                    </>
+                )}
+                <button
+                    onClick={startTutorial}
+                    className="mt-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
+                >
+                    Reopen Tutorial
+                </button>
+            </>
+        </div>
+    );
+}
+
+
+export function AI4MWrapper() {
+    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+
+    return (
+        <div className="space-y-8">
+            {/* {!selectedAnomaly && (
+                <PreferredTerrestrialClassifications
+                    onSelectAnomaly={(anomalyId: number | null, selectedVehicle: string | null) => {
+                        setSelectedAnomaly(anomalyId);
+                    }}
+                />
+            )}  */}
+            {selectedAnomaly && 
+                <AiForMarsProject
+                    parentClassificationId={selectedAnomaly}
+                    anomalyid={selectedAnomaly}
+                />
+            }
+        </div>
+    );
 };
 
 export function StarterAiForMars({ anomalyid }: Props) {
@@ -140,269 +375,6 @@ export function StarterAiForMars({ anomalyid }: Props) {
                     </>
                 )}
             </div> 
-        </div>
-    );
-};
-
-interface SelectedAnomProps {
-    anomalyid?: number;
-    parentClassificationId?: number;
-}; 
-
-function AiForMarsProjectWithID({
-    anomalyid
-}: SelectedAnomProps) {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
-    const [showTutorial, setShowTutorial] = useState(false);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
-    
-    const [loading, setLoading] = useState(true);
-
-    const fetchAnomaly = async () => {
-        if (!session) {
-            setLoading(false);
-            return;
-        };
-
-        try {
-            const {
-                data: anomalyData,
-                error,
-            } = await supabase
-                .from("anomalies")
-                .select("*")
-                .eq("anomalySet", "automaton-aiForMars")
-                .eq('id', anomalyid);
-
-            if (error) {
-                console.log('error');
-                setLoading(false);
-            } else {
-                setAnomaly(anomalyData[0]);
-                setImageUrl(
-                    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-ai4Mars/${anomalyid}.jpeg`
-                );
-            };
-        } catch (error: any) {
-            setLoading(false);
-            console.error(error);
-        } finally {
-            setLoading(false);
-        };
-    };
-
-    useEffect(() => {
-        fetchAnomaly();
-    }, [session]);
-
-    if (loading) {
-        return (
-            <p>Loading...</p>
-        );
-    };
-
-    return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full overflow-y-auto max-h-[90vh] rounded-lg overflow-x-hidden">
-                <>
-                    {imageUrl && (
-                        <>
-                            <div className="w-full overflow-x-auto">
-                                <ImageAnnotator
-                                    initialImageUrl={imageUrl}
-                                    anomalyId={anomalyid?.toString()}
-                                    anomalyType="automaton-aiForMars"
-                                    missionNumber={200000062}
-                                    assetMentioned={imageUrl}
-                                    structureItemId={3102} 
-                                    annotationType="AI4M"
-                                    parentPlanetLocation={anomalyid?.toString()}
-                                />
-                            </div>
-                        </>
-                    )}
-                </>
-        </div>
-    );
-};
-
-export function AiForMarsProject({
-    anomalyid,
-    parentClassificationId,
-}: SelectedAnomProps) {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const { activePlanet } = useActivePlanet();
-
-    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
-    const [showTutorial, setShowTutorial] = useState(false);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [hasMission20000006, setHasMission20000006] = useState<boolean | null>(null);
-
-    useEffect(() => {
-        const checkTutorialMission = async () => {
-            if (!session) return;
-
-            try {
-                const { data: missionData, error: missionError } = await supabase
-                    .from("missions")
-                    .select("id")
-                    .eq("user", session.user.id)
-                    .eq("mission", "20000006")
-                    .limit(1);
-
-                if (missionError) {
-                    console.error("Error fetching mission data:", missionError);
-                    setHasMission20000006(false);
-                    return;
-                }
-
-                setHasMission20000006(missionData && missionData.length > 0);
-            } catch (error) {
-                console.error("Error checking user mission: ", error);
-                setHasMission20000006(false);
-            }
-        };
-
-        checkTutorialMission();
-    }, [session, supabase]);
-
-    const fetchAnomaly = async () => {
-        if (!session) {
-            setLoading(false);
-            return;
-        };
-
-        try {
-            const { data: anomalyData, error: anomalyError } = await supabase
-                .from("anomalies")
-                .select("*")
-                .eq("anomalySet", "automaton-aiForMars");
-
-            if (anomalyError) throw anomalyError;
-
-            const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
-            setAnomaly(randomAnomaly);
-            setImageUrl(
-                `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-ai4Mars/${randomAnomaly.id}.jpeg`
-            );
-        } catch (error: any) {
-            console.error("Error fetching anomaly", error.message);
-            setAnomaly(null);
-        } finally {
-            setLoading(false);
-        };
-    };
-
-    useEffect(() => {
-        fetchAnomaly();
-    }, [session, supabase]);
-
-    if (loading) {
-        return (
-            <div>
-                <p>Loading...</p>
-            </div>
-        );
-    };
-
-    if (!anomaly) {
-        return (
-            <div>
-                <p>No anomaly found.</p>
-            </div>
-        );
-    };
-
-    const startTutorial = () => setShowTutorial(true);
-
-    return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full overflow-y-auto max-h-[90vh] rounded-lg overflow-x-hidden">
-            {!hasMission20000006 ? (
-                <StarterAiForMars anomalyid={anomaly.id || 69592674} />
-            ) : (
-                <>
-                    {imageUrl && (
-                        <>
-                            <div className="w-full overflow-x-auto">
-                                <ImageAnnotator
-                                    initialImageUrl={imageUrl}
-                                    anomalyId={anomaly.id.toString()}
-                                    anomalyType="automaton-aiForMars"
-                                    missionNumber={200000062}
-                                    assetMentioned={imageUrl}
-                                    structureItemId={3102} 
-                                    parentClassificationId={parentClassificationId}
-                                    annotationType="AI4M"
-                                    parentPlanetLocation={anomalyid?.toString()}
-                                />
-                            </div>
-                            {/* <ClassificationForm
-                                
-                            /> */}
-                        </>
-                    )}
-                    <button
-                        onClick={startTutorial}
-                        className="mt-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
-                    >
-                        Reopen Tutorial
-                    </button>
-                </> 
-            )}
-        </div>
-    );
-};
-
-export function AI4MWrapper() {
-    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
-
-    return (
-        <div className="space-y-8">
-            {/* {!selectedAnomaly && (
-                <PreferredTerrestrialClassifications
-                    onSelectAnomaly={(anomalyId: number | null, selectedVehicle: string | null) => {
-                        setSelectedAnomaly(anomalyId);
-                    }}
-                />
-            )}  */}
-            {selectedAnomaly && 
-                <AiForMarsProject
-                    parentClassificationId={selectedAnomaly}
-                    anomalyid={selectedAnomaly}
-                />
-            }
-        </div>
-    );
-};
-
-interface AI4MWWHCProps {
-    anomalyId: number;
-};
-
-export function AI4MWrapperWithHardcode({
-    anomalyId
-}: AI4MWWHCProps) {
-    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
-
-    return (
-        <div className="space-y-8">
-            {/* {!selectedAnomaly && (
-                <PreferredTerrestrialClassifications
-                    onSelectAnomaly={(anomalyId: number | null, selectedVehicle: string | null) => {
-                        setSelectedAnomaly(anomalyId);
-                    }}
-                />
-            )}  */}
-            {selectedAnomaly && 
-                <AiForMarsProjectWithID
-                    anomalyid={anomalyId}
-                />
-            }
         </div>
     );
 };
