@@ -5,7 +5,6 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 
-import { Anomaly } from "@/app/planets/[id]/page";
 // import ImageAnnotation from "../(classifications)/Annotation";
 import * as markerjs2 from "markerjs2";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +14,12 @@ import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 interface Props {
     anomalyid: number | bigint;
 }; 
+
+interface Anomaly {
+  id: number;
+  content: string | null;
+  anomalySet: string | null;
+};
 
 export function StarterPlanetFour({
     anomalyid
@@ -137,114 +142,7 @@ export function StarterPlanetFour({
     );
 };
 
-interface SelectedAnomProps {
-    anomalyid?: number;
-}; 
-
-export function PlanetFourProjectWithAnomalyId({
-    anomalyid
-}: SelectedAnomProps) {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);    
-    const [imageUrl, setImageUrl] = useState<string | null>(null);    
-    const [showTutorial, setShowTutorial] = useState(false);
-    
-    const [loading, setLoading] = useState(true);
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
-    const handleShowTutorial = () => {
-        setShowTutorial(true);
-    };
-
-    const fetchAnomaly = async () => {
-        if (!session) {
-            setLoading(false);
-            return;
-        };
-
-        try {
-            const {
-                data: anomalyfromid,
-                error,
-            } = await supabase
-                .from("anomalies")
-                .select("*")
-                .eq('anomalySet', 'satellite-planetFour')
-                .eq('id', anomalyid);
-
-            if (error) {
-                throw error;
-            };
-
-            if (!anomalyfromid) {
-                console.error("No anomaly with that id found");
-            } else {
-                setAnomaly(anomalyfromid[0]);
-                setImageUrl(`${supabaseUrl}/storage/v1/objects/public/telescope/satellite-planetFour/${anomalyid}.jpeg`);
-            };
-        } catch (error: any) {
-            console.error('Error fetching anomaly: ', error);
-        } finally {
-            setLoading(false);
-        };
-    };
-
-    useEffect(() => {
-        fetchAnomaly();
-    }, [session]);
-
-    if (loading) {
-        return (
-            <p>
-                Loading...
-            </p>
-        );
-    };
-
-    if (!anomaly) {
-        return (
-            <p>No anomaly with that id found</p>
-        );
-    };
-
-    return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-            {!showTutorial ? (
-                <>
-                    <Button
-                        className="mb-4"
-                        onClick={handleShowTutorial}
-                    >
-                        Show Tutorial
-                    </Button>
-                    {imageUrl && (
-                        <ImageAnnotator
-                            anomalyId={anomaly.id.toString()}
-                            anomalyType="satellite-planetFour"
-                            missionNumber={200000052}
-                            assetMentioned={imageUrl}
-                            structureItemId={3103}
-                            annotationType="P4"
-                            initialImageUrl={imageUrl}
-                            parentPlanetLocation={anomalyid?.toString()}
-                        />
-                    )}
-                    {imageUrl}
-                </>
-            ) : (
-                <div>
-                    <StarterPlanetFour anomalyid={anomaly.id} />
-                </div>
-            )}
-            <p>Selected Anomaly ID: {anomalyid}</p>
-        </div>
-    );
-};
-
-export function PlanetFourProject({ anomalyid }: SelectedAnomProps) { 
+export function PlanetFourProject() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -252,7 +150,6 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [showTutorial, setShowTutorial] = useState(false);
-    const [hasMission20000005, setHasMission20000005] = useState(false);
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -260,39 +157,68 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
         setShowTutorial(true);
     };
 
-        const fetchAnomaly = async () => {
-            if (!session) {
-                console.error("No session found");
-                setLoading(false);
-                return;
-            };
-        
-            setLoading(true);
-        
-            try {
-                const { data: anomalies, error } = await supabase
-                    .from('anomalies')
-                    .select('*')
-                    .eq('anomalySet', 'satellite-planetFour');
-        
-                if (error) throw error;
-        
-                if (!anomalies || anomalies.length === 0) {
-                    console.error("No anomalies found for the given type");
-                    setAnomaly(null);
-                } else {
-                    const randomIndex = Math.floor(Math.random() * anomalies.length);
-                    const anomaly = anomalies[randomIndex];
-                    setAnomaly(anomaly);
-                    setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomaly.id}.jpeg`);
-                }
-            } catch (error) {
-                console.error("Error fetching anomaly: ", error);
+const fetchAnomaly = async () => {
+    if (!session) {
+        console.error("No session found");
+        setLoading(false);
+        return;
+    }
+
+    setLoading(true);
+
+    try {
+        // Try to fetch a previously linked anomaly by this user
+        const { data: linkedAnomalies, error: linkedError } = await supabase
+            .from("linked_anomalies")
+            .select(`
+                id,
+                anomaly_id,
+                anomalies (
+                    id,
+                    anomalySet,
+                    content
+                )
+            `)
+            .eq("author", session.user.id)
+            .filter("anomalies.anomalySet", "eq", "satellite-planetFour")
+            .limit(1);
+
+        if (linkedError) throw linkedError;
+
+        let selectedAnomaly = null;
+
+        if (linkedAnomalies && linkedAnomalies.length > 0 && linkedAnomalies[0].anomalies) {
+            selectedAnomaly = linkedAnomalies[0].anomalies;
+            console.log("Using previously linked anomaly:", selectedAnomaly[0]?.id);
+        } else {
+            // Fallback: Pick a random anomaly from satellite-planetFour
+            const { data: anomalies, error: fallbackError } = await supabase
+                .from("anomalies")
+                .select("*")
+                .eq("anomalySet", "satellite-planetFour");
+
+            if (fallbackError) throw fallbackError;
+
+            if (!anomalies || anomalies.length === 0) {
+                console.error("No anomalies found for the given set");
                 setAnomaly(null);
-            } finally {
-                setLoading(false);
-            }    
-    };    
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * anomalies.length);
+            selectedAnomaly = anomalies[randomIndex];
+            console.log("Using random fallback anomaly:", selectedAnomaly.id);
+        }
+
+        setAnomaly(selectedAnomaly);
+        setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${selectedAnomaly.id}.jpeg`);
+    } catch (error) {
+        console.error("Error fetching anomaly:", error);
+        setAnomaly(null);
+    } finally {
+        setLoading(false);
+    }
+};
 
     useEffect(() => {
         fetchAnomaly();
@@ -300,20 +226,17 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
 
     if (loading) {
         return <div><p>Loading...</p></div>;
-    };
+    }
 
     if (!anomaly) {
-        return <div><p>No anomaly found with ID {anomalyid}</p></div>;
-    };
+        return <div><p>No anomaly available.</p></div>;
+    }
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
             {!showTutorial ? (
                 <>
-                    <Button
-                        className="mb-4"
-                        onClick={handleShowTutorial}
-                    >
+                    <Button className="mb-4" onClick={handleShowTutorial}>
                         Show Tutorial
                     </Button>
                     {imageUrl && (
@@ -325,7 +248,7 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
                             structureItemId={3103}
                             annotationType="P4"
                             initialImageUrl={imageUrl}
-                            parentPlanetLocation={anomalyid?.toString()}
+                            parentPlanetLocation={anomaly.id.toString()}
                         />
                     )}
                     {imageUrl}
@@ -335,22 +258,7 @@ export function PlanetFourProject({ anomalyid }: SelectedAnomProps) {
                     <StarterPlanetFour anomalyid={anomaly.id} />
                 </div>
             )}
-            <p>Selected Anomaly ID: {anomalyid}</p>
-        </div>
-    );
-};    
-
-export function P4Wrapper () {
-    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
-
-    return (
-        <div className="space-y-8">
-            {/* {!selectedAnomaly && (
-                <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
-            )} */}
-            {selectedAnomaly && (
-                <PlanetFourProject anomalyid={selectedAnomaly} />
-            )}
+            <p>Selected Anomaly ID: {anomaly.id}</p>
         </div>
     );
 };

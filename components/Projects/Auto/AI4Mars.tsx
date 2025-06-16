@@ -80,7 +80,7 @@ const fetchAnomaly = async () => {
             const singleAnomaly = randomEntry.anomalies as unknown as AnomalyRecord;
 
             setAnomaly(singleAnomaly);
-            setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-ai4Mars/${randomEntry.anomaly_id}.jpeg`);
+            setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automatons-ai4Mars/${randomEntry.anomaly_id}.jpeg`);
             setParentClassificationId(randomEntry.classification_id);
         } else {
             setAnomaly(null);
@@ -139,27 +139,36 @@ export function AiForMarsProject({
 
         try {
             const { data, error } = await supabase
-                .from("linked_anomalies")
-                .select(`
-                    id,
-                    anomaly_id,
-                    anomalies (
-                        id,
-                        anomalySet,
-                        content
-                    )
-                `)
-                .eq("author", session.user.id)
-                .eq("anomaly_id", anomalyid)
-                .filter("anomalies.anomalySet", "eq", "automaton-aiForMars")
-                .single();
+  .from("linked_anomalies")
+  .select(`
+    id,
+    anomaly_id,
+    anomalies (
+      id,
+      anomalySet,
+      content
+    )
+  `)
+  .eq("author", session.user.id)
+  .eq("anomaly_id", anomalyid)
+  .filter("anomalies.anomalySet", "eq", "automaton-aiForMars")
+  .maybeSingle();
+
 
             if (error) throw error;
 
             if (data?.anomalies) {
                 setAnomaly(Array.isArray(data.anomalies) ? data.anomalies[0] : data.anomalies);
-                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automaton-ai4Mars/${data.anomaly_id}.jpeg`);
+                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automatons-ai4Mars/${data.anomaly_id}.jpeg`);
             }
+
+            if (!data || !data.anomalies) {
+  console.warn("No matching anomaly found or anomalies is null.");
+  setAnomaly(null);
+  setLoading(false);
+  return;
+}
+
         } catch (error: any) {
             console.error("Error fetching specific joined anomaly:", error.message);
             setAnomaly(null);
@@ -219,29 +228,6 @@ export function AiForMarsProject({
                     Reopen Tutorial
                 </button>
             </>
-        </div>
-    );
-}
-
-
-export function AI4MWrapper() {
-    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
-
-    return (
-        <div className="space-y-8">
-            {/* {!selectedAnomaly && (
-                <PreferredTerrestrialClassifications
-                    onSelectAnomaly={(anomalyId: number | null, selectedVehicle: string | null) => {
-                        setSelectedAnomaly(anomalyId);
-                    }}
-                />
-            )}  */}
-            {selectedAnomaly && 
-                <AiForMarsProject
-                    parentClassificationId={selectedAnomaly}
-                    anomalyid={selectedAnomaly}
-                />
-            }
         </div>
     );
 };

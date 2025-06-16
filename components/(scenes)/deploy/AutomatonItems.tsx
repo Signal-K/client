@@ -152,8 +152,8 @@ export default function AutomatonDeploySection() {
         await fetch(`api/gameplay/research/upgrades?techType=proberange&count=${probeDistance}`);
       } catch (error) {
         console.error("Error fetching research data:", error);
-      }
-    }
+      };
+    };
 
     fetchResearchData();
   }, [session, supabase]);
@@ -193,7 +193,7 @@ export default function AutomatonDeploySection() {
     if (fetchErr) {
       console.error("Error fetching existing linked anomalies:", fetchErr);
       return;
-    }
+    };
 
     const now = new Date();
     const currentWeek = getISOWeekYear(now);
@@ -239,19 +239,22 @@ export default function AutomatonDeploySection() {
 
     const neededSets: Record<string, number> = {};
 
-    rovers.forEach(() => {
-      getRandomTypes(["AI4M", "JVH"]).forEach((type) => {
-        const key = anomalySetMap[type];
-        neededSets[key] = (neededSets[key] || 0) + 1;
-      });
-    });
+const roverCount = rovers.length;
+const probeCount = probes.length;
 
-    probes.forEach(() => {
-      getRandomTypes(["P4", "Clouds"]).forEach((type) => {
-        const key = anomalySetMap[type];
-        neededSets[key] = (neededSets[key] || 0) + 1;
-      });
-    });
+// Ensure 3 of each anomaly set for every rover
+neededSets["automaton-aiForMars"] = roverCount * 3;
+neededSets["lidar-jovianVortexHunter"] = roverCount * 3;
+neededSets["satellite-planetFour"] = roverCount * 3;
+neededSets["cloudspottingOnMars"] = roverCount * 3;
+
+// For probes, keep the randomized behavior (optional: adjust to fixed 2 each as well if needed)
+probes.forEach(() => {
+  getRandomTypes(["P4", "Clouds"]).forEach((type) => {
+    const key = anomalySetMap[type];
+    neededSets[key] = (neededSets[key] || 0) + 1;
+  });
+});
 
     const anomalyIdPool: Record<string, number[]> = {};
 
@@ -300,7 +303,22 @@ export default function AutomatonDeploySection() {
       });
     };
 
-    assignAnomalies(rovers, ["AI4M", "JVH"], "Rover");
+    // Assign anomalies for rovers: 3 each of all 4 types per rover
+rovers.forEach((loc) => {
+  ["automaton-aiForMars", "lidar-jovianVortexHunter", "satellite-planetFour", "cloudspottingOnMars"].forEach((set) => {
+    for (let i = 0; i < 3; i++) {
+      const ids = anomalyIdPool[set] || [];
+      const assignedId = ids.length ? ids.shift()! : null;
+
+      assignments.push({
+        classification: loc,
+        anomalySet: set,
+        anomalyId: assignedId,
+        automaton: "Rover",
+      });
+    }
+  });
+});
     assignAnomalies(probes, ["P4", "Clouds"], "Probe");
 
     const entriesToInsert = assignments

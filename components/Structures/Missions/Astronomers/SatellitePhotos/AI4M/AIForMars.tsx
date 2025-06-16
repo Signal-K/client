@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../../BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
-import { AI4MWrapper, AiForMarsProject, AiForMarsProjectWithID, StarterAiForMars } from "@/components/Projects/Auto/AI4Mars";
+import { AiForMarsProjectWithID, StarterAiForMars } from "@/components/Projects/Auto/AI4Mars";
 import VoteAI4MClassifications from "./AI4MVote";
 
 export interface Mission {
