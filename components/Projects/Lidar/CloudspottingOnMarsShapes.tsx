@@ -2,8 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { Anomaly } from "../Telescopes/Transiting";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+
+type Anomaly = {
+  id: string;
+  name: string;
+  details?: string;
+};
 
 interface SelectedAnomProps {
     anomalyid: number;

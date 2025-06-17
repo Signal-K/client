@@ -170,7 +170,11 @@ export const IguanasFromAboveTutorial: React.FC<ZoodexProps> = ({ anomalyId }) =
   );
 };
 
-import { Anomaly } from "../Telescopes/Transiting";
+type Anomaly = {
+  id: string;
+  name: string;
+  details?: string;
+};
 
 export function ZoodexIguanas() {
   const supabase = useSupabaseClient();

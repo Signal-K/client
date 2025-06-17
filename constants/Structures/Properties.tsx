@@ -19,9 +19,9 @@ import PlanktonPortal from "@/components/Structures/Missions/Biologists/Plankton
 // import SwitchPlanet from "@/components/(scenes)/travel/SolarSystem";
 // import { ExoplanetTransitHunter } from "@/components/Projects/Telescopes/ExoplanetC23";
 import { AiForMarsProject } from "@/components/Projects/Auto/AI4Mars";
-import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
+// import { DailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
 import { PlanetFourProject } from "@/components/Projects/Satellite/PlanetFour";
-import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
+// import { LidarJVHSatellite } from "@/components/Projects/Lidar/JovianVortexHunter";
 import { BurrowingOwl } from "@/components/Projects/Zoodex/burrowingOwls";
 // import TutorialPopup from "@/content/Dialogue/helpButton";
 import FreeformUploadData from "@/components/Projects/(classifications)/FreeForm";

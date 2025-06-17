@@ -166,7 +166,11 @@ const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
     );
 };
 
-import { Anomaly } from "./Transiting";
+type Anomaly = {
+  id: string;
+  name: string;
+  details?: string;
+};
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
 export function StarterSunspot({ anomalyid }: SelectedAnomalyProps ) {

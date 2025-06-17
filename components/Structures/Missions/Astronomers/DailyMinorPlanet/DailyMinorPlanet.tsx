@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { BarChartBigIcon, GlassWater, Guitar, HelpCircle, PenBoxIcon, RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
 import MissionShell from "../../BasePlate";
-import { DailyMinorPlanet, StarterDailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
+import { DailyMinorPlanetWithId, StarterDailyMinorPlanet } from "@/components/Projects/Telescopes/DailyMinorPlanet";
 import VoteDMPClassifications from "./DMPVote";
 import DMPGenerator from "./AsteroidMaker";
 import { ActiveAsteroidWithId } from "@/components/Projects/Telescopes/ActiveAsteroids";
@@ -32,7 +32,7 @@ const DailyMinorPlanetMissions = () => {
       icon: TelescopeIcon,
       points: 2, 
       completedCount: 0,
-      internalComponent: () => <DailyMinorPlanet />,
+      internalComponent: () => <DailyMinorPlanetWithId />,
       color: "text-blue-500",
       shadow: false,
       action: () => {},
@@ -45,7 +45,7 @@ const DailyMinorPlanetMissions = () => {
       icon: RadioIcon,
       points: 1,
       completedCount: 0,
-      internalComponent: () => <DailyMinorPlanet />,
+      internalComponent: () => <DailyMinorPlanetWithId />,
       color: "text-green-500",
       shadow: false,
       action: () => {},

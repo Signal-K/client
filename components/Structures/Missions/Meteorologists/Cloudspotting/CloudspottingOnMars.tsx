@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "@/components/Structures/Missions/BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, Paintbrush2Icon, PaintBucket, Vote } from "lucide-react";
-import { CloudspottingWrapper, StarterLidar } from "@/components/Projects/Lidar/Clouds";
+import { CloudspottingOnMarsWithId, StarterLidar } from "@/components/Projects/Lidar/Clouds";
 import VoteCoMClassifications from "./CoMVote";
 import CloudClassificationGenerator from "./CloudMaker";
 import { CloudspottingOnMarsTutorial } from "@/components/Projects/Lidar/cloudspottingOnMars";
@@ -44,22 +44,11 @@ const CloudspottingOnMars = () => {
                 icon: CloudCogIcon,
                 points: 2,
                 completedCount: 0,
-                internalComponent: () => <CloudspottingWrapper />,
+                internalComponent: () => <CloudspottingOnMarsWithId />,
                 color: "text-blue-500",
             },
             {
                 id: 2,
-                chapter: 1,
-                title: "Propose a cloud in your classifications",
-                description: "Make a classification indicating a positive cloud candidate",
-                icon: FolderCog,
-                points: 1,
-                completedCount: 0,
-                internalComponent: () => <StarterLidar />,
-                color: "text-cyan-300",
-            },
-            {
-                id: 3,
                 chapter: 1,
                 title: "Comment or vote on a cloud classification",
                 description:
@@ -71,7 +60,7 @@ const CloudspottingOnMars = () => {
                 color: "text-green-700",
             },
             {
-                id: 4,
+                id: 3,
                 chapter: 2,
                 title: "Create a cloud representation",
                 description:
@@ -83,7 +72,7 @@ const CloudspottingOnMars = () => {
                 color: 'text-green-300',
             },
             {
-                id: 5,
+                id: 4,
                 chapter: 2,
                 title: "Identify shapes in cloud classifications",
                 description: 'Use your LIDAR to identify shapes in the cloud classification',

@@ -4,7 +4,7 @@ import { CameraIcon, CloudDrizzleIcon, DogIcon, MicroscopeIcon, SunDimIcon, Tele
 import { BurrowingOwlIcon } from '../../content/Icons/BurrowingOwl';
 import { FishIcon } from '../../content/Icons/FishIcon';
 import { StarterTelescopeTess } from '../Projects/Telescopes/Transiting';
-import { DailyMinorPlanet } from '../Projects/Telescopes/DailyMinorPlanet';
+// import { DailyMinorPlanet } from '../Projects/Telescopes/DailyMinorPlanet';
 import { PlanetFourProject } from '../Projects/Satellite/PlanetFour';
 import { StarterSunspot } from '../Projects/Telescopes/Sunspots';
 import { TelescopeDiskDetector } from '../Projects/Telescopes/DiskDetector';
@@ -137,7 +137,7 @@ export const telescopeDataSources = [
                 activeStructure: 3103,
                 researched: 'telescope-minorPlanets',
                 techId: 1,
-                dynamicComponent: <DailyMinorPlanet />
+                // dynamicComponent: <DailyMinorPlanet />
             },
             {
                 name: 'Planet Four',
