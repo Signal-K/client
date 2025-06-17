@@ -295,14 +295,14 @@ export default function TelescopeRangeSlider() {
             </Card>
         </div>
     );
-}
+};
 
 interface DropRateItemProps {
     icon: React.ReactNode;
     label: string;
     rate: number;
     colorClass: string;
-}
+};
 
 function DropRateItem({
     icon,

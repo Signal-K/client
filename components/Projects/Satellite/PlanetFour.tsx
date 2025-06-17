@@ -251,14 +251,12 @@ const fetchAnomaly = async () => {
                             parentPlanetLocation={anomaly.id.toString()}
                         />
                     )}
-                    {imageUrl}
                 </>
             ) : (
                 <div>
                     <StarterPlanetFour anomalyid={anomaly.id} />
                 </div>
             )}
-            <p>Selected Anomaly ID: {anomaly.id}</p>
         </div>
     );
 };

@@ -39,23 +39,24 @@ export function StarterTelescopeTess() {
       }
 
       try {
-        const { data: linkedAnomalies, error: linkedError } = await supabase
-          .from("linked_anomalies")
-          .select(
-            `
-              id,
-              anomaly_id,
-              anomalies (
-                id,
-                anomalySet,
-                avatar_url,
-                content
-              )
-            `
-          )
-          .eq("author", session.user.id)
-          .filter("anomalies.anomalySet", "eq", "telescope-tess")
-          .limit(1);
+const { data: linkedAnomalies, error: linkedError } = await supabase
+  .from("linked_anomalies")
+  .select(
+    `
+      id,
+      anomaly_id,
+      anomalies!inner (
+        id,
+        anomalySet,
+        avatar_url,
+        content
+      )
+    `
+  )
+  .eq("author", session.user.id)
+  .eq("anomalies.anomalySet", "telescope-tess")
+  .limit(1);
+
 
         if (linkedError) throw linkedError;
 
@@ -122,8 +123,7 @@ export function StarterTelescopeTess() {
       </div>
     </div>
   );
-}
-
+};
 
 interface TelescopeProps {
     anomalyid: string;
