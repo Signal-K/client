@@ -12,7 +12,7 @@ interface Props {
 
 export default function StructuresOnTerrarium({
     location
-}: Props) {
+}: Props) { 
     const supabase = useSupabaseClient();
     const session = useSession();
 

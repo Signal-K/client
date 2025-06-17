@@ -6,12 +6,13 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import { InventoryStructureItem } from "@/types/Items";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
-import StructuresOnPlanet, {
-  AtmosphereStructuresOnPlanet,
-  OrbitalStructuresOnPlanet,
-} from "@/components/Structures/Structures";
+// import StructuresOnPlanet, {
+//   AtmosphereStructuresOnPlanet,
+//   OrbitalStructuresOnPlanet,
+// } from "@/components/Structures/Structures";
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import InventoryPage from "@/components/Inventory/Grid/Grid";
+import Structures from "@/components/Structures/Structures";
 // import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
 // import TopographicMap from "@/components/topographic-map";
 
@@ -53,14 +54,11 @@ const EarthStructures: React.FC = () => {
       {/* <EnhancedWeatherEvents /> */}
       <div className="w-full">
         <div className="py-2">
-          <center>
-            <AtmosphereStructuresOnPlanet />
-          </center>
         </div>
       </div>
       <div className="w-full">
         <center>
-          <StructuresOnPlanet />
+          <Structures />
         </center>
       </div>
       <div className="relative flex-1">

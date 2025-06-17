@@ -8,468 +8,137 @@ import IndividualStructure, { IndividualStructureProps } from "./IndividualStruc
 import { StructuresConfig } from "@/constants/Structures/Properties";
 
 import "../../styles/Anims/StarterStructureAnimations.css";
- 
-interface StructuresOnPlanetProps { 
-    onStructuresFetch: (
-        orbitalStructures: InventoryStructureItem[],
-        atmosphereStructures: InventoryStructureItem[],
-        surfaceStructures: InventoryStructureItem[]
-    ) => void;
-}; 
 
 import { UnownedSurfaceStructures } from "./Build/EditMode";
+import { useRouter } from "next/navigation";
 
 interface Props {
   author?: string;
 };
 
-export default function StructuresOnPlanet({ author }: Props) {
-  const supabase = useSupabaseClient(); 
-  const session = useSession();
-
-  const { activePlanet } = useActivePlanet();
-
-  const [userStructuresOnPlanet, setUserStructuresOnPlanet] = useState<InventoryStructureItem[]>([]);
-  const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
-  const [selectedStructure, setSelectedStructure] = useState<IndividualStructureProps | null>(null);
-  const [missionStructureId, setMissionStructureId] = useState<number | null>(null);
-
-  const [loading, setLoading] = useState(true);
-
-  const fetchStructures = useCallback(async () => {
-    if (!session?.user?.id || !activePlanet?.id) {
-      setLoading(false);
-      return;
-    };
-
-    try {
-      const response = await fetch('/api/gameplay/inventory');
-      const itemsData: StructureItemDetail[] = await response.json();
-      const itemMap = new Map<number, StructureItemDetail>();
-      itemsData.forEach(item => {
-        if (item.ItemCategory === 'Structure') {
-          itemMap.set(item.id, item);
-        };
-      });
-
-      setItemDetails(itemMap);
-
-      const { data: inventoryData, error: inventoryError } = await supabase
-        .from('inventory')
-        .select('*')
-        .eq('owner', session.user.id)
-        .eq('anomaly', activePlanet.id);
-
-      if (inventoryError) throw inventoryError;
-
-      const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
-      inventoryData.forEach(( structure: InventoryStructureItem ) => {
-        const itemDetail = itemMap.get(structure.item);
-        if (itemDetail && itemDetail.locationType === 'Surface' && !uniqueStructuresMap.has(structure.item)) {
-          uniqueStructuresMap.set(structure.item, structure);
-        };
-      });
-
-      const uniqueStructures = Array.from(uniqueStructuresMap.values());
-      setUserStructuresOnPlanet(uniqueStructures || []);
-    } catch (error: any) {
-      console.error('Error fetching data: ', error);
-    } finally {
-      setLoading(false);
-    };
-  }, [session?.user?.id, activePlanet?.id, supabase]);
-
-  const fetchStructuresFromProvidedAuthor = useCallback(async () => {
-    if (!session?.user?.id || !activePlanet?.id) {
-      setLoading(false);
-      return;
-    };
-
-    try {
-      const response = await fetch('/api/gameplay/inventory');
-      const itemsData: StructureItemDetail[] = await response.json();
-      const itemMap = new Map<number, StructureItemDetail>();
-      itemsData.forEach(item => {
-        if (item.ItemCategory === 'Structure') {
-          itemMap.set(item.id, item);
-        };
-      });
-
-      setItemDetails(itemMap);
-
-      const { data: inventoryData, error: inventoryError } = await supabase
-        .from('inventory')
-        .select('*')
-        .eq('owner', author)
-        .eq('anomaly', activePlanet.id);
-
-      if (inventoryError) throw inventoryError;
-
-      const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
-      inventoryData.forEach((structure: InventoryStructureItem) => {
-        const itemDetail = itemMap.get(structure.item);
-        if (itemDetail && itemDetail.locationType === 'Surface' && !uniqueStructuresMap.has(structure.item)) {
-          uniqueStructuresMap.set(structure.item, structure);
-        };
-      });
-
-      const uniqueStructures = Array.from(uniqueStructuresMap.values());
-      setUserStructuresOnPlanet(uniqueStructures || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    };
-  }, [session?.user?.id, activePlanet?.id, supabase]);
-
-  useEffect(() => {
-    if (!author) {
-      fetchStructures();
-    };
-
-    if (author) {
-      fetchStructuresFromProvidedAuthor();
-    };
-  }, [fetchStructures]);
-
-  const handleIconClick = ( itemId: number, inventoryId: number ) => {
-    const itemDetail = itemDetails.get(itemId);
-    if (itemDetail) {
-      const config = StructuresConfig[itemDetail.id] || {};
-      setSelectedStructure({
-        name: itemDetail.name,
-        imageSrc: itemDetail.icon_url,
-        title: `Structure ID: ${inventoryId}`,
-        labels: config.labels || [],
-        actions: config.actions || [],
-        buttons: config.buttons.map(button => ({
-          ...button,
-          showInNoModal: true,
-        })),
-        structureId: inventoryId
-      });
-    };
-  };
-
-  const handleClose = useCallback(() => {
-    setSelectedStructure(null);
-  }, []);
-
-  if (loading) {
-    return (
-        <div>
-            <p>
-                Loading...
-            </p>
-        </div>
-    );
-  }; 
-
-  return (
-<div className="relative">
-  <div className={`grid px-11 grid-cols-4 gap-1 gap-y-3 relative ${userStructuresOnPlanet.length === 1 ? 'justify-center' : 'justify-between'}`}>
-    {userStructuresOnPlanet.map(( structure, index ) => {
-      const itemDetail = itemDetails.get(structure.item);
-      return itemDetail ? (
-        <div 
-          key={structure.id} 
-          className={`flex flex-col items-center space-y-2 ${index === 1 ? 'justify-self-center' : ''}`}
-        >
-          <img
-            src={itemDetail.icon_url}
-            alt={itemDetail.name}
-            className={`w-24 h-24 object-cover cursor-pointer ${structure.item === missionStructureId ? 'bouncing-structure' : 'moving-structure'}`}
-            onClick={() => handleIconClick(itemDetail.id, structure.id)}
-          />
-          {!author && (
-            <p className="text-white text-sm mt-2">{itemDetail.name}</p>
-          )}
-        </div>
-      ) : null;
-    })}
-  </div>
-
-  {selectedStructure && (
-    <IndividualStructure
-      key={selectedStructure.name}
-      name={selectedStructure.name}
-      title={selectedStructure.title} 
-      labels={selectedStructure.labels}
-      imageSrc={selectedStructure.imageSrc}
-      actions={selectedStructure.actions}
-      buttons={selectedStructure.buttons}
-      structureId={selectedStructure.structureId}
-      onClose={handleClose}
-    />
-  )}
-  {!author && (
-    <UnownedSurfaceStructures />
-  )}
-</div>
-  );
-};
-
-export function OrbitalStructuresOnPlanet() {
-    const supabase = useSupabaseClient();
-  const session = useSession();
-
-  const { activePlanet } = useActivePlanet();
-
-  const [userStructuresOnPlanet, setUserStructuresOnPlanet] = useState<InventoryStructureItem[]>([]);
-  const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
-  const [loading, setLoading] = useState(true);
-  const [selectedStructure, setSelectedStructure] = useState<IndividualStructureProps | null>(null);
-  const [missionStructureId, setMissionStructureId] = useState<number | null>(null);
-
-  const fetchStructures = useCallback(async () => {
-    if (!session?.user?.id || !activePlanet?.id) {
-      setLoading(false);
-      return;
-    };
-
-    try {
-      const response = await fetch('/api/gameplay/inventory');
-      const itemsData: StructureItemDetail[] = await response.json();
-
-      const itemMap = new Map<number, StructureItemDetail>();
-      itemsData.forEach(item => {
-        if (item.ItemCategory === 'Structure') {
-          itemMap.set(item.id, item);
-        }
-      });
-
-      setItemDetails(itemMap);
-
-      const { data: inventoryData, error: inventoryError } = await supabase
-        .from('inventory')
-        .select('*')
-        .eq('owner', session.user.id)
-        .eq('anomaly', activePlanet.id);
-
-      if (inventoryError) throw inventoryError;
-
-      const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
-      inventoryData.forEach((structure: InventoryStructureItem) => {
-        const itemDetail = itemMap.get(structure.item);
-        if (itemDetail && itemDetail.locationType === 'Orbital' && !uniqueStructuresMap.has(structure.item)) {
-          uniqueStructuresMap.set(structure.item, structure);
-        }
-      });
-
-      const uniqueStructures = Array.from(uniqueStructuresMap.values());
-      setUserStructuresOnPlanet(uniqueStructures || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [session?.user?.id, activePlanet?.id, supabase]);
-
-  useEffect(() => {
-    fetchStructures();
-  }, [fetchStructures]);
-
-  const getRandomAnimationDuration = () => `${Math.random() * 2 + 1.5}s`;
-  const getRandomAnimationDelay = () => `${Math.random() * 1}s`;
-
-  const handleIconClick = (itemId: number, inventoryId: number) => {
-    const itemDetail = itemDetails.get(itemId);
-    if (itemDetail) {
-      const config = StructuresConfig[itemDetail.id] || {};
-      setSelectedStructure({
-        name: itemDetail.name,
-        imageSrc: itemDetail.icon_url,
-        title: `Structure ID: ${inventoryId}`,
-        labels: config.labels || [],
-        actions: config.actions || [],
-        buttons: config.buttons.map(button => ({
-          ...button,
-          showInNoModal: true,
-        })),
-        structureId: inventoryId
-      });
-    }
-  };
-
-  const handleClose = useCallback(() => {
-    setSelectedStructure(null);
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  const activeStructure = userStructuresOnPlanet.find(structure => structure.item === missionStructureId);
-  const otherStructures = userStructuresOnPlanet.filter(structure => structure.item !== missionStructureId);
-
-  return (
-    <div className="relative">
-      <div className="grid grid-cols-4 gap-1 gap-y-1">
-        {activeStructure && (
-          <div key={activeStructure.id} className="flex flex-col items-center space-y-2">
-            <img
-              src={itemDetails.get(activeStructure.item)?.icon_url}
-              alt={itemDetails.get(activeStructure.item)?.name}
-              className="w-10 h-10 object-cover cursor-pointer bouncing-structure"
-              onClick={() => handleIconClick(activeStructure.item, activeStructure.id)}
-            />
-          </div>
-        )}
-        {otherStructures.map((structure) => {
-          const itemDetail = itemDetails.get(structure.item);
-
-          return itemDetail ? (
-            <div key={structure.id} className="flex flex-col items-center space-y-2">
-              <img
-                src={itemDetail.icon_url}
-                alt={itemDetail.name}
-                className="w-8 h-8 object-cover cursor-pointer moving-structure"
-                onClick={() => handleIconClick(itemDetail.id, structure.id)}
-              />
-            </div>
-          ) : null;
-        })}
-      </div>
-
-      {selectedStructure && (
-        <IndividualStructure
-          key={selectedStructure.name}
-          name={selectedStructure.name}
-          title={selectedStructure.title}
-          labels={selectedStructure.labels}
-          imageSrc={selectedStructure.imageSrc}
-          actions={selectedStructure.actions}
-          buttons={selectedStructure.buttons}
-          structureId={selectedStructure.structureId}
-          onClose={handleClose}
-        />
-      )}
-    </div>
-  );
-};
-
-export function AtmosphereStructuresOnPlanet() {
+export default function Structures() {
   const supabase = useSupabaseClient();
   const session = useSession();
-
+  const router = useRouter();
   const { activePlanet } = useActivePlanet();
 
-  const [userStructuresOnPlanet, setUserStructuresOnPlanet] = useState<InventoryStructureItem[]>([]);
-  const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
   const [loading, setLoading] = useState(true);
-  const [selectedStructure, setSelectedStructure] = useState<IndividualStructureProps | null>(null);
+  const [structureGroups, setStructureGroups] = useState<{
+    Orbital: InventoryStructureItem[],
+    Atmosphere: InventoryStructureItem[],
+    Surface: InventoryStructureItem[],
+  }>({ Orbital: [], Atmosphere: [], Surface: [] });
+
+  const [itemDetails, setItemDetails] = useState<Map<number, StructureItemDetail>>(new Map());
 
   const fetchStructures = useCallback(async () => {
-    if (!session?.user?.id || !activePlanet?.id) {
+    if (!session || !activePlanet) {
       setLoading(false);
       return;
-    }
+    };
 
     try {
-      // Fetch item details from the gameplay API
       const response = await fetch('/api/gameplay/inventory');
       const itemsData: StructureItemDetail[] = await response.json();
 
-      // Create a map for quick access to item details
       const itemMap = new Map<number, StructureItemDetail>();
       itemsData.forEach(item => {
         if (item.ItemCategory === 'Structure') {
           itemMap.set(item.id, item);
         }
       });
-
       setItemDetails(itemMap);
 
-      // Fetch inventory data for user and active planet
-      const { data: inventoryData, error: inventoryError } = await supabase
-        .from('inventory')
-        .select('*')
-        .eq('owner', session.user.id)
-        .eq('anomaly', activePlanet.id);
+      const { data: inventoryData, error } = await supabase
+        .from("inventory")
+        .select("*")
+        .eq("owner", session.user.id)
+        .eq("anomaly", activePlanet.id);
 
-      if (inventoryError) throw inventoryError;
+      if (error) throw error;
 
-      // Filter for unique structures based on locationType fetched from the API
-      const uniqueStructuresMap = new Map<number, InventoryStructureItem>();
-      inventoryData.forEach((structure: InventoryStructureItem) => {
+      const groups = {
+        Orbital: [] as InventoryStructureItem[],
+        Atmosphere: [] as InventoryStructureItem[],
+        Surface: [] as InventoryStructureItem[],
+      };
+
+      const uniqueStructureMap = new Map<number, InventoryStructureItem>();
+
+      for (const structure of inventoryData) {
         const itemDetail = itemMap.get(structure.item);
-        if (itemDetail && itemDetail.locationType === 'Atmosphere' && !uniqueStructuresMap.has(structure.item)) {
-          uniqueStructuresMap.set(structure.item, structure);
-        }
-      });
+        if (itemDetail && !uniqueStructureMap.has(structure.item)) {
+          uniqueStructureMap.set(structure.item, structure);
+          const location = itemDetail.locationType || 'Surface';
+          if (location in groups) {
+            groups[location as keyof typeof groups].push(structure);
+          };
+        };
+      };
 
-      const uniqueStructures = Array.from(uniqueStructuresMap.values());
-      setUserStructuresOnPlanet(uniqueStructures || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+      setStructureGroups(groups);
+    } catch (err) {
+      console.error("Error fetching structures:", err);
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.id, activePlanet?.id, supabase]);
+  }, [session, supabase, activePlanet]);
 
   useEffect(() => {
     fetchStructures();
   }, [fetchStructures]);
 
-  const handleIconClick = (itemId: number, inventoryId: number) => {
-    const itemDetail = itemDetails.get(itemId);
-    if (itemDetail) {
-      const config = StructuresConfig[itemDetail.id] || {};
-      setSelectedStructure({
-        name: itemDetail.name,
-        imageSrc: itemDetail.icon_url,
-        title: `Structure ID: ${inventoryId}`,
-        labels: config.labels || [],
-        actions: config.actions || [],
-        buttons: config.buttons.map(button => ({
-          ...button, 
-          showInNoModal: true,
-        })),
-        structureId: inventoryId
-      });
-    }
+  const handleIconClick = (itemId: number) => {
+    const routes: Record<number, string> = {
+      3103: "telescope",
+      3104: "greenhouse",
+      3105: "balloon"
+    };
+
+    const route = routes[itemId];
+    if (route) {
+      router.push(`/structures/${route}`);
+    };
   };
 
-  const handleClose = useCallback(() => {
-    setSelectedStructure(null);
-  }, []);
+  const renderStructureGroup = (label: string, structures: InventoryStructureItem[]) => {
+    if (!structures.length) return null;
 
-  if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="mb-6">
+        <h3 className="text-center text-lg font-semibold text-blue-800 mb-3">{label}</h3>
+        <div className="grid px-11 grid-cols-4 gap-1 gap-y-3">
+          {structures.map(structure => {
+            const itemDetail = itemDetails.get(structure.item);
+            if (!itemDetail) return null;
+
+            return (
+              <div key={structure.id} className="flex flex-col items-center space-y-2">
+                <img
+                  src={itemDetail.icon_url}
+                  alt={itemDetail.name}
+                  className="w-24 h-24 object-cover cursor-pointer hover:scale-105 transition-transform duration-200"
+                  onClick={() => handleIconClick(itemDetail.id)}
+                />
+                <p className="text-xs text-center text-gray-700">{itemDetail.name}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="relative">
-      <div className="grid grid-cols-1 gap-4 justify-items-center" style={{ marginLeft: "-14%" }}>
-        {userStructuresOnPlanet.map((structure) => {
-          const itemDetail = itemDetails.get(structure.item);
-
-          return itemDetail ? (
-            <div key={structure.id} className="flex flex-col items-center space-y-2">
-              <img
-                src={itemDetail.icon_url}
-                alt={itemDetail.name}
-                className="w-16 h-16 object-cover cursor-pointer"
-                onClick={() => handleIconClick(itemDetail.id, structure.id)}
-              />
-              <p className="text-white text-sm mt-2">{itemDetail.name}</p>
-            </div>
-          ) : null;
-        })}
-      </div>
-
-      {selectedStructure && (
-        <IndividualStructure
-          key={selectedStructure.name}
-          name={selectedStructure.name}
-          title={selectedStructure.title}
-          labels={selectedStructure.labels}
-          imageSrc={selectedStructure.imageSrc}
-          actions={selectedStructure.actions}
-          buttons={selectedStructure.buttons}
-          structureId={selectedStructure.structureId}
-          onClose={handleClose}
-        />
+    <div className="relative w-full">
+      {loading ? (
+        <p className="text-center text-sm text-gray-500">Loading structures...</p>
+      ) : (
+        <>
+          {renderStructureGroup("", structureGroups.Orbital)}
+          {renderStructureGroup("", structureGroups.Atmosphere)}
+          {renderStructureGroup("", structureGroups.Surface)}
+        </>
       )}
     </div>
   );
