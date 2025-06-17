@@ -13,6 +13,7 @@ import SunspotSteps from "@/components/Projects/Telescopes/Sunspots/SunspotShell
 export default function TelescopeProjectRoute() {
   const { project } = useParams();
   const router = useRouter();
+
   const { session, isLoading } = useSessionContext();
 
   const [ProjectComponent, setProjectComponent] = useState<React.ReactNode | null>(null);
@@ -41,13 +42,13 @@ export default function TelescopeProjectRoute() {
         default:
           router.push('/structures/telescope');
           break;
-      }
-    }
+      };
+    };
   }, [project, session, isLoading, router]);
 
   if (isLoading) {
     return null;
-  }
+  };
 
   return (
     <div className="relative min-h-screen w-full flex flex-col">
@@ -57,7 +58,7 @@ export default function TelescopeProjectRoute() {
         alt='Earth Background'
       />
 
-      <div className="relative z-10">
+      <div className="relative z-10 pb-4">
         <GameNavbar />
       </div>
 
