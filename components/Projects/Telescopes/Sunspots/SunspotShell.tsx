@@ -4,7 +4,7 @@ import MissionShell from "@/components/Structures/Missions/BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Sun, Vote } from "lucide-react";
 
 import { Mission } from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AIForMars";
-import { SunspotsWrapper } from "../Sunspots";
+import { StarterSunspot } from "../Sunspots";
 
 export interface MissionStep {
   id: number;
@@ -46,7 +46,7 @@ const SunspotSteps = () => {
             icon: Sun,
             points: 2,
             completedCount: 0,
-            internalComponent: () => <SunspotsWrapper />,
+            internalComponent: () => <StarterSunspot />,
             color: 'text-yellow-500',
         },
         // comments, voting, etc...

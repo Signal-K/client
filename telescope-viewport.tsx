@@ -27,7 +27,7 @@ interface DatabaseAnomaly {
   gravity: number | null
   temperatureEq: number | null
   temperature: number | null
-  smaxis: number | null
+  smaxis: number | null 
   orbital_period: number | null
   classification_status: string | null
   avatar_url: string | null

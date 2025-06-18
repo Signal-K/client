@@ -11,7 +11,7 @@ import { RoverPhoto } from "@/components/Projects/Auto/Mars-Photos";
 import { AnomalyRoverPhoto } from "@/components/Structures/Auto/AutomatonClassificationShell";
 import ModernTechTree from "@/components/Structures/Research/TechTree";
 import { DataSourcesModal } from "@/components/Data/unlockNewDataSources";
-import { SunspotsWrapper } from "@/components/Projects/Telescopes/Sunspots";
+// import { SunspotsWrapper } from "@/components/Projects/Telescopes/Sunspots";
 import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
 // import LaunchpadStructure from "@/components/Structures/Launchpad/Dashboard";
 // import CameraComponent from "@/components/Projects/Zoodex/Upload/Camera";

@@ -172,7 +172,7 @@ export const telescopeDataSources = [
                 activeStructure: 3103,
                 researched: 'telescope-sunspots',
                 techId: 5,
-                dynamicComponent: <StarterSunspot anomalyid={40} />
+                // dynamicComponent: <StarterSunspot anomalyid={40} />
             }
         ] 
     },

@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
 import Home from "@/app/page";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@supabase/auth-helpers-react";
 import {
   BuildingIcon,
   CameraOffIcon,
@@ -16,11 +16,13 @@ import GameNavbar from "@/components/Layout/Tes";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export default function WeatherBalloonOnEarthPage() {
-  const supabase = useSupabaseClient();
   const session = useSession();
+
   const router = useRouter();
 
-  if (!session) return <Home />;
+  if (!session) {
+    router.push("/");
+  };
 
   const actions = [
     {

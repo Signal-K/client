@@ -173,7 +173,7 @@ type Anomaly = {
 };
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
-export function StarterSunspot({ anomalyid }: SelectedAnomalyProps ) {
+export function StarterSunspot() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -253,30 +253,11 @@ export function StarterSunspot({ anomalyid }: SelectedAnomalyProps ) {
                         assetMentioned={imageUrl}
                         structureItemId={3103}
                         missionNumber={5055655555}
-                        parentPlanetLocation={anomalyid?.toString() || ''}
+                        // parentPlanetLocation={anomalyid?.toString() || ''}
                         annotationType="Sunspots"
                     />
                 )}
             </div>
-        </div>
-    );
-};
-
-export function SunspotsWrapper() {
-    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
-
-    return (
-        <div className="space-y-8">
-            {/* {!selectedAnomaly && (
-                <PreferredTerrestrialClassifications
-                    onSelectAnomaly={setSelectedAnomaly}
-                />
-            )} */}
-            {selectedAnomaly && (
-                <StarterSunspot 
-                    anomalyid={selectedAnomaly}
-                />
-            )}
         </div>
     );
 };
