@@ -234,39 +234,39 @@ export const lidarDataSources = [
     },
 ];
 
-export const physicsLabDataSources = [
-    {
-        category: 'Particle Accelerator',
-        items: [
-            {
-                name: 'Cosmic Muon Images',
-                description: 'Using Muon Tomography we can probe the internal structure of massive objects, like volcanoes, with particles from stars and galaxies far far away... help us identify these particles inside our detectors',
-                identifier: 'physicslab-cosmicMuons',
-                researchId: 'muon-cosmic-muon-images',
-                researcher: 'zooniverse/reinforce',
-                unlocked: false,
-                compatiblePlanetTypes: ['Frozen', 'Hellhole', 'Arid', 'Lush', 'IceGiant', 'GasGiant'],
-                bestPlanetType: ['Hellhole'],
-                tutorialMission: 20000002,
-                activeStructure: 31010,
-                techId: 6,
-            },
-            {
-                name: 'Name that Neutrino',
-                description: 'When a neutrino interacts in ice, a signal or light pattern is produced. Classify the shape of the signals to help us understand the pattern and movement of these particles',
-                identifier: 'physicslab-neutrinoName',
-                researchId: 'name-that-neutrino',
-                researcher: 'zooniverse/icecubeobservatory',
-                unlocked: false,
-                compatiblePlanetTypes: ['Frozen', 'Hellhole', 'Arid', 'Lush', 'IceGiant', 'GasGiant'],
-                bestPlanetType: ['Frozen'],
-                tutorialMission: 20000001,
-                activeStructure: 31010,
-                techId: 6,
-            },
-        ],
-    },
-];
+// export const physicsLabDataSources = [
+//     {
+//         category: 'Particle Accelerator',
+//         items: [
+//             {
+//                 name: 'Cosmic Muon Images',
+//                 description: 'Using Muon Tomography we can probe the internal structure of massive objects, like volcanoes, with particles from stars and galaxies far far away... help us identify these particles inside our detectors',
+//                 identifier: 'physicslab-cosmicMuons',
+//                 researchId: 'muon-cosmic-muon-images',
+//                 researcher: 'zooniverse/reinforce',
+//                 unlocked: false,
+//                 compatiblePlanetTypes: ['Frozen', 'Hellhole', 'Arid', 'Lush', 'IceGiant', 'GasGiant'],
+//                 bestPlanetType: ['Hellhole'],
+//                 tutorialMission: 20000002,
+//                 activeStructure: 31010,
+//                 techId: 6,
+//             },
+//             {
+//                 name: 'Name that Neutrino',
+//                 description: 'When a neutrino interacts in ice, a signal or light pattern is produced. Classify the shape of the signals to help us understand the pattern and movement of these particles',
+//                 identifier: 'physicslab-neutrinoName',
+//                 researchId: 'name-that-neutrino',
+//                 researcher: 'zooniverse/icecubeobservatory',
+//                 unlocked: false,
+//                 compatiblePlanetTypes: ['Frozen', 'Hellhole', 'Arid', 'Lush', 'IceGiant', 'GasGiant'],
+//                 bestPlanetType: ['Frozen'],
+//                 tutorialMission: 20000001,
+//                 activeStructure: 31010,
+//                 techId: 6,
+//             },
+//         ],
+//     },
+// ];
 
 export const roverDataSources = [
     {

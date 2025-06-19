@@ -136,19 +136,19 @@ export function StationCard({ station, onBuild, onView }: StationCardProps) {
       <CardContent className="relative z-10 space-y-4">
         <div className="flex items-center gap-2 text-sm text-blue-400">
           <MapPin className="w-4 h-4" />
-          <span> {station.location.coordinates} </span>
+          {/* <span> {station.location.coordinates} </span>
           {station.location.depth && (
             <span className="text-blue-500 flex items-center gap-1">
               <ArrowDown className="w-3 h-3" />
               {station.location.depth}
             </span>
-          )}
-          {station.location.altitude && (
+          )} */}
+          {/* {station.location.altitude && (
             <span className="text-blue-500 flex items-center gap-1">
               <ArrowUp className="w-3 h-3" />
               {station.location.altitude}
             </span>
-          )}
+          )} */}
         </div>
 
         <div className="flex flex-wrap gap-2">

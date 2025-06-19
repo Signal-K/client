@@ -103,8 +103,8 @@ export function DiscoveriesView({
         return <Disc className="h-4 w-4" />
       default:
         return <Planet className="h-4 w-4" />
-    }
-  }
+    };
+  };
 
   const getAnomalyTypeLabel = (type: string) => {
     switch (type) {
@@ -118,8 +118,8 @@ export function DiscoveriesView({
         return "Accretion Disc"
       default:
         return type
-    }
-  }
+    };
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2E3440] via-[#3B4252] to-[#434C5E] p-6">
@@ -290,5 +290,5 @@ export function DiscoveriesView({
         </div>
       </div>
     </div>
-  )
+  );
 };

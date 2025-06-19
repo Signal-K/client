@@ -16,7 +16,7 @@ interface TelescopeViewProps {
   handleAnomalyClick: (anomaly: Anomaly) => void
   currentSectorName: string
   focusedAnomaly?: Anomaly | null
-}
+};
 
 export function TelescopeView({
   stars,
@@ -42,7 +42,7 @@ export function TelescopeView({
             <div className="w-4 h-4 bg-[#A3BE8C] rounded-full border-2 border-[#2E3440] animate-pulse" />
             <div className="w-4 h-4 bg-[#EBCB8B] rounded-full border-2 border-[#2E3440]" />
             <div className="w-4 h-4 bg-[#BF616A] rounded-full border-2 border-[#2E3440]" />
-            <div className="text-[#2E3440] font-bold text-sm">DEEP SPACE OBSERVATORY</div>
+            <div className="text-[#2E3440] font-bold text-sm">TELESCOPE</div>
           </div>
 
           {/* Right Side - System Info */}
@@ -59,7 +59,7 @@ export function TelescopeView({
         </div>
 
         {/* Left Control Panel */}
-        <div className="absolute left-6 top-28 bottom-6 w-32 bg-gradient-to-b from-[#434C5E] to-[#3B4252] rounded-2xl border-2 border-[#2E3440] p-4 space-y-4">
+        <div className="absolute left-6 top-28 bottom-6 w-32 bg-gradient-to-b from-[#434C5E] to-[#3B4252] rounded-2xl border-2 border-[#2E3440] p-4 space-y-4 hidden sm:block">
           {/* Mini Screens */}
           <div className="h-16 bg-[#2E3440] rounded-lg border border-[#4C566A] flex items-center justify-center">
             <Gauge className="h-6 w-6 text-[#88C0D0]" />
@@ -88,7 +88,7 @@ export function TelescopeView({
         </div>
 
         {/* Right Control Panel */}
-        <div className="absolute right-6 top-28 bottom-6 w-32 bg-gradient-to-b from-[#434C5E] to-[#3B4252] rounded-2xl border-2 border-[#2E3440] p-4 space-y-4">
+        <div className="absolute right-6 top-28 bottom-6 w-32 bg-gradient-to-b from-[#434C5E] to-[#3B4252] rounded-2xl border-2 border-[#2E3440] p-4 space-y-4 hidden sm:block">
           {/* System Monitors */}
           <div className="h-20 bg-[#2E3440] rounded-lg border border-[#4C566A] p-2">
             <div className="flex flex-col gap-1">
@@ -133,7 +133,13 @@ export function TelescopeView({
         </div>
 
         {/* Main Telescope Viewport */}
-        <div className="absolute left-40 right-40 top-28 bottom-24 bg-gradient-to-br from-[#2E3440] to-[#3B4252] rounded-2xl border-4 border-[#4C566A] p-2">
+        <div className="
+  absolute 
+  left-4 right-4 top-16 bottom-4 
+  sm:left-40 sm:right-40 sm:top-28 sm:bottom-24
+  bg-gradient-to-br from-[#2E3440] to-[#3B4252] 
+  rounded-2xl border-4 border-[#4C566A] p-2
+">
           <div
             ref={viewportRef}
             className="w-full h-full rounded-xl overflow-hidden cursor-move border-2 border-[#5E81AC] relative"

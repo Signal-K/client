@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 
 // Base anomaly type with just essential properties
-export interface BaseAnomaly {
+interface BaseAnomaly {
   id: string
   name: string
   type: "exoplanet" | "sunspot" | "asteroid" | "accretion_disc"
@@ -44,13 +44,7 @@ export interface Mission {
   difficulty: "easy" | "medium" | "hard"
   completed: boolean
   icon: ReactNode
-}
-
-export interface Sector {
-  x: number
-  y: number
-  name: string
-}
+};
 
 export interface Star {
   x: number

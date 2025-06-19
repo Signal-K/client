@@ -1,7 +1,6 @@
 import type { Project } from "@/types/Structures/telescope"
 import { SpaceIcon as Planet, Sun, Asterisk, Disc } from "lucide-react"
 
-// Project definitions with icons and colors
 export const projects: Project[] = [
   {
     id: "planet-hunters",
@@ -47,4 +46,4 @@ export const projects: Project[] = [
     color: "from-[#88C0D0] to-[#5E81AC]",
     bgGradient: "linear-gradient(135deg, #88C0D0, #5E81AC)",
   },
-]
+];

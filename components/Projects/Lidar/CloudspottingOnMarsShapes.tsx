@@ -14,40 +14,6 @@ interface SelectedAnomProps {
     anomalyid: number;
 };
 
-export function ShapesOnMarsWithId({ anomalyid }: SelectedAnomProps) {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
-
-    const [loading, setLoading] = useState<boolean>(true);
-
-    async function fetchAnomaly() {
-        if (!session) {
-            setLoading(false);
-            return;
-        };
-
-        const {
-            data: anomalyData,
-            error,
-        } = await supabase
-            .from("anomalies")
-            .select("*")
-            .eq("anomalySet", 'balloon-marsCloudShapes')
-            .eq('id', anomalyid);
-
-        if (error) {
-            setAnomaly(null);
-            return;
-            setLoading(false);
-        } else {
-            setAnomaly(anomalyData[0]);
-        }
-    };
-};
-
 export function StarterCoMShapes({ anomalyid }: SelectedAnomProps) {
     const supabase = useSupabaseClient();
     const session = useSession();
