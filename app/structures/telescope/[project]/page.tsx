@@ -64,6 +64,14 @@ export default function TelescopeProjectRoute() {
 
       <main className="flex-grow z-10 px-4 py-12 flex justify-center items-start overflow-y-auto">
         <div className="max-w-4xl w-full">
+          <div className="mb-6 flex justify-end">
+            <button
+              onClick={() => router.push('/structures/telescope')}
+              className="bg-muted hover:bg-muted/70 text-sm text-foreground border border-border rounded-md px-4 py-2 transition-colors"
+            >
+              All Projects
+            </button>
+          </div>
           {ProjectComponent}
         </div>
       </main>

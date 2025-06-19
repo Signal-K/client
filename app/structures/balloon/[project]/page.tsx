@@ -37,7 +37,7 @@ export default function WeatherBalloonProjectPage() {
         <p className="text-gray-500 mt-2">The selected weather balloon project does not exist.</p>
       </div>
     );
-  }
+  };
 
   return (
     <div className="relative min-h-screen w-full flex flex-col">
@@ -46,10 +46,22 @@ export default function WeatherBalloonProjectPage() {
         src="/assets/Backdrops/Earth.png"
         alt="Earth Background"
       />
-      <GameNavbar />
-      <div className="relative z-10 py-12 p-6 max-w-4xl mx-auto w-full">
-        {SelectedComponent}
+      <div className='pb-8'>
+        <GameNavbar />
       </div>
+      <main className="flex-grow z-10 px-4 py-12 flex justify-center items-start overflow-y-auto">
+        <div className="max-w-4xl w-full">
+          <div className="mb-6 flex justify-end">
+            <button
+              onClick={() => router.push('/structures/balloon')}
+              className="bg-muted hover:bg-muted/70 text-sm text-foreground border border-border rounded-md px-4 py-2 transition-colors"
+            >
+              All Projects
+            </button>
+          </div>
+          {SelectedComponent}
+        </div>
+      </main>
     </div>
   );
 };
