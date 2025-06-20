@@ -23,8 +23,8 @@ const PlanetHuntersSteps = () => {
   const [missions, setMissions] = useState([
     {
       id: 1,
-      title: "Classify a Planet",
-      description: "Use your telescope to classify a planet.",
+      title: "Discover planets",
+      description: "Use your telescope to classify planet candidates",
       icon: TelescopeIcon,
       points: 1,
       completedCount: 0,
@@ -34,22 +34,22 @@ const PlanetHuntersSteps = () => {
       action: () => {},
       chapter: 1,
     },
+    // {
+    //   id: 2,
+    //   title: "Propose 1 planetary candidate",
+    //   description: "Make a classification indicating a positive candidate.",
+    //   icon: RadioIcon,
+    //   points: 2,
+    //   completedCount: 0,
+    //   internalComponent: () => <StarterTelescopeTess />,
+    //   color: "text-purple-500",
+    //   shadow: false,
+    //   action: () => {},
+    //   chapter: 1,
+    // },
     {
       id: 2,
-      title: "Propose 1 planetary candidate",
-      description: "Make a classification indicating a positive candidate.",
-      icon: RadioIcon,
-      points: 2,
-      completedCount: 0,
-      internalComponent: () => <StarterTelescopeTess />,
-      color: "text-purple-500",
-      shadow: false,
-      action: () => {},
-      chapter: 1,
-    },
-    {
-      id: 3,
-      title: "Propose a planet type",
+      title: "Identify planet types",
       description: "Make a comment proposing a planet type for a classification.",
       icon: SpeakerIcon,
       points: 1,
@@ -61,7 +61,7 @@ const PlanetHuntersSteps = () => {
       chapter: 1,
     },
     {
-      id: 4,
+      id: 3,
       title: "Survey planet classifications",
       description: "Comment & vote on a planet, suggesting stats and alterations to classifications.",
       icon: DiscAlbum,
@@ -114,7 +114,7 @@ const PlanetHuntersSteps = () => {
     if (!session?.user?.id) {
       console.warn("No user session found.");
       return;
-    }
+    };
 
     const fetchMissionData = async () => {
       try {
@@ -132,13 +132,13 @@ const PlanetHuntersSteps = () => {
 
         const mission1CompletedCount = classificationsData?.length || 0;
 
-        const mission2CompletedCount =
-          classificationsData?.filter(({ classificationConfiguration }) => {
-            const options = classificationConfiguration?.classificationOptions?.[""] || {};
-            const hasValidOptions = ["2", "3", "4"].some((option) => options?.[option]);
-            const hasInvalidOption = options?.["1"];
-            return hasValidOptions && !hasInvalidOption;
-          }).length || 0;
+        // const mission2CompletedCount =
+        //   classificationsData?.filter(({ classificationConfiguration }) => {
+        //     const options = classificationConfiguration?.classificationOptions?.[""] || {};
+        //     const hasValidOptions = ["2", "3", "4"].some((option) => options?.[option]);
+        //     const hasInvalidOption = options?.["1"];
+        //     return hasValidOptions && !hasInvalidOption;
+        //   }).length || 0;
 
         // Comments by the user
         const { data: commentsData, error: commentsError } = await supabase
@@ -175,8 +175,6 @@ const PlanetHuntersSteps = () => {
           switch (mission.id) {
             case 1:
               return { ...mission, completedCount: mission1CompletedCount };
-            case 2:
-              return { ...mission, completedCount: mission2CompletedCount };
             case 3:
               return { ...mission, completedCount: mission3CompletedCount };
             case 4:
@@ -190,7 +188,6 @@ const PlanetHuntersSteps = () => {
 
         const totalPoints =
           mission1CompletedCount * 1 +
-          mission2CompletedCount * 2 +
           mission3CompletedCount * 1 +
           mission4CompletedCount * 1 +
           mission5CompletedCount * 1;

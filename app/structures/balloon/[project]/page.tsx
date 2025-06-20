@@ -8,7 +8,7 @@ import AI4M from '@/components/Structures/Missions/Astronomers/SatellitePhotos/A
 import PlanetFour from '@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/PlanetFour';
 import CloudspottingOnMars from '@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudspottingOnMars';
 import JovianVortexHunters from '@/components/Structures/Missions/Meteorologists/JVH/JovianVortexHunters';
-import { DataSourcesModal } from '@/components/Data/unlockNewDataSources';
+// import { DataSourcesModal } from '@/components/Data/unlockNewDataSources';
 import React from 'react';
 
 export default function WeatherBalloonProjectPage() {
@@ -21,7 +21,7 @@ export default function WeatherBalloonProjectPage() {
   const project = params?.project;
 
   const componentMap: { [key: string]: React.ReactNode } = {
-    research: <DataSourcesModal structureId="3105" structure="LIDAR" />,
+    // research: <DataSourcesModal structureId="3105" structure="LIDAR" />,
     clouds: <CloudspottingOnMars />,
     storms: <JovianVortexHunters />,
     landmarks: <AI4M />,

@@ -1,4 +1,4 @@
-import { Telescope, Leaf, CloudSun, Globe, Target, Zap, Eye, Search, Wind, Shield } from "lucide-react"
+import { Telescope, Leaf, CloudSun, Globe, Target, Zap, Eye, Search, Wind, Shield, DrillIcon } from "lucide-react"
 import type { Structure, Project } from "./types"
 
 export const structures: Structure[] = [
@@ -40,6 +40,19 @@ export const structures: Structure[] = [
     status: "limited",
     powerLevel: 64,
     systemVersion: "v4.0.2",
+  },
+  {
+    name: "SeisCAM",
+    icon: DrillIcon,
+    description: "For geologists exploring exoplanet surfaces and oceans",
+    specialty: "Geologists",
+    difficulty: "Beginner",
+    bgGradient: 'from-green-500 to-primary/10',
+    iconColor: 'text-blue-400',
+    inventoryItemId: 3107,
+    status: "operational",
+    powerLevel: 100,
+    systemVersion: 'v1.0.1',
   },
 ]
 
@@ -83,6 +96,36 @@ export const projects: Record<string, Project[]> = {
       status: "maintenance",
       difficulty: 4,
       estimatedTime: "5-8 hrs",
+    },
+  ],
+  "SeisCAM": [
+    {
+      name: "AI4Mars",
+      description:
+        "Label real Mars rover images to help train autonomous navigation systems and improve future Martian exploration.",
+      identifier: "seiscam-ai4mars",
+      sourceLink: "https://www.zooniverse.org/projects/hiroc/ai4mars",
+      icon: Search,
+      techId: 3107,
+      tutorialMission: 3000021,
+      activeStructure: 3107,
+      status: "active",
+      difficulty: 3,
+      estimatedTime: "4-6 hrs",
+    },
+    {
+      name: "Planet Four",
+      description:
+        "Help identify wind-driven features on Mars' south pole to better understand Martian climate patterns.",
+      identifier: "seiscam-planetFour",
+      sourceLink: "https://www.zooniverse.org/projects/mschwamb/planet-four",
+      icon: Wind,
+      techId: 3107,
+      tutorialMission: 3000022,
+      activeStructure: 3107,
+      status: "active",
+      difficulty: 2,
+      estimatedTime: "3-5 hrs",
     },
   ],
   Biodome: [

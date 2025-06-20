@@ -60,5 +60,5 @@ export default function SeiscamOnEarthPage() {
                 </Dialog>
             </div>
         </div>
-    )
+    );
 };

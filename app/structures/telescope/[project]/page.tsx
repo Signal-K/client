@@ -58,7 +58,7 @@ export default function TelescopeProjectRoute() {
         alt='Earth Background'
       />
 
-      <div className="relative z-10 pb-4">
+      <div className="relative z-10 pb-8">
         <GameNavbar />
       </div>
 

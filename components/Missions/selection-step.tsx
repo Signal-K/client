@@ -17,7 +17,7 @@ export const SelectionStep = ({ structures, onStructureClick }: SelectionStepPro
     <motion.div
       key="selection"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      animate={{ opacity: 1 }} 
       exit={{ opacity: 0 }}
       className="space-y-8"
     >
@@ -136,5 +136,5 @@ export const SelectionStep = ({ structures, onStructureClick }: SelectionStepPro
         ))}
       </div>
     </motion.div>
-  )
+  );
 };
