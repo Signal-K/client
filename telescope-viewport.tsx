@@ -321,7 +321,7 @@ export default function TelescopeViewport() {
   const selectProject = (project: (typeof projects)[0] | null) => {
     setSelectedProject(project)
     setShowProjectPanel(false)
-  }
+  };
 
   const toggleProjectPanel = () => setShowProjectPanel(!showProjectPanel)
 
@@ -334,7 +334,25 @@ export default function TelescopeViewport() {
     if (!loading) {
       loadSector(currentSector.x, currentSector.y)
     }
-  }, [currentSector, loadSector, loading])
+  }, [currentSector, loadSector, loading]);
+
+  useEffect(() => {
+  if (!loading && anomalies.length > 0) {
+    const alreadyClassifiedIds = new Set(classifications.map(c => `db-${c.anomaly}`));
+    const unclassified = anomalies.filter(a => !alreadyClassifiedIds.has(a.id));
+    const pool = unclassified.length > 0 ? unclassified : anomalies;
+    const randomAnomaly = pool[Math.floor(Math.random() * pool.length)];
+
+    if (randomAnomaly) {
+      setSelectedAnomaly(randomAnomaly)
+      if (randomAnomaly.classified) {
+        setShowDetailDialog(true)
+      } else {
+        setShowClassifyDialog(true)
+      }
+    }
+  }
+}, [loading, anomalies, classifications]);
 
   // Computed values
   const currentSectorName = generateSectorName(currentSector.x, currentSector.y)
@@ -346,8 +364,8 @@ export default function TelescopeViewport() {
       <div className="h-screen bg-[#2E3440] flex items-center justify-center">
         <div className="text-[#ECEFF4] text-xl">Loading telescope data...</div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="h-screen bg-[#2E3440] flex flex-col overflow-hidden">
