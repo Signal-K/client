@@ -278,7 +278,7 @@ export default function Home() {
       } catch (error: any) {
         console.error("Error checking inventory:", error.message);
         setHasRequiredItems(false);
-      }
+      };
     };
 
     const checkClassifications = async () => {

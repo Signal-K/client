@@ -195,7 +195,7 @@ export function AiForMarsProject({
                 <p>No anomaly found.</p>
             </div>
         );
-    }
+    };
 
     const startTutorial = () => setShowTutorial(true);
 

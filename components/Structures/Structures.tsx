@@ -4,12 +4,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
-import IndividualStructure, { IndividualStructureProps } from "./IndividualStructure";
+// import IndividualStructure, { IndividualStructureProps } from "./IndividualStructure";
 // import { StructuresConfig } from "@/constants/Structures/Properties";
 
 import "../../styles/Anims/StarterStructureAnimations.css";
 
-import { UnownedSurfaceStructures } from "./Build/EditMode";
+// import { UnownedSurfaceStructures } from "./Build/EditMode";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -45,7 +45,7 @@ export default function Structures() {
       itemsData.forEach(item => {
         if (item.ItemCategory === 'Structure') {
           itemMap.set(item.id, item);
-        }
+        };
       });
       setItemDetails(itemMap);
 
@@ -92,7 +92,8 @@ export default function Structures() {
     const routes: Record<number, string> = {
       3103: "telescope",
       3104: "greenhouse",
-      3105: "balloon"
+      3105: "balloon",
+      3107: "seiscam",
     };
 
     const route = routes[itemId];

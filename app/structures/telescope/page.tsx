@@ -66,7 +66,7 @@ export default function TelescopeOnEarthPage() {
       </div>
     </div>
   );
-}
+};
 
 function SimpleTelescopePanel({ router }: { router: any }) {
   const actions = [

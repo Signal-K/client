@@ -13,6 +13,7 @@ import React from 'react';
 
 export default function WeatherBalloonProjectPage() {
   const session = useSession();
+  
   const router = useRouter();
   const params = useParams();
 
