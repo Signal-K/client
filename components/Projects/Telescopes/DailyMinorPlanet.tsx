@@ -158,7 +158,6 @@ type Anomaly = {
 export function DailyMinorPlanetWithId() {
   const supabase = useSupabaseClient();
   const session = useSession();
-
   const router = useRouter();
 
   const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
@@ -177,7 +176,7 @@ export function DailyMinorPlanetWithId() {
     }
 
     try {
-      console.log("Fetching anomaly for user:", session.user.id);
+      console.log("Fetching anomalies for user:", session.user.id);
       const { data: linkedAnomalies, error: linkedError } = await supabase
         .from("linked_anomalies")
         .select(`
@@ -185,6 +184,7 @@ export function DailyMinorPlanetWithId() {
           anomaly_id,
           anomalies!inner (
             id,
+            name,
             content,
             ticId,
             anomalytype,
@@ -208,38 +208,60 @@ export function DailyMinorPlanetWithId() {
           )
         `)
         .eq("author", session.user.id)
-        .eq("anomalies.anomalySet", "telescope-minorPlanet")
-        .limit(1);
+        .eq("anomalies.anomalySet", "telescope-minorPlanet");
 
       if (linkedError) throw linkedError;
 
-      console.log("Query result:", linkedAnomalies);
-
-      const selectedAnomaly = linkedAnomalies?.[0]?.anomalies as unknown as Anomaly | undefined;
-
-      if (!selectedAnomaly) {
-        console.log("No matching anomaly found. Redirecting in 10s...");
-        setTimeout(() => router.push("/deploy"), 10000);
-        return;
-      }
-
-      console.log("Anomaly found:", selectedAnomaly);
-      setAnomaly(selectedAnomaly);
-
-      const images = [1, 2, 3, 4].map(
-        (i) =>
-          `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${selectedAnomaly.id}/${i}.png`
+      const validLinked = (linkedAnomalies ?? []).filter(
+        (entry: any) =>
+          !!entry.anomalies && entry.anomalies.anomalySet === "telescope-minorPlanet"
       );
 
-      console.log("Image URLs:", images);
-      setImageUrls(images);
+      if (validLinked.length > 0) {
+        const shuffled = [...validLinked].sort(() => 0.5 - Math.random());
+        const randomAnomaly = shuffled[0].anomalies as unknown as Anomaly;
+        setAnomaly(randomAnomaly);
+
+        const images = [1, 2, 3, 4].map(
+          (i) =>
+            `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${randomAnomaly.id}/${i}.png`
+        );
+        setImageUrls(images);
+      } else {
+        await fetchFallbackAnomaly();
+      }
     } catch (error: any) {
-      console.error("Error fetching linked anomaly:", error.message);
-      setAnomaly(null);
-      console.log("Redirecting due to fetch error in 10s...");
-      setTimeout(() => router.push("/deploy"), 10000);
+      console.error("Error fetching linked anomalies:", error.message);
+      await fetchFallbackAnomaly();
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchFallbackAnomaly = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("anomalies")
+        .select("*")
+        .eq("anomalySet", "telescope-minorPlanet");
+
+      if (error) throw error;
+      if (!data || data.length === 0) return;
+
+      const shuffled = [...data].sort(() => 0.5 - Math.random());
+      const randomAnomaly = shuffled[0] as Anomaly;
+
+      setAnomaly(randomAnomaly);
+
+      const fallbackImages = [1, 2, 3, 4].map(
+        (i) =>
+          `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${randomAnomaly.id}/${i}.png`
+      );
+
+      setImageUrls(fallbackImages);
+    } catch (err: any) {
+      console.error("Fallback anomaly fetch error:", err.message);
+      setAnomaly(null);
     }
   };
 
@@ -260,7 +282,7 @@ export function DailyMinorPlanetWithId() {
   };
 
   if (loading) return <p>Loading...</p>;
-  if (!anomaly) return null;
+  if (!anomaly) return <p>No anomalies found for Daily Minor Planet project.</p>;
 
   return (
     <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
@@ -328,7 +350,7 @@ export function DailyMinorPlanetWithId() {
         />
       )}
 
-      {/* Optionally add your tutorial modal here if showTutorial is true */}
+      {/* Optionally show modal here if showTutorial is true */}
     </div>
   );
 };

@@ -39,59 +39,84 @@ export function AiForMarsProjectWithID() {
     const [parentClassificationId, setParentClassificationId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
 
-const fetchAnomaly = async () => {
-    if (!session?.user?.id) {
-        setLoading(false);
-        return;
-    }
-
-    try {
-        const { data, error } = await supabase
-            .from("linked_anomalies")
-            .select(`
-                id,
-                anomaly_id,
-                classification_id,
-                anomalies (
+    const __temporaryFallbackFetchFromAnomaliesForAiForMars__ = async () => {
+        try {
+            const { data, error } = await supabase
+                .from("anomalies")
+                .select(`
                     id,
                     anomalySet,
                     content
-                )
-            `)
-            .eq("author", session.user.id)
-            ;
+                `)
+                .eq("anomalySet", "automaton-aiForMars")
+                .limit(1)
+                .maybeSingle();
 
-        if (error) throw error;
-
-        console.log("Raw fetched linked_anomalies data:", data);
-
-        const validEntries = (data ?? []).filter((entry): entry is LinkedAnomaly => {
-            const anomaly = entry.anomalies;
-            return anomaly &&
-                typeof anomaly === "object" &&
-                "anomalySet" in anomaly &&
-                anomaly.anomalySet === "automaton-aiForMars";
-        });
-
-        console.log("Filtered valid linked anomalies:", validEntries);
-
-        if (validEntries.length > 0) {
-            const randomEntry = validEntries[Math.floor(Math.random() * validEntries.length)];
-            const singleAnomaly = randomEntry.anomalies as unknown as AnomalyRecord;
-
-            setAnomaly(singleAnomaly);
-            setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automatons-ai4Mars/${randomEntry.anomaly_id}.jpeg`);
-            setParentClassificationId(randomEntry.classification_id);
-        } else {
-            setAnomaly(null);
+            if (error) throw error;
+            if (data) {
+                setAnomaly(data);
+                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automatons-ai4Mars/${data.id}.jpeg`);
+                setParentClassificationId(null);
+            }
+        } catch (err: any) {
+            console.error("Error in fallback anomaly fetch:", err.message);
         }
-    } catch (err: any) {
-        console.error("Error fetching anomaly:", err.message);
-        setAnomaly(null);
-    } finally {
-        setLoading(false);
-    }
-};
+    };
+
+    const fetchAnomaly = async () => {
+        if (!session?.user?.id) {
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const { data, error } = await supabase
+                .from("linked_anomalies")
+                .select(`
+                    id,
+                    anomaly_id,
+                    classification_id,
+                    anomalies (
+                        id,
+                        anomalySet,
+                        content
+                    )
+                `)
+                .eq("author", session.user.id);
+
+            if (error) throw error;
+
+            console.log("Raw fetched linked_anomalies data:", data);
+
+            const validEntries = (data ?? []).filter((entry): entry is LinkedAnomaly => {
+                const anomaly = entry.anomalies;
+                return anomaly &&
+                    typeof anomaly === "object" &&
+                    "anomalySet" in anomaly &&
+                    anomaly.anomalySet === "automaton-aiForMars";
+            });
+
+            console.log("Filtered valid linked anomalies:", validEntries);
+
+            if (validEntries.length > 0) {
+                const randomEntry = validEntries[Math.floor(Math.random() * validEntries.length)];
+                const singleAnomaly = randomEntry.anomalies as unknown as AnomalyRecord;
+
+                setAnomaly(singleAnomaly);
+                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automatons-ai4Mars/${randomEntry.anomaly_id}.jpeg`);
+                setParentClassificationId(randomEntry.classification_id);
+            } else {
+                // Fallback to anomalies table if no valid linked anomalies
+                await __temporaryFallbackFetchFromAnomaliesForAiForMars__();
+            }
+        } catch (err: any) {
+            console.error("Error fetching anomaly:", err.message);
+            setAnomaly(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchAnomaly();
     }, [session]);
@@ -115,7 +140,7 @@ const fetchAnomaly = async () => {
             </div>
         </div>
     );
-}
+};
 
 export function AiForMarsProject({
     anomalyid,
@@ -139,36 +164,31 @@ export function AiForMarsProject({
 
         try {
             const { data, error } = await supabase
-  .from("linked_anomalies")
-  .select(`
-    id,
-    anomaly_id,
-    anomalies (
-      id,
-      anomalySet,
-      content
-    )
-  `)
-  .eq("author", session.user.id)
-  .eq("anomaly_id", anomalyid)
-  .filter("anomalies.anomalySet", "eq", "automaton-aiForMars")
-  .maybeSingle();
-
+                .from("linked_anomalies")
+                .select(`
+                    id,
+                    anomaly_id,
+                    anomalies (
+                        id,
+                        anomalySet,
+                        content
+                    )
+                `)
+                .eq("author", session.user.id)
+                .eq("anomaly_id", anomalyid)
+                .filter("anomalies.anomalySet", "eq", "automaton-aiForMars")
+                .maybeSingle();
 
             if (error) throw error;
 
             if (data?.anomalies) {
-                setAnomaly(Array.isArray(data.anomalies) ? data.anomalies[0] : data.anomalies);
+                const anomalyData = Array.isArray(data.anomalies) ? data.anomalies[0] : data.anomalies;
+                setAnomaly(anomalyData);
                 setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automatons-ai4Mars/${data.anomaly_id}.jpeg`);
+            } else {
+                console.warn("No linked anomaly found, falling back...");
+                await __DEV_FALLBACK_fetchFromAnomaliesTable(anomalyid);
             }
-
-            if (!data || !data.anomalies) {
-  console.warn("No matching anomaly found or anomalies is null.");
-  setAnomaly(null);
-  setLoading(false);
-  return;
-}
-
         } catch (error: any) {
             console.error("Error fetching specific joined anomaly:", error.message);
             setAnomaly(null);
@@ -177,25 +197,40 @@ export function AiForMarsProject({
         }
     };
 
+    // 🌟 Easily removable fallback function
+    const __DEV_FALLBACK_fetchFromAnomaliesTable = async (id: number) => {
+        try {
+            const { data, error } = await supabase
+                .from("anomalies")
+                .select("id, anomalySet, content")
+                .eq("id", id)
+                .eq("anomalySet", "automaton-aiForMars")
+                .maybeSingle();
+
+            if (error) throw error;
+
+            if (data) {
+                setAnomaly(data);
+                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/automatons-ai4Mars/${id}.jpeg`);
+            } else {
+                console.log("No fallback anomaly found in anomalies table.");
+            }
+        } catch (err: any) {
+            console.error("Fallback fetch error:", err.message);
+        }
+    };
+
     useEffect(() => {
         fetchAnomaly();
     }, [session, supabase]);
 
     if (loading) {
-        return (
-            <div>
-                <p>Loading...</p>
-            </div>
-        );
+        return <div><p>Loading...</p></div>;
     }
 
     if (!anomaly) {
-        return (
-            <div>
-                <p>No anomaly found.</p>
-            </div>
-        );
-    };
+        return <div><p>No anomaly found.</p></div>;
+    }
 
     const startTutorial = () => setShowTutorial(true);
 
@@ -216,9 +251,6 @@ export function AiForMarsProject({
                                 parentPlanetLocation={anomalyid?.toString()}
                             />
                         </div>
-                        {/* <ClassificationForm
-                            
-                        /> */}
                     </>
                 )}
                 <button

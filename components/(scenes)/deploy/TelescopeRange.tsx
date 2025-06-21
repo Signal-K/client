@@ -106,7 +106,7 @@ export default function TelescopeRangeSlider() {
         };
 
         checkDeployment();
-    }, [supabase]);
+    }, [supabase, session?.user?.id]);
 
     const activeDropTypes = [
         {
@@ -232,13 +232,13 @@ export default function TelescopeRangeSlider() {
 
     // If already deployed this week, show only a message
     if (alreadyDeployed) {
-        {deploymentMessage && (
-            <div className="bg-green-100 text-green-800 border border-green-300 p-4 rounded-md mb-4 text-sm">
-                {deploymentMessage}
-            </div>
-        )}
         return (
             <div className="container mx-auto py-8 px-4 max-w-2xl text-center text-sm text-muted-foreground">
+                {deploymentMessage && (
+                    <div className="bg-green-100 text-green-800 border border-green-300 p-4 rounded-md mb-4 text-sm">
+                        {deploymentMessage}
+                    </div>
+                )}
                 <p className="bg-muted border border-border p-6 rounded-lg shadow-sm">
                     The Telescope has already been deployed this week. You’ll be able to recalibrate and search again next week.
                 </p>
