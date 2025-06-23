@@ -9,9 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface PlanetGeneratorProps {
-    classificationId: string;
-    editMode?: boolean;
-};
+  classificationId: string;
+  editMode?: boolean;
+  showSettings?: boolean; // ← add this
+  onToggleSettings?: () => void; // ← and this
+}
 
 interface PlanetStats {
   mass?: number;
@@ -22,6 +24,8 @@ interface PlanetStats {
 export default function PlanetGenerator({
     classificationId,
     editMode,
+    showSettings,
+    onToggleSettings,
 }: PlanetGeneratorProps) { 
     const supabase = useSupabaseClient();
 
@@ -127,7 +131,14 @@ export default function PlanetGenerator({
     return (
         <main className="flex w-full relative flex-col">
             <div className="w-full h-screen">
-                <PlanetViewer planetConfig={planetConfig} onConfigChange={handleConfigChange} classificationId={classificationId} editMode={editMode} />
+                <PlanetViewer
+  planetConfig={planetConfig}
+  onConfigChange={handleConfigChange}
+  classificationId={classificationId}
+  editMode={editMode}
+  showSettings={showSettings ?? false}
+  onToggleSettings={onToggleSettings ?? (() => {})}
+/>
             </div>
 
             <p>{JSON.stringify(planetStats, null, 2)}</p>
