@@ -11,7 +11,7 @@ interface AnomalyDetailDialogProps {
   showDetailDialog: boolean
   setShowDetailDialog: (show: boolean) => void
   selectedAnomaly: Anomaly | null
-}
+};
 
 export function AnomalyDetailDialog({
   showDetailDialog,
@@ -158,5 +158,5 @@ export function AnomalyDetailDialog({
         )}
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};

@@ -92,5 +92,5 @@ export function AnomalyDialog({
         )}
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};

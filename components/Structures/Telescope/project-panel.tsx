@@ -105,5 +105,5 @@ export function ProjectPanel({
         })}
       </div>
     </div>
-  )
+  );
 };
