@@ -3,7 +3,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../../BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 import VoteP4Classifications from "./P4Vote";
-import { P4Wrapper, StarterPlanetFour } from "@/components/Projects/Satellite/PlanetFour";
+import { PlanetFourProject, StarterPlanetFour } from "@/components/Projects/Satellite/PlanetFour";
 
 interface Mission {
     id: number;
@@ -40,7 +40,7 @@ const PlanetFour = () => {
                 icon: CloudCogIcon,
                 points: 2,
                 completedCount: 0,
-                internalComponent: () => <P4Wrapper />,
+                internalComponent: () => <PlanetFourProject />,
                 color: "text-blue-500",
             },
             {

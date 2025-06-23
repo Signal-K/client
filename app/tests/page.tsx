@@ -41,7 +41,7 @@ export default function TestPage() {
         setLocationIds(parsedData);
       }
       setLoading(false);
-    }
+    };
 
     fetchLocationIds();
   }, [session]);
@@ -60,7 +60,7 @@ export default function TestPage() {
                   />
                   <MyLocationIds /> */}
       {/* <WeatherEventsOverview /> */}
-      <TelescopeViewport />
+      {/* <TelescopeViewport /> */}
       {/* <PlanetGenerator classificationId="1" />   */}
       {/* <PlanetGenerator classificationId={1} biome={'RockyHighlands'} biomass={0.01} density={3.5} /> */}
     </div>

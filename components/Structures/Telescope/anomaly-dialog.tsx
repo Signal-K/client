@@ -11,7 +11,7 @@ interface AnomalyDialogProps {
   setShowClassifyDialog: (show: boolean) => void
   selectedAnomaly: Anomaly | null
   handleClassify: () => void
-}
+};
 
 export function AnomalyDialog({
   showClassifyDialog,

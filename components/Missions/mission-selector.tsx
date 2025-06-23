@@ -91,7 +91,7 @@ export default function MissionSelector() {
   const insertAdditionalStarterItems = async (chosenId: number) => {
     if (!session) return
 
-    const starterItemIds = [3105, 3104, 3103]
+    const starterItemIds = [3105, 3104, 3103, 3107]
     const otherItemIds = starterItemIds.filter((id) => id !== chosenId)
 
     const additionalInserts = otherItemIds.map((itemId) => ({

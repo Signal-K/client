@@ -2,7 +2,7 @@ export interface Animal {
   name: string;
   icon: string;
   biomassType: string;
-  mass: number; // in kilos, approximate average
+  mass: number;
 };
 
 export interface Biome {
@@ -12,14 +12,8 @@ export interface Biome {
   darkColor: string;
 };
 
-export interface Location {
-  coordinates: string;
-  depth?: string;
-  altitude?: string;
-};
-
 export interface Station {
-  id: string; // also points to `inventory.item`
+  id: string;
   name: string;
   icon: string;
   icon_url?: string;
@@ -27,5 +21,5 @@ export interface Station {
   biome: Biome;
   animals: Animal[];
   built: boolean;
-  location: Location;
+  // location: Location;
 };

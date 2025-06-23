@@ -12,7 +12,7 @@ interface MissionStepProps {
   projects: Record<string, Project[]>
   onMissionClick: (mission: Project) => void
   onBack: () => void
-}
+};
 
 export const MissionStep = ({ selectedStructure, projects, onMissionClick, onBack }: MissionStepProps) => {
   return (
@@ -97,5 +97,5 @@ export const MissionStep = ({ selectedStructure, projects, onMissionClick, onBac
         ))}
       </div>
     </motion.div>
-  )
+  );
 };

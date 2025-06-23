@@ -28,6 +28,7 @@ export default function TelescopeRangeSlider() {
     const [dropRates, setDropRates] = useState<Record<string, number>>({});
     const [fetchedAnomalies, setFetchedAnomalies] = useState<any[]>([]);
     const [alreadyDeployed, setAlreadyDeployed] = useState<boolean>(false);
+    const [deploymentMessage, setDeploymentMessage] = useState<string | null>(null);
 
     // Calculate weighted anomaly drop rates whenever the slider changes
     useEffect(() => {
@@ -105,7 +106,7 @@ export default function TelescopeRangeSlider() {
         };
 
         checkDeployment();
-    }, [supabase]);
+    }, [supabase, session?.user?.id]);
 
     const activeDropTypes = [
         {
@@ -223,12 +224,21 @@ export default function TelescopeRangeSlider() {
 
         console.log("Fetched anomalies:", anomalies);
         setFetchedAnomalies(anomalies);
+        if (anomalies.length > 0) {
+            const anomalyNames = anomalies.map((a) => a.anomalySet).join(", ");
+            setDeploymentMessage(`Telescope successfully deployed. New anomalies detected: ${anomalyNames}. Open the telescope interface to begin your observations.`);
+        };
     };
 
     // If already deployed this week, show only a message
     if (alreadyDeployed) {
         return (
             <div className="container mx-auto py-8 px-4 max-w-2xl text-center text-sm text-muted-foreground">
+                {deploymentMessage && (
+                    <div className="bg-green-100 text-green-800 border border-green-300 p-4 rounded-md mb-4 text-sm">
+                        {deploymentMessage}
+                    </div>
+                )}
                 <p className="bg-muted border border-border p-6 rounded-lg shadow-sm">
                     The Telescope has already been deployed this week. You’ll be able to recalibrate and search again next week.
                 </p>
@@ -239,6 +249,11 @@ export default function TelescopeRangeSlider() {
     // Main UI if not yet deployed
     return (
         <div className="container mx-auto py-2 pb-8 px-4 max-w-2xl">
+            {deploymentMessage && (
+                <div className="bg-green-100 text-green-800 border border-green-300 p-4 rounded-md mb-4 text-sm">
+                    {deploymentMessage}
+                </div>
+            )}
             <Card className="text-sm">
                 <CardHeader className="pb-2">
                     <CardTitle className="text-xl flex items-center gap-2">
@@ -295,14 +310,14 @@ export default function TelescopeRangeSlider() {
             </Card>
         </div>
     );
-}
+};
 
 interface DropRateItemProps {
     icon: React.ReactNode;
     label: string;
     rate: number;
     colorClass: string;
-}
+};
 
 function DropRateItem({
     icon,

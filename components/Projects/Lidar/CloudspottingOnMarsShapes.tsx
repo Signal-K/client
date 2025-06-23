@@ -2,46 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { Anomaly } from "../Telescopes/Transiting";
-import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+
+type Anomaly = {
+  id: string;
+  name: string;
+  details?: string;
+};
 
 interface SelectedAnomProps {
     anomalyid: number;
-};
-
-export function ShapesOnMarsWithId({ anomalyid }: SelectedAnomProps) {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
-    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
-
-    const [loading, setLoading] = useState<boolean>(true);
-
-    async function fetchAnomaly() {
-        if (!session) {
-            setLoading(false);
-            return;
-        };
-
-        const {
-            data: anomalyData,
-            error,
-        } = await supabase
-            .from("anomalies")
-            .select("*")
-            .eq("anomalySet", 'balloon-marsCloudShapes')
-            .eq('id', anomalyid);
-
-        if (error) {
-            setAnomaly(null);
-            return;
-            setLoading(false);
-        } else {
-            setAnomaly(anomalyData[0]);
-        }
-    };
 };
 
 export function StarterCoMShapes({ anomalyid }: SelectedAnomProps) {
@@ -126,9 +96,9 @@ export function CloudspottingShapesWrapper() {
 
     return (
         <div className="space-y-8">
-            {!selectedAnomaly && (
+            {/* {!selectedAnomaly && (
                 <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
-            )}
+            )} */}
             {selectedAnomaly && (
                 <StarterCoMShapes anomalyid={selectedAnomaly} />
             )}

@@ -4,8 +4,8 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, CheckCircle2, Clock, Eye, SpaceIcon as Planet, Sun, Asterisk, Disc } from "lucide-react"
-import type { Anomaly, Mission, Project } from "@/types/Structures/telescope"
-import { projects } from "@/data/projects"
+import type { Anomaly, Mission, Project } from "@/types/Structures/telescope";
+import { projects } from "@/data/projects";
 
 interface DiscoveriesViewProps {
   classifications: any[]
@@ -15,8 +15,8 @@ interface DiscoveriesViewProps {
   onBack: () => void
   onViewAnomaly: (anomaly: Anomaly) => void
   showAllDiscoveries: boolean
-  anomalies: Anomaly[]
-}
+  anomalies: Anomaly[] 
+};
 
 export function DiscoveriesView({
   classifications,
@@ -28,10 +28,8 @@ export function DiscoveriesView({
   showAllDiscoveries,
   anomalies,
 }: DiscoveriesViewProps) {
-  // Convert classifications to anomaly format for display
   const convertClassificationsToAnomalies = (classificationData: any[]): Anomaly[] => {
     return classificationData.map((classification) => {
-      // Find the corresponding anomaly from our anomalies list
       const dbAnomalyId = `db-${classification.anomaly}`
       const anomaly = anomalies.find((a) => a.id === dbAnomalyId)
 
@@ -46,26 +44,30 @@ export function DiscoveriesView({
         }
       }
 
-      // Fallback if anomaly not found in our list
+      const classificationTypeMap: Record<string, Anomaly["type"]> = {
+        planet: "exoplanet",
+        sunspot: "sunspot",
+        asteroid: "asteroid",
+        "DiskDetective": "accretion_disc",
+        "active-asteroid": "asteroid",
+        "telescope-minorPlanet": "asteroid",
+      }
+
+      const projectMap: Record<Anomaly["type"], string> = {
+        exoplanet: "planet-hunters",
+        sunspot: "sunspots",
+        asteroid: "daily-minor-planet",
+        accretion_disc: "disk-detective",
+      }
+
+      const anomalyType = classificationTypeMap[classification.classificationtype] || "exoplanet"
+      const anomalyProject = projectMap[anomalyType] || "planet-hunters"
+
       return {
         id: `classification-${classification.id}`,
         name: `ANOMALY-${classification.anomaly}`,
-        type:
-          classification.classificationtype === "planet"
-            ? "exoplanet"
-            : classification.classificationtype === "sunspot"
-              ? "sunspot"
-              : classification.classificationtype === "asteroid"
-                ? "asteroid"
-                : "exoplanet",
-        project:
-          classification.classificationtype === "planet"
-            ? "planet-hunters"
-            : classification.classificationtype === "sunspot"
-              ? "sunspots"
-              : classification.classificationtype === "asteroid"
-                ? "daily-minor-planet"
-                : "planet-hunters",
+        type: anomalyType,
+        project: anomalyProject,
         x: 50,
         y: 50,
         brightness: 1,
@@ -101,8 +103,8 @@ export function DiscoveriesView({
         return <Disc className="h-4 w-4" />
       default:
         return <Planet className="h-4 w-4" />
-    }
-  }
+    };
+  };
 
   const getAnomalyTypeLabel = (type: string) => {
     switch (type) {
@@ -116,13 +118,12 @@ export function DiscoveriesView({
         return "Accretion Disc"
       default:
         return type
-    }
-  }
+    };
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2E3440] via-[#3B4252] to-[#434C5E] p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-4">
             <Button onClick={onBack} className="bg-[#5E81AC] text-white hover:bg-[#81A1C1]">
@@ -154,7 +155,6 @@ export function DiscoveriesView({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Classified Anomalies */}
           <div>
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-[#ECEFF4]">
               <CheckCircle2 className="h-5 w-5 text-[#88C0D0]" />
@@ -189,15 +189,10 @@ export function DiscoveriesView({
                             <div>
                               <CardTitle className="text-sm text-[#ECEFF4] flex items-center gap-2">
                                 {anomaly.name}
-                                {/* {isOtherUser && (
-                                  <Badge variant="outline" className="text-xs border-[#B48EAD] text-[#B48EAD]">
-                                    {(anomaly as any).discoveredBy}
-                                  </Badge>
-                                )} */}
                               </CardTitle>
                               <CardDescription className="text-xs text-[#D8DEE9] flex items-center gap-2">
                                 <Badge variant="outline" className="text-xs border-[#5E81AC] text-[#88C0D0]">
-                                  {getAnomalyTypeLabel(anomaly.type)}
+                                  {(anomaly as any)?.dbData?.anomalySet || getAnomalyTypeLabel(anomaly.type)}
                                 </Badge>
                                 <span>•</span>
                                 <span>{anomaly.sector}</span>
@@ -230,7 +225,6 @@ export function DiscoveriesView({
             )}
           </div>
 
-          {/* Available Missions */}
           <div>
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-[#ECEFF4]">
               <Clock className="h-5 w-5 text-[#EBCB8B]" />
@@ -296,5 +290,5 @@ export function DiscoveriesView({
         </div>
       </div>
     </div>
-  )
+  );
 };

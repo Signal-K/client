@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import { subscribeUser, unsubscribeUser, sendNotification } from './actions'
-import StructuresOnPlanet, { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
+// import { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 // import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
@@ -19,6 +19,7 @@ import LandingSS from "./auth/landing";
 import GameNavbar from "@/components/Layout/Tes";
 import BiomassOnEarth from "@/components/Data/BiomassEarth";
 import NPSPopup from "@/lib/helper/nps-popup";
+import Structures from "@/components/Structures/Structures";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -277,7 +278,7 @@ export default function Home() {
       } catch (error: any) {
         console.error("Error checking inventory:", error.message);
         setHasRequiredItems(false);
-      }
+      };
     };
 
     const checkClassifications = async () => {
@@ -466,24 +467,11 @@ export default function Home() {
             </Dialog>
           )}
           <center>
-            <OrbitalStructuresOnPlanet />
+            {/* <OrbitalStructuresOnPlanet /> */}
           </center>
         </div>
       </div>
-      <div className="w-full">
-        <div className="py-2">
-          <center>
-            <AllSatellitesOnActivePlanet />
-            <AtmosphereStructuresOnPlanet />
-          </center>
-        </div>
-      </div>
-      <div className="w-full py-2">
-        <center>
-          <StructuresOnPlanet />
-          <AllAutomatonsOnActivePlanet />
-        </center>
-      </div>
+      <Structures />
       {!userClassifications && (
         <div className="w-full py-2">
           <SimpleeMissionGuide />

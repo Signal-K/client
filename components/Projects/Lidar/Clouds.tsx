@@ -4,16 +4,16 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
-import { Anomaly } from "../Telescopes/Transiting";
 import { CloudspottingOnMarsTutorial } from "./cloudspottingOnMars"; 
-import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
-export interface SelectedAnomProps {
-    anomalyid?: number;
+type Anomaly = {
+  id: string;
+  name: string;
+  details?: string;
 };
 
-export function StarterLidar({ anomalyid }: SelectedAnomProps) {
+export function StarterLidar({ anomalyid }: { anomalyid: string }) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -159,46 +159,76 @@ export function StarterLidar({ anomalyid }: SelectedAnomProps) {
     );
 };
 
-export function CloudspottingOnMarsWithId({ anomalyid }: SelectedAnomProps) {
+export function CloudspottingOnMarsWithId() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-
     const [loading, setLoading] = useState<boolean>(true);
 
-    async function fetchAnomaly() {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+
+    const fetchAnomaly = async () => {
         if (!session) {
             setLoading(false);
             return;
-        };
+        }
+
+        setLoading(true);
 
         try {
-            const {
-                data: anomalyData,
-                error,
-            } = await supabase
-                .from("anomalies")
-                .select("*")
-                .eq("anomalySet", 'cloudspottingOnMars')
-                .eq('id', anomalyid);
+            // Step 1: Try to find a linked anomaly for this user
+            const { data: linkedAnomalies, error: linkedError } = await supabase
+                .from("linked_anomalies")
+                .select(`
+                    id,
+                    anomaly_id,
+                    anomalies (
+                        id,
+                        anomalySet,
+                        content
+                    )
+                `)
+                .eq("author", session.user.id)
+                .filter("anomalies.anomalySet", "eq", "cloudspottingOnMars")
+                .limit(1);
 
-            if (error) {
-                setAnomaly(null);
-                return;
-                setLoading(false);
+            if (linkedError) throw linkedError;
+
+            let selectedAnomaly = null;
+
+            if (linkedAnomalies && linkedAnomalies.length > 0 && linkedAnomalies[0].anomalies && linkedAnomalies[0].anomalies.length > 0) {
+                selectedAnomaly = linkedAnomalies[0].anomalies[0];
+                console.log("Using previously linked anomaly:", selectedAnomaly.id);
             } else {
-                setAnomaly(anomalyData[0]);
-                setImageUrl(`${supabaseUrl}/storage/v1/object/public/clouds/${anomalyid}.png`);
-            };
+                // Step 2: Fallback to random anomaly
+                const { data: anomalies, error: fallbackError } = await supabase
+                    .from("anomalies")
+                    .select("*")
+                    .eq("anomalySet", "cloudspottingOnMars");
+
+                if (fallbackError) throw fallbackError;
+
+                if (!anomalies || anomalies.length === 0) {
+                    console.error("No anomalies found in cloudspottingOnMars");
+                    setAnomaly(null);
+                    return;
+                }
+
+                const randomIndex = Math.floor(Math.random() * anomalies.length);
+                selectedAnomaly = anomalies[randomIndex];
+                console.log("Using fallback random anomaly:", selectedAnomaly.id);
+            }
+
+            setAnomaly(selectedAnomaly);
+            setImageUrl(`${supabaseUrl}/storage/v1/object/public/clouds/${selectedAnomaly.id}.png`);
         } catch (error: any) {
-            console.error("Error fetching cloud: ", error.message);
+            console.error("Error fetching cloud:", error.message);
             setAnomaly(null);
         } finally {
             setLoading(false);
-        };
+        }
     };
 
     useEffect(() => {
@@ -206,20 +236,12 @@ export function CloudspottingOnMarsWithId({ anomalyid }: SelectedAnomProps) {
     }, [session, supabase]);
 
     if (loading) {
-        return (
-            <div>
-                <p>Loading...</p>
-            </div>
-        );
-    };
+        return <div><p>Loading...</p></div>;
+    }
 
-    if (!anomalyid) {
-        return (
-            <div>
-                Loading...
-            </div>
-        );
-    };
+    if (!anomaly) {
+        return <div><p>No anomaly found.</p></div>;
+    }
 
     return (
         <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
@@ -227,12 +249,11 @@ export function CloudspottingOnMarsWithId({ anomalyid }: SelectedAnomProps) {
                 {imageUrl && (
                     <ImageAnnotator
                         initialImageUrl={imageUrl}
-                        anomalyId={anomalyid.toString() || ''} 
+                        anomalyId={anomaly.id.toString()}
                         anomalyType="cloud"
-                        missionNumber={100000034}
                         assetMentioned={imageUrl}
                         structureItemId={3105}
-                        parentPlanetLocation={anomalyid?.toString() || ''}
+                        parentPlanetLocation={anomaly.id.toString()}
                         annotationType="CoM"
                     />
                 )}
@@ -240,39 +261,3 @@ export function CloudspottingOnMarsWithId({ anomalyid }: SelectedAnomProps) {
         </div>
     );
 };
-
-export function CloudspottingWrapper() {
-    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
-
-    return (
-        <div className="space-y-8">
-            {!selectedAnomaly && (
-                <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
-            )}
-            {selectedAnomaly && (
-                <StarterLidar anomalyid={selectedAnomaly} />
-            )}
-        </div>
-    );
-};
-
-interface CWWHProps {
-    anomalyId: number;
-};
-
-export function CloudspottingWrapperWithHardcode({
-    anomalyId
-}: CWWHProps) {
-    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
-
-    return (
-        <div className="space-y-8">
-            {!selectedAnomaly && (
-                <PreferredTerrestrialClassifications onSelectAnomaly={setSelectedAnomaly} />
-            )}
-            {selectedAnomaly && (
-                <StarterLidar anomalyid={anomalyId} />
-            )}
-        </div>
-    )
-}

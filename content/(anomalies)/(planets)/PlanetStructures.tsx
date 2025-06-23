@@ -6,8 +6,9 @@ import { useActivePlanet } from "@/context/ActivePlanet";
 import { InventoryStructureItem } from "@/types/Items";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";
-import StructuresOnPlanet, { OrbitalStructuresOnPlanet, AtmosphereStructuresOnPlanet } from "@/components/Structures/Structures";
+// import StructuresOnPlanet, { OrbitalStructuresOnPlanet, AtmosphereStructuresOnPlanet } from "@/components/Structures/Structures";
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
+import Structures from "@/components/Structures/Structures";
 
 const PlanetStructures: React.FC = () => {
     return (
@@ -19,20 +20,21 @@ const PlanetStructures: React.FC = () => {
                         <PlanetarySystem />
                     </div>
                     <center>
-                        <OrbitalStructuresOnPlanet />
+                        {/* <OrbitalStructuresOnPlanet /> */}
                     </center>
                 </div>
             </div>
             <div className="w-full">
                 <div className="py-2">
-                    <center>
+                    {/* <center>
                         <AtmosphereStructuresOnPlanet />
-                    </center>
+                    </center> */}
                 </div>
             </div>
             <div className="w-full">
                 <center>
-                    <StructuresOnPlanet />
+                    <Structures />
+                    {/* <StructuresOnPlanet /> */}
                 </center>
             </div>
             <div className="relative flex-1">
