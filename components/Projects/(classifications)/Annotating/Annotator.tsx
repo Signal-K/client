@@ -31,6 +31,8 @@ import {
   CoMCATEGORIES,
 } from '@/types/Annotation';
 import { SciFiPanel } from '@/components/ui/styles/sci-fi/panel';
+import { useActivePlanet } from '@/context/ActivePlanet';
+import { useRouter } from 'next/navigation';
 
 interface ImageAnnotatorProps {
   initialImageUrl: string;
@@ -57,8 +59,11 @@ export default function ImageAnnotator({
   structureItemId,
   annotationType,
 }: ImageAnnotatorProps) {
+  const router = useRouter();
+
   const supabase = useSupabaseClient();
   const session = useSession();
+
   const [selectedImage, setSelectedImage] = useState<string | null>(initialImageUrl);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentTool, setCurrentTool] = useState<Tool>('pen');
@@ -67,7 +72,7 @@ export default function ImageAnnotator({
   const [drawings, setDrawings] = useState<DrawingObject[]>([]);
   const [currentDrawing, setCurrentDrawing] = useState<DrawingObject | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploads, setUploads] = useState<string[]>([]);
+  const [uploads, setUploads] = useState<[string, string][]>([]);
   const [annotationOptions, setAnnotationOptions] = useState<string[]>([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -95,29 +100,34 @@ export default function ImageAnnotator({
       : {} as Record<string, CategoryConfig>;
 
   const addMedia = async () => {
-    if (!canvasRef.current || !session) return;
-    const canvas = canvasRef.current;
-    setIsUploading(true);
-    try {
-      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
-      if (!blob) throw new Error('Failed to create Blob from canvas');
-      const fileName = `${Date.now()}-${session.user.id}-annotated-image.png`;
-      const { data, error } = await supabase.storage
-        .from('media')
-        .upload(fileName, blob, { contentType: 'image/png' });
-      if (error) {
-        console.error('Upload error:', error.message);
-      } else if (data) {
-        const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
-        setUploads((prev) => [...prev, url]);
-        setIsFormVisible(true);
-      }
-    } catch (err) {
-      console.error('Unexpected error during canvas upload:', err);
-    } finally {
-      setIsUploading(false);
+  if (!canvasRef.current || !session) return;
+  const canvas = canvasRef.current;
+  setIsUploading(true);
+  try {
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/png')
+    );
+    if (!blob) throw new Error('Failed to create Blob from canvas');
+
+    const fileName = `${Date.now()}-${session.user.id}-annotated-image.png`;
+    const { data, error } = await supabase.storage
+      .from('media')
+      .upload(fileName, blob, { contentType: 'image/png' });
+
+    if (error) {
+      console.error('Upload error:', error.message);
+    } else if (data) {
+      const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
+      // Store as a tuple [url, id] to match expected shape
+      setUploads((prev) => [...prev, [url, fileName]]);
+      setIsFormVisible(true);
     }
-  };
+  } catch (err) {
+    console.error('Unexpected error during canvas upload:', err);
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   const renderCanvas = () => {
     if (!canvasRef.current || !imageRef.current) return;
@@ -191,17 +201,114 @@ export default function ImageAnnotator({
     return acc;
   }, {} as Record<string, number>);
 
+  // Final post creation step
+  const [content, setContent] = useState<string>("");
+  const [additionalFields, setAdditionalFields] = useState<{ [ key: string ] : string; }>({});
+  const [inventoryItemId, setInventoryItemId] = useState<number | null>(null);
+
+  const { activePlanet } = useActivePlanet();
+
+  useEffect(() => {
+    const fetchInventoryItemId = async () => {
+      if (!session || !activePlanet ) {
+        return;
+      };
+
+      try {
+        const {
+          data: inventoryData,
+          error: inventoryError,
+        } = await supabase
+          .from("inventory")
+          .select("*")
+          .eq("owner", session.user.id)
+          .eq("anomaly", activePlanet.id)
+          .eq("item", structureItemId)
+          .limit(1)
+          .single();
+
+        if (inventoryError) {
+          throw inventoryError;
+        };
+
+        if (inventoryData) {
+          setInventoryItemId(inventoryData.id);
+        };
+      } catch (error: any) {
+        console.error("Error fetching inventory for classification: ", error.message);
+      };
+    };
+
+    fetchInventoryItemId();
+  }, [session, structureItemId]);
+
+  const createPost = async () => {
+    if (!session) {
+      return;
+    };
+
+    const classificationConfiguration = {
+      annotationOptions: annotationOptions,
+      additionalFields,
+      parentPlanetLocation: activePlanet?.id,
+      createdBy: inventoryItemId ?? null,
+      classificationParent: parentClassificationId ?? null,
+    };
+
+    try {
+      let currentConfig: any = {};
+      const {
+        data: classificationData,
+        error: classificationError
+      } = await supabase
+        .from("classifications")
+        .insert({
+          author: session.user.id,
+          content,
+media: [
+  [],
+  ...uploads, // This will be like [["url", "generatedId"]]
+  ...(otherAssets || []).map(url => ["http://...", "generated-id"]), // convert others to tuples if needed
+  ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]).map(id => id && [id, "id"]),
+].filter((item): item is [string, string] => Array.isArray(item) && item.length === 2),
+          anomaly: anomalyId,
+          classificationtype: anomalyType,
+          classificationConfiguration,
+        })
+        .select()
+        .single();
+
+      if (classificationError) {
+        console.error("Error creating classification: ", classificationError.message);
+        alert("Failed to create classification. Please try again");
+        return;
+      };
+
+      console.log("Classification created successfully: ", classificationData);
+
+      setContent("");
+      setAdditionalFields({});
+      setUploads([]);
+      setDrawings([]);
+
+      router.push(`/next/${classificationData.id}`);
+    } catch (error: any) {
+      console.error("Unexpected error: ", error);
+      alert("Classification error occurred. Please try again");
+    };
+  };
+
   return (
     <div className="space-y-4 max-w-full px-2 md:px-4 mx-auto overflow-x-hidden overflow-y-auto max-h-screen">
       <div className="flex justify-between items-center">
-        <SciFiPanel className="p-4 w-full max-w-md mx-auto">
+        {/* <SciFiPanel className="p-4 w-full max-w-md mx-auto"> */}
           <AnnotationTools
             currentTool={currentTool}
             setCurrentTool={setCurrentTool}
             lineWidth={lineWidth}
             setLineWidth={setLineWidth}
           />
-        </SciFiPanel>
+        {/* </SciFiPanel> */}
       </div>
       {selectedImage && (
         <div className="space-y-4">
@@ -237,7 +344,7 @@ export default function ImageAnnotator({
               {isUploading ? 'Uploading...' : 'Save & proceed'}
             </Button>
           </SciFiPanel>
-          {otherAssets && (
+          {otherAssets && ( 
             <SciFiPanel>
               {otherAssets.map((url, index) => (
                 <div
@@ -254,8 +361,25 @@ export default function ImageAnnotator({
               ))}
             </SciFiPanel>
           )}
+          <SciFiPanel className='p-4 w-full mad-w-md mx-auto'>
+            <div className='space-y-4'>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className='w-full p-3 h-24 text-sm text-white rounded-md border border-[#3B4252]'
+                placeholder='Describe your annotations or post any additional information'
+              />
+
+              <Button
+                onClick={createPost}
+                disabled={isUploading}
+              >
+                Submit classification
+              </Button>
+            </div>
+          </SciFiPanel>
           {/* {isFormVisible && ( */}
-            <SciFiPanel className="p-4 w-full max-w-md mx-auto">
+            {/* <SciFiPanel className="p-4 w-full max-w-md mx-auto">
               {anomalyId && anomalyType && (
                 <ClassificationForm
                   anomalyId={anomalyId}
@@ -272,7 +396,7 @@ export default function ImageAnnotator({
                   annotationOptions={annotationOptions}
                 />
               )}
-            </SciFiPanel>
+            </SciFiPanel> */}
           {/* // )} */}
         </div>
       )}

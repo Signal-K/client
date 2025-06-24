@@ -39,24 +39,23 @@ export function StarterTelescopeTess() {
       }
 
       try {
-const { data: linkedAnomalies, error: linkedError } = await supabase
-  .from("linked_anomalies")
-  .select(
-    `
-      id,
-      anomaly_id,
-      anomalies!inner (
-        id,
-        anomalySet,
-        avatar_url,
-        content
-      )
-    `
-  )
-  .eq("author", session.user.id)
-  .eq("anomalies.anomalySet", "telescope-tess")
-  .limit(1);
-
+        const { data: linkedAnomalies, error: linkedError } = await supabase
+          .from("linked_anomalies")
+          .select(
+            `
+              id,
+              anomaly_id,
+              anomalies!inner (
+                id,
+                anomalySet,
+                avatar_url,
+                content
+              )
+            `
+          )
+          .eq("author", session.user.id)
+          .eq("anomalies.anomalySet", "telescope-tess")
+          .limit(1);
 
         if (linkedError) throw linkedError;
 
@@ -97,29 +96,33 @@ const { data: linkedAnomalies, error: linkedError } = await supabase
 
   if (showTutorial) {
     return (
-      <div className="w-full">
-        <FirstTelescopeClassification anomalyid="6" />
+      <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] p-4">
+        <div className="w-full max-w-4xl h-full overflow-auto rounded-xl shadow-lg bg-white p-6">
+          <FirstTelescopeClassification anomalyid="6" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full flex flex-col items-center gap-4 pb-4 relative overflow-y-auto max-h-[90vh] rounded-lg">
-      <div className="mt-6 w-full flex justify-center">
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6 overflow-hidden">
+      <div className="mb-4 w-full flex justify-center">
         <Button variant="outline" onClick={() => setShowTutorial(true)}>
           Want a walkthrough? Start the tutorial
         </Button>
       </div>
-      <div className="p-4 w-full rounded-md relative max-w-4xl mx-auto">
-        <ImageAnnotator
-          anomalyType="planet"
-          missionNumber={1372001}
-          structureItemId={3103}
-          assetMentioned={selectedAnomaly.id.toString()}
-          annotationType="PH"
-          initialImageUrl={imageUrls[1]}
-          anomalyId={selectedAnomaly.id.toString()}
-        />
+      <div className="w-full max-w-4xl h-full flex flex-col rounded-xl bg-white shadow-lg p-4 overflow-hidden">
+        <div className="flex-1 overflow-hidden rounded-md">
+          <ImageAnnotator
+            anomalyType="planet"
+            missionNumber={1372001}
+            structureItemId={3103}
+            assetMentioned={selectedAnomaly.id.toString()}
+            annotationType="PH"
+            initialImageUrl={imageUrls[1]}
+            anomalyId={selectedAnomaly.id.toString()}
+          />
+        </div>
       </div>
     </div>
   );
@@ -200,7 +203,7 @@ export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomaly
                                 className="w-24 h-24 mb-2"
                             />
                         </div>
-                        <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                        <div className="max-w-4xl mx-auto rounded-lg text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
                             <div className='relative'>
                                 <div className='absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
                                 <div className='bg-white bg-opacity-90'>

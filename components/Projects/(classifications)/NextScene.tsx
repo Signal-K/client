@@ -146,7 +146,9 @@ export default function ClientClassificationPage({ id }: Props) {
   if (loading) return <div className="text-center mt-10 text-[#2E3440]">Loading...</div>;
   if (!classification) return null;
 
-  const mediaUrl = classification.media?.[1]?.[0];
+  const mediaUrl = Array.isArray(classification.media)
+    ? classification.media.find((item: any) => Array.isArray(item) && typeof item[0] === 'string' && item[0].startsWith('http'))?.[0]
+    : undefined;
   const type = classification.classificationtype;
 
   let structure = 'greenhouse';
