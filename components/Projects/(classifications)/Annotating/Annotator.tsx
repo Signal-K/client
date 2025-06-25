@@ -366,7 +366,7 @@ media: [
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className='w-full p-3 h-24 text-sm text-white rounded-md border border-[#3B4252]'
+                className='w-full p-3 h-24 text-sm text-blue-300 rounded-md border border-[#3B4252]'
                 placeholder='Describe your annotations or post any additional information'
               />
 

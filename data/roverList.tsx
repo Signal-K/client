@@ -3,7 +3,7 @@ import type { Rover } from "@/types/Structures/Rover";
 export const rovers: Rover[] = [
   {
     id: "curiosity-mars",
-    name: "Curiosity",
+    name: "Curiosity", 
     planet: "mars",
     x: 45,
     y: 60,
