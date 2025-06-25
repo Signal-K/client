@@ -125,18 +125,23 @@ export function AiForMarsProjectWithID() {
     if (!anomaly || !imageUrl) return <p>No anomaly found for this user in AI4Mars project.</p>;
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full overflow-y-auto max-h-[90vh] rounded-lg overflow-x-hidden">
-            <div className="w-full overflow-x-auto">
-                <ImageAnnotator
-                    initialImageUrl={imageUrl}
-                    anomalyId={anomaly.id.toString()}
-                    anomalyType="automaton-aiForMars"
-                    missionNumber={200000062}
-                    assetMentioned={imageUrl}
-                    structureItemId={3102}
-                    annotationType="AI4M"
-                    parentPlanetLocation={parentClassificationId?.toString() ?? ""}
-                />
+        <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6 overflow-hidden">
+            <div className="w-full max-w-4xl h-full flex flex-col rounded-xl bg-white shadow-lg p-4 overflow-hidden">
+                <div className="flex-1 overflow-hidden round-md">
+                    {/* <Button variant="outline" onClick={() => setShowTutorial(true)}>
+                        Want a walkthrough? Start the tutorial
+                    </Button> */}
+                    <ImageAnnotator
+                        initialImageUrl={imageUrl}
+                        anomalyId={anomaly.id.toString()}
+                        anomalyType="automaton-aiForMars"
+                        missionNumber={200000062}
+                        assetMentioned={imageUrl}
+                        structureItemId={3102}
+                        annotationType="AI4M"
+                        parentPlanetLocation={parentClassificationId?.toString() ?? ""}
+                    />
+                </div>
             </div>
         </div>
     );

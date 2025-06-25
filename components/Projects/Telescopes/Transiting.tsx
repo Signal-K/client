@@ -106,13 +106,11 @@ export function StarterTelescopeTess() {
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6 overflow-hidden">
-      <div className="mb-4 w-full flex justify-center">
-        <Button variant="outline" onClick={() => setShowTutorial(true)}>
-          Want a walkthrough? Start the tutorial
-        </Button>
-      </div>
       <div className="w-full max-w-4xl h-full flex flex-col rounded-xl bg-white shadow-lg p-4 overflow-hidden">
         <div className="flex-1 overflow-hidden rounded-md">
+          <Button variant="outline" onClick={() => setShowTutorial(true)}>
+            Want a walkthrough? Start the tutorial
+          </Button>
           <ImageAnnotator
             anomalyType="planet"
             missionNumber={1372001}

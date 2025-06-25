@@ -10,6 +10,7 @@ import * as markerjs2 from "markerjs2";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import AI4M from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AIForMars";
 
 interface Props {
     anomalyid: number | bigint;
@@ -233,11 +234,11 @@ const fetchAnomaly = async () => {
     }
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-            {!showTutorial ? (
-                <>
-                    <Button className="mb-4" onClick={handleShowTutorial}>
-                        Show Tutorial
+        <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6 overflow-hidden">
+            <div className="w-full max-w-4xl h-full flex flex-col rounded-xl bg-white shadow-lg p-4 overflow-hidden">
+                <div className="flex-1 overflow-hidden rounded-md">
+                    <Button variant="outline" onClick={() => setShowTutorial(true)}>
+                        Want a walkthrough? Start the tutorial
                     </Button>
                     {imageUrl && (
                         <ImageAnnotator
@@ -251,12 +252,13 @@ const fetchAnomaly = async () => {
                             parentPlanetLocation={anomaly.id.toString()}
                         />
                     )}
-                </>
-            ) : (
-                <div>
-                    <StarterPlanetFour anomalyid={anomaly.id} />
                 </div>
-            )}
+                {showTutorial && (
+                    <div>
+                        <StarterPlanetFour anomalyid={anomaly.id} />
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

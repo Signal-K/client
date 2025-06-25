@@ -214,12 +214,12 @@ export function CloudspottingOnMarsWithId() {
                     console.error("No anomalies found in cloudspottingOnMars");
                     setAnomaly(null);
                     return;
-                }
+                };
 
                 const randomIndex = Math.floor(Math.random() * anomalies.length);
                 selectedAnomaly = anomalies[randomIndex];
                 console.log("Using fallback random anomaly:", selectedAnomaly.id);
-            }
+            };
 
             setAnomaly(selectedAnomaly);
             setImageUrl(`${supabaseUrl}/storage/v1/object/public/clouds/${selectedAnomaly.id}.png`);
@@ -228,7 +228,7 @@ export function CloudspottingOnMarsWithId() {
             setAnomaly(null);
         } finally {
             setLoading(false);
-        }
+        };
     };
 
     useEffect(() => {
@@ -237,26 +237,31 @@ export function CloudspottingOnMarsWithId() {
 
     if (loading) {
         return <div><p>Loading...</p></div>;
-    }
+    };
 
     if (!anomaly) {
         return <div><p>No anomaly found.</p></div>;
-    }
+    };
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-            <div className="p-4 rounded-md relative w-full">
-                {imageUrl && (
-                    <ImageAnnotator
-                        initialImageUrl={imageUrl}
-                        anomalyId={anomaly.id.toString()}
-                        anomalyType="cloud"
-                        assetMentioned={imageUrl}
-                        structureItemId={3105}
-                        parentPlanetLocation={anomaly.id.toString()}
-                        annotationType="CoM"
-                    />
-                )}
+        <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6 overflow-hidden">
+            <div className="w-full max-w-4xl h-full flex flex-col rounded-xl bg-white shadow-lg p-4 overflow-hidden">
+                <div className="flex-1 overflow-hidden rounded-md">
+                    {/* <Button variant="outline" onClick={() => setShowTutorial(true)}>
+                        Want a walkthrough? Start the tutorial
+                    </Button> */}
+                    {imageUrl && (
+                        <ImageAnnotator
+                            initialImageUrl={imageUrl}
+                            anomalyId={anomaly.id.toString()}
+                            anomalyType="cloud"
+                            assetMentioned={imageUrl}
+                            structureItemId={3105}
+                            parentPlanetLocation={anomaly.id.toString()}
+                            annotationType="CoM"
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );
