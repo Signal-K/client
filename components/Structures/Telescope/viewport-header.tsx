@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
-import { Grid3X3, Trophy, Target, Users, User } from "lucide-react"
+import { Grid3X3, Trophy, Target, Users, User, ChevronUp, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react"
 import type { Project, ViewMode } from "@/types/Structures/telescope"
 
 interface ViewportHeaderProps {
@@ -14,8 +14,9 @@ interface ViewportHeaderProps {
   classifiedCount: number
   availableMissionsCount: number
   showAllDiscoveries: boolean
-  setShowAllDiscoveries: (show: boolean) => void
-}
+  setShowAllDiscoveries: (show: boolean) => void;
+  onNavigate: (direction: "up" | "down" | "left" | "right") => void;
+};
 
 export function ViewportHeader({
   selectedProject,
@@ -23,6 +24,7 @@ export function ViewportHeader({
   toggleProjectPanel,
   setViewMode,
   classifiedCount,
+  onNavigate,
   availableMissionsCount,
   showAllDiscoveries,
   setShowAllDiscoveries,
@@ -33,8 +35,7 @@ export function ViewportHeader({
         {/* Left Side - Title */}
         <div className="flex items-center gap-4">
           <div>
-            <h1 className="text-xl font-bold text-[#ECEFF4]">Deep Space Observatory</h1>
-            <p className="text-xs text-[#D8DEE9]">Citizen Science Platform</p>
+            <h1 className="text-xl font-bold text-[#ECEFF4]">Telescope</h1>
           </div>
         </div>
 
@@ -95,6 +96,49 @@ export function ViewportHeader({
             <Grid3X3 className="h-4 w-4 mr-2" />
             <span>{viewMode === "viewport" ? "Archive" : "Telescope"}</span>
           </Button>
+          <div className="md:hidden bg-[#3B4252] rounded-lg p-2 flex items-center gap-1">
+            <div className="grid grid-cols-3 gap-1">
+              <div></div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onNavigate("up")}
+                className="bg-[#5E81AC] border-[#81A1C1] text-white hover:bg-[#81A1C1] p-1 h-6 w-6"
+              >
+                <ChevronUp className="h-3 w-3" />
+              </Button>
+              <div></div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onNavigate("left")}
+                className="bg-[#5E81AC] border-[#81A1C1] text-white hover:bg-[#81A1C1] p-1 h-6 w-6"
+              >
+                <ChevronLeft className="h-3 w-3" />
+              </Button>
+              <div className="flex items-center justify-center">
+                <div className="w-1 h-1 bg-[#81A1C1] rounded-full"></div>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onNavigate("right")}
+                className="bg-[#5E81AC] border-[#81A1C1] text-white hover:bg-[#81A1C1] p-1 h-6 w-6"
+              >
+                <ChevronRight className="h-3 w-3" />
+              </Button>
+              <div></div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onNavigate("down")}
+                className="bg-[#5E81AC] border-[#81A1C1] text-white hover:bg-[#81A1C1] p-1 h-6 w-6"
+              >
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+              <div></div>
+            </div>
+          </div>
         </div>
       </div>
     </header>

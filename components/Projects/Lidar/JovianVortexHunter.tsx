@@ -240,16 +240,21 @@ async function fetchAnomaly() {
     }
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg"> 
-            <ImageAnnotator
-                anomalyId={anomaly.id.toString()}
-                anomalyType="lidar-jovianVortexHunter"
-                missionNumber={200000072}
-                assetMentioned={imageUrl}
-                structureItemId={3105}
-                initialImageUrl={imageUrl}
-                annotationType="JVH"
-            />
+        <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6 overflow-hidden">
+            <div className="w-full max-w-4xl h-full flex flex-col rounded-xl bg-white shadow-lg p-4 overflow-hidden">
+                {/* <Button variant='outline' onClick={() => setShowTutorial(true)}>
+                    Want a walkthrough? Start the tutorial
+                </Button> */}
+                <ImageAnnotator
+                    anomalyId={anomaly.id.toString()}
+                    anomalyType="lidar-jovianVortexHunter"
+                    missionNumber={200000072}
+                    assetMentioned={imageUrl}
+                    structureItemId={3105}
+                    initialImageUrl={imageUrl}
+                    annotationType="JVH"
+                />
+            </div>
         </div>
     );
 };

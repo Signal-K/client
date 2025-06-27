@@ -48,17 +48,17 @@ export default function TelescopeOnEarthPage() {
                 onClick={() => setSimpleMode(!simpleMode)}
                 className="bg-[#88C0D0] text-white px-4 py-1 rounded-md text-sm hover:bg-[#81A1C1] transition"
               > 
-                {simpleMode ? "Back to Viewport" : "Back to viewport" } {/*// "All projects / Simple"} */}
+                {simpleMode ? "All projects" : "Simple" } 
               </button>
             </div>
 
             <div className="flex-grow overflow-hidden">
               {simpleMode ? (
                 <div className="h-full w-full overflow-hidden">
-                  <TelescopeViewport />
+                  <SimpleTelescopePanel router={router} />
                 </div>
               ) : (
-                <SimpleTelescopePanel router={router} />
+                <TelescopeViewport />
               )}
             </div>
           </DialogContent>

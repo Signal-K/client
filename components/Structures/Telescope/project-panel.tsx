@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Star, X } from "lucide-react"
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Star, X } from "lucide-react"
 import type { Project } from "@/types/Structures/telescope"
 
 interface Anomaly {
@@ -21,7 +21,8 @@ interface ProjectPanelProps {
   selectProject: (project: Project | null) => void
   showProjectPanel: boolean
   onClose: () => void
-  anomalies: Anomaly[]
+  anomalies: Anomaly[];
+  onNavigate?: (direction: "up" | "down" | "left" | "right") => void;
 };
 
 export function ProjectPanel({
@@ -30,9 +31,16 @@ export function ProjectPanel({
   selectProject,
   showProjectPanel,
   onClose,
+  onNavigate,
   anomalies,
 }: ProjectPanelProps) {
-  if (!showProjectPanel) return null
+  if (!showProjectPanel) return null;
+
+  const handleNavigation = ( direction: "up" | "down" | "left" | "right" ) => {
+    if (onNavigate) {
+      onNavigate(direction);
+    };
+  };
 
   return (
     <div className="absolute top-20 right-4 z-50 w-80 bg-gradient-to-br from-[#3B4252] to-[#2E3440] border-2 border-[#5E81AC] rounded-lg shadow-2xl">
@@ -47,6 +55,52 @@ export function ProjectPanel({
         >
           <X className="h-4 w-4" />
         </Button>
+      </div>
+
+      {/* Navigation controls - sector */}
+      <div className="p-4 border-b border-[#4C566A]">
+        <div className="text-xs text-[#88C0D0] mb-2 font-medium">Sector Navigation</div>
+        <div className="grid grid-cols-3 gap-1">
+          <div></div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleNavigation("up")}
+            className="bg-[#434C5E] border-[#5E81AC] text-[#ECEFF4] hover:bg-[#4C566A] p-2"
+          >
+            <ChevronUp className="h-4 w-4" />
+          </Button>
+          <div></div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleNavigation("left")}
+            className="bg-[#434C5E] border-[#5E81AC] text-[#ECEFF4] hover:bg-[#4C566A] p-2"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <div className="flex items-center justify-center">
+            <div className="w-2 h-2 bg-[#5E81AC] rounded-full"></div>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleNavigation("right")}
+            className="bg-[#434C5E] border-[#5E81AC] text-[#ECEFF4] hover:bg-[#4C566A] p-2"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <div></div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleNavigation("down")}
+            className="bg-[#434C5E] border-[#5E81AC] text-[#ECEFF4] hover:bg-[#4C566A] p-2"
+          >
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+          <div></div>
+        </div>
       </div>
 
       {/* Content */}

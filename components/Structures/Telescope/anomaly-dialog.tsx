@@ -1,16 +1,19 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import type { Anomaly } from "@/types/Structures/telescope"
-import { SpaceIcon as Planet, Sun, Asterisk, Disc } from "lucide-react"
-import { projects } from "@/data/projects"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import type { Anomaly } from "@/types/Structures/telescope";
+import { SpaceIcon as Planet, Sun, Asterisk, Disc } from "lucide-react";
+import { Star, Zap, Target, Calendar } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { projects } from "@/data/projects";
+import { useRouter } from "next/navigation";
 
 interface AnomalyDialogProps {
-  showClassifyDialog: boolean
-  setShowClassifyDialog: (show: boolean) => void
-  selectedAnomaly: Anomaly | null
-  handleClassify: () => void
+  showClassifyDialog: boolean;
+  setShowClassifyDialog: (show: boolean) => void;
+  selectedAnomaly: Anomaly | null;
+  handleClassify: () => void;
 };
 
 export function AnomalyDialog({
@@ -19,78 +22,132 @@ export function AnomalyDialog({
   selectedAnomaly,
   handleClassify,
 }: AnomalyDialogProps) {
+  const router = useRouter();
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "exoplanet":
+        return "bg-[#4FC3F7] text-white"
+      case "sunspot":
+        return "bg-[#FF7043] text-white"
+      case "asteroid":
+        return "bg-[#9C27B0] text-white"
+      case "accretion_disc":
+        return "bg-[#00E676] text-black"
+      default:
+        return "bg-[#5E81AC] text-white"
+    };
+  };
+
+  const getTypeDescription = (type: string) => {
+    switch (type) {
+      case "exoplanet":
+        return "A planet orbiting a star outside our solar system"
+      case "sunspot":
+        return "A temporary dark region on the Sun's surface"
+      case "asteroid":
+        return "A rocky object orbiting the Sun"
+      case "accretion_disc":
+        return "A disk of matter spiraling into a massive object"
+      default:
+        return "An unidentified celestial object"
+    };
+  };
+
+  const handleRedirect = () => {
+    if (!selectedAnomaly) return;
+
+    switch (selectedAnomaly.type) {
+      case "exoplanet":
+        router.push("/structures/telescope/planet-hunters");
+        break;
+      case "sunspot":
+        router.push("/structures/telescope/sunspots");
+        break;
+      case "accretion_disc":
+        router.push("/structures/telescope/disk-detective");
+        break;
+      case "asteroid":
+        router.push("/structures/telescope/daily-minor-planet");
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <Dialog open={showClassifyDialog} onOpenChange={setShowClassifyDialog}>
-      <DialogContent className="bg-[#E5E9F0] border-[#C2C8D2]">
-        <DialogHeader>
-          <DialogTitle className="text-[#2E3440]">Classify Anomaly</DialogTitle>
-        </DialogHeader>
-        {selectedAnomaly && (
-          <div className="space-y-4">
-            <div className="bg-[#ECEFF4] rounded-lg p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{
-                    background:
-                      selectedAnomaly.type === "exoplanet"
-                        ? "linear-gradient(to bottom right, #EBCB8B, #D08770)"
-                        : selectedAnomaly.type === "sunspot"
-                          ? "linear-gradient(to bottom right, #D08770, #BF616A)"
-                          : selectedAnomaly.type === "asteroid"
-                            ? "linear-gradient(to bottom right, #B48EAD, #81A1C1)"
-                            : "linear-gradient(to bottom right, #88C0D0, #5E81AC)",
-                    boxShadow: "0 0 15px rgba(255, 255, 255, 0.5)",
-                  }}
-                >
-                  {selectedAnomaly.type === "exoplanet" && <Planet className="h-6 w-6 text-[#2E3440]" />}
-                  {selectedAnomaly.type === "sunspot" && <Sun className="h-6 w-6 text-[#2E3440]" />}
-                  {selectedAnomaly.type === "asteroid" && <Asterisk className="h-6 w-6 text-[#2E3440]" />}
-                  {selectedAnomaly.type === "accretion_disc" && <Disc className="h-6 w-6 text-[#2E3440]" />}
-                </div>
-                <div>
-                  <h4 className="font-semibold text-[#2E3440]">{selectedAnomaly.name}</h4>
-                  <p className="text-sm text-[#4C566A] capitalize">{selectedAnomaly.type.replace("_", " ")}</p>
-                  <p className="text-xs text-[#4C566A]">{selectedAnomaly.sector}</p>
-                </div>
+      {selectedAnomaly && (
+        <DialogContent className="bg-[#3B4252] border-[#4C566A] text-[#ECEFF4] max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Target className="h-5 w-5 text-[#88C0D0]" />
+              Classify Discovery
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* Anomaly Info */}
+            <div className="space-y-4">
+              <div className="text-center">
+                <h3 className="text-lg font-bold text-[#ECEFF4] mb-2">{selectedAnomaly.name}</h3>
+                <Badge className={getTypeColor(selectedAnomaly.type)}>
+                  {selectedAnomaly.type.replace("_", " ").toUpperCase()}
+                </Badge>
               </div>
 
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-[#4C566A]">ID:</span>
-                  <span className="font-mono text-[#2E3440]">{selectedAnomaly.id}</span>
+              <div className="bg-[#2E3440] rounded-lg p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Star className="h-4 w-4 text-[#EBCB8B]" />
+                  <span className="text-sm text-[#D8DEE9]">Sector: {selectedAnomaly.sector}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-[#4C566A]">Project:</span>
-                  <span className="text-[#2E3440]">{projects.find((p) => p.id === selectedAnomaly.project)?.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#4C566A]">Position:</span>
-                  <span className="font-mono text-[#2E3440]">
-                    ({selectedAnomaly.x.toFixed(1)}%, {selectedAnomaly.y.toFixed(1)}%)
+
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-[#A3BE8C]" />
+                  <span className="text-sm text-[#D8DEE9]">
+                    Brightness: {(selectedAnomaly.brightness * 100).toFixed(1)}%
                   </span>
                 </div>
+
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-[#88C0D0]" />
+                  <span className="text-sm text-[#D8DEE9]">Discovered: {selectedAnomaly.discoveryDate}</span>
+                </div>
+              </div>
+
+              <div className="text-sm text-[#D8DEE9] text-center bg-[#434C5E] rounded-lg p-3">
+                {getTypeDescription(selectedAnomaly.type)}
               </div>
             </div>
 
-            <div className="flex gap-3">
-              <Button
-                onClick={handleClassify}
-                className="flex-1 bg-[#5E81AC] hover:bg-[#81A1C1] text-white border-none"
-              >
-                Classify
-              </Button>
-              <Button
-                onClick={() => setShowClassifyDialog(false)}
-                variant="outline"
-                className="flex-1 border-[#C2C8D2] text-[#2E3440] bg-[#E5E9F0] hover:bg-[#D8DEE9]"
-              >
-                Cancel
-              </Button>
+            {/* Classification Actions */}
+            <div className="space-y-3">
+              <div className="text-sm text-[#88C0D0] text-center">
+                Confirm this classification to contribute to our research database.
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowClassifyDialog(false)}
+                  variant="outline"
+                  className="flex-1 bg-[#434C5E] border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleClassify();
+                    handleRedirect();
+                  }}
+                  className="flex-1 bg-[#A3BE8C] text-white hover:bg-[#8FBCBB]"
+                >
+                  Classify
+                </Button>
+              </div>
             </div>
           </div>
-        )}
-      </DialogContent>
+        </DialogContent>
+      )}
     </Dialog>
   );
 };

@@ -51,6 +51,16 @@ function getWeekDateRange(startDateStr: string): { start: string; end: string } 
   };
 }
 
+const badgeColors = [
+  'bg-red-100 text-red-800',
+  'bg-green-100 text-green-800',
+  'bg-blue-100 text-blue-800',
+  'bg-yellow-100 text-yellow-800',
+  'bg-purple-100 text-purple-800',
+  'bg-pink-100 text-pink-800',
+  'bg-indigo-100 text-indigo-800',
+];
+
 export default function ClientClassificationPage({ id }: Props) {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -160,6 +170,9 @@ export default function ClientClassificationPage({ id }: Props) {
     ? `/${structure}/${project}/2/${classification.id}`
     : `/greenhouse/two/${classification.id}`;
 
+  const annotationOptions: string[] =
+    classification?.configuration?.annotationOptions ?? [];
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
       <div className="absolute inset-0 -z-10">
@@ -180,6 +193,22 @@ export default function ClientClassificationPage({ id }: Props) {
             <h1 className="text-xl font-semibold text-[#2E3440]">Discovery Summary</h1>
             <p className="text-md text-[#4C566A]">{classification.content}</p>
           </div>
+
+          {annotationOptions.length > 0 && (
+            <div className="flex flex-wrap gap-2 pt-2">
+              {annotationOptions.map((option, idx) => (
+                <span
+                  key={option}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold border border-gray-300 ${
+                    badgeColors[idx % badgeColors.length]
+                  }`}
+                >
+                  {option}
+                </span>
+              ))}
+            </div>
+          )}
+
           {mediaUrl && (
             <div className="relative group rounded-md overflow-hidden border border-[#D8DEE9]">
               <Dialog>
@@ -192,13 +221,6 @@ export default function ClientClassificationPage({ id }: Props) {
                     className="w-full h-[300px] object-contain cursor-zoom-in transition-transform duration-200 group-hover:scale-105"
                   />
                 </DialogTrigger>
-                {/* <DialogContent className="p-0 bg-transparent shadow-none border-none max-w-4xl">
-                  <img
-                    src={mediaUrl}
-                    alt="Full View"
-                    className="w-full max-h-[6000px] rounded-lg object-contain"
-                  />
-                </DialogContent> */}
               </Dialog>
             </div>
           )}
@@ -251,9 +273,6 @@ export default function ClientClassificationPage({ id }: Props) {
             <Button variant="ghost" onClick={() => router.push('/')}>
               🏠 Home
             </Button>
-            {/* <Button variant="default" onClick={() => router.push('/research')}>
-              🌟 View Stardust / Research
-            </Button> */}
             {type === 'planet' && (
               <Button variant="default" onClick={() => router.push(`/planets/paint/${classification.id}`)}>
                 🪐 Customise planet

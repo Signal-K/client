@@ -12,12 +12,15 @@ import BiologyResearch from "@/components/Research/BiologyItems";
 import AstronomyResearch from "@/components/Research/AstronomyItems";
 import MeteorologyResearch from "@/components/Research/MeteorologyItems";
 import ReferralCodePanel from "@/components/Account/Referrals";
+import AutomatonSurfaceRoverResearch from "@/components/Research/Automatons/Rovers";
 
 type CapacityKey =
   | "probeCount"
   | "probeDistance"
   | "stationCount"
   | "balloonCount"
+  | "Seiscam"
+  | "Wheels"
   | "cameraCount"
   | "stationSize";
 
@@ -77,12 +80,12 @@ export default function ResearchPage() {
     if (!session?.user?.id) {
       setReferralError("You must be logged in to submit a referral code.");
       return;
-    }
+    };
 
     if (!referralCodeInput.trim()) {
       setReferralError("Please enter a valid referral code.");
       return;
-    }
+    };
 
     setIsSubmittingReferral(true);
 
@@ -150,6 +153,7 @@ export default function ResearchPage() {
               <div className="my-4" onClick={handleDivClick}>
                 <AstronomyResearch />
                 <MeteorologyResearch />
+                <AutomatonSurfaceRoverResearch />
                 <BiologyResearch />
               </div>
 
