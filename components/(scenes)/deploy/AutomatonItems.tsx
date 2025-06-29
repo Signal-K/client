@@ -24,7 +24,8 @@ const automatons: Vehicle[] = [
   {
     id: "1",
     name: "Probe",
-    description: "Simple and versatile satellite used to obtain data of nearby exoplanets",
+    // description: "Simple and versatile satellite used to obtain data of nearby exoplanets",
+    description: "Send probes to your discovered planets to find clouds and study the surface",
     image: "/assets/Automatons/Sat.png",
     stats: { speed: 100, armor: 100, capacity: 100 },
     cost: 1,
@@ -33,7 +34,8 @@ const automatons: Vehicle[] = [
   {
     id: "2",
     name: "Scout Roover",
-    description: "Train roover",
+    // description: "Train roover",
+    description: "Send rovers alongside your probes to planets to train the rover AI and find cool sights (and alien artifacts) on the planets discovered by you and the community!",
     image: "/assets/Automatons/ExploreRover1.png",
     stats: { speed: 100, armor: 100, capacity: 100 },
     cost: 1,

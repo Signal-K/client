@@ -55,7 +55,7 @@ export function TelescopeView({
               <span>ONLINE</span>
             </div>
             <div className="flex items-center gap-1">
-              <Activity className="h-4 w-4" />
+              <Activity className="h-4 w-4" /> 
               <span>STABLE</span>
             </div>
           </div>

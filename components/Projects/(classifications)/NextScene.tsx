@@ -83,6 +83,12 @@ export default function ClientClassificationPage({ id }: Props) {
         return;
       }
 
+      console.log('classificationConfiguration:', data.classificationConfiguration);
+      console.log(
+        'annotationOptions:',
+        data.classificationConfiguration?.annotationOptions ?? []
+      );
+
       setClassification(data);
       setLoading(false);
 
@@ -171,7 +177,26 @@ export default function ClientClassificationPage({ id }: Props) {
     : `/greenhouse/two/${classification.id}`;
 
   const annotationOptions: string[] =
-    classification?.configuration?.annotationOptions ?? [];
+    classification?.classificationConfiguration?.annotationOptions ?? [];
+
+  // Reduce to count occurrences
+  const annotationCounts = annotationOptions.reduce((acc: Record<string, number>, label: string) => {
+    const key = label.trim();
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+
+  const annotationBadges = Object.entries(annotationCounts).map(([label, count], idx) => {
+    const color = badgeColors[idx % badgeColors.length];
+    return (
+      <span
+        key={label}
+        className={`inline-block px-3 py-1 rounded-full text-xs font-medium mr-2 mb-2 ${color}`}
+      >
+        {count > 1 ? `${label} (${count})` : label}
+      </span>
+    );
+  });
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
@@ -194,21 +219,6 @@ export default function ClientClassificationPage({ id }: Props) {
             <p className="text-md text-[#4C566A]">{classification.content}</p>
           </div>
 
-          {annotationOptions.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-2">
-              {annotationOptions.map((option, idx) => (
-                <span
-                  key={option}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold border border-gray-300 ${
-                    badgeColors[idx % badgeColors.length]
-                  }`}
-                >
-                  {option}
-                </span>
-              ))}
-            </div>
-          )}
-
           {mediaUrl && (
             <div className="relative group rounded-md overflow-hidden border border-[#D8DEE9]">
               <Dialog>
@@ -223,6 +233,10 @@ export default function ClientClassificationPage({ id }: Props) {
                 </DialogTrigger>
               </Dialog>
             </div>
+          )}
+
+          {annotationBadges.length > 0 && (
+            <div className="flex flex-wrap pt-2">{annotationBadges}</div>
           )}
 
           <div className="bg-[#D8F3DC] text-[#2E7D32] text-sm font-medium p-2 rounded-lg border border-[#A5D6A7]">
@@ -276,6 +290,11 @@ export default function ClientClassificationPage({ id }: Props) {
             {type === 'planet' && (
               <Button variant="default" onClick={() => router.push(`/planets/paint/${classification.id}`)}>
                 🪐 Customise planet
+              </Button>
+            )}
+            {type != 'planet' && (
+              <Button variant='default' onClick={() => router.push(`/structures/${structure}`)}>
+                ⚙️ Step 2
               </Button>
             )}
           </div>

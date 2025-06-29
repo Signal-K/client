@@ -2,6 +2,39 @@ import { Telescope } from "lucide-react";
 import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
+    {
+        weekStart: '2025-06-29',
+        data: [
+            {
+                name: "Contribute to someone else's discovery by commenting",
+                structure: "Telescope",
+                group: "Astronomy",
+                icon: "Telescope",
+                extendedDescription: '',
+                xp: 1,
+                completionInfo: '',
+                rewardInfo: '',
+                table: 'comments',
+                field: 'surveyor',
+                value: 'TRUE',
+                requiredCount: 1,
+            },
+            {
+                name: "Train our automatons - discover 3 obstacles",
+                structure: "WeatherBalloon",
+                group: "Meteorology",
+                icon: "SnowflakeIcon",
+                extendedDescription: '',
+                xp: 3,
+                completionInfo: '',
+                rewardInfo: '',
+                table: 'classifications',
+                field: 'classificationtype',
+                value: 'automaton-aiForMars',
+                requiredCount: 3,
+            },
+        ],
+    },
             {
         weekStart: '2025-06-15',
         data: [

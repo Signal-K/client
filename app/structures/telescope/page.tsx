@@ -55,10 +55,10 @@ export default function TelescopeOnEarthPage() {
             <div className="flex-grow overflow-hidden">
               {simpleMode ? (
                 <div className="h-full w-full overflow-hidden">
-                  <SimpleTelescopePanel router={router} />
+                  <TelescopeViewport />
                 </div>
               ) : (
-                <TelescopeViewport />
+                <SimpleTelescopePanel router={router} />
               )}
             </div>
           </DialogContent>
