@@ -104,7 +104,7 @@ export default function AstronomyResearch() {
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold text-[#4cc9f0] mb-4 border-b border-[#1e3a5f] pb-2">
-              AVAILABLE UPGRADES
+              AVAILABLE UPGRADES 
             </h3>
             <UpgradeItem
               title="Probe Count ++"

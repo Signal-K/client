@@ -28,6 +28,7 @@ import Link from "next/link";
 // import UserAvatar, { UserAvatarNullUpload } from "@/components/Profile/Avatar";
 import { ClassificationFormProps } from "./FormConfigurations";
 import { SciFiButton } from "@/components/ui/styles/sci-fi/button";
+import MediaUpload from "./FormFileUpload";
 
 const ClassificationForm: React.FC<ClassificationFormProps> = ({
   anomalyType,
@@ -216,25 +217,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       },
     }));
   };
-
-  // const handleMissionComplete = async () => {
-  //   try {
-  //     const missionData = {
-  //       user: session?.user?.id,
-  //       time_of_completion: new Date().toISOString(),
-  //       mission: missionNumber,
-  //       configuration: null,
-  //     };
-  //     await supabase.from("missions").insert([missionData]);
-  //     // const newAnomalyData = {
-  //     //   user_id: session?.user?.id,
-  //     //   anomaly_id: activePlanet?.id,
-  //     // };
-  //     // await supabase.from("user_anomalies").insert([newAnomalyData]);
-  //   } catch (error: any) {
-  //     console.error(error);
-  //   };
-  // };
 
   const createPost = async () => {
     const flattenedOptions = classificationOptions.flat();
@@ -427,15 +409,10 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
 
   return (
     <div className="p-4 w-full max-w-4xl mx-auto rounded-lg h-full bg-[#2C4F64]/30 text-white bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
-      {/* {uses !== null && uses <= 0 ? (
-        <div className="text-red-500 font-bold">
-          You need to repair the structure's durability before you can use it.
-        </div>
-      ) : ( */}
         <div className="flex flex-col gap-6">
           {classificationOptions.length > 0 ? (
             <>
-              <div className="flex flex-col gap-2">
+              {/* <div className="flex flex-col gap-2">
                 {classificationOptions.map((optionSet, setIndex) => (
                   <div key={setIndex} className="flex flex-col gap-4">
                     <h3 className="font-bold text-sm">Option Set {setIndex + 1}</h3>
@@ -456,7 +433,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
                     </div>
                   </div>
                 ))}
-              </div>
+              </div> */}
   
               <div className="flex flex-col gap-4">
                 <textarea
@@ -517,25 +494,10 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
                 placeholder={placeholder}
               />
               <div className="flex items-center justify-between">
-                <label className="flex gap-1 items-center cursor-pointer text-[#88C0D0] hover:text-white">
-                  <input type="file" className="hidden" onChange={addMedia} />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-6.5 6.5"
-                    />
-                  </svg>
-                  <span>Upload Media</span>
-                </label>
-                {isUploading && <span className="text-[#88C0D0]">Uploading...</span>}
+                <MediaUpload
+                  onMediaAdd={addMedia}
+                  isUploading={isUploading}
+                />
                 <SciFiButton
                   onClick={createPost}
                   className="flex items-center justify-center gap-2"

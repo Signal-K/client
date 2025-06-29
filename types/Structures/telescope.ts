@@ -8,7 +8,7 @@ interface BaseAnomaly {
   project: string
   classified?: boolean
   discoveryDate?: string
-}
+};
 
 // Extended anomaly with rendering properties
 export interface Anomaly extends BaseAnomaly {

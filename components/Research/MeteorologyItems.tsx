@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { SatelliteDishIcon } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { TechSection } from "./TechSection";
-import { UpgradeItem } from "./UpgradeItem";
+import { UpgradeItem } from "./UpgradeItem"; 
 import TotalPoints from "../Structures/Missions/Stardust/Total";
 
 type CapacityKey = 'probeCount' | 'balloonCount';

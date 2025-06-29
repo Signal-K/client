@@ -1,6 +1,7 @@
 import type { Project } from "@/types/Structures/telescope"
 import { SpaceIcon as Planet, Sun, Asterisk, Disc } from "lucide-react"
 
+// Telescope/space projects
 export const projects: Project[] = [
   {
     id: "planet-hunters",
@@ -47,3 +48,27 @@ export const projects: Project[] = [
     bgGradient: "linear-gradient(135deg, #88C0D0, #5E81AC)",
   },
 ];
+
+// Rover/surface exploration projects
+import { Mountain, Gem } from "lucide-react"
+
+export const roverProjects = [
+  {
+    id: "geological-survey",
+    name: "SeisCAM Geological Survey",
+    description: "Analyze rock formations and geological structures on planetary surfaces",
+    icon: <Mountain className="h-4 w-4" />,
+    bgGradient: "linear-gradient(135deg, #8D6E63 0%, #5D4037 100%)",
+    color: "#8D6E63",
+    anomalyTypes: ["rock_formation", "geological_feature"],
+  },
+  {
+    id: "mineral-analysis",
+    name: "SeisCAM Mineral Analysis",
+    description: "Identify and catalog mineral deposits and rare earth elements",
+    icon: <Gem className="h-4 w-4" />,
+    bgGradient: "linear-gradient(135deg, #7E57C2 0%, #512DA8 100%)",
+    color: "#7E57C2",
+    anomalyTypes: ["mineral_deposit", "dust_storm"],
+  },
+]

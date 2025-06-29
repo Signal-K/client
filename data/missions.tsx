@@ -1,7 +1,7 @@
 import type { Mission } from "@/types/Structures/telescope"
 import { Sparkles, Sun, Rocket, Award } from "lucide-react"
 
-// Sample missions with icons
+// Telescope missions
 export const missions: Mission[] = [
   {
     id: "mission-1",
@@ -91,4 +91,75 @@ export const baseAnomalies: { [key: string]: Array<{ id: string; name: string; t
     type: "accretion_disc",
     project: "disk-detective",
   })),
-}
+};
+
+
+// Rover-seiscam (automaton) missions
+import { Mountain, Wind, Gem, Target, Search, MapPin, Zap } from "lucide-react";
+import type { RoverMission } from "@/types/Structures/Rover";
+
+export const roverMissions = [
+  // SeisCAM Geological Survey Missions
+  {
+    id: "geological-survey-1",
+    title: "Surface Rock Analysis",
+    description: "Collect and analyze 5 different rock formation samples",
+    project: "geological-survey",
+    icon: <Mountain className="h-4 w-4" />,
+    difficulty: "easy" as const,
+    reward: "50 Credits",
+    completed: false,
+  },
+  {
+    id: "geological-survey-2",
+    title: "Crater Investigation",
+    description: "Map geological features around impact craters",
+    project: "geological-survey",
+    icon: <Search className="h-4 w-4" />,
+    difficulty: "medium" as const,
+    reward: "100 Credits",
+    completed: false,
+  },
+  {
+    id: "geological-survey-3",
+    title: "Terrain Mapping",
+    description: "Create detailed topographical maps of unexplored regions",
+    project: "geological-survey",
+    icon: <Mountain className="h-4 w-4" />,
+    difficulty: "hard" as const,
+    reward: "200 Credits",
+    completed: false,
+  },
+
+  // SeisCAM Mineral Analysis Missions
+  {
+    id: "mineral-analysis-1",
+    title: "Rare Earth Detection",
+    description: "Locate and identify rare earth mineral deposits",
+    project: "mineral-analysis",
+    icon: <Gem className="h-4 w-4" />,
+    difficulty: "easy" as const,
+    reward: "75 Credits",
+    completed: false,
+  },
+  {
+    id: "mineral-analysis-2",
+    title: "Subsurface Scanning",
+    description: "Use seismic analysis to detect underground mineral veins",
+    project: "mineral-analysis",
+    icon: <Zap className="h-4 w-4" />,
+    difficulty: "medium" as const,
+    reward: "150 Credits",
+    completed: false,
+  },
+  {
+    id: "mineral-analysis-3",
+    title: "Composition Analysis",
+    description: "Perform detailed spectral analysis of mineral samples",
+    project: "mineral-analysis",
+    icon: <Gem className="h-4 w-4" />,
+    difficulty: "hard" as const,
+    reward: "250 Credits",
+    completed: false,
+  },
+];

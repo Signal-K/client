@@ -367,6 +367,25 @@ export default function TelescopeViewport() {
     );
   };
 
+  const handleNavigate = (direction: "up" | "down" | "left" | "right") => {
+    const newSector = { ...currentSector }
+    switch (direction) {
+      case "up":
+        newSector.y -= 1
+        break
+      case "down":
+        newSector.y += 1
+        break
+      case "left":
+        newSector.x -= 1
+        break
+      case "right":
+        newSector.x += 1
+        break
+    }
+    setCurrentSector(newSector)
+  };
+
   return (
     <div className="h-screen bg-[#2E3440] flex flex-col overflow-hidden">
       <ViewportHeader
@@ -376,6 +395,7 @@ export default function TelescopeViewport() {
         setViewMode={setViewMode}
         classifiedCount={classifications.length}
         availableMissionsCount={availableMissions.length}
+        onNavigate={handleNavigate}
         showAllDiscoveries={showAllDiscoveries}
         setShowAllDiscoveries={setShowAllDiscoveries}
       />
@@ -385,6 +405,7 @@ export default function TelescopeViewport() {
         selectedProject={selectedProject}
         selectProject={selectProject}
         showProjectPanel={showProjectPanel}
+        onNavigate={handleNavigate}
         onClose={() => setShowProjectPanel(false)}
         anomalies={anomalies}
       />
@@ -399,6 +420,7 @@ export default function TelescopeViewport() {
             handleMouseMove={handleMouseMove}
             handleMouseUp={handleMouseUp}
             handleAnomalyClick={handleAnomalyClick}
+            onNavigate={handleNavigate}
             currentSectorName={currentSectorName}
             focusedAnomaly={focusedAnomaly}
           />

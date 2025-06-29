@@ -64,7 +64,6 @@ async function generateAlerts(supabase: any, session: any): Promise<AlertItem[]>
   const alerts: AlertItem[] = [];
 
   try {
-    // Get linked anomalies from the last 7 days
     const { data: linkedAnomalies, error: linkedError } = await supabase
       .from('linked_anomalies')
       .select(`

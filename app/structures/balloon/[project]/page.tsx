@@ -50,7 +50,7 @@ export default function WeatherBalloonProjectPage() {
       <div className='pb-8'>
         <GameNavbar />
       </div>
-      <main className="flex-grow z-10 px-4 py-12 flex justify-center items-start overflow-y-auto">
+      <main className="flex-grow z-10 px-4 py-6 flex justify-center items-start overflow-y-auto">
         <div className="max-w-4xl w-full">
           <div className="mb-6 flex justify-end">
             <button

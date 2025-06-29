@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import Navbar from "@/components/Layout/Navbar";
@@ -17,7 +16,7 @@ interface MissionConfig {
   color: string;
   action?: () => void;
   completedCount?: number;
-};
+}
 
 interface MissionShellProps {
   missions: MissionConfig[];
@@ -28,7 +27,7 @@ interface MissionShellProps {
   onPreviousChapter: () => void;
   onNextChapter: () => void;
   tutorialMission?: MissionConfig;
-};
+}
 
 const MissionShell = ({
   missions,
@@ -38,11 +37,11 @@ const MissionShell = ({
   maxUnlockedChapter,
   onPreviousChapter,
   onNextChapter,
-  tutorialMission, 
+  tutorialMission,
 }: MissionShellProps) => {
   const supabase = useSupabaseClient();
   const session = useSession();
-  
+
   const [loading, setLoading] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [username, setUsername] = useState("");
@@ -54,6 +53,7 @@ const MissionShell = ({
 
   useEffect(() => {
     let ignore = false;
+
     async function getProfile() {
       setLoading(true);
       const { data, error } = await supabase
@@ -61,7 +61,7 @@ const MissionShell = ({
         .select(`username, full_name, avatar_url`)
         .eq("id", session?.user.id)
         .single();
-  
+
       if (!ignore) {
         if (error) {
           console.warn(error);
@@ -69,46 +69,48 @@ const MissionShell = ({
           setUsername(data.username);
           setFirstName(data?.full_name);
           setAvatarPreview(data?.avatar_url || "");
-        };
-      };
+        }
+      }
+
       setLoading(false);
-    };
-  
+    }
+
     if (session?.user?.id) {
       getProfile();
-    };
-  
+    }
+
     return () => {
       ignore = true;
     };
   }, [session, refresh]);
 
-  const renderMission = (mission: MissionConfig) => {
+  const getCardSpanClass = (index: number, total: number) => {
+    if (total === 1) return "col-span-2 md:col-span-2 lg:col-span-4";
+    if (total === 2) return "col-span-2 md:col-span-1 lg:col-span-2";
+    if (total === 3 && index === 0) return "col-span-2 md:col-span-2 lg:col-span-2";
+    return "";
+  };
+
+  const renderMission = (mission: MissionConfig, index: number, total: number) => {
     const completedCount = mission.completedCount ?? 0;
 
     return (
       <div
         key={mission.id}
-        className={`flex items-center p-6 rounded-2xl cursor-pointer${
-          mission.id > 2
-            ? "bg-[#74859A]"
-            : mission.id < 3
-            ? "bg-gray-000"
-            : completedCount > 0
-            ? "bg-gray-700"
-            : ""
-        }`}
+        className={`bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] shadow-md rounded-xl cursor-pointer p-4 aspect-square w-full max-w-full flex flex-col justify-between ${getCardSpanClass(index, total)}`}
         onClick={() => setSelectedMission(mission)}
       >
-        <mission.icon className={`w-10 h-10 ${mission.color}`} />
-        <div className="ml-4">
-          <h2 className={`text-lg font-bold ${mission.color}`}>{mission.title}</h2>
-          <p className={`text-sm ${mission.color}`}>{mission.description}</p>
-          {mission.points && (
-            <p className={`text-sm ${mission.color}`}>Points: {mission.points}</p>
-          )}
+        <div className="flex items-start space-x-4">
+          <mission.icon className={`w-10 h-10 ${mission.color}`} />
+          <div>
+            <h2 className="text-lg font-bold text-[#2E3440]">{mission.title}</h2>
+            <p className="text-sm text-[#4C566A]">{mission.description}</p>
+            {mission.points && (
+              <p className="text-sm text-[#4C566A]">Points: {mission.points}</p>
+            )}
+          </div>
         </div>
-        <div className="ml-auto text-right">
+        <div className="mt-4 text-right text-[#2E3440]">
           <p className="text-xs">Completed: {completedCount}</p>
           <p className="text-xl font-bold">{completedCount}</p>
         </div>
@@ -117,26 +119,18 @@ const MissionShell = ({
   };
 
   const renderTutorialMission = (mission: MissionConfig) => {
-    const completedCount = mission.completedCount ?? 0;
-
     return (
       <div
         key={mission.id}
-        className={`flex items-center p-6 rounded-2xl cursor-pointer${
-          mission.id > 2
-            ? "bg-[#74859A]"
-            : mission.id < 3
-            ? "bg-gray-000"
-            : completedCount > 0
-            ? "bg-gray-700"
-            : ""
-        }`}
+        className={`bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] shadow-md rounded-xl cursor-pointer p-4 aspect-square w-full max-w-[180px] flex flex-col justify-between`}
         onClick={() => setSelectedMission(mission)}
       >
-        <mission.icon className={`w-10 h-10 ${mission.color}`} />
-        <div className="ml-4">
-          <h2 className={`text-lg font-bold ${mission.color}`}>{mission.title}</h2>
-          <p className={`text-sm ${mission.color}`}>{mission.description}</p>
+        <div className="flex items-start space-x-4">
+          <mission.icon className={`w-10 h-10 ${mission.color}`} />
+          <div>
+            <h2 className="text-lg font-bold text-[#2E3440]">{mission.title}</h2>
+            <p className="text-sm text-[#4C566A]">{mission.description}</p>
+          </div>
         </div>
       </div>
     );
@@ -148,68 +142,64 @@ const MissionShell = ({
     return (
       <EarthViewLayout>
         <ProfileSetupForm onProfileUpdate={() => setRefresh((prev) => !prev)} />
-        <div></div>
+          <></>
       </EarthViewLayout>
     );
-  };
+  }
 
   return (
-    <div className="flex flex-col items-center bg-[#1D2833] text-white rounded-2xl shadow-lg p-6 w-full max-w-4xl mx-auto">
+    <div className="flex flex-col items-center justify-center w-full min-h-screen px-4 text-white overflow-x-hidden">
       {!selectedMission && (
-        <>
-          <div className="flex justify-between items-center w-full mb-6">
-            <h1 className="text-xl font-bold">Chapter {currentChapter}</h1>
+        <div className="flex flex-col w-full max-w-6xl">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-xl font-bold text-[#2E3440]">Chapter {currentChapter}</h1>
             <div className="flex space-x-4">
               <Button onClick={onPreviousChapter} disabled={currentChapter === 1}>
                 Previous
               </Button>
               <Button
                 onClick={onNextChapter}
-                disabled={currentChapter === maxUnlockedChapter || experiencePoints < pointsForNextChapter}
+                disabled={
+                  currentChapter === maxUnlockedChapter ||
+                  experiencePoints < pointsForNextChapter
+                }
               >
                 Next
               </Button>
             </div>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-4 mb-6">
+
+          <div className="w-full bg-gray-300 rounded-full h-4 mb-2">
             <div
               className="bg-[#5FCBC3] h-4 rounded-full"
               style={{ width: `${(experiencePoints % 9) * 10.5}%` }}
             ></div>
           </div>
-          <p className="text-sm text-center mb-6">
+
+          <p className="text-sm text-center text-[#4C566A] mb-6">
             Level {level} ({experiencePoints} points)
           </p>
-          {currentChapter === 1 ? (
-            <>
-              <div className="bg-gray-700 p-6 rounded-2xl w-full mb-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                  {missions.slice(0, 2).map((mission) => renderMission(mission))}
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mt-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-                {missions.slice(2).map((mission) => renderMission(mission))}
-              </div>
-            </>
-          ) : (
-            <div className="grid gap-4 w-full mt-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-              {missions.map((mission) => renderMission(mission))}
-            </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {missions.map((mission, idx) =>
+              renderMission(mission, idx, missions.length)
+            )}
+          </div>
+
+          {currentChapter === 1 && tutorialMission && (
+            <div className="mt-6">{renderTutorialMission(tutorialMission)}</div>
           )}
-        </>
+        </div>
       )}
-      
-      {/* Display tutorial mission when Chapter 1 is selected */}
-      {currentChapter === 1 && tutorialMission && !selectedMission && (
-  <div className="mt-6">
-    {renderTutorialMission(tutorialMission)}
-  </div>
-)}
 
       <AnimatePresence>
         {selectedMission && (
           <motion.div
-            className="flex flex-col bg-[#1D2833] rounded-2xl p-6 w-full max-w-5xl mx-auto"
+            className="flex flex-col rounded-2xl p-6 w-full max-w-5xl mx-auto h-full"
+            style={{
+              background: "linear-gradient(135deg, #E5EEF4, #D8E5EC)",
+              color: "#2E3440",
+            }}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -220,9 +210,7 @@ const MissionShell = ({
             </div>
             <div className="flex-1 overflow-y-auto max-h-[calc(100vh-150px)]">
               {selectedMission.internalComponent && (
-                // <div className="overflow-x-auto w-full">{/* Add this wrapper */}
-                  <selectedMission.internalComponent />
-                // </div>
+                <selectedMission.internalComponent />
               )}
             </div>
           </motion.div>

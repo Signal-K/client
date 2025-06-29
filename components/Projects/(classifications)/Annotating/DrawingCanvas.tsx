@@ -11,13 +11,13 @@ interface AnnotationCanvasProps {
   setIsDrawing: (isDrawing: boolean) => void;
   currentTool: Tool;
   currentColor: string;
-  lineWidth: number; 
+  lineWidth: number;
   drawings: DrawingObject[];
   setDrawings: (drawings: DrawingObject[]) => void;
   currentDrawing: DrawingObject | null;
   setCurrentDrawing: (drawing: DrawingObject | null) => void;
   currentCategory: AI4MCategory | P4Category;
-};
+}
 
 export function AnnotationCanvas({
   canvasRef,
@@ -33,8 +33,7 @@ export function AnnotationCanvas({
   setCurrentDrawing,
   currentCategory,
 }: AnnotationCanvasProps) {
-  const CANVAS_WIDTH = 500; 
-  const CANVAS_HEIGHT = 400;
+  const CANVAS_WIDTH = 500;
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -63,14 +62,14 @@ export function AnnotationCanvas({
       y: touch.clientY - rect.top,
     };
   };
-  
+
   const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-  
-    const touch = e.touches[0];
-    const { x, y } = getTouchPos(touch as unknown as Touch, canvas);
-  
+
+    const touch = e.nativeEvent.touches[0];
+    const { x, y } = getTouchPos(touch, canvas);
+
     setIsDrawing(true);
     const newDrawing: DrawingObject = {
       type: currentTool,
@@ -82,13 +81,13 @@ export function AnnotationCanvas({
     };
     setCurrentDrawing(newDrawing);
   };
-  
+
   const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing || !currentDrawing || !canvasRef.current) return;
-  
-    const touch = e.touches[0];
-    const { x, y } = getTouchPos(touch as unknown as Touch, canvasRef.current);
-  
+
+    const touch = e.nativeEvent.touches[0];
+    const { x, y } = getTouchPos(touch, canvasRef.current);
+
     if (currentTool === 'pen') {
       setCurrentDrawing({
         ...currentDrawing,
@@ -101,14 +100,14 @@ export function AnnotationCanvas({
       });
     }
   };
-  
+
   const handleTouchEnd = () => {
     if (currentDrawing) {
       setDrawings([...drawings, currentDrawing]);
     }
     setIsDrawing(false);
     setCurrentDrawing(null);
-  };  
+  };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing || !currentDrawing || !canvasRef.current) return;
@@ -162,72 +161,85 @@ export function AnnotationCanvas({
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx || !imageRef.current) return;
-  
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
+
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
     const img = imageRef.current;
-    const imgAspectRatio = img.width / img.height;
-    const canvasAspectRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
-  
-    let drawWidth, drawHeight, offsetX, offsetY;
-  
-    if (imgAspectRatio > canvasAspectRatio) {
-      // Image is wider than canvas
-      drawWidth = CANVAS_WIDTH;
-      drawHeight = CANVAS_WIDTH / imgAspectRatio;
-      offsetX = 0;
-      offsetY = (CANVAS_HEIGHT - drawHeight) / 2;
-    } else {
-      // Image is taller than canvas
-      drawWidth = CANVAS_HEIGHT * imgAspectRatio;
-      drawHeight = CANVAS_HEIGHT;
-      offsetX = (CANVAS_WIDTH - drawWidth) / 2;
-      offsetY = 0;
-    };
-  
+    const imgAspectRatio = img.naturalWidth / img.naturalHeight;
+
+    const drawWidth = canvasWidth;
+    const drawHeight = canvasWidth / imgAspectRatio;
+
+    const offsetX = 0;
+    const offsetY = (canvasHeight - drawHeight) / 2;
+
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-  
+
     drawings.forEach((drawing) => {
       drawObject(ctx, drawing);
     });
-  
+
     if (currentDrawing) {
       drawObject(ctx, currentDrawing);
-    };
-  };  
+    }
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const img = imageRef.current;
 
-    if (canvas && img) {
-      // Ensure actual canvas size matches styled size to avoid scaling issues
-      canvas.width = CANVAS_WIDTH;
-      canvas.height = CANVAS_HEIGHT;
-      canvas.style.width = `${CANVAS_WIDTH}px`;
-      canvas.style.height = `${CANVAS_HEIGHT}px`;
+    const dpr = window.devicePixelRatio || 1;
+
+    if (!canvas || !img) return;
+
+    const setCanvasSize = () => {
+      const aspectRatio = img.naturalWidth / img.naturalHeight;
+      const width = CANVAS_WIDTH;
+      const height = width / aspectRatio;
+
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.scale(dpr, dpr);
 
       renderCanvas();
+    };
+
+    if (img.complete) {
+      setCanvasSize();
+    } else {
+      img.addEventListener('load', setCanvasSize);
+      return () => img.removeEventListener('load', setCanvasSize);
     }
-  }, [imageRef.current]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     renderCanvas();
   }, [drawings, currentDrawing]);
 
   return (
-    <div className="border rounded-lg overflow-hidden inline-block">
-      <canvas
-        ref={canvasRef}
-        onMouseDown={startDrawing}
-        onMouseMove={draw}
-        onMouseUp={stopDrawing}
-        onMouseOut={stopDrawing}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className={cn("cursor-crosshair", isDrawing && "cursor-none")}
-      />
-    </div>
-  );
+  <div className="border rounded-lg overflow-hidden inline-block max-w-[500px] max-h-[500px] w-full h-auto">
+    <canvas
+      ref={canvasRef}
+      onMouseDown={startDrawing}
+      onMouseMove={draw}
+      onMouseUp={stopDrawing}
+      onMouseOut={stopDrawing}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className={cn(
+        "w-full h-auto cursor-crosshair",
+        isDrawing && "cursor-none"
+      )}
+    />
+  </div>
+);
 };

@@ -4,7 +4,8 @@ import type React from "react"
 import { useRef } from "react"
 import type { Anomaly, Star } from "@/types/Structures/telescope"
 import { AnomalyComponent } from "./anomaly-component"
-import { Move, Zap, Radio, Gauge, Activity, Cpu, HardDrive, Wifi } from "lucide-react"
+import { Move, Zap, Radio, Gauge, Activity, Cpu, HardDrive, Wifi, ChevronUp, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface TelescopeViewProps {
   stars: Star[]
@@ -16,6 +17,7 @@ interface TelescopeViewProps {
   handleAnomalyClick: (anomaly: Anomaly) => void
   currentSectorName: string
   focusedAnomaly?: Anomaly | null
+  onNavigate: (direction: "up" | "down" | "left" | "right") => void;
 };
 
 export function TelescopeView({
@@ -25,6 +27,7 @@ export function TelescopeView({
   handleMouseDown,
   handleMouseMove,
   handleMouseUp,
+  onNavigate,
   handleAnomalyClick,
   currentSectorName,
   focusedAnomaly,
@@ -52,7 +55,7 @@ export function TelescopeView({
               <span>ONLINE</span>
             </div>
             <div className="flex items-center gap-1">
-              <Activity className="h-4 w-4" />
+              <Activity className="h-4 w-4" /> 
               <span>STABLE</span>
             </div>
           </div>
@@ -60,6 +63,50 @@ export function TelescopeView({
 
         {/* Left Control Panel */}
         <div className="absolute left-6 top-28 bottom-6 w-32 bg-gradient-to-b from-[#434C5E] to-[#3B4252] rounded-2xl border-2 border-[#2E3440] p-4 space-y-4 hidden sm:block">
+          <div className="bg-[#2E3440] rounded-lg border border-[#4C566A] p-2">
+            <div className="text-[#88C0D0] text-xs font-mono mb-2 text-center">NAV</div>
+            <div className="grid grid-cols-3 gap-1">
+              <div></div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onNavigate("up")}
+                className="bg-[#5E81AC] border-[#81A1C1] text-white hover:bg-[#81A1C1] p-1 h-6 w-6"
+              >
+                <ChevronUp className="h-3 w-3" />
+              </Button>
+              <div></div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onNavigate("left")}
+                className="bg-[#5E81AC] border-[#81A1C1] text-white hover:bg-[#81A1C1] p-1 h-6 w-6"
+              >
+                <ChevronLeft className="h-3 w-3" />
+              </Button>
+              <div className="flex items-center justify-center">
+                <div className="w-1 h-1 bg-[#81A1C1] rounded-full"></div>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onNavigate("right")}
+                className="bg-[#5E81AC] border-[#81A1C1] text-white hover:bg-[#81A1C1] p-1 h-6 w-6"
+              >
+                <ChevronRight className="h-3 w-3" />
+              </Button>
+              <div></div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onNavigate("down")}
+                className="bg-[#5E81AC] border-[#81A1C1] text-white hover:bg-[#81A1C1] p-1 h-6 w-6"
+              >
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+              <div></div>
+            </div>
+          </div>
           {/* Mini Screens */}
           <div className="h-16 bg-[#2E3440] rounded-lg border border-[#4C566A] flex items-center justify-center">
             <Gauge className="h-6 w-6 text-[#88C0D0]" />
@@ -256,5 +303,5 @@ export function TelescopeView({
         }
       `}</style>
     </div>
-  )
-}
+  );
+};

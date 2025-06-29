@@ -6,7 +6,8 @@ import { CloudspottingOnMarsWithId, StarterLidar } from "@/components/Projects/L
 import VoteCoMClassifications from "./CoMVote";
 import CloudClassificationGenerator from "./CloudMaker";
 import { CloudspottingOnMarsTutorial } from "@/components/Projects/Lidar/cloudspottingOnMars";
-import { CloudspottingShapesWrapper } from "@/components/Projects/Lidar/CloudspottingOnMarsShapes";
+import { StarterCoMShapes } from "@/components/Projects/Lidar/CloudspottingOnMarsShapes";
+// import { CloudspottingShapesWrapper } from "@/components/Projects/Lidar/CloudspottingOnMarsShapes";
 
 export interface Mission {
     id: number;
@@ -79,7 +80,7 @@ const CloudspottingOnMars = () => {
                 icon: Paintbrush2Icon,
                 points: 2,
                 completedCount: 0,
-                internalComponent: () => <CloudspottingShapesWrapper />,
+                internalComponent: () => <StarterCoMShapes />,
                 color: 'text-green-200',
             }
         ];

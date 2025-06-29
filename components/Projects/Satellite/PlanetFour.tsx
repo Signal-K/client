@@ -10,6 +10,7 @@ import * as markerjs2 from "markerjs2";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import AI4M from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AIForMars";
 
 interface Props {
     anomalyid: number | bigint;
@@ -148,6 +149,7 @@ export function PlanetFourProject() {
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [parentClassificationId, setParentClassificationId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [showTutorial, setShowTutorial] = useState(false);
 
@@ -157,68 +159,103 @@ export function PlanetFourProject() {
         setShowTutorial(true);
     };
 
-const fetchAnomaly = async () => {
-    if (!session) {
-        console.error("No session found");
-        setLoading(false);
-        return;
-    }
-
-    setLoading(true);
-
-    try {
-        // Try to fetch a previously linked anomaly by this user
-        const { data: linkedAnomalies, error: linkedError } = await supabase
-            .from("linked_anomalies")
-            .select(`
-                id,
-                anomaly_id,
-                anomalies (
-                    id,
-                    anomalySet,
-                    content
-                )
-            `)
-            .eq("author", session.user.id)
-            .filter("anomalies.anomalySet", "eq", "satellite-planetFour")
-            .limit(1);
-
-        if (linkedError) throw linkedError;
-
-        let selectedAnomaly = null;
-
-        if (linkedAnomalies && linkedAnomalies.length > 0 && linkedAnomalies[0].anomalies) {
-            selectedAnomaly = linkedAnomalies[0].anomalies;
-            console.log("Using previously linked anomaly:", selectedAnomaly[0]?.id);
-        } else {
-            // Fallback: Pick a random anomaly from satellite-planetFour
-            const { data: anomalies, error: fallbackError } = await supabase
-                .from("anomalies")
-                .select("*")
-                .eq("anomalySet", "satellite-planetFour");
-
-            if (fallbackError) throw fallbackError;
-
-            if (!anomalies || anomalies.length === 0) {
-                console.error("No anomalies found for the given set");
-                setAnomaly(null);
-                return;
-            }
-
-            const randomIndex = Math.floor(Math.random() * anomalies.length);
-            selectedAnomaly = anomalies[randomIndex];
-            console.log("Using random fallback anomaly:", selectedAnomaly.id);
+    const fetchAnomaly = async () => {
+        if (!session) {
+            console.error("No session found");
+            setLoading(false);
+            return;
         }
 
-        setAnomaly(selectedAnomaly);
-        setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${selectedAnomaly.id}.jpeg`);
-    } catch (error) {
-        console.error("Error fetching anomaly:", error);
-        setAnomaly(null);
-    } finally {
-        setLoading(false);
-    }
-};
+        setLoading(true);
+
+        try {
+            // Try to fetch a previously linked anomaly by this user
+            const { data: linkedAnomalies, error: linkedError } = await supabase
+                .from("linked_anomalies")
+                .select(`
+                    id,
+                    anomaly_id,
+                    classification_id,
+                    anomalies (
+                        id,
+                        anomalySet,
+                        content
+                    )
+                `)
+                .eq("author", session.user.id)
+                .filter("anomalies.anomalySet", "eq", "satellite-planetFour")
+                .limit(1);
+
+            if (linkedError) throw linkedError;
+
+            let selectedAnomaly = null;
+            let classificationId: number | null = null;
+
+            if (linkedAnomalies && linkedAnomalies.length > 0 && linkedAnomalies[0].anomalies) {
+                selectedAnomaly = linkedAnomalies[0].anomalies;
+                classificationId = linkedAnomalies[0].classification_id;
+                console.log("Using previously linked anomaly:", selectedAnomaly[0]?.id);
+            } else {
+                // Fallback: Try to find any linked anomaly with a classification_id
+                const { data: fallbackLinked, error: fallbackLinkedError } = await supabase
+                    .from("linked_anomalies")
+                    .select(`
+                        id,
+                        anomaly_id,
+                        classification_id,
+                        anomalies (
+                            id,
+                            anomalySet,
+                            content
+                        )
+                    `)
+                    .eq("author", session.user.id)
+                    .not("classification_id", "is", null)
+                    .limit(1);
+
+                if (fallbackLinkedError) throw fallbackLinkedError;
+
+                if (fallbackLinked && fallbackLinked.length > 0 && fallbackLinked[0].anomalies) {
+                    selectedAnomaly = fallbackLinked[0].anomalies;
+                    classificationId = fallbackLinked[0].classification_id;
+                    console.log("Using fallback linked anomaly with classification_id:", selectedAnomaly[0]?.id);
+                } else {
+                    // Final fallback: Pick a random anomaly from the anomaly set
+                    const { data: anomalies, error: fallbackError } = await supabase
+                        .from("anomalies")
+                        .select("*")
+                        .eq("anomalySet", "satellite-planetFour");
+
+                    if (fallbackError) throw fallbackError;
+
+                    if (!anomalies || anomalies.length === 0) {
+                        console.error("No anomalies found for the given set");
+                        setAnomaly(null);
+                        return;
+                    }
+
+                    const randomIndex = Math.floor(Math.random() * anomalies.length);
+                    selectedAnomaly = anomalies[randomIndex];
+                    classificationId = null;
+                    console.log("Using random fallback anomaly:", selectedAnomaly.id);
+                }
+            }
+
+            // Some queries return `anomalies` as an array of one object, some as a single object
+            const finalAnomaly = Array.isArray(selectedAnomaly)
+                ? selectedAnomaly[0]
+                : selectedAnomaly;
+
+            setAnomaly(finalAnomaly);
+            setParentClassificationId(classificationId);
+            setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${finalAnomaly.id}.jpeg`);
+        } catch (error) {
+            console.error("Error fetching anomaly:", error);
+            setAnomaly(null);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         fetchAnomaly();
@@ -233,11 +270,11 @@ const fetchAnomaly = async () => {
     }
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-            {!showTutorial ? (
-                <>
-                    <Button className="mb-4" onClick={handleShowTutorial}>
-                        Show Tutorial
+        <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6 overflow-hidden">
+            <div className="w-full max-w-4xl h-full flex flex-col rounded-xl bg-white shadow-lg p-4 overflow-hidden">
+                <div className="flex-1 overflow-hidden rounded-md">
+                    <Button variant="outline" onClick={handleShowTutorial}>
+                        Want a walkthrough? Start the tutorial
                     </Button>
                     {imageUrl && (
                         <ImageAnnotator
@@ -249,14 +286,16 @@ const fetchAnomaly = async () => {
                             annotationType="P4"
                             initialImageUrl={imageUrl}
                             parentPlanetLocation={anomaly.id.toString()}
+                            parentClassificationId={parentClassificationId ?? undefined}
                         />
                     )}
-                </>
-            ) : (
-                <div>
-                    <StarterPlanetFour anomalyid={anomaly.id} />
                 </div>
-            )}
+                {showTutorial && (
+                    <div>
+                        <StarterPlanetFour anomalyid={anomaly.id} />
+                    </div>
+                )}
+            </div>
         </div>
     );
-};
+}

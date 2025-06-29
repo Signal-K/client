@@ -51,6 +51,16 @@ function getWeekDateRange(startDateStr: string): { start: string; end: string } 
   };
 }
 
+const badgeColors = [
+  'bg-red-100 text-red-800',
+  'bg-green-100 text-green-800',
+  'bg-blue-100 text-blue-800',
+  'bg-yellow-100 text-yellow-800',
+  'bg-purple-100 text-purple-800',
+  'bg-pink-100 text-pink-800',
+  'bg-indigo-100 text-indigo-800',
+];
+
 export default function ClientClassificationPage({ id }: Props) {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -72,6 +82,12 @@ export default function ClientClassificationPage({ id }: Props) {
         console.error('Error fetching classification:', error);
         return;
       }
+
+      console.log('classificationConfiguration:', data.classificationConfiguration);
+      console.log(
+        'annotationOptions:',
+        data.classificationConfiguration?.annotationOptions ?? []
+      );
 
       setClassification(data);
       setLoading(false);
@@ -146,7 +162,9 @@ export default function ClientClassificationPage({ id }: Props) {
   if (loading) return <div className="text-center mt-10 text-[#2E3440]">Loading...</div>;
   if (!classification) return null;
 
-  const mediaUrl = classification.media?.[1]?.[0];
+  const mediaUrl = Array.isArray(classification.media)
+    ? classification.media.find((item: any) => Array.isArray(item) && typeof item[0] === 'string' && item[0].startsWith('http'))?.[0]
+    : undefined;
   const type = classification.classificationtype;
 
   let structure = 'greenhouse';
@@ -157,6 +175,28 @@ export default function ClientClassificationPage({ id }: Props) {
   const studyUrl = project
     ? `/${structure}/${project}/2/${classification.id}`
     : `/greenhouse/two/${classification.id}`;
+
+  const annotationOptions: string[] =
+    classification?.classificationConfiguration?.annotationOptions ?? [];
+
+  // Reduce to count occurrences
+  const annotationCounts = annotationOptions.reduce((acc: Record<string, number>, label: string) => {
+    const key = label.trim();
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+
+  const annotationBadges = Object.entries(annotationCounts).map(([label, count], idx) => {
+    const color = badgeColors[idx % badgeColors.length];
+    return (
+      <span
+        key={label}
+        className={`inline-block px-3 py-1 rounded-full text-xs font-medium mr-2 mb-2 ${color}`}
+      >
+        {count > 1 ? `${label} (${count})` : label}
+      </span>
+    );
+  });
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
@@ -178,6 +218,7 @@ export default function ClientClassificationPage({ id }: Props) {
             <h1 className="text-xl font-semibold text-[#2E3440]">Discovery Summary</h1>
             <p className="text-md text-[#4C566A]">{classification.content}</p>
           </div>
+
           {mediaUrl && (
             <div className="relative group rounded-md overflow-hidden border border-[#D8DEE9]">
               <Dialog>
@@ -190,15 +231,12 @@ export default function ClientClassificationPage({ id }: Props) {
                     className="w-full h-[300px] object-contain cursor-zoom-in transition-transform duration-200 group-hover:scale-105"
                   />
                 </DialogTrigger>
-                {/* <DialogContent className="p-0 bg-transparent shadow-none border-none max-w-4xl">
-                  <img
-                    src={mediaUrl}
-                    alt="Full View"
-                    className="w-full max-h-[6000px] rounded-lg object-contain"
-                  />
-                </DialogContent> */}
               </Dialog>
             </div>
+          )}
+
+          {annotationBadges.length > 0 && (
+            <div className="flex flex-wrap pt-2">{annotationBadges}</div>
           )}
 
           <div className="bg-[#D8F3DC] text-[#2E7D32] text-sm font-medium p-2 rounded-lg border border-[#A5D6A7]">
@@ -249,12 +287,14 @@ export default function ClientClassificationPage({ id }: Props) {
             <Button variant="ghost" onClick={() => router.push('/')}>
               🏠 Home
             </Button>
-            {/* <Button variant="default" onClick={() => router.push('/research')}>
-              🌟 View Stardust / Research
-            </Button> */}
             {type === 'planet' && (
               <Button variant="default" onClick={() => router.push(`/planets/paint/${classification.id}`)}>
                 🪐 Customise planet
+              </Button>
+            )}
+            {type != 'planet' && (
+              <Button variant='default' onClick={() => router.push(`/structures/${structure}`)}>
+                ⚙️ Step 2
               </Button>
             )}
           </div>
