@@ -44,6 +44,7 @@ interface ImageAnnotatorProps {
   assetMentioned?: string | string[];
   structureItemId?: number;
   parentPlanetLocation?: string;
+  classificationParent?: string;
   annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'AA' | 'CoMS' | 'Sunspots' | 'Custom';
 };
 
@@ -55,6 +56,7 @@ export default function ImageAnnotator({
   missionNumber,
   assetMentioned,
   otherAssets,
+  classificationParent,
   parentPlanetLocation,
   structureItemId,
   annotationType,
@@ -268,6 +270,7 @@ export default function ImageAnnotator({
             ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]).map(id => id && [id, "id"]),
           ].filter((item): item is [string, string] => Array.isArray(item) && item.length === 2),
           anomaly: anomalyId,
+          classificationParent: classificationParent,
           classificationtype: anomalyType,
           classificationConfiguration,
         })
