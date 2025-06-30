@@ -418,4 +418,4 @@ export async function GET(req: NextRequest) {
         playerMilestones: mostRecentMilestone ? [mostRecentMilestone] : [],
         communityMilestones: communityMilestones, // or filter this too if needed
     });
-}
+};

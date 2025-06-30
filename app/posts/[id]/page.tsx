@@ -15,7 +15,7 @@ interface Classification {
   media: string[] | null;
   classificationtype: string | null;
   classificationConfig?: any | null;
-}
+};
 
 export default function SinglePostPage({ params }: { params: { id: string } }) {
   const supabase = useSupabaseClient();

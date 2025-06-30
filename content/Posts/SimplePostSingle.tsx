@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AvatarGenerator } from '@/components/Account/Avatar';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import html2canvas from 'html2canvas';
 
 interface SimplePostSingleProps {
   title: string;
-  id: string;
+  id: string; // classification ID
   author: string;
   content: string;
   category: string;
@@ -27,8 +27,36 @@ export function SimplePostSingle({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isSharing, setIsSharing] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [classificationVotesCount, setClassificationVotesCount] = useState<number | null>(null);
+  const [anomalyVotesCount, setAnomalyVotesCount] = useState<number | null>(null);
+
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  // 🔸 Fetch vote counts
+  useEffect(() => {
+    async function fetchVoteCounts() {
+      try {
+        const classificationRes = await fetch(`/api/votes/classification/${id}`);
+        const classificationData = await classificationRes.json();
+        setClassificationVotesCount(classificationData.count || 0);
+
+        const anomalyIdRes = await fetch(`/api/classification/${id}`);
+        const anomalyData = await anomalyIdRes.json();
+        const anomalyId = anomalyData?.anomaly;
+
+        if (anomalyId) {
+          const anomalyVotesRes = await fetch(`/api/votes/anomaly/${anomalyId}`);
+          const anomalyVotesData = await anomalyVotesRes.json();
+          setAnomalyVotesCount(anomalyVotesData.count || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching vote counts:', error);
+      }
+    }
+
+    fetchVoteCounts();
+  }, [id]);
 
   const goToNextImage = () => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -149,11 +177,21 @@ export function SimplePostSingle({
             <button className="flex items-center gap-1 text-[#4C566A] hover:text-[#88C0D0] transition">
               <ThumbsUpIcon className="w-5 h-5" />
               Vote
+              {classificationVotesCount !== null && (
+                <span className="ml-1 text-xs text-[#5E81AC]">({classificationVotesCount})</span>
+              )}
             </button>
+
             <button className="flex items-center gap-1 text-[#4C566A] hover:text-[#A3BE8C] transition">
               <MessageCircle className="w-5 h-5" />
               Comment
             </button>
+          </div>
+
+          <div className="text-xs text-[#4C566A]">
+            {anomalyVotesCount !== null && (
+              <>Anomaly Votes: <strong>{anomalyVotesCount}</strong></>
+            )}
           </div>
 
           {/* Share Dropdown */}

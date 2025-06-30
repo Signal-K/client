@@ -22,12 +22,12 @@ export async function POST(request: Request) {
     const userIds = body.userIds || (body.userId ? [body.userId] : null);
     const message = body.message;
 
-    if (!Array.isArray(userIds) || !message) {
+    if (!Array.isArray(userIds) || !message) { 
       return NextResponse.json(
         { error: "Invalid input: userIds must be an array and message must be a string." },
-        { status: 400 }
+        { status: 400 },
       );
-    }
+    };
 
     // Fetch user push subscriptions
     const { data: profiles, error } = await supabase
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     if (error) {
       console.error("Error fetching user subscriptions:", error);
       return NextResponse.json({ error: "Database query failed" }, { status: 500 });
-    }
+    };
 
     const results = [];
 
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       if (!push_subscription) {
         results.push({ id, success: false, error: "No subscription" });
         continue;
-      }
+      };
 
       let subscription;
       try {
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
         console.error(`Failed to parse push_subscription for user ${id}`, parseErr);
         results.push({ id, success: false, error: "Invalid subscription format" });
         continue;
-      }
+      };
 
       const payload = JSON.stringify({
         title: message,
