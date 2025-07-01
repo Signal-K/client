@@ -94,7 +94,6 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
               content={classification.content || "No content available"}
               category={classification.classificationtype || "Unknown"}
               images={classification.media || []}
-              classificationConfiguration={classification.classificationConfig}
             />
             {/* <div className="mt-8">
               <StructuresOnPlanet author={classification.author} />
