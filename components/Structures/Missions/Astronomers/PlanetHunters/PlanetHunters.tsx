@@ -191,7 +191,7 @@ const PlanetHuntersSteps = () => {
     } else if (mission.slug) {
       // slug is already replaced by useEffect
       router.push(mission.slug);
-    }
+    };
   };
 
   return (

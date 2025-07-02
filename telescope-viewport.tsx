@@ -12,7 +12,7 @@ import { ProjectPanel } from "./components/Structures/Telescope/project-panel"
 import { TelescopeView } from "./components/Structures/Telescope/telescope-view"
 import { DiscoveriesView } from "./components/Structures/Telescope/discoveries-view"
 import { AnomalyDialog } from "./components/Structures/Telescope/anomaly-dialog"
-import { AnomalyDetailDialog } from "./components/Structures/Telescope/anomaly-detail-dialog"
+import { AnomalyDetailDialog } from "./components/Structures/Viewport/anomaly-detail-dialogue"
 
 interface DatabaseAnomaly {
   id: number
@@ -448,8 +448,9 @@ export default function TelescopeViewport() {
       <AnomalyDetailDialog
         showDetailDialog={showDetailDialog}
         setShowDetailDialog={setShowDetailDialog}
-        selectedAnomaly={selectedAnomaly}
-      />
+        selectedAnomaly={selectedAnomaly} onClassify={function (): void {
+          throw new Error("Function not implemented.")
+        } } config={"telescope"}      />
     </div>
   )
 };

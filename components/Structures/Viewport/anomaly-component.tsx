@@ -1,6 +1,6 @@
 "use client"
 
-import type { Anomaly } from "@/types/Structures/telescope"
+import type { Anomaly } from "@/types/Structures/telescope";
 
 interface AnomalyComponentProps {
   anomaly: Anomaly
