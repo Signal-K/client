@@ -300,7 +300,7 @@ export default function TelescopeViewport() {
       sunspot: "sunspot", 
       asteroid: "asteroid",
       accretion_disc: "disk"
-    }
+    };
     
     const classificationType = typeMapping[selectedAnomaly.type] || "planet"
     const result = await createClassification(selectedAnomaly.id, classificationType)
@@ -316,7 +316,7 @@ export default function TelescopeViewport() {
 
     setShowClassifyDialog(false)
     setSelectedAnomaly(null)
-  }
+  };
 
   const selectProject = (project: (typeof projects)[0] | null) => {
     setSelectedProject(project)

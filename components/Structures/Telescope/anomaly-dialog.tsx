@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 interface AnomalyDialogProps {
   showClassifyDialog: boolean;
-  setShowClassifyDialog: (show: boolean) => void;
+  setShowClassifyDialog: (show: boolean) => void; 
   selectedAnomaly: Anomaly | null;
   handleClassify: () => void;
 };

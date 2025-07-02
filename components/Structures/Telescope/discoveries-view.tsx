@@ -6,6 +6,15 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, CheckCircle2, Clock, Eye, SpaceIcon as Planet, Sun, Asterisk, Disc } from "lucide-react"
 import type { Anomaly, Mission, Project } from "@/types/Structures/telescope";
 import { projects } from "@/data/projects";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 interface DiscoveriesViewProps {
   classifications: any[]

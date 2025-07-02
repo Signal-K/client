@@ -4,19 +4,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import Navbar from "@/components/Layout/Navbar";
+import Link from "next/link";
 import ProfileSetupForm from "@/components/Account/ProfileSetup";
 
-interface MissionConfig {
+export interface MissionConfig {
   id: number;
   title: string;
   description: string;
   icon: React.ElementType;
   points?: number;
+  slug?: string;
   internalComponent?: React.ElementType;
   color: string;
   action?: () => void;
   completedCount?: number;
-}
+};
 
 interface MissionShellProps {
   missions: MissionConfig[];
@@ -27,7 +29,7 @@ interface MissionShellProps {
   onPreviousChapter: () => void;
   onNextChapter: () => void;
   tutorialMission?: MissionConfig;
-}
+};
 
 const MissionShell = ({
   missions,
@@ -91,32 +93,47 @@ const MissionShell = ({
     return "";
   };
 
-  const renderMission = (mission: MissionConfig, index: number, total: number) => {
-    const completedCount = mission.completedCount ?? 0;
+const renderMission = (mission: MissionConfig, index: number, total: number) => {
+  const completedCount = mission.completedCount ?? 0;
 
-    return (
-      <div
-        key={mission.id}
-        className={`bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] shadow-md rounded-xl cursor-pointer p-4 aspect-square w-full max-w-full flex flex-col justify-between ${getCardSpanClass(index, total)}`}
-        onClick={() => setSelectedMission(mission)}
-      >
-        <div className="flex items-start space-x-4">
-          <mission.icon className={`w-10 h-10 ${mission.color}`} />
-          <div>
-            <h2 className="text-lg font-bold text-[#2E3440]">{mission.title}</h2>
-            <p className="text-sm text-[#4C566A]">{mission.description}</p>
-            {mission.points && (
-              <p className="text-sm text-[#4C566A]">Points: {mission.points}</p>
-            )}
-          </div>
-        </div>
-        <div className="mt-4 text-right text-[#2E3440]">
-          <p className="text-xs">Completed: {completedCount}</p>
-          <p className="text-xl font-bold">{completedCount}</p>
+  const cardContent = (
+    <div
+      key={mission.id}
+      className={`bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] shadow-md rounded-xl cursor-pointer p-4 aspect-square w-full max-w-full flex flex-col justify-between ${getCardSpanClass(index, total)}`}
+    >
+      <div className="flex items-start space-x-4">
+        <mission.icon className={`w-10 h-10 ${mission.color}`} />
+        <div>
+          <h2 className="text-lg font-bold text-[#2E3440]">{mission.title}</h2>
+          <p className="text-sm text-[#4C566A]">{mission.description}</p>
+          {mission.points && (
+            <p className="text-sm text-[#4C566A]">Points: {mission.points}</p>
+          )}
         </div>
       </div>
+      <div className="mt-4 text-right text-[#2E3440]">
+        <p className="text-xs">Completed: {completedCount}</p>
+        <p className="text-xl font-bold">{completedCount}</p>
+      </div>
+    </div>
+  );
+
+  // If it has a slug, make it a link
+  if (mission.slug) {
+    return (
+      <Link key={mission.id} href={mission.slug}>
+        {cardContent}
+      </Link>
     );
-  };
+  }
+
+  // Otherwise, set as internal mission
+  return (
+    <div key={mission.id} onClick={() => setSelectedMission(mission)}>
+      {cardContent}
+    </div>
+  );
+}
 
   const renderTutorialMission = (mission: MissionConfig) => {
     return (

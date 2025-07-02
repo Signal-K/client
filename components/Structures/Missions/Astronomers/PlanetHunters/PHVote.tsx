@@ -1,149 +1,137 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { PostCardSingle } from "@/content/Posts/PostSingle";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import StarnetLayout from "@/components/Layout/Starnet";
 import PostCard from "@/content/Posts/TestPostCard";
 
 interface Classification {
-    id: number;
-    created_at: string;
-    content: string | null; 
-    author: string | null;
-    anomaly: number | null; 
-    media: any | null; 
-    classificationtype: string | null;
-    classificationConfiguration: any | null; 
-};
+  id: number;
+  created_at: string;
+  content: string | null;
+  author: string | null;
+  anomaly: number | null;
+  media: any | null;
+  classificationtype: string | null;
+  classificationConfiguration: any | null;
+}
 
-export default function VotePlanetClassifications() {
-    const supabase = useSupabaseClient();
-    const session = useSession();
+interface VotePlanetClassificationsProps {
+  classificationId: string | number;
+}
 
-    const [classifications, setClassifications] = useState<any[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-    const [currentIndex, setCurrentIndex] = useState<number>(0);
+export default function VotePlanetClassifications({ classificationId }: VotePlanetClassificationsProps) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-    const fetchClassifications = async () => {
-        if (!session?.user) {
-          setError("User session not found.");
-          setLoading(false);
-          return; 
-        };
+  const [classification, setClassification] = useState<any | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-        setLoading(true);
-        setError(null);
-        try {
-          const { data, error } = await supabase
-            .from('classifications')
-            .select('*')
-            .eq('classificationtype', 'planet')
-            .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
+  const fetchClassification = async () => {
+    if (!session?.user) {
+      setError("User session not found.");
+      setLoading(false);
+      return;
+    }
 
-          if (error) throw error;
+    setLoading(true);
+    setError(null);
 
-          const processedData = data.map((classification) => {
-            const media = classification.media;
-            let image: string | null = null;
+    try {
+      const { data, error } = await supabase
+        .from("classifications")
+        .select("*")
+        .eq("id", classificationId)
+        .single(); // <– just get one
 
-            if (Array.isArray(media)) {
-                for (const subArray of media) {
-                    if (Array.isArray(subArray) && subArray.length > 0) {
-                        image = subArray[0];
-                        break;
-                    }
-                }
-            } else if (media && typeof media.uploadUrl === "string") {
-                image = media.uploadUrl;
-            }
+      if (error) throw error;
 
-            const votes = classification.classificationConfiguration?.votes || 0;
+      let image: string | null = null;
+      const media = data.media;
 
-            return { ...classification, image, votes };
-          });
-
-          setClassifications(processedData);
-        } catch (error) {
-          console.error("Error fetching classifications:", error);
-          setError("Failed to load classifications.");
-        } finally {
-          setLoading(false);
-        };
-    };
-
-    useEffect(() => {
-        fetchClassifications();
-    }, [session]);
-
-    const handleVote = async (classificationId: number, currentConfig: any) => {
-        try {
-          const currentVotes = currentConfig?.votes || 0;
-
-          const updatedConfig = {
-            ...currentConfig,
-            votes: currentVotes + 1,
-          };
-
-          const { error } = await supabase
-            .from("classifications")
-            .update({ classificationConfiguration: updatedConfig })
-            .eq("id", classificationId);
-
-          if (error) {
-            console.error("Error updating classificationConfiguration:", error);
-          } else {
-            setClassifications((prevClassifications) =>
-              prevClassifications.map((classification) =>
-                classification.id === classificationId
-                  ? { ...classification, votes: updatedConfig.votes }
-                  : classification
-              )
-            );
+      if (Array.isArray(media)) {
+        for (const subArray of media) {
+          if (Array.isArray(subArray) && subArray.length > 0) {
+            image = subArray[0];
+            break;
           }
-        } catch (error) {
-          console.error("Error voting:", error);
-        };
-    };
+        }
+      } else if (media && typeof media.uploadUrl === "string") {
+        image = media.uploadUrl;
+      }
 
-    const nextPost = () => {
-        setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, classifications.length - 1));
-    };
+      const votes = data.classificationConfiguration?.votes || 0;
 
-    const prevPost = () => {
-        setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-    };
+      setClassification({ ...data, image, votes });
+    } catch (error) {
+      console.error("Error fetching classification:", error);
+      setError("Failed to load classification.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div className="container mx-auto p-4 max-w-md">
+  useEffect(() => {
+    fetchClassification();
+  }, [session, classificationId]);
+
+  const handleVote = async (classificationId: number, currentConfig: any) => {
+    try {
+      const currentVotes = currentConfig?.votes || 0;
+
+      const updatedConfig = {
+        ...currentConfig,
+        votes: currentVotes + 1,
+      };
+
+      const { error } = await supabase
+        .from("classifications")
+        .update({ classificationConfiguration: updatedConfig })
+        .eq("id", classificationId);
+
+      if (error) {
+        console.error("Error updating classificationConfiguration:", error);
+      } else {
+        setClassification((prev: any) =>
+          prev ? { ...prev, votes: updatedConfig.votes } : prev
+        );
+      }
+    } catch (error) {
+      console.error("Error voting:", error);
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-4 max-w-md">
       <div className="space-y-6">
         {loading ? (
-          <p className="text-center text-gray-400">Loading classifications...</p>
+          <p className="text-center text-gray-400">Loading classification...</p>
         ) : error ? (
           <p className="text-center text-red-500">{error}</p>
-        ) : classifications.length === 0 ? (
-          <p className="text-center text-gray-400">No classifications available.</p>
+        ) : classification ? (
+          <PostCard
+            classificationId={classification.id}
+            title={classification.title}
+            author={classification.author}
+            content={classification.content}
+            votes={classification.votes}
+            category={classification.category}
+            tags={classification.tags || []}
+            images={classification.image ? [classification.image] : []}
+            anomalyId={classification.anomaly}
+            classificationConfig={classification.classificationConfiguration}
+            classificationType={classification.classificationtype}
+            onVote={() =>
+              handleVote(
+                classification.id,
+                classification.classificationConfiguration
+              )
+            }
+          />
         ) : (
-          classifications.map((classification) => (
-            <PostCard
-              key={classification.id}
-              classificationId={classification.id}
-              title={classification.title}
-              author={classification.author}
-              content={classification.content}
-              votes={classification.votes}
-              category={classification.category}
-              tags={classification.tags || []}
-              images={classification.image ? [classification.image] : []}
-              anomalyId={classification.anomaly}
-              classificationConfig={classification.classificationConfiguration}
-              classificationType={classification.classificationtype}
-              onVote={() => handleVote(classification.id, classification.classificationConfiguration)}
-            />
-          ))
+          <p className="text-center text-gray-400">Classification not found.</p>
         )}
       </div>
-      </div>
-    );
+    </div>
+  );
 };

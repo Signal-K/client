@@ -9,8 +9,10 @@ import TelescopeViewport from "@/telescope-viewport";
 import { useState } from "react";
 
 export default function TelescopeOnEarthPage() {
-  const session = useSession();
   const router = useRouter();
+
+  const session = useSession();
+
   const [simpleMode, setSimpleMode] = useState(false);
 
   if (!session) return <Home />;

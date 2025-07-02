@@ -20,7 +20,6 @@ type Anomaly = {
 export function StarterTelescopeTess() {
   const supabase = useSupabaseClient();
   const session = useSession();
-
   const router = useRouter();
 
   const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null);
@@ -41,18 +40,16 @@ export function StarterTelescopeTess() {
       try {
         const { data: linkedAnomalies, error: linkedError } = await supabase
           .from("linked_anomalies")
-          .select(
-            `
+          .select(`
+            id,
+            anomaly_id,
+            anomalies!inner (
               id,
-              anomaly_id,
-              anomalies!inner (
-                id,
-                anomalySet,
-                avatar_url,
-                content
-              )
-            `
-          )
+              anomalySet,
+              avatar_url,
+              content
+            )
+          `)
           .eq("author", session.user.id)
           .eq("anomalies.anomalySet", "telescope-tess")
           .limit(1);
@@ -69,14 +66,8 @@ export function StarterTelescopeTess() {
         setSelectedAnomaly(anomaly);
 
         const urls: string[] = [];
-
-        if (anomaly.avatar_url) {
-          urls.push(anomaly.avatar_url);
-        }
-
-        urls.push(
-          `${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector1.png`
-        );
+        if (anomaly.avatar_url) urls.push(anomaly.avatar_url);
+        urls.push(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector1.png`);
 
         setImageUrls(urls);
       } catch (err: any) {
@@ -90,38 +81,50 @@ export function StarterTelescopeTess() {
     fetchLinkedAnomaly();
   }, [session]);
 
-  if (error) return <div><p>{error}</p></div>;
-  if (loading) return <div><p>Loading...</p></div>;
-  if (!selectedAnomaly || imageUrls.length === 0) return <div><p>No anomaly found.</p></div>;
-
-  if (showTutorial) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] p-4">
-        <div className="w-full max-w-4xl h-full overflow-auto rounded-xl shadow-lg bg-white p-6">
-          <FirstTelescopeClassification anomalyid="6" />
-        </div>
-      </div>
-    );
-  }
+  if (error) return <div className="text-red-500 p-4">{error}</div>;
+  if (loading) return <div className="text-white p-4">Loading...</div>;
+  if (!selectedAnomaly || imageUrls.length === 0)
+    return <div className="text-white p-4">No anomaly found.</div>;
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6 overflow-hidden">
-      <div className="w-full max-w-4xl h-full flex flex-col rounded-xl bg-white shadow-lg p-4 overflow-hidden">
-        <div className="flex-1 overflow-hidden rounded-md">
-          <Button variant="outline" onClick={() => setShowTutorial(true)}>
-            Want a walkthrough? Start the tutorial
-          </Button>
-          <ImageAnnotator
-            anomalyType="planet"
-            missionNumber={1372001}
-            structureItemId={3103}
-            assetMentioned={selectedAnomaly.id.toString()}
-            annotationType="PH"
-            initialImageUrl={imageUrls[1]}
-            anomalyId={selectedAnomaly.id.toString()}
-          />
-        </div>
+    <div className="w-full h-screen overflow-hidden flex flex-col gap-2 px-4 py-6">
+      {/* Button Bar */}
+      <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-2 flex justify-end">
+        <Button variant="outline" onClick={() => setShowTutorial(true)}>
+          Want a walkthrough? Start the tutorial
+        </Button>
       </div>
+
+      {/* Tutorial OR Annotator */}
+      <div className="flex-1 w-full rounded-xl bg-white/10 backdrop-blur-md shadow-md p-2 overflow-hidden">
+        {showTutorial ? (
+          <div className="w-full h-full overflow-auto">
+            <FirstTelescopeClassification anomalyid="6" />
+          </div>
+        ) : (
+          <div className="w-full h-full overflow-hidden grid grid-rows-[auto_1fr] sm:grid-rows-none sm:grid-cols-1">
+            <ImageAnnotator
+              anomalyType="planet"
+              missionNumber={1372001}
+              structureItemId={3103}
+              assetMentioned={selectedAnomaly.id.toString()}
+              annotationType="PH"
+              initialImageUrl={imageUrls[1]}
+              anomalyId={selectedAnomaly.id.toString()}
+              className="h-full max-h-[calc(100vh-10rem)] sm:max-h-full"
+            />
+          </div>
+        )}
+      </div>
+
+      <style jsx global>{`
+        @media (max-width: 640px) {
+          html, body {
+            overflow: hidden;
+            height: 100vh;
+          }
+        }
+      `}</style>
     </div>
   );
 };

@@ -1,26 +1,38 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/navigation";
 import MissionShell from "../../BasePlate";
 import {
   TelescopeIcon,
-  RadioIcon,
   SpeakerIcon,
   DiscAlbum,
-  PersonStandingIcon,
   Paintbrush2Icon,
 } from "lucide-react";
 
-import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting";
-import PlanetTypeCommentForm from "./PlanetType";
-import VotePlanetClassifications from "./PHVote";
-import PlanetHuntersTemperatureWrapper from "./PlanetTemperature";
-import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+interface Mission {
+  id: number;
+  title: string;
+  description: string;
+  icon: any;
+  points: number;
+  completedCount: number;
+  link?: string;
+  slug?: string;
+  color: string;
+  chapter: number;
+  action?: () => void;
+}
 
 const PlanetHuntersSteps = () => {
   const supabase = useSupabaseClient();
   const session = useSession();
+  const router = useRouter();
 
-  const [missions, setMissions] = useState([
+  const [planetClassifications, setPlanetClassifications] = useState<any[]>([]);
+  const [selectedClassificationId, setSelectedClassificationId] = useState<number | null>(null);
+
+  // Base missions with slug placeholders
+  const baseMissions: Mission[] = [
     {
       id: 1,
       title: "Discover planets",
@@ -28,25 +40,10 @@ const PlanetHuntersSteps = () => {
       icon: TelescopeIcon,
       points: 1,
       completedCount: 0,
-      internalComponent: () => <StarterTelescopeTess />,
+      link: "/structures/telescope/planet-hunters/classify",
       color: "text-blue-500",
-      shadow: false,
-      action: () => {},
       chapter: 1,
     },
-    // {
-    //   id: 2,
-    //   title: "Propose 1 planetary candidate",
-    //   description: "Make a classification indicating a positive candidate.",
-    //   icon: RadioIcon,
-    //   points: 2,
-    //   completedCount: 0,
-    //   internalComponent: () => <StarterTelescopeTess />,
-    //   color: "text-purple-500",
-    //   shadow: false,
-    //   action: () => {},
-    //   chapter: 1,
-    // },
     {
       id: 2,
       title: "Identify planet types",
@@ -54,10 +51,8 @@ const PlanetHuntersSteps = () => {
       icon: SpeakerIcon,
       points: 1,
       completedCount: 0,
-      internalComponent: () => <PlanetTypeCommentForm />,
+      slug: "/structures/telescope/planet-hunters/{classificationid}/comment/",
       color: "text-green-500",
-      shadow: false,
-      action: () => {},
       chapter: 1,
     },
     {
@@ -67,10 +62,8 @@ const PlanetHuntersSteps = () => {
       icon: DiscAlbum,
       points: 1,
       completedCount: 0,
-      internalComponent: () => <VotePlanetClassifications />,
+      slug: "/structures/telescope/planet-hunters/{classificationid}/survey",
       color: "text-red-500",
-      shadow: true,
-      action: () => {},
       chapter: 1,
     },
     {
@@ -80,26 +73,13 @@ const PlanetHuntersSteps = () => {
       icon: Paintbrush2Icon,
       points: 1,
       completedCount: 0,
-      internalComponent: () => <></>,
-      color: 'text-green-300',
-      shadow: true,
-      action: () => {},
+      slug: "/structures/telescope/planet-hunters/{classificationid}/paint/",
+      color: "text-green-300",
       chapter: 2,
     },
-    // {
-    //   id: 5,
-    //   title: "Calculate planetary temperatures",
-    //   description: "Use satellite data to help determine the temperature of planets you've discovered.",
-    //   icon: PersonStandingIcon,
-    //   points: 1,
-    //   completedCount: 0,
-    //   internalComponent: () => <PlanetHuntersTemperatureWrapper />,
-    //   color: "text-yellow-700",
-    //   shadow: true,
-    //   action: () => {},
-    //   chapter: 2,
-    // },
-  ]);
+  ];
+
+  const [missions, setMissions] = useState<Mission[]>(baseMissions);
 
   const [experiencePoints, setExperiencePoints] = useState<number>(0);
   const [level, setLevel] = useState<number>(1);
@@ -111,97 +91,91 @@ const PlanetHuntersSteps = () => {
   );
 
   useEffect(() => {
-    if (!session?.user?.id) {
-      console.warn("No user session found.");
-      return;
-    };
+    if (!session?.user?.id) return;
 
-    const fetchMissionData = async () => {
+    const fetchData = async () => {
       try {
-        console.log("Fetching mission data for user:", session.user.id);
-
-        // Classifications where classificationtype is "planet"
-        const { data: classificationsData, error: classificationsError } = await supabase
+        const { data: classifications, error } = await supabase
           .from("classifications")
           .select("id, classificationConfiguration, classificationtype, author")
           .eq("author", session.user.id)
           .ilike("classificationtype", "planet");
 
-        if (classificationsError) throw classificationsError;
-        console.log("Planet classifications fetched:", classificationsData);
+        if (error) throw error;
 
-        const mission1CompletedCount = classificationsData?.length || 0;
+        setPlanetClassifications(classifications || []);
+        if (classifications && classifications.length > 0 && !selectedClassificationId) {
+          setSelectedClassificationId(classifications[0].id);
+        }
 
-        // const mission2CompletedCount =
-        //   classificationsData?.filter(({ classificationConfiguration }) => {
-        //     const options = classificationConfiguration?.classificationOptions?.[""] || {};
-        //     const hasValidOptions = ["2", "3", "4"].some((option) => options?.[option]);
-        //     const hasInvalidOption = options?.["1"];
-        //     return hasValidOptions && !hasInvalidOption;
-        //   }).length || 0;
-
-        // Comments by the user
         const { data: commentsData, error: commentsError } = await supabase
           .from("comments")
           .select("classification_id")
           .eq("author", session.user.id);
         if (commentsError) throw commentsError;
-        console.log("Comments fetched:", commentsData);
 
-        // Votes by the user
         const { data: votesData, error: votesError } = await supabase
           .from("votes")
           .select("classification_id")
           .eq("user_id", session.user.id);
         if (votesError) throw votesError;
-        console.log("Votes fetched:", votesData);
 
-        const mission3CompletedCount = commentsData?.length || 0;
-        const mission4CompletedCount = (commentsData?.length || 0) + (votesData?.length || 0);
-
-        // Temperature comments
         const { data: temperatureData, error: tempError } = await supabase
           .from("comments")
           .select("id")
           .eq("author", session.user.id)
           .eq("category", "Temperature");
         if (tempError) throw tempError;
-        console.log("Temperature comments fetched:", temperatureData);
 
-        const mission5CompletedCount = temperatureData?.length || 0;
+        const mission1Completed = classifications?.length || 0;
+        const mission3Completed = commentsData?.length || 0;
+        const mission4Completed = (commentsData?.length || 0) + (votesData?.length || 0);
+        const mission5Completed = temperatureData?.length || 0;
 
-        // Update completed counts
-        const updatedMissions = missions.map((mission) => {
+        const updatedMissions = baseMissions.map((mission) => {
           switch (mission.id) {
             case 1:
-              return { ...mission, completedCount: mission1CompletedCount };
+              return { ...mission, completedCount: mission1Completed };
             case 3:
-              return { ...mission, completedCount: mission3CompletedCount };
+              return { ...mission, completedCount: mission3Completed };
             case 4:
-              return { ...mission, completedCount: mission4CompletedCount };
+              return { ...mission, completedCount: mission4Completed };
             case 5:
-              return { ...mission, completedCount: mission5CompletedCount };
+              return { ...mission, completedCount: mission5Completed };
             default:
               return mission;
           }
         });
 
-        const totalPoints =
-          mission1CompletedCount * 1 +
-          mission3CompletedCount * 1 +
-          mission4CompletedCount * 1 +
-          mission5CompletedCount * 1;
+        const totalPoints = mission1Completed + mission3Completed + mission4Completed + mission5Completed;
 
         setMissions(updatedMissions);
         setExperiencePoints(totalPoints);
         setLevel(Math.floor(totalPoints / 9) + 1);
-      } catch (error) {
-        console.error("Error fetching Planet Hunters mission data:", error);
+      } catch (err) {
+        console.error("Failed to load planet data:", err);
       }
     };
 
-    fetchMissionData();
+    fetchData();
   }, [supabase, session?.user?.id]);
+
+  // Update missions' slugs whenever selectedClassificationId changes to replace placeholder
+  useEffect(() => {
+    if (selectedClassificationId === null) return;
+
+    const updatedMissionsWithSlug = missions.map((mission) => {
+      if (mission.slug) {
+        return {
+          ...mission,
+          slug: mission.slug.replace("{classificationid}", selectedClassificationId.toString()),
+        };
+      }
+      return mission;
+    });
+
+    setMissions(updatedMissionsWithSlug);
+  }, [selectedClassificationId]);
 
   const handlePreviousChapter = () => {
     if (currentChapter > 1) setCurrentChapter(currentChapter - 1);
@@ -211,16 +185,52 @@ const PlanetHuntersSteps = () => {
     if (currentChapter < maxUnlockedChapter) setCurrentChapter(currentChapter + 1);
   };
 
+  const handleMissionClick = (mission: Mission) => {
+    if (mission.link) {
+      router.push(mission.link);
+    } else if (mission.slug) {
+      // slug is already replaced by useEffect
+      router.push(mission.slug);
+    }
+  };
+
   return (
-    <MissionShell
-      missions={missions.filter((mission) => mission.chapter === currentChapter)}
-      experiencePoints={experiencePoints}
-      level={level}
-      currentChapter={currentChapter}
-      maxUnlockedChapter={maxUnlockedChapter}
-      onPreviousChapter={handlePreviousChapter}
-      onNextChapter={handleNextChapter}
-    />
+    <div className="w-full">
+      <div className="max-w-5xl mx-auto p-4">
+        {planetClassifications.length > 0 && (
+          <div className="mb-4">
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Select a planet
+            </label>
+            <select
+              className="w-full p-2 border border-gray-300 rounded-md"
+              value={selectedClassificationId || ""}
+              onChange={(e) => setSelectedClassificationId(Number(e.target.value))}
+            >
+              {planetClassifications.map((classification) => (
+                <option key={classification.id} value={classification.id}>
+                  Planet #{classification.id}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        <MissionShell
+          missions={missions
+            .filter((m) => m.chapter === currentChapter)
+            .map((m) => ({
+              ...m,
+              action: () => handleMissionClick(m),
+            }))}
+          experiencePoints={experiencePoints}
+          level={level}
+          currentChapter={currentChapter}
+          maxUnlockedChapter={maxUnlockedChapter}
+          onPreviousChapter={handlePreviousChapter}
+          onNextChapter={handleNextChapter}
+        />
+      </div>
+    </div>
   );
 };
 

@@ -157,10 +157,10 @@ export function SimplePostSingle({
 
         <CardContent>
           <p className="text-xs font-semibold text-[#5E81AC] uppercase mb-1 tracking-wide">{category}</p>
-          <p className="text-[#2E3440] mb-4">{content}</p>
+          <p className="text-[#2E3440]">{content}</p>
 
           {images.length > 0 && (
-            <div className="relative mb-4">
+            <div className="relative">
               <img
                 src={images[currentIndex]}
                 alt={`Image ${currentIndex + 1}`}
