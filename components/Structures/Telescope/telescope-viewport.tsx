@@ -4,15 +4,15 @@ import type React from "react"
 
 import { useState, useEffect, useCallback } from "react"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
-import type { Anomaly, ViewMode } from "./types/Structures/telescope"
+import type { Anomaly, ViewMode } from "@/types/Structures/telescope"
 import { projects } from "@/data/projects"
 import { missions } from "@/data/missions"
 import { generateSectorName, generateStars, filterAnomaliesBySector, seededRandom } from "@/utils/Structures/Telescope/sector-utils"
-import { TelescopeView } from "./components/Structures/Telescope/telescope-view"
-import { DiscoveriesView } from "./components/Structures/Telescope/discoveries-view"
-import { AnomalyDialog } from "./components/Structures/Telescope/anomaly-dialogue"
-import { AnomalyDetailDialog } from "./components/Structures/Viewport/anomaly-detail-dialogue"
-import { ClassificationDetailDialog } from "./components/Structures/Viewport/classification-detail-dialog"
+import { TelescopeView } from "./telescope-view"
+import { DiscoveriesView } from "./discoveries-view"
+import AnomalyDialog from "./anomaly-dialogue"
+import { AnomalyDetailDialog } from "../Viewport/anomaly-detail-dialogue"
+import { ClassificationDetailDialog } from "../Viewport/classification-detail-dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -32,6 +32,7 @@ import {
   Building,
   Filter,
 } from "lucide-react"
+import TelescopeNavControls from "./blocks/navigation-controls"
 
 interface DatabaseAnomaly {
   id: number
@@ -331,32 +332,32 @@ export default function TelescopeViewport() {
     setShowClassificationDetailDialog(true)
   }
 
-  const handleClassify = async () => {
-    if (!selectedAnomaly || !session?.user?.id) return
+//   const handleClassify = async () => {
+//     if (!selectedAnomaly || !session?.user?.id) return
 
-    // Map UI types to database classification types
-    const typeMapping = {
-      exoplanet: "planet",
-      sunspot: "sunspot",
-      asteroid: "asteroid",
-      accretion_disc: "disk",
-    }
+//     // Map UI types to database classification types
+//     const typeMapping = {
+//       exoplanet: "planet",
+//       sunspot: "sunspot",
+//       asteroid: "asteroid",
+//       accretion_disc: "disk",
+//     }
 
-    const classificationType = typeMapping[selectedAnomaly.type] || "planet"
-    const result = await createClassification(selectedAnomaly.id, classificationType)
+//     const classificationType = typeMapping[selectedAnomaly.type] || "planet"
+//     const result = await createClassification(selectedAnomaly.id, classificationType)
 
-    if (result) {
-      setAnomalies(
-        anomalies.map((a) =>
-          a.id === selectedAnomaly.id ? { ...a, classified: true, discoveryDate: new Date().toLocaleDateString() } : a,
-        ),
-      )
-      loadSector(currentSector.x, currentSector.y)
-    }
+//     if (result) {
+//       setAnomalies(
+//         anomalies.map((a) =>
+//           a.id === selectedAnomaly.id ? { ...a, classified: true, discoveryDate: new Date().toLocaleDateString() } : a,
+//         ),
+//       )
+//       loadSector(currentSector.x, currentSector.y)
+//     }
 
-    setShowClassifyDialog(false)
-    setSelectedAnomaly(null)
-  }
+//     setShowClassifyDialog(false)
+//     setSelectedAnomaly(null)
+//   }
 
   const selectProject = (project: (typeof projects)[0] | null) => {
     setSelectedProject(project)
@@ -470,57 +471,13 @@ export default function TelescopeViewport() {
         </div>
 
         {/* Navigation Controls */}
-        <Card className="m-4 bg-[#1a1a2e]/60 border border-[#a8d8ea]/20 backdrop-blur-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-[#e8f4f8] text-sm font-mono flex items-center gap-2">
-              <Crosshair className="h-4 w-4 text-[#a8d8ea]" />
-              NAVIGATION
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-1 w-fit mx-auto">
-              <div></div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleNavigate("up")}
-                className="h-8 w-8 p-0 text-[#a8d8ea] hover:bg-[#a8d8ea]/20 hover:text-[#e8f4f8] border border-[#a8d8ea]/30"
-              >
-                <ChevronUp className="h-4 w-4" />
-              </Button>
-              <div></div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleNavigate("left")}
-                className="h-8 w-8 p-0 text-[#a8d8ea] hover:bg-[#a8d8ea]/20 hover:text-[#e8f4f8] border border-[#a8d8ea]/30"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <div className="flex items-center justify-center">
-                <div className="w-3 h-3 bg-gradient-to-br from-[#a8d8ea] to-[#87ceeb] rounded-full"></div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleNavigate("right")}
-                className="h-8 w-8 p-0 text-[#a8d8ea] hover:bg-[#a8d8ea]/20 hover:text-[#e8f4f8] border border-[#a8d8ea]/30"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <div></div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleNavigate("down")}
-                className="h-8 w-8 p-0 text-[#a8d8ea] hover:bg-[#a8d8ea]/20 hover:text-[#e8f4f8] border border-[#a8d8ea]/30"
-              >
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-              <div></div>
-            </div>
-          </CardContent>
-        </Card>
+        <TelescopeNavControls
+            sector={currentSector}
+            setSector={setCurrentSector}
+            sectorName={currentSectorName}
+            targetsCount={filteredAnomalies.length}
+            maxTargets={15}
+        />
 
         {/* Project Selection */}
         <Card className="m-4 bg-[#1a1a2e]/60 border border-[#a8d8ea]/20 backdrop-blur-sm">
@@ -909,7 +866,7 @@ export default function TelescopeViewport() {
         showClassifyDialog={showClassifyDialog}
         setShowClassifyDialog={setShowClassifyDialog}
         selectedAnomaly={selectedAnomaly}
-        handleClassify={handleClassify}
+        // handleClassify={handleClassify}
       />
 
       <AnomalyDetailDialog

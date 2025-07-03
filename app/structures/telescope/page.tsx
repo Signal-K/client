@@ -5,7 +5,7 @@ import Home from "@/app/page";
 import GameNavbar from "@/components/Layout/Tes";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useSession } from "@supabase/auth-helpers-react";
-import TelescopeViewport from "@/telescope-viewport";
+import TelescopeViewport from "@/components/Structures/Telescope/telescope-viewport";
 import { useState } from "react";
 
 export default function TelescopeOnEarthPage() {

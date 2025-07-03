@@ -1,150 +1,107 @@
-"use client"
+'use client'
 
-import { useRouter } from "next/navigation"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Star, Zap, Target, Disc } from "lucide-react"
-import type { Anomaly } from "@/types/Structures/telescope"
+import { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
+import { useSessionContext } from "@supabase/auth-helpers-react"
 
-interface AnomalyDialogProps {
-  showClassifyDialog: boolean
-  setShowClassifyDialog: (show: boolean) => void
-  selectedAnomaly: Anomaly | null
-}
+// Mission imports
+import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters"
+import { StarterSunspot } from "@/components/Projects/Telescopes/Sunspots"
+import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting"
+import GameNavbar from "@/components/Layout/Tes"
+import PlanetTypeCommentForm from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetType"
+import VotePlanetClassifications from "@/components/Structures/Missions/Astronomers/PlanetHunters/PHVote"
+import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator"
 
-export function AnomalyDialog({
-  showClassifyDialog,
-  setShowClassifyDialog,
-  selectedAnomaly,
-}: AnomalyDialogProps) {
+export default function TelescopeClassifyPage() {
+  const params = useParams()
   const router = useRouter()
 
-  if (!selectedAnomaly) return null
+  const { session, isLoading } = useSessionContext()
 
-  const handleClassify = () => {
-    const id = selectedAnomaly?.id?.toString()
-    if (!id) return
+  const [MissionComponent, setMissionComponent] = useState<React.ReactNode | null>(null)
 
-    let path = ""
+  useEffect(() => {
+    if (!isLoading && !session) {
+      router.push('/')
+    }
+  }, [session, isLoading, router])
 
-    switch (selectedAnomaly.type) {
-      case "exoplanet":
-        path = `/structures/telescope/planet-hunters/${id}/classify`
+  useEffect(() => {
+    if (isLoading || !session) return
+
+    const project = String(params.project)
+    const mission = String(params.mission)
+    const idParam = String(params.id || "")
+
+    let classificationId: string | undefined
+    if (idParam.startsWith("cl-")) {
+      classificationId = idParam.replace("cl-", "")
+    } else if (!isNaN(Number(idParam))) {
+      classificationId = idParam
+    };
+
+    let component: React.ReactNode = null
+
+    switch (project) {
+      case "planet-hunters":
+        switch (mission) {
+          case "one":
+          case "classify":
+            component = <StarterTelescopeTess />
+            break
+          case "comment":
+            component = (
+              <PlanetTypeCommentForm classificationId={classificationId} />
+            );
+            break;
+          case "survey":
+            component = (
+              <VotePlanetClassifications classificationId={classificationId || '8'} />
+            );
+            break; 
+          case "paint":
+            component = (
+              <PlanetGenerator classificationId={classificationId || '8'} editMode={true} showSettings={true} onToggleSettings={() => {}} />
+            );
+            break;
+          default:
+            component = <PlanetHuntersSteps />
+            break
+        }
         break
-      case "sunspot":
-        path = `/structures/telescope/sunspots/${id}/classify`
+
+      case "sunspots":
+        component = <StarterSunspot />
         break
-      case "asteroid":
-        path = `/structures/telescope/daily-minor-planet/${id}/classify`
-        break
-      case "accretion_disc":
-        path = `/structures/telescope/disk-detective/${id}/classify`
-        break
+
       default:
-        return
+        component = <div className="text-white p-4">Unknown mission or project.</div>
+        break
     }
 
-    router.push(path)
-  }
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "exoplanet":
-        return <Star className="h-5 w-5" />
-      case "sunspot":
-        return <Zap className="h-5 w-5" />
-      case "asteroid":
-        return <Target className="h-5 w-5" />
-      case "accretion_disc":
-        return <Disc className="h-5 w-5" />
-      default:
-        return <Star className="h-5 w-5" />
-    }
-  }
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "exoplanet":
-        return "bg-blue-500"
-      case "sunspot":
-        return "bg-orange-500"
-      case "asteroid":
-        return "bg-purple-500"
-      case "accretion_disc":
-        return "bg-green-500"
-      default:
-        return "bg-gray-500"
-    }
-  }
+    setMissionComponent(component)
+  }, [params, session, isLoading])
 
   return (
-    <Dialog open={showClassifyDialog} onOpenChange={setShowClassifyDialog}>
-      <DialogContent className="bg-[#2E3440] border-[#4C566A] text-[#ECEFF4] max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {getTypeIcon(selectedAnomaly.type)}
-            Classify Anomaly
-          </DialogTitle>
-        </DialogHeader>
+    <div className="relative min-h-screen w-full flex flex-col">
+      {/* Background image behind everything */}
+      <div className="fixed inset-0 -z-10">
+        <img
+          className="w-full h-full object-cover"
+          src="/assets/Backdrops/Earth.png"
+          alt="Earth Background"
+        />
+      </div>
 
-        <div className="space-y-4">
-          <div className="text-center">
-            <div
-              className="w-16 h-16 mx-auto mb-3 rounded-full"
-              style={{
-                backgroundColor: selectedAnomaly.color,
-                boxShadow: `0 0 20px ${selectedAnomaly.color}`,
-              }}
-            />
-            <h3 className="text-lg font-semibold">{selectedAnomaly.name}</h3>
-            <Badge className={`${getTypeColor(selectedAnomaly.type)} text-white mt-2`}>
-              {selectedAnomaly.type.replace("_", " ").toUpperCase()}
-            </Badge>
-          </div>
+      {/* Sticky/relative nav and content */}
+      <div className="relative z-10 pb-8">
+        <GameNavbar />
+      </div>
 
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-[#88C0D0]">Sector:</span>
-              <span>{selectedAnomaly.sector}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-[#88C0D0]">Brightness:</span>
-              <span>{(selectedAnomaly.brightness * 100).toFixed(0)}%</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-[#88C0D0]">Size:</span>
-              <span>{(selectedAnomaly.size * 100).toFixed(0)}%</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-[#88C0D0]">Shape:</span>
-              <span className="capitalize">{selectedAnomaly.shape}</span>
-            </div>
-          </div>
-
-          <div className="bg-[#434C5E] p-3 rounded-lg">
-            <p className="text-sm text-[#D8DEE9]">
-              {/* Optional info about classification can go here */}
-            </p>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setShowClassifyDialog(false)}
-              variant="outline"
-              className="flex-1 border-[#4C566A] text-[#D8DEE9] hover:bg-[#434C5E]"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleClassify}
-              className="flex-1 bg-[#A3BE8C] text-[#2E3440] hover:bg-[#8FBCBB]"
-            >
-              Classify
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+      <main className="relative z-5 py-10">
+        {MissionComponent}
+      </main>
+    </div>
+  )
 };
