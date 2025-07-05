@@ -9,6 +9,7 @@ import html2canvas from 'html2canvas';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { CommentForm } from '../Comments/CommentForm';
 import CommentsList from '../Comments/CommentListById';
+import { useRouter } from 'next/navigation';
 
 interface SimplePostSingleProps {
   title: string;
@@ -27,6 +28,8 @@ export function SimplePostSingle({
   category,
   images,
 }: SimplePostSingleProps) {
+  const router = useRouter();
+
   const supabase = useSupabaseClient();
   const session = useSession();
 
@@ -271,6 +274,13 @@ export function SimplePostSingle({
               </div>
             </div>
           </div>
+
+                <Button
+                  onClick={() => router.push(`/next/${id}`)}
+                  variant='outline'
+                >
+                  Details
+                </Button>
 
           <CommentForm classificationId={parseInt(id)} onSubmit={() => setShowCommentForm(false)} />
           <CommentsList classificationId={id} />

@@ -10,52 +10,54 @@ import { useState } from "react";
 
 export default function TelescopeOnEarthPage() {
   const router = useRouter();
-
   const session = useSession();
-
-  const [simpleMode, setSimpleMode] = useState(false);
+  const [simpleMode, setSimpleMode] = useState(false); // default: viewport mode
 
   if (!session) return <Home />;
 
   return (
     <div className="relative min-h-screen w-full flex flex-col">
+      {/* Background Image */}
       <img
         className="absolute inset-0 w-full h-full object-cover"
         src="/assets/Backdrops/Earth.png"
         alt="Earth Background"
       />
 
+      {/* Navbar */}
       <div className="w-full z-10">
         <GameNavbar />
       </div>
 
-      <div className="flex flex-row space-y-4 z-10">
+      {/* Dialog Wrapper */}
+      <div className="flex justify-center items-center flex-grow z-10 px-4">
         <Dialog
           defaultOpen
           onOpenChange={(open) => {
-            if (!open) {
-              router.push("/");
-            };
+            if (!open) router.push("/");
           }}
         >
           <DialogContent
-            className="rounded-2xl text-white w-[90vw] h-[90vh] max-w-none max-h-none p-4 overflow-hidden flex flex-col"
-            style={{
-              background: "linear-gradient(135deg, rgba(191, 223, 245, 0.95), rgba(158, 208, 218, 0.9))",
-              color: "#2E3440",
-            }}
+            className={`p-0 w-full max-w-[90vw] h-[85vh] overflow-hidden flex flex-col ${
+              !simpleMode
+                ? "bg-transparent shadow-none"
+                : "bg-white/80 backdrop-blur-sm rounded-2xl p-4"
+            }`}
+            style={{ color: "#2E3440" }}
           >
-            <div className="flex justify-end mb-2">
+            {/* Mode Toggle */}
+            <div className="flex justify-end mb-2 px-4 pt-4">
               <button
                 onClick={() => setSimpleMode(!simpleMode)}
                 className="bg-[#88C0D0] text-white px-4 py-1 rounded-md text-sm hover:bg-[#81A1C1] transition"
-              > 
-                {simpleMode ? "All projects" : "Simple" } 
+              >
+                {simpleMode ? "View Telescope" : "All projects"}
               </button>
             </div>
 
+            {/* Content */}
             <div className="flex-grow overflow-hidden">
-              {simpleMode ? (
+              {!simpleMode ? (
                 <div className="h-full w-full overflow-hidden">
                   <TelescopeViewport />
                 </div>
@@ -68,7 +70,7 @@ export default function TelescopeOnEarthPage() {
       </div>
     </div>
   );
-};
+}
 
 function SimpleTelescopePanel({ router }: { router: any }) {
   const actions = [

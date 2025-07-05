@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,42 +11,18 @@ interface AnomalyDialogProps {
   showClassifyDialog: boolean
   setShowClassifyDialog: (show: boolean) => void
   selectedAnomaly: Anomaly | null
-}
+  handleClassify: () => void
+};
 
 export function AnomalyDialog({
   showClassifyDialog,
   setShowClassifyDialog,
   selectedAnomaly,
+  handleClassify, // Optional: still used?
 }: AnomalyDialogProps) {
-  const router = useRouter()
+  const router = useRouter();
 
-  if (!selectedAnomaly) return null
-
-  const handleClassify = () => {
-    const id = selectedAnomaly?.id?.toString()
-    if (!id) return
-
-    let path = ""
-
-    switch (selectedAnomaly.type) {
-      case "exoplanet":
-        path = `/structures/telescope/planet-hunters/${id}/classify`
-        break
-      case "sunspot":
-        path = `/structures/telescope/sunspots/${id}/classify`
-        break
-      case "asteroid":
-        path = `/structures/telescope/daily-minor-planet/${id}/classify`
-        break
-      case "accretion_disc":
-        path = `/structures/telescope/disk-detective/${id}/classify`
-        break
-      default:
-        return
-    }
-
-    router.push(path)
-  }
+  if (!selectedAnomaly) return null;
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -77,6 +53,26 @@ export function AnomalyDialog({
         return "bg-gray-500"
     }
   }
+
+  const getRouteForType = (type: string) => {
+    switch (type) {
+      case "exoplanet":
+        return "/structures/telescope/planet-hunters/classify"
+      case "sunspot":
+        return "/structures/telescope/sunspots/classify"
+      case "asteroid":
+        return "/structures/telescope/daily-minor-planet/classify"
+      case "accretion_disc":
+        return "/structures/telescope/disk-detective/classify"
+      default:
+        return "/structures/telescope"
+    }
+  }
+
+  const handleClassifyClick = () => {
+    const path = getRouteForType(selectedAnomaly.type);
+    router.push(path);
+  };
 
   return (
     <Dialog open={showClassifyDialog} onOpenChange={setShowClassifyDialog}>
@@ -124,7 +120,7 @@ export function AnomalyDialog({
 
           <div className="bg-[#434C5E] p-3 rounded-lg">
             <p className="text-sm text-[#D8DEE9]">
-              {/* Optional info about classification can go here */}
+              {/* Optional content area */}
             </p>
           </div>
 
@@ -137,7 +133,7 @@ export function AnomalyDialog({
               Cancel
             </Button>
             <Button
-              onClick={handleClassify}
+              onClick={handleClassifyClick}
               className="flex-1 bg-[#A3BE8C] text-[#2E3440] hover:bg-[#8FBCBB]"
             >
               Classify
