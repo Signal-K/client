@@ -12,6 +12,7 @@ import GameNavbar from "@/components/Layout/Tes"
 import PlanetTypeCommentForm from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetType"
 import VotePlanetClassifications from "@/components/Structures/Missions/Astronomers/PlanetHunters/PHVote"
 import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator"
+import { DailyMinorPlanetWithId } from "@/components/Projects/Telescopes/DailyMinorPlanet"
 
 export default function TelescopeClassifyPage() {
   const params = useParams()
@@ -39,7 +40,7 @@ export default function TelescopeClassifyPage() {
       classificationId = idParam.replace("cl-", "")
     } else if (!isNaN(Number(idParam))) {
       classificationId = idParam
-    };
+    }
 
     let component: React.ReactNode = null
 
@@ -53,18 +54,23 @@ export default function TelescopeClassifyPage() {
           case "comment":
             component = (
               <PlanetTypeCommentForm classificationId={classificationId} />
-            );
-            break;
+            )
+            break
           case "survey":
             component = (
               <VotePlanetClassifications classificationId={classificationId || '8'} />
-            );
-            break; 
+            )
+            break
           case "paint":
             component = (
-              <PlanetGenerator classificationId={classificationId || '8'} editMode={true} showSettings={true} onToggleSettings={() => {}} />
-            );
-            break;
+              <PlanetGenerator
+                classificationId={classificationId || '8'}
+                editMode={true}
+                showSettings={true}
+                onToggleSettings={() => {}}
+              />
+            )
+            break
           default:
             component = <PlanetHuntersSteps />
             break
@@ -73,6 +79,14 @@ export default function TelescopeClassifyPage() {
 
       case "sunspots":
         component = <StarterSunspot />
+        break
+
+      case "daily-minor-planet":
+        switch (mission) {
+          case "classify":
+            component = <DailyMinorPlanetWithId />
+            break
+        }
         break
 
       default:
@@ -99,9 +113,11 @@ export default function TelescopeClassifyPage() {
         <GameNavbar />
       </div>
 
-      <main className="relative z-5 py-10">
-        {MissionComponent}
+      <main className="relative z-5 py-10 flex justify-center">
+        <div className="w-full max-w-6xl px-4">
+          {MissionComponent}
+        </div>
       </main>
     </div>
-  )
+  );
 };

@@ -4,20 +4,9 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import PostCard from "@/content/Posts/TestPostCard";
 
-interface Classification {
-  id: number;
-  created_at: string;
-  content: string | null;
-  author: string | null;
-  anomaly: number | null;
-  media: any | null;
-  classificationtype: string | null;
-  classificationConfiguration: any | null;
-}
-
-interface VotePlanetClassificationsProps {
+interface VotePlanetClassificationsProps { 
   classificationId: string | number;
-}
+};
 
 export default function VotePlanetClassifications({ classificationId }: VotePlanetClassificationsProps) {
   const supabase = useSupabaseClient();
@@ -32,7 +21,7 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
       setError("User session not found.");
       setLoading(false);
       return;
-    }
+    };
 
     setLoading(true);
     setError(null);
@@ -42,7 +31,7 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
         .from("classifications")
         .select("*")
         .eq("id", classificationId)
-        .single(); // <– just get one
+        .single(); 
 
       if (error) throw error;
 
@@ -54,11 +43,11 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
           if (Array.isArray(subArray) && subArray.length > 0) {
             image = subArray[0];
             break;
-          }
-        }
+          };
+        };
       } else if (media && typeof media.uploadUrl === "string") {
         image = media.uploadUrl;
-      }
+      };
 
       const votes = data.classificationConfiguration?.votes || 0;
 
@@ -68,7 +57,7 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
       setError("Failed to load classification.");
     } finally {
       setLoading(false);
-    }
+    };
   };
 
   useEffect(() => {
@@ -95,14 +84,14 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
         setClassification((prev: any) =>
           prev ? { ...prev, votes: updatedConfig.votes } : prev
         );
-      }
+      };
     } catch (error) {
       console.error("Error voting:", error);
-    }
+    };
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-md">
+    <div className="w-full max-w-4xl mx-auto rounded-lg">
       <div className="space-y-6">
         {loading ? (
           <p className="text-center text-gray-400">Loading classification...</p>

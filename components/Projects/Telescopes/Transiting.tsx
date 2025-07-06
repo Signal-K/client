@@ -18,23 +18,23 @@ type Anomaly = {
 };
 
 export function StarterTelescopeTess() {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-  const router = useRouter();
+  const supabase = useSupabaseClient()
+  const session = useSession()
+  const router = useRouter()
 
-  const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null)
+  const [imageUrls, setImageUrls] = useState<string[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [showTutorial, setShowTutorial] = useState(false)
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
 
   useEffect(() => {
-    const fetchLinkedAnomaly = async () => {
+    const fetchRandomLinkedAnomaly = async () => {
       if (!session) {
-        setLoading(false);
-        return;
+        setLoading(false)
+        return
       }
 
       try {
@@ -52,39 +52,40 @@ export function StarterTelescopeTess() {
           `)
           .eq("author", session.user.id)
           .eq("anomalies.anomalySet", "telescope-tess")
-          .limit(1);
 
-        if (linkedError) throw linkedError;
+        if (linkedError) throw linkedError
 
-        const anomaly = linkedAnomalies?.[0]?.anomalies as unknown as Anomaly | undefined;
-
-        if (!anomaly) {
-          router.push("/deploy");
-          return;
+        if (!linkedAnomalies || linkedAnomalies.length === 0) {
+          router.push("/deploy")
+          return
         }
 
-        setSelectedAnomaly(anomaly);
+        // Pick a random anomaly from the list
+        const randomIndex = Math.floor(Math.random() * linkedAnomalies.length)
+        const anomaly = linkedAnomalies[randomIndex]?.anomalies as unknown as Anomaly
 
-        const urls: string[] = [];
-        if (anomaly.avatar_url) urls.push(anomaly.avatar_url);
-        urls.push(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector1.png`);
+        setSelectedAnomaly(anomaly)
 
-        setImageUrls(urls);
+        const urls: string[] = []
+        if (anomaly.avatar_url) urls.push(anomaly.avatar_url)
+        urls.push(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector1.png`)
+
+        setImageUrls(urls)
       } catch (err: any) {
-        console.error("Error fetching linked anomaly:", err.message || err);
-        setError("Unable to load anomaly.");
+        console.error("Error fetching linked anomaly:", err.message || err)
+        setError("Unable to load anomaly.")
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchLinkedAnomaly();
-  }, [session]);
+    fetchRandomLinkedAnomaly()
+  }, [session])
 
-  if (error) return <div className="text-red-500 p-4">{error}</div>;
-  if (loading) return <div className="text-white p-4">Loading...</div>;
+  if (error) return <div className="text-red-500 p-4">{error}</div>
+  if (loading) return <div className="text-white p-4">Loading...</div>
   if (!selectedAnomaly || imageUrls.length === 0)
-    return <div className="text-white p-4">No anomaly found.</div>;
+    return <div className="text-white p-4">No anomaly found.</div>
 
   return (
     <div className="w-full h-screen overflow-hidden flex flex-col gap-2 px-4 py-6">
@@ -126,8 +127,8 @@ export function StarterTelescopeTess() {
         }
       `}</style>
     </div>
-  );
-};
+  )
+}
 
 interface TelescopeProps {
     anomalyid: string;

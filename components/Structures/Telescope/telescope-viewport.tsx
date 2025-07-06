@@ -445,7 +445,7 @@ export default function TelescopeViewport() {
               <Search className="h-5 w-5 text-[#1a1a2e]" />
             </div>
             <div>
-              <h1 className="text-[#e8f4f8] font-bold text-lg tracking-wider">DEEP SPACE</h1>
+              <h1 className="text-[#e8f4f8] font-bold text-lg tracking-wider">Telescope</h1>
               <p className="text-[#a8d8ea] text-xs font-mono">OBSERVATORY</p>
             </div>
           </div>

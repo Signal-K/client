@@ -142,8 +142,6 @@ export default function TelescopeRangeSlider() {
     };
 
     const handleDeploy = async () => {
-        // This code block should never run if alreadyDeployed is true,
-        // but is retained for logic completeness.
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
@@ -200,7 +198,10 @@ export default function TelescopeRangeSlider() {
             }
 
             if (data && data.length > 0) {
-                const anomaly = data[0];
+                // 🔧 FIX: Pick a random anomaly from the list instead of always using data[0]
+                const randomIndex = Math.floor(Math.random() * data.length);
+                const anomaly = data[randomIndex];
+
                 anomalies.push(anomaly);
 
                 const { error: insertError } = await supabase
@@ -230,7 +231,6 @@ export default function TelescopeRangeSlider() {
         };
     };
 
-    // If already deployed this week, show only a message
     if (alreadyDeployed) {
         return (
             <div className="container mx-auto py-8 px-4 max-w-2xl text-center text-sm text-muted-foreground">
@@ -246,7 +246,6 @@ export default function TelescopeRangeSlider() {
         );
     }
 
-    // Main UI if not yet deployed
     return (
         <div className="container mx-auto py-2 pb-8 px-4 max-w-2xl">
             {deploymentMessage && (

@@ -36,7 +36,7 @@ export function SimplePostSingle({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [voteTotal, setVoteTotal] = useState<number>(0);
-  const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
+  const [userVote, setUserVote] = useState<'up' | 'down' | null>(null); 
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 

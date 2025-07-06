@@ -136,6 +136,9 @@ export function ClassificationDetailDialog({
   const mediaArray = parseMedia(selectedClassification.media);
   const firstImage = mediaArray.find((item: any) => item?.type === "image");
 
+  const isPlanet = selectedClassification.classificationtype === "planet";
+  const classificationId = selectedClassification.id;
+
   return (
     <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
       <DialogContent className={`${colors.bg} ${colors.border} ${colors.text} max-w-2xl max-h-[80vh] overflow-y-auto`}>
@@ -150,7 +153,7 @@ export function ClassificationDetailDialog({
           {/* Header Info */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold">Classification #{selectedClassification.id}</h3>
+              <h3 className="text-lg font-semibold">Classification #{classificationId}</h3>
               <div className="flex items-center gap-4 mt-1 text-sm">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4 text-gray-400" />
@@ -230,12 +233,26 @@ export function ClassificationDetailDialog({
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-2">
-            <Link href={`/posts/${selectedClassification.id}`}>
+          <div className="flex flex-wrap justify-end gap-2">
+            <Link href={`/posts/${classificationId}`}>
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 View
               </Button>
             </Link>
+            {isPlanet && (
+              <>
+                <Link href={`/${classificationId}/survey`}>
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                    Analyse behaviour
+                  </Button>
+                </Link>
+                <Link href={`/planets/paint/${classificationId}`}>
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                    Customise
+                  </Button>
+                </Link>
+              </>
+            )}
             <Button
               onClick={() => setShowDetailDialog(false)}
               variant="outline"

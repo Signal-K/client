@@ -320,7 +320,7 @@ const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps)
                   ))}
               </div>
               <div className="mt-4 space-y-2">
-                <textarea
+                <textarea 
                   value={commentInputs[classification.id] || ""}
                   onChange={(e) => handleCommentInputChange(classification.id, e.target.value)}
                   placeholder="Make a comment and propose a planet type"
