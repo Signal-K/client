@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
@@ -8,7 +8,6 @@ import { Classification } from "../../[id]/page";
 import GameNavbar from "@/components/Layout/Tes";
 import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 import { Button } from "@/components/ui/button";
-import { Cog } from "lucide-react";
 
 export default function PaintYourPlanetPage() {
   const params = useParams();
@@ -20,9 +19,7 @@ export default function PaintYourPlanetPage() {
 
   const [classification, setClassification] = useState<Classification | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-
-  const [showSettings, setShowSettings] = useState(false);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const fetchClassification = async () => {
@@ -35,7 +32,7 @@ export default function PaintYourPlanetPage() {
 
       if (error) {
         console.error("Error fetching planet details: ", error);
-        setError('Failed to fetch classification data');
+        setError("Failed to fetch classification data");
         return;
       }
 
@@ -51,7 +48,7 @@ export default function PaintYourPlanetPage() {
     <div className="min-h-screen w-screen flex flex-col bg-black text-white">
       <GameNavbar />
 
-      <div className="relative flex-1 overflow-hidden">
+      <div className="relative flex-1 overflow-visible">
         {/* Background */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <Image
@@ -64,15 +61,10 @@ export default function PaintYourPlanetPage() {
           <div className="absolute inset-0 bg-black/30 pointer-events-none" />
         </div>
 
-        <main className="relative z-10 flex flex-col h-full px-4 pt-4">
-          <div className="flex-grow overflow-auto max-h-[calc(100vh-160px)]">
-            <PlanetGenerator
-              classificationId={classification.id.toString()}
-              editMode={true}
-              showSettings={showSettings}
-              onToggleSettings={() => setShowSettings(prev => !prev)}
-            />
-          </div>
+          <PlanetGenerator
+            classificationId={classification.id.toString()}
+            editMode={true}
+          />
 
           <blockquote className="mx-auto my-6 max-w-xl rounded-lg border border-blue-600 bg-blue-900/30 px-6 py-4 text-blue-300 text-center text-sm leading-relaxed">
             Complete missions, make key discoveries about your planet with your Telescope, and unlock deeper planet editing tools.
@@ -85,24 +77,11 @@ export default function PaintYourPlanetPage() {
               <Button variant="outline" onClick={() => router.push(`/structures/telescope`)}>
                 🧬 Back to Telescope
               </Button>
-              <Button variant="ghost" onClick={() => router.push('/')}>
+              <Button variant="ghost" onClick={() => router.push("/")}>
                 🏠 Home
               </Button>
             </div>
-
-            {/* Mobile-only Planet Settings Button */}
-            <div className="md:hidden">
-              <Button
-                onClick={() => setShowSettings(prev => !prev)}
-                className="flex items-center gap-2 text-white border border-white/20"
-                variant="outline"
-              >
-                <Cog className="w-4 h-4" />
-                Planet Settings
-              </Button>
-            </div>
           </div>
-        </main>
       </div>
     </div>
   );

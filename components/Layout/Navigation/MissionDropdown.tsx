@@ -65,13 +65,16 @@ export function MissionsPopover() {
                 let query = supabase
                     .from(table)
                     .select("*", { count: "exact" })
+                    .eq(field, value)
                     .gte("created_at", startDate.toISOString())
-                    .lte("created_at", endDate.toISOString())
-                    .eq(field, value);
+                    .lte("created_at", endDate.toISOString());
 
-                if (session.user?.id) {
-                    query = query.eq("author", session.user.id);
-                };
+                // Determine user column based on table
+                const userField = ["votes", "classifications", "comments"].includes(table)
+                    ? "user_id"
+                    : "author";
+
+                query = query.eq(userField, session.user.id);
 
                 const { data: rows, count, error } = await query;
 

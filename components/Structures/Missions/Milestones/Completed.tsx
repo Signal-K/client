@@ -61,7 +61,7 @@ export default function MilestoneHistoryList() {
             .from(table)
             .select("*", { count: "exact" })
             .eq(field, value)
-            .eq("author", session.user.id)
+            .or(`author.eq.${session.user.id},user_id.eq.${session.user.id}`)
             .gte("created_at", startDate.toISOString())
             .lte("created_at", endDate.toISOString());
 

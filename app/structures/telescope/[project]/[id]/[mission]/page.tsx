@@ -65,9 +65,6 @@ export default function TelescopeClassifyPage() {
             component = (
               <PlanetGenerator
                 classificationId={classificationId || '8'}
-                editMode={true}
-                showSettings={true}
-                onToggleSettings={() => {}}
               />
             )
             break

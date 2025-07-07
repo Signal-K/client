@@ -18,18 +18,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Progress } from "@/components/ui/progress"
+} from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, Transition } from "@headlessui/react"
 import TotalPoints from "../Structures/Missions/Stardust/Total"
 import { MissionsPopover } from "./Navigation/MissionDropdown"
-import AlertsDropdown from "./Navigation/AlertsDropdown"
+// import AlertsDropdown from "./Navigation/AlertsDropdown"
 import { StardustDropdown } from "./Navigation/StardustDropdown"
 import { LocationsDropdown } from "./Navigation/LocationsDropdown"
 import TechnologyPopover, { TechnologySection } from "./Navigation/TechTreeDropdown"
-import { Alert } from "antd"
 import { useRouter } from "next/navigation"
 import ResponsiveAlerts from "./Navigation/AlertsDropdown"
 

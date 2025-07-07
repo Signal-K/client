@@ -3,6 +3,39 @@ import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
     {
+        weekStart: '2025-07-06',
+        data: [
+            {
+                name: "Verify other users' discoveries and get some of the earnings in return",
+                structure: "Telescope",
+                group: "Astronomy",
+                icon: 'Telescope',
+                extendedDescription: ',',
+                xp: 1,
+                completionInfo: '',
+                rewardInfo: '',
+                table: 'votes',
+                field: 'vote_type',
+                value: 'up',
+                requiredCount: 2,
+            },
+            {
+                name: "Contribute to someone else's discovery by commenting",
+                structure: "Telescope",
+                group: "Astronomy",
+                icon: "Telescope",
+                extendedDescription: '',
+                xp: 1,
+                completionInfo: '',
+                rewardInfo: '',
+                table: 'comments',
+                field: 'surveyor',
+                value: 'TRUE',
+                requiredCount: 1,
+            },
+        ],
+    },
+    {
         weekStart: '2025-06-29',
         data: [
             {

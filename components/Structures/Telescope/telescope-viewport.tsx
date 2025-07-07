@@ -463,7 +463,7 @@ export default function TelescopeViewport() {
               <span className="text-[#e8f4f8] text-xs font-mono">PWR: 98%</span>
             </div>
           </div>
-          <div className="text-[#e8f4f8] text-sm font-mono mb-1">Sector: {currentSectorName}</div>
+          {/* <div className="text-[#e8f4f8] text-sm font-mono mb-1">Sector: {currentSectorName}</div> */}
           <div className="text-[#a8d8ea] text-sm font-mono mb-2">Targets: {filteredAnomalies.length}/15</div>
           <Badge className="bg-[#b8e6b8] text-[#1a1a2e] text-xs px-2 py-1 font-mono">
             {classifications.length} CLASSIFIED
@@ -642,26 +642,28 @@ export default function TelescopeViewport() {
             <span className="text-[#e8f4f8] text-sm font-mono">RECENT ACTIVITY</span>
           </div>
 
-          {classifications.slice(0, 8).map((classification) => (
-            <Card
-              key={classification.id}
-              className="bg-[#1a1a2e]/60 border border-[#a8d8ea]/20 hover:border-[#a8d8ea]/40 transition-all cursor-pointer backdrop-blur-sm"
-              onClick={() => handleViewClassification(classification)}
-            >
-              <CardContent className="p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-[#e8f4f8] text-sm font-mono">#{classification.id}</div>
-                  <Badge className="bg-[#a8d8ea] text-[#1a1a2e] text-xs font-mono">
-                    {classification.classificationtype?.toUpperCase() || "UNKNOWN"}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-[#a8d8ea] font-mono">
-                  <Calendar className="h-3 w-3" />
-                  <span>{new Date(classification.created_at).toLocaleDateString()}</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+         <div className="max-h-[600px] overflow-y-auto space-y-2 pr-2">
+  {classifications.slice(0, 20).map((classification) => (
+    <Card
+      key={classification.id}
+      className="bg-[#1a1a2e]/60 border border-[#a8d8ea]/20 hover:border-[#a8d8ea]/40 transition-all cursor-pointer backdrop-blur-sm"
+      onClick={() => handleViewClassification(classification)}
+    >
+      <CardContent className="p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-[#e8f4f8] text-sm font-mono">#{classification.id}</div>
+          <Badge className="bg-[#a8d8ea] text-[#1a1a2e] text-xs font-mono">
+            {classification.classificationtype?.toUpperCase() || "UNKNOWN"}
+          </Badge>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-[#a8d8ea] font-mono">
+          <Calendar className="h-3 w-3" />
+          <span>{new Date(classification.created_at).toLocaleDateString()}</span>
+        </div>
+      </CardContent>
+    </Card>
+  ))}
+</div>
 
           {classifications.length === 0 && (
             <div className="text-center py-8">

@@ -5,6 +5,8 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface Props {
     anomalyid: number | bigint;
@@ -130,7 +132,11 @@ export function AiForMarsProjectWithID() {
     }, [session]);
 
     if (loading) return <p>Loading...</p>;
-    if (!anomaly || !imageUrl) return <p>No anomaly found for this user in AI4Mars project.</p>;
+    if (!anomaly || !imageUrl) return (
+        <div>
+            <Link href="/deploy"><Button>No anomaly found for this user in AI4Mars project. Re-deploy your automatons this week.</Button></Link>
+        </div>
+    );
 
     return (
         <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6 overflow-hidden">

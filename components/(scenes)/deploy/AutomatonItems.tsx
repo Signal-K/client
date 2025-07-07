@@ -96,7 +96,7 @@ export default function AutomatonDeploySection() {
       if (!data || data.length === 0) {
         setDeployDisabled(false);
         return;
-      }
+      };
 
       const now = new Date();
       const currentWeek = getISOWeekYear(now);

@@ -113,7 +113,35 @@ useEffect(() => {
 
   return (
     <div className="space-y-6 bg-gray-100 text-slate-100">
-      <div className="flex justify-between items-center p-4">
+              <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowImportExport(!showImportExport)}
+          className="flex items-center gap-2 bg-gray-50 text-gray-900 border-gray-300 p-5 hover:bg-gray-300"
+        >
+          {showImportExport ? "Hide" : "Save"} 
+          {/* Import/Export */}
+          {showImportExport ? <Download className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
+        </Button>
+      <div className="py-10">
+      <Tabs defaultValue="basic" className="w-full">
+        <TabsList className="w-full grid grid-cols-3 mb-4 bg-gray-50">
+          <TabsTrigger value="basic" className="data-[state=active]:bg-gray-300">
+            Basic
+          </TabsTrigger>
+          <TabsTrigger value="terrain" className="data-[state=active]:bg-gray-300">
+            Terrain
+          </TabsTrigger>
+          <TabsTrigger value="colors" className="data-[state=active]:bg-gray-300">
+            Colors
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="basic" className="space-y-6">
+          <div className="space-y-4">
+            <div className="bg-gray-50 p-4 rounded-md border border-gray-300">
+              <h3 className="text-sm font-medium mb-3 text-gray-900">Planet Type</h3>
+                            <div className="flex justify-between items-center p-4">
         <Button
           variant="outline"
           size="sm"
@@ -155,24 +183,6 @@ useEffect(() => {
           </div>
         </div>
       )}
-
-      <Tabs defaultValue="basic" className="w-full">
-        <TabsList className="w-full grid grid-cols-3 mb-4 bg-gray-50">
-          <TabsTrigger value="basic" className="data-[state=active]:bg-gray-300">
-            Basic
-          </TabsTrigger>
-          <TabsTrigger value="terrain" className="data-[state=active]:bg-gray-300">
-            Terrain
-          </TabsTrigger>
-          <TabsTrigger value="colors" className="data-[state=active]:bg-gray-300">
-            Colors
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="basic" className="space-y-6">
-          <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-md border border-gray-300">
-              <h3 className="text-sm font-medium mb-3 text-gray-900">Planet Type</h3>
               <div className="flex gap-2">
                 <Button
                   variant={planetConfig.type === "terrestrial" ? "default" : "outline"}
@@ -417,7 +427,77 @@ useEffect(() => {
               </div>
             </div>
           )}
+        </TabsContent>
 
+        <TabsContent value="colors" className="space-y-6">
+          <div className="bg-gray-50 p-4 rounded-md space-y-4 border border-gray-300">
+            <h3 className="text-sm font-medium text-gray-900">Planet Colors</h3>
+
+            <div className="grid grid-cols-2 gap-4">
+              <ColorPicker
+                label="Atmosphere"
+                color={planetConfig.colors.atmosphere}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, atmosphere: color } })}
+              />
+
+              <ColorPicker
+                label={`${liquidType.name}`}
+                color={planetConfig.colors.ocean}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, ocean: color } })}
+              />
+
+              <ColorPicker
+                label={`${liquidType.name} Pattern`}
+                color={planetConfig.colors.oceanPattern}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, oceanPattern: color } })}
+              />
+
+              <ColorPicker
+                label="Beach"
+                color={planetConfig.colors.beach}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, beach: color } })}
+              />
+
+              <ColorPicker
+                label="Lowland"
+                color={planetConfig.colors.lowland}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, lowland: color } })}
+              />
+
+              <ColorPicker
+                label="Midland"
+                color={planetConfig.colors.midland}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, midland: color } })}
+              />
+
+              <ColorPicker
+                label="Highland"
+                color={planetConfig.colors.highland}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, highland: color } })}
+              />
+
+              <ColorPicker
+                label="Mountain"
+                color={planetConfig.colors.mountain}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, mountain: color } })}
+              />
+
+              <ColorPicker
+                label="Snow"
+                color={planetConfig.colors.snow}
+                onChange={(color) => onChange({ colors: { ...planetConfig.colors, snow: color } })}
+              />
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+    </div>
+  );
+};
+
+
+/*
           <div className="bg-gray-50 p-4 rounded-md space-y-4 border border-gray-300">
             {/* <div className="flex justify-between items-center">
               <h3 className="text-sm font-medium text-gray-900">Debug Mode</h3>
@@ -425,7 +505,7 @@ useEffect(() => {
                 checked={planetConfig.debugMode || false}
                 onCheckedChange={(checked) => onChange({ debugMode: checked })}
               />
-            </div> */}
+            </div> 
 
             {/* {planetConfig.debugMode && (
               <div className="pt-2 border-t border-gray-300 space-y-2">
@@ -600,72 +680,6 @@ useEffect(() => {
                   </div>
                 </div>
               </div>
-            )} */}
+            )} 
           </div>
-        </TabsContent>
-
-        <TabsContent value="colors" className="space-y-6">
-          <div className="bg-gray-50 p-4 rounded-md space-y-4 border border-gray-300">
-            <h3 className="text-sm font-medium text-gray-900">Planet Colors</h3>
-
-            <div className="grid grid-cols-2 gap-4">
-              <ColorPicker
-                label="Atmosphere"
-                color={planetConfig.colors.atmosphere}
-                onChange={(color) => onChange({ colors: { ...planetConfig.colors, atmosphere: color } })}
-              />
-
-              <ColorPicker
-                label={`${liquidType.name}`}
-                color={planetConfig.colors.ocean}
-                onChange={(color) => onChange({ colors: { ...planetConfig.colors, ocean: color } })}
-              />
-
-              <ColorPicker
-                label={`${liquidType.name} Pattern`}
-                color={planetConfig.colors.oceanPattern}
-                onChange={(color) => onChange({ colors: { ...planetConfig.colors, oceanPattern: color } })}
-              />
-
-              <ColorPicker
-                label="Beach"
-                color={planetConfig.colors.beach}
-                onChange={(color) => onChange({ colors: { ...planetConfig.colors, beach: color } })}
-              />
-
-              <ColorPicker
-                label="Lowland"
-                color={planetConfig.colors.lowland}
-                onChange={(color) => onChange({ colors: { ...planetConfig.colors, lowland: color } })}
-              />
-
-              <ColorPicker
-                label="Midland"
-                color={planetConfig.colors.midland}
-                onChange={(color) => onChange({ colors: { ...planetConfig.colors, midland: color } })}
-              />
-
-              <ColorPicker
-                label="Highland"
-                color={planetConfig.colors.highland}
-                onChange={(color) => onChange({ colors: { ...planetConfig.colors, highland: color } })}
-              />
-
-              <ColorPicker
-                label="Mountain"
-                color={planetConfig.colors.mountain}
-                onChange={(color) => onChange({ colors: { ...planetConfig.colors, mountain: color } })}
-              />
-
-              <ColorPicker
-                label="Snow"
-                color={planetConfig.colors.snow}
-                onChange={(color) => onChange({ colors: { ...planetConfig.colors, snow: color } })}
-              />
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-};
+*/
