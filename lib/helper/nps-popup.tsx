@@ -12,7 +12,7 @@ interface NPSPopupProps {
   isOpen: boolean;
   onClose: () => void;
   userId?: string | null;
-}
+};
 
 export default function NPSPopup({ isOpen, onClose, userId }: NPSPopupProps) {
   const supabase = useSupabaseClient();
