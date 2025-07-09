@@ -26,7 +26,7 @@ type WeekMilestones = {
   data: Milestone[];
 };
 
-const GROUPS = ["Astronomy", "Meteorology", "Geology", "Biology"];
+const ALL_GROUPS = ["Astronomy", "Meteorology", "Geology", "Biology"];
 
 const groupIcons: Record<string, JSX.Element> = {
   Astronomy: <Telescope className="w-7 h-7" />,
@@ -35,7 +35,11 @@ const groupIcons: Record<string, JSX.Element> = {
   Geology: <MountainIcon className="w-7 h-7" />,
 };
 
-export default function UserMilestoneMissionSummary() {
+export default function UserMilestoneMissionSummary({
+  groupsToShow,
+}: {
+  groupsToShow?: string[];
+}) {
   const [milestones, setMilestones] = useState<WeekMilestones | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
@@ -51,13 +55,14 @@ export default function UserMilestoneMissionSummary() {
 
   if (!milestones) return null;
 
+  const activeGroups = groupsToShow ?? ALL_GROUPS;
+
   const grouped: Record<string, Milestone[]> = {};
   for (const m of milestones.data) {
     if (!grouped[m.group]) grouped[m.group] = [];
     grouped[m.group].push(m);
   }
 
-  // Your layered background texture style converted from CSS:
   const backgroundStyle: React.CSSProperties = {
     width: "100%",
     height: "100%",
@@ -73,13 +78,12 @@ export default function UserMilestoneMissionSummary() {
     backgroundSize: "50px 50px, 50px 50px, 40px 40px, 60px 60px, 100% 100%",
     animation: "shift 15s linear infinite",
     opacity: 0.3,
-    pointerEvents: "none", // so clicks go through
+    pointerEvents: "none",
     zIndex: 0,
   };
 
   return (
     <div className="relative flex gap-6 items-center py-4 px-6 rounded-2xl border border-white/10 shadow-xl backdrop-blur-md overflow-hidden text-white min-h-[150px]">
-      {/* Inject keyframes scoped inside component */}
       <style>{`
         @keyframes shift {
           0% {
@@ -101,12 +105,10 @@ export default function UserMilestoneMissionSummary() {
         }
       `}</style>
 
-      {/* Background texture layer */}
       <div style={backgroundStyle} aria-hidden="true" />
 
-      {/* Foreground content */}
       <div className="relative z-10 flex gap-6 items-center">
-        {GROUPS.map((group) => {
+        {activeGroups.map((group) => {
           const hasMissions = grouped[group] && grouped[group].length > 0;
           const icon = groupIcons[group] || <Star className="w-7 h-7" />;
 
@@ -168,4 +170,4 @@ export default function UserMilestoneMissionSummary() {
       </Sheet>
     </div>
   );
-};
+}
