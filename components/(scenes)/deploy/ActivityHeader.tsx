@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { Star } from "lucide-react";
 import { AvatarGenerator } from "@/components/Account/Avatar";
+import ProfileDetailsPanel from "@/components/Account/ProfileDetailsPanel";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface Milestone {
   name: string;
@@ -34,12 +42,12 @@ export default function ActivityHeader({
   const [profile, setProfile] = useState<{ classificationPoints: number | null } | null>(null);
   const [milestones, setMilestones] = useState<WeekMilestones[]>([]);
   const [userProgress, setUserProgress] = useState<{ [weekKey: string]: { [milestoneName: string]: number } }>({});
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   useEffect(() => {
     if (!session?.user?.id) return;
 
     const fetchData = async () => {
-      // Fetch profile classification points
       const { data: profileData } = await supabase
         .from("profiles")
         .select("classificationPoints")
@@ -47,7 +55,6 @@ export default function ActivityHeader({
         .maybeSingle();
       setProfile(profileData);
 
-      // Fetch milestones data
       const res = await fetch("/api/gameplay/milestones");
       const data = await res.json();
 
@@ -57,7 +64,6 @@ export default function ActivityHeader({
       );
       setMilestones(sortedMilestones);
 
-      // Calculate progress
       const progressMap: { [weekKey: string]: { [milestoneName: string]: number } } = {};
 
       for (const week of sortedMilestones) {
@@ -124,7 +130,6 @@ export default function ActivityHeader({
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        // Remove any overlay filter, keep original image brightness as is
       }}
     >
       {/* Left: Avatar, username, landmarks button */}
@@ -134,12 +139,23 @@ export default function ActivityHeader({
         </div>
         <div className="text-white">
           <h2 className="text-3xl font-bold">{session?.user?.email || "User"}</h2>
-          <button
-            onClick={onToggleLandmarks}
-            className="mt-2 inline-flex items-center px-3 py-1 rounded bg-purple-600 hover:bg-purple-700 transition text-white font-semibold"
-          >
-            {landmarksExpanded ? "Hide Landmarks" : "View Landmarks"}
-          </button>
+
+          <div className="mt-2 flex flex-col gap-2">
+            <Button
+              onClick={() => setShowDetailsModal(true)}
+              variant="secondary"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-3 py-1"
+            >
+              View Profile
+            </Button>
+
+            <Button
+              onClick={onToggleLandmarks}
+              className="inline-flex items-center px-3 py-1 rounded bg-purple-600 hover:bg-purple-700 transition text-white font-semibold text-sm"
+            >
+              {landmarksExpanded ? "Hide Landmarks" : "View Landmarks"}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -160,6 +176,15 @@ export default function ActivityHeader({
           ))}
         </div>
       </div>
+
+      <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-indigo-700">Your Profile</DialogTitle>
+          </DialogHeader>
+          <ProfileDetailsPanel onClose={() => setShowDetailsModal(false)} />
+        </DialogContent>
+      </Dialog>
     </header>
   );
-}
+};

@@ -20,12 +20,13 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
 
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
-  const [referralCode, setReferralCode] = useState("");
+  const [ownReferralCode, setOwnReferralCode] = useState("");
+  const [referrerCodeInput, setReferrerCodeInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    setReferralCode(generateReferralCode());
+    setOwnReferralCode(generateReferralCode());
   }, []);
 
   const handleSubmit = async () => {
@@ -39,30 +40,78 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
     setLoading(true);
     setErrorMsg("");
 
+    const userId = session.user.id;
+
     const updates = {
-      id: session.user.id,
+      id: userId,
       username: username.trim(),
       full_name: fullName.trim(),
-      referral_code: referralCode,
+      referral_code: ownReferralCode,
       updated_at: new Date(),
     };
 
-    const { error } = await supabase.from("profiles").upsert(updates);
+    // Step 1: Update Profile
+    const { error: updateError } = await supabase.from("profiles").upsert(updates);
 
-    if (error) {
-      if (error.message.includes("profiles_username_key")) {
+    if (updateError) {
+      if (updateError.message.includes("profiles_username_key")) {
         setErrorMsg("That username is already taken. Please choose another one.");
-      } else if (error.message.includes("profiles_referral_code_key")) {
+      } else if (updateError.message.includes("profiles_referral_code_key")) {
         setErrorMsg("Referral code already exists. Please try again.");
       } else {
-        setErrorMsg(error.message || "Failed to update profile.");
+        setErrorMsg(updateError.message || "Failed to update profile.");
       }
       setLoading(false);
       return;
     }
 
+    // Step 2: Handle referral (if input provided)
+    if (referrerCodeInput.trim()) {
+      // Check if user already has a referral
+      const { data: existingReferral, error: referralCheckError } = await supabase
+        .from("referrals")
+        .select("id")
+        .eq("referree_id", userId)
+        .maybeSingle();
+
+      if (!referralCheckError && !existingReferral) {
+        // Find user with referral_code
+        const { data: referrerProfile } = await supabase
+          .from("profiles")
+          .select("id, referral_code")
+          .eq("referral_code", referrerCodeInput.trim())
+          .maybeSingle();
+
+        if (referrerProfile) {
+          // Create referral from current user → referrer
+          await supabase.from("referrals").insert({
+            referree_id: userId,
+            referral_code: referrerCodeInput.trim(),
+          });
+
+          // Check if the referrer was also referred by someone else
+          const { data: referrersReferral } = await supabase
+            .from("referrals")
+            .select("referral_code")
+            .eq("referree_id", referrerProfile.id)
+            .maybeSingle();
+
+          if (referrersReferral) {
+            // Create an extended referral from current user → referrer's referrer
+            await supabase.from("referrals").insert({
+              referree_id: userId,
+              referral_code: referrersReferral.referral_code,
+            });
+          }
+        } else {
+          // Referral code not found — soft fail, but don't stop profile completion
+          console.warn("Invalid referral code provided");
+        }
+      }
+    }
+
     if (typeof onSuccess === "function") {
-      onSuccess(); // close the modal
+      onSuccess(); // Close the modal
     }
   };
 
@@ -97,9 +146,21 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
         <div>
           <label className="block text-sm font-medium mb-1 text-[#2E3440]">Your Referral Code</label>
           <Input
-            value={referralCode}
+            value={ownReferralCode}
             readOnly
             className="bg-gray-100 cursor-not-allowed text-muted-foreground"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1 text-[#2E3440]">
+            Referral Code (optional)
+          </label>
+          <Input
+            value={referrerCodeInput}
+            onChange={(e) => setReferrerCodeInput(e.target.value)}
+            placeholder="Enter your friend's code"
+            className="bg-white"
           />
         </div>
 
@@ -115,4 +176,4 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
       </Button>
     </section>
   );
-}
+};

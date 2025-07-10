@@ -84,5 +84,5 @@ export default function TipsPanel() {
         ⏳ New missions in: <span className="text-indigo-600">{countdown}</span>
       </div>
     </aside>
-  )
+  );
 };

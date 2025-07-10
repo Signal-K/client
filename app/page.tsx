@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import WeeklyBanner from "@/components/ui/update-banner";
 
 export interface LinkedAnomaly {
   id: number;
@@ -190,7 +191,7 @@ export default function ActivityPage() {
   const needsProfileSetup = !profile?.username || !profile?.full_name;
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center text-[#2E3440] bg-gradient-to-b from-[#E5EEF4] to-[#D8E5EC] overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center text-[#2E3440] bg-gradient-to-b from-[#E5EEF4] to-[#D8E5EC] overflow-hidden pb-20">
       <ActivityHeader
         landmarksExpanded={landmarksExpanded}
         onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
@@ -283,14 +284,20 @@ export default function ActivityPage() {
         {showTipsPanel && <TipsPanel />}
       </div>
 
-<Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
-  <DialogContent className="max-w-md">
-    <DialogHeader>
-      <DialogTitle className="text-indigo-700">Complete Your Profile</DialogTitle>
-    </DialogHeader>
-    <CompleteProfileForm onSuccess={() => setShowProfileModal(false)} />
-  </DialogContent>
-</Dialog>
+      <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-indigo-700">Complete Your Profile</DialogTitle>
+          </DialogHeader>
+          <CompleteProfileForm onSuccess={() => setShowProfileModal(false)} />
+        </DialogContent>
+      </Dialog>
+
+      <WeeklyBanner
+        message="🚀 New discoveries are now available. Check the latest missions!"
+        buttonLabel="View Missions"
+        buttonHref="/missions"
+      />
     </div>
   );
 };
