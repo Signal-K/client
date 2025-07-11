@@ -2,20 +2,20 @@
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
-import LoginPage from "./auth/LoginModal";
+import LoginPage from "../auth/LoginModal";
 import { useRouter} from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useActivePlanet } from "@/context/ActivePlanet";
-import { subscribeUser, unsubscribeUser, sendNotification } from './actions'
+import { subscribeUser, unsubscribeUser, sendNotification } from '../actions'
 // import { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 // import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
-import Onboarding from "./scenes/onboarding/page";
-import SimpleeMissionGuide from "./tests/singleMissionGuide";
+import Onboarding from "../scenes/onboarding/page";
+import SimpleeMissionGuide from "../tests/singleMissionGuide";
 import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatellites";
-import LandingSS from "./auth/landing";
+import LandingSS from "../auth/landing";
 import GameNavbar from "@/components/Layout/Tes";
 import BiomassOnEarth from "@/components/Data/BiomassEarth";
 import NPSPopup from "@/lib/helper/nps-popup";

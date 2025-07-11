@@ -59,7 +59,7 @@ export default function PlanetGenerator({ classificationId, editMode }: PlanetGe
     const updatedConfig = {
       ...data.classificationConfiguration,
       planetConfiguration: planetConfig,
-    };
+    }; 
 
     await supabase
       .from("classifications")
@@ -101,10 +101,10 @@ export default function PlanetGenerator({ classificationId, editMode }: PlanetGe
           <PlanetViewer
             planetConfig={planetConfig}
             onConfigChange={handleConfigChange}
-            classificationId={classificationId}
-            editMode={editMode}
-            showSettings={false}
-            onToggleSettings={() => {}}
+            // classificationId={classificationId}
+            // editMode={editMode}
+            // showSettings={false}
+            // onToggleSettings={() => {}}
           />
         </div>
 

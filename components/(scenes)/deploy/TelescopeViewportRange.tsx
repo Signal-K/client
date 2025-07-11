@@ -140,13 +140,15 @@ export default function DeployTelescopeViewport() {
     console.log("Total allowed deploys:", totalAllowedDeploys)
     console.log("User can redeploy?", userCanRedeploy ? "YES" : "NO")
 
-    setAlreadyDeployed(!userCanRedeploy)
-    if (userCanRedeploy) {
-      setDeploymentMessage("You have earned additional deploys by interacting with the community this week!")
-    } else if (linkedCount > 0) {
-      setDeploymentMessage("Telescope has already been deployed this week. Recalibrate & search again next week.")
-    } else {
+    if (linkedCount === 0) {
+      setAlreadyDeployed(false)
       setDeploymentMessage(null)
+    } else if (userCanRedeploy) {
+      setAlreadyDeployed(false)
+      setDeploymentMessage("You have earned additional deploys by interacting with the community this week!")
+    } else {
+      setAlreadyDeployed(true)
+      setDeploymentMessage("Telescope has already been deployed this week. Recalibrate & search again next week.")
     }
   }
 

@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import WeeklyBanner from "@/components/ui/update-banner";
+import GameNavbar from "@/components/Layout/Tes";
 
 export interface LinkedAnomaly {
   id: number;
@@ -77,6 +78,18 @@ export default function ActivityPage() {
   const [hasCheckedNps, setHasCheckedNps] = useState(false);
   const [showTipsPanel, setShowTipsPanel] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    if (!session) return;
+
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [session]);
 
   useEffect(() => {
     if (!session) return;
@@ -191,113 +204,160 @@ export default function ActivityPage() {
   const needsProfileSetup = !profile?.username || !profile?.full_name;
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center text-[#2E3440] bg-gradient-to-b from-[#E5EEF4] to-[#D8E5EC] overflow-hidden pb-20">
-      <ActivityHeader
-        landmarksExpanded={landmarksExpanded}
-        onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
-      />
+    <div className="min-h-screen w-full flex flex-col items-center overflow-hidden pb-20"
+         style={{
+           background: "var(--color-background)",
+           color: "var(--color-foreground)"
+         }}
+    >
+      <div className="w-full sticky top-0 z-50">
+        <ActivityHeader
+          scrolled={scrolled}
+          landmarksExpanded={landmarksExpanded}
+          onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
+        />
+      </div>
 
-      <div
-        className={`w-full px-4 py-6 gap-6 ${
-          showTipsPanel
-            ? "flex flex-col lg:flex-row max-w-screen-xl"
-            : "flex flex-col items-center max-w-screen-md"
-        }`}
-      >
-        <main className="w-full space-y-6 overflow-y-auto z-10 relative">
-          <RecentDiscoveries
-            classifications={classifications}
-            linkedAnomalies={linkedAnomalies}
-          />
+      {scrolled && <GameNavbar />}
 
-          {needsProfileSetup ? (
-            <section className="rounded-2xl bg-white/80 p-6 border shadow space-y-4 text-center">
-              <h3 className="text-xl font-semibold text-indigo-700">Finish setting up your account</h3>
-              <p className="text-muted-foreground">
-                Unlock Structures, Research, and referral features by completing your profile.
-              </p>
-              <button
-                onClick={() => setShowProfileModal(true)}
-                className="inline-block mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+      <div className="w-full flex justify-center">
+        <div
+          className={`w-full px-4 py-6 gap-6 ${
+            showTipsPanel
+              ? "flex flex-col lg:flex-row max-w-screen-xl"
+              : "flex flex-col items-center max-w-screen-md"
+          }`}
+        >
+          <main className="w-full space-y-6 z-10 relative">
+            <RecentDiscoveries
+              classifications={classifications}
+              linkedAnomalies={linkedAnomalies}
+            />
+
+            {needsProfileSetup ? (
+              <section
+                className="rounded-2xl p-6 border shadow space-y-4 text-center"
+                style={{
+                  backgroundColor: "var(--color-card)",
+                  color: "var(--color-card-foreground)",
+                  borderColor: "var(--color-border)",
+                }}
               >
-                Complete your profile
-              </button>
-            </section>
-          ) : (
-            <>
-              <RecentActivity
-                activityFeed={activityFeed}
-                otherClassifications={otherClassifications}
-              />
-
-              <section className="rounded-2xl bg-white/80 p-4 border shadow space-y-4">
-                <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <Telescope className="text-indigo-600" />
-                  Structures & Research
+                <h3 className="text-xl font-semibold" style={{ color: "var(--color-primary)" }}>
+                  Finish setting up your account
                 </h3>
-                <div className="space-y-4">
-                  <div className="border p-3 rounded-lg bg-slate-50">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">Telescope Array</p>
-                        <p className="text-sm text-muted-foreground">
-                          Enhances classification of distant light curves and planet candidates.
+                <p className="text-sm" style={{ color: "var(--color-muted-foreground)" }}>
+                  Unlock Structures, Research, and referral features by completing your profile.
+                </p>
+                <button
+                  onClick={() => setShowProfileModal(true)}
+                  className="mt-4 px-4 py-2 rounded-lg transition"
+                  style={{
+                    backgroundColor: "var(--color-primary)",
+                    color: "var(--color-primary-foreground)"
+                  }}
+                >
+                  Complete your profile
+                </button>
+              </section>
+            ) : (
+              <>
+                <RecentActivity
+                  activityFeed={activityFeed}
+                  otherClassifications={otherClassifications}
+                />
+
+                <section
+                  className="rounded-2xl p-4 border shadow space-y-4"
+                  style={{
+                    backgroundColor: "var(--color-card)",
+                    color: "var(--color-card-foreground)",
+                    borderColor: "var(--color-border)"
+                  }}
+                >
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Telescope style={{ color: "var(--color-primary)" }} />
+                    Structures & Research
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="border p-3 rounded-lg"
+                         style={{
+                           backgroundColor: "var(--color-popover)",
+                           borderColor: "var(--color-border)"
+                         }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-medium">Telescope Array</p>
+                          <p className="text-sm" style={{ color: "var(--color-muted-foreground)" }}>
+                            Enhances classification of distant light curves and planet candidates.
+                          </p>
+                        </div>
+                        <Link
+                          href="/activity/deploy"
+                          className="px-3 py-1 rounded text-sm"
+                          style={{
+                            backgroundColor: "var(--color-primary)",
+                            color: "var(--color-primary-foreground)"
+                          }}
+                        >
+                          Deploy
+                        </Link>
+                      </div>
+                    </div>
+
+                    {["Satellites", "Rovers", "Balloons"].map((label) => (
+                      <div
+                        key={label}
+                        className="border p-3 rounded-lg"
+                        style={{
+                          backgroundColor: "var(--color-muted)",
+                          color: "var(--color-muted-foreground)",
+                          borderColor: "var(--color-border)"
+                        }}
+                      >
+                        <p className="font-medium">{label} (Coming Soon)</p>
+                        <p className="text-sm">
+                          {label === "Satellites" && "Will scan magnetic & atmospheric fields."}
+                          {label === "Rovers" && "Explore surface geology and send rich data back."}
+                          {label === "Balloons" && "Float above atmospheres for weather anomaly mapping."}
                         </p>
                       </div>
-                      <Link
-                        href="/activity/deploy"
-                        className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 text-sm"
-                      >
-                        Deploy
-                      </Link>
-                    </div>
+                    ))}
                   </div>
+                </section>
+              </>
+            )}
 
-                  <div className="border p-3 rounded-lg bg-muted text-muted-foreground">
-                    <p className="font-medium">Satellites (Coming Soon)</p>
-                    <p className="text-sm">Will scan magnetic & atmospheric fields.</p>
-                  </div>
+            {showNpsModal && (
+              <NPSPopup
+                userId={session.user.id}
+                isOpen={true}
+                onClose={() => setShowNpsModal(false)}
+              />
+            )}
+          </main>
 
-                  <div className="border p-3 rounded-lg bg-muted text-muted-foreground">
-                    <p className="font-medium">Rovers (Coming Soon)</p>
-                    <p className="text-sm">Explore surface geology and send rich data back.</p>
-                  </div>
-
-                  <div className="border p-3 rounded-lg bg-muted text-muted-foreground">
-                    <p className="font-medium">Balloons (Coming Soon)</p>
-                    <p className="text-sm">Float above atmospheres for weather anomaly mapping.</p>
-                  </div>
-                </div>
-              </section>
-            </>
-          )}
-
-          {showNpsModal && (
-            <NPSPopup
-              userId={session.user.id}
-              isOpen={true}
-              onClose={() => setShowNpsModal(false)}
-            />
-          )}
-        </main>
-
-        {showTipsPanel && <TipsPanel />}
+          {showTipsPanel && <TipsPanel />}
+        </div>
       </div>
 
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-indigo-700">Complete Your Profile</DialogTitle>
+            <DialogTitle style={{ color: "var(--color-primary)" }}>
+              Complete Your Profile
+            </DialogTitle>
           </DialogHeader>
           <CompleteProfileForm onSuccess={() => setShowProfileModal(false)} />
         </DialogContent>
       </Dialog>
 
       <WeeklyBanner
-        message="🚀 New discoveries are now available. Check the latest missions!"
-        buttonLabel="View Missions"
-        buttonHref="/missions"
+        message="🚀 The full Star Sailors experience has more projects and deeper mechanics. Feel free to explore—or stay here for a simpler start."
+        buttonLabel="Play"
+        buttonHref="/alpha"
       />
     </div>
   );
-};
+}
