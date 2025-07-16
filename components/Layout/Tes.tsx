@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
 import { Bell, ChevronDown, HammerIcon, LogOut, Settings, Star, Trophy, User, X, Zap } from "lucide-react"
 import { formatDistanceToNow, startOfDay, addDays } from "date-fns"
-import { Avatar } from "../Account/Avatar";
+import { Avatar, AvatarGenerator } from "../Account/Avatar";
 import { Moon, Sun } from "lucide-react"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -285,7 +285,8 @@ export default function GameNavbar() {
                     <div
                                     className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-[#5FCBC3]/60 hover:bg-[#5FCBC3]/80 transition"
                                   >
-                    <Avatar />
+                    {/* <Avatar /> */}
+                    <AvatarGenerator author={session?.user.id ?? ""} />
                     </div>
                 </div>
                 <ChevronDown className="h-4 w-4 text-white/70" />
