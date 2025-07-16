@@ -1,22 +1,47 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, CheckCircle2, Clock, Eye, SpaceIcon as Planet, Sun, Asterisk, Disc } from "lucide-react"
-import type { Anomaly, Mission, Project } from "@/types/Structures/telescope";
-import { projects } from "@/data/projects";
+import { Eye, Calendar, User, Star, ArrowLeft, Users, Sparkles, Target, CheckCircle2 } from "lucide-react";
+import type { Anomaly, Project, Mission } from "@/types/Structures/telescope";
+import { useState } from "react";
+import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { projects } from "@/data/telescope/projects";
+
+interface DatabaseClassification {
+  id: number
+  created_at: string
+  content: string | null
+  author: string | null
+  anomaly: number | null
+  media: any
+  classificationtype: string | null
+  classificationConfiguration: any
+}
 
 interface DiscoveriesViewProps {
-  classifications: any[]
-  allClassifications: any[]
+  classifications: DatabaseClassification[]
+  allClassifications: DatabaseClassification[]
   projectMissions: Mission[]
   selectedProject: Project | null
   onBack: () => void
   onViewAnomaly: (anomaly: Anomaly) => void
+  onViewClassification: (classification: DatabaseClassification) => void
   showAllDiscoveries: boolean
-  anomalies: Anomaly[] 
-};
+  setShowAllDiscoveries: (show: boolean) => void
+  anomalies: Anomaly[]
+}
 
 export function DiscoveriesView({
   classifications,
@@ -25,269 +50,297 @@ export function DiscoveriesView({
   selectedProject,
   onBack,
   onViewAnomaly,
+  onViewClassification,
   showAllDiscoveries,
+  setShowAllDiscoveries,
   anomalies,
 }: DiscoveriesViewProps) {
-  const convertClassificationsToAnomalies = (classificationData: any[]): Anomaly[] => {
-    return classificationData.map((classification) => {
-      const dbAnomalyId = `db-${classification.anomaly}`
-      const anomaly = anomalies.find((a) => a.id === dbAnomalyId)
+  const [activeTab, setActiveTab] = useState("discoveries")
 
-      if (anomaly) {
-        return {
-          ...anomaly,
-          classified: true,
-          discoveryDate: new Date(classification.created_at).toLocaleDateString(),
-          classificationId: classification.id,
-          classificationContent: classification.content,
-          discoveredBy: showAllDiscoveries ? `User${classification.author?.slice(-4)}` : undefined,
-        }
-      }
-
-      const classificationTypeMap: Record<string, Anomaly["type"]> = {
-        planet: "exoplanet",
-        sunspot: "sunspot",
-        asteroid: "asteroid",
-        "DiskDetective": "accretion_disc",
-        "active-asteroid": "asteroid",
-        "telescope-minorPlanet": "asteroid",
-      }
-
-      const projectMap: Record<Anomaly["type"], string> = {
-        exoplanet: "planet-hunters",
-        sunspot: "sunspots",
-        asteroid: "daily-minor-planet",
-        accretion_disc: "disk-detective",
-      }
-
-      const anomalyType = classificationTypeMap[classification.classificationtype] || "exoplanet"
-      const anomalyProject = projectMap[anomalyType] || "planet-hunters"
-
-      return {
-        id: `classification-${classification.id}`,
-        name: `ANOMALY-${classification.anomaly}`,
-        type: anomalyType,
-        project: anomalyProject,
-        x: 50,
-        y: 50,
-        brightness: 1,
-        size: 1,
-        color: "#4FC3F7",
-        sector: "Unknown Sector",
-        shape: "circle" as const,
-        pulseSpeed: 2,
-        glowIntensity: 0.5,
-        classified: true,
-        discoveryDate: new Date(classification.created_at).toLocaleDateString(),
-        classificationId: classification.id,
-        classificationContent: classification.content,
-        discoveredBy: showAllDiscoveries ? `User${classification.author?.slice(-4)}` : undefined,
-      } as Anomaly & { classificationId: number; classificationContent: string; discoveredBy?: string }
-    })
+  const getAnomalyForClassification = (classification: DatabaseClassification): Anomaly | null => {
+    return anomalies.find((a) => a.id === `db-${classification.anomaly}`) || null
   }
 
-  const displayClassifications = showAllDiscoveries ? allClassifications : classifications
-  const classifiedAnomalies = convertClassificationsToAnomalies(displayClassifications)
-  const filteredAnomalies = classifiedAnomalies.filter((a) => !selectedProject || a.project === selectedProject.id)
+  const getClassificationTypeColor = (type: string | null) => {
+    switch (type) {
+      case "planet":
+        return "bg-[#a8d8ea]"
+      case "sunspot":
+        return "bg-[#ffd93d]"
+      case "asteroid":
+        return "bg-[#c7cedb]"
+      case "disk":
+        return "bg-[#b8e6b8]"
+      default:
+        return "bg-[#87ceeb]"
+    }
+  }
+
+  const completedMissions = projectMissions.filter((m) => m.completed)
   const availableMissions = projectMissions.filter((m) => !m.completed)
 
-  const getAnomalyIcon = (type: string) => {
-    switch (type) {
-      case "exoplanet":
-        return <Planet className="h-4 w-4" />
-      case "sunspot":
-        return <Sun className="h-4 w-4" />
-      case "asteroid":
-        return <Asterisk className="h-4 w-4" />
-      case "accretion_disc":
-        return <Disc className="h-4 w-4" />
-      default:
-        return <Planet className="h-4 w-4" />
-    };
-  };
-
-  const getAnomalyTypeLabel = (type: string) => {
-    switch (type) {
-      case "exoplanet":
-        return "Planet"
-      case "sunspot":
-        return "Sunspot"
-      case "asteroid":
-        return "Asteroid"
-      case "accretion_disc":
-        return "Accretion Disc"
-      default:
-        return type
-    };
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2E3440] via-[#3B4252] to-[#434C5E] p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Button onClick={onBack} className="bg-[#5E81AC] text-white hover:bg-[#81A1C1]">
+    <div className="h-full flex flex-col relative overflow-hidden bg-[#1a1a2e]">
+      {/* Header */}
+      <div className="p-4 lg:p-6 border-b border-[#a8d8ea]/20 bg-[#16213e]/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              onClick={onBack}
+              className="text-[#a8d8ea] hover:bg-[#a8d8ea]/20 border border-[#a8d8ea]/30"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Telescope
             </Button>
-            <h1 className="text-2xl font-bold text-[#ECEFF4]">Discovery Archive</h1>
-            <Badge className="bg-[#EBCB8B] text-[#2E3440]">
-              {showAllDiscoveries ? "All Users" : "Your Discoveries"}
-            </Badge>
-          </div>
-
-          {selectedProject && (
-            <div className="bg-gradient-to-r from-[#3B4252] to-[#434C5E] border border-[#5E81AC] rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center text-white"
-                  style={{ background: selectedProject.bgGradient }}
-                >
-                  {selectedProject.icon}
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-[#ECEFF4]">{selectedProject.name}</h2>
-                  <p className="text-[#D8DEE9] text-sm">{selectedProject.description}</p>
-                </div>
-              </div>
+            <div>
+              <h1 className="text-xl lg:text-2xl font-bold text-[#e8f4f8] font-mono">DISCOVERY ARCHIVE</h1>
+              <p className="text-[#a8d8ea] text-sm font-mono">
+                {selectedProject ? `${selectedProject.name.toUpperCase()} PROJECT` : "ALL PROJECTS"}
+              </p>
             </div>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-[#ECEFF4]">
-              <CheckCircle2 className="h-5 w-5 text-[#88C0D0]" />
-              Classified Discoveries ({filteredAnomalies.length})
-            </h3>
-
-            {filteredAnomalies.length === 0 ? (
-              <Card className="bg-gradient-to-br from-[#3B4252] to-[#434C5E] border-[#5E81AC] text-center p-6">
-                <p className="text-[#D8DEE9]">No discoveries yet.</p>
-                <p className="text-[#D8DEE9] text-sm mt-1">Explore the telescope to find anomalies!</p>
-              </Card>
-            ) : (
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-                {filteredAnomalies.map((anomaly) => {
-                  const project = projects.find((p) => p.id === anomaly.project)
-                  const isOtherUser = showAllDiscoveries && "discoveredBy" in anomaly && anomaly.discoveredBy
-
-                  return (
-                    <Card
-                      key={anomaly.id}
-                      className="bg-gradient-to-r from-[#3B4252] to-[#434C5E] border-[#4C566A] hover:border-[#5E81AC] transition-colors"
-                    >
-                      <CardHeader className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-10 h-10 rounded-full flex items-center justify-center text-white"
-                              style={{ background: project?.bgGradient }}
-                            >
-                              {getAnomalyIcon(anomaly.type)}
-                            </div>
-                            <div>
-                              <CardTitle className="text-sm text-[#ECEFF4] flex items-center gap-2">
-                                {anomaly.name}
-                              </CardTitle>
-                              <CardDescription className="text-xs text-[#D8DEE9] flex items-center gap-2">
-                                <Badge variant="outline" className="text-xs border-[#5E81AC] text-[#88C0D0]">
-                                  {(anomaly as any)?.dbData?.anomalySet || getAnomalyTypeLabel(anomaly.type)}
-                                </Badge>
-                                <span>•</span>
-                                <span>{anomaly.sector}</span>
-                              </CardDescription>
-                            </div>
-                          </div>
-                          <Button
-                            size="sm"
-                            onClick={() => onViewAnomaly(anomaly)}
-                            className="bg-[#5E81AC] text-white hover:bg-[#81A1C1]"
-                          >
-                            <Eye className="h-3 w-3 mr-1" />
-                            View
-                          </Button>
-                        </div>
-                        <div className="flex justify-between items-center text-xs text-[#D8DEE9] mt-2">
-                          <span>Classified: {anomaly.discoveryDate}</span>
-                          <span>{project?.name}</span>
-                        </div>
-                        {(anomaly as any).classificationContent && (
-                          <div className="text-xs text-[#D8DEE9] mt-2 p-2 bg-[#2E3440] rounded">
-                            {(anomaly as any).classificationContent}
-                          </div>
-                        )}
-                      </CardHeader>
-                    </Card>
-                  )
-                })}
-              </div>
-            )}
           </div>
+          <div className="flex items-center gap-3">
+            <Badge className="bg-[#a8d8ea] text-[#1a1a2e] font-mono">{classifications.length} YOUR FINDS</Badge>
+            <Badge className="bg-[#87ceeb] text-[#1a1a2e] font-mono">{allClassifications.length} TOTAL</Badge>
+          </div>
+        </div>
+      </div>
 
-          <div>
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-[#ECEFF4]">
-              <Clock className="h-5 w-5 text-[#EBCB8B]" />
-              Active Missions ({availableMissions.length})
-            </h3>
+      {/* Content */}
+      <div className="flex-1 overflow-hidden">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+          <TabsList className="mx-4 lg:mx-6 mt-4 bg-[#16213e]/60 border border-[#a8d8ea]/20">
+            <TabsTrigger
+              value="discoveries"
+              className="data-[state=active]:bg-[#a8d8ea] data-[state=active]:text-[#1a1a2e] text-[#e8f4f8] font-mono"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              Your Discoveries
+            </TabsTrigger>
+            <TabsTrigger
+              value="global"
+              className="data-[state=active]:bg-[#a8d8ea] data-[state=active]:text-[#1a1a2e] text-[#e8f4f8] font-mono"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Global Archive
+            </TabsTrigger>
+            <TabsTrigger
+              value="missions"
+              className="data-[state=active]:bg-[#a8d8ea] data-[state=active]:text-[#1a1a2e] text-[#e8f4f8] font-mono"
+            >
+              <Target className="h-4 w-4 mr-2" />
+              Missions
+            </TabsTrigger>
+          </TabsList>
 
-            {availableMissions.length === 0 ? (
-              <Card className="bg-gradient-to-br from-[#3B4252] to-[#434C5E] border-[#5E81AC] text-center p-6">
-                <p className="text-[#D8DEE9]">No active missions.</p>
-              </Card>
+          <TabsContent value="discoveries" className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4">
+            {classifications.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-24 h-24 border-2 border-dashed border-[#a8d8ea]/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Sparkles className="h-8 w-8 text-[#a8d8ea]/50" />
+                </div>
+                <h3 className="text-xl font-bold text-[#e8f4f8] mb-2 font-mono">NO DISCOVERIES YET</h3>
+                <p className="text-[#a8d8ea] font-mono">Start exploring the cosmos to make your first discovery!</p>
+              </div>
             ) : (
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-                {availableMissions.map((mission) => {
-                  const project = projects.find((p) => p.id === mission.project)
+              <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+                {classifications.map((classification) => {
+                  const anomaly = getAnomalyForClassification(classification)
                   return (
                     <Card
-                      key={mission.id}
-                      className="bg-gradient-to-r from-[#3B4252] to-[#434C5E] border-[#4C566A] hover:border-[#EBCB8B] transition-colors"
+                      key={classification.id}
+                      className="bg-[#16213e]/60 border border-[#a8d8ea]/20 hover:border-[#a8d8ea]/40 transition-all cursor-pointer backdrop-blur-sm"
+                      onClick={() => onViewClassification(classification)}
                     >
-                      <CardHeader className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-10 h-10 rounded-full flex items-center justify-center"
-                              style={{ background: project?.bgGradient }}
-                            >
-                              {mission.icon}
-                            </div>
-                            <div>
-                              <CardTitle className="text-sm text-[#ECEFF4]">{mission.title}</CardTitle>
-                              <CardDescription className="text-xs text-[#D8DEE9]">
-                                {mission.description}
-                              </CardDescription>
-                            </div>
-                          </div>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-[#e8f4f8] text-lg font-mono">#{classification.id}</CardTitle>
                           <Badge
-                            variant="outline"
-                            className={`text-xs ${
-                              mission.difficulty === "easy"
-                                ? "border-[#A3BE8C] text-[#A3BE8C]"
-                                : mission.difficulty === "medium"
-                                  ? "border-[#EBCB8B] text-[#EBCB8B]"
-                                  : "border-[#BF616A] text-[#BF616A]"
-                            }`}
+                            className={`${getClassificationTypeColor(
+                              classification.classificationtype,
+                            )} text-[#1a1a2e] font-mono`}
                           >
-                            {mission.difficulty}
+                            {classification.classificationtype?.toUpperCase() || "UNKNOWN"}
                           </Badge>
                         </div>
-                        <div className="flex justify-between items-center text-xs text-[#D8DEE9] mt-2">
-                          <div className="flex items-center gap-1">
-                            {project?.icon}
-                            <span>{project?.name}</span>
-                          </div>
-                          <div className="font-medium text-[#88C0D0]">{mission.reward}</div>
-                        </div>
                       </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-sm text-[#a8d8ea] font-mono">
+                            <Calendar className="h-4 w-4" />
+                            <span>{new Date(classification.created_at).toLocaleDateString()}</span>
+                          </div>
+                          {anomaly && (
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded-full"
+                                style={{
+                                  backgroundColor: anomaly.color,
+                                  boxShadow: `0 0 8px ${anomaly.color}66`,
+                                }}
+                              />
+                              <span className="text-[#e8f4f8] text-sm font-mono">{anomaly.name}</span>
+                            </div>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              if (anomaly) onViewAnomaly(anomaly)
+                            }}
+                            className="w-full text-[#a8d8ea] hover:bg-[#a8d8ea]/20 border border-[#a8d8ea]/30 font-mono"
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            View in Telescope
+                          </Button>
+                        </div>
+                      </CardContent>
                     </Card>
                   )
                 })}
               </div>
             )}
-          </div>
-        </div>
+          </TabsContent>
+
+          <TabsContent value="global" className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-[#e8f4f8] font-mono">GLOBAL DISCOVERIES</h3>
+              <Button
+                onClick={() => setShowAllDiscoveries(!showAllDiscoveries)}
+                className="bg-[#a8d8ea] text-[#1a1a2e] hover:bg-[#87ceeb] font-mono"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                All Users
+              </Button>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+              {allClassifications.slice(0, showAllDiscoveries ? undefined : 12).map((classification) => {
+                const anomaly = getAnomalyForClassification(classification)
+                return (
+                  <Card
+                    key={classification.id}
+                    className="bg-[#16213e]/60 border border-[#a8d8ea]/20 hover:border-[#a8d8ea]/40 transition-all cursor-pointer backdrop-blur-sm"
+                    onClick={() => onViewClassification(classification)}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-[#e8f4f8] text-lg font-mono">#{classification.id}</CardTitle>
+                        <Badge
+                          className={`${getClassificationTypeColor(
+                            classification.classificationtype,
+                          )} text-[#1a1a2e] font-mono`}
+                        >
+                          {classification.classificationtype?.toUpperCase() || "UNKNOWN"}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-sm text-[#a8d8ea] font-mono">
+                          <User className="h-4 w-4" />
+                          <span>User {classification.author?.slice(0, 8) || "Anonymous"}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-[#a8d8ea] font-mono">
+                          <Calendar className="h-4 w-4" />
+                          <span>{new Date(classification.created_at).toLocaleDateString()}</span>
+                        </div>
+                        {anomaly && (
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-4 h-4 rounded-full"
+                              style={{
+                                backgroundColor: anomaly.color,
+                                boxShadow: `0 0 8px ${anomaly.color}66`,
+                              }}
+                            />
+                            <span className="text-[#e8f4f8] text-sm font-mono">{anomaly.name}</span>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="missions" className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
+            {/* Available Missions */}
+            <div>
+              <h3 className="text-lg font-bold text-[#e8f4f8] mb-4 font-mono flex items-center gap-2">
+                <Target className="h-5 w-5 text-[#a8d8ea]" />
+                ACTIVE MISSIONS
+              </h3>
+              <div className="grid gap-4 lg:grid-cols-2">
+                {availableMissions.map((mission) => (
+                  <Card
+                    key={mission.id}
+                    className="bg-[#16213e]/60 border border-[#a8d8ea]/20 hover:border-[#a8d8ea]/40 transition-all backdrop-blur-sm"
+                  >
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-[#e8f4f8] font-mono">{mission.name}</CardTitle>
+                        <Badge className="bg-[#ffd93d] text-[#1a1a2e] font-mono">ACTIVE</Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-[#a8d8ea] text-sm mb-4 font-mono">{mission.description}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-sm text-[#e8f4f8] font-mono">
+                          <Star className="h-4 w-4 text-[#ffd93d]" />
+                          <span>{mission.reward} points</span>
+                        </div>
+                        <Badge className="bg-[#a8d8ea]/20 text-[#a8d8ea] font-mono">
+                          {mission.progress || 0}/{mission.target}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Completed Missions */}
+            {completedMissions.length > 0 && (
+              <div>
+                <h3 className="text-lg font-bold text-[#e8f4f8] mb-4 font-mono flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-[#b8e6b8]" />
+                  COMPLETED MISSIONS
+                </h3>
+                <div className="grid gap-4 lg:grid-cols-2">
+                  {completedMissions.map((mission) => (
+                    <Card
+                      key={mission.id}
+                      className="bg-[#16213e]/40 border border-[#b8e6b8]/20 backdrop-blur-sm opacity-75"
+                    >
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-[#e8f4f8] font-mono">{mission.name}</CardTitle>
+                          <Badge className="bg-[#b8e6b8] text-[#1a1a2e] font-mono">COMPLETE</Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-[#a8d8ea] text-sm mb-4 font-mono">{mission.description}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm text-[#e8f4f8] font-mono">
+                            <Star className="h-4 w-4 text-[#ffd93d]" />
+                            <span>{mission.reward} points earned</span>
+                          </div>
+                          <Badge className="bg-[#b8e6b8]/20 text-[#b8e6b8] font-mono">
+                            {mission.target}/{mission.target}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

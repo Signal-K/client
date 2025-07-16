@@ -46,6 +46,7 @@ interface ImageAnnotatorProps {
   parentPlanetLocation?: string;
   classificationParent?: string;
   annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'AA' | 'CoMS' | 'Sunspots' | 'Custom';
+  className?: string;
 };
 
 export default function ImageAnnotator({
@@ -60,6 +61,7 @@ export default function ImageAnnotator({
   parentPlanetLocation,
   structureItemId,
   annotationType,
+  className = '', // default empty
 }: ImageAnnotatorProps) {
   const router = useRouter();
 
@@ -298,7 +300,7 @@ export default function ImageAnnotator({
   };
 
   return (
-    <div className="space-y-4 max-w-full px-2 md:px-4 mx-auto overflow-x-hidden overflow-y-auto max-h-screen">
+    <div className={`space-y-4 max-w-full px-2 md:px-4 mx-auto overflow-x-hidden overflow-y-auto max-h-screen ${className}`}>
       <div className="flex justify-between items-center">
         <AnnotationTools
           currentTool={currentTool}

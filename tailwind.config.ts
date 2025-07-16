@@ -11,8 +11,56 @@ const config: Config = {
   theme: {
     extend: {
       backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        'tech-grid': `
+          linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)
+        `,
+        'stars': `
+          radial-gradient(white 1px, transparent 1px),
+          radial-gradient(white 1px, transparent 1px)
+        `,
+        'gradient-radial': "radial-gradient(var(--tw-gradient-stops))",
+        'gradient-conic': "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      },
+      backgroundSize: {
+        'tech-grid': '40px 40px',
+        'stars': '200px 200px, 100px 100px',
+      },
+      animation: {
+        'stars-twinkle': 'twinkle 4s ease-in-out infinite',
+        'grid-shimmer': 'shimmer 10s linear infinite',
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+      },
+      keyframes: {
+        twinkle: {
+          '0%, 100%': { opacity: '0.8' },
+          '50%': { opacity: '0.3' },
+        },
+        shimmer: {
+          '0%': {
+            backgroundPosition: '0px 0px',
+          },
+          '100%': {
+            backgroundPosition: '100px 100px',
+          },
+        },
+        'accordion-down': {
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
+        },
+        'accordion-up': {
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -61,30 +109,9 @@ const config: Config = {
           "5": "hsl(var(--chart-5))",
         },
       },
-      keyframes: {
-        "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
-        },
-        "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-      },
     },
   },
   plugins: [require("tailwindcss-animate")],
 }
+
 export default config

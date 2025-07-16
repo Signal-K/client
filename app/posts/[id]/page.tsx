@@ -5,6 +5,9 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
 import StructuresOnPlanet from "@/components/Structures/Structures";
 import Navbar from "@/components/Layout/Navbar";
+import GameNavbar from "@/components/Layout/Tes";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface Classification {
   id: number;
@@ -15,10 +18,13 @@ interface Classification {
   media: string[] | null;
   classificationtype: string | null;
   classificationConfig?: any | null;
-}
+};
 
 export default function SinglePostPage({ params }: { params: { id: string } }) {
   const supabase = useSupabaseClient();
+
+  const router = useRouter();
+
   const [classification, setClassification] = useState<Classification | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,11 +85,17 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
+
       <img
         className="absolute inset-0 w-full h-full object-cover z-0"
         src="/assets/Backdrops/Earth.png"
         alt="Backdrop"
       />
+
+      <div className="w-full z-10">
+        <GameNavbar />
+      </div>
+
       <div className="relative z-10 flex items-center justify-center px-4 py-12 min-h-screen">
         {classification.author && (
           <div className="w-full max-w-3xl">
@@ -94,7 +106,6 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
               content={classification.content || "No content available"}
               category={classification.classificationtype || "Unknown"}
               images={classification.media || []}
-              classificationConfiguration={classification.classificationConfig}
             />
             {/* <div className="mt-8">
               <StructuresOnPlanet author={classification.author} />

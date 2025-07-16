@@ -6,7 +6,7 @@ interface AnomalyComponentProps {
   anomaly: Anomaly
   onClick: (anomaly: Anomaly) => void
   isHighlighted?: boolean
-};
+}
 
 export function AnomalyComponent({ anomaly, onClick, isHighlighted = false }: AnomalyComponentProps) {
   const baseClasses = "absolute cursor-pointer transition-all duration-300 hover:scale-125 hover:brightness-125"

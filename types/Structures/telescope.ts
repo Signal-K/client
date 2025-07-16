@@ -36,15 +36,15 @@ export interface Project {
 }
 
 export interface Mission {
+  target: ReactNode
   id: string
-  title: string
+  name: string
   description: string
-  project: string
-  reward: string
-  difficulty: "easy" | "medium" | "hard"
+  project: string | null
+  progress: number
   completed: boolean
-  icon: ReactNode
-};
+  reward: string
+}
 
 export interface Star {
   x: number
