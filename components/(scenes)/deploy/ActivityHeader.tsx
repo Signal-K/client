@@ -4,14 +4,8 @@ import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { AvatarGenerator } from "@/components/Account/Avatar";
 import ProfileDetailsPanel from "@/components/Account/ProfileDetailsPanel";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import UserMilestoneMissionSummary from "@/components/Structures/Missions/MissionProgress";
+import { Globe } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 export default function ActivityHeader({
   landmarksExpanded,
@@ -65,68 +59,28 @@ export default function ActivityHeader({
   const displayName = profile?.username || session?.user?.email || "User";
 
   return (
-    <header
-      className="transition-all duration-500 w-full px-4 sm:px-6 pt-4 py-10 sm:pt-6 bg-cover bg-center bg-no-repeat"
-      style={{
-        height: scrolled ? 60 : landmarksExpanded ? "70vh" : 220,
-        backgroundImage: "url('/assets/Backdrops/Earth.png')",
-      }}
-    >
-      <div className="w-full flex flex-row items-start justify-between gap-4 z-10 text-white overflow-x-auto">
-        {/* Left Section: Avatar + Buttons */}
-        <div className="flex flex-row items-start gap-4 min-w-[250px] max-w-full flex-shrink-0">
-          {!scrolled && (
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-white overflow-hidden">
-              <AvatarGenerator author={session?.user.id ?? ""} />
+    <Card className="relative w-full h-48 sm:h-64 overflow-hidden rounded-lg border-chart-4/30 bg-card">
+      <img
+        src="/assets/Backdrops/Earth.png"
+        alt="Earth"
+        className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent via-card/20 flex items-end p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
+          <div className="flex items-center gap-3">
+            {/* <Globe className="w-8 h-8 text-chart-4" /> */}
+            <div>
+              <AvatarGenerator author={session?.user.id || ""} />
+              <h2 className="text-l font-bold text-foreground">
+                {profile?.username || "USERNAME"}
+              </h2>
             </div>
-          )}
-
-          <div className="flex flex-col">
-            <h2 className="text-lg sm:text-2xl font-bold">{displayName}</h2>
-
-            {!scrolled && (
-              <div className="mt-2 flex flex-col sm:flex-row gap-2">
-                <Button
-                  onClick={() => setShowDetailsModal(true)}
-                  variant="secondary"
-                  className="bg-[color:var(--color-primary)] hover:bg-[color:var(--color-primary-hover)] text-white text-xs sm:text-sm px-3 py-1"
-                >
-                  View Profile
-                </Button>
-
-                <Button
-                  onClick={onToggleLandmarks}
-                  className="inline-flex items-center px-3 py-1 rounded bg-[color:var(--color-accent)] hover:bg-[color:var(--color-accent-hover)] transition text-white font-semibold text-xs sm:text-sm"
-                >
-                  {landmarksExpanded ? "Hide Landmarks" : "View Landmarks"}
-                </Button>
-              </div>
-            )}
+          </div>
+          <div className="flex flex-col items-start sm:items-end px-2 sm:px-8 text-sm text-muted-foreground">
+            Landmarks
           </div>
         </div>
-
-        {/* Right Section: Stardust + Missions */}
-        {!scrolled && (
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
-            <div className="text-sm sm:text-xl font-semibold whitespace-nowrap">
-              {profile?.classificationPoints ?? 0} Stardust
-            </div>
-
-            <div className="w-full">
-              <UserMilestoneMissionSummary groupsToShow={groupsToShow} />
-            </div>
-          </div>
-        )}
       </div>
-
-      <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle className="text-[color:var(--color-primary)]">Your Profile</DialogTitle>
-          </DialogHeader>
-          <ProfileDetailsPanel onClose={() => setShowDetailsModal(false)} />
-        </DialogContent>
-      </Dialog>
-    </header>
+    </Card>
   );
 };

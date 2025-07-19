@@ -35,7 +35,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
             <UserAnomaliesProvider>
               <InventoryProvider>
                 <LayoutContent>
-                  <div className="sci-fi-overlay">
+                  {/* <div className="sci-fi-overlay">
                     <svg className="sci-fi-shape sci-fi-shape-1" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                       <path d="M100,10 L190,50 L190,150 L100,190 L10,150 L10,50 Z" fill="none" stroke="#5FCBC3" strokeWidth="2" />
                       <path d="M100,30 L170,60 L170,140 L100,170 L30,140 L30,60 Z" fill="none" stroke="#85DDA2" strokeWidth="2" />
@@ -58,7 +58,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                     <div className="sci-fi-wire sci-fi-wire-2"></div>
                     <div className="sci-fi-signal sci-fi-signal-1"></div>
                     <div className="sci-fi-signal sci-fi-signal-2"></div>
-                  </div>
+                  </div> */}
                   <div className="relative min-h-screen w-full flex flex-col">
                     {children}
                   </div>

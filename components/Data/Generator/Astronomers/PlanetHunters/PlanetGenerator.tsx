@@ -20,7 +20,7 @@ interface PlanetStats {
   [key: string]: any;
 }
 
-export default function PlanetGenerator({ classificationId, editMode }: PlanetGeneratorProps) {
+export default function PlanetGenerator({ classificationId }: PlanetGeneratorProps) {
   const supabase = useSupabaseClient();
   const [planetConfig, setPlanetConfig] = useState<PlanetConfig>(defaultPlanetConfig);
   const [importDialogOpen, setImportDialogOpen] = useState(false);

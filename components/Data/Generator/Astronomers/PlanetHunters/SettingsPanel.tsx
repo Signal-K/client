@@ -9,7 +9,6 @@ import { Download, Upload, Save } from "lucide-react"
 import BasicSettings from "./Settings/BasicSettings";
 import TerrainSettings from "./Settings/TerrainSettings";
 import ColorSettings from "./Settings/ColourSettings";
-import { createClient } from "@supabase/supabase-js"
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface SettingsPanelProps {

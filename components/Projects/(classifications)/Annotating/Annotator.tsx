@@ -296,11 +296,11 @@ export default function ImageAnnotator({
     } catch (error: any) {
       console.error("Unexpected error: ", error);
       alert("Classification error occurred. Please try again");
-    }
+    };
   };
 
   return (
-    <div className={`space-y-4 max-w-full px-2 md:px-4 mx-auto overflow-x-hidden overflow-y-auto max-h-screen ${className}`}>
+    <div className={`space-y-2 max-w-full px-2 md:px-4 mx-auto overflow-x-hidden overflow-y-auto max-h-screen ${className}`}>
       <div className="flex justify-between items-center">
         <AnnotationTools
           currentTool={currentTool}

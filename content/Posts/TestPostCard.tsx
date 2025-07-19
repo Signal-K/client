@@ -73,55 +73,11 @@ export default function PostCard({
   const supabase = useSupabaseClient()
   const session = useSession()
 
-  const [comments, setComments] = useState<CommentProps[]>([])
-  const [newComment, setNewComment] = useState("")
   const [voteCount, setVoteCount] = useState(votes)
   const [isSharing, setIsSharing] = useState(false)
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const shareCardRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
-
-  const fetchComments = async () => {
-    setLoading(true)
-    try {
-      const { data: commentsData, error: commentsError } = await supabase
-        .from("comments")
-        .select("id, content, created_at, author, classification_id")
-        .eq("classification_id", classificationId)
-        .order("created_at", { ascending: false })
-
-      if (commentsError) throw commentsError
-
-      const authorIds = [...new Set(commentsData.map((c) => c.author))]
-      const { data: profilesData, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, username")
-        .in("id", authorIds)
-
-      if (profilesError) throw profilesError
-
-      const profileMap = Object.fromEntries(
-        profilesData.map((p) => [p.id, p.username])
-      )
-      const enrichedComments = commentsData.map((comment) => ({
-        ...comment,
-        username: profileMap[comment.author] || "Unknown",
-      }))
-
-      setComments(enrichedComments)
-    } catch (error: any) {
-      console.error(error)
-      setError("Error fetching comments.")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchComments()
-  }, [])
 
   const handleVoteClick = async () => {
     if (!session) return
@@ -142,24 +98,6 @@ export default function PostCard({
       console.error("Error voting:", error)
     }
   }
-
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return
-    try {
-      const { error } = await supabase.from("comments").insert([
-        {
-          content: newComment,
-          classification_id: classificationId,
-          author: session?.user.id,
-        },
-      ])
-      if (error) throw error
-      setNewComment("")
-      fetchComments()
-    } catch (error: any) {
-      console.error("Error adding comment:", error)
-    };
-  };
 
   const goToNextImage = () =>
     setCurrentIndex((prev) => (prev + 1) % images.length)
@@ -219,7 +157,7 @@ export default function PostCard({
       className="flex items-center justify-center w-full px-4 overflow-hidden"
       ref={shareCardRef}
     >
-      <Card className="w-full max-w-4xl md:w-4/5 max-h-screen bg-white border border-[#D8DEE9] shadow-2xl rounded-xl overflow-y-auto">
+      <Card className="w-full max-w-4xl md:w-4/5 bg-white border border-[#D8DEE9] shadow-2xl rounded-xl overflow-y-auto">
         <CardHeader className="flex flex-row items-center gap-3 p-4 border-b border-gray-200 bg-gray-50">
           {session && <AvatarGenerator author={session.user.id} />}
           <div className="flex flex-col">
@@ -238,11 +176,11 @@ export default function PostCard({
             onClick={() => setIsLightboxOpen(true)}
           >
             {images.length > 0 && (
-              <div className="relative">
+              <div className="">
                 <img
                   src={images[currentIndex]}
                   alt={`Image ${currentIndex + 1}`}
-                  className="w-full max-h-[250px] object-contain cursor-pointer rounded-lg transition-all duration-200"
+                  className="w-full max-h-[80px] object-contain cursor-pointer rounded-lg transition-all duration-200"
                 />
                 {images.length > 1 && (
                   <>
@@ -276,8 +214,8 @@ export default function PostCard({
               </div>
             )}
           </div>
-          <div className="p-4 space-y-2 bg-gradient-to-b from-gray-50 to-white">
-            <p className="text-sm text-gray-800">{content}</p>
+          <div className="p-4 bg-gradient-to-b from-gray-50 to-white">
+            <p className="text-sm text-gray-800 line-clamp-6 min-h-[3rem]">{content}</p>
           </div>
         </CardContent>
 
@@ -342,60 +280,12 @@ export default function PostCard({
           </Popover>
         </CardFooter>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border-t border-gray-200 bg-white">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">Comments</h3>
-            {loading ? (
-              <p className="text-gray-600">Loading comments...</p>
-            ) : error ? (
-              <p className="text-red-500">{error}</p>
-            ) : comments.length === 0 ? (
-              <p className="text-gray-500">No comments yet. Be the first to comment!</p>
-            ) : (
-              <div className="space-y-4">
-                {comments.map((comment) => (
-                  <div key={comment.id} className="flex gap-3">
-                    <Avatar className="h-8 w-8 border border-green-500">
-                      <AvatarFallback className="bg-white text-gray-800 text-xs">
-                        {comment.username
-                          ? comment.username[0].toUpperCase()
-                          : "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-gray-800">
-                          {comment.username}
-                        </p>
-                      </div>
-                      <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {session && (
-              <div className="flex flex-col gap-2 pt-4">
-                <Textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Add a comment..."
-                />
-                <Button size="sm" onClick={handleAddComment} className="self-end">
-                  <Send className="h-4 w-4 mr-1" />
-                  Post
-                </Button>
-              </div>
-            )}
+        {classificationType === "planet" && (
+          <div className="p-4 border-t border-gray-200 bg-white">
+            <h3 className="text-sm font-semibold text-gray-700 mb-2">Surveyor Tools</h3>
+            <SurveyorCalculator classificationId={classificationId.toString()} />
           </div>
-
-          {classificationType === "planet" && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Surveyor Tools</h3>
-              <SurveyorCalculator classificationId={classificationId.toString()} />
-            </div>
-          )}
-        </div>
+        )}
 
         <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
           <DialogContent className="max-w-4xl bg-white border-gray-300 text-gray-800">

@@ -21,13 +21,17 @@ interface OtherClassification {
   created_at: string;
 }
 
+interface RecentActivityProps {
+  activityFeed: CommentVote[];
+  otherClassifications: OtherClassification[];
+  isInsidePanel?: boolean;
+}
+
 export default function RecentActivity({
   activityFeed,
   otherClassifications,
-}: {
-  activityFeed: CommentVote[];
-  otherClassifications: OtherClassification[];
-}) {
+  isInsidePanel = false,
+}: RecentActivityProps) {
   const [activeTab, setActiveTab] = useState<"comments" | "others">("comments");
 
   const ClassificationIcon = ({ type }: { type: string | null }) => {
@@ -36,7 +40,14 @@ export default function RecentActivity({
         return (
           <svg className="w-10 h-10 animate-pulse" viewBox="0 0 64 64">
             <circle cx="32" cy="32" r="20" fill="#3B82F6" />
-            <circle cx="32" cy="32" r="24" stroke="#3B82F6" strokeOpacity="0.3" strokeWidth="4" />
+            <circle
+              cx="32"
+              cy="32"
+              r="24"
+              stroke="#3B82F6"
+              strokeOpacity="0.3"
+              strokeWidth="4"
+            />
             <circle cx="20" cy="24" r="4" fill="white" fillOpacity="0.6" />
           </svg>
         );
@@ -78,7 +89,14 @@ export default function RecentActivity({
   };
 
   return (
-    <section className="rounded-2xl bg-white/80 p-4 border shadow space-y-4">
+    <section
+      className={`rounded-2xl ${
+        isInsidePanel ? "bg-card" : "bg-white/80"
+      } p-4 border ${
+        isInsidePanel ? "border-border" : "border"
+      } shadow space-y-4 max-h-[480px] overflow-auto`}
+    >
+      {/* Tabs */}
       <div className="flex border-b border-gray-300 mb-2">
         <button
           className={`py-2 px-4 -mb-px font-semibold rounded-t-lg transition-colors ${
@@ -102,6 +120,7 @@ export default function RecentActivity({
         </button>
       </div>
 
+      {/* Tab Content */}
       {activeTab === "comments" ? (
         <>
           {activityFeed.length === 0 ? (
@@ -109,17 +128,27 @@ export default function RecentActivity({
               No comments or votes in the last 7 days.
             </p>
           ) : (
-            <ul className="space-y-2 max-h-80 overflow-y-auto">
+            <ul className="space-y-2">
               {activityFeed.map((item, idx) => (
                 <li
                   key={idx}
-                  className="flex items-start gap-3 bg-slate-100 rounded-lg p-3"
+                  className={`flex items-start gap-3 rounded-lg p-3 ${
+                    isInsidePanel ? "bg-popover" : "bg-slate-100"
+                  }`}
                 >
                   <div className="pt-1">
                     {item.type === "comment" ? (
-                      <MessageCircle className="text-sky-500" />
+                      <MessageCircle
+                        className={`${
+                          isInsidePanel ? "text-sky-500" : "text-sky-500"
+                        }`}
+                      />
                     ) : (
-                      <Star className="text-yellow-400" />
+                      <Star
+                        className={`${
+                          isInsidePanel ? "text-yellow-400" : "text-yellow-400"
+                        }`}
+                      />
                     )}
                   </div>
                   <div>
@@ -127,9 +156,7 @@ export default function RecentActivity({
                       {item.type === "comment"
                         ? `Someone commented: "${item.content}"`
                         : `Received a ${
-                            item.vote_type === "up"
-                              ? "👍 upvote"
-                              : "👎 downvote"
+                            item.vote_type === "up" ? "👍 upvote" : "👎 downvote"
                           }`}
                     </p>
                     <p className="text-xs text-muted-foreground">
@@ -139,7 +166,7 @@ export default function RecentActivity({
                       {" • "}
                       <Link
                         href={`/posts/${item.classification_id}`}
-                        className="text-blue-600 hover:underline"
+                        className="text-primary hover:underline"
                       >
                         View Post
                       </Link>
@@ -157,20 +184,32 @@ export default function RecentActivity({
               No recent classifications from other users.
             </p>
           ) : (
-            <ul className="space-y-3 max-h-80 overflow-y-auto pr-2">
+            <ul className="space-y-3 pr-2">
               {otherClassifications.map((c) => (
                 <li
                   key={c.id}
-                  className="flex items-center gap-4 p-3 bg-slate-50 rounded-lg border border-gray-200 shadow-sm"
+                  className={`flex items-center gap-4 p-3 rounded-lg border shadow-sm ${
+                    isInsidePanel
+                      ? "bg-popover border-border"
+                      : "bg-slate-50 border-gray-200"
+                  }`}
                 >
                   <div className="flex-shrink-0">
                     <ClassificationIcon type={c.classificationtype} />
                   </div>
                   <div className="flex-grow">
-                    <p className="text-sm font-semibold capitalize text-indigo-700">
+                    <p
+                      className={`text-sm font-semibold capitalize ${
+                        isInsidePanel ? "text-indigo-400" : "text-indigo-700"
+                      }`}
+                    >
                       {c.classificationtype || "Unknown Type"}
                     </p>
-                    <p className="text-xs text-gray-600 truncate">
+                    <p
+                      className={`text-xs truncate ${
+                        isInsidePanel ? "text-muted-foreground" : "text-gray-600"
+                      }`}
+                    >
                       {c.content?.slice(0, 100) || "No content"}
                     </p>
                   </div>

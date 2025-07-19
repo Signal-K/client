@@ -33,8 +33,6 @@ export function AnnotationCanvas({
   setCurrentDrawing,
   currentCategory,
 }: AnnotationCanvasProps) {
-  const CANVAS_WIDTH = 500;
-
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -63,43 +61,52 @@ export function AnnotationCanvas({
     };
   };
 
-  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
 
-    const touch = e.nativeEvent.touches[0];
-    const { x, y } = getTouchPos(touch, canvas);
+  // Allow scroll if more than 1 finger (e.g. pinch/scroll gesture)
+  if (e.touches.length > 1) return;
 
-    setIsDrawing(true);
-    const newDrawing: DrawingObject = {
-      type: currentTool,
-      category: currentCategory,
-      color: currentColor,
-      width: lineWidth,
-      points: [{ x, y }],
-      startPoint: { x, y },
-    };
-    setCurrentDrawing(newDrawing);
+  const touch = e.nativeEvent.touches[0];
+  const { x, y } = getTouchPos(touch, canvas);
+
+  setIsDrawing(true);
+  const newDrawing: DrawingObject = {
+    type: currentTool,
+    category: currentCategory,
+    color: currentColor,
+    width: lineWidth,
+    points: [{ x, y }],
+    startPoint: { x, y },
   };
+  setCurrentDrawing(newDrawing);
 
-  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || !currentDrawing || !canvasRef.current) return;
+  // Prevent scroll only if single-touch drawing
+  e.preventDefault();
+};
 
-    const touch = e.nativeEvent.touches[0];
-    const { x, y } = getTouchPos(touch, canvasRef.current);
+const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+  if (!isDrawing || !currentDrawing || !canvasRef.current) return;
 
-    if (currentTool === 'pen') {
-      setCurrentDrawing({
-        ...currentDrawing,
-        points: [...currentDrawing.points, { x, y }],
-      });
-    } else {
-      setCurrentDrawing({
-        ...currentDrawing,
-        endPoint: { x, y },
-      });
-    }
-  };
+  const touch = e.nativeEvent.touches[0];
+  const { x, y } = getTouchPos(touch, canvasRef.current);
+
+  if (currentTool === 'pen') {
+    setCurrentDrawing({
+      ...currentDrawing,
+      points: [...currentDrawing.points, { x, y }],
+    });
+  } else {
+    setCurrentDrawing({
+      ...currentDrawing,
+      endPoint: { x, y },
+    });
+  }
+
+  // Prevent scroll only if actually drawing
+  e.preventDefault();
+};
 
   const handleTouchEnd = () => {
     if (currentDrawing) {
@@ -196,8 +203,12 @@ export function AnnotationCanvas({
     if (!canvas || !img) return;
 
     const setCanvasSize = () => {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+
+      const maxWidth = parent.offsetWidth;
       const aspectRatio = img.naturalWidth / img.naturalHeight;
-      const width = CANVAS_WIDTH;
+      const width = maxWidth;
       const height = width / aspectRatio;
 
       canvas.width = width * dpr;
@@ -206,7 +217,10 @@ export function AnnotationCanvas({
       canvas.style.height = `${height}px`;
 
       const ctx = canvas.getContext('2d');
-      if (ctx) ctx.scale(dpr, dpr);
+      if (ctx) {
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transform
+        ctx.scale(dpr, dpr);
+      }
 
       renderCanvas();
     };
@@ -217,6 +231,9 @@ export function AnnotationCanvas({
       img.addEventListener('load', setCanvasSize);
       return () => img.removeEventListener('load', setCanvasSize);
     }
+
+    window.addEventListener('resize', setCanvasSize);
+    return () => window.removeEventListener('resize', setCanvasSize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -225,21 +242,21 @@ export function AnnotationCanvas({
   }, [drawings, currentDrawing]);
 
   return (
-  <div className="border rounded-lg overflow-hidden inline-block max-w-[500px] max-h-[500px] w-full h-auto">
-    <canvas
-      ref={canvasRef}
-      onMouseDown={startDrawing}
-      onMouseMove={draw}
-      onMouseUp={stopDrawing}
-      onMouseOut={stopDrawing}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      className={cn(
-        "w-full h-auto cursor-crosshair",
-        isDrawing && "cursor-none"
-      )}
-    />
-  </div>
-);
+    <div className="border rounded-lg overflow-hidden inline-block w-full max-w-full">
+      <canvas
+        ref={canvasRef}
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+        onMouseOut={stopDrawing}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+className={cn(
+    "w-full h-auto cursor-crosshair touch-none",
+    isDrawing && "cursor-none"
+  )}
+      />
+    </div>
+  );
 };

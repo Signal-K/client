@@ -237,45 +237,54 @@ export default function DeployTelescopeViewport() {
   }
 
   return (
-    <div className="h-screen bg-[#002439] flex flex-col lg:flex-row overflow-hidden">
-      <DeployTelescopeMobileHeader
-        sectorAnomalies={sectorAnomalies}
-        selectedSector={selectedSector}
-        alreadyDeployed={alreadyDeployed}
-        deploying={deploying}
-        onDeploy={handleDeploy}
-      />
-      <DeployTelescopeSidebar
-        tessAnomalies={tessAnomalies}
-        sectorAnomalies={sectorAnomalies}
-        selectedSector={selectedSector}
-        alreadyDeployed={alreadyDeployed}
-        deploying={deploying}
-        deploymentMessage={deploymentMessage}
-        onDeploy={handleDeploy}
-        currentSector={currentSector}
-        setCurrentSector={setCurrentSector}
-        setSelectedSector={setSelectedSector}
-      />
-      <div className="flex-1 relative">
-        <DeployTelescopeOverlay
-          selectedSector={selectedSector}
-          currentSector={currentSector}
-          sectorAnomalies={sectorAnomalies}
-        />
-        <TelescopeView
-          stars={stars}
-          filteredAnomalies={sectorAnomalies}
-          isDragging={isDragging}
-          handleMouseDown={handleMouseDown}
-          handleMouseMove={handleMouseMove}
-          handleMouseUp={handleMouseUp}
-          handleAnomalyClick={handleAnomalyClick}
-          currentSectorName=""
-          focusedAnomaly={focusedAnomaly}
-          anomalies={sectorAnomalies}
-        />
-      </div>
-    </div>
-  )
+  <div className="h-screen bg-[#002439] relative overflow-hidden">
+  {/* Telescope View */}
+  <div className="absolute inset-0 z-0">
+    <DeployTelescopeOverlay
+      selectedSector={selectedSector}
+      currentSector={currentSector}
+      sectorAnomalies={sectorAnomalies}
+    />
+    <TelescopeView
+      stars={stars}
+      filteredAnomalies={sectorAnomalies}
+      isDragging={isDragging}
+      handleMouseDown={handleMouseDown}
+      handleMouseMove={handleMouseMove}
+      handleMouseUp={handleMouseUp}
+      handleAnomalyClick={handleAnomalyClick}
+      currentSectorName=""
+      focusedAnomaly={focusedAnomaly}
+      anomalies={sectorAnomalies}
+    />
+  </div>
+
+  {/* Mobile Header */}
+  <div className="relative z-20 lg:hidden">
+    <DeployTelescopeMobileHeader
+      sectorAnomalies={sectorAnomalies}
+      selectedSector={selectedSector}
+      alreadyDeployed={alreadyDeployed}
+      deploying={deploying}
+      onDeploy={handleDeploy}
+    />
+  </div>
+
+  {/* Sidebar Controls */}
+  <div className="relative z-30">
+    <DeployTelescopeSidebar
+      tessAnomalies={tessAnomalies}
+      sectorAnomalies={sectorAnomalies}
+      selectedSector={selectedSector}
+      alreadyDeployed={alreadyDeployed}
+      deploying={deploying}
+      deploymentMessage={deploymentMessage}
+      onDeploy={handleDeploy}
+      currentSector={currentSector}
+      setCurrentSector={setCurrentSector}
+      setSelectedSector={setSelectedSector}
+    />
+  </div>
+</div>
+)
 }

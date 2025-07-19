@@ -131,10 +131,9 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
     };
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh]">
+        <div className="w-full h-screen flex flex-col gap-2 px-4">
             <div className="p-4 rounded-md relative w-full">
                 {imageUrl && (
-                    // <img src={imageUrl} alt={anomaly.content} className="w-full h-64 object-cover" />
                     <ImageAnnotator
                         initialImageUrl={imageUrl}
                         anomalyId={anomaly.id.toString()}
@@ -146,14 +145,6 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
                         annotationType="CoM"
                     />
                 )}
-                {/* <ClassificationForm
-                    anomalyId={anomaly.id.toString()}
-                    anomalyType="cloud"
-                    missionNumber={100000034}
-                    assetMentioned={imageUrl || ""}
-                    structureItemId={3105}
-                    parentPlanetLocation={anomalyid?.toString()} 
-                /> */}
             </div>
         </div>
     );

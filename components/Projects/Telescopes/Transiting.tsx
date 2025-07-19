@@ -88,9 +88,9 @@ export function StarterTelescopeTess() {
     return <div className="text-white p-4">No anomaly found.</div>
 
   return (
-    <div className="w-full h-screen overflow-hidden flex flex-col gap-2 px-4 py-6">
+    <div className="w-full h-screen overflow-hidden flex flex-col gap-2 px-4">
       {/* Button Bar */}
-      <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-2 flex justify-end">
+      <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-1 flex justify-end">
         <Button variant="outline" onClick={() => setShowTutorial(true)}>
           Want a walkthrough? Start the tutorial
         </Button>
@@ -128,7 +128,7 @@ export function StarterTelescopeTess() {
       `}</style>
     </div>
   )
-}
+};
 
 interface TelescopeProps {
     anomalyid: string;

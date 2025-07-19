@@ -12,7 +12,7 @@ import Footer from "./landing/footer";
 const teamMembers = [
     {
       img: "Eric.jpg",
-      name: "L. R. Arbuckle",
+      name: "Teddy Martin",
       role: "Technical Lead",
       bio: "Full stack engineer with a background in mathematics and decentralised science.",
       social: [

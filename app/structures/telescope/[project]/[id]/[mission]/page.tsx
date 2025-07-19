@@ -110,7 +110,7 @@ export default function TelescopeClassifyPage() {
         <GameNavbar />
       </div>
 
-      <main className="relative z-5 py-10 flex justify-center">
+      <main className="relative z-5 py-8 flex justify-center">
         <div className="w-full max-w-6xl px-4">
           {MissionComponent}
         </div>
