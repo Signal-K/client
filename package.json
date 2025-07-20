@@ -21,7 +21,12 @@
     "test:e2e:local": "SKIP_USER_CREATION_TESTS=false cypress run",
     "test:e2e:open": "cypress open",
     "test:e2e:headless": "SKIP_USER_CREATION_TESTS=true cypress run --headless",
-    "test:all": "npm run test:unit && npm run test:e2e"
+    "test:all": "npm run test:unit && npm run test:e2e",
+    "docker:test:unit": "docker-compose -f docker-compose.test.yml --profile unit up --build --abort-on-container-exit",
+    "docker:test:e2e": "docker-compose -f docker-compose.test.yml --profile e2e up --build --abort-on-container-exit",
+    "docker:test:e2e:local": "docker-compose -f docker-compose.test.yml --profile local-test up --build --abort-on-container-exit",
+    "docker:test:all": "docker-compose -f docker-compose.test.yml --profile all up --build --abort-on-container-exit",
+    "docker:test:clean": "docker-compose -f docker-compose.test.yml down --volumes --remove-orphans"
   },
   "dependencies": {
     "@dicebear/collection": "^9.2.2",

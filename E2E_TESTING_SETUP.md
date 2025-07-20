@@ -45,6 +45,11 @@ Successfully set up complete End-to-End testing infrastructure for your Navigati
 ### CI/CD
 - `.github/workflows/e2e.yml` - GitHub Actions workflow for automated testing
 
+### Docker Integration
+- `test.dockerfile` - Specialized Docker image for testing with Cypress
+- `docker-compose.test.yml` - Complete containerized testing environment
+- `DOCKER_TESTING_GUIDE.md` - Comprehensive Docker testing documentation
+
 ## NPM Scripts Added
 ```json
 {
@@ -52,7 +57,12 @@ Successfully set up complete End-to-End testing infrastructure for your Navigati
   "test:e2e:local": "SKIP_USER_CREATION_TESTS=false cypress run",
   "test:e2e:open": "cypress open",
   "test:e2e:headless": "SKIP_USER_CREATION_TESTS=true cypress run --headless",
-  "test:all": "npm run test:unit && npm run test:e2e"
+  "test:all": "npm run test:unit && npm run test:e2e",
+  "docker:test:unit": "docker-compose -f docker-compose.test.yml --profile unit up --build --abort-on-container-exit",
+  "docker:test:e2e": "docker-compose -f docker-compose.test.yml --profile e2e up --build --abort-on-container-exit",
+  "docker:test:e2e:local": "docker-compose -f docker-compose.test.yml --profile local-test up --build --abort-on-container-exit",
+  "docker:test:all": "docker-compose -f docker-compose.test.yml --profile all up --build --abort-on-container-exit",
+  "docker:test:clean": "docker-compose -f docker-compose.test.yml down --volumes --remove-orphans"
 }
 ```
 
@@ -89,6 +99,21 @@ npm run test:e2e:local
 
 # Open Cypress Test Runner
 npm run test:e2e:open
+```
+
+### Docker Testing
+```bash
+# Run all tests in Docker
+npm run docker:test:all
+
+# Run only E2E tests in Docker
+npm run docker:test:e2e
+
+# Run E2E tests with user creation (local development)
+npm run docker:test:e2e:local
+
+# Clean up Docker test environment
+npm run docker:test:clean
 ```
 
 ### CI/CD Integration
