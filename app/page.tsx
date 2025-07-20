@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
+import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestonesNewUi";
 
 export interface LinkedAnomaly {
   id: number;
@@ -222,16 +223,16 @@ export default function ActivityPage() {
         .maybeSingle();
       setProfile(profileData);
 
-const { data: myClassifications } = await supabase
-  .from("classifications")
-  .select(`
-    id, 
-    classificationtype, 
-    content, 
-    created_at, 
-    anomaly,
-    anomaly:anomaly(content)
-  `)
+      const { data: myClassifications } = await supabase
+        .from("classifications")
+        .select(`
+          id, 
+          classificationtype, 
+          content, 
+          created_at, 
+          anomaly,
+          anomaly:anomaly(content)
+        `)
         .eq("author", userId)
         .order("created_at", { ascending: false })
         .limit(10);
@@ -243,11 +244,17 @@ const { data: myClassifications } = await supabase
       }));
       setClassifications(transformedClassifications);
 
+      // Get all anomaly IDs that have been classified by this user
+      const { data: userClassifications } = await supabase
+        .from("classifications")
+        .select("anomaly")
+        .eq("author", userId);
+
       const classifiedAnomalyIds = new Set(
-  transformedClassifications
-    .map((c) => (c.anomaly ? c.anomaly.content : null))
-    .filter((id): id is string => !!id)
-);
+        (userClassifications ?? [])
+          .map(c => c.anomaly)
+          .filter((id): id is number => !!id)
+      );
 
       const { data: rawLinked } = await supabase
         .from("linked_anomalies")
@@ -265,7 +272,8 @@ const { data: myClassifications } = await supabase
         .order("date", { ascending: false });
 
       const linked = (rawLinked ?? []) as unknown as LinkedAnomaly[];
-      const filteredLinked = linked.filter((a) => !classifiedAnomalyIds.has(String(a.anomaly_id)));
+      // Filter out linked anomalies that have already been classified by the user
+      const filteredLinked = linked.filter((a) => !classifiedAnomalyIds.has(a.anomaly_id));
       setLinkedAnomalies(filteredLinked);
 
       const oneWeekAgo = subDays(new Date(), 7).toISOString();
@@ -343,14 +351,14 @@ const { data: myClassifications } = await supabase
         <div className="flex flex-wrap sm:flex-nowrap items-center justify-between px-4 lg:px-6 py-3 gap-4 sm:gap-0">
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <h1 className="text-xl font-bold text-primary">Star Sailors</h1>
-            <div className="hidden sm:flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+            {/* <div className="hidden sm:flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <div className="w-2 h-2 bg-chart-1 rounded-full"></div>
               <span className="text-chart-2">8.4</span>
               <span className="text-chart-3">2 h</span>
               <span className="text-chart-4">15 min</span>
               <span className="text-chart-5">32 sec</span>
               <span className="text-foreground">data history</span>
-            </div>
+            </div> */}
           </div>
 
           <div className="flex items-center gap-4">
@@ -381,10 +389,10 @@ const { data: myClassifications } = await supabase
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
+                  {/* <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">Teddy Martin</p>
                     <p className="text-xs leading-none text-muted-foreground">ted@tmartin.com</p>
-                  </div>
+                  </div> */}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Profile</DropdownMenuItem>
@@ -419,6 +427,8 @@ const { data: myClassifications } = await supabase
           linkedAnomalies={linkedAnomalies}
           incompletePlanet={incompletePlanet}
         />
+
+        <MilestoneCard />
 
         {needsProfileSetup ? (
           <section className="rounded-2xl p-6 border shadow space-y-4 text-center bg-card text-card-foreground">
