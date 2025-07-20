@@ -3,14 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
     {
-        weekStart: '2025-07-13',
+        weekStart: '2025-07-20',
         data: [
             {
                 name: "Verify other users' discoveries and get some of the earnings in return",
                 structure: "Telescope",
                 group: "Astronomy",
                 icon: 'Telescope',
-                extendedDescription: ',',
+                extendedDescription: 'Check your notifications to see if someone has made a classification and requested support',
                 xp: 1,
                 completionInfo: '',
                 rewardInfo: '',
@@ -20,11 +20,11 @@ const milestones = [
                 requiredCount: 2,
             },
             {
-                name: "Contribute to someone else's discovery by commenting",
+                name: "Propose 3 planet candidates",
                 structure: "Telescope",
                 group: "Astronomy",
                 icon: "Telescope",
-                extendedDescription: '',
+                extendedDescription: 'Deploy your telescope and find new planets!',
                 xp: 1,
                 completionInfo: '',
                 rewardInfo: '',

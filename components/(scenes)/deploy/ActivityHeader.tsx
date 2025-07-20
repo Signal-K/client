@@ -76,9 +76,9 @@ export default function ActivityHeader({
               </h2>
             </div>
           </div>
-          <div className="flex flex-col items-start sm:items-end px-2 sm:px-8 text-sm text-muted-foreground">
+          {/* <div className="flex flex-col items-start sm:items-end px-2 sm:px-8 text-sm text-muted-foreground">
             Landmarks
-          </div>
+          </div> */}
         </div>
       </div>
     </Card>
