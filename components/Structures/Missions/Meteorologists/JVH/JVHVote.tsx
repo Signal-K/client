@@ -36,7 +36,7 @@ export default function VoteJVH() {
         
         try {
             const { data, error } = await supabase
-            .from('classifications')
+            .from("classifications")
             .select('*')
             .eq('classificationtype', 'lidar-jovianVortexHunter')
             .order('created_at', { ascending: false }) as { data: Classification[]; error: any };

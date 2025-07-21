@@ -153,7 +153,7 @@ type Anomaly = {
   id: string;
   name: string;
   details?: string;
-};
+}; 
 
 export function DailyMinorPlanetWithId() {
   const supabase = useSupabaseClient();
@@ -285,7 +285,7 @@ export function DailyMinorPlanetWithId() {
   if (!anomaly) return <p>No anomalies found for Daily Minor Planet project.</p>;
 
   return (
-    <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+    <div className="w-full h-screen overflow-hidden flex flex-col gap-2 px-4">
       <div className="p-4 rounded-md relative w-full">
         {imageUrls.length > 0 && (
           <div className="relative">

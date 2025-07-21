@@ -110,7 +110,7 @@ const CloudUploadEarthCameraComponent = () => {
         };
         try {
             const { data, error } = await supabase
-                .from('classifications')
+                .from("classifications")
                 .insert({
                     content: comment || null,
                     author: session?.user?.id,

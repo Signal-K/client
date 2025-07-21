@@ -71,7 +71,7 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
       setLoading(true);
       try {
         const { data, error } = await supabase
-          .from('classifications')
+          .from("classifications")
           .select('id, content, classificationtype, created_at, media, anomaly, classificationConfiguration, anomalies(avatar_url)')
           .eq('id', classificationId)
           .single();
@@ -85,7 +85,7 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
 
         if (data.anomaly) {
           const { data: anomalyData } = await supabase
-            .from('anomalies')
+            .from("anomalies")
             .select('avatar_url')
             .eq('id', data.anomaly)
             .single();
@@ -137,7 +137,7 @@ export function DiscoveryCardSingle({ classificationId }: DiscoveryCardSinglePro
       };
   
       const { error: updateError } = await supabase
-        .from('classifications')
+        .from("classifications")
         .update({ classificationConfiguration: updatedConfiguration })
         .eq('id', classification.id);
   

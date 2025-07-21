@@ -11,7 +11,7 @@ interface Props {
   linkedAnomalies: LinkedAnomaly[];
   classifications: Classification[];
   incompletePlanet: Classification | null;
-}
+};
 
 export default function RecentDiscoveries({
   linkedAnomalies,
@@ -71,7 +71,10 @@ export default function RecentDiscoveries({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2">
               {linkedAnomalies.map((a) => {
                 const anomaly = a.anomaly;
-                const type = anomaly?.anomalytype?.toLowerCase();
+                let type = anomaly?.anomalytype?.toLowerCase() || null;
+                if (type?.includes("minorplanet") || type?.includes("asteroid")) {
+                  type = "telescope-minorplanet";
+                }
                 const isTESS = type?.includes("tess");
                 const color = getAnomalyColor(type || "");
 

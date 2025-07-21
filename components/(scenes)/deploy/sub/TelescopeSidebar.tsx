@@ -36,7 +36,7 @@ interface Props {
   alreadyDeployed: boolean
   deploying: boolean
   deploymentMessage: string | null
-}
+};
 
 export default function DeployTelescopeSidebar({
   sectorAnomalies,
@@ -175,5 +175,5 @@ export default function DeployTelescopeSidebar({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

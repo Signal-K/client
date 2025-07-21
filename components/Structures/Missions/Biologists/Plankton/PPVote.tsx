@@ -35,7 +35,7 @@ export default function VotePPClassifications() {
         setError(null);
         try {
           const { data, error } = await supabase
-            .from('classifications')
+            .from("classifications")
             .select('*')
             .eq('classificationtype', 'zoodex-planktonPortal')
             .order('created_at', { ascending: false }) as { data: Classification[]; error: any };

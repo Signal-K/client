@@ -89,7 +89,7 @@ async function generateAlerts(supabase: any, session: any): Promise<AlertItem[]>
     const linkedAnomalyIds = linkedAnomalies?.map((la: { anomaly: { id: any; }; }) => la.anomaly.id) || [];
     
     const { data: existingClassifications } = await supabase
-      .from('classifications')
+      .from("classifications")
       .select('anomaly')
       .eq('author', userId)
       .in('anomaly', linkedAnomalyIds);

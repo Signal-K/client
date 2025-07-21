@@ -65,7 +65,7 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
           setActivePlanet(planet);
 
           const { data: classificationsData, error: classificationsError } = await supabase
-            .from('classifications')
+            .from("classifications")
             .select('*')
             .eq('author', session.user.id)
             .eq('anomaly', planet.id)
@@ -106,7 +106,7 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
         setActivePlanet(planet);
 
         const { data: classificationsData, error: classificationsError } = await supabase
-          .from('classifications')
+          .from("classifications")
           .select('*')
           .eq('author', session.user.id)
           .eq('anomaly', planet.id)

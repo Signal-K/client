@@ -16,6 +16,7 @@ export interface DatabaseAnomaly {
   avatar_url: string | null
   created_at: string
   configuration: any
+  type?: string
   parentAnomaly: number | null
   anomalySet: string | null
 }
@@ -28,6 +29,11 @@ function seededRandom1(seed: number, salt: number = 0) {
 
 function generateAnomalyFromDB(dbAnomaly: DatabaseAnomaly, sectorX: number, sectorY: number): LocalAnomaly {
   const seed = dbAnomaly.id + sectorX * 1000 + sectorY
+
+  // Determine type
+  let type: "planet" | "asteroid" = "planet"
+  if (dbAnomaly.anomalySet === "telescope-minorPlanet") type = "asteroid"
+
   return {
     id: `db-${dbAnomaly.id}`,
     name: dbAnomaly.content || `TESS-${String(dbAnomaly.id).padStart(3, "0")}`,
@@ -37,15 +43,15 @@ function generateAnomalyFromDB(dbAnomaly: DatabaseAnomaly, sectorX: number, sect
     size: seededRandom1(seed, 4) * 0.8 + 0.6,
     pulseSpeed: seededRandom1(seed, 5) * 2 + 1,
     glowIntensity: seededRandom1(seed, 6) * 0.5 + 0.3,
-    color: "#78cce2",
-    shape: "circle",
+    color: type === "planet" ? "#78cce2" : "#f2c572", // blue for planet, gold for minor-planet
+    shape: type === "planet" ? "circle" : "triangle",
     sector: generateSectorName(sectorX, sectorY),
     discoveryDate: new Date().toLocaleDateString(),
-    type: "exoplanet",
+    type,
     project: "planet-hunters",
     dbData: dbAnomaly,
   }
-}
+};
 
 export default function DeployTelescopeViewport() {
   const supabase = useSupabaseClient()
@@ -62,22 +68,34 @@ export default function DeployTelescopeViewport() {
   const [deploying, setDeploying] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-  const [focusedAnomaly, setFocusedAnomaly] = useState<Anomaly | null>(null)
+  const [focusedAnomaly, setFocusedAnomaly] = useState<Anomaly | null>(null);
+  const [skillProgress, setSkillProgress] = useState<{ [key: string]: number }>({});
 
   const fetchTessAnomalies = async () => {
-    const { data, error } = await supabase
-      .from("anomalies")
-      .select("*")
-      .eq("anomalySet", "telescope-tess")
+    try {
+      const setsToFetch = ['telescope-tess']
 
-    if (error) {
-      console.error("Error fetching anomalies:", error)
-      return
-    }
-    if (data) {
-      setTessAnomalies(data)
-    }
-  }
+      if (skillProgress.telescope >= 4) {
+        setsToFetch.push("telescope-minorPlanet");
+      };
+
+      const { data, error } = await supabase
+        .from("anomalies")
+        .select("*")
+        .in("anomalySet", setsToFetch);
+
+      if (error) {
+        console.error("Error fetching anomalies: ", error);
+        return;
+      };
+
+      if (data) {
+        setTessAnomalies(data);
+      };
+    } catch (error: any) {
+      console.error("Unexpected error in fetchTessAnomalies: ", error);
+    };
+  };
 
   const checkDeployment = async () => {
     if (!session?.user?.id) return
@@ -162,18 +180,87 @@ export default function DeployTelescopeViewport() {
     setSectorAnomalies(candidates)
   }, [tessAnomalies])
 
+    useEffect(() => {
+    if (!session) {
+      return;
+    };
+
+    const fetchSkillProgress = async () => {
+      const skillCounts: { [key: string]: number} = {
+        telescope: 0,
+        weather: 0,
+      };
+
+      const start = new Date("2000-01-01").toISOString();
+
+      const queries = [
+        supabase
+          .from("classifications")
+          .select("*", { count: "exact" })
+          .eq("author", session.user.id)
+          .in("classificationtype", ["planet", "telescope-minorPlanet"])
+          .gte("created_at", start),
+        supabase
+          .from("classifications")
+          .select("*", { count: "exact" })
+          .eq("author", session.user.id)
+          .in("classificationtype", ["cloud", "lidar-jovianVortexHunter"])
+          .gte("created_at", start),
+      ];
+
+      const [telescopeRes, weatherRes] = await Promise.all(queries);
+
+      if (!telescopeRes.error && telescopeRes.count !== null) {
+        skillCounts.telescope = telescopeRes.count;
+      }
+
+      if (!weatherRes.error && weatherRes.count !== null) {
+        skillCounts.weather = weatherRes.count;
+      }
+
+      setSkillProgress(skillCounts);
+    };
+
+    fetchSkillProgress();
+  }, [session]);
+
   const handleDeploy = async () => {
-    if (!session?.user?.id || !selectedSector || alreadyDeployed) return
-    setDeploying(true)
-    const seed = selectedSector.x * 1000 + selectedSector.y
-    const selectedAnomalies = tessAnomalies
-      .filter((_, i) => Math.floor(seededRandom1(seed, i) * 10) < 3)
-      .slice(0, 4)
+    if (!session || !selectedSector || alreadyDeployed) {
+      return;
+    };
+
+    setDeploying(true);
+    const seed = selectedSector.x * 1000 + selectedSector.y;
+
+    // Separate two anomaly sets
+    const planets = tessAnomalies.filter(a => a.anomalySet === 'telescope-tess');
+    const asteroids = tessAnomalies.filter(a => a.anomalySet === 'telescope-minorPlanet');
+
+    const shuffleAndPick = (arr: DatabaseAnomaly[], count: number) =>
+      arr
+        .map((item, i) => ({ item, r: seededRandom1(seed, i) }))
+        .sort((a, b) => a.r - b.r)
+        .slice(0, count)
+        .map(obj => obj.item);
+
+    let selectedAnomalies: DatabaseAnomaly[] = [];
+
+    if (skillProgress.telescope >= 4) {
+      const planetPick = shuffleAndPick(planets, 1);
+      const asteroidPick = shuffleAndPick(asteroids, 1);
+      const remaining = shuffleAndPick([...planets, ...asteroids].filter(a => !planetPick.includes(a) && !asteroidPick.includes(a)), 2);
+
+      selectedAnomalies = [...planetPick, ...asteroidPick, ...remaining];
+    } else {
+      selectedAnomalies = shuffleAndPick(planets, 4); // If the user hasn't unlocked asteroid/DMP project yet
+    };
+
     if (selectedAnomalies.length === 0) {
-      setDeploymentMessage("No TESS anomalies found in selected sector.")
-      setDeploying(false)
-      return
-    }
+      setDeploymentMessage("No anomalies found in selected sector")
+      setDeploying(false);
+      return;
+    };
+
     const inserts = selectedAnomalies.map(anomaly =>
       supabase.from("linked_anomalies").insert({
         author: session.user.id,
@@ -181,17 +268,20 @@ export default function DeployTelescopeViewport() {
         classification_id: null,
         automaton: "Telescope",
       })
-    )
-    const results = await Promise.all(inserts)
-    const hasError = results.some(r => r.error)
+    );
+
+    const results = await Promise.all(inserts);
+    const hasError = results.some(r => r.error);
+
     setDeploymentMessage(
       hasError
         ? "Error deploying telescope. Please try again."
-        : `Telescope successfully deployed! ${selectedAnomalies.length} TESS exoplanet candidates are now being monitored.`
-    )
-    setAlreadyDeployed(!hasError)
-    setDeploying(false)
-  }
+        : `Telescope deployed! ${selectedAnomalies.length} targets are now active.`
+    );
+
+    setAlreadyDeployed(!hasError);
+    setDeploying(false);
+  };
 
   const handleAnomalyClick = (a: Anomaly) => setFocusedAnomaly(a)
   const handleMouseDown = (e: React.MouseEvent) => {

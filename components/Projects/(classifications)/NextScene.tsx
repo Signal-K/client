@@ -73,7 +73,7 @@ export default function ClientClassificationPage({ id }: Props) {
   useEffect(() => {
     const fetchClassification = async () => {
       const { data, error } = await supabase
-        .from('classifications')
+        .from("classifications")
         .select('*')
         .eq('id', id)
         .single();
@@ -117,7 +117,7 @@ export default function ClientClassificationPage({ id }: Props) {
 
       const relevantMilestones = matchingWeek.data?.filter(
         (m: any) =>
-          m.table === 'classifications' &&
+          m.table === "classifications" &&
           m.field === 'classificationtype' &&
           m.value === classificationType
       ) || [];
@@ -132,7 +132,7 @@ export default function ClientClassificationPage({ id }: Props) {
       const milestoneStatuses = await Promise.all(
         relevantMilestones.map(async (m: any) => {
           const { count, error } = await supabase
-            .from('classifications')
+            .from("classifications")
             .select('', { count: 'exact', head: true })
             .eq('author', session?.user?.id)
             .eq('classificationtype', classificationType)

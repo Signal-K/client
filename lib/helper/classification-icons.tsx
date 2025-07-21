@@ -24,6 +24,14 @@ export function ClassificationIcon({ type }: { type: string | null }) {
           <circle cx="44" cy="20" r="4" fill="#FCD34D" />
         </svg>
       );
+    case "telescopeminor":
+      return (
+        <svg className="w-12 h-12 animate-spin-slow" viewBox="0 0 64 64" fill="none">
+          <circle cx="32" cy="32" r="16" stroke="#FBBF24" strokeWidth="4" />
+          <circle cx="32" cy="32" r="8" fill="#F59E0B" />
+          <circle cx="44" cy="20" r="4" fill="#FCD34D" />
+        </svg>
+      );
     case "sunspot":
       return (
         <svg className="w-12 h-12 animate-pulse" viewBox="0 0 64 64" fill="none">
@@ -40,10 +48,11 @@ export function ClassificationIcon({ type }: { type: string | null }) {
       return (
         <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-bold text-sm">
           ?
+          {/* <p>{type}</p> */}
         </div>
       );
-  }
-}
+  };
+};
 
 export function getAnomalyColor(type: string | null) {
   if (!type) return "#9CA3AF";

@@ -52,7 +52,9 @@ export function DiscoveriesPanel({
 
       const projectMap: Record<Anomaly["type"], string> = {
         exoplanet: "planet-hunters",
+        planet: "planet-hunters",
         sunspot: "sunspots",
+        // minor_planet: "daily-minor-planet",
         asteroid: "daily-minor-planet",
         accretion_disc: "disk-detective",
       }

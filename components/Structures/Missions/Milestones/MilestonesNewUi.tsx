@@ -15,12 +15,12 @@ interface Milestone {
   value: string;
   requiredCount: number;
   extendedDescription: string;
-}
-
+};
+ 
 interface WeekMilestones {
   weekStart: string;
   data: Milestone[];
-}
+};
 
 export default function MilestoneCard() {
   const supabase = useSupabaseClient();
@@ -31,6 +31,7 @@ export default function MilestoneCard() {
   const [userProgress, setUserProgress] = useState<{ [key: string]: number }>({});
   const [communityProgress, setCommunityProgress] = useState<{ [key: string]: number }>({});
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
+  const [skillProgress, setSkillProgress] = useState<{ [key: string]: number }>({});
   const [activeTab, setActiveTab] = useState<"player" | "community">("player");
 
   useEffect(() => {
@@ -59,6 +60,50 @@ export default function MilestoneCard() {
         setCurrentWeekIndex(latestIndex !== -1 ? latestIndex : 0);
       });
   }, []);
+
+  useEffect(() => {
+    if (!session) {
+      return;
+    };
+
+    const fetchSkillProgress = async () => {
+      const skillCounts: { [key: string]: number} = {
+        telescope: 0,
+        weather: 0,
+      };
+
+      const start = new Date("2000-01-01").toISOString();
+
+      const queries = [
+        supabase
+          .from("classifications")
+          .select("*", { count: "exact" })
+          .eq("author", session.user.id)
+          .in("classificationtype", ["planet", "telescope-minorPlanet"])
+          .gte("created_at", start),
+        supabase
+          .from("classifications")
+          .select("*", { count: "exact" })
+          .eq("author", session.user.id)
+          .in("classificationtype", ["cloud", "lidar-jovianVortexHunter"])
+          .gte("created_at", start),
+      ];
+
+      const [telescopeRes, weatherRes] = await Promise.all(queries);
+
+      if (!telescopeRes.error && telescopeRes.count !== null) {
+        skillCounts.telescope = telescopeRes.count;
+      }
+
+      if (!weatherRes.error && weatherRes.count !== null) {
+        skillCounts.weather = weatherRes.count;
+      }
+
+      setSkillProgress(skillCounts);
+    };
+
+    fetchSkillProgress();
+  }, [session]);
 
   useEffect(() => {
     if (!session || milestones.length === 0) return;
@@ -123,23 +168,6 @@ export default function MilestoneCard() {
       </CardHeader>
 
       <CardContent className="p-4 space-y-4">
-        {/* Tabs */}
-        {/* <div className="flex border-b border-border text-sm font-medium">
-          {["player", "community"].map((type) => (
-            <button
-              key={type}
-              onClick={() => setActiveTab(type as "player" | "community")}
-              className={`py-2 px-3 rounded-t-md transition-all ${
-                activeTab === type
-                  ? "bg-background border border-b-transparent border-border text-primary font-semibold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-              }`}
-            >
-              {type === "player" ? "Your Progress" : "Community Progress"}
-            </button>
-          ))}
-        </div> */}
-
         {/* Controls */}
         <div className="flex items-center justify-between gap-3">
           <Button
@@ -186,6 +214,55 @@ export default function MilestoneCard() {
             </li>
           ))}
         </ul>
+
+        <div className="mt-6 space-y-3">
+          <div className="text-sm font-medium text-chart-2 flex items-center gap-2">
+            <Zap className="w-4 h-4" />
+            Field Experience
+          </div>
+
+          <ul className="space-y-3">
+            <li className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 bg-muted/20 p-4 rounded border border-border hover:bg-muted/30 transition">
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-foreground truncate">
+                  Planetary Observation
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Unlock asteroid detection with {Math.max(4 - skillProgress.telescope, 0)} more discoveries.
+                </div>
+                <div className="mt-2 w-full bg-muted rounded h-2">
+                  <div
+                    className="h-2 bg-chart-1 rounded transition-all duration-300"
+                    style={{ width: `${Math.min((skillProgress.telescope / 4) * 100, 100)}%` }}
+                  />
+                </div>
+              </div>
+              <div className="text-xs text-muted-foreground whitespace-nowrap sm:text-right">
+                {Math.min(skillProgress.telescope, 4)}/4 completed
+              </div>
+            </li>
+
+            <li className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 bg-muted/20 p-4 rounded border border-border hover:bg-muted/30 transition">
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-foreground truncate">
+                  Atmospheric Analysis
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Unlock gas giant pattern recognition with {Math.max(4 - skillProgress.weather, 0)} more cloud observations.
+                </div>
+                <div className="mt-2 w-full bg-muted rounded h-2">
+                  <div
+                    className="h-2 bg-chart-1 rounded transition-all duration-300"
+                    style={{ width: `${Math.min((skillProgress.weather / 4) * 100, 100)}%` }}
+                  />
+                </div>
+              </div>
+              <div className="text-xs text-muted-foreground whitespace-nowrap sm:text-right">
+                {Math.min(skillProgress.weather, 4)}/4 completed
+              </div>
+            </li>
+          </ul>
+        </div>
       </CardContent>
     </Card>
   );

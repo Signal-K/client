@@ -8,6 +8,7 @@ import type { Anomaly, ViewMode } from "@/types/Structures/telescope"
 import { projects } from "@/data/projects"
 import { missions } from "@/data/missions"
 import { generateSectorName, generateStars, filterAnomaliesBySector, seededRandom } from "@/utils/Structures/Telescope/sector-utils"
+import { generateAnomalyProperties, ANOMALY_TYPES, PASTEL_COLORS, DatabaseClassification, DatabaseAnomaly } from "./blocks/types"
 import { TelescopeView } from "./telescope-view"
 import { DiscoveriesView } from "./discoveries-view"
 import AnomalyDialog from "./anomaly-dialogue"
@@ -33,114 +34,6 @@ import {
   Filter,
 } from "lucide-react"
 import TelescopeNavControls from "./blocks/navigation-controls"
-
-interface DatabaseAnomaly {
-  id: number
-  content: string | null
-  anomalytype: string | null
-  avatar_url: string | null
-  created_at: string
-  configuration: any
-  parentAnomaly: number | null
-  anomalySet: string | null
-}
-
-interface DatabaseClassification {
-  id: number
-  created_at: string
-  content: string | null
-  author: string | null
-  anomaly: number | null
-  media: any
-  classificationtype: string | null
-  classificationConfiguration: any
-}
-
-// Pastel color palette
-const PASTEL_COLORS = {
-  primary: "#a8d8ea", // soft blue
-  secondary: "#ffb3d9", // soft pink
-  accent: "#c7cedb", // soft purple
-  success: "#b8e6b8", // soft green
-  warning: "#ffd93d", // soft yellow
-  info: "#87ceeb", // soft sky blue
-  background: "#1a1a2e", // dark navy
-  surface: "#16213e", // darker blue
-  text: "#e8f4f8", // very light blue
-  textSecondary: "#b8c5d1", // muted blue-gray
-}
-
-// Anomaly type mapping configuration with pastel colors
-const ANOMALY_TYPES = {
-  exoplanet: {
-    project: "planet-hunters",
-    colors: ["#a8d8ea", "#87ceeb", "#b8e6b8", "#c7cedb", "#a8d8ea", "#87ceeb", "#b8e6b8", "#c7cedb"],
-    shapes: ["circle", "star", "hexagon"] as const,
-  },
-  sunspot: {
-    project: "sunspots",
-    colors: ["#ffd93d", "#ffb3d9", "#ffd93d", "#ffb3d9", "#ffd93d", "#ffb3d9", "#ffd93d", "#ffb3d9"],
-    shapes: ["circle", "oval", "star"] as const,
-  },
-  asteroid: {
-    project: "daily-minor-planet",
-    colors: ["#c7cedb", "#ffb3d9", "#c7cedb", "#ffb3d9", "#c7cedb", "#ffb3d9", "#c7cedb", "#ffb3d9"],
-    shapes: ["diamond", "triangle", "hexagon"] as const,
-  },
-  accretion_disc: {
-    project: "disk-detective",
-    colors: ["#b8e6b8", "#87ceeb", "#b8e6b8", "#87ceeb", "#b8e6b8", "#87ceeb", "#b8e6b8", "#87ceeb"],
-    shapes: ["oval", "circle", "hexagon"] as const,
-  },
-} as const
-
-type AnomalyType = keyof typeof ANOMALY_TYPES
-
-function normalizeAnomalyType(type: string | null): AnomalyType {
-  switch (type) {
-    case "planet":
-    case "telescope-tess":
-    case "exoplanet":
-      return "exoplanet"
-    case "sunspot":
-      return "sunspot"
-    case "telescope-awa":
-    case "accretion_disc":
-    case "disk":
-      return "accretion_disc"
-    case "asteroid":
-    case "active-asteroids":
-    case "telescope-minorPlanet":
-    case "minor-planet":
-      return "asteroid"
-    default:
-      return "exoplanet"
-  }
-}
-
-function generateAnomalyProperties(dbAnomaly: DatabaseAnomaly): Anomaly & { dbData: DatabaseAnomaly } {
-  const seed = dbAnomaly.id
-  const type = normalizeAnomalyType(dbAnomaly.anomalySet)
-  const config = ANOMALY_TYPES[type]
-
-  return {
-    id: `db-${dbAnomaly.id}`,
-    name: dbAnomaly.content || `${type.toUpperCase()}-${String(dbAnomaly.id).padStart(3, "0")}`,
-    type,
-    project: config.project,
-    x: seededRandom(seed, 1) * 80 + 10,
-    y: seededRandom(seed, 2) * 80 + 10,
-    brightness: seededRandom(seed, 3) * 0.7 + 0.5,
-    size: seededRandom(seed, 4) * 0.8 + 0.6,
-    pulseSpeed: seededRandom(seed, 5) * 2 + 1,
-    glowIntensity: seededRandom(seed, 6) * 0.5 + 0.3,
-    color: config.colors[Math.floor(seededRandom(seed, 7) * config.colors.length)],
-    shape: config.shapes[Math.floor(seededRandom(seed, 8) * config.shapes.length)],
-    sector: generateSectorName(Math.floor(seededRandom(seed, 9) * 10) - 5, Math.floor(seededRandom(seed, 10) * 10) - 5),
-    discoveryDate: new Date().toLocaleDateString(),
-    dbData: dbAnomaly,
-  }
-}
 
 export default function TelescopeViewport() {
   const session = useSession()
@@ -179,7 +72,7 @@ export default function TelescopeViewport() {
   const [mobileBottomTab, setMobileBottomTab] = useState<"controls" | "projects" | "stats" | "archive">("controls")
 
   // Database operations
-  const fetchAnomalies = async () => {
+    const fetchAnomalies = async () => {
     try {
       const { data, error } = await supabase.from("anomalies").select("*")
 
@@ -189,8 +82,62 @@ export default function TelescopeViewport() {
       }
     } catch (error) {
       console.error("Error fetching anomalies:", error)
-    }
-  }
+    };
+  };
+// const fetchAnomalies = async (userId: string) => {
+//   try {
+//     console.log("fetchAnomalies called with userId:", userId)
+
+//     if (!userId) {
+//       console.warn("No userId provided to fetchAnomalies.")
+//       return
+//     }
+
+//     // Step 1: Fetch linked anomalies for the current user
+//     const { data: linkedData, error: linkedError } = await supabase
+//       .from("linked_anomalies")
+//       .select("anomaly_id")
+//       .eq("author", userId)
+
+//     console.log("Linked anomalies query result:", { linkedData, linkedError })
+
+//     if (linkedError) {
+//       console.error("Error fetching linked anomalies:", linkedError)
+//       return
+//     }
+
+//     const anomalyIds = linkedData?.map((entry) => entry.anomaly_id) || []
+//     console.log("Extracted anomaly IDs:", anomalyIds)
+
+//     if (anomalyIds.length === 0) {
+//       console.log("No linked anomalies found for user")
+//       setAnomalies([]) // Clear state if none
+//       return
+//     }
+
+//     // Step 2: Fetch anomalies matching the linked IDs
+//     const { data: anomaliesData, error: anomaliesError } = await supabase
+//       .from("anomalies")
+//       .select("*")
+//       .in("id", anomalyIds)
+
+//     console.log("Anomalies query result:", { anomaliesData, anomaliesError })
+
+//     if (anomaliesError) {
+//       console.error("Error fetching anomalies:", anomaliesError)
+//       return
+//     }
+
+//     if (anomaliesData) {
+//       const processedAnomalies = anomaliesData.map(generateAnomalyProperties)
+//       console.log("Processed anomalies:", processedAnomalies.length)
+//       setAnomalies(processedAnomalies)
+//     }
+
+//   } catch (error) {
+//     console.error("Unexpected error in fetchAnomalies:", error)
+//   }
+// }
 
   const fetchUserClassifications = async () => {
     if (!session?.user?.id) return
@@ -232,32 +179,6 @@ export default function TelescopeViewport() {
     }
   }
 
-  const createClassification = async (anomalyId: string, classificationType: string) => {
-    if (!session?.user?.id) return null
-
-    try {
-      const dbId = Number.parseInt(anomalyId.replace("db-", ""))
-      const { data, error } = await supabase
-        .from("classifications")
-        .insert({
-          author: session.user.id,
-          anomaly: dbId,
-          classificationtype: classificationType,
-          content: `Classified as ${classificationType}`,
-        })
-        .select()
-        .single()
-
-      if (!error && data) {
-        await Promise.all([fetchUserClassifications(), fetchAllClassifications()])
-        return data
-      }
-    } catch (error) {
-      console.error("Error creating classification:", error)
-    }
-    return null
-  }
-
   // Sector management
   const loadSector = useCallback(
     (sectorX: number, sectorY: number) => {
@@ -276,15 +197,20 @@ export default function TelescopeViewport() {
   )
 
   // Data loading
-  const loadData = async () => {
-    setLoading(true)
-    await fetchAnomalies()
-    if (session?.user?.id) {
-      await fetchUserClassifications()
-    }
-    await fetchAllClassifications()
-    setLoading(false)
+const loadData = async () => {
+  setLoading(true)
+
+  if (session?.user?.id) {
+    await fetchAnomalies()//(session.user.id)
+    await fetchUserClassifications()
+  } else {
+    console.warn("Session not ready, skipping user-specific fetches")
   }
+
+  await fetchAllClassifications()
+
+  setLoading(false)
+}
 
   // Event handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -331,33 +257,6 @@ export default function TelescopeViewport() {
     setSelectedClassification(classification)
     setShowClassificationDetailDialog(true)
   }
-
-//   const handleClassify = async () => {
-//     if (!selectedAnomaly || !session?.user?.id) return
-
-//     // Map UI types to database classification types
-//     const typeMapping = {
-//       exoplanet: "planet",
-//       sunspot: "sunspot",
-//       asteroid: "asteroid",
-//       accretion_disc: "disk",
-//     }
-
-//     const classificationType = typeMapping[selectedAnomaly.type] || "planet"
-//     const result = await createClassification(selectedAnomaly.id, classificationType)
-
-//     if (result) {
-//       setAnomalies(
-//         anomalies.map((a) =>
-//           a.id === selectedAnomaly.id ? { ...a, classified: true, discoveryDate: new Date().toLocaleDateString() } : a,
-//         ),
-//       )
-//       loadSector(currentSector.x, currentSector.y)
-//     }
-
-//     setShowClassifyDialog(false)
-//     setSelectedAnomaly(null)
-//   }
 
   const selectProject = (project: (typeof projects)[0] | null) => {
     setSelectedProject(project)
@@ -891,3 +790,57 @@ export default function TelescopeViewport() {
     </div>
   );
 };
+
+
+// const createClassification = async (anomalyId: string, classificationType: string) => {
+  //   if (!session?.user?.id) return null
+
+  //   try {
+  //     const dbId = Number.parseInt(anomalyId.replace("db-", ""))
+  //     const { data, error } = await supabase
+  //       .from("classifications")
+  //       .insert({
+  //         author: session.user.id,
+  //         anomaly: dbId,
+  //         classificationtype: classificationType,
+  //         content: `Classified as ${classificationType}`,
+  //       })
+  //       .select()
+  //       .single()
+
+  //     if (!error && data) {
+  //       await Promise.all([fetchUserClassifications(), fetchAllClassifications()])
+  //       return data
+  //     }
+  //   } catch (error) {
+  //     console.error("Error creating classification:", error)
+  //   }
+  //   return null
+  // }
+
+  //   const handleClassify = async () => {
+//     if (!selectedAnomaly || !session?.user?.id) return
+
+//     // Map UI types to database classification types
+//     const typeMapping = {
+//       exoplanet: "planet",
+//       sunspot: "sunspot",
+//       asteroid: "asteroid",
+//       accretion_disc: "disk",
+//     }
+
+//     const classificationType = typeMapping[selectedAnomaly.type] || "planet"
+//     const result = await createClassification(selectedAnomaly.id, classificationType)
+
+//     if (result) {
+//       setAnomalies(
+//         anomalies.map((a) =>
+//           a.id === selectedAnomaly.id ? { ...a, classified: true, discoveryDate: new Date().toLocaleDateString() } : a,
+//         ),
+//       )
+//       loadSector(currentSector.x, currentSector.y)
+//     }
+
+//     setShowClassifyDialog(false)
+//     setSelectedAnomaly(null)
+//   }

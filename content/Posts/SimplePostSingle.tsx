@@ -18,7 +18,7 @@ interface SimplePostSingleProps {
   content: string;
   category: string;
   images: string[];
-}
+};
 
 export function SimplePostSingle({
   id,
