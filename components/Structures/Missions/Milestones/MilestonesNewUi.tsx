@@ -16,7 +16,7 @@ interface Milestone {
   requiredCount: number;
   extendedDescription: string;
 };
- 
+
 interface WeekMilestones {
   weekStart: string;
   data: Milestone[];
@@ -62,12 +62,10 @@ export default function MilestoneCard() {
   }, []);
 
   useEffect(() => {
-    if (!session) {
-      return;
-    };
+    if (!session) return;
 
     const fetchSkillProgress = async () => {
-      const skillCounts: { [key: string]: number} = {
+      const skillCounts: { [key: string]: number } = {
         telescope: 0,
         weather: 0,
       };
@@ -215,6 +213,7 @@ export default function MilestoneCard() {
           ))}
         </ul>
 
+        {/* Skill Progress */}
         <div className="mt-6 space-y-3">
           <div className="text-sm font-medium text-chart-2 flex items-center gap-2">
             <Zap className="w-4 h-4" />
@@ -222,6 +221,7 @@ export default function MilestoneCard() {
           </div>
 
           <ul className="space-y-3">
+            {/* Planetary Observation */}
             <li className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 bg-muted/20 p-4 rounded border border-border hover:bg-muted/30 transition">
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-foreground truncate">
@@ -242,6 +242,30 @@ export default function MilestoneCard() {
               </div>
             </li>
 
+            {/* Active Asteroid Recon */}
+            {skillProgress.telescope >= 4 && (
+              <li className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 bg-muted/20 p-4 rounded border border-border hover:bg-muted/30 transition cursor-pointer">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-foreground truncate">
+                    Active Asteroid Recon
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    You've unlocked asteroid detection. Now, focus on identifying signs of activity — jets, tails, or unusual paths. Confirm at least 2 minor asteroid classifications to unlock the <strong>Active Asteroids</strong> project.
+                  </div>
+                  <div className="mt-2 w-full bg-muted rounded h-2">
+                    <div
+                      className="h-2 bg-chart-2 rounded transition-all duration-300"
+                      style={{ width: `${Math.min(((skillProgress.telescope - 4) / 2) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="text-xs text-muted-foreground whitespace-nowrap sm:text-right">
+                  {Math.min(skillProgress.telescope - 4, 2)}/2 completed
+                </div>
+              </li>
+            )}
+
+            {/* Atmospheric Analysis */}
             <li className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 bg-muted/20 p-4 rounded border border-border hover:bg-muted/30 transition">
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-foreground truncate">
@@ -266,4 +290,133 @@ export default function MilestoneCard() {
       </CardContent>
     </Card>
   );
-}
+};
+
+interface UserMilestone {
+  id: string;
+  user_id: string;
+  week_start: string;
+  milestone_data: {
+    name: string;
+    structure: string;
+    group: string;
+    icon: string;
+    table: "classifications" | "comments";
+    field: string;
+    value: string;
+    requiredCount: number;
+    extendedDescription: string;
+  };
+};
+
+export function NewMilestones() {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const[milestones, setMilestones] = useState<UserMilestone[]>([]);
+  const [progress, setProgress] = useState<{ [name: string]: number }>({});
+
+  useEffect(() => {
+    if (!session) {
+      return;
+    };
+
+    const fetchMilestones = async () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const weekday = today.getDay(); // Sunday = 0
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - weekday);
+
+      const { data, error } = await supabase
+        .from("user_milestones")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("week_start", weekStart.toLocaleDateString("en-CA")); // formats as YYYY-MM-DD
+
+      if (!error && data) {
+        setMilestones(data as UserMilestone[]);
+      };
+    };
+
+    fetchMilestones();
+  }, [session]);
+
+  useEffect(() => {
+    if (!session || !milestones || milestones.length === 0) {
+      return;
+    };
+
+    const fetchProgress = async () => {
+      const progressMap: { [name: string]: number } = {};
+      const weekStartDate = new Date(milestones[0].week_start);
+      const weekEndDate = new Date(weekStartDate);
+      weekEndDate.setDate(weekStartDate.getDate() + 6);
+
+      for (const milestone of milestones) {
+        const {
+          table,
+          field,
+          value
+        } = milestone.milestone_data;
+
+        const {
+          count,
+          error
+        } = await supabase
+          .from(table)
+          .select("*", { count: "exact" })
+          .eq("author", session.user.id)
+          .eq(field, value)
+          .gte("created_at", weekStartDate.toISOString())
+          .lte("created_at", weekEndDate.toISOString());
+
+        if (!error && count !== null) {
+          progressMap[milestone.milestone_data.name] = count;
+        }
+      }
+
+      setProgress(progressMap);
+    };
+
+    fetchProgress();
+  }, [session, milestones]);
+
+  return (
+    <Card className="bg-card border border-chart-2/30">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm flex items-center gap-2 text-chart-2">
+          <Zap className="w-4 h-4" />
+          Your Weekly Milestones
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="p-4 space-y-3">
+        {milestones.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No milestones assigned for this week.</p>
+        ) : (
+          <ul className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+            {milestones.map((milestone) => (
+              <li
+                key={milestone.id}
+                className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 bg-muted/20 p-4 rounded border border-border hover:bg-muted/30 transition"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-foreground truncate">
+                    {milestone.milestone_data.name}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {milestone.milestone_data.extendedDescription}
+                  </div>
+                </div>
+                <div className="text-xs text-muted-foreground whitespace-nowrap sm:text-right">
+                  {progress[milestone.milestone_data.name] || 0}/{milestone.milestone_data.requiredCount} completed
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+  );
+};

@@ -6,6 +6,7 @@ import WeatherEventsOverview from "@/components/Data/Generator/Weather/EventsAcr
 import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
 import MilestoneTotalCompleted from "@/components/Structures/Missions/Milestones/Completed";
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
+import { NewMilestones } from "@/components/Structures/Missions/Milestones/MilestonesNewUi";
 import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
 import MyLocationIds from "@/content/Classifications/UserLocationPK";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
@@ -60,6 +61,7 @@ export default function TestPage() {
                   />
                   <MyLocationIds /> */}
       {/* <WeatherEventsOverview /> */}
+      <NewMilestones />
       {/* <TelescopeViewport /> */}
       {/* <PlanetGenerator classificationId="1" />   */}
       {/* <PlanetGenerator classificationId={1} biome={'RockyHighlands'} biomass={0.01} density={3.5} /> */}
