@@ -1,0 +1,25 @@
+{
+  "researchTree": {
+    "nodes": [
+      {
+        "id": "basic-astronomy",
+        "name": "Basic Astronomy",
+        "unlocked": true,
+        "prerequisites": []
+      },
+      {
+        "id": "advanced-optics",
+        "name": "Advanced Optics",
+        "unlocked": false,
+        "prerequisites": ["basic-astronomy"]
+      }
+    ]
+  },
+  "sampleResearch": {
+    "id": "telescope-upgrade",
+    "name": "Telescope Upgrade",
+    "description": "Improve telescope resolution",
+    "cost": 100,
+    "unlocked": false
+  }
+}

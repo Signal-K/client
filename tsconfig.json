@@ -7,6 +7,7 @@
     ],
     "allowJs": true,
     "strict": true,
+    "types": ["cypress", "node"],
     "noEmit": true,
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -29,6 +30,7 @@
     "esModuleInterop": true
   },
   "include": [
+    "cypress/**/*.ts",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
