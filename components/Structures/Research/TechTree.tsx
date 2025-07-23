@@ -143,7 +143,7 @@ export default function ModernTechTree() {
             }
           : tech
       )
-    )
+    ) 
   }
 
   React.useEffect(() => {

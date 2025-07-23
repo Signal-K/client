@@ -30,6 +30,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestonesNewUi";
+import { SkillTree } from "@/components/Research/SkillTree/tree";
+import { isSkillUnlockable } from "@/utils/research/skill-utils";
+import { SkillTreeSection } from "@/components/Research/SkillTree/skill-tree-section";
 
 export interface LinkedAnomaly {
   id: number;
@@ -429,6 +432,10 @@ export default function ActivityPage() {
         />
 
         <MilestoneCard />
+
+        <Link href="/research/tree" className="block">
+          <SkillTreeSection isFullTree={false} />
+        </Link>
 
         {needsProfileSetup ? (
           <section className="rounded-2xl p-6 border shadow space-y-4 text-center bg-card text-card-foreground">

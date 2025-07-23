@@ -26,7 +26,7 @@ interface LeftSidebarProps {
   selectProject: (project: any | null) => void
   handleNavigate: (direction: "up" | "down" | "left" | "right") => void
   getSectorAnomaliesForProject: (projectId: string | null) => any[]
-}
+};
 
 export function LeftSidebar({
   currentSectorName,

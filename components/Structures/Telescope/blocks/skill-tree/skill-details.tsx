@@ -1,10 +1,11 @@
-'use client'
+"use client"
 
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertCircle, CheckCircle, X, Lock, Sparkles } from "lucide-react"
+import { X, Sparkles, Lock, CheckCircle, AlertCircle } from "lucide-react"
+import { getSkillIcon } from "./skill-icons"
 import type { Skill, SkillStatus, UserProgress } from "@/types/Structures/telescope-skills"
 
 interface SkillDetailsProps {
@@ -21,31 +22,27 @@ export function SkillDetails({ skill, status, progress, userProgress, onUnlock, 
     switch (status) {
       case "unlocked":
         return {
-          icon: <CheckCircle className="h-5 w-5 text-[#78cce2]" />,
+          icon: <CheckCircle className="h-4 w-4" style={{ color: "#78cce2" }} />,
           text: "UNLOCKED",
-          color: "text-[#78cce2]",
-          bgColor: "bg-[#78cce2]/20",
+          style: { color: "#78cce2", backgroundColor: "rgba(120, 204, 226, 0.2)" },
         }
       case "can-unlock":
         return {
-          icon: <Sparkles className="h-5 w-5 text-[#4e7988]" />,
-          text: "READY TO UNLOCK",
-          color: "text-[#4e7988]",
-          bgColor: "bg-[#4e7988]/20",
+          icon: <Sparkles className="h-4 w-4" style={{ color: "#4e7988" }} />,
+          text: "READY",
+          style: { color: "#4e7988", backgroundColor: "rgba(78, 121, 136, 0.2)" },
         }
       case "locked":
         return {
-          icon: <Lock className="h-5 w-5 text-[#78cce2]" />,
+          icon: <Lock className="h-4 w-4" style={{ color: "#78cce2" }} />,
           text: "LOCKED",
-          color: "text-[#78cce2]",
-          bgColor: "bg-[#78cce2]/10",
+          style: { color: "#78cce2", backgroundColor: "rgba(120, 204, 226, 0.1)" },
         }
       default:
         return {
-          icon: <AlertCircle className="h-5 w-5 text-[#78cce2]" />,
+          icon: <AlertCircle className="h-4 w-4" style={{ color: "#78cce2" }} />,
           text: "UNKNOWN",
-          color: "text-[#78cce2]",
-          bgColor: "bg-[#78cce2]/10",
+          style: { color: "#78cce2", backgroundColor: "rgba(120, 204, 226, 0.1)" },
         }
     }
   }
@@ -57,67 +54,95 @@ export function SkillDetails({ skill, status, progress, userProgress, onUnlock, 
   const getRequirementText = () => {
     if (skill.requirementType === "classification" && skill.classificationType) {
       const userCount = userProgress.classifications[skill.classificationType] || 0
-      return `${userCount}/${skill.requiredCount} ${skill.classificationType} classifications`
+      return `${userCount}/${skill.requiredCount} classifications`
     }
     return "No requirements"
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col" style={{ backgroundColor: "#005066" }}>
       {/* Header */}
-      <div className="p-4 border-b border-[#78cce2]/30 flex items-center justify-between">
-        <h2 className="text-[#e4eff0] font-bold text-lg font-mono">SKILL DETAILS</h2>
-        <Button variant="ghost" size="sm" onClick={onClose} className="text-[#78cce2] hover:bg-[#4e7988]/50">
+      <div
+        className="p-3 border-b flex items-center justify-between"
+        style={{
+          borderColor: "rgba(120, 204, 226, 0.3)",
+          backgroundColor: "rgba(0, 80, 102, 0.95)",
+        }}
+      >
+        <h2 className="font-bold text-sm font-mono" style={{ color: "#e4eff0" }}>
+          SKILL DETAILS
+        </h2>
+        <Button variant="ghost" size="sm" onClick={onClose} className="p-1 h-auto" style={{ color: "#78cce2" }}>
           <X className="h-4 w-4" />
         </Button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-3 space-y-3">
         {/* Skill Info */}
-        <Card className="bg-[#002439]/80 border border-[#78cce2]/30">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-[#e4eff0] text-lg font-mono">{skill.name.toUpperCase()}</CardTitle>
-              <Badge className={`${statusInfo.bgColor} ${statusInfo.color} font-mono`}>
-                {statusInfo.icon}
-                <span className="ml-1">{statusInfo.text}</span>
-              </Badge>
+        <Card
+          className="border"
+          style={{
+            backgroundColor: "rgba(0, 36, 57, 0.8)",
+            borderColor: "rgba(120, 204, 226, 0.3)",
+          }}
+        >
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2 mb-2">
+              <div style={{ color: "#78cce2" }}>{getSkillIcon(skill.id)}</div>
+              <CardTitle className="text-sm font-mono" style={{ color: "#e4eff0" }}>
+                {skill.name.toUpperCase()}
+              </CardTitle>
             </div>
+            <Badge className="font-mono text-xs w-fit" style={statusInfo.style}>
+              {statusInfo.icon}
+              <span className="ml-1">{statusInfo.text}</span>
+            </Badge>
           </CardHeader>
-          <CardContent>
-            <p className="text-[#78cce2] text-sm mb-4">{skill.description}</p>
+          <CardContent className="pt-0">
+            <p className="text-xs mb-3" style={{ color: "#78cce2" }}>
+              {skill.description}
+            </p>
 
             {/* Cost */}
             {skill.cost > 0 && (
-              <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="h-4 w-4 text-[#78cce2]" />
-                <span className="text-[#e4eff0] font-mono">Cost: {skill.cost} Stardust</span>
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="h-3 w-3" style={{ color: "#78cce2" }} />
+                <span className="text-xs font-mono" style={{ color: "#e4eff0" }}>
+                  {skill.cost} Stardust
+                </span>
                 {!canAfford && status === "can-unlock" && (
-                  <Badge className="bg-red-500/20 text-red-400 text-xs">INSUFFICIENT FUNDS</Badge>
+                  <Badge
+                    className="text-xs ml-auto"
+                    style={{ backgroundColor: "rgba(191, 97, 106, 0.2)", color: "#BF616A" }}
+                  >
+                    INSUFFICIENT
+                  </Badge>
                 )}
               </div>
             )}
 
-            {/* Requirements */}
+            {/* Requirements - Simplified */}
             {skill.requirementType !== "none" && (
               <div className="space-y-2">
-                <div className="text-[#e4eff0] font-mono text-sm">Requirements:</div>
+                <div className="text-xs font-mono" style={{ color: "#e4eff0" }}>
+                  Requirements:
+                </div>
 
                 {/* Prerequisites */}
                 {skill.prerequisites.length > 0 && (
                   <div className="space-y-1">
-                    {skill.prerequisites.map((prereqId) => {
+                    {skill.prerequisites.slice(0, 2).map((prereqId) => {
                       const isUnlocked = userProgress.unlockedSkills.includes(prereqId)
                       return (
                         <div key={prereqId} className="flex items-center gap-2 text-xs">
                           {isUnlocked ? (
-                            <CheckCircle className="h-3 w-3 text-[#78cce2]" />
+                            <CheckCircle className="h-3 w-3" style={{ color: "#78cce2" }} />
                           ) : (
-                            <Lock className="h-3 w-3 text-[#78cce2]" />
+                            <Lock className="h-3 w-3" style={{ color: "#78cce2" }} />
                           )}
-                          <span className={isUnlocked ? "text-[#78cce2]" : "text-[#78cce2]/60"}>
-                            {prereqId.replace("-", " ").toUpperCase()}
+                          <span style={{ color: isUnlocked ? "#78cce2" : "rgba(120, 204, 226, 0.6)" }}>
+                            {prereqId.split("-")[0].toUpperCase()}
                           </span>
                         </div>
                       )
@@ -127,9 +152,13 @@ export function SkillDetails({ skill, status, progress, userProgress, onUnlock, 
 
                 {/* Classification Requirements */}
                 {skill.requirementType === "classification" && (
-                  <div className="space-y-2">
-                    <div className="text-xs text-[#78cce2]">{getRequirementText()}</div>
-                    {progress > 0 && <Progress value={progress} className="h-2 bg-[#005066]" />}
+                  <div className="space-y-1">
+                    <div className="text-xs" style={{ color: "#78cce2" }}>
+                      {getRequirementText()}
+                    </div>
+                    {progress > 0 && (
+                      <Progress value={progress} className="h-1" style={{ backgroundColor: "#005066" }} />
+                    )}
                   </div>
                 )}
               </div>
@@ -137,17 +166,25 @@ export function SkillDetails({ skill, status, progress, userProgress, onUnlock, 
           </CardContent>
         </Card>
 
-        {/* Rewards */}
-        <Card className="bg-[#002439]/80 border border-[#78cce2]/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-[#e4eff0] text-sm font-mono">REWARDS</CardTitle>
+        {/* Rewards - Simplified */}
+        <Card
+          className="border"
+          style={{
+            backgroundColor: "rgba(0, 36, 57, 0.8)",
+            borderColor: "rgba(120, 204, 226, 0.3)",
+          }}
+        >
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-mono" style={{ color: "#e4eff0" }}>
+              REWARDS
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {skill.rewards.map((reward, index) => (
-                <li key={index} className="flex items-start gap-2 text-xs text-[#78cce2]">
-                  <div className="w-1 h-1 bg-[#78cce2] rounded-full mt-2 flex-shrink-0" />
-                  <span>{reward}</span>
+          <CardContent className="pt-0">
+            <ul className="space-y-1">
+              {skill.rewards.slice(0, 2).map((reward, index) => (
+                <li key={index} className="flex items-start gap-2 text-xs" style={{ color: "#78cce2" }}>
+                  <div className="w-1 h-1 rounded-full mt-1 flex-shrink-0" style={{ backgroundColor: "#78cce2" }} />
+                  <span className="truncate">{reward}</span>
                 </li>
               ))}
             </ul>
@@ -159,26 +196,30 @@ export function SkillDetails({ skill, status, progress, userProgress, onUnlock, 
           <Button
             onClick={onUnlock}
             disabled={!canUnlock}
-            className={`w-full font-mono ${
-              canUnlock
-                ? "bg-[#78cce2] text-[#002439] hover:bg-[#e4eff0]"
-                : "bg-[#4e7988]/50 text-[#78cce2]/50 cursor-not-allowed"
-            }`}
+            className="w-full font-mono text-xs py-2"
+            style={{
+              backgroundColor: canUnlock ? "#78cce2" : "rgba(78, 121, 136, 0.5)",
+              color: canUnlock ? "#002439" : "rgba(120, 204, 226, 0.5)",
+              border: "none",
+            }}
           >
-            <Sparkles className="h-4 w-4 mr-2" />
-            {canUnlock ? "UNLOCK SKILL" : "INSUFFICIENT STARDUST"}
+            <Sparkles className="h-3 w-3 mr-1" />
+            {canUnlock ? "UNLOCK" : "INSUFFICIENT STARDUST"}
           </Button>
         )}
 
         {status === "unlocked" && (
-          <div className="text-center py-4">
-            <Badge className="bg-[#78cce2]/20 text-[#78cce2] font-mono">
-              <CheckCircle className="h-4 w-4 mr-1" />
-              SKILL UNLOCKED
+          <div className="text-center py-2">
+            <Badge
+              className="font-mono text-xs"
+              style={{ backgroundColor: "rgba(120, 204, 226, 0.2)", color: "#78cce2" }}
+            >
+              <CheckCircle className="h-3 w-3 mr-1" />
+              UNLOCKED
             </Badge>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 };
