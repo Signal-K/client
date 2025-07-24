@@ -2,23 +2,23 @@
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
-import LoginPage from "../auth/LoginModal";
+import LoginPage from "@/src/components/profile/auth/LoginModal";
 import { useRouter} from "next/navigation";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/src/components/ui/dialog";
+import { Button } from "@/src/components/ui/button";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 // import { subscribeUser, unsubscribeUser, sendNotification } from '../actions'
-// import { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
-// import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
-import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
-import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
-import SimpleeMissionGuide from "../tests/singleMissionGuide";
-import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatellites";
-import LandingSS from "../auth/landing";
-import GameNavbar from "@/components/Layout/Tes";
-import BiomassOnEarth from "@/components/Data/BiomassEarth";
-import NPSPopup from "@/src/shared/helpers/nps-popup";
-import Structures from "@/components/Structures/Structures";
+// import { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/src/components/deployment/structures/Structures";
+// import EnhancedWeatherEvents from '@/src/components/ui/scenes/mining/enhanced-weather-events';
+import AllAutomatonsOnActivePlanet from "@/src/components/deployment/structures/auto/AllAutomatons";
+import { EarthViewLayout } from "@/src/components/ui/scenes/planetScene/layout";
+import SimpleeMissionGuide from "@/src/components/deployment/missions/guide";
+import AllSatellitesOnActivePlanet from "@/src/components/deployment/structures/auto/AllSatellites";
+import LandingSS from "@/src/components/profile/auth/landing";
+import GameNavbar from "@/src/components/layout/Tes";
+import BiomassOnEarth from "@/src/components/social/activity/BiomassEarth";
+import NPSPopup from "@/src/components/ui/helpers/nps-popup";
+import Structures from "@/src/components/deployment/structures/Structures";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -383,7 +383,7 @@ export default function Home() {
 
   function handleDeployConfirm() {
     setShowDeployModal(false);
-    router.push("/deploy");
+    router.push("/activity/deploy");
   };
 
   async function handleDeployCancel() {

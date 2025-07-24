@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
-import LoginPage from "@/app/auth/LoginModal";
+import LoginPage from "@/src/components/profile/auth/LoginModal";
 
 const Login = () => {
     const session = useSession();

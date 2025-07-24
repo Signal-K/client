@@ -2,9 +2,9 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { useSession } from "@supabase/auth-helpers-react";
-import GameNavbar from "@/components/Layout/Tes";
-import AI4M from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AIForMars";
-import PlanetFour from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/PlanetFour";
+import GameNavbar from "@/src/components/layout/Tes";
+import AI4M from "@/src/components/deployment/missions/structures/Astronomers/SatellitePhotos/AI4M/AIForMars";
+import PlanetFour from "@/src/components/deployment/missions/structures/Astronomers/SatellitePhotos/P4/PlanetFour";
 
 export default function SeisCamProjectpage() {
     const params = useParams();

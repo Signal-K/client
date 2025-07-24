@@ -3,31 +3,30 @@
 import { useState } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
 
-import LandingSS from "./auth/landing";
-import NPSPopup from "@/src/shared/helpers/nps-popup";
-import { TelescopeBackground } from "@/components/Structures/Telescope/telescope-background";
+import LandingSS from "@/src/components/profile/auth/landing";
+import NPSPopup from "@/src/components/ui/helpers/nps-popup";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import WeeklyBanner from "@/components/ui/update-banner";
-import CompleteProfileForm from "@/components/Account/FinishProfile";
+} from "@/src/components/ui/dialog";
+import WeeklyBanner from "@/src/components/ui/update-banner";
+import CompleteProfileForm from "@/src/components/profile/setup/FinishProfile";
 
-// Import the new modular components
-import MainHeader from "@/components/Layout/Header/MainHeader";
-import ActivityHeaderSection from "@/components/Data/ActivityHeaderSection";
-import NextStepsSection from "@/components/Dashboard/NextStepsSection";
-// import TipsGuidanceSection from "@/components/Dashboard/TipsGuidanceSection";
-import ResearchProgressSection from "@/components/Research/ResearchProgressSection";
-import StructuresEquipmentSection from "@/components/Structures/StructuresEquipmentSection";
-import MilestonesSection from "@/components/Missions/MilestonesSection";
-import ProfileSetupSection from "@/components/Account/ProfileSetupSection";
-import CompleteStructuresSection from "@/components/Structures/CompleteStructuresSection";
-import ProfileSetupRequired from "@/components/Account/ProfileSetupRequired";
-import LegacyTipsPanel from "@/components/Dashboard/LegacyTipsPanel";
-import LegacyMilestonesSection from "@/components/Dashboard/LegacyMilestonesSection";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
+import NextStepsSection from "@/src/components/profile/dashboard/NextStepsSection";
+// import TipsGuidanceSection from "@/src/components/profile/dashboard/TipsGuidanceSection";
+import ResearchProgressSection from "@/src/components/research/ResearchProgressSection";
+import StructuresEquipmentSection from "@/src/components/deployment/structures/StructuresEquipmentSection";
+import MilestonesSection from "@/src/components/deployment/missions/MilestonesSection";
+import ProfileSetupSection from "@/src/components/profile/setup/ProfileSetupSection";
+import CompleteStructuresSection from "@/src/components/deployment/structures/CompleteStructuresSection";
+import ProfileSetupRequired from "@/src/components/profile/setup/ProfileSetupRequired";
+import LegacyTipsPanel from "@/src/components/profile/dashboard/LegacyTipsPanel";
+import LegacyMilestonesSection from "@/src/components/profile/dashboard/LegacyMilestonesSection";
 
 // Import custom hooks
 import { usePageData } from "@/hooks/usePageData";

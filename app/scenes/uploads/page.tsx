@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import Navbar from "@/components/Layout/Navbar";
+import Navbar from "@/src/components/layout/Navbar";
 import Link from "next/link";
 
 const BiodomeStructureBase = () => {

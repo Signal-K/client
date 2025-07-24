@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSessionContext } from "@supabase/auth-helpers-react";
 
-import GameNavbar from "@/components/Layout/Tes";
-import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters";
-import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
-import DailyMinorPlanetMissions from "@/components/Structures/Missions/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
-import SunspotSteps from "@/components/Projects/Telescopes/Sunspots/SunspotShell";
+import GameNavbar from "@/src/components/layout/Tes";
+import PlanetHuntersSteps from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetHunters";
+import { TelescopeDiskDetector } from "@/src/components/research/projects/Telescopes/DiskDetector";
+import DailyMinorPlanetMissions from "@/src/components/deployment/missions/structures/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
+import SunspotSteps from "@/src/components/research/projects/Telescopes/Sunspots/SunspotShell";
 
 export default function TelescopeProjectRoute() {
   const { project } = useParams();

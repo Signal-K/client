@@ -3,12 +3,12 @@
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from '@supabase/auth-helpers-react';
 import Home from '@/app/page';
-import GameNavbar from '@/components/Layout/Tes';
-import AI4M from '@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AIForMars';
-import PlanetFour from '@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/PlanetFour';
-import CloudspottingOnMars from '@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudspottingOnMars';
-import JovianVortexHunters from '@/components/Structures/Missions/Meteorologists/JVH/JovianVortexHunters';
-// import { DataSourcesModal } from '@/components/Data/unlockNewDataSources';
+import GameNavbar from '@/src/components/layout/Tes';
+import AI4M from '@/src/components/deployment/missions/structures/Astronomers/SatellitePhotos/AI4M/AIForMars';
+import PlanetFour from '@/src/components/deployment/missions/structures/Astronomers/SatellitePhotos/P4/PlanetFour';
+import CloudspottingOnMars from '@/src/components/deployment/missions/structures/Meteorologists/Cloudspotting/CloudspottingOnMars';
+import JovianVortexHunters from '@/src/components/deployment/missions/structures/Meteorologists/JVH/JovianVortexHunters';
+// import { DataSourcesModal } from '@/src/components/social/activity/unlockNewDataSources';
 import React from 'react';
 
 export default function WeatherBalloonProjectPage() {

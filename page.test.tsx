@@ -6,8 +6,8 @@ import { PlantDetails } from './components/plant-details'
 import { PlantMapView } from './components/plant-map-view'
 import { AnimalFollowUp } from './components/animal-follow-up'
 import { Plant, Structure, PlantMapData, Animal, Comment } from './types/greenhouse'
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/src/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const mockStructure: Structure = {

@@ -1,8 +1,8 @@
 "use client";
 
-import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
-import ProfileSetupForm from "@/components/Account/ProfileSetup";
-import Navbar from "@/components/Layout/Navbar";
+import { EarthViewLayout } from "@/src/components/ui/scenes/planetScene/layout";
+import ProfileSetupForm from "@/src/components/profile/setup/ProfileSetup";
+import Navbar from "@/src/components/layout/Navbar";
 import { useState } from "react";
 
 export default function AccountPage() {

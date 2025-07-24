@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import PostCard from "@/content/Posts/TestPostCard";
-import GameNavbar from "@/components/Layout/Tes";
-import StructuresOnPlanet from "@/components/Structures/Structures";
+import PostCard from "@/src/components/social/posts/TestPostCard";
+import GameNavbar from "@/src/components/layout/Tes";
+import StructuresOnPlanet from "@/src/components/deployment/structures/Structures";
 
 interface Classification {
     id: number;

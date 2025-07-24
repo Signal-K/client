@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
-import RootLayoutClient from "./RootLayoutClient";
+import RootLayoutClient from "@/src/components/layout/RootLayoutClient";
 
 export const metadata: Metadata = {
   title: "Star Sailors",

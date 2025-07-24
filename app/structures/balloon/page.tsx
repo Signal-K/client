@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
-import GameNavbar from "@/components/Layout/Tes";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import GameNavbar from "@/src/components/layout/Tes";
+import { Dialog, DialogContent } from "@/src/components/ui/dialog";
 
 export default function WeatherBalloonOnEarthPage() {
   const session = useSession();

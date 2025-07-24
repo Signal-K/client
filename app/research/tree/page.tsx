@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react"
 import { Globe } from "lucide-react"
-import { Switch } from "@/components/ui/switch"
+import { Switch } from "@/src/components/ui/switch"
 import { Sun, Moon, User } from "lucide-react"
 import {
     DropdownMenu,
@@ -11,15 +11,15 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import { SkillTree } from "@/components/Research/SkillTree/tree"
-import { SkillIcons } from "@/components/Research/SkillTree/skill-node"
-import { SkillTreeExpandedPanelOverlay } from "@/components/ui/panel-overlay"
+} from "@/src/components/ui/dropdown-menu"
+import { SkillTree } from "@/src/components/research/SkillTree/tree"
+import { SkillIcons } from "@/src/components/research/SkillTree/skill-node"
+import { SkillTreeExpandedPanelOverlay } from "@/src/components/ui/panel-overlay"
 import { SkillCategory, Skill } from "@/types/Reseearch/skill-tree"
-import { isSkillUnlockable } from "@/src/features/research/skill-utils"
+import { isSkillUnlockable } from "@/src/components/research/skill-utils"
 import { useRouter } from "next/navigation"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
-import { SkillTreeSection } from "@/components/Research/SkillTree/skill-tree-section"
+import { SkillTreeSection } from "@/src/components/research/SkillTree/skill-tree-section"
 
 interface ExpandedPanelState {
   type: "structures" | "notifications" | "discoveries" | "missions" | "tech_tree"
@@ -63,7 +63,7 @@ export default function SkillResearchPage() {
       if (session) {
         setIsAuthenticated(true)
       } else {
-        router.push("/login")
+        router.push("/auth")
       }
       setLoadingAuth(false)
     }
@@ -75,7 +75,7 @@ export default function SkillResearchPage() {
         setIsAuthenticated(true)
       } else {
         setIsAuthenticated(false)
-        router.push("/login")
+        router.push("/auth")
       }
     })
 
@@ -155,7 +155,7 @@ export default function SkillResearchPage() {
     if (error) {
       console.error("Error logging out:", error.message)
     } else {
-      router.push("/login")
+      router.push("/auth")
     }
   }
 

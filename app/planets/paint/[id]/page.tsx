@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import PlanetViewer from "@/components/Data/Generator/Astronomers/PlanetHunters/planetViewer"
-import { type PlanetConfig, defaultPlanetConfig } from "./planet-config"
-import SettingsPanel from "@/components/Data/Generator/Astronomers/PlanetHunters/SettingsPanel"
+import PlanetViewer from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/planetViewer"
+import { type PlanetConfig, defaultPlanetConfig } from "@/src/components/discovery/planets/planet-config"
+import SettingsPanel from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/SettingsPanel"
 import { useSupabaseClient } from "@supabase/auth-helpers-react"
-import { Button } from "@/components/ui/button"
-import GameNavbar from "@/components/Layout/Tes"
+import { Button } from "@/src/components/ui/button"
+import GameNavbar from "@/src/components/layout/Tes"
 
 export default function PlanetGeneratorPage() {
   const router = useRouter()
