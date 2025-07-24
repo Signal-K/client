@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
+import { Globe } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Sun, Moon, User } from "lucide-react"
 import {
@@ -16,184 +17,174 @@ import { SkillIcons } from "@/components/Research/SkillTree/skill-node"
 import { SkillTreeExpandedPanelOverlay } from "@/components/ui/panel-overlay"
 import { SkillCategory, Skill } from "@/types/Reseearch/skill-tree"
 import { isSkillUnlockable } from "@/utils/research/skill-utils"
+import { useRouter } from "next/navigation"
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { SkillTreeSection } from "@/components/Research/SkillTree/skill-tree-section"
 
 interface ExpandedPanelState {
   type: "structures" | "notifications" | "discoveries" | "missions" | "tech_tree"
   data: any[] // The full data array for the specific panel
 };
 
-export default function SkillTreePage() {
-    const [isDark, setIsDark] = useState(false);
-    const [activeExpandedPanel, setActiveExpandedPanel] = useState<ExpandedPanelState | null>(null);
-    const [activeSkillDetailPanel, setActiveSkillDetailPanel] = useState<Skill | null>(null);
-    const [unlockedSkills, setUnlockedSkills] = useState<string[]>([]);
-    const [classifiedPlanets, setClassifiedPlanets] = useState(0);
-    const [discoveredAsteroids, setDiscoveredAsteroids] = useState(0);
+export default function SkillResearchPage() {
+    const supabase = useSupabaseClient();
+    const session = useSession()
 
-    useEffect(() => {
-        const root = document.documentElement;
-        if (isDark) {
-            root.classList.add("dark");
-        } else {
-            root.classList.remove("dark");
-        }
-    }, [isDark]);
+  const [isDark, setIsDark] = useState(false)
+  const [activeExpandedPanel, setActiveExpandedPanel] = useState<ExpandedPanelState | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loadingAuth, setLoadingAuth] = useState(true) // New loading state for auth
+  const [classifiedPlanets, setClassifiedPlanets] = useState(0) // New state for classified planets
+  const [discoveredAsteroids, setDiscoveredAsteroids] = useState(0) // New state for discovered asteroids
+  const [loadingCounts, setLoadingCounts] = useState(true) // New loading state for counts
+  const router = useRouter()
 
-    useEffect(() => {
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        setIsDark(prefersDark);
-    }, []);
-
-    useEffect(() => {
-        setClassifiedPlanets(2);
-        setDiscoveredAsteroids(1);
-        setUnlockedSkills(['planet-hunters']);
-    }, []);
-
-    const handleThemeToggle = () => {
-        setIsDark(( prev ) => !prev);
-    };
-
-    const handleExpandPanel = ( type: ExpandedPanelState['type'], data: any) => {
-        setActiveExpandedPanel({
-            type,
-            data
-        });
-    };
-
-    const handleCloseExpandedPanel = () => {
-        setActiveExpandedPanel(null);
-        setActiveSkillDetailPanel(null);
+  useEffect(() => {
+    const root = document.documentElement
+    if (isDark) {
+      root.classList.add("dark")
+    } else {
+      root.classList.remove("dark")
     }
+  }, [isDark])
 
-    const handleViewSkillDetails = ( skill: Skill ) => {
-        setActiveSkillDetailPanel(skill);
-    };
+  useEffect(() => {
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+    setIsDark(prefersDark)
+  }, [])
 
-    const handleUnlockSkill = ( skillId: string ) => {
-        const skillToUnlock = skillTreeData[0].skills.find((s) => s.id === skillId);
-        if (skillToUnlock && skillToUnlock.status === 'available') {
-            setUnlockedSkills(( prev ) => [...prev, skillId])
-            console.log(`Skill unlocked: ${skillId}`);
-            handleCloseExpandedPanel();
-        };
-    };
+  // Check authentication status on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      setLoadingAuth(true)
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (session) {
+        setIsAuthenticated(true)
+      } else {
+        router.push("/login")
+      }
+      setLoadingAuth(false)
+    }
+    checkAuth()
 
-    const skillTreeData: SkillCategory[] = [
-        {
-        id: "telescope",
-        name: "Telescope Operations",
-        skills: [
-            {
-            id: "planet-hunters",
-            name: "Planet Hunters",
-            description: "Master the art of discovering new exoplanets and celestial bodies.",
-            status: unlockedSkills.includes("planet-hunters") ? "unlocked" : "available", // Always available/unlocked
-            prerequisites: [],
-            unlockCost: 0,
-            icon: SkillIcons.PlanetHunters,
-            details: ["Increases exoplanet discovery rate.", "Unlocks advanced planetary analysis tools."],
-            },
-            {
-            id: "asteroid-hunting",
-            name: "Asteroid Hunting",
-            description: "Specialize in identifying and tracking asteroids, including potential resource-rich ones.",
-            status:
-                classifiedPlanets >= 4 && unlockedSkills.includes("planet-hunters")
-                ? unlockedSkills.includes("asteroid-hunting")
-                    ? "unlocked"
-                    : "available"
-                : "locked",
-            prerequisites: [
-                { type: "skill", value: "planet-hunters" },
-                { type: "progress", value: "4 planets classified" },
-            ],
-            unlockCost: 100,
-            icon: SkillIcons.AsteroidHunting,
-            details: ["Improves asteroid detection range.", "Unlocks asteroid trajectory prediction."],
-            },
-            {
-            id: "planet-exploration",
-            name: "Planet Exploration",
-            description:
-                "Learn techniques for detailed surface analysis and environmental assessment of discovered planets.",
-            status:
-                classifiedPlanets >= 1 && unlockedSkills.includes("planet-hunters")
-                ? unlockedSkills.includes("planet-exploration")
-                    ? "unlocked"
-                    : "available"
-                : "locked",
-            prerequisites: [
-                { type: "skill", value: "planet-hunters" },
-                { type: "progress", value: "1 planet explored" },
-            ],
-            unlockCost: 150,
-            icon: SkillIcons.PlanetExploration,
-            details: ["Enables detailed planetary surface scans.", "Unlocks environmental data collection."],
-            },
-            {
-            id: "cloudspotting",
-            name: "Cloudspotting",
-            description:
-                "Focus on atmospheric phenomena, identifying unique cloud formations and weather patterns on gas giants.",
-            status: unlockedSkills.includes("planet-exploration")
-                ? unlockedSkills.includes("cloudspotting")
-                ? "unlocked"
-                : "available"
-                : "locked",
-            prerequisites: [
-                { type: "skill", value: "planet-exploration" },
-                { type: "progress", value: "1 planet explored" },
-            ],
-            unlockCost: 200,
-            icon: SkillIcons.Cloudspotting,
-            details: ["Improves atmospheric analysis capabilities.", "Unlocks weather prediction models for gas giants."],
-            },
-            {
-            id: "active-asteroids",
-            name: "Active Asteroids",
-            description: "Specialize in detecting and analyzing active asteroids, which exhibit comet-like activity.",
-            status:
-                discoveredAsteroids >= 2 && unlockedSkills.includes("asteroid-hunting")
-                ? unlockedSkills.includes("active-asteroids")
-                    ? "unlocked"
-                    : "available"
-                : "locked",
-            prerequisites: [
-                { type: "skill", value: "asteroid-hunting" },
-                { type: "progress", value: "2 asteroids discovered" },
-            ],
-            unlockCost: 250,
-            icon: SkillIcons.ActiveAsteroids,
-            details: ["Enhances detection of active asteroids.", "Provides insights into their unique compositions."],
-            },
-        ],
-        },
-        // Add more categories and skills here later
-    ];
+    // Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setIsAuthenticated(true)
+      } else {
+        setIsAuthenticated(false)
+        router.push("/login")
+      }
+    })
 
-    const updatedSkillTreeData: SkillCategory[] = skillTreeData.map(( category ) => ({
-        ...category,
-        skills: category.skills.map(( skill ) => {
-            const isUnlocked = unlockedSkills.includes(skill.id);
-            const isAvailable = isSkillUnlockable(skill, unlockedSkills, classifiedPlanets, discoveredAsteroids);
-            return {
-                ...skill,
-                status: isUnlocked
-                    ? "unlocked"
-                    : isAvailable
-                    ? "available"
-                    : "locked"
-            } as Skill;
-        }),
-    }));
+    return () => {
+      authListener.subscription.unsubscribe()
+    }
+  }, [router])
 
+  // Fetch classification counts
+  const fetchClassificationCounts = useCallback(async () => {
+    setLoadingCounts(true)
+    try {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession()
+      if (sessionError) throw sessionError
+
+      const currentUserId = session?.user?.id
+
+      if (!currentUserId) {
+        console.warn("No user ID found. Classification count fetching skipped.")
+        setLoadingCounts(false)
+        return
+      }
+
+      // Fetch classified planets
+      console.log("DEBUG: Fetching planets for user:", currentUserId, "with classificationtype: 'Planet'") // ADDED LOG
+      const { count: planetCount, error: planetError } = await supabase
+        .from("classifications")
+        .select("id", { count: "exact" })
+        .eq("author", currentUserId)
+        .eq("classificationtype", "planet") // Corrected to 'Planet'
+
+      if (planetError) {
+        console.error("Error fetching planet count:", planetError) // ADDED LOG
+        throw planetError
+      }
+      setClassifiedPlanets(planetCount || 0)
+      console.log("DEBUG: Classified Planets count:", planetCount) // ADDED LOG
+
+      // Fetch discovered asteroids (using 'telescope-minorPlanet' as per schema)
+      console.log(
+        "DEBUG: Fetching asteroids for user:",
+        currentUserId,
+        "with classificationtype: 'telescope-minorPlanet'",
+      ) // ADDED LOG
+      const { count: asteroidCount, error: asteroidError } = await supabase
+        .from("classifications")
+        .select("id", { count: "exact" })
+        .eq("author", currentUserId)
+        .eq("classificationtype", "telescope-minorPlanet")
+
+      if (asteroidError) {
+        console.error("Error fetching asteroid count:", asteroidError) // ADDED LOG
+        throw asteroidError
+      }
+      setDiscoveredAsteroids(asteroidCount || 0)
+      console.log("DEBUG: Discovered Asteroids count:", asteroidCount) // ADDED LOG
+    } catch (error) {
+      console.error("Error fetching classification counts:", error)
+    } finally {
+      setLoadingCounts(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchClassificationCounts()
+    }
+  }, [isAuthenticated, fetchClassificationCounts])
+
+  const handleThemeToggle = () => {
+    setIsDark((prev) => !prev)
+  }
+
+  const handleExpandPanel = (type: ExpandedPanelState["type"], data: any) => {
+    setActiveExpandedPanel({ type, data })
+  }
+
+  const handleCloseExpandedPanel = () => {
+    setActiveExpandedPanel(null)
+  }
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      console.error("Error logging out:", error.message)
+    } else {
+      router.push("/login")
+    }
+  }
+
+  if (loadingAuth) {
     return (
+      <div className="flex items-center justify-center min-h-screen text-muted-foreground">Redirecting to login...</div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return null // Or a loading spinner, as redirect is handled by useEffect
+  }
+
+  return (
     <div className="h-screen bg-background overflow-hidden flex flex-col">
       {/* Top Status Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 lg:px-6 py-3 bg-card border-b border-border gap-4 sm:gap-0">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-          
+          <h1 className="text-xl font-bold text-primary">Star Sailors</h1>
         </div>
 
         <div className="flex items-center gap-4">
@@ -202,39 +193,53 @@ export default function SkillTreePage() {
             <Switch checked={isDark} onCheckedChange={handleThemeToggle} />
             <Moon className="w-4 h-4 text-chart-4" />
           </div>
-          {/* Profile Dropdown Menu */}
-
+            {/* Profile Dropdown Menu */}
+            <button
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted hover:bg-accent text-sm font-medium transition-colors border border-border"
+            aria-label="Back to Home"
+            >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="hidden sm:inline">Back</span>
+            </button>
         </div>
       </div>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col p-4 gap-4 overflow-y-auto">
-        <SkillTree
-            skillTreeData={updatedSkillTreeData}
-            classifiedPlanets={classifiedPlanets}
-            discoveredAsteroids={discoveredAsteroids}
-            onUnlockSkill={handleUnlockSkill}
-            onViewSkillDetails={handleViewSkillDetails} // Use the new handler
-            isFullTree={true} // This page always shows the full tree
-            onViewDetails={function (): void {
-                throw new Error("Function not implemented.")
-            } }        
-        />
+        {/* User Classification Stats */}
+        <div className="bg-card border border-border rounded-lg p-4 flex flex-wrap items-center justify-around gap-4 text-sm">
+          <div className="flex items-center gap-2 text-chart-2">
+            <Globe className="w-5 h-5" />
+            <span>Planets Classified:</span>
+            <span className="font-bold text-lg">{loadingCounts ? "..." : classifiedPlanets}</span>
+          </div>
+          <div className="flex items-center gap-2 text-chart-3">
+            <Moon className="w-5 h-5" />
+            <span>Asteroids Discovered:</span>
+            <span className="font-bold text-lg">{loadingCounts ? "..." : discoveredAsteroids}</span>
+          </div>
+        </div>
+
+        <SkillTreeSection isFullTree={true} />
       </div>
-      
-      {activeSkillDetailPanel && (
+
+      {/* Expanded Panel Overlay
+      {activeExpandedPanel && (
         <SkillTreeExpandedPanelOverlay
-          skill={activeSkillDetailPanel}
+          panelType={activeExpandedPanel.type}
+          panelData={activeExpandedPanel.data}
           onClose={handleCloseExpandedPanel}
-          onUnlockSkill={handleUnlockSkill}
-          isUnlockable={isSkillUnlockable(
-            activeSkillDetailPanel,
-            unlockedSkills,
-            classifiedPlanets,
-            discoveredAsteroids,
-          )}
         />
-      )}
+      )} */}
     </div>
-  );
+  )
 };

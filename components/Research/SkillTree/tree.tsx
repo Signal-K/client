@@ -23,18 +23,6 @@ export function SkillTree({
       borderColorClass="border-chart-4/30"
       title="skill tree"
       icon={GitFork}
-      headerRightContent={
-        !isFullTree && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onViewSkillDetails(null as any)}
-            className="h-6 w-6 p-0 hover:bg-chart-4/20"
-          >
-            <ChevronRight className="w-3 h-3 text-chart-4" />
-          </Button>
-        )
-      }
       className={isFullTree ? "min-h-[calc(100vh-120px)]" : ""}
       contentClassName="p-4 overflow-auto" // Ensure overflow-auto is correctly applied
     >
@@ -95,7 +83,7 @@ export function SkillTree({
                           key={skill.id}
                           skill={skill}
                           onViewDetails={onViewSkillDetails}
-                          onUnlock={onUnlockSkill}
+                          onUnlock={onUnlockSkill} // This now receives the updated data from SkillTreeSection
                           isUnlockable={isSkillUnlockable(
                             skill,
                             category.skills.filter((s) => s.status === "unlocked").map((s) => s.id),

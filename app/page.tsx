@@ -30,8 +30,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestonesNewUi";
-import { SkillTree } from "@/components/Research/SkillTree/tree";
-import { isSkillUnlockable } from "@/utils/research/skill-utils";
 import { SkillTreeSection } from "@/components/Research/SkillTree/skill-tree-section";
 
 export interface LinkedAnomaly {
@@ -180,7 +178,6 @@ export default function ActivityPage() {
       const userId = session?.user.id;
       if (!userId) return;
 
-      // Step 1: Fetch classifications of type 'planet'
       const { data } = await supabase
         .from("classifications")
         .select("id, anomaly:anomaly(content)")
@@ -259,24 +256,58 @@ export default function ActivityPage() {
           .filter((id): id is number => !!id)
       );
 
-      const { data: rawLinked } = await supabase
+      // Fetch all linked anomalies for the user
+      const { data: rawLinked, error: linkedError } = await supabase
         .from("linked_anomalies")
         .select(`
           id,
           anomaly_id,
           date,
           anomaly:anomaly_id(
-            content,
-            anomalytype,
-            anomalySet
+        content,
+        anomalytype,
+        anomalySet
           )
         `)
         .eq("author", userId)
         .order("date", { ascending: false });
+      
+      // Let's also check the total count in the table
+      const { count: totalLinkedCount, error: countError } = await supabase
+        .from("linked_anomalies")
+        .select("id", { count: "exact" });
+    
+      
+      // Let's also check what's in the table without filtering by author
+      const { data: allLinkedData, error: allLinkedError } = await supabase
+        .from("linked_anomalies")
+        .select("id, author, anomaly_id, date")
+        .limit(10);
+    
 
+      // Fetch all cloud anomalies that have already been classified by the user
+      const { data: classifiedClouds } = await supabase
+        .from("classifications")
+        .select("anomaly, anomaly:anomaly(content, anomalytype)")
+        .eq("author", userId)
+        .eq("classificationtype", "cloud");
+
+      const classifiedCloudAnomalyIds = new Set(
+        (classifiedClouds ?? [])
+          .filter((c) => c.anomaly && c.anomaly.anomalytype === "cloud")
+          .map((c) => c.anomaly)
+      );
+
+      // Filter linked anomalies: keep those not classified by user,
+      // plus those of type 'cloud' that HAVE been classified by user
       const linked = (rawLinked ?? []) as unknown as LinkedAnomaly[];
-      // Filter out linked anomalies that have already been classified by the user
-      const filteredLinked = linked.filter((a) => !classifiedAnomalyIds.has(a.anomaly_id));
+      const filteredLinked = linked.filter((a) => {
+        const isCloud = a.anomaly?.anomalytype === "cloud";
+        if (!classifiedAnomalyIds.has(a.anomaly_id)) return true;
+        if (isCloud && classifiedCloudAnomalyIds.has(a.anomaly_id)) return true;
+        return false;
+      });
+      console.log("DEBUG: filteredLinked after processing:", filteredLinked);
       setLinkedAnomalies(filteredLinked);
 
       const oneWeekAgo = subDays(new Date(), 7).toISOString();
@@ -354,14 +385,6 @@ export default function ActivityPage() {
         <div className="flex flex-wrap sm:flex-nowrap items-center justify-between px-4 lg:px-6 py-3 gap-4 sm:gap-0">
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <h1 className="text-xl font-bold text-primary">Star Sailors</h1>
-            {/* <div className="hidden sm:flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-              <div className="w-2 h-2 bg-chart-1 rounded-full"></div>
-              <span className="text-chart-2">8.4</span>
-              <span className="text-chart-3">2 h</span>
-              <span className="text-chart-4">15 min</span>
-              <span className="text-chart-5">32 sec</span>
-              <span className="text-foreground">data history</span>
-            </div> */}
           </div>
 
           <div className="flex items-center gap-4">
