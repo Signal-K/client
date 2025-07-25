@@ -8,7 +8,7 @@ import Link from "next/link";
 
 import ActivityHeader from "@/components/(scenes)/deploy/ActivityHeader";
 import LandingSS from "./auth/landing";
-import NPSPopup from "@/lib/helper/nps-popup";
+import NPSPopup from "@/src/shared/helpers/nps-popup";
 import RecentActivity from "@/components/Data/RecentActivity";
 import RecentDiscoveries from "@/components/Data/RecentDiscoveries";
 import TipsPanel from "@/components/Structures/Missions/Milestones/NextStepsTips";

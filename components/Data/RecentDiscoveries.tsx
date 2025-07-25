@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Zap, Telescope } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Classification, LinkedAnomaly } from "@/app/page";
-import { ClassificationIcon, getAnomalyColor } from "@/lib/helper/classification-icons";
+import { ClassificationIcon, getAnomalyColor } from "@/src/shared/helpers/classification-icons";
 
 interface Props {
   linkedAnomalies: LinkedAnomaly[];

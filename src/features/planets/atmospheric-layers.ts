@@ -1,4 +1,4 @@
-import { AtmosphericLayer, CloudComposition } from '../types/Generators/JVH/atmosphere'
+import { AtmosphericLayer, CloudComposition } from '@/types/Generators/JVH/atmosphere'
 
 const hydrogenComposition: CloudComposition = {
   name: 'Hydrogen',

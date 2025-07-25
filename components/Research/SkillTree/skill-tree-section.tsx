@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react"
 import { SkillTree } from "./tree"
 import { SkillIcons } from "./skill-node"
 import { SkillTreeExpandedPanelOverlay } from "@/components/ui/panel-overlay"
-import { isSkillUnlockable } from "@/utils/research/skill-utils"
+import { isSkillUnlockable } from "@/src/features/research/skill-utils"
 import type { SkillCategory, Skill, SkillStatus } from "@/types/Reseearch/skill-tree"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { projects } from "@/data/projects"
+import { projects } from "@/src/shared/data/projects"
 import { Telescope, Archive, TreePine, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, X } from "lucide-react"
 
 interface MobileMenuProps {

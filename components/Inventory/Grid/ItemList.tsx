@@ -4,7 +4,7 @@ import { Draggable, Droppable } from "@hello-pangea/dnd";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn } from "@/src/shared/utils";
 
 interface InventoryListProps {
     userInventory: UserInventoryItem[];

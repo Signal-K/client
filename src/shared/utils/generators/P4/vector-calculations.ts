@@ -1,4 +1,4 @@
-import { Feature, WindVector } from '../../../types/Generators/planet-4'
+import { Feature, WindVector } from '@/types/Generators/planet-4'
 
 export function calculateWindVectors(features: Feature[]): WindVector[] {
   const fans = features.filter(f => f.type === 'fan' && f.orientation !== undefined)

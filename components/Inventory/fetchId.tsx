@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useSession } from "@supabase/auth-helpers-react";
-import { useActivePlanet } from "@/context/ActivePlanet";
+import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 
 interface InventoryIdFetcherProps {
   structureId: string;

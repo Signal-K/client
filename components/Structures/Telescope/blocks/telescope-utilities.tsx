@@ -1,5 +1,5 @@
 import type { Anomaly } from "@/types/Structures/telescope";
-import { seededRandom, generateSectorName } from "@/utils/Structures/Telescope/sector-utils";
+import { seededRandom, generateSectorName } from "@/src/features/telescope/utils/sector-utils";
 
 // Pastel color palette
 export const PASTEL_COLORS = {

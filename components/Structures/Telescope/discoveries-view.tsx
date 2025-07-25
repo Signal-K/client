@@ -17,7 +17,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { projects } from "@/data/telescope/projects";
+import { projects } from "@/src/features/telescope/data/telescope/projects";
 
 interface DatabaseClassification {
   id: number

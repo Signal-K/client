@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useActivePlanet } from "@/context/ActivePlanet";
+import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 import { Button } from "@/components/ui/button";

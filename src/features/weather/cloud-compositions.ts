@@ -1,4 +1,4 @@
-import { CloudComposition } from '../types/Generators/JVH/atmosphere';
+import { CloudComposition } from '@/types/Generators/JVH/atmosphere';
 
 export type CloudPattern = 'featureless' | 'turbulent' | 'vortex' | 'bands';
 

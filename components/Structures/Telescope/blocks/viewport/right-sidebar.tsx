@@ -1,7 +1,7 @@
 "use client"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardTitle, CardHeader, CardFooter } from "@/components/ui/card"
-import { projects } from "@/data/projects"
+import { projects } from "@/src/shared/data/projects"
 import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { DatabaseClassification } from "../types"

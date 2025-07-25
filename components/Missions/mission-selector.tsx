@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { AnimatePresence } from "framer-motion"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
-import { useActivePlanet } from "@/context/ActivePlanet"
+import { useActivePlanet } from "@/src/core/context/ActivePlanet"
 
 import { IntroStep } from "./intro-step"
 import { SelectionStep } from "./selection-step"

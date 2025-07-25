@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { Avatar } from "../Account/Avatar";
 import Link from "next/link";
-import { useActivePlanet } from "@/context/ActivePlanet";
+import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import MilestoneCard from "../Structures/Missions/Milestones/MilestoneCard";
 import JournalPage from "../Structures/Missions/Stardust/Journal";

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useCallback } from 'react';
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import { useActivePlanet } from '@/context/ActivePlanet';
+import { useActivePlanet } from '@/src/core/context/ActivePlanet';
 
 interface TravelContextProps {
   handleTravel: (mission: any, session: any) => Promise<void>;

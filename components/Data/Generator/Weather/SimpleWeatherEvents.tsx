@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { biomeData, BiomeData } from "@/utils/biome-data"
+import { biomeData, BiomeData } from "@/src/features/weather/biomes"
 
 interface WeatherSettings {
   rain: boolean

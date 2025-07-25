@@ -1,5 +1,5 @@
 import type { Anomaly, ViewMode } from "@/types/Structures/telescope"
-import { generateSectorName, generateStars, filterAnomaliesBySector, seededRandom } from "@/utils/Structures/Telescope/sector-utils"
+import { generateSectorName, generateStars, filterAnomaliesBySector, seededRandom } from "@/src/features/telescope/utils/sector-utils"
 
 export interface DatabaseAnomaly {
   id: number

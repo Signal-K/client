@@ -6,7 +6,7 @@ import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import { toast } from "sonner";
 import { InventoryGrid } from "./ItemGrid";
 import { InventoryList } from "./ItemList";
-import { useActivePlanet } from "@/context/ActivePlanet";
+import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 
 export default function InventoryPage() {
     const supabase = useSupabaseClient();

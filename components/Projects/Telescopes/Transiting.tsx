@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import { useActivePlanet } from '@/context/ActivePlanet'; 
+import { useActivePlanet } from '@/src/core/context/ActivePlanet'; 
 import ClassificationForm from '@/components/Projects/(classifications)/PostForm';
 import { planetClassificationConfig } from '@/components/Projects/(classifications)/FormConfigurations';
 // import PreferredTerrestrialClassifications from '@/components/Structures/Missions/PickPlanet';

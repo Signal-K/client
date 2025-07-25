@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { useActivePlanet } from "@/context/ActivePlanet";
+import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { InventoryStructureItem } from "@/types/Items";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
 import { PlanetarySystem } from "@/components/(scenes)/planetScene/orbitals/system";

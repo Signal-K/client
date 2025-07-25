@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import type { PlanetConfig } from "@/app/planets/paint/[id]/planet-config"
-import { getLiquidType } from "@/utils/planet-physics"
+import { getLiquidType } from "@/src/features/planets/physics"
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"

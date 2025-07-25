@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls, Stars } from "@react-three/drei"
 import { Cog } from "lucide-react"
-import type { PlanetConfig } from "@/utils/planet-physics"
+import type { PlanetConfig } from "@/src/features/planets/physics"
 import SimplePlanetMesh from "./planet-simple"
 // import SimplePlanetSettings from "./simple-planet-settings"
 

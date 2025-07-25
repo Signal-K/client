@@ -3,7 +3,7 @@
 import { useRef, useMemo } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
-import type { PlanetConfig } from "@/utils/planet-physics"
+import type { PlanetConfig } from "@/src/features/planets/physics"
 
 interface SimplePlanetMeshProps {
   config: PlanetConfig

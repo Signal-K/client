@@ -3,9 +3,9 @@
 import { useRef, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import type { PlanetConfig } from "@/utils/planet-physics";
-import { vertexShader } from "@/utils/Generators/PH/vertex-shader";
-import { fragmentShader } from "@/utils/Generators/PH/fragment-shader";
+import type { PlanetConfig } from "@/src/features/planets/physics";
+import { vertexShader } from "@/src/shared/utils/generators/PH/vertex-shader";
+import { fragmentShader } from "@/src/shared/utils/generators/PH/fragment-shader";
 
 interface PlanetProps {
   config: PlanetConfig

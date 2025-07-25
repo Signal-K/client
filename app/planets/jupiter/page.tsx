@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Navbar from "@/components/Layout/Navbar";
 // import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
-// import { calculatePlanetStats, calculateTerrainHeight } from "@/utils/planet-physics";
+// import { calculatePlanetStats, calculateTerrainHeight } from "@/src/features/planets/physics";
 import Link from "next/link";
 import JVHCloudAggregator from "@/components/Structures/Missions/Meteorologists/JVH/JVHCloudAggregator";
 

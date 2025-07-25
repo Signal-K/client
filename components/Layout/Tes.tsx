@@ -9,7 +9,7 @@ import { Avatar, AvatarGenerator } from "../Account/Avatar";
 import { Moon, Sun } from "lucide-react"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import UseDarkMode from "@/hooks/useDarkMode";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import {
   DropdownMenu,
   DropdownMenuContent,

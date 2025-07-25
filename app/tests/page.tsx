@@ -10,7 +10,7 @@ import { NewMilestones } from "@/components/Structures/Missions/Milestones/Miles
 import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
 import MyLocationIds from "@/content/Classifications/UserLocationPK";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
-import NPSPopup from "@/lib/helper/nps-popup";
+import NPSPopup from "@/src/shared/helpers/nps-popup";
 // import TelescopeViewport from "@/telescope-viewport";
 import { TelescopeBackground } from "@/components/Structures/Telescope/telescope-background";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";

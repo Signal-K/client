@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { PanelCard } from "@/components/ui/common/panel-card"
 import { GitFork, ChevronRight } from "lucide-react"
 import { SkillNode } from "./skill-node"
-import { isSkillUnlockable } from "@/utils/research/skill-utils"
+import { isSkillUnlockable } from "@/src/features/research/skill-utils"
 import type { SkillTreeProps, Skill, SkillCategory } from "@/types/Reseearch/skill-tree"
 
 export function SkillTree({

@@ -4,9 +4,9 @@ import "@/styles/globals.css";
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useEffect, useState, ReactNode } from "react";
-import { ActivePlanetProvider, useActivePlanet } from "@/context/ActivePlanet";
-import { InventoryProvider } from "@/context/InventoryContext";
-import { UserAnomaliesProvider } from "@/context/UserAnomalies";
+import { ActivePlanetProvider, useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { InventoryProvider } from "@/src/core/context/InventoryContext";
+import { UserAnomaliesProvider } from "@/src/core/context/UserAnomalies";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 

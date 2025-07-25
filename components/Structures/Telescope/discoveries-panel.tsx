@@ -2,7 +2,7 @@
 
 import type { Anomaly, DiscoveryPanelPosition, Mission, Project } from "@/types/Structures/telescope"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { projects } from "@/data/projects";
+import { projects } from "@/src/shared/data/projects";
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Eye, Calendar, User } from "lucide-react"

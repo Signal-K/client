@@ -8,7 +8,7 @@ import SatellitePlanetFourAggregator from "@/components/Structures/Missions/Astr
 import AI4MAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AI4MAggregator";
 import { AggregatedCloud, AggregatedBalloon, AggregatedAI4M, AggregatedP4 } from "../[id]/page";
 // import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
-// import { calculatePlanetStats, calculateTerrainHeight } from "@/utils/planet-physics";
+// import { calculatePlanetStats, calculateTerrainHeight } from "@/src/features/planets/physics";
 import MarsCloudsShapesAggregator from "@/components/Structures/Missions/Meteorologists/Cloudspotting/Shapes/ShapesAggregator";
 
 export default function MarsClassifications() {

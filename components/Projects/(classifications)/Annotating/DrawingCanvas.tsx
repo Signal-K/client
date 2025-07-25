@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/src/shared/utils';
 import type { DrawingObject, Tool, AI4MCategory, P4Category } from '@/types/Annotation';
 
 interface AnnotationCanvasProps {

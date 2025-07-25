@@ -4,7 +4,7 @@ import { Milestones } from "./Milestones";
 import type { Station } from "@/types/station";
 import type { Milestone } from "@/types/milestone";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useActivePlanet } from "@/context/ActivePlanet";
+import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { InventoryItem } from "@/types/Items";
 import BiomassStats from "./BiomassOnPlanet";
 import StationModal from "./StationModal"; 

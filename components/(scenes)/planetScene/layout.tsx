@@ -8,7 +8,7 @@ import {
   background3,
   callme,
   mining,
-} from "@/constants/backgrounds";
+} from "@/src/shared/constants/backgrounds";
 import backgroundImage from "@/public/assets/Backdrops/Negotiations.jpg";
 import Header from "@/components/ui/Header";
 

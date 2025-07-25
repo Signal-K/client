@@ -31,7 +31,7 @@ import {
   CoMCATEGORIES,
 } from '@/types/Annotation';
 import { SciFiPanel } from '@/components/ui/styles/sci-fi/panel';
-import { useActivePlanet } from '@/context/ActivePlanet';
+import { useActivePlanet } from '@/src/core/context/ActivePlanet';
 import { useRouter } from 'next/navigation';
 
 interface ImageAnnotatorProps {

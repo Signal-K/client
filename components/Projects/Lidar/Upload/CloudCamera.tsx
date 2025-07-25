@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import useSound from 'use-sound';
 import Webcam from "react-webcam";
 import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
-import { useActivePlanet } from '@/context/ActivePlanet';
+import { useActivePlanet } from '@/src/core/context/ActivePlanet';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

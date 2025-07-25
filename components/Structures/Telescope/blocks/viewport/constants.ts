@@ -1,5 +1,5 @@
 import type { DatabaseAnomaly } from "../types"
-import { seededRandom, generateSectorName } from "@/utils/Structures/Telescope/sector-utils"
+import { seededRandom, generateSectorName } from "@/src/features/telescope/utils/sector-utils"
 
 // Anomaly type mapping configuration
 export const ANOMALY_TYPES = {

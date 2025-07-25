@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { zoodexDataSources } from "@/components/Data/ZoodexDataSources";
 import { BirdIcon } from "lucide-react";
-import { useActivePlanet } from "@/context/ActivePlanet";
+import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const ZoodexComponent: React.FC = () => {
