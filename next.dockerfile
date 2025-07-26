@@ -1,5 +1,5 @@
 # Use the official Node.js image
-FROM node:20-bullseye
+FROM node:22-bullseye
 
 # Set the working directory
 WORKDIR /app

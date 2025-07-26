@@ -531,6 +531,15 @@ export default function ActivityPage() {
           </div>
         </div>
 
+                <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
+          <h3 className="text-xl font-semibold text-primary mb-4">Your Recent Discoveries</h3>
+          <RecentDiscoveries
+            classifications={classifications}
+            linkedAnomalies={linkedAnomalies}
+            incompletePlanet={incompletePlanet}
+          />
+        </div>
+
         {/* Tips & Guidance - PRIORITY #2 for concept explanation */}
         <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
           <div className="flex items-center justify-between mb-4">
@@ -605,16 +614,6 @@ export default function ActivityPage() {
         <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
           <h3 className="text-xl font-semibold text-primary mb-4">Current Milestones</h3>
           <MilestoneCard />
-        </div>
-
-        {/* Recent Activity - PRIORITY #5 for tracking progress */}
-        <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
-          <h3 className="text-xl font-semibold text-primary mb-4">Your Recent Discoveries</h3>
-          <RecentDiscoveries
-            classifications={classifications}
-            linkedAnomalies={linkedAnomalies}
-            incompletePlanet={incompletePlanet}
-          />
         </div>
 
         {needsProfileSetup ? (

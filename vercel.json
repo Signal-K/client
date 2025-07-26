@@ -3,6 +3,9 @@
       "app/api/**/*.ts": {
         "maxDuration": 60
       }
-    }
+    },
+    "buildCommand": "yarn build",
+    "installCommand": "yarn install",
+    "framework": "nextjs"
   }
   

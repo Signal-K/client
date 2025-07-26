@@ -48,19 +48,27 @@ make db-generate       # Generate types
 
 ## ⚠️ Node.js Version Incompatibility - FIXED ✅
 
-The `@neondatabase/serverless` package requires Node.js >=19.0.0, but our CI/CD pipeline was using Node.js 18.
+The `@neondatabase/serverless` package requires Node.js >=19.0.0, and Vercel now requires Node.js 22.x for deployments after 2025-09-01.
 
-**Status**: RESOLVED - Updated all environments to Node.js 20 (LTS)
+**Status**: RESOLVED - Updated all environments to Node.js 22 (Latest LTS)
 
 **Files Updated**:
-- ✅ `.github/workflows/build.yml` - Updated from Node 18 to Node 20
-- ✅ `Dockerfile` - Updated from node:18-bullseye to node:20-bullseye  
-- ✅ `Dockerfile.prod` - Updated from node:18-alpine to node:20-alpine
-- ✅ `next.dockerfile` - Updated from node:18-bullseye to node:20-bullseye
+- ✅ `.github/workflows/build.yml` - Updated to Node 22
+- ✅ `Dockerfile` - Updated to node:22-bullseye  
+- ✅ `Dockerfile.prod` - Updated to node:22-alpine
+- ✅ `next.dockerfile` - Updated to node:22-bullseye
+- ✅ `vercel.json` - Removed invalid `nodejs` property
+- ✅ `.nvmrc` - Created with Node.js 22 (Vercel's preferred method)
+- ✅ `package.json` - Added engines field requiring Node.js >=22.0.0
+
+**Vercel Configuration**: 
+- ✅ Created `.nvmrc` file with "22" (Vercel's standard approach)
+- ✅ Added `engines` field to package.json for explicit version requirement
+- ✅ Removed invalid `nodejs` property from vercel.json
 
 **Next Steps**:
-- Test the GitHub Actions build to confirm the fix
-- For Vercel deployment, ensure Node.js 20 is set in Vercel dashboard project settings
+- Redeploy to Vercel - should now use Node.js 22.x automatically via .nvmrc
+- Test the GitHub Actions build with Node.js 22
 
 #### 2. Docker Environment Variables
 The Drizzle Studio container was building but had environment variable warnings. This should be fixed now with the `env_file: .env.local` configuration, but needs testing once the environment variables are properly set.
