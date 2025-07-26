@@ -14,6 +14,16 @@ import {
   ChevronRight,
   Target,
   Star,
+  Search,
+  Crosshair,
+  Power,
+  Satellite,
+  Activity,
+  Eye,
+  Scan,
+  Zap,
+  Radar,
+  Settings,
 } from "lucide-react"
 
 interface LeftSidebarProps {
@@ -40,177 +50,405 @@ export function LeftSidebar({
   getSectorAnomaliesForProject,
 }: LeftSidebarProps) {
   return (
-    <div className="hidden lg:flex lg:flex-col lg:w-80 bg-[#2E3440] border-r border-[#4C566A] overflow-hidden">
+    <div
+      className="hidden lg:flex w-56 xl:w-64 flex-col backdrop-blur-sm flex-shrink-0"
+      style={{ backgroundColor: "rgba(0, 80, 102, 0.95)", borderRight: "1px solid rgba(120, 204, 226, 0.3)" }}
+    >
       {/* Header */}
-      <div className="p-4 border-b border-[#4C566A] flex-shrink-0">
-        <h1 className="text-[#ECEFF4] font-bold text-xl tracking-wider mb-1">DEEP SPACE OBSERVATORY</h1>
-        <p className="text-[#88C0D0] text-sm font-mono">{currentSectorName}</p>
-        <div className="flex items-center gap-4 mt-3 text-xs">
-          <div className="flex items-center gap-1">
-            <Target className="h-3 w-3 text-[#88C0D0]" />
-            <span className="text-[#D8DEE9]">{filteredAnomalies.length} targets</span>
+      <div
+        className="p-4 border-b"
+        style={{ borderColor: "rgba(120, 204, 226, 0.3)", background: "linear-gradient(to right, #002439, #005066)" }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+            style={{ background: "linear-gradient(to bottom right, #78cce2, #4e7988)" }}
+          >
+            <Search className="h-5 w-5" style={{ color: "#002439" }} />
           </div>
-          <div className="flex items-center gap-1">
-            <Star className="h-3 w-3 text-[#88C0D0]" />
-            <span className="text-[#D8DEE9]">{classifications.length} classified</span>
+          <div>
+            <h1 style={{ color: "#e4eff0" }} className="font-bold text-sm tracking-wider">
+              TELESCOPE
+            </h1>
+            <p style={{ color: "#78cce2" }} className="text-xs font-mono">
+              {currentSectorName}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* View Mode Selection */}
-      <div className="p-4 border-b border-[#4C566A] flex-shrink-0">
-        <h3 className="text-[#88C0D0] font-semibold text-sm uppercase tracking-wider mb-3">View Mode</h3>
-        <div className="space-y-2">
-          <Button
-            variant={viewMode === "viewport" ? "default" : "outline"}
-            onClick={() => setViewMode("viewport")}
-            className={`w-full justify-start ${
-              viewMode === "viewport"
-                ? "bg-[#5E81AC] hover:bg-[#81A1C1] text-white"
-                : "border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
-            }`}
-          >
-            <Telescope className="h-4 w-4 mr-2" />
-            Telescope View
-          </Button>
-          <Button
-            variant={viewMode === "discoveries" ? "default" : "outline"}
-            onClick={() => setViewMode("discoveries")}
-            className={`w-full justify-start ${
-              viewMode === "discoveries"
-                ? "bg-[#5E81AC] hover:bg-[#81A1C1] text-white"
-                : "border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
-            }`}
-          >
-            <Archive className="h-4 w-4 mr-2" />
-            Discoveries
-          </Button>
-          <Button
-            variant={viewMode === "skill-tree" ? "default" : "outline"}
-            onClick={() => setViewMode("skill-tree")}
-            className={`w-full justify-start ${
-              viewMode === "skill-tree"
-                ? "bg-[#5E81AC] hover:bg-[#81A1C1] text-white"
-                : "border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
-            }`}
-          >
-            <TreePine className="h-4 w-4 mr-2" />
-            Skill Tree
-          </Button>
-        </div>
-      </div>
-
-      {/* Navigation Controls */}
-      {viewMode === "viewport" && (
-        <div className="p-4 border-b border-[#4C566A] flex-shrink-0">
-          <h3 className="text-[#88C0D0] font-semibold text-sm uppercase tracking-wider mb-3">Navigation</h3>
-          <div className="grid grid-cols-3 gap-2 max-w-32 mx-auto">
-            <div></div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleNavigate("up")}
-              className="border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
-            >
-              <ChevronUp className="h-4 w-4" />
-            </Button>
-            <div></div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleNavigate("left")}
-              className="border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <div className="flex items-center justify-center">
-              <div className="w-2 h-2 bg-[#88C0D0] rounded-full"></div>
+      {/* System Status */}
+      <div className="overflow-y-auto flex-1">
+        <div
+          className="p-4 border-b"
+          style={{
+            borderColor: "rgba(120, 204, 226, 0.3)",
+            background: "linear-gradient(to right, rgba(0, 80, 102, 0.5), transparent)",
+          }}
+        >
+          <div className="grid grid-cols-2 gap-3 mb-3 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: "#78cce2" }}></div>
+              <span style={{ color: "#78cce2" }} className="font-mono">
+                ONLINE
+              </span>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleNavigate("right")}
-              className="border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <div></div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleNavigate("down")}
-              className="border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
-            >
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-            <div></div>
+            <div className="flex items-center gap-2">
+              <Power className="h-3 w-3" style={{ color: "#e4eff0" }} />
+              <span style={{ color: "#e4eff0" }} className="font-mono">
+                PWR: 98%
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Satellite className="h-3 w-3" style={{ color: "#78cce2" }} />
+              <span style={{ color: "#78cce2" }} className="font-mono">
+                LINK: STABLE
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Activity className="h-3 w-3" style={{ color: "#4e7988" }} />
+              <span style={{ color: "#4e7988" }} className="font-mono">
+                CPU: 67%
+              </span>
+            </div>
           </div>
-        </div>
-      )}
-
-      {/* Project Selection */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4">
-          <h3 className="text-[#88C0D0] font-semibold text-sm uppercase tracking-wider mb-3">Active Projects</h3>
-          <div className="space-y-2">
-            <Button
-              variant={!selectedProject ? "default" : "outline"}
-              onClick={() => selectProject(null)}
-              className={`w-full justify-start ${
-                !selectedProject
-                  ? "bg-[#5E81AC] hover:bg-[#81A1C1] text-white"
-                  : "border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
-              }`}
-            >
-              All Projects
-            </Button>
-            {projects.map((project) => {
-              const sectorCount = getSectorAnomaliesForProject(project.id).length
-              return (
-                <Button
-                  key={project.id}
-                  variant={selectedProject?.id === project.id ? "default" : "outline"}
-                  onClick={() => selectProject(project)}
-                  className={`w-full justify-between ${
-                    selectedProject?.id === project.id
-                      ? "bg-[#5E81AC] hover:bg-[#81A1C1] text-white"
-                      : "border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
-                  }`}
-                >
-                  <span className="truncate text-left">{project.name}</span>
-                  <Badge variant="secondary" className="ml-2 bg-[#88C0D0]/20 text-[#88C0D0] text-xs flex-shrink-0">
-                    {sectorCount}
-                  </Badge>
-                </Button>
-              )
-            })}
+          <div style={{ color: "#78cce2" }} className="text-xs font-mono mb-2">
+            Targets: {filteredAnomalies.length}/10
           </div>
+          <Badge style={{ backgroundColor: "#78cce2", color: "#002439" }} className="text-xs px-2 py-1 font-mono">
+            {classifications.length} CLASSIFIED
+          </Badge>
         </div>
 
-        {/* Current Sector Info */}
-        <div className="p-4 border-t border-[#4C566A]">
-          <Card className="bg-[#3B4252] border-[#4C566A]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-[#ECEFF4] text-sm">Current Sector</CardTitle>
+        {/* Navigation Controls */}
+        {viewMode === "viewport" && (
+          <Card
+            className="m-4 border backdrop-blur-sm"
+            style={{ backgroundColor: "rgba(0, 36, 57, 0.8)", borderColor: "rgba(120, 204, 226, 0.3)" }}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle style={{ color: "#e4eff0" }} className="text-sm font-mono flex items-center gap-2">
+                <Crosshair className="h-4 w-4" style={{ color: "#78cce2" }} />
+                SECTOR NAVIGATION
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="text-[#88C0D0] font-mono text-xs">{currentSectorName}</div>
-              <div className="flex justify-between text-xs">
-                <span className="text-[#D8DEE9]">Anomalies:</span>
-                <span className="text-[#88C0D0]">{filteredAnomalies.length}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-[#D8DEE9]">Classified:</span>
-                <span className="text-[#A3BE8C]">{filteredAnomalies.filter((a) => a.classified).length}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-[#D8DEE9]">Unclassified:</span>
-                <span className="text-[#EBCB8B]">{filteredAnomalies.filter((a) => !a.classified).length}</span>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-2 w-fit mx-auto">
+                <div></div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleNavigate("up")}
+                  className="h-8 w-8 p-0 border"
+                  style={{
+                    color: "#78cce2",
+                    borderColor: "rgba(120, 204, 226, 0.3)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "rgba(120, 204, 226, 0.2)"
+                    e.currentTarget.style.color = "#e4eff0"
+                    e.currentTarget.style.borderColor = "#78cce2"
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent"
+                    e.currentTarget.style.color = "#78cce2"
+                    e.currentTarget.style.borderColor = "rgba(120, 204, 226, 0.3)"
+                  }}
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+                <div></div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleNavigate("left")}
+                  className="h-8 w-8 p-0 border"
+                  style={{
+                    color: "#78cce2",
+                    borderColor: "rgba(120, 204, 226, 0.3)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "rgba(120, 204, 226, 0.2)"
+                    e.currentTarget.style.color = "#e4eff0"
+                    e.currentTarget.style.borderColor = "#78cce2"
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent"
+                    e.currentTarget.style.color = "#78cce2"
+                    e.currentTarget.style.borderColor = "rgba(120, 204, 226, 0.3)"
+                  }}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <div className="flex items-center justify-center">
+                  <div
+                    className="w-3 h-3 rounded-full shadow-lg"
+                    style={{ background: "linear-gradient(to bottom right, #78cce2, #4e7988)" }}
+                  ></div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleNavigate("right")}
+                  className="h-8 w-8 p-0 border"
+                  style={{
+                    color: "#78cce2",
+                    borderColor: "rgba(120, 204, 226, 0.3)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "rgba(120, 204, 226, 0.2)"
+                    e.currentTarget.style.color = "#e4eff0"
+                    e.currentTarget.style.borderColor = "#78cce2"
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent"
+                    e.currentTarget.style.color = "#78cce2"
+                    e.currentTarget.style.borderColor = "rgba(120, 204, 226, 0.3)"
+                  }}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <div></div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleNavigate("down")}
+                  className="h-8 w-8 p-0 border"
+                  style={{
+                    color: "#78cce2",
+                    borderColor: "rgba(120, 204, 226, 0.3)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "rgba(120, 204, 226, 0.2)"
+                    e.currentTarget.style.color = "#e4eff0"
+                    e.currentTarget.style.borderColor = "#78cce2"
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent"
+                    e.currentTarget.style.color = "#78cce2"
+                    e.currentTarget.style.borderColor = "rgba(120, 204, 226, 0.3)"
+                  }}
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+                <div></div>
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Project Selection */}
+        <Card
+          className="m-4 border backdrop-blur-sm"
+          style={{ backgroundColor: "rgba(0, 36, 57, 0.8)", borderColor: "rgba(120, 204, 226, 0.3)" }}
+        >
+          <CardHeader className="pb-3">
+            <CardTitle style={{ color: "#e4eff0" }} className="text-sm font-mono flex items-center gap-2">
+              <Target className="h-4 w-4" style={{ color: "#78cce2" }} />
+              PROJECT FILTER
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 max-h-48 overflow-y-auto">
+            <Button
+              variant={!selectedProject ? "default" : "ghost"}
+              className="w-full justify-start text-xs font-mono"
+              style={{
+                backgroundColor: !selectedProject ? "#78cce2" : "transparent",
+                color: !selectedProject ? "#002439" : "#e4eff0",
+                borderColor: !selectedProject ? "transparent" : "rgba(120, 204, 226, 0.3)",
+              }}
+              onClick={() => selectProject(null)}
+              onMouseEnter={(e) => {
+                if (!selectedProject) {
+                  e.currentTarget.style.backgroundColor = "#e4eff0"
+                } else {
+                  e.currentTarget.style.backgroundColor = "rgba(120, 204, 226, 0.2)"
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!selectedProject) {
+                  e.currentTarget.style.backgroundColor = "#78cce2"
+                } else {
+                  e.currentTarget.style.backgroundColor = "transparent"
+                }
+              }}
+            >
+              <Star className="h-3 w-3 mr-2 flex-shrink-0" />
+              <span className="truncate">ALL PROJECTS</span>
+              <span className="ml-auto text-xs flex-shrink-0">({getSectorAnomaliesForProject(null).length})</span>
+            </Button>
+
+            {projects.map((project) => {
+              const sectorCount = getSectorAnomaliesForProject(project.id).length
+              const isSelected = selectedProject?.id === project.id
+
+              return (
+                <Button
+                  key={project.id}
+                  variant={isSelected ? "default" : "ghost"}
+                  className="w-full justify-start text-xs font-mono"
+                  style={{
+                    backgroundColor: isSelected ? "#78cce2" : "transparent",
+                    color: isSelected ? "#002439" : "#e4eff0",
+                    borderColor: isSelected ? "transparent" : "rgba(120, 204, 226, 0.3)",
+                  }}
+                  onClick={() => selectProject(project)}
+                  onMouseEnter={(e) => {
+                    if (isSelected) {
+                      e.currentTarget.style.backgroundColor = "#e4eff0"
+                    } else {
+                      e.currentTarget.style.backgroundColor = "rgba(120, 204, 226, 0.2)"
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (isSelected) {
+                      e.currentTarget.style.backgroundColor = "#78cce2"
+                    } else {
+                      e.currentTarget.style.backgroundColor = "transparent"
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-2 w-full min-w-0">
+                    <div
+                      className="w-4 h-4 rounded-full flex items-center justify-center shadow-sm flex-shrink-0"
+                      style={{ background: project.bgGradient }}
+                    >
+                      {project.icon}
+                    </div>
+                    <span className="flex-1 text-left truncate">{project.name.toUpperCase()}</span>
+                    <span className="text-xs flex-shrink-0">({sectorCount})</span>
+                  </div>
+                </Button>
+              )
+            })}
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <div className="p-4 space-y-2">
+          <Button
+            onClick={() => setViewMode(viewMode === "viewport" ? "discoveries" : "viewport")}
+            className="w-full font-mono text-sm py-2"
+            style={{
+              backgroundColor: "#78cce2",
+              color: "#002439",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#e4eff0")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#78cce2")}
+          >
+            {viewMode === "viewport" ? (
+              <>
+                <Archive className="h-4 w-4 mr-2" />
+                ACCESS ARCHIVE
+              </>
+            ) : (
+              <>
+                <Eye className="h-4 w-4 mr-2" />
+                RETURN TO SCOPE
+              </>
+            )}
+          </Button>
+
+          <Button
+            onClick={() => setViewMode("skill-tree")}
+            className="w-full font-mono text-sm py-2"
+            style={{
+              backgroundColor: "#4e7988",
+              color: "#e4eff0",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#78cce2"
+              e.currentTarget.style.color = "#002439"
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#4e7988"
+              e.currentTarget.style.color = "#e4eff0"
+            }}
+          >
+            <TreePine className="h-4 w-4 mr-2" />
+            RESEARCH & DEVELOPMENT
+          </Button>
+
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              size="sm"
+              className="font-mono text-xs"
+              style={{
+                backgroundColor: "#4e7988",
+                color: "#e4eff0",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#78cce2"
+                e.currentTarget.style.color = "#002439"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#4e7988"
+                e.currentTarget.style.color = "#e4eff0"
+              }}
+            >
+              <Scan className="h-3 w-3 mr-1" />
+              SCAN
+            </Button>
+            <Button
+              size="sm"
+              className="font-mono text-xs"
+              style={{
+                backgroundColor: "#005066",
+                color: "#e4eff0",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#78cce2"
+                e.currentTarget.style.color = "#002439"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#005066"
+                e.currentTarget.style.color = "#e4eff0"
+              }}
+            >
+              <Zap className="h-3 w-3 mr-1" />
+              BOOST
+            </Button>
+            <Button
+              size="sm"
+              className="font-mono text-xs"
+              style={{
+                backgroundColor: "#4e7988",
+                color: "#e4eff0",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#78cce2"
+                e.currentTarget.style.color = "#002439"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#4e7988"
+                e.currentTarget.style.color = "#e4eff0"
+              }}
+            >
+              <Radar className="h-3 w-3 mr-1" />
+              RADAR
+            </Button>
+            <Button
+              size="sm"
+              className="font-mono text-xs"
+              style={{
+                backgroundColor: "#005066",
+                color: "#e4eff0",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#78cce2"
+                e.currentTarget.style.color = "#002439"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#005066"
+                e.currentTarget.style.color = "#e4eff0"
+              }}
+            >
+              <Settings className="h-3 w-3 mr-1" />
+              CONFIG
+            </Button>
+          </div>
         </div>
       </div>
     </div>
   )
-};
+}

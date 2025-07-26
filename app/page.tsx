@@ -307,7 +307,6 @@ export default function ActivityPage() {
         if (isCloud && classifiedCloudAnomalyIds.has(a.anomaly_id)) return true;
         return false;
       });
-      console.log("DEBUG: filteredLinked after processing:", filteredLinked);
       setLinkedAnomalies(filteredLinked);
 
       const oneWeekAgo = subDays(new Date(), 7).toISOString();

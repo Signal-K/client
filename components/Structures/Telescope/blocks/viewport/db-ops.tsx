@@ -8,10 +8,12 @@ export function useDatabaseOperations() {
   const fetchAnomalies = async () => {
     try {
       const { data, error } = await supabase.from("anomalies").select("*")
-      console.log("Fetching anomalies viewport")
+      console.log("Fetching anomalies viewport - raw data count:", data?.length)
 
       if (!error && data) {
         const processedAnomalies = data.map(generateAnomalyProperties)
+        console.log("Processed anomalies count:", processedAnomalies.length)
+        console.log("Sample processed anomaly:", processedAnomalies[0])
         return processedAnomalies        
       }
     } catch (error) {

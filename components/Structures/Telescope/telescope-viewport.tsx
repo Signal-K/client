@@ -87,6 +87,7 @@ export default function TelescopeViewport() {
     (sectorX: number, sectorY: number) => {
       const sectorStars = generateStars(sectorX, sectorY)
       const sectorAnomalies = filterAnomaliesBySector(state.anomalies, sectorX, sectorY)
+      
       let filtered = state.selectedProject
         ? sectorAnomalies.filter((a) => a.project === state.selectedProject.id)
         : sectorAnomalies
@@ -292,7 +293,13 @@ export default function TelescopeViewport() {
   // Get sector-specific counts for projects
   const getSectorAnomaliesForProject = (projectId: string | null) => {
     const sectorAnomalies = filterAnomaliesBySector(state.anomalies, state.currentSector.x, state.currentSector.y)
-    return projectId ? sectorAnomalies.filter((a) => a.project === projectId) : sectorAnomalies
+    const projectAnomalies = projectId ? sectorAnomalies.filter((a) => a.project === projectId) : sectorAnomalies
+    
+    if (projectId) {
+      
+    }
+    
+    return projectAnomalies
   }
 
   if (state.loading) {
@@ -320,7 +327,7 @@ export default function TelescopeViewport() {
           <Menu className="h-4 w-4" />
         </Button>
         <div className="text-center">
-          <h1 className="text-[#e4eff0] font-bold text-sm tracking-wider">DEEP SPACE OBSERVATORY</h1>
+          <h1 className="text-[#e4eff0] font-bold text-sm tracking-wider">TELESCOPE</h1>
           <p className="text-[#78cce2] text-xs font-mono">{currentSectorName}</p>
         </div>
         <div className="flex items-center gap-2">

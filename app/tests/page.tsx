@@ -12,6 +12,7 @@ import MyLocationIds from "@/content/Classifications/UserLocationPK";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 import NPSPopup from "@/lib/helper/nps-popup";
 // import TelescopeViewport from "@/telescope-viewport";
+import { TelescopeBackground } from "@/components/Structures/Telescope/telescope-background";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 // import { PlanetGenerator } from "starsailors-planet-generator";
@@ -48,7 +49,7 @@ export default function TestPage() {
   }, [session]);
 
   return (
-    <div className="min-h-screen bg-black  p-4 space-y-8">
+    <div className="min-h-screen bg-black p-4">
       {/* <NPSPopup userId={session?.user.id} onClose={() => {}} isOpen={true} /> */}
       {/* <MySettlementsLocations /> */}
       {/* <MilestoneTotalCompleted />
@@ -61,8 +62,16 @@ export default function TestPage() {
                   />
                   <MyLocationIds /> */}
       {/* <WeatherEventsOverview /> */}
-      <NewMilestones />
+      {/* <NewMilestones /> */}
       {/* <TelescopeViewport /> */}
+      <div className="w-full h-[calc(100vh-2rem)] border border-gray-700 rounded-lg overflow-hidden">
+        <TelescopeBackground 
+          sectorX={0} 
+          sectorY={0} 
+          showAllAnomalies={true}
+          onAnomalyClick={(anomaly) => console.log('Clicked anomaly:', anomaly)}
+        />
+      </div>
       {/* <PlanetGenerator classificationId="1" />   */}
       {/* <PlanetGenerator classificationId={1} biome={'RockyHighlands'} biomass={0.01} density={3.5} /> */}
     </div>

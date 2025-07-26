@@ -103,7 +103,6 @@ export default function SkillResearchPage() {
       }
 
       // Fetch classified planets
-      console.log("DEBUG: Fetching planets for user:", currentUserId, "with classificationtype: 'Planet'") // ADDED LOG
       const { count: planetCount, error: planetError } = await supabase
         .from("classifications")
         .select("id", { count: "exact" })
@@ -115,14 +114,6 @@ export default function SkillResearchPage() {
         throw planetError
       }
       setClassifiedPlanets(planetCount || 0)
-      console.log("DEBUG: Classified Planets count:", planetCount) // ADDED LOG
-
-      // Fetch discovered asteroids (using 'telescope-minorPlanet' as per schema)
-      console.log(
-        "DEBUG: Fetching asteroids for user:",
-        currentUserId,
-        "with classificationtype: 'telescope-minorPlanet'",
-      ) // ADDED LOG
       const { count: asteroidCount, error: asteroidError } = await supabase
         .from("classifications")
         .select("id", { count: "exact" })
@@ -130,11 +121,10 @@ export default function SkillResearchPage() {
         .eq("classificationtype", "telescope-minorPlanet")
 
       if (asteroidError) {
-        console.error("Error fetching asteroid count:", asteroidError) // ADDED LOG
+        console.error("Error fetching asteroid count:", asteroidError)
         throw asteroidError
       }
       setDiscoveredAsteroids(asteroidCount || 0)
-      console.log("DEBUG: Discovered Asteroids count:", asteroidCount) // ADDED LOG
     } catch (error) {
       console.error("Error fetching classification counts:", error)
     } finally {

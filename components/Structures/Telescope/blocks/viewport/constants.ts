@@ -1,5 +1,5 @@
 import type { DatabaseAnomaly } from "../types"
-import { seededRandom } from "@/utils/Structures/Telescope/sector-utils"
+import { seededRandom, generateSectorName } from "@/utils/Structures/Telescope/sector-utils"
 
 // Anomaly type mapping configuration
 export const ANOMALY_TYPES = {
@@ -54,6 +54,15 @@ export function generateAnomalyProperties(dbAnomaly: DatabaseAnomaly) {
   const type = normalizeAnomalyType(dbAnomaly.anomalySet)
   const config = ANOMALY_TYPES[type]
 
+  // Debug logging for first few anomalies
+  if (seed <= 5) {
+    // console.log(`DEBUG: Anomaly ${seed} - anomalySet: "${dbAnomaly.anomalySet}", normalized type: "${type}", project: "${config.project}"`)
+  }
+
+  // Generate sector coordinates that match the current sector system
+  const sectorX = Math.floor(seededRandom(seed, 9) * 10) - 5
+  const sectorY = Math.floor(seededRandom(seed, 10) * 10) - 5
+
   return {
     id: `db-${dbAnomaly.id}`,
     name: dbAnomaly.content || `${type.toUpperCase()}-${String(dbAnomaly.id).padStart(3, "0")}`,
@@ -67,7 +76,7 @@ export function generateAnomalyProperties(dbAnomaly: DatabaseAnomaly) {
     glowIntensity: seededRandom(seed, 6) * 0.5 + 0.3,
     color: config.colors[Math.floor(seededRandom(seed, 7) * config.colors.length)],
     shape: config.shapes[Math.floor(seededRandom(seed, 8) * config.shapes.length)],
-    sector: `SECTOR-${Math.floor(seededRandom(seed, 9) * 10) - 5}-${Math.floor(seededRandom(seed, 10) * 10) - 5}`,
+    sector: generateSectorName(sectorX, sectorY),
     discoveryDate: new Date().toLocaleDateString(),
     dbData: dbAnomaly,
   }

@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { AvatarGenerator } from "@/components/Account/Avatar";
 import ProfileDetailsPanel from "@/components/Account/ProfileDetailsPanel";
-import { Globe } from "lucide-react";
+import { Globe, Telescope } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function ActivityHeader({
   landmarksExpanded,
@@ -76,9 +77,20 @@ export default function ActivityHeader({
               </h2>
             </div>
           </div>
-          {/* <div className="flex flex-col items-start sm:items-end px-2 sm:px-8 text-sm text-muted-foreground">
-            Landmarks
-          </div> */}
+          <div className="flex flex-col items-start sm:items-end px-2 sm:px-8 text-sm text-muted-foreground">
+            <div className="mb-2">Landmarks</div>
+            <Link 
+              href="/structures/telescope"
+              className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-card/20 transition-colors group"
+            >
+              <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <Telescope className="w-6 h-6 text-primary" />
+              </div>
+              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                Telescope
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
     </Card>
