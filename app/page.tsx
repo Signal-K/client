@@ -467,7 +467,7 @@ export default function ActivityPage() {
       </div>
 
       <div className="w-full max-w-screen-xl px-4 py-6 space-y-8 pt-24 relative z-10">
-        {/* Welcome & Quick Status */}
+        {/* Activity Header - User profile and deployment status */}
         <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="text-right">
@@ -484,7 +484,7 @@ export default function ActivityPage() {
           />
         </div>
 
-        {/* Next Steps Guide */}
+        {/* Next Steps Guide - PRIORITY #1 for new users */}
         <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
@@ -531,17 +531,50 @@ export default function ActivityPage() {
           </div>
         </div>
 
-        {/* Recent Activity */}
+        {/* Tips & Guidance - PRIORITY #2 for concept explanation */}
         <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
-          <h3 className="text-xl font-semibold text-primary mb-4">Your Recent Discoveries</h3>
-          <RecentDiscoveries
-            classifications={classifications}
-            linkedAnomalies={linkedAnomalies}
-            incompletePlanet={incompletePlanet}
-          />
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-semibold text-primary">💡 Tips & Next Actions</h3>
+            <button
+              onClick={() => setShowTipsPanel(!showTipsPanel)}
+              className="text-sm font-medium px-3 py-1 rounded-lg bg-muted text-muted-foreground hover:bg-muted/80 transition"
+            >
+              {showTipsPanel ? 'Hide Tips' : 'Show Tips'}
+            </button>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-4 mb-4">
+            <div className="text-center p-4 bg-card/50 rounded-lg">
+              <div className="text-2xl mb-2">📊</div>
+              <h4 className="font-semibold text-sm mb-1">Track Progress</h4>
+              <p className="text-xs text-muted-foreground">
+                Monitor your discoveries and research advancement in real-time
+              </p>
+            </div>
+            <div className="text-center p-4 bg-card/50 rounded-lg">
+              <div className="text-2xl mb-2">🏆</div>
+              <h4 className="font-semibold text-sm mb-1">Complete Milestones</h4>
+              <p className="text-xs text-muted-foreground">
+                Achieve goals to unlock new features and capabilities
+              </p>
+            </div>
+            <div className="text-center p-4 bg-card/50 rounded-lg">
+              <div className="text-2xl mb-2">🌌</div>
+              <h4 className="font-semibold text-sm mb-1">Explore Deeper</h4>
+              <p className="text-xs text-muted-foreground">
+                Visit the full experience for advanced projects and features
+              </p>
+            </div>
+          </div>
+
+          {showTipsPanel && (
+            <div className="border-t border-border pt-4">
+              <TipsPanel />
+            </div>
+          )}
         </div>
 
-        {/* Research Progress */}
+        {/* Research Progress - PRIORITY #3 for understanding core mechanics */}
         <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -568,10 +601,20 @@ export default function ActivityPage() {
           <SkillTreeSection isFullTree={false} />
         </div>
 
-        {/* Milestones */}
+        {/* Milestones - PRIORITY #4 for goal setting */}
         <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
           <h3 className="text-xl font-semibold text-primary mb-4">Current Milestones</h3>
           <MilestoneCard />
+        </div>
+
+        {/* Recent Activity - PRIORITY #5 for tracking progress */}
+        <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
+          <h3 className="text-xl font-semibold text-primary mb-4">Your Recent Discoveries</h3>
+          <RecentDiscoveries
+            classifications={classifications}
+            linkedAnomalies={linkedAnomalies}
+            incompletePlanet={incompletePlanet}
+          />
         </div>
 
         {needsProfileSetup ? (
