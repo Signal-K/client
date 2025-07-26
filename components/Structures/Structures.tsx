@@ -2,10 +2,10 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import { useActivePlanet } from "@/context/ActivePlanet";
+import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 // import IndividualStructure, { IndividualStructureProps } from "./IndividualStructure";
-// import { StructuresConfig } from "@/constants/Structures/Properties";
+// import { StructuresConfig } from "@/src/features/structures/constants/Properties";
 
 import "../../styles/Anims/StarterStructureAnimations.css";
 

@@ -18,7 +18,7 @@ interface SimplePostSingleProps {
   content: string;
   category: string;
   images: string[];
-}
+};
 
 export function SimplePostSingle({
   id,
@@ -243,13 +243,13 @@ export function SimplePostSingle({
             </div>
 
             <div className="flex items-center gap-4">
-              <button
+              {/* <button
                 onClick={toggleCommentForm}
                 className="flex items-center gap-1 text-[#4C566A] hover:text-[#A3BE8C] transition"
               >
                 <MessageCircle className="w-5 h-5" />
                 Comment
-              </button>
+              </button> */}
               <div className="relative">
                 <button
                   onClick={toggleDropdown}
@@ -275,12 +275,12 @@ export function SimplePostSingle({
             </div>
           </div>
 
-                <Button
+                {/* <Button
                   onClick={() => router.push(`/next/${id}`)}
                   variant='outline'
                 >
                   Details
-                </Button>
+                </Button> */}
 
           <CommentForm classificationId={parseInt(id)} onSubmit={() => setShowCommentForm(false)} />
           <CommentsList classificationId={id} />

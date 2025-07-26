@@ -2,7 +2,7 @@
 
 import type { Anomaly, DiscoveryPanelPosition, Mission, Project } from "@/types/Structures/telescope"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { projects } from "@/data/projects";
+import { projects } from "@/src/shared/data/projects";
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Eye, Calendar, User } from "lucide-react"
@@ -52,7 +52,9 @@ export function DiscoveriesPanel({
 
       const projectMap: Record<Anomaly["type"], string> = {
         exoplanet: "planet-hunters",
+        planet: "planet-hunters",
         sunspot: "sunspots",
+        // minor_planet: "daily-minor-planet",
         asteroid: "daily-minor-planet",
         accretion_disc: "disk-detective",
       }

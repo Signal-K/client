@@ -226,34 +226,11 @@ export const planetClassificationConfig: FormConfig = {
 //   options: zoodexSouthCoastFaunaRecoveryOptions,
 // };
 
-export const cloudClassificationConfig: FormConfig = {
-  title: "Cloud Classification",
-  richTextFields: 1,
-  options: cloudClassificationOptions,
-};
-
 // export const zoodexBurrowingOwlClassificationConfig: FormConfig = {
 //   title: "Zoodex Burrowing Owl Classification",
 //   richTextFields: 1,
 //   options: zoodexBurrowingOwlClassificationOptions,
 // };
-
-export const zoodexIguanasFromAboveClassificationConfig: FormConfig = {
-  title: "Zoodex Iguanas From Above Classification",
-  richTextFields: 1,
-  options: zoodexIguanasFromAboveClassificationOptions,
-};
-
-export const telescopeSunspotDetectorConfig: FormConfig = {
-  title: "Sunspot Detector",
-  richTextFields: 1,
-};
-
-export const telescopeDiskDetectorConfig: FormConfig = {
-  title: "Disk Detector",
-  richTextFields: 1,
-  options: diskDetectorOptions,
-};
 
 // export const zoodexNestQuestGoConfig: FormConfig = {
 //   title: "Nested Quest Go",

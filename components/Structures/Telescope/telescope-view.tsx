@@ -17,7 +17,7 @@ interface TelescopeViewProps {
   currentSectorName: string
   focusedAnomaly?: Anomaly | null
   anomalies?: Anomaly[]
-}
+};
 
 export function TelescopeView({
   stars = [],

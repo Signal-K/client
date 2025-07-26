@@ -26,7 +26,7 @@ export default function ClassificationOptionsCounter() {
       setIsLoading(true);
 
       const { data, error } = await supabase
-        .from('classifications')
+        .from("classifications")
         .select('classificationConfiguration')
         .eq('author', session.user.id)
         .eq('classificationtype', 'lidar-jovianVortexHunter');

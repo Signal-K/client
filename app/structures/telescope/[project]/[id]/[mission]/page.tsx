@@ -13,6 +13,7 @@ import PlanetTypeCommentForm from "@/components/Structures/Missions/Astronomers/
 import VotePlanetClassifications from "@/components/Structures/Missions/Astronomers/PlanetHunters/PHVote"
 import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator"
 import { DailyMinorPlanetWithId } from "@/components/Projects/Telescopes/DailyMinorPlanet"
+import { TelescopeBackground } from "@/components/Structures/Telescope/telescope-background"
 
 export default function TelescopeClassifyPage() {
   const params = useParams()
@@ -96,7 +97,18 @@ export default function TelescopeClassifyPage() {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col">
-      {/* Background image behind everything */}
+      {/* Telescope Background - Full screen behind everything */}
+      <div className="fixed inset-0 -z-10">
+        <TelescopeBackground 
+          sectorX={0} 
+          sectorY={0} 
+          showAllAnomalies={true}
+          onAnomalyClick={(anomaly) => console.log('Clicked anomaly:', anomaly)}
+        />
+      </div>
+
+      {/* Original Earth background - commented out */}
+      {/* 
       <div className="fixed inset-0 -z-10">
         <img
           className="w-full h-full object-cover"
@@ -104,17 +116,25 @@ export default function TelescopeClassifyPage() {
           alt="Earth Background"
         />
       </div>
+      */}
 
       {/* Sticky/relative nav and content */}
-      <div className="relative z-10 pb-8">
+      {/* <div className="relative z-10 pb-8">
         <GameNavbar />
-      </div>
+      </div> */}
 
-      <main className="relative z-5 py-8 flex justify-center">
-        <div className="w-full max-w-6xl px-4">
+      <main className="relative z-20 py-8 pb-24 flex justify-center">
+        <div className="w-full max-w-6xl px-4 bg-black/20 rounded-lg border border-[#78cce2]/30">
           {MissionComponent}
         </div>
       </main>
+
+      {/* Bottom Navigation - stays above everything else */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 w-full">
+        <div className="w-full" style={{ position: 'fixed', bottom: '0', left: '0', right: '0', zIndex: 9999 }}>
+          <GameNavbar />
+        </div>
+      </div>
     </div>
   );
 };

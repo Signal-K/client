@@ -70,78 +70,132 @@ export const defaultPlanetConfig: PlanetConfig = {
   },
 }
 
-// Simple planet presets using the full PlanetConfig
-export const simplePlanetPresets: Record<string, PlanetConfig> = {
-  earth: {
-    type: "terrestrial",
-    seed: 1234,
-    radius: 1.0,
-    temperature: 288,
-    biomass: 0.7,
-    mass: 1.0,
-    terrainRoughness: 0.6,
-    liquidHeight: 0.55,
-    volcanicActivity: 0.2,
-    continentSize: 0.5,
-    continentCount: 5,
-    noiseScale: 1.0,
-    debugMode: false,
-    visibleTerrains: {
-      ocean: true,
-      beach: true,
-      lowland: true,
-      midland: true,
-      highland: true,
-      mountain: true,
-      snow: true,
-    },
-    colors: {
-      atmosphere: "#87CEEB",
-      ocean: "#1E90FF",
-      oceanPattern: "#1E7FFF",
-      beach: "#F0E68C",
-      lowland: "#32CD32",
-      midland: "#228B22",
-      highland: "#8B4513",
-      mountain: "#A0A0A0",
-      snow: "#FFFFFF",
-    },
-  },
-  mars: {
-    type: "terrestrial",
-    seed: 5678,
-    radius: 0.5,
-    temperature: 210, // Mars average
-    biomass: 0.0,
-    mass: 0.1,
-    terrainRoughness: 0.8,
-    liquidHeight: 0.3,
-    volcanicActivity: 0.1,
-    continentSize: 0.8,
-    continentCount: 2,
-    noiseScale: 1.2,
-    debugMode: false,
-    visibleTerrains: {
-      ocean: true,
-      beach: true,
-      lowland: true,
-      midland: true,
-      highland: true,
-      mountain: true,
-      snow: true,
-    },
-    colors: {
-      atmosphere: "#CD853F",
-      ocean: "#8B4513",
-      oceanPattern: "#A0522D",
-      beach: "#CD853F",
-      lowland: "#A0522D",
-      midland: "#8B4513",
-      highland: "#8B0000",
-      mountain: "#696969",
-      snow: "#F5F5DC",
-    },
-  },
+// Function to determine liquid type based on temperature
+export function getLiquidType(temperature: number): {
+  name: string
+  color: string
+  patternColor: string
+} {
+  // Temperature ranges in Kelvin
+  if (temperature < 90) {
+    // Liquid nitrogen (63K to 77K)
+    return {
+      name: "Liquid Nitrogen",
+      color: "#D6E7FF",
+      patternColor: "#C0D6FF",
+    }
+  } else if (temperature < 120) {
+    // Liquid methane (90K to 112K)
+    return {
+      name: "Liquid Methane",
+      color: "#A2CDB0",
+      patternColor: "#8EBDA0",
+    }
+  } else if (temperature < 373) {
+    // Water (273K to 373K)
+    return {
+      name: "Water",
+      color: "#1E90FF",
+      patternColor: "#1E7FFF",
+    }
+  } else if (temperature < 600) {
+    // Sulfuric acid (283K to 610K)
+    return {
+      name: "Sulfuric Acid",
+      color: "#D6C562",
+      patternColor: "#C4B250",
+    }
+  } else {
+    // Molten silicates/lava (>1000K)
+    return {
+      name: "Molten Rock",
+      color: "#FF4500",
+      patternColor: "#FF2400",
+    }
+  }
+}
+
+// Function to adjust terrain colors based on temperature
+export function getTemperatureAdjustedColors(
+  temperature: number,
+  biomass: number,
+): {
+  beach: string
+  lowland: string
+  midland: string
+  highland: string
+  mountain: string
+  snow: string
+} {
+  // Base colors for earth-like conditions (around 288K)
+  let beach = "#F0E68C"
+  let lowland = "#32CD32"
+  let midland = "#228B22"
+  let highland = "#8B4513"
+  let mountain = "#A0A0A0"
+  let snow = "#FFFFFF"
+
+  // Very cold planets (< 200K) - frozen, icy worlds  
+  if (temperature < 200) {
+    beach = "#E0E0FF" // Light blue ice
+    lowland = biomass > 0.1 ? "#B0C4DE" : "#DCDCDC" // Frozen vegetation or ice
+    midland = "#C0C0C0" // Light gray ice
+    highland = "#A9A9A9" // Dark gray rock
+    mountain = "#696969" // Dark stone
+    snow = "#F0F8FF" // Blue-white snow
+  }
+  // Cold planets (200-273K) - tundra-like
+  else if (temperature < 273) {
+    beach = "#D2B48C" // Light brown
+    lowland = biomass > 0.3 ? "#9ACD32" : "#F5F5DC" // Sparse vegetation or permafrost
+    midland = biomass > 0.2 ? "#6B8E23" : "#DCDCDC"
+    highland = "#8B7355" // Brown rock
+    mountain = "#A0A0A0" // Gray stone
+    snow = "#FFFAFA" // Snow white
+  }
+  // Temperate planets (273-350K) - earth-like
+  else if (temperature < 350) {
+    // Use base colors adjusted by biomass
+    if (biomass < 0.1) {
+      lowland = "#D2B48C" // Desert tan
+      midland = "#CD853F" // Peru brown
+    } else if (biomass > 0.8) {
+      lowland = "#228B22" // Forest green
+      midland = "#006400" // Dark green
+    }
+  }
+  // Hot planets (350-500K) - arid desert worlds
+  else if (temperature < 500) {
+    beach = "#DEB887" // Burlywood
+    lowland = biomass > 0.2 ? "#9ACD32" : "#D2B48C" // Sparse vegetation or sand
+    midland = biomass > 0.1 ? "#8FBC8F" : "#CD853F" // Dry vegetation or rock
+    highland = "#A0522D" // Sienna
+    mountain = "#696969" // Dark gray
+    snow = "#F5DEB3" // Wheat (no real snow)
+  }
+  // Very hot planets (500-700K) - volcanic worlds
+  else if (temperature < 700) {
+    beach = "#CD853F" // Peru brown
+    lowland = "#A0522D" // Sienna  
+    midland = "#8B4513" // Saddle brown
+    highland = "#800000" // Maroon
+    mountain = "#2F4F4F" // Dark slate gray
+    snow = "#D3D3D3" // Light gray (ash)
+  }
+  // Extremely hot planets (>700K) - hellish worlds like Venus
+  else {
+    beach = "#FF6347" // Tomato red
+    lowland = "#FF4500" // Orange red
+    midland = "#DC143C" // Crimson
+    highland = "#A03010" // Very dark red
+    mountain = "#802000" // Almost black-red
+    snow = "#D0D0D0" // Light gray (ash)
+  }
+
+  return { beach, lowland, midland, highland, mountain, snow }
+}
+
+export const planets = {
   jupiter: {
     type: "gaseous",
     seed: 9012,
@@ -248,204 +302,3 @@ export const simplePlanetPresets: Record<string, PlanetConfig> = {
     },
   },
 }
-
-// Function to determine liquid type based on temperature
-export function getLiquidType(temperature: number): {
-  name: string
-  color: string
-  patternColor: string
-} {
-  // Temperature ranges in Kelvin
-  if (temperature < 90) {
-    // Liquid nitrogen (63K to 77K)
-    return {
-      name: "Liquid Nitrogen",
-      color: "#D6E7FF",
-      patternColor: "#C0D6FF",
-    }
-  } else if (temperature < 120) {
-    // Liquid methane (90K to 112K)
-    return {
-      name: "Liquid Methane",
-      color: "#A2CDB0",
-      patternColor: "#8EBDA0",
-    }
-  } else if (temperature < 373) {
-    // Water (273K to 373K)
-    return {
-      name: "Water",
-      color: "#1E90FF",
-      patternColor: "#1E7FFF",
-    }
-  } else if (temperature < 600) {
-    // Sulfuric acid (283K to 610K)
-    return {
-      name: "Sulfuric Acid",
-      color: "#D6C562",
-      patternColor: "#C4B250",
-    }
-  } else {
-    // Molten silicates/lava (>1000K)
-    return {
-      name: "Molten Rock",
-      color: "#FF4500",
-      patternColor: "#FF2400",
-    }
-  }
-}
-
-// Function to adjust terrain colors based on temperature
-export function getTemperatureAdjustedColors(
-  temperature: number,
-  biomass: number,
-): {
-  beach: string
-  lowland: string
-  midland: string
-  highland: string
-  mountain: string
-  snow: string
-} {
-  // Base colors
-  let beach = "#F0E68C" // Default sandy beach
-  let lowland = "#32CD32" // Default green lowland
-  let midland = "#228B22" // Default forest green
-  let highland = "#8B4513" // Default brown
-  let mountain = "#A0A0A0" // Default gray
-  let snow = "#FFFFFF" // Default white
-
-  // Cold planet (< 240K)
-  if (temperature < 240) {
-    beach = "#E0E0E0" // Icy shore
-    lowland = "#E8E8F0" // Light ice
-    midland = "#C8D8E0" // Bluish ice
-    highland = "#A8B8C0" // Darker ice
-    mountain = "#889098" // Dark gray
-    snow = "#FFFFFF" // Pure white
-  }
-  // Cool planet (240K to 280K)
-  else if (temperature < 280) {
-    beach = "#D8D8C0" // Cool sand
-    lowland = "#C0D8C0" // Tundra
-    midland = "#A0C0A0" // Sparse vegetation
-    highland = "#909080" // Rocky tundra
-    mountain = "#808080" // Gray rock
-    snow = "#FFFFFF" // White snow
-  }
-  // Temperate planet (280K to 310K)
-  else if (temperature < 310) {
-    // Adjust based on biomass
-    const bioFactor = Math.min(biomass * 1.5, 1.0)
-
-    beach = "#F0E68C" // Sandy beach
-    lowland = bioFactor > 0.3 ? "#32CD32" : "#C2CC70" // Green if biomass, otherwise yellowish
-    midland = bioFactor > 0.3 ? "#228B22" : "#A0A060" // Forest if biomass, otherwise scrubland
-    highland = "#8B4513" // Brown
-    mountain = "#A0A0A0" // Gray
-    snow = "#FFFFFF" // White
-  }
-  // Hot planet (310K to 400K)
-  else if (temperature < 400) {
-    beach = "#F8E0A0" // Light sand
-    lowland = biomass > 0.4 ? "#74A662" : "#D8C878" // Either vegetation or desert
-    midland = biomass > 0.4 ? "#567D46" : "#C0A060" // Either vegetation or desert
-    highland = "#B89060" // Light brown
-    mountain = "#A89080" // Reddish rock
-    snow = temperature > 350 ? "#F0F0F0" : "#FFFFFF" // Slightly off-white at higher temps
-  }
-  // Very hot planet (400K to 600K)
-  else if (temperature < 600) {
-    beach = "#F8D080" // Orange sand
-    lowland = "#E0B060" // Desert
-    midland = "#C09050" // Dark desert
-    highland = "#A07040" // Reddish brown
-    mountain = "#805030" // Dark red rock
-    snow = "#E8E8E8" // Off-white (salt flats)
-  }
-  // Extremely hot planet (>600K)
-  else {
-    beach = "#FF9060" // Orange-red
-    lowland = "#E07040" // Reddish
-    midland = "#C05020" // Dark red
-    highland = "#A03010" // Very dark red
-    mountain = "#802000" // Almost black-red
-    snow = "#D0D0D0" // Light gray (ash)
-  }
-
-  return { beach, lowland, midland, highland, mountain, snow }
-}
-
-// Auto-determine planet type based on mass and radius
-export function getAutoType(mass: number, radius: number): "terrestrial" | "gaseous" {
-  return mass > 7.5 || radius > 2.5 ? "gaseous" : "terrestrial"
-}
-
-// Get simplified colors for simple planet interface (maps to primary terrain colors)
-export function getSimplifiedColors(config: PlanetConfig): {
-  primary: string
-  secondary: string
-  accent: string
-} {
-  if (config.type === "gaseous") {
-    return {
-      primary: config.colors.atmosphere,
-      secondary: config.colors.ocean,
-      accent: config.colors.oceanPattern,
-    }
-  } else {
-    return {
-      primary: config.colors.ocean, // Water/ocean
-      secondary: config.colors.lowland, // Land
-      accent: config.colors.highland, // Mountains
-    }
-  }
-}
-
-// Update full config from simplified colors
-export function updateFromSimplifiedColors(
-  config: PlanetConfig,
-  colors: { primary: string; secondary: string; accent: string },
-): Partial<PlanetConfig> {
-  if (config.type === "gaseous") {
-    return {
-      colors: {
-        ...config.colors,
-        atmosphere: colors.primary,
-        ocean: colors.secondary,
-        oceanPattern: colors.accent,
-        beach: colors.primary,
-        lowland: colors.secondary,
-        midland: colors.accent,
-        highland: colors.primary,
-        mountain: colors.secondary,
-        snow: colors.accent,
-      },
-    }
-  } else {
-    return {
-      colors: {
-        ...config.colors,
-        ocean: colors.primary,
-        oceanPattern: colors.primary,
-        lowland: colors.secondary,
-        midland: colors.secondary,
-        highland: colors.accent,
-        mountain: colors.accent,
-      },
-    }
-  }
-}
-
-// Create a simplified config interface for the simple planet viewer
-export function createSimplifiedConfig(config: PlanetConfig) {
-  return {
-    type: config.type,
-    radius: config.radius,
-    mass: config.mass,
-    density: config.mass / ((config.radius ** 3 * Math.PI * 4) / 3),
-    seed: config.seed,
-    colors: getSimplifiedColors(config),
-    // Include full config for the mesh to use
-    fullConfig: config,
-  }
-};

@@ -13,28 +13,13 @@ export const AvatarGenerator: React.FC<Props> = ({ author }) => {
     const [avatarUrl, setAvatarUrl] = useState("");
   
     useEffect(() => {
-      let ignore = false;
-
-      async function fetchAvatar () {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("avatar_url")
-          .eq("id", session?.user.id)
-          .single();
-
-        if (!data?.avatar_url) {
-          const generateAvatar = () => {
-            const apiUrl = `https://api.dicebear.com/6.x/bottts/svg?seed=${encodeURIComponent(author)}`;
-            setAvatarUrl(apiUrl);
-          };
-      
-          generateAvatar();
-        } else {
-          setAvatarUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${data.avatar_url}`)
-        };
-      }
-
-      fetchAvatar();
+      // Always generate an avatar using Dicebear API, ignore user's profile avatar
+      const generateAvatar = () => {
+        const apiUrl = `https://api.dicebear.com/6.x/bottts/svg?seed=${encodeURIComponent(author)}`;
+        setAvatarUrl(apiUrl);
+      };
+  
+      generateAvatar();
     }, [author]);
   
     return (

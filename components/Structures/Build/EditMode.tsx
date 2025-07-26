@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import { useActivePlanet } from '@/context/ActivePlanet';
+import { useActivePlanet } from '@/src/core/context/ActivePlanet';
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button"; 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";

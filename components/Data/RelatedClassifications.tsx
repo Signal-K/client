@@ -41,7 +41,7 @@ export default function RelatedClassifications({ parentId }: RelatedClassificati
 
       // Step 1: Get the classification with parentId to find its anomaly
       const { data: baseClassification, error: baseError } = await supabase
-        .from('classifications')
+        .from("classifications")
         .select('id, anomaly, classificationConfiguration')
         .eq('id', parentId)
         .single();
@@ -61,7 +61,7 @@ export default function RelatedClassifications({ parentId }: RelatedClassificati
 
       // Step 2: Get all classifications with matching parentPlanetLocation = anomaly
       const { data: matchingClassifications, error: matchError } = await supabase
-        .from('classifications')
+        .from("classifications")
         .select('*')
         .filter('classificationConfiguration->>parentPlanetLocation', 'eq', anomaly.toString());
 

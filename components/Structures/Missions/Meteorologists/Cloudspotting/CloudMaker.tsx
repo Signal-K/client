@@ -23,7 +23,7 @@ export default function CloudClassificationGenerator() {
       setError(null);
       try {
         const { data, error } = await supabase
-          .from('classifications')
+          .from("classifications")
           .select('*')
           .eq('author', session.user.id)
           .eq('classificationtype', 'cloud')

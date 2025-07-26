@@ -29,7 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
+import { 
   Tabs,
   TabsContent,
   TabsList,
@@ -54,6 +54,7 @@ import html2canvas from "html2canvas"
 import { AvatarGenerator } from "@/components/Account/Avatar"
 import { PostCardSingleProps, CommentProps } from "./PostSingle"
 import SurveyorCalculator from "./Surveyor/CalculatorSurveyor";
+import { SurveyorCommentList } from "../Comments/CommentListById"
 
 export default function PostCard({
   classificationId,
@@ -284,6 +285,7 @@ export default function PostCard({
           <div className="p-4 border-t border-gray-200 bg-white">
             <h3 className="text-sm font-semibold text-gray-700 mb-2">Surveyor Tools</h3>
             <SurveyorCalculator classificationId={classificationId.toString()} />
+            <SurveyorCommentList classificationId={classificationId.toString()} />
           </div>
         )}
 

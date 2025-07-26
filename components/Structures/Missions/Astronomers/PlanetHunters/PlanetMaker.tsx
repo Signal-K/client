@@ -34,7 +34,7 @@ export default function PHClassificationGenerator() {
         setError(null);
         try {
           const { data, error } = await supabase
-            .from('classifications')
+            .from("classifications")
             .select('*')
             .eq("author", session.user.id)
             .eq('classificationtype', 'planet')

@@ -37,7 +37,7 @@ export function ConfigIOPanel({ currentConfig, classificationId, onImport }: Con
     setExporting(true)
     try {
       const { data, error } = await supabase
-        .from('classifications')
+        .from("classifications")
         .select('classificationConfiguration')
         .eq('id', classificationId)
         .single()
@@ -56,7 +56,7 @@ export function ConfigIOPanel({ currentConfig, classificationId, onImport }: Con
       }
 
       const { error: updateError } = await supabase
-        .from('classifications')
+        .from("classifications")
         .update({
           classificationConfiguration: updatedConfig
         })

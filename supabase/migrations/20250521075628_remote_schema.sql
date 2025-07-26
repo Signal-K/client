@@ -367,7 +367,7 @@ on "storage"."objects"
 as permissive
 for select
 to public
-using ((bucket_id = 'anomalies'::text));
+using ((bucket_id = "anomalies"::text));
 
 
 create policy "Enable read access for all users zj231d_1"
@@ -375,7 +375,7 @@ on "storage"."objects"
 as permissive
 for insert
 to public
-with check ((bucket_id = 'anomalies'::text));
+with check ((bucket_id = "anomalies"::text));
 
 
 create policy "Enable read access for all users zj231d_2"
@@ -383,7 +383,7 @@ on "storage"."objects"
 as permissive
 for update
 to public
-using ((bucket_id = 'anomalies'::text));
+using ((bucket_id = "anomalies"::text));
 
 
 create policy "Enable read access for all users zj231d_3"
@@ -391,7 +391,7 @@ on "storage"."objects"
 as permissive
 for delete
 to public
-using ((bucket_id = 'anomalies'::text));
+using ((bucket_id = "anomalies"::text));
 
 
 

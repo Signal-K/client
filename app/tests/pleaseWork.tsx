@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from "react"
 import Webcam from "react-webcam"
 import axios from "axios"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
-import { useActivePlanet } from "@/context/ActivePlanet"
+import { useActivePlanet } from "@/src/core/context/ActivePlanet"
 
 export default function ChatGPTImageClassifier() {
   const supabase = useSupabaseClient()

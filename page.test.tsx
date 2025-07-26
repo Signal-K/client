@@ -108,7 +108,7 @@ export default function Greenhouse() {
 
       try {
         const { data: classifications, error: classificationError } = await supabase
-          .from('classifications')
+          .from("classifications")
           .select('anomaly')
           .eq('author', session.user.id);
 
@@ -117,7 +117,7 @@ export default function Greenhouse() {
         const classifiedAnomalies = classifications?.map((item) => item.anomaly);
 
         const { data, error } = await supabase
-          .from('anomalies')
+          .from("anomalies")
           .select(`
             id,
             content,

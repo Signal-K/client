@@ -6,19 +6,18 @@ import LoginPage from "../auth/LoginModal";
 import { useRouter} from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useActivePlanet } from "@/context/ActivePlanet";
-import { subscribeUser, unsubscribeUser, sendNotification } from '../actions'
+import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+// import { subscribeUser, unsubscribeUser, sendNotification } from '../actions'
 // import { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/components/Structures/Structures";
 // import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
-import Onboarding from "../scenes/onboarding/page";
 import SimpleeMissionGuide from "../tests/singleMissionGuide";
 import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatellites";
 import LandingSS from "../auth/landing";
 import GameNavbar from "@/components/Layout/Tes";
 import BiomassOnEarth from "@/components/Data/BiomassEarth";
-import NPSPopup from "@/lib/helper/nps-popup";
+import NPSPopup from "@/src/shared/helpers/nps-popup";
 import Structures from "@/components/Structures/Structures";
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -380,10 +379,6 @@ export default function Home() {
 
   if (hasRequiredItems === null) {
     return <div>Loading...</div>;
-  }
-
-  if (!hasRequiredItems) {
-    return <Onboarding />;
   }
 
   function handleDeployConfirm() {

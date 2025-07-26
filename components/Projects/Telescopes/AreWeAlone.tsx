@@ -10,7 +10,7 @@ type Anomaly = {
   details?: string;
 };
 
-import { useActivePlanet } from "@/context/ActivePlanet";
+import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 
 import { Props } from "@/types/Anomalies";
 

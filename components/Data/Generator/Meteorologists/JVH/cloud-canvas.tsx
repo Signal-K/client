@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { CloudPattern } from '../../../../../types/Generators/JVH/atmosphere'
-import { getColorsByAltitude } from '../../../../../data/cloud-compositions'
+import { getColorsByAltitude } from '@/src/features/weather/cloud-compositions'
 
 interface CloudCanvasProps {
   patterns: CloudPattern[]

@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import type { PlanetConfig } from "@/app/planets/paint/[id]/planet-config"
 import { getLiquidType, getTemperatureAdjustedColors } from "@/app/planets/paint/[id]/planet-config"
-import ColorPicker from "@/utils/Generators/PH/color-picker";
+import ColorPicker from "@/src/shared/utils/generators/PH/color-picker";
 
 interface ColorSettingsProps {
   planetConfig: PlanetConfig

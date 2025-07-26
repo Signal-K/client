@@ -94,7 +94,7 @@ const milestones = [
                 xp: 3,
                 completionInfo: '',
                 rewardInfo: '',
-                table: 'classifications',
+                table: "classifications",
                 field: 'classificationtype',
                 value: 'automaton-aiForMars',
                 requiredCount: 3,

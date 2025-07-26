@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import { useActivePlanet } from '@/context/ActivePlanet'; 
+import { useActivePlanet } from '@/src/core/context/ActivePlanet'; 
 import ClassificationForm from '@/components/Projects/(classifications)/PostForm';
 import { planetClassificationConfig } from '@/components/Projects/(classifications)/FormConfigurations';
 // import PreferredTerrestrialClassifications from '@/components/Structures/Missions/PickPlanet';
@@ -35,7 +35,7 @@ export function StarterTelescopeTess() {
       if (!session) {
         setLoading(false)
         return
-      }
+      };
 
       try {
         const { data: linkedAnomalies, error: linkedError } = await supabase
@@ -134,7 +134,7 @@ interface TelescopeProps {
     anomalyid: string;
 };
 
-export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid }) => {
+const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
 

@@ -16,7 +16,7 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchClassification = async () => {
+  const fetchClassification = async () => { 
     if (!session?.user) {
       setError("User session not found.");
       setLoading(false);

@@ -4,7 +4,7 @@ import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CloudPattern, AtmosphericLayer } from '../../../../../types/Generators/JVH/atmosphere';
-import { atmosphericLayers } from '../../../../../data/atmospheric-layers';
+import { atmosphericLayers } from '@/src/features/planets/atmospheric-layers';
 import { Cloud, Wind, TornadoIcon as Hurricane, Waves } from 'lucide-react';
 
 export default function CloudPatternGenerator() {

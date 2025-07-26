@@ -14,7 +14,7 @@ const OceanCounter = () => {
     const fetchClassifications = async () => {
       if (session?.user?.id) {
         const { data, error } = await supabase
-          .from('classifications')
+          .from("classifications")
           .select('id, classificationtype, created_at')
           .eq('author', session.user.id)
           .in('classificationtype', ['zoodex-clickACoral', 'zoodex-planktonPortal'])

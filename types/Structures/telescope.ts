@@ -4,7 +4,7 @@ import type { ReactNode } from "react"
 interface BaseAnomaly {
   id: string
   name: string
-  type: "exoplanet" | "sunspot" | "asteroid" | "accretion_disc"
+  type: "exoplanet" | "planet" | "asteroid" | "sunspot" | "asteroid" | "accretion_disc"
   project: string
   classified?: boolean
   discoveryDate?: string

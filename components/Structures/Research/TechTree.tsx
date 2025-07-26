@@ -5,7 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Rocket, Microscope, Atom, Satellite, Zap, Globe, Building, Cpu, CircleDot, Check, Plus, BarChart3 } from 'lucide-react'
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
-import { useActivePlanet } from "@/context/ActivePlanet"
+import { useActivePlanet } from "@/src/core/context/ActivePlanet"
 
 const techIcons: { [key: string]: React.FC<any> } = {
   "Advanced Propulsion": Rocket,
@@ -143,7 +143,7 @@ export default function ModernTechTree() {
             }
           : tech
       )
-    )
+    ) 
   }
 
   React.useEffect(() => {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import PlanetViewer from "./planetViewer";
-import { type PlanetConfig, defaultPlanetConfig } from "@/utils/planet-physics";
+import { type PlanetConfig, defaultPlanetConfig } from "@/src/features/planets/physics";
 import SettingsPanel from "./SettingsPanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";

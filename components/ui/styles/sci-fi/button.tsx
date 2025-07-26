@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn } from "@/src/shared/utils"
 
 interface SciFiButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean
