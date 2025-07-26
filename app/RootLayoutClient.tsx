@@ -5,7 +5,6 @@ import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useEffect, useState, ReactNode } from "react";
 import { ActivePlanetProvider, useActivePlanet } from "@/src/core/context/ActivePlanet";
-import { InventoryProvider } from "@/src/core/context/InventoryContext";
 import { UserAnomaliesProvider } from "@/src/core/context/UserAnomalies";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -33,7 +32,6 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
           <ActivePlanetProvider>
             {/* <MissionProvider> */}
             <UserAnomaliesProvider>
-              <InventoryProvider>
                 <LayoutContent>
                   {/* <div className="sci-fi-overlay">
                     <svg className="sci-fi-shape sci-fi-shape-1" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -65,7 +63,6 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                 </LayoutContent>
                 <Analytics />
                 <SpeedInsights />
-              </InventoryProvider>
             </UserAnomaliesProvider>
             {/* </MissionProvider> */}
           </ActivePlanetProvider>

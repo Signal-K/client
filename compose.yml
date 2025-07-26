@@ -1,28 +1,5 @@
-version: '3.8'
-
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
-    container_name: navigation-postgres
-    environment:
-      POSTGRES_DB: navigation
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Next.js Application
+  # Next.js Application (using Supabase instead of local PostgreSQL)
   nextapp:
     container_name: nextapp
     build:
@@ -30,31 +7,41 @@ services:
       dockerfile: next.dockerfile
     ports:
       - "3000:3000"
+    env_file:
+      - .env.local
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/navigation
-      - NEXT_PUBLIC_API_URL=http://flask:5001
-      # Add other environment variables as needed
       - NODE_ENV=development
     volumes:
       - ./:/app
       - /app/node_modules
       - /app/.next
     working_dir: /app
-    depends_on:
-      postgres:
-        condition: service_healthy
     networks:
       - app-network
-    # Run database setup and then start the app
-    command: >
-      sh -c "
-        echo 'Waiting for database to be ready...' &&
-        yarn db:push &&
-        echo 'Database setup complete, starting application...' &&
-        yarn dev
-      "
+    # Simple command to start the development server
+    command: "yarn dev"
 
-  # Flask service (commented out but ready to use)
+  # Drizzle Studio - Database management UI connected to Supabase
+  drizzle-studio:
+    container_name: drizzle-studio
+    build:
+      context: ./
+      dockerfile: next.dockerfile
+    ports:
+      - "4983:4983"
+    env_file:
+      - .env.local
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    working_dir: /app
+    networks:
+      - app-network
+    command: "yarn db:studio"
+    profiles:
+      - studio
+
+  # Optional: Flask service (uncomment if needed)
   # flask:
   #   container_name: flask
   #   build:
@@ -70,32 +57,6 @@ services:
   #   working_dir: /app
   #   networks:
   #     - app-network
-
-  # Drizzle Studio (optional - for database management UI)
-  drizzle-studio:
-    container_name: drizzle-studio
-    build:
-      context: ./
-      dockerfile: next.dockerfile
-    ports:
-      - "4983:4983"
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/navigation
-    volumes:
-      - ./:/app
-      - /app/node_modules
-    working_dir: /app
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - app-network
-    command: "yarn db:studio"
-    profiles:
-      - studio
-
-volumes:
-  postgres_data:
 
 networks:
   app-network:
