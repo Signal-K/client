@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { PostCardSingle } from "@/content/Posts/PostSingle";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import StarnetLayout from "@/components/Layout/Starnet";
 
 interface Classification {
     id: number;

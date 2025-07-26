@@ -9,10 +9,16 @@ COPY package.json yarn.lock ./
 
 # Install dependencies
 RUN yarn install
-# RUN yarn build
 
 # Copy the rest of the application code
 COPY . .
 
-# For hot-reloading, you can use development mode
+# Generate Drizzle types and run migrations (if needed)
+# Note: This requires DATABASE_URL to be available at build time for type generation
+# RUN yarn db:generate
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# For development with hot-reloading
 CMD ["yarn", "dev"]

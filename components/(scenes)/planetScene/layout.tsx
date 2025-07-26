@@ -2,13 +2,6 @@
 
 import React, { useState, CSSProperties } from "react";
 // import { Header } from "@/app/components/sections/header";
-import {
-  Essendonitis,
-  background2,
-  background3,
-  callme,
-  mining,
-} from "@/src/shared/constants/backgrounds";
 import backgroundImage from "@/public/assets/Backdrops/Negotiations.jpg";
 import Header from "@/components/ui/Header";
 

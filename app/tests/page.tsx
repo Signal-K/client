@@ -8,7 +8,6 @@ import MilestoneTotalCompleted from "@/components/Structures/Missions/Milestones
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
 import { NewMilestones } from "@/components/Structures/Missions/Milestones/MilestonesNewUi";
 import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
-import MyLocationIds from "@/content/Classifications/UserLocationPK";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 import NPSPopup from "@/src/shared/helpers/nps-popup";
 // import TelescopeViewport from "@/telescope-viewport";

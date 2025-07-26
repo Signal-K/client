@@ -8,10 +8,25 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY!
 )
  
-let subscription: PushSubscription | null = null
+let subscription: webpush.PushSubscription | null = null
+
+// Extend the standard PushSubscription to include the keys property
+interface ExtendedPushSubscription extends Omit<PushSubscription, 'keys'> {
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
  
-export async function subscribeUser(sub: PushSubscription) {
-  subscription = sub
+export async function subscribeUser(sub: ExtendedPushSubscription) {
+  // Convert browser PushSubscription to web-push compatible format
+  subscription = {
+    endpoint: sub.endpoint,
+    keys: {
+      p256dh: sub.keys.p256dh,
+      auth: sub.keys.auth
+    }
+  }
   // In a production environment, you would want to store the subscription in a database
   // For example: await db.subscriptions.create({ data: sub })
   return { success: true }

@@ -12,7 +12,6 @@ import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 // import EnhancedWeatherEvents from '@/components/(scenes)/mining/enhanced-weather-events';
 import AllAutomatonsOnActivePlanet from "@/components/Structures/Auto/AllAutomatons";
 import { EarthViewLayout } from "@/components/(scenes)/planetScene/layout";
-import Onboarding from "../scenes/onboarding/page";
 import SimpleeMissionGuide from "../tests/singleMissionGuide";
 import AllSatellitesOnActivePlanet from "@/components/Structures/Auto/AllSatellites";
 import LandingSS from "../auth/landing";
@@ -380,10 +379,6 @@ export default function Home() {
 
   if (hasRequiredItems === null) {
     return <div>Loading...</div>;
-  }
-
-  if (!hasRequiredItems) {
-    return <Onboarding />;
   }
 
   function handleDeployConfirm() {

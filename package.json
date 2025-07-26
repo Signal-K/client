@@ -99,6 +99,7 @@
     "@types/node": "^22.7.8",
     "@types/react": "^18.2.22",
     "@types/react-dom": "^18.2.7",
+    "@types/web-push": "^3.6.4",
     "daisyui": "^4.11.1",
     "drizzle-kit": "^0.31.4",
     "knip": "^5.33.3",
