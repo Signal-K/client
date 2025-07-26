@@ -51,12 +51,12 @@ export function LeftSidebar({
 }: LeftSidebarProps) {
   return (
     <div
-      className="hidden lg:flex w-56 xl:w-64 flex-col backdrop-blur-sm flex-shrink-0"
+      className="hidden lg:flex w-56 xl:w-64 flex-col backdrop-blur-sm flex-shrink-0 h-full"
       style={{ backgroundColor: "rgba(0, 80, 102, 0.95)", borderRight: "1px solid rgba(120, 204, 226, 0.3)" }}
     >
       {/* Header */}
       <div
-        className="p-4 border-b"
+        className="p-4 border-b flex-shrink-0"
         style={{ borderColor: "rgba(120, 204, 226, 0.3)", background: "linear-gradient(to right, #002439, #005066)" }}
       >
         <div className="flex items-center gap-3">
@@ -78,15 +78,15 @@ export function LeftSidebar({
       </div>
 
       {/* System Status */}
-      <div className="overflow-y-auto flex-1">
+      <div className="overflow-y-auto flex-1 min-h-0">
         <div
-          className="p-4 border-b"
+          className="p-4 border-b flex-shrink-0"
           style={{
             borderColor: "rgba(120, 204, 226, 0.3)",
             background: "linear-gradient(to right, rgba(0, 80, 102, 0.5), transparent)",
           }}
         >
-          <div className="grid grid-cols-2 gap-3 mb-3 text-xs">
+          {/* <div className="grid grid-cols-2 gap-3 mb-3 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: "#78cce2" }}></div>
               <span style={{ color: "#78cce2" }} className="font-mono">
@@ -111,13 +111,13 @@ export function LeftSidebar({
                 CPU: 67%
               </span>
             </div>
-          </div>
-          <div style={{ color: "#78cce2" }} className="text-xs font-mono mb-2">
+          </div> */}
+          {/* <div style={{ color: "#78cce2" }} className="text-xs font-mono mb-2">
             Targets: {filteredAnomalies.length}/10
           </div>
           <Badge style={{ backgroundColor: "#78cce2", color: "#002439" }} className="text-xs px-2 py-1 font-mono">
             {classifications.length} CLASSIFIED
-          </Badge>
+          </Badge> */}
         </div>
 
         {/* Navigation Controls */}
@@ -325,7 +325,7 @@ export function LeftSidebar({
         </Card>
 
         {/* Quick Actions */}
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-2 flex-shrink-0">
           <Button
             onClick={() => setViewMode(viewMode === "viewport" ? "discoveries" : "viewport")}
             className="w-full font-mono text-sm py-2"

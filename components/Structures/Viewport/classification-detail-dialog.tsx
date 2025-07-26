@@ -84,11 +84,16 @@ export function ClassificationDetailDialog({
     switch (config) {
       case "telescope":
         return {
-          bg: "bg-[#2E3440]",
-          border: "border-[#4C566A]",
-          text: "text-[#ECEFF4]",
-          accent: "text-[#88C0D0]",
-          card: "bg-[#434C5E]",
+          bg: "backdrop-blur-sm",
+          bgStyle: { backgroundColor: "rgba(0, 80, 102, 0.95)" },
+          border: "border",
+          borderStyle: { borderColor: "rgba(120, 204, 226, 0.3)" },
+          text: "font-mono",
+          textStyle: { color: "#e4eff0" },
+          accent: "font-mono",
+          accentStyle: { color: "#78cce2" },
+          card: "backdrop-blur-sm",
+          cardStyle: { backgroundColor: "rgba(0, 36, 57, 0.8)", borderColor: "rgba(120, 204, 226, 0.3)" },
         };
       case "weather":
         return {
@@ -141,9 +146,15 @@ export function ClassificationDetailDialog({
 
   return (
     <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-      <DialogContent className={`${colors.bg} ${colors.border} ${colors.text} max-w-2xl max-h-[80vh] overflow-y-auto`}>
+      <DialogContent 
+        className={`${colors.bg} ${colors.border} ${colors.text} max-w-2xl max-h-[80vh] overflow-y-auto`}
+        style={config === "telescope" ? { ...colors.bgStyle, ...colors.borderStyle, ...colors.textStyle } : {}}
+      >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle 
+            className={`flex items-center gap-2 ${colors.text}`}
+            style={config === "telescope" ? colors.textStyle : {}}
+          >
             {getTypeIcon(selectedClassification.classificationtype)}
             Classification Details
           </DialogTitle>
@@ -153,16 +164,31 @@ export function ClassificationDetailDialog({
           {/* Header Info */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold">Classification #{classificationId}</h3>
+              <h3 
+                className={`text-lg font-semibold ${colors.text}`}
+                style={config === "telescope" ? colors.textStyle : {}}
+              >
+                Classification #{classificationId}
+              </h3>
               <div className="flex items-center gap-4 mt-1 text-sm">
                 <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4 text-gray-400" />
-                  <span className={colors.accent}>{formatDate(selectedClassification.created_at)}</span>
+                  <Calendar className="h-4 w-4" style={config === "telescope" ? { color: "#4e7988" } : { color: "rgb(156 163 175)" }} />
+                  <span 
+                    className={colors.accent}
+                    style={config === "telescope" ? colors.accentStyle : {}}
+                  >
+                    {formatDate(selectedClassification.created_at)}
+                  </span>
                 </div>
                 {selectedClassification.author && (
                   <div className="flex items-center gap-1">
-                    <User className="h-4 w-4 text-gray-400" />
-                    <span className={colors.accent}>User {selectedClassification.author.slice(0, 8)}...</span>
+                    <User className="h-4 w-4" style={config === "telescope" ? { color: "#4e7988" } : { color: "rgb(156 163 175)" }} />
+                    <span 
+                      className={colors.accent}
+                      style={config === "telescope" ? colors.accentStyle : {}}
+                    >
+                      User {selectedClassification.author.slice(0, 8)}...
+                    </span>
                   </div>
                 )}
               </div>
@@ -176,10 +202,18 @@ export function ClassificationDetailDialog({
 
           {/* Media Display */}
           {firstImage && (
-            <div className={`${colors.card} p-4 rounded-lg`}>
+            <div 
+              className={`${colors.card} p-4 rounded-lg border`}
+              style={config === "telescope" ? { ...colors.cardStyle, borderColor: "rgba(120, 204, 226, 0.3)" } : {}}
+            >
               <div className="flex items-center gap-2 mb-3">
-                <ImageIcon className="h-4 w-4 text-gray-400" />
-                <span className={`${colors.accent} text-sm font-medium`}>Associated Media</span>
+                <ImageIcon className="h-4 w-4" style={config === "telescope" ? { color: "#4e7988" } : { color: "rgb(156 163 175)" }} />
+                <span 
+                  className={`${colors.accent} text-sm font-medium`}
+                  style={config === "telescope" ? colors.accentStyle : {}}
+                >
+                  Associated Media
+                </span>
               </div>
               <div className="relative">
                 <img
@@ -193,39 +227,97 @@ export function ClassificationDetailDialog({
                 />
               </div>
               {mediaArray.length > 1 && (
-                <div className="mt-2 text-xs text-gray-400">+{mediaArray.length - 1} more media items</div>
+                <div 
+                  className="mt-2 text-xs"
+                  style={config === "telescope" ? { color: "#4e7988" } : { color: "rgb(156 163 175)" }}
+                >
+                  +{mediaArray.length - 1} more media items
+                </div>
               )}
             </div>
           )}
 
           {/* Content */}
           {selectedClassification.content && (
-            <div className={`${colors.card} p-4 rounded-lg`}>
+            <div 
+              className={`${colors.card} p-4 rounded-lg border`}
+              style={config === "telescope" ? { ...colors.cardStyle, borderColor: "rgba(120, 204, 226, 0.3)" } : {}}
+            >
               <div className="flex items-center gap-2 mb-3">
-                <FileText className="h-4 w-4 text-gray-400" />
-                <span className={`${colors.accent} text-sm font-medium`}>Classification Notes</span>
+                <FileText className="h-4 w-4" style={config === "telescope" ? { color: "#4e7988" } : { color: "rgb(156 163 175)" }} />
+                <span 
+                  className={`${colors.accent} text-sm font-medium`}
+                  style={config === "telescope" ? colors.accentStyle : {}}
+                >
+                  Classification Notes
+                </span>
               </div>
-              <p className="text-sm leading-relaxed">{selectedClassification.content}</p>
+              <p 
+                className={`text-sm leading-relaxed ${colors.text}`}
+                style={config === "telescope" ? colors.textStyle : {}}
+              >
+                {selectedClassification.content}
+              </p>
             </div>
           )}
 
           {/* Technical Details */}
-          <div className={`${colors.card} p-4 rounded-lg`}>
-            <h4 className={`${colors.accent} text-sm font-medium mb-3`}>Technical Information</h4>
+          <div 
+            className={`${colors.card} p-4 rounded-lg border`}
+            style={config === "telescope" ? { ...colors.cardStyle, borderColor: "rgba(120, 204, 226, 0.3)" } : {}}
+          >
+            <h4 
+              className={`${colors.accent} text-sm font-medium mb-3`}
+              style={config === "telescope" ? colors.accentStyle : {}}
+            >
+              Technical Information
+            </h4>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-400">Anomaly ID:</span>
-                <div>{selectedClassification.anomaly || "Unknown"}</div>
+                <span 
+                  className="block"
+                  style={config === "telescope" ? { color: "#4e7988" } : { color: "rgb(156 163 175)" }}
+                >
+                  Anomaly ID:
+                </span>
+                <div 
+                  className={colors.text}
+                  style={config === "telescope" ? colors.textStyle : {}}
+                >
+                  {selectedClassification.anomaly || "Unknown"}
+                </div>
               </div>
               <div>
-                <span className="text-gray-400">Classification Type:</span>
-                <div className="capitalize">{selectedClassification.classificationtype || "Unknown"}</div>
+                <span 
+                  className="block"
+                  style={config === "telescope" ? { color: "#4e7988" } : { color: "rgb(156 163 175)" }}
+                >
+                  Classification Type:
+                </span>
+                <div 
+                  className={`capitalize ${colors.text}`}
+                  style={config === "telescope" ? colors.textStyle : {}}
+                >
+                  {selectedClassification.classificationtype || "Unknown"}
+                </div>
               </div>
             </div>
             {selectedClassification.classificationConfiguration && (
               <div className="mt-3">
-                <span className="text-gray-400 text-xs">Configuration:</span>
-                <pre className="text-xs mt-1 p-2 bg-black/20 rounded overflow-x-auto">
+                <span 
+                  className="text-xs block"
+                  style={config === "telescope" ? { color: "#4e7988" } : { color: "rgb(156 163 175)" }}
+                >
+                  Configuration:
+                </span>
+                <pre 
+                  className="text-xs mt-1 p-2 rounded overflow-x-auto font-mono"
+                  style={config === "telescope" ? { 
+                    backgroundColor: "rgba(0, 0, 0, 0.3)", 
+                    color: "#78cce2",
+                    border: "1px solid rgba(120, 204, 226, 0.3)"
+                  } : { backgroundColor: "rgba(0, 0, 0, 0.2)" }}
+                >
                   {JSON.stringify(selectedClassification.classificationConfiguration, null, 2)}
                 </pre>
               </div>
@@ -235,19 +327,59 @@ export function ClassificationDetailDialog({
           {/* Actions */}
           <div className="flex flex-wrap justify-end gap-2">
             <Link href={`/posts/${classificationId}`}>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Button 
+                className="font-mono text-sm"
+                style={config === "telescope" ? {
+                  backgroundColor: "#78cce2",
+                  color: "#002439",
+                } : {}}
+                onMouseEnter={config === "telescope" ? (e) => {
+                  (e.target as HTMLElement).style.backgroundColor = "#e4eff0"
+                } : undefined}
+                onMouseLeave={config === "telescope" ? (e) => {
+                  (e.target as HTMLElement).style.backgroundColor = "#78cce2"
+                } : undefined}
+              >
                 View
               </Button>
             </Link>
             {isPlanet && (
               <>
                 <Link href={`/${classificationId}/survey`}>
-                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                  <Button 
+                    className="font-mono text-sm"
+                    style={config === "telescope" ? {
+                      backgroundColor: "#4e7988",
+                      color: "#e4eff0",
+                    } : {}}
+                    onMouseEnter={config === "telescope" ? (e) => {
+                      (e.target as HTMLElement).style.backgroundColor = "#78cce2"
+                      ;(e.target as HTMLElement).style.color = "#002439"
+                    } : undefined}
+                    onMouseLeave={config === "telescope" ? (e) => {
+                      (e.target as HTMLElement).style.backgroundColor = "#4e7988"
+                      ;(e.target as HTMLElement).style.color = "#e4eff0"
+                    } : undefined}
+                  >
                     Analyse behaviour
                   </Button>
                 </Link>
                 <Link href={`/planets/paint/${classificationId}`}>
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                  <Button 
+                    className="font-mono text-sm"
+                    style={config === "telescope" ? {
+                      backgroundColor: "#005066",
+                      color: "#e4eff0",
+                    } : {}}
+                    onMouseEnter={config === "telescope" ? (e) => {
+                      (e.target as HTMLElement).style.backgroundColor = "#78cce2"
+                      ;(e.target as HTMLElement).style.color = "#002439"
+                    } : undefined}
+                    onMouseLeave={config === "telescope" ? (e) => {
+                      (e.target as HTMLElement).style.backgroundColor = "#005066"
+                      ;(e.target as HTMLElement).style.color = "#e4eff0"
+                    } : undefined}
+                  >
                     Customise
                   </Button>
                 </Link>
@@ -256,7 +388,18 @@ export function ClassificationDetailDialog({
             <Button
               onClick={() => setShowDetailDialog(false)}
               variant="outline"
-              className={`${colors.border} ${colors.text} hover:bg-opacity-10`}
+              className={`${colors.border} ${colors.text} font-mono`}
+              style={config === "telescope" ? {
+                ...colors.borderStyle,
+                ...colors.textStyle,
+                backgroundColor: "transparent"
+              } : {}}
+              onMouseEnter={config === "telescope" ? (e) => {
+                (e.target as HTMLElement).style.backgroundColor = "rgba(120, 204, 226, 0.2)"
+              } : undefined}
+              onMouseLeave={config === "telescope" ? (e) => {
+                (e.target as HTMLElement).style.backgroundColor = "transparent"
+              } : undefined}
             >
               Close
             </Button>

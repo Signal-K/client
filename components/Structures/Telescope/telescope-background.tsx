@@ -12,6 +12,7 @@ interface TelescopeBackgroundProps {
   sectorX?: number
   sectorY?: number
   showAllAnomalies?: boolean
+  isDarkTheme?: boolean
   onAnomalyClick?: (anomaly: Anomaly) => void
 }
 
@@ -19,6 +20,7 @@ export function TelescopeBackground({
   sectorX = 0,
   sectorY = 0,
   showAllAnomalies = false,
+  isDarkTheme = true,
   onAnomalyClick,
 }: TelescopeBackgroundProps) {
   const session = useSession()
@@ -79,10 +81,18 @@ export function TelescopeBackground({
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-[#000000] to-[#0a0a1a]">
+      <div className={`w-full h-full flex items-center justify-center ${
+        isDarkTheme 
+          ? 'bg-gradient-to-b from-[#000000] to-[#0a0a1a]' 
+          : 'bg-gradient-to-b from-[#87CEEB] to-[#4682B4]'
+      }`}>
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-[#78cce2] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-          <div className="text-[#78cce2] text-sm font-mono">LOADING...</div>
+          <div className={`w-8 h-8 border-2 ${
+            isDarkTheme ? 'border-[#78cce2]' : 'border-white'
+          } border-t-transparent rounded-full animate-spin mx-auto mb-2`}></div>
+          <div className={`${
+            isDarkTheme ? 'text-[#78cce2]' : 'text-white'
+          } text-sm font-mono`}>LOADING...</div>
         </div>
       </div>
     )
@@ -91,7 +101,9 @@ export function TelescopeBackground({
   return (
     <div className="w-full h-full relative overflow-hidden">
       {/* Debug info */}
-      <div className="absolute top-2 right-2 text-white text-xs z-50">
+      <div className={`absolute top-2 right-2 ${
+        isDarkTheme ? 'text-white' : 'text-slate-800'
+      } text-xs z-50`}>
         Stars: {stars.length} | Anomalies: {filteredAnomalies.length}
       </div>
       
@@ -100,11 +112,16 @@ export function TelescopeBackground({
         ref={viewportRef}
         className="w-full h-full relative"
         style={{
-          background: `
+          background: isDarkTheme ? `
             radial-gradient(ellipse at 30% 40%, #0a0a1a 0%, transparent 70%),
             radial-gradient(ellipse at 70% 60%, #000510 0%, transparent 70%),
             radial-gradient(ellipse at 20% 80%, #050510 0%, transparent 70%),
             linear-gradient(135deg, #000000 0%, #0a0a1a 50%, #000510 100%)
+          ` : `
+            radial-gradient(ellipse at 30% 40%, #87CEEB 0%, transparent 70%),
+            radial-gradient(ellipse at 70% 60%, #4682B4 0%, transparent 70%),
+            radial-gradient(ellipse at 20% 80%, #5F9EA0 0%, transparent 70%),
+            linear-gradient(135deg, #87CEEB 0%, #4682B4 50%, #2F4F4F 100%)
           `,
         }}
       >
@@ -118,10 +135,12 @@ export function TelescopeBackground({
               top: `${star.y}%`,
               width: `${Math.max(star.size * 0.5, 1)}px`,
               height: `${Math.max(star.size * 0.5, 1)}px`,
-              backgroundColor: star.color,
-              opacity: star.opacity * 0.8,
+              backgroundColor: isDarkTheme ? star.color : '#ffffff',
+              opacity: isDarkTheme ? star.opacity * 0.8 : star.opacity * 0.6,
               animation: `twinkle ${star.twinkleSpeed}s ease-in-out infinite alternate`,
-              boxShadow: `0 0 ${star.size}px ${star.color}`,
+              boxShadow: isDarkTheme 
+                ? `0 0 ${star.size}px ${star.color}` 
+                : `0 0 ${star.size}px #ffffff88`,
             }}
           />
         ))}
@@ -130,10 +149,14 @@ export function TelescopeBackground({
         <div
           className="absolute inset-0 pointer-events-none opacity-10"
           style={{
-            background: `
+            background: isDarkTheme ? `
               radial-gradient(ellipse 300px 150px at 20% 30%, #a8d8ea22 0%, transparent 70%),
               radial-gradient(ellipse 200px 100px at 80% 70%, #ffb3d922 0%, transparent 70%),
               radial-gradient(ellipse 150px 200px at 60% 20%, #b8e6b822 0%, transparent 70%)
+            ` : `
+              radial-gradient(ellipse 300px 150px at 20% 30%, #ffffff33 0%, transparent 70%),
+              radial-gradient(ellipse 200px 100px at 80% 70%, #e6f3ff33 0%, transparent 70%),
+              radial-gradient(ellipse 150px 200px at 60% 20%, #f0f8ff33 0%, transparent 70%)
             `,
           }}
         />
@@ -150,14 +173,22 @@ export function TelescopeBackground({
 
         {/* Info overlay */}
         {!showAllAnomalies && (
-          <div className="absolute top-4 left-4 bg-[#002439]/90 text-[#78cce2] px-3 py-2 rounded-lg text-xs font-mono border border-[#78cce2]/30 backdrop-blur-sm">
+          <div className={`absolute top-4 left-4 ${
+            isDarkTheme 
+              ? 'bg-[#002439]/90 text-[#78cce2] border-[#78cce2]/30' 
+              : 'bg-white/90 text-slate-800 border-slate-400/50'
+          } px-3 py-2 rounded-lg text-xs font-mono border backdrop-blur-sm`}>
             <div>SECTOR: {generateSectorName(sectorX, sectorY)}</div>
             <div>ANOMALIES: {filteredAnomalies.length}</div>
           </div>
         )}
 
         {showAllAnomalies && (
-          <div className="absolute top-4 left-4 bg-[#002439]/90 text-[#78cce2] px-3 py-2 rounded-lg text-xs font-mono border border-[#78cce2]/30 backdrop-blur-sm">
+          <div className={`absolute top-4 left-4 ${
+            isDarkTheme 
+              ? 'bg-[#002439]/90 text-[#78cce2] border-[#78cce2]/30' 
+              : 'bg-white/90 text-slate-800 border-slate-400/50'
+          } px-3 py-2 rounded-lg text-xs font-mono border backdrop-blur-sm`}>
             <div>OVERVIEW MODE</div>
             <div>SHOWING: {filteredAnomalies.length} OF {anomalies.length}</div>
           </div>

@@ -81,9 +81,19 @@ export default function AnomalyDialog({
 
   return (
     <Dialog open={showClassifyDialog} onOpenChange={setShowClassifyDialog}>
-      <DialogContent className="bg-[#2E3440] border-[#4C566A] text-[#ECEFF4] max-w-md">
+      <DialogContent 
+        className="backdrop-blur-sm border font-mono text-sm max-w-md"
+        style={{ 
+          backgroundColor: "rgba(0, 80, 102, 0.95)", 
+          borderColor: "rgba(120, 204, 226, 0.3)",
+          color: "#e4eff0"
+        }}
+      >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle 
+            className="flex items-center gap-2 font-mono"
+            style={{ color: "#e4eff0" }}
+          >
             {getTypeIcon(selectedAnomaly.type)}
             Classify Anomaly
           </DialogTitle>
@@ -98,33 +108,54 @@ export default function AnomalyDialog({
                 boxShadow: `0 0 20px ${selectedAnomaly.color}`,
               }}
             />
-            <h3 className="text-lg font-semibold">{selectedAnomaly.name}</h3>
-            <Badge className={`${getTypeColor(selectedAnomaly.type)} text-white mt-2`}>
+            <h3 
+              className="text-lg font-semibold font-mono"
+              style={{ color: "#e4eff0" }}
+            >
+              {selectedAnomaly.name}
+            </h3>
+            <Badge 
+              className={`${getTypeColor(selectedAnomaly.type)} text-white mt-2 font-mono text-xs`}
+            >
               {selectedAnomaly.type.replace("_", " ").toUpperCase()}
             </Badge>
           </div>
 
-          <div className="space-y-2 text-sm">
+          <div className="space-y-2 text-sm font-mono">
             <div className="flex justify-between">
-              <span className="text-[#88C0D0]">Sector:</span>
-              <span>{selectedAnomaly.sector}</span>
+              <span style={{ color: "#78cce2" }}>Sector:</span>
+              <span style={{ color: "#e4eff0" }}>{selectedAnomaly.sector}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[#88C0D0]">Brightness:</span>
-              <span>{(selectedAnomaly.brightness * 100).toFixed(0)}%</span>
+              <span style={{ color: "#78cce2" }}>Brightness:</span>
+              <span style={{ color: "#e4eff0" }}>{(selectedAnomaly.brightness * 100).toFixed(0)}%</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[#88C0D0]">Size:</span>
-              <span>{(selectedAnomaly.size * 100).toFixed(0)}%</span>
+              <span style={{ color: "#78cce2" }}>Size:</span>
+              <span style={{ color: "#e4eff0" }}>{(selectedAnomaly.size * 100).toFixed(0)}%</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[#88C0D0]">Shape:</span>
-              <span className="capitalize">{selectedAnomaly.shape}</span>
+              <span style={{ color: "#78cce2" }}>Shape:</span>
+              <span 
+                className="capitalize" 
+                style={{ color: "#e4eff0" }}
+              >
+                {selectedAnomaly.shape}
+              </span>
             </div>
           </div>
 
-          <div className="bg-[#434C5E] p-3 rounded-lg">
-            <p className="text-sm text-[#D8DEE9]">
+          <div 
+            className="p-3 rounded-lg border backdrop-blur-sm"
+            style={{ 
+              backgroundColor: "rgba(0, 36, 57, 0.8)", 
+              borderColor: "rgba(120, 204, 226, 0.3)" 
+            }}
+          >
+            <p 
+              className="text-sm font-mono"
+              style={{ color: "#78cce2" }}
+            >
               {/* Optional info about classification can go here */}
             </p>
           </div>
@@ -133,13 +164,34 @@ export default function AnomalyDialog({
             <Button
               onClick={() => setShowClassifyDialog(false)}
               variant="outline"
-              className="flex-1 border-[#4C566A] text-[#D8DEE9] hover:bg-[#434C5E]"
+              className="flex-1 border font-mono text-sm"
+              style={{
+                borderColor: "rgba(120, 204, 226, 0.3)",
+                color: "#e4eff0",
+                backgroundColor: "transparent"
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.backgroundColor = "rgba(120, 204, 226, 0.2)"
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.backgroundColor = "transparent"
+              }}
             >
               Cancel
             </Button>
             <Button
               onClick={handleClassify}
-              className="flex-1 bg-[#A3BE8C] text-[#2E3440] hover:bg-[#8FBCBB]"
+              className="flex-1 font-mono text-sm"
+              style={{
+                backgroundColor: "#78cce2",
+                color: "#002439"
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.backgroundColor = "#e4eff0"
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.backgroundColor = "#78cce2"
+              }}
             >
               Classify
             </Button>

@@ -39,29 +39,45 @@ export function RightSidebar({
   })
 
   return (
-    <div className="hidden lg:flex lg:flex-col lg:w-80 bg-[#2E3440] border-l border-[#4C566A] overflow-hidden">
-      {/* Statistics */}
-      <div className="p-4 border-b border-[#4C566A] flex-shrink-0">
-        <h3 className="text-[#88C0D0] font-semibold text-sm uppercase tracking-wider mb-3">Observatory Statistics</h3>
+    <div 
+      className="hidden lg:flex lg:flex-col lg:w-80 overflow-hidden backdrop-blur-sm"
+      style={{ backgroundColor: "rgba(0, 80, 102, 0.95)", borderLeft: "1px solid rgba(120, 204, 226, 0.3)" }}
+    >
+      <div className="flex flex-col h-full overflow-y-auto">
+        {/* Statistics */}
+        <div 
+          className="p-4 border-b flex-shrink-0"
+          style={{ 
+            borderColor: "rgba(120, 204, 226, 0.3)", 
+            background: "linear-gradient(to right, #002439, #005066)" 
+          }}
+        >
+        <h3 style={{ color: "#e4eff0" }} className="font-bold text-sm tracking-wider mb-3">OBSERVATORY STATISTICS</h3>
         <div className="grid grid-cols-2 gap-3">
-          <Card className="bg-[#3B4252] border-[#4C566A]">
+          <Card 
+            className="border backdrop-blur-sm"
+            style={{ backgroundColor: "rgba(0, 36, 57, 0.8)", borderColor: "rgba(120, 204, 226, 0.3)" }}
+          >
             <CardContent className="p-3">
               <div className="flex items-center gap-2">
-                <Target className="h-4 w-4 text-[#88C0D0]" />
+                <Target className="h-4 w-4" style={{ color: "#78cce2" }} />
                 <div>
-                  <div className="text-[#ECEFF4] font-bold text-lg">{totalAnomalies}</div>
-                  <div className="text-[#D8DEE9] text-xs">Total Anomalies</div>
+                  <div style={{ color: "#e4eff0" }} className="font-bold text-lg">{totalAnomalies}</div>
+                  <div style={{ color: "#78cce2" }} className="text-xs font-mono">Total Anomalies</div>
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-[#3B4252] border-[#4C566A]">
+          <Card 
+            className="border backdrop-blur-sm"
+            style={{ backgroundColor: "rgba(0, 36, 57, 0.8)", borderColor: "rgba(120, 204, 226, 0.3)" }}
+          >
             <CardContent className="p-3">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-[#A3BE8C]" />
+                <CheckCircle className="h-4 w-4" style={{ color: "#78cce2" }} />
                 <div>
-                  <div className="text-[#ECEFF4] font-bold text-lg">{totalClassified}</div>
-                  <div className="text-[#D8DEE9] text-xs">Classified</div>
+                  <div style={{ color: "#e4eff0" }} className="font-bold text-lg">{totalClassified}</div>
+                  <div style={{ color: "#78cce2" }} className="text-xs font-mono">Classified</div>
                 </div>
               </div>
             </CardContent>
@@ -70,108 +86,145 @@ export function RightSidebar({
 
         <div className="mt-3">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-[#D8DEE9] text-xs">Classification Progress</span>
-            <span className="text-[#88C0D0] text-xs">{classificationRate.toFixed(1)}%</span>
+            <span style={{ color: "#78cce2" }} className="text-xs font-mono">Classification Progress</span>
+            <span style={{ color: "#e4eff0" }} className="text-xs font-mono">{classificationRate.toFixed(1)}%</span>
           </div>
-          <Progress value={classificationRate} className="h-2 bg-[#4C566A]" />
+          <Progress 
+            value={classificationRate} 
+            className="h-2" 
+            style={{ backgroundColor: "rgba(120, 204, 226, 0.3)" }}
+          />
         </div>
       </div>
 
       {/* Current Sector Details */}
-      <div className="p-4 border-b border-[#4C566A] flex-shrink-0">
-        <h3 className="text-[#88C0D0] font-semibold text-sm uppercase tracking-wider mb-3">Sector Analysis</h3>
-        <Card className="bg-[#3B4252] border-[#4C566A]">
+      <div 
+        className="p-4 border-b flex-shrink-0"
+        style={{
+          borderColor: "rgba(120, 204, 226, 0.3)",
+          background: "linear-gradient(to right, rgba(0, 80, 102, 0.5), transparent)",
+        }}
+      >
+        <h3 style={{ color: "#e4eff0" }} className="font-bold text-sm tracking-wider mb-3">SECTOR ANALYSIS</h3>
+        <Card 
+          className="border backdrop-blur-sm"
+          style={{ backgroundColor: "rgba(0, 36, 57, 0.8)", borderColor: "rgba(120, 204, 226, 0.3)" }}
+        >
           <CardContent className="p-3 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-[#D8DEE9]">Visible Targets:</span>
-              <span className="text-[#88C0D0]">{filteredAnomalies.length}</span>
+            <div className="flex justify-between text-sm font-mono">
+              <span style={{ color: "#78cce2" }}>Visible Targets:</span>
+              <span style={{ color: "#e4eff0" }}>{filteredAnomalies.length}</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-[#D8DEE9]">Classified:</span>
-              <span className="text-[#A3BE8C]">{filteredAnomalies.filter((a) => a.classified).length}</span>
+            <div className="flex justify-between text-sm font-mono">
+              <span style={{ color: "#78cce2" }}>Classified:</span>
+              <span style={{ color: "#78cce2" }}>{filteredAnomalies.filter((a) => a.classified).length}</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-[#D8DEE9]">Pending:</span>
-              <span className="text-[#EBCB8B]">{filteredAnomalies.filter((a) => !a.classified).length}</span>
+            <div className="flex justify-between text-sm font-mono">
+              <span style={{ color: "#78cce2" }}>Pending:</span>
+              <span style={{ color: "#4e7988" }}>{filteredAnomalies.filter((a) => !a.classified).length}</span>
             </div>
             {selectedProject && (
-              <div className="flex justify-between text-sm pt-2 border-t border-[#4C566A]">
-                <span className="text-[#D8DEE9]">Project Targets:</span>
-                <span className="text-[#88C0D0]">{getSectorAnomaliesForProject(selectedProject.id).length}</span>
+              <div className="flex justify-between text-sm font-mono pt-2" style={{ borderTop: "1px solid rgba(120, 204, 226, 0.3)" }}>
+                <span style={{ color: "#78cce2" }}>Project Targets:</span>
+                <span style={{ color: "#e4eff0" }}>{getSectorAnomaliesForProject(selectedProject.id).length}</span>
               </div>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Active Missions */}
-      <div className="p-4 border-b border-[#4C566A] flex-shrink-0">
-        <h3 className="text-[#88C0D0] font-semibold text-sm uppercase tracking-wider mb-3">Active Missions</h3>
+      {/* Active Missions - Hidden */}
+      {/* 
+      <div 
+        className="p-4 border-b flex-shrink-0"
+        style={{
+          borderColor: "rgba(120, 204, 226, 0.3)",
+          background: "linear-gradient(to right, rgba(0, 80, 102, 0.5), transparent)",
+        }}
+      >
+        <h3 style={{ color: "#e4eff0" }} className="font-bold text-sm tracking-wider mb-3">ACTIVE MISSIONS</h3>
         <div className="space-y-2">
           {availableMissions.slice(0, 3).map((mission) => (
-            <Card key={mission.id} className="bg-[#3B4252] border-[#4C566A]">
+            <Card 
+              key={mission.id} 
+              className="border backdrop-blur-sm"
+              style={{ backgroundColor: "rgba(0, 36, 57, 0.8)", borderColor: "rgba(120, 204, 226, 0.3)" }}
+            >
               <CardContent className="p-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <div className="text-[#ECEFF4] text-sm font-medium mb-1">{mission.name}</div>
-                    <div className="text-[#D8DEE9] text-xs mb-2">{mission.description}</div>
+                    <div style={{ color: "#e4eff0" }} className="text-sm font-mono font-medium mb-1">{mission.name}</div>
+                    <div style={{ color: "#78cce2" }} className="text-xs font-mono mb-2">{mission.description}</div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="border-[#88C0D0] text-[#88C0D0] text-xs">
+                      <Badge 
+                        variant="outline" 
+                        className="text-xs font-mono"
+                        style={{ borderColor: "#78cce2", color: "#78cce2" }}
+                      >
                         {mission.reward} XP
                       </Badge>
-                      <div className="flex items-center gap-1 text-xs text-[#D8DEE9]">
+                      <div className="flex items-center gap-1 text-xs font-mono" style={{ color: "#78cce2" }}>
                         <Clock className="h-3 w-3" />
                         {mission.timeLimit}
                       </div>
                     </div>
                   </div>
-                  <AlertCircle className="h-4 w-4 text-[#EBCB8B] flex-shrink-0" />
+                  <AlertCircle className="h-4 w-4 flex-shrink-0" style={{ color: "#4e7988" }} />
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
       </div>
+      */}
 
       {/* Recent Classifications */}
-      <div className="flex-1 overflow-hidden">
-        <div className="p-4 border-b border-[#4C566A]">
-          <h3 className="text-[#88C0D0] font-semibold text-sm uppercase tracking-wider mb-3">Recent Classifications</h3>
+      <div className="flex-1 overflow-hidden min-h-0">
+        <div 
+          className="p-4 border-b flex-shrink-0"
+          style={{ borderColor: "rgba(120, 204, 226, 0.3)" }}
+        >
+          <h3 style={{ color: "#e4eff0" }} className="font-bold text-sm tracking-wider mb-3">RECENT CLASSIFICATIONS</h3>
         </div>
-        <ScrollArea className="flex-1">
+        <ScrollArea className="h-full">
           <div className="p-4 space-y-2">
             {recentClassifications.map((classification) => (
               <Card
                 key={classification.id}
-                className="bg-[#3B4252] border-[#4C566A] cursor-pointer hover:bg-[#434C5E] transition-colors"
+                className="border backdrop-blur-sm cursor-pointer hover:opacity-80 transition-opacity"
+                style={{ backgroundColor: "rgba(0, 36, 57, 0.8)", borderColor: "rgba(120, 204, 226, 0.3)" }}
                 onClick={() => handleViewClassification(classification)}
               >
                 <CardContent className="p-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="text-[#ECEFF4] text-sm font-medium mb-1">{classification.anomalyName}</div>
-                      <div className="text-[#D8DEE9] text-xs mb-2">
+                      <div style={{ color: "#e4eff0" }} className="text-sm font-mono font-medium mb-1">{classification.anomalyName}</div>
+                      <div style={{ color: "#78cce2" }} className="text-xs font-mono mb-2">
                         Classified as {classification.classificationtype}
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="border-[#A3BE8C] text-[#A3BE8C] text-xs">
+                        <Badge 
+                          variant="outline" 
+                          className="text-xs font-mono"
+                          style={{ borderColor: "#78cce2", color: "#78cce2" }}
+                        >
                           {classification.classificationtype}
                         </Badge>
-                        <div className="text-[#D8DEE9] text-xs">
+                        <div style={{ color: "#78cce2" }} className="text-xs font-mono">
                           {new Date(classification.created_at).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
-                    <Eye className="h-4 w-4 text-[#88C0D0] flex-shrink-0" />
+                    <Eye className="h-4 w-4 flex-shrink-0" style={{ color: "#78cce2" }} />
                   </div>
                 </CardContent>
               </Card>
             ))}
             {recentClassifications.length === 0 && (
               <div className="text-center py-8">
-                <Star className="h-8 w-8 text-[#4C566A] mx-auto mb-2" />
-                <div className="text-[#D8DEE9] text-sm">No classifications yet</div>
-                <div className="text-[#88C0D0] text-xs mt-1">Start classifying anomalies to see them here</div>
+                <Star className="h-8 w-8 mx-auto mb-2" style={{ color: "#4e7988" }} />
+                <div style={{ color: "#78cce2" }} className="text-sm font-mono">No classifications yet</div>
+                <div style={{ color: "#e4eff0" }} className="text-xs font-mono mt-1">Start classifying anomalies to see them here</div>
               </div>
             )}
           </div>
@@ -179,30 +232,37 @@ export function RightSidebar({
       </div>
 
       {/* Performance Metrics */}
-      <div className="p-4 border-t border-[#4C566A] flex-shrink-0">
-        <Card className="bg-[#3B4252] border-[#4C566A]">
+      <div 
+        className="p-4 border-t flex-shrink-0"
+        style={{ borderColor: "rgba(120, 204, 226, 0.3)" }}
+      >
+        <Card 
+          className="border backdrop-blur-sm"
+          style={{ backgroundColor: "rgba(0, 36, 57, 0.8)", borderColor: "rgba(120, 204, 226, 0.3)" }}
+        >
           <CardHeader className="pb-2">
-            <CardTitle className="text-[#ECEFF4] text-sm flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Performance
+            <CardTitle style={{ color: "#e4eff0" }} className="text-sm font-mono flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" style={{ color: "#78cce2" }} />
+              PERFORMANCE
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex justify-between text-xs">
-              <span className="text-[#D8DEE9]">Accuracy Rate:</span>
-              <span className="text-[#A3BE8C]">94.2%</span>
+            <div className="flex justify-between text-xs font-mono">
+              <span style={{ color: "#78cce2" }}>Accuracy Rate:</span>
+              <span style={{ color: "#78cce2" }}>94.2%</span>
             </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-[#D8DEE9]">Classifications Today:</span>
-              <span className="text-[#88C0D0]">{classifications.length}</span>
+            <div className="flex justify-between text-xs font-mono">
+              <span style={{ color: "#78cce2" }}>Classifications Today:</span>
+              <span style={{ color: "#e4eff0" }}>{classifications.length}</span>
             </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-[#D8DEE9]">Streak:</span>
-              <span className="text-[#EBCB8B]">7 days</span>
+            <div className="flex justify-between text-xs font-mono">
+              <span style={{ color: "#78cce2" }}>Streak:</span>
+              <span style={{ color: "#4e7988" }}>7 days</span>
             </div>
           </CardContent>
         </Card>
       </div>
+      </div>
     </div>
   )
-};
+}

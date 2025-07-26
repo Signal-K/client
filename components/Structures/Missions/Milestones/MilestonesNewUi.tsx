@@ -119,6 +119,12 @@ export default function MilestoneCard() {
       for (const milestone of data) {
         const { table, field, value } = milestone;
 
+        // Skip if any required values are undefined
+        if (!table || !field || value === undefined) {
+          console.warn('Skipping milestone with undefined data in MilestoneCard:', milestone);
+          continue;
+        }
+
         let query = supabase
           .from(table)
           .select("*", { count: "exact" })
@@ -133,6 +139,8 @@ export default function MilestoneCard() {
         const { count, error } = await query;
         if (!error && count !== null) {
           progress[milestone.name] = count;
+        } else if (error) {
+          console.error('Error fetching milestone progress in MilestoneCard:', error);
         }
       }
 
@@ -360,6 +368,12 @@ export function NewMilestones() {
           value
         } = milestone.milestone_data;
 
+        // Skip if any required values are undefined
+        if (!table || !field || value === undefined) {
+          console.warn('Skipping milestone with undefined data:', milestone.milestone_data);
+          continue;
+        }
+
         const {
           count,
           error
@@ -373,6 +387,8 @@ export function NewMilestones() {
 
         if (!error && count !== null) {
           progressMap[milestone.milestone_data.name] = count;
+        } else if (error) {
+          console.error('Error fetching milestone progress:', error);
         }
       }
 

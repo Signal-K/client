@@ -14,6 +14,8 @@ export const isSkillUnlockable = (
   classifiedPlanets: number,
   discoveredAsteroids: number,
 ) => {
+  console.log(`Checking skill ${skill.id}: planets=${classifiedPlanets}, asteroids=${discoveredAsteroids}`)
+  
   if (skill.status === "unlocked") return false
   if (skill.status === "locked") return false // Should not happen if status is correctly derived, but as a safeguard
 
@@ -25,6 +27,8 @@ export const isSkillUnlockable = (
     } else if (prereq.type === "progress") {
       if (prereq.value === "4 planets classified" && classifiedPlanets < 4) return false
       if (prereq.value === "1 planet explored" && classifiedPlanets < 1) return false
+      if (prereq.value === "1 planet classified" && classifiedPlanets < 1) return false
+      if (prereq.value === "2 planets classified" && classifiedPlanets < 2) return false
       if (prereq.value === "2 asteroids discovered" && discoveredAsteroids < 2) return false
     }
   }

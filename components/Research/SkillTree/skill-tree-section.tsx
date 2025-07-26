@@ -48,7 +48,7 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
             { type: "skill", value: "planet-hunters" }, // Keep this for visual leveling
             { type: "progress", value: "4 planets classified" },
           ],
-          unlockCost: 100,
+          unlockCost: 5,
           icon: SkillIcons.AsteroidHunting,
           details: ["Improves asteroid detection range.", "Unlocks asteroid trajectory prediction."],
         },
@@ -60,9 +60,9 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
           status: "locked", // Will be updated by fetched data
           prerequisites: [
             { type: "skill", value: "planet-hunters" }, // Keep this for visual leveling
-            { type: "progress", value: "1 planet explored" },
+            { type: "progress", value: "1 planet classified" },
           ],
-          unlockCost: 150,
+          unlockCost: 5,
           icon: SkillIcons.PlanetExploration,
           details: ["Enables detailed planetary surface scans.", "Unlocks environmental data collection."],
         },
@@ -74,9 +74,9 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
           status: "locked", // Will be updated by fetched data
           prerequisites: [
             { type: "skill", value: "planet-exploration" },
-            { type: "progress", value: "1 planet explored" },
+            { type: "progress", value: "2 planets classified" },
           ],
-          unlockCost: 200,
+          unlockCost: 5,
           icon: SkillIcons.Cloudspotting,
           details: ["Improves atmospheric analysis capabilities.", "Unlocks weather prediction models for gas giants."],
         },
@@ -89,7 +89,7 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
             { type: "skill", value: "asteroid-hunting" },
             { type: "progress", value: "2 asteroids discovered" },
           ],
-          unlockCost: 250,
+          unlockCost: 5,
           icon: SkillIcons.ActiveAsteroids,
           details: ["Enhances detection of active asteroids.", "Provides insights into their unique compositions."],
         },
@@ -140,6 +140,20 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
 
       setUnlockedSkills(fetchedUnlockedSkillIds)
 
+      // Debug: Log user ID
+      console.log("Research Skill Tree - Current user ID:", currentUserId)
+
+      // Debug: Check what classifications exist for this user
+      const { data: userClassifications, error: debugError } = await supabase
+        .from("classifications")
+        .select("id, classificationtype, author")
+        .eq("author", currentUserId)
+        .limit(10)
+
+      if (!debugError && userClassifications) {
+        console.log("Research Skill Tree - User's classifications:", userClassifications)
+      }
+
       // Fetch classified planets
       const { count: planetCount, error: planetError } = await supabase
         .from("classifications")
@@ -151,6 +165,7 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
         throw planetError
       }
       setClassifiedPlanets(planetCount || 0)
+      console.log("Research Skill Tree - Classified planets:", planetCount || 0)
 
       // Fetch discovered asteroids (using 'telescope-minorPlanet' as per schema)
       const { count: asteroidCount, error: asteroidError } = await supabase
@@ -163,6 +178,7 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
         throw asteroidError
       }
       setDiscoveredAsteroids(asteroidCount || 0)
+      console.log("Research Skill Tree - Discovered asteroids:", asteroidCount || 0)
     } catch (error) {
       console.error("Error fetching skill tree data:", error)
       // Optionally show an error message to the user

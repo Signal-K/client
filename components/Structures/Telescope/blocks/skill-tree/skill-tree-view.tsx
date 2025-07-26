@@ -32,7 +32,7 @@ const SKILLS: Skill[] = [
     id: "planetary-analysis",
     name: "Planetary Analysis",
     description: "Advanced analysis techniques for planetary characteristics",
-    cost: 25,
+    cost: 5,
     position: { x: 100, y: 200 },
     prerequisites: ["planet-hunting"],
     requirementType: "classification",
@@ -45,7 +45,7 @@ const SKILLS: Skill[] = [
     id: "planet-exploration",
     name: "Planet Exploration",
     description: "Deep exploration of planetary systems and environments",
-    cost: 50,
+    cost: 5,
     position: { x: 200, y: 250 },
     prerequisites: ["planet-hunting"],
     requirementType: "classification",
@@ -58,7 +58,7 @@ const SKILLS: Skill[] = [
     id: "planet-visualization",
     name: "Planet Visualization",
     description: "Advanced visualization tools for planetary data",
-    cost: 75,
+    cost: 5,
     position: { x: 300, y: 200 },
     prerequisites: ["planet-hunting"],
     requirementType: "classification",
@@ -71,7 +71,7 @@ const SKILLS: Skill[] = [
     id: "asteroid-hunting",
     name: "Asteroid Hunting",
     description: "Detection and tracking of minor planetary bodies",
-    cost: 100,
+    cost: 5,
     position: { x: 450, y: 100 },
     prerequisites: ["planet-hunting"],
     requirementType: "classification",
@@ -84,7 +84,7 @@ const SKILLS: Skill[] = [
     id: "active-asteroids",
     name: "Active Asteroids",
     description: "Advanced tracking of active and potentially hazardous asteroids",
-    cost: 125,
+    cost: 5,
     position: { x: 450, y: 200 },
     prerequisites: ["asteroid-hunting"],
     requirementType: "classification",
@@ -97,7 +97,7 @@ const SKILLS: Skill[] = [
     id: "stellar-analysis",
     name: "Stellar Analysis",
     description: "Advanced stellar classification and analysis techniques",
-    cost: 200,
+    cost: 5,
     position: { x: 100, y: 350 },
     prerequisites: ["planetary-analysis"],
     requirementType: "locked",
@@ -110,7 +110,7 @@ const SKILLS: Skill[] = [
     id: "deep-space-survey",
     name: "Deep Space Survey",
     description: "Large-scale astronomical surveys and data mining",
-    cost: 300,
+    cost: 5,
     position: { x: 300, y: 350 },
     prerequisites: ["planet-exploration", "planet-visualization"],
     requirementType: "locked",
@@ -141,11 +141,17 @@ export function SkillTreeView({ onBack }: SkillTreeViewProps) {
   const fetchUserProgress = async () => {
     setLoading(true)
     try {
+      // Debug: Log user ID
+      console.log("Skill Tree View - Current user ID:", userId)
+
       // Fetch user classifications
       const { data: classifications } = await supabase
         .from("classifications")
         .select("classificationtype")
         .eq("author", userId)
+
+      // Debug: Log all classifications found
+      console.log("Skill Tree View - User's classifications:", classifications)
 
       // Count classifications by type
       const classificationCounts: Record<string, number> = {}
@@ -154,10 +160,22 @@ export function SkillTreeView({ onBack }: SkillTreeViewProps) {
         classificationCounts[type] = (classificationCounts[type] || 0) + 1
       })
 
-      // Fetch unlocked skills (you might want to store this in a separate table)
-      const { data: unlockedSkills } = await supabase.from("user_skills").select("skill_id").eq("user_id", userId)
+      console.log("Skill Tree View - Classification counts:", classificationCounts)
 
-      const unlockedSkillIds = unlockedSkills?.map((s) => s.skill_id) || ["planet-hunting"]
+      // Fetch unlocked skills from researched table
+      const { data: researchedData, error: researchedError } = await supabase
+        .from("researched")
+        .select("tech_type")
+        .eq("user_id", userId)
+
+      if (researchedError) throw researchedError
+
+      const unlockedSkillIds = researchedData
+        ?.map((row) => {
+          const foundSkill = SKILLS.find((s) => s.id === row.tech_type || s.name === row.tech_type)
+          return foundSkill ? foundSkill.id : null
+        })
+        .filter(Boolean) as string[] || ["planet-hunting"]
 
       setUserProgress({
         unlockedSkills: unlockedSkillIds,
@@ -214,11 +232,10 @@ export function SkillTreeView({ onBack }: SkillTreeViewProps) {
     }
 
     try {
-      // Add skill to user_skills table
-      await supabase.from("user_skills").insert({
+      // Add skill to researched table
+      await supabase.from("researched").insert({
+        tech_type: skill.id,
         user_id: userId,
-        skill_id: skill.id,
-        unlocked_at: new Date().toISOString(),
       })
 
       // Deduct stardust cost (you might want to implement this in your points system)
