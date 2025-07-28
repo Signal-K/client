@@ -7,7 +7,7 @@ import Navbar from "@/components/Layout/Navbar";
 import Link from "next/link";
 import ProfileSetupForm from "@/components/Account/ProfileSetup";
 
-export interface MissionConfig {
+interface MissionConfig {
   id: number;
   title: string;
   description: string;

@@ -2,8 +2,6 @@
 
 import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
 // import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
-import WeatherEventsOverview from "@/components/Data/Generator/Weather/EventsAcrossMyLocations";
-import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
 import MilestoneTotalCompleted from "@/components/Structures/Missions/Milestones/Completed";
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
 import { NewMilestones } from "@/components/Structures/Missions/Milestones/MilestonesNewUi";

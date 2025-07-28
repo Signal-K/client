@@ -13,9 +13,7 @@ export const isSkillUnlockable = (
   unlockedSkills: string[],
   classifiedPlanets: number,
   discoveredAsteroids: number,
-) => {
-  console.log(`Checking skill ${skill.id}: planets=${classifiedPlanets}, asteroids=${discoveredAsteroids}`)
-  
+) => {  
   if (skill.status === "unlocked") return false
   if (skill.status === "locked") return false // Should not happen if status is correctly derived, but as a safeguard
 

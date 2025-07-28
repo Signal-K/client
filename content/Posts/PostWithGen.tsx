@@ -11,8 +11,8 @@ import { CommentCard } from "../Comments/CommentSingle";
 
 import CloudSignal from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudSignal";
 // import { PlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
-import AsteroidViewer from "@/components/Data/Generator/Astronomers/DailyMinorPlanet/asteroid-viewer";
-import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
+// import AsteroidViewer from "@/components/Data/Generator/Astronomers/DailyMinorPlanet/asteroid-viewer";
+// import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
 // import { PlanetScene } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/planet-scene";
 // import { FullPlanetGenerator } from "@/components/Data/Generator/Astronomers/PlanetHunters/V2/full-planet-generator";
 import SimplePlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/SimplePlanetGenerator";
@@ -143,10 +143,10 @@ export function PostCardSingleWithGenerator({
           //   author={author}
           //   />
         );
-      case "telescope-minorPlanet":
-        return <AsteroidViewer classificationId={String(classificationId)} classificationConfig={classificationConfig} />;
-      case "lidar-jovianVortexHunter":
-        return <CloudClassifier classificationId={String(classificationId)} classificationConfig={classificationConfig} />;
+      // case "telescope-minorPlanet":
+      //   return <AsteroidViewer classificationId={String(classificationId)} classificationConfig={classificationConfig} />;
+      // case "lidar-jovianVortexHunter":
+      //   return <CloudClassifier classificationId={String(classificationId)} classificationConfig={classificationConfig} />;
       default:
         return (
           <div>
@@ -368,16 +368,16 @@ export function PostCardSingleWithGeneratorEditMode({
               )}
             </>
           );
-      case "telescope-minorPlanet":
-        return <AsteroidViewer 
-          classificationId={String(classificationId)} 
-          classificationConfig={classificationConfig}
-        />;
-      case "lidar-jovianVortexHunter":
-        return <CloudClassifier
-          classificationId={String(classificationId)} 
-          classificationConfig={classificationConfig}
-        />;
+      // case "telescope-minorPlanet":
+      //   return <AsteroidViewer 
+      //     classificationId={String(classificationId)} 
+      //     classificationConfig={classificationConfig}
+      //   />;
+      // case "lidar-jovianVortexHunter":
+      //   return <CloudClassifier
+      //     classificationId={String(classificationId)} 
+      //     classificationConfig={classificationConfig}
+      //   />;
       default:
         return (
           <div>

@@ -4,7 +4,7 @@ interface Recipe {
     [key: string]: number;
 };
 
-export interface MineralDeposit {
+interface MineralDeposit {
   id: number;
   anomaly: number | null;
   owner: string | null;
@@ -16,7 +16,7 @@ export interface MineralDeposit {
 
 type SpeedLevel = 1 | 2 | 3;
 
-export interface UserStructure {
+interface UserStructure {
     id: number;
     item: number; // Assuming this should be a number
     name: string;
@@ -76,7 +76,7 @@ export interface InventoryStructureItem {
     locationType: string | null;
 };
 
-export interface TerrariumInventoryStructureItem {
+interface TerrariumInventoryStructureItem {
     configuration: {};
     itemDetail: any;
     id: number;
@@ -117,7 +117,7 @@ interface TerrariumStructureItemDetail {
     recipe?: Record<string, number>;
 };
 
-export interface OwnedItem {
+interface OwnedItem {
     id: string;
     item: string;
     quantity: number;
@@ -125,7 +125,7 @@ export interface OwnedItem {
     anomaly: number;
 };
 
-export interface UserItem {
+interface UserItem {
     id: number;
     item: number;
     owner: string;

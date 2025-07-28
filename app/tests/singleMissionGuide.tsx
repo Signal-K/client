@@ -7,7 +7,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import JournalPage from "@/components/Structures/Missions/Stardust/Journal";
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
 
-export interface Mission {
+interface Mission {
   id: number;
   name: string;
   description: string;

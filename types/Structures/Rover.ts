@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export interface BaseAnomaly {
+interface BaseAnomaly {
     id: string;
     name: string;
     type: "rock_formation" | "dust_storm" | "mineral_deposit" | "geological_feature" | "atmospheric_event";
@@ -9,7 +9,7 @@ export interface BaseAnomaly {
     discoveryDate?: string;
 };
 
-export interface SurfaceAnomaly extends BaseAnomaly {
+interface SurfaceAnomaly extends BaseAnomaly {
     x: number;
     y: number;
     intensity: number;
@@ -23,7 +23,7 @@ export interface SurfaceAnomaly extends BaseAnomaly {
     rover: string;
 };
 
-export interface RoverProject {
+interface RoverProject {
   id: string;
   name: string;
   description: string;
@@ -46,7 +46,7 @@ export interface RoverMission {
   icon: ReactNode;
 };
 
-export interface Rover {
+interface Rover {
   id: string;
   name: string;
   planet: string;
@@ -62,7 +62,7 @@ export interface Rover {
   distanceTraveled: string;
 };
 
-export interface Planet {
+interface Planet {
   id: string;
   name: string;
   surfaceColor: string;
@@ -73,7 +73,7 @@ export interface Planet {
   description: string;
 };
 
-export interface SurfaceLayer {
+interface SurfaceLayer {
   x: number;
   y: number;
   size: number;
@@ -83,6 +83,6 @@ export interface SurfaceLayer {
   type: "dust" | "rock" | "sand" | "crater";
 };
 
-export type ViewMode = "rovers" | "surface" | "discoveries";
+type ViewMode = "rovers" | "surface" | "discoveries";
 
-export type DiscoveryPanelPosition = "top" | "bottom" | "hidden";
+type DiscoveryPanelPosition = "top" | "bottom" | "hidden";

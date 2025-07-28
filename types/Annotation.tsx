@@ -342,7 +342,7 @@ export interface Line {
   width: number;
 };
 
-export interface DrawingState {
+interface DrawingState {
   isDrawing: boolean;
   currentLine: Line;
   currentShape: Shape | null;

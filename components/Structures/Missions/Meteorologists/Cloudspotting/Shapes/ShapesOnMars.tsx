@@ -3,7 +3,7 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../../BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 // import { CloudspottingShapesWrapper } from "@/components/Projects/Lidar/CloudspottingOnMarsShapes";
-import { Mission } from "../CloudspottingOnMars";
+import { Mission } from "../../../Astronomers/SatellitePhotos/AI4M/AIForMars";
 import { StarterCoMShapes } from "@/components/Projects/Lidar/CloudspottingOnMarsShapes";
 
 interface MissionPoints {

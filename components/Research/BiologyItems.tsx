@@ -6,7 +6,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { TechSection } from "./TechSection";
 import { UpgradeItem } from "./UpgradeItem";
 import TotalPoints from "../Structures/Missions/Stardust/Total";
-import { GreenhouseResearchStations } from "../Structures/Missions/Biologists/ResearchStations";
+// import { GreenhouseResearchStations } from "../Structures/Missions/Biologists/ResearchStations";
 
 type CapacityKey = "cameraCount" | "sensorCount" | "stationSize";
 type UserCapacities =  Record<CapacityKey, number>;

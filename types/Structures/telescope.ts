@@ -57,4 +57,4 @@ export interface Star {
 
 export type ViewMode = "viewport" | "discoveries"
 
-export type DiscoveryPanelPosition = "top" | "bottom" | "hidden"
+type DiscoveryPanelPosition = "top" | "bottom" | "hidden"

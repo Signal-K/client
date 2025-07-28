@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { GreenhouseResearchStations } from "./Missions/Biologists/ResearchStations";
+// import { GreenhouseResearchStations } from "./Missions/Biologists/ResearchStations";
 import MilestoneCard from "./Missions/Milestones/MilestoneCard";
 import MySettlementsLocations from "@/content/Classifications/UserLocations";
 import { ClassificationsLastWeek } from "./Missions/Milestones/ClassificationNumber";
@@ -273,9 +273,9 @@ const IndividualStructure: React.FC<IndividualStructureProps> = ({
           </DialogContent>
         )}
 
-        {structureId === 3104 && (
+        {/* {structureId === 3104 && (
           <GreenhouseResearchStations />
-        )}
+        )} */}
       </div>
     </Dialog>
   );

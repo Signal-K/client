@@ -9,7 +9,7 @@ import { CloudspottingOnMarsTutorial } from "@/components/Projects/Lidar/cloudsp
 import { StarterCoMShapes } from "@/components/Projects/Lidar/CloudspottingOnMarsShapes";
 // import { CloudspottingShapesWrapper } from "@/components/Projects/Lidar/CloudspottingOnMarsShapes";
 
-export interface Mission {
+interface Mission {
     id: number;
     chapter: number;
     title: string;

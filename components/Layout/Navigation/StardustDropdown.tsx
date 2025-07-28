@@ -97,5 +97,3 @@ export function StardustDropdown() {
     </Popover>
   );
 };
-
-export default StardustDropdown;

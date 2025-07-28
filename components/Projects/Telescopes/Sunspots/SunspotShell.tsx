@@ -6,7 +6,7 @@ import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Sun, Vote } from "luc
 import { Mission } from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AIForMars";
 import { StarterSunspot } from "../Sunspots";
 
-export interface MissionStep {
+interface MissionStep {
   id: number;
   title: string;
   description: string;

@@ -5,7 +5,7 @@ import { LidarJVHSatelliteWithId } from "@/components/Projects/Lidar/JovianVorte
 import { CloudCogIcon, CloudHail, HelpCircle, ShovelIcon } from "lucide-react";
 import { StarterJovianVortexHunter } from "@/components/Projects/Lidar/JovianVortexHunter";
 import VoteJVH from "./JVHVote";
-import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
+// import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
 import JVHCloudClassificationGenerator from "./GaseousPlanetCloudMaker";
 import ClassificationOptionsCounter from "@/content/Posts/ClassificationOptionsCounter";
 // import { PreferredGaseousClassifications } from "../../PickPlanet";

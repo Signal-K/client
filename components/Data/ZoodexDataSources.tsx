@@ -10,9 +10,9 @@ import { StarterSunspot } from '../Projects/Telescopes/Sunspots';
 import { TelescopeDiskDetector } from '../Projects/Telescopes/DiskDetector';
 // import CameraComponent from '../Projects/Zoodex/Upload/Camera';
 // import { DataSourcesModal } from './unlockNewDataSources';
-import { BurrowingOwl } from '../Projects/Zoodex/burrowingOwls';
-import { PenguinWatch } from '../Projects/Zoodex/penguinWatch';
-import { ZoodexIguanas } from '../Projects/Zoodex/iguanasFromAbove';
+// import { BurrowingOwl } from '../Projects/Zoodex/burrowingOwls';
+// import { PenguinWatch } from '../Projects/Zoodex/penguinWatch';
+// import { ZoodexIguanas } from '../Projects/Zoodex/iguanasFromAbove';
 
 export const zoodexDataSources = [ 
     {
