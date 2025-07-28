@@ -24,11 +24,57 @@ export function StarterTelescopeTess() {
 
   const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null)
   const [imageUrls, setImageUrls] = useState<string[]>([])
+  const [availableSectors, setAvailableSectors] = useState<number[]>([])
+  const [currentSector, setCurrentSector] = useState<number>(1)
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
+
+  const fetchAvailableSectors = async (anomalyId: number) => {
+    try {
+      const { data: files, error } = await supabase.storage
+        .from('anomalies')
+        .list(`${anomalyId}`, {
+          limit: 100,
+          offset: 0,
+        })
+
+      if (error) {
+        console.error("Error fetching sectors:", error)
+        return [1] // Default to sector 1 if there's an error
+      }
+
+      if (!files || files.length === 0) {
+        return [1] // Default to sector 1 if no files found
+      }
+
+      // Extract sector numbers from filenames like "Sector1.png", "Sector2.png", etc.
+      const sectors = files
+        .filter(file => file.name.match(/^Sector\d+\.png$/))
+        .map(file => {
+          const match = file.name.match(/^Sector(\d+)\.png$/)
+          return match ? parseInt(match[1], 10) : null
+        })
+        .filter((sector): sector is number => sector !== null)
+        .sort((a, b) => a - b)
+
+      return sectors.length > 0 ? sectors : [1]
+    } catch (err) {
+      console.error("Error in fetchAvailableSectors:", err)
+      return [1]
+    }
+  }
+
+  const handleSectorChange = (sector: number) => {
+    if (selectedAnomaly) {
+      setCurrentSector(sector)
+      const newImageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${selectedAnomaly.id}/Sector${sector}.png`
+      setCurrentImageUrl(newImageUrl)
+    }
+  }
 
   useEffect(() => {
     const fetchRandomLinkedAnomaly = async () => {
@@ -66,11 +112,26 @@ export function StarterTelescopeTess() {
 
         setSelectedAnomaly(anomaly)
 
+        // Fetch available sectors for this anomaly
+        const sectors = await fetchAvailableSectors(anomaly.id)
+        setAvailableSectors(sectors)
+        setCurrentSector(sectors[0] || 1)
+
         const urls: string[] = []
         if (anomaly.avatar_url) urls.push(anomaly.avatar_url)
-        urls.push(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector1.png`)
+        
+        // Set up image URLs for all sectors
+        const sectorUrls = sectors.map(sector => 
+          `${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector${sector}.png`
+        )
+        urls.push(...sectorUrls)
 
         setImageUrls(urls)
+        
+        // Set the initial current image URL to the first sector
+        const initialImageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector${sectors[0] || 1}.png`
+        setCurrentImageUrl(initialImageUrl)
+
       } catch (err: any) {
         console.error("Error fetching linked anomaly:", err.message || err)
         setError("Unable to load anomaly.")
@@ -84,48 +145,89 @@ export function StarterTelescopeTess() {
 
   if (error) return <div className="text-red-500 p-4">{error}</div>
   if (loading) return <div className="text-white p-4">Loading...</div>
-  if (!selectedAnomaly || imageUrls.length === 0)
+  if (!selectedAnomaly || !currentImageUrl)
     return <div className="text-white p-4">No anomaly found.</div>
 
   return (
-    <div className="w-full h-screen overflow-hidden flex flex-col gap-2 px-4">
+    <div className="w-full h-[calc(100vh-8rem)] overflow-hidden flex flex-col gap-2 px-4">
       {/* Button Bar */}
-      <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-1 flex justify-end">
+      <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-1 flex justify-between items-center flex-shrink-0">
+        {/* Sector Navigation Buttons */}
+        {/* {availableSectors.length > 1 && (
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-white/70 px-2">Sectors:</span>
+            <div className="flex flex-col gap-1">
+              {availableSectors.map((sector) => (
+                <Button
+                  key={sector}
+                  variant={currentSector === sector ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleSectorChange(sector)}
+                  className={`w-8 h-8 p-0 text-xs ${
+                    currentSector === sector 
+                      ? "bg-blue-600 text-white border-blue-600" 
+                      : "bg-white/20 text-white border-white/30 hover:bg-white/30"
+                  }`}
+                >
+                  {sector}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )} */}
+        
         <Button variant="outline" onClick={() => setShowTutorial(true)}>
           Want a walkthrough? Start the tutorial
         </Button>
       </div>
 
       {/* Tutorial OR Annotator */}
-      <div className="flex-1 w-full rounded-xl bg-white/10 backdrop-blur-md shadow-md p-2 overflow-hidden">
-        {showTutorial ? (
-          <div className="w-full h-full overflow-auto">
-            <FirstTelescopeClassification anomalyid="6" />
-          </div>
-        ) : (
-          <div className="w-full h-full overflow-hidden grid grid-rows-[auto_1fr] sm:grid-rows-none sm:grid-cols-1">
-            <ImageAnnotator
-              anomalyType="planet"
-              missionNumber={1372001}
-              structureItemId={3103}
-              assetMentioned={selectedAnomaly.id.toString()}
-              annotationType="PH"
-              initialImageUrl={imageUrls[1]}
-              anomalyId={selectedAnomaly.id.toString()}
-              className="h-full max-h-[calc(100vh-10rem)] sm:max-h-full"
-            />
+      <div className="flex-1 w-full rounded-xl bg-white/10 backdrop-blur-md shadow-md p-2 overflow-hidden flex min-h-0">
+        {/* Sector buttons on the left (for larger screens) */}
+        {availableSectors.length > 1 && !showTutorial && (
+          <div className="hidden sm:flex flex-col gap-2 mr-2 pt-4 flex-shrink-0">
+            <span className="text-xs text-white/70 text-center mb-1">Sectors</span>
+            {availableSectors.map((sector) => (
+              <Button
+                key={sector}
+                variant={currentSector === sector ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleSectorChange(sector)}
+                className={`w-10 h-10 p-0 text-sm ${
+                  currentSector === sector 
+                    ? "bg-blue-600 text-white border-blue-600" 
+                    : "bg-white/20 text-white border-white/30 hover:bg-white/30"
+                }`}
+              >
+                {sector}
+              </Button>
+            ))}
           </div>
         )}
+        
+        {/* Main content area */}
+        <div className="flex-1 overflow-hidden min-h-0">
+          {showTutorial ? (
+            <div className="w-full h-full overflow-auto">
+              <FirstTelescopeClassification anomalyid="6" />
+            </div>
+          ) : (
+            <div className="w-full h-full overflow-hidden">
+              <ImageAnnotator
+                key={`${selectedAnomaly.id}-sector-${currentSector}`}
+                anomalyType="planet"
+                missionNumber={1372001}
+                structureItemId={3103}
+                assetMentioned={selectedAnomaly.id.toString()}
+                annotationType="PH"
+                initialImageUrl={currentImageUrl}
+                anomalyId={selectedAnomaly.id.toString()}
+                className="h-full w-full"
+              />
+            </div>
+          )}
+        </div>
       </div>
-
-      <style jsx global>{`
-        @media (max-width: 640px) {
-          html, body {
-            overflow: hidden;
-            height: 100vh;
-          }
-        }
-      `}</style>
     </div>
   )
 };

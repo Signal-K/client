@@ -2,17 +2,12 @@
 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
-import { Bell, Telescope, Sun, Moon, User } from "lucide-react";
 import { subDays } from "date-fns";
 import Link from "next/link";
+import { Telescope } from "lucide-react";
 
-import ActivityHeader from "@/components/(scenes)/deploy/ActivityHeader";
 import LandingSS from "./auth/landing";
 import NPSPopup from "@/src/shared/helpers/nps-popup";
-import RecentActivity from "@/components/Data/RecentActivity";
-import RecentDiscoveries from "@/components/Data/RecentDiscoveries";
-import TipsPanel from "@/components/Structures/Missions/Milestones/NextStepsTips";
-import CompleteProfileForm from "@/components/Account/FinishProfile";
 import { TelescopeBackground } from "@/components/Structures/Telescope/telescope-background";
 import {
   Dialog,
@@ -21,17 +16,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import WeeklyBanner from "@/components/ui/update-banner";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Switch } from "@/components/ui/switch";
+import RecentDiscoveries from "@/components/Data/RecentDiscoveries";
+import TipsPanel from "@/components/Structures/Missions/Milestones/NextStepsTips";
+import CompleteProfileForm from "@/components/Account/FinishProfile";
 import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestonesNewUi";
 import { SkillTreeSection } from "@/components/Research/SkillTree/skill-tree-section";
+
+// Import the new modular components
+import MainHeader from "@/components/Layout/Header/MainHeader";
+import ActivityHeaderSection from "@/components/Data/ActivityHeaderSection";
+import NextStepsSection from "@/components/Dashboard/NextStepsSection";
+import TipsGuidanceSection from "@/components/Dashboard/TipsGuidanceSection";
+import ResearchProgressSection from "@/components/Research/ResearchProgressSection";
+import StructuresEquipmentSection from "@/components/Structures/StructuresEquipmentSection";
+import MilestonesSection from "@/components/Missions/MilestonesSection";
+import ProfileSetupSection from "@/components/Account/ProfileSetupSection";
 
 export interface LinkedAnomaly {
   id: number;
@@ -109,6 +108,11 @@ export default function ActivityPage() {
     rovers: false,
     balloons: false
   });
+
+  // Additional state for the new components
+  const [weeklyMissions, setWeeklyMissions] = useState<any[]>([]);
+  const [userMissionsLoading, setUserMissionsLoading] = useState(false);
+  const [profileCreated, setProfileCreated] = useState(false);
 
   const handleThemeToggle = () => {
     setIsDark(!isDark);
@@ -405,210 +409,64 @@ export default function ActivityPage() {
         />
       </div>
 
-      {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-sm border-b border-border">
-        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between px-4 lg:px-6 py-3 gap-4 sm:gap-0">
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <h1 className="text-xl font-bold text-primary">Star Sailors</h1>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Sun className="w-4 h-4 text-chart-2" />
-              <Switch checked={isDark} onCheckedChange={handleThemeToggle} />
-              <Moon className="w-4 h-4 text-chart-4" />
-            </div>
-            <button
-              aria-label="Toggle notifications"
-              onClick={() => setNotificationsOpen((open) => !open)}
-              className="relative p-2 rounded-full hover:bg-muted transition"
-            >
-              <Bell className="w-6 h-6 text-chart-5" />
-              {activityFeed.length > 0 && (
-                <>
-                  <span className="absolute top-1 right-1 block w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                  <span className="absolute top-1 right-1 block w-2 h-2 rounded-full bg-red-600" />
-                </>
-              )}
-            </button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="relative h-8 w-8 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-chart-3" />
-                  <span className="sr-only">Open user menu</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  {/* <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">Teddy Martin</p>
-                    <p className="text-xs leading-none text-muted-foreground">ted@tmartin.com</p>
-                  </div> */}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Log out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        {/* Notification Panel */}
-        {notificationsOpen && (
-          <div className="fixed top-[60px] right-4 sm:right-6 w-full sm:w-[420px] max-h-[80vh] overflow-y-auto rounded-xl bg-card/95 backdrop-blur-sm border border-border shadow-xl z-40">
-            <RecentActivity
-              activityFeed={activityFeed}
-              otherClassifications={otherClassifications}
-              isInsidePanel={true}
-            />
-          </div>
-        )}
-      </div>
+      {/* Main Header */}
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={handleThemeToggle}
+        notificationsOpen={notificationsOpen}
+        onToggleNotifications={() => setNotificationsOpen((open) => !open)}
+        activityFeed={activityFeed}
+        otherClassifications={otherClassifications}
+      />
 
       <div className="w-full max-w-screen-xl px-4 py-6 space-y-8 pt-24 relative z-10">
         {/* Activity Header - User profile and deployment status */}
-        <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Your Progress</p>
-              <p className="text-lg font-semibold text-primary">
-                {classifications.length} discoveries made
-              </p>
-            </div>
-          </div>
-          <ActivityHeader
-            scrolled={true}
-            landmarksExpanded={landmarksExpanded}
-            onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
-          />
-        </div>
+        <ActivityHeaderSection
+          classificationsCount={classifications.length}
+          landmarksExpanded={landmarksExpanded}
+          onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
+        />
 
         {/* Next Steps Guide - PRIORITY #1 for new users */}
-        <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-            <h3 className="text-xl font-semibold text-primary">Your Next Steps</h3>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Classification Progress */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🔬</span>
-                <div>
-                  <h4 className="font-semibold text-foreground">Make More Discoveries</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Classify more planets and asteroids to unlock advanced research
-                  </p>
-                </div>
-              </div>
-              
-              {incompletePlanet && (
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
-                  <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                    🌍 Complete your planet analysis!
-                  </p>
-                  <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
-                    You have an unfinished planet classification. Add radius measurements to complete it.
-                  </p>
-                </div>
-              )}
-            </div>
+        <NextStepsSection
+          incompletePlanet={incompletePlanet}
+        />
 
-            {/* Structure Deployment */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🚀</span>
-                <div>
-                  <h4 className="font-semibold text-foreground">Deploy Structures</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Build telescopes and satellites to enhance your research capabilities
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Tips & Guidance */}
+        <TipsGuidanceSection 
+          showTipsPanel={showTipsPanel}
+          onToggleTipsPanel={() => setShowTipsPanel(!showTipsPanel)}
+        />
 
-                <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
-          <h3 className="text-xl font-semibold text-primary mb-4">Your Recent Discoveries</h3>
-          <RecentDiscoveries
-            classifications={classifications}
-            linkedAnomalies={linkedAnomalies}
-            incompletePlanet={incompletePlanet}
-          />
-        </div>
+        {/* Research Progress */}
+        <ResearchProgressSection />
 
-        {/* Tips & Guidance - PRIORITY #2 for concept explanation */}
-        <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold text-primary">💡 Tips & Next Actions</h3>
-            <button
-              onClick={() => setShowTipsPanel(!showTipsPanel)}
-              className="text-sm font-medium px-3 py-1 rounded-lg bg-muted text-muted-foreground hover:bg-muted/80 transition"
-            >
-              {showTipsPanel ? 'Hide Tips' : 'Show Tips'}
-            </button>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-4 mb-4">
-            <div className="text-center p-4 bg-card/50 rounded-lg">
-              <div className="text-2xl mb-2">📊</div>
-              <h4 className="font-semibold text-sm mb-1">Track Progress</h4>
-              <p className="text-xs text-muted-foreground">
-                Monitor your discoveries and research advancement in real-time
-              </p>
-            </div>
-            <div className="text-center p-4 bg-card/50 rounded-lg">
-              <div className="text-2xl mb-2">🏆</div>
-              <h4 className="font-semibold text-sm mb-1">Complete Milestones</h4>
-              <p className="text-xs text-muted-foreground">
-                Achieve goals to unlock new features and capabilities
-              </p>
-            </div>
-            <div className="text-center p-4 bg-card/50 rounded-lg">
-              <div className="text-2xl mb-2">🌌</div>
-              <h4 className="font-semibold text-sm mb-1">Explore Deeper</h4>
-              <p className="text-xs text-muted-foreground">
-                Visit the full experience for advanced projects and features
-              </p>
-            </div>
-          </div>
+        {/* Milestones */}
+        <MilestonesSection 
+          weeklyMissions={weeklyMissions}
+          userMissionsLoading={userMissionsLoading}
+        />
 
-          {showTipsPanel && (
-            <div className="border-t border-border pt-4">
-              <TipsPanel />
-            </div>
-          )}
-        </div>
+        {/* Structures & Equipment */}
+        <StructuresEquipmentSection
+          planetTargets={planetTargets}
+          activeSatelliteMessage={activeSatelliteMessage}
+          visibleStructures={visibleStructures}
+          onSendSatellite={handleSendSatellite}
+          onCheckActiveSatellite={checkActiveSatellite}
+        />
 
-        {/* Research Progress - PRIORITY #3 for understanding core mechanics */}
-        <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-xl font-semibold text-primary">Research & Development</h3>
-              <p className="text-sm text-muted-foreground">
-                Unlock new capabilities by advancing through the skill tree
-              </p>
-            </div>
-            <Link 
-              href="/research/tree"
-              className="text-sm font-medium px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition"
-            >
-              View Full Tree
-            </Link>
-          </div>
-          
-          <div className="mb-4 p-4 bg-card/50 rounded-lg border">
-            <p className="text-sm text-muted-foreground">
-              <strong>How it works:</strong> Make classifications to unlock research skills. 
-              Each skill provides new tools and capabilities for your space exploration journey.
-            </p>
-          </div>
-          
-          <SkillTreeSection isFullTree={false} />
-        </div>
+        {/* Profile Setup */}
+        <ProfileSetupSection
+          session={session}
+          profile={profile ? {
+            id: profile.id,
+            username: profile.username ?? undefined,
+            full_name: profile.full_name ?? undefined,
+          } : null}
+          profileCreated={profileCreated}
+          hasMadeClassifications={classifications.length > 0}
+        />
 
         {/* Milestones - PRIORITY #4 for goal setting */}
         <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
