@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useParams } from "next/navigation";
 import { BarChartBigIcon, GlassWater, Guitar, HelpCircle, PenBoxIcon, RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
 import MissionShell from "../../BasePlate";
 import { DailyMinorPlanetWithId, StarterDailyMinorPlanet } from "@/src/components/research/projects/Telescopes/DailyMinorPlanet";
@@ -22,6 +23,15 @@ interface Mission {
 const DailyMinorPlanetMissions = () => {
   const supabase = useSupabaseClient();
   const session = useSession();
+  const params = useParams();
+
+  // Extract anomaly ID from URL params if available
+  const getAnomalyId = () => {
+    const idParam = String(params?.id || "");
+    return idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
+  };
+
+  const anomalyId = getAnomalyId();
 
   const [missions, setMissions] = useState([
     {
@@ -32,7 +42,7 @@ const DailyMinorPlanetMissions = () => {
       icon: TelescopeIcon,
       points: 2, 
       completedCount: 0,
-      internalComponent: () => <DailyMinorPlanetWithId />,
+      internalComponent: () => anomalyId ? <DailyMinorPlanetWithId anomalyId={anomalyId} /> : <DailyMinorPlanetWithId anomalyId="random" />,
       color: "text-blue-500",
       shadow: false,
       action: () => {},
@@ -45,7 +55,7 @@ const DailyMinorPlanetMissions = () => {
       icon: RadioIcon,
       points: 1,
       completedCount: 0,
-      internalComponent: () => <DailyMinorPlanetWithId />,
+      internalComponent: () => anomalyId ? <DailyMinorPlanetWithId anomalyId={anomalyId} /> : <DailyMinorPlanetWithId anomalyId="random" />,
       color: "text-green-500",
       shadow: false,
       action: () => {},

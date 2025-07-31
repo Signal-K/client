@@ -89,6 +89,16 @@ export default function TelescopeClassifyPage() {
         }
         break
 
+      case "active-asteroids":
+        switch (mission) {
+          case "classify":
+            // Extract anomaly ID from params.id (remove "db-" prefix if present)
+            const activeAsteroidId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
+            component = <DailyMinorPlanetWithId anomalyId={activeAsteroidId} />
+            break
+        }
+        break
+
       default:
         component = <div className="text-white p-4">Unknown mission or project.</div>
         break

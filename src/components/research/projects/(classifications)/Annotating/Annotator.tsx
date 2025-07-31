@@ -300,7 +300,7 @@ export default function ImageAnnotator({
   };
 
   return (
-    <div className={`space-y-2 max-w-full px-2 md:px-4 mx-auto overflow-x-hidden overflow-y-auto max-h-screen ${className}`}>
+    <div className={`space-y-2 max-w-full px-2 md:px-4 mx-auto overflow-x-hidden ${className}`}>
       <div className="flex justify-between items-center">
         <AnnotationTools
           currentTool={currentTool}
@@ -312,7 +312,7 @@ export default function ImageAnnotator({
 
       {selectedImage && (
         <>
-          <div style={{ width: '100%', overflow: 'auto', textAlign: 'center' }}>
+          <div className={`w-full overflow-auto text-center ${className.includes('max-h-') ? className : ''}`}>
             <AnnotationCanvas
               canvasRef={canvasRef}
               imageRef={imageRef}

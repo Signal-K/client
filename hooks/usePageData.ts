@@ -25,6 +25,7 @@ export interface LinkedAnomaly {
   anomaly_id: number;
   date: string;
   automaton?: string; // Added automaton field
+  unlocked?: boolean; // Added unlocked field
   anomaly: {
     id: number | null; // Added id field
     content: string | null;
@@ -165,6 +166,8 @@ export function usePageData() {
         id,
         anomaly_id,
         date,
+        automaton,
+        unlocked,
         anomaly:anomaly_id(
           content,
           anomalytype,

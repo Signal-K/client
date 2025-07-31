@@ -181,7 +181,7 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
 
   useEffect(() => {
     const fetchAnomalyById = async () => {
-      if (!session || !anomalyId) {
+      if (!session) {
         setLoading(false);
         return;
       }
@@ -189,39 +189,89 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
       try {
         console.log("Fetching anomaly with ID:", anomalyId);
         
-        const { data: anomalies, error: anomalyError } = await supabase
-          .from("anomalies")
-          .select("id, content, anomalySet, anomalytype")
-          .eq("id", anomalyId);
+        if (anomalyId === "random" || !anomalyId) {
+          // Fetch a random anomaly from linked_anomalies for backward compatibility
+          const { data: linkedAnomalies, error: linkedError } = await supabase
+            .from("linked_anomalies")
+            .select(`
+              id,
+              anomaly_id,
+              anomalies!inner (
+                id,
+                content,
+                anomalySet,
+                anomalytype
+              )
+            `)
+            .eq("author", session.user.id)
+            .eq("anomalies.anomalySet", "telescope-minorPlanet");
 
-        if (anomalyError) {
-          console.error("Database error:", anomalyError);
-          throw anomalyError;
+          if (linkedError) throw linkedError;
+
+          if (!linkedAnomalies || linkedAnomalies.length === 0) {
+            console.log("No linked anomalies found for user");
+            setError("No anomalies available for classification.");
+            return;
+          }
+
+          // Pick a random anomaly from the list
+          const randomIndex = Math.floor(Math.random() * linkedAnomalies.length);
+          const linkedAnomaly = linkedAnomalies[randomIndex];
+          const anomaly = linkedAnomaly?.anomalies as unknown as Anomaly;
+
+          if (!anomaly || !anomaly.id) {
+            console.error("Selected anomaly is invalid:", anomaly);
+            setError("Invalid anomaly data.");
+            return;
+          }
+
+          setSelectedAnomaly(anomaly);
+
+          // Set up image URLs for all frames (1-4)
+          const urls = [1, 2, 3, 4].map(i => 
+            `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomaly.id}/${i}.png`
+          );
+          setImageUrls(urls);
+          
+          // Set the initial current image URL to the first frame
+          setCurrentImageUrl(urls[0]);
+        } else {
+          // Fetch specific anomaly by ID
+          const { data: anomalies, error: anomalyError } = await supabase
+            .from("anomalies")
+            .select("id, content, anomalySet, anomalytype")
+            .eq("id", anomalyId)
+            .eq("anomalySet", "telescope-minorPlanet");
+
+          if (anomalyError) {
+            console.error("Database error:", anomalyError);
+            throw anomalyError;
+          }
+
+          console.log("Query returned:", anomalies);
+
+          if (!anomalies || anomalies.length === 0) {
+            console.log("No anomaly found with ID:", anomalyId);
+            setError("Anomaly not found.");
+            return;
+          }
+
+          if (anomalies.length > 1) {
+            console.warn("Multiple anomalies found with same ID:", anomalies);
+          }
+
+          const anomaly = anomalies[0];
+          setSelectedAnomaly(anomaly);
+
+          // Set up image URLs for all frames (1-4)
+          const urls = [1, 2, 3, 4].map(i => 
+            `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomaly.id}/${i}.png`
+          );
+          setImageUrls(urls);
+          
+          // Set the initial current image URL to the first frame
+          setCurrentImageUrl(urls[0]);
         }
-
-        console.log("Query returned:", anomalies);
-
-        if (!anomalies || anomalies.length === 0) {
-          console.log("No anomaly found with ID:", anomalyId);
-          setError("Anomaly not found.");
-          return;
-        }
-
-        if (anomalies.length > 1) {
-          console.warn("Multiple anomalies found with same ID:", anomalies);
-        }
-
-        const anomaly = anomalies[0];
-        setSelectedAnomaly(anomaly);
-
-        // Set up image URLs for all frames (1-4)
-        const urls = [1, 2, 3, 4].map(i => 
-          `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomaly.id}/${i}.png`
-        );
-        setImageUrls(urls);
-        
-        // Set the initial current image URL to the first frame
-        setCurrentImageUrl(urls[0]);
 
       } catch (err: any) {
         console.error("Error fetching anomaly:", err.message || err);

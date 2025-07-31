@@ -41,7 +41,9 @@ type PageSatellite = {
   y: number;
   hasUnclassifiedAnomaly: boolean;
   anomalyId: string | undefined;
-  tile: string; // Add tile property
+  tile: string;
+  unlocked: boolean;
+  linkedAnomalyId: string;
 };
 
 export default function ActivityPage() {
@@ -87,14 +89,24 @@ export default function ActivityPage() {
 
   const needsProfileSetup = !profile?.username || !profile?.full_name;
 
-  const satelliteData: PageSatellite | null = linkedAnomalies.length > 0 ? {
-    id: "satellite-1",
-    x: 50, // Centered position
-    y: 50, // Centered position
-    hasUnclassifiedAnomaly: linkedAnomalies.some(anomaly => anomaly.automaton === "WeatherSatellite"),
-    anomalyId: linkedAnomalies[0]?.anomaly?.id?.toString(), // Link to the first anomaly
-    tile: "/assets/Viewports/Satellite/Satellite_Tile1.png", // Add a default tile
-  } : null;
+  const satelliteData: PageSatellite | null = (() => {
+    const weatherSatelliteAnomaly = linkedAnomalies.find(anomaly => anomaly.automaton === "WeatherSatellite");
+    
+    if (weatherSatelliteAnomaly) {
+      return {
+        id: "satellite-1",
+        x: 50, // Centered position
+        y: 50, // Centered position
+        hasUnclassifiedAnomaly: true,
+        anomalyId: weatherSatelliteAnomaly.anomaly?.id?.toString(),
+        tile: "/assets/Viewports/Satellite/Satellite_Tile1.png",
+        unlocked: false, // Will be fetched by SatellitePosition component
+        linkedAnomalyId: weatherSatelliteAnomaly.id.toString(),
+      };
+    }
+    
+    return null;
+  })();
 
   return (
     <div className="min-h-screen w-full relative flex justify-center pb-20">

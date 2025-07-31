@@ -132,7 +132,7 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
 
     return (
         <div className="w-full h-screen flex flex-col gap-2 px-4">
-            <div className="p-4 rounded-md relative w-full">
+            <div className="p-4 rounded-md relative w-full h-full md:h-[60vh] lg:h-[70vh] overflow-hidden">
                 {imageUrl && (
                     <ImageAnnotator
                         initialImageUrl={imageUrl}
@@ -143,6 +143,7 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
                         structureItemId={3105}
                         parentPlanetLocation={anomalyid?.toString() || ''}
                         annotationType="CoM"
+                        className="h-full w-full"
                     />
                 )}
             </div>
@@ -267,9 +268,9 @@ export function CloudspottingOnMarsWithId() {
     }
 
     return (
-        <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6 overflow-hidden">
-            <div className="w-full max-w-4xl h-full flex flex-col rounded-xl bg-white shadow-lg p-4 overflow-hidden">
-                <div className="flex-1 overflow-hidden rounded-md">
+        <div className="w-full min-h-screen flex flex-col items-center justify-start bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6">
+            <div className="w-full max-w-4xl flex flex-col rounded-xl bg-white shadow-lg p-4">
+                <div className="w-full">
                     {imageUrl && (
                         <ImageAnnotator
                             initialImageUrl={imageUrl}
@@ -280,6 +281,7 @@ export function CloudspottingOnMarsWithId() {
                             parentClassificationId={classificationId ?? undefined}
                             parentPlanetLocation={anomaly.id.toString()}
                             annotationType="CoM"
+                            className="max-h-[50vh] md:max-h-[60vh]"
                         />
                     )}
                 </div>

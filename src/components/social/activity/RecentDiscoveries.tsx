@@ -20,6 +20,16 @@ export default function RecentDiscoveries({
 }: Props) {
   const [tab, setTab] = useState<"anomalies" | "yours">("anomalies");
 
+  // Filter out WeatherSatellite anomalies that are not unlocked
+  const filteredLinkedAnomalies = linkedAnomalies.filter(anomaly => {
+    if (anomaly.automaton === "WeatherSatellite") {
+      // For WeatherSatellite, only show if unlocked is true
+      return anomaly.unlocked === true;
+    }
+    // For all other automaton types, show normally
+    return true;
+  });
+
   return (
     <Card className="bg-card border border-chart-2/30">
       <CardHeader className="pb-3">
@@ -51,7 +61,7 @@ export default function RecentDiscoveries({
 
         {/* Tab Content */}
         {tab === "anomalies" ? (
-          linkedAnomalies.length === 0 && !incompletePlanet ? (
+          filteredLinkedAnomalies.length === 0 && !incompletePlanet ? (
             <div className="flex flex-col items-center justify-center bg-muted/20 border border-dashed border-border rounded-xl p-6 text-center space-y-3">
               <Telescope className="h-6 w-6 text-chart-2" />
               <h4 className="text-sm font-semibold text-chart-2">
@@ -69,7 +79,7 @@ export default function RecentDiscoveries({
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2">
-              {linkedAnomalies.map((a) => {
+              {filteredLinkedAnomalies.map((a) => {
                 const anomaly = a.anomaly;
                 let type = anomaly?.anomalytype?.toLowerCase() || null;
                 if (type?.includes("minorplanet") || type?.includes("asteroid")) {
