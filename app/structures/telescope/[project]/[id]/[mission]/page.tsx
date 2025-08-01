@@ -82,7 +82,9 @@ export default function TelescopeClassifyPage() {
       case "daily-minor-planet":
         switch (mission) {
           case "classify":
-            component = <DailyMinorPlanetWithId />
+            // Extract anomaly ID from params.id (remove "db-" prefix if present)
+            const anomalyId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
+            component = <DailyMinorPlanetWithId anomalyId={anomalyId} />
             break
         }
         break

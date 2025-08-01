@@ -363,7 +363,7 @@ export default function ImageAnnotator({
             </SciFiPanel>
           </div>
 
-          {otherAssets && (
+          {/* {otherAssets && (
             <SciFiPanel>
               {otherAssets.map((url, index) => (
                 <div
@@ -379,7 +379,7 @@ export default function ImageAnnotator({
                 </div>
               ))}
             </SciFiPanel>
-          )}
+          )} */}
         </>
       )}
     </div>

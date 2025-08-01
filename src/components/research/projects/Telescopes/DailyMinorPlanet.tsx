@@ -152,11 +152,12 @@ export function StarterDailyMinorPlanet({
 
 type Anomaly = {
   id: string;
-  name: string;
-  details?: string;
+  content: string;
+  anomalySet: string;
+  anomalytype?: string;
 }; 
 
-export function DailyMinorPlanetWithId() {
+export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
   const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
@@ -179,39 +180,38 @@ export function DailyMinorPlanetWithId() {
   };
 
   useEffect(() => {
-    const fetchRandomLinkedAnomaly = async () => {
-      if (!session) {
+    const fetchAnomalyById = async () => {
+      if (!session || !anomalyId) {
         setLoading(false);
         return;
       }
 
       try {
-        const { data: linkedAnomalies, error: linkedError } = await supabase
-          .from("linked_anomalies")
-          .select(`
-            id,
-            anomaly_id,
-            anomalies!inner (
-              id,
-              name,
-              content,
-              anomalySet
-            )
-          `)
-          .eq("author", session.user.id)
-          .eq("anomalies.anomalySet", "telescope-minorPlanet");
+        console.log("Fetching anomaly with ID:", anomalyId);
+        
+        const { data: anomalies, error: anomalyError } = await supabase
+          .from("anomalies")
+          .select("id, content, anomalySet, anomalytype")
+          .eq("id", anomalyId);
 
-        if (linkedError) throw linkedError;
+        if (anomalyError) {
+          console.error("Database error:", anomalyError);
+          throw anomalyError;
+        }
 
-        if (!linkedAnomalies || linkedAnomalies.length === 0) {
-          router.push("/activity/deploy");
+        console.log("Query returned:", anomalies);
+
+        if (!anomalies || anomalies.length === 0) {
+          console.log("No anomaly found with ID:", anomalyId);
+          setError("Anomaly not found.");
           return;
         }
 
-        // Pick a random anomaly from the list
-        const randomIndex = Math.floor(Math.random() * linkedAnomalies.length);
-        const anomaly = linkedAnomalies[randomIndex]?.anomalies as unknown as Anomaly;
+        if (anomalies.length > 1) {
+          console.warn("Multiple anomalies found with same ID:", anomalies);
+        }
 
+        const anomaly = anomalies[0];
         setSelectedAnomaly(anomaly);
 
         // Set up image URLs for all frames (1-4)
@@ -224,15 +224,15 @@ export function DailyMinorPlanetWithId() {
         setCurrentImageUrl(urls[0]);
 
       } catch (err: any) {
-        console.error("Error fetching linked anomaly:", err.message || err);
+        console.error("Error fetching anomaly:", err.message || err);
         setError("Unable to load anomaly.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRandomLinkedAnomaly();
-  }, [session]);
+    fetchAnomalyById();
+  }, [session, anomalyId, supabase, supabaseUrl]);
 
   if (error) return <div className="text-red-500 p-4">{error}</div>;
   if (loading) return <div className="text-white p-4">Loading...</div>;

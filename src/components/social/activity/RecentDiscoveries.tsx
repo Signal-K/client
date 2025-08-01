@@ -83,6 +83,13 @@ export default function RecentDiscoveries({
                   link = `/structures/telescope/planet-hunters/db-${a.anomaly_id}/classify`;
                 } else if (type === "cloud") {
                   link = `/structures/balloon/cloudspotting/db-${a.anomaly_id}/classify`;
+                } else if (anomaly?.anomalytype === 'telescopeMinor') {
+                  // Check the anomalySet to determine the correct route
+                  if (anomaly?.anomalySet === 'active-asteroids') {
+                    link = `/structures/telescope/active-asteroids/db-${a.anomaly_id}/classify`;
+                  } else {
+                    link = `/structures/telescope/daily-minor-planet/db-${a.anomaly_id}/classify`;
+                  }
                 }
 
                 return (
@@ -100,7 +107,7 @@ export default function RecentDiscoveries({
                         className="inline-block px-2 py-0.5 mb-1 text-[10px] font-semibold rounded-full"
                         style={{ backgroundColor: color, color: "white" }}
                       >
-                        {anomaly?.anomalytype || "Unknown Type"}
+                        {anomaly?.anomalytype === 'telescopeMinor' ? 'Asteroid Candidate' : (anomaly?.anomalytype || "Unknown Type")}
                       </span>
                       <p className="text-sm text-foreground truncate" title={anomaly?.content || ""}>
                         {anomaly?.content || "No content"}

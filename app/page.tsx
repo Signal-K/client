@@ -27,6 +27,7 @@ import CompleteStructuresSection from "@/src/components/deployment/structures/Co
 import ProfileSetupRequired from "@/src/components/profile/setup/ProfileSetupRequired";
 import LegacyTipsPanel from "@/src/components/profile/dashboard/LegacyTipsPanel";
 import LegacyMilestonesSection from "@/src/components/profile/dashboard/LegacyMilestonesSection";
+import RecentDiscoveries from "@/src/components/social/activity/RecentDiscoveries";
 
 // Import custom hooks
 import { usePageData } from "@/hooks/usePageData";
@@ -134,16 +135,17 @@ export default function ActivityPage() {
           />
         )}
 
+        {/* Recent Discoveries */}
+        <RecentDiscoveries
+          linkedAnomalies={linkedAnomalies}
+          classifications={classifications}
+          incompletePlanet={incompletePlanet}
+        />
+
         {/* Next Steps Guide - PRIORITY #1 for new users */}
         <NextStepsSection
           incompletePlanet={incompletePlanet}
         />
-
-        {/* Tips & Guidance */}
-        {/* <TipsGuidanceSection 
-          showTipsPanel={showTipsPanel}
-          onToggleTipsPanel={() => setShowTipsPanel(!showTipsPanel)}
-        /> */}
 
         {/* Research Progress */}
         <ResearchProgressSection />
