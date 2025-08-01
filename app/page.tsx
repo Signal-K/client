@@ -32,6 +32,16 @@ import LegacyMilestonesSection from "@/src/components/profile/dashboard/LegacyMi
 import { usePageData } from "@/hooks/usePageData";
 import { useSatelliteManagement } from "@/hooks/useSatelliteManagement";
 import { useNPSManagement } from "@/hooks/useNPSManagement";
+import SatellitePosition from "@/src/components/ui/scenes/deploy/SatellitePosition";
+
+type PageSatellite = {
+  id: string;
+  x: number;
+  y: number;
+  hasUnclassifiedAnomaly: boolean;
+  anomalyId: string | undefined;
+  tile: string; // Add tile property
+};
 
 export default function ActivityPage() {
   const session = useSession();
@@ -76,6 +86,15 @@ export default function ActivityPage() {
 
   const needsProfileSetup = !profile?.username || !profile?.full_name;
 
+  const satelliteData: PageSatellite | null = linkedAnomalies.length > 0 ? {
+    id: "satellite-1",
+    x: 50, // Centered position
+    y: 50, // Centered position
+    hasUnclassifiedAnomaly: linkedAnomalies.some(anomaly => anomaly.automaton === "WeatherSatellite"),
+    anomalyId: linkedAnomalies[0]?.anomaly?.id?.toString(), // Link to the first anomaly
+    tile: "/assets/Viewports/Satellite/Satellite_Tile1.png", // Add a default tile
+  } : null;
+
   return (
     <div className="min-h-screen w-full relative flex justify-center pb-20">
       {/* Telescope Background - Full screen behind everything */}
@@ -83,8 +102,9 @@ export default function ActivityPage() {
         <TelescopeBackground 
           sectorX={0} 
           sectorY={0} 
-          showAllAnomalies={true}
+          showAllAnomalies={false}
           isDarkTheme={isDark}
+          variant="stars-only"
           onAnomalyClick={(anomaly) => console.log('Clicked anomaly:', anomaly)}
         />
       </div>
@@ -106,6 +126,13 @@ export default function ActivityPage() {
           landmarksExpanded={landmarksExpanded}
           onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
         />
+
+        {satelliteData && (
+          <SatellitePosition
+            satellites={[satelliteData]} // Pass a single satellite
+            flashingIndicator={satelliteData.hasUnclassifiedAnomaly} // Add flashing indicator
+          />
+        )}
 
         {/* Next Steps Guide - PRIORITY #1 for new users */}
         <NextStepsSection

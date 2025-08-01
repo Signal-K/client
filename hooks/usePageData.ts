@@ -24,7 +24,9 @@ export interface LinkedAnomaly {
   id: number;
   anomaly_id: number;
   date: string;
+  automaton?: string; // Added automaton field
   anomaly: {
+    id: number | null; // Added id field
     content: string | null;
     anomalytype: string | null;
     anomalySet: string | null;

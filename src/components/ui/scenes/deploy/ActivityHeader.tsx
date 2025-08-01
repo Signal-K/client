@@ -448,50 +448,52 @@ export default function ActivityHeader({
   const displayName = profile?.username || session?.user?.email || "User";
 
   return (
-    <Card className="relative w-full h-48 sm:h-64 overflow-visible rounded-lg border-chart-4/30 bg-card">
+    <Card className="relative w-full h-48 sm:h-56 md:h-64 overflow-visible rounded-lg border-chart-4/30 bg-card">
       <img
         src="/assets/Backdrops/Earth.png"
         alt="Earth"
         className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent via-card/20 flex items-end p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
-          <div className="flex items-center gap-3">
-            {/* <Globe className="w-8 h-8 text-chart-4" /> */}
-            <div>
-              <AvatarGenerator author={session?.user.id || ""} />
-              <h2 className="text-l font-bold text-foreground">
-                {profile?.username || "USERNAME"}
-              </h2>
-            </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent via-card/20 flex items-end p-3 sm:p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between w-full gap-3 sm:gap-4">
+          {/* User info */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <AvatarGenerator author={session?.user.id || ""} />
+            <h2 className="text-sm sm:text-base md:text-lg font-bold text-foreground">
+              {profile?.username || "USERNAME"}
+            </h2>
           </div>
-          <div className="flex flex-col items-start sm:items-end px-2 sm:px-8 text-sm text-muted-foreground relative">
-            <div className="mb-3 text-xs uppercase tracking-wide">Deployment Status</div>
+          
+          {/* Deployment status */}
+          <div className="flex flex-col items-start sm:items-end gap-2">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">
+              Deployment Status
+            </div>
             
             {/* Deployment Success Message */}
             {deploymentMessage && (
-              <div className={`mb-3 p-2 rounded-lg bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 text-xs font-medium transition-all duration-500 ${isAnimating ? 'animate-bounce' : ''}`}>
+              <div className={`p-2 rounded-lg bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 text-xs font-medium transition-all duration-500 ${isAnimating ? 'animate-bounce' : ''}`}>
                 {deploymentMessage}
               </div>
             )}
             
-            <div className="flex gap-4 relative">
+            <div className="flex gap-3 sm:gap-4">
               {/* Telescope Status */}
               <Link 
                 href="/structures/telescope"
-                className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-card/20 transition-colors group"
+                className="flex flex-col items-center gap-1 p-1.5 sm:p-2 rounded-lg hover:bg-card/20 transition-colors group min-w-0"
               >
-                <div className={`p-2 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount)}`}>
+                <div className={`p-1.5 sm:p-2 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount)}`}>
                   <TelescopeIcon 
                     deployed={deploymentStatus.telescope.deployed} 
                     hasDiscoveries={deploymentStatus.telescope.unclassifiedCount > 0} 
                   />
                 </div>
-                <div className="text-center">
-                  <span className="text-xs font-medium group-hover:text-foreground transition-colors block">
+                <div className="text-center min-w-0">
+                  <span className="text-xs font-medium group-hover:text-foreground transition-colors block truncate">
                     Telescope
                   </span>
-                  <span className={`text-xs ${getStatusColor(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount)} transition-colors block`}>
+                  <span className={`text-xs ${getStatusColor(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount)} transition-colors block truncate`}>
                     {getStatusLabel(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount, "telescope")}
                   </span>
                 </div>
@@ -501,19 +503,19 @@ export default function ActivityHeader({
               {deploymentStatus.satellites.available && (
                 <button
                   onClick={() => setShowPlanetSelector(true)}
-                  className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-card/20 transition-colors group"
+                  className="flex flex-col items-center gap-1 p-1.5 sm:p-2 rounded-lg hover:bg-card/20 transition-colors group min-w-0"
                 >
-                  <div className={`p-2 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount)}`}>
+                  <div className={`p-1.5 sm:p-2 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount)}`}>
                     <SatelliteIcon 
                       deployed={deploymentStatus.satellites.deployed} 
                       hasDiscoveries={deploymentStatus.satellites.unclassifiedCount > 0} 
                     />
                   </div>
-                  <div className="text-center">
-                    <span className="text-xs font-medium group-hover:text-foreground transition-colors block">
+                  <div className="text-center min-w-0">
+                    <span className="text-xs font-medium group-hover:text-foreground transition-colors block truncate">
                       Satellites
                     </span>
-                    <span className={`text-xs ${getStatusColor(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount)} transition-colors block`}>
+                    <span className={`text-xs ${getStatusColor(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount)} transition-colors block truncate`}>
                       {getStatusLabel(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount, "satellites")}
                     </span>
                   </div>
