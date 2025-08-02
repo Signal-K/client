@@ -33,6 +33,7 @@ import RecentDiscoveries from "@/src/components/social/activity/RecentDiscoverie
 import { usePageData } from "@/hooks/usePageData";
 import { useSatelliteManagement } from "@/hooks/useSatelliteManagement";
 import { useNPSManagement } from "@/hooks/useNPSManagement";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import SatellitePosition from "@/src/components/ui/scenes/deploy/SatellitePosition";
 
 type PageSatellite = {
@@ -52,7 +53,6 @@ export default function ActivityPage() {
   const [landmarksExpanded, setLandmarksExpanded] = useState(false);
   const [showTipsPanel, setShowTipsPanel] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [isDark, setIsDark] = useState(false);
   
   // Additional state for the new components
   const [weeklyMissions, setWeeklyMissions] = useState<any[]>([]);
@@ -79,17 +79,15 @@ export default function ActivityPage() {
   } = useSatelliteManagement();
 
   const { showNpsModal, handleCloseNps } = useNPSManagement();
-
-  const handleThemeToggle = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle("dark", !isDark);
-  };
+  
+  // Use the global theme hook
+  const { isDark, toggleDarkMode } = UseDarkMode();
 
   if (!session) return <LandingSS />;
 
   const needsProfileSetup = !profile?.username || !profile?.full_name;
 
-  const satelliteData: PageSatellite | null = (() => {
+  const satelliteData: PageSatellite & { deployTime: Date } | null = (() => {
     const weatherSatelliteAnomaly = linkedAnomalies.find(anomaly => anomaly.automaton === "WeatherSatellite");
     
     if (weatherSatelliteAnomaly) {
@@ -102,6 +100,7 @@ export default function ActivityPage() {
         tile: "/assets/Viewports/Satellite/Satellite_Tile1.png",
         unlocked: false, // Will be fetched by SatellitePosition component
         linkedAnomalyId: weatherSatelliteAnomaly.id.toString(),
+        deployTime: new Date(), // Provide a default or actual deploy time here
       };
     }
     
@@ -109,7 +108,7 @@ export default function ActivityPage() {
   })();
 
   return (
-    <div className="min-h-screen w-full relative flex justify-center pb-20">
+    <div className="min-h-screen w-full relative flex justify-center">
       {/* Telescope Background - Full screen behind everything */}
       <div className="fixed inset-0 -z-10">
         <TelescopeBackground 
@@ -125,7 +124,7 @@ export default function ActivityPage() {
       {/* Main Header */}
       <MainHeader
         isDark={isDark}
-        onThemeToggle={handleThemeToggle}
+        onThemeToggle={toggleDarkMode}
         notificationsOpen={notificationsOpen}
         onToggleNotifications={() => setNotificationsOpen((open) => !open)}
         activityFeed={activityFeed}
@@ -155,18 +154,15 @@ export default function ActivityPage() {
         />
 
         {/* Next Steps Guide - PRIORITY #1 for new users */}
-        <NextStepsSection
+        {/* <NextStepsSection
           incompletePlanet={incompletePlanet}
-        />
-
-        {/* Research Progress */}
-        <ResearchProgressSection />
+        /> */}
 
         {/* Milestones */}
-        <MilestonesSection 
+        {/* <MilestonesSection 
           weeklyMissions={weeklyMissions}
           userMissionsLoading={userMissionsLoading}
-        />
+        /> */}
 
         {/* Structures & Equipment */}
         <StructuresEquipmentSection
@@ -193,23 +189,18 @@ export default function ActivityPage() {
         <LegacyMilestonesSection />
 
         {/* Profile Setup or Complete Structures Section */}
-        {needsProfileSetup ? (
+        {needsProfileSetup &&(
           <ProfileSetupRequired onOpenProfileModal={() => setShowProfileModal(true)} />
-        ) : (
-          <CompleteStructuresSection
-            planetTargets={planetTargets}
-            activeSatelliteMessage={activeSatelliteMessage}
-            visibleStructures={visibleStructures}
-            onSendSatellite={handleSendSatellite}
-            onCheckActiveSatellite={checkActiveSatellite}
-          />
         )}
 
         {/* Legacy Tips Panel */}
-        <LegacyTipsPanel 
+        {/* <LegacyTipsPanel 
           showTipsPanel={showTipsPanel}
           onToggleTipsPanel={() => setShowTipsPanel(!showTipsPanel)}
-        />
+        /> */}
+
+        {/* Research Progress */}
+        <ResearchProgressSection />
       </div>
 
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>

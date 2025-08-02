@@ -132,7 +132,7 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
 
     return (
         <div className="w-full h-screen flex flex-col gap-2 px-4">
-            <div className="p-4 rounded-md relative w-full h-full md:h-[60vh] lg:h-[70vh] overflow-hidden">
+            <div className="p-4 rounded-md relative w-full h-full md:h-[90vh] lg:h-[90vh] overflow-hidden">
                 {imageUrl && (
                     <ImageAnnotator
                         initialImageUrl={imageUrl}
@@ -269,7 +269,7 @@ export function CloudspottingOnMarsWithId() {
 
     return (
         <div className="w-full min-h-screen flex flex-col items-center justify-start bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6">
-            <div className="w-full max-w-4xl flex flex-col rounded-xl bg-white shadow-lg p-4">
+            <div className="w-full max-w-4xl min-h-[80vh] flex flex-col rounded-xl bg-white shadow-lg p-4">
                 <div className="w-full">
                     {imageUrl && (
                         <ImageAnnotator
@@ -281,7 +281,6 @@ export function CloudspottingOnMarsWithId() {
                             parentClassificationId={classificationId ?? undefined}
                             parentPlanetLocation={anomaly.id.toString()}
                             annotationType="CoM"
-                            className="max-h-[50vh] md:max-h-[60vh]"
                         />
                     )}
                 </div>

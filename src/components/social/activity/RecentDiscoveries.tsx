@@ -24,6 +24,7 @@ export default function RecentDiscoveries({
   const filteredLinkedAnomalies = linkedAnomalies.filter(anomaly => {
     if (anomaly.automaton === "WeatherSatellite") {
       // For WeatherSatellite, only show if unlocked is true
+      // If unlocked is undefined (backward compatibility), don't show
       return anomaly.unlocked === true;
     }
     // For all other automaton types, show normally
@@ -31,11 +32,11 @@ export default function RecentDiscoveries({
   });
 
   return (
-    <Card className="bg-card border border-chart-2/30">
+    <Card className="bg-background/20 backdrop-blur-sm border border-[#78cce2]/30">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm flex items-center gap-2 text-chart-2">
-            <Zap className="w-4 h-4" />
+          <CardTitle className="text-xl font-semibold flex items-center gap-2 text-primary">
+            <Zap className="w-5 h-5" />
             Recent Discoveries
           </CardTitle>
         </div>
@@ -62,9 +63,9 @@ export default function RecentDiscoveries({
         {/* Tab Content */}
         {tab === "anomalies" ? (
           filteredLinkedAnomalies.length === 0 && !incompletePlanet ? (
-            <div className="flex flex-col items-center justify-center bg-muted/20 border border-dashed border-border rounded-xl p-6 text-center space-y-3">
-              <Telescope className="h-6 w-6 text-chart-2" />
-              <h4 className="text-sm font-semibold text-chart-2">
+            <div className="flex flex-col items-center justify-center bg-card/50 border border-dashed border-border rounded-xl p-6 text-center space-y-3">
+              <Telescope className="h-6 w-6 text-primary" />
+              <h4 className="text-sm font-semibold text-primary">
                 No objects of interest available
               </h4>
               <p className="text-xs text-muted-foreground max-w-md">

@@ -160,6 +160,7 @@ export function usePageData() {
     );
 
     // Fetch all linked anomalies for the user
+    // Note: The unlocked column may not exist in all environments, so we handle it gracefully
     const { data: rawLinked, error: linkedError } = await supabase
       .from("linked_anomalies")
       .select(`
@@ -169,6 +170,7 @@ export function usePageData() {
         automaton,
         unlocked,
         anomaly:anomaly_id(
+          id,
           content,
           anomalytype,
           anomalySet
@@ -176,6 +178,68 @@ export function usePageData() {
       `)
       .eq("author", userId)
       .order("date", { ascending: false });
+
+    // Handle case where unlocked column doesn't exist (graceful degradation)
+    if (linkedError && linkedError.message?.includes('unlocked')) {
+      console.warn('Database missing unlocked column, falling back to query without it');
+      
+      const { data: fallbackLinked, error: fallbackError } = await supabase
+        .from("linked_anomalies")
+        .select(`
+          id,
+          anomaly_id,
+          date,
+          automaton,
+          anomaly:anomaly_id(
+            id,
+            content,
+            anomalytype,
+            anomalySet
+          )
+        `)
+        .eq("author", userId)
+        .order("date", { ascending: false });
+
+      if (fallbackError) {
+        console.error("Error fetching linked anomalies (fallback):", fallbackError);
+        return {
+          activityFeed: [],
+          linkedAnomalies: [],
+          classifications: [],
+          incompletePlanet: null,
+          otherClassifications: [],
+          profile: null,
+        };
+      }
+
+      // Add unlocked: undefined to fallback data
+      const linkedWithDefaults = (fallbackLinked ?? []).map(item => ({
+        ...item,
+        unlocked: undefined,
+        anomaly: Array.isArray(item.anomaly) ? item.anomaly[0] : item.anomaly,
+      })) as unknown as LinkedAnomaly[];
+
+      return {
+        activityFeed: [],
+        linkedAnomalies: linkedWithDefaults,
+        classifications: [],
+        incompletePlanet: null,
+        otherClassifications: [],
+        profile: null,
+      };
+    }
+
+    if (linkedError) {
+      console.error("Error fetching linked anomalies:", linkedError);
+      return {
+        activityFeed: [],
+        linkedAnomalies: [],
+        classifications: [],
+        incompletePlanet: null,
+        otherClassifications: [],
+        profile: null,
+      };
+    }
 
     // Fetch all cloud anomalies that have already been classified by the user
     const { data: classifiedClouds } = await supabase

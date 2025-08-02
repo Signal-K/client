@@ -4,21 +4,25 @@ export default function UseDarkMode() {
     const [isDark, setIsDark] = useState<boolean>(false);
 
     useEffect(() => {
-        const root = window.document.documentElement;
-        const dark = localStorage.getItem("theme") === "dark";
-
-        root.classList.toggle("dark", dark);
-        setIsDark(dark)
+        const savedTheme = localStorage.getItem('star-sailors-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        const shouldBeDark = savedTheme === 'dark' || (savedTheme === null && prefersDark);
+        
+        setIsDark(shouldBeDark);
+        document.documentElement.classList.toggle('dark', shouldBeDark);
     }, []);
 
     const toggleDarkMode = () => {
-    const root = window.document.documentElement;
-    const isCurrentlyDark = root.classList.contains("dark");
+        const newTheme = !isDark;
+        setIsDark(newTheme);
+        
+        // Save to localStorage
+        localStorage.setItem('star-sailors-theme', newTheme ? 'dark' : 'light');
+        
+        // Apply to document
+        document.documentElement.classList.toggle('dark', newTheme);
+    };
 
-    root.classList.toggle("dark", !isCurrentlyDark);
-    localStorage.setItem("theme", !isCurrentlyDark ? "dark" : "light");
-    setIsDark(!isCurrentlyDark);
-  };
-
-  return { isDark, toggleDarkMode };
+    return { isDark, toggleDarkMode };
 };

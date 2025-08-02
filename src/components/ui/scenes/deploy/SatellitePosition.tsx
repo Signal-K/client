@@ -24,6 +24,7 @@ interface Satellite {
   tile: string;
   unlocked: boolean;
   linkedAnomalyId: string;
+  deployTime: Date;
 }
 
 interface SatellitePositionProps {
@@ -38,12 +39,61 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [selectedSatellite, setSelectedSatellite] = useState<Satellite | null>(null);
   const [isUnlocking, setIsUnlocking] = useState(false);
+  const [currentTileIndex, setCurrentTileIndex] = useState(0);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   const satelliteTiles = [
     "/assets/Viewports/Satellite/Satellite_Tile1.png",
     "/assets/Viewports/Satellite/Satellite_Tile2.png",
     "/assets/Viewports/Satellite/Satellite_Tile3.png",
   ];
+
+  // Time utility functions
+  const getTimeSinceDeploy = (deployTime: Date): { minutes: number; seconds: number; total: number } => {
+    const now = currentTime.getTime();
+    const deploy = deployTime.getTime();
+    const diffMs = Math.max(0, now - deploy);
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    
+    return {
+      minutes,
+      seconds,
+      total: totalSeconds
+    };
+  };
+
+  const formatTimeSinceDeploy = (deployTime: Date): string => {
+    const { minutes, seconds } = getTimeSinceDeploy(deployTime);
+    if (minutes > 0) {
+      return `${minutes}m ${seconds}s`;
+    }
+    return `${seconds}s`;
+  };
+
+  // Extensible position calculation function
+  const calculateSatellitePosition = (satellite: Satellite, timeSinceDeploy: number): { x: number; y: number } => {
+    // TODO: Future enhancement - satellite movement based on deploy time and user actions
+    // This function can be extended to:
+    // 1. Calculate orbital mechanics based on time since deploy
+    // 2. Apply user-directed movement commands
+    // 3. Factor in gravitational effects or mission parameters
+    // 4. Handle different satellite types with unique movement patterns
+    // 5. Implement realistic satellite orbiting behavior
+    
+    // For now, keep the existing movement pattern but make it time-based
+    const baseX = 50; // Starting position
+    const baseY = 50; // Starting position
+    
+    // Use deploy time as a seed for consistent movement pattern
+    const timeOffset = timeSinceDeploy * 0.1; // Slower movement factor
+    
+    return {
+      x: (baseX + (timeOffset * 0.3)) % 100,
+      y: (baseY + (timeOffset * 0.2)) % 100
+    };
+  };
 
   useEffect(() => {
     const fetchSatellites = async () => {
@@ -52,15 +102,48 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
       try {
         const { data: linkedAnomalies, error } = await supabase
           .from("linked_anomalies")
-          .select("id, anomaly_id, automaton, unlocked")
+          .select("id, anomaly_id, automaton, unlocked, date")
           .eq("automaton", "WeatherSatellite")
           .eq("author", session.user.id)
           .limit(1);
+
+        // Handle missing unlocked column gracefully
+        if (error && error.message?.includes('unlocked')) {
+          console.warn('Database missing unlocked column in SatellitePosition, falling back');
+          
+          const { data: fallbackAnomalies, error: fallbackError } = await supabase
+            .from("linked_anomalies")
+            .select("id, anomaly_id, automaton, date")
+            .eq("automaton", "WeatherSatellite")
+            .eq("author", session.user.id)
+            .limit(1);
+
+          if (fallbackError) throw fallbackError;
+
+          if (fallbackAnomalies && fallbackAnomalies.length > 0) {
+            const anomaly = { ...fallbackAnomalies[0], unlocked: false }; // Default to locked
+            const deployTime = new Date(anomaly.date);
+            const satelliteData: Satellite = {
+              id: anomaly.id.toString(),
+              x: 50,
+              y: 50,
+              hasUnclassifiedAnomaly: true,
+              anomalyId: anomaly.anomaly_id.toString(),
+              tile: satelliteTiles[0],
+              unlocked: anomaly.unlocked,
+              linkedAnomalyId: anomaly.id.toString(),
+              deployTime: deployTime,
+            };
+            setPositions([satelliteData]);
+          }
+          return;
+        }
 
         if (error) throw error;
 
         if (linkedAnomalies.length > 0) {
           const anomaly = linkedAnomalies[0];
+          const deployTime = new Date(anomaly.date);
           const satelliteData: Satellite = {
             id: anomaly.id.toString(),
             x: 50,
@@ -70,6 +153,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
             tile: satelliteTiles[0],
             unlocked: anomaly.unlocked || false,
             linkedAnomalyId: anomaly.id.toString(),
+            deployTime: deployTime,
           };
 
           setPositions([satelliteData]);
@@ -90,13 +174,20 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
       const { error } = await supabase
         .from("linked_anomalies")
         .update({ 
-          unlocked: true, 
-          unlock_time: new Date().toISOString() 
+          unlocked: true
         })
         .eq("id", selectedSatellite.linkedAnomalyId)
         .eq("author", session.user.id);
 
-      if (error) throw error;
+      if (error) {
+        // Handle case where unlocked column doesn't exist
+        if (error.message?.includes('unlocked')) {
+          console.warn('Cannot unlock: unlocked column missing in database');
+          alert('Unlock feature requires database update. Please contact support.');
+          return;
+        }
+        throw error;
+      }
 
       // Update the satellite state
       setPositions(prev => 
@@ -111,6 +202,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
       setSelectedSatellite(null);
     } catch (err) {
       console.error("Error unlocking anomaly:", err);
+      alert('Failed to unlock satellite. Please try again.');
     } finally {
       setIsUnlocking(false);
     }
@@ -131,22 +223,31 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
 
   useEffect(() => {
     const interval = setInterval(() => {
+      setCurrentTime(new Date());
+      
       setPositions((prev) =>
-        prev.map((sat) => ({
-          ...sat,
-          x: (sat.x + 0.3) % 100, // Slower movement
-          y: (sat.y + 0.2) % 100, // Slower movement
-        }))
+        prev.map((sat) => {
+          const timeSinceDeploy = getTimeSinceDeploy(sat.deployTime).total;
+          const newPosition = calculateSatellitePosition(sat, timeSinceDeploy);
+          return {
+            ...sat,
+            x: newPosition.x,
+            y: newPosition.y,
+          };
+        })
       );
-    }, 500); // Slower interval
+      
+      // Cycle through satellite tile images
+      setCurrentTileIndex((prev) => (prev + 1) % satelliteTiles.length);
+    }, 1000); // Update every second for time display
 
     return () => clearInterval(interval);
   }, []);
 
   return (
     <>
-      <Card className="relative w-full h-48 rounded-lg text-white bg-transparent border-none">
-        <div className="absolute inset-0 z-0">
+      <Card className="relative w-full h-48 rounded-lg text-white bg-card border border-chart-4/30">
+        <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
           <TelescopeBackground
             sectorX={0}
             sectorY={0}
@@ -155,6 +256,14 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
           />
         </div>
         <div className="p-4 relative z-10">
+          {/* Time Since Deploy Display */}
+          {positions.length > 0 && (
+            <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1.5 text-white text-sm font-mono">
+              <div className="text-xs text-gray-300">Deploy Time</div>
+              <div className="font-semibold">{formatTimeSinceDeploy(positions[0].deployTime)}</div>
+            </div>
+          )}
+          
           {positions.map((sat) => (
             <div
               key={sat.id}
@@ -166,11 +275,11 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
               onClick={() => handleSatelliteClick(sat)}
             >
               <Image
-                src={sat.tile}
+                src={satelliteTiles[currentTileIndex]}
                 alt="Satellite"
                 width={59} // Increased by 18% (50 * 1.18)
                 height={59} // Increased by 18% (50 * 1.18)
-                className="" // Removed animate-spin
+                className="transition-opacity duration-200 transform rotate-[86deg]" // Smooth transition between frames + rotation
               />
               {sat.hasUnclassifiedAnomaly && (
                 <div

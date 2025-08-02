@@ -56,7 +56,7 @@ export function MobileMenu({
               className={`justify-start ${
                 viewMode === "viewport"
                   ? "bg-[#5E81AC] hover:bg-[#81A1C1] text-white"
-                  : "border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
+                  : "border-[#78cce2] text-[#78cce2] hover:bg-[#78cce2]/10 hover:text-[#e4eff0]"
               }`}
             >
               <Telescope className="h-4 w-4 mr-2" />
@@ -71,7 +71,7 @@ export function MobileMenu({
               className={`justify-start ${
                 viewMode === "discoveries"
                   ? "bg-[#5E81AC] hover:bg-[#81A1C1] text-white"
-                  : "border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
+                  : "border-[#78cce2] text-[#78cce2] hover:bg-[#78cce2]/10 hover:text-[#e4eff0]"
               }`}
             >
               <Archive className="h-4 w-4 mr-2" />
@@ -86,7 +86,7 @@ export function MobileMenu({
               className={`justify-start ${
                 viewMode === "skill-tree"
                   ? "bg-[#5E81AC] hover:bg-[#81A1C1] text-white"
-                  : "border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
+                  : "border-[#78cce2] text-[#78cce2] hover:bg-[#78cce2]/10 hover:text-[#e4eff0]"
               }`}
             >
               <TreePine className="h-4 w-4 mr-2" />
@@ -105,7 +105,7 @@ export function MobileMenu({
                 variant="outline"
                 size="sm"
                 onClick={() => handleNavigate("up")}
-                className="border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
+                className="border-[#78cce2] text-[#78cce2] hover:bg-[#78cce2]/10 hover:text-[#e4eff0]"
               >
                 <ChevronUp className="h-4 w-4" />
               </Button>
@@ -114,7 +114,7 @@ export function MobileMenu({
                 variant="outline"
                 size="sm"
                 onClick={() => handleNavigate("left")}
-                className="border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
+                className="border-[#78cce2] text-[#78cce2] hover:bg-[#78cce2]/10 hover:text-[#e4eff0]"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -125,7 +125,7 @@ export function MobileMenu({
                 variant="outline"
                 size="sm"
                 onClick={() => handleNavigate("right")}
-                className="border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
+                className="border-[#78cce2] text-[#78cce2] hover:bg-[#78cce2]/10 hover:text-[#e4eff0]"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -134,7 +134,7 @@ export function MobileMenu({
                 variant="outline"
                 size="sm"
                 onClick={() => handleNavigate("down")}
-                className="border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
+                className="border-[#78cce2] text-[#78cce2] hover:bg-[#78cce2]/10 hover:text-[#e4eff0]"
               >
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -153,7 +153,7 @@ export function MobileMenu({
               className={`w-full justify-start ${
                 !selectedProject
                   ? "bg-[#5E81AC] hover:bg-[#81A1C1] text-white"
-                  : "border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
+                  : "border-[#78cce2] text-[#78cce2] hover:bg-[#78cce2]/10 hover:text-[#e4eff0]"
               }`}
             >
               All Projects
@@ -166,7 +166,7 @@ export function MobileMenu({
                 className={`w-full justify-between ${
                   selectedProject?.id === project.id
                     ? "bg-[#5E81AC] hover:bg-[#81A1C1] text-white"
-                    : "border-[#4C566A] text-[#ECEFF4] hover:bg-[#4C566A]/50"
+                    : "border-[#78cce2] text-[#78cce2] hover:bg-[#78cce2]/10 hover:text-[#e4eff0]"
                 }`}
               >
                 <span className="truncate">{project.name}</span>

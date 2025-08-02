@@ -312,7 +312,7 @@ export default function ImageAnnotator({
 
       {selectedImage && (
         <>
-          <div className={`w-full overflow-auto text-center ${className.includes('max-h-') ? className : ''}`}>
+          <div className="w-full text-center max-h-[50vh] md:max-h-[60vh] overflow-auto">
             <AnnotationCanvas
               canvasRef={canvasRef}
               imageRef={imageRef}
