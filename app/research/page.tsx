@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import GameNavbar from "@/components/Layout/Tes";
-import { Button } from "@/components/ui/button";
+import GameNavbar from "@/src/components/layout/Tes";
+import { Button } from "@/src/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/src/components/ui/dialog";
 import { ChevronDown } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
-import BiologyResearch from "@/components/Research/BiologyItems";
-import AstronomyResearch from "@/components/Research/AstronomyItems";
-import MeteorologyResearch from "@/components/Research/MeteorologyItems";
-import ReferralCodePanel from "@/components/Account/Referrals";
-import AutomatonSurfaceRoverResearch from "@/components/Research/Automatons/Rovers";
+import TotalPoints from "@/src/components/deployment/missions/structures/Stardust/Total";
+import BiologyResearch from "@/src/components/research/BiologyItems";
+import AstronomyResearch from "@/src/components/research/AstronomyItems";
+import MeteorologyResearch from "@/src/components/research/MeteorologyItems";
+import ReferralCodePanel from "@/src/components/profile/setup/Referrals";
+import AutomatonSurfaceRoverResearch from "@/src/components/research/Automatons/Rovers";
 
 type CapacityKey =
   | "probeCount"

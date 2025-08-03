@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { SimplePostSingle } from "@/content/Posts/SimplePostSingle";
-import StructuresOnPlanet from "@/components/Structures/Structures";
-import Navbar from "@/components/Layout/Navbar";
-import GameNavbar from "@/components/Layout/Tes";
-import { Button } from "@/components/ui/button";
+import { SimplePostSingle } from "@/src/components/social/posts/SimplePostSingle";
+import StructuresOnPlanet from "@/src/components/deployment/structures/Structures";
+import Navbar from "@/src/components/layout/Navbar";
+import GameNavbar from "@/src/components/layout/Tes";
+import { Button } from "@/src/components/ui/button";
 import { useRouter } from "next/navigation";
 
 interface Classification {

@@ -5,9 +5,9 @@ import Home from "@/app/page";
 import { useSession } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import { BuildingIcon, CloudCogIcon, MicroscopeIcon } from "lucide-react";
-import ChatGPTImageClassifier from "@/app/tests/pleaseWork";
-import GameNavbar from "@/components/Layout/Tes";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import ChatGPTImageClassifier from "@/src/components/classification/tools/image-classifier";
+import GameNavbar from "@/src/components/layout/Tes";
+import { Dialog, DialogContent } from "@/src/components/ui/dialog";
 
 export default function CameraAggregatesPage() {
     const session = useSession();

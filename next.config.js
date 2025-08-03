@@ -5,6 +5,8 @@ const nextConfig = {
 	images: {
 	  unoptimized: true,
 	},
+	// This is required to support PostHog trailing slash API requests
+	skipTrailingSlashRedirect: true,
 	async rewrites() {
 	  return [
 		// Rewrite /citizen requests to the Flask API
@@ -22,6 +24,19 @@ const nextConfig = {
 			process.env.NODE_ENV === 'development'
 			  ? 'http://127.0.0.1:5328/api/:path*' // Next.js API during development
 			  : '/api/', // Next.js API in production
+		},
+		// PostHog rewrites to support local ingest proxy
+		{
+		  source: '/ingest/static/:path*',
+		  destination: 'https://us-assets.i.posthog.com/static/:path*',
+		},
+		{
+		  source: '/ingest/:path*',
+		  destination: 'https://us.i.posthog.com/:path*',
+		},
+		{
+		  source: '/ingest/flags',
+		  destination: 'https://us.i.posthog.com/flags',
 		},
 	  ];
 	},

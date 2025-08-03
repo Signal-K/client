@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useSessionContext } from "@supabase/auth-helpers-react"
 
-import { StarterLidar } from "@/components/Projects/Lidar/Clouds"
-import GameNavbar from "@/components/Layout/Tes"
+import { StarterLidar } from "@/src/components/research/projects/Lidar/Clouds"
+import GameNavbar from "@/src/components/layout/Tes"
 
 export default function BalloonClassifyPage() {
     const params = useParams();

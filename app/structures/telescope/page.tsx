@@ -2,10 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import Home from "@/app/page";
-import GameNavbar from "@/components/Layout/Tes";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import GameNavbar from "@/src/components/layout/Tes";
+import { Dialog, DialogContent } from "@/src/components/ui/dialog";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import TelescopeViewport from "@/components/Structures/Telescope/telescope-viewport";
+import TelescopeViewport from "@/src/components/classification/telescope/telescope-viewport";
 import { useState, useEffect } from "react";
 
 export default function TelescopeOnEarthPage() {

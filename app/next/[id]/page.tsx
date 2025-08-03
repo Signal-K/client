@@ -1,4 +1,4 @@
-import ClientClassificationPage from "@/components/Projects/(classifications)/NextScene";
+import ClientClassificationPage from "@/src/components/research/projects/(classifications)/NextScene";
 
 type Props = {
   params: { id: string };

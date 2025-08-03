@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import Navbar from "@/components/Layout/Navbar";
-import { PostCardSingleWithGeneratorEditMode } from "@/content/Posts/PostWithGen";
-import CloudClassificationSummary from "@/components/Structures/Missions/Meteorologists/Cloudspotting/CloudAggregator";
-import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
+import Navbar from "@/src/components/layout/Navbar";
+import { PostCardSingleWithGeneratorEditMode } from "@/src/components/social/posts/PostWithGen";
+import CloudClassificationSummary from "@/src/components/deployment/missions/structures/Meteorologists/Cloudspotting/CloudAggregator";
+import BiomeAggregator from "@/src/components/discovery/data-sources/BiomeAggregator";
 
 import { Classification } from "../../[id]/page";
 

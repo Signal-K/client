@@ -1,17 +1,15 @@
 "use client";
 
-import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
-// import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
-import WeatherEventsOverview from "@/components/Data/Generator/Weather/EventsAcrossMyLocations";
-import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
-import MilestoneTotalCompleted from "@/components/Structures/Missions/Milestones/Completed";
-import MilestoneCard from "@/components/Structures/Missions/Milestones/MilestoneCard";
-import { NewMilestones } from "@/components/Structures/Missions/Milestones/MilestonesNewUi";
-import TotalPoints from "@/components/Structures/Missions/Stardust/Total";
-import MySettlementsLocations from "@/content/Classifications/UserLocations";
-import NPSPopup from "@/src/shared/helpers/nps-popup";
+import PlanetGenerator from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator";
+// import PlanetGenerator from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator";
+import MilestoneTotalCompleted from "@/src/components/deployment/missions/structures/Milestones/Completed";
+import MilestoneCard from "@/src/components/deployment/missions/structures/Milestones/MilestoneCard";
+import { NewMilestones } from "@/src/components/deployment/missions/structures/Milestones/MilestonesNewUi";
+import TotalPoints from "@/src/components/deployment/missions/structures/Stardust/Total";
+import MySettlementsLocations from "@/src/components/classification/UserLocations";
+import NPSPopup from "@/src/components/ui/helpers/nps-popup";
 // import TelescopeViewport from "@/telescope-viewport";
-import { TelescopeBackground } from "@/components/Structures/Telescope/telescope-background";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 // import { PlanetGenerator } from "starsailors-planet-generator";

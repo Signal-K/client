@@ -1,0 +1,32 @@
+{
+  "samplePlanet": {
+    "id": 1,
+    "name": "Test Planet",
+    "description": "A test planet for E2E testing",
+    "coordinates": {
+      "x": 100,
+      "y": 200,
+      "z": 50
+    }
+  },
+  "planets": [
+    {
+      "id": 1,
+      "name": "Earth",
+      "type": "terrestrial",
+      "discovered": true
+    },
+    {
+      "id": 2,
+      "name": "Mars",
+      "type": "terrestrial",
+      "discovered": true
+    },
+    {
+      "id": 3,
+      "name": "Kepler-452b",
+      "type": "exoplanet",
+      "discovered": false
+    }
+  ]
+}

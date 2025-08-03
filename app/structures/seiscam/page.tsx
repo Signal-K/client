@@ -3,8 +3,8 @@
 import React, { useEffect } from "react"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import { useRouter } from "next/navigation"
-import GameNavbar from "@/components/Layout/Tes"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import GameNavbar from "@/src/components/layout/Tes"
+import { Dialog, DialogContent } from "@/src/components/ui/dialog"
 import {
   BuildingIcon,
   CameraOffIcon,

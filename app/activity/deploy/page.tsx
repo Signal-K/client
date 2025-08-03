@@ -2,23 +2,19 @@
 
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { AvatarGenerator } from "@/components/Account/Avatar"
-import DeployTelescopeViewport from "@/components/(scenes)/deploy/TelescopeViewportRange"
-import { Button } from "@/components/ui/button"
+import { AvatarGenerator } from "@/src/components/profile/setup/Avatar"
+import DeployTelescopeViewport from "@/src/components/ui/scenes/deploy/TelescopeViewportRange"
+import { Button } from "@/src/components/ui/button"
 import { useSession } from "@supabase/auth-helpers-react"
 import { ArrowLeft, User, Sun, Moon } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Switch } from "@/components/ui/switch"
+import { Switch } from "@/src/components/ui/switch"
+import UseDarkMode from "@/src/shared/hooks/useDarkMode"
 
 export default function NewDeployPage() {
   const router = useRouter()
   const session = useSession()
-  const [isDark, setIsDark] = useState(false)
-
-  const handleThemeToggle = () => {
-    setIsDark(!isDark)
-    document.documentElement.classList.toggle("dark", !isDark)
-  }
+  const { isDark, toggleDarkMode } = UseDarkMode()
 
   return (
     <div className="h-screen w-full flex flex-col bg-gradient-to-b from-[#E5EEF4] to-[#D8E5EC] overflow-hidden">
@@ -39,7 +35,7 @@ export default function NewDeployPage() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Sun className="w-4 h-4 text-chart-2" />
-              <Switch checked={isDark} onCheckedChange={handleThemeToggle} />
+              <Switch checked={isDark} onCheckedChange={toggleDarkMode} />
               <Moon className="w-4 h-4 text-chart-4" />
             </div>
             <div className="relative h-8 w-8 rounded-full flex items-center justify-center">

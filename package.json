@@ -13,7 +13,20 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:introspect": "drizzle-kit introspect"
+    "db:introspect": "drizzle-kit introspect",
+    "test": "vitest",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:e2e": "cypress run",
+    "test:e2e:local": "SKIP_USER_CREATION_TESTS=false cypress run",
+    "test:e2e:open": "cypress open",
+    "test:e2e:headless": "SKIP_USER_CREATION_TESTS=true cypress run --headless",
+    "test:all": "npm run test:unit && npm run test:e2e",
+    "docker:test:unit": "docker-compose -f docker-compose.test.yml --profile unit up --build --abort-on-container-exit",
+    "docker:test:e2e": "docker-compose -f docker-compose.test.yml --profile e2e up --build --abort-on-container-exit",
+    "docker:test:e2e:local": "docker-compose -f docker-compose.test.yml --profile local-test up --build --abort-on-container-exit",
+    "docker:test:all": "docker-compose -f docker-compose.test.yml --profile all up --build --abort-on-container-exit",
+    "docker:test:clean": "docker-compose -f docker-compose.test.yml down --volumes --remove-orphans"
   },
   "dependencies": {
     "@dicebear/collection": "^9.2.2",
@@ -61,6 +74,7 @@
     "daisyui": "^4.11.1",
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.2.0",
+    "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.3",
     "formidable": "^3.5.2",
     "framer-motion": "^12.0.5",
@@ -74,6 +88,8 @@
     "openai": "^4.86.1",
     "polished": "^4.3.1",
     "postcss": "^8.4.30",
+    "posthog-js": "^1.258.2",
+    "posthog-node": "^5.6.0",
     "postprocessing": "^6.36.4",
     "react": "^18.3.1",
     "react-colorful": "^5.6.1",
@@ -94,19 +110,25 @@
     "web-push": "^3.6.7"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.4",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/d3": "^7.4.3",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.7.8",
     "@types/react": "^18.2.22",
     "@types/react-dom": "^18.2.7",
     "@types/web-push": "^3.6.4",
+    "cypress": "^14.5.3",
     "daisyui": "^4.11.1",
     "drizzle-kit": "^0.31.4",
+    "jsdom": "^26.1.0",
     "knip": "^5.33.3",
     "markerjs2": "^2.32.3",
     "postcss": "^8.4.30",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=19.0.0"

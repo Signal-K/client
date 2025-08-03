@@ -5,15 +5,15 @@ import { useParams, useRouter } from "next/navigation"
 import { useSessionContext } from "@supabase/auth-helpers-react"
 
 // Mission imports
-import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters"
-import { StarterSunspot } from "@/components/Projects/Telescopes/Sunspots"
-import { StarterTelescopeTess } from "@/components/Projects/Telescopes/Transiting"
-import GameNavbar from "@/components/Layout/Tes"
-import PlanetTypeCommentForm from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetType"
-import VotePlanetClassifications from "@/components/Structures/Missions/Astronomers/PlanetHunters/PHVote"
-import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator"
-import { DailyMinorPlanetWithId } from "@/components/Projects/Telescopes/DailyMinorPlanet"
-import { TelescopeBackground } from "@/components/Structures/Telescope/telescope-background"
+import PlanetHuntersSteps from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetHunters"
+import { StarterSunspot } from "@/src/components/research/projects/Telescopes/Sunspots"
+import { StarterTelescopeTess } from "@/src/components/research/projects/Telescopes/Transiting"
+import GameNavbar from "@/src/components/layout/Tes"
+import PlanetTypeCommentForm from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetType"
+import VotePlanetClassifications from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PHVote"
+import PlanetGenerator from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator"
+import { DailyMinorPlanetWithId } from "@/src/components/research/projects/Telescopes/DailyMinorPlanet"
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
 
 export default function TelescopeClassifyPage() {
   const params = useParams()
@@ -82,7 +82,19 @@ export default function TelescopeClassifyPage() {
       case "daily-minor-planet":
         switch (mission) {
           case "classify":
-            component = <DailyMinorPlanetWithId />
+            // Extract anomaly ID from params.id (remove "db-" prefix if present)
+            const anomalyId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
+            component = <DailyMinorPlanetWithId anomalyId={anomalyId} />
+            break
+        }
+        break
+
+      case "active-asteroids":
+        switch (mission) {
+          case "classify":
+            // Extract anomaly ID from params.id (remove "db-" prefix if present)
+            const activeAsteroidId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
+            component = <DailyMinorPlanetWithId anomalyId={activeAsteroidId} />
             break
         }
         break

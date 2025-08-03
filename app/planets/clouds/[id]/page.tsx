@@ -1,4 +1,4 @@
-import CloudDetailsClient from './client';
+import CloudDetailsClient from '@/src/components/discovery/planets/client';
 
 type MyCloudPageProps = {
     params: {

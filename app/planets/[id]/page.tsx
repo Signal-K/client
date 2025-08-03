@@ -2,18 +2,18 @@
 
 import React, { useEffect, useCallback, useState, useMemo } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { PostCardSingleWithGenerator } from "@/content/Posts/PostWithGen";
+import { PostCardSingleWithGenerator } from "@/src/components/social/posts/PostWithGen";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import { ArrowLeft, Droplets, FileText, Info, Thermometer } from "lucide-react";
-import PlanetGenerator from "@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator";
+import PlanetGenerator from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator";
 // import { PlanetGenerator } from "starsailors-planet-generator";
-import WeatherEventStatus from "@/components/Data/Generator/Weather/EventsCounter";
-import BiomassStats from "@/components/Structures/Missions/Biologists/BiomassOnPlanet";
-import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
-import PlanetProgress from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetCompletion";
-// import WeatherGenerator from "@/components/Data/Generator/Weather/SimpleWeatherEvents";
-import GameNavbar from "@/components/Layout/Tes";
+// import WeatherEventStatus from "@/src/components/discovery/data-sources/Weather/EventsCounter";
+// import BiomassStats from "@/src/components/deployment/missions/structures/Biologists/BiomassOnPlanet";
+import BiomeAggregator from "@/src/components/discovery/data-sources/BiomeAggregator";
+import PlanetProgress from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetCompletion";
+// import WeatherGenerator from "@/src/components/discovery/data-sources/Weather/SimpleWeatherEvents";
+import GameNavbar from "@/src/components/layout/Tes";
 
 export interface Classification {
   id: number;

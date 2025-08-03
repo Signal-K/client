@@ -41,6 +41,35 @@ services:
     profiles:
       - studio
 
+  # E2E Testing Service
+  e2e-tests:
+    container_name: e2e-tests
+    build:
+      context: ./
+      dockerfile: test.dockerfile
+    ports:
+      - "3001:3000"  # Different port to avoid conflicts
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=test
+      - SKIP_USER_CREATION_TESTS=true
+      - CYPRESS_baseUrl=http://nextapp:3000
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - /app/.next
+      - /app/.cypress
+    working_dir: /app
+    networks:
+      - app-network
+    depends_on:
+      - nextapp
+    profiles:
+      - test
+    # Override default command for different test types
+    command: "yarn test:e2e:headless"
+
   # Optional: Flask service (uncomment if needed)
   # flask:
   #   container_name: flask
