@@ -5,6 +5,7 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Textarea } from "@/src/components/ui/textarea";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 export default function SurveyorCalculator({ classificationId }: Props) {
   const supabase = useSupabaseClient();
   const session = useSession();
+  const router = useRouter();
 
   const [calculatorInputs, setCalculatorInputs] = useState({
     input1: "",
@@ -24,11 +26,13 @@ export default function SurveyorCalculator({ classificationId }: Props) {
   const [selectedCalculator, setSelectedCalculator] = useState<string>("");
   const [newComment, setNewComment] = useState<string>("");
   const [calculatedValueComment, setCalculatedValueComment] = useState<string>("");
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const handleAddComment = async () => {
     if (!newComment.trim() && !calculatedValueComment.trim()) return;
 
     try {
+      console.log('CalculatorSurveyor: Starting comment submission...');
       const { error } = await supabase.from("comments").insert([
         {
           content: `Calculated Value: ${calculatedValueComment}\nGeneral Comment: ${newComment}`,
@@ -39,8 +43,26 @@ export default function SurveyorCalculator({ classificationId }: Props) {
       ]);
 
       if (error) throw error;
+      
+      console.log('CalculatorSurveyor: Comment submitted successfully, showing popup...');
       setNewComment("");
       setCalculatedValueComment("");
+      setShowSuccessPopup(true);
+      
+      // Show popup and redirect after 3 seconds
+      const redirectTimeout = setTimeout(() => {
+        console.log('CalculatorSurveyor: Attempting redirect to dashboard...');
+        try {
+          router.push('/');
+          console.log('CalculatorSurveyor: Router.push called successfully');
+        } catch (error) {
+          console.error('CalculatorSurveyor: Router.push error:', error);
+          // Fallback to window.location
+          window.location.href = '/';
+        }
+      }, 3000);
+      
+      console.log('CalculatorSurveyor: Redirect timeout set, ID:', redirectTimeout);
     } catch (error: any) {
       console.error("Error adding comment:", error.message);
     }
@@ -146,7 +168,20 @@ export default function SurveyorCalculator({ classificationId }: Props) {
 
       if (error) throw error;
 
+      console.log('CalculatorSurveyor: Density comment submitted successfully, showing popup...');
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
+      setShowSuccessPopup(true);
+      
+      // Show popup and redirect after 3 seconds
+      setTimeout(() => {
+        console.log('CalculatorSurveyor: Redirecting to dashboard from density...');
+        try {
+          router.push('/');
+        } catch (error) {
+          console.error('CalculatorSurveyor: Router error:', error);
+          window.location.href = '/';
+        }
+      }, 3000);
 
     } catch (error) {
       console.error("Error adding density comment:", error);
@@ -179,7 +214,20 @@ export default function SurveyorCalculator({ classificationId }: Props) {
 
       if (error) throw error;
 
+      console.log('CalculatorSurveyor: Temperature comment submitted successfully, showing popup...');
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
+      setShowSuccessPopup(true);
+      
+      // Show popup and redirect after 3 seconds
+      setTimeout(() => {
+        console.log('CalculatorSurveyor: Redirecting to dashboard from temperature...');
+        try {
+          router.push('/');
+        } catch (error) {
+          console.error('CalculatorSurveyor: Router error:', error);
+          window.location.href = '/';
+        }
+      }, 3000);
 
     } catch (error) {
       console.error("Error adding temperature comment:", error);
@@ -212,7 +260,20 @@ export default function SurveyorCalculator({ classificationId }: Props) {
 
       if (error) throw error;
 
+      console.log('CalculatorSurveyor: Period comment submitted successfully, showing popup...');
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
+      setShowSuccessPopup(true);
+      
+      // Show popup and redirect after 3 seconds
+      setTimeout(() => {
+        console.log('CalculatorSurveyor: Redirecting to dashboard from period...');
+        try {
+          router.push('/');
+        } catch (error) {
+          console.error('CalculatorSurveyor: Router error:', error);
+          window.location.href = '/';
+        }
+      }, 3000);
 
     } catch (error) {
       console.error("Error adding period comment: ", error);
@@ -249,11 +310,25 @@ export default function SurveyorCalculator({ classificationId }: Props) {
         throw error;
       };
 
-    setCalculatorInputs({
-      input1: "",
-      input2: "",
-      input3: "",
-    });
+      console.log('CalculatorSurveyor: Radius comment submitted successfully, showing popup...');
+      setCalculatorInputs({
+        input1: "",
+        input2: "",
+        input3: "",
+      });
+      setShowSuccessPopup(true);
+      
+      // Show popup and redirect after 3 seconds
+      setTimeout(() => {
+        console.log('CalculatorSurveyor: Redirecting to dashboard from radius...');
+        try {
+          router.push('/');
+        } catch (error) {
+          console.error('CalculatorSurveyor: Router error:', error);
+          window.location.href = '/';
+        }
+      }, 3000);
+      
   } catch (error: any) {
     console.error("Error adding your comment: ", error)
   }
@@ -416,6 +491,30 @@ export default function SurveyorCalculator({ classificationId }: Props) {
           </Button>
         </div>
       </div>
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4 text-center">
+            <div className="mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Calculation Submitted!
+              </h3>
+              <p className="text-gray-600">
+                Your calculation has been entered into the research database. Redirecting you to the dashboard...
+              </p>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="bg-green-600 h-2 rounded-full animate-pulse" style={{width: '100%'}}></div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

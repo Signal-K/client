@@ -211,10 +211,10 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   const handleSatelliteClick = (satellite: Satellite) => {
     if (satellite.hasUnclassifiedAnomaly) {
       if (satellite.unlocked) {
-        // If unlocked, navigate directly to classification
+        // If cloud found, navigate directly to classification
         window.location.href = `/structures/balloon/cloudspotting/db-${satellite.anomalyId}/classify`;
       } else {
-        // If not unlocked, show unlock dialog
+        // If still scanning, show cloud detection dialog
         setSelectedSatellite(satellite);
         setShowUnlockDialog(true);
       }
@@ -256,13 +256,19 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
           />
         </div>
         <div className="p-4 relative z-10">
-          {/* Time Since Deploy Display */}
-          {positions.length > 0 && (
-            <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1.5 text-white text-sm font-mono">
-              <div className="text-xs text-gray-300">Deploy Time</div>
-              <div className="font-semibold">{formatTimeSinceDeploy(positions[0].deployTime)}</div>
+          {/* Status Legend - Top Right Corner */}
+          <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-sm rounded-lg px-2 py-1 text-white text-xs font-sans">
+            <div className="flex flex-col gap-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-ping flex-shrink-0"></div>
+                <span className="text-xs whitespace-nowrap">Click to Scan</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-ping flex-shrink-0"></div>
+                <span className="text-xs whitespace-nowrap">Click to Observe</span>
+              </div>
             </div>
-          )}
+          </div>
           
           {positions.map((sat) => (
             <div
@@ -298,10 +304,10 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
       <Dialog open={showUnlockDialog} onOpenChange={setShowUnlockDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-primary">Satellite Data Available</DialogTitle>
+            <DialogTitle className="text-primary">Cloud Formation Detected</DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Your weather satellite has detected new atmospheric data that requires analysis. 
-              Would you like to unlock and begin classification?
+              Your weather satellite has completed scanning the region of interest and detected a cloud formation ready for atmospheric analysis. 
+              Would you like to begin cloud observation and classification?
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-3 mt-4">
@@ -310,14 +316,14 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
               onClick={() => setShowUnlockDialog(false)}
               className="flex-1"
             >
-              Cancel
+              Continue Scanning
             </Button>
             <Button
               onClick={handleUnlockAnomaly}
               disabled={isUnlocking}
               className="flex-1"
             >
-              {isUnlocking ? "Unlocking..." : "Unlock Data"}
+              {isUnlocking ? "Analyzing..." : "Begin Observation"}
             </Button>
           </div>
         </DialogContent>

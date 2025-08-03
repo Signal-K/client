@@ -102,18 +102,41 @@ export function SurveyorCommentList({
     const fetchComments = async () => {
         setLoading(true);
 
-        const { data, error } = await supabase
-            .from("comments")
-            .select("*")
-            .eq("classification_id", classificationId)
-            .eq("surveyor", true)
-            .order('created_at', { ascending: true });
+        try {
+            const { data, error } = await supabase
+                .from("comments")
+                .select("*")
+                .eq("classification_id", classificationId)
+                .eq("surveyor", true)
+                .order('created_at', { ascending: true });
 
-        if (error) {
-            console.error("Failed to fetch surveyor comments ", error.message);
-        } else {
-            setComments(data);
-        };
+            if (error) {
+                // If surveyor column doesn't exist, fall back to all comments
+                if (error.message?.includes('surveyor')) {
+                    console.warn('Surveyor column not found, falling back to all comments');
+                    const { data: fallbackData, error: fallbackError } = await supabase
+                        .from("comments")
+                        .select("*")
+                        .eq("classification_id", classificationId)
+                        .order('created_at', { ascending: true });
+                    
+                    if (fallbackError) {
+                        console.error("Failed to fetch comments:", fallbackError.message);
+                        setComments([]);
+                    } else {
+                        setComments(fallbackData || []);
+                    }
+                } else {
+                    console.error("Failed to fetch surveyor comments:", error.message);
+                    setComments([]);
+                }
+            } else {
+                setComments(data || []);
+            }
+        } catch (err) {
+            console.error("Error fetching comments:", err);
+            setComments([]);
+        }
 
         setLoading(false);
     };

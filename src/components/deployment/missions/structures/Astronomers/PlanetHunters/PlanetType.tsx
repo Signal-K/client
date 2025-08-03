@@ -1,5 +1,8 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/navigation";
 import { SimplePostSingle } from "@/src/components/social/posts/SimplePostSingle";
 
 interface Classification {
@@ -27,11 +30,13 @@ interface PlanetTypeCommentFormProps {
 const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps) => {
   const supabase = useSupabaseClient();
   const session = useSession();
+  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [classifications, setClassifications] = useState<Classification[]>([]);
   const [comments, setComments] = useState<any[]>([]);
   const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const classificationIdNum = classificationId ? Number(classificationId) : undefined;
 
@@ -177,6 +182,7 @@ const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps)
     }
 
     try {
+      console.log("Inserting comment...");
       const { error } = await supabase.from("comments").insert([
         {
           content: commentInput,
@@ -186,10 +192,24 @@ const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps)
         },
       ]);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
 
       setCommentInputs((prev) => ({ ...prev, [classificationId]: "" }));
       console.log("Comment inserted successfully with planet type.");
+      
+      // Show success popup
+      console.log("Setting popup to true");
+      setShowSuccessPopup(true);
+      
+      // Redirect after 3 seconds
+      console.log("Setting redirect timeout");
+      setTimeout(() => {
+        console.log("Redirecting to dashboard");
+        router.push('/');
+      }, 3000);
     } catch (err) {
       console.error("Error inserting comment: ", err);
     }
@@ -346,6 +366,30 @@ const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps)
         </div>
       ) : (
         <p>No classifications found.</p>
+      )}
+      
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md mx-4 text-center animate-in zoom-in-95 duration-300">
+            <div className="mb-4">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Proposal Submitted!
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Proposal entered into community database, rerouting you to the dashboard
+              </p>
+            </div>
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
