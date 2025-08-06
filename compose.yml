@@ -1,5 +1,5 @@
 services:
-  # Next.js Application (using Supabase instead of local PostgreSQL)
+  # Next.js Application (using Supabase)
   nextapp:
     container_name: nextapp
     build:
@@ -86,6 +86,20 @@ services:
   #   working_dir: /app
   #   networks:
   #     - app-network
+
+  push-notifier:
+    container_name: push-notifier
+    build:
+      context: ./jobs
+      dockerfile: Dockerfile
+    env_file:
+      - .env.local
+    working_dir: /app
+    command: ["./push-notifications"]
+    networks:
+      - app-network
+    profiles:
+      - notify
 
 networks:
   app-network:
