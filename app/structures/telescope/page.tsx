@@ -20,20 +20,19 @@ export default function TelescopeOnEarthPage() {
       if (!session?.user?.id) return;
 
       try {
-        // Check if user has any telescope-specific linked anomalies
+        // Check if user has any linked anomalies (indicating they've deployed a telescope)
         const { data: linkedAnomalies, error } = await supabase
           .from("linked_anomalies")
           .select("id")
           .eq("author", session.user.id)
-          .eq("automaton", "Telescope")
           .limit(1);
 
         if (error) {
-          console.error("Error checking telescope linked anomalies:", error);
+          console.error("Error checking linked anomalies:", error);
           return;
         }
 
-        // If no telescope linked anomalies found, redirect to deploy page
+        // If no linked anomalies found, redirect to deploy page
         if (!linkedAnomalies || linkedAnomalies.length === 0) {
           router.push("/activity/deploy");
           return;
