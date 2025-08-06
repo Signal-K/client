@@ -32,10 +32,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci --legacy-peer-deps
 
       - name: Setup environment
         run: |
@@ -43,17 +43,17 @@ jobs:
           echo "NODE_ENV=test" >> $GITHUB_ENV
 
       - name: Build application
-        run: yarn build
+        run: npm run build
 
       - name: Start application
         run: |
-          yarn start &
+          npm start &
           sleep 10
         env:
           NODE_ENV: production
 
       - name: Run E2E tests
-        run: yarn test:e2e:headless
+        run: npm run test:e2e:headless
         env:
           SKIP_USER_CREATION_TESTS: true
 

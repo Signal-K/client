@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import { TelescopeView } from "@/src/components/classification/telescope/telescope-view"
-import type { Anomaly, Star } from "@/types/Structures/telescope" 
+import type { Anomaly, Star } from "@/types/Structures/telescope"
 import { generateSectorName, generateStars } from "@/src/components/classification/telescope/utils/sector-utils"
 import DeployTelescopeSidebar from "./sub/TelescopeSidebar"
 import DeployTelescopeMobileHeader from "./sub/TelescopeMobileHeader"
@@ -107,7 +107,6 @@ export default function DeployTelescopeViewport() {
       .from("linked_anomalies")
       .select("*")
       .eq("author", userId)
-      .eq("automaton", "Telescope")
       .gte("date", oneWeekAgo.toISOString())
 
     if (linkedAnomaliesError) {
@@ -273,34 +272,6 @@ export default function DeployTelescopeViewport() {
 
     const results = await Promise.all(inserts);
     const hasError = results.some(r => r.error);
-
-    if (!hasError) {
-      // Send notification about the deployment
-      try {
-        const anomalyNames = selectedAnomalies.map(a => a.content || `TESS-${String(a.id).padStart(3, "0")}`);
-        const sectorName = generateSectorName(selectedSector.x, selectedSector.y);
-        
-        const notificationTitle = "Telescope Deployed Successfully";
-        const notificationBody = `New targets discovered in ${sectorName}: ${anomalyNames.join(", ")}`;
-        
-        await fetch('/api/send-test-notification', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            title: notificationTitle,
-            message: notificationBody,
-            url: '/structures/telescope'
-          })
-        });
-        
-        console.log('Deployment notification sent successfully');
-      } catch (notificationError) {
-        console.error('Failed to send deployment notification:', notificationError);
-        // Don't let notification failure affect the deployment success
-      }
-    }
 
     setDeploymentMessage(
       hasError

@@ -35,7 +35,6 @@ import { useSatelliteManagement } from "@/hooks/useSatelliteManagement";
 import { useNPSManagement } from "@/hooks/useNPSManagement";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import SatellitePosition from "@/src/components/ui/scenes/deploy/SatellitePosition";
-import NotificationSubscribeButton from "@/src/components/providers/NotificationSubscribeButton";
 
 type PageSatellite = {
   id: string;
@@ -147,8 +146,6 @@ export default function ActivityPage() {
           />
         )}
 
-        <NotificationSubscribeButton />
-
         {/* Recent Discoveries */}
         <RecentDiscoveries
           linkedAnomalies={linkedAnomalies}
@@ -189,7 +186,7 @@ export default function ActivityPage() {
         /> */}
 
         {/* Legacy Milestones Section */}
-        {/* <LegacyMilestonesSection /> */}
+        <LegacyMilestonesSection />
 
         {/* Profile Setup or Complete Structures Section */}
         {needsProfileSetup &&(
