@@ -14,6 +14,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:introspect": "drizzle-kit introspect",
+    "notify:discoveries": "node scripts/notify-unclassified-discoveries.js",
     "test": "vitest",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",

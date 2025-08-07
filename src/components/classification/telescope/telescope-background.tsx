@@ -38,8 +38,8 @@ export function TelescopeBackground({
   const handleAnomalyClick = (anomaly: Anomaly) => {
     if (onAnomalyClick) {
       onAnomalyClick(anomaly)
-    }
-  }
+    };
+  };
 
   // Load data on mount
   useEffect(() => {

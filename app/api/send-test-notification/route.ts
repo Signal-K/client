@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
             title,
             body: message,
             url,
-            icon: '/assets/Captn.jpg'
+            icon: 'https://github.com/Signal-K/client/blob/main/public/assets/Captn.jpg?raw=true'
         });
 
         console.log(`Sending test notification to ${subscriptions.length} subscribers`);
