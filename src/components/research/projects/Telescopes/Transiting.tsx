@@ -17,6 +17,257 @@ type Anomaly = {
   content?: any;
 };
 
+export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
+  const supabase = useSupabaseClient()
+  const session = useSession()
+  const router = useRouter()
+
+  const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null)
+  const [imageUrls, setImageUrls] = useState<string[]>([])
+  const [availableSectors, setAvailableSectors] = useState<number[]>([])
+  const [currentSector, setCurrentSector] = useState<number>(1)
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>("")
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [showTutorial, setShowTutorial] = useState(false)
+  const [sectorsExpanded, setSectorsExpanded] = useState(false)
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
+
+  const fetchAvailableSectors = async (anomalyId: number) => {
+    try {
+      const { data: files, error } = await supabase.storage
+        .from('anomalies')
+        .list(`${anomalyId}`, {
+          limit: 100,
+          offset: 0,
+        })
+
+      if (error) {
+        console.error("Error fetching sectors:", error)
+        return [1] // Default to sector 1 if there's an error
+      }
+
+      if (!files || files.length === 0) {
+        return [1] // Default to sector 1 if no files found
+      }
+
+      // Extract sector numbers from filenames like "Sector1.png", "Sector2.png", etc.
+      const sectors = files
+        .filter(file => file.name.match(/^Sector\d+\.png$/))
+        .map(file => {
+          const match = file.name.match(/^Sector(\d+)\.png$/)
+          return match ? parseInt(match[1], 10) : null
+        })
+        .filter((sector): sector is number => sector !== null)
+        .sort((a, b) => a - b)
+
+      return sectors.length > 0 ? sectors : [1]
+    } catch (err) {
+      console.error("Error in fetchAvailableSectors:", err)
+      return [1]
+    }
+  }
+
+  const handleSectorChange = (sector: number) => {
+    if (selectedAnomaly) {
+      setCurrentSector(sector)
+      const newImageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${selectedAnomaly.id}/Sector${sector}.png`
+      setCurrentImageUrl(newImageUrl)
+    }
+  }
+
+  useEffect(() => {
+    const fetchAnomalyById = async () => {
+      if (!session) {
+        setLoading(false)
+        return
+      }
+
+      try {
+        console.log("Fetching anomaly with ID:", anomalyId)
+        
+        let anomaly: Anomaly | null = null
+
+        if (anomalyId === "random" || !anomalyId) {
+          // Fetch a random anomaly from linked_anomalies for backward compatibility
+          const { data: linkedAnomalies, error: linkedError } = await supabase
+            .from("linked_anomalies")
+            .select(`
+              id,
+              anomaly_id,
+              anomalies!inner (
+                id,
+                anomalySet,
+                avatar_url,
+                content
+              )
+            `)
+            .eq("author", session.user.id)
+            .eq("anomalies.anomalySet", "telescope-tess");
+
+          if (linkedError) throw linkedError
+
+          if (!linkedAnomalies || linkedAnomalies.length === 0) {
+            router.push("/activity/deploy")
+            return
+          }
+
+          // Pick a random anomaly from the list
+          const randomIndex = Math.floor(Math.random() * linkedAnomalies.length)
+          anomaly = linkedAnomalies[randomIndex]?.anomalies as unknown as Anomaly
+        } else {
+          // Fetch specific anomaly by ID - remove restrictive filtering since planet-hunters can have various anomaly types
+          const { data: anomalies, error: anomalyError } = await supabase
+            .from("anomalies")
+            .select("id, content, anomalySet, avatar_url, anomalytype")
+            .eq("id", anomalyId);
+
+          if (anomalyError) {
+            console.error("Database error:", anomalyError);
+            throw anomalyError;
+          }
+
+          console.log("Query returned:", anomalies);
+
+          if (!anomalies || anomalies.length === 0) {
+            console.log("No anomaly found with ID:", anomalyId);
+            setError("Anomaly not found.");
+            return;
+          }
+
+          anomaly = anomalies[0];
+        }
+
+        if (!anomaly) {
+          setError("Unable to load anomaly.");
+          return;
+        }
+
+        setSelectedAnomaly(anomaly);
+
+        // Fetch available sectors for this anomaly
+        const sectors = await fetchAvailableSectors(anomaly.id)
+        setAvailableSectors(sectors)
+        setCurrentSector(sectors[0] || 1)
+
+        const urls: string[] = []
+        if (anomaly.avatar_url) urls.push(anomaly.avatar_url)
+        
+        // Set up image URLs for all sectors
+        const sectorUrls = sectors.map(sector => 
+          `${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector${sector}.png`
+        )
+        urls.push(...sectorUrls)
+
+        setImageUrls(urls)
+        
+        // Set the initial current image URL to the first sector
+        const initialImageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector${sectors[0] || 1}.png`
+        setCurrentImageUrl(initialImageUrl)
+
+      } catch (err: any) {
+        console.error("Error fetching anomaly:", err.message || err)
+        setError("Unable to load anomaly.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAnomalyById()
+  }, [session, anomalyId])
+
+  if (error) return <div className="text-red-500 p-4">{error}</div>
+  if (loading) return <div className="text-white p-4">Loading...</div>
+  if (!selectedAnomaly || !currentImageUrl)
+    return <div className="text-white p-4">No anomaly found.</div>
+
+  return (
+    <div className="w-full h-[calc(100vh-8rem)] overflow-hidden flex flex-col gap-2 px-4">
+      {/* Top Button Bar */}
+      <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-2 flex justify-center items-center flex-shrink-0">
+        <Button variant="outline" onClick={() => setShowTutorial(true)}>
+          Want a walkthrough? Start the tutorial
+        </Button>
+      </div>
+      
+      {/* Main content area with sidebar */}
+      <div className="flex-1 overflow-hidden min-h-0 flex gap-2">
+        {/* Left Sector Selector */}
+        {availableSectors.length > 1 && !showTutorial && (
+          <div className="flex-shrink-0">
+            <div className="h-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-2 flex flex-col items-center">
+              {/* Header with expand/collapse button */}
+              <div className="flex flex-col items-center mb-2">
+                <span className="text-xs text-white/70 mb-1">Sectors</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSectorsExpanded(!sectorsExpanded)}
+                  className="w-8 h-8 p-0 text-white/70 hover:bg-white/20"
+                >
+                  {sectorsExpanded ? "↑" : "↓"}
+                </Button>
+              </div>
+              
+              {/* Current sector (always visible) */}
+              <Button
+                variant="default"
+                size="sm"
+                className="w-10 h-10 p-0 text-sm bg-blue-600 text-white border-blue-600 mb-2"
+              >
+                {currentSector}
+              </Button>
+              
+              {/* Expanded sectors */}
+              {sectorsExpanded && (
+                <div className="flex flex-col gap-1">
+                  {availableSectors
+                    .filter(sector => sector !== currentSector)
+                    .map((sector) => (
+                      <Button
+                        key={sector}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSectorChange(sector)}
+                        className="w-10 h-10 p-0 text-sm bg-white/20 text-white border-white/30 hover:bg-white/30"
+                      >
+                        {sector}
+                      </Button>
+                    ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {/* Main content */}
+        <div className="flex-1 overflow-hidden min-h-0">
+          {showTutorial ? (
+            <div className="w-full h-full overflow-auto">
+              <FirstTelescopeClassification anomalyid={selectedAnomaly.id.toString()} />
+            </div>
+          ) : (
+            <div className="w-full h-full overflow-hidden">
+              <ImageAnnotator
+                key={`${selectedAnomaly.id}-sector-${currentSector}`}
+                anomalyType="planet"
+                missionNumber={1372001}
+                structureItemId={3103}
+                assetMentioned={selectedAnomaly.id.toString()}
+                annotationType="PH"
+                initialImageUrl={currentImageUrl}
+                anomalyId={selectedAnomaly.id.toString()}
+                className="h-full w-full"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function StarterTelescopeTess() {
   const supabase = useSupabaseClient()
   const session = useSession()

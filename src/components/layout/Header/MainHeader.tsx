@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "@supabase/auth-helpers-react";
-import { Bell, Sun, Moon, User, UserPlus, UserX, Zap } from "lucide-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { Bell, Sun, Moon, User, UserPlus, UserX, Zap, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,6 +56,7 @@ export default function MainHeader({
   otherClassifications,
 }: MainHeaderProps) {
   const session = useSession();
+  const supabase = useSupabaseClient();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   const isAnonymousUser = session?.user?.is_anonymous;
@@ -66,6 +67,17 @@ export default function MainHeader({
 
   const handleUpgradeSuccess = () => {
     setShowUpgradeModal(false);
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error signing out:", error.message);
+    } else {
+      console.log("User signed out successfully");
+      // Optionally redirect to home page or login page
+      window.location.href = '/';
+    }
   };
 
   return (
@@ -162,7 +174,10 @@ export default function MainHeader({
               )}
               
               <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-700 cursor-pointer">
+                <LogOut className="w-4 h-4 mr-2" />
+                Log out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
