@@ -47,6 +47,7 @@ interface ImageAnnotatorProps {
   classificationParent?: string;
   annotationType: 'AI4M' | 'P4' | 'PH' | 'CoM' | 'CAC' | 'JVH' | 'AA' | 'CoMS' | 'Sunspots' | 'Custom';
   className?: string;
+  onClassificationComplete?: () => void | Promise<void>;
 };
 
 export default function ImageAnnotator({
@@ -62,6 +63,7 @@ export default function ImageAnnotator({
   structureItemId,
   annotationType,
   className = '', // default empty
+  onClassificationComplete,
 }: ImageAnnotatorProps) {
   const router = useRouter();
 
@@ -70,7 +72,7 @@ export default function ImageAnnotator({
 
   const [selectedImage, setSelectedImage] = useState<string | null>(initialImageUrl);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [currentTool, setCurrentTool] = useState<Tool>('pen');
+  const [currentTool, setCurrentTool] = useState<Tool>('square');
   const [currentCategory, setCurrentCategory] = useState<AI4MCategory | P4Category>('Custom');
   const [lineWidth, setLineWidth] = useState(2);
   const [drawings, setDrawings] = useState<DrawingObject[]>([]);
@@ -171,6 +173,30 @@ export default function ImageAnnotator({
     img.src = initialImageUrl;
   }, [initialImageUrl]);
 
+  // Update cursor based on current tool and drawing state
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    
+    // Set cursor based on tool type and drawing state
+    if (currentTool === 'pen') {
+      if (isDrawing) {
+        // Enhanced pencil cursor when actively drawing
+        canvas.style.cursor = 'url("data:image/svg+xml,%3Csvg width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M3 21L21 3M21 3L19 5M21 3L19 1M3 21L5 19M3 21H1V23H3V21Z\' stroke=\'%23ff6b6b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") 3 21, auto';
+      } else {
+        // Regular pencil cursor when hovering
+        canvas.style.cursor = 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M2 18L18 2M18 2L16 4M18 2L16 0M2 18L4 16M2 18H0V20H2V18Z\' stroke=\'%23333\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") 2 18, auto';
+      }
+    } else if (currentTool === 'circle') {
+      canvas.style.cursor = isDrawing ? 'grabbing' : 'crosshair';
+    } else if (currentTool === 'square') {
+      canvas.style.cursor = isDrawing ? 'grabbing' : 'crosshair';
+    } else {
+      canvas.style.cursor = 'default';
+    }
+  }, [currentTool, isDrawing]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -214,6 +240,14 @@ export default function ImageAnnotator({
     acc[drawing.category] = (acc[drawing.category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+
+  // Function to clear all drawings
+  const handleClearAll = () => {
+    setDrawings([]);
+    setCurrentDrawing(null);
+    // Re-render the canvas to remove all annotations
+    renderCanvas();
+  };
 
   const [content, setContent] = useState<string>("");
   const [additionalFields, setAdditionalFields] = useState<{ [key: string]: string; }>({});
@@ -292,7 +326,13 @@ export default function ImageAnnotator({
       setUploads([]);
       setDrawings([]);
 
-      router.push(`/next/${classificationData.id}`);
+      // Call the completion callback if provided (for tutorial completion)
+      if (onClassificationComplete) {
+        onClassificationComplete();
+      } else {
+        // Only redirect if no callback is provided
+        router.push(`/next/${classificationData.id}`);
+      }
     } catch (error: any) {
       console.error("Unexpected error: ", error);
       alert("Classification error occurred. Please try again");
@@ -301,18 +341,33 @@ export default function ImageAnnotator({
 
   return (
     <div className={`space-y-2 max-w-full px-2 md:px-4 mx-auto overflow-x-hidden ${className}`}>
+      {/* Add custom styles for enhanced drawing experience */}
+      <style jsx>{`
+        .annotation-canvas-container {
+          transition: all 0.2s ease-in-out;
+        }
+        .annotation-canvas-container:hover {
+          transform: scale(1.01);
+        }
+        .annotation-canvas-container.drawing {
+          box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+          transform: scale(1.02);
+        }
+      `}</style>
+      
       <div className="flex justify-between items-center">
         <AnnotationTools
           currentTool={currentTool}
           setCurrentTool={setCurrentTool}
           lineWidth={lineWidth}
           setLineWidth={setLineWidth}
+          onClearAll={handleClearAll}
         />
       </div>
 
       {selectedImage && (
         <>
-          <div className="w-full text-center max-h-[50vh] md:max-h-[60vh] overflow-auto">
+          <div className={`w-full text-center max-h-[50vh] md:max-h-[60vh] overflow-auto annotation-canvas-container ${isDrawing ? 'drawing' : ''}`}>
             <AnnotationCanvas
               canvasRef={canvasRef}
               imageRef={imageRef}

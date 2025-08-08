@@ -3,10 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/src/core/context/ActivePlanet'; 
-import ClassificationForm from '@/src/components/research/projects/(classifications)/PostForm';
+import ImageAnnotator from '../(classifications)/Annotating/Annotator';
 import { planetClassificationConfig } from '@/src/components/research/projects/(classifications)/FormConfigurations';
 // import PreferredTerrestrialClassifications from '@/src/components/deployment/missions/structures/PickPlanet';
-import ImageAnnotator from '../(classifications)/Annotating/Annotator';
 import { Button } from "@/src/components/ui/button";
 import { useRouter } from 'next/navigation';
 
@@ -31,8 +30,33 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
   const [error, setError] = useState<string | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
   const [sectorsExpanded, setSectorsExpanded] = useState(false)
+  const [hasCompletedTutorial, setHasCompletedTutorial] = useState<boolean | null>(null)
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
+
+  // Check if user has completed a planet classification before
+  const checkTutorialCompletion = async () => {
+    if (!session?.user?.id) return false
+
+    try {
+      const { data: classifications, error } = await supabase
+        .from('classifications')
+        .select('id')
+        .eq('author', session.user.id)
+        .eq('classificationtype', 'planet')
+        .limit(1)
+
+      if (error) {
+        console.error('Error checking tutorial completion:', error)
+        return false
+      }
+
+      return classifications && classifications.length > 0
+    } catch (err) {
+      console.error('Error in checkTutorialCompletion:', err)
+      return false
+    }
+  }
 
   const fetchAvailableSectors = async (anomalyId: number) => {
     try {
@@ -78,12 +102,22 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
   }
 
   useEffect(() => {
-    const fetchAnomalyById = async () => {
+    const initializeComponent = async () => {
       if (!session) {
         setLoading(false)
         return
       }
 
+      // First check if user has completed tutorial
+      const tutorialCompleted = await checkTutorialCompletion()
+      setHasCompletedTutorial(tutorialCompleted)
+      
+      // For anonymous users or users who haven't completed tutorial, show tutorial by default
+      if (session.user.is_anonymous && !tutorialCompleted) {
+        setShowTutorial(true)
+      }
+
+      // Now fetch the anomaly data
       try {
         console.log("Fetching anomaly with ID:", anomalyId)
         
@@ -174,7 +208,7 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
       }
     }
 
-    fetchAnomalyById()
+    initializeComponent()
   }, [session, anomalyId])
 
   if (error) return <div className="text-red-500 p-4">{error}</div>
@@ -186,9 +220,24 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
     <div className="w-full h-[calc(100vh-8rem)] overflow-hidden flex flex-col gap-2 px-4">
       {/* Top Button Bar */}
       <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-2 flex justify-center items-center flex-shrink-0">
-        <Button variant="outline" onClick={() => setShowTutorial(true)}>
-          Want a walkthrough? Start the tutorial
-        </Button>
+        {hasCompletedTutorial === false ? (
+          <div className="flex flex-col items-center gap-2">
+            <div className="text-amber-300 text-sm font-medium">
+              Complete the tutorial before classifying
+            </div>
+            <Button 
+              variant="default" 
+              onClick={() => setShowTutorial(true)}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              Start Required Tutorial
+            </Button>
+          </div>
+        ) : (
+          <Button variant="outline" onClick={() => setShowTutorial(true)}>
+            Want a walkthrough? Start the tutorial
+          </Button>
+        )}
       </div>
       
       {/* Main content area with sidebar */}
@@ -243,11 +292,21 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
         
         {/* Main content */}
         <div className="flex-1 overflow-hidden min-h-0">
-          {showTutorial ? (
+          {showTutorial || (hasCompletedTutorial === false) ? (
             <div className="w-full h-full overflow-auto">
-              <FirstTelescopeClassification anomalyid={selectedAnomaly.id.toString()} />
+              <FirstTelescopeClassification 
+                anomalyid={selectedAnomaly.id.toString()} 
+                onTutorialComplete={async () => {
+                  // Refresh tutorial completion status
+                  const completed = await checkTutorialCompletion()
+                  setHasCompletedTutorial(completed)
+                  if (completed) {
+                    setShowTutorial(false)
+                  }
+                }}
+              />
             </div>
-          ) : (
+          ) : hasCompletedTutorial === true ? (
             <div className="w-full h-full overflow-hidden">
               <ImageAnnotator
                 key={`${selectedAnomaly.id}-sector-${currentSector}`}
@@ -260,6 +319,13 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
                 anomalyId={selectedAnomaly.id.toString()}
                 className="h-full w-full"
               />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-white text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
+                Checking tutorial status...
+              </div>
             </div>
           )}
         </div>
@@ -485,9 +551,10 @@ export function StarterTelescopeTess() {
 
 interface TelescopeProps {
     anomalyid: string;
+    onTutorialComplete?: () => void | Promise<void>;
 };
 
-const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid }) => {
+const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid, onTutorialComplete }) => {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -503,6 +570,13 @@ const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid }) =
     const nextPart = () => {
         setPart(2);
         setLine(1); 
+    };
+
+    // Handle classification completion
+    const handleClassificationComplete = () => {
+        if (onTutorialComplete) {
+            onTutorialComplete();
+        }
     };
 
     const tutorialContent = (
@@ -559,17 +633,17 @@ const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid }) =
                             />
                         </div>
                         <div className="max-w-4xl mx-auto rounded-lg text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
-                            <div className='relative'>
-                                <div className='absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
-                                <div className='bg-white bg-opacity-90'>
-                                    <img
-                                        src={imageUrl}
-                                        alt={`Active Planet ${activePlanet?.id}`}
-                                        className="relative z-10 w-128 h-128 object-contain"
-                                    />
-                                </div>
-                            </div>
-                            <ClassificationForm anomalyId={anomalyid} anomalyType='planet' missionNumber={3000001} assetMentioned={imageUrl} />
+                            <ImageAnnotator
+                                initialImageUrl={imageUrl}
+                                anomalyType='planet'
+                                missionNumber={3000001}
+                                structureItemId={3103}
+                                assetMentioned={anomalyid}
+                                annotationType="PH"
+                                anomalyId={anomalyid}
+                                className="h-full w-full"
+                                onClassificationComplete={handleClassificationComplete}
+                            />
                         </div>
                     </>
                 )}

@@ -54,6 +54,7 @@ export default function TelescopeClassifyPage() {
             component = <StarterTelescopeTess />
             break
           case "classify":
+            // For anonymous users accessing classify directly, check if they need tutorial
             // Use the specific anomaly ID from the URL
             component = <TelescopeTessWithId anomalyId={classificationId || '8'} />
             break
