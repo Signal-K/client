@@ -32,6 +32,12 @@ interface SatellitePositionProps {
   flashingIndicator?: boolean;
 }
 
+interface TooltipData {
+  timeRemaining: string;
+  timeSinceLastAction: string;
+  deployTime: Date;
+}
+
 export default function SatellitePosition({ satellites, flashingIndicator }: SatellitePositionProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -41,6 +47,9 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [currentTileIndex, setCurrentTileIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [hoveredSatellite, setHoveredSatellite] = useState<string | null>(null);
+  const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
+  const [lastActionTime, setLastActionTime] = useState<Date | null>(null);
 
   const satelliteTiles = [
     "/assets/Viewports/Satellite/Satellite_Tile1.png",
@@ -49,6 +58,37 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   ];
 
   // Time utility functions
+  const getNextSaturdayMidnight = (): Date => {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
+    
+    // Calculate days until next Saturday (or today if it's Saturday)
+    let daysUntilSaturday;
+    if (dayOfWeek === 6) {
+      // If today is Saturday, check if it's before 23:59
+      const todayMidnight = new Date(now);
+      todayMidnight.setHours(23, 59, 59, 999);
+      
+      if (now < todayMidnight) {
+        // Still Saturday, use today
+        daysUntilSaturday = 0;
+      } else {
+        // After 23:59 Saturday, go to next Saturday
+        daysUntilSaturday = 7;
+      }
+    } else {
+      // Calculate days until next Saturday
+      daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
+      if (daysUntilSaturday === 0) daysUntilSaturday = 7; // If Sunday (0), next Saturday is 6 days away
+    }
+    
+    const nextSaturday = new Date(now);
+    nextSaturday.setDate(now.getDate() + daysUntilSaturday);
+    nextSaturday.setHours(23, 59, 59, 999);
+    
+    return nextSaturday;
+  };
+
   const getTimeSinceDeploy = (deployTime: Date): { minutes: number; seconds: number; total: number } => {
     const now = currentTime.getTime();
     const deploy = deployTime.getTime();
@@ -64,6 +104,47 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
     };
   };
 
+  const getTimeUntilWeekEnd = (): { days: number; hours: number; minutes: number; totalMs: number } => {
+    const now = currentTime.getTime();
+    const weekEnd = getNextSaturdayMidnight().getTime();
+    const diffMs = Math.max(0, weekEnd - now);
+    
+    const totalMinutes = Math.floor(diffMs / (1000 * 60));
+    const totalHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = totalHours % 24;
+    const minutes = totalMinutes % 60;
+    
+    return {
+      days,
+      hours, 
+      minutes,
+      totalMs: diffMs
+    };
+  };
+
+  const getTimeSinceLastAction = (): { days: number; hours: number; minutes: number } => {
+    if (!lastActionTime) {
+      return { days: 0, hours: 0, minutes: 0 };
+    }
+    
+    const now = currentTime.getTime();
+    const lastAction = lastActionTime.getTime();
+    const diffMs = Math.max(0, now - lastAction);
+    
+    const totalMinutes = Math.floor(diffMs / (1000 * 60));
+    const totalHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = totalHours % 24;
+    const minutes = totalMinutes % 60;
+    
+    return {
+      days,
+      hours,
+      minutes
+    };
+  };
+
   const formatTimeSinceDeploy = (deployTime: Date): string => {
     const { minutes, seconds } = getTimeSinceDeploy(deployTime);
     if (minutes > 0) {
@@ -72,26 +153,50 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
     return `${seconds}s`;
   };
 
+  const formatTimeRemaining = (): string => {
+    const { days, hours, minutes } = getTimeUntilWeekEnd();
+    if (days > 0) {
+      return `${days}d ${hours}h ${minutes}m`;
+    } else if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}m`;
+  };
+
+  const formatTimeSinceAction = (): string => {
+    const { days, hours, minutes } = getTimeSinceLastAction();
+    if (days > 0) {
+      return `${days}d ${hours}h ago`;
+    } else if (hours > 0) {
+      return `${hours}h ${minutes}m ago`;
+    } else if (minutes > 0) {
+      return `${minutes}m ago`;
+    }
+    return "Just now";
+  };
+
   // Extensible position calculation function
   const calculateSatellitePosition = (satellite: Satellite, timeSinceDeploy: number): { x: number; y: number } => {
-    // TODO: Future enhancement - satellite movement based on deploy time and user actions
-    // This function can be extended to:
-    // 1. Calculate orbital mechanics based on time since deploy
-    // 2. Apply user-directed movement commands
-    // 3. Factor in gravitational effects or mission parameters
-    // 4. Handle different satellite types with unique movement patterns
-    // 5. Implement realistic satellite orbiting behavior
+    // Calculate progress based on time remaining until Saturday 23:59 AEST
+    const { totalMs: timeRemainingMs } = getTimeUntilWeekEnd();
+    const weekDurationMs = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
+    const weekProgress = 1 - (timeRemainingMs / weekDurationMs); // 0 to 1 progress through the week
     
-    // For now, keep the existing movement pattern but make it time-based
-    const baseX = 50; // Starting position
-    const baseY = 50; // Starting position
+    // Satellite moves in a path from center to edge over the course of the week
+    const centerX = 50;
+    const centerY = 50;
     
-    // Use deploy time as a seed for consistent movement pattern
-    const timeOffset = timeSinceDeploy * 0.1; // Slower movement factor
+    // Create a spiral path from center to edge
+    const angle = weekProgress * Math.PI * 4; // 4 full rotations over the week
+    const radius = weekProgress * 40; // Max radius of 40% to stay within bounds
     
+    const x = centerX + Math.cos(angle) * radius;
+    const y = centerY + Math.sin(angle) * radius;
+    
+    // Ensure position stays within bounds (10% to 90%)
     return {
-      x: (baseX + (timeOffset * 0.3)) % 100,
-      y: (baseY + (timeOffset * 0.2)) % 100
+      x: Math.max(10, Math.min(90, x)),
+      y: Math.max(10, Math.min(90, y))
     };
   };
 
@@ -100,12 +205,33 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
       if (!session?.user?.id) return;
 
       try {
+        // Get the most recent WeatherSatellite deployment from last week
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
         const { data: linkedAnomalies, error } = await supabase
           .from("linked_anomalies")
           .select("id, anomaly_id, automaton, unlocked, date")
           .eq("automaton", "WeatherSatellite")
           .eq("author", session.user.id)
+          .gte("date", oneWeekAgo.toISOString())
+          .order("date", { ascending: false })
           .limit(1);
+
+        // Get last action time (most recent classification mentioning a WeatherSatellite linked_anomaly)
+        const { data: lastClassifications, error: classError } = await supabase
+          .from("classifications")
+          .select("created_at")
+          .eq("author", session.user.id)
+          .not("content", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(10); // Get recent classifications to check content
+
+        if (lastClassifications && lastClassifications.length > 0) {
+          // For now, use the most recent classification as last action
+          // TODO: Filter by classifications that mention WeatherSatellite linked_anomalies
+          setLastActionTime(new Date(lastClassifications[0].created_at));
+        }
 
         // Handle missing unlocked column gracefully
         if (error && error.message?.includes('unlocked')) {
@@ -116,6 +242,8 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
             .select("id, anomaly_id, automaton, date")
             .eq("automaton", "WeatherSatellite")
             .eq("author", session.user.id)
+            .gte("date", oneWeekAgo.toISOString())
+            .order("date", { ascending: false })
             .limit(1);
 
           if (fallbackError) throw fallbackError;
@@ -221,6 +349,20 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
     }
   };
 
+  const handleSatelliteMouseEnter = (satellite: Satellite) => {
+    setHoveredSatellite(satellite.id);
+    setTooltipData({
+      timeRemaining: formatTimeRemaining(),
+      timeSinceLastAction: formatTimeSinceAction(),
+      deployTime: satellite.deployTime
+    });
+  };
+
+  const handleSatelliteMouseLeave = () => {
+    setHoveredSatellite(null);
+    setTooltipData(null);
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
@@ -279,6 +421,8 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
                 top: `${sat.y}%`,
               }}
               onClick={() => handleSatelliteClick(sat)}
+              onMouseEnter={() => handleSatelliteMouseEnter(sat)}
+              onMouseLeave={handleSatelliteMouseLeave}
             >
               <Image
                 src={satelliteTiles[currentTileIndex]}
@@ -294,6 +438,22 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
                   }`}
                   style={{ transform: "translate(-50%, -50%)" }}
                 ></div>
+              )}
+              
+              {/* Tooltip */}
+              {hoveredSatellite === sat.id && tooltipData && (
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-20">
+                  <div className="bg-black/90 backdrop-blur-sm rounded-lg px-3 py-2 text-white text-xs font-sans whitespace-nowrap shadow-lg border border-white/20">
+                    <div className="space-y-1">
+                      <div className="font-medium text-blue-300">🛰️ Satellite Status</div>
+                      <div>📍 Deployed: {formatTimeSinceDeploy(tooltipData.deployTime)} ago</div>
+                      <div>⏱️ Time until redeployment: {tooltipData.timeRemaining}</div>
+                      <div>🎯 Last action: {tooltipData.timeSinceLastAction}</div>
+                    </div>
+                    {/* Arrow */}
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black/90"></div>
+                  </div>
+                </div>
               )}
             </div>
           ))}

@@ -12,6 +12,12 @@ interface PushSubscription {
     created_at: string;
 }
 
+interface NotificationRejection {
+    id: string;
+    profile_id: string;
+    created_at: string;
+}
+
 export default function NotificationSubscribeButton() {
     const supabase = useSupabaseClient();
     const session = useSession();
@@ -21,8 +27,11 @@ export default function NotificationSubscribeButton() {
     const [subscriptionData, setSubscriptionData] = useState<PushSubscription | null>(null);
     const [sendingTest, setSendingTest] = useState<boolean>(false);
     const [checkingDiscoveries, setCheckingDiscoveries] = useState<boolean>(false);
+    const [hasRejected, setHasRejected] = useState<boolean>(false);
+    const [isRejecting, setIsRejecting] = useState<boolean>(false);
+    const [hideSection, setHideSection] = useState<boolean>(false);
 
-    // Check if user is already subscribed
+    // Check if user is already subscribed or has rejected notifications
     useEffect(() => {
         if (session?.user?.id) {
             checkExistingSubscription();
@@ -31,6 +40,20 @@ export default function NotificationSubscribeButton() {
 
     const checkExistingSubscription = async () => {
         if (!session?.user?.id) return;
+
+        // Check if user has rejected notifications
+        const { data: rejectionData, error: rejectionError } = await supabase
+            .from("notification_rejections")
+            .select("*")
+            .eq("profile_id", session.user.id)
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+        if (!rejectionError && rejectionData && rejectionData.length > 0) {
+            setHasRejected(true);
+            setHideSection(true);
+            return;
+        }
 
         // First, check if this device already has a push subscription
         let currentDeviceEndpoint = null;
@@ -61,18 +84,21 @@ export default function NotificationSubscribeButton() {
                 : null;
 
             if (currentDeviceSubscription) {
-                // This device is already subscribed
+                // This device is already subscribed - hide the section
                 setSubscribed(true);
                 setSubscriptionData(currentDeviceSubscription);
+                setHideSection(true);
             } else {
                 // This device is not subscribed, but user has other subscriptions
                 setSubscribed(false);
                 setSubscriptionData(data[0]); // Show most recent subscription for reference
+                setHideSection(false);
             }
         } else {
             // No subscription exists at all
             setSubscribed(false);
             setSubscriptionData(null);
+            setHideSection(false);
         }
     };
 
@@ -235,6 +261,9 @@ export default function NotificationSubscribeButton() {
             console.log('Push subscription saved successfully');
             alert('Successfully subscribed to notifications!');
             
+            // Hide the section after successful subscription
+            setHideSection(true);
+            
             // Refresh subscription data
             checkExistingSubscription();
         } catch (error) {
@@ -243,6 +272,41 @@ export default function NotificationSubscribeButton() {
             alert(`Failed to subscribe to notifications: ${errorMessage}`);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleRejectNotifications = async () => {
+        if (!session?.user?.id) {
+            console.log('No user session found');
+            return;
+        }
+
+        setIsRejecting(true);
+
+        try {
+            // Save rejection to database
+            const { error } = await supabase
+                .from("notification_rejections")
+                .insert({
+                    profile_id: session.user.id,
+                });
+
+            if (error) {
+                console.error('Error saving notification rejection:', error);
+                alert('Failed to save preference. Please try again.');
+                return;
+            }
+
+            console.log('Notification rejection saved successfully');
+            setHasRejected(true);
+            setHideSection(true);
+            
+        } catch (error) {
+            console.error('Error rejecting notifications:', error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            alert(`Failed to save preference: ${errorMessage}`);
+        } finally {
+            setIsRejecting(false);
         }
     };
 
@@ -423,6 +487,11 @@ export default function NotificationSubscribeButton() {
         );
     }
 
+    // Hide the section if user has subscribed on this device or rejected notifications
+    if (hideSection) {
+        return null;
+    }
+
     // Check if we're on iOS Safari
     const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
     const isSafari = typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -511,13 +580,22 @@ export default function NotificationSubscribeButton() {
                     <div className="text-yellow-600">
                         📢 Subscribe to get notifications about discoveries and updates
                     </div>
-                    <button
-                        onClick={handleClick}
-                        disabled={isLoading}
-                        className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
-                    >
-                        {isLoading ? "Subscribing..." : "Enable Notifications"}
-                    </button>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={handleClick}
+                            disabled={isLoading}
+                            className="flex-1 px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                        >
+                            {isLoading ? "Subscribing..." : "Enable Notifications"}
+                        </button>
+                        <button
+                            onClick={handleRejectNotifications}
+                            disabled={isRejecting}
+                            className="px-4 py-2 rounded bg-gray-600 text-white hover:bg-gray-700 disabled:opacity-50"
+                        >
+                            {isRejecting ? "Saving..." : "No Thanks"}
+                        </button>
+                    </div>
                 </div>
             )}
         </div>

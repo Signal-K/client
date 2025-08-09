@@ -2,9 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useRouter } from "next/navigation"
 import { TelescopeView } from "@/src/components/classification/telescope/telescope-view"
 import type { Anomaly, Star } from "@/types/Structures/telescope" 
 import { generateSectorName, generateStars } from "@/src/components/classification/telescope/utils/sector-utils"
+import { Button } from "@/src/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Badge } from "@/src/components/ui/badge"
+import { CheckCircle, Telescope, X, Target } from "lucide-react"
 import DeployTelescopeSidebar from "./sub/TelescopeSidebar"
 import DeployTelescopeMobileHeader from "./sub/TelescopeMobileHeader"
 import DeployTelescopeOverlay from "./sub/TelescopeOverlay"
@@ -56,6 +61,7 @@ function generateAnomalyFromDB(dbAnomaly: DatabaseAnomaly, sectorX: number, sect
 export default function DeployTelescopeViewport() {
   const supabase = useSupabaseClient()
   const session = useSession()
+  const router = useRouter()
 
   const [currentSector, setCurrentSector] = useState({ x: 0, y: 0 })
   const [tessAnomalies, setTessAnomalies] = useState<DatabaseAnomaly[]>([])
@@ -70,6 +76,11 @@ export default function DeployTelescopeViewport() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [focusedAnomaly, setFocusedAnomaly] = useState<Anomaly | null>(null);
   const [skillProgress, setSkillProgress] = useState<{ [key: string]: number }>({});
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [deploymentResult, setDeploymentResult] = useState<{
+    anomalies: string[]
+    sectorName: string
+  } | null>(null)
 
   const fetchTessAnomalies = async () => {
     try {
@@ -275,11 +286,17 @@ export default function DeployTelescopeViewport() {
     const hasError = results.some(r => r.error);
 
     if (!hasError) {
+      // Prepare deployment result data
+      const anomalyNames = selectedAnomalies.map(a => a.content || `TESS-${String(a.id).padStart(3, "0")}`);
+      const sectorName = generateSectorName(selectedSector.x, selectedSector.y);
+      
+      setDeploymentResult({
+        anomalies: anomalyNames,
+        sectorName: sectorName
+      });
+
       // Send notification about the deployment
       try {
-        const anomalyNames = selectedAnomalies.map(a => a.content || `TESS-${String(a.id).padStart(3, "0")}`);
-        const sectorName = generateSectorName(selectedSector.x, selectedSector.y);
-        
         const notificationTitle = "Telescope Deployed Successfully";
         const notificationBody = `New targets discovered in ${sectorName}: ${anomalyNames.join(", ")}`;
         
@@ -300,6 +317,9 @@ export default function DeployTelescopeViewport() {
         console.error('Failed to send deployment notification:', notificationError);
         // Don't let notification failure affect the deployment success
       }
+
+      // Show confirmation popup
+      setShowConfirmation(true);
     }
 
     setDeploymentMessage(
@@ -331,6 +351,14 @@ export default function DeployTelescopeViewport() {
   }
   const handleMouseUp = () => setIsDragging(false)
 
+  const handleConfirmationClose = () => {
+    setShowConfirmation(false)
+    // Redirect to home after a brief delay to allow user to see the confirmation
+    setTimeout(() => {
+      router.push('/')
+    }, 1000)
+  }
+
   useEffect(() => {
     const load = async () => {
       setLoading(true)
@@ -356,54 +384,138 @@ export default function DeployTelescopeViewport() {
   }
 
   return (
-  <div className="h-screen bg-[#002439] relative overflow-hidden">
-  {/* Telescope View */}
-  <div className="absolute inset-0 z-0">
-    <DeployTelescopeOverlay
-      selectedSector={selectedSector}
-      currentSector={currentSector}
-      sectorAnomalies={sectorAnomalies}
-    />
-    <TelescopeView
-      stars={stars}
-      filteredAnomalies={sectorAnomalies}
-      isDragging={isDragging}
-      handleMouseDown={handleMouseDown}
-      handleMouseMove={handleMouseMove}
-      handleMouseUp={handleMouseUp}
-      handleAnomalyClick={handleAnomalyClick}
-      currentSectorName=""
-      focusedAnomaly={focusedAnomaly}
-      anomalies={sectorAnomalies}
-    />
-  </div>
+    <div className="h-screen bg-[#002439] relative overflow-hidden">
+      {/* Telescope View - Full screen background with proper padding for header */}
+      <div className="absolute inset-0 z-0" style={{ paddingTop: '64px' }}>
+        <DeployTelescopeOverlay
+          selectedSector={selectedSector}
+          currentSector={currentSector}
+          sectorAnomalies={sectorAnomalies}
+        />
+        <TelescopeView
+          stars={stars}
+          filteredAnomalies={sectorAnomalies}
+          isDragging={isDragging}
+          handleMouseDown={handleMouseDown}
+          handleMouseMove={handleMouseMove}
+          handleMouseUp={handleMouseUp}
+          handleAnomalyClick={handleAnomalyClick}
+          currentSectorName=""
+          focusedAnomaly={focusedAnomaly}
+          anomalies={sectorAnomalies}
+        />
+      </div>
 
-  {/* Mobile Header */}
-  <div className="relative z-20 lg:hidden">
-    <DeployTelescopeMobileHeader
-      sectorAnomalies={sectorAnomalies}
-      selectedSector={selectedSector}
-      alreadyDeployed={alreadyDeployed}
-      deploying={deploying}
-      onDeploy={handleDeploy}
-    />
-  </div>
+      {/* Compact Header - Fixed at top */}
+      <div className="absolute top-0 left-0 right-0 z-30 h-16">
+        <DeployTelescopeSidebar
+          tessAnomalies={tessAnomalies}
+          sectorAnomalies={sectorAnomalies}
+          selectedSector={selectedSector}
+          alreadyDeployed={alreadyDeployed}
+          deploying={deploying}
+          deploymentMessage={deploymentMessage}
+          onDeploy={handleDeploy}
+          currentSector={currentSector}
+          setCurrentSector={setCurrentSector}
+          setSelectedSector={setSelectedSector}
+        />
+      </div>
 
-  {/* Sidebar Controls */}
-  <div className="relative z-30">
-    <DeployTelescopeSidebar
-      tessAnomalies={tessAnomalies}
-      sectorAnomalies={sectorAnomalies}
-      selectedSector={selectedSector}
-      alreadyDeployed={alreadyDeployed}
-      deploying={deploying}
-      deploymentMessage={deploymentMessage}
-      onDeploy={handleDeploy}
-      currentSector={currentSector}
-      setCurrentSector={setCurrentSector}
-      setSelectedSector={setSelectedSector}
-    />
-  </div>
-</div>
-)
+      {/* Sector Status Overlay */}
+      {sectorAnomalies.length === 0 && !loading && (
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 bg-[#005066]/90 backdrop-blur-sm border border-[#78cce2]/30 rounded-lg px-6 py-3">
+          <div className="flex items-center gap-3 text-[#78cce2]">
+            <Target className="h-5 w-5" />
+            <span className="text-sm">No exoplanet candidates in this sector • Navigate to explore more areas</span>
+          </div>
+        </div>
+      )}
+
+      {/* Deployment Confirmation Dialog */}
+      {showConfirmation && deploymentResult && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="bg-[#002439] border-2 border-[#78cce2] max-w-2xl w-full mx-4 shadow-2xl">
+            <CardHeader className="relative pb-4">
+              <button
+                onClick={handleConfirmationClose}
+                className="absolute top-4 right-4 p-2 text-[#78cce2] hover:bg-[#78cce2]/20 rounded-full transition"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-[#78cce2] to-[#4e7988] rounded-full flex items-center justify-center">
+                  <CheckCircle className="h-8 w-8 text-[#002439]" />
+                </div>
+                <div>
+                  <CardTitle className="text-[#e4eff0] text-2xl">Telescope Deployed Successfully!</CardTitle>
+                  <CardDescription className="text-[#78cce2] text-base">
+                    Your telescope is now monitoring sector {deploymentResult.sectorName}
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="bg-[#005066]/30 p-6 rounded-lg border border-[#78cce2]/30">
+                <div className="flex items-center gap-3 mb-4">
+                  <Telescope className="h-6 w-6 text-[#78cce2]" />
+                  <span className="text-[#e4eff0] font-medium text-lg">Active Monitoring Targets</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {deploymentResult.anomalies.map((name, index) => (
+                    <div key={index} className="flex items-center justify-between py-2 px-3 bg-[#002439]/50 rounded border border-[#78cce2]/20">
+                      <span className="text-[#78cce2] text-sm font-mono">{name}</span>
+                      <Badge className="bg-[#78cce2]/20 text-[#78cce2] text-xs">
+                        ● Active
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="bg-[#78cce2]/10 p-6 rounded-lg border border-[#78cce2]/30">
+                <h3 className="text-[#e4eff0] font-medium text-lg mb-3">What happens next?</h3>
+                <div className="space-y-3 text-sm leading-relaxed">
+                  <div className="flex items-start gap-3">
+                    <span className="bg-[#78cce2] text-[#002439] w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
+                    <span className="text-[#e4eff0]">Your telescope will continuously monitor <strong>{deploymentResult.anomalies.length}</strong> potential exoplanet candidates</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="bg-[#78cce2] text-[#002439] w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
+                    <span className="text-[#e4eff0]">When planet transits are detected, you'll receive notifications</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="bg-[#78cce2] text-[#002439] w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
+                    <span className="text-[#e4eff0]">Classify the discoveries in the telescope interface to help confirm exoplanets</span>
+                  </div>
+                </div>
+                <p className="text-[#78cce2] text-sm mt-4 text-center border-t border-[#78cce2]/20 pt-3">
+                  🚀 You'll be redirected to the main dashboard shortly...
+                </p>
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <Button
+                  onClick={() => router.push('/structures/telescope')}
+                  size="lg"
+                  className="flex-1 bg-[#78cce2] text-[#002439] hover:bg-[#e4eff0] h-12 text-base font-medium"
+                >
+                  <Telescope className="h-5 w-5 mr-3" />
+                  View Telescope Interface
+                </Button>
+                <Button
+                  onClick={handleConfirmationClose}
+                  variant="outline"
+                  size="lg"
+                  className="flex-1 border-[#78cce2] text-[#78cce2] hover:bg-[#78cce2]/20 h-12 text-base"
+                >
+                  Return to Dashboard
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  )
 }

@@ -133,13 +133,14 @@ revoke truncate on table "storage"."prefixes" from "service_role";
 
 revoke update on table "storage"."prefixes" from "service_role";
 
-alter table "storage"."iceberg_namespaces" drop constraint if exists "iceberg_namespaces_bucket_id_fkey";
+-- Comment out constraint drops for tables we're keeping
+-- alter table "storage"."iceberg_namespaces" drop constraint "iceberg_namespaces_bucket_id_fkey";
 
-alter table "storage"."iceberg_tables" drop constraint if exists "iceberg_tables_bucket_id_fkey";
+-- alter table "storage"."iceberg_tables" drop constraint "iceberg_tables_bucket_id_fkey";
 
-alter table "storage"."iceberg_tables" drop constraint if exists "iceberg_tables_namespace_id_fkey";
+-- alter table "storage"."iceberg_tables" drop constraint "iceberg_tables_namespace_id_fkey";
 
-alter table "storage"."prefixes" drop constraint if exists "prefixes_bucketId_fkey";
+-- alter table "storage"."prefixes" drop constraint "prefixes_bucketId_fkey";
 
 drop function if exists "storage"."add_prefixes"(_bucket_id text, _name text);
 
@@ -149,7 +150,7 @@ drop function if exists "storage"."delete_prefix_hierarchy_trigger"();
 
 drop function if exists "storage"."enforce_bucket_name_length"();
 
-drop function if exists "storage"."get_level"(name text) cascade;
+-- drop function if exists "storage"."get_level"(name text);
 
 drop function if exists "storage"."get_prefix"(name text);
 
@@ -167,13 +168,14 @@ drop function if exists "storage"."search_v1_optimised"(prefix text, bucketname 
 
 drop function if exists "storage"."search_v2"(prefix text, bucket_name text, limits integer, levels integer, start_after text);
 
-alter table "storage"."buckets_analytics" drop constraint if exists "buckets_analytics_pkey";
+-- Comment out constraint drops for tables we're keeping
+-- alter table "storage"."buckets_analytics" drop constraint "buckets_analytics_pkey";
 
-alter table "storage"."iceberg_namespaces" drop constraint if exists "iceberg_namespaces_pkey";
+-- alter table "storage"."iceberg_namespaces" drop constraint "iceberg_namespaces_pkey";
 
-alter table "storage"."iceberg_tables" drop constraint if exists "iceberg_tables_pkey";
+-- alter table "storage"."iceberg_tables" drop constraint "iceberg_tables_pkey";
 
-alter table "storage"."prefixes" drop constraint if exists "prefixes_pkey";
+-- alter table "storage"."prefixes" drop constraint "prefixes_pkey";
 
 drop index if exists "storage"."buckets_analytics_pkey";
 
@@ -195,19 +197,21 @@ drop index if exists "storage"."objects_bucket_id_level_idx";
 
 drop index if exists "storage"."prefixes_pkey";
 
-drop table if exists "storage"."buckets_analytics";
+-- Comment out table drops to maintain compatibility with local storage service
+-- drop table "storage"."buckets_analytics";
 
-drop table if exists "storage"."iceberg_namespaces";
+-- drop table "storage"."iceberg_namespaces";
 
-drop table if exists "storage"."iceberg_tables";
+-- drop table "storage"."iceberg_tables";
 
-drop table if exists "storage"."prefixes";
+-- drop table "storage"."prefixes";
 
-alter table "storage"."buckets" drop column if exists "type";
+-- Skip dropping type column to maintain compatibility with local storage service
+-- alter table "storage"."buckets" drop column "type";
 
-alter table "storage"."objects" drop column if exists "level";
+alter table "storage"."objects" drop column "level";
 
-drop type if exists "storage"."buckettype";
+drop type "storage"."buckettype";
 
 set check_function_bodies = off;
 

@@ -120,17 +120,8 @@ export default function ActivityHeader({
         return [];
       }
 
-      // Get comments with radius measurements
-      const { data: radiusComments } = await supabase
-        .from("comments")
-        .select("classification_id")
-        .eq("category", "Radius")
-        .in("classification_id", planetIds);
-
-      const planetIdsWithRadius = new Set((radiusComments ?? []).map((c) => c.classification_id));
-
+      // Get all classified planets
       const validPlanets = (planetClassifications ?? [])
-        .filter((c) => planetIdsWithRadius.has(c.id))
         .map((c) => ({
           id: c.id,
           name: (c.anomaly as any)?.content || `Planet #${c.id}`,
@@ -142,13 +133,16 @@ export default function ActivityHeader({
 
     const checkDeploymentStatus = async () => {
       const userId = session.user.id;
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-      // Check telescope deployment (entries without automaton field)
+      // Check telescope deployment (entries with Telescope automaton from last week)
       const { data: telescopeDeployments } = await supabase
         .from("linked_anomalies")
         .select("anomaly_id, anomaly:anomaly_id(id)")
         .eq("author", userId)
-        .is("automaton", null);
+        .eq("automaton", "Telescope")
+        .gte("date", oneWeekAgo.toISOString());
 
       // Check satellite deployment (entries with WeatherSatellite automaton)
       const { data: satelliteDeployments } = await supabase
@@ -583,7 +577,7 @@ export default function ActivityHeader({
               <div className="text-center py-8 text-muted-foreground">
                 <span className="text-4xl block mb-2">🌍</span>
                 <p className="text-sm">No planets available for satellite deployment</p>
-                <p className="text-xs">Classify planets with radius measurements to unlock satellite deployment</p>
+                <p className="text-xs">Complete a planet classification to unlock satellites</p>
               </div>
             )}
           </div>

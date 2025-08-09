@@ -636,6 +636,29 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
 ALTER TABLE "public"."profiles" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."push_anomaly_log" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "anomaly_id" bigint NOT NULL,
+    "sent_at" timestamp with time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."push_anomaly_log" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."push_subscriptions" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "profile_id" "uuid" NOT NULL,
+    "endpoint" "text" NOT NULL,
+    "p256dh" "text" NOT NULL,
+    "auth" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."push_subscriptions" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."referrals" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "referree_id" "uuid" NOT NULL,
@@ -908,6 +931,16 @@ ALTER TABLE ONLY "public"."profiles"
 
 
 
+ALTER TABLE ONLY "public"."push_anomaly_log"
+    ADD CONSTRAINT "push_anomaly_log_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."push_subscriptions"
+    ADD CONSTRAINT "push_subscriptions_pkey" PRIMARY KEY ("id");
+
+
+
 ALTER TABLE ONLY "public"."referrals"
     ADD CONSTRAINT "referrals_pkey" PRIMARY KEY ("id");
 
@@ -920,6 +953,11 @@ ALTER TABLE ONLY "public"."researched"
 
 ALTER TABLE ONLY "public"."sectors"
     ADD CONSTRAINT "sectors_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."push_anomaly_log"
+    ADD CONSTRAINT "unique_anomaly_push_log" UNIQUE ("anomaly_id");
 
 
 
@@ -1097,6 +1135,16 @@ ALTER TABLE ONLY "public"."profiles"
 
 ALTER TABLE ONLY "public"."profiles"
     ADD CONSTRAINT "profiles_location_fkey" FOREIGN KEY ("location") REFERENCES "public"."anomalies"("id");
+
+
+
+ALTER TABLE ONLY "public"."push_anomaly_log"
+    ADD CONSTRAINT "push_anomaly_log_anomaly_id_fkey" FOREIGN KEY ("anomaly_id") REFERENCES "public"."linked_anomalies"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."push_subscriptions"
+    ADD CONSTRAINT "push_subscriptions_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
 
 
 
@@ -2475,6 +2523,18 @@ GRANT ALL ON TABLE "public"."nps_analytics" TO "service_role";
 GRANT ALL ON TABLE "public"."profiles" TO "anon";
 GRANT ALL ON TABLE "public"."profiles" TO "authenticated";
 GRANT ALL ON TABLE "public"."profiles" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."push_anomaly_log" TO "anon";
+GRANT ALL ON TABLE "public"."push_anomaly_log" TO "authenticated";
+GRANT ALL ON TABLE "public"."push_anomaly_log" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."push_subscriptions" TO "anon";
+GRANT ALL ON TABLE "public"."push_subscriptions" TO "authenticated";
+GRANT ALL ON TABLE "public"."push_subscriptions" TO "service_role";
 
 
 

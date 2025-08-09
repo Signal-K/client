@@ -122,10 +122,10 @@ export default function StructuresEquipmentSection({
             {planetTargets.length === 0 ? (
               <div className="bg-gray-50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  <strong>Prerequisites:</strong> You need to classify at least one planet with radius measurements before deploying satellites.
+                  <strong>Prerequisites:</strong> You need to classify at least one planet before deploying satellites.
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                  💡 Tip: Complete any unfinished planet classifications first!
+                  💡 Tip: Complete a planet classification to unlock satellites!
                 </p>
               </div>
             ) : (
