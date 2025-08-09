@@ -2,15 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
 
-// Configure web-push with VAPID keys
-webpush.setVapidDetails(
-    'mailto:admin@starsailors.app',
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-    process.env.VAPID_PRIVATE_KEY!
-);
-
 export async function POST(request: NextRequest) {
     try {
+        // Configure web-push with VAPID keys
+        webpush.setVapidDetails(
+            'mailto:admin@starsailors.app',
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+            process.env.VAPID_PRIVATE_KEY!
+        );
+
         // Get the discovery data and user info from the request
         const requestBody = await request.json();
         const { userId, unclassifiedDiscoveries } = requestBody;

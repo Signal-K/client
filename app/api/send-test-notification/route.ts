@@ -2,15 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
 
-// Configure web-push with your VAPID keys
-webpush.setVapidDetails(
-    'mailto:your-email@example.com',
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-    process.env.VAPID_PRIVATE_KEY!
-);
-
 export async function POST(request: NextRequest) {
     try {
+        // Configure web-push with your VAPID keys
+        webpush.setVapidDetails(
+            'mailto:your-email@example.com',
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+            process.env.VAPID_PRIVATE_KEY!
+        );
+
         console.log('Environment check:');
         console.log('SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
         console.log('SERVICE_ROLE_KEY exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);

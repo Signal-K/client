@@ -2,12 +2,6 @@
  
 import webpush from 'web-push';
  
-webpush.setVapidDetails(
-  '<mailto:your-email@example.com>',
-  process.env.VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-)
- 
 let subscription: webpush.PushSubscription | null = null
 
 // Extend the standard PushSubscription to include the keys property
@@ -40,6 +34,13 @@ export async function unsubscribeUser() {
 }
  
 export async function sendNotification(message: string) {
+  // Configure web-push with VAPID keys
+  webpush.setVapidDetails(
+    'mailto:your-email@example.com',
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+    process.env.VAPID_PRIVATE_KEY!
+  )
+
   if (!subscription) {
     throw new Error('No subscription available')
   }
