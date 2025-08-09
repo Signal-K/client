@@ -1,8 +1,6 @@
 CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
 
-drop trigger if exists "enforce_bucket_name_length_trigger" on "storage"."buckets";
-
 drop trigger if exists "objects_delete_delete_prefix" on "storage"."objects";
 
 drop trigger if exists "objects_insert_create_prefix" on "storage"."objects";
@@ -12,84 +10,6 @@ drop trigger if exists "objects_update_create_prefix" on "storage"."objects";
 drop trigger if exists "prefixes_create_hierarchy" on "storage"."prefixes";
 
 drop trigger if exists "prefixes_delete_hierarchy" on "storage"."prefixes";
-
-revoke delete on table "storage"."buckets_analytics" from "anon";
-
-revoke insert on table "storage"."buckets_analytics" from "anon";
-
-revoke references on table "storage"."buckets_analytics" from "anon";
-
-revoke select on table "storage"."buckets_analytics" from "anon";
-
-revoke trigger on table "storage"."buckets_analytics" from "anon";
-
-revoke truncate on table "storage"."buckets_analytics" from "anon";
-
-revoke update on table "storage"."buckets_analytics" from "anon";
-
-revoke delete on table "storage"."buckets_analytics" from "authenticated";
-
-revoke insert on table "storage"."buckets_analytics" from "authenticated";
-
-revoke references on table "storage"."buckets_analytics" from "authenticated";
-
-revoke select on table "storage"."buckets_analytics" from "authenticated";
-
-revoke trigger on table "storage"."buckets_analytics" from "authenticated";
-
-revoke truncate on table "storage"."buckets_analytics" from "authenticated";
-
-revoke update on table "storage"."buckets_analytics" from "authenticated";
-
-revoke delete on table "storage"."buckets_analytics" from "service_role";
-
-revoke insert on table "storage"."buckets_analytics" from "service_role";
-
-revoke references on table "storage"."buckets_analytics" from "service_role";
-
-revoke select on table "storage"."buckets_analytics" from "service_role";
-
-revoke trigger on table "storage"."buckets_analytics" from "service_role";
-
-revoke truncate on table "storage"."buckets_analytics" from "service_role";
-
-revoke update on table "storage"."buckets_analytics" from "service_role";
-
-revoke select on table "storage"."iceberg_namespaces" from "anon";
-
-revoke select on table "storage"."iceberg_namespaces" from "authenticated";
-
-revoke delete on table "storage"."iceberg_namespaces" from "service_role";
-
-revoke insert on table "storage"."iceberg_namespaces" from "service_role";
-
-revoke references on table "storage"."iceberg_namespaces" from "service_role";
-
-revoke select on table "storage"."iceberg_namespaces" from "service_role";
-
-revoke trigger on table "storage"."iceberg_namespaces" from "service_role";
-
-revoke truncate on table "storage"."iceberg_namespaces" from "service_role";
-
-revoke update on table "storage"."iceberg_namespaces" from "service_role";
-
-revoke select on table "storage"."iceberg_tables" from "anon";
-
-revoke select on table "storage"."iceberg_tables" from "authenticated";
-
-revoke delete on table "storage"."iceberg_tables" from "service_role";
-
-revoke insert on table "storage"."iceberg_tables" from "service_role";
-
-revoke references on table "storage"."iceberg_tables" from "service_role";
-
-revoke select on table "storage"."iceberg_tables" from "service_role";
-
-revoke trigger on table "storage"."iceberg_tables" from "service_role";
-
-revoke truncate on table "storage"."iceberg_tables" from "service_role";
-
-revoke update on table "storage"."iceberg_tables" from "service_role";
 
 revoke delete on table "storage"."prefixes" from "anon";
 
@@ -133,6 +53,7 @@ revoke truncate on table "storage"."prefixes" from "service_role";
 
 revoke update on table "storage"."prefixes" from "service_role";
 
+<<<<<<<< HEAD:supabase/migrations/20250809142756_remote_schema.sql
 -- Comment out constraint drops for tables we're keeping
 -- alter table "storage"."iceberg_namespaces" drop constraint "iceberg_namespaces_bucket_id_fkey";
 
@@ -141,6 +62,9 @@ revoke update on table "storage"."prefixes" from "service_role";
 -- alter table "storage"."iceberg_tables" drop constraint "iceberg_tables_namespace_id_fkey";
 
 -- alter table "storage"."prefixes" drop constraint "prefixes_bucketId_fkey";
+========
+alter table "storage"."prefixes" drop constraint "prefixes_bucketId_fkey";
+>>>>>>>> main:supabase/migrations/20250521075628_remote_schema.sql
 
 drop function if exists "storage"."add_prefixes"(_bucket_id text, _name text);
 
@@ -148,6 +72,7 @@ drop function if exists "storage"."delete_prefix"(_bucket_id text, _name text);
 
 drop function if exists "storage"."delete_prefix_hierarchy_trigger"();
 
+<<<<<<<< HEAD:supabase/migrations/20250809142756_remote_schema.sql
 drop function if exists "storage"."enforce_bucket_name_length"();
 
 -- drop function if exists "storage"."get_level"(name text);
@@ -162,12 +87,15 @@ drop function if exists "storage"."objects_update_prefix_trigger"();
 
 drop function if exists "storage"."prefixes_insert_trigger"();
 
+========
+>>>>>>>> main:supabase/migrations/20250521075628_remote_schema.sql
 drop function if exists "storage"."search_legacy_v1"(prefix text, bucketname text, limits integer, levels integer, offsets integer, search text, sortcolumn text, sortorder text);
 
 drop function if exists "storage"."search_v1_optimised"(prefix text, bucketname text, limits integer, levels integer, offsets integer, search text, sortcolumn text, sortorder text);
 
 drop function if exists "storage"."search_v2"(prefix text, bucket_name text, limits integer, levels integer, start_after text);
 
+<<<<<<<< HEAD:supabase/migrations/20250809142756_remote_schema.sql
 -- Comment out constraint drops for tables we're keeping
 -- alter table "storage"."buckets_analytics" drop constraint "buckets_analytics_pkey";
 
@@ -186,6 +114,9 @@ drop index if exists "storage"."iceberg_tables_pkey";
 drop index if exists "storage"."idx_iceberg_namespaces_bucket_id";
 
 drop index if exists "storage"."idx_iceberg_tables_namespace_id";
+========
+alter table "storage"."prefixes" drop constraint "prefixes_pkey";
+>>>>>>>> main:supabase/migrations/20250521075628_remote_schema.sql
 
 drop index if exists "storage"."idx_name_bucket_level_unique";
 
@@ -197,6 +128,7 @@ drop index if exists "storage"."objects_bucket_id_level_idx";
 
 drop index if exists "storage"."prefixes_pkey";
 
+<<<<<<<< HEAD:supabase/migrations/20250809142756_remote_schema.sql
 -- Comment out table drops to maintain compatibility with local storage service
 -- drop table "storage"."buckets_analytics";
 
@@ -212,6 +144,11 @@ drop index if exists "storage"."prefixes_pkey";
 alter table "storage"."objects" drop column "level";
 
 drop type "storage"."buckettype";
+========
+drop table "storage"."prefixes";
+
+alter table "storage"."objects" drop column "level";
+>>>>>>>> main:supabase/migrations/20250521075628_remote_schema.sql
 
 set check_function_bodies = off;
 
@@ -493,11 +430,11 @@ using ((bucket_id = 'telescope'::text));
 
 
 create policy "Enable read access for all users zj231d_0"
-on "storage"."objects"
+on "storage"."objects" 
 as permissive
 for select
 to public
-using ((bucket_id = 'anomalies'::text));
+using ((bucket_id = "anomalies"::text));
 
 
 create policy "Enable read access for all users zj231d_1"
@@ -505,7 +442,7 @@ on "storage"."objects"
 as permissive
 for insert
 to public
-with check ((bucket_id = 'anomalies'::text));
+with check ((bucket_id = "anomalies"::text));
 
 
 create policy "Enable read access for all users zj231d_2"
@@ -513,7 +450,7 @@ on "storage"."objects"
 as permissive
 for update
 to public
-using ((bucket_id = 'anomalies'::text));
+using ((bucket_id = "anomalies"::text));
 
 
 create policy "Enable read access for all users zj231d_3"
@@ -521,7 +458,7 @@ on "storage"."objects"
 as permissive
 for delete
 to public
-using ((bucket_id = 'anomalies'::text));
+using ((bucket_id = "anomalies"::text));
 
 
 

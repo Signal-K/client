@@ -57,6 +57,3 @@ public/workbox-7144475a.js.map
 public/workbox-f1770938.js
 certificates
 .env.local
-
-# Supabase
-supabase/seed.sql

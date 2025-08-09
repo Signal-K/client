@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import { useRouter } from "next/navigation"
 import { TelescopeView } from "@/src/components/classification/telescope/telescope-view"
-import type { Anomaly, Star } from "@/types/Structures/telescope" 
+import type { Anomaly, Star } from "@/types/Structures/telescope"
 import { generateSectorName, generateStars } from "@/src/components/classification/telescope/utils/sector-utils"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
@@ -118,7 +118,6 @@ export default function DeployTelescopeViewport() {
       .from("linked_anomalies")
       .select("*")
       .eq("author", userId)
-      .eq("automaton", "Telescope")
       .gte("date", oneWeekAgo.toISOString())
 
     if (linkedAnomaliesError) {

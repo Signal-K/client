@@ -10,10 +10,6 @@ up-full:
 
 down:
 	docker-compose down
-	docker-compose --profile studio down
-	docker-compose --profile test down 
-	docker-compose --profile notify down
-# 	supabase stop || true
 
 # Run locally without Docker (recommended for Supabase development)
 dev:

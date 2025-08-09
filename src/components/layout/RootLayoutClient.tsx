@@ -2,8 +2,7 @@
 
 import "@/styles/globals.css";
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
-import { SessionContextProvider, useSession } from "@supabase/auth-helpers-react";
-import { subscribeToPushNotifications } from "@/src/shared/utils/usePushNotifications";
+import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useEffect, useState, ReactNode } from "react";
 import { ActivePlanetProvider, useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { UserAnomaliesProvider } from "@/src/core/context/UserAnomalies";
@@ -12,8 +11,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 // import { PostHogProvider } from "@/components/PostHogProvider";
 
 function LayoutContent({ children }: { children: ReactNode }) {
-  const session = useSession();
-
   const { activePlanet } = useActivePlanet();
 
   useEffect(() => {
@@ -21,12 +18,6 @@ function LayoutContent({ children }: { children: ReactNode }) {
       console.log("Active Planet: ", activePlanet);
     }
   }, [activePlanet]);
-
-  useEffect(() => {
-    if (session?.user?.id) {
-      subscribeToPushNotifications({ user: { id: session.user.id } });
-    }
-  }, [session]);
 
   return <>{children}</>;
 }
