@@ -159,7 +159,7 @@ export default function LandingSS() {
               <h1 className="text-5xl font-bold tracking-tight lg:text-7xl text-gray-900 [text-shadow:_2px_2px_0_rgb(0_0_0_/_20%)]">
                 Actively contribute to science
               </h1>
-              <p className="text-xl text-gray-600">
+                            <p className="text-xl text-gray-600">
                 Discover the world around you and contribute to real scientific research in Star Sailors
               </p>
               <div className="flex flex-wrap gap-6">
@@ -168,7 +168,7 @@ export default function LandingSS() {
                         size="lg"
                         className="bg-blue-300 text-white hover:bg-aqua-400 hover:translate-y-[-2px] hover:translate-x-[2px] text-lg px-8 py-6 rounded-md border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:shadow-none"
                     >   
-                        Sign Up/Log In
+                        Start Exploring Now
                     </Button>
                 </Link>
                 <Button
@@ -178,6 +178,9 @@ export default function LandingSS() {
                 >
                   View Discoveries
                 </Button>
+              </div>
+              <div className="mt-4 text-sm text-gray-600">
+                <p>✨ Try as a guest first, then create an account to save your progress forever</p>
               </div>
             </div>
             <div className="relative aspect-square">
@@ -204,6 +207,29 @@ export default function LandingSS() {
                 The ability to contribute to science shouldn't require a university degree and a JSTOR account. Star Sailors works with partners like DeSci Labs, 
                 ORCID, and the Royal Society of Victoria to give our users opportunities to meaningfully impact the scientific industry. It's 100% free & open-source. And it always will be.
               </p>
+              
+              {/* New Anonymous Features Section */}
+              <div className="mt-8 p-6 bg-purple-50 rounded-lg border border-purple-200">
+                <h3 className="text-xl font-semibold text-purple-800 mb-3">🎯 New: Anonymous Sign-In</h3>
+                <p className="text-purple-700 mb-4">
+                  Jump right into exploring the cosmos without creating an account! Your progress is saved temporarily, and you can upgrade to a permanent account anytime.
+                </p>
+                <div className="space-y-2 text-sm text-purple-700">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-purple-600 rounded-full"></span>
+                    <span>No email required to start</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-purple-600 rounded-full"></span>
+                    <span>Full access to all features</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-purple-600 rounded-full"></span>
+                    <span>Upgrade to permanent account when ready</span>
+                  </div>
+                </div>
+              </div>
+
               <div className="mt-8 grid gap-6">
                 <div className="flex items-start gap-4">
                   <div className="rounded-lg bg-aqua-100 p-3">

@@ -9,9 +9,19 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
     apple: [
       {
-        url: "https://i.ibb.co/qrSP4gq/Removebg.png",
+        url: "/assets/Captn.jpg",
         sizes: "180x180",
-        type: "image/png",
+        type: "image/jpeg",
+      },
+      {
+        url: "/assets/Captn.jpg",
+        sizes: "152x152",
+        type: "image/jpeg",
+      },
+      {
+        url: "/assets/Captn.jpg",
+        sizes: "167x167",
+        type: "image/jpeg",
       },
     ],
   },

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
-import LoginPage from "@/src/components/profile/auth/LoginModal";
+import EnhancedAuthPage from "@/src/components/profile/auth/EnhancedAuth";
 
 const Login = () => {
     const session = useSession();
@@ -15,16 +15,7 @@ const Login = () => {
         }
     }, [session, router]);
 
-    return (
-        // <div className='container' style={{ padding: '50px 0 100px 0' }}>
-        //     {!session ? (
-        //         <LoginPage />
-        //     ) : (
-        //         <p>Logged in</p>
-        //     )}
-        // </div>
-        <LoginPage />
-    );
+    return <EnhancedAuthPage />;
 };
 
 export default Login;

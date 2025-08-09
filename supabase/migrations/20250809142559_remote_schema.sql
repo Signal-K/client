@@ -467,6 +467,43 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
 ALTER TABLE "public"."profiles" OWNER TO "postgres";
 
 
+<<<<<<<< HEAD:supabase/migrations/20250809142559_remote_schema.sql
+CREATE TABLE IF NOT EXISTS "public"."push_anomaly_log" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "anomaly_id" bigint NOT NULL,
+    "sent_at" timestamp with time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."push_anomaly_log" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."push_subscriptions" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "profile_id" "uuid" NOT NULL,
+    "endpoint" "text" NOT NULL,
+    "p256dh" "text" NOT NULL,
+    "auth" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."push_subscriptions" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."referrals" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "referree_id" "uuid" NOT NULL,
+    "referral_code" "text" NOT NULL,
+    "referred_at" timestamp with time zone DEFAULT "timezone"('utc'::"text", "now"())
+);
+
+
+ALTER TABLE "public"."referrals" OWNER TO "postgres";
+
+
+========
+>>>>>>>> main:supabase/migrations/20250521075552_remote_schema.sql
 CREATE TABLE IF NOT EXISTS "public"."researched" (
     "id" integer NOT NULL,
     "tech_type" character varying(50) NOT NULL,
@@ -712,6 +749,24 @@ ALTER TABLE ONLY "public"."profiles"
 
 
 
+<<<<<<<< HEAD:supabase/migrations/20250809142559_remote_schema.sql
+ALTER TABLE ONLY "public"."push_anomaly_log"
+    ADD CONSTRAINT "push_anomaly_log_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."push_subscriptions"
+    ADD CONSTRAINT "push_subscriptions_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."referrals"
+    ADD CONSTRAINT "referrals_pkey" PRIMARY KEY ("id");
+
+
+
+========
+>>>>>>>> main:supabase/migrations/20250521075552_remote_schema.sql
 ALTER TABLE ONLY "public"."researched"
     ADD CONSTRAINT "researched_pkey" PRIMARY KEY ("id");
 
@@ -719,6 +774,11 @@ ALTER TABLE ONLY "public"."researched"
 
 ALTER TABLE ONLY "public"."sectors"
     ADD CONSTRAINT "sectors_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."push_anomaly_log"
+    ADD CONSTRAINT "unique_anomaly_push_log" UNIQUE ("anomaly_id");
 
 
 
@@ -851,6 +911,24 @@ ALTER TABLE ONLY "public"."profiles"
 
 
 
+<<<<<<<< HEAD:supabase/migrations/20250809142559_remote_schema.sql
+ALTER TABLE ONLY "public"."push_anomaly_log"
+    ADD CONSTRAINT "push_anomaly_log_anomaly_id_fkey" FOREIGN KEY ("anomaly_id") REFERENCES "public"."linked_anomalies"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."push_subscriptions"
+    ADD CONSTRAINT "push_subscriptions_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."referrals"
+    ADD CONSTRAINT "referrals_referree_id_fkey" FOREIGN KEY ("referree_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
+========
+>>>>>>>> main:supabase/migrations/20250521075552_remote_schema.sql
 ALTER TABLE ONLY "public"."researched"
     ADD CONSTRAINT "researched_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id");
 
@@ -2176,6 +2254,27 @@ GRANT ALL ON TABLE "public"."profiles" TO "service_role";
 
 
 
+<<<<<<<< HEAD:supabase/migrations/20250809142559_remote_schema.sql
+GRANT ALL ON TABLE "public"."push_anomaly_log" TO "anon";
+GRANT ALL ON TABLE "public"."push_anomaly_log" TO "authenticated";
+GRANT ALL ON TABLE "public"."push_anomaly_log" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."push_subscriptions" TO "anon";
+GRANT ALL ON TABLE "public"."push_subscriptions" TO "authenticated";
+GRANT ALL ON TABLE "public"."push_subscriptions" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."referrals" TO "anon";
+GRANT ALL ON TABLE "public"."referrals" TO "authenticated";
+GRANT ALL ON TABLE "public"."referrals" TO "service_role";
+
+
+
+========
+>>>>>>>> main:supabase/migrations/20250521075552_remote_schema.sql
 GRANT ALL ON TABLE "public"."researched" TO "anon";
 GRANT ALL ON TABLE "public"."researched" TO "authenticated";
 GRANT ALL ON TABLE "public"."researched" TO "service_role";

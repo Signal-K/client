@@ -2,7 +2,7 @@
 
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
-import { Pencil, Circle, Square } from 'lucide-react';
+import { Pencil, Circle, Square, Eraser } from 'lucide-react';
 import type { Tool } from '@/types/Annotation';
 
 interface AnnotationToolsProps {
@@ -10,6 +10,7 @@ interface AnnotationToolsProps {
   setCurrentTool: (tool: Tool) => void;
   lineWidth: number;
   setLineWidth: (width: number) => void;
+  onClearAll?: () => void;
 };
 
 export function AnnotationTools({
@@ -17,10 +18,24 @@ export function AnnotationTools({
   setCurrentTool,
   lineWidth,
   setLineWidth,
+  onClearAll,
 }: AnnotationToolsProps) {
+  
+  const handleEraseClick = () => {
+    if (onClearAll) {
+      onClearAll();
+    }
+  };
   return (
     <div className="flex gap-4 items-center">
       <div className="space-x-2">
+        <Button
+          variant={currentTool === 'square' ? 'default' : 'outline'}
+          onClick={() => setCurrentTool('square')}
+        >
+          <Square className="w-4 h-4 mr-2" />
+          Square
+        </Button>
         <Button
           variant={currentTool === 'pen' ? 'default' : 'outline'}
           onClick={() => setCurrentTool('pen')}
@@ -29,11 +44,12 @@ export function AnnotationTools({
           Pen
         </Button>
         <Button
-          variant={currentTool === 'square' ? 'default' : 'outline'}
-          onClick={() => setCurrentTool('square')}
+          variant={currentTool === 'erase' ? 'default' : 'outline'}
+          onClick={handleEraseClick}
+          className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
         >
-          <Square className="w-4 h-4 mr-2" />
-          Square
+          <Eraser className="w-4 h-4 mr-2" />
+          Clear All
         </Button>
       </div>
       <Input

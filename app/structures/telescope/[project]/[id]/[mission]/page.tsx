@@ -7,7 +7,7 @@ import { useSessionContext } from "@supabase/auth-helpers-react"
 // Mission imports
 import PlanetHuntersSteps from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetHunters"
 import { StarterSunspot } from "@/src/components/research/projects/Telescopes/Sunspots"
-import { StarterTelescopeTess } from "@/src/components/research/projects/Telescopes/Transiting"
+import { StarterTelescopeTess, TelescopeTessWithId } from "@/src/components/research/projects/Telescopes/Transiting"
 import GameNavbar from "@/src/components/layout/Tes"
 import PlanetTypeCommentForm from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetType"
 import VotePlanetClassifications from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PHVote"
@@ -39,6 +39,8 @@ export default function TelescopeClassifyPage() {
     let classificationId: string | undefined
     if (idParam.startsWith("cl-")) {
       classificationId = idParam.replace("cl-", "")
+    } else if (idParam.startsWith("db-")) {
+      classificationId = idParam.replace("db-", "")
     } else if (!isNaN(Number(idParam))) {
       classificationId = idParam
     }
@@ -49,8 +51,12 @@ export default function TelescopeClassifyPage() {
       case "planet-hunters":
         switch (mission) {
           case "one":
-          case "classify":
             component = <StarterTelescopeTess />
+            break
+          case "classify":
+            // For anonymous users accessing classify directly, check if they need tutorial
+            // Use the specific anomaly ID from the URL
+            component = <TelescopeTessWithId anomalyId={classificationId || '8'} />
             break
           case "comment":
             component = (
@@ -143,7 +149,7 @@ export default function TelescopeClassifyPage() {
 
       {/* Bottom Navigation - stays above everything else */}
       <div className="fixed bottom-0 left-0 right-0 z-50 w-full">
-        <div className="w-full" style={{ position: 'fixed', bottom: '0', left: '0', right: '0', zIndex: 9999 }}>
+        <div className="w-full pb-10 py-5" style={{ position: 'fixed', bottom: '0', left: '0', right: '0', zIndex: 9999 }}>
           <GameNavbar />
         </div>
       </div>

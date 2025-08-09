@@ -14,6 +14,7 @@ import {
 } from "@/src/components/ui/dialog";
 import WeeklyBanner from "@/src/components/ui/update-banner";
 import CompleteProfileForm from "@/src/components/profile/setup/FinishProfile";
+import AnonymousUserPrompt from "@/src/components/profile/auth/AnonymousUserPrompt";
 
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
@@ -132,6 +133,12 @@ export default function ActivityPage() {
       />
 
       <div className="w-full max-w-screen-xl px-4 py-6 space-y-8 pt-24 relative z-10">
+        {/* Anonymous User Upgrade Prompt */}
+        <AnonymousUserPrompt 
+          classificationsCount={classifications.length}
+          discoveryCount={linkedAnomalies.length}
+        />
+
         {/* Activity Header - User profile and deployment status */}
         <ActivityHeaderSection
           classificationsCount={classifications.length}

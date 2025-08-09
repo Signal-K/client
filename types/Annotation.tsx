@@ -324,7 +324,7 @@ export interface Shape {
   width: number;
 };
 
-export type Tool = 'pen' | 'circle' | 'square';
+export type Tool = 'pen' | 'circle' | 'square' | 'erase';
 
 export type DrawingObject = {
   type: Tool;

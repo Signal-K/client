@@ -1,6 +1,8 @@
 "use client";
 
-import { Bell, Sun, Moon, User } from "lucide-react";
+import { useState } from "react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { Bell, Sun, Moon, User, UserPlus, UserX, Zap, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,8 +11,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/src/components/ui/dialog";
 import { Switch } from "@/src/components/ui/switch";
+import { Badge } from "@/src/components/ui/badge";
 import RecentActivity from "@/src/components/social/activity/RecentActivity";
+import ConvertAnonymousAccount from "@/src/components/profile/auth/ConvertAnonymousAccount";
 
 interface CommentVote {
   type: "comment" | "vote";
@@ -45,11 +55,52 @@ export default function MainHeader({
   activityFeed,
   otherClassifications,
 }: MainHeaderProps) {
+  const session = useSession();
+  const supabase = useSupabaseClient();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  
+  const isAnonymousUser = session?.user?.is_anonymous;
+
+  const handleUpgradeClick = () => {
+    setShowUpgradeModal(true);
+  };
+
+  const handleUpgradeSuccess = () => {
+    setShowUpgradeModal(false);
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error signing out:", error.message);
+    } else {
+      console.log("User signed out successfully");
+      // Optionally redirect to home page or login page
+      window.location.href = '/';
+    }
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-sm border-b border-border">
       <div className="flex flex-wrap sm:flex-nowrap items-center justify-between px-4 lg:px-6 py-3 gap-4 sm:gap-0">
         <div className="flex flex-wrap items-center gap-4 sm:gap-6">
           <h1 className="text-xl font-bold text-primary">Star Sailors</h1>
+          
+          {/* Anonymous User Indicator */}
+          {isAnonymousUser && (
+            <div className="flex items-center gap-2">
+              <Badge 
+                variant="outline" 
+                className="border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 cursor-pointer transition-colors"
+                onClick={handleUpgradeClick}
+              >
+                <UserX className="w-3 h-3 mr-1" />
+                <span className="hidden sm:inline">Guest Account</span>
+                <span className="sm:hidden">Guest</span>
+                <Zap className="w-3 h-3 ml-1" />
+              </Badge>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-4">
@@ -73,22 +124,60 @@ export default function MainHeader({
           </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="relative h-8 w-8 rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-chart-3" />
+              <button className="relative h-8 w-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors">
+                {isAnonymousUser ? (
+                  <UserX className="w-5 h-5 text-amber-600" />
+                ) : (
+                  <User className="w-5 h-5 text-chart-3" />
+                )}
                 <span className="sr-only">Open user menu</span>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
-                {/* <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Teddy Martin</p>
-                  <p className="text-xs leading-none text-muted-foreground">ted@tmartin.com</p>
-                </div> */}
+                <div className="flex flex-col space-y-1">
+                  {isAnonymousUser ? (
+                    <>
+                      <p className="text-sm font-medium leading-none text-amber-800">Guest User</p>
+                      <p className="text-xs leading-none text-muted-foreground">Temporary account</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-medium leading-none">Your Account</p>
+                      <p className="text-xs leading-none text-muted-foreground">{session?.user?.email || "User"}</p>
+                    </>
+                  )}
+                </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
+              
+              {isAnonymousUser ? (
+                <>
+                  <DropdownMenuItem 
+                    onClick={handleUpgradeClick}
+                    className="text-amber-700 focus:text-amber-800 cursor-pointer"
+                  >
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Save Account (Free!)
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-gray-600">
+                    <User className="w-4 h-4 mr-2" />
+                    Profile (Limited)
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem>
+                  <User className="w-4 h-4 mr-2" />
+                  Profile
+                </DropdownMenuItem>
+              )}
+              
               <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-700 cursor-pointer">
+                <LogOut className="w-4 h-4 mr-2" />
+                Log out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -104,6 +193,19 @@ export default function MainHeader({
           />
         </div>
       )}
+
+      {/* Upgrade Account Modal */}
+      <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Save Your Guest Account</DialogTitle>
+          </DialogHeader>
+          <ConvertAnonymousAccount 
+            onSuccess={handleUpgradeSuccess}
+            onCancel={() => setShowUpgradeModal(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

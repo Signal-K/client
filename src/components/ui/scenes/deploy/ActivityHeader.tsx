@@ -35,10 +35,12 @@ export default function ActivityHeader({
   landmarksExpanded,
   onToggleLandmarks,
   scrolled,
+  location,
 }: {
   landmarksExpanded: boolean;
   onToggleLandmarks: () => void;
   scrolled: boolean;
+  location?: string;
 }) {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -118,17 +120,8 @@ export default function ActivityHeader({
         return [];
       }
 
-      // Get comments with radius measurements
-      const { data: radiusComments } = await supabase
-        .from("comments")
-        .select("classification_id")
-        .eq("category", "Radius")
-        .in("classification_id", planetIds);
-
-      const planetIdsWithRadius = new Set((radiusComments ?? []).map((c) => c.classification_id));
-
+      // Get all classified planets
       const validPlanets = (planetClassifications ?? [])
-        .filter((c) => planetIdsWithRadius.has(c.id))
         .map((c) => ({
           id: c.id,
           name: (c.anomaly as any)?.content || `Planet #${c.id}`,
@@ -140,13 +133,16 @@ export default function ActivityHeader({
 
     const checkDeploymentStatus = async () => {
       const userId = session.user.id;
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-      // Check telescope deployment (entries without automaton field)
+      // Check telescope deployment (entries with Telescope automaton from last week)
       const { data: telescopeDeployments } = await supabase
         .from("linked_anomalies")
         .select("anomaly_id, anomaly:anomaly_id(id)")
         .eq("author", userId)
-        .is("automaton", null);
+        .eq("automaton", "Telescope")
+        .gte("date", oneWeekAgo.toISOString());
 
       // Check satellite deployment (entries with WeatherSatellite automaton)
       const { data: satelliteDeployments } = await supabase
@@ -447,17 +443,36 @@ export default function ActivityHeader({
 
   const displayName = profile?.username || session?.user?.email || "User";
 
+  // Determine background image based on location prop
+  const getBackgroundImage = () => {
+    if (!location) return "/assets/Backdrops/Earth.png"; // Default image
+    
+    // Map location strings to background images
+    const locationBackgrounds: { [key: string]: string } = {
+      'earth': "/assets/Backdrops/Earth.png",
+      'mars': "/assets/Backdrops/Mars.png",
+      'moon': "/assets/Backdrops/Moon.png",
+      'space': "/assets/Backdrops/Space.png",
+      'jupiter': "/assets/Backdrops/Jupiter.png",
+      'saturn': "/assets/Backdrops/Saturn.png",
+      'nebula': "/assets/Backdrops/Nebula.png",
+      'galaxy': "/assets/Backdrops/Galaxy.png",
+    };
+    
+    return locationBackgrounds[location.toLowerCase()] || "/assets/Backdrops/Earth.png";
+  };
+
   return (
     <Card className="relative w-full h-48 sm:h-56 md:h-64 overflow-visible rounded-lg border-chart-4/30 bg-card">
       <img
-        src="/assets/Backdrops/Earth.png"
-        alt="Earth"
+        src={getBackgroundImage()}
+        alt={location ? `${location} backdrop` : "Earth"}
         className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent via-card/20 flex items-end p-3 sm:p-4 md:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between w-full gap-3 sm:gap-4">
+        <div className="flex flex-row items-end justify-between w-full gap-3 sm:gap-4">
           {/* User info */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <AvatarGenerator author={session?.user.id || ""} />
             <h2 className="text-sm sm:text-base md:text-lg font-bold text-foreground">
               {profile?.username || "USERNAME"}
@@ -465,8 +480,8 @@ export default function ActivityHeader({
           </div>
           
           {/* Deployment status */}
-          <div className="flex flex-col items-start sm:items-end gap-2">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">
+          <div className="flex flex-col items-end gap-2 flex-shrink-0">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground hidden sm:block">
               Deployment Status
             </div>
             
@@ -477,13 +492,13 @@ export default function ActivityHeader({
               </div>
             )}
             
-            <div className="flex gap-3 sm:gap-4">
+            <div className="flex gap-2 sm:gap-3">
               {/* Telescope Status */}
               <Link 
                 href="/structures/telescope"
-                className="flex flex-col items-center gap-1 p-1.5 sm:p-2 rounded-lg hover:bg-card/20 transition-colors group min-w-0"
+                className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-0"
               >
-                <div className={`p-1.5 sm:p-2 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount)}`}>
+                <div className={`p-1 sm:p-1.5 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount)}`}>
                   <TelescopeIcon 
                     deployed={deploymentStatus.telescope.deployed} 
                     hasDiscoveries={deploymentStatus.telescope.unclassifiedCount > 0} 
@@ -493,7 +508,7 @@ export default function ActivityHeader({
                   <span className="text-xs font-medium group-hover:text-foreground transition-colors block truncate">
                     Telescope
                   </span>
-                  <span className={`text-xs ${getStatusColor(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount)} transition-colors block truncate`}>
+                  <span className={`text-xs ${getStatusColor(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount)} transition-colors block truncate hidden sm:block`}>
                     {getStatusLabel(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount, "telescope")}
                   </span>
                 </div>
@@ -503,9 +518,9 @@ export default function ActivityHeader({
               {deploymentStatus.satellites.available && (
                 <button
                   onClick={() => setShowPlanetSelector(true)}
-                  className="flex flex-col items-center gap-1 p-1.5 sm:p-2 rounded-lg hover:bg-card/20 transition-colors group min-w-0"
+                  className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-0"
                 >
-                  <div className={`p-1.5 sm:p-2 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount)}`}>
+                  <div className={`p-1 sm:p-1.5 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount)}`}>
                     <SatelliteIcon 
                       deployed={deploymentStatus.satellites.deployed} 
                       hasDiscoveries={deploymentStatus.satellites.unclassifiedCount > 0} 
@@ -515,7 +530,7 @@ export default function ActivityHeader({
                     <span className="text-xs font-medium group-hover:text-foreground transition-colors block truncate">
                       Satellites
                     </span>
-                    <span className={`text-xs ${getStatusColor(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount)} transition-colors block truncate`}>
+                    <span className={`text-xs ${getStatusColor(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount)} transition-colors block truncate hidden sm:block`}>
                       {getStatusLabel(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount, "satellites")}
                     </span>
                   </div>
@@ -562,7 +577,7 @@ export default function ActivityHeader({
               <div className="text-center py-8 text-muted-foreground">
                 <span className="text-4xl block mb-2">🌍</span>
                 <p className="text-sm">No planets available for satellite deployment</p>
-                <p className="text-xs">Classify planets with radius measurements to unlock satellite deployment</p>
+                <p className="text-xs">Complete a planet classification to unlock satellites</p>
               </div>
             )}
           </div>

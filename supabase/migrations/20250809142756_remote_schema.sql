@@ -53,7 +53,18 @@ revoke truncate on table "storage"."prefixes" from "service_role";
 
 revoke update on table "storage"."prefixes" from "service_role";
 
+<<<<<<<< HEAD:supabase/migrations/20250809142756_remote_schema.sql
+-- Comment out constraint drops for tables we're keeping
+-- alter table "storage"."iceberg_namespaces" drop constraint "iceberg_namespaces_bucket_id_fkey";
+
+-- alter table "storage"."iceberg_tables" drop constraint "iceberg_tables_bucket_id_fkey";
+
+-- alter table "storage"."iceberg_tables" drop constraint "iceberg_tables_namespace_id_fkey";
+
+-- alter table "storage"."prefixes" drop constraint "prefixes_bucketId_fkey";
+========
 alter table "storage"."prefixes" drop constraint "prefixes_bucketId_fkey";
+>>>>>>>> main:supabase/migrations/20250521075628_remote_schema.sql
 
 drop function if exists "storage"."add_prefixes"(_bucket_id text, _name text);
 
@@ -61,13 +72,51 @@ drop function if exists "storage"."delete_prefix"(_bucket_id text, _name text);
 
 drop function if exists "storage"."delete_prefix_hierarchy_trigger"();
 
+<<<<<<<< HEAD:supabase/migrations/20250809142756_remote_schema.sql
+drop function if exists "storage"."enforce_bucket_name_length"();
+
+-- drop function if exists "storage"."get_level"(name text);
+
+drop function if exists "storage"."get_prefix"(name text);
+
+drop function if exists "storage"."get_prefixes"(name text);
+
+drop function if exists "storage"."objects_insert_prefix_trigger"();
+
+drop function if exists "storage"."objects_update_prefix_trigger"();
+
+drop function if exists "storage"."prefixes_insert_trigger"();
+
+========
+>>>>>>>> main:supabase/migrations/20250521075628_remote_schema.sql
 drop function if exists "storage"."search_legacy_v1"(prefix text, bucketname text, limits integer, levels integer, offsets integer, search text, sortcolumn text, sortorder text);
 
 drop function if exists "storage"."search_v1_optimised"(prefix text, bucketname text, limits integer, levels integer, offsets integer, search text, sortcolumn text, sortorder text);
 
 drop function if exists "storage"."search_v2"(prefix text, bucket_name text, limits integer, levels integer, start_after text);
 
+<<<<<<<< HEAD:supabase/migrations/20250809142756_remote_schema.sql
+-- Comment out constraint drops for tables we're keeping
+-- alter table "storage"."buckets_analytics" drop constraint "buckets_analytics_pkey";
+
+-- alter table "storage"."iceberg_namespaces" drop constraint "iceberg_namespaces_pkey";
+
+-- alter table "storage"."iceberg_tables" drop constraint "iceberg_tables_pkey";
+
+-- alter table "storage"."prefixes" drop constraint "prefixes_pkey";
+
+drop index if exists "storage"."buckets_analytics_pkey";
+
+drop index if exists "storage"."iceberg_namespaces_pkey";
+
+drop index if exists "storage"."iceberg_tables_pkey";
+
+drop index if exists "storage"."idx_iceberg_namespaces_bucket_id";
+
+drop index if exists "storage"."idx_iceberg_tables_namespace_id";
+========
 alter table "storage"."prefixes" drop constraint "prefixes_pkey";
+>>>>>>>> main:supabase/migrations/20250521075628_remote_schema.sql
 
 drop index if exists "storage"."idx_name_bucket_level_unique";
 
@@ -79,9 +128,27 @@ drop index if exists "storage"."objects_bucket_id_level_idx";
 
 drop index if exists "storage"."prefixes_pkey";
 
+<<<<<<<< HEAD:supabase/migrations/20250809142756_remote_schema.sql
+-- Comment out table drops to maintain compatibility with local storage service
+-- drop table "storage"."buckets_analytics";
+
+-- drop table "storage"."iceberg_namespaces";
+
+-- drop table "storage"."iceberg_tables";
+
+-- drop table "storage"."prefixes";
+
+-- Skip dropping type column to maintain compatibility with local storage service
+-- alter table "storage"."buckets" drop column "type";
+
+alter table "storage"."objects" drop column "level";
+
+drop type "storage"."buckettype";
+========
 drop table "storage"."prefixes";
 
 alter table "storage"."objects" drop column "level";
+>>>>>>>> main:supabase/migrations/20250521075628_remote_schema.sql
 
 set check_function_bodies = off;
 
