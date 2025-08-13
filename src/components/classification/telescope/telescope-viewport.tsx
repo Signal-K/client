@@ -267,23 +267,23 @@ export default function TelescopeViewport() {
     }
   }, [state.currentSector, loadSector, state.loading])
 
-  useEffect(() => {
-    if (!state.loading && state.anomalies.length > 0) {
-      const alreadyClassifiedIds = new Set(state.classifications.map((c) => `db-${c.anomaly}`))
-      const unclassified = state.anomalies.filter((a) => !alreadyClassifiedIds.has(a.id))
-      const pool = unclassified.length > 0 ? unclassified : state.anomalies
-      const randomAnomaly = pool[Math.floor(Math.random() * pool.length)]
+  // useEffect(() => {
+  //   if (!state.loading && state.anomalies.length > 0) {
+  //     const alreadyClassifiedIds = new Set(state.classifications.map((c) => `db-${c.anomaly}`))
+  //     const unclassified = state.anomalies.filter((a) => !alreadyClassifiedIds.has(a.id))
+  //     const pool = unclassified.length > 0 ? unclassified : state.anomalies
+  //     const randomAnomaly = pool[Math.floor(Math.random() * pool.length)]
 
-      if (randomAnomaly) {
-        setState((prev) => ({
-          ...prev,
-          selectedAnomaly: randomAnomaly,
-          showDetailDialog: randomAnomaly.classified || false,
-          showClassifyDialog: !randomAnomaly.classified,
-        }))
-      }
-    }
-  }, [state.loading, state.anomalies, state.classifications])
+  //     if (randomAnomaly) {
+  //       setState((prev) => ({
+  //         ...prev,
+  //         selectedAnomaly: randomAnomaly,
+  //         showDetailDialog: randomAnomaly.classified || false,
+  //         showClassifyDialog: !randomAnomaly.classified,
+  //       }))
+  //     }
+  //   }
+  // }, [state.loading, state.anomalies, state.classifications])
 
   // Computed values
   const currentSectorName = generateSectorName(state.currentSector.x, state.currentSector.y)

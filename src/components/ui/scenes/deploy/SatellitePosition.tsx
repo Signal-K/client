@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 import SatelliteCard from "./satellite/SatelliteCard";
+import Section from "@/src/components/sections/Section";
 import SatelliteLegend from "./satellite/SatelliteLegend";
 import SatelliteIcon from "./satellite/SatelliteIcon";
 import SatelliteTooltip from "./satellite/SatelliteTooltip";
@@ -315,8 +316,8 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
   }, []);
 
   return (
-    <>
-      <SatelliteCard>
+    <Section sectionId="satellite-position" variant="viewport" backgroundType="stars">
+      {/* <SatelliteCard> */}
         <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
           <TelescopeBackground
             sectorX={0}
@@ -325,7 +326,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
             isDarkTheme={true}
           />
         </div>
-        <div className="p-4 relative z-10" style={{ minHeight: 120 }}>
+        <div className="p-4 relative z-10" style={{ minHeight: '156px', height: '30vh', maxHeight: 520 }}>
           {/* Planet in top-right, behind overlays */}
           {positions[0]?.linkedAnomalyId && (
             <div
@@ -362,21 +363,24 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
           {positions.map((sat) => (
             <div
               key={sat.id}
-              className="absolute cursor-pointer"
+              className="cursor-pointer"
               style={{
-                left: `${sat.x}%`,
-                top: `${sat.y}%`,
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "100%",
+                height: "100%",
+                background: "none",
+                border: "none",
+                zIndex: 10,
+                pointerEvents: "none", // Only SatelliteIcon is interactive
               }}
-              onClick={() => handleSatelliteClick(sat)}
-              onMouseEnter={() => handleSatelliteMouseEnter(sat)}
-              onMouseLeave={handleSatelliteMouseLeave}
             >
               <SatelliteIcon
-                tile={sat.tile}
-                isUnlocked={sat.unlocked}
-                isFlashing={!!flashingIndicator}
-                currentTileIndex={currentTileIndex}
-                satelliteTiles={satelliteTiles}
+                deployTime={sat.deployTime}
+                currentTime={currentTime}
+                tile={satelliteTiles[currentTileIndex]}
+                unlocked={sat.unlocked}
               />
               {hoveredSatellite === sat.id && tooltipData && (
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-20">
@@ -393,7 +397,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
             </div>
           ))}
         </div>
-      </SatelliteCard>
+      {/* </SatelliteCard> */}
 
       {/* Unlock Dialog */}
       <Dialog open={showUnlockDialog} onOpenChange={setShowUnlockDialog}>
@@ -423,6 +427,6 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </Section>
   );
 };

@@ -66,7 +66,7 @@ export function ViewportHeader({
           </div>
 
           {/* Project Filter */}
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={toggleProjectPanel}
@@ -80,7 +80,7 @@ export function ViewportHeader({
             ) : (
               "All Projects"
             )}
-          </Button>
+          </Button> */}
 
           {/* View Toggle */}
           <Button

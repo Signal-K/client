@@ -120,7 +120,6 @@ export function TelescopeBackground({
 
   // Handle anomaly click
   const handleAnomalyClick = (anomaly: Anomaly) => {
-    console.log("Anomaly clicked:", anomaly)
     setSelectedAnomaly(anomaly)
     if (onAnomalyClick) {
       onAnomalyClick(anomaly)
@@ -308,15 +307,11 @@ export function TelescopeBackground({
 
   // Load data on mount
   useEffect(() => {
-    console.log("TelescopeBackground: Mount effect, session:", !!session)
     // Load data directly without the callback to avoid dependency issues
     const loadDataDirectly = async () => {
-      console.log("TelescopeBackground: Starting loadData")
       setLoading(true)
       try {
-        console.log("TelescopeBackground: Calling fetchAnomalies")
         const fetchedAnomalies = await fetchAnomalies()
-        console.log("TelescopeBackground: Fetched anomalies:", fetchedAnomalies.length)
         setAnomalies(fetchedAnomalies)
 
         // Generate environment-specific stars
@@ -342,7 +337,6 @@ export function TelescopeBackground({
         const environmentStars = generateEnvironmentStars(sectorX, sectorY, variant)
         setStars(environmentStars)
       } finally {
-        console.log("TelescopeBackground: Setting loading to false")
         setLoading(false)
       }
     }

@@ -37,6 +37,7 @@ import { useSatelliteManagement } from "@/hooks/useSatelliteManagement";
 import { useNPSManagement } from "@/hooks/useNPSManagement";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import SatellitePosition from "@/src/components/ui/scenes/deploy/SatellitePosition";
+import SolarHealth from "@/src/components/ui/scenes/solar/SolarHealth";
 
 type PageSatellite = {
   id: string;
@@ -147,11 +148,17 @@ export default function ActivityPage() {
           onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
         />
 
+
         {satelliteData && (
-          <SatellitePosition
-            satellites={[satelliteData]} // Pass a single satellite
-            flashingIndicator={satelliteData.hasUnclassifiedAnomaly} // Add flashing indicator
-          />
+          <>
+            <SatellitePosition
+              satellites={[satelliteData]} // Pass a single satellite
+              flashingIndicator={satelliteData.hasUnclassifiedAnomaly} // Add flashing indicator
+            />
+            <div className="mt-8">
+              <SolarHealth />
+            </div>
+          </>
         )}
 
         {/* Recent Discoveries */}
