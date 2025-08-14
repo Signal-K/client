@@ -78,6 +78,11 @@ export default function SolarHealth() {
 
   // Helper: is anomaly unlocked
   function isUnlocked(linked: any) {
+    if (!linked) return false;
+    // Use unlocked column if present, otherwise fallback to time logic
+    if (typeof linked.unlocked === 'boolean') {
+      return linked.unlocked;
+    }
     if (!linked?.date) return false;
     const unlockTime = new Date(linked.date);
     unlockTime.setDate(unlockTime.getDate() + 1);

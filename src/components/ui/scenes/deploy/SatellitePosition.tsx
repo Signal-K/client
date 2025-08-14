@@ -56,6 +56,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   const [hoveredSatellite, setHoveredSatellite] = useState<string | null>(null);
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
   const [lastActionTime, setLastActionTime] = useState<Date | null>(null);
+  const [showDeployDialog, setShowDeployDialog] = useState(false);
 
   const satelliteTiles = [
     "/assets/Viewports/Satellite/Satellite_Tile1.png",
@@ -317,113 +318,114 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
 
   return (
     <Section sectionId="satellite-position" variant="viewport" backgroundType="stars">
-      {/* <SatelliteCard> */}
-        <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
-          <TelescopeBackground
-            sectorX={0}
-            sectorY={0}
-            showAllAnomalies={false}
-            isDarkTheme={true}
-          />
-        </div>
-        <div className="p-4 relative z-10" style={{ minHeight: '156px', height: '30vh', maxHeight: 520 }}>
-          {/* Planet in top-right, behind overlays */}
-          {positions[0]?.linkedAnomalyId && (
-            <div
-              className="absolute group"
-              style={{
-                top: 0,
-                right: 0,
-                width: 1300,
-                height: 1300,
-                zIndex: 1,
-                pointerEvents: "auto",
-                background: "none",
-                borderRadius: "50%",
-                overflow: "visible",
-                transform: "translateX(40%)",
-              }}
+      <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={true}
+        />
+      </div>
+      <div className="p-4 relative z-10" style={{ minHeight: '156px', height: '30vh', maxHeight: 520 }}>
+        {/* If no satellites, show deploy button */}
+        {positions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="mb-4 text-lg text-white">No weather satellite deployed.</div>
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded shadow"
+              onClick={() => setShowDeployDialog(true)}
             >
-              <PlanetGeneratorMinimal
-                classificationId={positions[0]?.linkedAnomalyId}
-              />
-              {/* Tooltip for planet overlay */}
+              Deploy Weather Satellite
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Planet in top-right, behind overlays */}
+            {positions[0]?.linkedAnomalyId && (
               <div
-                className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-full bg-black bg-opacity-80 text-white text-xs rounded px-3 py-2 mt-2 opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap shadow-lg"
-                style={{ zIndex: 100 }}
+                className="absolute group"
+                style={{
+                  top: 0,
+                  right: 0,
+                  width: 1300,
+                  height: 1300,
+                  zIndex: 1,
+                  pointerEvents: "auto",
+                  background: "none",
+                  borderRadius: "50%",
+                  overflow: "visible",
+                  transform: "translateX(40%)",
+                }}
               >
-                {/* Example values, replace with real data as needed */}
-                <div><b>Planet:</b> {tooltipData?.planetName || positions[0]?.anomalyId || "Unknown"}</div>
-                <div><b>Distance:</b> Calculating...</div>
-                <div><b>Scan Time:</b> Calculating...</div>
-              </div>
-            </div>
-          )}
-          <SatelliteLegend />
-          {positions.map((sat) => (
-            <div
-              key={sat.id}
-              className="cursor-pointer"
-              style={{
-                position: "absolute",
-                left: 0,
-                top: 0,
-                width: "100%",
-                height: "100%",
-                background: "none",
-                border: "none",
-                zIndex: 10,
-                pointerEvents: "none", // Only SatelliteIcon is interactive
-              }}
-            >
-              <SatelliteIcon
-                deployTime={sat.deployTime}
-                currentTime={currentTime}
-                tile={satelliteTiles[currentTileIndex]}
-                unlocked={sat.unlocked}
-              />
-              {hoveredSatellite === sat.id && tooltipData && (
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-20">
-                  <SatelliteTooltip
-                    timeSinceDeploy={formatTimeSinceDeploy(tooltipData.deployTime)}
-                    timeRemaining={tooltipData.timeRemaining}
-                    timeSinceLastAction={tooltipData.timeSinceLastAction}
-                    planetName={tooltipData.planetName}
-                    classificationText={tooltipData.classificationText}
-                    deployTime={tooltipData.deployTime}
-                  />
+                <PlanetGeneratorMinimal
+                  classificationId={positions[0]?.linkedAnomalyId}
+                />
+                {/* Tooltip for planet overlay */}
+                <div
+                  className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-full bg-black bg-opacity-80 text-white text-xs rounded px-3 py-2 mt-2 opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap shadow-lg"
+                  style={{ zIndex: 100 }}
+                >
+                  <div><b>Planet:</b> {tooltipData?.planetName || positions[0]?.anomalyId || "Unknown"}</div>
+                  <div><b>Distance:</b> Calculating...</div>
+                  <div><b>Scan Time:</b> Calculating...</div>
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
-      {/* </SatelliteCard> */}
-
-      {/* Unlock Dialog */}
-      <Dialog open={showUnlockDialog} onOpenChange={setShowUnlockDialog}>
+              </div>
+            )}
+            <SatelliteLegend />
+            {positions.map((sat) => (
+              <div
+                key={sat.id}
+                className="cursor-pointer"
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  width: "100%",
+                  height: "100%",
+                  background: "none",
+                  border: "none",
+                  zIndex: 10,
+                  pointerEvents: "none",
+                }}
+              >
+                <SatelliteIcon
+                  deployTime={sat.deployTime}
+                  currentTime={currentTime}
+                  tile={satelliteTiles[currentTileIndex]}
+                  unlocked={sat.unlocked}
+                />
+                {hoveredSatellite === sat.id && tooltipData && (
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-20">
+                    <SatelliteTooltip
+                      timeSinceDeploy={formatTimeSinceDeploy(tooltipData.deployTime)}
+                      timeRemaining={tooltipData.timeRemaining}
+                      timeSinceLastAction={tooltipData.timeSinceLastAction}
+                      planetName={tooltipData.planetName}
+                      classificationText={tooltipData.classificationText}
+                      deployTime={tooltipData.deployTime}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+      {/* Deploy Dialog */}
+      <Dialog open={showDeployDialog} onOpenChange={setShowDeployDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-primary">Cloud Formation Detected</DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              Your weather satellite has completed scanning the region of interest and detected a cloud formation ready for atmospheric analysis. 
-              Would you like to begin cloud observation and classification?
-            </DialogDescription>
+            <DialogTitle className="text-primary">Deploy Weather Satellite</DialogTitle>
           </DialogHeader>
-          <div className="flex gap-3 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowUnlockDialog(false)}
-              className="flex-1"
+          <div className="py-4">
+            <p className="mb-4">Deploy a weather satellite to begin monitoring planetary atmospheres and discover new cloud formations. Select a planet to deploy to and start your mission!</p>
+            {/* TODO: Add planet selection and deploy logic here */}
+            <button
+              className="px-4 py-2 bg-green-600 text-white rounded shadow"
+              onClick={() => setShowDeployDialog(false)}
             >
-              Continue Scanning
-            </Button>
-            <Button
-              onClick={handleUnlockAnomaly}
-              disabled={isUnlocking}
-              className="flex-1"
-            >
-              {isUnlocking ? "Analyzing..." : "Begin Observation"}
-            </Button>
+              Deploy to Random Planet
+            </button>
           </div>
         </DialogContent>
       </Dialog>

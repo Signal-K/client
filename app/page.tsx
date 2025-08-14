@@ -92,21 +92,19 @@ export default function ActivityPage() {
 
   const satelliteData: PageSatellite & { deployTime: Date } | null = (() => {
     const weatherSatelliteAnomaly = linkedAnomalies.find(anomaly => anomaly.automaton === "WeatherSatellite");
-    
     if (weatherSatelliteAnomaly) {
       return {
         id: "satellite-1",
-        x: 50, // Centered position
-        y: 50, // Centered position
+        x: 50,
+        y: 50,
         hasUnclassifiedAnomaly: true,
         anomalyId: weatherSatelliteAnomaly.anomaly?.id?.toString(),
         tile: "/assets/Viewports/Satellite/Satellite_Tile1.png",
-        unlocked: false, // Will be fetched by SatellitePosition component
+        unlocked: false,
         linkedAnomalyId: weatherSatelliteAnomaly.id.toString(),
-        deployTime: new Date(), // Provide a default or actual deploy time here
+        deployTime: new Date(),
       };
     }
-    
     return null;
   })();
 
@@ -148,18 +146,14 @@ export default function ActivityPage() {
           onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
         />
 
+        <SatellitePosition
+          satellites={satelliteData ? [satelliteData] : []}
+          flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
+        />
 
-        {satelliteData && (
-          <>
-            <SatellitePosition
-              satellites={[satelliteData]} // Pass a single satellite
-              flashingIndicator={satelliteData.hasUnclassifiedAnomaly} // Add flashing indicator
-            />
-            <div className="mt-8">
+        <div className="mt-8">
               <SolarHealth />
             </div>
-          </>
-        )}
 
         {/* Recent Discoveries */}
         <RecentDiscoveries

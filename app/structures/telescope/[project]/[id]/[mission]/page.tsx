@@ -29,89 +29,96 @@ export default function TelescopeClassifyPage() {
     }
   }, [session, isLoading, router])
 
-  useEffect(() => {
-    if (isLoading || !session) return
+    useEffect(() => {
+      if (isLoading || !session) return;
 
-    const project = String(params.project)
-    const mission = String(params.mission)
-    const idParam = String(params.id || "")
+      const project = String(params.project);
+      const mission = String(params.mission);
+      const idParam = String(params.id || "");
 
-    let classificationId: string | undefined
-    if (idParam.startsWith("cl-")) {
-      classificationId = idParam.replace("cl-", "")
-    } else if (idParam.startsWith("db-")) {
-      classificationId = idParam.replace("db-", "")
-    } else if (!isNaN(Number(idParam))) {
-      classificationId = idParam
-    }
+      let classificationId: string | undefined;
+      if (idParam.startsWith("cl-")) {
+        classificationId = idParam.replace("cl-", "");
+      } else if (idParam.startsWith("db-")) {
+        classificationId = idParam.replace("db-", "");
+      } else if (!isNaN(Number(idParam))) {
+        classificationId = idParam;
+      }
 
-    let component: React.ReactNode = null
+      let component: React.ReactNode = null;
 
-    switch (project) {
-      case "planet-hunters":
-        switch (mission) {
-          case "one":
-            component = <StarterTelescopeTess />
-            break
-          case "classify":
-            // For anonymous users accessing classify directly, check if they need tutorial
-            // Use the specific anomaly ID from the URL
-            component = <TelescopeTessWithId anomalyId={classificationId || '8'} />
-            break
-          case "comment":
-            component = (
-              <PlanetTypeCommentForm classificationId={classificationId} />
-            )
-            break
-          case "survey":
-            component = (
-              <VotePlanetClassifications classificationId={classificationId || '8'} />
-            )
-            break
-          case "paint":
-            component = (
-              <PlanetGenerator
-                classificationId={classificationId || '8'}
-              />
-            )
-            break
-          default:
-            component = <PlanetHuntersSteps />
-            break
-        }
-        break
+      switch (project) {
+        case "planet-hunters":
+          switch (mission) {
+            case "one":
+              component = <StarterTelescopeTess />;
+              break;
+            case "classify":
+              component = <TelescopeTessWithId anomalyId={classificationId || '8'} />;
+              break;
+            case "comment":
+              component = (
+                <PlanetTypeCommentForm classificationId={classificationId} />
+              );
+              break;
+            case "survey":
+              component = (
+                <VotePlanetClassifications classificationId={classificationId || '8'} />
+              );
+              break;
+            case "paint":
+              component = (
+                <PlanetGenerator classificationId={classificationId || '8'} />
+              );
+              break;
+            default:
+              component = <PlanetHuntersSteps />;
+              break;
+          }
+          break;
 
-      case "sunspots":
-        component = <StarterSunspot />
-        break
+        case "sunspots":
+        case "sunspot":
+          switch (mission) {
+            case "count":
+              // If id is present, pass it to StarterSunspot for direct anomaly
+              if (classificationId) {
+                component = <StarterSunspot anomalyId={classificationId} />;
+              } else {
+                component = <StarterSunspot />;
+              }
+              break;
+            default:
+              component = <StarterSunspot />;
+              break;
+          }
+          break;
 
-      case "daily-minor-planet":
-        switch (mission) {
-          case "classify":
-            // Extract anomaly ID from params.id (remove "db-" prefix if present)
-            const anomalyId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
-            component = <DailyMinorPlanetWithId anomalyId={anomalyId} />
-            break
-        }
-        break
+        case "daily-minor-planet":
+          switch (mission) {
+            case "classify":
+              const anomalyId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
+              component = <DailyMinorPlanetWithId anomalyId={anomalyId} />;
+              break;
+          }
+          break;
 
-      case "active-asteroids":
-        switch (mission) {
-          case "classify":
-            // Extract anomaly ID from params.id (remove "db-" prefix if present)
-            const activeAsteroidId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
-            component = <DailyMinorPlanetWithId anomalyId={activeAsteroidId} />
-            break
-        }
-        break
+        case "active-asteroids":
+          switch (mission) {
+            case "classify":
+              const activeAsteroidId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
+              component = <DailyMinorPlanetWithId anomalyId={activeAsteroidId} />;
+              break;
+          }
+          break;
 
-      default:
-        component = <div className="text-white p-4">Unknown mission or project.</div>
-        break
-    }
+        default:
+          component = <div className="text-white p-4">Unknown mission or project.</div>;
+          break;
+      }
 
-    setMissionComponent(component)
-  }, [params, session, isLoading])
+      setMissionComponent(component);
+    }, [params, session, isLoading]);
 
   return (
     <div className="relative min-h-screen w-full flex flex-col">
