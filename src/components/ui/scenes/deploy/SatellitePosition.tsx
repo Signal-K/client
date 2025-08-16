@@ -45,6 +45,7 @@ interface TooltipData {
 };
 
 export default function SatellitePosition({ satellites, flashingIndicator }: SatellitePositionProps) {
+  // Restore handleUnlockAnomaly and handleSatelliteClick
   const supabase = useSupabaseClient();
   const session = useSession();
   const [positions, setPositions] = useState<Satellite[]>(satellites);
@@ -376,17 +377,10 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
               <div
                 key={sat.id}
                 className="cursor-pointer"
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  top: 0,
-                  width: "100%",
-                  height: "100%",
-                  background: "none",
-                  border: "none",
-                  zIndex: 10,
-                  pointerEvents: "none",
-                }}
+                onClick={() => handleSatelliteClick(sat)}
+                onMouseEnter={() => handleSatelliteMouseEnter(sat)}
+                onMouseLeave={handleSatelliteMouseLeave}
+                style={{ position: 'relative', width: 70, height: 70 }}
               >
                 <SatelliteIcon
                   deployTime={sat.deployTime}
@@ -426,6 +420,34 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
             >
               Deploy to Random Planet
             </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Unlock Dialog */}
+      <Dialog open={showUnlockDialog} onOpenChange={setShowUnlockDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-primary">Cloud Formation Detected</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Your weather satellite has completed scanning the region of interest and detected a cloud formation ready for atmospheric analysis. 
+              Would you like to begin cloud observation and classification?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowUnlockDialog(false)}
+              className="flex-1"
+            >
+              Continue Scanning
+            </Button>
+            <Button
+              onClick={handleUnlockAnomaly}
+              disabled={isUnlocking}
+              className="flex-1"
+            >
+              {isUnlocking ? "Analyzing..." : "Begin Observation"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
