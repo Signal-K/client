@@ -139,16 +139,17 @@ export default function SolarHealth() {
       sectionId="solar-health"
       variant="viewport"
       backgroundType="inner-solar"
+      infoText={"Investigate star activity to detect solar flares and measure the intensity of sunspots"}
     >
-      <div className="relative w-full h-64 md:h-96 flex items-center justify-center py-8 md:py-12">
+      <div className="relative w-full flex flex-col md:flex-row items-stretch justify-center py-8 md:py-12 h-auto min-h-[320px]">
         {/* 3D Sun Scene */}
         <div
-          className="absolute left-0 top-0 bottom-0 flex items-center pl-8"
-          style={{ width: "40%", minWidth: 180 }}
+          className="w-full md:w-2/5 flex items-center justify-center md:justify-start mb-6 md:mb-0"
+          style={{ minWidth: 180 }}
         >
           <Canvas
             camera={{ position: [0, 0, 8], fov: 50 }}
-            className="w-full h-full"
+            className="w-full h-64 md:h-96"
           >
             <ambientLight intensity={0.7} />
             <pointLight position={[0, 0, 10]} intensity={2} color="#FFD700" />
@@ -173,8 +174,7 @@ export default function SolarHealth() {
         </div>
         {/* Info and actions */}
         <div
-          className="relative z-10 flex flex-col items-center justify-center h-full w-full px-2 md:px-6"
-          style={{ marginLeft: "40%" }}
+          className="w-full md:w-3/5 flex flex-col items-center justify-center px-2 md:px-6"
         >
           <div className="w-full flex flex-col items-center justify-center">
             <h2 className="text-lg md:text-xl font-bold mb-2 text-center">

@@ -28,7 +28,7 @@ export default function ActivityHeaderSection({
         landmarksExpanded={landmarksExpanded}
         onToggleLandmarks={onToggleLandmarks}
       />
-      <p className="text-lg pt-3">This is test text</p>
+      <p className="text-lg pt-3">Welcome to Star Sailors</p>
     </div>
   );
 };

@@ -180,13 +180,13 @@ export default function ActivityPage() {
         /> */}
 
         {/* Structures & Equipment */}
-        <StructuresEquipmentSection
+        {/* <StructuresEquipmentSection
           planetTargets={planetTargets}
           activeSatelliteMessage={activeSatelliteMessage}
           visibleStructures={visibleStructures}
           onSendSatellite={handleSendSatellite}
           onCheckActiveSatellite={checkActiveSatellite}
-        />
+        /> */}
 
         {/* Profile Setup */}
         {/* <ProfileSetupSection
@@ -201,7 +201,7 @@ export default function ActivityPage() {
         /> */}
 
         {/* Legacy Milestones Section */}
-        <LegacyMilestonesSection />
+        {/* <LegacyMilestonesSection /> */}
 
         {/* Profile Setup or Complete Structures Section */}
         {needsProfileSetup &&(
