@@ -318,15 +318,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
   }, []);
 
   return (
-    <Section sectionId="satellite-position" variant="viewport" backgroundType="stars">
-      <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
-        <TelescopeBackground
-          sectorX={0}
-          sectorY={0}
-          showAllAnomalies={false}
-          isDarkTheme={true}
-        />
-      </div>
+    <Section sectionId="satellite-position" variant="viewport" backgroundType="outer-solar">
       <div className="p-4 relative z-10" style={{ minHeight: '156px', height: '30vh', maxHeight: 520 }}>
         {/* If no satellites, show deploy button */}
         {positions.length === 0 ? (
@@ -413,10 +405,46 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
           </DialogHeader>
           <div className="py-4">
             <p className="mb-4">Deploy a weather satellite to begin monitoring planetary atmospheres and discover new cloud formations. Select a planet to deploy to and start your mission!</p>
-            {/* TODO: Add planet selection and deploy logic here */}
             <button
               className="px-4 py-2 bg-green-600 text-white rounded shadow"
-              onClick={() => setShowDeployDialog(false)}
+              onClick={async () => {
+                if (!session?.user?.id) return;
+                // Fetch user's classified planets
+                const { data: planetClassifications } = await supabase
+                  .from("classifications")
+                  .select("id, anomaly:anomaly(content)")
+                  .eq("author", session.user.id)
+                  .eq("classificationtype", "planet");
+                if (!planetClassifications || planetClassifications.length === 0) {
+                  alert("No classified planets available for deployment.");
+                  return;
+                }
+                // Pick a random planet
+                const randomIndex = Math.floor(Math.random() * planetClassifications.length);
+                const selectedPlanet = planetClassifications[randomIndex];
+                // Fetch a random cloud anomaly
+                const { data: cloudAnomalies } = await supabase
+                  .from("anomalies")
+                  .select("id")
+                  .eq("anomalytype", "cloud");
+                if (!cloudAnomalies || cloudAnomalies.length === 0) {
+                  alert("No cloud anomalies available.");
+                  return;
+                }
+                const cloudIndex = Math.floor(Math.random() * cloudAnomalies.length);
+                const selectedAnomaly = cloudAnomalies[cloudIndex];
+                // Insert deployment row
+                await supabase.from("linked_anomalies").insert({
+                  author: session.user.id,
+                  anomaly_id: selectedAnomaly.id,
+                  classification_id: selectedPlanet.id,
+                  automaton: "WeatherSatellite",
+                  unlocked: false,
+                  date: new Date().toISOString(),
+                });
+                setShowDeployDialog(false);
+                window.location.reload();
+              }}
             >
               Deploy to Random Planet
             </button>

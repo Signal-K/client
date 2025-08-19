@@ -23,12 +23,15 @@ const Section: React.FC<SectionProps> = ({
   expanded = false,
 }) => {
   const router = useRouter();
-  // Example background logic
+  // Use TelescopeBackground for viewport variant
+  const TelescopeBackground = require("@/src/components/classification/telescope/telescope-background").TelescopeBackground;
   const renderBackground = () => {
     if (variant === "viewport" && backgroundType !== "none") {
-      // You can swap this for your actual background component
-      // return <TelescopeBackground variant={backgroundType} className="absolute inset-0 z-0" />;
-      return <div className="absolute inset-0 z-0 bg-gradient-to-br from-blue-900 to-black" />;
+      return (
+        <div className="absolute inset-0 z-0 w-full h-full">
+          <TelescopeBackground variant={backgroundType} />
+        </div>
+      );
     }
     return null;
   };

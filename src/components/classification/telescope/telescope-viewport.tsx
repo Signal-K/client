@@ -311,8 +311,8 @@ export default function TelescopeViewport() {
           <div className="text-[#78cce2] text-sm mt-2">Loading deep space data</div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="h-screen bg-[#002439] flex flex-col overflow-hidden">

@@ -44,6 +44,7 @@ function getWeekStart(date: Date) {
 export default function SolarHealth() {
   const supabase = useSupabaseClient();
   const session = useSession();
+  
   const [sunspotAnomalies, setSunspotAnomalies] = useState<any[]>([]);
   const [linkedSunspots, setLinkedSunspots] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

@@ -37,7 +37,8 @@ import { useSatelliteManagement } from "@/hooks/useSatelliteManagement";
 import { useNPSManagement } from "@/hooks/useNPSManagement";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import SatellitePosition from "@/src/components/ui/scenes/deploy/SatellitePosition";
-import SolarHealth from "@/src/components/ui/scenes/solar/SolarHealth";
+import SolarHealth from "@/src/components/ui/scenes/deploy/solar/SolarHealth";
+import TelescopeViewportSection from "@/src/components/ui/scenes/deploy/Telescope/TelescopeSection";
 
 type PageSatellite = {
   id: string;
@@ -145,6 +146,8 @@ export default function ActivityPage() {
           landmarksExpanded={landmarksExpanded}
           onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
         />
+
+        <TelescopeViewportSection />
 
         <SatellitePosition
           satellites={satelliteData ? [satelliteData] : []}
