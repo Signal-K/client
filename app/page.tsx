@@ -39,6 +39,7 @@ import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import SatellitePosition from "@/src/components/ui/scenes/deploy/SatellitePosition";
 import SolarHealth from "@/src/components/ui/scenes/deploy/solar/SolarHealth";
 import TelescopeViewportSection from "@/src/components/ui/scenes/deploy/Telescope/TelescopeSection";
+import RoverViewportSection from "@/src/components/ui/scenes/deploy/Rover/RoverSection";
 
 type PageSatellite = {
   id: string;
@@ -157,6 +158,10 @@ export default function ActivityPage() {
         <div className="mt-8">
               <SolarHealth />
             </div>
+
+        <div className="">
+          <RoverViewportSection />
+        </div>
 
         {/* Recent Discoveries */}
         <RecentDiscoveries
