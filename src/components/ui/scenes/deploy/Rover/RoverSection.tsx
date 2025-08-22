@@ -58,7 +58,7 @@ export default function RoverViewportSection() {
 
     // Deploy handler
     const handleDeployRover = async () => {
-        window.location.href="/activity/deploy/roover";
+        window.location.href="/activity/deploy/roover/";
     };
 
     return (
@@ -71,11 +71,11 @@ export default function RoverViewportSection() {
             }
         >
             <div className="relative w-full h-64 md:h-64 flex items-center justify-center py-8 md:py-12">
-                {hasRoverDeployed ? (
+                {!hasRoverDeployed ? (
                     <div className="absolute inset-0 flex items-center justify-center z-20">
                         <Button
                             onClick={handleDeployRover}
-                            variant='ghost'
+                            variant='default'
                         >
                             Deploy your rover
                         </Button>

@@ -192,7 +192,7 @@ export default function TestPlanetWrapper() {
   }, [classification?.id, classification?.author]);  
 
   useEffect(() => {
-      if (!params.id) return;
+      if (!params?.id) return;
 
       const fetchClassifications = async () => {
           const { data, error } = await supabase

@@ -23,13 +23,20 @@ const generateSectorName = (x: number, y: number) => `SECTOR ${x},${y}`
 const getMartianBackgroundStyle = (variant: string) => {
   switch (variant) {
     case "martian-surface":
+      // Mars topography: blue/green low, yellow/orange mid, red high, craters, polar caps
       return {
         background: `
-          radial-gradient(ellipse at 60% 40%, #c97a3a 0%, transparent 70%),
-          radial-gradient(ellipse at 30% 70%, #e8b07a 0%, transparent 60%),
-          radial-gradient(ellipse at 80% 20%, #a85c2a 0%, transparent 60%),
-          linear-gradient(135deg, #e8b07a 0%, #c97a3a 40%, #a85c2a 80%, #7a3a1a 100%),
-          repeating-linear-gradient(120deg, #c97a3a22 0px, #e8b07a22 20px, #a85c2a22 40px)
+          /* Elevation gradient */
+          linear-gradient(135deg, #2e6dbb 0%, #3ecf8e 15%, #f7e967 35%, #f7b267 55%, #e86a17 75%, #a82e2e 100%),
+          /* Crater overlays */
+          radial-gradient(circle 120px at 30% 60%, #2e6dbb 0%, #3ecf8e 40%, transparent 70%),
+          radial-gradient(circle 80px at 60% 40%, #f7e967 0%, #f7b267 60%, transparent 80%),
+          radial-gradient(circle 100px at 70% 80%, #e86a17 0%, #a82e2e 60%, transparent 80%),
+          /* Polar caps */
+          radial-gradient(circle 90px at 10% 10%, #e8e8e8 0%, transparent 80%),
+          radial-gradient(circle 90px at 90% 10%, #e8e8e8 0%, transparent 80%),
+          /* Subtle topographic lines */
+          repeating-linear-gradient(120deg, #e8b07a22 0px, #f7e96722 20px, #e86a1722 40px)
         `,
       }
     case "rust-basin":
@@ -135,7 +142,47 @@ export function RoverBackground({
 
       {/* Martian Background */}
       <div ref={viewportRef} className="w-full h-full relative" style={getMartianBackgroundStyle(variant)}>
-        {/* Topographic overlays could be added here as extra divs if needed */}
+        {/* Crater overlays for extra realism */}
+        {variant === "martian-surface" && (
+          <>
+            <div
+              className="absolute rounded-full"
+              style={{
+                left: "28%", top: "58%", width: "120px", height: "120px",
+                background: "radial-gradient(circle, #2e6dbb 0%, #3ecf8e 40%, transparent 70%)",
+                opacity: 0.5,
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              className="absolute rounded-full"
+              style={{
+                left: "68%", top: "78%", width: "100px", height: "100px",
+                background: "radial-gradient(circle, #e86a17 0%, #a82e2e 60%, transparent 80%)",
+                opacity: 0.4,
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              className="absolute rounded-full"
+              style={{
+                left: "8%", top: "8%", width: "90px", height: "90px",
+                background: "radial-gradient(circle, #e8e8e8 0%, transparent 80%)",
+                opacity: 0.3,
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              className="absolute rounded-full"
+              style={{
+                left: "88%", top: "8%", width: "90px", height: "90px",
+                background: "radial-gradient(circle, #e8e8e8 0%, transparent 80%)",
+                opacity: 0.3,
+                pointerEvents: "none",
+              }}
+            />
+          </>
+        )}
       </div>
 
       <style jsx>{`

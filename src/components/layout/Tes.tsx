@@ -131,46 +131,6 @@ export default function GameNavbar() {
       });
   }, []);  
 
-  // Fetch milestone progress
-  useEffect(() => {
-    if (!session || milestones.length === 0) return
-
-    const fetchProgress = async () => {
-      const progress: { [key: string]: number } = {}
-      if (!milestones[currentWeekIndex]) return
-
-      const { weekStart, data } = milestones[currentWeekIndex]
-
-      const startDate = new Date(weekStart)
-      const endDate = new Date(startDate)
-      endDate.setDate(startDate.getDate() + 6)
-
-      for (const milestone of data) {
-        const { table, field, value, name } = milestone
-
-        let query = supabase
-          .from(table)
-          .select("*", { count: "exact" })
-          .gte("created_at", startDate.toISOString())
-          .lte("created_at", endDate.toISOString())
-          .eq(field, value)
-
-        if (session.user.id) {
-          query = query.eq("author", session.user.id)
-        }
-
-        const { count, error } = await query
-        if (!error && count !== null) {
-          progress[name] = count
-        }
-      }
-
-      setUserProgress(progress)
-    }
-
-    fetchProgress()
-  }, [session, milestones, currentWeekIndex, supabase])
-
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-2">
       <div className="relative flex items-center justify-between rounded-lg backdrop-blur-md bg-black/30 border border-white/10 shadow-lg px-4 py-2">

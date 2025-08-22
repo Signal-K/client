@@ -32,9 +32,9 @@ export default function TelescopeClassifyPage() {
     useEffect(() => {
       if (isLoading || !session) return;
 
-      const project = String(params.project);
-      const mission = String(params.mission);
-      const idParam = String(params.id || "");
+      const project = params ? String(params.project) : "";
+      const mission = params ? String(params.mission) : "";
+      const idParam = params ? String(params.id || "") : "";
 
       let classificationId: string | undefined;
       if (idParam.startsWith("cl-")) {

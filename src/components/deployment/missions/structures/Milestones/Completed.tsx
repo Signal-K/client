@@ -12,12 +12,12 @@ interface Milestone {
   field: "classificationtype" | "category" | "source";
   value: string;
   requiredCount: number;
-};
+}
 
 interface WeekMilestones {
   weekStart: string;
   data: Milestone[];
-};
+}
 
 export default function MilestoneHistoryList() {
   const supabase = useSupabaseClient();
@@ -50,6 +50,7 @@ export default function MilestoneHistoryList() {
         const startDate = new Date(week.weekStart);
         const endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + 6);
+        endDate.setHours(23, 59, 59, 999); // Include full last day
 
         const weekKey = week.weekStart;
         progressMap[weekKey] = {};
@@ -57,15 +58,20 @@ export default function MilestoneHistoryList() {
         for (const milestone of week.data) {
           const { table, field, value } = milestone;
 
-          const { count } = await supabase
-            .from(table)
-            .select("*", { count: "exact" })
-            .eq(field, value)
+          const { count, error } = (await supabase
+            .from(table as string) // prevent type explosion from unions
+            .select("*", { count: "exact", head: true })
+            .eq(field as string, value)
             .or(`author.eq.${session.user.id},user_id.eq.${session.user.id}`)
             .gte("created_at", startDate.toISOString())
-            .lte("created_at", endDate.toISOString());
+            .lte("created_at", endDate.toISOString())) as {
+            count: number | null;
+            error: any;
+          };
 
-          progressMap[weekKey][milestone.name] = count || 0;
+          if (!error) {
+            progressMap[weekKey][milestone.name] = count ?? 0;
+          }
         }
       }
 
@@ -73,7 +79,7 @@ export default function MilestoneHistoryList() {
     };
 
     fetchData();
-  }, [session]);
+  }, [session, supabase]);
 
   const completedByGroup: {
     [group: string]: { name: string; date: string }[];
@@ -126,8 +132,10 @@ export default function MilestoneHistoryList() {
         </ul>
       </div>
 
-      {/* {Object.keys(completedByGroup).length === 0 ? (
-        <p className="text-center text-gray-300">No completed milestones yet.</p>
+      {Object.keys(completedByGroup).length === 0 ? (
+        <p className="text-center text-gray-300">
+          No completed milestones yet.
+        </p>
       ) : (
         Object.entries(completedByGroup).map(([group, items], index) => (
           <div
@@ -140,13 +148,14 @@ export default function MilestoneHistoryList() {
             <ul className="list-disc list-inside text-green-300 space-y-1 text-sm">
               {items.map((item, idx) => (
                 <li key={idx}>
-                  {item.name} <span className="text-gray-400">({item.date})</span>
+                  {item.name}{" "}
+                  <span className="text-gray-400">({item.date})</span>
                 </li>
               ))}
             </ul>
           </div>
         ))
-      )} */}
+      )}
     </div>
   );
-};
+}

@@ -24,9 +24,9 @@ export default function BalloonClassifyPage() {
     useEffect(() => {
         if (isLoading || !session) return;
 
-        const project = String(params.project);
-        const mission = String(params.mission);
-        const idParam = String(params.id || "");
+        const project = String(params?.project ?? "");
+        const mission = String(params?.mission ?? "");
+        const idParam = String(params?.id ?? "");
 
         let anomalyid: string | undefined;
         if (idParam.startsWith("an-")) {
