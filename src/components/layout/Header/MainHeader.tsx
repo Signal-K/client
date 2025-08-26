@@ -21,6 +21,7 @@ import { Switch } from "@/src/components/ui/switch";
 import { Badge } from "@/src/components/ui/badge";
 import RecentActivity from "@/src/components/social/activity/RecentActivity";
 import ConvertAnonymousAccount from "@/src/components/profile/auth/ConvertAnonymousAccount";
+import Link from "next/link";
 
 interface CommentVote {
   type: "comment" | "vote";
@@ -84,7 +85,7 @@ export default function MainHeader({
     <div className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-sm border-b border-border">
       <div className="flex flex-wrap sm:flex-nowrap items-center justify-between px-4 lg:px-6 py-3 gap-4 sm:gap-0">
         <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-          <h1 className="text-xl font-bold text-primary">Star Sailors</h1>
+          <Link href="/"><h1 className="text-xl font-bold text-primary">Star Sailors</h1></Link>
           
           {/* Anonymous User Indicator */}
           {isAnonymousUser && (
