@@ -7,49 +7,33 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { OrbitControls, Stars } from "@react-three/drei";
 import Section from "@/src/components/sections/Section";
+import { Sun } from "@/src/components/discovery/data-sources/Solar/Sun";
 
-function Sun3D() {
+function Sun3D({ sunspots }: { sunspots: number }) {
   return (
-    <group>
-      <mesh>
-        <sphereGeometry args={[2, 128, 128]} />
-        <meshStandardMaterial
-          color="#ffe066"
-          emissive="#ffd700"
-          emissiveIntensity={2.2}
-          metalness={0.2}
-          roughness={0.5}
-        />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[2.18, 64, 64]} />
-        <meshBasicMaterial
-          color="#fff8b0"
-          transparent
-          opacity={0.22}
-          blending={1}
-        />
-      </mesh>
-    </group>
+    <>
+      <Sun sunspots={sunspots} />
+    </>
   );
-};
+}
 
 function getWeekStart(date: Date) {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
   d.setDate(d.getDate() - d.getDay());
   return d;
-};
+}
 
 export default function SolarHealth() {
   const supabase = useSupabaseClient();
   const session = useSession();
-  
+
   const [sunspotAnomalies, setSunspotAnomalies] = useState<any[]>([]);
   const [linkedSunspots, setLinkedSunspots] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [participating, setParticipating] = useState(false);
   const [now, setNow] = useState(new Date());
+  const [sunspots, setSunspots] = useState<number>(0);
   const automatonType = "TelescopeSolar";
 
   // Fetch anomalies and linked anomalies
@@ -57,11 +41,14 @@ export default function SolarHealth() {
     setLoading(true);
     async function fetchSunspotData() {
       if (!session?.user?.id) return;
+      // Fetch sunspot anomalies
       const { data: anomalies } = await supabase
         .from("anomalies")
         .select("*")
         .eq("anomalySet", "sunspot");
       setSunspotAnomalies(anomalies || []);
+
+      // Fetch linked anomalies
       const weekStart = getWeekStart(now).toISOString();
       const { data: linked } = await supabase
         .from("linked_anomalies")
@@ -70,6 +57,16 @@ export default function SolarHealth() {
         .eq("automaton", automatonType)
         .gte("date", weekStart);
       setLinkedSunspots((linked || []).filter((l) => !isExpired(l)));
+
+      // Fetch sunspot classifications for this user in the last week
+      const { data: sunspotClassifications } = await supabase
+        .from("classifications")
+        .select("id")
+        .eq("author", session.user.id)
+        .eq("classificationtype", "sunspot")
+        .gte("created_at", weekStart);
+      setSunspots((sunspotClassifications || []).length);
+
       setLoading(false);
     }
     fetchSunspotData();
@@ -155,7 +152,7 @@ export default function SolarHealth() {
             <ambientLight intensity={0.7} />
             <pointLight position={[0, 0, 10]} intensity={2} color="#FFD700" />
             <Suspense fallback={null}>
-              <Sun3D />
+              <Sun3D sunspots={sunspots} />
             </Suspense>
             <Stars
               radius={10}
@@ -261,4 +258,4 @@ export default function SolarHealth() {
       </div>
     </Section>
   );
-};
+}
