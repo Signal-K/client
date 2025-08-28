@@ -113,7 +113,10 @@ export default function TelescopeViewportSection() {
     >
       <div className="relative w-full h-64 md:h-64 flex items-center justify-center py-8 md:py-12">
         {!hasTelescopeDeployed ? (
-          <div className="absolute inset-0 flex items-center justify-center z-20">
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
+            <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed px-2">
+              Each week, you are able to point and 'deploy' your telescope in a certain direction. Over the course of the week, new anomalous objects (referred to as "anomalies") will be identified by your telescope and become available for study. Classifying these anomalies can result in the discovery of planets and asteroids, which can later be visited and explored further.
+            </div>
             <button
               className="px-6 py-3 bg-blue-700 text-white rounded-lg shadow text-lg font-semibold"
               onClick={handleDeployTelescope}

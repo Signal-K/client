@@ -323,7 +323,9 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
         {/* If no satellites, show deploy button */}
         {positions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
-            <div className="mb-4 text-lg text-white">No weather satellite deployed.</div>
+            <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed px-2">
+              Now that we've discovered some planets, we can investigate them further with satellites. To start with, you get to send a satellite to a target location once every week. Currently, your satellites can identify weather events and storms on your planets - this is good information to have if you want to explore and maybe work on, or near, these planets!
+            </div>
             <button
               className="px-4 py-2 bg-blue-600 text-white rounded shadow"
               onClick={() => setShowDeployDialog(true)}

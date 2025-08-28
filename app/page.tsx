@@ -40,6 +40,7 @@ import SatellitePosition from "@/src/components/ui/scenes/deploy/SatellitePositi
 import SolarHealth from "@/src/components/ui/scenes/deploy/solar/SolarHealth";
 import TelescopeViewportSection from "@/src/components/ui/scenes/deploy/Telescope/TelescopeSection";
 import RoverViewportSection from "@/src/components/ui/scenes/deploy/Rover/RoverSection";
+import ViewportSkillTree from "@/src/components/research/section/skillTreeSection";
 
 type PageSatellite = {
   id: string;
@@ -155,7 +156,7 @@ export default function ActivityPage() {
           flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
         />
 
-        <div className="mt-8">
+          <div className="mt-8">
               <SolarHealth />
             </div>
 
@@ -169,6 +170,8 @@ export default function ActivityPage() {
           classifications={classifications}
           incompletePlanet={incompletePlanet}
         />
+
+        <ViewportSkillTree />
 
         {/* Notification Subscription */}
         <NotificationSubscribeButton />

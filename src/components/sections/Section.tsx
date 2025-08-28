@@ -5,7 +5,7 @@ import clsx from "clsx";
 // import { TelescopeBackground } from "@/src/components/backgrounds/TelescopeBackground";
 
 export interface SectionProps {
-  variant?: "viewport" | "default" | "highlight";
+  variant?: "viewport" | "default" | "highlight" | "minimal";
   backgroundType?: "stars" | "planets" | "rover" | "none" | string;
   className?: string;
   children: React.ReactNode;
@@ -26,6 +26,7 @@ const Section: React.FC<SectionProps> = ({
   const TelescopeBackground = require("@/src/components/classification/telescope/telescope-background").TelescopeBackground;
   const RoverBackground = require("@/src/components/classification/telescope/rover-background").RoverBackground;
   const renderBackground = () => {
+    if (variant === "minimal") return null;
     if (variant === "viewport" && backgroundType !== "none") {
       if (backgroundType === "rover") {
         return (
@@ -48,6 +49,7 @@ const Section: React.FC<SectionProps> = ({
     "relative w-full rounded-lg overflow-hidden",
     {
       "bg-card border border-chart-4/30 text-white": variant === "viewport",
+      "bg-white shadow-md text-zinc-900": variant === "minimal",
       "bg-white dark:bg-zinc-900/80 shadow-md": variant === "default",
       "bg-gradient-to-r from-yellow-100 to-yellow-300": variant === "highlight",
     },
@@ -76,7 +78,7 @@ const Section: React.FC<SectionProps> = ({
     <section className={sectionClass}>
       {renderBackground()}
       {/* Info icon, always visible, top-right */}
-      {sectionId && (
+      {sectionId && variant !== "minimal" && (
         <div
           style={{
             position: "absolute",
@@ -99,11 +101,11 @@ const Section: React.FC<SectionProps> = ({
           {infoIcon}
         </div>
       )}
-      <div className={variant === "viewport" ? "relative z-10 p-4" : "p-6"}>
+      <div className={variant === "viewport" ? "relative z-10 p-4" : variant === "minimal" ? "p-4" : "p-6"}>
         {children}
       </div>
       {/* Info area at bottom, responsive */}
-      {showInfo && infoText && (
+      {showInfo && infoText && variant !== "minimal" && (
         <div
           className={clsx(
             "w-full px-4 py-3 text-sm font-medium flex items-center justify-center",
