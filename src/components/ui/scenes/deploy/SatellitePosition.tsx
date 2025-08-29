@@ -318,7 +318,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
   }, []);
 
   return (
-  <Section sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Send satellites to planets you or the community have discovered to search for clouds and weather events."}>
+  <Section expandLink={"/viewports/satellite"} sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Send satellites to planets you or the community have discovered to search for clouds and weather events."}>
       <div className="p-4 relative z-10" style={{ minHeight: '156px', height: '30vh', maxHeight: 520 }}>
         {/* If no satellites, show deploy button */}
         {positions.length === 0 ? (

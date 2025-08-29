@@ -69,11 +69,12 @@ export default function RoverViewportSection() {
             infoText={
                 "View and control your surface rovers to find and discover surface anomalies"
             }
+            expandLink={"/viewports/roover"}
         >
             <div className="relative w-full h-64 md:h-64 flex items-center justify-center py-8 md:py-12">
                 {!hasRoverDeployed ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
-                        <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed px-2">
+                        <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-white leading-relaxed px-4 py-3 rounded-lg bg-black/40 drop-shadow">
                             Mars is one of the closest planets to us, and certainly one of the most interesting. You've been given a rover and have been asked to help 'train' it to avoid obstacles. Each week, you give it a series of commands and routes; and it will explore Mars, finding objects of interest and eventually getting stuck. It's your job to help the rover identify what it has found and why it got stuck. With enough training, you'll be able to explore the surface of the planets you and other scientists discover.
                         </div>
                         <Button

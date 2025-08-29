@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
 // Optionally import your backgrounds here
@@ -11,6 +12,7 @@ export interface SectionProps {
   children: React.ReactNode;
   sectionId?: string; // unique id for info text
   infoText?: string; // unique info text for each section
+  expandLink?: string | null; // optional link for expansion
 };
 
 const Section: React.FC<SectionProps> = ({
@@ -20,7 +22,26 @@ const Section: React.FC<SectionProps> = ({
   children,
   sectionId,
   infoText,
+  expandLink = null,
 }) => {
+  const router = useRouter();
+  // Expand icon SVG
+  const expandIconStyle = {
+    width: 32,
+    height: 32,
+    cursor: "pointer",
+    filter: "drop-shadow(0 0 2px #000)",
+    color: variant === "viewport" ? "#78cce2" : "#16213e",
+    transition: "color 0.2s",
+    display: "block",
+  };
+  const expandIcon = (
+    <svg style={expandIconStyle} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="4" width="16" height="16" rx="3" />
+      <polyline points="9 15 15 15 15 9" />
+      <line x1="9" y1="9" x2="15" y2="15" />
+    </svg>
+  );
   const [showInfo, setShowInfo] = useState(false);
   // Use TelescopeBackground or RoverBackground for viewport variant
   const TelescopeBackground = require("@/src/components/classification/telescope/telescope-background").TelescopeBackground;
@@ -99,6 +120,30 @@ const Section: React.FC<SectionProps> = ({
           title={showInfo ? "Hide info" : "Show info"}
         >
           {infoIcon}
+        </div>
+      )}
+      {/* Expand icon, bottom-right */}
+      {expandLink && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 16,
+            right: 16,
+            zIndex: 20,
+            background: variant === "viewport" ? "rgba(10,20,40,0.7)" : "rgba(255,255,255,0.7)",
+            borderRadius: 20,
+            padding: 4,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: variant === "viewport" ? "0 2px 8px #78cce2" : "0 2px 8px #16213e",
+            backdropFilter: "blur(2px)",
+            border: variant === "viewport" ? "1px solid #78cce2" : "1px solid #16213e",
+          }}
+          onClick={() => router.push(expandLink)}
+          title="Expand section"
+        >
+          {expandIcon}
         </div>
       )}
       <div className={variant === "viewport" ? "relative z-10 p-4" : variant === "minimal" ? "p-4" : "p-6"}>

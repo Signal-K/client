@@ -138,6 +138,7 @@ export default function SolarHealth() {
       variant="viewport"
       backgroundType="inner-solar"
       infoText={"Investigate star activity to detect solar flares and measure the intensity of sunspots"}
+      expandLink={"/viewports/solar"}
     >
       <div className="relative w-full h-64 md:h-96 flex items-center justify-center py-8 md:py-12">
         {/* 3D Sun Scene */}

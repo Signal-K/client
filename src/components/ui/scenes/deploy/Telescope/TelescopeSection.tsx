@@ -110,6 +110,7 @@ export default function TelescopeViewportSection() {
       infoText={
         "View your telescope and everything you've discovered so far. Deploy your telescope each week and check back to browse through objects of interest and classify them."
       }
+      expandLink={"/structures/telescope"}
     >
       <div className="relative w-full h-64 md:h-64 flex items-center justify-center py-8 md:py-12">
         {!hasTelescopeDeployed ? (
