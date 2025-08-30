@@ -149,19 +149,24 @@ export default function ActivityPage() {
           onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
         />
 
-        <TelescopeViewportSection />
-
-        <SatellitePosition
-          satellites={satelliteData ? [satelliteData] : []}
-          flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
-        />
-
-          <div className="mt-8">
-              <SolarHealth />
-            </div>
-
-        <div className="">
-          <RoverViewportSection />
+        {/* 2x2 Grid for viewports on desktop, single column on mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-6 w-full">
+          {/* Set a consistent height for all viewports, matching SolarHealth block */}
+          <div className="w-full h-[420px] md:h-[420px] flex">
+            <TelescopeViewportSection />
+          </div>
+          <div className="w-full h-[420px] md:h-[420px] flex">
+            <SatellitePosition
+              satellites={satelliteData ? [satelliteData] : []}
+              flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
+            />
+          </div>
+          <div className="w-full h-[420px] md:h-[420px] flex">
+            <SolarHealth />
+          </div>
+          <div className="w-full h-[420px] md:h-[420px] flex">
+            <RoverViewportSection />
+          </div>
         </div>
 
         {/* Recent Discoveries */}

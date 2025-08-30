@@ -127,8 +127,8 @@ export default function TelescopeViewportSection() {
           </div>
         ) : (
           <div className="w-full h-full relative">
-            {/* Toggle for linked anomalies vs all */}
-            <div className="absolute bottom-4 left-4 z-30 flex gap-2">
+            {/* Toggle for linked anomalies vs all - now at bottom, just above info button/text */}
+            {/* <div className="absolute left-4 right-4 bottom-8 z-30 flex justify-start md:justify-center">
               <div className="flex items-center bg-[#0a0a2a]/80 border border-[#78cce2] rounded-xl shadow-lg px-1 py-0.5">
                 <button
                   className={`px-2 py-1 rounded-l-xl font-mono tracking-wide text-xs transition-all duration-200 border-r border-[#78cce2] focus:outline-none ${
@@ -153,14 +153,17 @@ export default function TelescopeViewportSection() {
                   Discoveries
                 </button>
               </div>
-            </div>
+            </div> */}
             {/* Render anomalies or classifications */}
             <div className="w-full h-full relative">
               {showLinkedOnly
                 ? linkedAnomalies.map((anomaly) => (
                     <SciFiAnomalyComponent
                       key={anomaly.id}
-                      anomaly={anomaly}
+                      anomaly={{
+                        ...anomaly,
+                        name: "Anomaly"
+                      }}
                       onClick={(a) => {
                         setSelectedAnomaly(a);
                         setShowDetailDialog(true);
@@ -182,7 +185,7 @@ export default function TelescopeViewportSection() {
                         glowIntensity: 0.7,
                         pulseSpeed: 1.2,
                         sector: "N/A",
-                        name: `Classification #${classification.id}`,
+                        name: "Anomaly",
                         type: "planet",
                         project: "telescope",
                       }}

@@ -12,6 +12,7 @@ interface BaseAnomaly {
 
 // Extended anomaly with rendering properties
 export interface Anomaly extends BaseAnomaly {
+  anomaly?: any
   x: number
   y: number
   brightness: number

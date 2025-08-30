@@ -430,7 +430,7 @@ export function TelescopeBackground({
         )}
 
         {/* Anomalies - only show if not stars-only variant */}
-        {variant !== "stars-only" &&
+        {/* {variant !== "stars-only" &&
           filteredAnomalies.map((anomaly) => (
             <AnomalyComponent
               key={anomaly.id}
@@ -440,7 +440,7 @@ export function TelescopeBackground({
             />
           ))}
 
-        {/* Info overlay - only show if not stars-only variant */}
+        Info overlay - only show if not stars-only variant
         {variant !== "stars-only" && !showAllAnomalies && (
           <div
             className={`absolute top-4 left-4 ${isDarkTheme ? "bg-[#002439]/90 text-[#78cce2] border-[#78cce2]/30" : "bg-white/90 text-slate-800 border-slate-400/50"} px-3 py-2 rounded-lg text-xs font-mono border backdrop-blur-sm`}
@@ -467,7 +467,7 @@ export function TelescopeBackground({
               <div>MODE: {getEnvironmentName()}</div>
             )}
           </div>
-        )}
+        )} */}
 
         {/* Stars-only mode info overlay */}
         {variant === "stars-only" && (

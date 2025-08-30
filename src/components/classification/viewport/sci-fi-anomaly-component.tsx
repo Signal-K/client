@@ -79,7 +79,8 @@ export function SciFiAnomalyComponent({ anomaly, onClick, isHighlighted = false 
         {getIcon()}
       </div>
       <span className="mt-1 text-xs font-mono text-[#78cce2] bg-[#0a0a2a]/80 px-2 py-0.5 rounded shadow-lg">
-        {getLabel()}
+        {/* {getLabel()} */}
+        Anomaly
       </span>
     </div>
   )
