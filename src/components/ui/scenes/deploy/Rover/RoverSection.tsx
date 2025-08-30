@@ -19,24 +19,26 @@ export default function RoverViewportSection() {
 
     const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null);
     const [showDetailDialog, setShowDetailDialog] = useState(false);
+    const [waypoints, setWaypoints] = useState<any[]>([]);
     
     // Check for linked_anomalies of relevant type
     useEffect(() => {
-        async function fetchLinkedAnomalies() {
+        async function fetchLinkedAnomaliesAndWaypoints() {
             if (!session) {
                 return;
-            };
+            }
 
+            // Fetch linked anomalies
             const { data: linked, error: linkedError } = await supabase
                 .from("linked_anomalies")
                 .select("*, anomaly:anomalies(*)")
                 .eq("author", session.user.id)
                 .in("automaton", ["Rover"]);
 
-            setHasRoverDeployed(( linked && linked.length > 0 ) || false);
+            setHasRoverDeployed((linked && linked.length > 0) || false);
 
             // Map user's linked_anomalies to their anomalies[id] counterpart
-            const mapped = ( linked || [] ).map(( row: any ) => ({
+            const mapped = (linked || []).map((row: any) => ({
                 id: `db-${row.anomaly_id}`,
                 ...row.anomaly,
                 x: Math.random() * 80 + 10,
@@ -49,12 +51,22 @@ export default function RoverViewportSection() {
                 glowIntensity: 0.1,
                 pulseSpeed: 1.2,
             }));
-
             setLinkedAnomalies(mapped);
-        };
 
-        fetchLinkedAnomalies();
-    }, [session, supabase])
+            // Fetch waypoints/routes if rover deployed
+            if (linked && linked.length > 0) {
+                const { data: routes, error: routesError } = await supabase
+                    .from("routes")
+                    .select("*")
+                    .eq("author", session.user.id)
+                    .order("timestamp", { ascending: true });
+                setWaypoints(routes || []);
+            } else {
+                setWaypoints([]);
+            }
+        }
+        fetchLinkedAnomaliesAndWaypoints();
+    }, [session, supabase]);
 
     // Deploy handler
     const handleDeployRover = async () => {
@@ -86,7 +98,8 @@ export default function RoverViewportSection() {
                     </div>
                 ) : (
                     <div className="h-full w-full relative">
-                        {linkedAnomalies.map(( anomaly ) => (
+                        {/* Render anomalies */}
+                        {linkedAnomalies.map((anomaly) => (
                             <SciFiAnomalyComponent
                                 key={anomaly.id}
                                 anomaly={anomaly}
@@ -96,6 +109,23 @@ export default function RoverViewportSection() {
                                 }}
                             />
                         ))}
+                        {/* Render waypoints if available */}
+                        {waypoints.map((waypoint, idx) => {
+                            // Example: render as a small dot or marker
+                            // You may want to parse routeConfiguration/location for coordinates
+                            return (
+                                <div
+                                    key={waypoint.id}
+                                    className="absolute w-3 h-3 bg-yellow-400 rounded-full border-2 border-white shadow"
+                                    style={{
+                                        left: `${(idx * 10) % 90 + 5}%`, // Placeholder: spread out horizontally
+                                        top: `${(idx * 15) % 80 + 10}%`, // Placeholder: spread out vertically
+                                        zIndex: 20,
+                                    }}
+                                    title={`Waypoint ${idx + 1}`}
+                                />
+                            );
+                        })}
                     </div>
                 )}
             </div>

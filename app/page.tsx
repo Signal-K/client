@@ -170,11 +170,11 @@ export default function ActivityPage() {
         </div>
 
         {/* Recent Discoveries */}
-        <RecentDiscoveries
+        {/* <RecentDiscoveries
           linkedAnomalies={linkedAnomalies}
           classifications={classifications}
           incompletePlanet={incompletePlanet}
-        />
+        /> */}
 
         <ViewportSkillTree />
 
@@ -228,7 +228,7 @@ export default function ActivityPage() {
         /> */}
 
         {/* Research Progress */}
-        <ResearchProgressSection />
+        {/* <ResearchProgressSection /> */}
       </div>
 
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>

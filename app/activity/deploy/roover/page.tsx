@@ -136,6 +136,9 @@ export default function DeployRoverPage() {
       });
 
     setDeployMessage("Rover deployed successfully!");
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 5000);
   };
 
   // Draw lines between waypoints
@@ -332,10 +335,10 @@ export default function DeployRoverPage() {
               <h3 className="text-sm font-semibold text-yellow-400 mb-1">Energy Consumption</h3>
               <div className="bg-zinc-800/80 rounded-lg p-2 text-xs text-yellow-300">51% solar, 49% consumption</div>
             </div>
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <h3 className="text-sm font-semibold text-[#18dda1] mb-1">Set the Coordinates</h3>
               <div className="bg-zinc-800/80 rounded-lg p-2 text-xs text-zinc-200">12.20°N 104.23°E</div>
-            </div>
+            </div> */}
           </div>
           <div className="mt-4 flex flex-col gap-2">
             <button className="bg-[#ff3c1a] text-white rounded-lg py-2 font-bold shadow hover:bg-[#ff5c3c] transition">STOP</button>

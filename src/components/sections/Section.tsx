@@ -71,7 +71,7 @@ const Section: React.FC<SectionProps> = ({
     "relative w-full rounded-lg overflow-hidden",
     {
       "bg-card border border-chart-4/30 text-white": variant === "viewport",
-      "bg-white shadow-md text-zinc-900": variant === "minimal",
+      "bg-card shadow-md text-zinc-900": variant === "minimal",
       "bg-white dark:bg-zinc-900/80 shadow-md": variant === "default",
       "bg-gradient-to-r from-yellow-100 to-yellow-300": variant === "highlight",
     },
