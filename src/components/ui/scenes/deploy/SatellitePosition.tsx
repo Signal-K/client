@@ -1,19 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Card } from "@/src/components/ui/card";
-import { Button } from "@/src/components/ui/button";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import SatelliteCard from "./satellite/SatelliteCard";
+import Section from "@/src/components/sections/Section";
+import SatelliteLegend from "./satellite/SatelliteLegend";
+import SatelliteIcon from "./satellite/SatelliteIcon";
+import SatelliteTooltip from "./satellite/SatelliteTooltip";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/src/components/ui/dialog";
+  getNextSaturdayMidnight,
+  getTimeSinceDeploy,
+  getTimeUntilWeekEnd,
+  getTimeSinceLastAction,
+} from "./satellite/satelliteTimeUtils";
+import { calculateSatellitePosition } from "./satellite/satellitePositionUtils";
+import { Button } from "@/src/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/src/components/ui/dialog";
+import { PlanetGeneratorMinimal } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator";
 
 interface Satellite {
   id: string;
@@ -36,9 +40,12 @@ interface TooltipData {
   timeRemaining: string;
   timeSinceLastAction: string;
   deployTime: Date;
-}
+  planetName?: string;
+  classificationText?: string;
+};
 
 export default function SatellitePosition({ satellites, flashingIndicator }: SatellitePositionProps) {
+  // Restore handleUnlockAnomaly and handleSatelliteClick
   const supabase = useSupabaseClient();
   const session = useSession();
   const [positions, setPositions] = useState<Satellite[]>(satellites);
@@ -50,6 +57,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   const [hoveredSatellite, setHoveredSatellite] = useState<string | null>(null);
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
   const [lastActionTime, setLastActionTime] = useState<Date | null>(null);
+  const [showDeployDialog, setShowDeployDialog] = useState(false);
 
   const satelliteTiles = [
     "/assets/Viewports/Satellite/Satellite_Tile1.png",
@@ -58,95 +66,9 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   ];
 
   // Time utility functions
-  const getNextSaturdayMidnight = (): Date => {
-    const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
-    
-    // Calculate days until next Saturday (or today if it's Saturday)
-    let daysUntilSaturday;
-    if (dayOfWeek === 6) {
-      // If today is Saturday, check if it's before 23:59
-      const todayMidnight = new Date(now);
-      todayMidnight.setHours(23, 59, 59, 999);
-      
-      if (now < todayMidnight) {
-        // Still Saturday, use today
-        daysUntilSaturday = 0;
-      } else {
-        // After 23:59 Saturday, go to next Saturday
-        daysUntilSaturday = 7;
-      }
-    } else {
-      // Calculate days until next Saturday
-      daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
-      if (daysUntilSaturday === 0) daysUntilSaturday = 7; // If Sunday (0), next Saturday is 6 days away
-    }
-    
-    const nextSaturday = new Date(now);
-    nextSaturday.setDate(now.getDate() + daysUntilSaturday);
-    nextSaturday.setHours(23, 59, 59, 999);
-    
-    return nextSaturday;
-  };
-
-  const getTimeSinceDeploy = (deployTime: Date): { minutes: number; seconds: number; total: number } => {
-    const now = currentTime.getTime();
-    const deploy = deployTime.getTime();
-    const diffMs = Math.max(0, now - deploy);
-    const totalSeconds = Math.floor(diffMs / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    
-    return {
-      minutes,
-      seconds,
-      total: totalSeconds
-    };
-  };
-
-  const getTimeUntilWeekEnd = (): { days: number; hours: number; minutes: number; totalMs: number } => {
-    const now = currentTime.getTime();
-    const weekEnd = getNextSaturdayMidnight().getTime();
-    const diffMs = Math.max(0, weekEnd - now);
-    
-    const totalMinutes = Math.floor(diffMs / (1000 * 60));
-    const totalHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const hours = totalHours % 24;
-    const minutes = totalMinutes % 60;
-    
-    return {
-      days,
-      hours, 
-      minutes,
-      totalMs: diffMs
-    };
-  };
-
-  const getTimeSinceLastAction = (): { days: number; hours: number; minutes: number } => {
-    if (!lastActionTime) {
-      return { days: 0, hours: 0, minutes: 0 };
-    }
-    
-    const now = currentTime.getTime();
-    const lastAction = lastActionTime.getTime();
-    const diffMs = Math.max(0, now - lastAction);
-    
-    const totalMinutes = Math.floor(diffMs / (1000 * 60));
-    const totalHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const hours = totalHours % 24;
-    const minutes = totalMinutes % 60;
-    
-    return {
-      days,
-      hours,
-      minutes
-    };
-  };
-
+  // --- Utility wrappers for formatting ---
   const formatTimeSinceDeploy = (deployTime: Date): string => {
-    const { minutes, seconds } = getTimeSinceDeploy(deployTime);
+    const { minutes, seconds } = getTimeSinceDeploy(deployTime, currentTime);
     if (minutes > 0) {
       return `${minutes}m ${seconds}s`;
     }
@@ -154,7 +76,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   };
 
   const formatTimeRemaining = (): string => {
-    const { days, hours, minutes } = getTimeUntilWeekEnd();
+    const { days, hours, minutes } = getTimeUntilWeekEnd(currentTime);
     if (days > 0) {
       return `${days}d ${hours}h ${minutes}m`;
     } else if (hours > 0) {
@@ -164,7 +86,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   };
 
   const formatTimeSinceAction = (): string => {
-    const { days, hours, minutes } = getTimeSinceLastAction();
+    const { days, hours, minutes } = getTimeSinceLastAction(lastActionTime, currentTime);
     if (days > 0) {
       return `${days}d ${hours}h ago`;
     } else if (hours > 0) {
@@ -173,31 +95,6 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
       return `${minutes}m ago`;
     }
     return "Just now";
-  };
-
-  // Extensible position calculation function
-  const calculateSatellitePosition = (satellite: Satellite, timeSinceDeploy: number): { x: number; y: number } => {
-    // Calculate progress based on time remaining until Saturday 23:59 AEST
-    const { totalMs: timeRemainingMs } = getTimeUntilWeekEnd();
-    const weekDurationMs = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
-    const weekProgress = 1 - (timeRemainingMs / weekDurationMs); // 0 to 1 progress through the week
-    
-    // Satellite moves in a path from center to edge over the course of the week
-    const centerX = 50;
-    const centerY = 50;
-    
-    // Create a spiral path from center to edge
-    const angle = weekProgress * Math.PI * 4; // 4 full rotations over the week
-    const radius = weekProgress * 40; // Max radius of 40% to stay within bounds
-    
-    const x = centerX + Math.cos(angle) * radius;
-    const y = centerY + Math.sin(angle) * radius;
-    
-    // Ensure position stays within bounds (10% to 90%)
-    return {
-      x: Math.max(10, Math.min(90, x)),
-      y: Math.max(10, Math.min(90, y))
-    };
   };
 
   useEffect(() => {
@@ -349,14 +246,49 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
     }
   };
 
-  const handleSatelliteMouseEnter = (satellite: Satellite) => {
-    setHoveredSatellite(satellite.id);
-    setTooltipData({
-      timeRemaining: formatTimeRemaining(),
-      timeSinceLastAction: formatTimeSinceAction(),
-      deployTime: satellite.deployTime
-    });
-  };
+
+const handleSatelliteMouseEnter = async (satellite: Satellite) => {
+  setHoveredSatellite(satellite.id);
+
+  let planetName = "";
+  let classificationText = "";
+
+  // Fetch anomaly name/content
+  if (satellite.anomalyId) {
+    const { data: anomalyData } = await supabase
+      .from("anomalies")
+      .select("content")
+      .eq("id", satellite.anomalyId)
+      .single();
+    planetName = anomalyData?.content || "";
+  }
+
+  // Fetch classification text (if unlocked and classification_id exists)
+  let classificationId: string | undefined;
+  const { data: linkedAnomaly } = await supabase
+    .from("linked_anomalies")
+    .select("classification_id")
+    .eq("id", satellite.linkedAnomalyId)
+    .single();
+  classificationId = linkedAnomaly?.classification_id;
+
+  if (classificationId) {
+    const { data: classificationData } = await supabase
+      .from("classifications")
+      .select("content")
+      .eq("id", classificationId)
+      .single();
+    classificationText = classificationData?.content || "";
+  }
+
+  setTooltipData({
+    timeRemaining: formatTimeRemaining(),
+    timeSinceLastAction: formatTimeSinceAction(),
+    deployTime: satellite.deployTime,
+    planetName,
+    classificationText,
+  });
+};
 
   const handleSatelliteMouseLeave = () => {
     setHoveredSatellite(null);
@@ -369,8 +301,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
       
       setPositions((prev) =>
         prev.map((sat) => {
-          const timeSinceDeploy = getTimeSinceDeploy(sat.deployTime).total;
-          const newPosition = calculateSatellitePosition(sat, timeSinceDeploy);
+          const newPosition = calculateSatellitePosition(sat, currentTime);
           return {
             ...sat,
             x: newPosition.x,
@@ -387,79 +318,141 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   }, []);
 
   return (
-    <>
-      <Card className="relative w-full h-48 rounded-lg text-white bg-card border border-chart-4/30">
-        <div className="absolute inset-0 z-0 rounded-lg overflow-hidden">
-          <TelescopeBackground
-            sectorX={0}
-            sectorY={0}
-            showAllAnomalies={false}
-            isDarkTheme={true}
-          />
-        </div>
-        <div className="p-4 relative z-10">
-          {/* Status Legend - Top Right Corner */}
-          <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-sm rounded-lg px-2 py-1 text-white text-xs font-sans">
-            <div className="flex flex-col gap-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-red-500 animate-ping flex-shrink-0"></div>
-                <span className="text-xs whitespace-nowrap">Click to Scan</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-ping flex-shrink-0"></div>
-                <span className="text-xs whitespace-nowrap">Click to Observe</span>
-              </div>
+  <Section expandLink={"/viewports/satellite"} sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Send satellites to planets you or the community have discovered to search for clouds and weather events."}>
+      <div className="p-4 relative z-10" style={{ minHeight: '156px', height: '30vh', maxHeight: 520 }}>
+        {/* If no satellites, show deploy button */}
+        {positions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed px-2">
+              Now that we've discovered some planets, we can investigate them further with satellites. To start with, you get to send a satellite to a target location once every week. Currently, your satellites can identify weather events and storms on your planets - this is good information to have if you want to explore and maybe work on, or near, these planets!
             </div>
-          </div>
-          
-          {positions.map((sat) => (
-            <div
-              key={sat.id}
-              className="absolute cursor-pointer"
-              style={{
-                left: `${sat.x}%`,
-                top: `${sat.y}%`,
-              }}
-              onClick={() => handleSatelliteClick(sat)}
-              onMouseEnter={() => handleSatelliteMouseEnter(sat)}
-              onMouseLeave={handleSatelliteMouseLeave}
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded shadow"
+              onClick={() => setShowDeployDialog(true)}
             >
-              <Image
-                src={satelliteTiles[currentTileIndex]}
-                alt="Satellite"
-                width={59} // Increased by 18% (50 * 1.18)
-                height={59} // Increased by 18% (50 * 1.18)
-                className="transition-opacity duration-200 transform rotate-[86deg]" // Smooth transition between frames + rotation
-              />
-              {sat.hasUnclassifiedAnomaly && (
+              Deploy Weather Satellite
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Planet in top-right, behind overlays */}
+            {positions[0]?.linkedAnomalyId && (
+              <div
+                className="absolute group"
+                style={{
+                  top: 0,
+                  right: 0,
+                  width: 1300,
+                  height: 1300,
+                  zIndex: 1,
+                  pointerEvents: "auto",
+                  background: "none",
+                  borderRadius: "50%",
+                  overflow: "visible",
+                  transform: "translateX(40%)",
+                }}
+              >
+                <PlanetGeneratorMinimal
+                  classificationId={positions[0]?.linkedAnomalyId}
+                />
+                {/* Tooltip for planet overlay */}
                 <div
-                  className={`absolute top-0 left-0 w-4 h-4 rounded-full animate-ping ${
-                    sat.unlocked ? 'bg-green-500' : 'bg-red-500'
-                  }`}
-                  style={{ transform: "translate(-50%, -50%)" }}
-                ></div>
-              )}
-              
-              {/* Tooltip */}
-              {hoveredSatellite === sat.id && tooltipData && (
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-20">
-                  <div className="bg-black/90 backdrop-blur-sm rounded-lg px-3 py-2 text-white text-xs font-sans whitespace-nowrap shadow-lg border border-white/20">
-                    <div className="space-y-1">
-                      <div className="font-medium text-blue-300">🛰️ Satellite Status</div>
-                      <div>📍 Deployed: {formatTimeSinceDeploy(tooltipData.deployTime)} ago</div>
-                      <div>⏱️ Time until redeployment: {tooltipData.timeRemaining}</div>
-                      <div>🎯 Last action: {tooltipData.timeSinceLastAction}</div>
-                    </div>
-                    {/* Arrow */}
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black/90"></div>
-                  </div>
+                  className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-full bg-black bg-opacity-80 text-white text-xs rounded px-3 py-2 mt-2 opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap shadow-lg"
+                  style={{ zIndex: 100 }}
+                >
+                  <div><b>Planet:</b> {tooltipData?.planetName || positions[0]?.anomalyId || "Unknown"}</div>
+                  <div><b>Distance:</b> Calculating...</div>
+                  <div><b>Scan Time:</b> Calculating...</div>
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </Card>
-
+              </div>
+            )}
+            <SatelliteLegend />
+            {positions.map((sat) => (
+              <div
+                key={sat.id}
+                className="cursor-pointer"
+                onClick={() => handleSatelliteClick(sat)}
+                onMouseEnter={() => handleSatelliteMouseEnter(sat)}
+                onMouseLeave={handleSatelliteMouseLeave}
+                style={{ position: 'relative', width: 70, height: 70 }}
+              >
+                <SatelliteIcon
+                  deployTime={sat.deployTime}
+                  currentTime={currentTime}
+                  tile={satelliteTiles[currentTileIndex]}
+                  unlocked={sat.unlocked}
+                />
+                {hoveredSatellite === sat.id && tooltipData && (
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-20">
+                    <SatelliteTooltip
+                      timeSinceDeploy={formatTimeSinceDeploy(tooltipData.deployTime)}
+                      timeRemaining={tooltipData.timeRemaining}
+                      timeSinceLastAction={tooltipData.timeSinceLastAction}
+                      planetName={tooltipData.planetName}
+                      classificationText={tooltipData.classificationText}
+                      deployTime={tooltipData.deployTime}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+      {/* Deploy Dialog */}
+      <Dialog open={showDeployDialog} onOpenChange={setShowDeployDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-primary">Deploy Weather Satellite</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="mb-4">Deploy a weather satellite to begin monitoring planetary atmospheres and discover new cloud formations. Select a planet to deploy to and start your mission!</p>
+            <button
+              className="px-4 py-2 bg-green-600 text-white rounded shadow"
+              onClick={async () => {
+                if (!session?.user?.id) return;
+                // Fetch user's classified planets
+                const { data: planetClassifications } = await supabase
+                  .from("classifications")
+                  .select("id, anomaly:anomaly(content)")
+                  .eq("author", session.user.id)
+                  .eq("classificationtype", "planet");
+                if (!planetClassifications || planetClassifications.length === 0) {
+                  alert("No classified planets available for deployment.");
+                  return;
+                }
+                // Pick a random planet
+                const randomIndex = Math.floor(Math.random() * planetClassifications.length);
+                const selectedPlanet = planetClassifications[randomIndex];
+                // Fetch a random cloud anomaly
+                const { data: cloudAnomalies } = await supabase
+                  .from("anomalies")
+                  .select("id")
+                  .eq("anomalytype", "cloud");
+                if (!cloudAnomalies || cloudAnomalies.length === 0) {
+                  alert("No cloud anomalies available.");
+                  return;
+                }
+                const cloudIndex = Math.floor(Math.random() * cloudAnomalies.length);
+                const selectedAnomaly = cloudAnomalies[cloudIndex];
+                // Insert deployment row
+                await supabase.from("linked_anomalies").insert({
+                  author: session.user.id,
+                  anomaly_id: selectedAnomaly.id,
+                  classification_id: selectedPlanet.id,
+                  automaton: "WeatherSatellite",
+                  unlocked: false,
+                  date: new Date().toISOString(),
+                });
+                setShowDeployDialog(false);
+                window.location.reload();
+              }}
+            >
+              Deploy to Random Planet
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
       {/* Unlock Dialog */}
       <Dialog open={showUnlockDialog} onOpenChange={setShowUnlockDialog}>
         <DialogContent className="max-w-md">
@@ -488,6 +481,6 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </Section>
   );
 };

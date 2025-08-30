@@ -117,6 +117,7 @@ export default function DeployTelescopeViewport() {
     const { data: linkedAnomalies, error: linkedAnomaliesError } = await supabase
       .from("linked_anomalies")
       .select("*")
+      .eq("automaton", "Telescope")
       .eq("author", userId)
       .gte("date", oneWeekAgo.toISOString())
 

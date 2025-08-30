@@ -173,91 +173,181 @@ type Anomaly = {
 };
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
-export function StarterSunspot() {
+export function StarterSunspot({ anomalyId }: { anomalyId?: string }) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [imageUrl, setImageUrl] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [showTutorial, setShowTutorial] = useState(false);
+    const [linkedRow, setLinkedRow] = useState<any | null>(null);
+    const [unlocking, setUnlocking] = useState(false);
+    const [now, setNow] = useState<Date>(new Date());
 
-    const [loading, setLoading] = useState<boolean>(false);
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const automatonType = "TelescopeSolar";
 
     useEffect(() => {
-        async function fetchAnomaly() {
+        async function fetchData() {
             if (!session) {
                 setLoading(false);
                 return;
-            };
-
+            }
             try {
-                const {
-                    data: anomalyData,
-                    error: anomalyError,
-                } = await supabase
-                    .from("anomalies")
-                    .select("*")
-                    .eq("anomalySet", "sunspot")
+                // If anomalyId is provided, fetch that anomaly directly
+                if (anomalyId) {
+                    const { data: anomalyData, error: anomalyError } = await supabase
+                        .from("anomalies")
+                        .select("*")
+                        .eq("id", anomalyId)
+                        .limit(1);
+                    if (anomalyError) throw anomalyError;
+                    const anomalyObj = anomalyData && anomalyData.length > 0 ? anomalyData[0] : null;
+                    setAnomaly(anomalyObj);
+                    setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${anomalyId}.png`);
+                    setLinkedRow(null); // No linked row context for direct anomaly
+                } else {
+                    // Get linked anomaly row for user
+                    const { data: linkedData, error: linkedError } = await supabase
+                        .from("linked_anomalies")
+                        .select("*")
+                        .eq("author", session.user.id)
+                        .eq("automaton", automatonType)
+                        .order("date", { ascending: false })
+                        .limit(1);
+                    if (linkedError) throw linkedError;
+                    const row = linkedData && linkedData.length > 0 ? linkedData[0] : null;
+                    setLinkedRow(row);
 
-                if (anomalyError) {
-                    throw anomalyError;
-                };
-
-                if (!anomalyData) {
-                    setAnomaly(null);
-                    setLoading(false);
-                    return;
-                };
-
-                const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
-                
-                setAnomaly(randomAnomaly);
-                
-                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${randomAnomaly.id}.png`);
-            } catch ( error: any ) {
-                console.error("Error fetching sunspot data: ", error.message);
+                    // If row exists, get anomaly
+                    if (row) {
+                        const { data: anomalyData, error: anomalyError } = await supabase
+                            .from("anomalies")
+                            .select("*")
+                            .eq("id", row.anomaly_id)
+                            .limit(1);
+                        if (anomalyError) throw anomalyError;
+                        const anomalyObj = anomalyData && anomalyData.length > 0 ? anomalyData[0] : null;
+                        setAnomaly(anomalyObj);
+                        setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${row.anomaly_id}.png`);
+                    } else {
+                        setAnomaly(null);
+                        setImageUrl("");
+                    }
+                }
+            } catch (error: any) {
+                setError("Unable to load anomaly.");
                 setAnomaly(null);
-                setLoading(false);
             } finally {
                 setLoading(false);
-            };
-        };
+            }
+        }
+        fetchData();
+        const interval = setInterval(() => setNow(new Date()), 60000);
+        return () => clearInterval(interval);
+    }, [session, anomalyId]);
 
-        fetchAnomaly();
-    }, [session]);
+    // Helper: is unlocked
+    function isUnlocked(row: any) {
+        if (!row?.date) return false;
+        const unlockTime = new Date(row.date);
+        unlockTime.setDate(unlockTime.getDate() + 1);
+        return now >= unlockTime || row.unlocked;
+    }
+    // Helper: time until unlock
+    function timeUntilUnlock(row: any) {
+        if (!row?.date) return 0;
+        const unlockTime = new Date(row.date);
+        unlockTime.setDate(unlockTime.getDate() + 1);
+        return Math.max(0, unlockTime.getTime() - now.getTime());
+    }
 
-    if (loading) {
-        return (
-            <div>
-                <p>Loading...</p>
-            </div>
-        );
-    };
+    // Unlock handler
+    async function handleUnlock() {
+        if (!linkedRow) return;
+        setUnlocking(true);
+        await supabase
+            .from("linked_anomalies")
+            .update({ unlocked: true })
+            .eq("id", linkedRow.id);
+        setUnlocking(false);
+        // Refresh
+        const { data: updated, error } = await supabase
+            .from("linked_anomalies")
+            .select("*")
+            .eq("id", linkedRow.id)
+            .limit(1);
+        setLinkedRow(updated && updated.length > 0 ? updated[0] : linkedRow);
+    }
 
-    if (!anomaly) {
-        return (
-            <div>
-                <p>No sunspots available now</p>
-            </div>
-        );
-    };
+    if (error) return <div className="text-red-500 p-4">{error}</div>;
+    if (loading) return <div className="text-white p-4">Loading...</div>;
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh]">
-            <div className="p-4 rounded-md relative w-full">
-                {imageUrl && (
-                    <ImageAnnotator
-                        initialImageUrl={imageUrl}
-                        anomalyId={anomaly.id.toString()}
-                        anomalyType="sunspot"
-                        assetMentioned={imageUrl}
-                        structureItemId={3103}
-                        missionNumber={5055655555}
-                        // parentPlanetLocation={anomalyid?.toString() || ''}
-                        annotationType="Sunspots"
-                    />
+        <div className="w-full h-[calc(100vh-8rem)] overflow-hidden flex flex-col gap-2 px-4">
+            {/* Top Button Bar */}
+            <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-2 flex justify-center items-center flex-shrink-0 gap-2">
+                <button
+                    className="px-4 py-2 bg-[#D689E3] text-white rounded"
+                    onClick={() => setShowTutorial(true)}
+                >
+                    Want a walkthrough? Start the tutorial
+                </button>
+                {/* Count sunspots button logic */}
+                {!anomalyId && linkedRow && anomaly ? (
+                    isUnlocked(linkedRow) ? (
+                        <button
+                            className="px-4 py-2 bg-[#85DDA2] text-black rounded font-bold"
+                            onClick={() => window.location.href = `/structures/telescope/sunspot/db-${linkedRow.anomaly_id}/count`}
+                        >
+                            Count Sunspots
+                        </button>
+                    ) : (
+                        timeUntilUnlock(linkedRow) > 0 ? (
+                            <button
+                                className="px-4 py-2 bg-[#FFD700] text-black rounded font-bold"
+                                disabled
+                            >
+                                Unlocks in {Math.ceil(timeUntilUnlock(linkedRow) / 3600000)} hours
+                            </button>
+                        ) : (
+                            <button
+                                className="px-4 py-2 bg-[#FFD700] text-black rounded font-bold"
+                                onClick={handleUnlock}
+                                disabled={unlocking}
+                            >
+                                {unlocking ? "Unlocking..." : "Unlock Sunspot"}
+                            </button>
+                        )
+                    )
+                ) : null}
+            </div>
+            {/* Main content area */}
+            <div className="flex-1 w-full rounded-xl bg-white/10 backdrop-blur-md shadow-md p-2 overflow-hidden flex min-h-0">
+                {showTutorial && anomaly ? (
+                    <div className="flex-1 overflow-y-auto">
+                        <SunspotDetectorTutorial anomalyId={anomaly.id.toString()} />
+                    </div>
+                ) : (
+                    anomaly && imageUrl ? (
+                        <div className="flex-1 overflow-y-auto">
+                            <ImageAnnotator
+                                initialImageUrl={imageUrl}
+                                anomalyId={anomaly.id.toString()}
+                                anomalyType="sunspot"
+                                assetMentioned={imageUrl}
+                                structureItemId={3103}
+                                missionNumber={5055655555}
+                                annotationType="Sunspots"
+                            />
+                        </div>
+                    ) : (
+                        <div className="text-white p-4">No sunspots available now</div>
+                    )
                 )}
             </div>
         </div>
     );
-};
+}

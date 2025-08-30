@@ -626,11 +626,11 @@ const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid, onT
                 {part === 2 && (
                     <>
                         <div className="mb-2">
-                            <img
+                            {/* <img
                                 src='https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true'
                                 alt='telescope'
                                 className="w-24 h-24 mb-2"
-                            />
+                            /> */}
                         </div>
                         <div className="max-w-4xl mx-auto rounded-lg text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
                             <ImageAnnotator

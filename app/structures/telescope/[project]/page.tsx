@@ -11,7 +11,9 @@ import DailyMinorPlanetMissions from "@/src/components/deployment/missions/struc
 import SunspotSteps from "@/src/components/research/projects/Telescopes/Sunspots/SunspotShell";
 
 export default function TelescopeProjectRoute() {
-  const { project } = useParams();
+  const params = useParams();
+  const projectParam = params ? params['project'] : undefined;
+  const project = Array.isArray(projectParam) ? projectParam[0] : projectParam;
   const router = useRouter();
 
   const { session, isLoading } = useSessionContext();

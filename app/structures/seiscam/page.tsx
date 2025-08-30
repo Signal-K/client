@@ -16,11 +16,11 @@ export default function SeiscamOnEarthPage() {
   const router = useRouter()
   const session = useSession()
 
-  useEffect(() => {
-    if (!session) {
-      router.push("/")
-    }
-  }, [session, router])
+  // useEffect(() => {
+  //   if (!session) {
+  //     router.push("/")
+  //   }
+  // }, [session, router])
 
   const actions = [
     {

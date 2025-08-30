@@ -37,6 +37,10 @@ import { useSatelliteManagement } from "@/hooks/useSatelliteManagement";
 import { useNPSManagement } from "@/hooks/useNPSManagement";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import SatellitePosition from "@/src/components/ui/scenes/deploy/SatellitePosition";
+import SolarHealth from "@/src/components/ui/scenes/deploy/solar/SolarHealth";
+import TelescopeViewportSection from "@/src/components/ui/scenes/deploy/Telescope/TelescopeSection";
+import RoverViewportSection from "@/src/components/ui/scenes/deploy/Rover/RoverSection";
+import ViewportSkillTree from "@/src/components/research/section/skillTreeSection";
 
 type PageSatellite = {
   id: string;
@@ -91,21 +95,19 @@ export default function ActivityPage() {
 
   const satelliteData: PageSatellite & { deployTime: Date } | null = (() => {
     const weatherSatelliteAnomaly = linkedAnomalies.find(anomaly => anomaly.automaton === "WeatherSatellite");
-    
     if (weatherSatelliteAnomaly) {
       return {
         id: "satellite-1",
-        x: 50, // Centered position
-        y: 50, // Centered position
+        x: 50,
+        y: 50,
         hasUnclassifiedAnomaly: true,
         anomalyId: weatherSatelliteAnomaly.anomaly?.id?.toString(),
         tile: "/assets/Viewports/Satellite/Satellite_Tile1.png",
-        unlocked: false, // Will be fetched by SatellitePosition component
+        unlocked: false,
         linkedAnomalyId: weatherSatelliteAnomaly.id.toString(),
-        deployTime: new Date(), // Provide a default or actual deploy time here
+        deployTime: new Date(),
       };
     }
-    
     return null;
   })();
 
@@ -147,19 +149,34 @@ export default function ActivityPage() {
           onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
         />
 
-        {satelliteData && (
-          <SatellitePosition
-            satellites={[satelliteData]} // Pass a single satellite
-            flashingIndicator={satelliteData.hasUnclassifiedAnomaly} // Add flashing indicator
-          />
-        )}
+        {/* 2x2 Grid for viewports on desktop, single column on mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-6 w-full">
+          {/* Set a consistent height for all viewports, matching SolarHealth block */}
+          <div className="w-full h-[420px] md:h-[420px] flex">
+            <TelescopeViewportSection />
+          </div>
+          <div className="w-full h-[420px] md:h-[420px] flex">
+            <SatellitePosition
+              satellites={satelliteData ? [satelliteData] : []}
+              flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
+            />
+          </div>
+          <div className="w-full h-[420px] md:h-[420px] flex">
+            <SolarHealth />
+          </div>
+          <div className="w-full h-[420px] md:h-[420px] flex">
+            <RoverViewportSection />
+          </div>
+        </div>
 
         {/* Recent Discoveries */}
-        <RecentDiscoveries
+        {/* <RecentDiscoveries
           linkedAnomalies={linkedAnomalies}
           classifications={classifications}
           incompletePlanet={incompletePlanet}
-        />
+        /> */}
+
+        <ViewportSkillTree />
 
         {/* Notification Subscription */}
         <NotificationSubscribeButton />
@@ -176,13 +193,13 @@ export default function ActivityPage() {
         /> */}
 
         {/* Structures & Equipment */}
-        <StructuresEquipmentSection
+        {/* <StructuresEquipmentSection
           planetTargets={planetTargets}
           activeSatelliteMessage={activeSatelliteMessage}
           visibleStructures={visibleStructures}
           onSendSatellite={handleSendSatellite}
           onCheckActiveSatellite={checkActiveSatellite}
-        />
+        /> */}
 
         {/* Profile Setup */}
         {/* <ProfileSetupSection
@@ -197,7 +214,7 @@ export default function ActivityPage() {
         /> */}
 
         {/* Legacy Milestones Section */}
-        <LegacyMilestonesSection />
+        {/* <LegacyMilestonesSection /> */}
 
         {/* Profile Setup or Complete Structures Section */}
         {needsProfileSetup &&(
@@ -211,7 +228,7 @@ export default function ActivityPage() {
         /> */}
 
         {/* Research Progress */}
-        <ResearchProgressSection />
+        {/* <ResearchProgressSection /> */}
       </div>
 
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>

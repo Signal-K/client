@@ -1,0 +1,19 @@
+=== SUPABASE BACKUP SUMMARY ===
+Date: Mon Aug 11 12:43:04 AWST 2025
+
+DATABASE DUMPS:
+-rw-r--r--  1 scroobz  staff   2.5K Aug  3 12:22 comprehensive_linked_anomalies_migration.sql
+-rw-r--r--  1 scroobz  staff   1.0K Aug  9 23:31 create_notification_rejections_table.sql
+-rw-r--r--  1 scroobz  staff   701B Jul 27 00:53 init.sql
+-rw-r--r--  1 scroobz  staff    86K Aug 11 12:39 production_complete_dump.sql
+-rw-r--r--  1 scroobz  staff   8.8M Aug 11 12:38 production_data_dump.sql
+-rw-r--r--  1 scroobz  staff   297B Aug 11 12:39 production_roles_dump.sql
+
+STORAGE BUCKETS:
+-rw-r--r--  1 scroobz  staff    21K Aug 11 12:41 storage_backup/anomalies_list.txt
+-rw-r--r--  1 scroobz  staff   233B Aug 11 12:42 storage_backup/avatars_list.txt
+-rw-r--r--  1 scroobz  staff   548B Aug 11 12:40 storage_backup/clouds_list.txt
+-rw-r--r--  1 scroobz  staff   4.7K Aug 11 12:41 storage_backup/media_list.txt
+-rw-r--r--  1 scroobz  staff    20K Aug 11 12:42 storage_backup/telescope_list.txt
+-rw-r--r--  1 scroobz  staff   332B Aug 11 12:42 storage_backup/uploads_list.txt
+-rw-r--r--  1 scroobz  staff   8.5K Aug 11 12:41 storage_backup/zoodex_list.txt

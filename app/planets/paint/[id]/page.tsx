@@ -13,7 +13,7 @@ export default function PlanetGeneratorPage() {
   const router = useRouter()
   const supabase = useSupabaseClient()
   const params = useParams()
-  const planetId = params.id as string;
+  const planetId = params?.id as string | undefined;
 
   const [planetConfig, setPlanetConfig] = useState<PlanetConfig>(defaultPlanetConfig)
   const [loading, setLoading] = useState(true)
@@ -128,7 +128,7 @@ export default function PlanetGeneratorPage() {
             <SettingsPanel
               planetConfig={planetConfig}
               onChange={handleConfigChange}
-              classificationId={Number.parseInt(planetId)}
+              classificationId={Number.parseInt(planetId ?? "0")}
             />
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-[#D8DEE9] pb-4">
               <div className="flex flex-col sm:flex-row gap-3">

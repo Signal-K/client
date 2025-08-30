@@ -191,10 +191,30 @@ async function sendNotificationsToUser(userId, discoveries) {
       : `${discoveryCount} New Discoveries Await Classification!`;
     
     const firstDiscovery = discoveries[0];
+    // Determine entity and anomaly type
+    let entity = 'Telescope';
+    let anomalyType = 'anomaly';
+    if (firstDiscovery.automaton) {
+      if (firstDiscovery.automaton.toLowerCase().includes('satellite')) {
+        entity = 'Satellite';
+      } else if (firstDiscovery.automaton.toLowerCase().includes('telescope')) {
+        entity = 'Telescope';
+      }
+      // Map automaton to anomaly type
+      if (firstDiscovery.automaton.toLowerCase().includes('solar')) {
+        anomalyType = 'sunspot';
+      } else if (firstDiscovery.automaton.toLowerCase().includes('planet')) {
+        anomalyType = 'planet';
+      } else if (firstDiscovery.automaton.toLowerCase().includes('satellite')) {
+        anomalyType = 'satellite anomaly';
+      } else {
+        anomalyType = 'anomaly';
+      }
+    }
     const body = discoveryCount === 1
-      ? `Classify your discovery: ${firstDiscovery.anomalyName}`
+      ? `Classify your ${anomalyType} discovered by your ${entity}`
       : `You have ${discoveryCount} unclassified discoveries waiting for analysis`;
-
+    
     const payload = JSON.stringify({
       title,
       body,
@@ -242,9 +262,13 @@ async function sendNotificationsToUser(userId, discoveries) {
 
     if (successful > 0) {
       // Log the anomalies as notified only if at least one notification was successful
-      const logged = await logNotifiedAnomalies(discoveries);
-      if (!logged) {
-        console.warn(`Failed to log anomalies for user ${userId}, but notifications were sent`);
+      // Only log anomalies that have not already been notified
+      const newDiscoveries = discoveries.filter(d => !notifiedAnomalyIds.has(d.linkedAnomalyId));
+      if (newDiscoveries.length > 0) {
+        const logged = await logNotifiedAnomalies(newDiscoveries);
+        if (!logged) {
+          console.warn(`Failed to log anomalies for user ${userId}, but notifications were sent`);
+        }
       }
     }
 

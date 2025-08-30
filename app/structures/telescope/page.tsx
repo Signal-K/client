@@ -102,17 +102,8 @@ export default function TelescopeOnEarthPage() {
                 ? "bg-transparent shadow-none"
                 : "bg-white/80 backdrop-blur-sm rounded-2xl p-4"
             }`}
-            style={{ color: "#2E3440" }}
+            style={{ color: "" }}
           >
-            {/* Mode Toggle */}
-            <div className="flex justify-end mb-2 px-4 pt-4">
-              <button
-                onClick={() => setSimpleMode(!simpleMode)}
-                className="bg-[#88C0D0] text-white px-4 py-1 rounded-md text-sm hover:bg-[#81A1C1] transition"
-              >
-                {simpleMode ? "View Telescope" : "All projects"}
-              </button>
-            </div>
 
             {/* Content */}
             <div className="flex-grow overflow-hidden">
