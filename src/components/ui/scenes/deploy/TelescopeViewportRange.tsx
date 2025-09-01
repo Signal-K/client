@@ -351,6 +351,19 @@ export default function DeployTelescopeViewport() {
   }
   const handleMouseUp = () => setIsDragging(false)
 
+  // D-Pad handlers
+  const handleDPad = (dir: "up" | "down" | "left" | "right") => {
+    setCurrentSector((prev) => {
+      switch (dir) {
+        case "up": return { x: prev.x, y: prev.y - 1 };
+        case "down": return { x: prev.x, y: prev.y + 1 };
+        case "left": return { x: prev.x - 1, y: prev.y };
+        case "right": return { x: prev.x + 1, y: prev.y };
+        default: return prev;
+      }
+    });
+  }
+
   const handleConfirmationClose = () => {
     setShowConfirmation(false)
     // Redirect to home after a brief delay to allow user to see the confirmation
@@ -406,20 +419,56 @@ export default function DeployTelescopeViewport() {
         />
       </div>
 
-      {/* Compact Header - Fixed at top */}
-      <div className="absolute top-0 left-0 right-0 z-30 h-16">
-        <DeployTelescopeSidebar
-          tessAnomalies={tessAnomalies}
-          sectorAnomalies={sectorAnomalies}
-          selectedSector={selectedSector}
-          alreadyDeployed={alreadyDeployed}
-          deploying={deploying}
-          deploymentMessage={deploymentMessage}
-          onDeploy={handleDeploy}
-          currentSector={currentSector}
-          setCurrentSector={setCurrentSector}
-          setSelectedSector={setSelectedSector}
-        />
+      {/* Radically new layout: vertical sidebar, floating D-Pad, immersive viewport */}
+      {/* Sidebar controls - vertical left panel, now larger */}
+      <div className="absolute top-0 left-0 h-full z-30 flex flex-col items-start justify-start pt-8 pl-4 gap-4">
+        <div className="bg-[#002439]/90 border border-[#78cce2]/30 rounded-3xl shadow-2xl p-10 min-w-[380px] max-w-[480px] w-[420px] flex flex-col gap-8">
+          <DeployTelescopeSidebar
+            tessAnomalies={tessAnomalies}
+            sectorAnomalies={sectorAnomalies}
+            selectedSector={selectedSector}
+            alreadyDeployed={alreadyDeployed}
+            deploying={deploying}
+            deploymentMessage={deploymentMessage}
+            onDeploy={handleDeploy}
+            currentSector={currentSector}
+            setCurrentSector={setCurrentSector}
+            setSelectedSector={setSelectedSector}
+          />
+        </div>
+      </div>
+
+      {/* D-Pad Controls - floating bottom right overlay, cross layout */}
+      <div className="fixed bottom-12 right-12 z-40 flex flex-col items-center">
+        <div className="bg-[#002439]/90 border border-[#78cce2]/30 rounded-3xl shadow-2xl p-8 flex flex-col items-center">
+          <div className="grid grid-cols-3 grid-rows-3 gap-4 w-48 h-48 mb-2 relative">
+            <div></div>
+            <button
+              aria-label="Move Up"
+              className="bg-[#78cce2] hover:bg-[#e4eff0] text-[#002439] rounded-full w-16 h-16 shadow-lg border-2 border-[#005066] flex items-center justify-center text-2xl font-bold transition"
+              onClick={() => handleDPad("up")}
+            >↑</button>
+            <div></div>
+            <button
+              aria-label="Move Left"
+              className="bg-[#78cce2] hover:bg-[#e4eff0] text-[#002439] rounded-full w-16 h-16 shadow-lg border-2 border-[#005066] flex items-center justify-center text-2xl font-bold transition"
+              onClick={() => handleDPad("left")}
+            >←</button>
+            <div className="bg-[#005066] rounded-full border-2 border-[#78cce2] w-16 h-16 flex items-center justify-center text-xl text-[#78cce2] font-mono">{currentSector.x},{currentSector.y}</div>
+            <button
+              aria-label="Move Right"
+              className="bg-[#78cce2] hover:bg-[#e4eff0] text-[#002439] rounded-full w-16 h-16 shadow-lg border-2 border-[#005066] flex items-center justify-center text-2xl font-bold transition"
+              onClick={() => handleDPad("right")}
+            >→</button>
+            <div></div>
+            <button
+              aria-label="Move Down"
+              className="bg-[#78cce2] hover:bg-[#e4eff0] text-[#002439] rounded-full w-16 h-16 shadow-lg border-2 border-[#005066] flex items-center justify-center text-2xl font-bold transition"
+              onClick={() => handleDPad("down")}
+            >↓</button>
+            <div></div>
+          </div>
+        </div>
       </div>
 
       {/* Sector Status Overlay */}

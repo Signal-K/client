@@ -180,25 +180,40 @@ export default function SolarHealth() {
             <h2 className="text-lg md:text-xl font-bold mb-2 text-center">
               Solar Health
             </h2>
-            <div className="w-full max-w-xl mx-auto">
-              <p className="text-xs md:text-sm text-center mb-3 leading-relaxed break-words">
-                Each week, the sun undergoes new activity. Participate in the solar mission to monitor sunspots and help count solar anomalies. When a sunspot forms, you can classify and count it for science rewards. Sunspot events unlock after 1 hour and expire after 3 days.
-              </p>
-            </div>
-          </div>
-          <div className="mt-2 flex flex-col items-center gap-1 w-full max-w-xs mx-auto">
-            <span className="font-mono text-sm text-center">
-              Solar Activity: <span className="font-bold">{solarActivity}</span>
-            </span>
-            <span className="font-mono text-xs text-center">
-              Sunspots forming: {sunspotForming ? "Yes" : "No"}
-            </span>
-            <span className="font-mono text-xs text-center">
-              Sunspot count: {sunspotCount}
-            </span>
-            <span className="font-mono text-xs text-center">
-              Next flare: {nextFlare}
-            </span>
+            {/* Show tutorial text only if button says 'Participate' (no deployment, sunspot forming, not participating) */}
+            {!activeLinked && sunspotForming && !participating ? (
+              <div className="w-full max-w-xl mx-auto">
+                <p className="text-xs md:text-sm text-center mb-3 leading-relaxed break-words"
+                  style={{
+                    color: '#e4eff0',
+                    background: 'rgba(30,30,40,0.7)',
+                    borderRadius: '0.75rem',
+                    padding: '0.75rem',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    wordBreak: 'break-word',
+                    maxWidth: '100%',
+                  }}>
+                  Each week, the sun undergoes new activity. Participate in the solar mission to monitor sunspots and help count solar anomalies. When a sunspot forms, you can classify and count it for science rewards. Sunspot events unlock after 1 hour and expire after 3 days.
+                </p>
+              </div>
+            ) : null}
+            {/* Show solar stats only if deployment exists or user is participating (i.e. button does NOT say 'Participate') */}
+            {(activeLinked || participating || !sunspotForming) && (
+              <div className="mt-2 flex flex-col items-center gap-1 w-full max-w-xs mx-auto">
+                <span className="font-mono text-sm text-center">
+                  Solar Activity: <span className="font-bold">{solarActivity}</span>
+                </span>
+                <span className="font-mono text-xs text-center">
+                  Sunspots forming: {sunspotForming ? "Yes" : "No"}
+                </span>
+                <span className="font-mono text-xs text-center">
+                  Sunspot count: {sunspotCount}
+                </span>
+                <span className="font-mono text-xs text-center">
+                  Next flare: {nextFlare}
+                </span>
+              </div>
+            )}
           </div>
           {/* Mission description and participate button if not yet joined */}
           {!loading && !activeLinked && (

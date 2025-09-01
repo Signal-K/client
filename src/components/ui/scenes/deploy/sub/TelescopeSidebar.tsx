@@ -104,7 +104,7 @@ export default function DeployTelescopeSidebar({
             <div className="w-6 h-6 bg-gradient-to-br from-[#78cce2] to-[#4e7988] rounded-full flex items-center justify-center">
               <Crosshair className="h-3 w-3 text-[#002439]" />
             </div>
-            <div className="min-w-0">
+            {/* <div className="min-w-0">
               <h1 className="text-[#e4eff0] font-medium text-sm leading-tight truncate">Telescope Deploy</h1>
               <div className="text-[#78cce2] text-xs flex items-center gap-2">
                 <span className="font-mono">({currentSector.x}, {currentSector.y})</span>
@@ -117,7 +117,7 @@ export default function DeployTelescopeSidebar({
                   </>
                 )}
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
