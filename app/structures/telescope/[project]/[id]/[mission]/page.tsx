@@ -144,9 +144,9 @@ export default function TelescopeClassifyPage() {
       */}
 
       {/* Sticky/relative nav and content */}
-      {/* <div className="relative z-10 pb-8">
+      <div className="relative z-10 pb-8">
         <GameNavbar />
-      </div> */}
+      </div>
 
       <main className="relative z-20 py-8 pb-24 flex justify-center">
         <div className="w-full max-w-6xl px-4 bg-black/20 rounded-lg border border-[#78cce2]/30">
@@ -155,11 +155,11 @@ export default function TelescopeClassifyPage() {
       </main>
 
       {/* Bottom Navigation - stays above everything else */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 w-full">
+      {/* <div className="fixed bottom-0 left-0 right-0 z-50 w-full">
         <div className="w-full pb-10 py-5" style={{ position: 'fixed', bottom: '0', left: '0', right: '0', zIndex: 9999 }}>
           <GameNavbar />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

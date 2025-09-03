@@ -1,3 +1,29 @@
+// Utility to group classifications by type and extract annotationOptions
+export function useGroupedClassifications(classifications: Classification[]) {
+  // Group by classificationtype
+  const grouped: Record<string, Classification[]> = {};
+  classifications.forEach((c) => {
+    if (!grouped[c.classificationtype || "unknown"]) {
+      grouped[c.classificationtype || "unknown"] = [];
+    }
+    grouped[c.classificationtype || "unknown"].push(c);
+  });
+
+  // Extract annotationOptions for each classification
+  const withAnnotations = Object.entries(grouped).map(([type, entries]) => ({
+    type,
+    entries: entries.map((c) => {
+      let annotationOptions: string[] = [];
+      if (c.classificationConfiguration && typeof c.classificationConfiguration === "object") {
+        if (Array.isArray(c.classificationConfiguration.annotationOptions)) {
+          annotationOptions = c.classificationConfiguration.annotationOptions;
+        }
+      }
+      return { ...c, annotationOptions };
+    }),
+  }));
+  return withAnnotations;
+}
 import { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { subDays } from "date-fns";
@@ -18,6 +44,10 @@ export interface Classification {
   anomaly: {
     content: string | null;
   } | null;
+  classificationConfiguration?: {
+    annotationOptions?: string[];
+    [key: string]: any;
+  };
 }
 
 export interface LinkedAnomaly {

@@ -43,7 +43,7 @@ export default function TelescopeViewportSection() {
         .from("linked_anomalies")
         .select("*, anomaly:anomalies(*)")
         .eq("author", session.user.id)
-        .in("automaton", ["Telescope", "TelescopeSolar", "TelescopePlanet"]);
+        .in("automaton", ["Telescope", "TelescopePlanet"]); // TelescopeSolar
       
       setHasTelescopeDeployed((linked && linked.length > 0) || false);
       
@@ -264,4 +264,4 @@ export default function TelescopeViewportSection() {
       </div>
     </Section>
   );
-}
+};

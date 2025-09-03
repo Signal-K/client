@@ -2,8 +2,8 @@ name: Notify Users of Unclassified Discoveries
 
 on:
   schedule:
-    # Run every hour at minute 0
-    - cron: '0 * * * *'
+    # Run daily at 4pm AEST (6am UTC)
+    - cron: '0 6 * * *'
   push:
     branches: [ '*' ]
   workflow_dispatch: # Allow manual triggering

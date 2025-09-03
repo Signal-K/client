@@ -362,13 +362,13 @@ export function TelescopeBackground({
   return (
     <div className="w-full h-full relative overflow-hidden">
       {/* Debug info */}
-      <div className={`absolute top-2 right-2 ${isDarkTheme ? "text-white" : "text-slate-800"} text-xs z-50`}>
+      {/* <div className={`absolute top-2 right-2 ${isDarkTheme ? "text-white" : "text-slate-800"} text-xs z-50`}>
         {variant === "stars-only"
           ? `Stars: ${stars.length} | Mode: Stars Only`
           : variant === "reduced-density"
             ? `Stars: ${stars.length} | Anomalies: ${filteredAnomalies.length} | Mode: Reduced`
             : `Stars: ${stars.length} | Anomalies: ${filteredAnomalies.length} | ${getEnvironmentName()}`}
-      </div>
+      </div> */}
 
       {/* Space Background */}
       <div ref={viewportRef} className="w-full h-full relative" style={getBackgroundStyle()}>
@@ -470,14 +470,14 @@ export function TelescopeBackground({
         )} */}
 
         {/* Stars-only mode info overlay */}
-        {variant === "stars-only" && (
+        {/* {variant === "stars-only" && (
           <div
             className={`absolute top-4 left-4 ${isDarkTheme ? "bg-[#002439]/90 text-[#78cce2] border-[#78cce2]/30" : "bg-white/90 text-slate-800 border-slate-400/50"} px-3 py-2 rounded-lg text-xs font-mono border backdrop-blur-sm`}
           >
             <div>STARFIELD MODE</div>
             <div>SECTOR: {generateSectorName(sectorX, sectorY)}</div>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Anomaly Info Panel

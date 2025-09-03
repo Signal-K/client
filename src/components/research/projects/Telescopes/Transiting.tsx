@@ -501,7 +501,7 @@ export function StarterTelescopeTess() {
       {/* Tutorial OR Annotator */}
       <div className="flex-1 w-full rounded-xl bg-white/10 backdrop-blur-md shadow-md p-2 overflow-hidden flex min-h-0">
         {/* Sector buttons on the left (for larger screens) */}
-        {availableSectors.length > 1 && !showTutorial && (
+        {/* {availableSectors.length > 1 && !showTutorial && (
           <div className="hidden sm:flex flex-col gap-2 mr-2 pt-4 flex-shrink-0">
             <span className="text-xs text-white/70 text-center mb-1">Sectors</span>
             {availableSectors.map((sector) => (
@@ -520,7 +520,7 @@ export function StarterTelescopeTess() {
               </Button>
             ))}
           </div>
-        )}
+        )} */}
         
         {/* Main content area */}
         <div className="flex-1 overflow-hidden min-h-0">

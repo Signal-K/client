@@ -4,8 +4,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/componen
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Card, CardContent } from "@/src/components/ui/card";
-import { Star, Zap, Target, Disc, Calendar, MapPin, Eye, Palette } from "lucide-react"
+import { Star, Zap, Target, Disc, Calendar, Eye, Palette, Info, Hash } from "lucide-react";
 import type { Anomaly } from "@/types/Structures/telescope";
+import { useTheme } from "@/hooks/useTheme";
 
 interface AnomalyDetailDialogProps {
   showDetailDialog: boolean
@@ -22,84 +23,49 @@ export function AnomalyDetailDialog({
   onClassify,
   config,
 }: AnomalyDetailDialogProps) {
-  if (!selectedAnomaly) return null
+  const { isDark } = useTheme();
+  if (!selectedAnomaly) return null;
 
+  // Color scheme for telescope/dark/light
+  const dialogBg = isDark ? "bg-[#23283b] border-[#3b4252] text-[#e4eff0]" : "bg-[#eaf2fb] border-[#bcd2e8] text-[#23283b]";
+  const accent = isDark ? "text-[#7eb6f6]" : "text-[#2e5c8a]";
+  const button = isDark ? "bg-[#3b4252] hover:bg-[#7eb6f6] text-[#e4eff0]" : "bg-[#bcd2e8] hover:bg-[#7eb6f6] text-[#23283b]";
+
+  // Icon for anomaly type
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "exoplanet":
-        return <Star className="h-5 w-5" />
-      case "sunspot":
-        return <Zap className="h-5 w-5" />
-      case "asteroid":
-        return <Target className="h-5 w-5" />
-      case "accretion_disc":
-        return <Disc className="h-5 w-5" />
-      default:
-        return <Star className="h-5 w-5" />
+      case "exoplanet": return <Star className={accent + " h-5 w-5"} />;
+      case "sunspot": return <Zap className={accent + " h-5 w-5"} />;
+      case "asteroid": return <Target className={accent + " h-5 w-5"} />;
+      case "accretion_disc": return <Disc className={accent + " h-5 w-5"} />;
+      default: return <Info className={accent + " h-5 w-5"} />;
     }
-  }
+  };
 
-  const getTypeColor = (type: string) => {
-    const colors = {
-      telescope: {
-        exoplanet: "bg-blue-500",
-        sunspot: "bg-orange-500",
-        asteroid: "bg-purple-500",
-        accretion_disc: "bg-green-500",
-      },
-      weather: {
-        exoplanet: "bg-red-500",
-        sunspot: "bg-yellow-500",
-        asteroid: "bg-pink-500",
-        accretion_disc: "bg-cyan-500",
-      },
-      rover: {
-        exoplanet: "bg-yellow-500",
-        sunspot: "bg-amber-500",
-        asteroid: "bg-orange-500",
-        accretion_disc: "bg-lime-500",
-      },
-    }
-    return colors[config][type as keyof (typeof colors)[typeof config]] || "bg-gray-500"
-  }
-
-  const getConfigColors = () => {
-    switch (config) {
-      case "telescope":
-        return {
-          bg: "bg-[#2E3440]",
-          border: "border-[#4C566A]",
-          text: "text-[#ECEFF4]",
-          accent: "text-[#88C0D0]",
-          button: "bg-[#5E81AC] hover:bg-[#81A1C1]",
-        }
-      case "weather":
-        return {
-          bg: "bg-[#3B2F2F]",
-          border: "border-[#5D4E4E]",
-          text: "text-[#F4ECEC]",
-          accent: "text-[#C08888]",
-          button: "bg-[#AC5E5E] hover:bg-[#C18181]",
-        }
-      case "rover":
-        return {
-          bg: "bg-[#3B3B2F]",
-          border: "border-[#5D5D4E]",
-          text: "text-[#F4F4EC]",
-          accent: "text-[#C0C088]",
-          button: "bg-[#ACAC5E] hover:bg-[#C1C181]",
-        }
-    }
-  }
-
-  const colors = getConfigColors()
+  // Real anomaly info from DB
+  // Support both Anomaly and DatabaseAnomaly shape
+  const hasDbData = typeof (selectedAnomaly as any).dbData !== "undefined";
+  const anomalyContent =
+    (hasDbData ? (selectedAnomaly as any).dbData.content : undefined)
+    || ("content" in selectedAnomaly ? (selectedAnomaly as any).content : undefined)
+    || selectedAnomaly.name;
+  const anomalyType =
+    (hasDbData ? (selectedAnomaly as any).dbData.anomalytype : undefined)
+    || ("anomalytype" in selectedAnomaly ? (selectedAnomaly as any).anomalytype : undefined)
+    || selectedAnomaly.type;
+  const anomalyTicId =
+    (hasDbData ? (selectedAnomaly as any).dbData.ticId : undefined)
+    || ("ticId" in selectedAnomaly ? (selectedAnomaly as any).ticId : undefined);
+  const anomalyCreated =
+    (hasDbData ? (selectedAnomaly as any).dbData.created_at : undefined)
+    || ("created_at" in selectedAnomaly ? (selectedAnomaly as any).created_at : undefined);
 
   return (
     <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-      <DialogContent className={`${colors.bg} ${colors.border} ${colors.text} max-w-lg`}>
+      <DialogContent className={`${dialogBg} max-w-lg`}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {getTypeIcon(selectedAnomaly.type)}
+            {getTypeIcon(anomalyType)}
             Anomaly Details
           </DialogTitle>
         </DialogHeader>
@@ -121,89 +87,75 @@ export function AnomalyDetailDialog({
                 </div>
               )}
             </div>
-            <h3 className="text-xl font-bold">{selectedAnomaly.name}</h3>
-            <Badge className={`${getTypeColor(selectedAnomaly.type)} text-white mt-2`}>
-              {selectedAnomaly.type.replace("_", " ").toUpperCase()}
-            </Badge>
+            <h3 className="text-xl font-bold break-words">{anomalyContent}</h3>
+            <Badge className={`${accent} bg-transparent border border-[#7eb6f6] mt-2`}>{anomalyType?.replace("_", " ").toUpperCase()}</Badge>
           </div>
 
-          {/* Properties Grid */}
+          {/* Properties Grid - show real info only */}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-gray-400" />
-                <div>
-                  <div className={colors.accent}>Sector</div>
-                  <div>{selectedAnomaly.sector}</div>
+              {anomalyTicId && (
+                <div className="flex items-center gap-2">
+                  <Hash className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <div className={accent}>TIC ID</div>
+                    <div>{anomalyTicId}</div>
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="flex items-center gap-2">
                 <Eye className="h-4 w-4 text-gray-400" />
                 <div>
-                  <div className={colors.accent}>Brightness</div>
+                  <div className={accent}>Brightness</div>
                   <div>{(selectedAnomaly.brightness * 100).toFixed(0)}%</div>
                 </div>
               </div>
             </div>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Target className="h-4 w-4 text-gray-400" />
-                <div>
-                  <div className={colors.accent}>Size</div>
-                  <div>{(selectedAnomaly.size * 100).toFixed(0)}%</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
                 <Palette className="h-4 w-4 text-gray-400" />
                 <div>
-                  <div className={colors.accent}>Shape</div>
+                  <div className={accent}>Shape</div>
                   <div className="capitalize">{selectedAnomaly.shape}</div>
                 </div>
               </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-gray-400" />
+                <div>
+                  <div className={accent}>Created At</div>
+                  <div>{anomalyCreated ? new Date(anomalyCreated).toLocaleString() : "-"}</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Discovery Info */}
-          <div
-            className={`${colors.bg === "bg-[#2E3440]" ? "bg-[#434C5E]" : colors.bg === "bg-[#3B2F2F]" ? "bg-[#4E3B3B]" : "bg-[#4E4E3B]"} p-4 rounded-lg`}
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <Calendar className="h-4 w-4 text-gray-400" />
-              <span className={`${colors.accent} text-sm`}>Discovery Date</span>
-            </div>
-            <div className="text-sm">{selectedAnomaly.discoveryDate}</div>
-            {selectedAnomaly.classified && (
-              <div className="mt-2 text-sm text-green-400">✓ This anomaly has been classified</div>
-            )}
-          </div>
-
-          {/* Technical Details */}
+          {/* Technical Details
           <div className="space-y-2 text-xs">
             <div className="flex justify-between">
-              <span className={colors.accent}>Pulse Speed:</span>
+              <span className={accent}>Pulse Speed:</span>
               <span>{selectedAnomaly.pulseSpeed.toFixed(1)}s</span>
             </div>
             <div className="flex justify-between">
-              <span className={colors.accent}>Glow Intensity:</span>
+              <span className={accent}>Glow Intensity:</span>
               <span>{(selectedAnomaly.glowIntensity * 100).toFixed(0)}%</span>
             </div>
             <div className="flex justify-between">
-              <span className={colors.accent}>Color Code:</span>
+              <span className={accent}>Color Code:</span>
               <span>{selectedAnomaly.color}</span>
             </div>
-          </div>
+          </div> */}
 
           {/* Actions */}
           <div className="flex gap-2">
             <Button
               onClick={() => setShowDetailDialog(false)}
               variant="outline"
-              className={`flex-1 ${colors.border} ${colors.text} hover:bg-opacity-10`}
+              className={`flex-1 ${button}`}
             >
               Close
             </Button>
             {!selectedAnomaly.classified && onClassify && (
-              <Button onClick={onClassify} className={`flex-1 ${colors.button} text-white`}>
+              <Button onClick={onClassify} className={`flex-1 ${button} font-bold`}>
                 Classify
               </Button>
             )}
@@ -212,4 +164,4 @@ export function AnomalyDetailDialog({
       </DialogContent>
     </Dialog>
   );
-};
+}
