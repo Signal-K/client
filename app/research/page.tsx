@@ -15,6 +15,7 @@ import ResearchSection from "@/src/components/sections/ResearchSection";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import Login from "../auth/page";
 
 type CapacityKey =
   | "probeCount"
@@ -97,7 +98,13 @@ export default function ResearchPage() {
       setReferralError("An unexpected error occurred.");
     } finally {
       setIsSubmittingReferral(false);
-    }
+    };
+  };
+
+  if (!session) {
+    return (
+      <Login />
+    );
   };
 
   // Theme-based colors

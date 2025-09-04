@@ -159,12 +159,13 @@ export function usePageData() {
     const { data: myClassifications } = await supabase
       .from("classifications")
       .select(`
-        id, 
-        classificationtype, 
-        content, 
-        created_at, 
+        id,
+        classificationtype,
+        content,
+        created_at,
         anomaly,
-        anomaly:anomaly(content)
+        anomaly:anomaly(content),
+        classificationConfiguration
       `)
       .eq("author", userId)
       .order("created_at", { ascending: false })

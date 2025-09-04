@@ -48,10 +48,11 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
     const checkRoute = () => {
       if (typeof window !== "undefined") {
         const path = window.location.pathname;
-        // Hide sidebar for /posts/[id] and /next/[id] routes
+        // Hide sidebar for /posts/[id], /next/[id], and /planets/paint/[id] routes
         setHideSidebar(
           /^\/posts\/[\w-]+$/.test(path) ||
-          /^\/next\/[\w-]+$/.test(path)
+          /^\/next\/[\w-]+$/.test(path) ||
+          /^\/planets\/paint\/[\w-]+$/.test(path)
         );
       }
     };

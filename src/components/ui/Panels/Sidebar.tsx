@@ -2,6 +2,7 @@
 import TotalPoints from "@/src/components/deployment/missions/structures/Stardust/Total";
 
 import type React from "react"
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useState, useEffect } from "react"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent } from "@/src/components/ui/card"
@@ -30,6 +31,7 @@ interface ToolStatus {
   status: "undeployed" | "deployed"
   location?: string
   color: string
+  deployUrl?: string
 }
 
 interface Notification {
@@ -42,6 +44,45 @@ interface Notification {
 }
 
 export function SectionSidebar() {
+  // Supabase session and client
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  // Tool deployment state
+  const [toolDeployment, setToolDeployment] = useState({
+    Satellite: false,
+    Telescope: false,
+    Rover: false,
+    Sunspot: false,
+  });
+
+  // Fetch deployment status from linked_anomalies
+  useEffect(() => {
+    async function fetchDeployment() {
+      if (!session?.user?.id) return;
+      const { data, error } = await supabase
+        .from("linked_anomalies")
+        .select("automaton")
+        .eq("author", session.user.id);
+      if (error) return;
+      const deployed = {
+        Satellite: false,
+        Telescope: false,
+        Rover: false,
+        Sunspot: false,
+      };
+      if (Array.isArray(data)) {
+        for (const row of data) {
+          if (row.automaton === "Satellite") deployed.Satellite = true;
+          if (row.automaton === "Telescope") deployed.Telescope = true;
+          if (row.automaton === "Rover") deployed.Rover = true;
+          if (row.automaton === "TelescopeSolar") deployed.Sunspot = true;
+        }
+      }
+      setToolDeployment(deployed);
+    }
+    fetchDeployment();
+  }, [session, supabase]);
   // Responsive: minimised by default on mobile/small desktop
   const getDefaultCollapsed = () => {
     if (typeof window !== 'undefined') {
@@ -70,28 +111,54 @@ export function SectionSidebar() {
 
   const Link = require("next/link").default;
 
+  // SVG icons for each tool
+  const SunspotIcon = (props: any) => (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" {...props}>
+      <circle cx="10" cy="10" r="7" fill="#FFD700" stroke="#F59E42" strokeWidth="2" />
+      <circle cx="10" cy="10" r="3" fill="#F59E42" />
+      <g stroke="#FFD700" strokeWidth="1.5">
+        <line x1="10" y1="1" x2="10" y2="4" />
+        <line x1="10" y1="16" x2="10" y2="19" />
+        <line x1="1" y1="10" x2="4" y2="10" />
+        <line x1="16" y1="10" x2="19" y2="10" />
+        <line x1="4" y1="4" x2="6" y2="6" />
+        <line x1="16" y1="16" x2="14" y2="14" />
+        <line x1="4" y1="16" x2="6" y2="14" />
+        <line x1="16" y1="4" x2="14" y2="6" />
+      </g>
+    </svg>
+  );
+
   const toolStatuses: ToolStatus[] = [
-    {
-      name: "Telescope",
-      icon: Telescope,
-      status: "deployed",
-      location: "Kepler-442b",
-      color: "text-primary",
-    },
     {
       name: "Satellite",
       icon: Satellite,
-      status: "deployed",
-      location: "Mars Orbit",
-      color: "text-secondary",
+      status: toolDeployment.Satellite ? "deployed" : "undeployed",
+      color: toolDeployment.Satellite ? "text-secondary" : "text-muted-foreground",
+      deployUrl: "/viewports/satellite",
+    },
+    {
+      name: "Telescope",
+      icon: Telescope,
+      status: toolDeployment.Telescope ? "deployed" : "undeployed",
+      color: toolDeployment.Telescope ? "text-primary" : "text-muted-foreground",
+      deployUrl: "/structures/telescope",
     },
     {
       name: "Rover",
       icon: Car,
-      status: "undeployed",
-      color: "text-muted-foreground",
+      status: toolDeployment.Rover ? "deployed" : "undeployed",
+      color: toolDeployment.Rover ? "text-primary" : "text-muted-foreground",
+      deployUrl: "/viewports/roover",
     },
-  ]
+    {
+      name: "Sunspot Telescope",
+      icon: SunspotIcon,
+      status: toolDeployment.Sunspot ? "deployed" : "undeployed",
+      color: toolDeployment.Sunspot ? "text-yellow-500" : "text-muted-foreground",
+      deployUrl: "/viewports/solar",
+    },
+  ];
 
   const notifications: Notification[] = [
     {
@@ -213,7 +280,7 @@ export function SectionSidebar() {
           <div className="space-y-3">
             {toolStatuses.map((tool) => (
               <Card key={tool.name} className="bg-card/50 border-border/30">
-                <CardContent className={cn("p-3", isCollapsed && "p-2")}>
+                <CardContent className={cn("p-3", isCollapsed && "p-2")}> 
                   <div className="flex items-center gap-3">
                     <tool.icon className={cn("h-4 w-4 flex-shrink-0", tool.color)} />
                     {!isCollapsed && (
@@ -227,6 +294,16 @@ export function SectionSidebar() {
                             {tool.status}
                           </Badge>
                         </div>
+                        {/* Deploy link if undeployed */}
+                        {tool.status === "undeployed" && (
+                          <div className="mt-2">
+                            <Link href={tool.deployUrl} passHref legacyBehavior>
+                              <Button variant="outline" size="sm" className="font-mono text-xs w-full">
+                                Deploy {tool.name}
+                              </Button>
+                            </Link>
+                          </div>
+                        )}
                         {tool.location && (
                           <div className="flex items-center gap-1 mt-1">
                             <MapPin className="h-3 w-3 text-muted-foreground" />

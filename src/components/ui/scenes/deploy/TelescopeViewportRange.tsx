@@ -13,7 +13,7 @@ import { CheckCircle, Telescope, X, Target } from "lucide-react"
 import DeployTelescopeSidebar from "./sub/TelescopeSidebar"
 import DeployTelescopeMobileHeader from "./sub/TelescopeMobileHeader"
 import DeployTelescopeOverlay from "./sub/TelescopeOverlay"
-
+ 
 export interface DatabaseAnomaly {
   id: number
   content: string | null
@@ -24,13 +24,13 @@ export interface DatabaseAnomaly {
   type?: string
   parentAnomaly: number | null
   anomalySet: string | null
-}
-type LocalAnomaly = Anomaly & { dbData: DatabaseAnomaly }
+};
+type LocalAnomaly = Anomaly & { dbData: DatabaseAnomaly };
 
 function seededRandom1(seed: number, salt: number = 0) {
   let x = Math.sin(seed + salt) * 10000
   return x - Math.floor(x)
-}
+};
 
 function generateAnomalyFromDB(dbAnomaly: DatabaseAnomaly, sectorX: number, sectorY: number): LocalAnomaly {
   const seed = dbAnomaly.id + sectorX * 1000 + sectorY
@@ -55,7 +55,7 @@ function generateAnomalyFromDB(dbAnomaly: DatabaseAnomaly, sectorX: number, sect
     type,
     project: "planet-hunters",
     dbData: dbAnomaly,
-  }
+  };
 };
 
 export default function DeployTelescopeViewport() {
