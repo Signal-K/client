@@ -58,6 +58,37 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
   const [lastActionTime, setLastActionTime] = useState<Date | null>(null);
   const [showDeployDialog, setShowDeployDialog] = useState(false);
+  const [deploymentCount, setDeploymentCount] = useState<number | null>(null);
+
+  // Helper to get start of week (Sunday AEST 00:01)
+  function getAESTWeekStart(date: Date) {
+    // Convert to AEST (UTC+10)
+    const utc = new Date(date.getTime() + 10 * 60 * 60 * 1000);
+    const day = utc.getUTCDay();
+    const diff = utc.getUTCDate() - day;
+    const weekStart = new Date(utc);
+    weekStart.setUTCDate(diff);
+    weekStart.setUTCHours(0, 1, 0, 0); // 00:01 AEST
+    // Convert back to local time
+    return new Date(weekStart.getTime() - 10 * 60 * 60 * 1000);
+  }
+
+  // Fetch deployment count for this week
+  useEffect(() => {
+    async function fetchDeploymentCount() {
+      if (!session?.user?.id) return;
+      const weekStart = getAESTWeekStart(new Date());
+      const { count, error } = await supabase
+        .from("linked_anomalies")
+        .select("id", { count: "exact", head: true })
+        .eq("automaton", "WeatherSatellite")
+        .eq("author", session.user.id)
+        .gte("date", weekStart.toISOString());
+      if (!error) setDeploymentCount(count ?? 0);
+      else setDeploymentCount(null);
+    }
+    fetchDeploymentCount();
+  }, [session, supabase]);
 
   const satelliteTiles = [
     "/assets/Viewports/Satellite/Satellite_Tile1.png",
@@ -398,6 +429,18 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
             ))}
           </>
         )}
+        {/* Bottom mission/deployment type bar */}
+        <div className="w-full absolute left-0 bottom-0 bg-[#10141c]/90 border-t border-[#232b3b] text-center py-2 px-4 text-xs md:text-sm text-[#78cce2] font-medium z-20" style={{letterSpacing: 0.2}}>
+          {deploymentCount === null ? (
+            "Checking mission type..."
+          ) : deploymentCount === 0 ? (
+            "No satellite deployed this week. Deploy a Weather Satellite to begin a new mission."
+          ) : deploymentCount === 1 ? (
+            "Mission: Standard Weather Satellite Deployment. Your satellite is now monitoring for cloud anomalies. You'll receive alerts when new weather events are detected."
+          ) : (
+            `Mission: Advanced Multi-Target Deployment (${deploymentCount} satellites this week). Your satellites are monitoring multiple planetary atmospheres for rare and extreme weather. Stay tuned for more discoveries!`
+          )}
+        </div>
       </div>
       {/* Deploy Dialog */}
       <Dialog open={showDeployDialog} onOpenChange={setShowDeployDialog}>

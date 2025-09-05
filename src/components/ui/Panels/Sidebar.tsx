@@ -43,11 +43,31 @@ interface Notification {
   icon: React.ComponentType<{ className?: string }>
 }
 
-export function SectionSidebar() {
+
+// SVG icons for each tool
+const SunspotIcon = (props: any) => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" {...props}>
+    <circle cx="10" cy="10" r="7" fill="#FFD700" stroke="#F59E42" strokeWidth="2" />
+    <circle cx="10" cy="10" r="3" fill="#F59E42" />
+    <g stroke="#FFD700" strokeWidth="1.5">
+      <line x1="10" y1="1" x2="10" y2="4" />
+      <line x1="10" y1="16" x2="10" y2="19" />
+      <line x1="1" y1="10" x2="4" y2="10" />
+      <line x1="16" y1="10" x2="19" y2="10" />
+      <line x1="4" y1="4" x2="6" y2="6" />
+      <line x1="16" y1="16" x2="14" y2="14" />
+      <line x1="4" y1="16" x2="6" y2="14" />
+      <line x1="16" y1="4" x2="14" y2="6" />
+    </g>
+  </svg>
+);
+
+export default function Sidebar() {
+
+// Supabase session and client
   // Supabase session and client
   const supabase = useSupabaseClient();
   const session = useSession();
-
   // Tool deployment state
   const [toolDeployment, setToolDeployment] = useState({
     Satellite: false,
@@ -55,10 +75,18 @@ export function SectionSidebar() {
     Rover: false,
     Sunspot: false,
   });
-
-  // Fetch deployment status from linked_anomalies
+  // Sidebar notifications based on linked_anomalies
+  type AutomatonNotification = {
+    id: string;
+    type: "discovery" | "orbit" | "deployment" | "alert";
+    message: string;
+    link?: string;
+    timestamp: string;
+    icon: React.ComponentType<{ className?: string }>;
+  };
+  const [automatonNotifications, setAutomatonNotifications] = useState<AutomatonNotification[]>([]);
   useEffect(() => {
-    async function fetchDeployment() {
+    async function fetchDeploymentAndNotifications() {
       if (!session?.user?.id) return;
       const { data, error } = await supabase
         .from("linked_anomalies")
@@ -71,17 +99,59 @@ export function SectionSidebar() {
         Rover: false,
         Sunspot: false,
       };
+      // Collect unique automaton types
+      const automatonSet = new Set();
       if (Array.isArray(data)) {
         for (const row of data) {
-          if (row.automaton === "Satellite") deployed.Satellite = true;
+          if (row.automaton === "Satellite" || row.automaton === "WeatherSatellite") deployed.Satellite = true;
           if (row.automaton === "Telescope") deployed.Telescope = true;
           if (row.automaton === "Rover") deployed.Rover = true;
           if (row.automaton === "TelescopeSolar") deployed.Sunspot = true;
+          if (row.automaton) automatonSet.add(row.automaton);
         }
       }
       setToolDeployment(deployed);
+      // Human-readable automaton/viewport mapping
+      const automatonMap: Record<string, { name: string; section: string; icon: React.ComponentType<{ className?: string }> }> = {
+        WeatherSatellite: {
+          name: "Weather Satellite",
+          section: "Satellite Viewport",
+          icon: Satellite,
+        },
+        Satellite: {
+          name: "Satellite",
+          section: "Satellite Viewport",
+          icon: Satellite,
+        },
+        Telescope: {
+          name: "Telescope",
+          section: "Telescope Interface",
+          icon: Telescope,
+        },
+        Rover: {
+          name: "Rover",
+          section: "Rover Viewport",
+          icon: Car,
+        },
+        TelescopeSolar: {
+          name: "Sunspot Telescope",
+          section: "Solar Observatory",
+          icon: SunspotIcon,
+        },
+      };
+      const notifications: AutomatonNotification[] = Array.from(automatonSet).map((automaton) => {
+        const info = automatonMap[automaton as keyof typeof automatonMap] || { name: String(automaton), section: "Unknown Section", icon: Package };
+        return {
+          id: String(automaton),
+          type: "deployment" as const,
+          message: `${info.name} is active in the ${info.section}.`,
+          timestamp: "Active now",
+          icon: info.icon,
+        };
+      });
+      setAutomatonNotifications(notifications);
     }
-    fetchDeployment();
+    fetchDeploymentAndNotifications();
   }, [session, supabase]);
   // Responsive: minimised by default on mobile/small desktop
   const getDefaultCollapsed = () => {
@@ -91,7 +161,6 @@ export function SectionSidebar() {
     return false;
   };
   const [isCollapsed, setIsCollapsed] = useState(getDefaultCollapsed());
-
   // Dispatch custom event on collapse/expand
   useEffect(() => {
     // Only dispatch event on client
@@ -101,33 +170,13 @@ export function SectionSidebar() {
     }
   }, [isCollapsed]);
   const [isExpandedMobile, setIsExpandedMobile] = useState(false);
-
   const navigationItems = [
     { name: "Settings", icon: Settings, href: "/settings", color: "text-accent" },
     { name: "Research", icon: Search, href: "/research", color: "text-primary" },
     { name: "Inventory", icon: Package, href: "/inventory/classifications", color: "text-secondary" },
-    { name: "Feed", icon: Rss, href: "/feed", color: "text-chart-1" },
+    { name: "Feed", icon: Rss, href: "/feed", color: "text-chart-1" }
   ];
-
   const Link = require("next/link").default;
-
-  // SVG icons for each tool
-  const SunspotIcon = (props: any) => (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" {...props}>
-      <circle cx="10" cy="10" r="7" fill="#FFD700" stroke="#F59E42" strokeWidth="2" />
-      <circle cx="10" cy="10" r="3" fill="#F59E42" />
-      <g stroke="#FFD700" strokeWidth="1.5">
-        <line x1="10" y1="1" x2="10" y2="4" />
-        <line x1="10" y1="16" x2="10" y2="19" />
-        <line x1="1" y1="10" x2="4" y2="10" />
-        <line x1="16" y1="10" x2="19" y2="10" />
-        <line x1="4" y1="4" x2="6" y2="6" />
-        <line x1="16" y1="16" x2="14" y2="14" />
-        <line x1="4" y1="16" x2="6" y2="14" />
-        <line x1="16" y1="4" x2="14" y2="6" />
-      </g>
-    </svg>
-  );
 
   const toolStatuses: ToolStatus[] = [
     {
@@ -160,37 +209,7 @@ export function SectionSidebar() {
     },
   ];
 
-  const notifications: Notification[] = [
-    {
-      id: "1",
-      type: "discovery",
-      message: "Satellite has discovered: Exoplanet K2-18b",
-      link: "/discoveries/k2-18b",
-      timestamp: "2 min ago",
-      icon: Satellite,
-    },
-    {
-      id: "2",
-      type: "orbit",
-      message: "Satellite is orbiting: Mars",
-      timestamp: "15 min ago",
-      icon: MapPin,
-    },
-    {
-      id: "3",
-      type: "deployment",
-      message: "Telescope has been deployed, wait approx. 3h for next discovery",
-      timestamp: "1h ago",
-      icon: Clock,
-    },
-    {
-      id: "4",
-      type: "alert",
-      message: "Rover maintenance required",
-      timestamp: "2h ago",
-      icon: Car,
-    },
-  ]
+  // Notifications now come from automatonNotifications
 
   // Detect screen size for mobile overlay
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 1024 : false;
@@ -335,12 +354,12 @@ export function SectionSidebar() {
           {isCollapsed ? (
             <div className="flex flex-col items-center gap-2">
               <Badge variant="secondary" className="w-6 h-6 rounded-full p-0 flex items-center justify-center">
-                <span className="text-xs">{notifications.length}</span>
+                <span className="text-xs">{automatonNotifications.length}</span>
               </Badge>
             </div>
           ) : (
             <div className="space-y-3 max-h-64 overflow-y-auto">
-              {notifications.map((notification) => (
+              {automatonNotifications.map((notification) => (
                 <Card key={notification.id} className="bg-card/30 border-border/20 hover:bg-card/50 transition-colors">
                   <CardContent className="p-3">
                     <div className="flex items-start gap-2">
@@ -348,15 +367,6 @@ export function SectionSidebar() {
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-foreground leading-relaxed">
                           {notification.message}
-                          {notification.link && (
-                            <Button
-                              variant="link"
-                              size="sm"
-                              className="h-auto p-0 ml-1 text-xs text-primary hover:text-primary/80"
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                            </Button>
-                          )}
                         </p>
                         <span className="text-xs text-muted-foreground font-mono">{notification.timestamp}</span>
                       </div>

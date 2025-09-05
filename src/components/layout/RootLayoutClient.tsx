@@ -7,7 +7,7 @@ import { useEffect, useState, ReactNode } from "react";
 import { ActivePlanetProvider, useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { UserAnomaliesProvider } from "@/src/core/context/UserAnomalies";
 import { Analytics } from "@vercel/analytics/react";
-import { SectionSidebar } from "@/src/components/ui/Panels/Sidebar";
+import Sidebar from "../ui/Panels/Sidebar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 // import { PostHogProvider } from "@/components/PostHogProvider";
 
@@ -48,6 +48,11 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
     const checkRoute = () => {
       if (typeof window !== "undefined") {
         const path = window.location.pathname;
+        // Always show sidebar on index route
+        if (path === "/") {
+          setHideSidebar(false);
+          return;
+        }
         // Hide sidebar for /posts/[id], /next/[id], /planets/paint/[id], and /viewports/satellite/deploy
         setHideSidebar(
           /^\/posts\/[\w-]+$/.test(path) ||
@@ -84,7 +89,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                   {/* Sidebar: fixed to left, does not scroll */}
                   {session && !hideSidebar && (
                     <div className="fixed left-0 top-0 h-screen z-40">
-                      <SectionSidebar />
+                      <Sidebar />
                     </div>
                   )}
                   {/* Main content: margin-left for sidebar width, center if sidebar is collapsed, no margin if sidebar hidden */}
