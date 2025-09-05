@@ -60,7 +60,8 @@ function generateAnomalyFromDB(dbAnomaly: DatabaseAnomaly, sectorX: number, sect
 
 export default function DeployTelescopeViewport() {
   const supabase = useSupabaseClient()
-  const session = useSession()
+  const session = useSession();
+
   const router = useRouter()
 
   const [currentSector, setCurrentSector] = useState({ x: 0, y: 0 })
@@ -80,7 +81,7 @@ export default function DeployTelescopeViewport() {
   const [deploymentResult, setDeploymentResult] = useState<{
     anomalies: string[]
     sectorName: string
-  } | null>(null)
+  } | null>(null);
 
   const fetchTessAnomalies = async () => {
     try {
