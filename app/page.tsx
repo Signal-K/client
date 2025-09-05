@@ -36,7 +36,7 @@ import { usePageData } from "@/hooks/usePageData";
 import { useSatelliteManagement } from "@/hooks/useSatelliteManagement";
 import { useNPSManagement } from "@/hooks/useNPSManagement";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
-import SatellitePosition from "@/src/components/ui/scenes/deploy/SatellitePosition";
+import SatellitePosition from "@/src/components/ui/scenes/deploy/satellite/SatellitePosition";
 import SolarHealth from "@/src/components/ui/scenes/deploy/solar/SolarHealth";
 import TelescopeViewportSection from "@/src/components/ui/scenes/deploy/Telescope/TelescopeSection";
 import RoverViewportSection from "@/src/components/ui/scenes/deploy/Rover/RoverSection";

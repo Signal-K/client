@@ -459,10 +459,9 @@ export default function DeployTelescopeViewport() {
         />
       </div>
 
-      {/* Radically new layout: vertical sidebar, floating D-Pad, immersive viewport */}
-      {/* Sidebar controls - vertical left panel, now larger */}
-      <div className="absolute top-0 left-0 h-full z-30 flex flex-col items-start justify-start pt-8 pl-4 gap-4">
-        <div className="bg-[#002439]/90 border border-[#78cce2]/30 rounded-3xl shadow-2xl p-10 min-w-[380px] max-w-[480px] w-[420px] flex flex-col gap-8">
+      {/* Sidebar controls - vertical left panel, content-wrapping, not full height */}
+      <div className="absolute top-0 left-0 z-30 flex flex-col items-start pt-8 pl-4 gap-4">
+        <div className="bg-[#002439]/90 border border-[#78cce2]/30 rounded-3xl shadow-2xl p-10 min-w-[380px] max-w-[480px] w-[420px] flex flex-col gap-6 justify-between" style={{height: 'auto'}}>
           <DeployTelescopeSidebar
             tessAnomalies={tessAnomalies}
             sectorAnomalies={sectorAnomalies}
@@ -475,6 +474,22 @@ export default function DeployTelescopeViewport() {
             setCurrentSector={setCurrentSector}
             setSelectedSector={setSelectedSector}
           />
+        </div>
+      </div>
+
+      {/* Anomaly types deployed info - absolutely positioned at the bottom left of the display */}
+      <div className="fixed bottom-8 left-8 z-40 p-3 rounded bg-[#00304a]/80 border border-[#78cce2]/20 text-[#e4eff0] text-xs font-mono min-w-[260px] max-w-[340px] shadow-lg">
+        <span className="font-bold text-[#78cce2]">Anomaly Types:</span>
+        <ul className="list-disc ml-5 mt-1">
+          <li>Planets (TESS)</li>
+          <li>Asteroids (Minor planets)</li>
+          {tessAnomalies.some(a => a.anomalySet === 'active-asteroids') && (
+            <li>Active Asteroids (asteroids, comets)</li>
+          )}
+        </ul>
+        <div className="mt-2 text-[#78cce2]">
+          <span className="font-semibold">Asteroid projects</span>: asteroids, comets<br/>
+          <span className="font-semibold">Planets</span>: exoplanet candidates
         </div>
       </div>
 

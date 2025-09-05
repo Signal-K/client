@@ -3,6 +3,7 @@ import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "../..
 import { Badge } from "../../../badge";
 import { Button } from "../../../button";
 import { CheckCircle, Target, Telescope, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function SatelliteDeployConfirmation({
   deploymentResult,
@@ -13,6 +14,8 @@ export default function SatelliteDeployConfirmation({
   onClose: () => void;
   onTelescope: () => void;
 }) {
+    const router = useRouter();
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2">
       <Card className="bg-[#181e2a] border-2 border-[#6be0b3] max-w-md w-full mx-2 shadow-2xl rounded-2xl">
@@ -58,15 +61,15 @@ export default function SatelliteDeployConfirmation({
             <div className="space-y-2 text-xs leading-relaxed">
               <div className="flex items-start gap-2">
                 <span className="bg-[#6be0b3] text-[#181e2a] w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">1</span>
-                <span className="text-[#e4eff0]">Your satellite will monitor <strong>{deploymentResult.anomalies.length}</strong> weather or planetary anomalies in real time.</span>
+                <span className="text-[#e4eff0]">If you selected <strong>Planet Investigation</strong>, your satellite will gradually scan and identify the planet's radius, temperature, density, and other properties over time. You can check the satellite viewport at any time to see the progress.</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="bg-[#6be0b3] text-[#181e2a] w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">2</span>
-                <span className="text-[#e4eff0]">You'll receive alerts when new data is detected from these targets.</span>
+                <span className="text-[#e4eff0]">If you selected <strong>Weather Investigation</strong>, your satellite will identify four clouds on the selected planet before returning to be re-deployed. This process happens throughout the week.</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="bg-[#6be0b3] text-[#181e2a] w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">3</span>
-                <span className="text-[#e4eff0]">Review and classify new discoveries in the satellite or telescope interface to help the mission.</span>
+                <span className="text-[#e4eff0]">Later, you can upgrade your satellites or build more to expand your investigation capabilities.</span>
               </div>
             </div>
             <p className="text-[#6be0b3] text-xs mt-3 text-center border-t border-[#6be0b3]/10 pt-2">
@@ -75,12 +78,12 @@ export default function SatelliteDeployConfirmation({
           </div>
           <div className="flex gap-2 pt-2">
             <Button
-              onClick={onTelescope}
+              onClick={() => router.push("/viewports/satellite")}
               size="sm"
               className="flex-1 bg-[#6be0b3] text-[#181e2a] hover:bg-[#78cce2] h-10 text-xs font-medium rounded-lg"
             >
               <Telescope className="h-4 w-4 mr-2" />
-              View Telescope
+              View Satellite
             </Button>
             <Button
               onClick={onClose}

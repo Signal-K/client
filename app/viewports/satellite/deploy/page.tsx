@@ -10,7 +10,7 @@ export default function SatelliteDeployPage() {
 
     return (
         <div className="h-screen w-full flex flex-col bg-gradient-to-b from-[#002439] to-[#001a2a] overflow-hidden">
-            {/* <GameNavbar /> */}
+            <GameNavbar />
             <DeploySatelliteViewport />
         </div>
     );

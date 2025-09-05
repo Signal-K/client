@@ -1,35 +1,40 @@
 import React from "react";
+import InvestigationModeSelect from "./InvestigationModeSelect";
 
-export default function SatelliteSidebar({
-  planetAnomalies,
-  focusedPlanetIdx,
-  setFocusedPlanetIdx,
-  investigationMode,
-  cloudAnomalies,
-  handleAnomalyClick,
-  anomalyContent,
-  setAnomalyContent,
-  userPlanetCount,
-  communityPlanetCount,
-}: {
+type SatelliteSidebarProps = {
   planetAnomalies: any[];
   focusedPlanetIdx: number;
   setFocusedPlanetIdx: (i: number) => void;
   investigationMode: 'weather' | 'planets';
+  setInvestigationMode: (mode: 'weather' | 'planets') => void;
   cloudAnomalies: any[];
   handleAnomalyClick: (a: any) => void;
   anomalyContent: { content: string; type: string } | null;
   setAnomalyContent: (v: null) => void;
   userPlanetCount: number;
   communityPlanetCount: number;
-}) {
+};
+
+export default function SatelliteSidebar({
+  planetAnomalies,
+  focusedPlanetIdx,
+  setFocusedPlanetIdx,
+  investigationMode,
+  setInvestigationMode,
+  cloudAnomalies,
+  handleAnomalyClick,
+  anomalyContent,
+  setAnomalyContent,
+  userPlanetCount,
+  communityPlanetCount,
+}: SatelliteSidebarProps) {
   return (
-    <div className="hidden md:flex flex-col w-[340px] min-w-[260px] max-w-[400px] h-full bg-gradient-to-br from-[#181e2a] to-[#10141c] border-l border-[#232b3b] z-20 p-0 overflow-y-auto shadow-2xl">
+  <div className="hidden md:flex flex-col w-[400px] min-w-[340px] max-w-[480px] h-full bg-gradient-to-br from-[#181e2a] to-[#10141c] border-l border-[#232b3b] z-20 p-0 overflow-y-auto shadow-2xl">
       {/* Mode toggle in sidebar */}
       <div className="px-6 pt-6 pb-2 border-b border-[#232b3b] bg-[#181e2a]/90 sticky top-0 z-10">
         <div className="flex flex-col gap-2">
           <span className="text-[#78cce2] text-lg font-bold">Investigation Mode</span>
-          {/* InvestigationModeSelect should be rendered here in parent */}
+          <InvestigationModeSelect value={investigationMode} onChange={setInvestigationMode} />
         </div>
       </div>
       <div className="flex-1 px-6 py-4 flex flex-col gap-6">

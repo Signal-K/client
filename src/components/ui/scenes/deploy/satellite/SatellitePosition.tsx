@@ -1,23 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
-import SatelliteCard from "./satellite/SatelliteCard";
+import SatelliteCard from "./SatelliteCard";
 import Section from "@/src/components/sections/Section";
-import SatelliteLegend from "./satellite/SatelliteLegend";
-import SatelliteIcon from "./satellite/SatelliteIcon";
-import SatelliteTooltip from "./satellite/SatelliteTooltip";
+import WeatherSatelliteMissionType from "./WeatherSatelliteMissionType";
+import SatelliteProgressBar from "./SatelliteProgressBar";
+import SatelliteIcon from "./SatelliteIcon";
+import SatelliteTooltip from "./SatelliteTooltip";
 import {
   getNextSaturdayMidnight,
   getTimeSinceDeploy,
   getTimeUntilWeekEnd,
   getTimeSinceLastAction,
-} from "./satellite/satelliteTimeUtils";
-import { calculateSatellitePosition } from "./satellite/satellitePositionUtils";
+} from "./satelliteTimeUtils";
+import { calculateSatellitePosition } from "./satellitePositionUtils";
 import { Button } from "@/src/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/src/components/ui/dialog";
 import { PlanetGeneratorMinimal } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator";
+import { useRouter } from "next/navigation";
 
 interface Satellite {
   id: string;
@@ -45,9 +47,30 @@ interface TooltipData {
 };
 
 export default function SatellitePosition({ satellites, flashingIndicator }: SatellitePositionProps) {
+  // State for classification object and id for the current satellite
+  const [classification, setClassification] = useState<any>(null);
+  const [classificationId, setClassificationId] = useState<number | string | null>(null);
+  // Ref and state for parent section dimensions (must be inside component)
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [sectionDims, setSectionDims] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+
+  useEffect(() => {
+    function updateDims() {
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect();
+        setSectionDims({ width: Math.round(rect.width), height: Math.round(rect.height) });
+      }
+    }
+    updateDims();
+    window.addEventListener('resize', updateDims);
+    return () => window.removeEventListener('resize', updateDims);
+  }, []);
   // Restore handleUnlockAnomaly and handleSatelliteClick
   const supabase = useSupabaseClient();
   const session = useSession();
+
+  const router = useRouter();
+
   const [positions, setPositions] = useState<Satellite[]>(satellites);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [selectedSatellite, setSelectedSatellite] = useState<Satellite | null>(null);
@@ -59,6 +82,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   const [lastActionTime, setLastActionTime] = useState<Date | null>(null);
   const [showDeployDialog, setShowDeployDialog] = useState(false);
   const [deploymentCount, setDeploymentCount] = useState<number | null>(null);
+  const [allWeatherSatEntries, setAllWeatherSatEntries] = useState<any[]>([]);
 
   // Helper to get start of week (Sunday AEST 00:01)
   function getAESTWeekStart(date: Date) {
@@ -73,11 +97,12 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
     return new Date(weekStart.getTime() - 10 * 60 * 60 * 1000);
   }
 
-  // Fetch deployment count for this week
+  // Fetch deployment count for this week and all WeatherSatellite entries for this user
   useEffect(() => {
-    async function fetchDeploymentCount() {
+    async function fetchDeploymentData() {
       if (!session?.user?.id) return;
       const weekStart = getAESTWeekStart(new Date());
+      // Count for this week
       const { count, error } = await supabase
         .from("linked_anomalies")
         .select("id", { count: "exact", head: true })
@@ -86,8 +111,16 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
         .gte("date", weekStart.toISOString());
       if (!error) setDeploymentCount(count ?? 0);
       else setDeploymentCount(null);
+      // All entries (ignore time)
+      const { data: allEntries, error: allErr } = await supabase
+        .from("linked_anomalies")
+        .select("*")
+        .eq("automaton", "WeatherSatellite")
+        .eq("author", session.user.id);
+      if (!allErr && allEntries) setAllWeatherSatEntries(allEntries);
+      else setAllWeatherSatEntries([]);
     }
-    fetchDeploymentCount();
+    fetchDeploymentData();
   }, [session, supabase]);
 
   const satelliteTiles = [
@@ -139,7 +172,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
 
         const { data: linkedAnomalies, error } = await supabase
           .from("linked_anomalies")
-          .select("id, anomaly_id, automaton, unlocked, date")
+          .select("id, anomaly_id, automaton, unlocked, date, classification_id")
           .eq("automaton", "WeatherSatellite")
           .eq("author", session.user.id)
           .gte("date", oneWeekAgo.toISOString())
@@ -211,8 +244,24 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
             linkedAnomalyId: anomaly.id.toString(),
             deployTime: deployTime,
           };
-
           setPositions([satelliteData]);
+          // Fetch classification if classification_id exists
+          if (anomaly.classification_id) {
+            setClassificationId(anomaly.classification_id);
+            const { data: classificationData, error: classErr } = await supabase
+              .from("classifications")
+              .select("id, media")
+              .eq("id", anomaly.classification_id)
+              .single();
+            if (!classErr && classificationData) {
+              setClassification(classificationData);
+            } else {
+              setClassification(null);
+            }
+          } else {
+            setClassificationId(null);
+            setClassification(null);
+          }
         }
       } catch (err) {
         console.error("Error fetching satellites:", err);
@@ -350,8 +399,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
 
   return (
   <Section expandLink={"/viewports/satellite"} sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Send satellites to planets you or the community have discovered to search for clouds and weather events."}>
-      <div className="p-4 relative z-10" style={{ minHeight: '156px', height: '30vh', maxHeight: 520 }}>
-        {/* If no satellites, show deploy button */}
+      <div ref={sectionRef} className="p-4 relative z-10" style={{ minHeight: '156px', height: '30vh', maxHeight: 520 }}>
         {positions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed px-2">
@@ -359,45 +407,13 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
             </div>
             <button
               className="px-4 py-2 bg-blue-600 text-white rounded shadow"
-              onClick={() => setShowDeployDialog(true)}
+              onClick={() => router.push('/viewports/satellite/deploy')}
             >
               Deploy Weather Satellite
             </button>
           </div>
         ) : (
           <>
-            {/* Planet in top-right, behind overlays */}
-            {positions[0]?.linkedAnomalyId && (
-              <div
-                className="absolute group"
-                style={{
-                  top: 0,
-                  right: 0,
-                  width: 1300,
-                  height: 1300,
-                  zIndex: 1,
-                  pointerEvents: "auto",
-                  background: "none",
-                  borderRadius: "50%",
-                  overflow: "visible",
-                  transform: "translateX(40%)",
-                }}
-              >
-                <PlanetGeneratorMinimal
-                  classificationId={positions[0]?.linkedAnomalyId}
-                />
-                {/* Tooltip for planet overlay */}
-                <div
-                  className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-full bg-black bg-opacity-80 text-white text-xs rounded px-3 py-2 mt-2 opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap shadow-lg"
-                  style={{ zIndex: 100 }}
-                >
-                  <div><b>Planet:</b> {tooltipData?.planetName || positions[0]?.anomalyId || "Unknown"}</div>
-                  <div><b>Distance:</b> Calculating...</div>
-                  <div><b>Scan Time:</b> Calculating...</div>
-                </div>
-              </div>
-            )}
-            <SatelliteLegend />
             {positions.map((sat) => (
               <div
                 key={sat.id}
@@ -429,101 +445,24 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
             ))}
           </>
         )}
-        {/* Bottom mission/deployment type bar */}
-        <div className="w-full absolute left-0 bottom-0 bg-[#10141c]/90 border-t border-[#232b3b] text-center py-2 px-4 text-xs md:text-sm text-[#78cce2] font-medium z-20" style={{letterSpacing: 0.2}}>
-          {deploymentCount === null ? (
-            "Checking mission type..."
-          ) : deploymentCount === 0 ? (
-            "No satellite deployed this week. Deploy a Weather Satellite to begin a new mission."
-          ) : deploymentCount === 1 ? (
-            "Mission: Standard Weather Satellite Deployment. Your satellite is now monitoring for cloud anomalies. You'll receive alerts when new weather events are detected."
-          ) : (
-            `Mission: Advanced Multi-Target Deployment (${deploymentCount} satellites this week). Your satellites are monitoring multiple planetary atmospheres for rare and extreme weather. Stay tuned for more discoveries!`
+        <div className="w-full absolute left-0 flex flex-col items-center z-30 pointer-events-none">
+          <div className="pointer-events-auto mb-2">
+            <WeatherSatelliteMissionType entries={allWeatherSatEntries} />
+          </div>
+          {positions[0]?.deployTime && (
+            <div className="pointer-events-auto">
+              <SatelliteProgressBar
+                deployTime={positions[0].deployTime}
+                width={Math.max(180, Math.min(Math.round(sectionDims.width * 0.6), 900))}
+                height={48}
+                classificationId={classificationId ?? undefined}
+                classification={classification ?? undefined}
+                parentWidth={sectionDims.width}
+              />
+            </div>
           )}
         </div>
       </div>
-      {/* Deploy Dialog */}
-      <Dialog open={showDeployDialog} onOpenChange={setShowDeployDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-primary">Deploy Weather Satellite</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <p className="mb-4">Deploy a weather satellite to begin monitoring planetary atmospheres and discover new cloud formations. Select a planet to deploy to and start your mission!</p>
-            <button
-              className="px-4 py-2 bg-green-600 text-white rounded shadow"
-              onClick={async () => {
-                if (!session?.user?.id) return;
-                // Fetch user's classified planets
-                const { data: planetClassifications } = await supabase
-                  .from("classifications")
-                  .select("id, anomaly:anomaly(content)")
-                  .eq("author", session.user.id)
-                  .eq("classificationtype", "planet");
-                if (!planetClassifications || planetClassifications.length === 0) {
-                  alert("No classified planets available for deployment.");
-                  return;
-                }
-                // Pick a random planet
-                const randomIndex = Math.floor(Math.random() * planetClassifications.length);
-                const selectedPlanet = planetClassifications[randomIndex];
-                // Fetch a random cloud anomaly
-                const { data: cloudAnomalies } = await supabase
-                  .from("anomalies")
-                  .select("id")
-                  .eq("anomalytype", "cloud");
-                if (!cloudAnomalies || cloudAnomalies.length === 0) {
-                  alert("No cloud anomalies available.");
-                  return;
-                }
-                const cloudIndex = Math.floor(Math.random() * cloudAnomalies.length);
-                const selectedAnomaly = cloudAnomalies[cloudIndex];
-                // Insert deployment row
-                await supabase.from("linked_anomalies").insert({
-                  author: session.user.id,
-                  anomaly_id: selectedAnomaly.id,
-                  classification_id: selectedPlanet.id,
-                  automaton: "WeatherSatellite",
-                  unlocked: false,
-                  date: new Date().toISOString(),
-                });
-                setShowDeployDialog(false);
-                window.location.reload();
-              }}
-            >
-              Deploy to Random Planet
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      {/* Unlock Dialog */}
-      <Dialog open={showUnlockDialog} onOpenChange={setShowUnlockDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-primary">Cloud Formation Detected</DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              Your weather satellite has completed scanning the region of interest and detected a cloud formation ready for atmospheric analysis. 
-              Would you like to begin cloud observation and classification?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-3 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowUnlockDialog(false)}
-              className="flex-1"
-            >
-              Continue Scanning
-            </Button>
-            <Button
-              onClick={handleUnlockAnomaly}
-              disabled={isUnlocking}
-              className="flex-1"
-            >
-              {isUnlocking ? "Analyzing..." : "Begin Observation"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </Section>
   );
 };

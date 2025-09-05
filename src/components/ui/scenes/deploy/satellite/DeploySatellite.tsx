@@ -11,6 +11,7 @@ import { Button } from "../../../button"
 import SatelliteDeployConfirmation from "./SatelliteDeployConfirmation";
 import InvestigationModeSelect from "./InvestigationModeSelect";
 import SatelliteSidebar from "./SatelliteSidebar";
+import { useState as useReactState } from "react";
 import SatelliteDPad from "./SatelliteDPad";
 import SatellitePlanetSVG from "./SatellitePlanetSVG";
 import SatelliteCloudIcons from "./SatelliteCloudIcons";
@@ -56,6 +57,8 @@ function generateAnomalyFromDB(dbAnomaly: DatabaseAnomaly, sectorX: number, sect
 }
 
 export default function DeploySatelliteViewport() {
+  // For mobile sidebar/modal
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useReactState(false);
   const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
@@ -384,11 +387,11 @@ export default function DeploySatelliteViewport() {
   };
 
     return (
-      <div className="h-screen w-screen flex flex-col bg-[#10141c]">
+      <div className="min-h-screen h-screen w-screen flex flex-col bg-[#10141c]">
         {/* Top bar: controls and stats */}
         <div className="flex flex-row items-center justify-between px-6 py-3 bg-[#181e2a]/90 border-b border-[#232b3b] z-20">
           <div className="flex items-center gap-4">
-            <InvestigationModeSelect value={investigationMode} onChange={setInvestigationMode} />
+            {/* InvestigationModeSelect moved to sidebar */}
           </div>
           {investigationMode === 'weather' && (
             <div className="flex gap-6 text-xs text-[#78cce2]">
@@ -398,8 +401,8 @@ export default function DeploySatelliteViewport() {
           )}
         </div>
 
-        {/* Main map/viewport area */}
-        <div className="flex-1 flex flex-row relative overflow-hidden">
+  {/* Main map/viewport area */}
+  <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0">
           {/* Map/coverage background with satellite-style space texture */}
           <div className="absolute inset-0 z-0">
             {/* Custom SVG space texture (stars, nebula, subtle grid) */}
@@ -520,18 +523,115 @@ export default function DeploySatelliteViewport() {
           </div>
 
           {/* Right-side info panel (sidebar) */}
-          <SatelliteSidebar
-            planetAnomalies={planetAnomalies}
-            focusedPlanetIdx={focusedPlanetIdx}
-            setFocusedPlanetIdx={setFocusedPlanetIdx}
-            investigationMode={investigationMode}
-            cloudAnomalies={cloudAnomalies}
-            handleAnomalyClick={handleAnomalyClick}
-            anomalyContent={anomalyContent}
-            setAnomalyContent={setAnomalyContent}
-            userPlanetCount={userPlanetCount}
-            communityPlanetCount={communityPlanetCount}
-          />
+          {/* Desktop sidebar */}
+          <div className="hidden md:flex flex-col h-full min-h-0 w-[370px] max-w-[370px] z-30 bg-[#10141c] border-l border-[#232b3b]">
+            <SatelliteSidebar
+              planetAnomalies={planetAnomalies}
+              focusedPlanetIdx={focusedPlanetIdx}
+              setFocusedPlanetIdx={setFocusedPlanetIdx}
+              investigationMode={investigationMode}
+              setInvestigationMode={setInvestigationMode}
+              cloudAnomalies={cloudAnomalies}
+              handleAnomalyClick={handleAnomalyClick}
+              anomalyContent={anomalyContent}
+              setAnomalyContent={setAnomalyContent}
+              userPlanetCount={userPlanetCount}
+              communityPlanetCount={communityPlanetCount}
+            />
+          </div>
+
+          {/* Mobile controls: show a floating button to open controls, and a bottom sheet/modal */}
+          <div className="md:hidden">
+            <button
+              className="fixed bottom-6 right-6 z-50 bg-[#181e2a] border border-[#78cce2] text-[#78cce2] rounded-full px-5 py-3 shadow-lg font-bold text-base flex items-center gap-2"
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open Controls"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#78cce2" fillOpacity="0.18"/><rect x="10" y="4" width="4" height="8" rx="2" fill="#78cce2"/><rect x="6" y="16" width="12" height="2" rx="1" fill="#f2c572"/></svg>
+              Controls
+            </button>
+            {mobileSidebarOpen && (
+              <div className="fixed inset-0 z-50 bg-black/60 flex flex-col justify-end">
+                <div className="bg-gradient-to-br from-[#181e2a] to-[#10141c] border-t border-[#232b3b] rounded-t-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-[#78cce2] text-lg font-bold">Controls</span>
+                    <button onClick={() => setMobileSidebarOpen(false)} className="text-[#78cce2] text-xl font-bold">×</button>
+                  </div>
+                  {/* Investigation mode toggle */}
+                  <div className="mb-4">
+                    <InvestigationModeSelect value={investigationMode} onChange={setInvestigationMode} />
+                  </div>
+                  {/* Planets list */}
+                  <div className="mb-4">
+                    <div className="text-[#f2c572] text-base font-bold mb-2">Planets</div>
+                    <div className="space-y-2">
+                      {planetAnomalies.length > 0 ? planetAnomalies.map((p, i) => (
+                        <div
+                          key={p.id}
+                          className={`flex items-center gap-2 px-3 py-2 rounded cursor-pointer transition border border-transparent ${i === focusedPlanetIdx ? (investigationMode === 'planets' ? 'bg-[#f2c572]/20 border-[#f2c572]' : 'bg-[#78cce2]/20 border-[#78cce2]') : 'hover:bg-[#232b3b]'}`}
+                          onClick={() => { setFocusedPlanetIdx(i); setMobileSidebarOpen(false); }}
+                        >
+                          <span className={`w-2 h-2 rounded-full inline-block ${investigationMode === 'planets' ? 'bg-[#f2c572]' : 'bg-[#78cce2]'}`}></span>
+                          <span className="text-[#e4eff0] font-mono text-sm">TIC {p.content || p.id}</span>
+                          {i === focusedPlanetIdx && <span className={`text-xs ${investigationMode === 'planets' ? 'text-[#f2c572]' : 'text-[#78cce2]'}`}>Focused</span>}
+                        </div>
+                      )) : (
+                        <div className={investigationMode === 'planets' ? 'text-[#f2c572] text-xs' : 'text-[#78cce2] text-xs'}>
+                          No planets discovered yet.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {/* Weather anomalies (if in weather mode) */}
+                  {investigationMode === 'weather' && (
+                    <div className="mb-4">
+                      <div className="text-[#78cce2] text-base font-bold mb-2">Weather Anomalies</div>
+                      <div className="space-y-2">
+                        {cloudAnomalies.length > 0 ? cloudAnomalies.map((a, i) => (
+                          <div
+                            key={a.id}
+                            className="flex items-center gap-2 px-3 py-2 rounded cursor-pointer hover:bg-[#232b3b] border border-[#78cce2]/30"
+                            onClick={() => {
+                              handleAnomalyClick(generateAnomalyFromDB(a, planetAnomalies[focusedPlanetIdx]?.id || 0, 0));
+                              setMobileSidebarOpen(false);
+                            }}
+                          >
+                            <span className="w-2 h-2 rounded-full bg-[#78cce2] inline-block"></span>
+                            <span className="text-[#e4eff0] font-mono text-sm">{a.content || `Cloud #${a.id}`}</span>
+                          </div>
+                        )) : <div className="text-[#78cce2] text-xs">No weather anomalies for this planet.</div>}
+                      </div>
+                    </div>
+                  )}
+                  {/* Anomaly details (if open) */}
+                  {anomalyContent && (
+                    <div className="mt-8 p-4 bg-[#232b3b] rounded-lg border border-[#78cce2]/30">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-bold text-lg text-[#e4eff0]">Anomaly Details</span>
+                        <button onClick={() => setAnomalyContent(null)} className="text-[#78cce2] hover:underline">Close</button>
+                      </div>
+                      <div className="mb-2 text-xs text-[#78cce2]">Type: <span className="font-semibold">{anomalyContent.type}</span></div>
+                      <div className="whitespace-pre-line text-sm mb-4 text-[#e4eff0]">{anomalyContent.content}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          {/* Bottom description box in main viewport */}
+          <div className="pointer-events-none select-none absolute left-1/2 bottom-8 transform -translate-x-1/2 z-30">
+            <div className="bg-[#00304a]/90 border border-[#78cce2]/20 rounded px-5 py-3 text-xs md:text-sm text-[#e4eff0] font-mono shadow-lg max-w-md text-center">
+              {investigationMode === 'weather' ? (
+                <>
+                  <span className="font-bold text-[#78cce2]">Weather Investigation:</span> Deploy satellites to planets to search for clouds and weather events. Select a planet and click "Deploy Weather Satellite" to begin atmospheric analysis.
+                </>
+              ) : (
+                <>
+                  <span className="font-bold text-[#78cce2]">Planet Investigation:</span> Deploy satellites to confirm planetary properties and monitor for new discoveries. Select a planet and click "Deploy Weather Satellite" to start your mission.
+                </>
+              )}
+            </div>
+          </div>
 
           {/* D-pad and sector/planet info: bottom left, floating, responsive */}
           <SatelliteDPad

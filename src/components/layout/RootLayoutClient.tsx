@@ -53,12 +53,13 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
           setHideSidebar(false);
           return;
         }
-        // Hide sidebar for /posts/[id], /next/[id], /planets/paint/[id], and /viewports/satellite/deploy
+        // Hide sidebar for /posts/[id], /next/[id], /planets/paint/[id], /viewports/satellite/deploy, and /activity/deploy/
         setHideSidebar(
           /^\/posts\/[\w-]+$/.test(path) ||
           /^\/next\/[\w-]+$/.test(path) ||
           /^\/planets\/paint\/[\w-]+$/.test(path) ||
-          path === "/viewports/satellite/deploy"
+          path === "/viewports/satellite/deploy" ||
+          path === "/activity/deploy/"
         );
       }
     };
@@ -88,7 +89,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
                 <div className="flex min-h-screen w-full">
                   {/* Sidebar: fixed to left, does not scroll */}
                   {session && !hideSidebar && (
-                    <div className="fixed left-0 top-0 h-screen z-40">
+                    <div className="hidden sm:block fixed left-0 top-0 h-screen z-40">
                       <Sidebar />
                     </div>
                   )}
