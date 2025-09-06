@@ -86,32 +86,33 @@ export default function Sidebar() {
   };
   const [automatonNotifications, setAutomatonNotifications] = useState<AutomatonNotification[]>([]);
   useEffect(() => {
-    async function fetchDeploymentAndNotifications() {
-      if (!session?.user?.id) return;
+    async function fetchNotifications() {
+      if (!session?.user?.id) {
+        setAutomatonNotifications([]);
+        return;
+      }
       const { data, error } = await supabase
         .from("linked_anomalies")
-        .select("automaton")
+        .select("id, automaton, anomaly_id")
         .eq("author", session.user.id);
-      if (error) return;
-      const deployed = {
-        Satellite: false,
-        Telescope: false,
-        Rover: false,
-        Sunspot: false,
-      };
-      // Collect unique automaton types
-      const automatonSet = new Set();
-      if (Array.isArray(data)) {
-        for (const row of data) {
-          if (row.automaton === "Satellite" || row.automaton === "WeatherSatellite") deployed.Satellite = true;
-          if (row.automaton === "Telescope") deployed.Telescope = true;
-          if (row.automaton === "Rover") deployed.Rover = true;
-          if (row.automaton === "TelescopeSolar") deployed.Sunspot = true;
-          if (row.automaton) automatonSet.add(row.automaton);
-        }
+      if (error || !Array.isArray(data)) {
+        setAutomatonNotifications([]);
+        return;
       }
-      setToolDeployment(deployed);
-      // Human-readable automaton/viewport mapping
+      // Group by automaton
+      const grouped: Record<string, any[]> = {};
+      data.forEach((row) => {
+        if (!grouped[row.automaton]) grouped[row.automaton] = [];
+        grouped[row.automaton].push(row);
+      });
+      // Update toolDeployment state based on presence in linked_anomalies
+      setToolDeployment({
+        Satellite: !!grouped["Satellite"] || !!grouped["WeatherSatellite"],
+        Telescope: !!grouped["Telescope"],
+        Rover: !!grouped["Rover"],
+        Sunspot: !!grouped["TelescopeSolar"],
+      });
+      // Build notifications
       const automatonMap: Record<string, { name: string; section: string; icon: React.ComponentType<{ className?: string }> }> = {
         WeatherSatellite: {
           name: "Weather Satellite",
@@ -139,19 +140,43 @@ export default function Sidebar() {
           icon: SunspotIcon,
         },
       };
-      const notifications: AutomatonNotification[] = Array.from(automatonSet).map((automaton) => {
-        const info = automatonMap[automaton as keyof typeof automatonMap] || { name: String(automaton), section: "Unknown Section", icon: Package };
+      const notifications: AutomatonNotification[] = Object.entries(grouped).map(([automaton, anomalies]) => {
+        const info = automatonMap[automaton] || { name: automaton, section: "Unknown Section", icon: Package };
+        const sorted = [...anomalies].sort((a, b) => (b.id || 0) - (a.id || 0));
+        let message = "";
+        if (automaton === "TelescopeSolar") {
+          message = `The Sunspot Telescope has identified ${sorted.length} sunspot${sorted.length === 1 ? "" : "s"}.`;
+        } else if (automaton === "Satellite" || automaton === "WeatherSatellite") {
+          const latest = sorted[0];
+          message = `Satellite is currently deployed and has found anomaly ID: ${latest?.anomaly_id || "?"}. (${sorted.length} total)`;
+        } else if (automaton === "Telescope") {
+          const latest = sorted[0];
+          message = `Telescope has detected anomaly ID: ${latest?.anomaly_id || "?"}. (${sorted.length} total)`;
+        } else if (automaton === "Rover") {
+          const latest = sorted[0];
+          message = `Rover has discovered anomaly ID: ${latest?.anomaly_id || "?"}. (${sorted.length} total)`;
+        } else {
+          message = `${info.name} is active in the ${info.section}. (${sorted.length} anomaly${sorted.length === 1 ? "" : "ies"})`;
+        }
         return {
-          id: String(automaton),
+          id: String(sorted[0]?.id || automaton),
           type: "deployment" as const,
-          message: `${info.name} is active in the ${info.section}.`,
+          message,
           timestamp: "Active now",
           icon: info.icon,
         };
       });
-      setAutomatonNotifications(notifications);
+      setAutomatonNotifications(notifications.length > 0 ? notifications : [
+        {
+          id: "none",
+          type: "deployment",
+          message: "No deployments or discoveries yet. Deploy an automaton to begin your mission!",
+          timestamp: "",
+          icon: Bell,
+        },
+      ]);
     }
-    fetchDeploymentAndNotifications();
+    fetchNotifications();
   }, [session, supabase]);
   // Responsive: minimised by default on mobile/small desktop
   const getDefaultCollapsed = () => {
@@ -171,12 +196,14 @@ export default function Sidebar() {
   }, [isCollapsed]);
   const [isExpandedMobile, setIsExpandedMobile] = useState(false);
   const navigationItems = [
-    { name: "Settings", icon: Settings, href: "/settings", color: "text-accent" },
+    // { name: "Settings", icon: Settings, href: "/settings", color: "text-accent" },
     { name: "Research", icon: Search, href: "/research", color: "text-primary" },
     { name: "Inventory", icon: Package, href: "/inventory/classifications", color: "text-secondary" },
-    { name: "Feed", icon: Rss, href: "/feed", color: "text-chart-1" }
+    // { name: "Feed", icon: Rss, href: "/feed", color: "text-chart-1" }
   ];
   const Link = require("next/link").default;
+  // ...existing code...
+// ...existing code...
 
   const toolStatuses: ToolStatus[] = [
     {
@@ -359,21 +386,27 @@ export default function Sidebar() {
             </div>
           ) : (
             <div className="space-y-3 max-h-64 overflow-y-auto">
-              {automatonNotifications.map((notification) => (
-                <Card key={notification.id} className="bg-card/30 border-border/20 hover:bg-card/50 transition-colors">
-                  <CardContent className="p-3">
-                    <div className="flex items-start gap-2">
-                      <notification.icon className="h-3 w-3 text-muted-foreground mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-foreground leading-relaxed">
-                          {notification.message}
-                        </p>
-                        <span className="text-xs text-muted-foreground font-mono">{notification.timestamp}</span>
+              {automatonNotifications.length === 0 ? (
+                <div className="text-xs text-muted-foreground font-mono px-2 py-1">No deployments or discoveries yet. Deploy an automaton to begin your mission!</div>
+              ) : (
+                automatonNotifications.map((notification) => (
+                  <Card key={notification.id} className="bg-card/30 border-border/20 hover:bg-card/50 transition-colors">
+                    <CardContent className="p-3">
+                      <div className="flex items-start gap-2">
+                        <notification.icon className="h-3 w-3 text-muted-foreground mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-foreground leading-relaxed">
+                            {notification.message}
+                          </p>
+                          {notification.timestamp && (
+                            <span className="text-xs text-muted-foreground font-mono">{notification.timestamp}</span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           )}
         </div>

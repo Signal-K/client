@@ -85,11 +85,24 @@ export default function DeployTelescopeViewport() {
 
   const fetchTessAnomalies = async () => {
     try {
-      const setsToFetch = ['telescope-tess']
+      // Always include these sets
+      const setsToFetch = ['telescope-tess', 'telescope-minorPlanet'];
 
-      if (skillProgress.telescope >= 4) {
-        setsToFetch.push("telescope-minorPlanet");
-      };
+      // Check if user has 2+ telescope-minorPlanet classifications
+      let includeActiveAsteroids = false;
+      if (session?.user?.id) {
+        const { count, error: countError } = await supabase
+          .from("classifications")
+          .select("id", { count: "exact", head: true })
+          .eq("author", session.user.id)
+          .eq("classificationtype", "telescope-minorPlanet");
+        if (!countError && typeof count === 'number' && count >= 2) {
+          includeActiveAsteroids = true;
+        }
+      }
+      if (includeActiveAsteroids) {
+        setsToFetch.push('active-asteroids');
+      }
 
       const { data, error } = await supabase
         .from("anomalies")
@@ -245,9 +258,10 @@ export default function DeployTelescopeViewport() {
     setDeploying(true);
     const seed = selectedSector.x * 1000 + selectedSector.y;
 
-    // Separate two anomaly sets
+    // Separate anomaly sets
     const planets = tessAnomalies.filter(a => a.anomalySet === 'telescope-tess');
     const asteroids = tessAnomalies.filter(a => a.anomalySet === 'telescope-minorPlanet');
+    const activeAsteroids = tessAnomalies.filter(a => a.anomalySet === 'active-asteroids');
 
     const shuffleAndPick = (arr: DatabaseAnomaly[], count: number) =>
       arr
@@ -258,15 +272,40 @@ export default function DeployTelescopeViewport() {
 
     let selectedAnomalies: DatabaseAnomaly[] = [];
 
-    if (skillProgress.telescope >= 4) {
+    // Check if user can see active-asteroids
+    let canSeeActiveAsteroids = false;
+    if (session?.user?.id) {
+      const { count, error: countError } = await supabase
+        .from("classifications")
+        .select("id", { count: "exact", head: true })
+        .eq("author", session.user.id)
+        .eq("classificationtype", "telescope-minorPlanet");
+      if (!countError && typeof count === 'number' && count >= 2) {
+        canSeeActiveAsteroids = true;
+      }
+    }
+
+    if (canSeeActiveAsteroids) {
+      // Pick from all three sets
+      const planetPick = shuffleAndPick(planets, 1);
+      const asteroidPick = shuffleAndPick(asteroids, 1);
+      const activeAsteroidPick = shuffleAndPick(activeAsteroids, 1);
+      const remaining = shuffleAndPick(
+        [...planets, ...asteroids, ...activeAsteroids].filter(
+          a => !planetPick.includes(a) && !asteroidPick.includes(a) && !activeAsteroidPick.includes(a)
+        ),
+        1
+      );
+      selectedAnomalies = [...planetPick, ...asteroidPick, ...activeAsteroidPick, ...remaining];
+    } else if (skillProgress.telescope >= 4) {
+      // Only planets and asteroids
       const planetPick = shuffleAndPick(planets, 1);
       const asteroidPick = shuffleAndPick(asteroids, 1);
       const remaining = shuffleAndPick([...planets, ...asteroids].filter(a => !planetPick.includes(a) && !asteroidPick.includes(a)), 2);
-
       selectedAnomalies = [...planetPick, ...asteroidPick, ...remaining];
     } else {
       selectedAnomalies = shuffleAndPick(planets, 4); // If the user hasn't unlocked asteroid/DMP project yet
-    };
+    }
 
     if (selectedAnomalies.length === 0) {
       setDeploymentMessage("No anomalies found in selected sector")
