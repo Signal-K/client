@@ -78,12 +78,6 @@ export default function ActivityPage() {
     loading,
   } = usePageData();
 
-  const {
-    activeSatelliteMessage,
-    handleSendSatellite,
-    checkActiveSatellite,
-  } = useSatelliteManagement();
-
   const { showNpsModal, handleCloseNps } = useNPSManagement();
   
   // Use the global theme hook

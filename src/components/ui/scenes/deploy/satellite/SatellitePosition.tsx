@@ -8,7 +8,6 @@ import Section from "@/src/components/sections/Section";
 import WeatherSatelliteMissionType from "./WeatherSatelliteMissionType";
 import SatelliteProgressBar from "./SatelliteProgressBar";
 import SatelliteIcon from "./SatelliteIcon";
-import SatelliteTooltip from "./SatelliteTooltip";
 import {
   getNextSaturdayMidnight,
   getTimeSinceDeploy,
@@ -128,16 +127,6 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
     "/assets/Viewports/Satellite/Satellite_Tile2.png",
     "/assets/Viewports/Satellite/Satellite_Tile3.png",
   ];
-
-  // Time utility functions
-  // --- Utility wrappers for formatting ---
-  const formatTimeSinceDeploy = (deployTime: Date): string => {
-    const { minutes, seconds } = getTimeSinceDeploy(deployTime, currentTime);
-    if (minutes > 0) {
-      return `${minutes}m ${seconds}s`;
-    }
-    return `${seconds}s`;
-  };
 
   const formatTimeRemaining = (): string => {
     const { days, hours, minutes } = getTimeUntilWeekEnd(currentTime);
@@ -429,18 +418,6 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
                   tile={satelliteTiles[currentTileIndex]}
                   unlocked={sat.unlocked}
                 />
-                {hoveredSatellite === sat.id && tooltipData && (
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-20">
-                    <SatelliteTooltip
-                      timeSinceDeploy={formatTimeSinceDeploy(tooltipData.deployTime)}
-                      timeRemaining={tooltipData.timeRemaining}
-                      timeSinceLastAction={tooltipData.timeSinceLastAction}
-                      planetName={tooltipData.planetName}
-                      classificationText={tooltipData.classificationText}
-                      deployTime={tooltipData.deployTime}
-                    />
-                  </div>
-                )}
               </div>
             ))}
           </>
@@ -450,7 +427,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
             <WeatherSatelliteMissionType entries={allWeatherSatEntries} />
           </div>
           {positions[0]?.deployTime && (
-            <div className="pointer-events-auto">
+            <div className="pointer-events-auto flex flex-col items-center">
               <SatelliteProgressBar
                 deployTime={positions[0].deployTime}
                 width={Math.max(180, Math.min(Math.round(sectionDims.width * 0.6), 900))}
@@ -458,6 +435,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
                 classificationId={classificationId ?? undefined}
                 classification={classification ?? undefined}
                 parentWidth={sectionDims.width}
+                investigationType={allWeatherSatEntries && allWeatherSatEntries.length > 1 ? 'weather' : 'planet'}
               />
             </div>
           )}
