@@ -4,8 +4,8 @@ on:
   schedule:
     # Run daily at 4pm AEST (6am UTC)
     - cron: '0 6 * * *'
-  # push:
-  #   branches: [ '*' ]
+  push:
+    branches: [ '*' ]
   workflow_dispatch: # Allow manual triggering
 
 jobs:
