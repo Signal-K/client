@@ -59,21 +59,51 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
   const current = now || new Date();
 
   // Timeline steps for planet investigation
-  // Find first image in media array (anywhere)
-  let firstImage: string | undefined = undefined;
-  if (classification && Array.isArray(classification.media)) {
-    for (const arr of classification.media) {
-      if (Array.isArray(arr)) {
-        for (const url of arr) {
-          if (typeof url === "string" && url.startsWith("http")) {
-            firstImage = url;
+  // Find first image in media array from the classification referenced by linked_anomalies.classification_id
+  const [firstImage, setFirstImage] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    async function fetchFirstImage() {
+      if (investigationType !== "planet" || !session?.user?.id) return;
+      // Get the latest linked_anomalies for this user
+      const { data: linked, error: linkedErr } = await supabase
+        .from("linked_anomalies")
+        .select("classification_id")
+        .eq("author", session.user.id)
+        .order("date", { ascending: false });
+      if (linkedErr || !linked || linked.length === 0) return;
+      const classificationId = linked[0].classification_id;
+      if (!classificationId) return;
+      // Fetch the classification
+      const { data: classData, error: classErr } = await supabase
+        .from("classifications")
+        .select("media")
+        .eq("id", classificationId)
+        .single();
+      if (classErr || !classData || !classData.media) return;
+      // Find first image in media array (anywhere)
+      let foundImage: string | undefined = undefined;
+      if (Array.isArray(classData.media)) {
+        for (const arr of classData.media) {
+          if (Array.isArray(arr)) {
+            for (const url of arr) {
+              if (typeof url === "string" && url.startsWith("http")) {
+                foundImage = url;
+                break;
+              }
+            }
+          } else if (typeof arr === "string" && arr.startsWith("http")) {
+            foundImage = arr;
             break;
           }
+          if (foundImage) break;
         }
       }
-      if (firstImage) break;
+      setFirstImage(foundImage);
     }
-  }
+    fetchFirstImage();
+    // Only run on mount or when investigationType/session changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [investigationType, session?.user?.id]);
 
   const [allWeatherSatEntries, setAllWeatherSatEntries] = useState<any[]>([]);
   const [deploymentCount, setDeploymentCount] = useState<number | null>(null);
@@ -162,7 +192,8 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
     },
     {
       label: "Identify orbital period of planet",
-      description: "User inputs orbital period",
+      // Updated description to inform user to look at dips in the first card
+      description: "Find the period by looking at the dips you annotated in the first card.",
       time: 20 * 60 * 1000,
     },
     {
@@ -356,6 +387,9 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
   const [flux, setFlux] = React.useState<number | null>(null);
   // User result for planet stats
   const [planetStats, setPlanetStats] = React.useState<null | { mass: number; radius: number; density: number; temp: number }>(null);
+  // Classification creation state
+  const [creatingClassification, setCreatingClassification] = useState(false);
+  const [classificationResult, setClassificationResult] = useState<string | null>(null);
 
   // Generate random values on mount (desktop only)
   useEffect(() => {
@@ -400,7 +434,19 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       }}
     >
       {isVertical ? (
-        <>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            position: "relative",
+            zIndex: 5,
+            width: "100%",
+            height: "100%",
+            maxHeight: "80vh",
+            overflowY: "auto",
+          }}
+        >
           <div
             style={{
               flex: 1,
@@ -412,7 +458,6 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
             }}
           >
             {steps.map((step, i) => {
-              if (i % 2 !== 0) return null;
               // Time gating for each card (planet mission)
               if (investigationType === "planet") {
                 if (i === 1 && elapsed < 10 * 60 * 1000) return null;
@@ -455,6 +500,12 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
                     >
                       {step.label}
                     </div>
+                    {/* 1st card: show image from classification if available */}
+                    {investigationType === "planet" && i === 0 && firstImage && (
+                      <div style={{ margin: "8px 0" }}>
+                        <img src={firstImage} alt="Deployment" style={{ maxWidth: 180, borderRadius: 8, border: "1.5px solid #78cce2" }} />
+                      </div>
+                    )}
                     {/* 2nd card: show random stellar values */}
                     {investigationType === "planet" && i === 1 && stellar && (
                       <div style={{ color: "#e4eff0", fontSize: 15, margin: "8px 0" }}>
@@ -816,7 +867,7 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
                 )
             )}
           </div>
-        </>
+  </div>
       ) : (
         <div
           style={{
@@ -1067,6 +1118,12 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
                       >
                         {step.label}
                       </div>
+                      {/* 1st card: show image from classification if available (planet mode) */}
+                      {investigationType === "planet" && i === 0 && firstImage && (
+                        <div style={{ margin: "8px 0" }}>
+                          <img src={firstImage} alt="Deployment" style={{ maxWidth: 180, borderRadius: 8, border: "1.5px solid #78cce2" }} />
+                        </div>
+                      )}
                       {/* 2nd card: show random stellar values */}
                       {investigationType === "planet" && i === 1 && stellar && (
                         <div style={{ color: "#e4eff0", fontSize: 15, margin: "8px 0" }}>
@@ -1110,6 +1167,86 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
                               <div>Radius: <b>{planetStats.radius.toFixed(2)} R⊕</b></div>
                               <div>Density: <b>{planetStats.density.toFixed(2)} g/cm³</b></div>
                               <div>Temperature: <b>{planetStats.temp.toFixed(0)} K</b></div>
+                              {/* Button to create classification and wipe linked_anomalies */}
+                              <button
+                                style={{
+                                  marginTop: 16,
+                                  padding: "8px 22px",
+                                  borderRadius: 6,
+                                  border: "1.5px solid #78cce2",
+                                  background: creatingClassification ? "#78cce2" : "#232b3b",
+                                  color: creatingClassification ? "#232b3b" : "#e4eff0",
+                                  fontSize: 16,
+                                  fontWeight: 600,
+                                  cursor: creatingClassification ? "not-allowed" : "pointer",
+                                  opacity: creatingClassification ? 0.7 : 1,
+                                }}
+                                disabled={creatingClassification}
+                                onClick={async () => {
+                                  if (!session?.user?.id) return;
+                                  setCreatingClassification(true);
+                                  setClassificationResult(null);
+                                  try {
+                                    // Find the current anomaly for this user (planet mode: use first linked_anomalies entry for this user, ignore automaton)
+                                    const { data: linked, error: linkedErr } = await supabase
+                                      .from("linked_anomalies")
+                                      .select("*")
+                                      .eq("author", session.user.id)
+                                      .order("date", { ascending: false });
+                                    if (linkedErr || !linked || linked.length === 0) {
+                                      setClassificationResult("No linked anomaly found for this planet.");
+                                      setCreatingClassification(false);
+                                      return;
+                                    }
+                                    const anomalyId = linked[0].anomaly_id;
+                                    const planetClassificationId = linked[0].classification_id;
+                                    // Prepare stats as plain text
+                                    const statsText = `Mass: ${planetStats.mass.toFixed(2)} M⊕\nRadius: ${planetStats.radius.toFixed(2)} R⊕\nDensity: ${planetStats.density.toFixed(2)} g/cm³\nTemperature: ${planetStats.temp.toFixed(0)} K`;
+                                    // Insert new classification
+                                    const { data: newClass, error: classErr } = await supabase
+                                      .from("classifications")
+                                      .insert([
+                                        {
+                                          content: statsText,
+                                          anomaly: anomalyId,
+                                          classificationType: "planetInspection",
+                                          author: session.user.id,
+                                          classificationConfiguration: {
+                                            stats: planetStats,
+                                            planet_classification_id: planetClassificationId,
+                                          },
+                                        },
+                                      ])
+                                      .select();
+                                    if (classErr || !newClass || newClass.length === 0) {
+                                      setClassificationResult("Failed to create classification.");
+                                      setCreatingClassification(false);
+                                      return;
+                                    }
+                                    // Wipe linked_anomalies for this user and automaton=WeatherSatellite
+                                    const { error: wipeErr } = await supabase
+                                      .from("linked_anomalies")
+                                      .delete()
+                                      .eq("author", session.user.id)
+                                      .eq("automaton", "WeatherSatellite");
+                                    if (wipeErr) {
+                                      setClassificationResult("Classification created, but failed to wipe weather satellite anomalies.");
+                                    } else {
+                                      setClassificationResult("Classification created and weather satellite anomalies wiped.");
+                                    }
+                                  } catch (e) {
+                                    setClassificationResult("Unexpected error: " + (e instanceof Error ? e.message : String(e)));
+                                  }
+                                  setCreatingClassification(false);
+                                }}
+                              >
+                                {creatingClassification ? "Saving..." : "Save Classification & Reset Weather Satellite"}
+                              </button>
+                              {classificationResult && (
+                                <div style={{ marginTop: 10, color: classificationResult.startsWith("Classification created") ? "#78cce2" : "#f66", fontWeight: 500 }}>
+                                  {classificationResult}
+                                </div>
+                              )}
                             </>
                           ) : (
                             <>
