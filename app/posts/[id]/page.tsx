@@ -85,17 +85,14 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
-
       <img
         className="absolute inset-0 w-full h-full object-cover z-0"
         src="/assets/Backdrops/Earth.png"
         alt="Backdrop"
       />
-
       <div className="w-full z-10">
         <GameNavbar />
       </div>
-
       <div className="relative z-10 flex items-center justify-center px-4 py-12 min-h-screen">
         {classification.author && (
           <div className="w-full max-w-3xl">

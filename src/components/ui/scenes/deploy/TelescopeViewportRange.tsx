@@ -13,7 +13,7 @@ import { CheckCircle, Telescope, X, Target } from "lucide-react"
 import DeployTelescopeSidebar from "./sub/TelescopeSidebar"
 import DeployTelescopeMobileHeader from "./sub/TelescopeMobileHeader"
 import DeployTelescopeOverlay from "./sub/TelescopeOverlay"
-
+ 
 export interface DatabaseAnomaly {
   id: number
   content: string | null
@@ -24,13 +24,13 @@ export interface DatabaseAnomaly {
   type?: string
   parentAnomaly: number | null
   anomalySet: string | null
-}
-type LocalAnomaly = Anomaly & { dbData: DatabaseAnomaly }
+};
+type LocalAnomaly = Anomaly & { dbData: DatabaseAnomaly };
 
 function seededRandom1(seed: number, salt: number = 0) {
   let x = Math.sin(seed + salt) * 10000
   return x - Math.floor(x)
-}
+};
 
 function generateAnomalyFromDB(dbAnomaly: DatabaseAnomaly, sectorX: number, sectorY: number): LocalAnomaly {
   const seed = dbAnomaly.id + sectorX * 1000 + sectorY
@@ -55,12 +55,13 @@ function generateAnomalyFromDB(dbAnomaly: DatabaseAnomaly, sectorX: number, sect
     type,
     project: "planet-hunters",
     dbData: dbAnomaly,
-  }
+  };
 };
 
 export default function DeployTelescopeViewport() {
   const supabase = useSupabaseClient()
-  const session = useSession()
+  const session = useSession();
+
   const router = useRouter()
 
   const [currentSector, setCurrentSector] = useState({ x: 0, y: 0 })
@@ -80,15 +81,28 @@ export default function DeployTelescopeViewport() {
   const [deploymentResult, setDeploymentResult] = useState<{
     anomalies: string[]
     sectorName: string
-  } | null>(null)
+  } | null>(null);
 
   const fetchTessAnomalies = async () => {
     try {
-      const setsToFetch = ['telescope-tess']
+      // Always include these sets
+      const setsToFetch = ['telescope-tess', 'telescope-minorPlanet'];
 
-      if (skillProgress.telescope >= 4) {
-        setsToFetch.push("telescope-minorPlanet");
-      };
+      // Check if user has 2+ telescope-minorPlanet classifications
+      let includeActiveAsteroids = false;
+      if (session?.user?.id) {
+        const { count, error: countError } = await supabase
+          .from("classifications")
+          .select("id", { count: "exact", head: true })
+          .eq("author", session.user.id)
+          .eq("classificationtype", "telescope-minorPlanet");
+        if (!countError && typeof count === 'number' && count >= 2) {
+          includeActiveAsteroids = true;
+        }
+      }
+      if (includeActiveAsteroids) {
+        setsToFetch.push('active-asteroids');
+      }
 
       const { data, error } = await supabase
         .from("anomalies")
@@ -244,9 +258,10 @@ export default function DeployTelescopeViewport() {
     setDeploying(true);
     const seed = selectedSector.x * 1000 + selectedSector.y;
 
-    // Separate two anomaly sets
+    // Separate anomaly sets
     const planets = tessAnomalies.filter(a => a.anomalySet === 'telescope-tess');
     const asteroids = tessAnomalies.filter(a => a.anomalySet === 'telescope-minorPlanet');
+    const activeAsteroids = tessAnomalies.filter(a => a.anomalySet === 'active-asteroids');
 
     const shuffleAndPick = (arr: DatabaseAnomaly[], count: number) =>
       arr
@@ -257,15 +272,40 @@ export default function DeployTelescopeViewport() {
 
     let selectedAnomalies: DatabaseAnomaly[] = [];
 
-    if (skillProgress.telescope >= 4) {
+    // Check if user can see active-asteroids
+    let canSeeActiveAsteroids = false;
+    if (session?.user?.id) {
+      const { count, error: countError } = await supabase
+        .from("classifications")
+        .select("id", { count: "exact", head: true })
+        .eq("author", session.user.id)
+        .eq("classificationtype", "telescope-minorPlanet");
+      if (!countError && typeof count === 'number' && count >= 2) {
+        canSeeActiveAsteroids = true;
+      }
+    }
+
+    if (canSeeActiveAsteroids) {
+      // Pick from all three sets
+      const planetPick = shuffleAndPick(planets, 1);
+      const asteroidPick = shuffleAndPick(asteroids, 1);
+      const activeAsteroidPick = shuffleAndPick(activeAsteroids, 1);
+      const remaining = shuffleAndPick(
+        [...planets, ...asteroids, ...activeAsteroids].filter(
+          a => !planetPick.includes(a) && !asteroidPick.includes(a) && !activeAsteroidPick.includes(a)
+        ),
+        1
+      );
+      selectedAnomalies = [...planetPick, ...asteroidPick, ...activeAsteroidPick, ...remaining];
+    } else if (skillProgress.telescope >= 4) {
+      // Only planets and asteroids
       const planetPick = shuffleAndPick(planets, 1);
       const asteroidPick = shuffleAndPick(asteroids, 1);
       const remaining = shuffleAndPick([...planets, ...asteroids].filter(a => !planetPick.includes(a) && !asteroidPick.includes(a)), 2);
-
       selectedAnomalies = [...planetPick, ...asteroidPick, ...remaining];
     } else {
       selectedAnomalies = shuffleAndPick(planets, 4); // If the user hasn't unlocked asteroid/DMP project yet
-    };
+    }
 
     if (selectedAnomalies.length === 0) {
       setDeploymentMessage("No anomalies found in selected sector")
@@ -351,6 +391,19 @@ export default function DeployTelescopeViewport() {
   }
   const handleMouseUp = () => setIsDragging(false)
 
+  // D-Pad handlers
+  const handleDPad = (dir: "up" | "down" | "left" | "right") => {
+    setCurrentSector((prev) => {
+      switch (dir) {
+        case "up": return { x: prev.x, y: prev.y - 1 };
+        case "down": return { x: prev.x, y: prev.y + 1 };
+        case "left": return { x: prev.x - 1, y: prev.y };
+        case "right": return { x: prev.x + 1, y: prev.y };
+        default: return prev;
+      }
+    });
+  }
+
   const handleConfirmationClose = () => {
     setShowConfirmation(false)
     // Redirect to home after a brief delay to allow user to see the confirmation
@@ -406,20 +459,71 @@ export default function DeployTelescopeViewport() {
         />
       </div>
 
-      {/* Compact Header - Fixed at top */}
-      <div className="absolute top-0 left-0 right-0 z-30 h-16">
-        <DeployTelescopeSidebar
-          tessAnomalies={tessAnomalies}
-          sectorAnomalies={sectorAnomalies}
-          selectedSector={selectedSector}
-          alreadyDeployed={alreadyDeployed}
-          deploying={deploying}
-          deploymentMessage={deploymentMessage}
-          onDeploy={handleDeploy}
-          currentSector={currentSector}
-          setCurrentSector={setCurrentSector}
-          setSelectedSector={setSelectedSector}
-        />
+      {/* Sidebar controls - vertical left panel, content-wrapping, not full height */}
+      <div className="absolute top-0 left-0 z-30 flex flex-col items-start pt-8 pl-4 gap-4">
+        <div className="bg-[#002439]/90 border border-[#78cce2]/30 rounded-3xl shadow-2xl p-10 min-w-[380px] max-w-[480px] w-[420px] flex flex-col gap-6 justify-between" style={{height: 'auto'}}>
+          <DeployTelescopeSidebar
+            tessAnomalies={tessAnomalies}
+            sectorAnomalies={sectorAnomalies}
+            selectedSector={selectedSector}
+            alreadyDeployed={alreadyDeployed}
+            deploying={deploying}
+            deploymentMessage={deploymentMessage}
+            onDeploy={handleDeploy}
+            currentSector={currentSector}
+            setCurrentSector={setCurrentSector}
+            setSelectedSector={setSelectedSector}
+          />
+        </div>
+      </div>
+
+      {/* Anomaly types deployed info - absolutely positioned at the bottom left of the display */}
+      <div className="fixed bottom-8 left-8 z-40 p-3 rounded bg-[#00304a]/80 border border-[#78cce2]/20 text-[#e4eff0] text-xs font-mono min-w-[260px] max-w-[340px] shadow-lg">
+        <span className="font-bold text-[#78cce2]">Anomaly Types:</span>
+        <ul className="list-disc ml-5 mt-1">
+          <li>Planets (TESS)</li>
+          <li>Asteroids (Minor planets)</li>
+          {tessAnomalies.some(a => a.anomalySet === 'active-asteroids') && (
+            <li>Active Asteroids (asteroids, comets)</li>
+          )}
+        </ul>
+        <div className="mt-2 text-[#78cce2]">
+          <span className="font-semibold">Asteroid projects</span>: asteroids, comets<br/>
+          <span className="font-semibold">Planets</span>: exoplanet candidates
+        </div>
+      </div>
+
+      {/* D-Pad Controls - floating bottom right overlay, cross layout */}
+      <div className="fixed bottom-12 right-12 z-40 flex flex-col items-center">
+        <div className="bg-[#002439]/90 border border-[#78cce2]/30 rounded-3xl shadow-2xl p-8 flex flex-col items-center">
+          <div className="grid grid-cols-3 grid-rows-3 gap-4 w-48 h-48 mb-2 relative">
+            <div></div>
+            <button
+              aria-label="Move Up"
+              className="bg-[#78cce2] hover:bg-[#e4eff0] text-[#002439] rounded-full w-16 h-16 shadow-lg border-2 border-[#005066] flex items-center justify-center text-2xl font-bold transition"
+              onClick={() => handleDPad("up")}
+            >↑</button>
+            <div></div>
+            <button
+              aria-label="Move Left"
+              className="bg-[#78cce2] hover:bg-[#e4eff0] text-[#002439] rounded-full w-16 h-16 shadow-lg border-2 border-[#005066] flex items-center justify-center text-2xl font-bold transition"
+              onClick={() => handleDPad("left")}
+            >←</button>
+            <div className="bg-[#005066] rounded-full border-2 border-[#78cce2] w-16 h-16 flex items-center justify-center text-xl text-[#78cce2] font-mono">{currentSector.x},{currentSector.y}</div>
+            <button
+              aria-label="Move Right"
+              className="bg-[#78cce2] hover:bg-[#e4eff0] text-[#002439] rounded-full w-16 h-16 shadow-lg border-2 border-[#005066] flex items-center justify-center text-2xl font-bold transition"
+              onClick={() => handleDPad("right")}
+            >→</button>
+            <div></div>
+            <button
+              aria-label="Move Down"
+              className="bg-[#78cce2] hover:bg-[#e4eff0] text-[#002439] rounded-full w-16 h-16 shadow-lg border-2 border-[#005066] flex items-center justify-center text-2xl font-bold transition"
+              onClick={() => handleDPad("down")}
+            >↓</button>
+            <div></div>
+          </div>
+        </div>
       </div>
 
       {/* Sector Status Overlay */}

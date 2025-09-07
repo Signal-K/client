@@ -81,6 +81,20 @@ export default function PlanetGeneratorPage() {
     fetchPlanetData()
   }, [planetId, supabase])
 
+  // Hide sidebar for this page
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("sidebar:collapse", { detail: { collapsed: true } }));
+      window.localStorage.setItem("hideSidebar", "true");
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem("hideSidebar");
+        window.dispatchEvent(new CustomEvent("sidebar:collapse", { detail: { collapsed: false } }));
+      }
+    };
+  }, []);
+
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-black text-white">
@@ -135,7 +149,7 @@ export default function PlanetGeneratorPage() {
                 <Button variant="outline" onClick={() => router.push(`/structures/telescope`)}>
                   🧬 Back to Telescope
                 </Button>
-                <Button variant="ghost" onClick={() => router.push("/")}>
+                <Button variant="ghost" onClick={() => router.push("/")}> 
                   🏠 Home
                 </Button>
               </div>

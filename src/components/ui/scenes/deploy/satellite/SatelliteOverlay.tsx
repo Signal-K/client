@@ -6,7 +6,7 @@ interface Props {
   selectedSector: { x: number; y: number } | null
 };
 
-export default function DeployTelescopeOverlay({
+export default function DeploySatelliteOverlay({
   sectorAnomalies,
   currentSector,
   selectedSector,
@@ -36,7 +36,7 @@ export default function DeployTelescopeOverlay({
       </div>
 
       <div className="absolute top-6 lg:top-12 left-6 lg:left-12 text-[#78cce2] text-xs">
-        <div>TESS TARGETS: {sectorAnomalies.length}</div>
+        <div>CLOUD TARGETS: {sectorAnomalies.length}</div>
         <div>STATUS: {selectedSector ? "SELECTED" : "SCANNING"}</div>
       </div>
 

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import GameNavbar from "@/src/components/layout/Tes";
 import { Dialog, DialogContent } from "@/src/components/ui/dialog";
-import SatellitePosition from "@/src/components/ui/scenes/deploy/SatellitePosition";
+import SatellitePosition from "@/src/components/ui/scenes/deploy/satellite/SatellitePosition";
 import { usePageData } from "@/hooks/usePageData";
 
 type PageSatellite = {
@@ -17,10 +17,31 @@ type PageSatellite = {
   linkedAnomalyId: string;
 };
 
+
+import { useEffect } from "react";
+
 export default function SatelliteViewportExpandedPage() {
   const router = useRouter();
-  
   const { linkedAnomalies } = usePageData();
+
+  // Calculate start of week (Sunday 00:01 AEST)
+  function getStartOfWeekAEST() {
+    // Get current time in UTC
+    const now = new Date();
+    // Calculate AEST offset (UTC+10)
+    const aestOffsetMs = 10 * 60 * 60 * 1000;
+    // Convert now to AEST
+    const nowAEST = new Date(now.getTime() + aestOffsetMs);
+    // Find previous Sunday in AEST
+    const day = nowAEST.getDay();
+    const diff = nowAEST.getDate() - day;
+    const sundayAEST = new Date(nowAEST);
+    sundayAEST.setDate(diff);
+    sundayAEST.setHours(0, 1, 0, 0); // 00:01
+    // Convert back to UTC for comparison
+    const sundayUTC = new Date(sundayAEST.getTime() - aestOffsetMs);
+    return sundayUTC;
+  }
 
   const satelliteData: (PageSatellite & { deployTime: Date }) | null = (() => {
     const weatherSatelliteAnomaly = linkedAnomalies.find(

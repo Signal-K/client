@@ -10,6 +10,7 @@ import { ArrowLeft, User, Sun, Moon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Switch } from "@/src/components/ui/switch"
 import UseDarkMode from "@/src/shared/hooks/useDarkMode"
+import GameNavbar from "@/src/components/layout/Tes"
 
 export default function NewDeployPage() {
   const router = useRouter()
@@ -47,6 +48,7 @@ export default function NewDeployPage() {
 
   return (
     <div className="h-screen w-full flex flex-col bg-gradient-to-b from-[#002439] to-[#001a2a] overflow-hidden">
+      <GameNavbar />
       <DeployTelescopeViewport />
     </div>
   );

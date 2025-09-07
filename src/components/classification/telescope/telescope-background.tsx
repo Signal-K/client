@@ -200,10 +200,12 @@ export function TelescopeBackground({
             linear-gradient(135deg, #000000 0%, #0a0a1a 50%, #000510 100%)
           `
                 : `
-            radial-gradient(ellipse at 30% 40%, #ffffff 0%, transparent 70%),
-            radial-gradient(ellipse at 70% 60%, #f0f0f0 0%, transparent 70%),
-            radial-gradient(ellipse at 20% 80%, #e0e0e0 0%, transparent 70%),
-            linear-gradient(135deg, #ffffff 0%, #f8f8f8 50%, #e0e0e0 100%)
+            /* More vibrant, textured, and 15% darker for light mode */
+            radial-gradient(ellipse at 30% 40%, #e0e0e0 0%, transparent 65%),
+            radial-gradient(ellipse at 70% 60%, #c8d0e6 0%, transparent 65%),
+            radial-gradient(ellipse at 20% 80%, #b0b8c8 0%, transparent 65%),
+            linear-gradient(135deg, #d0d8e0 0%, #b0b8c8 50%, #a0a8b8 100%),
+            repeating-linear-gradient(120deg, #e0e6f0 0 2px, transparent 2px 8px)
           `,
         }
     }
@@ -343,7 +345,6 @@ export function TelescopeBackground({
 
     loadDataDirectly()
   }, [sectorX, sectorY, showAllAnomalies, variant]) // Include variant in dependencies
-
   if (loading) {
     return (
       <div
@@ -362,13 +363,13 @@ export function TelescopeBackground({
   return (
     <div className="w-full h-full relative overflow-hidden">
       {/* Debug info */}
-      <div className={`absolute top-2 right-2 ${isDarkTheme ? "text-white" : "text-slate-800"} text-xs z-50`}>
+      {/* <div className={`absolute top-2 right-2 ${isDarkTheme ? "text-white" : "text-slate-800"} text-xs z-50`}>
         {variant === "stars-only"
           ? `Stars: ${stars.length} | Mode: Stars Only`
           : variant === "reduced-density"
             ? `Stars: ${stars.length} | Anomalies: ${filteredAnomalies.length} | Mode: Reduced`
             : `Stars: ${stars.length} | Anomalies: ${filteredAnomalies.length} | ${getEnvironmentName()}`}
-      </div>
+      </div> */}
 
       {/* Space Background */}
       <div ref={viewportRef} className="w-full h-full relative" style={getBackgroundStyle()}>
@@ -380,12 +381,16 @@ export function TelescopeBackground({
             style={{
               left: `${star.x}%`,
               top: `${star.y}%`,
-              width: `${Math.max(star.size * 0.5, 1)}px`,
-              height: `${Math.max(star.size * 0.5, 1)}px`,
-              backgroundColor: isDarkTheme ? star.color : "#ffffff",
-              opacity: isDarkTheme ? star.opacity * 0.8 : star.opacity * 0.6,
+              width: `${Math.max(star.size * (isDarkTheme ? 0.5 : 0.8), 1.5)}px`,
+              height: `${Math.max(star.size * (isDarkTheme ? 0.5 : 0.8), 1.5)}px`,
+              backgroundColor: isDarkTheme ? star.color : star.color || "#e6f0ff",
+              opacity: isDarkTheme ? Math.min(star.opacity * 0.8, 1) : Math.min(star.opacity * 1.1, 1),
+              filter: !isDarkTheme ? "drop-shadow(0 0 4px #b0d0ff) brightness(1.2)" : undefined,
               animation: `twinkle ${star.twinkleSpeed}s ease-in-out infinite alternate`,
-              boxShadow: isDarkTheme ? `0 0 ${star.size}px ${star.color}` : `0 0 ${star.size}px #ffffff88`,
+              boxShadow: isDarkTheme
+                ? `0 0 ${star.size}px ${star.color}`
+                : `0 0 ${star.size * 1.5}px #b0d0ff, 0 0 2px #fff`,
+              zIndex: 2,
             }}
           />
         ))}
@@ -430,54 +435,29 @@ export function TelescopeBackground({
         )}
 
         {/* Anomalies - only show if not stars-only variant */}
-        {/* {variant !== "stars-only" &&
+        {variant !== "stars-only" &&
           filteredAnomalies.map((anomaly) => (
-            <AnomalyComponent
-              key={anomaly.id}
-              anomaly={anomaly}
-              onClick={handleAnomalyClick}
-              isHighlighted={selectedAnomaly?.id === anomaly.id}
-            />
+            <div style={!isDarkTheme ? {
+              filter: "drop-shadow(0 0 8px #b0d0ff) brightness(1.1)",
+              zIndex: 3
+            } : {}} key={anomaly.id}>
+              <AnomalyComponent
+                anomaly={anomaly}
+                onClick={handleAnomalyClick}
+                isHighlighted={selectedAnomaly?.id === anomaly.id}
+              />
+            </div>
           ))}
 
-        Info overlay - only show if not stars-only variant
-        {variant !== "stars-only" && !showAllAnomalies && (
-          <div
-            className={`absolute top-4 left-4 ${isDarkTheme ? "bg-[#002439]/90 text-[#78cce2] border-[#78cce2]/30" : "bg-white/90 text-slate-800 border-slate-400/50"} px-3 py-2 rounded-lg text-xs font-mono border backdrop-blur-sm`}
-          >
-            <div>SECTOR: {generateSectorName(sectorX, sectorY)}</div>
-            <div>ANOMALIES: {filteredAnomalies.length}</div>
-            {(variant === "reduced-density" ||
-              ["leo", "inner-solar", "outer-solar", "interstellar", "nebula"].includes(variant)) && (
-              <div>MODE: {getEnvironmentName()}</div>
-            )}
-          </div>
-        )}
-
-        {variant !== "stars-only" && showAllAnomalies && (
-          <div
-            className={`absolute top-4 left-4 ${isDarkTheme ? "bg-[#002439]/90 text-[#78cce2] border-[#78cce2]/30" : "bg-white/90 text-slate-800 border-slate-400/50"} px-3 py-2 rounded-lg text-xs font-mono border backdrop-blur-sm`}
-          >
-            <div>OVERVIEW MODE</div>
-            <div>
-              SHOWING: {filteredAnomalies.length} OF {anomalies.length}
-            </div>
-            {(variant === "reduced-density" ||
-              ["leo", "inner-solar", "outer-solar", "interstellar", "nebula"].includes(variant)) && (
-              <div>MODE: {getEnvironmentName()}</div>
-            )}
-          </div>
-        )} */}
-
         {/* Stars-only mode info overlay */}
-        {variant === "stars-only" && (
+        {/* {variant === "stars-only" && (
           <div
             className={`absolute top-4 left-4 ${isDarkTheme ? "bg-[#002439]/90 text-[#78cce2] border-[#78cce2]/30" : "bg-white/90 text-slate-800 border-slate-400/50"} px-3 py-2 rounded-lg text-xs font-mono border backdrop-blur-sm`}
           >
             <div>STARFIELD MODE</div>
             <div>SECTOR: {generateSectorName(sectorX, sectorY)}</div>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Anomaly Info Panel

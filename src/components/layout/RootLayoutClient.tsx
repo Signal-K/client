@@ -7,6 +7,7 @@ import { useEffect, useState, ReactNode } from "react";
 import { ActivePlanetProvider, useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { UserAnomaliesProvider } from "@/src/core/context/UserAnomalies";
 import { Analytics } from "@vercel/analytics/react";
+// import Sidebar from "../ui/Panels/Sidebar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 // import { PostHogProvider } from "@/components/PostHogProvider";
 
@@ -25,28 +26,40 @@ function LayoutContent({ children }: { children: ReactNode }) {
 export default function RootLayoutClient({ children }: { children: ReactNode }) {
   const [supabaseClient] = useState(() => createPagesBrowserClient());
 
+
+  // Get session from supabaseClient
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    supabaseClient.auth.getSession().then(({ data }) => {
+      setSession(data?.session ?? null);
+    });
+  }, [supabaseClient]);
+
   return (
     <html lang="en">
       <body>
         {/* <PostHogProvider> */}
-          <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
-            {/* <ThemeProviders attribute="class" defaultTheme="system" enableSystem> */}
-            <ActivePlanetProvider>
-              {/* <MissionProvider> */}
-              <UserAnomaliesProvider>
-                <LayoutContent>
-                  {/* <div className="sci-fi-overlay"> ... </div> */}
-                  <div className="relative min-h-screen w-full flex flex-col">
+        <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
+          {/* <ThemeProviders attribute="class" defaultTheme="system" enableSystem> */}
+          <ActivePlanetProvider>
+            {/* <MissionProvider> */}
+            <UserAnomaliesProvider>
+              <LayoutContent>
+                {/* Main content layout without sidebar */}
+                <div className="flex min-h-screen w-full">
+                  <main className="flex-1 min-w-0">
                     {children}
-                  </div>
-                </LayoutContent>
-                <Analytics />
-                <SpeedInsights />
-              </UserAnomaliesProvider>
-              {/* </MissionProvider> */}
-            </ActivePlanetProvider>
-            {/* </ThemeProviders> */}
-          </SessionContextProvider>
+                  </main>
+                </div>
+              </LayoutContent>
+              <Analytics />
+              <SpeedInsights />
+            </UserAnomaliesProvider>
+            {/* </MissionProvider> */}
+          </ActivePlanetProvider>
+          {/* </ThemeProviders> */}
+        </SessionContextProvider>
         {/* </PostHogProvider> */}
       </body>
     </html>
