@@ -178,7 +178,7 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
   // Steps for planet and weather missions
   const planetSteps = [
     {
-      label: "Deploy satellite to your planet",
+      label: "Identify orbital period of your planet",
       description: "Satellite deployed and in transit.",
       time: 0,
       card: firstImage
@@ -191,7 +191,7 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       time: 10 * 60 * 1000,
     },
     {
-      label: "Identify orbital period of planet",
+      label: "Input orbital period",
       // Updated description to inform user to look at dips in the first card
       description: "Find the period by looking at the dips you annotated in the first card.",
       time: 20 * 60 * 1000,
@@ -382,23 +382,60 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
 
   // Inputs and random values
   const [inputs, setInputs] = React.useState<{ [key: number]: string }>({});
-  // Random values for stellar and flux
-  const [stellar, setStellar] = React.useState<{ temp: number; radius: number; mass: number } | null>(null);
+  // Stellar and flux values
+  const [stellar, setStellar] = React.useState<{ temp: number | null; radius: number | null; mass?: number | null } | null>(null);
   const [flux, setFlux] = React.useState<number | null>(null);
+
+  // Fetch stellar values from anomalyConfiguration if available
+  useEffect(() => {
+    async function fetchStellarFromAnomaly() {
+      if (investigationType !== "planet" || !session?.user?.id) return;
+      // Get the latest linked_anomalies for this user
+      const { data: linked, error: linkedErr } = await supabase
+        .from("linked_anomalies")
+        .select("anomaly_id")
+        .eq("author", session.user.id)
+        .order("date", { ascending: false });
+      if (linkedErr || !linked || linked.length === 0) {
+        setStellar(null);
+        return;
+      }
+      const anomalyId = linked[0].anomaly_id;
+      if (!anomalyId) {
+        setStellar(null);
+        return;
+      }
+      // Fetch anomalyConfiguration from anomalies
+      const { data: anomaly, error: anomalyErr } = await supabase
+        .from("anomalies")
+        .select("anomalyConfiguration")
+        .eq("id", anomalyId)
+        .single();
+      if (anomalyErr || !anomaly || !anomaly.anomalyConfiguration) {
+        setStellar(null);
+        return;
+      }
+      let config = anomaly.anomalyConfiguration;
+      // If config is a string, parse it
+      if (typeof config === "string") {
+        try { config = JSON.parse(config); } catch { config = {}; }
+      }
+      setStellar({
+        temp: config.stellar_temperature ?? null,
+        radius: config.stellar_radius ?? null,
+      });
+    }
+    fetchStellarFromAnomaly();
+  }, [investigationType, session?.user?.id, supabase]);
   // User result for planet stats
   const [planetStats, setPlanetStats] = React.useState<null | { mass: number; radius: number; density: number; temp: number }>(null);
   // Classification creation state
   const [creatingClassification, setCreatingClassification] = useState(false);
   const [classificationResult, setClassificationResult] = useState<string | null>(null);
 
-  // Generate random values on mount (desktop only)
+  // Generate random flux value on mount (desktop only)
   useEffect(() => {
     if (investigationType === "planet") {
-      setStellar({
-        temp: Math.round(3000 + Math.random() * 7000), // 3000-10000 K
-        radius: +(0.5 + Math.random() * 1.5).toFixed(2), // 0.5-2.0 solar radii
-        mass: +(0.5 + Math.random() * 1.5).toFixed(2), // 0.5-2.0 solar mass
-      });
       setFlux(+(0.5 + Math.random() * 2.5).toFixed(2)); // 0.5-3.0
     }
   }, [investigationType]);
@@ -506,12 +543,20 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
                         <img src={firstImage} alt="Deployment" style={{ maxWidth: 180, borderRadius: 8, border: "1.5px solid #78cce2" }} />
                       </div>
                     )}
-                    {/* 2nd card: show random stellar values */}
-                    {investigationType === "planet" && i === 1 && stellar && (
+                    {/* 2nd card: show stellar values from anomalyConfiguration if available */}
+                    {investigationType === "planet" && i === 1 && (
                       <div style={{ color: "#e4eff0", fontSize: 15, margin: "8px 0" }}>
-                        <div>Stellar Temp: <b>{stellar.temp} K</b></div>
-                        <div>Stellar Radius: <b>{stellar.radius} R☉</b></div>
-                        <div>Stellar Mass: <b>{stellar.mass} M☉</b></div>
+                        {stellar && (stellar.temp || stellar.radius) ? (
+                          <>
+                            <div>Stellar Temp: <b>{stellar.temp ? `${stellar.temp} Kelvin` : "Unknown"}</b></div>
+                            <div>Stellar Radius: <b>{stellar.radius ? `${stellar.radius} Solar Radii` : "Unknown"}</b></div>
+                          </>
+                        ) : (
+                          <>
+                            <div>Stellar Temp: <b>Unknown</b></div>
+                            <div>Stellar Radius: <b>Unknown</b></div>
+                          </>
+                        )}
                       </div>
                     )}
                     {/* 3rd card: input for orbital period */}
@@ -572,11 +617,21 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
                                 // Radius (R⊕): proportional to (stellar.radius * Math.sqrt(period))
                                 // Density: mass / (radius^3) * 5.5
                                 // Temp: stellar.temp * Math.pow(flux, 0.25) / 2
-                                const mass = stellar.mass * period * flux / 100;
-                                const radius = stellar.radius * Math.sqrt(period) / 5;
-                                const density = mass / Math.pow(radius, 3) * 5.5;
-                                const temp = stellar.temp * Math.pow(flux, 0.25) / 2;
-                                setPlanetStats({ mass, radius, density, temp });
+                                if (
+                                  stellar &&
+                                  typeof stellar.mass === "number" &&
+                                  typeof stellar.radius === "number" &&
+                                  typeof stellar.temp === "number"
+                                ) {
+                                  const mass = stellar.mass * period * flux / 100;
+                                  const radius = stellar.radius * Math.sqrt(period) / 5;
+                                  const density = mass / Math.pow(radius, 3) * 5.5;
+                                  const temp = stellar.temp * Math.pow(flux, 0.25) / 2;
+                                  setPlanetStats({ mass, radius, density, temp });
+                                } else {
+                                  // fallback: skip calculation if any value is missing
+                                  setPlanetStats(null);
+                                }
                               }}
                             >Calculate Planet Stats</button>
                           </>
@@ -1270,11 +1325,20 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
                                   // Radius (R⊕): proportional to (stellar.radius * Math.sqrt(period))
                                   // Density: mass / (radius^3) * 5.5
                                   // Temp: stellar.temp * Math.pow(flux, 0.25) / 2
-                                  const mass = stellar.mass * period * flux / 100;
-                                  const radius = stellar.radius * Math.sqrt(period) / 5;
-                                  const density = mass / Math.pow(radius, 3) * 5.5;
-                                  const temp = stellar.temp * Math.pow(flux, 0.25) / 2;
-                                  setPlanetStats({ mass, radius, density, temp });
+                                  if (
+                                    stellar &&
+                                    typeof stellar.mass === "number" &&
+                                    typeof stellar.radius === "number" &&
+                                    typeof stellar.temp === "number"
+                                  ) {
+                                    const mass = stellar.mass * period * flux / 100;
+                                    const radius = stellar.radius * Math.sqrt(period) / 5;
+                                    const density = mass / Math.pow(radius, 3) * 5.5;
+                                    const temp = stellar.temp * Math.pow(flux, 0.25) / 2;
+                                    setPlanetStats({ mass, radius, density, temp });
+                                  } else {
+                                    setPlanetStats(null);
+                                  }
                                 }}
                               >Calculate Planet Stats</button>
                             </>
