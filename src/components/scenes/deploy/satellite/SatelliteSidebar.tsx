@@ -1,5 +1,5 @@
 import React from "react";
-import InvestigationModeSelect from "./InvestigationModeSelect";
+import InvestigationModeSelect from "./Deploy/InvestigationModeSelect";
 
 type SatelliteSidebarProps = {
   planetAnomalies: any[];

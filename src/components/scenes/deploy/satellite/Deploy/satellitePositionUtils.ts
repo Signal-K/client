@@ -1,5 +1,5 @@
 // Position calculation for satellites
-import { getTimeUntilWeekEnd } from "./satelliteTimeUtils";
+import { getTimeUntilWeekEnd } from "../satelliteTimeUtils";
 
 export const calculateSatellitePosition = (satellite: any, currentTime: Date) => {
   const { totalMs: timeRemainingMs } = getTimeUntilWeekEnd(currentTime);

@@ -5,14 +5,14 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import Section from "@/src/components/sections/Section";
 import WeatherSatelliteMissionType from "./WeatherSatelliteMissionType";
 import SatelliteProgressBar from "./SatelliteProgressBar";
-import SatelliteIcon from "./SatelliteIcon";
+import SatelliteIcon from "./Deploy/SatelliteIcon";
 import {
   getNextSaturdayMidnight,
   getTimeSinceDeploy,
   getTimeUntilWeekEnd,
   getTimeSinceLastAction,
 } from "./satelliteTimeUtils";
-import { calculateSatellitePosition } from "./satellitePositionUtils";
+import { calculateSatellitePosition } from "./Deploy/satellitePositionUtils";
 import { PlanetGeneratorMinimal } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator";
 import { useRouter } from "next/navigation";
 

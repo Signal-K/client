@@ -8,14 +8,14 @@ import type { Anomaly, Star } from "@/types/Structures/telescope"
 import { DatabaseAnomaly } from "../TelescopeViewportRange"
 import { generateSectorName, generateStars } from "@/src/components/classification/telescope/utils/sector-utils"
 import { Button } from "@/src/components/ui/button"
-import SatelliteDeployConfirmation from "./SatelliteDeployConfirmation";
-import InvestigationModeSelect from "./InvestigationModeSelect";
+import SatelliteDeployConfirmation from "./Deploy/SatelliteDeployConfirmation";
+import InvestigationModeSelect from "./Deploy/InvestigationModeSelect";
 import SatelliteSidebar from "./SatelliteSidebar";
 import { useState as useReactState } from "react";
-import SatelliteDPad from "./SatelliteDPad";
-import SatellitePlanetSVG from "./SatellitePlanetSVG";
-import SatelliteCloudIcons from "./SatelliteCloudIcons";
-import SatelliteDeployButton from "./SatelliteDeployButton";
+import SatelliteDPad from "./Deploy/SatelliteDPad";
+import SatellitePlanetSVG from "./Deploy/SatellitePlanetSVG";
+import SatelliteCloudIcons from "./Deploy/SatelliteCloudIcons";
+import SatelliteDeployButton from "./Deploy/SatelliteDeployButton";
 
 type LocalAnomaly = Anomaly & { dbData: DatabaseAnomaly };
 
