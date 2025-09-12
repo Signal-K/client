@@ -102,13 +102,56 @@ export default function AstronomyResearch() {
         glowColor="rgba(67, 97, 238, 0.5)"
       >
         <div className="space-y-6">
+          {/* Planet Hunters Section */}
           <div>
             <h3 className="text-lg font-semibold text-[#4cc9f0] mb-4 border-b border-[#1e3a5f] pb-2">
-              AVAILABLE UPGRADES 
+              PLANET HUNTERS
             </h3>
             <UpgradeItem
-              title="Probe Count ++"
-              description="Increase your probe count to explore more planets & space objects simultaneously"
+              title="Planet Hunters"
+              description="Already unlocked. Contribute to planetary discovery projects."
+              current={1}
+              max={1}
+              cost={0}
+              onUpgrade={() => {}}
+              disabled={true}
+              color="#4361ee"
+            />
+            <LockedItem
+              title="More Data"
+              description="Coming soon. Unlock additional planetary data."
+            />
+          </div>
+
+          {/* Asteroid Hunters Section */}
+          <div>
+            <h3 className="text-lg font-semibold text-[#4cc9f0] mb-4 border-b border-[#1e3a5f] pb-2">
+              ASTEROID HUNTERS
+            </h3>
+            <UpgradeItem
+              title="Asteroid Hunters"
+              description="Already unlocked. Contribute to asteroid discovery projects."
+              current={1}
+              max={1}
+              cost={0}
+              onUpgrade={() => {}}
+              disabled={true}
+              color="#4361ee"
+            />
+            <LockedItem
+              title="Active Asteroids"
+              description="Requires 2 or more entries in the classifications table with a classification type of 'telescope-minorPlanet'."
+            />
+          </div>
+
+          {/* Telescope Tech Section */}
+          <div>
+            <h3 className="text-lg font-semibold text-[#4cc9f0] mb-4 border-b border-[#1e3a5f] pb-2">
+              TELESCOPE TECH
+            </h3>
+            <UpgradeItem
+              title="Increase Receptors"
+              description="Add more anomalies per scan."
               current={userCapacities.probeCount}
               max={3}
               cost={getUpgradeCost(userCapacities.probeCount)}
@@ -118,19 +161,6 @@ export default function AstronomyResearch() {
                 availablePoints < getUpgradeCost(userCapacities.probeCount)
               }
               color="#4361ee"
-            />
-            <UpgradeItem
-              title="Probe Distance ++"
-              description="Extend the reach of your probes to discover objects farther from Earth"
-              current={userCapacities.probeDistance}
-              max={5}
-              cost={getUpgradeCost(userCapacities.probeDistance)}
-              onUpgrade={() => handleUpgrade("probeDistance", userCapacities.probeDistance)}
-              disabled={
-                userCapacities.probeDistance >= 5 ||
-                availablePoints < getUpgradeCost(userCapacities.probeDistance)
-              }
-              color="#4cc9f0"
             />
           </div>
         </div>
