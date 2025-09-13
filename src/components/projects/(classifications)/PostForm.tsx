@@ -289,6 +289,17 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         alert("Failed to create classification. Please try again.");
         return;
       } else {
+        // On successful classification, delete linked_anomalies entries
+        const { error: deleteError } = await supabase
+          .from("linked_anomalies")
+          .delete()
+          .eq("author", session?.user.id)
+          .eq("anomaly_id", anomalyId);
+
+        if (deleteError) {
+          console.error("Error deleting linked anomalies:", deleteError.message);
+        }
+
         const newClassificationId = classificationData.id;
         setClassificationOutput(classificationConfiguration);
         setContent("");

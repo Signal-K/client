@@ -24,6 +24,7 @@ interface PlanetMissionProps {
   clampedStepIdx: number;
   hideCards: boolean;
   creatingClassification: boolean;
+  stepProgress: number;
 }
 
 export default function PlanetMission({
@@ -49,6 +50,7 @@ export default function PlanetMission({
   clampedStepIdx,
   hideCards,
   creatingClassification,
+  stepProgress,
 }: PlanetMissionProps) {
   return (
     <div

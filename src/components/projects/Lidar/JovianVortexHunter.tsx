@@ -22,10 +22,42 @@ interface Props {
 export function StarterJovianVortexHunter({
     anomalyid
 }: Props) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${anomalyid}.png`;
 
     const [part, setPart] = useState(1);
     const [line, setLine] = useState(1);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const checkPreviousClassifications = async () => {
+            if (!session?.user?.id) {
+                setPart(1); // Show tutorial if no user
+                setLoading(false);
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('classifications')
+                .select('id', { count: 'exact' })
+                .eq('author', session.user.id)
+                .eq('classificationtype', 'lidar-jovianVortexHunter');
+
+            if (error) {
+                console.error("Error checking classifications:", error);
+                setPart(1); // Default to tutorial on error
+            } else if (data && data.length > 0) {
+                setPart(2); // Skip tutorial
+            } else {
+                setPart(1); // Show tutorial
+            }
+            setLoading(false);
+        };
+
+        checkPreviousClassifications();
+    }, [session, supabase]);
+
     const nextLine = () => setLine(prevLine => prevLine + 1);
     const nextPart = () => {
         setPart(2);
@@ -33,7 +65,7 @@ export function StarterJovianVortexHunter({
     };
 
     const tutorialContent = (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-2xl lg:max-w-4xl overflow-y-auto max-h-[90vh] rounded-lg">
             <div className="p-4 bg-[#2C3A4A] border border-[#85DDA2] rounded-md shadow-md relative w-full">
                 <div className="relative">
                     <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
@@ -110,6 +142,10 @@ export function StarterJovianVortexHunter({
             </div>
         </div>
     );
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="rounded-lg">

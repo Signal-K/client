@@ -86,6 +86,8 @@ export default function DeploySatelliteViewport() {
   const [cloudAnomalies, setCloudAnomalies] = useState<DatabaseAnomaly[]>([])
   // For stats
   const [userPlanetCount, setUserPlanetCount] = useState<number>(0)
+  const [userCloudClassifications, setUserCloudClassifications] = useState<number>(0);
+  const [cloudInvestigationDescription, setCloudInvestigationDescription] = useState<string>('');
   // Remove userPlanets, always use planetAnomalies for sidebar
   const [communityPlanetCount, setCommunityPlanetCount] = useState<number>(0)
   const [stars, setStars] = useState<Star[]>([])
@@ -155,12 +157,23 @@ export default function DeploySatelliteViewport() {
   };
 
   // Fetch up to 10 cloud anomalies for a given planet id
-  const fetchCloudAnomalies = async (planetId: number) => {
+  const fetchCloudAnomalies = async (planetId: number, cloudClassificationCount: number) => {
+    let anomalySets: string[] = [];
+    let description = "Investigating clouds on terrestrial planets.";
+
+    if (cloudClassificationCount >= 2) {
+      anomalySets = ["lidar-jovianVortexHunter", "cloudspottingOnMars", "balloon-marsCloudShapes"];
+      description = "Investigating radar clouds, clouds on terrestrial planets, and clouds on gaseous planets.";
+    } else {
+      anomalySets = ["cloudspottingOnMars"];
+    }
+    setCloudInvestigationDescription(description);
+
     try {
       const { data, error } = await supabase
         .from("anomalies")
         .select("*")
-        .in("anomalySet", ["lidar-jovianVortexHunter", "cloudspottingOnMars", "balloon-marsCloudShapes"])
+        .in("anomalySet", anomalySets)
         .eq("parentAnomaly", planetId);
       if (!error && data) {
         // Deterministically select up to 10
@@ -198,6 +211,32 @@ export default function DeploySatelliteViewport() {
     } catch (err) {
       setUserPlanetCount(0);
       setCommunityPlanetCount(0);
+    }
+  };
+
+  const fetchUserCloudClassificationCount = async () => {
+    if (!session?.user?.id) {
+      setUserCloudClassifications(0);
+      return 0;
+    }
+    try {
+      const { count, error } = await supabase
+        .from("classifications")
+        .select("id", { count: "exact", head: true })
+        .eq("author", session.user.id)
+        .in("classificationtype", ["cloud", "vortex", "radar"]);
+
+      if (error) {
+        console.error("Error fetching user cloud classifications count:", error);
+        setUserCloudClassifications(0);
+        return 0;
+      }
+      setUserCloudClassifications(count || 0);
+      return count || 0;
+    } catch (err) {
+      console.error("Unexpected error in fetchUserCloudClassificationCount:", err);
+      setUserCloudClassifications(0);
+      return 0;
     }
   };
 
@@ -243,7 +282,7 @@ export default function DeploySatelliteViewport() {
   useEffect(() => {
     if (planetAnomalies.length > 0 && focusedPlanetIdx >= 0 && focusedPlanetIdx < planetAnomalies.length) {
       const planet = planetAnomalies[focusedPlanetIdx];
-      fetchCloudAnomalies(planet.id);
+      fetchCloudAnomalies(planet.id, userCloudClassifications);
       setStars(generateStars(planet.id, 0));
 
       // Fetch stats for the focused planet
@@ -258,12 +297,13 @@ export default function DeploySatelliteViewport() {
       setCloudAnomalies([]);
       setStars([]);
     }
-  }, [planetAnomalies, focusedPlanetIdx]);
+  }, [planetAnomalies, focusedPlanetIdx, userCloudClassifications]);
   // Fetch anomalies and check deployment on mount/session change
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       await fetchPlanetAnomalies();
+      await fetchUserCloudClassificationCount();
       await checkDeployment();
       setLoading(false);
     };
@@ -364,20 +404,26 @@ export default function DeploySatelliteViewport() {
         .eq('anomaly', planet.id)
         .eq('classificationtype', 'planet');
       const classificationId = classifications && classifications[0]?.id;
+      
+      let anomalySets: string[] = [];
+      if (userCloudClassifications >= 2) {
+        anomalySets = ["lidar-jovianVortexHunter", "cloudspottingOnMars", "balloon-marsCloudShapes"];
+      } else {
+        anomalySets = ["cloudspottingOnMars"];
+      }
+
       // Fetch up to 4 cloud anomalies from ANYWHERE in the correct sets
       const { data: allClouds, error: cloudErr } = await supabase
         .from('anomalies')
         .select('id')
-        .in('anomalySet', [
-          'lidar-jovianVortexHunter',
-          'cloudspottingOnMars',
-          'balloon-marsCloudShapes',
-        ]);
+        .in('anomalySet', anomalySets);
+
       if (cloudErr) {
         alert('Failed to fetch cloud anomalies: ' + cloudErr.message);
         return;
       }
-      (allClouds || []).slice(0, 4).forEach((cloud) => {
+      const shuffledClouds = (allClouds || []).sort(() => 0.5 - Math.random());
+      shuffledClouds.slice(0, 4).forEach((cloud) => {
         rows.push({
           author: userId,
           anomaly_id: cloud.id,
@@ -461,9 +507,14 @@ export default function DeploySatelliteViewport() {
             {/* InvestigationModeSelect moved to sidebar */}
           </div>
           {investigationMode === 'weather' && (
-            <div className="flex gap-6 text-xs text-[#78cce2]">
-              <span>Your Planets: <span className="font-bold">{userPlanetCount}</span></span>
-              <span>Community: <span className="font-bold">{communityPlanetCount}</span></span>
+            <div className="flex flex-col items-center gap-2 text-xs text-[#78cce2]">
+              <div className="flex gap-6">
+                <span>Your Planets: <span className="font-bold">{userPlanetCount}</span></span>
+                <span>Community: <span className="font-bold">{communityPlanetCount}</span></span>
+              </div>
+              <div>
+                <p>{cloudInvestigationDescription}</p>
+              </div>
             </div>
           )}
         </div>
@@ -490,6 +541,8 @@ export default function DeploySatelliteViewport() {
               setDuration={(days) => console.log('Set duration:', days)}
               onDeploy={handleDeploy}
               isDeploying={deploying}
+              cloudInvestigationDescription={cloudInvestigationDescription}
+              userCloudClassifications={userCloudClassifications}
             />
           </div>
         </div>
@@ -504,6 +557,8 @@ export default function DeploySatelliteViewport() {
             onDeploy={handleDeploy}
             isDeploying={deploying}
             isMobile
+            cloudInvestigationDescription={cloudInvestigationDescription}
+            userCloudClassifications={userCloudClassifications}
           />
         </div>
 

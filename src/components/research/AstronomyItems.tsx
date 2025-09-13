@@ -8,35 +8,29 @@ import { StatCard } from "@/src/components/research/StatCard";
 import { UpgradeItem } from "@/src/components/research/UpgradeItem";
 import { LockedItem } from "@/src/components/research/LockedItem";
 
-type CapacityKey = "probeCount" | "probeDistance";
-type UserCapacities = Record<CapacityKey, number>;
-
 export default function AstronomyResearch() {
   const supabase = useSupabaseClient();
   const session = useSession();
 
   const [availablePoints, setAvailablePoints] = useState(10);
-  const [userCapacities, setUserCapacities] = useState<UserCapacities>({
-    probeCount: 1,
-    probeDistance: 1,
-  });
-  const [probeRangeDescription, setProbeRangeDescription] = useState("Unknown");
+  const [asteroidClassificationsCount, setAsteroidClassificationsCount] = useState(0);
+  const [receptorCount, setReceptorCount] = useState(1);
 
   const getUpgradeCost = (currentLevel: number): number => {
     return (currentLevel + 1) * 2;
   };
 
-  const handleUpgrade = async (capacity: CapacityKey, currentLevel: number) => {
+  const handleUpgrade = async (capacity: string, currentLevel: number) => {
     const cost = getUpgradeCost(currentLevel);
     if (availablePoints >= cost) {
       setAvailablePoints((prev) => prev - cost);
-      setUserCapacities((prev) => ({
-        ...prev,
-        [capacity]: prev[capacity] + 1,
-      }));
+
+      if (capacity === "receptors") {
+        setReceptorCount((prev) => prev + 1);
+      }
 
       if (session?.user) {
-        const techType = capacity === "probeCount" ? "probecount" : "proberange";
+        const techType = capacity === "receptors" ? "probereceptors" : "";
         await supabase.from("researched").insert([
           {
             user_id: session.user.id,
@@ -63,22 +57,25 @@ export default function AstronomyResearch() {
 
       if (error) throw error;
 
-      let probeCount = 1;
-      let probeDistance = 1;
+      const { data: classifications, error: classificationsError } = await supabase
+        .from("classifications")
+        .select("id")
+        .eq("author", session.user.id)
+        .eq("classificationtype", "telescope-minorPlanet");
 
+      if (classificationsError) throw classificationsError;
+
+      setAsteroidClassificationsCount(classifications.length);
+
+      let receptorCount = 1;
       researched?.forEach(item => {
-        if (item.tech_type === "probecount") probeCount += 1;
-        if (item.tech_type === "proberange") probeDistance += 1;
+        if (item.tech_type === "probereceptors") receptorCount += 1;
       });
 
-      setUserCapacities({ probeCount, probeDistance });
-
-      const response = await fetch(`/api/gameplay/research/upgrades?techType=proberange&count=${probeDistance}`);
-      const data = await response.json();
-      setProbeRangeDescription(data.description);
+      setReceptorCount(receptorCount);
     } catch (err) {
       console.error("Error fetching research data:", err);
-    };
+    }
   };
 
   return (
@@ -110,7 +107,7 @@ export default function AstronomyResearch() {
             <UpgradeItem
               title="Planet Hunters"
               description="Already unlocked. Contribute to planetary discovery projects."
-              current={1}
+              current={0}
               max={1}
               cost={0}
               onUpgrade={() => {}}
@@ -131,16 +128,22 @@ export default function AstronomyResearch() {
             <UpgradeItem
               title="Asteroid Hunters"
               description="Already unlocked. Contribute to asteroid discovery projects."
-              current={1}
+              current={0}
               max={1}
               cost={0}
               onUpgrade={() => {}}
               disabled={true}
               color="#4361ee"
             />
-            <LockedItem
+            <UpgradeItem
               title="Active Asteroids"
               description="Requires 2 or more entries in the classifications table with a classification type of 'telescope-minorPlanet'."
+              current={asteroidClassificationsCount}
+              max={2}
+              cost={0}
+              onUpgrade={() => {}}
+              disabled={asteroidClassificationsCount < 2}
+              color="#4cc9f0"
             />
           </div>
 
@@ -152,14 +155,11 @@ export default function AstronomyResearch() {
             <UpgradeItem
               title="Increase Receptors"
               description="Add more anomalies per scan."
-              current={userCapacities.probeCount}
-              max={3}
-              cost={getUpgradeCost(userCapacities.probeCount)}
-              onUpgrade={() => handleUpgrade("probeCount", userCapacities.probeCount)}
-              disabled={
-                userCapacities.probeCount >= 3 ||
-                availablePoints < getUpgradeCost(userCapacities.probeCount)
-              }
+              current={receptorCount}
+              max={Infinity}
+              cost={getUpgradeCost(receptorCount)}
+              onUpgrade={() => handleUpgrade("receptors", receptorCount)}
+              disabled={availablePoints < getUpgradeCost(receptorCount)}
               color="#4361ee"
             />
           </div>

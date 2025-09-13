@@ -105,7 +105,6 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
   // Parse times
   const deploy =
     typeof deployTime === "string" ? new Date(deployTime) : deployTime;
-  const current = now || new Date();
 
   // Timeline steps for planet investigation
   // Find first image in media array from the classification referenced by linked_anomalies.classification_id
@@ -218,6 +217,26 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
   }>({});
   const [classifications, setClassifications] = useState<any[]>([]);
   const [pauseIdx, setPauseIdx] = useState<number | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [currentTime, setCurrentTime] = useState(now || new Date());
+  const current = currentTime;
+
+  // --- State for calculated weather values ---
+  const [weatherProgress, setWeatherProgress] = useState({
+    weatherStepIdx: 0,
+    weatherStepProgress: 0,
+    weatherDirection: "right" as "right" | "left",
+    currentAnomaly: null as any,
+    anomalyPause: false,
+    waitingForNextAnomaly: false,
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   function getAESTWeekStart(date: Date) {
     // Convert to AEST (UTC+10)
@@ -247,7 +266,7 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       // All entries (ignore time)
       const { data: allEntries, error: allErr } = await supabase
         .from("linked_anomalies")
-        .select("*")
+        .select("*, anomaly:anomalies(id, anomalySet)")
         .eq("automaton", "WeatherSatellite")
         .eq("author", session.user.id);
       if (!allErr && allEntries) setAllWeatherSatEntries(allEntries);
@@ -317,6 +336,72 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       time: 40 * 60 * 1000,
     },
   ];
+
+  // Bounce logic: after reaching step 2, bounce between 1 and 2 N times
+  const weatherBounceCount = 4; // number of bounces (forward+back = 1 bounce)
+  const weatherBounceDuration = 10 * 60 * 1000; // 10 minutes per segment
+
+  // NEW, SIMPLIFIED LOGIC FOR WEATHER ANOMALY AVAILABILITY
+  useEffect(() => {
+    if (investigationType !== "weather") return;
+
+    const ONE_HOUR_MS = 60 * 60 * 1000;
+    const elapsedMs = Math.max(0, currentTime.getTime() - deploy.getTime());
+
+    // Find the first unclassified anomaly
+    const nextAnomaly = sortedAnomalies.find(
+      (anomaly) => !anomalyClassifiedMap[anomaly.anomaly_id]
+    );
+
+    if (!nextAnomaly) {
+      // All anomalies are classified, or there are no anomalies
+      setWeatherProgress({
+        weatherStepIdx: 1,
+        weatherStepProgress: 1,
+        weatherDirection: "right",
+        currentAnomaly: null,
+        anomalyPause: false,
+        waitingForNextAnomaly: true, // Show scanning for next event
+      });
+      setTimeRemaining(null);
+      return;
+    }
+
+    // Check if enough time has passed for the *first* anomaly
+    const isReadyForClassification = elapsedMs >= ONE_HOUR_MS;
+
+    if (isReadyForClassification) {
+      // Time is up, ready to classify
+      setWeatherProgress({
+        weatherStepIdx: 2, // Move to the "Finish scanning" step
+        weatherStepProgress: 1,
+        weatherDirection: "right",
+        currentAnomaly: nextAnomaly,
+        anomalyPause: true, // This should show the classification button
+        waitingForNextAnomaly: false,
+      });
+      setTimeRemaining(null);
+    } else {
+      // Still waiting for the 1-hour mark
+      const remainingMs = ONE_HOUR_MS - elapsedMs;
+      setTimeRemaining(remainingMs);
+      setWeatherProgress({
+        weatherStepIdx: 1, // Stay on "Commence scanning"
+        weatherStepProgress: elapsedMs / ONE_HOUR_MS, // Show progress towards 1 hour
+        weatherDirection: "right",
+        currentAnomaly: nextAnomaly,
+        anomalyPause: false,
+        waitingForNextAnomaly: true, // Show "scanning" message
+      });
+    }
+  }, [
+    currentTime,
+    deploy,
+    investigationType,
+    sortedAnomalies,
+    anomalyClassifiedMap,
+  ]);
+
   // For weather: exactly 3 cards, satellite bounces between 2 and 3
   const weatherSteps = [
     {
@@ -330,126 +415,23 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       time: 10 * 60 * 1000,
     },
     {
-      label: "Finish scanning, cloud or storm identified",
-      description: "Cloud or storm identified",
+      label: weatherProgress.waitingForNextAnomaly
+        ? "Scanning for next event"
+        : "Finish scanning, cloud or storm identified",
+      description: weatherProgress.waitingForNextAnomaly
+        ? `Scanning for the next weather event is underway. Time remaining: ${
+            timeRemaining
+              ? `${Math.floor(timeRemaining / 60000)}m ${Math.floor(
+                  (timeRemaining % 60000) / 1000
+                )}s`
+              : "..."
+          }`
+        : `Identified: ${
+            weatherProgress.currentAnomaly?.anomaly?.anomalySet ?? "Cloud or storm"
+          }`,
       time: 20 * 60 * 1000,
     },
   ];
-
-  // Bounce logic: after reaching step 2, bounce between 1 and 2 N times
-  const weatherBounceCount = 4; // number of bounces (forward+back = 1 bounce)
-  const weatherBounceDuration = 10 * 60 * 1000; // 10 minutes per segment
-  // Calculate total duration: initial (0->1->2), then bounce (2->1->2->1...)
-  const initialDuration = weatherSteps[2].time; // 20 min
-  const bounceSegments = weatherBounceCount * 2; // e.g. 4 bounces = 8 segments
-  const totalWeatherDuration =
-    initialDuration + bounceSegments * weatherBounceDuration;
-
-  // Calculate satellite position and direction for weather
-  let weatherStepIdx = 0;
-  let weatherStepProgress = 0;
-  let weatherDirection: "right" | "left" = "right";
-  let currentAnomalyIdx = 0;
-  let currentAnomaly = sortedAnomalies[0];
-  let anomalyPause = false;
-  if (investigationType === "weather" && sortedAnomalies.length > 0) {
-    const elapsedMs = Math.max(0, current.getTime() - deploy.getTime());
-    let anomalyIdx = 0;
-    let anomalyStartTime = 0;
-    let anomalyEndTime = initialDuration;
-    let anomalyClassifiedAt: Date | null = null;
-    for (let i = 0; i < sortedAnomalies.length; i++) {
-      // For each anomaly, after initial, time is based on classification
-      if (i === 0) {
-        anomalyStartTime = 0;
-        anomalyEndTime = initialDuration;
-        anomalyClassifiedAt = null;
-      } else {
-        // For subsequent anomalies, time is based on classification of previous
-        const prevAnomaly = sortedAnomalies[i - 1];
-        // Find classification for prevAnomaly
-        const prevClass = classifications
-          .filter(
-            (c) =>
-              c.anomaly?.toString() === prevAnomaly.anomaly_id.toString() &&
-              c.author === session?.user?.id
-          )
-          .sort(
-            (a, b) =>
-              new Date(b.created_at).getTime() -
-              new Date(a.created_at).getTime()
-          )[0];
-        if (prevClass) {
-          anomalyStartTime = new Date(prevClass.created_at).getTime();
-          anomalyEndTime = anomalyStartTime + weatherBounceDuration * 2;
-        } else {
-          // If no classification, skip this anomaly (not active yet)
-          continue;
-        }
-        anomalyClassifiedAt = null;
-      }
-      // If current time is within this anomaly's window, use it
-      if (
-        (i === 0 && elapsedMs < initialDuration) ||
-        (i > 0 &&
-          current.getTime() >= anomalyStartTime &&
-          current.getTime() < anomalyEndTime)
-      ) {
-        anomalyIdx = i;
-        break;
-      }
-    }
-    currentAnomalyIdx = anomalyIdx;
-    currentAnomaly = sortedAnomalies[anomalyIdx];
-    // Now, determine if we are paused at the third card for this anomaly
-    // If not classified, pause at third card
-    const classified = anomalyClassifiedMap[currentAnomaly.anomaly_id];
-    if (!classified) {
-      weatherStepIdx = 2;
-      weatherStepProgress = 1;
-      weatherDirection = "right";
-      anomalyPause = true;
-    } else {
-      // After classification, start timer for next anomaly
-      // Find classification for this anomaly
-      const thisClass = classifications
-        .filter(
-          (c) =>
-            c.anomaly?.toString() === currentAnomaly.anomaly_id.toString() &&
-            c.author === session?.user?.id
-        )
-        .sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )[0];
-      if (thisClass) {
-        const sinceClass =
-          current.getTime() - new Date(thisClass.created_at).getTime();
-        // Bounce logic: 2->1 (left), 1->2 (right), each 10 min
-        const bounceElapsed = sinceClass;
-        const bounceIdx = Math.floor(bounceElapsed / weatherBounceDuration);
-        const bounceProgress =
-          (bounceElapsed % weatherBounceDuration) / weatherBounceDuration;
-        if (bounceIdx % 2 === 0) {
-          // 2 -> 1
-          weatherStepIdx = 2;
-          weatherStepProgress = 1 - bounceProgress;
-          weatherDirection = "left";
-        } else {
-          // 1 -> 2
-          weatherStepIdx = 1;
-          weatherStepProgress = bounceProgress;
-          weatherDirection = "right";
-        }
-        // Clamp to end if finished all bounces
-        if (bounceIdx >= bounceSegments) {
-          weatherStepIdx = 2;
-          weatherStepProgress = 1;
-          weatherDirection = "right";
-        }
-      }
-    }
-  }
 
   // For planet, use original logic
   let steps;
@@ -481,12 +463,14 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
         : 1;
   } else {
     steps = weatherSteps;
-    totalDuration = totalWeatherDuration;
-    elapsed = Math.max(0, current.getTime() - deploy.getTime());
-    currentStepIdx = weatherStepIdx;
+    const initialDuration = weatherSteps[2].time; // 20 min
+    const bounceSegments = weatherBounceCount * 2;
+    totalDuration = initialDuration + bounceSegments * weatherBounceDuration;
+    elapsed = Math.max(0, currentTime.getTime() - deploy.getTime());
+    currentStepIdx = weatherProgress.weatherStepIdx;
     clampedElapsed = Math.min(elapsed, totalDuration);
-    clampedStepIdx = weatherStepIdx;
-    stepProgress = weatherStepProgress;
+    clampedStepIdx = weatherProgress.weatherStepIdx;
+    stepProgress = weatherProgress.weatherStepProgress;
   }
 
   // Convert height/width to numbers for calculations (default fallback)
@@ -544,74 +528,28 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
     );
 
     // Planet temperature in Kelvin
-    const planetTemp = stellarTemp * Math.sqrt(
-      (stellarRadius * 696340) / (2 * semiMajorAxis * 1.496e11)
-    );
+    const planetTemp =
+      stellarTemp *
+      Math.sqrt((stellarRadius * 696340) / (2 * semiMajorAxis * 1.496e11));
 
     // Mass of the planet in Earth masses (using a simplified mass-radius relation)
     let planetMass;
-    if (planetRadius < 1.6) {
-      planetMass = Math.pow(planetRadius, 3.5);
+    if (planetRadius < 1.5) {
+      // For rocky planets
+      planetMass = Math.pow(planetRadius, 1.0 / 0.56);
     } else {
-      planetMass = 1.5 * Math.pow(planetRadius, 1.5);
+      // For gaseous planets
+      planetMass = Math.pow(10, -0.25 + 0.64 * Math.log10(planetRadius));
     }
 
-    // Density in g/cm^3
-    const planetDensity =
-      (planetMass * 5.972e24) /
-      ((4 / 3) * Math.PI * Math.pow(planetRadius * 6.371e6, 3)) /
-      1000;
+    const planetDensity = calculatePlanetDensity(planetMass, planetRadius);
 
-    let planetType = "unknown";
-    if (planetRadius > 2.5 && planetMass > 5 && planetDensity < 1.5) {
-      planetType = "gas-giant";
-    } else if (planetRadius < 1.6 && planetMass > 0.5 && planetDensity > 3.5) {
-      planetType = "rocky";
-    } else if (
-      planetRadius >= 1.0 &&
-      planetRadius <= 2.5 &&
-      planetDensity >= 1.5 &&
-      planetDensity <= 3.5
-    ) {
-      planetType = "water-world";
-    } else if (planetDensity >= 0.5 && planetDensity <= 2.0) {
-      planetType = "ice";
-    }
-
-    if (session?.user?.id && supabase) {
-      const content = `radius: ${planetRadius}, density: ${planetDensity}, temperature: ${planetTemp}, mass: ${planetMass}, type: ${planetType}, inputs: ${JSON.stringify(
-        inputs
-      )}`;
-      // Find the latest linked anomaly for this user
-      const { data: linked, error: linkedErr } = await supabase
-        .from("linked_anomalies")
-        .select("anomaly_id")
-        .eq("author", session.user.id)
-        .order("date", { ascending: false })
-        .limit(1)
-        .single();
-
-      const anomalyId = linked?.anomaly_id;
-
-      // After classification, clear linked_anomalies for this user and WeatherSatellite
-      await supabase
-        .from("linked_anomalies")
-        .delete()
-        .eq("author", session.user.id)
-        .eq("automaton", "WeatherSatellite");
-
-      await supabase.from("classifications").insert([
-        {
-          author: session.user.id,
-          classificationtype: "planet-inspection",
-          content,
-          anomaly: anomalyId,
-        },
-      ]);
-
-      // Refresh the page after clearing
-      window.location.reload();
-    }
+    const planetType =
+      planetDensity > 3
+        ? "Terrestrial"
+        : planetRadius > 10
+        ? "Gas Giant"
+        : "Super-Earth";
 
     setPlanetStats({
       mass: planetMass,
@@ -620,65 +558,90 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       temp: planetTemp,
       type: planetType,
     });
+
+    // Create a new classification in the database
+    const { data, error } = await supabase
+      .from("classifications")
+      .insert([
+        {
+          author: session?.user?.id,
+          classification_type: "planet-discovery",
+          anomaly: classification?.id,
+          metadata: {
+            planet_mass: planetMass,
+            planet_radius: planetRadius,
+            planet_density: planetDensity,
+            planet_temp: planetTemp,
+            planet_type: planetType,
+            orbital_period: orbitalPeriod,
+            transit_depth: transitDepth,
+          },
+        },
+      ])
+      .select();
+
+    if (error) {
+      console.error("Error creating classification:", error);
+      alert("Failed to save your findings. Please try again.");
+    } else {
+      console.log("Classification created:", data);
+      // Maybe show a success message to the user
+    }
+
     setCreatingClassification(false);
   };
 
-  const handleInputChange = (idx: number, value: string) => {
-    setInputs((prev) => ({ ...prev, [idx]: value }));
-  };
-
-  // Determine which mission component to render
   if (investigationType === "planet") {
     return (
       <PlanetMission
-        isVertical={isVertical}
-        width={width}
-        pxHeight={pxHeight}
-        style={props.style}
+        isVertical={isMobile}
         steps={steps}
-        elapsed={elapsed}
+        clampedStepIdx={clampedStepIdx}
         currentStepIdx={currentStepIdx}
-        firstImage={firstImage}
-        planetStats={planetStats}
-        handleCalculate={handleCalculate}
+        stepProgress={stepProgress}
+        pxHeight={pxHeight}
+        pxWidth={pxWidth}
+        satPos={satPos}
+        satSize={satSize}
+        hideCards={hideCards}
         inputs={inputs}
-        handleInputChange={handleInputChange}
-        stellar={stellar}
-        pxWidth={pxWidth}
-        satPos={satPos}
-        satSize={satSize}
-        barEnd={barEnd}
-        barStart={barStart}
-        segmentLength={segmentLength}
-        clampedStepIdx={clampedStepIdx}
-        hideCards={hideCards}
+        handleCalculate={handleCalculate}
+        planetStats={planetStats}
         creatingClassification={creatingClassification}
-      />
-    );
-  }
-
-  if (investigationType === "weather") {
-    return (
-      <WeatherMission
-        isVertical={isVertical}
-        width={width}
-        pxHeight={pxHeight}
-        style={props.style}
-        steps={steps}
-        currentStepIdx={currentStepIdx}
-        satPos={satPos}
-        satSize={satSize}
-        barEnd={barEnd}
         barStart={barStart}
+        barEnd={barEnd}
         segmentLength={segmentLength}
-        clampedStepIdx={clampedStepIdx}
-        pxWidth={pxWidth}
-        weatherDirection={weatherDirection}
-        isWeatherScanning={isWeatherScanning}
-        hideCards={hideCards}
+        firstImage={firstImage}
+        stellar={stellar}
+        elapsed={elapsed}
+        width={width}
+        handleInputChange={(idx: number, value: string) => {
+          setInputs((prev) => ({ ...prev, [idx]: value }));
+        }}
       />
     );
   }
 
-  return null;
+  return (
+    <WeatherMission
+      isVertical={isMobile}
+      steps={steps}
+      clampedStepIdx={clampedStepIdx}
+      currentStepIdx={currentStepIdx}
+      stepProgress={stepProgress}
+      pxHeight={pxHeight}
+      pxWidth={pxWidth}
+      satPos={satPos}
+      satSize={satSize}
+      hideCards={hideCards}
+      barStart={barStart}
+      barEnd={barEnd}
+      segmentLength={segmentLength}
+      isWeatherScanning={isWeatherScanning}
+      weatherDirection={weatherProgress.weatherDirection}
+      anomalyPause={weatherProgress.anomalyPause}
+      currentAnomaly={weatherProgress.currentAnomaly}
+      width={width}
+    />
+  );
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 // Define props for WeatherMission - these will be passed from SatelliteProgressBar
 interface WeatherMissionProps {
@@ -18,6 +19,9 @@ interface WeatherMissionProps {
   weatherDirection: "left" | "right";
   isWeatherScanning: boolean;
   hideCards: boolean;
+  currentAnomaly: any;
+  anomalyPause: boolean;
+  stepProgress: number;
 }
 
 export default function WeatherMission({
@@ -37,7 +41,27 @@ export default function WeatherMission({
   weatherDirection,
   isWeatherScanning,
   hideCards,
+  currentAnomaly,
+  anomalyPause,
+  stepProgress,
 }: WeatherMissionProps) {
+  const getClaissfyUrl = (anomaly: any) => {
+    if (!anomaly || !anomaly.anomaly || !anomaly.anomaly.anomalySet) return "/";
+    const anomalyId = anomaly.anomaly_id;
+    const anomalySet = anomaly.anomaly.anomalySet;
+
+    switch (anomalySet) {
+      case "lidar-jovianVortexHunter":
+        return `/structures/balloon/jvh/an-${anomalyId}/classify`;
+      case "cloudspottingOnMars":
+        return `/structures/balloon/cloudspotting/an-${anomalyId}/classify`;
+      case "balloon-marsCloudShapes":
+        return `/structures/balloon/shapes/an-${anomalyId}/classify`;
+      default:
+        return "/";
+    }
+  };
+
   return (
     <div
       style={{
@@ -125,6 +149,26 @@ export default function WeatherMission({
                       >
                         {step.description}
                       </div>
+                      {i === 2 && anomalyPause && (
+                        <div style={{ marginTop: 12 }}>
+                          <Link href={getClaissfyUrl(currentAnomaly)} passHref>
+                            <a
+                              style={{
+                                background: "#f2c572",
+                                color: "#181e2a",
+                                padding: "8px 16px",
+                                borderRadius: 8,
+                                textDecoration: "none",
+                                fontWeight: 600,
+                                fontSize: 14,
+                                display: "inline-block",
+                              }}
+                            >
+                              Classify
+                            </a>
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -327,6 +371,26 @@ export default function WeatherMission({
                       >
                         {step.description}
                       </div>
+                      {i === 2 && anomalyPause && (
+                        <div style={{ marginTop: 12 }}>
+                          <Link href={getClaissfyUrl(currentAnomaly)} passHref>
+                            <a
+                              style={{
+                                background: "#f2c572",
+                                color: "#181e2a",
+                                padding: "8px 16px",
+                                borderRadius: 8,
+                                textDecoration: "none",
+                                fontWeight: 600,
+                                fontSize: 14,
+                                display: "inline-block",
+                              }}
+                            >
+                              Classify
+                            </a>
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -538,6 +602,26 @@ export default function WeatherMission({
                       >
                         {step.description}
                       </div>
+                      {i === 2 && anomalyPause && (
+                        <div style={{ marginTop: 12 }}>
+                          <Link href={getClaissfyUrl(currentAnomaly)} passHref legacyBehavior>
+                            <a
+                              style={{
+                                background: "#f2c572",
+                                color: "#181e2a",
+                                padding: "8px 16px",
+                                borderRadius: 8,
+                                textDecoration: "none",
+                                fontWeight: 600,
+                                fontSize: 14,
+                                display: "inline-block",
+                              }}
+                            >
+                              Classify
+                            </a>
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

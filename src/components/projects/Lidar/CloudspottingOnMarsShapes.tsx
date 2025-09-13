@@ -10,7 +10,13 @@ type Anomaly = {
   details?: string;
 };
 
-export function StarterCoMShapes() {
+interface ShapesProps {
+  anomalyid: number;
+};
+
+export function StarterCoMShapes({
+    anomalyid
+}: ShapesProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
 
@@ -30,7 +36,8 @@ export function StarterCoMShapes() {
         const { data: anomalyData, error: anomalyError } = await supabase
           .from("anomalies")
           .select("*")
-          .eq("anomalySet", "balloon-marsCloudShapes");
+          .eq("anomalySet", "balloon-marsCloudShapes")
+          .eq("content", anomalyid);
 
         if (anomalyError) throw anomalyError;
 

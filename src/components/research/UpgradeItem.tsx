@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 interface UpgradeItemProps {
   title: string;
   description: string;
-  current: number;
+  current?: number; // Made optional
   max: number;
   cost: number | string;
   onUpgrade: () => void;
@@ -34,26 +34,24 @@ export const UpgradeItem: React.FC<UpgradeItemProps> = ({
           </p>
         )}
       </div>
-      <Button
-        onClick={onUpgrade}
-        disabled={disabled}
-        className="text-white border-[#1e3a5f]"
-        style={{
-          backgroundColor: color,
-          boxShadow: `0 0 10px ${color}80`, // 50% opacity glow
-        }}
-      >
-        {current < max ? (
-          <>
-            UPGRADE <ArrowRight className="ml-2 w-4 h-4" />
-            <span className="ml-2 bg-transparent px-2 py-1 rounded text-sm text-[#f72585]">
-              {cost}
-            </span>
-          </>
-        ) : (
-          "MAXED"
-        )}
-      </Button>
+      {current !== undefined && current < max ? (
+        <Button
+          onClick={onUpgrade}
+          disabled={disabled}
+          className="text-white border-[#1e3a5f]"
+          style={{
+            backgroundColor: color,
+            boxShadow: `0 0 10px ${color}80`, // 50% opacity glow
+          }}
+        >
+          UPGRADE <ArrowRight className="ml-2 w-4 h-4" />
+          <span className="ml-2 bg-transparent px-2 py-1 rounded text-sm text-[#f72585]">
+            {cost}
+          </span>
+        </Button>
+      ) : (
+        <span className="text-[#f72585] text-sm">MAXED</span>
+      )}
     </div>
   </div>
 );

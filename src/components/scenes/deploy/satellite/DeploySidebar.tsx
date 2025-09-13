@@ -14,6 +14,8 @@ interface DeploySidebarProps {
   onDeploy: () => void;
   isDeploying: boolean;
   isMobile?: boolean;
+  cloudInvestigationDescription?: string;
+  userCloudClassifications?: number;
 }
 
 const DeploySidebar: React.FC<DeploySidebarProps> = ({
@@ -24,6 +26,8 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
   onDeploy,
   isDeploying,
   isMobile = false,
+  cloudInvestigationDescription,
+  userCloudClassifications,
 }) => {
   const containerClasses = isMobile
     ? "w-full bg-gray-900/80 backdrop-blur-md p-4 rounded-t-lg"
@@ -78,6 +82,12 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
                     <li>{duration * 10} Research Points</li>
                     <li>{Math.floor(duration / 5)} Discovery Credits</li>
                 </ul>
+                {investigationMode === 'weather' && (
+                  <>
+                    {cloudInvestigationDescription && <p className="mt-2 text-xs italic">{cloudInvestigationDescription}</p>}
+                    <p className="mt-2 text-xs">Cloud Classifications: {userCloudClassifications}</p>
+                  </>
+                )}
             </div>
         </div>
       </div>

@@ -6,6 +6,8 @@ import { useSessionContext } from "@supabase/auth-helpers-react"
 
 import { StarterLidar } from "@/src/components/projects/Lidar/Clouds"
 import GameNavbar from "@/src/components/layout/Tes"
+import { StarterJovianVortexHunter } from "@/src/components/projects/Lidar/JovianVortexHunter"
+import { StarterCoMShapes } from "@/src/components/projects/Lidar/CloudspottingOnMarsShapes"
 
 export default function BalloonClassifyPage() {
     const params = useParams();
@@ -44,6 +46,21 @@ export default function BalloonClassifyPage() {
                         component = <StarterLidar anomalyid={anomalyid || ""} />
                         break;
                 };
+
+            case "jvh":
+                switch(mission) {
+                    case "classify":
+                        component = <StarterJovianVortexHunter anomalyid={Number(anomalyid || "77311541")} />
+                        break;
+                };
+                break;
+
+            case "shapes":
+                switch(mission) {
+                    case "classify":
+                        component = <StarterCoMShapes anomalyid={anomalyid ? Number(anomalyid) : 0} />
+                        break;
+                };
         };
 
         setMissionComponent(component)
@@ -64,7 +81,7 @@ export default function BalloonClassifyPage() {
             </div>
 
             <main className="relative z-5 py-8 flex justify-center">
-                <div className="w-full max-w-6xl px-4">
+                <div className="w-full max-w-6xl p-4 py-4">
                     {MissionComponent}
                 </div>
             </main>
