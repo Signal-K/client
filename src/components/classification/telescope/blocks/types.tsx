@@ -9,6 +9,7 @@ export interface DatabaseAnomaly {
   created_at: string
   configuration: any
   parentAnomaly: number | null
+  anomalyConfiguration?: string | null;
   anomalySet: string | null
 };
 

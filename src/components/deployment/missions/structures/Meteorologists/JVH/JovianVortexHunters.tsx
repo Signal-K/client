@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../BasePlate";
-import { LidarJVHSatelliteWithId } from "@/src/components/research/projects/Lidar/JovianVortexHunter";
+import { LidarJVHSatelliteWithId } from "@/src/components/projects/Lidar/JovianVortexHunter";
 import { CloudCogIcon, CloudHail, HelpCircle, ShovelIcon } from "lucide-react";
-import { StarterJovianVortexHunter } from "@/src/components/research/projects/Lidar/JovianVortexHunter";
+import { StarterJovianVortexHunter } from "@/src/components/projects/Lidar/JovianVortexHunter";
 import VoteJVH from "./JVHVote";
 // import CloudClassifier from "@/src/components/discovery/data-sources/Meteorologists/JVH/cloud-classifier";
 import JVHCloudClassificationGenerator from "./GaseousPlanetCloudMaker";

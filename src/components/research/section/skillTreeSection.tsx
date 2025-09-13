@@ -1,97 +1,103 @@
 "use client";
 
-import { usePageData } from "@/hooks/usePageData";
-import Section from "@/src/components/sections/Section";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import Link from "next/link";
+import Section from "../../sections/Section";
+import { Button } from "../../ui/button";
 
-export default function ViewportSkillTree() {
-  const { classifications } = usePageData();
+type CapacityKey =
+  | "probeCount"
+  | "probeDistance"
+  | "stationCount"
+  | "balloonCount"
+  | "Seiscam"
+  | "Wheels"
+  | "cameraCount"
+  | "stationSize";
 
-  // Mission definitions by viewport
-  const missions = [
-    {
-      viewport: "Telescope",
-      groups: [
-        {
-          name: "Planet Hunters",
-          types: ["planet"],
-        },
-        {
-          name: "Daily Minor Planet",
-          types: ["telescope-minorPlanet", "active-asteroid"],
-        },
-      ],
-    },
-    {
-      viewport: "Satellite",
-      groups: [
-        {
-          name: "Cloudspotting on Mars",
-          types: ["cloud"],
-        },
-        {
-          name: "Jovian Vortex Hunter",
-          types: ["lidar-jovianVortexHunter"],
-        },
-      ],
-    },
-    {
-      viewport: "Rover",
-      groups: [
-        {
-          name: "AI4Mars",
-          types: ["automaton-aiForMars"],
-        },
-      ],
-    },
-    {
-      viewport: "Solar Health",
-      groups: [
-        {
-          name: "Sunspots",
-          types: ["sunspot"],
-        },
-      ],
-    },
-  ];
+type UserCapacities = Record<CapacityKey, number>;
 
-  // Group user's classifications by mission
-  const missionProgress = missions.map((mission) => ({
-    viewport: mission.viewport,
-    groups: mission.groups.map((group) => {
-      const count = classifications.filter((c) =>
-        group.types.includes((c.classificationtype || "").toLowerCase())
-      ).length;
-      return {
-        name: group.name,
-        count,
-      };
-    }),
-  }));
+export default function ResearchSkillViewport() {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const [userCapacities, setUserCapacities] = useState<UserCapacities | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    const fetchCapacities = async () => {
+      const { data, error } = await supabase
+        .from("user_capacities")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching user capacities:", error);
+      } else {
+        setUserCapacities(data);
+      }
+    };
+
+    fetchCapacities();
+  }, [session, supabase]);
 
   return (
     <Section
-      sectionId="research-skilltree-viewportSkills"
-      variant="minimal"
-      backgroundType="none"
+      sectionId="research-viewport-preview"
+      variant="viewport"
+      backgroundType="interstellar"
+      infoText={""}
+      expandLink={"/research"}
     >
-      <div className="w-full flex flex-col gap-6 py-8 md:py-12">
-        {missionProgress.map((mission) => (
-          <div key={mission.viewport} className="">
-            <h3 className="text-lg font-bold mb-2 text-primary">{mission.viewport} Viewport</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mission.groups.map((group) => (
-                <div key={group.name} className="bg-muted/10 border border-border rounded-lg p-4 flex items-center justify-between">
-                  <span className="font-semibold text-chart-2">{group.name}</span>
-                  <span className="text-xs text-muted-foreground">{group.count} discovered</span>
-                </div>
-              ))}
+      <div className="relative w-full h-full flex items-center justify-center py-8 md:py-12">
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black bg-opacity-50 z-0"></div>
+
+        {/* Content */}
+        <div className="relative z-10 text-center text-white p-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Advance Your Research
+          </h2>
+          <p className="text-lg md:text-xl mb-6 max-w-2xl mx-auto">
+            Unlock new technologies and expand your cosmic reach. Upgrading your
+            equipment allows you to explore further, gather more data, and make
+            groundbreaking discoveries.
+          </p>
+
+          {userCapacities && (
+            <div className="flex justify-center gap-8 mb-8">
+              <div className="text-center">
+                <p className="text-2xl font-bold">
+                  {userCapacities.probeCount}
+                </p>
+                <p className="text-sm">Probes</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold">
+                  {userCapacities.stationCount}
+                </p>
+                <p className="text-sm">Stations</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold">
+                  {userCapacities.balloonCount}
+                </p>
+                <p className="text-sm">Balloons</p>
+              </div>
             </div>
-          </div>
-        ))}
+          )}
+
+          <Link href="/research" passHref>
+            <Button size="lg" className="text-lg">
+              Go to Research
+            </Button>
+          </Link>
+        </div>
       </div>
     </Section>
   );
-}
+};

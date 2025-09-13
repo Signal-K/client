@@ -11,7 +11,7 @@ import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 // import { AtmosphereStructuresOnPlanet, OrbitalStructuresOnPlanet } from "@/src/components/deployment/structures/Structures";
 // import EnhancedWeatherEvents from '@/src/components/ui/scenes/mining/enhanced-weather-events';
 import AllAutomatonsOnActivePlanet from "@/src/components/deployment/structures/auto/AllAutomatons";
-import { EarthViewLayout } from "@/src/components/ui/scenes/planetScene/layout";
+import { EarthViewLayout } from "@/src/components/scenes/planetScene/layout";
 import SimpleeMissionGuide from "@/src/components/deployment/missions/guide";
 import AllSatellitesOnActivePlanet from "@/src/components/deployment/structures/auto/AllSatellites";
 import LandingSS from "@/src/components/profile/auth/landing";

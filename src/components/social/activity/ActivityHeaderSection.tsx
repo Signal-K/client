@@ -1,6 +1,6 @@
 "use client";
 
-import ActivityHeader from "@/src/components/ui/scenes/deploy/ActivityHeader";
+import ActivityHeader from "../../scenes/deploy/ActivityHeader";
 
 interface ActivityHeaderSectionProps {
   classificationsCount: number;

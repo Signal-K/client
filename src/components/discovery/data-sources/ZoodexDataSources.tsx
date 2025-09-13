@@ -3,11 +3,11 @@
 import { CameraIcon, CloudDrizzleIcon, DogIcon, MicroscopeIcon, SunDimIcon, TelescopeIcon, TestTube } from 'lucide-react';
 import { BurrowingOwlIcon } from '../../ui/icons/BurrowingOwl';
 import { FishIcon } from '../../ui/icons/FishIcon';
-import { StarterTelescopeTess } from '../../research/projects/Telescopes/Transiting';
+import { StarterTelescopeTess } from '../../projects/Telescopes/Transiting';
 // import { DailyMinorPlanet } from '../../research/projects/Telescopes/DailyMinorPlanet';
-import { PlanetFourProject } from '../../research/projects/Satellite/PlanetFour';
-import { StarterSunspot } from '../../research/projects/Telescopes/Sunspots';
-import { TelescopeDiskDetector } from '../../research/projects/Telescopes/DiskDetector';
+import { PlanetFourProject } from '../../projects/Satellite/PlanetFour';
+// import { StarterSunspot } from '../../research/projects/Telescopes/Sunspots';
+import { TelescopeDiskDetector } from '../../projects/Telescopes/DiskDetector';
 // import CameraComponent from '../Projects/Zoodex/Upload/Camera';
 // import { DataSourcesModal } from './unlockNewDataSources';
 // import { BurrowingOwl } from '../Projects/Zoodex/burrowingOwls';

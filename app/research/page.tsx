@@ -16,6 +16,7 @@ import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 import Login from "../auth/page";
+import RoverResearch from "@/src/components/research/RoverItems";
 
 type CapacityKey =
   | "probeCount"
@@ -135,9 +136,26 @@ export default function ResearchPage() {
         activityFeed={[]}
         otherClassifications={[]}
       />
-      {/* Main content with more space from sidebar and reduced width */}
+      {/* Navigation Toggle */}
+      <div className="fixed top-20 right-10 z-20">
+        <div className="flex flex-col space-y-2">
+          <Button onClick={() => document.getElementById('astronomy-section')?.scrollIntoView({ behavior: 'smooth' })}>
+            Astronomy
+          </Button>
+          <Button onClick={() => document.getElementById('meteorology-section')?.scrollIntoView({ behavior: 'smooth' })}>
+            Meteorology
+          </Button>
+          <Button onClick={() => document.getElementById('automaton-section')?.scrollIntoView({ behavior: 'smooth' })}>
+            Automaton
+          </Button>
+          <Button onClick={() => document.getElementById('rover-section')?.scrollIntoView({ behavior: 'smooth' })}>
+            Rover
+          </Button>
+        </div>
+      </div>
+      {/* Main content with more space from sidebar and increased width */}
       <div className="w-full flex justify-center pt-24 relative z-10">
-        <div className="w-full max-w-3xl px-6 md:px-8 lg:px-12 xl:px-0">
+        <div className="w-full max-w-5xl px-6 md:px-8 lg:px-12 xl:px-0">
           {/* Activity Header from main page */}
           <div className="mb-10">
             <ActivityHeaderSection
@@ -148,18 +166,26 @@ export default function ResearchPage() {
           </div>
           <main className="w-full flex flex-col gap-0">
             <div className="w-full flex flex-col gap-0" onClick={handleDivClick}>
-              <ResearchSectionModern title="Astronomy" infoText="Explore astronomy research and discoveries." backgroundType="stars">
-                <AstronomyResearch />
-              </ResearchSectionModern>
-              <ResearchSectionModern title="Meteorology" infoText="Study meteorological phenomena and data." backgroundType="planets">
-                <MeteorologyResearch />
-              </ResearchSectionModern>
-              <ResearchSectionModern title="Automaton Surface Rover" infoText="Automaton rover research and surface exploration." backgroundType="rover">
-                <AutomatonSurfaceRoverResearch />
-              </ResearchSectionModern>
-              <ResearchSectionModern title="Biology" infoText="Biological research and findings." backgroundType="planets">
-                <BiologyResearch />
-              </ResearchSectionModern>
+              <div id="astronomy-section">
+                <ResearchSectionModern title="Astronomy" infoText="Explore astronomy research and discoveries." backgroundType="stars">
+                  <AstronomyResearch />
+                </ResearchSectionModern>
+              </div>
+              <div id="meteorology-section">
+                <ResearchSectionModern title="Meteorology" infoText="Study meteorological phenomena and data." backgroundType="planets">
+                  <MeteorologyResearch />
+                </ResearchSectionModern>
+              </div>
+              {/* <div id="automaton-section">
+                <ResearchSectionModern title="Automaton Surface Rover" infoText="Automaton rover research and surface exploration." backgroundType="rover">
+                  <AutomatonSurfaceRoverResearch />
+                </ResearchSectionModern>
+              </div> */}
+              <div id="rover-section">
+                <ResearchSectionModern title="Rover Research" infoText="Explore rover research and technology." backgroundType="rover">
+                  <RoverResearch />
+                </ResearchSectionModern>
+              </div>
             </div>
             <div className="w-full my-8">
               <ReferralCodePanel />
