@@ -159,7 +159,7 @@ export default function ActivityPage() {
           incompletePlanet={incompletePlanet}
         /> */}
 
-        <ViewportSkillTree />
+        {/* <ViewportSkillTree /> */}
 
         {/* Notification Subscription */}
         <NotificationSubscribeButton />

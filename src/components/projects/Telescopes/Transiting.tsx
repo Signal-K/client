@@ -224,13 +224,13 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
             <div className="text-amber-300 text-sm font-medium">
               Complete the tutorial before classifying
             </div>
-            <Button 
+            {!showTutorial && (<Button 
               variant="default" 
               onClick={() => setShowTutorial(true)}
               className="bg-amber-600 hover:bg-amber-700"
             >
               Start Required Tutorial
-            </Button>
+            </Button>)}
           </div>
         ) : (
           <Button variant="outline" onClick={() => setShowTutorial(true)}>
