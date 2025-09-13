@@ -137,7 +137,7 @@ export default function AstronomyResearch() {
             />
             <UpgradeItem
               title="Active Asteroids"
-              description="Requires 2 or more entries in the classifications table with a classification type of 'telescope-minorPlanet'."
+              description="After finding two regular asteroids, you can start looking for asteroids with thermal activity as well as comets!"
               current={asteroidClassificationsCount}
               max={2}
               cost={0}

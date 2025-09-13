@@ -127,7 +127,7 @@ export default function MeteorologyResearch() {
                         </h3>
                         <UpgradeItem
                             title="Terrestrial Cloudspotting"
-                            description="Monitor terrestrial clouds to gather weather data."
+                            description="Monitor terrestrial planets to spot cloud formation."
                             max={1}
                             cost={0}
                             onUpgrade={() => {}}
@@ -136,7 +136,7 @@ export default function MeteorologyResearch() {
                         />
                         <UpgradeItem
                             title="Gaseous Cloudspotting"
-                            description="Unlock gaseous cloud monitoring with advanced radar systems. Requires 2 classifications of type 'cloud'."
+                            description="Unlock gaseous cloud monitoring with advanced radar systems. Requires 2 classifications of weather events on terrestrial planets"
                             current={cloudClassificationsCount}
                             max={2}
                             cost={0}

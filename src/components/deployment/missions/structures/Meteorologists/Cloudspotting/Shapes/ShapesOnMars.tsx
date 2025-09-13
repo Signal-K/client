@@ -30,7 +30,7 @@ const CloudspottingOnMarsShapes = () => {
                 icon: CloudCogIcon,
                 points: 2,
                 completedCount: 0,
-                internalComponent: () => <StarterCoMShapes />,
+                internalComponent: () => <StarterCoMShapes anomalyid={104286112}/>,
                 color: 'text-blue-500',
             },
             {

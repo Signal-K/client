@@ -30,6 +30,7 @@ import SolarHealth from "@/src/components/scenes/deploy/solar/SolarHealth";
 import TelescopeViewportSection from "@/src/components/scenes/deploy/Telescope/TelescopeSection";
 import RoverViewportSection from "@/src/components/scenes/deploy/Rover/RoverSection";
 import ViewportSkillTree from "@/src/components/research/section/skillTreeSection";
+import ResearchSkillViewport from "@/src/components/research/section/skillTreeSection";
 
 type PageSatellite = {
   id: string;
@@ -58,7 +59,7 @@ export default function ActivityPage() {
   } = usePageData();
 
   const { showNpsModal, handleCloseNps } = useNPSManagement();
-  
+
   // Use the global theme hook
   const { isDark, toggleDarkMode } = UseDarkMode();
 
@@ -66,8 +67,10 @@ export default function ActivityPage() {
 
   const needsProfileSetup = !profile?.username || !profile?.full_name;
 
-  const satelliteData: PageSatellite & { deployTime: Date } | null = (() => {
-    const weatherSatelliteAnomaly = linkedAnomalies.find(anomaly => anomaly.automaton === "WeatherSatellite");
+  const satelliteData: (PageSatellite & { deployTime: Date }) | null = (() => {
+    const weatherSatelliteAnomaly = linkedAnomalies.find(
+      (anomaly) => anomaly.automaton === "WeatherSatellite"
+    );
     if (weatherSatelliteAnomaly) {
       return {
         id: "satellite-1",
@@ -88,13 +91,13 @@ export default function ActivityPage() {
     <div className="min-h-screen w-full relative flex justify-center">
       {/* Telescope Background - Full screen behind everything */}
       <div className="fixed inset-0 -z-10">
-        <TelescopeBackground 
-          sectorX={0} 
-          sectorY={0} 
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
           showAllAnomalies={false}
           isDarkTheme={isDark}
           variant="stars-only"
-          onAnomalyClick={(anomaly) => console.log('Clicked anomaly:', anomaly)}
+          onAnomalyClick={(anomaly) => console.log("Clicked anomaly:", anomaly)}
         />
       </div>
 
@@ -110,7 +113,7 @@ export default function ActivityPage() {
 
       <div className="w-full max-w-screen-xl px-4 py-6 space-y-8 pt-24 relative z-10">
         {/* Anonymous User Upgrade Prompt */}
-        <AnonymousUserPrompt 
+        <AnonymousUserPrompt
           classificationsCount={classifications.length}
           discoveryCount={linkedAnomalies.length}
         />
@@ -122,9 +125,9 @@ export default function ActivityPage() {
           onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
         />
 
-        {/* 2x2 Grid for viewports on desktop, single column on mobile */}
+        {/* 2x2 Grid for viewports on desktop, single column on mobile 
         <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-6 w-full">
-          {/* Set a consistent height for all viewports, matching SolarHealth block */}
+          {/* Set a consistent height for all viewports, matching SolarHealth block 
           <div className="w-full h-[420px] md:h-[420px] flex">
             <TelescopeViewportSection />
           </div>
@@ -139,8 +142,15 @@ export default function ActivityPage() {
           </div>
           <div className="w-full h-[420px] md:h-[420px] flex">
             <RoverViewportSection />
-          </div>
-        </div>
+          </div> 
+        </div> */}
+        <TelescopeViewportSection />
+        <SatellitePosition
+          satellites={satelliteData ? [satelliteData] : []}
+          flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
+        />
+        <ResearchSkillViewport />
+        <SolarHealth />
 
         {/* Recent Discoveries */}
         {/* <RecentDiscoveries
@@ -190,8 +200,10 @@ export default function ActivityPage() {
         {/* <LegacyMilestonesSection /> */}
 
         {/* Profile Setup or Complete Structures Section */}
-        {needsProfileSetup &&(
-          <ProfileSetupRequired onOpenProfileModal={() => setShowProfileModal(true)} />
+        {needsProfileSetup && (
+          <ProfileSetupRequired
+            onOpenProfileModal={() => setShowProfileModal(true)}
+          />
         )}
 
         {/* Legacy Tips Panel */}
@@ -207,7 +219,9 @@ export default function ActivityPage() {
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-primary">Complete Your Profile</DialogTitle>
+            <DialogTitle className="text-primary">
+              Complete Your Profile
+            </DialogTitle>
           </DialogHeader>
           <CompleteProfileForm onSuccess={() => setShowProfileModal(false)} />
         </DialogContent>
@@ -228,4 +242,4 @@ export default function ActivityPage() {
       />
     </div>
   );
-};
+}

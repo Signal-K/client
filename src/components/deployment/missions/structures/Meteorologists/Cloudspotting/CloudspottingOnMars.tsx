@@ -80,7 +80,7 @@ const CloudspottingOnMars = () => {
                 icon: Paintbrush2Icon,
                 points: 2,
                 completedCount: 0,
-                internalComponent: () => <StarterCoMShapes />,
+                internalComponent: () => <StarterCoMShapes anomalyid={104286112} />,
                 color: 'text-green-200',
             }
         ];
