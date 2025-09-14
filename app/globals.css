@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 216 23% 94%; /* #ECEFF4 */
+  --foreground: 219 15% 21%; /* #2E3440 */
+
+  --card: 216 23% 92%; /* #E5E9F0 */
+  --card-foreground: 219 15% 21%; /* #2E3440 */
+
+  --popover: 216 23% 88%; /* #D8DEE9 */
+  --popover-foreground: 219 15% 21%; /* #2E3440 */
+
+  --primary: 195 53% 67%; /* #88C0D0 */
+  --primary-foreground: 219 15% 21%; /* #2E3440 */
+
+  --secondary: 214 32% 52%; /* #5E81AC */
+  --secondary-foreground: 216 23% 88%; /* #D8DEE9 */
+
+  --muted: 216 23% 88%; /* #D8DEE9 */
+  --muted-foreground: 219 15% 35%; /* #4C566A */
+
+  --accent: 210 30% 63%; /* #81A1C1 */
+  --accent-foreground: 219 15% 21%; /* #2E3440 */
+
+  --destructive: 355 47% 56%; /* #BF616A */
+  --destructive-foreground: 216 23% 94%; /* #ECEFF4 */
+
+  --border: 216 23% 88%; /* #D8DEE9 */
+  --input: 216 23% 88%; /* #D8DEE9 */
+  --ring: 195 53% 67%; /* #88C0D0 */
+
+  --chart-1: 178 20% 64%; /* #8FBCBB */
+  --chart-2: 195 53% 67%; /* #88C0D0 */
+  --chart-3: 210 30% 63%; /* #81A1C1 */
+  --chart-4: 214 32% 52%; /* #5E81AC */
+  --chart-5: 355 47% 56%; /* #BF616A */
+
+  --radius: 0.5rem;
+  --shadow-2xs: 0px 5px 20px 0px hsl(0 0% 0% / 0.07);
+  --shadow-xs: 0px 5px 20px 0px hsl(0 0% 0% / 0.07);
+  --shadow-sm: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 1px 2px -1px hsl(0 0% 0% / 0.15);
+  --shadow: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 1px 2px -1px hsl(0 0% 0% / 0.15);
+  --shadow-md: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 2px 4px -1px hsl(0 0% 0% / 0.15);
+  --shadow-lg: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 4px 6px -1px hsl(0 0% 0% / 0.15);
+  --shadow-xl: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 8px 10px -1px hsl(0 0% 0% / 0.15);
+  --shadow-2xl: 0px 5px 20px 0px hsl(0 0% 0% / 0.38);
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+  --font-serif: serif;
+  --font-mono: Menlo, Monaco, Consolas, "Courier New", monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
+  --tracking-tight: calc(var(--tracking-normal) - 0.025em);
+  --tracking-normal: 0.025em;
+  --tracking-wide: calc(var(--tracking-normal) + 0.025em);
+  --tracking-wider: calc(var(--tracking-normal) + 0.05em);
+  --tracking-widest: calc(var(--tracking-normal) + 0.1em);
+  --spacing: 0.25rem;
+}
+
+.dark {
+  --background: 219 15% 12%; /* #181A1F */
+  --foreground: 216 23% 88%; /* #D8DEE9 */
+
+  --card: 219 15% 16%; /* #22272E */
+  --card-foreground: 216 23% 88%; /* #D8DEE9 */
+
+  --popover: 219 15% 18%; /* #2B303B */
+  --popover-foreground: 216 23% 88%; /* #D8DEE9 */
+
+  --primary: 195 53% 67%; /* #88C0D0 */
+  --primary-foreground: 219 15% 21%; /* #2E3440 */
+
+  --secondary: 214 32% 52%; /* #5E81AC */
+  --secondary-foreground: 216 23% 88%; /* #D8DEE9 */
+
+  --muted: 219 15% 25%; /* #434C5E */
+  --muted-foreground: 216 23% 70%; /* #A3B1C8 */
+
+  --accent: 210 30% 63%; /* #81A1C1 */
+  --accent-foreground: 216 23% 88%; /* #D8DEE9 */
+
+  --destructive: 355 47% 56%; /* #BF616A */
+  --destructive-foreground: 216 23% 88%; /* #D8DEE9 */
+
+  --border: 219 15% 25%; /* #434C5E */
+  --input: 219 15% 25%; /* #434C5E */
+  --ring: 195 53% 67%; /* #88C0D0 */
+
+  --chart-1: 178 20% 64%; /* #8FBCBB */
+  --chart-2: 195 53% 67%; /* #88C0D0 */
+  --chart-3: 210 30% 63%; /* #81A1C1 */
+  --chart-4: 214 32% 52%; /* #5E81AC */
+  --chart-5: 355 47% 56%; /* #BF616A */
+
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+  --font-mono: Menlo, Monaco, Consolas, "Courier New", monospace;
+  --font-serif: serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --shadow-2xs: 0px 5px 20px 0px hsl(0 0% 0% / 0.07);
+  --shadow-xs: 0px 5px 20px 0px hsl(0 0% 0% / 0.07);
+  --shadow-sm: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 1px 2px -1px hsl(0 0% 0% / 0.15);
+  --shadow: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 1px 2px -1px hsl(0 0% 0% / 0.15);
+  --shadow-md: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 2px 4px -1px hsl(0 0% 0% / 0.15);
+  --shadow-lg: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 4px 6px -1px hsl(0 0% 0% / 0.15);
+  --shadow-xl: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 8px 10px -1px hsl(0 0% 0% / 0.15);
+  --shadow-2xl: 0px 5px 20px 0px hsl(0 0% 0% / 0.38);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    letter-spacing: var(--tracking-normal);
+    /* Minimal background image */
+    background-image: url("/placeholder.svg?height=1000&width=1600");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+}
