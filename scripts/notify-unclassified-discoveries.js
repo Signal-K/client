@@ -218,9 +218,9 @@ async function sendNotificationsToUser(userId, discoveries) {
     const payload = JSON.stringify({
       title,
       body,
-      icon: '/assets/Captn.jpg', // Keep using Captn.jpg for both iOS and Android
-      badge: '/assets/Captn.jpg', // Badge for Android
-      image: '/assets/Captn.jpg', // Large image for rich notifications
+      icon: '/icon-192.png', // Use PNG for Android compatibility
+      badge: '/icon-192.png', // Badge for Android
+      image: '/icon-192.png', // Large image for rich notifications
       url: '/structures/telescope', // Or wherever users go to classify
       tag: 'unclassified-discoveries', // Prevent multiple notifications from stacking
       requireInteraction: true, // Keep notification visible until user interacts
