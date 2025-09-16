@@ -20,6 +20,17 @@ export default function RoverViewportSection() {
     const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null);
     const [showDetailDialog, setShowDetailDialog] = useState(false);
     const [waypoints, setWaypoints] = useState<any[]>([]);
+    const [hoveredWaypoint, setHoveredWaypoint] = useState<string | null>(null);
+    const [hoveredAnomaly, setHoveredAnomaly] = useState<string | null>(null);
+    const [isMobile, setIsMobile] = useState(false);
+    const [routeProgress, setRouteProgress] = useState<string>('');
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
     
     // Check for linked_anomalies of relevant type
     useEffect(() => {
@@ -53,14 +64,41 @@ export default function RoverViewportSection() {
             }));
             setLinkedAnomalies(mapped);
 
+            // Get set of anomaly_ids still linked
+            const linkedIds = new Set((linked || []).map(l => l.anomaly_id));
+
             // Fetch waypoints/routes if rover deployed
             if (linked && linked.length > 0) {
+                // Calculate cutoff: last Sunday 00:01 AEST, which is last Saturday 14:01 UTC
+                const now = new Date();
+                const utcDay = now.getUTCDay(); // 0=Sun, 6=Sat
+                const daysToLastSaturday = utcDay === 6 ? 0 : (utcDay + 1) % 7;
+                const cutoff = new Date(now);
+                cutoff.setUTCDate(now.getUTCDate() - daysToLastSaturday);
+                cutoff.setUTCHours(14, 1, 0, 0);
+
                 const { data: routes, error: routesError } = await supabase
                     .from("routes")
                     .select("*")
                     .eq("author", session.user.id)
+                    .gte("timestamp", cutoff.toISOString())
                     .order("timestamp", { ascending: true });
                 setWaypoints(routes || []);
+
+                // Compute progress for latest route
+                if (routes && routes.length > 0) {
+                    const latestRoute = routes[routes.length - 1];
+                    const config = latestRoute.routeConfiguration;
+                    if (config && config.anomalies) {
+                        const total = config.anomalies.length;
+                        const classified = config.anomalies.filter((id: number) => !linkedIds.has(id)).length;
+                        setRouteProgress(`Anomalies classified: ${classified}/${total}`);
+                    } else {
+                        setRouteProgress('');
+                    }
+                } else {
+                    setRouteProgress('');
+                }
             } else {
                 setWaypoints([]);
             }
@@ -100,32 +138,145 @@ export default function RoverViewportSection() {
                     <div className="h-full w-full relative">
                         {/* Render anomalies */}
                         {linkedAnomalies.map((anomaly) => (
-                            <SciFiAnomalyComponent
+                            <div
                                 key={anomaly.id}
-                                anomaly={anomaly}
-                                onClick={(a) => {
-                                    setSelectedAnomaly(a);
-                                    setShowDetailDialog(true);
-                                }}
-                            />
+                                className="absolute"
+                                style={{ zIndex: 19 }}
+                                onMouseEnter={() => setHoveredAnomaly(anomaly.id)}
+                                onMouseLeave={() => setHoveredAnomaly(null)}
+                            >
+                                <SciFiAnomalyComponent
+                                    anomaly={anomaly}
+                                    onClick={(a) => {
+                                        setSelectedAnomaly(a);
+                                        setShowDetailDialog(true);
+                                    }}
+                                />
+                                {(hoveredAnomaly === anomaly.id || isMobile) && (
+                                    <span className="absolute text-white text-xs bg-black/50 px-1 rounded" style={{ top: '-20px', left: '50%', transform: 'translateX(-50%)' }}>
+                                        Anomaly
+                                    </span>
+                                )}
+                            </div>
                         ))}
-                        {/* Render waypoints if available */}
-                        {waypoints.map((waypoint, idx) => {
-                            // Example: render as a small dot or marker
-                            // You may want to parse routeConfiguration/location for coordinates
+                        {/* Render tracks between waypoints */}
+                        <svg
+                            className="absolute inset-0 w-full h-full pointer-events-none"
+                            style={{ zIndex: 15 }}
+                        >
+                            {waypoints.map((route) => {
+                                const config = route.routeConfiguration;
+                                if (!config || !config.waypoints || config.waypoints.length < 2) return null;
+                                return config.waypoints.slice(1).map((wp: { x: number; y: number }, idx: number) => {
+                                    const prev = config.waypoints[idx];
+                                    return (
+                                        <line
+                                            key={`track-${route.id}-${idx}`}
+                                            x1={`${prev.x}%`}
+                                            y1={`${prev.y}%`}
+                                            x2={`${wp.x}%`}
+                                            y2={`${wp.y}%`}
+                                            stroke="#18dda1"
+                                            strokeWidth={2}
+                                            strokeDasharray="5 5"
+                                            opacity={0.8}
+                                        />
+                                    );
+                                });
+                            })}
+                        </svg>
+                        {/* Render rover just after first waypoint if available */}
+                        {waypoints.map((route) => {
+                            const config = route.routeConfiguration;
+                            if (!config || !config.waypoints || config.waypoints.length < 2) return null;
+                            const wp0 = config.waypoints[0];
+                            const wp1 = config.waypoints[1];
+                            const angle = Math.atan2(wp1.y - wp0.y, wp1.x - wp0.x) * 180 / Math.PI;
+                            // Position rover 10% along the line from wp0 to wp1
+                            const roverX = wp0.x + 0.1 * (wp1.x - wp0.x);
+                            const roverY = wp0.y + 0.1 * (wp1.y - wp0.y);
                             return (
                                 <div
-                                    key={waypoint.id}
-                                    className="absolute w-3 h-3 bg-yellow-400 rounded-full border-2 border-white shadow"
+                                    key={`rover-${route.id}`}
+                                    className="absolute"
                                     style={{
-                                        left: `${(idx * 10) % 90 + 5}%`, // Placeholder: spread out horizontally
-                                        top: `${(idx * 15) % 80 + 10}%`, // Placeholder: spread out vertically
-                                        zIndex: 20,
+                                        left: `${roverX}%`,
+                                        top: `${roverY}%`,
+                                        transform: `translate(-50%, -50%) rotate(${angle}deg)`,
+                                        zIndex: 25,
                                     }}
-                                    title={`Waypoint ${idx + 1}`}
-                                />
+                                >
+                                    <svg width="50" height="25" viewBox="0 0 50 25">
+                                        {/* Body */}
+                                        <rect x="8" y="8" width="34" height="12" fill="#ff3c1a" rx="3" />
+                                        {/* Solar panels */}
+                                        <rect x="2" y="5" width="10" height="18" fill="#18dda1" rx="1" />
+                                        <rect x="38" y="5" width="10" height="18" fill="#18dda1" rx="1" />
+                                        {/* Wheels */}
+                                        <circle cx="12" cy="22" r="4" fill="#333" stroke="#666" strokeWidth="1" />
+                                        <circle cx="25" cy="22" r="4" fill="#333" stroke="#666" strokeWidth="1" />
+                                        <circle cx="38" cy="22" r="4" fill="#333" stroke="#666" strokeWidth="1" />
+                                        {/* Wheel details */}
+                                        <circle cx="12" cy="22" r="1" fill="#666" />
+                                        <circle cx="25" cy="22" r="1" fill="#666" />
+                                        <circle cx="38" cy="22" r="1" fill="#666" />
+                                        {/* Antenna */}
+                                        <line x1="40" y1="8" x2="45" y2="3" stroke="#fff" strokeWidth="2" />
+                                        <circle cx="45" cy="3" r="1" fill="#ff3c1a" />
+                                        {/* Headlights */}
+                                        <circle cx="8" cy="10" r="1.5" fill="#ffff00" />
+                                        <circle cx="8" cy="15" r="1.5" fill="#ffff00" />
+                                        {/* Details on body */}
+                                        <rect x="10" y="10" width="6" height="2" fill="#fff" />
+                                        <rect x="18" y="10" width="6" height="2" fill="#fff" />
+                                        <rect x="26" y="10" width="6" height="2" fill="#fff" />
+                                        {/* Simple animation: pulse */}
+                                        <animateTransform
+                                            attributeName="transform"
+                                            type="scale"
+                                            values="1;1.05;1"
+                                            dur="2s"
+                                            repeatCount="indefinite"
+                                        />
+                                    </svg>
+                                </div>
                             );
                         })}
+                        {/* Render waypoints if available */}
+                        {waypoints.map((route) => {
+                            const config = route.routeConfiguration;
+                            if (!config || !config.waypoints) return null;
+                            return config.waypoints.map((wp: { x: number; y: number }, idx: number) => (
+                                <div
+                                    key={`${route.id}-${idx}`}
+                                    className="absolute"
+                                    style={{
+                                        left: `${wp.x}%`,
+                                        top: `${wp.y}%`,
+                                    }}
+                                    onMouseEnter={() => setHoveredWaypoint(`${route.id}-${idx}`)}
+                                    onMouseLeave={() => setHoveredWaypoint(null)}
+                                >
+                                    <div
+                                        className="w-3 h-3 bg-yellow-400 rounded-full border-2 border-white shadow"
+                                        style={{
+                                            zIndex: 20,
+                                        }}
+                                        title={`Waypoint ${idx + 1}`}
+                                    />
+                                    {(hoveredWaypoint === `${route.id}-${idx}` || isMobile) && (
+                                        <span className="absolute text-white text-xs bg-black/50 px-1 rounded" style={{ top: '-20px', left: '50%', transform: 'translateX(-50%)' }}>
+                                            Waypoint {idx + 1}
+                                        </span>
+                                    )}
+                                </div>
+                            ));
+                        })}
+                        {routeProgress && (
+                            <div className="absolute bottom-0 right-0 text-white text-xs bg-black/50 p-2 rounded m-2">
+                                {routeProgress}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

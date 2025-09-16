@@ -41,6 +41,21 @@ export default function DeployRoverPage() {
     fetchPlanetClassification();
   }, [session, supabase]);
 
+  useEffect(() => {
+    async function checkExistingRoverDeployment() {
+      if (!session) return;
+      const { data: existingDeployments, error } = await supabase
+        .from("linked_anomalies")
+        .select("*")
+        .eq("author", session.user.id)
+        .eq("automaton", "Rover");
+      if (existingDeployments && existingDeployments.length > 0) {
+        window.location.href = "/viewports/roover";
+      }
+    }
+    checkExistingRoverDeployment();
+  }, [session, supabase]);
+
   const {
     linkedAnomalies,
     activityFeed,

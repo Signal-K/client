@@ -45,7 +45,7 @@ type PageSatellite = {
 
 export default function ActivityPage() {
   const session = useSession();
-  
+
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [landmarksExpanded, setLandmarksExpanded] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -150,6 +150,7 @@ export default function ActivityPage() {
           satellites={satelliteData ? [satelliteData] : []}
           flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
         />
+        <RoverViewportSection />
         <ResearchSkillViewport />
         <SolarHealth />
 

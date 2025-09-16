@@ -8,7 +8,7 @@ import { Rocket, Users, Star, Globe, ExternalLink, Calendar, ArrowRight, Github,
 const teamMembers = [
   { 
     img: "Eric.jpg",
-    name: "Liam Arbuckle",
+    name: "Teddy Martin",
     role: "Technical Lead",
     bio: "Full stack engineer with a background in mathematics and decentralised science.",
     social: [
