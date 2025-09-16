@@ -1,7 +1,41 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Rocket, Users, Star, Globe, ExternalLink, Calendar, ArrowRight, Github, Linkedin, Mail } from "lucide-react"
+"use client"
+
+import { Button } from "@/src/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Badge } from "@/src/components/ui/badge"
+import { Rocket, Users, Star, Globe, ExternalLink, Calendar, ArrowRight, Github, Linkedin, Instagram, Mail } from "lucide-react"
+
+const teamMembers = [
+  { 
+    img: "Eric.jpg",
+    name: "Liam Arbuckle",
+    role: "Technical Lead",
+    bio: "Full stack engineer with a background in mathematics and decentralised science.",
+    social: [
+      { platform: "Github", url: "https://github.com/gizmotronn", icon: <Github /> },
+      { platform: "Linkedin", url: "https://www.linkedin.com/in/l-arbuckle/", icon: <Linkedin /> },
+    ],
+  },
+  {
+    img: "Campbells.jpg",
+    name: "Rhys Campbell",
+    role: "Machine Learning Specialist",
+    bio: "Passionate open-source contributor & the brains behind MATR AI.",
+    social: [
+      { platform: "Github", url: "https://github.com/Rhysmalcolm13", icon: <Github /> },
+      { platform: "Linkedin", url: "https://www.linkedin.com/in/rhys-campbell-96a196294/", icon: <Linkedin /> },
+    ],
+  },
+  {
+    img: "Fred.webp",
+    name: "Bruce Chooser",
+    role: "UX Designer",
+    bio: "Cybersecurity consultant and creator of all things audio-visual.",
+    social: [
+      { platform: "Instagram", url: "https://instagram.com/choose_bruce", icon: <Instagram /> },
+    ],
+  },
+];
 
 export default function HomePage() {
   return (
@@ -74,7 +108,7 @@ export default function HomePage() {
             <Card className="group overflow-hidden bg-card border-border hover:shadow-lg transition-all duration-300">
               <div className="aspect-[4/3] bg-gradient-to-br from-primary/20 to-secondary/20 relative overflow-hidden">
                 <img
-                  src="/solar-monitoring-interface.jpg"
+                  src="/assets/Images/landing1.jpg"
                   alt="Solar Health & Sunspots"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -89,7 +123,7 @@ export default function HomePage() {
             <Card className="group overflow-hidden bg-card border-border hover:shadow-lg transition-all duration-300">
               <div className="aspect-[4/3] bg-gradient-to-br from-secondary/20 to-accent/20 relative overflow-hidden">
                 <img
-                  src="/exoplanet-detection-interface.jpg"
+                  src="/assets/Images/landing2.jpg"
                   alt="Finding Planets"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -104,7 +138,7 @@ export default function HomePage() {
             <Card className="group overflow-hidden bg-card border-border hover:shadow-lg transition-all duration-300">
               <div className="aspect-[4/3] bg-gradient-to-br from-accent/20 to-primary/20 relative overflow-hidden">
                 <img
-                  src="/comet-tracking-interface.jpg"
+                  src="/assets/Images/landing3.jpg"
                   alt="Finding Comets"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -119,7 +153,7 @@ export default function HomePage() {
             <Card className="group overflow-hidden bg-card border-border hover:shadow-lg transition-all duration-300">
               <div className="aspect-[4/3] bg-gradient-to-br from-primary/20 to-secondary/20 relative overflow-hidden">
                 <img
-                  src="/asteroid-detection-interface.jpg"
+                  src="/assets/Images/landing4.jpg"
                   alt="Finding Asteroids"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -134,7 +168,7 @@ export default function HomePage() {
             <Card className="group overflow-hidden bg-card border-border hover:shadow-lg transition-all duration-300">
               <div className="aspect-[4/3] bg-gradient-to-br from-secondary/20 to-accent/20 relative overflow-hidden">
                 <img
-                  src="/mars-rover-simulation.jpg"
+                  src="/assets/Images/landing5.jpg"
                   alt="Mars Rover Training"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -149,7 +183,7 @@ export default function HomePage() {
             <Card className="group overflow-hidden bg-card border-border hover:shadow-lg transition-all duration-300">
               <div className="aspect-[4/3] bg-gradient-to-br from-accent/20 to-primary/20 relative overflow-hidden">
                 <img
-                  src="/mars-weather-tracking.jpg"
+                  src="/assets/Images/landing6.jpg"
                   alt="Mars Dust Storms"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -228,98 +262,38 @@ export default function HomePage() {
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-foreground mb-4">Technical team</h3>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-card border-border text-center">
-              <CardHeader>
-                <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <img
-                    src="/team-member-1.jpg"
-                    alt="Teddy Martin"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                </div>
-                <CardTitle className="text-card-foreground">Teddy Martin</CardTitle>
-                <CardDescription>Technical Lead</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-center gap-2">
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <Mail className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <Linkedin className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card border-border text-center">
-              <CardHeader>
-                <div className="w-20 h-20 bg-gradient-to-br from-secondary/20 to-accent/20 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <img
-                    src="/team-member-2.jpg"
-                    alt="Rhys Malcolm"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                </div>
-                <CardTitle className="text-card-foreground">Rhys Malcolm</CardTitle>
-                <CardDescription>Machine Learning Specialist</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-center gap-2">
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <Github className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <Linkedin className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card border-border text-center">
-              <CardHeader>
-                <div className="w-20 h-20 bg-gradient-to-br from-accent/20 to-primary/20 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <img
-                    src="/team-member-3.jpg"
-                    alt="Bruce Chooser"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                </div>
-                <CardTitle className="text-card-foreground">Bruce Chooser</CardTitle>
-                <CardDescription>UX Designer</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-center gap-2">
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <Mail className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <Linkedin className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card border-border text-center">
-              <CardHeader>
-                <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <img src="/team-member-4.jpg" alt="Emma Wilson" className="w-full h-full object-cover rounded-full" />
-                </div>
-                <CardTitle className="text-card-foreground">Emma Wilson</CardTitle>
-                <CardDescription>UX Designer</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-center gap-2">
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <Mail className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="p-2">
-                    <Linkedin className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {teamMembers.map((member, index) => (
+              <Card key={index} className="bg-card border-border text-center">
+                <CardHeader>
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <img
+                      src={`/${member.img}`}
+                      alt={member.name}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  </div>
+                  <CardTitle className="text-card-foreground">{member.name}</CardTitle>
+                  <CardDescription className="mb-2">{member.role}</CardDescription>
+                  <p className="text-sm text-muted-foreground">{member.bio}</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex justify-center gap-2">
+                    {member.social.map((social, socialIndex) => (
+                      <Button
+                        key={socialIndex}
+                        variant="ghost"
+                        size="sm"
+                        className="p-2"
+                        onClick={() => window.open(social.url, '_blank')}
+                      >
+                        {social.icon}
+                      </Button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
