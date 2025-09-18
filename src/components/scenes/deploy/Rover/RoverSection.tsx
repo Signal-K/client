@@ -26,6 +26,10 @@ export default function RoverViewportSection() {
     const [classificationProgress, setClassificationProgress] = useState<string>('');
     const [roverStatus, setRoverStatus] = useState<string>('');
     const [roverPos, setRoverPos] = useState({x: 0, y: 0, angle: 0});
+        const [activeWaypointIndex, setActiveWaypointIndex] = useState<number>(-1);
+    const [roverAtWaypointIndex, setRoverAtWaypointIndex] = useState<number | null>(null);
+    const [nextWaypointArrivalMs, setNextWaypointArrivalMs] = useState<number | null>(null);
+    const [nextWaypointRemainingMs, setNextWaypointRemainingMs] = useState<number | null>(null);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -96,23 +100,22 @@ export default function RoverViewportSection() {
                     }
                     setWaypoints(routes);
 
-                    // Determine which anomalies from the route have been classified
+                    // Determine which anomalies from the route have been classified.
+                    // Note: classification rows live in a separate table and linked_anomalies may not be cleared on classification,
+                    // so fetch classifications for the route anomalies directly.
                     const routeAnomalies = new Set(config.anomalies);
-                    const linkedAnomalyIds = new Set(linked.map(l => l.anomaly_id));
-                    const classifiedAnomalyIds = new Set(
-                        [...routeAnomalies].filter(id => !linkedAnomalyIds.has(id))
-                    );
+                    const linkedAnomalyIds = new Set(linked.map((l: any) => l.anomaly_id));
 
-                    let classData = [];
-                    if (classifiedAnomalyIds.size > 0) {
-                        const anomalyIdsToFetch = [...classifiedAnomalyIds];
+                    let classData: any[] = [];
+                    if (routeAnomalies.size > 0) {
+                        const anomalyIdsToFetch = [...routeAnomalies];
                         console.log("Querying classifications for author:", session.user.id, "and anomaly IDs:", anomalyIdsToFetch);
                         const { data, error } = await supabase
                             .from("classifications")
                             .select("*")
                             .eq("author", session.user.id)
                             .in("anomaly", anomalyIdsToFetch);
-                        
+
                         if (error) {
                             console.error("Error fetching classifications:", error);
                         }
@@ -120,9 +123,11 @@ export default function RoverViewportSection() {
                             classData = data;
                         }
                     }
-                    
+
                     const classifications = classData;
                     setClassifications(classifications);
+
+                    const classifiedAnomalyIds = new Set(classifications.map((c: any) => c.anomaly));
 
                     console.log("Route Anomalies:", [...routeAnomalies]);
                     console.log("Linked (unclassified) Anomaly IDs:", [...linkedAnomalyIds]);
@@ -145,6 +150,10 @@ export default function RoverViewportSection() {
                     let roverY = base.y;
                     let angle = 0;
                     let status = '';
+                    let activeIndexVar: number = -1;
+                    // Local vars to compute whether the rover is exactly at a waypoint and the next arrival timestamp
+                    let roverAtIndexLocal: number | null = null;
+                    let nextArrivalMsLocal: number | null = null;
 
                     for (let i = 0; i <= config.anomalies.length; i++) {
                         if (i === 0) {
@@ -156,15 +165,22 @@ export default function RoverViewportSection() {
                                 roverY = base.y + progress * (config.waypoints[0].y - base.y);
                                 angle = Math.atan2(config.waypoints[0].y - base.y, config.waypoints[0].x - base.x) * 180 / Math.PI;
                                 status = `${Math.ceil((arrival.getTime() - now.getTime()) / 60000)} min until Waypoint 1`;
+                                activeIndexVar = 0;
+                                // We are currently en-route to waypoint 0
+                                roverAtIndexLocal = null;
+                                nextArrivalMsLocal = arrival.getTime();
                                 break;
                             } else {
                                 // at wp0
                                 roverX = config.waypoints[0].x;
                                 roverY = config.waypoints[0].y;
                                 const isWp0AnomalyClassified = classifiedAnomalyIds.has(config.anomalies[0]);
+                                // We are exactly at waypoint 0
+                                roverAtIndexLocal = 0;
                                 if (!isWp0AnomalyClassified) {
                                     status = 'Waiting for classification of Waypoint 1';
                                     angle = Math.atan2(config.waypoints[0].y - base.y, config.waypoints[0].x - base.x) * 180 / Math.PI;
+                                    activeIndexVar = 0;
                                     break;
                                 }
                             }
@@ -184,6 +200,7 @@ export default function RoverViewportSection() {
                                 roverY = prevWp.y;
                                 status = `Waiting for classification of Waypoint ${i}`;
                                 angle = Math.atan2(prevWp.y - (i > 1 ? config.waypoints[i-2].y : base.y), prevWp.x - (i > 1 ? config.waypoints[i-2].x : base.x)) * 180 / Math.PI;
+                                activeIndexVar = i - 1;
                                 break;
                             }
 
@@ -195,6 +212,10 @@ export default function RoverViewportSection() {
                                 angle = Math.atan2(nextWp.y - prevWp.y, nextWp.x - prevWp.x) * 180 / Math.PI;
                                 const wpLabel = i < config.waypoints.length ? `Waypoint ${i+1}` : 'Refueling Station';
                                 status = `${Math.ceil((arrival.getTime() - now.getTime()) / 60000)} min until ${wpLabel}`;
+                                activeIndexVar = i;
+                                // en-route from prevWp to nextWp
+                                roverAtIndexLocal = null;
+                                nextArrivalMsLocal = arrival.getTime();
                                 break;
                             } else {
                                 if (i < config.waypoints.length) {
@@ -203,23 +224,33 @@ export default function RoverViewportSection() {
                                     roverY = config.waypoints[i].y;
                                     const isNextAnomalyClassified = classifiedAnomalyIds.has(config.anomalies[i]);
                                     if (!isNextAnomalyClassified) {
+                                        // We are at waypoint i
+                                        roverAtIndexLocal = i;
                                         status = `Waiting for classification of Waypoint ${i+1}`;
                                         angle = Math.atan2(config.waypoints[i].y - config.waypoints[i-1].y, config.waypoints[i].x - config.waypoints[i-1].x) * 180 / Math.PI;
+                                        activeIndexVar = i;
                                         break;
                                     }
                                 } else {
-                                    // at refuel
-                                    roverX = refuel.x;
-                                    roverY = refuel.y;
-                                    status = 'At refueling station';
-                                    angle = Math.atan2(refuel.y - config.waypoints[i-1].y, refuel.x - config.waypoints[i-1].x) * 180 / Math.PI;
-                                    break;
+                                        // at refuel
+                                        roverX = refuel.x;
+                                        roverY = refuel.y;
+                                        // At refuel - consider rover at the final index
+                                        roverAtIndexLocal = config.waypoints.length - 1;
+                                        status = 'At refueling station';
+                                        angle = Math.atan2(refuel.y - config.waypoints[i-1].y, refuel.x - config.waypoints[i-1].x) * 180 / Math.PI;
+                                        activeIndexVar = config.waypoints.length - 1;
+                                        break;
                                 }
                             }
                         }
                     }
                     setRoverPos({x: roverX, y: roverY, angle});
                     setRoverStatus(status);
+                    setActiveWaypointIndex(activeIndexVar);
+                    // Update rover-at-waypoint and next arrival states
+                    setRoverAtWaypointIndex(roverAtIndexLocal);
+                    setNextWaypointArrivalMs(nextArrivalMsLocal);
                 } else {
                     setWaypoints([]);
                 }
@@ -229,6 +260,24 @@ export default function RoverViewportSection() {
         }
         fetchLinkedAnomaliesAndWaypoints();
     }, [session, supabase]);
+
+    // Ticking effect to update remaining ms until next waypoint arrival
+    useEffect(() => {
+        if (!nextWaypointArrivalMs) {
+            setNextWaypointRemainingMs(null);
+            return;
+        }
+
+        const tick = () => {
+            const now = Date.now();
+            const remaining = nextWaypointArrivalMs - now;
+            setNextWaypointRemainingMs(remaining > 0 ? remaining : 0);
+        };
+
+        tick();
+        const id = setInterval(tick, 1000);
+        return () => clearInterval(id);
+    }, [nextWaypointArrivalMs]);
 
     // Deploy handler
     const handleDeployRover = async () => {
@@ -260,29 +309,7 @@ export default function RoverViewportSection() {
                     </div>
                 ) : (
                     <div className="h-full w-full relative">
-                        {/* Render anomalies */}
-                        {linkedAnomalies.map((anomaly) => (
-                            <div
-                                key={anomaly.id}
-                                className="absolute"
-                                style={{ zIndex: 19 }}
-                                onMouseEnter={() => setHoveredAnomaly(anomaly.id)}
-                                onMouseLeave={() => setHoveredAnomaly(null)}
-                            >
-                                <SciFiAnomalyComponent
-                                    anomaly={anomaly}
-                                    onClick={(a) => {
-                                        setSelectedAnomaly(a);
-                                        setShowDetailDialog(true);
-                                    }}
-                                />
-                                {(hoveredAnomaly === anomaly.id || isMobile) && (
-                                    <span className="absolute text-white text-xs bg-black/50 px-1 rounded" style={{ top: '-20px', left: '50%', transform: 'translateX(-50%)' }}>
-                                        Anomaly
-                                    </span>
-                                )}
-                            </div>
-                        ))}
+                        {/* Anomalies are rendered above their corresponding waypoint below */}
                         {/* Render tracks between waypoints */}
                         <svg
                             className="absolute inset-0 w-full h-full pointer-events-none"
@@ -313,7 +340,7 @@ export default function RoverViewportSection() {
                             })}
                         </svg>
                         {/* Render rover just after base waypoint if available */}
-                                                {/* Render rover */}
+                        {/* Render small rover on-path (restored original) */}
                         <div
                             className="absolute"
                             style={{
@@ -399,26 +426,90 @@ export default function RoverViewportSection() {
                                         onMouseEnter={() => setHoveredWaypoint(`${route.id}-${idx}`)}
                                         onMouseLeave={() => setHoveredWaypoint(null)}
                                     >
-                                        <div
-                                            className={`${isSpecial ? 'w-4 h-4 bg-blue-400' : 'w-3 h-3 bg-yellow-400'} rounded-full border-2 border-white shadow`}
-                                            style={{
-                                                zIndex: 20,
-                                            }}
-                                            title={wp.label}
-                                        />
-                                        {(hoveredWaypoint === `${route.id}-${idx}` || isMobile) && (
-                                            <span className="absolute text-white text-xs bg-black/50 px-1 rounded" style={{ top: '-20px', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}>
-                                                {wp.label}
-                                                {wp.classificationId && (
-                                                    <>
-                                                        <br />
-                                                        Classified: {new Date(wp.classificationTime!).toLocaleString()}
-                                                        <br />
-                                                        ID: {wp.classificationId}
-                                                    </>
-                                                )}
-                                            </span>
-                                        )}
+                                            <div
+                                                className={`${isSpecial ? 'w-5 h-5 bg-blue-400' : 'w-3 h-3 bg-yellow-400'} rounded-full border-2 border-white shadow`}
+                                                style={{
+                                                    zIndex: 20,
+                                                }}
+                                                title={wp.label}
+                                            />
+
+                                            {/* If this waypoint has a linked anomaly, render the anomaly component just above it */}
+                                                {(() => {
+                                                    // For extendedWaypoints, anomaly index correlates to idx-1 (base at idx 0)
+                                                    const anomalyIndex = (idx > 0 && idx < extendedWaypoints.length - 1) ? idx - 1 : null;
+                                                    const anomalyId = anomalyIndex !== null ? config.anomalies[anomalyIndex] : null;
+                                                    const linked = anomalyId !== null ? linkedAnomalies.find(l => l.id === `db-${anomalyId}`) : null;
+
+                                                    // Determine whether this anomaly (linked or classified) should be visible.
+                                                    const isClassified = anomalyId !== null && classifiedAnomalyIds.has(anomalyId as number);
+                                                    // Only show anomalies up to the active waypoint + 1. activeWaypointIndex defaults to -1 (hide all until computed)
+                                                    const shouldShow = anomalyIndex !== null && anomalyIndex <= (activeWaypointIndex + 1);
+
+                                                    if (!anomalyIndex && anomalyIndex !== 0) return null;
+
+                                                    if ((linked || isClassified) && shouldShow) {
+                                                        // If we don't have a linked anomaly object (because it's classified), create a minimal placeholder
+                                                        const anomalyObj = linked || {
+                                                            id: `db-${anomalyId}`,
+                                                            x: wp.x,
+                                                            y: wp.y,
+                                                            classified: true,
+                                                        } as any;
+
+                                                        // Decide visual status
+                                                        let statusProp: 'classified' | 'active' | 'default' = 'default';
+                                                        if (anomalyIndex !== null && anomalyIndex === activeWaypointIndex) statusProp = 'active';
+                                                        else if (isClassified) statusProp = 'classified';
+
+                                                        return (
+                                                            // place anomaly below the waypoint (so it's visually under the marker)
+                                                            <div style={{ position: 'absolute', top: '28px', left: '50%', transform: 'translateX(-50%)', zIndex: 21 }}>
+                                                                <SciFiAnomalyComponent
+                                                                        anomaly={anomalyObj}
+                                                                        status={statusProp}
+                                                                        inline={true}
+                                                                        title={statusProp === 'active' ? 'Object of Interest' : undefined}
+                                                                        onClick={(a) => { setSelectedAnomaly(a); setShowDetailDialog(true); }}
+                                                                    />
+                                                                {(hoveredAnomaly === anomalyObj.id || isMobile) && (
+                                                                    <span className="absolute text-white text-xs bg-black/50 px-1 rounded" style={{ top: '48px', left: '50%', transform: 'translateX(-50%)' }}>
+                                                                        {statusProp === 'active' ? 'Object of Interest' : 'Anomaly'}
+                                                                    </span>
+                                                                )}
+
+                                                                {/* If rover is at this waypoint AND the anomaly is unclassified (linked), show Scan button */}
+                                                                {anomalyIndex !== null && roverAtWaypointIndex === anomalyIndex && anomalyId !== null && linkedAnomalyIds.has(anomalyId as number) && (
+                                                                    <a
+                                                                        href={`/structures/seiscam/ai4mars/cl-${anomalyId}/one`}
+                                                                        className="absolute left-1/2 transform -translate-x-1/2 mt-1 inline-block bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded"
+                                                                        style={{ top: '72px', zIndex: 22 }}
+                                                                    >
+                                                                        Scan Object of Interest
+                                                                    </a>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                })()}
+
+                                            {/* Always visible label for Base & Refueling (isSpecial). Larger text and wrapping. */}
+                                            {(isSpecial || hoveredWaypoint === `${route.id}-${idx}` || isMobile) && (
+                                                <span className="absolute text-white text-sm md:text-base bg-black/60 px-2 py-1 rounded max-w-[160px] text-center break-words" style={{ top: '-40px', left: '50%', transform: 'translateX(-50%)' }}>
+                                                    {wp.label}
+                                                    {wp.classificationId && (
+                                                        <>
+                                                            <br />
+                                                            Classified: {new Date(wp.classificationTime!).toLocaleString()}
+                                                            <br />
+                                                            ID: {wp.classificationId}
+                                                        </>
+                                                    )}
+                                                </span>
+                                            )}
+
+                                            {/* (removed per-waypoint rover; single global rover is rendered separately) */}
                                     </div>
                                 );
                             });
@@ -426,6 +517,9 @@ export default function RoverViewportSection() {
                         {roverStatus && (
                             <div className="fixed bottom-0 right-0 text-white text-xs bg-black/50 p-2 rounded m-2 z-50">
                                 <div>{roverStatus}</div>
+                                {nextWaypointRemainingMs !== null && nextWaypointRemainingMs !== undefined && nextWaypointRemainingMs > 0 && (
+                                    <div>Arriving in: {Math.ceil(nextWaypointRemainingMs / 1000)}s</div>
+                                )}
                                 {classificationProgress && <div>{classificationProgress}</div>}
                             </div>
                         )}

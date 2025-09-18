@@ -3,12 +3,15 @@
 import type { Anomaly } from "@/types/Structures/telescope"
 
 interface SciFiAnomalyComponentProps {
-  anomaly: Anomaly
-  onClick: (anomaly: Anomaly) => void
-  isHighlighted?: boolean
-}
+  anomaly: Anomaly;
+  title?: string;
+  status?: 'classified' | 'active' | 'default';
+  onClick: (anomaly: Anomaly) => void;
+  isHighlighted?: boolean;
+  inline?: boolean; // when true, don't absolutely position using anomaly.x/y (parent provides positioning)
+};
 
-export function SciFiAnomalyComponent({ anomaly, onClick, isHighlighted = false }: SciFiAnomalyComponentProps) {
+export function SciFiAnomalyComponent({ anomaly, onClick, title, isHighlighted = false, status, inline = false }: SciFiAnomalyComponentProps) {
   // Choose icon based on anomaly type
   const getIcon = () => {
     switch (anomaly.type) {
@@ -44,44 +47,55 @@ export function SciFiAnomalyComponent({ anomaly, onClick, isHighlighted = false 
     }
   }
 
-  // Label for anomaly type/anomalySet
-  const getLabel = () => {
-  const anomalyType = (anomaly as any).anomalytype || anomaly.type;
-  const anomalySet = (anomaly as any).anomalySet;
-    if (anomalyType === "planet" || anomalySet === "telescope-tess") {
-      return "Planet candidate";
+  // If a status override was passed via props (through the render), provide different palettes/titles
+  const renderByStatus = (s?: 'classified' | 'active' | 'default') => {
+    const effectiveStatus = s ?? status;
+  if (effectiveStatus === 'active') {
+      return (
+        <div
+          className={`${inline ? 'relative' : 'absolute'} flex flex-col items-center`}
+          style={inline ? { zIndex: isHighlighted ? 50 : 10 } : { left: `${anomaly.x}%`, top: `${anomaly.y}%`, zIndex: isHighlighted ? 50 : 10 }}
+          onClick={() => onClick(anomaly)}
+        >
+          <div className={`transition-all duration-300 cursor-pointer ${isHighlighted ? "scale-125 ring-4 ring-white" : "hover:scale-110"}`}>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#18dda1] to-[#0aa86f] border-2 border-[#18dda1] flex items-center justify-center shadow-lg" />
+          </div>
+          <span className="mt-1 text-xs font-mono text-[#18dda1] bg-[#03140f]/80 px-2 py-0.5 rounded shadow-lg">{title || 'Object of Interest'}</span>
+        </div>
+      )
     }
-    if (anomalyType === "asteroid" || anomalyType === "telescopeMinor" || anomalySet === "telescope-minorPlanet" || anomalySet === "active-asteroids") {
-      return "Asteroid candidate";
+  if (effectiveStatus === 'classified') {
+      return (
+        <div
+          className={`${inline ? 'relative' : 'absolute'} flex flex-col items-center`}
+          style={inline ? { zIndex: isHighlighted ? 50 : 10 } : { left: `${anomaly.x}%`, top: `${anomaly.y}%`, zIndex: isHighlighted ? 50 : 10 }}
+          onClick={() => onClick(anomaly)}
+        >
+          <div className={`transition-all duration-300 cursor-pointer ${isHighlighted ? "scale-125 ring-4 ring-white" : "hover:scale-110"}`}>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4fb3ff] to-[#2e7bbf] border-2 border-[#4fb3ff] flex items-center justify-center shadow-lg" />
+          </div>
+          <span className="mt-1 text-xs font-mono text-[#4fb3ff] bg-[#071025]/80 px-2 py-0.5 rounded shadow-lg">{title || (Math.random() < 0.5 ? 'Mineral deposit' : 'Training data source')}</span>
+        </div>
+      )
     }
-    if (anomalyType === "sunspot" || anomalySet === "telescope-sunspot") {
-      return "Sunspot";
-    }
-    if (anomalyType === "accretion_disc" || anomalySet === "disk-detective") {
-      return "Disk candidate";
-    }
-    if (anomalyType === "cloud" || anomalySet === "cloudspotting") {
-      return "Cloud anomaly";
-    }
-    return anomalyType ? anomalyType.charAt(0).toUpperCase() + anomalyType.slice(1) : "Anomaly";
+    return (
+      <div
+        key={anomaly.id}
+        className={`${inline ? 'relative' : 'absolute'} flex flex-col items-center`}
+        style={inline ? { zIndex: isHighlighted ? 50 : 10 } : { left: `${anomaly.x}%`, top: `${anomaly.y}%`, zIndex: isHighlighted ? 50 : 10 }}
+        onClick={() => onClick(anomaly)}
+      >
+        <div
+          className={`transition-all duration-300 cursor-pointer ${isHighlighted ? "scale-125 ring-4 ring-white" : "hover:scale-110"}`}
+        >
+          {getIcon()}
+        </div>
+        <span className="mt-1 text-xs font-mono text-[#78cce2] bg-[#0a0a2a]/80 px-2 py-0.5 rounded shadow-lg">
+          {title}
+        </span>
+      </div>
+    )
   }
 
-  return (
-    <div
-      key={anomaly.id}
-      className={`absolute flex flex-col items-center`}
-      style={{ left: `${anomaly.x}%`, top: `${anomaly.y}%`, zIndex: isHighlighted ? 50 : 10 }}
-      onClick={() => onClick(anomaly)}
-    >
-      <div
-        className={`transition-all duration-300 cursor-pointer ${isHighlighted ? "scale-125 ring-4 ring-white" : "hover:scale-110"}`}
-      >
-        {getIcon()}
-      </div>
-      <span className="mt-1 text-xs font-mono text-[#78cce2] bg-[#0a0a2a]/80 px-2 py-0.5 rounded shadow-lg">
-        {/* {getLabel()} */}
-        Anomaly
-      </span>
-    </div>
-  )
+  return renderByStatus((title && title === 'Object of Interest') ? 'active' : undefined);
 }
