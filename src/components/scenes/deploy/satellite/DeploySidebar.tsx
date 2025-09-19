@@ -7,8 +7,8 @@ import { Slider } from '@/src/components/ui/slider';
 import { Satellite } from 'lucide-react';
 
 interface DeploySidebarProps {
-  investigationMode: 'weather' | 'planets';
-  setInvestigationMode: (mode: 'weather' | 'planets') => void;
+  investigationMode: 'weather' | 'planets' | 'p-4';
+  setInvestigationMode: (mode: 'weather' | 'planets' | 'p-4') => void;
   duration: number;
   setDuration: (days: number) => void;
   onDeploy: () => void;
@@ -16,7 +16,9 @@ interface DeploySidebarProps {
   isMobile?: boolean;
   cloudInvestigationDescription?: string;
   userCloudClassifications?: number;
-}
+  isDeployDisabled?: boolean;
+  deploymentWarning?: string | null;
+};
 
 const DeploySidebar: React.FC<DeploySidebarProps> = ({
   investigationMode,
@@ -28,6 +30,8 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
   isMobile = false,
   cloudInvestigationDescription,
   userCloudClassifications,
+  isDeployDisabled = false,
+  deploymentWarning = null,
 }) => {
   const containerClasses = isMobile
     ? "w-full bg-gray-900/80 backdrop-blur-md p-4 rounded-t-lg"
@@ -46,7 +50,7 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
           <label htmlFor="mission-select" className="block text-sm font-medium mb-2">Mission</label>
           <Select
             value={investigationMode}
-            onValueChange={(value: 'weather' | 'planets') => setInvestigationMode(value)}
+            onValueChange={(value: 'weather' | 'planets' | 'p-4') => setInvestigationMode(value)}
           >
             <SelectTrigger id="mission-select">
               <SelectValue placeholder="Select a mission" />
@@ -54,6 +58,7 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
             <SelectContent>
               <SelectItem value="weather">Weather Analysis</SelectItem>
               <SelectItem value="planets">Planetary Survey</SelectItem>
+              <SelectItem value="p-4">Wind Survey</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -88,15 +93,25 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
                     <p className="mt-2 text-xs">Cloud Classifications: {userCloudClassifications}</p>
                   </>
                 )}
+                {investigationMode === 'p-4' && (
+                  <>
+                    <p className='mt-2 text-xs'>Sublimation & surface spider anomalies</p>
+                  </>
+                )}
             </div>
         </div>
       </div>
 
       {/* Deploy Button */}
       <div className="mt-6">
-        <Button onClick={onDeploy} disabled={isDeploying} className="w-full">
-          {isDeploying ? 'Deploying...' : 'Deploy Satellite'}
-        </Button>
+        {deploymentWarning && (
+          <p className="text-red-500 text-sm text-center mb-4">{deploymentWarning}</p>
+        )}
+        {!isDeployDisabled && (
+          <Button onClick={onDeploy} disabled={isDeploying} className="w-full">
+            {isDeploying ? 'Deploying...' : 'Deploy Satellite'}
+          </Button>
+        )}
       </div>
     </div>
   );

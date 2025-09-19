@@ -70,7 +70,7 @@ export function PlanetGeneratorMinimal({
     setPlanetConfig((prev) => ({ ...prev, ...config }));
   };
   return (
-    <div style={style}>
+    <div className="w-full h-full min-h-[480px]">
       <PlanetOnly
         planetConfig={planetConfig}
       />
@@ -195,7 +195,7 @@ export default function PlanetGenerator({
 
         {/* Settings Panel */}
         {!hideControls && !hideSettings && (
-          <div className="w-full md:w-[400px] border-t md:border-t-0 md:border-l border-gray-200 bg-white relative z-10">
+          <div className="w-full md:w-[400px] border-t md:border-t-0 md:border-l border-gray-200 relative z-10">
             <SettingsPanel
               planetConfig={planetConfig}
               onChange={handleConfigChange}

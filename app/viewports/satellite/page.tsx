@@ -17,9 +17,6 @@ type PageSatellite = {
   linkedAnomalyId: string;
 };
 
-
-import { useEffect } from "react";
-
 export default function SatelliteViewportExpandedPage() {
   const router = useRouter();
   const { linkedAnomalies } = usePageData();

@@ -7,6 +7,10 @@ interface WeatherSatelliteMissionTypeProps {
 
 export default function WeatherSatelliteMissionType({ entries, className = "" }: WeatherSatelliteMissionTypeProps) {
   if (!entries || entries.length === 0) return null;
+  
+  // Additional check: filter out entries without anomaly data
+  const validEntries = entries.filter(entry => entry.anomaly && entry.anomaly.id);
+  if (validEntries.length === 0) return null;
 
   // Mission step definitions
   const planetSteps = [
@@ -24,14 +28,14 @@ export default function WeatherSatelliteMissionType({ entries, className = "" }:
     { label: "Finish scanning, cloud or storm identified", description: "Cloud or storm identified", time: 40 * 60 * 1000 },
   ];
 
-  // Determine mission type
-  const isPlanetMission = entries.length === 1;
+  // Determine mission type using validEntries
+  const isPlanetMission = validEntries.length === 1;
   const steps = isPlanetMission ? planetSteps : weatherSteps;
 
-  // Calculate current step based on deploy time
+  // Calculate current step based on deploy time using validEntries
   let currentStep = steps[0];
-  if (entries[0]?.date) {
-    const deployTime = new Date(entries[0].date);
+  if (validEntries[0]?.date) {
+    const deployTime = new Date(validEntries[0].date);
     const now = new Date();
     const elapsedMs = now.getTime() - deployTime.getTime();
     for (let i = 0; i < steps.length; i++) {

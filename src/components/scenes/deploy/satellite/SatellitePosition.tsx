@@ -7,12 +7,11 @@ import WeatherSatelliteMissionType from "./WeatherSatelliteMissionType";
 import SatelliteProgressBar from "./SatelliteProgressBar";
 import SatelliteIcon from "./Deploy/SatelliteIcon";
 import {
-  getNextSaturdayMidnight,
-  getTimeSinceDeploy,
   getTimeUntilWeekEnd,
   getTimeSinceLastAction,
 } from "./satelliteTimeUtils";
 import { calculateSatellitePosition } from "./Deploy/satellitePositionUtils";
+import SatelliteSpiderScan from "./satelliteSpiderScan";
 import { PlanetGeneratorMinimal } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator";
 import { useRouter } from "next/navigation";
 
@@ -26,6 +25,7 @@ interface Satellite {
   unlocked: boolean;
   linkedAnomalyId: string;
   deployTime: Date;
+  anomalySet?: string;
 }
 
 interface SatellitePositionProps {
@@ -48,6 +48,8 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   // Ref and state for parent section dimensions (must be inside component)
   const sectionRef = useRef<HTMLDivElement>(null);
   const [sectionDims, setSectionDims] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+  const [missionType, setMissionType] = useState<'weather' | 'planet' | 'p-4' | null>(null);
+  const [windSurveyAnomalies, setWindSurveyAnomalies] = useState<any[]>([]);
 
   useEffect(() => {
     function updateDims() {
@@ -109,10 +111,27 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
       // All entries (ignore time)
       const { data: allEntries, error: allErr } = await supabase
         .from("linked_anomalies")
-        .select("*")
+        .select("*, anomaly:anomalies(id, content, type, anomalySet)")
         .eq("automaton", "WeatherSatellite")
         .eq("author", session.user.id);
-      if (!allErr && allEntries) setAllWeatherSatEntries(allEntries);
+      if (!allErr && allEntries) {
+        setAllWeatherSatEntries(allEntries);
+        // Determine mission type
+        const isP4 = allEntries.some(entry => entry.anomaly?.anomalySet === 'satellite-planetFour');
+        if (isP4) {
+          setMissionType('p-4');
+          const p4Anomalies = allEntries
+            .filter(entry => entry.anomaly?.anomalySet === 'satellite-planetFour')
+            .map(entry => ({ ...entry.anomaly, linked_anomaly_id: entry.id }));
+          setWindSurveyAnomalies(p4Anomalies);
+        } else if (allEntries.length > 1) {
+          setMissionType('weather');
+        } else if (allEntries.length === 1) {
+          setMissionType('planet');
+        } else {
+          setMissionType(null);
+        }
+      }
       else setAllWeatherSatEntries([]);
     }
     fetchDeploymentData();
@@ -161,62 +180,34 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
           .eq("automaton", "WeatherSatellite")
           .eq("author", session.user.id)
           .gte("date", oneWeekAgo.toISOString())
-          .order("date", { ascending: false })
-          .limit(1);
-
-        // Get last action time (most recent classification mentioning a WeatherSatellite linked_anomaly)
-        const { data: lastClassifications, error: classError } = await supabase
-          .from("classifications")
-          .select("created_at")
-          .eq("author", session.user.id)
-          .not("content", "is", null)
-          .order("created_at", { ascending: false })
-          .limit(10); // Get recent classifications to check content
-
-        if (lastClassifications && lastClassifications.length > 0) {
-          // For now, use the most recent classification as last action
-          // TODO: Filter by classifications that mention WeatherSatellite linked_anomalies
-          setLastActionTime(new Date(lastClassifications[0].created_at));
-        }
-
-        // Handle missing unlocked column gracefully
-        if (error && error.message?.includes('unlocked')) {
-          console.warn('Database missing unlocked column in SatellitePosition, falling back');
-          
-          const { data: fallbackAnomalies, error: fallbackError } = await supabase
-            .from("linked_anomalies")
-            .select("id, anomaly_id, automaton, date")
-            .eq("automaton", "WeatherSatellite")
-            .eq("author", session.user.id)
-            .gte("date", oneWeekAgo.toISOString())
-            .order("date", { ascending: false })
-            .limit(1);
-
-          if (fallbackError) throw fallbackError;
-
-          if (fallbackAnomalies && fallbackAnomalies.length > 0) {
-            const anomaly = { ...fallbackAnomalies[0], unlocked: false }; // Default to locked
-            const deployTime = new Date(anomaly.date);
-            const satelliteData: Satellite = {
-              id: anomaly.id.toString(),
-              x: 50,
-              y: 50,
-              hasUnclassifiedAnomaly: true,
-              anomalyId: anomaly.anomaly_id.toString(),
-              tile: satelliteTiles[0],
-              unlocked: anomaly.unlocked,
-              linkedAnomalyId: anomaly.id.toString(),
-              deployTime: deployTime,
-            };
-            setPositions([satelliteData]);
-          }
-          return;
-        }
+          .order("date", { ascending: false });
 
         if (error) throw error;
 
-        if (linkedAnomalies.length > 0) {
-          const anomaly = linkedAnomalies[0];
+        if (linkedAnomalies && linkedAnomalies.length > 0) {
+          const anomaliesWithSets = await Promise.all(
+            linkedAnomalies.map(async (la) => {
+              const { data: anomalyData } = await supabase
+                .from('anomalies')
+                .select('anomalySet')
+                .eq('id', la.anomaly_id)
+                .single();
+              return { ...la, anomaly: anomalyData };
+            })
+          );
+
+          const isP4Mission = anomaliesWithSets.some(a => a.anomaly && a.anomaly.anomalySet === 'satellite-planetFour');
+          if (isP4Mission) {
+            setMissionType('p-4');
+            const p4Anomalies = anomaliesWithSets
+              .filter(a => a.anomaly && a.anomaly.anomalySet === 'satellite-planetFour')
+              .map(entry => ({ ...entry.anomaly, id: entry.anomaly_id, linked_anomaly_id: entry.id, classification_id: entry.classification_id, date: entry.date }));
+            setWindSurveyAnomalies(p4Anomalies);
+            setPositions([]);
+            return;
+          }
+
+          const anomaly = anomaliesWithSets[0];
           const deployTime = new Date(anomaly.date);
           const satelliteData: Satellite = {
             id: anomaly.id.toString(),
@@ -228,9 +219,10 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
             unlocked: anomaly.unlocked || false,
             linkedAnomalyId: anomaly.id.toString(),
             deployTime: deployTime,
+            anomalySet: anomaly.anomaly?.anomalySet,
           };
           setPositions([satelliteData]);
-          // Fetch classification if classification_id exists
+
           if (anomaly.classification_id) {
             setClassificationId(anomaly.classification_id);
             const { data: classificationData, error: classErr } = await supabase
@@ -382,6 +374,16 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
     return () => clearInterval(interval);
   }, []);
 
+  if (missionType === 'p-4') {
+    return (
+      <Section expandLink={"/viewports/satellite"} sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Wind Survey mission is active."}>
+        <div ref={sectionRef} className="relative z-10 flex items-center justify-center w-full h-full min-h-0 overflow-hidden">
+          <SatelliteSpiderScan anomalies={windSurveyAnomalies} />
+        </div>
+      </Section>
+    );
+  }
+
   return (
   <Section expandLink={"/viewports/satellite"} sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Send satellites to planets you or the community have discovered to search for clouds and weather events."}>
       <div ref={sectionRef} className="p-4 relative z-10" style={{ minHeight: '156px', height: '30vh', maxHeight: 520 }}>
@@ -419,9 +421,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
           </>
         )}
         <div className="w-full absolute left-0 flex flex-col items-center z-30 pointer-events-none">
-          <div className="pointer-events-auto mb-2">
-            <WeatherSatelliteMissionType entries={allWeatherSatEntries} />
-          </div>
+
           {positions[0]?.deployTime && (
             <div className="pointer-events-auto flex flex-col items-center">
               <SatelliteProgressBar
@@ -431,7 +431,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
                 classificationId={classificationId ?? undefined}
                 classification={classification ?? undefined}
                 parentWidth={sectionDims.width}
-                investigationType={allWeatherSatEntries && allWeatherSatEntries.length > 1 ? 'weather' : 'planet'}
+                investigationType={missionType || 'planet'}
               />
             </div>
           )}
