@@ -335,12 +335,24 @@ export default function DeploySatelliteViewport() {
   };
 
   const handleDeploy = async () => {
-    if (!session?.user?.id) return;
-    const userId = session.user.id;
-    const now = new Date().toISOString();
-    let rows = [];
-    const planet = planetAnomalies[focusedPlanetIdx];
-    if (!planet) return;
+    console.log("handleDeploy called");
+    setDeploying(true);
+    
+    try {
+      if (!session?.user?.id) {
+        console.log("No user session");
+        return;
+      }
+      const userId = session.user.id;
+      console.log("User ID:", userId);
+      const now = new Date().toISOString();
+      let rows = [];
+      const planet = planetAnomalies[focusedPlanetIdx];
+      console.log("Planet:", planet, "Investigation mode:", investigationMode);
+      if (!planet) {
+        console.log("No planet selected");
+        return;
+      }
     if (investigationMode === 'planets') {
       // Find classification for this user/planet
       const { data: classifications } = await supabase
@@ -432,17 +444,30 @@ export default function DeploySatelliteViewport() {
         });
       });
     }
+    console.log("Rows to insert:", rows);
     if (rows.length > 0) {
-      const { error } = await supabase.from('linked_anomalies').insert(rows);
+      console.log("Attempting to insert rows into linked_anomalies");
+      const { error, data } = await supabase.from('linked_anomalies').insert(rows);
+      console.log("Insert result:", { error, data });
       if (!error) {
+        console.log("Deployment successful");
         setShowConfirmation(true);
         setDeploymentResult({
           anomalies: rows.map(r => String(r.anomaly_id)),
           sectorName: planet.content || `TIC ${planet.id}`,
         });
       } else {
+        console.error("Deployment failed:", error);
         alert('Deployment failed: ' + error.message);
       }
+    } else {
+      console.log("No rows to insert");
+    }
+    } catch (error) {
+      console.error("Error in handleDeploy:", error);
+      alert("An error occurred during deployment. Please try again.");
+    } finally {
+      setDeploying(false);
     }
   };
 
@@ -517,7 +542,7 @@ export default function DeploySatelliteViewport() {
         </div>
 
       {/* Main map/viewport area */}
-      <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0">
+      <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0 pb-96 md:pb-0">
           {/* Main viewport content (planets/clouds) */}
           <div className="relative flex-1 flex items-center justify-center z-10">
             <PlanetFocusView
@@ -546,8 +571,8 @@ export default function DeploySatelliteViewport() {
           </div>
         </div>
 
-        {/* Mobile controls */}
-        <div className="md:hidden">
+        {/* Mobile controls - Fixed bottom positioning */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40">
           <DeploySidebar
             investigationMode={investigationMode}
             setInvestigationMode={setInvestigationMode}

@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, Satellite } from 'lucide-react';
+import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
+import { useRouter } from 'next/navigation';
 import { DatabaseAnomaly } from '../TelescopeViewportRange';
 import { PlanetGeneratorMinimal } from '@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator';
 
@@ -144,12 +146,18 @@ const OrbitalPaths: React.FC<{ anomalies: SatelliteSpiderScanProps['anomalies'] 
 };
 
 const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) => {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+  const router = useRouter();
+  
   const primaryClassificationId = anomalies[0]?.classification_id?.toString();
   // photos: array of timestamps when photos became available
   const [photos, setPhotos] = useState<number[]>([]);
   const [photosTaken, setPhotosTaken] = useState(0);
   const [isFlashing, setIsFlashing] = useState(false);
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+  const [classifiedAnomalies, setClassifiedAnomalies] = useState<Set<number>>(new Set());
+  const [isRecalling, setIsRecalling] = useState(false);
 
   useEffect(() => {
     if (anomalies.length === 0) return;
@@ -199,6 +207,54 @@ const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) 
       clearInterval(countdownInterval);
     };
   }, [anomalies]);
+
+  // Check which anomalies have been classified by the user
+  useEffect(() => {
+    const checkClassifiedAnomalies = async () => {
+      if (!session?.user?.id || anomalies.length === 0) return;
+
+      const anomalyIds = anomalies.map(a => a.id);
+      const { data: classifications, error } = await supabase
+        .from('classifications')
+        .select('anomaly')
+        .eq('author', session.user.id)
+        .in('anomaly', anomalyIds);
+
+      if (!error && classifications) {
+        const classifiedIds = new Set(classifications.map(c => c.anomaly));
+        setClassifiedAnomalies(classifiedIds);
+      }
+    };
+
+    checkClassifiedAnomalies();
+  }, [anomalies, session, supabase]);
+
+  // Function to recall the satellite
+  const handleRecallSatellite = async () => {
+    if (!session?.user?.id) return;
+    
+    setIsRecalling(true);
+    try {
+      const { error } = await supabase
+        .from('linked_anomalies')
+        .delete()
+        .eq('author', session.user.id)
+        .eq('automaton', 'WeatherSatellite');
+
+      if (error) {
+        console.error('Error recalling satellite:', error);
+        alert('Failed to recall satellite. Please try again.');
+      } else {
+        // Redirect to home or satellite viewport after successful recall
+        router.push('/viewports/satellite');
+      }
+    } catch (err) {
+      console.error('Unexpected error recalling satellite:', err);
+      alert('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsRecalling(false);
+    }
+  };
 
   // helper: time until next photo in ms, or null if exhausted or no anomalies
   const nextPhotoMs = (() => {
@@ -287,8 +343,15 @@ const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) 
                 const anomaly = anomalies[idx];
                 const anomalyId = anomaly?.id ?? ts;
                 const url = buildPhotoUrl(anomalyId);
+                const isClassified = classifiedAnomalies.has(anomalyId);
                 return (
-                  <div key={ts} className="flex items-center space-x-3">
+                  <div key={ts} className={`flex items-center space-x-3 relative ${isClassified ? 'opacity-60' : ''}`}>
+                    {isClassified && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                        <div className="w-full h-0.5 bg-red-500 rotate-12 ml-8"></div>
+                        <div className="absolute w-full h-0.5 bg-red-500 -rotate-12 ml-8"></div>
+                      </div>
+                    )}
                     <button
                       className="w-16 h-12 bg-[#061018] rounded-sm border border-[#1f2a37] overflow-hidden flex-shrink-0"
                       title={`Photo ${idx + 1}`}
@@ -296,12 +359,18 @@ const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) 
                     >
                       <img src={url} alt={`photo-${idx + 1}`} className="w-full h-full object-cover" />
                     </button>
-                    <a
-                      href={`/structures/balloon/p4/an-${anomalyId}/classify`}
-                      className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-medium rounded transition-colors"
-                    >
-                      Classify
-                    </a>
+                    {isClassified ? (
+                      <div className="px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded">
+                        Classified
+                      </div>
+                    ) : (
+                      <a
+                        href={`/structures/balloon/p4/an-${anomalyId}/classify`}
+                        className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-medium rounded transition-colors"
+                      >
+                        Classify
+                      </a>
+                    )}
                   </div>
                 );
               })}
@@ -314,6 +383,21 @@ const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) 
                 <div>Next photo in: <span className="font-medium text-gray-100">{nextPhotoMs ? formatMs(nextPhotoMs) : '—'}</span></div>
               )}
             </div>
+          </div>
+          
+          {/* Recall Satellite Button */}
+          <div className="mt-4">
+            <button
+              onClick={handleRecallSatellite}
+              disabled={isRecalling}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 text-white text-sm font-medium rounded transition-colors"
+            >
+              <Satellite size={16} />
+              {isRecalling ? 'Recalling...' : 'Recall Satellite'}
+            </button>
+            <p className="mt-2 text-xs text-gray-400">
+              Return satellite to base and clear mission data
+            </p>
           </div>
         </div>
       </div>

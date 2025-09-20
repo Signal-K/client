@@ -119,21 +119,17 @@ export function StarterPlanetFour({
                         <div className="mb-2">
                             <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
                                 <div className="relative">
-                                    <div className='absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
-                                    <div className="bg-white bg-opacity-90">
-                                        <img
-                                            src={imageUrl}
-                                            alt="Planet Four"
-                                            className="relative z-10 w-128 h-128 object-contain"
-                                        />
-                                    </div>
-                                </div>
-                                <ClassificationForm
+                                <ImageAnnotator
+                                    className="h-full w-full"
+                                    initialImageUrl={imageUrl}
                                     anomalyId={anomalyid.toString()}
                                     anomalyType="satellite-planetFour"
-                                    missionNumber={20000005}
                                     assetMentioned={imageUrl}
+                                    structureItemId={3105}
+                                    parentPlanetLocation={anomalyid?.toString()}
+                                    annotationType="P4"
                                 />
+                                </div>
                             </div>
                         </div>
                     </>

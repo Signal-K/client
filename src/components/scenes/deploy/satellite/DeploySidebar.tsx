@@ -34,15 +34,15 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
   deploymentWarning = null,
 }) => {
   const containerClasses = isMobile
-    ? "w-full bg-gray-900/80 backdrop-blur-md p-4 rounded-t-lg"
+    ? "w-full bg-[#181e2a]/95 backdrop-blur-md p-4 rounded-t-xl border-t border-[#232b3b] text-white min-h-80 max-h-96 overflow-y-auto"
     : "flex flex-col h-full min-h-0 w-full max-w-full z-30 bg-[#10141c] border-l border-[#232b3b] p-6 text-white";
 
   return (
     <div className={containerClasses}>
-      <div className="flex-grow space-y-6">
+      <div className={`flex-grow ${isMobile ? 'space-y-3' : 'space-y-6'}`}>
         <div className="text-center">
-            <Satellite className="mx-auto h-12 w-12 text-blue-400" />
-            <h2 className="text-xl font-bold mt-2">Satellite Controls</h2>
+            <Satellite className={`mx-auto text-blue-400 ${isMobile ? 'h-8 w-8' : 'h-12 w-12'}`} />
+            <h2 className={`font-bold mt-2 ${isMobile ? 'text-lg' : 'text-xl'}`}>Satellite Controls</h2>
         </div>
 
         {/* Mission Selection */}
