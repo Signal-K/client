@@ -4,12 +4,12 @@ import Section from "@/src/components/sections/Section";
 import { Anomaly } from "@/types/Structures/telescope";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import { SciFiAnomalyComponent } from "@/src/components/classification/viewport/sci-fi-anomaly-component";
 
 export default function RoverViewportSection() {
-    // const router = useRouter();
-
+    const router = useRouter();
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -30,6 +30,8 @@ export default function RoverViewportSection() {
     const [roverAtWaypointIndex, setRoverAtWaypointIndex] = useState<number | null>(null);
     const [nextWaypointArrivalMs, setNextWaypointArrivalMs] = useState<number | null>(null);
     const [nextWaypointRemainingMs, setNextWaypointRemainingMs] = useState<number | null>(null);
+    const [missionCompleteTime, setMissionCompleteTime] = useState<number | null>(null);
+    const [isReturningHome, setIsReturningHome] = useState<boolean>(false);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -237,7 +239,27 @@ export default function RoverViewportSection() {
                                         roverY = refuel.y;
                                         // At refuel - consider rover at the final index
                                         roverAtIndexLocal = config.waypoints.length - 1;
-                                        status = 'At refueling station';
+                                        
+                                        // Check if mission is complete (all anomalies classified)
+                                        if (classifiedAnomalyIds.size === config.anomalies.length) {
+                                            // Find the time of the last classification
+                                            const lastClassificationTime = Math.max(
+                                                ...classifications.map(c => new Date(c.created_at).getTime())
+                                            );
+                                            setMissionCompleteTime(lastClassificationTime);
+                                            
+                                            // Check if 1 hour has passed since mission completion
+                                            const oneHourAfterCompletion = lastClassificationTime + (60 * 60 * 1000);
+                                            if (now.getTime() >= oneHourAfterCompletion) {
+                                                status = 'Mission complete - Ready to return home';
+                                            } else {
+                                                const remainingMinutes = Math.ceil((oneHourAfterCompletion - now.getTime()) / (60 * 1000));
+                                                status = `At refueling station - Return home available in ${remainingMinutes} min`;
+                                            }
+                                        } else {
+                                            status = 'At refueling station';
+                                        }
+                                        
                                         angle = Math.atan2(refuel.y - config.waypoints[i-1].y, refuel.x - config.waypoints[i-1].x) * 180 / Math.PI;
                                         activeIndexVar = config.waypoints.length - 1;
                                         break;
@@ -282,6 +304,55 @@ export default function RoverViewportSection() {
     // Deploy handler
     const handleDeployRover = async () => {
         window.location.href="/activity/deploy/roover/";
+    };
+
+    // Return home handler - removes routes and linked_anomalies for this user's rover
+    const handleReturnHome = async () => {
+        if (!session?.user?.id) return;
+        
+        setIsReturningHome(true);
+        try {
+            // Delete all linked_anomalies for this user's rover
+            const { error: linkedError } = await supabase
+                .from('linked_anomalies')
+                .delete()
+                .eq('author', session.user.id)
+                .eq('automaton', 'Rover');
+
+            if (linkedError) {
+                console.error('Error deleting linked anomalies:', linkedError);
+                alert('Failed to clear rover mission data. Please try again.');
+                return;
+            }
+
+            // Delete all routes for this user for this week
+            const now = new Date();
+            const utcDay = now.getUTCDay(); // 0=Sun, 6=Sat
+            const daysToLastSaturday = utcDay === 6 ? 0 : (utcDay + 1) % 7;
+            const cutoff = new Date(now);
+            cutoff.setUTCDate(now.getUTCDate() - daysToLastSaturday);
+            cutoff.setUTCHours(14, 1, 0, 0);
+
+            const { error: routeError } = await supabase
+                .from('routes')
+                .delete()
+                .eq('author', session.user.id)
+                .gte('timestamp', cutoff.toISOString());
+
+            if (routeError) {
+                console.error('Error deleting routes:', routeError);
+                alert('Failed to clear route data. Please try again.');
+                return;
+            }
+
+            // Redirect to home
+            router.push('/');
+        } catch (err) {
+            console.error('Unexpected error returning home:', err);
+            alert('An unexpected error occurred. Please try again.');
+        } finally {
+            setIsReturningHome(false);
+        }
     };
 
     return (
@@ -515,12 +586,31 @@ export default function RoverViewportSection() {
                             });
                         })}
                         {roverStatus && (
-                            <div className="fixed bottom-0 right-0 text-white text-xs bg-black/50 p-2 rounded m-2 z-50">
+                            <div className="fixed bottom-0 right-0 text-white text-xs bg-black/50 p-2 rounded m-2 z-50 max-w-xs">
                                 <div>{roverStatus}</div>
                                 {nextWaypointRemainingMs !== null && nextWaypointRemainingMs !== undefined && nextWaypointRemainingMs > 0 && (
                                     <div>Arriving in: {Math.ceil(nextWaypointRemainingMs / 1000)}s</div>
                                 )}
                                 {classificationProgress && <div>{classificationProgress}</div>}
+                                
+                                {/* Show return home button if mission is complete and 1 hour has passed */}
+                                {missionCompleteTime && 
+                                 waypoints.length > 0 && 
+                                 waypoints[waypoints.length - 1].routeConfiguration?.anomalies && 
+                                 classifications.length === waypoints[waypoints.length - 1].routeConfiguration.anomalies.length &&
+                                 Date.now() >= (missionCompleteTime + (60 * 60 * 1000)) && (
+                                    <div className="mt-2">
+                                        <Button
+                                            onClick={handleReturnHome}
+                                            disabled={isReturningHome}
+                                            variant="destructive"
+                                            size="sm"
+                                            className="w-full text-xs"
+                                        >
+                                            {isReturningHome ? 'Returning...' : 'Return home - rover has finished mission'}
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

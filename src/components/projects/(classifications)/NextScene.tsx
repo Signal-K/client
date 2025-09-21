@@ -181,7 +181,7 @@ export default function ClientClassificationPage({ id }: Props) {
     viewportUrl = '/viewports/satellite';
   } else if (rooverTypes.includes(type)) {
     structure = 'rover';
-    viewportUrl = '/viewports/rover';
+    viewportUrl = '/viewports/roover';
   }
 
   const project = projectMap[type];
