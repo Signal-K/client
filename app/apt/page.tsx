@@ -4,11 +4,14 @@ import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Badge } from "@/src/components/ui/badge"
 import { Rocket, Users, Star, Globe, ExternalLink, Calendar, ArrowRight, Github, Linkedin, Instagram, Mail } from "lucide-react"
+import Link from "next/link"
+import { useState, useEffect } from "react"
+import { getRecentDiscoveries, getDiscoveryTypeLabel, getDiscoveryDescription, Classification } from "@/lib/discoveries"
 
 const teamMembers = [
   { 
     img: "Eric.jpg",
-    name: "Teddy Martin",
+    name: "Liam Arbuckle",
     role: "Technical Lead",
     bio: "Full stack engineer with a background in mathematics and decentralised science.",
     social: [
@@ -37,7 +40,25 @@ const teamMembers = [
   },
 ];
 
-export default function HomePage() {
+export default function Landing() {
+  const [discoveries, setDiscoveries] = useState<Classification[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchDiscoveries() {
+      try {
+        const data = await getRecentDiscoveries()
+        setDiscoveries(data)
+      } catch (error) {
+        console.error('Failed to fetch discoveries:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchDiscoveries()
+  }, [])
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -84,13 +105,13 @@ export default function HomePage() {
             Join citizen scientists discovering exoplanets, classifying galaxies, and advancing astronomy.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Link href="/auth"><Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Rocket className="w-4 h-4 mr-2" />
-              Start Your Journey
-            </Button>
-            <Button size="lg" variant="outline" className="border-border text-foreground hover:bg-muted bg-transparent">
+              Play now
+            </Button></Link>
+            {/* <Button size="lg" variant="outline" className="border-border text-foreground hover:bg-muted bg-transparent">
               Learn More
-            </Button>
+            </Button> */}
           </div>
         </div>
       </section>
@@ -204,55 +225,78 @@ export default function HomePage() {
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-foreground mb-4">Latest Discoveries</h3>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Recent discoveries made by our citizen science community.
+              Recent discoveries made by our users
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                  <Calendar className="w-4 h-4" />
-                  December 15, 2024
-                </div>
-                <CardTitle className="text-card-foreground">New Exoplanet Discovered</CardTitle>
-                <CardDescription>Potentially habitable world found 127 light-years away.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="ghost" className="p-0 h-auto text-primary hover:text-primary/80">
-                  Read More <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                  <Calendar className="w-4 h-4" />
-                  December 10, 2024
-                </div>
-                <CardTitle className="text-card-foreground">Galaxy Merger Detected</CardTitle>
-                <CardDescription>Rare galaxy collision identified in progress.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="ghost" className="p-0 h-auto text-primary hover:text-primary/80">
-                  Read More <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                  <Calendar className="w-4 h-4" />
-                  December 5, 2024
-                </div>
-                <CardTitle className="text-card-foreground">Milestone Reached</CardTitle>
-                <CardDescription>1 million stellar classifications completed!</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="ghost" className="p-0 h-auto text-primary hover:text-primary/80">
-                  Read More <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </CardContent>
-            </Card>
+            {isLoading ? (
+              // Loading skeleton cards
+              Array.from({ length: 3 }).map((_, index) => (
+                <Card key={index} className="bg-card border-border">
+                  <CardHeader>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                      <Calendar className="w-4 h-4" />
+                      <div className="h-4 bg-muted rounded animate-pulse w-24"></div>
+                    </div>
+                    <div className="h-6 bg-muted rounded animate-pulse w-3/4 mb-2"></div>
+                    <div className="h-4 bg-muted rounded animate-pulse w-full"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-4 bg-muted rounded animate-pulse w-20"></div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : discoveries.length > 0 ? (
+              discoveries.slice(0, 3).map((discovery) => (
+                <Card key={discovery.id} className="bg-card border-border">
+                  <CardHeader>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                      <Calendar className="w-4 h-4" />
+                      {new Date(discovery.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </div>
+                    <CardTitle className="text-card-foreground">
+                      {getDiscoveryTypeLabel(discovery.classificationtype)}
+                    </CardTitle>
+                    <CardDescription>
+                      {getDiscoveryDescription(discovery.classificationtype, discovery.content)}
+                    </CardDescription>
+                    {discovery.profiles && (
+                      <div className="text-xs text-muted-foreground mt-2">
+                        Discovered by {discovery.profiles.username || discovery.profiles.full_name || 'Anonymous'}
+                      </div>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <Link href={`/posts/${discovery.id}`}>
+                      <Button variant="ghost" className="p-0 h-auto text-primary hover:text-primary/80">
+                        Read More <ArrowRight className="w-4 h-4 ml-1" />
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              // Fallback cards when no discoveries are found
+              <Card className="bg-card border-border">
+                <CardHeader>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <Calendar className="w-4 h-4" />
+                    Coming Soon
+                  </div>
+                  <CardTitle className="text-card-foreground">New Discoveries Loading</CardTitle>
+                  <CardDescription>Recent citizen science discoveries will appear here.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="ghost" className="p-0 h-auto text-primary hover:text-primary/80" disabled>
+                    Coming Soon <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </section>
@@ -299,7 +343,7 @@ export default function HomePage() {
       </section>
 
       {/* Links Section */}
-      <section id="links" className="py-16 px-6 bg-muted/30">
+      {/* <section id="links" className="py-16 px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-foreground mb-4">Join Our Community</h3>
@@ -378,7 +422,7 @@ export default function HomePage() {
             </Card>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
       <footer className="bg-card/50 border-t border-border py-12 px-6">
@@ -399,16 +443,16 @@ export default function HomePage() {
               <h4 className="font-semibold text-foreground mb-3">Game</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <a href="/auth" className="text-muted-foreground hover:text-foreground transition-colors">
                     Play Now
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                    Tutorial
+                  <a href="https://github.com/signal-k/deepdock" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Upcoming features
                   </a>
                 </li>
-                <li>
+                {/* <li>
                   <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
                     Leaderboard
                   </a>
@@ -417,24 +461,24 @@ export default function HomePage() {
                   <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
                     Achievements
                   </a>
-                </li>
+                </li> */}
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-foreground mb-3">Community</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                    Forum
+                  <a href="https://github.com/signal-k" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Github
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                    Discord
+                  <a href="https://github.com/signal-k/client" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Codebase
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <a href="https://twitter.com/TheMrScrooby" className="text-muted-foreground hover:text-foreground transition-colors">
                     Twitter
                   </a>
                 </li>
@@ -449,22 +493,22 @@ export default function HomePage() {
               <h4 className="font-semibold text-foreground mb-3">Resources</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                    Documentation
+                  <a href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Terms
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                    Research
+                  <a href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Privacy Policy
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <a href="https://github.com/signal-k/sytizen" className="text-muted-foreground hover:text-foreground transition-colors">
                     API
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                  <a href="mailto:liam@skinetics.tech" className="text-muted-foreground hover:text-foreground transition-colors">
                     Support
                   </a>
                 </li>

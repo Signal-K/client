@@ -31,6 +31,7 @@ import TelescopeViewportSection from "@/src/components/scenes/deploy/Telescope/T
 import RoverViewportSection from "@/src/components/scenes/deploy/Rover/RoverSection";
 import ViewportSkillTree from "@/src/components/research/section/skillTreeSection";
 import ResearchSkillViewport from "@/src/components/research/section/skillTreeSection";
+import Landing from "./apt/page";
 
 type PageSatellite = {
   id: string;
@@ -64,7 +65,7 @@ export default function ActivityPage() {
   // Use the global theme hook
   const { isDark, toggleDarkMode } = UseDarkMode();
 
-  if (!session) return <LandingSS />;
+  if (!session) return <Landing />;
 
   const needsProfileSetup = !profile?.username || !profile?.full_name;
 
