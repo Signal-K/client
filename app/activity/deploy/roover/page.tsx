@@ -41,6 +41,21 @@ export default function DeployRoverPage() {
     fetchPlanetClassification();
   }, [session, supabase]);
 
+  useEffect(() => {
+    async function checkExistingRoverDeployment() {
+      if (!session) return;
+      const { data: existingDeployments, error } = await supabase
+        .from("linked_anomalies")
+        .select("*")
+        .eq("author", session.user.id)
+        .eq("automaton", "Rover");
+      if (existingDeployments && existingDeployments.length > 0) {
+        window.location.href = "/viewports/roover";
+      }
+    }
+    checkExistingRoverDeployment();
+  }, [session, supabase]);
+
   const {
     linkedAnomalies,
     activityFeed,
@@ -137,8 +152,8 @@ export default function DeployRoverPage() {
 
     setDeployMessage("Rover deployed successfully!");
     setTimeout(() => {
-      window.location.href = "/";
-    }, 5000);
+      window.location.href = "/viewports/roover";
+    }, 2000);
   };
 
   // Draw lines between waypoints
@@ -212,7 +227,7 @@ export default function DeployRoverPage() {
       />
       <div className="w-full max-w-screen-xl px-4 pt-24 flex flex-row gap-6 items-stretch justify-center h-[700px]">
         {/* Left Panel: Rover Mission Info */}
-        <div className="flex flex-col justify-between bg-zinc-900/80 rounded-2xl shadow-xl border border-zinc-800 p-6 w-[320px] min-w-[260px] max-w-[340px] h-full text-white">
+        {/* <div className="flex flex-col justify-between bg-zinc-900/80 rounded-2xl shadow-xl border border-zinc-800 p-6 w-[320px] min-w-[260px] max-w-[340px] h-full text-white">
           <div>
             <h2 className="text-xl font-bold text-[#ff3c1a] mb-2">Current Mission</h2>
             <div className="mb-4">
@@ -249,7 +264,7 @@ export default function DeployRoverPage() {
               <span className="ml-auto">🔬</span>
             </div>
           </div>
-        </div>
+        </div> */}
         {/* Center Panel: Rover Map */}
         <div className="flex-1 flex flex-col items-center justify-center">
           <h1 className="text-2xl font-bold text-white mb-4">Deploy Rover</h1>
@@ -286,13 +301,14 @@ export default function DeployRoverPage() {
               ))}
               {waypoints.length === 0 && (
                 <div className="text-zinc-400">
-                  Click on the map to add waypoints (max 4).
+                  Click on the map to add waypoints (max 4). Your rover will follow along these waypoints after leaving basecamp and gradually discover objects of interest - which you can help identify!
                 </div>
               )}
             </div>
             {planetAnomaly && (
               <div className="mt-4 text-zinc-300 text-sm">
-                <span className="font-semibold text-white">Selected Location:</span> {planetAnomaly.content}
+                <span className="font-semibold text-white">Selected Location:</span> Mars 
+                {/* {planetAnomaly.content} */}
               </div>
             )}
           </div>
@@ -310,7 +326,7 @@ export default function DeployRoverPage() {
           </button>
         </div>
         {/* Right Panel: Rover Stats */}
-        <div className="flex flex-col justify-between bg-zinc-900/80 rounded-2xl shadow-xl border border-zinc-800 p-6 w-[320px] min-w-[260px] max-w-[340px] h-full text-white">
+        {/* <div className="flex flex-col justify-between bg-zinc-900/80 rounded-2xl shadow-xl border border-zinc-800 p-6 w-[320px] min-w-[260px] max-w-[340px] h-full text-white">
           <div>
             <h2 className="text-xl font-bold text-[#18dda1] mb-2">Rover Stats</h2>
             <div className="mb-4 grid grid-cols-2 gap-4">
@@ -338,7 +354,7 @@ export default function DeployRoverPage() {
             {/* <div className="mb-4">
               <h3 className="text-sm font-semibold text-[#18dda1] mb-1">Set the Coordinates</h3>
               <div className="bg-zinc-800/80 rounded-lg p-2 text-xs text-zinc-200">12.20°N 104.23°E</div>
-            </div> */}
+            </div> 
           </div>
           <div className="mt-4 flex flex-col gap-2">
             <button className="bg-[#ff3c1a] text-white rounded-lg py-2 font-bold shadow hover:bg-[#ff5c3c] transition">STOP</button>
@@ -349,7 +365,7 @@ export default function DeployRoverPage() {
               <button className="bg-zinc-800/80 rounded-full w-10 h-10 flex items-center justify-center text-white text-xl shadow">→</button>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

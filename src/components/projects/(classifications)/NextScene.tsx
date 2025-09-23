@@ -24,9 +24,12 @@ const balloonTypes = [
   'cloud',
   'lidar-jovianVortexHunter',
   'balloon-marsCloudShapes',
-  'automaton-aiForMars',
   'satellite-planetFour',
 ];
+
+const rooverTypes = [
+  'automaton-aiForMars'
+]
 
 const projectMap: Record<string, string> = {
   planet: 'planethunters',
@@ -168,8 +171,18 @@ export default function ClientClassificationPage({ id }: Props) {
   const type = classification.classificationtype;
 
   let structure = 'greenhouse';
-  if (telescopeTypes.includes(type)) structure = 'telescope';
-  else if (balloonTypes.includes(type)) structure = 'balloon';
+  let viewportUrl = '/';
+  
+  if (telescopeTypes.includes(type)) {
+    structure = 'telescope';
+    viewportUrl = '/structures/telescope';
+  } else if (balloonTypes.includes(type)) {
+    structure = 'balloon';
+    viewportUrl = '/viewports/satellite';
+  } else if (rooverTypes.includes(type)) {
+    structure = 'rover';
+    viewportUrl = '/viewports/roover';
+  }
 
   const project = projectMap[type];
   const studyUrl = project
@@ -281,7 +294,7 @@ export default function ClientClassificationPage({ id }: Props) {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#D8DEE9]">
-            <Button variant="outline" onClick={() => router.push(`/structures/${structure}`)}>
+            <Button variant="outline" onClick={() => router.push(viewportUrl)}>
               🧬 Back to Structure
             </Button>
             <Button variant="ghost" onClick={() => router.push('/')}>
@@ -293,7 +306,7 @@ export default function ClientClassificationPage({ id }: Props) {
               </Button>
             )}
             {type != 'planet' && (
-              <Button variant='default' onClick={() => router.push(`/structures/${structure}`)}>
+              <Button variant='default' onClick={() => router.push(viewportUrl)}>
                 ⚙️ Step 2
               </Button>
             )}

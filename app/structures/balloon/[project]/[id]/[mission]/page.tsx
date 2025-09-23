@@ -8,6 +8,7 @@ import { StarterLidar } from "@/src/components/projects/Lidar/Clouds"
 import GameNavbar from "@/src/components/layout/Tes"
 import { StarterJovianVortexHunter } from "@/src/components/projects/Lidar/JovianVortexHunter"
 import { StarterCoMShapes } from "@/src/components/projects/Lidar/CloudspottingOnMarsShapes"
+import { StarterPlanetFour } from "@/src/components/projects/Satellite/PlanetFour"
 
 export default function BalloonClassifyPage() {
     const params = useParams();
@@ -61,6 +62,12 @@ export default function BalloonClassifyPage() {
                         component = <StarterCoMShapes anomalyid={anomalyid ? Number(anomalyid) : 0} />
                         break;
                 };
+            
+            case "p4":
+                switch(mission) {
+                    case "classify":
+                        component = <StarterPlanetFour anomalyid={anomalyid ? Number(anomalyid) : 5} />
+                }
         };
 
         setMissionComponent(component)

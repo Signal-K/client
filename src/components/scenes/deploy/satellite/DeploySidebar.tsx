@@ -7,8 +7,8 @@ import { Slider } from '@/src/components/ui/slider';
 import { Satellite } from 'lucide-react';
 
 interface DeploySidebarProps {
-  investigationMode: 'weather' | 'planets';
-  setInvestigationMode: (mode: 'weather' | 'planets') => void;
+  investigationMode: 'weather' | 'planets' | 'p-4';
+  setInvestigationMode: (mode: 'weather' | 'planets' | 'p-4') => void;
   duration: number;
   setDuration: (days: number) => void;
   onDeploy: () => void;
@@ -16,7 +16,9 @@ interface DeploySidebarProps {
   isMobile?: boolean;
   cloudInvestigationDescription?: string;
   userCloudClassifications?: number;
-}
+  isDeployDisabled?: boolean;
+  deploymentWarning?: string | null;
+};
 
 const DeploySidebar: React.FC<DeploySidebarProps> = ({
   investigationMode,
@@ -28,17 +30,19 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
   isMobile = false,
   cloudInvestigationDescription,
   userCloudClassifications,
+  isDeployDisabled = false,
+  deploymentWarning = null,
 }) => {
   const containerClasses = isMobile
-    ? "w-full bg-gray-900/80 backdrop-blur-md p-4 rounded-t-lg"
+    ? "w-full bg-[#181e2a]/95 backdrop-blur-md p-4 rounded-t-xl border-t border-[#232b3b] text-white min-h-80 max-h-96 overflow-y-auto"
     : "flex flex-col h-full min-h-0 w-full max-w-full z-30 bg-[#10141c] border-l border-[#232b3b] p-6 text-white";
 
   return (
     <div className={containerClasses}>
-      <div className="flex-grow space-y-6">
+      <div className={`flex-grow ${isMobile ? 'space-y-3' : 'space-y-6'}`}>
         <div className="text-center">
-            <Satellite className="mx-auto h-12 w-12 text-blue-400" />
-            <h2 className="text-xl font-bold mt-2">Satellite Controls</h2>
+            <Satellite className={`mx-auto text-blue-400 ${isMobile ? 'h-8 w-8' : 'h-12 w-12'}`} />
+            <h2 className={`font-bold mt-2 ${isMobile ? 'text-lg' : 'text-xl'}`}>Satellite Controls</h2>
         </div>
 
         {/* Mission Selection */}
@@ -46,7 +50,7 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
           <label htmlFor="mission-select" className="block text-sm font-medium mb-2">Mission</label>
           <Select
             value={investigationMode}
-            onValueChange={(value: 'weather' | 'planets') => setInvestigationMode(value)}
+            onValueChange={(value: 'weather' | 'planets' | 'p-4') => setInvestigationMode(value)}
           >
             <SelectTrigger id="mission-select">
               <SelectValue placeholder="Select a mission" />
@@ -54,6 +58,7 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
             <SelectContent>
               <SelectItem value="weather">Weather Analysis</SelectItem>
               <SelectItem value="planets">Planetary Survey</SelectItem>
+              <SelectItem value="p-4">Wind Survey</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -88,15 +93,25 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
                     <p className="mt-2 text-xs">Cloud Classifications: {userCloudClassifications}</p>
                   </>
                 )}
+                {investigationMode === 'p-4' && (
+                  <>
+                    <p className='mt-2 text-xs'>Sublimation & surface spider anomalies</p>
+                  </>
+                )}
             </div>
         </div>
       </div>
 
       {/* Deploy Button */}
       <div className="mt-6">
-        <Button onClick={onDeploy} disabled={isDeploying} className="w-full">
-          {isDeploying ? 'Deploying...' : 'Deploy Satellite'}
-        </Button>
+        {deploymentWarning && (
+          <p className="text-red-500 text-sm text-center mb-4">{deploymentWarning}</p>
+        )}
+        {!isDeployDisabled && (
+          <Button onClick={onDeploy} disabled={isDeploying} className="w-full">
+            {isDeploying ? 'Deploying...' : 'Deploy Satellite'}
+          </Button>
+        )}
       </div>
     </div>
   );

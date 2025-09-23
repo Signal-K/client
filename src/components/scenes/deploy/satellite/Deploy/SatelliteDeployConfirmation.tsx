@@ -69,6 +69,10 @@ export default function SatelliteDeployConfirmation({
               </div>
               <div className="flex items-start gap-2">
                 <span className="bg-[#6be0b3] text-[#181e2a] w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">3</span>
+                <span className="text-[#e4eff0]">If you selected <strong>Wind Survey</strong>, your satellite will monitor atmospheric dynamics on your selected planet. It will capture images of sublimation and surface spider anomalies - seasonal phenomena where CO₂ ice sublimates and creates dark fan-shaped features on the surface.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="bg-[#6be0b3] text-[#181e2a] w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">4</span>
                 <span className="text-[#e4eff0]">Later, you can upgrade your satellites or build more to expand your investigation capabilities.</span>
               </div>
             </div>

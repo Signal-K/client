@@ -1,21 +1,13 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import Link from "next/link"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import { useRouter } from "next/navigation"
 import type { Anomaly, Star } from "@/types/Structures/telescope"
 import { DatabaseAnomaly } from "../TelescopeViewportRange"
 import { generateSectorName, generateStars } from "@/src/components/classification/telescope/utils/sector-utils"
-import { Button } from "@/src/components/ui/button"
 import SatelliteDeployConfirmation from "./Deploy/SatelliteDeployConfirmation";
-import InvestigationModeSelect from "./Deploy/InvestigationModeSelect";
-import SatelliteSidebar from "./SatelliteSidebar";
 import { useState as useReactState } from "react";
-import SatelliteDPad from "./Deploy/SatelliteDPad";
-import SatellitePlanetSVG from "./Deploy/SatellitePlanetSVG";
-import SatelliteCloudIcons from "./Deploy/SatelliteCloudIcons";
-import SatelliteDeployButton from "./Deploy/SatelliteDeployButton";
 import PlanetFocusView from './PlanetFocusView';
 import DeploySidebar from './DeploySidebar';
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
@@ -76,7 +68,7 @@ export default function DeploySatelliteViewport() {
   const router = useRouter();
 
   // Investigation mode: 'weather' or 'planets'
-  const [investigationMode, setInvestigationMode] = useState<'weather' | 'planets'>('weather');
+  const [investigationMode, setInvestigationMode] = useState<'weather' | 'p-4' | 'planets'>('weather');
 
   // All planet anomalies user can deploy to (classified planets or all community planets if none)
   const [planetAnomalies, setPlanetAnomalies] = useState<EnrichedDatabaseAnomaly[]>([])
@@ -104,6 +96,25 @@ export default function DeploySatelliteViewport() {
     anomalies: string[]
     sectorName: string
   } | null>(null);
+  const [deploymentWarning, setDeploymentWarning] = useState<string | null>(null);
+  const [isDeployDisabled, setIsDeployDisabled] = useState(false);
+
+  // Validate deployment criteria
+  useEffect(() => {
+    if (investigationMode === 'p-4') {
+      const planet = planetAnomalies[focusedPlanetIdx];
+      if (planet && (!planet.stats || planet.stats.radius === "N/A" || !planet.stats.radius)) {
+        setDeploymentWarning("Wind Survey requires a planet with a known radius. Please select another planet or inspect it to determine its radius.");
+        setIsDeployDisabled(true);
+      } else {
+        setDeploymentWarning(null);
+        setIsDeployDisabled(false);
+      }
+    } else {
+      setDeploymentWarning(null);
+      setIsDeployDisabled(false);
+    }
+  }, [investigationMode, focusedPlanetIdx, planetAnomalies]);
 
   // Redirect if already deployed
   useEffect(() => {
@@ -316,52 +327,6 @@ export default function DeploySatelliteViewport() {
     setFocusedPlanetIdx(0);
   }, [planetAnomalies.length]);
 
-
-  // Show anomaly content on click
-  const [anomalyContent, setAnomalyContent] = useState<{ content: string; type: string } | null>(null);
-  const handleAnomalyClick = (a: Anomaly) => {
-    setFocusedAnomaly(a);
-    // Find the original anomaly by id
-    const dbId = typeof a.id === 'string' && a.id.startsWith('db-') ? Number(a.id.replace('db-', '')) : a.id;
-    // Try planet first, then cloud
-    const found = planetAnomalies.find(anom => anom.id === dbId) || cloudAnomalies.find(anom => anom.id === dbId);
-    let typeLabel = 'Unknown';
-    if (found) {
-      if (found.anomalySet === 'telescope-tess') typeLabel = 'Planet';
-      else typeLabel = 'Cloud';
-    }
-    setAnomalyContent(found ? { content: found.content || '', type: typeLabel } : null);
-  };
-
-  // Drag and D-Pad handlers for planet focus
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setDragStart({ x: e.clientX, y: e.clientY });
-    setIsDragging(true);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    const deltaX = e.clientX - dragStart.x;
-    if (Math.abs(deltaX) > 50) {
-      setFocusedPlanetIdx((prev) => {
-        if (deltaX > 0) {
-          return Math.max(0, prev - 1);
-        } else {
-          return Math.min(planetAnomalies.length - 1, prev + 1);
-        }
-      });
-      setDragStart({ x: e.clientX, y: e.clientY });
-    }
-  };
-
-  const handleMouseUp = () => setIsDragging(false);
-
-  // D-Pad handlers: left/right changes planet focus
-  const handleDPad = (dir: "up" | "down" | "left" | "right") => {
-    if (dir === "left") setFocusedPlanetIdx((prev) => Math.max(0, prev - 1));
-    else if (dir === "right") setFocusedPlanetIdx((prev) => Math.min(planetAnomalies.length - 1, prev + 1));
-  };
-
   const handleConfirmationClose = () => {
     setShowConfirmation(false);
     setTimeout(() => {
@@ -369,14 +334,25 @@ export default function DeploySatelliteViewport() {
     }, 1000);
   };
 
-
   const handleDeploy = async () => {
-    if (!session?.user?.id) return;
-    const userId = session.user.id;
-    const now = new Date().toISOString();
-    let rows = [];
-    const planet = planetAnomalies[focusedPlanetIdx];
-    if (!planet) return;
+    console.log("handleDeploy called");
+    setDeploying(true);
+    
+    try {
+      if (!session?.user?.id) {
+        console.log("No user session");
+        return;
+      }
+      const userId = session.user.id;
+      console.log("User ID:", userId);
+      const now = new Date().toISOString();
+      let rows = [];
+      const planet = planetAnomalies[focusedPlanetIdx];
+      console.log("Planet:", planet, "Investigation mode:", investigationMode);
+      if (!planet) {
+        console.log("No planet selected");
+        return;
+      }
     if (investigationMode === 'planets') {
       // Find classification for this user/planet
       const { data: classifications } = await supabase
@@ -434,18 +410,64 @@ export default function DeploySatelliteViewport() {
           unlock_time: null,
         });
       });
+    } else if (investigationMode === 'p-4') {
+      // Find classification for this user/planet
+      const { data: classifications } = await supabase
+        .from('classifications')
+        .select('id')
+        .eq('author', userId)
+        .eq('anomaly', planet.id)
+        .eq('classificationtype', 'planet');
+      const classificationId = classifications && classifications[0]?.id;
+
+      // Fetch up to 4 wind survey anomalies
+      const { data: windAnomalies, error: windErr } = await supabase
+        .from('anomalies')
+        .select('id')
+        .eq('anomalySet', 'satellite-planetFour');
+
+      if (windErr) {
+        alert('Failed to fetch wind survey anomalies: ' + windErr.message);
+        return;
+      }
+
+      const shuffledAnomalies = (windAnomalies || []).sort(() => 0.5 - Math.random());
+      shuffledAnomalies.slice(0, 4).forEach((anomaly) => {
+        rows.push({
+          author: userId,
+          anomaly_id: anomaly.id,
+          classification_id: classificationId || null,
+          date: now,
+          automaton: 'WeatherSatellite',
+          unlocked: false,
+          unlock_time: null,
+        });
+      });
     }
+    console.log("Rows to insert:", rows);
     if (rows.length > 0) {
-      const { error } = await supabase.from('linked_anomalies').insert(rows);
+      console.log("Attempting to insert rows into linked_anomalies");
+      const { error, data } = await supabase.from('linked_anomalies').insert(rows);
+      console.log("Insert result:", { error, data });
       if (!error) {
+        console.log("Deployment successful");
         setShowConfirmation(true);
         setDeploymentResult({
           anomalies: rows.map(r => String(r.anomaly_id)),
           sectorName: planet.content || `TIC ${planet.id}`,
         });
       } else {
+        console.error("Deployment failed:", error);
         alert('Deployment failed: ' + error.message);
       }
+    } else {
+      console.log("No rows to insert");
+    }
+    } catch (error) {
+      console.error("Error in handleDeploy:", error);
+      alert("An error occurred during deployment. Please try again.");
+    } finally {
+      setDeploying(false);
     }
   };
 
@@ -520,7 +542,7 @@ export default function DeploySatelliteViewport() {
         </div>
 
       {/* Main map/viewport area */}
-      <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0">
+      <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0 pb-96 md:pb-0">
           {/* Main viewport content (planets/clouds) */}
           <div className="relative flex-1 flex items-center justify-center z-10">
             <PlanetFocusView
@@ -543,12 +565,14 @@ export default function DeploySatelliteViewport() {
               isDeploying={deploying}
               cloudInvestigationDescription={cloudInvestigationDescription}
               userCloudClassifications={userCloudClassifications}
+              isDeployDisabled={isDeployDisabled}
+              deploymentWarning={deploymentWarning}
             />
           </div>
         </div>
 
-        {/* Mobile controls */}
-        <div className="md:hidden">
+        {/* Mobile controls - Fixed bottom positioning */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40">
           <DeploySidebar
             investigationMode={investigationMode}
             setInvestigationMode={setInvestigationMode}
@@ -559,6 +583,8 @@ export default function DeploySatelliteViewport() {
             isMobile
             cloudInvestigationDescription={cloudInvestigationDescription}
             userCloudClassifications={userCloudClassifications}
+            isDeployDisabled={isDeployDisabled}
+            deploymentWarning={deploymentWarning}
           />
         </div>
 
@@ -583,14 +609,14 @@ export default function DeploySatelliteViewport() {
         </div>
 
         {/* Stats display for focused planet */}
-        <div className="absolute top-4 right-4 bg-[#181e2a] p-4 rounded-lg shadow-lg z-50">
+        {/* <div className="absolute top-4 right-4 bg-[#181e2a] p-4 rounded-lg shadow-lg z-50">
           <div className="text-xs text-[#78cce2]">
             <h3 className="font-bold text-sm mb-2">Planet Stats</h3>
             <p>Temperature: {planetAnomalies[focusedPlanetIdx]?.stats?.temperature || "N/A"} K</p>
             <p>Radius: {planetAnomalies[focusedPlanetIdx]?.stats?.radius || "N/A"} R☉</p>
             <p>Mass: {planetAnomalies[focusedPlanetIdx]?.stats?.mass || "N/A"} M☉</p>
           </div>
-        </div>
+        </div> */}
       </div>
-  )
-}
+  );
+};

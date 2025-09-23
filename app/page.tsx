@@ -31,6 +31,7 @@ import TelescopeViewportSection from "@/src/components/scenes/deploy/Telescope/T
 import RoverViewportSection from "@/src/components/scenes/deploy/Rover/RoverSection";
 import ViewportSkillTree from "@/src/components/research/section/skillTreeSection";
 import ResearchSkillViewport from "@/src/components/research/section/skillTreeSection";
+import Landing from "./apt/page";
 
 type PageSatellite = {
   id: string;
@@ -45,6 +46,7 @@ type PageSatellite = {
 
 export default function ActivityPage() {
   const session = useSession();
+
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [landmarksExpanded, setLandmarksExpanded] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -63,7 +65,7 @@ export default function ActivityPage() {
   // Use the global theme hook
   const { isDark, toggleDarkMode } = UseDarkMode();
 
-  if (!session) return <LandingSS />;
+  if (!session) return <Landing />;
 
   const needsProfileSetup = !profile?.username || !profile?.full_name;
 
@@ -149,6 +151,7 @@ export default function ActivityPage() {
           satellites={satelliteData ? [satelliteData] : []}
           flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
         />
+        <RoverViewportSection />
         <ResearchSkillViewport />
         <SolarHealth />
 
