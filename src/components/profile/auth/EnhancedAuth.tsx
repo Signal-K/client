@@ -86,7 +86,7 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
               Explore the cosmos & catalogue discoveries
             </p>
             <p className="text-gray-300 text-lg leading-relaxed">
-              Join thousands of cosmic explorers in mapping the universe and discovering new frontiers in space science.
+              {/* Join thousands of cosmic explorers in mapping the universe and discovering new frontiers in space science. */}
             </p>
           </div>
         </div>
