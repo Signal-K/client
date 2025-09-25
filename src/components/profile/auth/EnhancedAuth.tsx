@@ -67,161 +67,153 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div>
-      <div className="flex flex-col md:flex-row min-h-screen">
-        {/* Left Panel */}
-        <div className="md:w-1/2 w-full flex flex-col justify-center items-center bg-gray-100 p-10">
-          <div className="w-full h-full relative">
-            <Image
-              src="assets/Backdrops/background1.jpg"
-              alt="Application UI"
-              layout="fill"
-              objectFit="cover"
-              className="absolute inset-0"
-            />
+    <div className="min-h-screen relative overflow-hidden">      
+      {/* Two Panel Layout */}
+      <div className="relative z-10 min-h-screen flex flex-col lg:flex-row">
+        {/* Left Panel - Branding/Info with solid dark background */}
+        <div className="lg:w-1/2 w-full flex flex-col justify-center items-center p-8 lg:p-16 bg-gray-900">
+          <div className="relative z-10 text-center max-w-md">
+            {/* Logo */}
+            <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 mb-6 bg-gradient-to-br from-green-400 to-blue-500 rounded-3xl shadow-2xl">
+              <span className="text-white font-bold text-2xl sm:text-3xl">⭐</span>
+            </div>
+            
+            {/* Branding Content */}
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4 bg-gradient-to-r from-green-200 to-blue-300 bg-clip-text text-transparent">
+              Star Sailors
+            </h1>
+            <p className="text-xl sm:text-2xl text-gray-200 mb-6 font-light">
+              Explore the cosmos & catalogue discoveries
+            </p>
+            <p className="text-gray-300 text-lg leading-relaxed">
+              Join thousands of cosmic explorers in mapping the universe and discovering new frontiers in space science.
+            </p>
           </div>
         </div>
         
-        {/* Right Panel */}
-        <div className="md:w-1/2 w-full flex flex-col justify-center p-10 bg-white">
-          <Flexbox
-            align={'center'}
-            as={'h1'}
-            className={styles.title}
-            gap={16}
-            horizontal
-            justify={'center'}
-            wrap={'wrap'}
-          >
-            <strong className="font-extrabold text-transparent text-8xl bg-clip-text bg-gradient-to-r from-green-200 to-amber-300" style={{ fontSize: 'min(56px, 8vw)' }}>
-              Star Sailors
-            </strong>
-          </Flexbox>
-          <p className="max-w-[600px] text-blue-800 md:text-xl mb-6">
-            Explore the cosmos & catalogue discoveries in different scientific disciplines
-          </p>
-
-          <div className="max-w-md w-full mx-auto py-5">
-            <Card>
-              <CardContent className="pt-6">
-                {/* Anonymous Sign-In Section */}
-                <div className="mb-6">
-                  <div className="text-center mb-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                      Quick Start
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Jump right in without creating an account. You can always add your email later.
-                    </p>
-                  </div>
-                  
-                  {anonymousError && (
-                    <Alert className="mb-4 border-red-200 bg-red-50">
-                      <AlertDescription className="text-red-700">
-                        {anonymousError}
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  <Button
-                    onClick={handleAnonymousSignIn}
-                    disabled={isLoadingAnonymous}
-                    className="w-full mb-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0"
-                    size="lg"
-                  >
-                    {isLoadingAnonymous ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Creating temporary account...
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <UserX className="w-4 h-4" />
-                        Continue as Guest
-                        <ArrowRight className="w-4 h-4" />
-                      </div>
-                    )}
-                  </Button>
-
-                  <div className="text-xs text-gray-500 text-center mb-4">
-                    No email required • Your progress will be saved temporarily
-                  </div>
-                </div>
-
-                {/* Separator */}
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <Separator className="w-full" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-3 text-muted-foreground">Or create a permanent account</span>
-                  </div>
-                </div>
-
-                {/* Traditional Auth */}
-                <div className="space-y-4">
+        {/* Right Panel - Authentication with background image */}
+        <div className="lg:w-1/2 w-full flex items-center justify-center p-4 sm:p-8 lg:p-16 relative">
+          {/* Background Image only for right panel */}
+          <div className="absolute inset-0">
+            <Image
+              src="/assets/Backdrops/garden.png"
+              alt="Background"
+              fill
+              className="object-cover"
+              priority
+            />
+            {/* Overlay for right panel */}
+            <div className="absolute inset-0 bg-black/20 backdrop-blur-md"></div>
+          </div>
+          
+          {/* Glass Authentication Card */}
+          <div className="relative z-10 w-full max-w-sm sm:max-w-md">
+            {/* Subtle glow effect behind card */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-green-400/20 to-blue-500/20 rounded-3xl blur-xl"></div>
+            
+            <Card className="relative bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl overflow-hidden transition-all duration-500 hover:bg-white/15 hover:border-white/30">
+              {/* Inner glass reflection effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl pointer-events-none"></div>
+              
+              <CardContent className="relative p-6 sm:p-8">
+                <div className="space-y-6">
+                  {/* Header */}
                   <div className="text-center">
-                    <h4 className="font-medium text-gray-800 mb-2">Sign up with email or Google</h4>
-                    <p className="text-xs text-gray-600 mb-4">
-                      Keep your progress forever and access from any device
+                    <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">
+                      Sign up
+                    </h2>
+                    <p className="text-white/70 text-sm leading-relaxed">
+                      Create your Star Sailors account and grow your share of the cosmic discoveries.
                     </p>
                   </div>
-                  
-                  <Auth
-                    supabaseClient={supabase}
-                    providers={["google"]}
-                    socialLayout="horizontal"
-                    theme="light"
-                  />
-                </div>
 
-                {/* Benefits of permanent account */}
-                <div className="mt-6 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-start gap-2">
-                    <Mail className="w-4 h-4 text-blue-600 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-blue-800">Permanent Account Benefits:</p>
-                      <ul className="text-xs text-blue-700 mt-1 space-y-1">
-                        <li>• Access from multiple devices</li>
-                        <li>• Never lose your progress</li>
-                        <li>• Get updates on new discoveries</li>
-                        <li>• Join the community leaderboard</li>
-                      </ul>
+                  {/* Anonymous Sign-In Section */}
+                  <div className="space-y-4">
+                    {anonymousError && (
+                      <Alert className="bg-red-500/10 backdrop-blur-sm border border-red-400/20 rounded-2xl">
+                        <AlertDescription className="text-red-300">
+                          {anonymousError}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    <Button
+                      onClick={handleAnonymousSignIn}
+                      disabled={isLoadingAnonymous}
+                      className="w-full h-12 bg-gradient-to-r from-purple-500/80 to-pink-500/80 hover:from-purple-600/90 hover:to-pink-600/90 text-white border-0 rounded-2xl backdrop-blur-sm shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
+                      size="lg"
+                    >
+                      {isLoadingAnonymous ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Creating temporary account...
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <UserX className="w-4 h-4" />
+                          Continue as Guest
+                          <ArrowRight className="w-4 h-4" />
+                        </div>
+                      )}
+                    </Button>
+
+                    <div className="text-xs text-white/60 text-center">
+                      No email required • Your progress will be saved temporarily
                     </div>
+                  </div>
+
+                  {/* Separator */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <Separator className="w-full border-white/30" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white/10 px-4 py-1 rounded-full text-white/70 backdrop-blur-sm">or sign up via</span>
+                    </div>
+                  </div>
+
+                  {/* Auth UI Component with glass styling */}
+                  <div className="space-y-4">
+                    <div className="[&_.supabase-auth-ui_*]:text-white [&_.supabase-auth-ui_input]:bg-white/10 [&_.supabase-auth-ui_input]:backdrop-blur-sm [&_.supabase-auth-ui_input]:border-white/20 [&_.supabase-auth-ui_input]:rounded-2xl [&_.supabase-auth-ui_input]:text-sm [&_.supabase-auth-ui_input]:h-12 [&_.supabase-auth-ui_button]:bg-white/20 [&_.supabase-auth-ui_button]:backdrop-blur-sm [&_.supabase-auth-ui_button]:text-white [&_.supabase-auth-ui_button]:rounded-2xl [&_.supabase-auth-ui_button]:h-12 [&_.supabase-auth-ui_button]:border-white/30 [&_.supabase-auth-ui_button]:hover:bg-white/30 [&_.supabase-auth-ui_button]:transition-all [&_.supabase-auth-ui_button]:duration-300">
+                      <Auth
+                        supabaseClient={supabase}
+                        providers={["google"]}
+                        socialLayout="vertical"
+                        appearance={{
+                          variables: {
+                            default: {
+                              colors: {
+                                brand: 'rgba(255, 255, 255, 0.2)',
+                                brandAccent: 'rgba(255, 255, 255, 0.3)',
+                                inputBackground: 'rgba(255, 255, 255, 0.1)',
+                                inputBorder: 'rgba(255, 255, 255, 0.2)',
+                                inputText: '#ffffff',
+                              },
+                              radii: {
+                                borderRadiusButton: '1rem',
+                                inputBorderRadius: '1rem',
+                              },
+                              space: {
+                                inputPadding: '12px 16px',
+                                buttonPadding: '12px 16px',
+                              },
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Login Link */}
+                  <div className="text-center pt-4">
+                    <span className="text-white/70 text-sm">Already Have An Account? </span>
+                    <Link href="/auth" className="text-green-300 hover:text-green-200 text-sm font-medium underline transition-colors duration-200">
+                      Login
+                    </Link>
                   </div>
                 </div>
               </CardContent>
             </Card>
-
-            {/* Connect Section */}
-            <div className="mt-8">
-              <div className="flex flex-col gap-3">
-                <h3 className="text-lg font-semibold text-center">Connect with Star Sailors</h3>
-                <div className="grid grid-cols-1 gap-2">
-                  <Link 
-                    href="https://threads.net/droidology" 
-                    className="flex items-center gap-2 p-2 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-colors text-sm"
-                  >
-                    <MicroscopeIcon className="h-4 w-4" />
-                    Follow us on Threads
-                  </Link>
-                  <Link 
-                    href="https://github.com/signal-k" 
-                    className="flex items-center gap-2 p-2 rounded-md bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-900 hover:to-black transition-colors text-sm"
-                  >
-                    <CodeIcon className="h-4 w-4" />
-                    View on GitHub
-                  </Link>
-                  <Link 
-                    href="https://github.com/signal-k/manuscript" 
-                    className="flex items-center gap-2 p-2 rounded-md bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 transition-colors text-sm"
-                  >
-                    <FilesIcon className="h-4 w-4" />
-                    Read Documentation
-                  </Link>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

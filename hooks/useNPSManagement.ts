@@ -11,13 +11,25 @@ export function useNPSManagement() {
     if (hasCheckedNps || !session) return;
     
     const timer = setTimeout(async () => {
-      const { data, error } = await supabase
-        .from("nps_surveys")
+      // First, check if user has made at least one classification
+      const { data: classificationsData, error: classificationsError } = await supabase
+        .from("classifications")
         .select("id")
-        .eq("user_id", session.user.id);
+        .eq("author", session.user.id)
+        .limit(1);
       
-      if (!error && Array.isArray(data) && data.length === 0) {
-        setShowNpsModal(true);
+      // Only proceed if user has made at least one classification
+      if (!classificationsError && Array.isArray(classificationsData) && classificationsData.length > 0) {
+        // Check if user has already completed NPS survey
+        const { data: npsData, error: npsError } = await supabase
+          .from("nps_surveys")
+          .select("id")
+          .eq("user_id", session.user.id);
+        
+        // Show modal if user hasn't done NPS survey yet
+        if (!npsError && Array.isArray(npsData) && npsData.length === 0) {
+          setShowNpsModal(true);
+        }
       }
       setHasCheckedNps(true);
     }, 15000);
