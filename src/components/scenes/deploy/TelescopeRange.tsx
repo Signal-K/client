@@ -142,6 +142,24 @@ export default function TelescopeRangeSlider() {
     };
 
     const handleDeploy = async () => {
+        // Check if user has fast deploy enabled (no classifications made)
+        const { count: userClassificationCount } = await supabase
+            .from('classifications')
+            .select('id', { count: 'exact', head: true })
+            .eq('author', session?.user?.id);
+
+        const isFastDeployEnabled = (userClassificationCount || 0) === 0;
+        console.log("Fast deploy enabled:", isFastDeployEnabled);
+        
+        // Set deployment date - one day prior for fast deploy, current time otherwise
+        const now = new Date();
+        const deploymentDate = isFastDeployEnabled 
+            ? new Date(now.getTime() - 24 * 60 * 60 * 1000) // 1 day ago
+            : now;
+        const deploymentDateISO = deploymentDate.toISOString();
+        
+        console.log("Deployment date:", deploymentDateISO, isFastDeployEnabled ? "(fast deploy)" : "(normal)");
+        
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
@@ -212,6 +230,7 @@ export default function TelescopeRangeSlider() {
                             anomaly_id: anomaly.id,
                             classification_id: null,
                             automaton: "Telescope",
+                            date: deploymentDateISO,
                         },
                     ]);
 

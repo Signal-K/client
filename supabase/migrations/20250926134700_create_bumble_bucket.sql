@@ -21,7 +21,7 @@ CREATE POLICY "Allow public read access to bumble bucket"
 -- (in case admins need to add new bumblebee images)
 CREATE POLICY "Allow authenticated users to upload to bumble bucket"
   ON storage.objects
-  FOR INSERT
+  FOR INSERT 
   TO authenticated
   WITH CHECK (bucket_id = 'bumble');
 

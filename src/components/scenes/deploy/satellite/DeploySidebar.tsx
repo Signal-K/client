@@ -18,6 +18,7 @@ interface DeploySidebarProps {
   userCloudClassifications?: number;
   isDeployDisabled?: boolean;
   deploymentWarning?: string | null;
+  isFastDeployEnabled?: boolean | null;
 };
 
 const DeploySidebar: React.FC<DeploySidebarProps> = ({
@@ -32,6 +33,7 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
   userCloudClassifications,
   isDeployDisabled = false,
   deploymentWarning = null,
+  isFastDeployEnabled = null,
 }) => {
   const containerClasses = isMobile
     ? "w-full bg-[#181e2a]/95 backdrop-blur-md p-4 rounded-t-xl border-t border-[#232b3b] text-white min-h-80 max-h-96 overflow-y-auto"
@@ -62,6 +64,21 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
             </SelectContent>
           </Select>
         </div>
+
+        {/* Fast Deploy Welcome Message */}
+        {isFastDeployEnabled === true && (
+          <div className="p-4 bg-gradient-to-br from-green-500/25 to-blue-500/25 rounded-lg border border-green-400/40 shadow-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-green-300 font-semibold text-sm">🎁 Welcome Gift Active!</span>
+            </div>
+            <p className="text-green-200 text-xs leading-relaxed">
+              🚀 As a new space explorer, your satellite will experience a <strong>speed boost</strong>! 
+              Anomalies will be made available for classification <strong>immediately</strong> instead of 
+              waiting for the usual deployment time. Enjoy your first mission!
+            </p>
+          </div>
+        )}
 
         {/* Duration Slider */}
         <div>

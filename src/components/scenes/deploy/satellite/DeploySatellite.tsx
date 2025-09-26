@@ -98,6 +98,7 @@ export default function DeploySatelliteViewport() {
   } | null>(null);
   const [deploymentWarning, setDeploymentWarning] = useState<string | null>(null);
   const [isDeployDisabled, setIsDeployDisabled] = useState(false);
+  const [isFastDeployEnabled, setIsFastDeployEnabled] = useState<boolean | null>(null);
 
   // Validate deployment criteria
   useEffect(() => {
@@ -251,6 +252,29 @@ export default function DeploySatelliteViewport() {
     }
   };
 
+  // Check if user has fast deploy enabled (no classifications made)
+  const checkFastDeployStatus = async () => {
+    if (!session?.user?.id) {
+      setIsFastDeployEnabled(false);
+      return false;
+    }
+    
+    try {
+      const { count: userClassificationCount } = await supabase
+        .from('classifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('author', session.user.id);
+
+      const isFastDeploy = (userClassificationCount || 0) === 0;
+      setIsFastDeployEnabled(isFastDeploy);
+      return isFastDeploy;
+    } catch (error) {
+      console.error('Error checking fast deploy status:', error);
+      setIsFastDeployEnabled(false);
+      return false;
+    }
+  };
+
 
   const checkDeployment = async () => {
     if (!session?.user?.id) return;
@@ -315,6 +339,7 @@ export default function DeploySatelliteViewport() {
       setLoading(true);
       await fetchPlanetAnomalies();
       await fetchUserCloudClassificationCount();
+      await checkFastDeployStatus();
       await checkDeployment();
       setLoading(false);
     };
@@ -345,7 +370,25 @@ export default function DeploySatelliteViewport() {
       }
       const userId = session.user.id;
       console.log("User ID:", userId);
-      const now = new Date().toISOString();
+      
+      // Check if user has fast deploy enabled (no classifications made)
+      const { count: userClassificationCount } = await supabase
+        .from('classifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('author', userId);
+
+      const isFastDeployEnabled = (userClassificationCount || 0) === 0;
+      console.log("Fast deploy enabled:", isFastDeployEnabled);
+      
+      // Set deployment date - one day prior for fast deploy, current time otherwise
+      const now = new Date();
+      const deploymentDate = isFastDeployEnabled 
+        ? new Date(now.getTime() - 24 * 60 * 60 * 1000) // 1 day ago
+        : now;
+      const deploymentDateISO = deploymentDate.toISOString();
+      
+      console.log("Deployment date:", deploymentDateISO, isFastDeployEnabled ? "(fast deploy)" : "(normal)");
+      
       let rows = [];
       const planet = planetAnomalies[focusedPlanetIdx];
       console.log("Planet:", planet, "Investigation mode:", investigationMode);
@@ -366,7 +409,7 @@ export default function DeploySatelliteViewport() {
         author: userId,
         anomaly_id: planet.id,
         classification_id: classificationId || null,
-        date: now,
+        date: deploymentDateISO,
         automaton: 'WeatherSatellite',
         unlocked: false,
         unlock_time: null,
@@ -404,7 +447,7 @@ export default function DeploySatelliteViewport() {
           author: userId,
           anomaly_id: cloud.id,
           classification_id: classificationId || null,
-          date: now,
+          date: deploymentDateISO,
           automaton: 'WeatherSatellite',
           unlocked: false,
           unlock_time: null,
@@ -429,7 +472,7 @@ export default function DeploySatelliteViewport() {
       if (windErr) {
         alert('Failed to fetch wind survey anomalies: ' + windErr.message);
         return;
-      }
+      };
 
       const shuffledAnomalies = (windAnomalies || []).sort(() => 0.5 - Math.random());
       shuffledAnomalies.slice(0, 4).forEach((anomaly) => {
@@ -437,7 +480,7 @@ export default function DeploySatelliteViewport() {
           author: userId,
           anomaly_id: anomaly.id,
           classification_id: classificationId || null,
-          date: now,
+          date: deploymentDateISO,
           automaton: 'WeatherSatellite',
           unlocked: false,
           unlock_time: null,
@@ -567,6 +610,7 @@ export default function DeploySatelliteViewport() {
               userCloudClassifications={userCloudClassifications}
               isDeployDisabled={isDeployDisabled}
               deploymentWarning={deploymentWarning}
+              isFastDeployEnabled={isFastDeployEnabled}
             />
           </div>
         </div>
@@ -585,6 +629,7 @@ export default function DeploySatelliteViewport() {
             userCloudClassifications={userCloudClassifications}
             isDeployDisabled={isDeployDisabled}
             deploymentWarning={deploymentWarning}
+            isFastDeployEnabled={isFastDeployEnabled}
           />
         </div>
 

@@ -183,6 +183,24 @@ export default function AutomatonDeploySection() {
   const handleSubmit = async () => {
     if (!session) return;
 
+    // Check if user has fast deploy enabled (no classifications made)
+    const { count: userClassificationCount } = await supabase
+      .from('classifications')
+      .select('id', { count: 'exact', head: true })
+      .eq('author', session.user.id);
+
+    const isFastDeployEnabled = (userClassificationCount || 0) === 0;
+    console.log("Fast deploy enabled:", isFastDeployEnabled);
+    
+    // Set deployment date - one day prior for fast deploy, current time otherwise
+    const currentTime = new Date();
+    const deploymentDate = isFastDeployEnabled 
+      ? new Date(currentTime.getTime() - 24 * 60 * 60 * 1000) // 1 day ago
+      : currentTime;
+    const deploymentDateISO = deploymentDate.toISOString();
+    
+    console.log("Deployment date:", deploymentDateISO, isFastDeployEnabled ? "(fast deploy)" : "(normal)");
+
     // Before inserting new linked anomalies:
     // Delete linked anomalies older than this week for this user
 
@@ -330,7 +348,7 @@ rovers.forEach((loc) => {
         classification_id: a.classification.id,
         anomaly_id: a.anomalyId!,
         automaton: a.automaton,
-        date: new Date().toISOString(),
+        date: deploymentDateISO,
       }));
 
     if (entriesToInsert.length === 0) {

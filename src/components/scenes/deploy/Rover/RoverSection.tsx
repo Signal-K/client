@@ -32,6 +32,8 @@ export default function RoverViewportSection() {
     const [nextWaypointRemainingMs, setNextWaypointRemainingMs] = useState<number | null>(null);
     const [missionCompleteTime, setMissionCompleteTime] = useState<number | null>(null);
     const [isReturningHome, setIsReturningHome] = useState<boolean>(false);
+    const [userClassificationCount, setUserClassificationCount] = useState<number>(0);
+    const [isFastDeployEnabled, setIsFastDeployEnabled] = useState<boolean>(false);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -39,6 +41,23 @@ export default function RoverViewportSection() {
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+    
+    // Fetch user classification count for fast deploy
+    useEffect(() => {
+        async function fetchClassificationCount() {
+            if (!session) return;
+            const { count, error } = await supabase
+                .from("classifications")
+                .select("id", { count: "exact" })
+                .eq("author", session.user.id);
+            
+            const classificationCount = count || 0;
+            setUserClassificationCount(classificationCount);
+            setIsFastDeployEnabled(classificationCount < 4);
+        }
+        
+        fetchClassificationCount();
+    }, [session, supabase]);
     
     // Check for linked_anomalies of relevant type
     useEffect(() => {
@@ -148,6 +167,10 @@ export default function RoverViewportSection() {
                     const routeTime = new Date(latestRoute.timestamp);
                     const base = { x: 1, y: 95 };
                     const refuel = { x: 99, y: 95 };
+                    
+                    // Calculate timing intervals based on fast deploy status
+                    const travelTimeMs = isFastDeployEnabled ? 60 * 1000 : 60 * 60 * 1000; // 60 seconds vs 1 hour
+                    
                     let roverX = base.x;
                     let roverY = base.y;
                     let angle = 0;
@@ -160,13 +183,17 @@ export default function RoverViewportSection() {
                     for (let i = 0; i <= config.anomalies.length; i++) {
                         if (i === 0) {
                             // from base to wp0
-                            const arrival = new Date(routeTime.getTime() + 60 * 60 * 1000);
+                            const arrival = new Date(routeTime.getTime() + travelTimeMs);
                             if (now < arrival) {
-                                const progress = (now.getTime() - routeTime.getTime()) / (60 * 60 * 1000);
+                                const progress = (now.getTime() - routeTime.getTime()) / travelTimeMs;
                                 roverX = base.x + progress * (config.waypoints[0].x - base.x);
                                 roverY = base.y + progress * (config.waypoints[0].y - base.y);
                                 angle = Math.atan2(config.waypoints[0].y - base.y, config.waypoints[0].x - base.x) * 180 / Math.PI;
-                                status = `${Math.ceil((arrival.getTime() - now.getTime()) / 60000)} min until Waypoint 1`;
+                                const timeUnit = isFastDeployEnabled ? 'sec' : 'min';
+                                const timeLeft = isFastDeployEnabled 
+                                    ? Math.ceil((arrival.getTime() - now.getTime()) / 1000)
+                                    : Math.ceil((arrival.getTime() - now.getTime()) / 60000);
+                                status = `${timeLeft} ${timeUnit} until Waypoint 1`;
                                 activeIndexVar = 0;
                                 // We are currently en-route to waypoint 0
                                 roverAtIndexLocal = null;
@@ -206,14 +233,18 @@ export default function RoverViewportSection() {
                                 break;
                             }
 
-                            const arrival = new Date(new Date(classif.created_at).getTime() + 60 * 60 * 1000);
+                            const arrival = new Date(new Date(classif.created_at).getTime() + travelTimeMs);
                             if (now < arrival) {
-                                const progress = (now.getTime() - new Date(classif.created_at).getTime()) / (60 * 60 * 1000);
+                                const progress = (now.getTime() - new Date(classif.created_at).getTime()) / travelTimeMs;
                                 roverX = prevWp.x + progress * (nextWp.x - prevWp.x);
                                 roverY = prevWp.y + progress * (nextWp.y - prevWp.y);
                                 angle = Math.atan2(nextWp.y - prevWp.y, nextWp.x - prevWp.x) * 180 / Math.PI;
                                 const wpLabel = i < config.waypoints.length ? `Waypoint ${i+1}` : 'Refueling Station';
-                                status = `${Math.ceil((arrival.getTime() - now.getTime()) / 60000)} min until ${wpLabel}`;
+                                const timeUnit = isFastDeployEnabled ? 'sec' : 'min';
+                                const timeLeft = isFastDeployEnabled 
+                                    ? Math.ceil((arrival.getTime() - now.getTime()) / 1000)
+                                    : Math.ceil((arrival.getTime() - now.getTime()) / 60000);
+                                status = `${timeLeft} ${timeUnit} until ${wpLabel}`;
                                 activeIndexVar = i;
                                 // en-route from prevWp to nextWp
                                 roverAtIndexLocal = null;
@@ -281,7 +312,7 @@ export default function RoverViewportSection() {
             }
         }
         fetchLinkedAnomaliesAndWaypoints();
-    }, [session, supabase]);
+    }, [session, supabase, isFastDeployEnabled]);
 
     // Ticking effect to update remaining ms until next waypoint arrival
     useEffect(() => {
@@ -587,6 +618,16 @@ export default function RoverViewportSection() {
                         })}
                         {roverStatus && (
                             <div className="fixed bottom-0 right-0 text-white text-xs bg-black/50 p-2 rounded m-2 z-50 max-w-xs">
+                                {/* Fast Deploy Welcome Message */}
+                                {isFastDeployEnabled && (
+                                    <div className="mb-2 p-2 bg-gradient-to-r from-green-500/30 to-blue-500/30 rounded border border-green-400/40">
+                                        <div className="flex items-center gap-1 mb-1">
+                                            <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
+                                            <span className="text-green-300 font-semibold text-xs">🎁 Speed Boost Active!</span>
+                                        </div>
+                                        <div className="text-green-200 text-xs">Rover reaching waypoints in 60s instead of 1h</div>
+                                    </div>
+                                )}
                                 <div>{roverStatus}</div>
                                 {nextWaypointRemainingMs !== null && nextWaypointRemainingMs !== undefined && nextWaypointRemainingMs > 0 && (
                                     <div>Arriving in: {Math.ceil(nextWaypointRemainingMs / 1000)}s</div>
