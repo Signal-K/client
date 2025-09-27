@@ -20,6 +20,7 @@ import MainHeader from "@/src/components/layout/Header/MainHeader";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
 import ProfileSetupRequired from "@/src/components/profile/setup/ProfileSetupRequired";
 import NotificationSubscribeButton from "@/src/components/providers/NotificationSubscribeButton";
+import GettingStartedViewport from "@/src/components/profile/setup/GettingStartedViewport";
 
 // Import custom hooks
 import { usePageData } from "@/hooks/usePageData";
@@ -134,6 +135,12 @@ export default function ActivityPage() {
           onOpenProfileModal={() => setShowProfileModal(true)}
         />
       )}
+
+        {/* Getting Started Progress Card */}
+        <GettingStartedViewport 
+          classificationsCount={classifications.length}
+          classificationTypes={Array.from(new Set(classifications.map(c => c.classificationtype).filter((type): type is string => type !== null)))}
+        />
 
         {/* Project Selection for New Users */}
         {classifications.length === 0 && (
