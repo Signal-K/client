@@ -119,13 +119,6 @@ export function AnomalyDetailDialog({
                   <div className="capitalize">{selectedAnomaly.shape}</div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-400" />
-                <div>
-                  <div className={accent}>Created At</div>
-                  <div>{anomalyCreated ? new Date(anomalyCreated).toLocaleString() : "-"}</div>
-                </div>
-              </div>
             </div>
           </div>
 

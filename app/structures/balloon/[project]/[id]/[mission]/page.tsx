@@ -83,7 +83,7 @@ export default function BalloonClassifyPage() {
                 />
             </div>
 
-            <div className="relative z-10 pb-8">
+            <div className="relative z-50 pb-8">
                 <GameNavbar />
             </div>
 
