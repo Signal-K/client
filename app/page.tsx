@@ -128,13 +128,20 @@ export default function ActivityPage() {
           onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
         />
 
+              {/* Profile Setup or Complete Structures Section */}
+      {needsProfileSetup && (
+        <ProfileSetupRequired
+          onOpenProfileModal={() => setShowProfileModal(true)}
+        />
+      )}
+
         {/* Project Selection for New Users */}
         {classifications.length === 0 && (
-          <ProjectSelectionViewport 
+          <ProjectSelectionViewport
             classificationsCount={classifications.length}
             showWelcomeMessage={true}
             onProjectSelect={(projectId) => {
-              console.log('Selected project:', projectId);
+              console.log("Selected project:", projectId);
               // Here we could trigger fast deployment logic in the future
             }}
           />
@@ -200,13 +207,6 @@ export default function ActivityPage() {
 
         {/* Legacy Milestones Section */}
         {/* <LegacyMilestonesSection /> */}
-
-        {/* Profile Setup or Complete Structures Section */}
-        {needsProfileSetup && (
-          <ProfileSetupRequired
-            onOpenProfileModal={() => setShowProfileModal(true)}
-          />
-        )}
 
         {/* Legacy Tips Panel */}
         {/* <LegacyTipsPanel 
