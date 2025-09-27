@@ -115,6 +115,14 @@ export default function DeployTelescopeViewport() {
       };
 
       if (data) {
+        console.log('Fetched anomalies by set:', {
+          totalFetched: data.length,
+          setsRequested: setsToFetch,
+          bySet: setsToFetch.map(set => ({
+            set,
+            count: data.filter(a => a.anomalySet === set).length
+          }))
+        });
         setTessAnomalies(data);
       };
     } catch (error: any) {
@@ -258,54 +266,71 @@ export default function DeployTelescopeViewport() {
     setDeploying(true);
     const seed = selectedSector.x * 1000 + selectedSector.y;
 
-    // Separate anomaly sets
+    // Separate anomaly sets - debug what we actually have
     const planets = tessAnomalies.filter(a => a.anomalySet === 'telescope-tess');
     const asteroids = tessAnomalies.filter(a => a.anomalySet === 'telescope-minorPlanet');
     const activeAsteroids = tessAnomalies.filter(a => a.anomalySet === 'active-asteroids');
 
-    const shuffleAndPick = (arr: DatabaseAnomaly[], count: number) =>
-      arr
+    // Debug logging
+    console.log('Available anomalies by type:', {
+      totalAnomalies: tessAnomalies.length,
+      planets: planets.length,
+      asteroids: asteroids.length,
+      activeAsteroids: activeAsteroids.length,
+      samplePlanet: planets[0]?.anomalySet,
+      sampleAsteroid: asteroids[0]?.anomalySet,
+      sampleActive: activeAsteroids[0]?.anomalySet,
+      allSets: [...new Set(tessAnomalies.map(a => a.anomalySet))]
+    });
+
+    const shuffleAndPick = (arr: DatabaseAnomaly[], count: number) => {
+      if (arr.length === 0) return [];
+      return arr
         .map((item, i) => ({ item, r: seededRandom1(seed, i) }))
         .sort((a, b) => a.r - b.r)
-        .slice(0, count)
+        .slice(0, Math.min(count, arr.length))
         .map(obj => obj.item);
+    };
 
     let selectedAnomalies: DatabaseAnomaly[] = [];
 
-    // Check if user can see active-asteroids
-    let canSeeActiveAsteroids = false;
-    if (session?.user?.id) {
-      const { count, error: countError } = await supabase
-        .from("classifications")
-        .select("id", { count: "exact", head: true })
-        .eq("author", session.user.id)
-        .eq("classificationtype", "telescope-minorPlanet");
-      if (!countError && typeof count === 'number' && count >= 2) {
-        canSeeActiveAsteroids = true;
-      }
-    }
+    // Check if user can see active-asteroids (should match the fetchTessAnomalies logic)
+    let canSeeActiveAsteroids = activeAsteroids.length > 0;
 
-    if (canSeeActiveAsteroids) {
-      // Pick from all three sets
+    if (canSeeActiveAsteroids && activeAsteroids.length > 0) {
+      console.log('Using active asteroid logic - 3 sets available');
+      // Pick from all three sets - ensure at least 2 different types
       const planetPick = shuffleAndPick(planets, 1);
       const asteroidPick = shuffleAndPick(asteroids, 1);
       const activeAsteroidPick = shuffleAndPick(activeAsteroids, 1);
-      const remaining = shuffleAndPick(
-        [...planets, ...asteroids, ...activeAsteroids].filter(
-          a => !planetPick.includes(a) && !asteroidPick.includes(a) && !activeAsteroidPick.includes(a)
-        ),
-        1
+      
+      // For the 4th anomaly, pick from any available set
+      const remainingPool = [...planets, ...asteroids, ...activeAsteroids].filter(
+        a => !planetPick.includes(a) && !asteroidPick.includes(a) && !activeAsteroidPick.includes(a)
       );
+      const remaining = shuffleAndPick(remainingPool, 1);
+      
       selectedAnomalies = [...planetPick, ...asteroidPick, ...activeAsteroidPick, ...remaining];
-    } else if (skillProgress.telescope >= 4) {
-      // Only planets and asteroids
+    } else if (asteroids.length > 0) {
+      console.log('Using 2-set logic - planets and asteroids. Telescope skill:', skillProgress.telescope);
+      // Only planets and asteroids - ensure at least 1 from each type
       const planetPick = shuffleAndPick(planets, 1);
       const asteroidPick = shuffleAndPick(asteroids, 1);
-      const remaining = shuffleAndPick([...planets, ...asteroids].filter(a => !planetPick.includes(a) && !asteroidPick.includes(a)), 2);
+      
+      // For the remaining 2 anomalies, pick from any available (planets or asteroids)
+      const remainingPool = [...planets, ...asteroids].filter(
+        a => !planetPick.includes(a) && !asteroidPick.includes(a)
+      );
+      const remaining = shuffleAndPick(remainingPool, 2);
+      
       selectedAnomalies = [...planetPick, ...asteroidPick, ...remaining];
     } else {
-      selectedAnomalies = shuffleAndPick(planets, 4); // If the user hasn't unlocked asteroid/DMP project yet
+      console.log('Using planet-only logic - user has no access to asteroids yet');
+      // New users only get planets - but still try to have variety if possible
+      selectedAnomalies = shuffleAndPick(planets, 4);
     }
+
+    console.log('Selected anomalies:', selectedAnomalies.map(a => ({ id: a.id, set: a.anomalySet, content: a.content })));
 
     if (selectedAnomalies.length === 0) {
       setDeploymentMessage("No anomalies found in selected sector")
@@ -330,15 +355,27 @@ export default function DeployTelescopeViewport() {
       const anomalyNames = selectedAnomalies.map(a => a.content || `TESS-${String(a.id).padStart(3, "0")}`);
       const sectorName = generateSectorName(selectedSector.x, selectedSector.y);
       
+      // Count anomaly types for better messaging
+      const typeCount = {
+        planets: selectedAnomalies.filter(a => a.anomalySet === 'telescope-tess').length,
+        asteroids: selectedAnomalies.filter(a => a.anomalySet === 'telescope-minorPlanet').length,
+        activeAsteroids: selectedAnomalies.filter(a => a.anomalySet === 'active-asteroids').length
+      };
+      
       setDeploymentResult({
         anomalies: anomalyNames,
         sectorName: sectorName
       });
 
-      // Send notification about the deployment
+      // Send notification about the deployment with type diversity info
       try {
+        const typeDescriptions = [];
+        if (typeCount.planets > 0) typeDescriptions.push(`${typeCount.planets} planet candidate${typeCount.planets > 1 ? 's' : ''}`);
+        if (typeCount.asteroids > 0) typeDescriptions.push(`${typeCount.asteroids} asteroid${typeCount.asteroids > 1 ? 's' : ''}`);
+        if (typeCount.activeAsteroids > 0) typeDescriptions.push(`${typeCount.activeAsteroids} active asteroid${typeCount.activeAsteroids > 1 ? 's' : ''}`);
+        
         const notificationTitle = "Telescope Deployed Successfully";
-        const notificationBody = `New targets discovered in ${sectorName}: ${anomalyNames.join(", ")}`;
+        const notificationBody = `Diverse targets discovered in ${sectorName}: ${typeDescriptions.join(', ')}`;
         
         await fetch('/api/send-test-notification', {
           method: 'POST',
@@ -365,7 +402,7 @@ export default function DeployTelescopeViewport() {
     setDeploymentMessage(
       hasError
         ? "Error deploying telescope. Please try again."
-        : `Telescope deployed! ${selectedAnomalies.length} targets are now active.`
+        : `Telescope deployed! ${selectedAnomalies.length} diverse targets are now active.`
     );
 
     setAlreadyDeployed(!hasError);
@@ -479,17 +516,16 @@ export default function DeployTelescopeViewport() {
 
       {/* Anomaly types deployed info - absolutely positioned at the bottom left of the display */}
       <div className="fixed bottom-8 left-8 z-40 p-3 rounded bg-[#00304a]/80 border border-[#78cce2]/20 text-[#e4eff0] text-xs font-mono min-w-[260px] max-w-[340px] shadow-lg">
-        <span className="font-bold text-[#78cce2]">Anomaly Types:</span>
+        <span className="font-bold text-[#78cce2]">Diverse Target Selection:</span>
         <ul className="list-disc ml-5 mt-1">
-          <li>Planets (TESS)</li>
+          <li>Planets (TESS exoplanet candidates)</li>
           <li>Asteroids (Minor planets)</li>
           {tessAnomalies.some(a => a.anomalySet === 'active-asteroids') && (
-            <li>Active Asteroids (asteroids, comets)</li>
+            <li>Active Asteroids (comets, moving objects)</li>
           )}
         </ul>
-        <div className="mt-2 text-[#78cce2]">
-          <span className="font-semibold">Asteroid projects</span>: asteroids, comets<br/>
-          <span className="font-semibold">Planets</span>: exoplanet candidates
+        <div className="mt-2 text-[#78cce2] text-xs">
+          <span className="font-semibold">🎯 Mission Strategy</span>: Each deployment ensures at least 2 different target types for comprehensive discovery
         </div>
       </div>
 
