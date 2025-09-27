@@ -16,7 +16,7 @@ export default function SolarHealthViewportExpandedPage() {
                 alt="Earth Background Image"
             />
 
-            <div className="z-10 w-full">
+            <div className="z-50 w-full">
                 <GameNavbar />
             </div>
 

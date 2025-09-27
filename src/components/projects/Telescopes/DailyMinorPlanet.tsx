@@ -5,6 +5,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ClassificationForm from "../(classifications)/PostForm";
 import { useRouter } from "next/navigation";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import TutorialContentBlock from "../TutorialContentBlock";
 
 import { Button } from "@/src/components/ui/button";
 interface Props {
@@ -24,13 +25,8 @@ export function StarterDailyMinorPlanet({
     ];
 
     const [part, setPart] = useState(1);
-    const [line, setLine] = useState(1);
-    const nextLine = () => setLine(prevLine => prevLine + 1);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-    const nextPart = () => {
-        setPart(2);
-        setLine(1);
-    };
+    const nextPart = () => setPart(2);
 
     const handlePrevious = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1));
@@ -40,110 +36,65 @@ export function StarterDailyMinorPlanet({
         setCurrentImageIndex((prevIndex) => (prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1));
     };
 
-    const tutorialContent = (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-            <div className="p-4 bg-[#2C3A4A] border border-[#85DDA2] rounded-md shadow-md relative w-full">
-                <div className="relative">
-                    <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
-                    {part === 1 && (
-                        <>
-                            {line === 1 && (
-                                <p className="text-[#EEEAD1]">
-                                    Welcome to the Asteroid Hunters project. In this project, you will be identifying minor planet candidates, like asteroids, around your local star.
-                                </p>
-                            )}
-                            {line === 2 && (
-                                <p className="text-[#EEEAD1]">
-                                    We use the apparent movement of asteroids from image to image to find them, so if you don't see movement, click through the different images to see if the circled object moves
-                                </p>
-                            )}
-                            {line === 3 && (
-                                <p className="text-[#EEEAD1]">
-                                    Find the green circle in the subject clip. Within the green circle is one object (light spot) that moves from frame to frame. We call this light spot inside the green circle a detection.
-                                </p>
-                            )}
-                            {line === 4 && (
-                                <p className="text-[#EEEAD1]">
-                                    That's it! Get ready to explore the skies. Click "Continue" to start classifying. 
-                                </p>
-                            )}
-
-                            {line < 4 && (
-                                <button
-                                    onClick={nextLine}
-                                    className="absolute bottom-4 right-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
-                                >
-                                    Next
-                                </button>
-                            )}
-                            {line === 4 && (
-                                <button
-                                    onClick={nextPart}
-                                    className="absolute bottom-4 right-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
-                                >
-                                    Continue
-                                </button>
-                            )}
-                            {line < 5 && (
-                                <div className="flex justify-center mt-4 w-full h-128">
-                                    {line === 1 && <img src="/assets/Docs/Telescopes/DailyMinorPlanet/Step1.png" alt="Step 1" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 2 && <img src="/assets/Docs/Telescopes/DailyMinorPlanet/Step2.png" alt="Step 2" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 3 && <img src="/assets/Docs/Telescopes/DailyMinorPlanet/Step3.png" alt="Step 3" className="mex-w-full max-h-full object-contain" />} 
-                                    {line === 4 && <img src="/assets/Docs/Telescopes/DailyMinorPlanet/Step4.png" alt="Step 4" className="mex-w-full max-h-full object-contain" />} 
-                                </div>
-                            )}
-                        </>
-                    )}
-
-                    {part === 2 && (
-                        <>
-                            {line === 1 && (
-                                <p className="text-[#EEEAD1]">
-                                    
-                                </p>
-                            )}
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
+    const tutorialSlides = [
+        {
+            title: "Welcome to Asteroid Hunters",
+            text: "Welcome to the Asteroid Hunters project. In this project, you will be identifying minor planet candidates, like asteroids, around your local star.",
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step1.png"
+        },
+        {
+            title: "Finding Moving Objects",
+            text: "We use the apparent movement of asteroids from image to image to find them, so if you don't see movement, click through the different images to see if the circled object moves",
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step2.png"
+        },
+        {
+            title: "Identify the Detection",
+            text: "Find the green circle in the subject clip. Within the green circle is one object (light spot) that moves from frame to frame. We call this light spot inside the green circle a detection.",
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step3.png"
+        },
+        {
+            title: "Ready to Explore",
+            text: "That's it! Get ready to explore the skies. Click 'Continue' to start classifying.",
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step4.png"
+        }
+    ];
 
     return (
         <div className="rounded-lg">
             <div className="flex flex-col items-center">
                 {part === 1 && (
-                    <div className="mb-2">
-                        {tutorialContent}
-                    </div>
+                    <TutorialContentBlock
+                        slides={tutorialSlides}
+                        classificationtype="telescope-minorPlanet"
+                        onComplete={nextPart}
+                    />
                 )}
 
                 {part === 2 && (
-                    <>
-                        <div className="mb-2">
-                            <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                    <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                        <div className="relative">
+                            <div className='absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
+                            <div className="bg-white bg-opacity-90">
                                 <div className="relative">
-                                    <div className='absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
-                                    <div className="bg-white bg-opacity-90">
-                                        <div className="relative">
                                     <img
                                         src={imageUrls[currentImageIndex]}
                                         alt={`Anomaly ${currentImageIndex + 1}`}
                                         className="w-full h-full object-contain"
                                     />
-                                    {imageUrls.map((_, index) => (
-                                        <span
-                                            key={index}
-                                            className={`h-2 w-2 rounded-full mx-1 ${index === currentImageIndex ? 'bg-blue-500' : 'bg-gray-300'}`}
-                                        />
-                                    ))}
-                                    </div>
+                                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2">
+                                        {imageUrls.map((_, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => setCurrentImageIndex(index)}
+                                                className={`h-3 w-3 rounded-full ${index === currentImageIndex ? 'bg-blue-500' : 'bg-gray-300'}`}
+                                            />
+                                        ))}
                                     </div>
                                 </div>
-                                <ClassificationForm anomalyId={anomalyid.toString()} anomalyType='telescope-minorPlanet' missionNumber={20000003} assetMentioned={imageUrls} />
                             </div>
                         </div>
-                    </>
+                        <ClassificationForm anomalyId={anomalyid.toString()} anomalyType='telescope-minorPlanet' missionNumber={20000003} assetMentioned={imageUrls} />
+                    </div>
                 )}
             </div>
         </div>
@@ -359,89 +310,61 @@ const FirstMinorPlanetClassification: React.FC<MinorPlanetProps> = ({ anomalyid 
     const session = useSession();
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/1.png`;
+    const imageUrls = [1, 2, 3, 4].map(i => 
+        `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/${i}.png`
+    );
 
     const [part, setPart] = useState(1);
-    const [line, setLine] = useState(1);
+    const nextPart = () => setPart(2);
 
-    const nextLine = () => setLine(prevLine => prevLine + 1);
-    const nextPart = () => {
-        setPart(2);
-        setLine(1); 
-    };
-
-    const tutorialContent = (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
-            <div className="p-4 bg-[#2C3A4A] border border-[#85DDA2] rounded-md shadow-md relative w-full">
-                <div className="relative">
-                    <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
-                    {part === 1 && (
-                        <>
-                            {line === 1 && <p className="text-[#EEEAD1]">Welcome to the Asteroid Hunters project! You'll be identifying minor planet candidates like asteroids.</p>}
-                            {line === 2 && <p className="text-[#EEEAD1]">Look for the green circle in the images. Within it is an object that moves from frame to frame.</p>}
-                            {line === 3 && <p className="text-[#EEEAD1]">Your task is to mark the moving object in each frame. This helps confirm if it's a real asteroid.</p>}
-                            {line === 4 && <p className="text-[#EEEAD1]">Use the annotation tools to mark the object's location. Ready to start?</p>}
-
-                            {line < 4 && (
-                                <button
-                                    onClick={nextLine}
-                                    className="absolute bottom-4 right-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
-                                >
-                                    Next
-                                </button>
-                            )}
-                            {line === 4 && (
-                                <button
-                                    onClick={nextPart}
-                                    className="absolute bottom-4 right-4 px-4 py-2 bg-[#85DDA2] text-[#2C3A4A] rounded-md shadow-md"
-                                >
-                                    Start Annotating
-                                </button>
-                            )}
-                        </>
-                    )}
-                    {part === 2 && (
-                        <>
-                            {line === 1 && (
-                                <div className="max-w-4xl mx-auto rounded-lg text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
-                                    <ImageAnnotator
-                                        anomalyType="telescope-minorPlanet"
-                                        missionNumber={20000003}
-                                        structureItemId={3103}
-                                        assetMentioned={anomalyid}
-                                        annotationType="AA"
-                                        initialImageUrl={imageUrl}
-                                        anomalyId={anomalyid}
-                                        className="h-full w-full"
-                                    />
-                                </div>
-                            )}
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
+    const tutorialSlides = [
+        {
+            title: "Welcome to Asteroid Hunters",
+            text: "Welcome to the Asteroid Hunters project. In this project, you will be identifying minor planet candidates, like asteroids, around your local star.",
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step1.png"
+        },
+        {
+            title: "Finding Moving Objects",
+            text: "We use the apparent movement of asteroids from image to image to find them, so if you don't see movement, click through the different images to see if the circled object moves",
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step2.png"
+        },
+        {
+            title: "Identify the Detection",
+            text: "Find the green circle in the subject clip. Within the green circle is one object (light spot) that moves from frame to frame. We call this light spot inside the green circle a detection.",
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step3.png"
+        },
+        {
+            title: "Ready to Explore",
+            text: "That's it! Get ready to explore the skies. Click 'Continue' to start classifying.",
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step4.png"
+        }
+    ];
 
     return (
         <div className="rounded-lg">
             <div className="flex flex-col items-center">
                 {part === 1 && (
-                    <div className="mb-2">{tutorialContent}</div>
+                    <TutorialContentBlock
+                        slides={tutorialSlides}
+                        classificationtype="telescope-minorPlanet"
+                        onComplete={nextPart}
+                    />
                 )}
+                
                 {part === 2 && (
-                    <>
-                        <div className="mb-2">
-                            <img
-                                src='https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true'
-                                alt='telescope'
-                                className="w-24 h-24 mb-2"
-                            />
-                        </div>
-                        <div className="max-w-4xl mx-auto rounded-lg text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
-                            {tutorialContent}
-                        </div>
-                    </>
+                    <div className="max-w-4xl mx-auto rounded-lg text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                        <ImageAnnotator
+                            anomalyType="telescope-minorPlanet"
+                            missionNumber={20000003}
+                            structureItemId={3103}
+                            assetMentioned={anomalyid}
+                            annotationType="AA"
+                            initialImageUrl={imageUrls[0]}
+                            otherAssets={imageUrls.slice(1)}
+                            anomalyId={anomalyid}
+                            className="h-full w-full"
+                        />
+                    </div>
                 )}
             </div>
         </div>

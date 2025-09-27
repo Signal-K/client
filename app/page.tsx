@@ -20,6 +20,7 @@ import MainHeader from "@/src/components/layout/Header/MainHeader";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
 import ProfileSetupRequired from "@/src/components/profile/setup/ProfileSetupRequired";
 import NotificationSubscribeButton from "@/src/components/providers/NotificationSubscribeButton";
+import GettingStartedViewport from "@/src/components/profile/setup/GettingStartedViewport";
 
 // Import custom hooks
 import { usePageData } from "@/hooks/usePageData";
@@ -31,6 +32,7 @@ import TelescopeViewportSection from "@/src/components/scenes/deploy/Telescope/T
 import RoverViewportSection from "@/src/components/scenes/deploy/Rover/RoverSection";
 import ViewportSkillTree from "@/src/components/research/section/skillTreeSection";
 import ResearchSkillViewport from "@/src/components/research/section/skillTreeSection";
+import ProjectSelectionViewport from "@/src/components/onboarding/ProjectSelectionViewport";
 import Landing from "./apt/page";
 
 type PageSatellite = {
@@ -127,33 +129,44 @@ export default function ActivityPage() {
           onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
         />
 
-        {/* 2x2 Grid for viewports on desktop, single column on mobile 
-        <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-6 w-full">
-          {/* Set a consistent height for all viewports, matching SolarHealth block 
-          <div className="w-full h-[420px] md:h-[420px] flex">
+              {/* Profile Setup or Complete Structures Section */}
+      {needsProfileSetup && (
+        <ProfileSetupRequired
+          onOpenProfileModal={() => setShowProfileModal(true)}
+        />
+      )}
+
+        {/* Getting Started Progress Card */}
+        <GettingStartedViewport 
+          classificationsCount={classifications.length}
+          classificationTypes={Array.from(new Set(classifications.map(c => c.classificationtype).filter((type): type is string => type !== null)))}
+        />
+
+        {/* Project Selection for New Users */}
+        {classifications.length === 0 && (
+          <ProjectSelectionViewport
+            classificationsCount={classifications.length}
+            showWelcomeMessage={true}
+            onProjectSelect={(projectId) => {
+              console.log("Selected project:", projectId);
+              // Here we could trigger fast deployment logic in the future
+            }}
+          />
+        )}
+
+        {/* Only show regular viewports if user has made classifications */}
+        {classifications.length > 0 && (
+          <>
             <TelescopeViewportSection />
-          </div>
-          <div className="w-full h-[420px] md:h-[420px] flex">
             <SatellitePosition
               satellites={satelliteData ? [satelliteData] : []}
               flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
             />
-          </div>
-          <div className="w-full h-[420px] md:h-[420px] flex">
-            <SolarHealth />
-          </div>
-          <div className="w-full h-[420px] md:h-[420px] flex">
             <RoverViewportSection />
-          </div> 
-        </div> */}
-        <TelescopeViewportSection />
-        <SatellitePosition
-          satellites={satelliteData ? [satelliteData] : []}
-          flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
-        />
-        <RoverViewportSection />
-        <ResearchSkillViewport />
-        <SolarHealth />
+            <ResearchSkillViewport />
+            <SolarHealth />
+          </>
+        )}
 
         {/* Recent Discoveries */}
         {/* <RecentDiscoveries
@@ -201,13 +214,6 @@ export default function ActivityPage() {
 
         {/* Legacy Milestones Section */}
         {/* <LegacyMilestonesSection /> */}
-
-        {/* Profile Setup or Complete Structures Section */}
-        {needsProfileSetup && (
-          <ProfileSetupRequired
-            onOpenProfileModal={() => setShowProfileModal(true)}
-          />
-        )}
 
         {/* Legacy Tips Panel */}
         {/* <LegacyTipsPanel 

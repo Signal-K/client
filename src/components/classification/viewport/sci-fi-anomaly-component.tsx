@@ -12,8 +12,33 @@ interface SciFiAnomalyComponentProps {
 };
 
 export function SciFiAnomalyComponent({ anomaly, onClick, title, isHighlighted = false, status, inline = false }: SciFiAnomalyComponentProps) {
-  // Choose icon based on anomaly type
+  // Choose icon based on anomaly type or title
   const getIcon = () => {
+    // Check title for candidate types
+    if (title === "Planet candidate") {
+      return (
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#8a8a8a] to-[#5a5a5a] border-2 border-[#78cce2] flex items-center justify-center shadow-lg relative">
+          {/* Rocky surface texture */}
+          <div className="w-3 h-3 rounded-full bg-[#6a6a6a] absolute left-1 top-1 opacity-70" />
+          <div className="w-2 h-2 rounded-full bg-[#4a4a4a] absolute right-1 bottom-1 opacity-60" />
+          <div className="w-1 h-1 rounded-full bg-[#3a3a3a] absolute left-2 bottom-2 opacity-80" />
+        </div>
+      )
+    }
+    
+    if (title === "Asteroid candidate") {
+      return (
+        <div className="w-7 h-7 bg-gradient-to-br from-[#7a7a7a] to-[#4a4a4a] border-2 border-[#78cce2] flex items-center justify-center shadow-md relative" 
+             style={{ borderRadius: '40% 60% 70% 30%' }}>
+          {/* Irregular rocky texture */}
+          <div className="w-2 h-2 bg-[#5a5a5a] absolute left-1 top-1 opacity-70" style={{ borderRadius: '60% 40%' }} />
+          <div className="w-1 h-1 bg-[#3a3a3a] absolute right-1 bottom-1 opacity-80" />
+          <div className="w-1 h-2 bg-[#6a6a6a] absolute left-2 bottom-1 opacity-60" style={{ borderRadius: '50% 80%' }} />
+        </div>
+      )
+    }
+    
+    // Original logic for other types
     switch (anomaly.type) {
       case "planet":
       case "exoplanet":
@@ -90,7 +115,11 @@ export function SciFiAnomalyComponent({ anomaly, onClick, title, isHighlighted =
         >
           {getIcon()}
         </div>
-        <span className="mt-1 text-xs font-mono text-[#78cce2] bg-[#0a0a2a]/80 px-2 py-0.5 rounded shadow-lg">
+        <span className={`mt-1 text-xs font-mono px-2 py-0.5 rounded shadow-lg ${
+          title === "Planet candidate" || title === "Asteroid candidate" 
+            ? "text-[#a8a8a8] bg-[#2a2a2a]/80" 
+            : "text-[#78cce2] bg-[#0a0a2a]/80"
+        }`}>
           {title}
         </span>
       </div>

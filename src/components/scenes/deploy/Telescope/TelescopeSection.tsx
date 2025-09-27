@@ -6,9 +6,7 @@ import { SciFiAnomalyComponent } from "@/src/components/classification/viewport/
 import { AnomalyDetailDialog } from "@/src/components/classification/viewport/anomaly-detail-dialogue";
 import { ClassificationDetailDialog } from "@/src/components/classification/viewport/classification-detail-dialog";
 import { TelescopeViewportState } from "@/src/components/classification/telescope/telescope-viewport";
-import { generateSectorName } from "@/src/components/classification/telescope/utils/sector-utils";
 import Section from "@/src/components/sections/Section";
-import { AnomalyData } from "@/types/AnomalyData";
 import { Anomaly } from "@/types/Structures/telescope";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
@@ -157,19 +155,35 @@ export default function TelescopeViewportSection() {
             {/* Render anomalies or classifications */}
             <div className="w-full h-full relative">
               {showLinkedOnly
-                ? linkedAnomalies.map((anomaly) => (
-                    <SciFiAnomalyComponent
-                      key={anomaly.id}
-                      anomaly={{
-                        ...anomaly,
-                        name: "Anomaly"
-                      }}
-                      onClick={(a) => {
-                        setSelectedAnomaly(a);
-                        setShowDetailDialog(true);
-                      }}
-                    />
-                  ))
+                ? linkedAnomalies.map((anomaly) => {
+                    // Determine the title based on anomalySet (using any to access database properties)
+                    const anomalyData = anomaly as any;
+                    let title = "Object of Interest";
+                    if (anomalyData.anomalySet === "telescope-tess" || anomalyData.anomalySet === "planet") {
+                      title = "Planet candidate";
+                    } else if (anomalyData.anomalySet === "telescope-minorPlanet" || anomalyData.anomalySet === "active-asteroids" || anomalyData.anomalySet === "asteroid") {
+                      title = "Asteroid candidate";
+                    } else if (anomalyData.anomalySet === "telescope-sunspot" || anomalyData.anomalySet === "sunspot") {
+                      title = "Solar anomaly";
+                    } else if (anomalyData.anomalySet === "disk-detective" || anomalyData.anomalySet === "accretion_disc") {
+                      title = "Stellar disk";
+                    }
+                    
+                    return (
+                      <SciFiAnomalyComponent
+                        key={anomaly.id}
+                        anomaly={{
+                          ...anomaly,
+                          name: title
+                        }}
+                        title={title}
+                        onClick={(a) => {
+                          setSelectedAnomaly(a);
+                          setShowDetailDialog(true);
+                        }}
+                      />
+                    );
+                  })
                 : classifications.map((classification) => (
                     <AnomalyComponent
                       key={classification.id}

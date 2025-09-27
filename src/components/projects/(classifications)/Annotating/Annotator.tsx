@@ -105,6 +105,93 @@ export default function ImageAnnotator({
       ? CoMSCategories
       : {} as Record<string, CategoryConfig>;
 
+  const handleSubmitClassification = async () => {
+    if (!canvasRef.current || !session) return;
+    
+    setIsUploading(true);
+    try {
+      // First, save the canvas as an image
+      const canvas = canvasRef.current;
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, 'image/png')
+      );
+      if (!blob) throw new Error('Failed to create Blob from canvas');
+
+      const fileName = `${Date.now()}-${session.user.id}-annotated-image.png`;
+      const { data, error } = await supabase.storage
+        .from('media')
+        .upload(fileName, blob, { contentType: 'image/png' });
+
+      if (error) {
+        console.error('Upload error:', error.message);
+        throw error;
+      }
+
+      let finalUploads = uploads;
+      if (data) {
+        const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
+        finalUploads = [...uploads, [url, fileName]];
+      }
+
+      // Then, create the classification
+      const classificationConfiguration = {
+        annotationOptions,
+        additionalFields,
+        parentPlanetLocation: activePlanet?.id,
+        createdBy: inventoryItemId ?? null,
+        classificationParent: parentClassificationId ?? null,
+      };
+
+      const {
+        data: classificationData,
+        error: classificationError,
+      } = await supabase
+        .from("classifications")
+        .insert({
+          author: session.user.id,
+          content,
+          media: [
+            [],
+            ...finalUploads,
+            ...(otherAssets || []).map(url => ["http://...", "generated-id"]),
+            ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]).map(id => id && [id, "id"]),
+          ].filter((item): item is [string, string] => Array.isArray(item) && item.length === 2),
+          anomaly: anomalyId,
+          classificationParent: classificationParent,
+          classificationtype: anomalyType,
+          classificationConfiguration,
+        })
+        .select()
+        .single();
+
+      if (classificationError) {
+        console.error("Error creating classification: ", classificationError.message);
+        alert("Failed to create classification. Please try again");
+        return;
+      }
+
+      console.log("Classification created successfully: ", classificationData);
+
+      setContent("");
+      setAdditionalFields({});
+      setUploads([]);
+      setDrawings([]);
+
+      // Call the completion callback if provided (for tutorial completion)
+      if (onClassificationComplete) {
+        onClassificationComplete();
+      } else {
+        // Only redirect if no callback is provided
+        router.push(`/next/${classificationData.id}`);
+      }
+    } catch (err) {
+      console.error('Error during classification submission:', err);
+      alert('Failed to submit classification. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const addMedia = async () => {
     if (!canvasRef.current || !session) return;
     const canvas = canvasRef.current;
@@ -405,15 +492,9 @@ export default function ImageAnnotator({
                   placeholder="Describe your annotations or post any additional information"
                 />
 
-                {!isFormVisible ? (
-                  <Button onClick={addMedia} disabled={isUploading}>
-                    {isUploading ? 'Uploading...' : 'Save & proceed'}
-                  </Button>
-                ) : (
-                  <Button onClick={createPost} disabled={isUploading}>
-                    Submit classification
-                  </Button>
-                )}
+                <Button onClick={handleSubmitClassification} disabled={isUploading}>
+                  {isUploading ? 'Submitting...' : 'Submit Classification'}
+                </Button>
               </div>
             </SciFiPanel>
           </div>

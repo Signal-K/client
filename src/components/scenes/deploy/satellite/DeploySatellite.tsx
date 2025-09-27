@@ -11,6 +11,7 @@ import { useState as useReactState } from "react";
 import PlanetFocusView from './PlanetFocusView';
 import DeploySidebar from './DeploySidebar';
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 
 type LocalAnomaly = Anomaly & { dbData: DatabaseAnomaly };
 export type EnrichedDatabaseAnomaly = DatabaseAnomaly & {
@@ -66,6 +67,7 @@ export default function DeploySatelliteViewport() {
   const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
+  const { isDark } = UseDarkMode();
 
   // Investigation mode: 'weather' or 'planets'
   const [investigationMode, setInvestigationMode] = useState<'weather' | 'p-4' | 'planets'>('weather');
@@ -98,6 +100,7 @@ export default function DeploySatelliteViewport() {
   } | null>(null);
   const [deploymentWarning, setDeploymentWarning] = useState<string | null>(null);
   const [isDeployDisabled, setIsDeployDisabled] = useState(false);
+  const [isFastDeployEnabled, setIsFastDeployEnabled] = useState<boolean | null>(null);
 
   // Validate deployment criteria
   useEffect(() => {
@@ -251,6 +254,29 @@ export default function DeploySatelliteViewport() {
     }
   };
 
+  // Check if user has fast deploy enabled (no classifications made)
+  const checkFastDeployStatus = async () => {
+    if (!session?.user?.id) {
+      setIsFastDeployEnabled(false);
+      return false;
+    }
+    
+    try {
+      const { count: userClassificationCount } = await supabase
+        .from('classifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('author', session.user.id);
+
+      const isFastDeploy = (userClassificationCount || 0) === 0;
+      setIsFastDeployEnabled(isFastDeploy);
+      return isFastDeploy;
+    } catch (error) {
+      console.error('Error checking fast deploy status:', error);
+      setIsFastDeployEnabled(false);
+      return false;
+    }
+  };
+
 
   const checkDeployment = async () => {
     if (!session?.user?.id) return;
@@ -315,6 +341,7 @@ export default function DeploySatelliteViewport() {
       setLoading(true);
       await fetchPlanetAnomalies();
       await fetchUserCloudClassificationCount();
+      await checkFastDeployStatus();
       await checkDeployment();
       setLoading(false);
     };
@@ -345,7 +372,25 @@ export default function DeploySatelliteViewport() {
       }
       const userId = session.user.id;
       console.log("User ID:", userId);
-      const now = new Date().toISOString();
+      
+      // Check if user has fast deploy enabled (no classifications made)
+      const { count: userClassificationCount } = await supabase
+        .from('classifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('author', userId);
+
+      const isFastDeployEnabled = (userClassificationCount || 0) === 0;
+      console.log("Fast deploy enabled:", isFastDeployEnabled);
+      
+      // Set deployment date - one day prior for fast deploy, current time otherwise
+      const now = new Date();
+      const deploymentDate = isFastDeployEnabled 
+        ? new Date(now.getTime() - 24 * 60 * 60 * 1000) // 1 day ago
+        : now;
+      const deploymentDateISO = deploymentDate.toISOString();
+      
+      console.log("Deployment date:", deploymentDateISO, isFastDeployEnabled ? "(fast deploy)" : "(normal)");
+      
       let rows = [];
       const planet = planetAnomalies[focusedPlanetIdx];
       console.log("Planet:", planet, "Investigation mode:", investigationMode);
@@ -366,7 +411,7 @@ export default function DeploySatelliteViewport() {
         author: userId,
         anomaly_id: planet.id,
         classification_id: classificationId || null,
-        date: now,
+        date: deploymentDateISO,
         automaton: 'WeatherSatellite',
         unlocked: false,
         unlock_time: null,
@@ -404,7 +449,7 @@ export default function DeploySatelliteViewport() {
           author: userId,
           anomaly_id: cloud.id,
           classification_id: classificationId || null,
-          date: now,
+          date: deploymentDateISO,
           automaton: 'WeatherSatellite',
           unlocked: false,
           unlock_time: null,
@@ -429,7 +474,7 @@ export default function DeploySatelliteViewport() {
       if (windErr) {
         alert('Failed to fetch wind survey anomalies: ' + windErr.message);
         return;
-      }
+      };
 
       const shuffledAnomalies = (windAnomalies || []).sort(() => 0.5 - Math.random());
       shuffledAnomalies.slice(0, 4).forEach((anomaly) => {
@@ -437,7 +482,7 @@ export default function DeploySatelliteViewport() {
           author: userId,
           anomaly_id: anomaly.id,
           classification_id: classificationId || null,
-          date: now,
+          date: deploymentDateISO,
           automaton: 'WeatherSatellite',
           unlocked: false,
           unlock_time: null,
@@ -522,14 +567,24 @@ export default function DeploySatelliteViewport() {
     };
 
     return (
-      <div className="min-h-screen h-screen w-screen flex flex-col bg-[#10141c]">
+      <div className={`min-h-screen h-screen w-screen flex flex-col ${
+        isDark 
+          ? "bg-[#10141c]" 
+          : "bg-gradient-to-br from-[#8ba3d1] via-[#9bb3e0] to-[#7a94c7]"
+      }`}>
         {/* Top bar: controls and stats */}
-        <div className="flex flex-row items-center justify-between px-6 py-3 bg-[#181e2a]/90 border-b border-[#232b3b] z-20">
+        <div className={`flex flex-row items-center justify-between px-6 py-3 border-b z-20 ${
+          isDark 
+            ? "bg-[#181e2a]/90 border-[#232b3b]" 
+            : "bg-gradient-to-r from-[#b8c5e0]/90 to-[#a5b8d1]/90 backdrop-blur-sm border-[#7a94c7]"
+        }`}>
           <div className="flex items-center gap-4">
             {/* InvestigationModeSelect moved to sidebar */}
           </div>
           {investigationMode === 'weather' && (
-            <div className="flex flex-col items-center gap-2 text-xs text-[#78cce2]">
+            <div className={`flex flex-col items-center gap-2 text-xs ${
+              isDark ? 'text-[#78cce2]' : 'text-slate-700'
+            }`}>
               <div className="flex gap-6">
                 <span>Your Planets: <span className="font-bold">{userPlanetCount}</span></span>
                 <span>Community: <span className="font-bold">{communityPlanetCount}</span></span>
@@ -551,11 +606,16 @@ export default function DeploySatelliteViewport() {
               onPrev={() => setFocusedPlanetIdx((prev) => Math.max(0, prev - 1))}
               isFirst={focusedPlanetIdx === 0}
               isLast={focusedPlanetIdx === planetAnomalies.length - 1}
+              isDarkMode={isDark}
             />
           </div>
 
           {/* Right-side info panel (sidebar) */}
-          <div className="hidden md:flex flex-col h-full min-h-0 w-[370px] max-w-[370px] z-30 bg-[#10141c] border-l border-[#232b3b]">
+          <div className={`hidden md:flex flex-col h-full min-h-0 w-[370px] max-w-[370px] z-30 border-l ${
+            isDark 
+              ? "bg-[#10141c] border-[#232b3b]" 
+              : "bg-white border-[#b0c4de]"
+          }`}>
             <DeploySidebar
               investigationMode={investigationMode}
               setInvestigationMode={setInvestigationMode}
@@ -567,6 +627,8 @@ export default function DeploySatelliteViewport() {
               userCloudClassifications={userCloudClassifications}
               isDeployDisabled={isDeployDisabled}
               deploymentWarning={deploymentWarning}
+              isFastDeployEnabled={isFastDeployEnabled}
+              isDarkMode={isDark}
             />
           </div>
         </div>
@@ -585,6 +647,8 @@ export default function DeploySatelliteViewport() {
             userCloudClassifications={userCloudClassifications}
             isDeployDisabled={isDeployDisabled}
             deploymentWarning={deploymentWarning}
+            isFastDeployEnabled={isFastDeployEnabled}
+            isDarkMode={isDark}
           />
         </div>
 
@@ -603,7 +667,7 @@ export default function DeploySatelliteViewport() {
             sectorX={0}
             sectorY={0}
             variant="default"
-            isDarkTheme={true}
+            isDarkTheme={isDark}
             showAllAnomalies={false}
           />
         </div>

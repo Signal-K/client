@@ -16,7 +16,7 @@ export default function RoverViewportExpandedPage() {
                 alt="Earth Background"
             />
 
-            <div className="w-full z-10">
+            <div className="w-full z-50">
                 <GameNavbar />
             </div>
 

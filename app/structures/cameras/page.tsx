@@ -50,7 +50,7 @@ export default function CameraAggregatesPage() {
                 alt="Earth Background"
             />
 
-            <div className="w-full">
+            <div className="w-full z-50">
                 <GameNavbar />
             </div>
 

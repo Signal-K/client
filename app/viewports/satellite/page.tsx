@@ -68,7 +68,7 @@ export default function SatelliteViewportExpandedPage() {
         alt="Earth Background"
       />
 
-      <div className="w-full z-10">
+      <div className="w-full z-50">
         <GameNavbar />
       </div>
 

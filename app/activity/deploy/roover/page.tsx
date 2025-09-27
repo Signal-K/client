@@ -38,7 +38,21 @@ export default function DeployRoverPage() {
         setPlanetAnomaly(classifications[0].anomaly);
       }
     }
+    
+    async function fetchClassificationCount() {
+      if (!session) return;
+      const { count, error } = await supabase
+        .from("classifications")
+        .select("id", { count: "exact" })
+        .eq("author", session.user.id);
+      
+      const classificationCount = count || 0;
+      setUserClassificationCount(classificationCount);
+      setIsFastDeployEnabled(classificationCount < 4);
+    }
+    
     fetchPlanetClassification();
+    fetchClassificationCount();
   }, [session, supabase]);
 
   useEffect(() => {
@@ -71,6 +85,8 @@ export default function DeployRoverPage() {
   const { isDark, toggleDarkMode } = UseDarkMode();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [deployMessage, setDeployMessage] = useState<string>("");
+  const [userClassificationCount, setUserClassificationCount] = useState<number>(0);
+  const [isFastDeployEnabled, setIsFastDeployEnabled] = useState<boolean>(false);
 
   // Handle map click to add waypoint
   const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -124,6 +140,10 @@ export default function DeployRoverPage() {
     const selectedAnomalies = unclassified.slice(0, 4);
 
     // 4. Add to linked_anomalies
+    const deploymentDate = isFastDeployEnabled 
+      ? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() // 1 day prior for fast deploy
+      : new Date().toISOString(); // Current time for normal deploy
+
     for (const anomaly of selectedAnomalies) {
       await supabase
         .from("linked_anomalies")
@@ -131,7 +151,7 @@ export default function DeployRoverPage() {
           author: session.user.id,
           anomaly_id: anomaly.id,
           automaton: "Rover",
-          date: new Date().toISOString(),
+          date: deploymentDate,
           unlocked: true,
         });
     }
@@ -141,13 +161,18 @@ export default function DeployRoverPage() {
       anomalies: selectedAnomalies.map((a: any) => a.id),
       waypoints,
     };
+    
+    const routeTimestamp = isFastDeployEnabled 
+      ? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() // 1 day prior for fast deploy
+      : new Date().toISOString(); // Current time for normal deploy
+      
     await supabase
       .from("routes")
       .insert({
         author: session.user.id,
         routeConfiguration: routeConfig,
         location: selectedAnomalies[0]?.id || null,
-        timestamp: new Date().toISOString(),
+        timestamp: routeTimestamp,
       });
 
     setDeployMessage("Rover deployed successfully!");
@@ -268,6 +293,22 @@ export default function DeployRoverPage() {
         {/* Center Panel: Rover Map */}
         <div className="flex-1 flex flex-col items-center justify-center">
           <h1 className="text-2xl font-bold text-white mb-4">Deploy Rover</h1>
+          
+          {/* Fast Deploy Welcome Message */}
+          {isFastDeployEnabled && (
+            <div className="mb-6 p-4 bg-gradient-to-br from-green-500/25 to-blue-500/25 rounded-lg border border-green-400/40 shadow-lg max-w-xl">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-green-300 font-semibold text-sm">🎁 Welcome Gift Active!</span>
+              </div>
+              <p className="text-green-200 text-xs leading-relaxed">
+                🤖 As a new space explorer, your rover will experience a <strong>speed boost</strong>! 
+                Your rover will reach waypoints in just <strong>60 seconds</strong> instead of the usual 1 hour, 
+                and your mission will begin <strong>immediately</strong>. Happy exploring!
+              </p>
+            </div>
+          )}
+          
           <div className="mb-4 flex items-center gap-4">
             <label className="text-white font-medium">Select Planet:</label>
             <select
