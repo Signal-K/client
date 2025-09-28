@@ -14,6 +14,7 @@ import VotePlanetClassifications from "@/src/components/deployment/missions/stru
 import PlanetGenerator from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator"
 import { DailyMinorPlanetWithId } from "@/src/components/projects/Telescopes/DailyMinorPlanet"
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
+import { DiskDetectorTutorial } from "@/src/components/projects/Telescopes/DiskDetector"
 
 export default function TelescopeClassifyPage() {
   const params = useParams()
@@ -108,6 +109,16 @@ export default function TelescopeClassifyPage() {
             case "classify":
               const activeAsteroidId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
               component = <DailyMinorPlanetWithId anomalyId={activeAsteroidId} />;
+              break;
+          }
+          break;
+
+        case "disk-detective":
+        case "diskdetective":
+          switch (mission) {
+            case "classify":
+              const diskDetectiveId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
+              component = <DiskDetectorTutorial anomalyId={diskDetectiveId} />;
               break;
           }
           break;
