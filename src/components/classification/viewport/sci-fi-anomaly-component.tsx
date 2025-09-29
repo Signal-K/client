@@ -37,6 +37,59 @@ export function SciFiAnomalyComponent({ anomaly, onClick, title, isHighlighted =
         </div>
       )
     }
+
+    if (title === "Stellar disk") {
+      return (
+        <div className="w-10 h-10 relative flex items-center justify-center">
+          {/* SVG for accretion disk with brown to red-yellow gradient */}
+          <svg width="40" height="40" viewBox="0 0 40 40" className="absolute">
+            <defs>
+              {/* Radial gradient from brown center to red-yellow outer */}
+              <radialGradient id="accretionGradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#8B4513" stopOpacity="0.9" />
+                <stop offset="30%" stopColor="#A0522D" stopOpacity="0.8" />
+                <stop offset="60%" stopColor="#CD853F" stopOpacity="0.7" />
+                <stop offset="85%" stopColor="#DAA520" stopOpacity="0.6" />
+                <stop offset="100%" stopColor="#FFD700" stopOpacity="0.4" />
+              </radialGradient>
+              {/* Inner darker gradient for depth */}
+              <radialGradient id="accretionInner" cx="50%" cy="50%" r="35%">
+                <stop offset="0%" stopColor="#654321" stopOpacity="1" />
+                <stop offset="50%" stopColor="#8B4513" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#A0522D" stopOpacity="0.6" />
+              </radialGradient>
+              {/* Bright center star */}
+              <radialGradient id="centralStar" cx="50%" cy="50%" r="20%">
+                <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+                <stop offset="70%" stopColor="#FFE4B5" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#DEB887" stopOpacity="0.7" />
+              </radialGradient>
+            </defs>
+            
+            {/* Outer disk ring */}
+            <ellipse cx="20" cy="20" rx="18" ry="6" fill="url(#accretionGradient)" 
+                     opacity="0.8" transform="rotate(-15 20 20)" />
+            
+            {/* Middle disk ring */}
+            <ellipse cx="20" cy="20" rx="14" ry="4.5" fill="url(#accretionInner)" 
+                     opacity="0.9" transform="rotate(-15 20 20)" />
+            
+            {/* Inner bright ring */}
+            <ellipse cx="20" cy="20" rx="9" ry="3" fill="url(#accretionGradient)" 
+                     opacity="1" transform="rotate(-15 20 20)" />
+            
+            {/* Central star */}
+            <circle cx="20" cy="20" r="3" fill="url(#centralStar)" />
+            
+            {/* Bright center point */}
+            <circle cx="20" cy="20" r="1.5" fill="#FFFFFF" opacity="0.9" />
+          </svg>
+          
+          {/* Glow effect */}
+          <div className="absolute w-10 h-10 rounded-full bg-gradient-to-br from-[#FFD700] to-[#8B4513] opacity-20 blur-sm"></div>
+        </div>
+      )
+    }
     
     // Original logic for other types
     switch (anomaly.type) {
@@ -61,8 +114,53 @@ export function SciFiAnomalyComponent({ anomaly, onClick, title, isHighlighted =
         )
       case "accretion_disc":
         return (
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#5e81ac] to-[#434c5e] border-2 border-[#5e81ac] flex items-center justify-center shadow-xl">
-            <div className="w-5 h-2 bg-[#e4eff0] rounded-full absolute left-2 top-4 opacity-50" />
+          <div className="w-10 h-10 relative flex items-center justify-center">
+            {/* SVG for accretion disk with brown to red-yellow gradient */}
+            <svg width="40" height="40" viewBox="0 0 40 40" className="absolute">
+              <defs>
+                {/* Radial gradient from brown center to red-yellow outer */}
+                <radialGradient id="accretionGradient2" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#8B4513" stopOpacity="0.9" />
+                  <stop offset="30%" stopColor="#A0522D" stopOpacity="0.8" />
+                  <stop offset="60%" stopColor="#CD853F" stopOpacity="0.7" />
+                  <stop offset="85%" stopColor="#DAA520" stopOpacity="0.6" />
+                  <stop offset="100%" stopColor="#FFD700" stopOpacity="0.4" />
+                </radialGradient>
+                {/* Inner darker gradient for depth */}
+                <radialGradient id="accretionInner2" cx="50%" cy="50%" r="35%">
+                  <stop offset="0%" stopColor="#654321" stopOpacity="1" />
+                  <stop offset="50%" stopColor="#8B4513" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#A0522D" stopOpacity="0.6" />
+                </radialGradient>
+                {/* Bright center star */}
+                <radialGradient id="centralStar2" cx="50%" cy="50%" r="20%">
+                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+                  <stop offset="70%" stopColor="#FFE4B5" stopOpacity="0.9" />
+                  <stop offset="100%" stopColor="#DEB887" stopOpacity="0.7" />
+                </radialGradient>
+              </defs>
+              
+              {/* Outer disk ring */}
+              <ellipse cx="20" cy="20" rx="18" ry="6" fill="url(#accretionGradient2)" 
+                       opacity="0.8" transform="rotate(-15 20 20)" />
+              
+              {/* Middle disk ring */}
+              <ellipse cx="20" cy="20" rx="14" ry="4.5" fill="url(#accretionInner2)" 
+                       opacity="0.9" transform="rotate(-15 20 20)" />
+              
+              {/* Inner bright ring */}
+              <ellipse cx="20" cy="20" rx="9" ry="3" fill="url(#accretionGradient2)" 
+                       opacity="1" transform="rotate(-15 20 20)" />
+              
+              {/* Central star */}
+              <circle cx="20" cy="20" r="3" fill="url(#centralStar2)" />
+              
+              {/* Bright center point */}
+              <circle cx="20" cy="20" r="1.5" fill="#FFFFFF" opacity="0.9" />
+            </svg>
+            
+            {/* Glow effect */}
+            <div className="absolute w-10 h-10 rounded-full bg-gradient-to-br from-[#FFD700] to-[#8B4513] opacity-20 blur-sm"></div>
           </div>
         )
       default:
@@ -118,6 +216,8 @@ export function SciFiAnomalyComponent({ anomaly, onClick, title, isHighlighted =
         <span className={`mt-1 text-xs font-mono px-2 py-0.5 rounded shadow-lg ${
           title === "Planet candidate" || title === "Asteroid candidate" 
             ? "text-[#a8a8a8] bg-[#2a2a2a]/80" 
+            : title === "Stellar disk"
+            ? "text-[#FFD700] bg-[#4a2c17]/80 border border-[#8B4513]/40"
             : "text-[#78cce2] bg-[#0a0a2a]/80"
         }`}>
           {title}
