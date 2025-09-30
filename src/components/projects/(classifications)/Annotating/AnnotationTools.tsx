@@ -28,27 +28,29 @@ export function AnnotationTools({
   };
   return (
     <div className="flex gap-4 items-center">
-      <div className="space-x-2">
+      <div className="space-x-3">
         <Button
           variant={currentTool === 'square' ? 'default' : 'outline'}
           onClick={() => setCurrentTool('square')}
+          className="px-6 py-3 text-base font-semibold"
         >
-          <Square className="w-4 h-4 mr-2" />
+          <Square className="w-5 h-5 mr-2" />
           Square
         </Button>
         <Button
           variant={currentTool === 'pen' ? 'default' : 'outline'}
           onClick={() => setCurrentTool('pen')}
+          className="px-6 py-3 text-base font-semibold"
         >
-          <Pencil className="w-4 h-4 mr-2" />
+          <Pencil className="w-5 h-5 mr-2" />
           Pen
         </Button>
         <Button
           variant={currentTool === 'erase' ? 'default' : 'outline'}
           onClick={handleEraseClick}
-          className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
+          className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700 px-6 py-3 text-base font-semibold"
         >
-          <Eraser className="w-4 h-4 mr-2" />
+          <Eraser className="w-5 h-5 mr-2" />
           Clear All
         </Button>
       </div>
@@ -58,7 +60,7 @@ export function AnnotationTools({
         max="20"
         value={lineWidth}
         onChange={(e) => setLineWidth(Number(e.target.value))}
-        className="w-20"
+        className="w-24 h-12 text-base"
       />
     </div>
   );
