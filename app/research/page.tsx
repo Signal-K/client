@@ -2,39 +2,19 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
-import ResearchSectionModern from "@/src/components/sections/ResearchSectionModern";
 import { Button } from "@/src/components/ui/button";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import TotalPoints from "@/src/components/deployment/missions/structures/Stardust/Total";
-import BiologyResearch from "@/src/components/research/BiologyItems";
-import AstronomyResearch from "@/src/components/research/AstronomyItems";
-import MeteorologyResearch from "@/src/components/research/MeteorologyItems";
+import CompactResearchPanel from "@/src/components/research/CompactResearchPanel";
 import ReferralCodePanel from "@/src/components/profile/setup/Referrals";
-import AutomatonSurfaceRoverResearch from "@/src/components/research/Automatons/Rovers";
-import ResearchSection from "@/src/components/sections/ResearchSection";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 import Login from "../auth/page";
-import RoverResearch from "@/src/components/research/RoverItems";
-
-type CapacityKey =
-  | "probeCount"
-  | "probeDistance"
-  | "stationCount"
-  | "balloonCount"
-  | "Seiscam"
-  | "Wheels"
-  | "cameraCount"
-  | "stationSize";
-
-type UserCapacities = Record<CapacityKey, number>;
 
 export default function ResearchPage() {
   const supabase = useSupabaseClient();
   const session = useSession();
   const { isDark, toggleDarkMode } = UseDarkMode();
-  const totalPointsRef = useRef<any>(null);
 
   // Referral related states
   const [userHasReferral, setUserHasReferral] = useState<boolean | null>(null);
@@ -61,14 +41,6 @@ export default function ResearchPage() {
     };
     checkReferral();
   }, [session, supabase]);
-
-  const handleDivClick = () => {
-    setTimeout(() => {
-      if (totalPointsRef.current?.refreshPoints) {
-        totalPointsRef.current.refreshPoints();
-      }
-    }, 3000);
-  };
 
   const handleReferralSubmit = async () => {
     setReferralError(null);
@@ -136,92 +108,63 @@ export default function ResearchPage() {
         activityFeed={[]}
         otherClassifications={[]}
       />
-      {/* Navigation Toggle */}
-      <div className="fixed top-20 right-10 z-20">
-        <div className="flex flex-col space-y-2">
-          <Button onClick={() => document.getElementById('astronomy-section')?.scrollIntoView({ behavior: 'smooth' })}>
-            Astronomy
-          </Button>
-          <Button onClick={() => document.getElementById('meteorology-section')?.scrollIntoView({ behavior: 'smooth' })}>
-            Meteorology
-          </Button>
-          <Button onClick={() => document.getElementById('automaton-section')?.scrollIntoView({ behavior: 'smooth' })}>
-            Automaton
-          </Button>
-          <Button onClick={() => document.getElementById('rover-section')?.scrollIntoView({ behavior: 'smooth' })}>
-            Rover
-          </Button>
-        </div>
-      </div>
       {/* Main content with more space from sidebar and increased width */}
       <div className="w-full flex justify-center pt-24 relative z-10">
-        <div className="w-full max-w-5xl px-6 md:px-8 lg:px-12 xl:px-0">
+        <div className="w-full max-w-4xl px-6 md:px-8 lg:px-12 xl:px-0">
           {/* Activity Header from main page */}
-          <div className="mb-10">
+          <div className="mb-8">
             <ActivityHeaderSection
               classificationsCount={0}
               landmarksExpanded={false}
               onToggleLandmarks={() => {}}
             />
           </div>
-          <main className="w-full flex flex-col gap-0">
-            <div className="w-full flex flex-col gap-0" onClick={handleDivClick}>
-              <div id="astronomy-section">
-                <ResearchSectionModern title="Astronomy" infoText="Explore astronomy research and discoveries." backgroundType="stars">
-                  <AstronomyResearch />
-                </ResearchSectionModern>
+          <main className="w-full flex flex-col gap-6">
+            {/* Main Research Panel - Compact Layout */}
+            <CompactResearchPanel />
+
+            {/* Referral Section - Compact Integration */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="lg:col-span-2">
+                <ReferralCodePanel />
               </div>
-              <div id="meteorology-section">
-                <ResearchSectionModern title="Meteorology" infoText="Study meteorological phenomena and data." backgroundType="planets">
-                  <MeteorologyResearch />
-                </ResearchSectionModern>
-              </div>
-              {/* <div id="automaton-section">
-                <ResearchSectionModern title="Automaton Surface Rover" infoText="Automaton rover research and surface exploration." backgroundType="rover">
-                  <AutomatonSurfaceRoverResearch />
-                </ResearchSectionModern>
-              </div> */}
-              <div id="rover-section">
-                <ResearchSectionModern title="Rover Research" infoText="Explore rover research and technology." backgroundType="rover">
-                  <RoverResearch />
-                </ResearchSectionModern>
-              </div>
+              
+              {/* Referral Input - Only show if user has no referral */}
+              {userHasReferral === false && (
+                <div className={`p-4 ${cardColor} rounded-lg shadow-sm border ${borderColor}`}>
+                  <h4 className={`text-base font-semibold ${isDark ? "text-[#81A1C1]" : "text-[#5E81AC]"} mb-2`}>
+                    Add Referral Code
+                  </h4>
+                  <p className={`text-sm ${isDark ? "text-[#D8DEE9]" : "text-[#232a36]"} mb-3`}>
+                    Get bonus stardust if someone referred you!
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={referralCodeInput}
+                      onChange={(e) => setReferralCodeInput(e.target.value)}
+                      placeholder="Enter referral code"
+                      disabled={isSubmittingReferral}
+                      className={`flex-1 px-3 py-2 rounded-lg border-0 text-sm ${isDark ? "bg-[#3B4252] text-[#ECEFF4]" : "bg-[#E5EEF4] text-[#232a36]"} focus:outline-none focus:ring-2 focus:ring-[#88C0D0]`}
+                    />
+                    <Button
+                      onClick={handleReferralSubmit}
+                      disabled={isSubmittingReferral}
+                      size="sm"
+                      className={`${isDark ? "bg-[#81A1C1] text-[#2E3440] hover:bg-[#88C0D0]" : "bg-[#5E81AC] text-white hover:bg-[#88C0D0]"}`}
+                    >
+                      {isSubmittingReferral ? "..." : "Submit"}
+                    </Button>
+                  </div>
+                  {referralError && (
+                    <p className="text-red-400 text-xs mt-2">{referralError}</p>
+                  )}
+                  {referralSuccess && (
+                    <p className="text-green-400 text-xs mt-2">{referralSuccess}</p>
+                  )}
+                </div>
+              )}
             </div>
-            <div className="w-full my-8">
-              <ReferralCodePanel />
-            </div>
-            {/* NEW referral input section if user has no referral yet */}
-            {userHasReferral === false && (
-              <div className={`max-w-md mx-auto mt-8 p-6 ${cardColor} rounded-2xl shadow-xl`}>
-                <h4 className={`text-lg font-semibold ${isDark ? "text-[#81A1C1]" : "text-[#5E81AC]"} mb-2`}>
-                  Add Your Referral Code
-                </h4>
-                <p className={isDark ? "text-[#D8DEE9]" : "text-[#232a36] mb-4"}>
-                  If someone referred you to Star Sailors, add their code to get some bonus stardust!
-                </p>
-                <input
-                  type="text"
-                  value={referralCodeInput}
-                  onChange={(e) => setReferralCodeInput(e.target.value)}
-                  placeholder="Enter your referral code"
-                  disabled={isSubmittingReferral}
-                  className={`w-full mb-3 px-3 py-2 rounded-xl border-0 ${isDark ? "bg-[#3B4252] text-[#ECEFF4]" : "bg-[#E5EEF4] text-[#232a36]"} focus:outline-none focus:ring-2 focus:ring-[#88C0D0]`}
-                />
-                {referralError && (
-                  <p className="text-red-400 mb-2">{referralError}</p>
-                )}
-                {referralSuccess && (
-                  <p className="text-green-400 mb-2">{referralSuccess}</p>
-                )}
-                <Button
-                  onClick={handleReferralSubmit}
-                  disabled={isSubmittingReferral}
-                  className={`w-full ${isDark ? "bg-[#81A1C1] text-[#2E3440] hover:bg-[#88C0D0]" : "bg-[#5E81AC] text-white hover:bg-[#88C0D0]"}`}
-                >
-                  {isSubmittingReferral ? "Submitting..." : "Submit Referral"}
-                </Button>
-              </div>
-            )}
           </main>
         </div>
       </div>

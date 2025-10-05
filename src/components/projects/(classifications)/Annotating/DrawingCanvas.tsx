@@ -206,14 +206,18 @@ const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
       const parent = canvas.parentElement;
       if (!parent) return;
 
-      const maxWidth = parent.offsetWidth;
+      // Limit canvas to reasonable maximum dimensions
+      const maxWidth = Math.min(parent.offsetWidth, 600); // Max 600px wide
       const aspectRatio = img.naturalWidth / img.naturalHeight;
       const width = maxWidth;
-      const height = width / aspectRatio;
+      const height = Math.min(width / aspectRatio, 500); // Max 500px tall
+      
+      // Recalculate width if height was constrained
+      const finalWidth = height * aspectRatio;
 
-      canvas.width = width * dpr;
+      canvas.width = finalWidth * dpr;
       canvas.height = height * dpr;
-      canvas.style.width = `${width}px`;
+      canvas.style.width = `${finalWidth}px`;
       canvas.style.height = `${height}px`;
 
       const ctx = canvas.getContext('2d');

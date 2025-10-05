@@ -165,7 +165,7 @@ export default function TelescopeViewportSection() {
                       title = "Asteroid candidate";
                     } else if (anomalyData.anomalySet === "telescope-sunspot" || anomalyData.anomalySet === "sunspot") {
                       title = "Solar anomaly";
-                    } else if (anomalyData.anomalySet === "disk-detective" || anomalyData.anomalySet === "accretion_disc") {
+                    } else if (anomalyData.anomalySet === "diskDetective" || anomalyData.anomalySet === "disk-detective" || anomalyData.anomalySet === "accretion_disc") {
                       title = "Stellar disk";
                     }
                     
@@ -255,6 +255,7 @@ export default function TelescopeViewportSection() {
                   link = `/structures/telescope/sunspots/db-${anomalyId}/classify`;
                 } else if (
                   anomalyType === "accretion_disc" ||
+                  anomalySet === "diskDetective" ||
                   anomalySet === "disk-detective"
                 ) {
                   link = `/structures/telescope/disk-detective/db-${anomalyId}/classify`;

@@ -160,7 +160,7 @@ const TotalPoints = forwardRef<TotalPointsHandle, TotalPointsProps>((props, ref)
       .eq("user_id", userId);
 
     const items = safeArray<ResearchedRow>(data as ResearchedRow[]);
-    setResearchedPenalty(items.length * 2);
+    setResearchedPenalty(items.length * 10); // Changed from 2 to 10 stardust per upgrade
   };
 
   const fetchReferralPoints = async () => {

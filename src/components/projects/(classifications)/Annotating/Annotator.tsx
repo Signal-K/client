@@ -426,8 +426,17 @@ export default function ImageAnnotator({
     };
   };
 
+  // Determine if we should use horizontal layout (only for Active Asteroids on desktop)
+  // Use horizontal layout only for AA with h-full className on desktop (md breakpoint and up)
+  const useHorizontalLayout = annotationType === 'AA' && className?.includes('h-full');
+  const isActiveAsteroids = annotationType === 'AA';
+
   return (
-    <div className={`space-y-2 max-w-full px-2 md:px-4 mx-auto overflow-x-hidden ${className}`}>
+    <div className={`max-w-full overflow-x-hidden ${
+      useHorizontalLayout 
+        ? 'h-full flex flex-col' 
+        : 'space-y-2 px-2 md:px-4 mx-auto'
+    } ${className}`}>
       {/* Add custom styles for enhanced drawing experience */}
       <style jsx>{`
         .annotation-canvas-container {
@@ -442,7 +451,8 @@ export default function ImageAnnotator({
         }
       `}</style>
       
-      <div className="flex justify-between items-center">
+      {/* Annotation Tools - Always at top */}
+      <div className={`${useHorizontalLayout ? 'flex-shrink-0' : ''} flex justify-between items-center px-2`}>
         <AnnotationTools
           currentTool={currentTool}
           setCurrentTool={setCurrentTool}
@@ -454,50 +464,145 @@ export default function ImageAnnotator({
 
       {selectedImage && (
         <>
-          <div className={`w-full text-center max-h-[50vh] md:max-h-[60vh] overflow-auto annotation-canvas-container ${isDrawing ? 'drawing' : ''}`}>
-            <AnnotationCanvas
-              canvasRef={canvasRef}
-              imageRef={imageRef}
-              isDrawing={isDrawing}
-              setIsDrawing={setIsDrawing}
-              currentTool={currentTool}
-              currentColor={
-                CATEGORY_CONFIG[currentCategory as keyof typeof CATEGORY_CONFIG]?.color || '#000000'
-              }
-              lineWidth={lineWidth}
-              drawings={drawings}
-              setDrawings={setDrawings}
-              currentDrawing={currentDrawing}
-              setCurrentDrawing={setCurrentDrawing}
-              currentCategory={currentCategory}
-            />
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-4 w-full max-w-5xl mx-auto">
-            <SciFiPanel className="p-4 w-full md:w-1/2">
-              <Legend
-                currentCategory={currentCategory}
-                setCurrentCategory={setCurrentCategory}
-                categoryCount={categoryCount}
-                categories={CATEGORY_CONFIG as Record<AI4MCategory | P4Category, CategoryConfig>}
-              />
-            </SciFiPanel>
-
-            <SciFiPanel className="p-4 w-full md:w-1/2">
-              <div className="space-y-4">
-                <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className="w-full p-3 h-24 text-sm text-blue-300 rounded-md border border-[#3B4252]"
-                  placeholder="Describe your annotations or post any additional information"
+          {/* Active Asteroids Horizontal Layout (Desktop only) */}
+          {useHorizontalLayout && (
+            <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-4 overflow-hidden px-2">
+              {/* Image Canvas Area */}
+              <div className={`annotation-canvas-container ${isDrawing ? 'drawing' : ''} flex-1 min-h-0 overflow-hidden flex items-center justify-center bg-gray-900 rounded-lg`}>
+                <AnnotationCanvas
+                  canvasRef={canvasRef}
+                  imageRef={imageRef}
+                  isDrawing={isDrawing}
+                  setIsDrawing={setIsDrawing}
+                  currentTool={currentTool}
+                  currentColor={
+                    CATEGORY_CONFIG[currentCategory as keyof typeof CATEGORY_CONFIG]?.color || '#000000'
+                  }
+                  lineWidth={lineWidth}
+                  drawings={drawings}
+                  setDrawings={setDrawings}
+                  currentDrawing={currentDrawing}
+                  setCurrentDrawing={setCurrentDrawing}
+                  currentCategory={currentCategory}
                 />
-
-                <Button onClick={handleSubmitClassification} disabled={isUploading}>
-                  {isUploading ? 'Submitting...' : 'Submit Classification'}
-                </Button>
               </div>
-            </SciFiPanel>
-          </div>
+
+              {/* Controls Area - Side Panel on desktop, below on mobile */}
+              <div className="w-full md:w-80 md:min-w-80 flex flex-col gap-3 overflow-y-auto">
+                <SciFiPanel className="p-3">
+                  <Legend
+                    currentCategory={currentCategory}
+                    setCurrentCategory={setCurrentCategory}
+                    categoryCount={categoryCount}
+                    categories={CATEGORY_CONFIG as Record<AI4MCategory | P4Category, CategoryConfig>}
+                  />
+                </SciFiPanel>
+
+                <SciFiPanel className="p-3">
+                  <div className="space-y-3">
+                    <textarea
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      className="w-full p-2 h-20 text-sm text-blue-300 rounded-md border border-[#3B4252]"
+                      placeholder="Describe your annotations or post any additional information"
+                    />
+
+                    <Button 
+                      onClick={handleSubmitClassification} 
+                      disabled={isUploading}
+                      className="w-full text-sm py-2"
+                    >
+                      {isUploading ? 'Submitting...' : 'Submit Classification'}
+                    </Button>
+                  </div>
+                </SciFiPanel>
+              </div>
+            </div>
+          )}
+
+          {/* Active Asteroids Mobile Layout OR Original Layout for all other types */}
+          {!useHorizontalLayout && (
+            <>
+              {/* Image Canvas Area */}
+              <div className={`annotation-canvas-container ${isDrawing ? 'drawing' : ''} w-full text-center ${
+                isActiveAsteroids ? 'min-h-[60vh] md:max-h-[60vh]' : 'max-h-[50vh] md:max-h-[60vh]'
+              } overflow-auto`}>
+                <AnnotationCanvas
+                  canvasRef={canvasRef}
+                  imageRef={imageRef}
+                  isDrawing={isDrawing}
+                  setIsDrawing={setIsDrawing}
+                  currentTool={currentTool}
+                  currentColor={
+                    CATEGORY_CONFIG[currentCategory as keyof typeof CATEGORY_CONFIG]?.color || '#000000'
+                  }
+                  lineWidth={lineWidth}
+                  drawings={drawings}
+                  setDrawings={setDrawings}
+                  currentDrawing={currentDrawing}
+                  setCurrentDrawing={setCurrentDrawing}
+                  currentCategory={currentCategory}
+                />
+              </div>
+
+              {/* Controls below image for Active Asteroids mobile, or original layout for others */}
+              {isActiveAsteroids ? (
+                /* Active Asteroids Mobile: Controls below image */
+                <div className="flex flex-col gap-3 md:gap-4 w-full max-w-5xl mx-auto px-2">
+                  <SciFiPanel className="p-3 md:p-4 w-full">
+                    <Legend
+                      currentCategory={currentCategory}
+                      setCurrentCategory={setCurrentCategory}
+                      categoryCount={categoryCount}
+                      categories={CATEGORY_CONFIG as Record<AI4MCategory | P4Category, CategoryConfig>}
+                    />
+                  </SciFiPanel>
+
+                  <SciFiPanel className="p-3 md:p-4 w-full">
+                    <div className="space-y-3 md:space-y-4">
+                      <textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        className="w-full p-2 md:p-3 h-20 md:h-24 text-sm text-blue-300 rounded-md border border-[#3B4252]"
+                        placeholder="Describe your annotations or post any additional information"
+                      />
+
+                      <Button onClick={handleSubmitClassification} disabled={isUploading} className="w-full">
+                        {isUploading ? 'Submitting...' : 'Submit Classification'}
+                      </Button>
+                    </div>
+                  </SciFiPanel>
+                </div>
+              ) : (
+                /* Original Layout for all other annotation types */
+                <div className="flex flex-col md:flex-row gap-4 w-full max-w-5xl mx-auto">
+                  <SciFiPanel className="p-4 w-full md:w-1/2">
+                    <Legend
+                      currentCategory={currentCategory}
+                      setCurrentCategory={setCurrentCategory}
+                      categoryCount={categoryCount}
+                      categories={CATEGORY_CONFIG as Record<AI4MCategory | P4Category, CategoryConfig>}
+                    />
+                  </SciFiPanel>
+
+                  <SciFiPanel className="p-4 w-full md:w-1/2">
+                    <div className="space-y-4">
+                      <textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        className="w-full p-3 h-24 text-sm text-blue-300 rounded-md border border-[#3B4252]"
+                        placeholder="Describe your annotations or post any additional information"
+                      />
+
+                      <Button onClick={handleSubmitClassification} disabled={isUploading}>
+                        {isUploading ? 'Submitting...' : 'Submit Classification'}
+                      </Button>
+                    </div>
+                  </SciFiPanel>
+                </div>
+              )}
+            </>
+          )}
 
           {/* {otherAssets && (
             <SciFiPanel>

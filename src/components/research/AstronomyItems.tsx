@@ -12,17 +12,17 @@ export default function AstronomyResearch() {
   const supabase = useSupabaseClient();
   const session = useSession();
 
-  const [availablePoints, setAvailablePoints] = useState(10);
+  const [availablePoints, setAvailablePoints] = useState(0);
   const [asteroidClassificationsCount, setAsteroidClassificationsCount] = useState(0);
   const [receptorCount, setReceptorCount] = useState(1);
 
   const getUpgradeCost = (currentLevel: number): number => {
-    return (currentLevel + 1) * 2;
+    return 10; // Fixed cost of 10 stardust per upgrade
   };
 
   const handleUpgrade = async (capacity: string, currentLevel: number) => {
     const cost = getUpgradeCost(currentLevel);
-    if (availablePoints >= cost) {
+    if (availablePoints >= cost && currentLevel < 2) {
       setAvailablePoints((prev) => prev - cost);
 
       if (capacity === "receptors") {
@@ -67,12 +67,24 @@ export default function AstronomyResearch() {
 
       setAsteroidClassificationsCount(classifications.length);
 
+      // Calculate stardust balance
+      const { data: allClassifications } = await supabase
+        .from("classifications")
+        .select("id")
+        .eq("author", session.user.id);
+
+      const basePoints = allClassifications?.length || 0;
+      const researchPenalty = (researched?.length || 0) * 10;
+      const totalPoints = Math.max(0, basePoints - researchPenalty);
+      setAvailablePoints(totalPoints);
+
+      // Count receptor upgrades
       let receptorCount = 1;
       researched?.forEach(item => {
         if (item.tech_type === "probereceptors") receptorCount += 1;
       });
 
-      setReceptorCount(receptorCount);
+      setReceptorCount(Math.min(receptorCount, 2)); // Max 2 upgrades for now
     } catch (err) {
       console.error("Error fetching research data:", err);
     }
@@ -152,14 +164,19 @@ export default function AstronomyResearch() {
             <h3 className="text-lg font-semibold text-[#4cc9f0] mb-4 border-b border-[#1e3a5f] pb-2">
               TELESCOPE TECH
             </h3>
+            <div className="mb-4 p-3 bg-blue-900/20 rounded-lg border border-blue-500/30">
+              <p className="text-sm text-blue-200 italic">
+                "Your observatory has approved a new module upgrade for enhanced deep-space observations."
+              </p>
+            </div>
             <UpgradeItem
-              title="Increase Receptors"
-              description="Add more anomalies per scan."
+              title="Extend Telescope Receptors"
+              description="Extending your telescope's receptors allows you to see deeper dips in lightcurves, revealing previously hidden anomalies. This enhancement increases your anomaly detection count per scan by 2, helping you discover more celestial phenomena during each observation session."
               current={receptorCount}
-              max={Infinity}
+              max={2}
               cost={getUpgradeCost(receptorCount)}
               onUpgrade={() => handleUpgrade("receptors", receptorCount)}
-              disabled={availablePoints < getUpgradeCost(receptorCount)}
+              disabled={availablePoints < getUpgradeCost(receptorCount) || receptorCount >= 2}
               color="#4361ee"
             />
           </div>

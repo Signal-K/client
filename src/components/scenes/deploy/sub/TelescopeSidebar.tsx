@@ -42,6 +42,8 @@ interface Props {
   alreadyDeployed: boolean
   deploying: boolean
   deploymentMessage: string | null
+  deploymentType: "stellar" | "planetary" | null
+  onBackToTypeSelection: () => void
 };
 
 export default function DeployTelescopeSidebar({
@@ -55,6 +57,8 @@ export default function DeployTelescopeSidebar({
   alreadyDeployed,
   deploying,
   deploymentMessage,
+  deploymentType,
+  onBackToTypeSelection,
 }: Props) {
   const router = useRouter()
   const { isDark, toggleDarkMode } = UseDarkMode()
@@ -99,30 +103,52 @@ export default function DeployTelescopeSidebar({
             <ArrowLeft className="w-4 h-4" />
           </button>
 
-          {/* Title and Status - Compact */}
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-gradient-to-br from-[#78cce2] to-[#4e7988] rounded-full flex items-center justify-center">
-              <Crosshair className="h-3 w-3 text-[#002439]" />
-            </div>
-            {/* <div className="min-w-0">
-              <h1 className="text-[#e4eff0] font-medium text-sm leading-tight truncate">Telescope Deploy</h1>
-              <div className="text-[#78cce2] text-xs flex items-center gap-2">
-                <span className="font-mono">({currentSector.x}, {currentSector.y})</span>
-                <span>•</span>
-                <span>{sectorAnomalies.length} targets</span>
-                {selectedSector && (
-                  <>
-                    <span>•</span>
-                    <span className="text-[#f2c572]">Ready</span>
-                  </>
+          {/* Mission Type Indicator */}
+          {deploymentType && (
+            <div className="flex items-center gap-2">
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                deploymentType === "stellar" 
+                  ? "bg-gradient-to-br from-[#ff6b6b] to-[#e55555]" 
+                  : "bg-gradient-to-br from-[#78cce2] to-[#4e7988]"
+              }`}>
+                {deploymentType === "stellar" ? (
+                  <Sun className="h-3 w-3 text-white" />
+                ) : (
+                  <Crosshair className="h-3 w-3 text-[#002439]" />
                 )}
               </div>
-            </div> */}
-          </div>
+              <div className="min-w-0">
+                <h1 className="text-[#e4eff0] font-medium text-sm leading-tight truncate">
+                  {deploymentType === "stellar" ? "Stellar Objects" : "Planetary Objects"}
+                </h1>
+                <div className="text-[#78cce2] text-xs flex items-center gap-2">
+                  <span className="font-mono">({currentSector.x}, {currentSector.y})</span>
+                  <span>•</span>
+                  <span>{sectorAnomalies.length} targets</span>
+                  {selectedSector && (
+                    <>
+                      <span>•</span>
+                      <span className="text-[#f2c572]">Ready</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right: Controls */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Change Mission Type Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBackToTypeSelection}
+            className="h-7 px-2 text-[#78cce2] hover:bg-[#78cce2]/20 text-xs"
+          >
+            <Settings2 className="h-3 w-3 mr-1" />
+            Change
+          </Button>
           {/* Navigation Controls - Desktop */}
           <div className="hidden lg:flex items-center gap-1 bg-[#002439]/50 rounded p-1">
             <Button

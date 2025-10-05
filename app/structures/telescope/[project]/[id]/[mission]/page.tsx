@@ -14,6 +14,8 @@ import VotePlanetClassifications from "@/src/components/deployment/missions/stru
 import PlanetGenerator from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator"
 import { DailyMinorPlanetWithId } from "@/src/components/projects/Telescopes/DailyMinorPlanet"
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
+import { DiskDetectorTutorial } from "@/src/components/projects/Telescopes/DiskDetector"
+import { ActiveAsteroidWithId, ActiveAsteroidClassifyWithId } from "@/src/components/projects/Telescopes/ActiveAsteroids"
 
 export default function TelescopeClassifyPage() {
   const params = useParams()
@@ -107,7 +109,17 @@ export default function TelescopeClassifyPage() {
           switch (mission) {
             case "classify":
               const activeAsteroidId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
-              component = <DailyMinorPlanetWithId anomalyId={activeAsteroidId} />;
+              component = <ActiveAsteroidClassifyWithId anomalyId={activeAsteroidId} />;
+              break;
+          }
+          break;
+
+        case "disk-detective":
+        case "diskdetective":
+          switch (mission) {
+            case "classify":
+              const diskDetectiveId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
+              component = <DiskDetectorTutorial anomalyId={diskDetectiveId} />;
               break;
           }
           break;
@@ -121,7 +133,7 @@ export default function TelescopeClassifyPage() {
     }, [params, session, isLoading]);
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col">
+    <div className="relative h-screen w-full flex flex-col overflow-hidden">
       {/* Telescope Background - Full screen behind everything */}
       <div className="fixed inset-0 -z-10">
         <TelescopeBackground 
@@ -144,12 +156,12 @@ export default function TelescopeClassifyPage() {
       */}
 
       {/* Sticky/relative nav and content */}
-      <div className="relative z-50 pb-8">
+      <div className="relative z-50 flex-shrink-0 pb-1">
         <GameNavbar />
       </div>
 
-      <main className="relative z-20 py-8 pb-24 flex justify-center">
-        <div className="w-full max-w-6xl px-4 bg-black/20 rounded-lg border border-[#78cce2]/30">
+      <main className="relative z-20 pt-12 flex-1 min-h-0 flex justify-center overflow-hidden">
+        <div className="w-full max-w-6xl bg-black/20 rounded-lg border border-[#78cce2]/30 h-full overflow-hidden">
           {MissionComponent}
         </div>
       </main>

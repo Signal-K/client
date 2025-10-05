@@ -391,9 +391,22 @@ export default function DeploySatelliteViewport() {
       
       console.log("Deployment date:", deploymentDateISO, isFastDeployEnabled ? "(fast deploy)" : "(normal)");
       
+      // Check for satellite upgrade
+      let anomalyCount = 4; // Default count
+      const { data: researched } = await supabase
+        .from("researched")
+        .select("tech_type")
+        .eq("user_id", userId)
+        .eq("tech_type", "satellitecount");
+      
+      if (researched && researched.length > 0) {
+        anomalyCount = 6; // Increased count with upgrade
+        console.log('Satellite upgrade detected - increasing anomaly count to 6');
+      }
+
       let rows = [];
       const planet = planetAnomalies[focusedPlanetIdx];
-      console.log("Planet:", planet, "Investigation mode:", investigationMode);
+      console.log("Planet:", planet, "Investigation mode:", investigationMode, "Anomaly count:", anomalyCount);
       if (!planet) {
         console.log("No planet selected");
         return;
@@ -433,7 +446,7 @@ export default function DeploySatelliteViewport() {
         anomalySets = ["cloudspottingOnMars"];
       }
 
-      // Fetch up to 4 cloud anomalies from ANYWHERE in the correct sets
+      // Fetch cloud anomalies from ANYWHERE in the correct sets (upgraded count)
       const { data: allClouds, error: cloudErr } = await supabase
         .from('anomalies')
         .select('id')
@@ -444,7 +457,7 @@ export default function DeploySatelliteViewport() {
         return;
       }
       const shuffledClouds = (allClouds || []).sort(() => 0.5 - Math.random());
-      shuffledClouds.slice(0, 4).forEach((cloud) => {
+      shuffledClouds.slice(0, anomalyCount).forEach((cloud) => {
         rows.push({
           author: userId,
           anomaly_id: cloud.id,
@@ -465,7 +478,7 @@ export default function DeploySatelliteViewport() {
         .eq('classificationtype', 'planet');
       const classificationId = classifications && classifications[0]?.id;
 
-      // Fetch up to 4 wind survey anomalies
+      // Fetch wind survey anomalies (upgraded count)
       const { data: windAnomalies, error: windErr } = await supabase
         .from('anomalies')
         .select('id')
@@ -477,7 +490,7 @@ export default function DeploySatelliteViewport() {
       };
 
       const shuffledAnomalies = (windAnomalies || []).sort(() => 0.5 - Math.random());
-      shuffledAnomalies.slice(0, 4).forEach((anomaly) => {
+      shuffledAnomalies.slice(0, anomalyCount).forEach((anomaly) => {
         rows.push({
           author: userId,
           anomaly_id: anomaly.id,
