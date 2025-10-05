@@ -293,29 +293,45 @@ export default function DeployTelescopeViewport() {
     setDeploying(true);
     const seed = selectedSector.x * 1000 + selectedSector.y;
 
+    // Check for telescope upgrade
+    let anomalyCount = 4; // Default count
+    if (session?.user?.id) {
+      const { data: researched } = await supabase
+        .from("researched")
+        .select("tech_type")
+        .eq("user_id", session.user.id)
+        .eq("tech_type", "probereceptors");
+      
+      if (researched && researched.length > 0) {
+        anomalyCount = 6; // Increased count with upgrade
+        console.log('Telescope upgrade detected - increasing anomaly count to 6');
+      }
+    }
+
     let selectedAnomalies: DatabaseAnomaly[] = [];
 
     if (deploymentType === "stellar") {
-      // For stellar objects - pick 4 diskDetective anomalies
+      // For stellar objects - pick based on upgrade status
       const stellarObjects = tessAnomalies.filter(a => a.anomalySet === 'diskDetective');
-      console.log('Using stellar object logic - diskDetective available:', stellarObjects.length);
+      console.log(`Using stellar object logic - diskDetective available: ${stellarObjects.length}, deploying: ${anomalyCount}`);
       
       selectedAnomalies = stellarObjects
         .map((item, i) => ({ item, r: seededRandom1(seed, i) }))
         .sort((a, b) => a.r - b.r)
-        .slice(0, Math.min(4, stellarObjects.length))
+        .slice(0, Math.min(anomalyCount, stellarObjects.length))
         .map(obj => obj.item);
     } else if (deploymentType === "planetary") {
-      // Existing planetary logic
+      // Existing planetary logic but with upgrade-aware count
       const planets = tessAnomalies.filter(a => a.anomalySet === 'telescope-tess');
       const asteroids = tessAnomalies.filter(a => a.anomalySet === 'telescope-minorPlanet');
       const activeAsteroids = tessAnomalies.filter(a => a.anomalySet === 'active-asteroids');
 
-      console.log('Available anomalies by type:', {
+      console.log(`Available anomalies by type:`, {
         totalAnomalies: tessAnomalies.length,
         planets: planets.length,
         asteroids: asteroids.length,
         activeAsteroids: activeAsteroids.length,
+        deployingCount: anomalyCount
       });
 
       const shuffleAndPick = (arr: DatabaseAnomaly[], count: number) => {
@@ -331,30 +347,30 @@ export default function DeployTelescopeViewport() {
 
       if (canSeeActiveAsteroids && activeAsteroids.length > 0) {
         console.log('Using active asteroid logic - 3 sets available');
-        const planetPick = shuffleAndPick(planets, 1);
-        const asteroidPick = shuffleAndPick(asteroids, 1);
-        const activeAsteroidPick = shuffleAndPick(activeAsteroids, 1);
+        const planetPick = shuffleAndPick(planets, Math.ceil(anomalyCount / 3));
+        const asteroidPick = shuffleAndPick(asteroids, Math.ceil(anomalyCount / 3));
+        const activeAsteroidPick = shuffleAndPick(activeAsteroids, Math.ceil(anomalyCount / 3));
         
         const remainingPool = [...planets, ...asteroids, ...activeAsteroids].filter(
           a => !planetPick.includes(a) && !asteroidPick.includes(a) && !activeAsteroidPick.includes(a)
         );
-        const remaining = shuffleAndPick(remainingPool, 1);
+        const remaining = shuffleAndPick(remainingPool, anomalyCount - planetPick.length - asteroidPick.length - activeAsteroidPick.length);
         
         selectedAnomalies = [...planetPick, ...asteroidPick, ...activeAsteroidPick, ...remaining];
       } else if (asteroids.length > 0) {
         console.log('Using 2-set logic - planets and asteroids');
-        const planetPick = shuffleAndPick(planets, 1);
-        const asteroidPick = shuffleAndPick(asteroids, 1);
+        const planetPick = shuffleAndPick(planets, Math.ceil(anomalyCount / 2));
+        const asteroidPick = shuffleAndPick(asteroids, Math.ceil(anomalyCount / 2));
         
         const remainingPool = [...planets, ...asteroids].filter(
           a => !planetPick.includes(a) && !asteroidPick.includes(a)
         );
-        const remaining = shuffleAndPick(remainingPool, 2);
+        const remaining = shuffleAndPick(remainingPool, anomalyCount - planetPick.length - asteroidPick.length);
         
         selectedAnomalies = [...planetPick, ...asteroidPick, ...remaining];
       } else {
         console.log('Using planet-only logic');
-        selectedAnomalies = shuffleAndPick(planets, 4);
+        selectedAnomalies = shuffleAndPick(planets, anomalyCount);
       }
     }
 

@@ -15,22 +15,23 @@ export default function MeteorologyResearch() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
-    const [availablePoints, setAvailablePoints] = useState(10); // update this to use the value from `TotalPoints`
+    const [availablePoints, setAvailablePoints] = useState(0); // update this to use real stardust balance
 
     const [userCapacities, setUserCapacities] = useState<UserCapacities>({
         probeCount: 1,
         balloonCount: 1,
     });
+    const [satelliteCount, setSatelliteCount] = useState(1);
     const [probeRangeDescription, setProbeRangeDescription] = useState("Unknown");
     const [cloudClassificationsCount, setCloudClassificationsCount] = useState(0);
 
     const getUpgradeCost = (currentLevel: number): number => {
-        return(currentLevel + 1) * 2;
+        return 10; // Fixed cost of 10 stardust per upgrade
     };
 
     const handleUpgrade = async ( capacity: CapacityKey, currentLevel: number ) => {
         const cost = getUpgradeCost(currentLevel);
-        if (availablePoints >= cost) {
+        if (availablePoints >= cost && currentLevel < 2) {
             setAvailablePoints((prev) => prev - cost);
             setUserCapacities((prev) => ({
                 ...prev,
@@ -48,6 +49,24 @@ export default function MeteorologyResearch() {
                 fetchResearchData();
             };
         };
+    };
+
+    const handleSatelliteUpgrade = async () => {
+        const cost = getUpgradeCost(satelliteCount);
+        if (availablePoints >= cost && satelliteCount < 2) {
+            setAvailablePoints((prev) => prev - cost);
+            setSatelliteCount((prev) => prev + 1);
+
+            if (session) {
+                await supabase.from('researched').insert([
+                    {
+                        user_id: session.user.id,
+                        tech_type: 'satellitecount',
+                    },
+                ]);
+                fetchResearchData();
+            }
+        }
     };
 
     useEffect(() => {
@@ -85,19 +104,33 @@ export default function MeteorologyResearch() {
                 throw classificationsError;
             }
 
+            // Calculate stardust balance
+            const { data: allClassifications } = await supabase
+                .from("classifications")
+                .select("id")
+                .eq("author", session.user.id);
+
+            const basePoints = allClassifications?.length || 0;
+            const researchPenalty = (researched?.length || 0) * 10;
+            const totalPoints = Math.max(0, basePoints - researchPenalty);
+            setAvailablePoints(totalPoints);
+
             let probeCount = 1;
             let balloonCount = 1;
+            let satelliteUpgrades = 0;
 
             researched?.forEach(item => {
                 if (item.tech_type === 'probecount') probeCount += 1;
                 if (item.tech_type === 'ballooncount') balloonCount += 1;
+                if (item.tech_type === 'satellitecount') satelliteUpgrades += 1;
             });
 
             setUserCapacities({
-                probeCount,
-                balloonCount,
+                probeCount: Math.min(probeCount, 2),
+                balloonCount: Math.min(balloonCount, 2),
             });
 
+            setSatelliteCount(Math.min(1 + satelliteUpgrades, 2));
             setCloudClassificationsCount(classifications.length);
 
             const response = await fetch(`/api/gameplay/research/upgrades?techType=proberange&count=${balloonCount}`);
@@ -170,13 +203,24 @@ export default function MeteorologyResearch() {
                         <h3 className="text-lg font-semibold text-[#4cc9f0] mb-4 border-b border-[#1e3a5f] pb-2">
                             TECH IMPROVEMENTS
                         </h3>
+                        <div className="mb-4 p-3 bg-blue-900/20 rounded-lg border border-blue-500/30">
+                            <p className="text-sm text-blue-200 italic">
+                                "Mission Control has authorized expansion of your satellite fleet for enhanced planetary coverage."
+                            </p>
+                        </div>
+                        <UpgradeItem
+                            title="Additional Satellite"
+                            description="Deploy an additional weather satellite to your fleet, allowing you to monitor multiple planetary locations simultaneously. This expansion increases your observation capacity and enables comprehensive atmospheric analysis across different worlds."
+                            current={satelliteCount}
+                            max={2}
+                            cost={getUpgradeCost(satelliteCount)}
+                            onUpgrade={handleSatelliteUpgrade}
+                            disabled={availablePoints < getUpgradeCost(satelliteCount) || satelliteCount >= 2}
+                            color="#564HFG"
+                        />
                         <LockedItem
                             title="Improved Range"
                             description="Coming soon. Extend the range of satellite observations."
-                        />
-                        <LockedItem
-                            title="Increase Satellite Count"
-                            description="Coming soon. Deploy additional satellites for enhanced coverage."
                         />
                     </div>
                 </div>
