@@ -43,8 +43,13 @@ export default function StardustBalance({ onPointsUpdate }: StardustBalanceProps
         // Calculate base points from classifications (1 point each)
         const basePoints = classifications?.length || 0;
 
+        // Only count purchased upgrades that cost stardust (not automatic unlocks)
+        const paidUpgrades = researched?.filter(r => 
+          ['probereceptors', 'satellitecount', 'probecount', 'proberange', 'rovercount'].includes(r.tech_type)
+        ) || [];
+
         // Calculate penalty from research upgrades (10 points each)
-        const researchPenalty = (researched?.length || 0) * 10;
+        const researchPenalty = paidUpgrades.length * 10;
 
         // Calculate referral bonus if they have a referral code
         let referralBonus = 0;

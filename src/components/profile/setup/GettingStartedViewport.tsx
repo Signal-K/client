@@ -99,7 +99,7 @@ export default function GettingStartedViewport({
       icon: <Telescope className="w-6 h-6" />,
       count: progress.toolsUsed.telescope,
       description: 'Discover exoplanets, track asteroids, and monitor solar activity',
-      link: '/viewports/telescope',
+      link: '/structures/telescope',
       color: 'text-blue-400'
     },
     {

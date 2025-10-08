@@ -79,8 +79,22 @@ export default function CompactResearchPanel() {
 
       // Calculate stardust
       const basePoints = allClassifications?.length || 0;
-      const researchPenalty = (researched?.length || 0) * 10;
+      
+      // Only count purchased upgrades that cost stardust (not automatic unlocks)
+      const paidUpgrades = researched?.filter(r => 
+        ['probereceptors', 'satellitecount', 'probecount', 'proberange', 'rovercount'].includes(r.tech_type)
+      ) || [];
+      
+      const researchPenalty = paidUpgrades.length * 10;
       const availableStardust = Math.max(0, basePoints - researchPenalty);
+
+      console.log('Stardust calculation:', {
+        basePoints,
+        totalResearched: researched?.length || 0,
+        paidUpgrades: paidUpgrades.length,
+        researchPenalty,
+        availableStardust
+      });
 
       setUpgradeData({
         telescopeReceptors: {

@@ -67,14 +67,20 @@ export default function AstronomyResearch() {
 
       setAsteroidClassificationsCount(classifications.length);
 
-      // Calculate stardust balance
+      // Calculate stardust balance - only count paid upgrades
       const { data: allClassifications } = await supabase
         .from("classifications")
         .select("id")
         .eq("author", session.user.id);
 
       const basePoints = allClassifications?.length || 0;
-      const researchPenalty = (researched?.length || 0) * 10;
+      
+      // Only count purchased upgrades that cost stardust (not automatic unlocks)
+      const paidUpgrades = researched?.filter(r => 
+        ['probereceptors', 'satellitecount', 'probecount', 'proberange', 'rovercount'].includes(r.tech_type)
+      ) || [];
+      
+      const researchPenalty = paidUpgrades.length * 10;
       const totalPoints = Math.max(0, basePoints - researchPenalty);
       setAvailablePoints(totalPoints);
 
