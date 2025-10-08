@@ -13,17 +13,10 @@ export async function POST(request: NextRequest) {
 
         // Get the discovery data and user info from the request
         const requestBody = await request.json();
-        const { userId, unclassifiedDiscoveries } = requestBody;
+        const { userId, unclassifiedDiscoveries, customMessage } = requestBody;
 
         if (!userId) {
             return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
-        }
-
-        if (!unclassifiedDiscoveries || unclassifiedDiscoveries.length === 0) {
-            return NextResponse.json({ 
-                message: 'No unclassified discoveries to notify about',
-                unclassifiedCount: 0
-            });
         }
 
         // Create Supabase client with service role for admin access to push subscriptions
@@ -53,6 +46,87 @@ export async function POST(request: NextRequest) {
         }
 
         const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+        // Handle custom messages (like deployment notifications)
+        if (customMessage) {
+            console.log('Processing custom message notification for user:', userId);
+            
+            // Get user's push subscriptions
+            const { data: subscriptions, error: subError } = await supabase
+                .from('push_subscriptions')
+                .select('*')
+                .eq('profile_id', userId)
+                .order('created_at', { ascending: false });
+
+            if (subError) {
+                console.error('Error fetching subscriptions:', subError);
+                return NextResponse.json({ 
+                    error: 'Failed to fetch push subscriptions',
+                    details: subError.message
+                }, { status: 500 });
+            }
+
+            if (!subscriptions || subscriptions.length === 0) {
+                return NextResponse.json({ 
+                    message: 'User has no push subscriptions'
+                });
+            }
+
+            // Deduplicate subscriptions by endpoint
+            const uniqueSubscriptions = new Map();
+            subscriptions.forEach(sub => {
+                if (!uniqueSubscriptions.has(sub.endpoint)) {
+                    uniqueSubscriptions.set(sub.endpoint, sub);
+                }
+            });
+
+            const deduplicatedSubscriptions = Array.from(uniqueSubscriptions.values());
+
+            const payload = JSON.stringify({
+                title: customMessage.title,
+                body: customMessage.body,
+                icon: 'https://github.com/Signal-K/client/blob/main/public/assets/Captn.jpg?raw=true',
+                url: customMessage.url || '/structures/telescope'
+            });
+
+            // Send notifications to all user's unique endpoints
+            const results = await Promise.all(
+                deduplicatedSubscriptions.map(async (subscription) => {
+                    try {
+                        const pushSubscription = {
+                            endpoint: subscription.endpoint,
+                            keys: {
+                                auth: subscription.auth,
+                                p256dh: subscription.p256dh
+                            }
+                        };
+
+                        await webpush.sendNotification(pushSubscription, payload);
+                        console.log(`Sent custom notification to user ${subscription.profile_id}`);
+                        return { success: true, endpoint: subscription.endpoint };
+                    } catch (pushError) {
+                        console.error(`Failed to send custom notification to user ${subscription.profile_id}:`, pushError);
+                        return { success: false, endpoint: subscription.endpoint, error: String(pushError) };
+                    }
+                })
+            );
+
+            const successful = results.filter(r => r.success).length;
+            const failed = results.filter(r => !r.success).length;
+
+            return NextResponse.json({
+                message: `Sent ${successful} custom notifications, ${failed} failed`,
+                notificationsSent: successful,
+                notificationsFailed: failed
+            });
+        }
+
+        if (!unclassifiedDiscoveries || unclassifiedDiscoveries.length === 0) {
+            return NextResponse.json({ 
+                message: 'No unclassified discoveries to notify about',
+                unclassifiedCount: 0
+            });
+        }
 
         console.log('Fetching push subscriptions for user:', userId);
 

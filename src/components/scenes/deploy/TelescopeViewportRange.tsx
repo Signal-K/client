@@ -150,6 +150,15 @@ export default function DeployTelescopeViewport() {
             count: data.filter(a => a.anomalySet === set).length
           }))
         });
+        
+        // Debug the first few anomalies to see their structure
+        console.log('Sample anomalies:', data.slice(0, 3).map(a => ({
+          id: a.id,
+          content: a.content,
+          anomalySet: a.anomalySet,
+          anomalytype: a.anomalytype
+        })));
+        
         setTessAnomalies(data);
       };
     } catch (error: any) {
@@ -308,6 +317,10 @@ export default function DeployTelescopeViewport() {
       }
     }
 
+    // HARD CAP: Absolutely no more than 6 anomalies can be deployed, regardless of any other factors
+    anomalyCount = Math.min(anomalyCount, 6);
+    console.log('Final anomaly count after hard cap applied:', anomalyCount);
+
     let selectedAnomalies: DatabaseAnomaly[] = [];
 
     if (deploymentType === "stellar") {
@@ -318,7 +331,7 @@ export default function DeployTelescopeViewport() {
       selectedAnomalies = stellarObjects
         .map((item, i) => ({ item, r: seededRandom1(seed, i) }))
         .sort((a, b) => a.r - b.r)
-        .slice(0, Math.min(anomalyCount, stellarObjects.length))
+        .slice(0, Math.min(anomalyCount, stellarObjects.length, 6)) // Hard cap at 6
         .map(obj => obj.item);
     } else if (deploymentType === "planetary") {
       // Existing planetary logic but with upgrade-aware count
@@ -336,10 +349,12 @@ export default function DeployTelescopeViewport() {
 
       const shuffleAndPick = (arr: DatabaseAnomaly[], count: number) => {
         if (arr.length === 0) return [];
+        // Additional safety: never pick more than 6 total anomalies
+        const safeCount = Math.min(count, 6, arr.length);
         return arr
           .map((item, i) => ({ item, r: seededRandom1(seed, i) }))
           .sort((a, b) => a.r - b.r)
-          .slice(0, Math.min(count, arr.length))
+          .slice(0, safeCount)
           .map(obj => obj.item);
       };
 
@@ -374,13 +389,28 @@ export default function DeployTelescopeViewport() {
       }
     }
 
-    console.log('Selected anomalies:', selectedAnomalies.map(a => ({ id: a.id, set: a.anomalySet, content: a.content })));
+    console.log('Selected anomalies for deployment:', selectedAnomalies.map(a => ({ id: a.id, set: a.anomalySet, content: a.content })));
+    console.log('About to create', selectedAnomalies.length, 'linked_anomalies entries');
 
     if (selectedAnomalies.length === 0) {
       setDeploymentMessage("No anomalies found in selected sector")
       setDeploying(false);
       return;
     };
+
+    // CRITICAL SAFETY CHECK: Absolutely ensure we never exceed the maximum allowed count
+    if (selectedAnomalies.length > 6) {
+      console.error(`CRITICAL: Selected ${selectedAnomalies.length} anomalies but maximum allowed is 6. Forcing trim to 6.`);
+      selectedAnomalies = selectedAnomalies.slice(0, 6);
+    }
+
+    // Additional safety check against the calculated count
+    if (selectedAnomalies.length > anomalyCount) {
+      console.warn(`WARNING: Selected ${selectedAnomalies.length} anomalies but expected only ${anomalyCount}. Trimming to expected count.`);
+      selectedAnomalies = selectedAnomalies.slice(0, anomalyCount);
+    }
+
+    console.log('Final anomalies to deploy after safety checks:', selectedAnomalies.length);
 
     const inserts = selectedAnomalies.map(anomaly =>
       supabase.from("linked_anomalies").insert({
@@ -403,25 +433,28 @@ export default function DeployTelescopeViewport() {
         sectorName: sectorName
       });
 
-      // Send deployment notification
+      // Send deployment notification only to the current user
       try {
         const notificationTitle = "Telescope Deployed Successfully";
         const targetType = deploymentType === "stellar" ? "stellar objects" : "exoplanet candidates";
         const notificationBody = `${selectedAnomalies.length} ${targetType} discovered in ${sectorName}`;
         
-        await fetch('/api/send-test-notification', {
+        await fetch('/api/notify-my-discoveries', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            title: notificationTitle,
-            message: notificationBody,
-            url: '/structures/telescope'
+            userId: session.user.id,
+            customMessage: {
+              title: notificationTitle,
+              body: notificationBody,
+              url: '/structures/telescope'
+            }
           })
         });
         
-        console.log('Deployment notification sent successfully');
+        console.log('Deployment notification sent successfully to user:', session.user.id);
       } catch (notificationError) {
         console.error('Failed to send deployment notification:', notificationError);
       }
