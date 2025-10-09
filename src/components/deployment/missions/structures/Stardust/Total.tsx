@@ -149,18 +149,25 @@ const TotalPoints = forwardRef<TotalPointsHandle, TotalPointsProps>((props, ref)
    * ------------------------------------------------------------
    */
 
-  const fetchResearchedPenalty = async () => {
-    if (!userId) {
-      setResearchedPenalty(0);
-      return;
-    }
+    const fetchResearchedPenalty = async () => {
+    if (!userId) {/* Lines 154-156 omitted */}
     const { data } = await supabase
       .from("researched")
-      .select("id, user_id")
+      .select("id, user_id, tech_type")
       .eq("user_id", userId);
 
-    const items = safeArray<ResearchedRow>(data as ResearchedRow[]);
-    setResearchedPenalty(items.length * 10); // Changed from 2 to 10 stardust per upgrade
+    const items = safeArray<any>(data as any[]);
+    
+    // Quantity upgrades cost 10 stardust
+    const quantityUpgrades = ['probereceptors', 'satellitecount', 'roverwaypoints'];
+    
+    // Calculate penalty: 10 for quantity upgrades, 2 for data/measurement upgrades
+    const penalty = items.reduce((total: number, item: any) => {
+      const isQuantityUpgrade = quantityUpgrades.includes(item.tech_type);
+      return total + (isQuantityUpgrade ? 10 : 2);
+    }, 0);
+    
+    setResearchedPenalty(penalty);
   };
 
   const fetchReferralPoints = async () => {

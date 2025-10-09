@@ -26,6 +26,11 @@ interface UpgradeData {
     max: number;
     available: boolean;
   };
+  // Data/measurement upgrades
+  spectroscopy: {
+    unlocked: boolean;
+    available: boolean;
+  };
   // Progress data
   asteroidClassifications: number;
   cloudClassifications: number;
@@ -40,6 +45,7 @@ export default function CompactResearchPanel() {
     telescopeReceptors: { current: 1, max: 2, available: false },
     satelliteCount: { current: 1, max: 2, available: false },
     roverWaypoints: { current: 4, max: 6, available: false },
+    spectroscopy: { unlocked: false, available: false },
     asteroidClassifications: 0,
     cloudClassifications: 0,
     availableStardust: 0,
@@ -84,22 +90,25 @@ export default function CompactResearchPanel() {
       const telescopeUpgrades = researched?.filter(r => r.tech_type === "probereceptors").length || 0;
       const satelliteUpgrades = researched?.filter(r => r.tech_type === "satellitecount").length || 0;
       const roverWaypointUpgrades = researched?.filter(r => r.tech_type === "roverwaypoints").length || 0;
+      const spectroscopyUnlocked = researched?.some(r => r.tech_type === "spectroscopy") || false;
 
-      // Calculate stardust
+      // Calculate stardust with tiered pricing
       const basePoints = allClassifications?.length || 0;
       
-      // Only count purchased upgrades that cost stardust (not automatic unlocks)
-      const paidUpgrades = researched?.filter(r => 
-        ['probereceptors', 'satellitecount', 'probecount', 'proberange', 'rovercount', 'roverwaypoints'].includes(r.tech_type)
-      ) || [];
+      // Quantity upgrades cost 10 stardust each
+      const quantityUpgrades = ['probereceptors', 'satellitecount', 'roverwaypoints'];
       
-      const researchPenalty = paidUpgrades.length * 10;
+      // Calculate penalty: 10 for quantity upgrades, 2 for data/measurement upgrades
+      const researchPenalty = (researched || []).reduce((total, r) => {
+        const isQuantityUpgrade = quantityUpgrades.includes(r.tech_type);
+        return total + (isQuantityUpgrade ? 10 : 2);
+      }, 0);
+      
       const availableStardust = Math.max(0, basePoints - researchPenalty);
 
       console.log('Stardust calculation:', {
         basePoints,
         totalResearched: researched?.length || 0,
-        paidUpgrades: paidUpgrades.length,
         researchPenalty,
         availableStardust
       });
@@ -120,6 +129,10 @@ export default function CompactResearchPanel() {
           max: 6,
           available: availableStardust >= 10 && roverWaypointUpgrades < 1,
         },
+        spectroscopy: {
+          unlocked: spectroscopyUnlocked,
+          available: availableStardust >= 2 && !spectroscopyUnlocked,
+        },
         asteroidClassifications: asteroidClassifications?.length || 0,
         cloudClassifications: cloudClassifications?.length || 0,
         availableStardust,
@@ -129,8 +142,8 @@ export default function CompactResearchPanel() {
     }
   };
 
-  const handleUpgrade = async (techType: string) => {
-    if (!session?.user || upgradeData.availableStardust < 10) return;
+  const handleUpgrade = async (techType: string, cost: number) => {
+    if (!session?.user || upgradeData.availableStardust < cost) return;
 
     try {
       await supabase.from("researched").insert([
@@ -148,43 +161,54 @@ export default function CompactResearchPanel() {
   };
 
   const availableUpgrades = [
-    // Telescope upgrades
+    // Telescope upgrades (Quantity - 10 stardust)
     ...(upgradeData.telescopeReceptors.current < upgradeData.telescopeReceptors.max ? [{
       id: "telescope-receptors",
       title: "Telescope Receptors",
-      description: "Extend your telescope's receptors to see deeper dips in lightcurves, revealing hidden anomalies. Increases anomaly detection by 2 per scan.",
+      description: "Extend your telescope's receptors to see deeper dips in lightcurves, revealing hidden anomalies. Increases anomaly detection by 2 per scan. (Quantity Upgrade)",
       category: "telescope" as const,
       current: upgradeData.telescopeReceptors.current,
       max: upgradeData.telescopeReceptors.max,
       cost: 10,
       available: upgradeData.telescopeReceptors.available,
-      onUpgrade: () => handleUpgrade("probereceptors"),
+      onUpgrade: () => handleUpgrade("probereceptors", 10),
     }] : []),
     
-    // Satellite upgrades
+    // Satellite upgrades (Quantity - 10 stardust)
     ...(upgradeData.satelliteCount.current < upgradeData.satelliteCount.max ? [{
       id: "satellite-count",
       title: "Additional Satellite",
-      description: "Deploy an additional weather satellite to your fleet for enhanced planetary coverage. Increases observation capacity across multiple worlds.",
+      description: "Deploy an additional weather satellite to your fleet for enhanced planetary coverage. Increases observation capacity across multiple worlds. (Quantity Upgrade)",
       category: "satellite" as const,
       current: upgradeData.satelliteCount.current,
       max: upgradeData.satelliteCount.max,
       cost: 10,
       available: upgradeData.satelliteCount.available,
-      onUpgrade: () => handleUpgrade("satellitecount"),
+      onUpgrade: () => handleUpgrade("satellitecount", 10),
     }] : []),
     
-    // Rover upgrades
+    // Rover upgrades (Quantity - 10 stardust)
     ...(upgradeData.roverWaypoints.current < upgradeData.roverWaypoints.max ? [{
       id: "rover-waypoints",
       title: "Rover Navigation Upgrade",
-      description: "Upgrade your rover's navigation system to support 2 additional waypoints (total 6). Allows for more complex exploration routes and increased discovery potential.",
+      description: "Upgrade your rover's navigation system to support 2 additional waypoints (total 6). Allows for more complex exploration routes and increased discovery potential. (Quantity Upgrade)",
       category: "rover" as const,
       current: upgradeData.roverWaypoints.current,
       max: upgradeData.roverWaypoints.max,
       cost: 10,
       available: upgradeData.roverWaypoints.available,
-      onUpgrade: () => handleUpgrade("roverwaypoints"),
+      onUpgrade: () => handleUpgrade("roverwaypoints", 10),
+    }] : []),
+    
+    // Spectroscopy (Data/Measurement - 2 stardust)
+    ...(!upgradeData.spectroscopy.unlocked ? [{
+      id: "spectroscopy",
+      title: "Spectroscopy Data",
+      description: "Access detailed atmospheric composition data from telescope observations of planets. Unlock spectroscopic analysis for enhanced planetary characterization. (Data Upgrade)",
+      category: "telescope" as const,
+      cost: 2,
+      available: upgradeData.spectroscopy.available,
+      onUpgrade: () => handleUpgrade("spectroscopy", 2),
     }] : []),
   ];
 
@@ -253,6 +277,16 @@ export default function CompactResearchPanel() {
       available: false,
       onUpgrade: () => {},
     }] : []),
+    
+    ...(upgradeData.spectroscopy.unlocked ? [{
+      id: "spectroscopy-complete",
+      title: "Spectroscopy Data",
+      description: "Spectroscopic analysis is now available for all planetary observations.",
+      category: "telescope" as const,
+      cost: 0,
+      available: false,
+      onUpgrade: () => {},
+    }] : []),
   ];
 
   return (
@@ -262,6 +296,16 @@ export default function CompactResearchPanel() {
         <div>
           <h2 className="text-lg font-semibold">Research Lab</h2>
           <p className="text-sm text-muted-foreground">Enhance your equipment with stardust</p>
+          <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+              <span>Quantity upgrades: 10⭐</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+              <span>Data upgrades: 2⭐</span>
+            </div>
+          </div>
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold">{upgradeData.availableStardust} ⭐</div>
@@ -328,20 +372,10 @@ export default function CompactResearchPanel() {
         <h3 className="text-lg font-semibold mb-4">Coming Soon</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <CompactUpgradeCard
-            title="Spectroscopy Data"
-            description="Access detailed atmospheric composition data from satellite observations."
-            category="satellite"
-            cost={20}
-            available={false}
-            isLocked={true}
-            requirementText="Coming in future update"
-            onUpgrade={() => {}}
-          />
-          <CompactUpgradeCard
             title="Deep Space Probe"
-            description="Extend telescope range for observations beyond the solar system."
+            description="Extend telescope range for observations beyond the solar system. (Quantity Upgrade)"
             category="telescope"
-            cost={25}
+            cost={10}
             available={false}
             isLocked={true}
             requirementText="Coming in future update"
@@ -349,9 +383,19 @@ export default function CompactResearchPanel() {
           />
           <CompactUpgradeCard
             title="Rover Battery Extension"
-            description="Increase rover battery life for longer exploration missions."
+            description="Increase rover battery life for longer exploration missions. (Data Upgrade)"
             category="rover"
-            cost={15}
+            cost={2}
+            available={false}
+            isLocked={true}
+            requirementText="Coming in future update"
+            onUpgrade={() => {}}
+          />
+          <CompactUpgradeCard
+            title="Advanced Radar System"
+            description="Enhanced atmospheric scanning for satellite observations. (Data Upgrade)"
+            category="satellite"
+            cost={2}
             available={false}
             isLocked={true}
             requirementText="Coming in future update"
