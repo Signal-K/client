@@ -20,6 +20,12 @@ interface UpgradeData {
     max: number;
     available: boolean;
   };
+  // Rover upgrades
+  roverWaypoints: {
+    current: number;
+    max: number;
+    available: boolean;
+  };
   // Progress data
   asteroidClassifications: number;
   cloudClassifications: number;
@@ -33,6 +39,7 @@ export default function CompactResearchPanel() {
   const [upgradeData, setUpgradeData] = useState<UpgradeData>({
     telescopeReceptors: { current: 1, max: 2, available: false },
     satelliteCount: { current: 1, max: 2, available: false },
+    roverWaypoints: { current: 4, max: 6, available: false },
     asteroidClassifications: 0,
     cloudClassifications: 0,
     availableStardust: 0,
@@ -76,13 +83,14 @@ export default function CompactResearchPanel() {
       // Calculate current upgrade levels
       const telescopeUpgrades = researched?.filter(r => r.tech_type === "probereceptors").length || 0;
       const satelliteUpgrades = researched?.filter(r => r.tech_type === "satellitecount").length || 0;
+      const roverWaypointUpgrades = researched?.filter(r => r.tech_type === "roverwaypoints").length || 0;
 
       // Calculate stardust
       const basePoints = allClassifications?.length || 0;
       
       // Only count purchased upgrades that cost stardust (not automatic unlocks)
       const paidUpgrades = researched?.filter(r => 
-        ['probereceptors', 'satellitecount', 'probecount', 'proberange', 'rovercount'].includes(r.tech_type)
+        ['probereceptors', 'satellitecount', 'probecount', 'proberange', 'rovercount', 'roverwaypoints'].includes(r.tech_type)
       ) || [];
       
       const researchPenalty = paidUpgrades.length * 10;
@@ -106,6 +114,11 @@ export default function CompactResearchPanel() {
           current: 1 + satelliteUpgrades,
           max: 2,
           available: availableStardust >= 10 && satelliteUpgrades < 1,
+        },
+        roverWaypoints: {
+          current: 4 + (roverWaypointUpgrades * 2),
+          max: 6,
+          available: availableStardust >= 10 && roverWaypointUpgrades < 1,
         },
         asteroidClassifications: asteroidClassifications?.length || 0,
         cloudClassifications: cloudClassifications?.length || 0,
@@ -160,6 +173,19 @@ export default function CompactResearchPanel() {
       available: upgradeData.satelliteCount.available,
       onUpgrade: () => handleUpgrade("satellitecount"),
     }] : []),
+    
+    // Rover upgrades
+    ...(upgradeData.roverWaypoints.current < upgradeData.roverWaypoints.max ? [{
+      id: "rover-waypoints",
+      title: "Rover Navigation Upgrade",
+      description: "Upgrade your rover's navigation system to support 2 additional waypoints (total 6). Allows for more complex exploration routes and increased discovery potential.",
+      category: "rover" as const,
+      current: upgradeData.roverWaypoints.current,
+      max: upgradeData.roverWaypoints.max,
+      cost: 10,
+      available: upgradeData.roverWaypoints.available,
+      onUpgrade: () => handleUpgrade("roverwaypoints"),
+    }] : []),
   ];
 
   const progressItems = [
@@ -211,6 +237,18 @@ export default function CompactResearchPanel() {
       category: "satellite" as const,
       current: upgradeData.satelliteCount.current,
       max: upgradeData.satelliteCount.max,
+      cost: 0,
+      available: false,
+      onUpgrade: () => {},
+    }] : []),
+    
+    ...(upgradeData.roverWaypoints.current >= upgradeData.roverWaypoints.max ? [{
+      id: "rover-waypoints-complete",
+      title: "Rover Navigation System",
+      description: "Your rover's navigation system is fully upgraded for maximum waypoint capacity.",
+      category: "rover" as const,
+      current: upgradeData.roverWaypoints.current,
+      max: upgradeData.roverWaypoints.max,
       cost: 0,
       available: false,
       onUpgrade: () => {},
@@ -290,16 +328,6 @@ export default function CompactResearchPanel() {
         <h3 className="text-lg font-semibold mb-4">Coming Soon</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <CompactUpgradeCard
-            title="Rover Battery"
-            description="Increase rover battery life for longer exploration missions."
-            category="rover"
-            cost={15}
-            available={false}
-            isLocked={true}
-            requirementText="Coming in future update"
-            onUpgrade={() => {}}
-          />
-          <CompactUpgradeCard
             title="Spectroscopy Data"
             description="Access detailed atmospheric composition data from satellite observations."
             category="satellite"
@@ -314,6 +342,16 @@ export default function CompactResearchPanel() {
             description="Extend telescope range for observations beyond the solar system."
             category="telescope"
             cost={25}
+            available={false}
+            isLocked={true}
+            requirementText="Coming in future update"
+            onUpgrade={() => {}}
+          />
+          <CompactUpgradeCard
+            title="Rover Battery Extension"
+            description="Increase rover battery life for longer exploration missions."
+            category="rover"
+            cost={15}
             available={false}
             isLocked={true}
             requirementText="Coming in future update"
