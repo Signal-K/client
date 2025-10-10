@@ -38,12 +38,12 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
   isDarkMode = true,
 }) => {
   const containerClasses = isMobile
-    ? `w-full backdrop-blur-md p-4 rounded-t-xl border-t min-h-80 max-h-96 overflow-y-auto ${
+    ? `w-full backdrop-blur-md p-3 rounded-t-xl border-t min-h-64 max-h-80 overflow-y-auto ${
         isDarkMode 
           ? "bg-[#181e2a]/95 border-[#232b3b] text-white" 
           : "bg-gradient-to-br from-[#f0f4ff]/95 to-[#e6ecf5]/95 border-[#9bb3d1] text-slate-800"
       }`
-    : `flex flex-col h-full min-h-0 w-full max-w-full z-30 border-l p-6 ${
+    : `flex flex-col h-full min-h-0 w-full max-w-full z-30 border-l p-4 ${
         isDarkMode 
           ? "bg-[#10141c] border-[#232b3b] text-white" 
           : "bg-gradient-to-b from-[#f0f4ff] via-[#f5f8ff] to-[#e8eeff] border-[#9bb3d1] text-slate-800"
@@ -51,12 +51,12 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
 
   return (
     <div className={containerClasses}>
-      <div className={`flex-grow ${isMobile ? 'space-y-3' : 'space-y-6'}`}>
+      <div className={`flex-grow ${isMobile ? 'space-y-2' : 'space-y-4'}`}>
         <div className="text-center">
             <Satellite className={`mx-auto ${
               isDarkMode ? 'text-blue-400' : 'text-indigo-700'
-            } ${isMobile ? 'h-8 w-8' : 'h-12 w-12'}`} />
-            <h2 className={`font-bold mt-2 ${isMobile ? 'text-lg' : 'text-xl'}`}>Satellite Controls</h2>
+            } ${isMobile ? 'h-6 w-6' : 'h-10 w-10'}`} />
+            <h2 className={`font-bold mt-1 ${isMobile ? 'text-base' : 'text-lg'}`}>Satellite Controls</h2>
         </div>
 
         {/* Mission Selection */}
@@ -109,8 +109,8 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
 
         {/* Reward Preview */}
         <div>
-            <h3 className="text-lg font-semibold">Mission Preview</h3>
-            <div className="mt-2 p-4 bg-gray-800/50 rounded-lg text-sm">
+            <h3 className="text-base font-semibold">Mission Preview</h3>
+            <div className="mt-2 p-3 bg-gray-800/50 rounded-lg text-sm">
                 <p>Deploying for <span className="font-bold">{duration} days</span> on the <span className="font-bold">{investigationMode}</span> mission:</p>
                 
                 {investigationMode === 'weather' && (
@@ -160,9 +160,9 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
       </div>
 
       {/* Deploy Button */}
-      <div className="mt-6">
+      <div className="mt-4">
         {deploymentWarning && (
-          <p className="text-red-500 text-sm text-center mb-4">{deploymentWarning}</p>
+          <p className="text-red-500 text-xs text-center mb-2">{deploymentWarning}</p>
         )}
         {!isDeployDisabled && (
           <Button onClick={onDeploy} disabled={isDeploying} className="w-full">

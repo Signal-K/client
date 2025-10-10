@@ -55,7 +55,8 @@ export function AiForMarsProjectWithID({ anomalyid }: { anomalyid?: number }) {
                 if (error) throw error;
                 setAnomaly(data);
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/automaton-ai4Mars/${data.id}.jpeg`);
+                // images for this project are stored in the "automaton-aiForMars" bucket
+                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/automaton-aiForMars/${data.id}.jpeg`);
             } catch (err: any) {
                 console.error("Error fetching anomaly:", err.message);
                 setAnomaly(null);
@@ -91,7 +92,8 @@ export function AiForMarsProjectWithID({ anomalyid }: { anomalyid?: number }) {
 
 export function StarterAiForMars({ anomalyid }: Props) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/automaton-ai4Mars/${anomalyid}.jpeg`;
+    // ensure we use the correct public bucket path (automaton-aiForMars)
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/automaton-aiForMars/${anomalyid}.jpeg`;
     const [showClassification, setShowClassification] = useState(false);
 
     // Tutorial slides for AI4Mars
