@@ -57,6 +57,7 @@ export function DiscoveriesPanel({
         // minor_planet: "daily-minor-planet",
         asteroid: "daily-minor-planet",
         accretion_disc: "disk-detective",
+        variable_star: "superwasp-variable"
       }
 
       const anomalyType = classificationTypeMap[classification.classificationtype] || "exoplanet"
