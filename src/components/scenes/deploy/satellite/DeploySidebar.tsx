@@ -38,12 +38,12 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
   isDarkMode = true,
 }) => {
   const containerClasses = isMobile
-    ? `w-full backdrop-blur-md p-3 rounded-t-xl border-t min-h-64 max-h-80 overflow-y-auto ${
+    ? `w-full backdrop-blur-md p-2.5 rounded-t-xl border-t shadow-2xl ${
         isDarkMode 
           ? "bg-[#181e2a]/95 border-[#232b3b] text-white" 
           : "bg-gradient-to-br from-[#f0f4ff]/95 to-[#e6ecf5]/95 border-[#9bb3d1] text-slate-800"
       }`
-    : `flex flex-col h-full min-h-0 w-full max-w-full z-30 border-l p-4 ${
+    : `flex flex-col h-full min-h-0 w-full max-w-full z-30 border-l p-3 sm:p-4 overflow-y-auto ${
         isDarkMode 
           ? "bg-[#10141c] border-[#232b3b] text-white" 
           : "bg-gradient-to-b from-[#f0f4ff] via-[#f5f8ff] to-[#e8eeff] border-[#9bb3d1] text-slate-800"
@@ -51,22 +51,29 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
 
   return (
     <div className={containerClasses}>
-      <div className={`flex-grow ${isMobile ? 'space-y-2' : 'space-y-4'}`}>
+      {/* Scroll indicator for mobile - visual cue */}
+      {isMobile && (
+        <div className="flex justify-center mb-2">
+          <div className={`w-12 h-1 rounded-full ${isDarkMode ? 'bg-gray-600' : 'bg-gray-400'}`}></div>
+        </div>
+      )}
+      
+      <div className={`flex-grow ${isMobile ? 'space-y-2 max-h-[50vh] overflow-y-auto' : 'space-y-3 sm:space-y-4'}`}>
         <div className="text-center">
             <Satellite className={`mx-auto ${
               isDarkMode ? 'text-blue-400' : 'text-indigo-700'
-            } ${isMobile ? 'h-6 w-6' : 'h-10 w-10'}`} />
-            <h2 className={`font-bold mt-1 ${isMobile ? 'text-base' : 'text-lg'}`}>Satellite Controls</h2>
+            } ${isMobile ? 'h-5 w-5' : 'h-8 w-8 sm:h-10 sm:w-10'}`} />
+            <h2 className={`font-bold mt-1 ${isMobile ? 'text-sm' : 'text-base sm:text-lg'}`}>Satellite Controls</h2>
         </div>
 
         {/* Mission Selection */}
         <div>
-          <label htmlFor="mission-select" className="block text-sm font-medium mb-2">Mission</label>
+          <label htmlFor="mission-select" className={`block font-medium mb-1.5 ${isMobile ? 'text-xs' : 'text-sm'}`}>Mission</label>
           <Select
             value={investigationMode}
             onValueChange={(value: 'weather' | 'planets' | 'p-4') => setInvestigationMode(value)}
           >
-            <SelectTrigger id="mission-select">
+            <SelectTrigger id="mission-select" className={isMobile ? 'h-9 text-sm' : ''}>
               <SelectValue placeholder="Select a mission" />
             </SelectTrigger>
             <SelectContent>
@@ -79,22 +86,21 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
 
         {/* Fast Deploy Welcome Message */}
         {isFastDeployEnabled === true && (
-          <div className="p-4 bg-gradient-to-br from-green-500/25 to-blue-500/25 rounded-lg border border-green-400/40 shadow-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-green-300 font-semibold text-sm">🎁 Welcome Gift Active!</span>
+          <div className={`p-2.5 sm:p-4 bg-gradient-to-br from-green-500/25 to-blue-500/25 rounded-lg border border-green-400/40 shadow-lg ${isMobile ? 'text-xs' : ''}`}>
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className={`text-green-300 font-semibold ${isMobile ? 'text-xs' : 'text-sm'}`}>🎁 Welcome Gift Active!</span>
             </div>
-            <p className="text-green-200 text-xs leading-relaxed">
-              🚀 As a new space explorer, your satellite will experience a <strong>speed boost</strong>! 
-              Anomalies will be made available for classification <strong>immediately</strong> instead of 
-              waiting for the usual deployment time. Enjoy your first mission!
+            <p className={`text-green-200 leading-snug ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
+              🚀 As a new explorer, your satellite has a <strong>speed boost</strong>! 
+              Anomalies available <strong>immediately</strong>.
             </p>
           </div>
         )}
 
         {/* Duration Slider */}
         <div>
-            <label htmlFor="duration-slider" className="block text-sm font-medium mb-2">
+            <label htmlFor="duration-slider" className={`block font-medium mb-1.5 ${isMobile ? 'text-xs' : 'text-sm'}`}>
                 Duration: <span className="font-bold text-blue-400">{duration} days</span>
             </label>
             <Slider
@@ -104,68 +110,73 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
                 step={1}
                 value={[duration]}
                 onValueChange={(value) => setDuration(value[0])}
+                className={isMobile ? 'h-1' : ''}
             />
         </div>
 
         {/* Reward Preview */}
         <div>
-            <h3 className="text-base font-semibold">Mission Preview</h3>
-            <div className="mt-2 p-3 bg-gray-800/50 rounded-lg text-sm">
-                <p>Deploying for <span className="font-bold">{duration} days</span> on the <span className="font-bold">{investigationMode}</span> mission:</p>
+            <h3 className={`font-semibold ${isMobile ? 'text-sm' : 'text-base'}`}>Mission Preview</h3>
+            <div className={`mt-1.5 sm:mt-2 p-2 sm:p-3 bg-gray-800/50 rounded-lg ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                <p className="leading-snug">Deploying for <span className="font-bold">{duration} days</span> on <span className="font-bold">{investigationMode}</span>:</p>
                 
                 {investigationMode === 'weather' && (
-                  <div className="mt-3">
-                    <h4 className="font-semibold text-blue-400 mb-2">Weather Analysis Mission</h4>
-                    <ul className="list-disc list-inside space-y-1 text-xs">
-                      <li>Discover and classify cloud formations on exoplanets</li>
-                      <li>Analyze atmospheric patterns and weather systems</li>
-                      <li>Contribute to understanding planetary atmospheres</li>
-                      <li>Expected anomalies: Cloud formations, atmospheric disturbances</li>
+                  <div className={`mt-2 sm:mt-3 ${isMobile ? 'space-y-1' : ''}`}>
+                    <h4 className={`font-semibold text-blue-400 mb-1.5 sm:mb-2 ${isMobile ? 'text-xs' : ''}`}>Weather Analysis</h4>
+                    <ul className={`list-disc list-inside space-y-0.5 sm:space-y-1 ${isMobile ? 'text-[10px]' : 'text-xs'} leading-snug`}>
+                      <li>Discover cloud formations on exoplanets</li>
+                      <li className="hidden sm:list-item">Analyze atmospheric patterns</li>
+                      <li>Contribute to planetary atmosphere understanding</li>
                     </ul>
-                    {cloudInvestigationDescription && <p className="mt-2 text-xs italic">{cloudInvestigationDescription}</p>}
-                    <p className="mt-2 text-xs">Your cloud classifications: {userCloudClassifications}</p>
+                    {cloudInvestigationDescription && <p className={`mt-1.5 sm:mt-2 italic ${isMobile ? 'text-[10px]' : 'text-xs'}`}>{cloudInvestigationDescription}</p>}
+                    {!isMobile && <p className="mt-1.5 sm:mt-2 text-xs">Your cloud classifications: {userCloudClassifications}</p>}
                   </div>
                 )}
                 
                 {investigationMode === 'planets' && (
-                  <div className="mt-3">
-                    <h4 className="font-semibold text-blue-400 mb-2">Planetary Survey Mission</h4>
-                    <ul className="list-disc list-inside space-y-1 text-xs">
-                      <li>Deploy satellites to previously discovered planets</li>
-                      <li>Calculate detailed planet physical properties (radius, mass, density)</li>
-                      <li>Analyze planetary temperatures and atmospheric compositions</li>
-                      <li>Conduct in-depth studies of confirmed planetary systems</li>
-                      <li>Expected data: Detailed planetary measurements and characteristics</li>
+                  <div className={`mt-2 sm:mt-3 ${isMobile ? 'space-y-1' : ''}`}>
+                    <h4 className={`font-semibold text-blue-400 mb-1.5 sm:mb-2 ${isMobile ? 'text-xs' : ''}`}>Planetary Survey</h4>
+                    <ul className={`list-disc list-inside space-y-0.5 sm:space-y-1 ${isMobile ? 'text-[10px]' : 'text-xs'} leading-snug`}>
+                      <li>Deploy satellites to discovered planets</li>
+                      <li>Calculate planet physical properties</li>
+                      <li className="hidden sm:list-item">Analyze planetary temperatures</li>
+                      <li>Conduct in-depth planetary studies</li>
                     </ul>
                   </div>
                 )}
                 
                 {investigationMode === 'p-4' && (
-                  <div className="mt-3">
-                    <h4 className="font-semibold text-blue-400 mb-2">Wind Survey Mission (Planet Four)</h4>
-                    <ul className="list-disc list-inside space-y-1 text-xs">
-                      <li>Identify surface features on Mars and similar planets</li>
-                      <li>Track seasonal changes and surface evolution</li>
-                      <li>Classify sublimation patterns and surface formations</li>
-                      <li>Expected anomalies: Sublimation features, surface spiders, fan formations</li>
+                  <div className={`mt-2 sm:mt-3 ${isMobile ? 'space-y-1' : ''}`}>
+                    <h4 className={`font-semibold text-blue-400 mb-1.5 sm:mb-2 ${isMobile ? 'text-xs' : ''}`}>Wind Survey (Planet Four)</h4>
+                    <ul className={`list-disc list-inside space-y-0.5 sm:space-y-1 ${isMobile ? 'text-[10px]' : 'text-xs'} leading-snug`}>
+                      <li>Identify surface features on Mars</li>
+                      <li>Track seasonal changes</li>
+                      <li className="hidden sm:list-item">Classify sublimation patterns</li>
+                      <li>Expected: Surface spiders, fan formations</li>
                     </ul>
                   </div>
                 )}
                 
-                <p className="mt-3 text-xs text-gray-400">
-                  Duration affects the variety and number of anomalies you'll encounter.
-                </p>
+                {!isMobile && (
+                  <p className="mt-2 sm:mt-3 text-xs text-gray-400 leading-snug">
+                    Duration affects variety and number of anomalies.
+                  </p>
+                )}
             </div>
         </div>
       </div>
 
       {/* Deploy Button */}
-      <div className="mt-4">
+      <div className={`${isMobile ? 'mt-2 pt-2 border-t' : 'mt-3 sm:mt-4'} ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
         {deploymentWarning && (
-          <p className="text-red-500 text-xs text-center mb-2">{deploymentWarning}</p>
+          <p className={`text-red-500 text-center mb-1.5 sm:mb-2 leading-snug ${isMobile ? 'text-[10px]' : 'text-xs'}`}>{deploymentWarning}</p>
         )}
         {!isDeployDisabled && (
-          <Button onClick={onDeploy} disabled={isDeploying} className="w-full">
+          <Button 
+            onClick={onDeploy} 
+            disabled={isDeploying} 
+            className={`w-full ${isMobile ? 'h-9 text-sm' : 'h-10'}`}
+          >
             {isDeploying ? 'Deploying...' : 'Deploy Satellite'}
           </Button>
         )}

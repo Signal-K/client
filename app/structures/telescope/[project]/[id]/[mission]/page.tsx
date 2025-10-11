@@ -15,6 +15,7 @@ import PlanetGenerator from "@/src/components/discovery/data-sources/Astronomers
 import { DailyMinorPlanetWithId } from "@/src/components/projects/Telescopes/DailyMinorPlanet"
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
 import { DiskDetectorTutorial } from "@/src/components/projects/Telescopes/DiskDetector"
+import { SuperWASPTutorial } from "@/src/components/projects/Telescopes/SuperWASP"
 import { ActiveAsteroidWithId, ActiveAsteroidClassifyWithId } from "@/src/components/projects/Telescopes/ActiveAsteroids"
 
 export default function TelescopeClassifyPage() {
@@ -120,6 +121,17 @@ export default function TelescopeClassifyPage() {
             case "classify":
               const diskDetectiveId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
               component = <DiskDetectorTutorial anomalyId={diskDetectiveId} />;
+              break;
+          }
+          break;
+
+        case "superwasp":
+        case "superwasp-variable":
+        case "stellar-classification":
+          switch (mission) {
+            case "classify":
+              const superwaspId = idParam.startsWith("db-") ? idParam.replace("db-", "") : idParam;
+              component = <SuperWASPTutorial anomalyId={superwaspId} />;
               break;
           }
           break;

@@ -167,6 +167,8 @@ export default function TelescopeViewportSection() {
                       title = "Solar anomaly";
                     } else if (anomalyData.anomalySet === "diskDetective" || anomalyData.anomalySet === "disk-detective" || anomalyData.anomalySet === "accretion_disc") {
                       title = "Stellar disk";
+                    } else if (anomalyData.anomalySet === "telescope-superwasp-variable" || anomalyData.anomalySet === "superwasp-variable" || anomalyData.anomalySet === "variable_star") {
+                      title = "Variable star";
                     }
                     
                     return (
@@ -259,6 +261,12 @@ export default function TelescopeViewportSection() {
                   anomalySet === "disk-detective"
                 ) {
                   link = `/structures/telescope/disk-detective/db-${anomalyId}/classify`;
+                } else if (
+                  anomalyType === "variable_star" ||
+                  anomalySet === "telescope-superwasp-variable" ||
+                  anomalySet === "superwasp-variable"
+                ) {
+                  link = `/structures/telescope/superwasp-variable/db-${anomalyId}/classify`;
                 } else {
                   // fallback: go to planet-hunters if type is missing
                   link = `/structures/telescope/planet-hunters/db-${anomalyId}/classify`;

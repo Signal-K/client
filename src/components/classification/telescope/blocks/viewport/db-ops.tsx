@@ -6,20 +6,64 @@ export function useDatabaseOperations() {
   const session = useSession();
 
   const fetchAnomalies = async () => {
-    try {
-      const { data, error } = await supabase.from("anomalies").select("*")
-      // console.log("Fetching anomalies viewport - raw data count:", data?.length)
+    if (!session) return [];
 
-      if (!error && data) {
-        const processedAnomalies = data.map(generateAnomalyProperties)
-        console.log("Processed anomalies count:", processedAnomalies.length)
-        console.log("Sample processed anomaly:", processedAnomalies[0])
-        return processedAnomalies        
+    try {
+      // Fetch anomalies that are linked to this user via linked_anomalies
+      const { data: linkedData, error: linkedError } = await supabase
+        .from("linked_anomalies")
+        .select(`
+          id,
+          anomaly_id,
+          anomalies:anomaly_id (
+            id,
+            content,
+            ticId,
+            anomalytype,
+            type,
+            radius,
+            mass,
+            density,
+            gravity,
+            temperatureEq,
+            temperature,
+            smaxis,
+            orbital_period,
+            classification_status,
+            avatar_url,
+            created_at,
+            deepnote,
+            lightkurve,
+            configuration,
+            parentAnomaly,
+            anomalySet,
+            anomalyConfiguration
+          )
+        `)
+        .eq("author", session.user.id)
+        .eq("automaton", "Telescope")
+        .not("anomalies", "is", null);
+
+      if (linkedError) {
+        console.error("Error fetching linked anomalies:", linkedError);
+        return [];
+      }
+
+      if (linkedData) {
+        // Extract the anomaly data from the linked records
+        const anomalies = linkedData
+          .map((link: any) => link.anomalies)
+          .filter(Boolean);
+        
+        const processedAnomalies = anomalies.map(generateAnomalyProperties);
+        console.log("Processed linked anomalies count:", processedAnomalies.length);
+        console.log("Sample processed anomaly:", processedAnomalies[0]);
+        return processedAnomalies;
       }
     } catch (error) {
-      console.error("Error fetching anomalies:", error)
+      console.error("Error fetching anomalies:", error);
     }
-    return []
+    return [];
   }
 
   const fetchUserClassifications = async () => {

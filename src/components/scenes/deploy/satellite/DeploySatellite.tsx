@@ -672,9 +672,9 @@ export default function DeploySatelliteViewport() {
         </div> */}
 
       {/* Main map/viewport area */}
-      <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0 pb-96 md:pb-0">
+      <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0 pb-0 md:pb-0">
           {/* Main viewport content (planets/clouds) */}
-          <div className="relative flex-1 flex items-center justify-center z-10">
+          <div className="relative flex-1 flex items-center justify-center z-10 pb-48 md:pb-0">
             <PlanetFocusView
               planet={planetAnomalies[focusedPlanetIdx] || null}
               onNext={() => setFocusedPlanetIdx((prev) => Math.min(planetAnomalies.length - 1, prev + 1))}

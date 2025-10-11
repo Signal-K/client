@@ -27,25 +27,64 @@ export default function AnomalyDialog({
     const id = selectedAnomaly?.id?.toString()
     if (!id) return
 
+    console.log('🔍 CLASSIFY DEBUG:', {
+      anomalyId: id,
+      anomalyType: selectedAnomaly.type,
+      anomalyProject: selectedAnomaly.project,
+      fullAnomaly: selectedAnomaly
+    });
+
     let path = ""
 
-    switch (selectedAnomaly.type) {
-      case "exoplanet":
-        path = `/structures/telescope/planet-hunters/${id}/classify`
-        break
-      case "sunspot":
-        path = `/structures/telescope/sunspots/${id}/classify`
-        break
-      case "asteroid":
-        path = `/structures/telescope/daily-minor-planet/${id}/classify`
-        break
-      case "accretion_disc":
-        path = `/structures/telescope/disk-detective/${id}/classify`
-        break
-      default:
-        return
+    // First check if anomaly has a specific project field
+    if (selectedAnomaly.project) {
+      switch (selectedAnomaly.project) {
+        case "planet-hunters":
+          path = `/structures/telescope/planet-hunters/${id}/classify`
+          break
+        case "disk-detective":
+          path = `/structures/telescope/disk-detective/${id}/classify`
+          break
+        case "superwasp-variable":
+        case "superwasp":
+          path = `/structures/telescope/superwasp-variable/${id}/classify`
+          break
+        case "daily-minor-planet":
+          path = `/structures/telescope/daily-minor-planet/${id}/classify`
+          break
+        case "active-asteroids":
+          path = `/structures/telescope/active-asteroids/${id}/classify`
+          break
+        default:
+          // Fallback to type-based routing
+          break
+      }
     }
 
+    // Fallback to type-based routing if no project-specific path was set
+    if (!path) {
+      switch (selectedAnomaly.type) {
+        case "exoplanet":
+          path = `/structures/telescope/planet-hunters/${id}/classify`
+          break
+        case "sunspot":
+          path = `/structures/telescope/sunspots/${id}/classify`
+          break
+        case "asteroid":
+          path = `/structures/telescope/daily-minor-planet/${id}/classify`
+          break
+        case "accretion_disc":
+          path = `/structures/telescope/disk-detective/${id}/classify`
+          break
+        case "variable_star":
+          path = `/structures/telescope/superwasp-variable/${id}/classify`
+          break
+        default:
+          return
+      }
+    }
+
+    console.log('🔍 ROUTING TO:', path);
     router.push(path)
   }
 
@@ -59,6 +98,8 @@ export default function AnomalyDialog({
         return <Target className="h-5 w-5" />
       case "accretion_disc":
         return <Disc className="h-5 w-5" />
+      case "variable_star":
+        return <Star className="h-5 w-5" />
       default:
         return <Star className="h-5 w-5" />
     }
@@ -73,7 +114,9 @@ export default function AnomalyDialog({
       case "asteroid":
         return "bg-purple-500"
       case "accretion_disc":
-        return "bg-green-500"
+        return "bg-red-500"
+      case "variable_star":
+        return "bg-orange-400"
       default:
         return "bg-gray-500"
     }
