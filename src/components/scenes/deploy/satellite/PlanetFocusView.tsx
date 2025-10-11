@@ -13,7 +13,27 @@ interface PlanetFocusViewProps {
   isDarkMode?: boolean;
 }
 
+// Helper function to interpret stellar metallicity [Fe/H] values
+function interpretMetallicity(value: string | number | null | undefined): string {
+  if (!value) return '';
+  const numVal = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(numVal)) return '';
+  
+  // Solar metallicity is [Fe/H] = 0
+  // Negative = less metals than Sun (older, metal-poor stars)
+  // Positive = more metals than Sun (younger, metal-rich stars)
+  
+  if (numVal > 0.3) return '(Very metal-rich, young star)';
+  if (numVal > 0.1) return '(Metal-rich, younger than Sun)';
+  if (numVal > -0.1) return '(Similar to Sun)';
+  if (numVal > -0.3) return '(Slightly metal-poor)';
+  if (numVal > -0.5) return '(Metal-poor, older star)';
+  return '(Very metal-poor, ancient star)';
+}
+
 const PlanetFocusView: React.FC<PlanetFocusViewProps> = ({ planet, onNext, onPrev, isFirst, isLast, isDarkMode = true }) => {
+  console.log('🎨 PlanetFocusView render:', planet?.id, 'stats:', planet?.stats);
+  
   if (!planet) {
     return (
       <div className={`flex flex-col items-center justify-center h-full w-full ${
@@ -74,6 +94,17 @@ const PlanetFocusView: React.FC<PlanetFocusViewProps> = ({ planet, onNext, onPre
         }`}>
           <li>Temperature: {planet.stats?.temperature || 'N/A'} K</li>
           <li>Radius: {planet.stats?.radius || 'N/A'} R☉</li>
+          {planet.stats?.metallicity && (
+            <li className="text-xs">
+              <span className={isDarkMode ? 'text-blue-300' : 'text-blue-600'}>
+                Metallicity [Fe/H]: {planet.stats.metallicity}
+              </span>
+              <br />
+              <span className={`text-xs italic ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                {interpretMetallicity(planet.stats.metallicity)}
+              </span>
+            </li>
+          )}
           <li>Mass: {planet.stats?.mass || 'N/A'} M☉</li>
         </ul>
       </div>

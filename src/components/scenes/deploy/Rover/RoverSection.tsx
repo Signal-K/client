@@ -34,6 +34,7 @@ export default function RoverViewportSection() {
     const [isReturningHome, setIsReturningHome] = useState<boolean>(false);
     const [userClassificationCount, setUserClassificationCount] = useState<number>(0);
     const [isFastDeployEnabled, setIsFastDeployEnabled] = useState<boolean>(false);
+    const [hasRoverUpgrade, setHasRoverUpgrade] = useState<boolean>(false);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -56,7 +57,20 @@ export default function RoverViewportSection() {
             setIsFastDeployEnabled(classificationCount < 4);
         }
         
+        async function checkRoverUpgrade() {
+            if (!session) return;
+            const { data: upgrade, error } = await supabase
+                .from("researched")
+                .select("*")
+                .eq("user_id", session.user.id)
+                .eq("tech_type", "roverwaypoints")
+                .maybeSingle();
+            
+            setHasRoverUpgrade(!!upgrade);
+        }
+        
         fetchClassificationCount();
+        checkRoverUpgrade();
     }, [session, supabase]);
     
     // Check for linked_anomalies of relevant type
@@ -618,6 +632,16 @@ export default function RoverViewportSection() {
                         })}
                         {roverStatus && (
                             <div className="fixed bottom-0 right-0 text-white text-xs bg-black/50 p-2 rounded m-2 z-50 max-w-xs">
+                                {/* Rover Upgrade Notification */}
+                                {hasRoverUpgrade && (
+                                    <div className="mb-2 p-2 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded border border-blue-400/40">
+                                        <div className="flex items-center gap-1 mb-1">
+                                            <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
+                                            <span className="text-blue-300 font-semibold text-xs">🛞 Navigation Upgrade Active!</span>
+                                        </div>
+                                        <div className="text-blue-200 text-xs">Rover supports up to 6 waypoints</div>
+                                    </div>
+                                )}
                                 {/* Fast Deploy Welcome Message */}
                                 {isFastDeployEnabled && (
                                     <div className="mb-2 p-2 bg-gradient-to-r from-green-500/30 to-blue-500/30 rounded border border-green-400/40">

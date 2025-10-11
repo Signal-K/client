@@ -20,8 +20,13 @@ export const ANOMALY_TYPES = {
   },
   accretion_disc: {
     project: "disk-detective",
-    colors: ["#78cce2", "#4e7988", "#78cce2", "#4e7988", "#78cce2", "#4e7988", "#78cce2", "#4e7988"],
-    shapes: ["oval", "circle", "hexagon"] as const,
+    colors: ["#ff6b6b", "#ff8888", "#ff6b6b", "#ff8888", "#ff6b6b", "#ff8888", "#ff6b6b", "#ff8888"],
+    shapes: ["oval", "circle", "star"] as const,
+  },
+  variable_star: {
+    project: "superwasp-variable",
+    colors: ["#ff9966", "#ffaa77", "#ff9966", "#ffaa77", "#ff9966", "#ffaa77", "#ff9966", "#ffaa77"],
+    shapes: ["star", "circle", "oval"] as const,
   },
 } as const
 
@@ -38,12 +43,18 @@ export function normalizeAnomalyType(type: string | null): AnomalyType {
     case "telescope-awa":
     case "accretion_disc":
     case "disk":
+    case "diskDetective":
       return "accretion_disc"
     case "asteroid":
     case "active-asteroids":
     case "telescope-minorPlanet":
     case "minor-planet":
       return "asteroid"
+    case "superwasp-variable":
+    case "telescope-superwasp-variable":
+    case "variable-star":
+    case "variable_star":
+      return "variable_star"
     default:
       return "exoplanet"
   }
@@ -54,10 +65,13 @@ export function generateAnomalyProperties(dbAnomaly: DatabaseAnomaly) {
   const type = normalizeAnomalyType(dbAnomaly.anomalySet)
   const config = ANOMALY_TYPES[type]
 
-  // Debug logging for first few anomalies
-  if (seed <= 5) {
-    // console.log(`DEBUG: Anomaly ${seed} - anomalySet: "${dbAnomaly.anomalySet}", normalized type: "${type}", project: "${config.project}"`)
-  }
+  // Debug logging for ALL anomalies to see what's happening
+  console.log(`🔍 DEBUG: Anomaly ${seed}:`, {
+    anomalySet: dbAnomaly.anomalySet,
+    normalizedType: type,
+    project: config.project,
+    content: dbAnomaly.content
+  });
 
   // Generate sector coordinates that match the current sector system
   const sectorX = Math.floor(seededRandom(seed, 9) * 10) - 5

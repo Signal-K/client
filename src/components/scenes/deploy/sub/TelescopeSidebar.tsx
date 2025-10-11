@@ -89,46 +89,46 @@ export default function DeployTelescopeSidebar({
   };
 
   return (
-    <div className="bg-[#005066]/95 backdrop-blur-sm border-b border-[#78cce2]/30 h-16">
+    <div className="bg-[#005066]/95 backdrop-blur-sm border-b border-[#78cce2]/30 min-h-16">
       {/* Main Control Bar - Simplified and Compact */}
-      <div className="flex items-center justify-between gap-3 px-4 py-2 h-full">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-3 px-2 sm:px-4 py-2 md:h-16">
         {/* Left: Navigation and Title */}
-        <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           {/* Back Button */}
           <button
             onClick={() => router.push("/")}
-            className="p-2 rounded-md hover:bg-[#78cce2]/20 transition text-[#78cce2] flex-shrink-0"
+            className="p-1.5 sm:p-2 rounded-md hover:bg-[#78cce2]/20 transition text-[#78cce2] flex-shrink-0"
             aria-label="Back to Home"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
           </button>
 
           {/* Mission Type Indicator */}
           {deploymentType && (
-            <div className="flex items-center gap-2">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center ${
                 deploymentType === "stellar" 
                   ? "bg-gradient-to-br from-[#ff6b6b] to-[#e55555]" 
                   : "bg-gradient-to-br from-[#78cce2] to-[#4e7988]"
               }`}>
                 {deploymentType === "stellar" ? (
-                  <Sun className="h-3 w-3 text-white" />
+                  <Sun className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-white" />
                 ) : (
-                  <Crosshair className="h-3 w-3 text-[#002439]" />
+                  <Crosshair className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-[#002439]" />
                 )}
               </div>
               <div className="min-w-0">
-                <h1 className="text-[#e4eff0] font-medium text-sm leading-tight truncate">
+                <h1 className="text-[#e4eff0] font-medium text-xs sm:text-sm leading-tight truncate">
                   {deploymentType === "stellar" ? "Stellar Objects" : "Planetary Objects"}
                 </h1>
-                <div className="text-[#78cce2] text-xs flex items-center gap-2">
+                <div className="text-[#78cce2] text-[10px] sm:text-xs flex items-center gap-1 sm:gap-2">
                   <span className="font-mono">({currentSector.x}, {currentSector.y})</span>
-                  <span>•</span>
-                  <span>{sectorAnomalies.length} targets</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="hidden sm:inline">{sectorAnomalies.length} targets</span>
                   {selectedSector && (
                     <>
-                      <span>•</span>
-                      <span className="text-[#f2c572]">Ready</span>
+                      <span className="hidden md:inline">•</span>
+                      <span className="text-[#f2c572] hidden md:inline">Ready</span>
                     </>
                   )}
                 </div>
@@ -138,16 +138,16 @@ export default function DeployTelescopeSidebar({
         </div>
 
         {/* Right: Controls */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 flex-wrap">
           {/* Change Mission Type Button */}
           <Button
             variant="ghost"
             size="sm"
             onClick={onBackToTypeSelection}
-            className="h-7 px-2 text-[#78cce2] hover:bg-[#78cce2]/20 text-xs"
+            className="h-6 sm:h-7 px-1.5 sm:px-2 text-[#78cce2] hover:bg-[#78cce2]/20 text-[10px] sm:text-xs"
           >
-            <Settings2 className="h-3 w-3 mr-1" />
-            Change
+            <Settings2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
+            <span className="hidden sm:inline">Change</span>
           </Button>
           {/* Navigation Controls - Desktop */}
           <div className="hidden lg:flex items-center gap-1 bg-[#002439]/50 rounded p-1">
@@ -190,9 +190,9 @@ export default function DeployTelescopeSidebar({
             <Button
               onClick={handleSectorSelect}
               size="sm"
-              className="bg-[#4e7988] text-[#e4eff0] hover:bg-[#78cce2] hover:text-[#002439] h-7 px-3 text-xs"
+              className="bg-[#4e7988] text-[#e4eff0] hover:bg-[#78cce2] hover:text-[#002439] h-6 sm:h-7 px-2 sm:px-3 text-[10px] sm:text-xs"
             >
-              <Target className="h-3 w-3 mr-1" />
+              <Target className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
               Select
             </Button>
           )}
@@ -202,7 +202,7 @@ export default function DeployTelescopeSidebar({
               onClick={onDeploy}
               disabled={alreadyDeployed || deploying}
               size="sm"
-              className="bg-[#78cce2] text-[#002439] hover:bg-[#e4eff0] h-7 px-3 text-xs font-medium"
+              className="bg-[#78cce2] text-[#002439] hover:bg-[#e4eff0] h-7 sm:h-8 px-3 sm:px-4 text-xs sm:text-sm font-medium shadow-lg"
             >
               {deploying ? (
                 <>
@@ -213,7 +213,7 @@ export default function DeployTelescopeSidebar({
                 "Deployed"
               ) : (
                 <>
-                  <Zap className="h-3 w-3 mr-1" />
+                  <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                   Deploy
                 </>
               )}
@@ -225,18 +225,18 @@ export default function DeployTelescopeSidebar({
             variant="ghost"
             size="sm"
             onClick={() => setNavExpanded(!navExpanded)}
-            className="lg:hidden h-7 w-7 p-0 text-[#78cce2] hover:bg-[#78cce2]/20"
+            className="lg:hidden h-6 w-6 sm:h-7 sm:w-7 p-0 text-[#78cce2] hover:bg-[#78cce2]/20"
           >
-            <Navigation className="h-3 w-3" />
+            <Navigation className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
           </Button>
 
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setInfoExpanded(!infoExpanded)}
-            className="h-7 w-7 p-0 text-[#78cce2] hover:bg-[#78cce2]/20"
+            className="h-6 w-6 sm:h-7 sm:w-7 p-0 text-[#78cce2] hover:bg-[#78cce2]/20"
           >
-            <Info className="h-3 w-3" />
+            <Info className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
           </Button>
         </div>
       </div>

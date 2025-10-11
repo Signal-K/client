@@ -22,6 +22,10 @@ export default function DeployRoverPage() {
   // Most recent planet classification and anomaly
   const [planetClassification, setPlanetClassification] = useState<any>(null);
   const [planetAnomaly, setPlanetAnomaly] = useState<any>(null);
+  
+  // Rover upgrade state
+  const [maxWaypoints, setMaxWaypoints] = useState<number>(4);
+  const [hasRoverUpgrade, setHasRoverUpgrade] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchPlanetClassification() {
@@ -51,8 +55,27 @@ export default function DeployRoverPage() {
       setIsFastDeployEnabled(classificationCount < 4);
     }
     
+    async function checkRoverUpgrade() {
+      if (!session) return;
+      const { data: upgrade, error } = await supabase
+        .from("researched")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("tech_type", "roverwaypoints")
+        .maybeSingle();
+      
+      if (upgrade) {
+        setHasRoverUpgrade(true);
+        setMaxWaypoints(6);
+      } else {
+        setHasRoverUpgrade(false);
+        setMaxWaypoints(4);
+      }
+    }
+    
     fetchPlanetClassification();
     fetchClassificationCount();
+    checkRoverUpgrade();
   }, [session, supabase]);
 
   useEffect(() => {
@@ -87,10 +110,11 @@ export default function DeployRoverPage() {
   const [deployMessage, setDeployMessage] = useState<string>("");
   const [userClassificationCount, setUserClassificationCount] = useState<number>(0);
   const [isFastDeployEnabled, setIsFastDeployEnabled] = useState<boolean>(false);
+  const [showWaypointDetails, setShowWaypointDetails] = useState<boolean>(false);
 
   // Handle map click to add waypoint
   const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (waypoints.length >= 4) return;
+    if (waypoints.length >= maxWaypoints) return;
     const rect = mapRef.current?.getBoundingClientRect();
     if (!rect) return;
     const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -132,12 +156,13 @@ export default function DeployRoverPage() {
       .select("id")
       .eq("anomalySet", "automaton-aiForMars");
     let unclassified = (allAnomalies || []).filter((a: any) => !classifiedIds.includes(a.id));
-    // If less than 4, allow already classified
-    if (unclassified.length < 4) {
+    // If less than required waypoints, allow already classified
+    const requiredAnomalies = waypoints.length;
+    if (unclassified.length < requiredAnomalies) {
       unclassified = allAnomalies || [];
     }
-    // Select up to 4
-    const selectedAnomalies = unclassified.slice(0, 4);
+    // Select up to the number of waypoints
+    const selectedAnomalies = unclassified.slice(0, requiredAnomalies);
 
     // 4. Add to linked_anomalies
     const deploymentDate = isFastDeployEnabled 
@@ -250,7 +275,7 @@ export default function DeployRoverPage() {
         activityFeed={activityFeed}
         otherClassifications={otherClassifications}
       />
-      <div className="w-full max-w-screen-xl px-4 pt-24 flex flex-row gap-6 items-stretch justify-center h-[700px]">
+  <div className="w-full max-w-screen-xl px-4 pt-24 pb-12 flex flex-row gap-6 items-start justify-center h-[calc(100vh-6rem)]">
         {/* Left Panel: Rover Mission Info */}
         {/* <div className="flex flex-col justify-between bg-zinc-900/80 rounded-2xl shadow-xl border border-zinc-800 p-6 w-[320px] min-w-[260px] max-w-[340px] h-full text-white">
           <div>
@@ -291,9 +316,9 @@ export default function DeployRoverPage() {
           </div>
         </div> */}
         {/* Center Panel: Rover Map */}
-        <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="flex-1 flex flex-col items-center h-full">
           <h1 className="text-2xl font-bold text-white mb-4">Deploy Rover</h1>
-          
+
           {/* Fast Deploy Welcome Message */}
           {isFastDeployEnabled && (
             <div className="mb-6 p-4 bg-gradient-to-br from-green-500/25 to-blue-500/25 rounded-lg border border-green-400/40 shadow-lg max-w-xl">
@@ -308,7 +333,7 @@ export default function DeployRoverPage() {
               </p>
             </div>
           )}
-          
+
           <div className="mb-4 flex items-center gap-4">
             <label className="text-white font-medium">Select Planet:</label>
             <select
@@ -322,49 +347,95 @@ export default function DeployRoverPage() {
             </select>
             <span className="text-zinc-400 text-xs">More planets/locations coming soon.</span>
           </div>
+
+          {/* Fixed height map container */}
           <div
-            className="relative w-full max-w-xl h-[420px] rounded-2xl overflow-hidden border border-zinc-700 shadow-2xl"
+            className="relative w-full max-w-xl rounded-2xl overflow-hidden border border-zinc-700 shadow-2xl flex-shrink-0"
             ref={mapRef}
             onClick={handleMapClick}
-            style={{ cursor: waypoints.length < 4 ? "crosshair" : "not-allowed", background: "rgba(30,20,20,0.7)" }}
+            style={{ 
+              cursor: waypoints.length < maxWaypoints ? "crosshair" : "not-allowed", 
+              background: "rgba(30,20,20,0.7)",
+              height: "420px",
+              minHeight: "420px",
+              maxHeight: "420px"
+            }}
           >
             <RoverBackground variant="martian-surface" />
             {renderLines()}
             {renderWaypoints()}
           </div>
-          <div className="mt-6 w-full max-w-xl">
-            <h2 className="text-lg text-white font-semibold mb-2">Waypoints</h2>
-            <div className="space-y-2">
-              {waypoints.map((pt, i) => (
-                <div key={i} className="text-white text-sm">
-                  Waypoint {i + 1}: X = {pt.x}, Y = {pt.y}
-                </div>
-              ))}
-              {waypoints.length === 0 && (
-                <div className="text-zinc-400">
-                  Click on the map to add waypoints (max 4). Your rover will follow along these waypoints after leaving basecamp and gradually discover objects of interest - which you can help identify!
-                </div>
+
+          {/* Compact waypoint summary (no large coordinate list) */}
+          <div className="w-full max-w-xl mt-6 px-2">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg text-white font-semibold">Waypoints</h2>
+              <div className="text-sm text-zinc-400">Max: {maxWaypoints}</div>
+            </div>
+
+            {/* Rover Upgrade Notification (compact) */}
+            {hasRoverUpgrade && (
+              <div className="mb-3 mt-2 p-2 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-400/20 text-xs text-blue-200">
+                🛞 Navigation Upgrade active — you can place up to {maxWaypoints} waypoints.
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2 items-center mt-2">
+              {waypoints.length > 0 ? (
+                waypoints.map((pt, i) => (
+                  <div
+                    key={i}
+                    title={`Waypoint ${i + 1}: X=${pt.x}, Y=${pt.y}`}
+                    className="inline-flex items-center justify-center bg-[#18dda1] text-xs text-black font-semibold rounded-full w-8 h-8"
+                  >
+                    {i + 1}
+                  </div>
+                ))
+              ) : (
+                <div className="text-zinc-400">No waypoints selected — click on the map to add.</div>
+              )}
+              <div className="ml-auto text-sm text-zinc-300">Selected Location: <span className="font-semibold text-white">Mars</span></div>
+            </div>
+
+            {/* optional details toggle: coords are hidden by default to save space */}
+            <div className="mt-3 flex items-center gap-3">
+              <div className="text-xs text-zinc-400">Waypoints selected: <span className="text-white font-medium">{waypoints.length}</span></div>
+              {waypoints.length > 0 && (
+                <button
+                  className="text-xs text-zinc-300 underline hover:text-white"
+                  onClick={() => setShowWaypointDetails((s) => !s)}
+                  type="button"
+                >
+                  {showWaypointDetails ? 'Hide coords' : 'Show coords'}
+                </button>
               )}
             </div>
-            {planetAnomaly && (
-              <div className="mt-4 text-zinc-300 text-sm">
-                <span className="font-semibold text-white">Selected Location:</span> Mars 
-                {/* {planetAnomaly.content} */}
+
+            {showWaypointDetails && (
+              <div className="mt-2 text-xs text-zinc-300 bg-black/20 rounded p-2 max-h-40 overflow-auto">
+                {waypoints.map((pt, i) => (
+                  <div key={`d-${i}`}>Waypoint {i + 1}: X = {pt.x}, Y = {pt.y}</div>
+                ))}
+              </div>
+            )}
+
+            {deployMessage && (
+              <div className="mt-4 text-center text-yellow-400 font-semibold text-md">
+                {deployMessage}
               </div>
             )}
           </div>
-          {deployMessage && (
-            <div className="mb-4 text-center text-yellow-400 font-semibold text-md">
-              {deployMessage}
-            </div>
-          )}
-          <button
-            className="mt-8 px-6 py-3 rounded bg-[#18dda1] text-white font-bold text-lg shadow-lg disabled:bg-zinc-700"
-            disabled={waypoints.length < 2}
-            onClick={handleDeployRover}
-          >
-            Deploy Rover
-          </button>
+
+          {/* Fixed action bar so Deploy button is always accessible */}
+          <div className="w-full max-w-xl flex-shrink-0 py-4 flex justify-center">
+            <button
+              className="px-6 py-3 rounded bg-[#18dda1] text-white font-bold text-lg shadow-lg disabled:bg-zinc-700"
+              disabled={waypoints.length < 2}
+              onClick={handleDeployRover}
+            >
+              Deploy Rover
+            </button>
+          </div>
         </div>
         {/* Right Panel: Rover Stats */}
         {/* <div className="flex flex-col justify-between bg-zinc-900/80 rounded-2xl shadow-xl border border-zinc-800 p-6 w-[320px] min-w-[260px] max-w-[340px] h-full text-white">

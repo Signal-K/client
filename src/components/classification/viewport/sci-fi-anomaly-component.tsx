@@ -90,6 +90,47 @@ export function SciFiAnomalyComponent({ anomaly, onClick, title, isHighlighted =
         </div>
       )
     }
+
+    if (title === "Variable star") {
+      return (
+        <div className="w-9 h-9 relative flex items-center justify-center">
+          {/* Pulsating variable star with orange gradient */}
+          <svg width="36" height="36" viewBox="0 0 36 36" className="absolute">
+            <defs>
+              {/* Orange to yellow gradient for variable star */}
+              <radialGradient id="variableStarGradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#FFF4E6" stopOpacity="1" />
+                <stop offset="30%" stopColor="#FFD580" stopOpacity="0.9" />
+                <stop offset="60%" stopColor="#FF8C00" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#FF6B00" stopOpacity="0.5" />
+              </radialGradient>
+              {/* Bright core */}
+              <radialGradient id="variableCore" cx="50%" cy="50%" r="30%">
+                <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+                <stop offset="50%" stopColor="#FFF8DC" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#FFD580" stopOpacity="0.8" />
+              </radialGradient>
+            </defs>
+            
+            {/* Outer glow */}
+            <circle cx="18" cy="18" r="16" fill="url(#variableStarGradient)" opacity="0.6" />
+            
+            {/* Star points (8-pointed star for variable) */}
+            <path d="M18,2 L20,14 L30,8 L22,16 L34,18 L22,20 L30,28 L20,22 L18,34 L16,22 L6,28 L14,20 L2,18 L14,16 L6,8 L16,14 Z" 
+                  fill="url(#variableStarGradient)" opacity="0.9" />
+            
+            {/* Bright core */}
+            <circle cx="18" cy="18" r="5" fill="url(#variableCore)" />
+            
+            {/* Central bright point */}
+            <circle cx="18" cy="18" r="2" fill="#FFFFFF" opacity="1" />
+          </svg>
+          
+          {/* Pulsing glow effect */}
+          <div className="absolute w-9 h-9 rounded-full bg-gradient-to-br from-[#FFD580] to-[#FF8C00] opacity-30 blur-md animate-pulse"></div>
+        </div>
+      )
+    }
     
     // Original logic for other types
     switch (anomaly.type) {
@@ -218,6 +259,8 @@ export function SciFiAnomalyComponent({ anomaly, onClick, title, isHighlighted =
             ? "text-[#a8a8a8] bg-[#2a2a2a]/80" 
             : title === "Stellar disk"
             ? "text-[#FFD700] bg-[#4a2c17]/80 border border-[#8B4513]/40"
+            : title === "Variable star"
+            ? "text-[#FFD580] bg-[#3d2817]/80 border border-[#FF8C00]/40"
             : "text-[#78cce2] bg-[#0a0a2a]/80"
         }`}>
           {title}

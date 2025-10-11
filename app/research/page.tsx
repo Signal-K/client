@@ -11,6 +11,59 @@ import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 import Login from "../auth/page";
 
+// Small helper component to show how stardust was spent
+function StardustSummary({ supabase, session, cardColor, textColor }: { supabase: any; session: any; cardColor: string; textColor: string }) {
+  const [items, setItems] = useState<{ tech_type: string; created_at?: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchResearched() {
+      if (!session?.user?.id) {
+        setItems([]);
+        setLoading(false);
+        return;
+      }
+      const { data } = await supabase
+        .from('researched')
+        .select('tech_type, created_at')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: true });
+
+      setItems(data || []);
+      setLoading(false);
+    }
+    fetchResearched();
+  }, [session, supabase]);
+
+  if (loading) return <div className="text-sm text-muted-foreground">Loading...</div>;
+
+  const quantityUpgrades = ['probereceptors', 'satellitecount', 'roverwaypoints'];
+
+  const breakdown = items.map((it: any) => {
+    const cost = quantityUpgrades.includes(it.tech_type) ? 10 : 2;
+    return { tech: it.tech_type, cost, when: it.created_at };
+  });
+
+  const totalSpent = breakdown.reduce((s: number, b: any) => s + b.cost, 0);
+
+  return (
+    <div className={`${textColor} text-sm`}>
+      {breakdown.length === 0 ? (
+        <div>No research purchases yet.</div>
+      ) : (
+        <div>
+          <ul className="list-disc pl-5 text-xs mb-2">
+            {breakdown.map((b: any, i: number) => (
+              <li key={i}>{b.tech} — {b.cost} ⭐ {b.when ? `(${new Date(b.when).toLocaleDateString()})` : ''}</li>
+            ))}
+          </ul>
+          <div className="text-xs">Total spent: <span className="font-semibold">{totalSpent} ⭐</span></div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ResearchPage() {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -122,6 +175,12 @@ export default function ResearchPage() {
           <main className="w-full flex flex-col gap-6">
             {/* Main Research Panel - Compact Layout */}
             <CompactResearchPanel />
+
+            {/* Stardust Spending Summary */}
+            <div className={`p-4 ${cardColor} rounded-lg shadow-sm border ${borderColor}`}>
+              <h4 className={`text-base font-semibold ${isDark ? "text-[#81A1C1]" : "text-[#5E81AC]"} mb-2`}>Stardust Spending</h4>
+              <StardustSummary supabase={supabase} session={session} cardColor={cardColor} textColor={textColor} />
+            </div>
 
             {/* Referral Section - Compact Integration */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

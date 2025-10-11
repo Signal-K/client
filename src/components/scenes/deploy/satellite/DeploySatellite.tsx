@@ -21,6 +21,7 @@ export type EnrichedDatabaseAnomaly = DatabaseAnomaly & {
     temperature: number | string;
     mass: number | string;
     type: string;
+    metallicity?: string | null;
   };
 };
 
@@ -93,6 +94,7 @@ export default function DeploySatelliteViewport() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [focusedAnomaly, setFocusedAnomaly] = useState<Anomaly | null>(null);
   const [skillProgress, setSkillProgress] = useState<{ [key: string]: number }>({});
+  const [hasStellarMetallicitySkill, setHasStellarMetallicitySkill] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [deploymentResult, setDeploymentResult] = useState<{
     anomalies: string[]
@@ -323,10 +325,50 @@ export default function DeploySatelliteViewport() {
       setStars(generateStars(planet.id, 0));
 
       // Fetch stats for the focused planet
-      fetchPlanetStats(planet.id).then((stats) => {
+      fetchPlanetStats(planet.id).then(async (stats) => {
+        // Start with default N/A stats if none exist
+        let finalStats = stats || {
+          radius: "N/A",
+          density: "N/A",
+          temperature: "N/A",
+          mass: "N/A",
+          type: "N/A",
+        };
+
+        // If user has metallicity skill, fetch metallicity from local ExoFOP CSV via API
+        console.log('🔍 Skill check:', hasStellarMetallicitySkill, 'Planet:', planet.id, planet.content);
+        if (hasStellarMetallicitySkill) {
+          try {
+            const content = String(planet.content || '');
+            let ticCandidate = '';
+            const ticMatch = content.match(/TIC\s*(\d+)/i) || content.match(/^(\d{6,})$/);
+            if (ticMatch) ticCandidate = ticMatch[1];
+            if (!ticCandidate) ticCandidate = String(planet.id);
+
+            console.log('🔍 Fetching metallicity for TIC:', ticCandidate);
+            const res = await fetch(`/api/exofop?tic=${encodeURIComponent(ticCandidate)}`);
+            if (res.ok) {
+              const body = await res.json();
+              console.log('🔍 API result:', body);
+              if (body?.result?.metallicity) {
+                // Add metallicity to stats before setting
+                finalStats = {
+                  ...finalStats,
+                  metallicity: body.result.metallicity,
+                } as any;
+                console.log('✅ Final stats with metallicity:', finalStats);
+              }
+            }
+          } catch (err) {
+            console.warn('[Metallicity] Failed to fetch:', err);
+          }
+        }
+
+        // Set planet stats once with all data (including metallicity if available)
         setPlanetAnomalies((prev) => {
           const updated = [...prev];
-          updated[focusedPlanetIdx] = { ...updated[focusedPlanetIdx], stats: stats ?? undefined };
+          updated[focusedPlanetIdx] = { ...updated[focusedPlanetIdx], stats: finalStats };
+          console.log('🔍 Updated planet anomalies[' + focusedPlanetIdx + ']:', updated[focusedPlanetIdx].stats);
           return updated;
         });
       });
@@ -334,7 +376,7 @@ export default function DeploySatelliteViewport() {
       setCloudAnomalies([]);
       setStars([]);
     }
-  }, [planetAnomalies, focusedPlanetIdx, userCloudClassifications]);
+  }, [planetAnomalies, focusedPlanetIdx, userCloudClassifications, hasStellarMetallicitySkill]);
   // Fetch anomalies and check deployment on mount/session change
   useEffect(() => {
     const load = async () => {
@@ -342,12 +384,33 @@ export default function DeploySatelliteViewport() {
       await fetchPlanetAnomalies();
       await fetchUserCloudClassificationCount();
       await checkFastDeployStatus();
+      await checkStellarMetallicitySkill();
       await checkDeployment();
       setLoading(false);
     };
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
+
+  const checkStellarMetallicitySkill = async () => {
+    if (!session?.user?.id) {
+      setHasStellarMetallicitySkill(false);
+      return false;
+    }
+    try {
+      const { data: researched } = await supabase
+        .from('researched')
+        .select('tech_type')
+        .eq('user_id', session.user.id)
+        .eq('tech_type', 'spectroscopy');
+      const has = !!(researched && researched.length > 0);
+      setHasStellarMetallicitySkill(has);
+      return has;
+    } catch (err) {
+      setHasStellarMetallicitySkill(false);
+      return false;
+    }
+  };
 
   // Reset focus if planet list changes
   useEffect(() => {
@@ -585,14 +648,13 @@ export default function DeploySatelliteViewport() {
           ? "bg-[#10141c]" 
           : "bg-gradient-to-br from-[#8ba3d1] via-[#9bb3e0] to-[#7a94c7]"
       }`}>
-        {/* Top bar: controls and stats */}
-        <div className={`flex flex-row items-center justify-between px-6 py-3 border-b z-20 ${
+        {/* Top bar: controls and stats - HIDDEN to fix layout */}
+        {/* <div className={`flex flex-row items-center justify-between px-6 py-3 border-b z-20 ${
           isDark 
             ? "bg-[#181e2a]/90 border-[#232b3b]" 
             : "bg-gradient-to-r from-[#b8c5e0]/90 to-[#a5b8d1]/90 backdrop-blur-sm border-[#7a94c7]"
         }`}>
           <div className="flex items-center gap-4">
-            {/* InvestigationModeSelect moved to sidebar */}
           </div>
           {investigationMode === 'weather' && (
             <div className={`flex flex-col items-center gap-2 text-xs ${
@@ -607,12 +669,12 @@ export default function DeploySatelliteViewport() {
               </div>
             </div>
           )}
-        </div>
+        </div> */}
 
       {/* Main map/viewport area */}
-      <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0 pb-96 md:pb-0">
+      <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0 pb-0 md:pb-0">
           {/* Main viewport content (planets/clouds) */}
-          <div className="relative flex-1 flex items-center justify-center z-10">
+          <div className="relative flex-1 flex items-center justify-center z-10 pb-48 md:pb-0">
             <PlanetFocusView
               planet={planetAnomalies[focusedPlanetIdx] || null}
               onNext={() => setFocusedPlanetIdx((prev) => Math.min(planetAnomalies.length - 1, prev + 1))}

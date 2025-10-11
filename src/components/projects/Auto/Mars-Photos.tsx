@@ -3,8 +3,7 @@ import axios from "axios";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
-import { MapPinIcon } from "@/src/components/ui/icons/MapPin";
-import Spinner from "@/src/components/ui/Spinner";
+import { MapPin } from "lucide-react";
 
 export const RooverFromAppeears: React.FC = () => { 
     const supabase = useSupabaseClient(); 
@@ -124,9 +123,6 @@ export const RooverFromAppeears: React.FC = () => {
 
     return (
         <div className="grid grid-cols-3 gap-4">
-            {loading ? (
-                <Spinner />
-            ) : (
                 <>
                     {rovers.length > 0 ? (
                         rovers.map((rover) => (
@@ -177,7 +173,7 @@ export const RooverFromAppeears: React.FC = () => {
                                         key={index}
                                         className="flex flex-col items-center m-2 p-2 border-2 border-gray-300 rounded-lg"
                                     >
-                                        <MapPinIcon className="h-6 w-6 text-blue-500 mb-2" />
+                                        <MapPin className="h-6 w-6 text-blue-500 mb-2" />
                                         <span className="text-sm">{deposit}</span>
                                     </div>
                                 ))}
@@ -191,7 +187,6 @@ export const RooverFromAppeears: React.FC = () => {
                         </div>
                     )}
                 </>
-            )}
         </div>
     );
 };
