@@ -25,7 +25,10 @@ export default function DeployRoverPage() {
   
   // Rover upgrade state
   const [maxWaypoints, setMaxWaypoints] = useState<number>(4);
-  const [hasRoverUpgrade, setHasRoverUpgrade] = useState<boolean>(false);
+  const [roverUpgrades, setRoverUpgrades] = useState<{ roverwaypoints: boolean; findMinerals: boolean }>({
+    roverwaypoints: false,
+    findMinerals: false,
+  });
 
   useEffect(() => {
     async function fetchPlanetClassification() {
@@ -42,40 +45,41 @@ export default function DeployRoverPage() {
         setPlanetAnomaly(classifications[0].anomaly);
       }
     }
-    
+
     async function fetchClassificationCount() {
       if (!session) return;
       const { count, error } = await supabase
         .from("classifications")
         .select("id", { count: "exact" })
         .eq("author", session.user.id);
-      
+
       const classificationCount = count || 0;
       setUserClassificationCount(classificationCount);
       setIsFastDeployEnabled(classificationCount < 4);
     }
-    
-    async function checkRoverUpgrade() {
+
+    async function fetchRoverUpgrades() {
       if (!session) return;
-      const { data: upgrade, error } = await supabase
+      const { data: upgrades, error } = await supabase
         .from("researched")
-        .select("*")
+        .select("tech_type")
         .eq("user_id", session.user.id)
-        .eq("tech_type", "roverwaypoints")
-        .maybeSingle();
-      
-      if (upgrade) {
-        setHasRoverUpgrade(true);
-        setMaxWaypoints(6);
-      } else {
-        setHasRoverUpgrade(false);
-        setMaxWaypoints(4);
-      }
+        .in("tech_type", ["roverwaypoints", "findMinerals"]);
+
+      const hasRoverWaypoints = upgrades?.some((u: any) => u.tech_type === "roverwaypoints") ?? false;
+      const hasFindMinerals = upgrades?.some((u: any) => u.tech_type === "findMinerals") ?? false;
+
+      setRoverUpgrades({
+        roverwaypoints: hasRoverWaypoints,
+        findMinerals: hasFindMinerals,
+      });
+
+      setMaxWaypoints(hasRoverWaypoints ? 6 : 4);
     }
-    
+
     fetchPlanetClassification();
     fetchClassificationCount();
-    checkRoverUpgrade();
+    fetchRoverUpgrades();
   }, [session, supabase]);
 
   useEffect(() => {
@@ -374,7 +378,7 @@ export default function DeployRoverPage() {
             </div>
 
             {/* Rover Upgrade Notification (compact) */}
-            {hasRoverUpgrade && (
+            {roverUpgrades.roverwaypoints && (
               <div className="mb-3 mt-2 p-2 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-400/20 text-xs text-blue-200">
                 🛞 Navigation Upgrade active — you can place up to {maxWaypoints} waypoints.
               </div>

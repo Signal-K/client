@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 interface UpgradeData {
   // Telescope upgrades
   telescopeReceptors: {
-    current: number;
+    current: number; 
     max: number;
     available: boolean;
   };
@@ -24,6 +24,10 @@ interface UpgradeData {
   roverWaypoints: {
     current: number;
     max: number;
+    available: boolean;
+  };
+  findMinerals: {
+    unlocked: boolean;
     available: boolean;
   };
   // Data/measurement upgrades
@@ -46,6 +50,7 @@ export default function CompactResearchPanel() {
     satelliteCount: { current: 1, max: 2, available: false },
     roverWaypoints: { current: 4, max: 6, available: false },
     spectroscopy: { unlocked: false, available: false },
+    findMinerals: { unlocked: false, available: false },
     asteroidClassifications: 0,
     cloudClassifications: 0,
     availableStardust: 0,
@@ -91,6 +96,7 @@ export default function CompactResearchPanel() {
       const satelliteUpgrades = researched?.filter(r => r.tech_type === "satellitecount").length || 0;
       const roverWaypointUpgrades = researched?.filter(r => r.tech_type === "roverwaypoints").length || 0;
       const spectroscopyUnlocked = researched?.some(r => r.tech_type === "spectroscopy") || false;
+      const findMineralsUnlocked = researched?.some(r => r.tech_type === "findMinerals") || false;
 
       // Calculate stardust with tiered pricing
       const basePoints = allClassifications?.length || 0;
@@ -132,6 +138,10 @@ export default function CompactResearchPanel() {
         spectroscopy: {
           unlocked: spectroscopyUnlocked,
           available: availableStardust >= 2 && !spectroscopyUnlocked,
+        },
+        findMinerals: {
+          unlocked: findMineralsUnlocked,
+          available: availableStardust >= 2 && !findMineralsUnlocked,
         },
         asteroidClassifications: asteroidClassifications?.length || 0,
         cloudClassifications: cloudClassifications?.length || 0,
@@ -198,6 +208,16 @@ export default function CompactResearchPanel() {
       cost: 10,
       available: upgradeData.roverWaypoints.available,
       onUpgrade: () => handleUpgrade("roverwaypoints", 10),
+    }] : []),
+
+    ...(!upgradeData.findMinerals.unlocked ? [{
+      id: "findMinerals",
+      title: "Find Mineral Deposits",
+      description: "Your rovers and satellites can find mineral and soil deposits, which can be extracted and manipulated in future to produce resources and farms",
+      category: "rover" as const,
+      cost: 2,
+      available: upgradeData.findMinerals.available,
+      onUpgrade: () => handleUpgrade("findMinerals", 2),
     }] : []),
     
     // Spectroscopy (Data/Measurement - 2 stardust)

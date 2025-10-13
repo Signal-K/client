@@ -87,7 +87,7 @@ export default function Landing() {
               Links
             </a>
           </nav>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Play Now</Button>
+          <Link href="/auth"><Button className="bg-primary text-primary-foreground hover:bg-primary/90">Play Now</Button></Link>
         </div>
       </header>
 
