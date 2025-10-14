@@ -564,6 +564,8 @@ export default function RoverViewportSection() {
 
                                                     if (!anomalyIndex && anomalyIndex !== 0) return null;
 
+                                                    const hasMineralDeposit = anomalyIndex !== null && config.waypoints[anomalyIndex]?.hasMineralDeposit === true;
+
                                                     if ((linked || isClassified) && shouldShow) {
                                                         // If we don't have a linked anomaly object (because it's classified), create a minimal placeholder
                                                         const anomalyObj = linked || {
@@ -607,6 +609,29 @@ export default function RoverViewportSection() {
                                                             </div>
                                                         );
                                                     }
+                                                    
+                                                    // Mineral Deposit Icon and Label (render regardless of anomaly visibility)
+                                                    if (hasMineralDeposit) {
+                                                        return (
+                                                            <div 
+                                                                className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center"
+                                                                style={{ top: '-30px', zIndex: 19 }}
+                                                            >
+                                                                {/* Mineral icon */}
+                                                                <div 
+                                                                    className="w-6 h-6 bg-gradient-to-br from-amber-500 to-orange-600 rounded border-2 border-amber-300 flex items-center justify-center shadow-lg"
+                                                                    title="Mineral Deposit Location"
+                                                                >
+                                                                    <span className="text-white text-xs font-bold">🪨</span>
+                                                                </div>
+                                                                {/* Label */}
+                                                                <span className="mt-1 text-xs text-amber-300 font-semibold bg-black/60 px-2 py-0.5 rounded whitespace-nowrap">
+                                                                    Mineral Deposit
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    
                                                     return null;
                                                 })()}
 
