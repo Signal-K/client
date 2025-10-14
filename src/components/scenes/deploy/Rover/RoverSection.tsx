@@ -562,9 +562,10 @@ export default function RoverViewportSection() {
                                                     // Only show anomalies up to the active waypoint + 1. activeWaypointIndex defaults to -1 (hide all until computed)
                                                     const shouldShow = anomalyIndex !== null && anomalyIndex <= (activeWaypointIndex + 1);
 
-                                                    if (!anomalyIndex && anomalyIndex !== 0) return null;
-
+                                                    // Check for mineral deposits early
                                                     const hasMineralDeposit = anomalyIndex !== null && config.waypoints[anomalyIndex]?.hasMineralDeposit === true;
+
+                                                    if (!anomalyIndex && anomalyIndex !== 0) return null;
 
                                                     if ((linked || isClassified) && shouldShow) {
                                                         // If we don't have a linked anomaly object (because it's classified), create a minimal placeholder
@@ -581,32 +582,53 @@ export default function RoverViewportSection() {
                                                         else if (isClassified) statusProp = 'classified';
 
                                                         return (
-                                                            // place anomaly below the waypoint (so it's visually under the marker)
-                                                            <div style={{ position: 'absolute', top: '28px', left: '50%', transform: 'translateX(-50%)', zIndex: 21 }}>
-                                                                <SciFiAnomalyComponent
-                                                                        anomaly={anomalyObj}
-                                                                        status={statusProp}
-                                                                        inline={true}
-                                                                        title={statusProp === 'active' ? 'Object of Interest' : undefined}
-                                                                        onClick={(a) => { setSelectedAnomaly(a); setShowDetailDialog(true); }}
-                                                                    />
-                                                                {(hoveredAnomaly === anomalyObj.id || isMobile) && (
-                                                                    <span className="absolute text-white text-xs bg-black/50 px-1 rounded" style={{ top: '48px', left: '50%', transform: 'translateX(-50%)' }}>
-                                                                        {statusProp === 'active' ? 'Object of Interest' : 'Anomaly'}
-                                                                    </span>
-                                                                )}
-
-                                                                {/* If rover is at this waypoint AND the anomaly is unclassified (linked), show Scan button */}
-                                                                {anomalyIndex !== null && roverAtWaypointIndex === anomalyIndex && anomalyId !== null && linkedAnomalyIds.has(anomalyId as number) && (
-                                                                    <a
-                                                                        href={`/structures/seiscam/ai4mars/cl-${anomalyId}/one`}
-                                                                        className="absolute left-1/2 transform -translate-x-1/2 mt-1 inline-block bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded"
-                                                                        style={{ top: '72px', zIndex: 22 }}
+                                                            <>
+                                                                {/* Mineral Deposit Icon (above waypoint) */}
+                                                                {hasMineralDeposit && (
+                                                                    <div 
+                                                                        className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center"
+                                                                        style={{ top: '-35px', zIndex: 23 }}
                                                                     >
-                                                                        Scan Object of Interest
-                                                                    </a>
+                                                                        {/* Mineral icon */}
+                                                                        <div 
+                                                                            className="w-6 h-6 bg-gradient-to-br from-amber-500 to-orange-600 rounded border-2 border-amber-300 flex items-center justify-center shadow-lg"
+                                                                            title="Mineral Deposit Location"
+                                                                        >
+                                                                            <span className="text-white text-xs font-bold">🪨</span>
+                                                                        </div>
+                                                                        {/* Label */}
+                                                                        <span className="mt-1 text-xs text-amber-300 font-semibold bg-black/60 px-2 py-0.5 rounded whitespace-nowrap">
+                                                                            Mineral Deposit
+                                                                        </span>
+                                                                    </div>
                                                                 )}
-                                                            </div>
+                                                                {/* Anomaly component (below waypoint) */}
+                                                                <div style={{ position: 'absolute', top: '28px', left: '50%', transform: 'translateX(-50%)', zIndex: 21 }}>
+                                                                    <SciFiAnomalyComponent
+                                                                            anomaly={anomalyObj}
+                                                                            status={statusProp}
+                                                                            inline={true}
+                                                                            title={statusProp === 'active' ? 'Object of Interest' : undefined}
+                                                                            onClick={(a) => { setSelectedAnomaly(a); setShowDetailDialog(true); }}
+                                                                        />
+                                                                    {(hoveredAnomaly === anomalyObj.id || isMobile) && (
+                                                                        <span className="absolute text-white text-xs bg-black/50 px-1 rounded" style={{ top: '48px', left: '50%', transform: 'translateX(-50%)' }}>
+                                                                            {statusProp === 'active' ? 'Object of Interest' : 'Anomaly'}
+                                                                        </span>
+                                                                    )}
+
+                                                                    {/* If rover is at this waypoint AND the anomaly is unclassified (linked), show Scan button */}
+                                                                    {anomalyIndex !== null && roverAtWaypointIndex === anomalyIndex && anomalyId !== null && linkedAnomalyIds.has(anomalyId as number) && (
+                                                                        <a
+                                                                            href={`/structures/seiscam/ai4mars/cl-${anomalyId}/one`}
+                                                                            className="absolute left-1/2 transform -translate-x-1/2 mt-1 inline-block bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded"
+                                                                            style={{ top: '72px', zIndex: 22 }}
+                                                                        >
+                                                                            Scan Object of Interest
+                                                                        </a>
+                                                                    )}
+                                                                </div>
+                                                            </>
                                                         );
                                                     }
                                                     

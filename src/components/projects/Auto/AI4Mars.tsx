@@ -84,6 +84,7 @@ export function AiForMarsProjectWithID({ anomalyid }: { anomalyid?: number }) {
                     anomalyId={anomalyid?.toString()}
                     initialImageUrl={imageUrl || ''}
                     annotationType="AI4M"
+                    anomalyType="automaton-aiForMars"
                 />
             </div>
         </div>

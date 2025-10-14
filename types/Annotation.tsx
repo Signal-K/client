@@ -314,6 +314,25 @@ export const AI4MCATEGORIES: Record<AI4MCategory, CategoryConfig> = {
   },
 };
 
+export type MineralType = 'iron-ore' | 'cultivable-soil' | 'gold' | 'aluminum' | 'water-ice' | 'silicate' | 'copper';
+
+export interface MineralConfiguration {
+  mineralType: MineralType;
+  purity: number;
+  estimatedQuantity: 'trace' | 'small' | 'moderate' | 'large' | 'abundant';
+  extractionDifficulty: 'easy' | 'moderate' | 'difficult' | 'extreme';
+  confidence: number; // 0-100, based on classification quality
+};
+
+export interface MineralDepositData {
+  anomaly: number;
+  owner: string;
+  mineralconfiguration: MineralConfiguration;
+  location: string;
+  discovery: number;
+  roverName: string;
+};
+
 export type DrawingMode = 'freehand' | 'rectangle' | 'circle';
 
 export interface Shape {
