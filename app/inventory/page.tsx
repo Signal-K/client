@@ -32,6 +32,7 @@ export default function UserInventoryPage() {
   const [landmarksExpanded, setLandmarksExpanded] = useState(false);
 
   const [mineralDeposits, setMineralDeposits] = useState<MineralDeposit[]>([]);
+  const [mineralsLoading, setMineralsLoading] = useState(true);
   // Researched upgrades / derived values
   const [telescopeUpgrade, setTelescopeUpgrade] = useState<boolean>(false);
   const [satelliteCount, setSatelliteCount] = useState<number>(1);
@@ -231,9 +232,16 @@ export default function UserInventoryPage() {
             <section className="flex-1 flex flex-col min-h-0">
                 <h3 className="text-lg font-semibold mb-2 text-foreground flex-shrink-0">Mineral Deposits</h3>
 
-                {loading ? (
+                {depositLoading ? (
                     <Card className="p-6 text-center">
                         <p className="text-muted-foreground">Loading deposits...</p>
+                    </Card>
+                ) : !findMinerals ? (
+                    <Card className="p-6 text-center">
+                        <p className="text-muted-foreground mb-1">Mineral detection not yet unlocked</p>
+                        <p className="text-sm text-muted-foreground">
+                            Research "Find Mineral Deposits" to unlock this feature
+                        </p>
                     </Card>
                 ) : mineralDeposits.length === 0 ? (
                     <Card className="p-6 text-center">
