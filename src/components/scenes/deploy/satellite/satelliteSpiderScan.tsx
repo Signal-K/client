@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronUp, ChevronDown, Satellite } from 'lucide-react';
 import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/navigation';
-import { DatabaseAnomaly } from '../TelescopeViewportRange';
+import { DatabaseAnomaly } from '../Telescope/TelescopeUtils';
 import { PlanetGeneratorMinimal } from '@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator';
 
 interface SatelliteSpiderScanProps {

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import { useRouter } from "next/navigation"
 import type { Anomaly, Star } from "@/types/Structures/telescope"
-import { DatabaseAnomaly } from "../TelescopeViewportRange"
+import { DatabaseAnomaly } from "../Telescope/TelescopeUtils"
 import { generateSectorName, generateStars } from "@/src/components/classification/telescope/utils/sector-utils"
 import SatelliteDeployConfirmation from "./Deploy/SatelliteDeployConfirmation";
 import { useState as useReactState } from "react";
