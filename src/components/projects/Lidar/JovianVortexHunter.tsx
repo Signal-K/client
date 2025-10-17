@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from "react"; 
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import ClassificationForm from "../(classifications)/PostForm";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
@@ -24,7 +22,7 @@ export function StarterJovianVortexHunter({
     anomalyid
 }: Props) {
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${anomalyid}.png`;
-    const [showClassification, setShowClassification] = useState(false);
+    const [showTutorial, setShowTutorial] = useState(false);
 
     // Tutorial slides for Jovian Vortex Hunter
     const tutorialSlides = createTutorialSlides([
@@ -65,40 +63,85 @@ export function StarterJovianVortexHunter({
         }
     ]);
 
-    const handleTutorialComplete = () => {
-        setShowClassification(true);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    
+    const nextSlide = () => {
+        if (currentSlide < tutorialSlides.length - 1) {
+            setCurrentSlide(prev => prev + 1);
+        }
+    };
+
+    const prevSlide = () => {
+        if (currentSlide > 0) {
+            setCurrentSlide(prev => prev - 1);
+        }
     };
 
     return (
         <div className="rounded-lg">
-            {/* Tutorial Component */}
-            <TutorialContentBlock
-                classificationtype="lidar-jovianVortexHunter"
-                slides={tutorialSlides}
-                onComplete={handleTutorialComplete}
-                title="Jovian Vortex Hunter Training"
-                description="Learn to identify atmospheric features on gas giants"
-            />
+            <div className="mb-4">
+                <Button onClick={() => setShowTutorial(!showTutorial)} variant="outline">
+                    {showTutorial ? 'Hide Tutorial' : 'Show Tutorial'}
+                </Button>
+            </div>
 
-            {/* Classification Interface - shown after tutorial or for returning users */}
-            {showClassification && (
-                <div className="flex flex-col items-center">
-                    <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
-                        <div className="relative">
-                            <div className=" absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0"></div>
-                            <div className="bg-white bg-opacity-90">
-                                <img
-                                    src={imageUrl}
-                                    alt='Vortex'
-                                    className="relative z-10 w-128 h-128 object-contain"
-                                />
-                            </div>
+            {/* Tutorial slides - shown when user clicks button */}
+            {showTutorial ? (
+                <div className="w-full max-w-3xl mx-auto bg-[#1D2833] rounded-lg p-4">
+                    <h2 className="text-lg font-bold text-white mb-2">
+                        {tutorialSlides[currentSlide].title}
+                    </h2>
+                    
+                    {tutorialSlides[currentSlide].image && (
+                        <div className="mb-3">
+                            <img 
+                                src={tutorialSlides[currentSlide].image} 
+                                alt={tutorialSlides[currentSlide].title}
+                                className="w-full max-h-[300px] object-contain rounded-lg"
+                            />
                         </div>
-                        <ClassificationForm
+                    )}
+                    
+                    <p className="text-white/90 text-sm mb-4 leading-relaxed">
+                        {tutorialSlides[currentSlide].text}
+                    </p>
+
+                    <div className="flex justify-between items-center">
+                        <Button 
+                            onClick={prevSlide} 
+                            disabled={currentSlide === 0}
+                            variant="outline"
+                            size="sm"
+                        >
+                            Previous
+                        </Button>
+                        
+                        <span className="text-white text-sm">
+                            {currentSlide + 1} / {tutorialSlides.length}
+                        </span>
+                        
+                        {currentSlide < tutorialSlides.length - 1 ? (
+                            <Button onClick={nextSlide} variant="default" size="sm">
+                                Next
+                            </Button>
+                        ) : (
+                            <Button onClick={() => setShowTutorial(false)} variant="default" size="sm">
+                                Start Classification
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            ) : (
+                /* Classification Interface - only shown when tutorial is hidden */
+                <div className="flex flex-col items-center">
+                    <div className="w-full max-w-4xl">
+                        <ImageAnnotator
                             anomalyId={anomalyid.toString()}
                             anomalyType="lidar-jovianVortexHunter"
                             missionNumber={20000007}
                             assetMentioned={imageUrl}
+                            initialImageUrl={imageUrl}
+                            annotationType="JVH"
                         />
                     </div>
                 </div>

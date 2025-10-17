@@ -54,7 +54,7 @@ export default function WeatherMission({
       case "lidar-jovianVortexHunter":
         return `/structures/balloon/jvh/an-${anomalyId}/classify`;
       case "cloudspottingOnMars":
-        return `/structures/balloon/cloudspotting/an-${anomalyId}/classify`;
+        return `/structures/balloon/shapes/an-${anomalyId}/classify`; // Mars clouds use shapes project
       case "balloon-marsCloudShapes":
         return `/structures/balloon/shapes/an-${anomalyId}/classify`;
       default:

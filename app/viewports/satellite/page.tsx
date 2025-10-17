@@ -15,6 +15,7 @@ type PageSatellite = {
   tile: string;
   unlocked: boolean;
   linkedAnomalyId: string;
+  anomalySet?: string;
 };
 
 export default function SatelliteViewportExpandedPage() {
@@ -40,7 +41,7 @@ export default function SatelliteViewportExpandedPage() {
     return sundayUTC;
   }
 
-  const satelliteData: (PageSatellite & { deployTime: Date }) | null = (() => {
+  const satelliteData: (PageSatellite & { deployTime: Date; anomalySet?: string }) | null = (() => {
     const weatherSatelliteAnomaly = linkedAnomalies.find(
       (anomaly) => anomaly.automaton === "WeatherSatellite"
     );
@@ -52,9 +53,10 @@ export default function SatelliteViewportExpandedPage() {
         hasUnclassifiedAnomaly: true,
         anomalyId: weatherSatelliteAnomaly.anomaly?.id?.toString(),
         tile: "/assets/Viewports/Satellite/Satellite_Tile1.png",
-        unlocked: false,
+        unlocked: weatherSatelliteAnomaly.unlocked ?? false,
         linkedAnomalyId: weatherSatelliteAnomaly.id.toString(),
-        deployTime: new Date(),
+        deployTime: new Date(weatherSatelliteAnomaly.date),
+        anomalySet: weatherSatelliteAnomaly.anomaly?.anomalySet ?? undefined,
       };
     }
     return null;
