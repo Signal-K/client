@@ -281,6 +281,20 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       else setClassifications([]);
     }
     fetchDeploymentData();
+
+    // Refetch when page gains focus (user comes back from classification page)
+    const handleFocus = () => {
+      fetchDeploymentData();
+    };
+    window.addEventListener("focus", handleFocus);
+
+    // Also poll every 5 seconds to catch updates
+    const interval = setInterval(fetchDeploymentData, 5000);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      clearInterval(interval);
+    };
   }, [session, supabase]);
 
   // Memo: sorted anomalies (ascending by anomaly_id)
@@ -302,6 +316,16 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
     }
     return map;
   }, [sortedAnomalies, classifications, session?.user?.id]);
+
+  // Calculate weather classification progress
+  const weatherProgress_count = useMemo(() => {
+    if (investigationType !== "weather") return { classified: 0, total: 0 };
+    
+    const classified = Object.values(anomalyClassifiedMap).filter(Boolean).length;
+    const total = sortedAnomalies.length;
+    
+    return { classified, total };
+  }, [investigationType, anomalyClassifiedMap, sortedAnomalies]);
 
   // Steps for planet and weather missions
   const planetSteps = [
@@ -345,6 +369,11 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
   useEffect(() => {
     if (investigationType !== "weather") return;
 
+    console.log("=== WEATHER SATELLITE DEBUG ===");
+    console.log("Sorted anomalies:", sortedAnomalies);
+    console.log("Anomaly classified map:", anomalyClassifiedMap);
+    console.log("Classifications:", classifications);
+
     const ONE_HOUR_MS = 60 * 60 * 1000;
     const elapsedMs = Math.max(0, currentTime.getTime() - deploy.getTime());
 
@@ -352,6 +381,9 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
     const nextAnomaly = sortedAnomalies.find(
       (anomaly) => !anomalyClassifiedMap[anomaly.anomaly_id]
     );
+
+    console.log("Next unclassified anomaly:", nextAnomaly);
+    console.log("Elapsed ms:", elapsedMs, "Need:", ONE_HOUR_MS);
 
     if (!nextAnomaly) {
       // All anomalies are classified, or there are no anomalies
@@ -642,6 +674,8 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       anomalyPause={weatherProgress.anomalyPause}
       currentAnomaly={weatherProgress.currentAnomaly}
       width={width}
+      classifiedCount={weatherProgress_count.classified}
+      totalAnomalies={weatherProgress_count.total}
     />
   );
 }

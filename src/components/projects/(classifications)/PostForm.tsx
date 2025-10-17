@@ -332,10 +332,29 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       ])
     );
 
+    // Check if this anomaly is in the user's linked_anomalies and get the classification_id
+    let parentPlanetFromLinkedAnomaly = null;
+    if (session?.user?.id && anomalyId) {
+      try {
+        const { data: linkedAnomalyData, error: linkedAnomalyError } = await supabase
+          .from("linked_anomalies")
+          .select("classification_id")
+          .eq("author", session.user.id)
+          .eq("anomaly_id", anomalyId)
+          .maybeSingle();
+
+        if (!linkedAnomalyError && linkedAnomalyData?.classification_id) {
+          parentPlanetFromLinkedAnomaly = linkedAnomalyData.classification_id;
+        }
+      } catch (error) {
+        console.error("Error checking linked_anomalies:", error);
+      }
+    }
+
     const classificationConfiguration = {
       classificationOptions: classificationOptionsObj,
       additionalFields,
-      parentPlanetLocation: parentPlanetLocation || null,
+      parentPlanet: parentPlanetFromLinkedAnomaly || parentPlanetLocation || null,
       activePlanet: activePlanet?.id,
       createdBy: inventoryItemId ?? null,
       classificationParent: parentClassificationId ?? null,

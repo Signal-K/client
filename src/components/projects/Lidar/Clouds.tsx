@@ -31,6 +31,30 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
             };
 
             try {
+                // If anomalyid is provided, fetch that specific anomaly
+                if (anomalyid) {
+                    const { data: anomalyData, error: anomalyError } = await supabase
+                        .from("anomalies")
+                        .select("*")
+                        .eq("id", anomalyid)
+                        .single();
+
+                    if (anomalyError) {
+                        throw anomalyError;
+                    };
+
+                    if (anomalyData) {
+                        setAnomaly(anomalyData as Anomaly);
+                        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                        setImageUrl(`${supabaseUrl}/storage/v1/object/public/clouds/${anomalyData.id}.png`);
+                    } else {
+                        setAnomaly(null);
+                    }
+                    setLoading(false);
+                    return;
+                }
+
+                // Otherwise, fetch a random cloud anomaly (original behavior)
                 const { data: anomalyData, error: anomalyError } = await supabase
                     .from("anomalies")
                     .select("*")
@@ -75,7 +99,7 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
         };
 
         fetchAnomaly();
-    }, [session, supabase, activePlanet]);
+    }, [session, supabase, activePlanet, anomalyid]);
 
     const [hasMission3000010, setHasMission3000010] = useState<boolean | null>(
         null
