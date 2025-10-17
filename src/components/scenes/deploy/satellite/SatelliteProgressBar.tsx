@@ -328,10 +328,21 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
   }, [investigationType, anomalyClassifiedMap, sortedAnomalies]);
 
   // Steps for planet and weather missions
+  const missionElapsed = Math.max(0, current.getTime() - deploy.getTime());
+  
+  const getTimeUntilStage = (stageTime: number) => {
+    const timeRemaining = stageTime - missionElapsed;
+    if (timeRemaining <= 0) return "Available now";
+    
+    const minutes = Math.floor(timeRemaining / 60000);
+    const seconds = Math.floor((timeRemaining % 60000) / 1000);
+    return `Available in ${minutes}m ${seconds}s`;
+  };
+
   const planetSteps = [
     {
       label: "Identify orbital period of your planet",
-      description: "Satellite deployed and in transit.",
+      description: missionElapsed < 0 ? "Satellite deployed and in transit." : "Satellite has deployed. Review the light curve data to identify dips caused by planetary transits.",
       time: 0,
       card: firstImage
         ? { image: firstImage, title: "Deployment Image" }
@@ -339,28 +350,33 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
     },
     {
       label: "Identify stellar temperature & radius",
-      description: "Finding star’s temperature and radius",
+      description: missionElapsed < 10 * 60 * 1000 
+        ? `Satellite gathering stellar data... ${getTimeUntilStage(10 * 60 * 1000)}`
+        : "Stellar temperature and radius measurements are ready. Review the data above.",
       time: 10 * 60 * 1000,
     },
     {
       label: "Input orbital period",
-      // Updated description to inform user to look at dips in the first card
-      description:
-        "Find the period by looking at the dips you annotated in the first card.",
+      description: missionElapsed < 20 * 60 * 1000
+        ? `Preparing orbital analysis tools... ${getTimeUntilStage(20 * 60 * 1000)}`
+        : "Input the orbital period you calculated from the transit dips in the light curve.",
       time: 20 * 60 * 1000,
     },
     {
       label: "Identify flux differential of planet",
-      description: "Calculating flux differential",
+      description: missionElapsed < 30 * 60 * 1000
+        ? `Calculating flux measurements... ${getTimeUntilStage(30 * 60 * 1000)}`
+        : "Enter the flux differential (transit depth) to determine planet size.",
       time: 30 * 60 * 1000,
     },
     {
       label: "Planet stats identified",
-      description: "Planet stats revealed, ready to publish",
+      description: missionElapsed < 40 * 60 * 1000
+        ? `Finalizing calculations... ${getTimeUntilStage(40 * 60 * 1000)}`
+        : "All planet statistics calculated! Review and publish your findings.",
       time: 40 * 60 * 1000,
     },
   ];
-
   // Bounce logic: after reaching step 2, bounce between 1 and 2 N times
   const weatherBounceCount = 4; // number of bounces (forward+back = 1 bounce)
   const weatherBounceDuration = 10 * 60 * 1000; // 10 minutes per segment

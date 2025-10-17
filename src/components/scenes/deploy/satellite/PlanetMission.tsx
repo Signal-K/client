@@ -488,6 +488,47 @@ export default function PlanetMission({
               })}
             </div>
           </div>
+
+          {/* Dynamic Description Box for Mobile - Shows current step info */}
+          <div
+            style={{
+              width: "90%",
+              maxWidth: 500,
+              margin: "24px auto 0",
+              textAlign: "center",
+              zIndex: 5,
+            }}
+          >
+            <div
+              style={{
+                background: "rgba(24, 30, 42, 0.95)",
+                border: "2px solid #78cce2",
+                borderRadius: 12,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+                padding: "12px 16px",
+              }}
+            >
+              <div
+                style={{
+                  color: "#78cce2",
+                  fontWeight: 700,
+                  fontSize: 16,
+                  marginBottom: 6,
+                }}
+              >
+                {steps[currentStepIdx]?.label || ""}
+              </div>
+              <div
+                style={{
+                  color: "#e4eff0",
+                  fontSize: 13,
+                  lineHeight: 1.4,
+                }}
+              >
+                {steps[currentStepIdx]?.description || ""}
+              </div>
+            </div>
+          </div>
         </>
       ) : (
         <div
@@ -518,7 +559,7 @@ export default function PlanetMission({
                 top: 140,
                 width: satSize,
                 height: satSize,
-                zIndex: 10,
+                zIndex: 15,
                 transition: "left 0.5s cubic-bezier(.4,1.6,.4,1)",
                 pointerEvents: "none",
                 display: "flex",
@@ -553,7 +594,7 @@ export default function PlanetMission({
                 position: "relative",
                 left: 0,
                 top: 140,
-                zIndex: 1,
+                zIndex: 8,
                 display: "block",
               }}
             >
@@ -609,7 +650,7 @@ export default function PlanetMission({
             {!hideCards &&
               steps.map((step, i) => {
                 const isAbove = i % 2 === 1;
-                const cardY = isAbove ? 40 : 140 + pxHeight + 100;
+                const cardY = isAbove ? -80 : 140 + pxHeight + 100;
 
                 return (
                   <div
@@ -782,6 +823,50 @@ export default function PlanetMission({
                   </div>
                 );
               })}
+
+            {/* Dynamic Description Box - Shows current step info */}
+            <div
+              style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+                top: 140 + pxHeight + 320,
+                width: "90%",
+                maxWidth: 600,
+                textAlign: "center",
+                zIndex: 5,
+              }}
+            >
+              <div
+                style={{
+                  background: "rgba(24, 30, 42, 0.95)",
+                  border: "2px solid #78cce2",
+                  borderRadius: 12,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+                  padding: "16px 24px",
+                }}
+              >
+                <div
+                  style={{
+                    color: "#78cce2",
+                    fontWeight: 700,
+                    fontSize: 18,
+                    marginBottom: 8,
+                  }}
+                >
+                  {steps[clampedStepIdx]?.label || ""}
+                </div>
+                <div
+                  style={{
+                    color: "#e4eff0",
+                    fontSize: 15,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {steps[clampedStepIdx]?.description || ""}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

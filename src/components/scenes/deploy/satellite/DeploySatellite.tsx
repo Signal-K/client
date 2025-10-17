@@ -103,6 +103,15 @@ export default function DeploySatelliteViewport() {
   const [deploymentWarning, setDeploymentWarning] = useState<string | null>(null);
   const [isDeployDisabled, setIsDeployDisabled] = useState(false);
   const [isFastDeployEnabled, setIsFastDeployEnabled] = useState<boolean | null>(null);
+  const [waterDiscoveryStatus, setWaterDiscoveryStatus] = useState<{
+    hasCloudClassifications: boolean;
+    hasValidStats: boolean;
+    canDiscoverMinerals: boolean;
+  }>({
+    hasCloudClassifications: false,
+    hasValidStats: false,
+    canDiscoverMinerals: false,
+  });
 
   // Validate deployment criteria
   useEffect(() => {
@@ -377,6 +386,94 @@ export default function DeploySatelliteViewport() {
       setStars([]);
     }
   }, [planetAnomalies, focusedPlanetIdx, userCloudClassifications, hasStellarMetallicitySkill]);
+
+  // Check for water/mineral discoveries from cloud classifications
+  useEffect(() => {
+    const checkWaterDiscovery = async () => {
+      if (!session?.user?.id || planetAnomalies.length === 0) {
+        setWaterDiscoveryStatus({
+          hasCloudClassifications: false,
+          hasValidStats: false,
+          canDiscoverMinerals: false,
+        });
+        return;
+      }
+
+      const focusedPlanet = planetAnomalies[focusedPlanetIdx];
+      if (!focusedPlanet) {
+        setWaterDiscoveryStatus({
+          hasCloudClassifications: false,
+          hasValidStats: false,
+          canDiscoverMinerals: false,
+        });
+        return;
+      }
+
+      // Check if planet has stats (density, radius, mass are not null/N/A)
+      const hasValidStats = focusedPlanet.stats && 
+        focusedPlanet.stats.density && focusedPlanet.stats.density !== "N/A" &&
+        focusedPlanet.stats.radius && focusedPlanet.stats.radius !== "N/A" &&
+        focusedPlanet.stats.mass && focusedPlanet.stats.mass !== "N/A";
+
+      // Find the classification ID for this planet
+      try {
+        const { data: planetClassification, error: planetClassError } = await supabase
+          .from("classifications")
+          .select("id")
+          .eq("author", session.user.id)
+          .eq("anomaly", focusedPlanet.id)
+          .eq("classificationtype", "planet")
+          .maybeSingle();
+
+        if (planetClassError || !planetClassification) {
+          setWaterDiscoveryStatus({
+            hasCloudClassifications: false,
+            hasValidStats: !!hasValidStats,
+            canDiscoverMinerals: false,
+          });
+          return;
+        }
+
+        // Check for cloud classifications that point to this planet
+        const { data: cloudClassifications, error: cloudError } = await supabase
+          .from("classifications")
+          .select("id, classificationConfiguration")
+          .eq("author", session.user.id)
+          .eq("classificationtype", "cloud");
+
+        if (cloudError || !cloudClassifications || cloudClassifications.length === 0) {
+          setWaterDiscoveryStatus({
+            hasCloudClassifications: false,
+            hasValidStats: !!hasValidStats,
+            canDiscoverMinerals: false,
+          });
+          return;
+        }
+
+        // Check if any cloud classification has parentPlanet matching this planet's classification ID
+        const hasCloudForPlanet = cloudClassifications.some(
+          (cloudClass: any) => 
+            cloudClass.classificationConfiguration?.parentPlanet === planetClassification.id
+        );
+
+        setWaterDiscoveryStatus({
+          hasCloudClassifications: hasCloudForPlanet,
+          hasValidStats: !!hasValidStats,
+          canDiscoverMinerals: hasCloudForPlanet && !!hasValidStats,
+        });
+      } catch (error) {
+        console.error("Error checking water discovery:", error);
+        setWaterDiscoveryStatus({
+          hasCloudClassifications: false,
+          hasValidStats: !!hasValidStats,
+          canDiscoverMinerals: false,
+        });
+      }
+    };
+
+    checkWaterDiscovery();
+  }, [session, planetAnomalies, focusedPlanetIdx, supabase]);
+
   // Fetch anomalies and check deployment on mount/session change
   useEffect(() => {
     const load = async () => {
@@ -704,6 +801,7 @@ export default function DeploySatelliteViewport() {
               deploymentWarning={deploymentWarning}
               isFastDeployEnabled={isFastDeployEnabled}
               isDarkMode={isDark}
+              waterDiscoveryStatus={waterDiscoveryStatus}
             />
           </div>
         </div>
@@ -724,6 +822,7 @@ export default function DeploySatelliteViewport() {
             deploymentWarning={deploymentWarning}
             isFastDeployEnabled={isFastDeployEnabled}
             isDarkMode={isDark}
+            waterDiscoveryStatus={waterDiscoveryStatus}
           />
         </div>
 
