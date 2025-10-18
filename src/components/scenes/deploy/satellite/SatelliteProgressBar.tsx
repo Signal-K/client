@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useState, useMemo } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/navigation";
 import PlanetMission from "./PlanetMission";
 import WeatherMission from "./WeatherMission";
 
@@ -13,6 +14,7 @@ interface SatelliteProgressBarProps {
   classification?: {
     id?: number | string;
     media?: any;
+    anomaly?: number;
   };
   classificationId?: number | string;
 
@@ -36,6 +38,7 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
 
   const session = useSession();
   const supabase = useSupabaseClient();
+  const router = useRouter();
   const [inputs, setInputs] = useState<{ [key: number]: string }>({});
   const [planetStats, setPlanetStats] = useState<{
     mass: number;
@@ -45,6 +48,8 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
     type: string;
   } | null>(null);
   const [creatingClassification, setCreatingClassification] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [newClassificationId, setNewClassificationId] = useState<number | null>(null);
   const [stellar, setStellar] = useState<{
     radius: number;
     mass: number;
@@ -342,38 +347,38 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
   const planetSteps = [
     {
       label: "Identify orbital period of your planet",
-      description: missionElapsed < 0 ? "Satellite deployed and in transit." : "Satellite has deployed. Review the light curve data to identify dips caused by planetary transits.",
+      description: missionElapsed < 0 ? "Satellite deployed and in transit." : "Review the light curve below. Look for periodic dips in brightness - the time between dips is the orbital period.",
       time: 0,
       card: firstImage
-        ? { image: firstImage, title: "Deployment Image" }
+        ? { image: firstImage, title: "Lightcurve Data" }
         : undefined,
     },
     {
       label: "Identify stellar temperature & radius",
       description: missionElapsed < 10 * 60 * 1000 
         ? `Satellite gathering stellar data... ${getTimeUntilStage(10 * 60 * 1000)}`
-        : "Stellar temperature and radius measurements are ready. Review the data above.",
+        : "Stellar temperature and radius measurements are ready. These will be used to calculate planet properties.",
       time: 10 * 60 * 1000,
     },
     {
       label: "Input orbital period",
       description: missionElapsed < 20 * 60 * 1000
         ? `Preparing orbital analysis tools... ${getTimeUntilStage(20 * 60 * 1000)}`
-        : "Input the orbital period you calculated from the transit dips in the light curve.",
+        : "Measure the time between transit dips in the lightcurve and enter the orbital period in days.",
       time: 20 * 60 * 1000,
     },
     {
       label: "Identify flux differential of planet",
       description: missionElapsed < 30 * 60 * 1000
         ? `Calculating flux measurements... ${getTimeUntilStage(30 * 60 * 1000)}`
-        : "Enter the flux differential (transit depth) to determine planet size.",
+        : "Measure the depth of the transits in the lightcurve. This reveals how much the planet blocks the star's light.",
       time: 30 * 60 * 1000,
     },
     {
       label: "Planet stats identified",
       description: missionElapsed < 40 * 60 * 1000
         ? `Finalizing calculations... ${getTimeUntilStage(40 * 60 * 1000)}`
-        : "All planet statistics calculated! Review and publish your findings.",
+        : "All measurements complete! Click Calculate to determine the planet's mass, radius, density, and type.",
       time: 40 * 60 * 1000,
     },
   ];
@@ -613,9 +618,9 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       .insert([
         {
           author: session?.user?.id,
-          classification_type: "planet-discovery",
-          anomaly: classification?.id,
-          metadata: {
+          classificationtype: "planet",
+          anomaly: classification?.anomaly,
+          classificationConfiguration: {
             planet_mass: planetMass,
             planet_radius: planetRadius,
             planet_density: planetDensity,
@@ -623,7 +628,11 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
             planet_type: planetType,
             orbital_period: orbitalPeriod,
             transit_depth: transitDepth,
+            stellar_temp: stellarTemp,
+            stellar_radius: stellarRadius,
+            stellar_mass: stellarMass,
           },
+          content: `Discovered ${planetType} with radius ${planetRadius.toFixed(2)} Earth radii and mass ${planetMass.toFixed(2)} Earth masses`,
         },
       ])
       .select();
@@ -633,7 +642,30 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       alert("Failed to save your findings. Please try again.");
     } else {
       console.log("Classification created:", data);
-      // Maybe show a success message to the user
+      if (data && data[0]) {
+        setNewClassificationId(data[0].id);
+        setShowSuccessModal(true);
+        
+        // Delete ALL linked_anomalies rows for WeatherSatellite missions by this user
+        if (session?.user?.id) {
+          const { error: deleteError } = await supabase
+            .from("linked_anomalies")
+            .delete()
+            .eq("author", session.user.id)
+            .eq("automaton", "WeatherSatellite");
+          
+          if (deleteError) {
+            console.error("Error deleting linked_anomalies rows:", deleteError);
+          } else {
+            console.log("Successfully deleted all WeatherSatellite linked_anomalies rows for user");
+          }
+        }
+        
+        // Redirect after 3 seconds
+        setTimeout(() => {
+          router.push(`/next/${data[0].id}`);
+        }, 3000);
+      }
     }
 
     setCreatingClassification(false);
@@ -641,32 +673,150 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
 
   if (investigationType === "planet") {
     return (
-      <PlanetMission
-        isVertical={isMobile}
-        steps={steps}
-        clampedStepIdx={clampedStepIdx}
-        currentStepIdx={currentStepIdx}
-        stepProgress={stepProgress}
-        pxHeight={pxHeight}
-        pxWidth={pxWidth}
-        satPos={satPos}
-        satSize={satSize}
-        hideCards={hideCards}
-        inputs={inputs}
-        handleCalculate={handleCalculate}
-        planetStats={planetStats}
-        creatingClassification={creatingClassification}
-        barStart={barStart}
-        barEnd={barEnd}
-        segmentLength={segmentLength}
-        firstImage={firstImage}
-        stellar={stellar}
-        elapsed={elapsed}
-        width={width}
-        handleInputChange={(idx: number, value: string) => {
-          setInputs((prev) => ({ ...prev, [idx]: value }));
-        }}
-      />
+      <>
+        <PlanetMission
+          isVertical={isMobile}
+          steps={steps}
+          clampedStepIdx={clampedStepIdx}
+          currentStepIdx={currentStepIdx}
+          stepProgress={stepProgress}
+          pxHeight={pxHeight}
+          pxWidth={pxWidth}
+          satPos={satPos}
+          satSize={satSize}
+          hideCards={hideCards}
+          inputs={inputs}
+          handleCalculate={handleCalculate}
+          planetStats={planetStats}
+          creatingClassification={creatingClassification}
+          barStart={barStart}
+          barEnd={barEnd}
+          segmentLength={segmentLength}
+          firstImage={firstImage}
+          stellar={stellar}
+          elapsed={elapsed}
+          width={width}
+          handleInputChange={(idx: number, value: string) => {
+            setInputs((prev) => ({ ...prev, [idx]: value }));
+          }}
+        />
+        
+        {/* Success Modal */}
+        {showSuccessModal && planetStats && (
+          <>
+            <style>{`
+              @keyframes slideInModal {
+                from {
+                  opacity: 0;
+                  transform: translateY(-20px) scale(0.95);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0) scale(1);
+                }
+              }
+            `}</style>
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "rgba(0, 0, 0, 0.85)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 1000,
+                padding: "20px",
+              }}
+            >
+              <div
+                style={{
+                  background: "linear-gradient(135deg, #1a2332 0%, #0f1419 100%)",
+                  borderRadius: 16,
+                  padding: "32px",
+                  maxWidth: 500,
+                  width: "100%",
+                  border: "2px solid #78cce2",
+                  boxShadow: "0 8px 32px rgba(120, 204, 226, 0.4)",
+                  animation: "slideInModal 0.3s ease-out",
+                }}
+              >
+              <div
+                style={{
+                  textAlign: "center",
+                  marginBottom: 24,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 48,
+                    marginBottom: 16,
+                  }}
+                >
+                  🎉
+                </div>
+                <h2
+                  style={{
+                    color: "#78cce2",
+                    fontSize: 24,
+                    fontWeight: 700,
+                    marginBottom: 8,
+                  }}
+                >
+                  Planet Discovered!
+                </h2>
+                <p
+                  style={{
+                    color: "#b8c5d0",
+                    fontSize: 14,
+                  }}
+                >
+                  Your findings have been saved successfully
+                </p>
+              </div>
+
+              <div
+                style={{
+                  background: "rgba(120, 204, 226, 0.1)",
+                  borderRadius: 12,
+                  padding: 20,
+                  marginBottom: 24,
+                }}
+              >
+                <div style={{ color: "#e4eff0", fontSize: 16, marginBottom: 12 }}>
+                  <strong style={{ color: "#78cce2" }}>Type:</strong> {planetStats.type}
+                </div>
+                <div style={{ color: "#e4eff0", fontSize: 15, marginBottom: 8 }}>
+                  <strong>Mass:</strong> {planetStats.mass.toFixed(2)} M⊕
+                </div>
+                <div style={{ color: "#e4eff0", fontSize: 15, marginBottom: 8 }}>
+                  <strong>Radius:</strong> {planetStats.radius.toFixed(2)} R⊕
+                </div>
+                <div style={{ color: "#e4eff0", fontSize: 15, marginBottom: 8 }}>
+                  <strong>Density:</strong> {planetStats.density.toFixed(2)} g/cm³
+                </div>
+                <div style={{ color: "#e4eff0", fontSize: 15 }}>
+                  <strong>Temperature:</strong> {planetStats.temp.toFixed(0)} K
+                </div>
+              </div>
+
+              <div
+                style={{
+                  textAlign: "center",
+                  color: "#78cce2",
+                  fontSize: 14,
+                  fontWeight: 600,
+                }}
+              >
+                Redirecting to your discovery...
+              </div>
+            </div>
+          </div>
+          </>
+        )}
+      </>
     );
   }
 

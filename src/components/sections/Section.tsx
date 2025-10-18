@@ -11,7 +11,7 @@ export interface SectionProps {
   className?: string;
   children: React.ReactNode;
   sectionId?: string; // unique id for info text
-  infoText?: string; // unique info text for each section
+  infoText?: string | null; // unique info text for each section
   expandLink?: string | null; // optional link for expansion
 };
 

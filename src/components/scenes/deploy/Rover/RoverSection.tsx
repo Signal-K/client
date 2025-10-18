@@ -354,7 +354,7 @@ export default function RoverViewportSection() {
     // Return home handler - removes routes and linked_anomalies for this user's rover
     const handleReturnHome = async () => {
         if (!session?.user?.id) return;
-        
+         
         setIsReturningHome(true);
         try {
             // Delete all linked_anomalies for this user's rover

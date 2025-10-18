@@ -253,7 +253,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
             setClassificationId(anomaly.classification_id);
             const { data: classificationData, error: classErr } = await supabase
               .from("classifications")
-              .select("id, media")
+              .select("id, media, anomaly")
               .eq("id", anomaly.classification_id)
               .single();
             if (!classErr && classificationData) {
@@ -419,7 +419,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
 
   return (
   <Section expandLink={"/viewports/satellite"} sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Send satellites to planets you or the community have discovered to search for clouds and weather events."}>
-      <div ref={sectionRef} className="p-4 relative z-10" style={{ minHeight: '156px', height: '30vh', maxHeight: 520 }}>
+      <div ref={sectionRef} className="p-4 relative z-10 overflow-y-auto" style={{ minHeight: '156px', height: missionType === 'planet' ? '80vh' : '30vh', maxHeight: missionType === 'planet' ? '80vh' : 520 }}>
         {positions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed px-2">
