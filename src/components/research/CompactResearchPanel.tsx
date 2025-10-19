@@ -452,6 +452,16 @@ export default function CompactResearchPanel() {
             onUpgrade={() => {}}
           />
           <CompactUpgradeCard
+            title="Mineral deposit extraction"
+            description="Collect water, silicates & other minerals that you discover"
+            category="rover"
+            cost={2}
+            available={false}
+            isLocked={true}
+            requirementText="Coming in future update"
+            onUpgrade={() => {}}
+          />
+          {/* <CompactUpgradeCard
             title="Rover Battery Extension"
             description="Increase rover battery life for longer exploration missions. (Data Upgrade)"
             category="rover"
@@ -460,7 +470,7 @@ export default function CompactResearchPanel() {
             isLocked={true}
             requirementText="Coming in future update"
             onUpgrade={() => {}}
-          />
+          /> */}
           <CompactUpgradeCard
             title="Advanced Radar System"
             description="Enhanced atmospheric scanning for satellite observations. (Data Upgrade)"

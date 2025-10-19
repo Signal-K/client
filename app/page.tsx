@@ -35,6 +35,7 @@ import ResearchSkillViewport from "@/src/components/research/section/skillTreeSe
 import ProjectSelectionViewport from "@/src/components/onboarding/ProjectSelectionViewport";
 import Landing from "./apt/page";
 import InventoryViewport from "@/src/components/classification/tools/inventory-viewport";
+import FeedbackTeaser from "@/src/components/viewports/FeedbackTeaser";
 
 type PageSatellite = {
   id: string;
@@ -130,6 +131,9 @@ export default function ActivityPage() {
           landmarksExpanded={landmarksExpanded}
           onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
         />
+
+        {/* Feedback Teaser - Bumble game announcement */}
+        <FeedbackTeaser />
 
         {/* Inventory Viewport - Only show if user has mineral deposits with roverName */}
         {hasRoverMineralDeposits && <InventoryViewport />}
