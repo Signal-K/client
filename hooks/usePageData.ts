@@ -104,6 +104,7 @@ export function usePageData() {
     balloons: false
   });
   const [loading, setLoading] = useState(true);
+  const [hasRoverMineralDeposits, setHasRoverMineralDeposits] = useState(false);
 
   const fetchPlanets = async () => {
     if (!session?.user?.id) return;
@@ -342,6 +343,16 @@ export function usePageData() {
 
     setIncompletePlanet(mostRecentUnfinishedPlanet ?? null);
 
+    // Check if user has mineral deposits with roverName
+    const { data: roverDeposits } = await supabase
+      .from("mineralDeposits")
+      .select("id")
+      .eq("owner", userId)
+      .not("roverName", "is", null)
+      .limit(1);
+
+    setHasRoverMineralDeposits((roverDeposits ?? []).length > 0);
+
     // Update structure visibility based on user progress
     setVisibleStructures({
       telescope: true, // Always visible
@@ -371,6 +382,7 @@ export function usePageData() {
     planetTargets,
     visibleStructures,
     loading,
+    hasRoverMineralDeposits,
     
     // Functions
     refetchData: fetchData,

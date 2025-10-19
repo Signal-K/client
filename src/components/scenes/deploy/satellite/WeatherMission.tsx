@@ -22,6 +22,8 @@ interface WeatherMissionProps {
   currentAnomaly: any;
   anomalyPause: boolean;
   stepProgress: number;
+  classifiedCount?: number;
+  totalAnomalies?: number;
 }
 
 export default function WeatherMission({
@@ -44,6 +46,8 @@ export default function WeatherMission({
   currentAnomaly,
   anomalyPause,
   stepProgress,
+  classifiedCount = 0,
+  totalAnomalies = 0,
 }: WeatherMissionProps) {
   const getClaissfyUrl = (anomaly: any) => {
     if (!anomaly || !anomaly.anomaly || !anomaly.anomaly.anomalySet) return "/";
@@ -54,7 +58,7 @@ export default function WeatherMission({
       case "lidar-jovianVortexHunter":
         return `/structures/balloon/jvh/an-${anomalyId}/classify`;
       case "cloudspottingOnMars":
-        return `/structures/balloon/cloudspotting/an-${anomalyId}/classify`;
+        return `/structures/balloon/cloudspotting/an-${anomalyId}/classify`; // Original cloudspotting project
       case "balloon-marsCloudShapes":
         return `/structures/balloon/shapes/an-${anomalyId}/classify`;
       default:
@@ -70,13 +74,60 @@ export default function WeatherMission({
         height: isVertical ? "100%" : undefined,
         position: isVertical ? "relative" : "relative",
         display: isVertical ? "flex" : undefined,
-        flexDirection: isVertical ? "row" : undefined,
+        flexDirection: isVertical ? "column" : undefined,
         alignItems: isVertical ? "center" : undefined,
         justifyContent: isVertical ? "center" : undefined,
         overflow: isVertical ? "visible" : undefined,
         ...style,
       }}
     >
+      {/* Progress Counter */}
+      {totalAnomalies > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            top: isVertical ? 10 : -40,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "#181e2a",
+            border: "1.5px solid #78cce2",
+            borderRadius: 8,
+            padding: "8px 16px",
+            zIndex: 20,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <div
+            style={{
+              color: "#78cce2",
+              fontWeight: 600,
+              fontSize: 16,
+            }}
+          >
+            Progress: {classifiedCount}/{totalAnomalies}
+          </div>
+          <div
+            style={{
+              width: 120,
+              height: 8,
+              background: "#232b3b",
+              borderRadius: 4,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                width: `${totalAnomalies > 0 ? (classifiedCount / totalAnomalies) * 100 : 0}%`,
+                height: "100%",
+                background: "#f2c572",
+                transition: "width 0.3s ease",
+              }}
+            />
+          </div>
+        </div>
+      )}
       {isVertical ? (
         <>
           <div

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@supabase/auth-helpers-react";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import { usePageData, useGroupedClassifications } from "@/hooks/usePageData";

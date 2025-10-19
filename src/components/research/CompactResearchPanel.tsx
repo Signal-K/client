@@ -10,27 +10,43 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 interface UpgradeData {
   // Telescope upgrades
   telescopeReceptors: {
-    current: number;
+    current: number; 
     max: number;
     available: boolean;
   };
+
   // Satellite upgrades
   satelliteCount: {
     current: number;
     max: number;
     available: boolean;
   };
+
   // Rover upgrades
   roverWaypoints: {
     current: number;
     max: number;
     available: boolean;
   };
+
+  // AI4M mineral upgrade
+  findMinerals: {
+    unlocked: boolean;
+    available: boolean;
+  };
+
+  // P-4 mineral upgrade
+  p4FindMinerals: {
+    unlocked: boolean;
+    available: boolean;
+  },
+
   // Data/measurement upgrades
   spectroscopy: {
     unlocked: boolean;
     available: boolean;
   };
+
   // Progress data
   asteroidClassifications: number;
   cloudClassifications: number;
@@ -46,6 +62,8 @@ export default function CompactResearchPanel() {
     satelliteCount: { current: 1, max: 2, available: false },
     roverWaypoints: { current: 4, max: 6, available: false },
     spectroscopy: { unlocked: false, available: false },
+    findMinerals: { unlocked: false, available: false },
+    p4FindMinerals: { unlocked: false, available: false },
     asteroidClassifications: 0,
     cloudClassifications: 0,
     availableStardust: 0,
@@ -91,6 +109,8 @@ export default function CompactResearchPanel() {
       const satelliteUpgrades = researched?.filter(r => r.tech_type === "satellitecount").length || 0;
       const roverWaypointUpgrades = researched?.filter(r => r.tech_type === "roverwaypoints").length || 0;
       const spectroscopyUnlocked = researched?.some(r => r.tech_type === "spectroscopy") || false;
+      const findMineralsUnlocked = researched?.some(r => r.tech_type === "findMinerals") || false;
+      const p4MineralsUnlocked = researched?.some(r => r.tech_type === "p4Minerals") || false;
 
       // Calculate stardust with tiered pricing
       const basePoints = allClassifications?.length || 0;
@@ -132,6 +152,14 @@ export default function CompactResearchPanel() {
         spectroscopy: {
           unlocked: spectroscopyUnlocked,
           available: availableStardust >= 2 && !spectroscopyUnlocked,
+        },
+        findMinerals: {
+          unlocked: findMineralsUnlocked,
+          available: availableStardust >= 2 && !findMineralsUnlocked,
+        },
+        p4FindMinerals: {
+          unlocked: p4MineralsUnlocked,
+          available: availableStardust >= 2 && !p4MineralsUnlocked,
         },
         asteroidClassifications: asteroidClassifications?.length || 0,
         cloudClassifications: cloudClassifications?.length || 0,
@@ -198,6 +226,28 @@ export default function CompactResearchPanel() {
       cost: 10,
       available: upgradeData.roverWaypoints.available,
       onUpgrade: () => handleUpgrade("roverwaypoints", 10),
+    }] : []),
+
+    // AI4M Minerals
+    ...(!upgradeData.findMinerals.unlocked ? [{
+      id: "findMinerals",
+      title: "Find Mineral Deposits",
+      description: "Your rovers and satellites can find mineral and soil deposits, which can be extracted and manipulated in future to produce resources and farms",
+      category: "rover" as const,
+      cost: 2,
+      available: upgradeData.findMinerals.available,
+      onUpgrade: () => handleUpgrade("findMinerals", 2),
+    }] : []),
+
+    // P4 + CoM Minerals
+    ...(!upgradeData.p4FindMinerals.unlocked ? [{
+      id: "p4Minerals",
+      title: "Find Icy Deposits",
+      description: "Your satellites can already track sublimation behaviour on your exoplanets, now you can combine your knowledge of clouds and ice-spiders to find water & CO2-ice sources for future extraction",
+      category: "satellite" as const,
+      cost: 2,
+      available: upgradeData.p4FindMinerals.available,
+      onUpgrade: () => handleUpgrade("p4Minerals", 2),
     }] : []),
     
     // Spectroscopy (Data/Measurement - 2 stardust)
@@ -283,6 +333,26 @@ export default function CompactResearchPanel() {
       title: "Spectroscopy Data",
       description: "Spectroscopic analysis is now available for all planetary observations.",
       category: "telescope" as const,
+      cost: 0,
+      available: false,
+      onUpgrade: () => {},
+    }] : []),
+
+    ...(upgradeData.findMinerals.unlocked ? [{
+      id: "findMinerals-complete",
+      title: "Find Mineral Deposits",
+      description: "Your rovers and satellites can now find mineral and soil deposits for future extraction.",
+      category: "rover" as const,
+      cost: 0,
+      available: false,
+      onUpgrade: () => {},
+    }] : []),
+
+    ...(upgradeData.p4FindMinerals.unlocked ? [{
+      id: "p4Minerals-complete",
+      title: "Find Icy Deposits",
+      description: "Your satellites can now track and locate water & CO2-ice sources for future extraction.",
+      category: "satellite" as const,
       cost: 0,
       available: false,
       onUpgrade: () => {},
@@ -382,6 +452,16 @@ export default function CompactResearchPanel() {
             onUpgrade={() => {}}
           />
           <CompactUpgradeCard
+            title="Mineral deposit extraction"
+            description="Collect water, silicates & other minerals that you discover"
+            category="rover"
+            cost={2}
+            available={false}
+            isLocked={true}
+            requirementText="Coming in future update"
+            onUpgrade={() => {}}
+          />
+          {/* <CompactUpgradeCard
             title="Rover Battery Extension"
             description="Increase rover battery life for longer exploration missions. (Data Upgrade)"
             category="rover"
@@ -390,7 +470,7 @@ export default function CompactResearchPanel() {
             isLocked={true}
             requirementText="Coming in future update"
             onUpgrade={() => {}}
-          />
+          /> */}
           <CompactUpgradeCard
             title="Advanced Radar System"
             description="Enhanced atmospheric scanning for satellite observations. (Data Upgrade)"

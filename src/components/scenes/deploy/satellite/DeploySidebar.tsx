@@ -20,6 +20,11 @@ interface DeploySidebarProps {
   deploymentWarning?: string | null;
   isFastDeployEnabled?: boolean | null;
   isDarkMode?: boolean;
+  waterDiscoveryStatus?: {
+    hasCloudClassifications: boolean;
+    hasValidStats: boolean;
+    canDiscoverMinerals: boolean;
+  };
 }
 
 const DeploySidebar: React.FC<DeploySidebarProps> = ({
@@ -36,6 +41,11 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
   deploymentWarning = null,
   isFastDeployEnabled = null,
   isDarkMode = true,
+  waterDiscoveryStatus = {
+    hasCloudClassifications: false,
+    hasValidStats: false,
+    canDiscoverMinerals: false,
+  },
 }) => {
   const containerClasses = isMobile
     ? `w-full backdrop-blur-md p-2.5 rounded-t-xl border-t shadow-2xl ${
@@ -57,6 +67,22 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
           <div className={`w-12 h-1 rounded-full ${isDarkMode ? 'bg-gray-600' : 'bg-gray-400'}`}></div>
         </div>
       )}
+
+      {/* Deploy Button - MOVED TO TOP */}
+      <div className={`${isMobile ? 'mb-2 pb-2 border-b' : 'mb-3 sm:mb-4 pb-3 sm:pb-4 border-b'} ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
+        {deploymentWarning && (
+          <p className={`text-red-500 text-center mb-1.5 sm:mb-2 leading-snug ${isMobile ? 'text-[10px]' : 'text-xs'}`}>{deploymentWarning}</p>
+        )}
+        {!isDeployDisabled && (
+          <Button 
+            onClick={onDeploy} 
+            disabled={isDeploying} 
+            className={`w-full ${isMobile ? 'h-9 text-sm' : 'h-10'}`}
+          >
+            {isDeploying ? 'Deploying...' : 'Deploy Satellite'}
+          </Button>
+        )}
+      </div>
       
       <div className={`flex-grow ${isMobile ? 'space-y-2 max-h-[50vh] overflow-y-auto' : 'space-y-3 sm:space-y-4'}`}>
         <div className="text-center">
@@ -95,6 +121,62 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
               🚀 As a new explorer, your satellite has a <strong>speed boost</strong>! 
               Anomalies available <strong>immediately</strong>.
             </p>
+          </div>
+        )}
+
+        {/* Water/Mineral Discovery Message */}
+        {(waterDiscoveryStatus.canDiscoverMinerals || waterDiscoveryStatus.hasCloudClassifications || waterDiscoveryStatus.hasValidStats) && (
+          <div className={`p-2.5 sm:p-4 ${
+            waterDiscoveryStatus.canDiscoverMinerals 
+              ? 'bg-gradient-to-br from-red-500/25 to-orange-500/25 border-red-400/40' 
+              : 'bg-gradient-to-br from-yellow-500/25 to-amber-500/25 border-yellow-400/40'
+          } rounded-lg border shadow-lg ${isMobile ? 'text-xs' : ''}`}>
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
+              <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 ${
+                waterDiscoveryStatus.canDiscoverMinerals ? 'bg-red-400' : 'bg-yellow-400'
+              } rounded-full animate-pulse`}></div>
+              <span className={`${
+                waterDiscoveryStatus.canDiscoverMinerals ? 'text-red-300' : 'text-yellow-300'
+              } font-semibold ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                {waterDiscoveryStatus.canDiscoverMinerals 
+                  ? '💧 Water & Minerals Detected!' 
+                  : '🔍 Resource Discovery Progress'}
+              </span>
+            </div>
+            <div className={`${
+              waterDiscoveryStatus.canDiscoverMinerals ? 'text-red-200' : 'text-yellow-200'
+            } leading-snug ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
+              {waterDiscoveryStatus.canDiscoverMinerals ? (
+                <p>
+                  🌊 Based on your cloud discoveries, this planet shows signs of <strong>water vapor</strong> and <strong>trace minerals</strong>. 
+                  The satellite can now locate these resources for extraction and analysis.
+                </p>
+              ) : (
+                <div className="space-y-1">
+                  <p className="font-semibold">Requirements for mineral discovery:</p>
+                  <ul className="list-none space-y-0.5 ml-2">
+                    <li className="flex items-center gap-1.5">
+                      {waterDiscoveryStatus.hasValidStats ? '✅' : '❌'}
+                      <span>Planet statistics calculated (density, radius, mass)</span>
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      {waterDiscoveryStatus.hasCloudClassifications ? '✅' : '❌'}
+                      <span>Cloud formations discovered on this planet</span>
+                    </li>
+                  </ul>
+                  {!waterDiscoveryStatus.hasValidStats && (
+                    <p className="mt-1.5 italic text-xs">
+                      💡 Deploy a <strong>Planetary Survey</strong> satellite to calculate planet statistics.
+                    </p>
+                  )}
+                  {!waterDiscoveryStatus.hasCloudClassifications && (
+                    <p className="mt-1.5 italic text-xs">
+                      💡 Deploy a <strong>Weather Analysis</strong> satellite to discover clouds.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -164,22 +246,6 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
                 )}
             </div>
         </div>
-      </div>
-
-      {/* Deploy Button */}
-      <div className={`${isMobile ? 'mt-2 pt-2 border-t' : 'mt-3 sm:mt-4'} ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
-        {deploymentWarning && (
-          <p className={`text-red-500 text-center mb-1.5 sm:mb-2 leading-snug ${isMobile ? 'text-[10px]' : 'text-xs'}`}>{deploymentWarning}</p>
-        )}
-        {!isDeployDisabled && (
-          <Button 
-            onClick={onDeploy} 
-            disabled={isDeploying} 
-            className={`w-full ${isMobile ? 'h-9 text-sm' : 'h-10'}`}
-          >
-            {isDeploying ? 'Deploying...' : 'Deploy Satellite'}
-          </Button>
-        )}
       </div>
     </div>
   );

@@ -46,14 +46,15 @@ export default function BalloonClassifyPage() {
                     case "classify":
                         component = <StarterLidar anomalyid={anomalyid || ""} />
                         break;
-                };
+                }
+                break;
 
             case "jvh":
                 switch(mission) {
                     case "classify":
                         component = <StarterJovianVortexHunter anomalyid={Number(anomalyid || "77311541")} />
                         break;
-                };
+                }
                 break;
 
             case "shapes":
@@ -61,13 +62,16 @@ export default function BalloonClassifyPage() {
                     case "classify":
                         component = <StarterCoMShapes anomalyid={anomalyid ? Number(anomalyid) : 0} />
                         break;
-                };
+                }
+                break;
             
             case "p4":
                 switch(mission) {
                     case "classify":
                         component = <StarterPlanetFour anomalyid={anomalyid ? Number(anomalyid) : 5} />
+                        break;
                 }
+                break;
         };
 
         setMissionComponent(component)

@@ -62,7 +62,7 @@ function StardustSummary({ supabase, session, cardColor, textColor }: { supabase
       )}
     </div>
   );
-}
+};
 
 export default function ResearchPage() {
   const supabase = useSupabaseClient();

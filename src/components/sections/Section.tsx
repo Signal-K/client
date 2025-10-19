@@ -11,7 +11,7 @@ export interface SectionProps {
   className?: string;
   children: React.ReactNode;
   sectionId?: string; // unique id for info text
-  infoText?: string; // unique info text for each section
+  infoText?: string | null; // unique info text for each section
   expandLink?: string | null; // optional link for expansion
 };
 
@@ -68,7 +68,7 @@ const Section: React.FC<SectionProps> = ({
 
   // Example variant styling
   const sectionClass = clsx(
-    "relative w-full rounded-lg overflow-hidden",
+    "relative w-full rounded-lg",
     {
       "bg-card border border-chart-4/30 text-white": variant === "viewport",
       "bg-card shadow-md text-zinc-900": variant === "minimal",

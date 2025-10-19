@@ -116,7 +116,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
         .eq("author", session.user.id);
       if (!allErr && allEntries) {
         setAllWeatherSatEntries(allEntries);
-        // Determine mission type
+        // Determine mission type based on anomalySet
         const isP4 = allEntries.some(entry => entry.anomaly?.anomalySet === 'satellite-planetFour');
         if (isP4) {
           setMissionType('p-4');
@@ -124,12 +124,23 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
             .filter(entry => entry.anomaly?.anomalySet === 'satellite-planetFour')
             .map(entry => ({ ...entry.anomaly, linked_anomaly_id: entry.id }));
           setWindSurveyAnomalies(p4Anomalies);
-        } else if (allEntries.length > 1) {
-          setMissionType('weather');
-        } else if (allEntries.length === 1) {
-          setMissionType('planet');
         } else {
-          setMissionType(null);
+          // Check if it's a weather/cloud mission (cloudspottingOnMars, lidar-jovianVortexHunter, etc.)
+          const hasCloudAnomaly = allEntries.some(entry => {
+            const set = entry.anomaly?.anomalySet;
+            return set === 'cloudspottingOnMars' || 
+                   set === 'lidar-jovianVortexHunter' || 
+                   set === 'balloon-marsCloudShapes' ||
+                   entry.anomaly?.anomalytype === 'cloud' ||
+                   entry.anomaly?.anomalytype === 'gaseousMapping';
+          });
+          
+          if (hasCloudAnomaly) {
+            setMissionType('weather');
+          } else {
+            // It's a planet mission
+            setMissionType('planet');
+          }
         }
       }
       else setAllWeatherSatEntries([]);
@@ -149,7 +160,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
       return `${days}d ${hours}h ${minutes}m`;
     } else if (hours > 0) {
       return `${hours}h ${minutes}m`;
-    }
+    };
     return `${minutes}m`;
   };
 
@@ -207,6 +218,21 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
             return;
           }
 
+          // Check if it's a weather/cloud mission
+          const hasCloudAnomaly = anomaliesWithSets.some(a => {
+            const set = a.anomaly?.anomalySet;
+            return set === 'cloudspottingOnMars' || 
+                   set === 'lidar-jovianVortexHunter' || 
+                   set === 'balloon-marsCloudShapes';
+          });
+          
+          if (hasCloudAnomaly) {
+            setMissionType('weather');
+          } else {
+            // It's a planet mission
+            setMissionType('planet');
+          }
+
           const anomaly = anomaliesWithSets[0];
           const deployTime = new Date(anomaly.date);
           const satelliteData: Satellite = {
@@ -227,7 +253,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
             setClassificationId(anomaly.classification_id);
             const { data: classificationData, error: classErr } = await supabase
               .from("classifications")
-              .select("id, media")
+              .select("id, media, anomaly")
               .eq("id", anomaly.classification_id)
               .single();
             if (!classErr && classificationData) {
@@ -294,7 +320,14 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
     if (satellite.hasUnclassifiedAnomaly) {
       if (satellite.unlocked) {
         // If cloud found, navigate directly to classification
-        window.location.href = `/structures/balloon/cloudspotting/db-${satellite.anomalyId}/classify`;
+        // Determine the correct project based on anomalySet
+        let projectPath = 'cloudspotting'; // default for Earth clouds
+        if (satellite.anomalySet === 'cloudspottingOnMars') {
+          projectPath = 'shapes'; // Mars cloud shapes
+        } else if (satellite.anomalySet === 'lidar-jovianVortexHunter') {
+          projectPath = 'jvh'; // Jovian vortex hunter
+        }
+        window.location.href = `/structures/balloon/${projectPath}/db-${satellite.anomalyId}/classify`;
       } else {
         // If still scanning, show cloud detection dialog
         setSelectedSatellite(satellite);
@@ -386,7 +419,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
 
   return (
   <Section expandLink={"/viewports/satellite"} sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Send satellites to planets you or the community have discovered to search for clouds and weather events."}>
-      <div ref={sectionRef} className="p-4 relative z-10" style={{ minHeight: '156px', height: '30vh', maxHeight: 520 }}>
+      <div ref={sectionRef} className="p-4 relative z-10" style={{ minHeight: '156px' }}>
         {positions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed px-2">
