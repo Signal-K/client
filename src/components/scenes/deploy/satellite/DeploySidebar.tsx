@@ -67,6 +67,22 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
           <div className={`w-12 h-1 rounded-full ${isDarkMode ? 'bg-gray-600' : 'bg-gray-400'}`}></div>
         </div>
       )}
+
+      {/* Deploy Button - MOVED TO TOP */}
+      <div className={`${isMobile ? 'mb-2 pb-2 border-b' : 'mb-3 sm:mb-4 pb-3 sm:pb-4 border-b'} ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
+        {deploymentWarning && (
+          <p className={`text-red-500 text-center mb-1.5 sm:mb-2 leading-snug ${isMobile ? 'text-[10px]' : 'text-xs'}`}>{deploymentWarning}</p>
+        )}
+        {!isDeployDisabled && (
+          <Button 
+            onClick={onDeploy} 
+            disabled={isDeploying} 
+            className={`w-full ${isMobile ? 'h-9 text-sm' : 'h-10'}`}
+          >
+            {isDeploying ? 'Deploying...' : 'Deploy Satellite'}
+          </Button>
+        )}
+      </div>
       
       <div className={`flex-grow ${isMobile ? 'space-y-2 max-h-[50vh] overflow-y-auto' : 'space-y-3 sm:space-y-4'}`}>
         <div className="text-center">
@@ -230,22 +246,6 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
                 )}
             </div>
         </div>
-      </div>
-
-      {/* Deploy Button */}
-      <div className={`${isMobile ? 'mt-2 pt-2 border-t' : 'mt-3 sm:mt-4'} ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
-        {deploymentWarning && (
-          <p className={`text-red-500 text-center mb-1.5 sm:mb-2 leading-snug ${isMobile ? 'text-[10px]' : 'text-xs'}`}>{deploymentWarning}</p>
-        )}
-        {!isDeployDisabled && (
-          <Button 
-            onClick={onDeploy} 
-            disabled={isDeploying} 
-            className={`w-full ${isMobile ? 'h-9 text-sm' : 'h-10'}`}
-          >
-            {isDeploying ? 'Deploying...' : 'Deploy Satellite'}
-          </Button>
-        )}
       </div>
     </div>
   );

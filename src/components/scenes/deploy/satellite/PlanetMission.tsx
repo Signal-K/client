@@ -52,7 +52,7 @@ export default function PlanetMission(props: PlanetMissionProps) {
   if (isVertical) {
     return (
       <div style={{ width: "100%", ...style }}>
-        <div style={{ padding: "20px 16px 200px" }}>
+        <div style={{ padding: "10px 16px 20px" }}>
           {steps.map((step, i) => {
             if (i === 0 && elapsed < 0) return null;
             if (i === 2 && elapsed < 20 * 60 * 1000) return null;
@@ -64,17 +64,17 @@ export default function PlanetMission(props: PlanetMissionProps) {
               <div
                 key={i}
                 style={{
-                  marginBottom: 20,
+                  marginBottom: 12,
                   background: "#1a2332",
                   border: `2px solid ${isActive ? "#78cce2" : "#3a4a5e"}`,
                   borderRadius: 12,
-                  padding: 16,
+                  padding: 12,
                 }}
               >
-                <div style={{ color: isActive ? "#78cce2" : "#e4eff0", fontSize: 16, fontWeight: 700, marginBottom: 12 }}>
+                <div style={{ color: isActive ? "#78cce2" : "#e4eff0", fontSize: 15, fontWeight: 700, marginBottom: 8 }}>
                   {i + 1}. {step.label}
                 </div>
-                <div style={{ color: "#b8c5d0", fontSize: 14, marginBottom: 12, lineHeight: 1.5 }}>
+                <div style={{ color: "#b8c5d0", fontSize: 13, marginBottom: 8, lineHeight: 1.4 }}>
                   {step.description}
                 </div>
 
@@ -161,7 +161,7 @@ export default function PlanetMission(props: PlanetMissionProps) {
   // DESKTOP
   return (
     <div style={{ width: "100%", position: "relative", ...style }}>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "40px 0", position: "relative" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "20px 0", position: "relative" }}>
         <svg width={pxWidth} height={60}>
           <rect x={barStart} y={25} width={barEnd - barStart} height={10} rx={5} fill="#1a2332" />
           <rect x={barStart} y={25} width={satPos - barStart} height={10} rx={5} fill="#78cce2" />
@@ -180,7 +180,7 @@ export default function PlanetMission(props: PlanetMissionProps) {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, padding: "0 40px 40px", maxWidth: 1400, margin: "0 auto" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, padding: "0 40px 40px", maxWidth: 1400, margin: "0 auto" }}>
         {steps.map((step, i) => {
           if (i === 0 && elapsed < 0) return null;
           if (i === 2 && elapsed < 20 * 60 * 1000) return null;
@@ -189,11 +189,11 @@ export default function PlanetMission(props: PlanetMissionProps) {
           const isActive = i === clampedStepIdx;
 
           return (
-            <div key={i} style={{ background: "#1a2332", border: `2px solid ${isActive ? "#78cce2" : "#3a4a5e"}`, borderRadius: 12, padding: 24, boxShadow: isActive ? "0 8px 24px rgba(120, 204, 226, 0.3)" : "0 4px 12px rgba(0,0,0,0.3)" }}>
-              <div style={{ color: isActive ? "#78cce2" : "#e4eff0", fontSize: 18, fontWeight: 700, marginBottom: 12 }}>
+            <div key={i} style={{ background: "#1a2332", border: `2px solid ${isActive ? "#78cce2" : "#3a4a5e"}`, borderRadius: 12, padding: 16, boxShadow: isActive ? "0 8px 24px rgba(120, 204, 226, 0.3)" : "0 4px 12px rgba(0,0,0,0.3)" }}>
+              <div style={{ color: isActive ? "#78cce2" : "#e4eff0", fontSize: 16, fontWeight: 700, marginBottom: 10 }}>
                 {i + 1}. {step.label}
               </div>
-              <div style={{ color: "#b8c5d0", fontSize: 14, marginBottom: 16, lineHeight: 1.5 }}>
+              <div style={{ color: "#b8c5d0", fontSize: 13, marginBottom: 12, lineHeight: 1.4 }}>
                 {step.description}
               </div>
 

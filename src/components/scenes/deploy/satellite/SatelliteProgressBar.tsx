@@ -50,6 +50,7 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
   const [creatingClassification, setCreatingClassification] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [newClassificationId, setNewClassificationId] = useState<number | null>(null);
+  const [linkedAnomalyClassificationId, setLinkedAnomalyClassificationId] = useState<number | null>(null);
   const [stellar, setStellar] = useState<{
     radius: number;
     mass: number;
@@ -126,6 +127,10 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       if (linkedErr || !linked || linked.length === 0) return;
       const classificationId = linked[0].classification_id;
       if (!classificationId) return;
+      
+      // Store the classification_id from linked_anomalies
+      setLinkedAnomalyClassificationId(classificationId);
+      
       // Fetch the classification
       const { data: classData, error: classErr } = await supabase
         .from("classifications")
@@ -631,6 +636,7 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
             stellar_temp: stellarTemp,
             stellar_radius: stellarRadius,
             stellar_mass: stellarMass,
+            source_classification_id: linkedAnomalyClassificationId, // Reference to the original lightcurve classification
           },
           content: `Discovered ${planetType} with radius ${planetRadius.toFixed(2)} Earth radii and mass ${planetMass.toFixed(2)} Earth masses`,
         },

@@ -22,6 +22,8 @@ interface Anomaly {
 export function StarterPlanetFour({
     anomalyid
 }: Props) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomalyid}.jpeg`;
     const [showClassification, setShowClassification] = useState(false);
@@ -80,6 +82,55 @@ export function StarterPlanetFour({
                                 structureItemId={3105}
                                 parentPlanetLocation={anomalyid?.toString()}
                                 annotationType="P4"
+                                onClassificationComplete={async () => {
+                                    if (!session) return;
+
+                                    try {
+                                        const { 
+                                            attemptMineralDepositCreation, 
+                                            selectPlanetFourMineral 
+                                        } = await import("@/src/utils/mineralDepositCreation");
+
+                                        const { data: recentClassification } = await supabase
+                                            .from("classifications")
+                                            .select("id, classificationConfiguration")
+                                            .eq("author", session.user.id)
+                                            .eq("anomaly", parseInt(anomalyid.toString()))
+                                            .eq("classificationtype", "satellite-planetFour")
+                                            .order("created_at", { ascending: false })
+                                            .limit(1)
+                                            .single();
+
+                                        if (recentClassification) {
+                                            // Extract annotations from classification config if available
+                                            let annotations;
+                                            try {
+                                                const config = typeof recentClassification.classificationConfiguration === 'string'
+                                                    ? JSON.parse(recentClassification.classificationConfiguration)
+                                                    : recentClassification.classificationConfiguration;
+                                                annotations = config?.annotationOptions || [];
+                                            } catch (e) {
+                                                annotations = [];
+                                            }
+
+                                            const mineralConfig = selectPlanetFourMineral(annotations);
+                                            const depositCreated = await attemptMineralDepositCreation({
+                                                supabase,
+                                                userId: session.user.id,
+                                                anomalyId: parseInt(anomalyid.toString()),
+                                                classificationId: recentClassification.id,
+                                                mineralConfig,
+                                                location: `Surface feature at anomaly ${anomalyid}`
+                                            });
+
+                                            if (depositCreated) {
+                                                console.log(`[Planet Four] Created ${mineralConfig.type} deposit!`);
+                                            }
+                                        }
+                                    } catch (error) {
+                                        console.error("[Planet Four] Error in mineral deposit creation:", error);
+                                    }
+                                }}
                             />
                             </div>
                         </div>
@@ -99,6 +150,7 @@ export function PlanetFourProject() {
     const [parentClassificationId, setParentClassificationId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [showTutorial, setShowTutorial] = useState(false);
+    const [hasMineralResearch, setHasMineralResearch] = useState<boolean>(false);
 
     useEffect(() => {
         async function fetchAnomaly() {
@@ -139,6 +191,27 @@ export function PlanetFourProject() {
         fetchAnomaly();
     }, [session, supabase]);
 
+    useEffect(() => {
+        async function checkMineralResearch() {
+            if (!session) return;
+
+            try {
+                const { data } = await supabase
+                    .from("inventory")
+                    .select("id")
+                    .eq("owner", session.user.id)
+                    .eq("item", 3103)
+                    .maybeSingle();
+
+                setHasMineralResearch(!!data);
+            } catch (error) {
+                console.error("Error checking mineral research:", error);
+            }
+        }
+
+        checkMineralResearch();
+    }, [session, supabase]);
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -150,7 +223,7 @@ export function PlanetFourProject() {
     const startTutorial = () => setShowTutorial(true);
 
     return (
-        <div className="flex flex-col items-start gap-4 pb-4 relative w-full overflow-y-auto max-h-[90vh] rounded-lg overflow-x-hidden">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full rounded-lg overflow-x-hidden">
             <Button onClick={startTutorial} variant="outline">
                 Show Tutorial
             </Button>
@@ -158,9 +231,18 @@ export function PlanetFourProject() {
             {showTutorial && <StarterPlanetFour anomalyid={Number(anomaly.id)} />}
 
             {imageUrl && !showTutorial && (
-                <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
-                    <div className="relative">
-                        <ImageAnnotator
+                <>
+                    {hasMineralResearch && (
+                        <div className="w-full max-w-4xl bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-2">
+                            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-sm text-blue-800 font-medium">Mineral Discovery Active (33% chance per classification)</span>
+                        </div>
+                    )}
+                    <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                        <div className="relative">
+                            <ImageAnnotator
                             className="h-full w-full"
                             initialImageUrl={imageUrl}
                             anomalyId={anomaly.id.toString()}
@@ -169,9 +251,58 @@ export function PlanetFourProject() {
                             structureItemId={3105}
                             parentPlanetLocation={anomaly.id.toString()}
                             annotationType="P4"
+                            onClassificationComplete={async () => {
+                                if (!session || !anomaly) return;
+
+                                try {
+                                    const { 
+                                        attemptMineralDepositCreation, 
+                                        selectPlanetFourMineral 
+                                    } = await import("@/src/utils/mineralDepositCreation");
+
+                                    const { data: recentClassification } = await supabase
+                                        .from("classifications")
+                                        .select("id, classificationConfiguration")
+                                        .eq("author", session.user.id)
+                                        .eq("anomaly", parseInt(anomaly.id.toString()))
+                                        .eq("classificationtype", "satellite-planetFour")
+                                        .order("created_at", { ascending: false })
+                                        .limit(1)
+                                        .single();
+
+                                    if (recentClassification) {
+                                        let annotations;
+                                        try {
+                                            const config = typeof recentClassification.classificationConfiguration === 'string'
+                                                ? JSON.parse(recentClassification.classificationConfiguration)
+                                                : recentClassification.classificationConfiguration;
+                                            annotations = config?.annotationOptions || [];
+                                        } catch (e) {
+                                            annotations = [];
+                                        }
+
+                                        const mineralConfig = selectPlanetFourMineral(annotations);
+                                        const depositCreated = await attemptMineralDepositCreation({
+                                            supabase,
+                                            userId: session.user.id,
+                                            anomalyId: parseInt(anomaly.id.toString()),
+                                            classificationId: recentClassification.id,
+                                            mineralConfig,
+                                            location: `Surface feature at anomaly ${anomaly.id}`
+                                        });
+
+                                        if (depositCreated) {
+                                            console.log(`[Planet Four] Created ${mineralConfig.type} deposit!`);
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.error("[Planet Four] Error in mineral deposit creation:", error);
+                                }
+                            }}
                         />
                     </div>
                 </div>
+                </>
             )}
         </div>
     );

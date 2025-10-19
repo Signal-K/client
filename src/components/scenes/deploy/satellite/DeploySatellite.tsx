@@ -374,11 +374,23 @@ export default function DeploySatelliteViewport() {
         }
 
         // Set planet stats once with all data (including metallicity if available)
+        // Only update if stats actually changed to avoid triggering the surrounding effect repeatedly.
         setPlanetAnomalies((prev) => {
           const updated = [...prev];
-          updated[focusedPlanetIdx] = { ...updated[focusedPlanetIdx], stats: finalStats };
-          console.log('🔍 Updated planet anomalies[' + focusedPlanetIdx + ']:', updated[focusedPlanetIdx].stats);
-          return updated;
+          const existing = updated[focusedPlanetIdx];
+          const existingStats = existing?.stats;
+
+          const statsChanged = JSON.stringify(existingStats) !== JSON.stringify(finalStats);
+
+          if (!existing || statsChanged) {
+            updated[focusedPlanetIdx] = { ...existing, stats: finalStats };
+            console.log('🔍 Updated planet anomalies[' + focusedPlanetIdx + ']:', updated[focusedPlanetIdx].stats);
+            return updated;
+          }
+
+          // No change — return previous array reference to avoid re-renders
+          console.log('🔍 Skipping planet anomalies update; stats unchanged.');
+          return prev;
         });
       });
     } else {
@@ -390,7 +402,10 @@ export default function DeploySatelliteViewport() {
   // Check for water/mineral discoveries from cloud classifications
   useEffect(() => {
     const checkWaterDiscovery = async () => {
+      console.log('[checkWaterDiscovery] Starting check...');
+      
       if (!session?.user?.id || planetAnomalies.length === 0) {
+        console.log('[checkWaterDiscovery] Early return - no session or planets');
         setWaterDiscoveryStatus({
           hasCloudClassifications: false,
           hasValidStats: false,
@@ -401,6 +416,7 @@ export default function DeploySatelliteViewport() {
 
       const focusedPlanet = planetAnomalies[focusedPlanetIdx];
       if (!focusedPlanet) {
+        console.log('[checkWaterDiscovery] Early return - no focused planet');
         setWaterDiscoveryStatus({
           hasCloudClassifications: false,
           hasValidStats: false,
@@ -408,6 +424,8 @@ export default function DeploySatelliteViewport() {
         });
         return;
       }
+      
+      console.log('[checkWaterDiscovery] Focused planet:', focusedPlanet.id, 'Stats:', focusedPlanet.stats);
 
       // Check if planet has stats (density, radius, mass are not null/N/A)
       const hasValidStats = focusedPlanet.stats && 
@@ -417,15 +435,22 @@ export default function DeploySatelliteViewport() {
 
       // Find the classification ID for this planet
       try {
-        const { data: planetClassification, error: planetClassError } = await supabase
+        const { data: planetClassifications, error: planetClassError } = await supabase
           .from("classifications")
-          .select("id")
+          .select("id, classificationConfiguration")
           .eq("author", session.user.id)
           .eq("anomaly", focusedPlanet.id)
-          .eq("classificationtype", "planet")
-          .maybeSingle();
+          .eq("classificationtype", "planet");
 
-        if (planetClassError || !planetClassification) {
+        console.log('[checkWaterDiscovery] Planet classifications query:', {
+          error: planetClassError,
+          count: planetClassifications?.length || 0,
+          userId: session.user.id,
+          anomalyId: focusedPlanet.id
+        });
+
+        if (planetClassError || !planetClassifications || planetClassifications.length === 0) {
+          console.log('[checkWaterDiscovery] Early return - no planet classifications found');
           setWaterDiscoveryStatus({
             hasCloudClassifications: false,
             hasValidStats: !!hasValidStats,
@@ -433,6 +458,10 @@ export default function DeploySatelliteViewport() {
           });
           return;
         }
+
+        // Get all planet classification IDs for this planet
+        const planetClassificationIds = planetClassifications.map(c => c.id);
+        console.log('[checkWaterDiscovery] All planet classification IDs:', planetClassificationIds);
 
         // Check for cloud classifications that point to this planet
         const { data: cloudClassifications, error: cloudError } = await supabase
@@ -450,11 +479,30 @@ export default function DeploySatelliteViewport() {
           return;
         }
 
-        // Check if any cloud classification has parentPlanet matching this planet's classification ID
+        // Check if any cloud classification has parentPlanet matching ANY of this planet's classification IDs
         const hasCloudForPlanet = cloudClassifications.some(
-          (cloudClass: any) => 
-            cloudClass.classificationConfiguration?.parentPlanet === planetClassification.id
+          (cloudClass: any) => {
+            if (!cloudClass.classificationConfiguration) return false;
+            
+            // Parse config if it's a string
+            let config;
+            try {
+              config = typeof cloudClass.classificationConfiguration === 'string'
+                ? JSON.parse(cloudClass.classificationConfiguration)
+                : cloudClass.classificationConfiguration;
+            } catch (e) {
+              console.error('[checkWaterDiscovery] Failed to parse cloud config:', e);
+              return false;
+            }
+            
+            // Check if parentPlanet matches ANY of the planet classification IDs
+            return config?.parentPlanet && planetClassificationIds.includes(config.parentPlanet);
+          }
         );
+
+        console.log('[checkWaterDiscovery] Planet classification IDs:', planetClassificationIds);
+        console.log('[checkWaterDiscovery] Cloud classifications count:', cloudClassifications.length);
+        console.log('[checkWaterDiscovery] Has cloud for planet:', hasCloudForPlanet);
 
         setWaterDiscoveryStatus({
           hasCloudClassifications: hasCloudForPlanet,
@@ -694,17 +742,62 @@ export default function DeploySatelliteViewport() {
       try {
         const { data: classifications, error } = await supabase
           .from("classifications")
-          .select("content, anomaly, classificationtype")
+          .select("content, anomaly, classificationtype, classificationConfiguration")
           .eq("anomaly", planetId)
-          .eq("classificationtype", "planet-inspection");
+          .in("classificationtype", ["planet-inspection", "planet"]);
 
         if (error) {
           console.error("Error fetching planet stats:", error);
           return null;
         }
 
+        console.log(`[fetchPlanetStats] Planet ${planetId}:`, classifications);
 
         if (classifications && classifications.length > 0) {
+          // First try to find a planet survey classification (from satellite mission)
+          // Look for one that has planet_mass, planet_radius, planet_temp in config
+          const planetSurvey = classifications.find(c => {
+            if (c.classificationtype !== "planet") return false;
+            if (!c.classificationConfiguration) return false;
+            
+            let config;
+            try {
+              config = typeof c.classificationConfiguration === 'string' 
+                ? JSON.parse(c.classificationConfiguration)
+                : c.classificationConfiguration;
+            } catch (e) {
+              return false;
+            }
+            
+            // Check if this config has planet survey data (not other classification data)
+            return config.planet_mass !== undefined || config.planet_radius !== undefined || config.planet_temp !== undefined;
+          });
+          
+          console.log('[fetchPlanetStats] Planet survey found:', planetSurvey);
+          
+          if (planetSurvey && planetSurvey.classificationConfiguration) {
+            let config;
+            try {
+              config = typeof planetSurvey.classificationConfiguration === 'string' 
+                ? JSON.parse(planetSurvey.classificationConfiguration)
+                : planetSurvey.classificationConfiguration;
+            } catch (e) {
+              console.error('[fetchPlanetStats] Failed to parse config:', e);
+              config = planetSurvey.classificationConfiguration;
+            }
+            
+            console.log('[fetchPlanetStats] Parsed config:', config);
+            
+            return {
+              radius: config.planet_radius?.toFixed(2) || config.stellar_radius || "N/A",
+              density: config.planet_density?.toFixed(7) || "N/A",
+              temperature: config.planet_temp?.toFixed(0) || config.stellar_temp || "N/A",
+              mass: config.planet_mass?.toFixed(2) || config.stellar_mass || "N/A",
+              type: config.planet_type || "N/A",
+            };
+          }
+          
+          // Fall back to planet-inspection classification
           const parsedStats = classifications.map((entry) => {
             return parsePlanetStats(entry.content);
           });

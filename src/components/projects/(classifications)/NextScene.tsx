@@ -135,10 +135,15 @@ export default function ClientClassificationPage({ id }: Props) {
         .from("mineralDeposits")
         .select("*")
         .eq("discovery", id)
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
+        console.log("[NextScene] Mineral deposit found:", data);
         setMineralDeposit(data);
+      } else if (error) {
+        console.error("[NextScene] Error fetching mineral deposit:", error);
+      } else {
+        console.log("[NextScene] No mineral deposit for this classification");
       }
     }
 
@@ -526,27 +531,29 @@ export default function ClientClassificationPage({ id }: Props) {
                 <div className="font-medium text-amber-700 dark:text-amber-300">
                   Type:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {getMineralDisplayName(
-                      mineralDeposit.mineralconfiguration.mineralType
-                    )}
+                    {mineralDeposit.mineralconfiguration?.type || 'Unknown'}
                   </span>
                 </div>
                 <div className="font-medium text-amber-700 dark:text-amber-300">
                   Purity:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {mineralDeposit.mineralconfiguration.purity}%
+                    {mineralDeposit.mineralconfiguration?.purity 
+                      ? `${(mineralDeposit.mineralconfiguration.purity * 100).toFixed(1)}%`
+                      : 'N/A'}
                   </span>
                 </div>
                 <div className="font-medium text-amber-700 dark:text-amber-300">
-                  Quantity:{" "}
+                  Amount:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {mineralDeposit.mineralconfiguration.estimatedQuantity}
+                    {mineralDeposit.mineralconfiguration?.amount 
+                      ? `${Math.round(mineralDeposit.mineralconfiguration.amount)} units`
+                      : 'N/A'}
                   </span>
                 </div>
                 <div className="font-medium text-amber-700 dark:text-amber-300">
-                  Difficulty:{" "}
+                  Source:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {mineralDeposit.mineralconfiguration.extractionDifficulty}
+                    {mineralDeposit.mineralconfiguration?.metadata?.source || 'Unknown'}
                   </span>
                 </div>
               </div>

@@ -22,6 +22,7 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     const [loading, setLoading] = useState<boolean>(true);
+    const [hasMineralResearch, setHasMineralResearch] = useState<boolean>(false);
 
     useEffect(() => {  
         async function fetchAnomaly() {
@@ -39,7 +40,7 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
                         .eq("id", anomalyid)
                         .single();
 
-                    if (anomalyError) {
+                    if (anomalyError) { 
                         throw anomalyError;
                     };
 
@@ -132,6 +133,36 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
     
         checkTutorialMission();
       }, [session, supabase]);
+
+    useEffect(() => {
+        async function checkMineralResearch() {
+            if (!session) return;
+
+            console.log("[Cloudspotting] Checking mineral research for user:", session.user.id);
+
+            try {
+                const { data, error } = await supabase
+                    .from("inventory")
+                    .select("id")
+                    .eq("owner", session.user.id)
+                    .eq("item", 3103);
+
+                console.log("[Cloudspotting] Mineral research query result:", { data, error });
+
+                if (error) {
+                    console.error("[Cloudspotting] Error checking mineral research:", error);
+                }
+
+                const hasResearch = !!data && data.length > 0;
+                console.log("[Cloudspotting] Has mineral research:", hasResearch);
+                setHasMineralResearch(hasResearch);
+            } catch (error) {
+                console.error("[Cloudspotting] Exception checking mineral research:", error);
+            }
+        }
+
+        checkMineralResearch();
+    }, [session, supabase]);
     
     // if (!hasMission3000010) {
     // return <CloudspottingOnMarsTutorial anomalyId={anomaly?.id.toString() || "8423850802"} />;
@@ -153,6 +184,61 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
         );
     };
 
+    const handleClassificationComplete = async () => {
+        if (!session || !anomalyid) return;
+
+        console.log("[Cloudspotting] Classification complete callback triggered");
+        console.log("[Cloudspotting] Session:", session.user.id);
+        console.log("[Cloudspotting] Anomaly ID:", anomalyid);
+
+        try {
+            // Import mineral deposit functions
+            const { 
+                attemptMineralDepositCreation, 
+                selectCloudMineral 
+            } = await import("@/src/utils/mineralDepositCreation");
+
+            // Get the most recent classification for this user and anomaly
+            const { data: recentClassification } = await supabase
+                .from("classifications")
+                .select("id")
+                .eq("author", session.user.id)
+                .eq("anomaly", anomalyid)
+                .eq("classificationtype", "cloud")
+                .order("created_at", { ascending: false })
+                .limit(1)
+                .single();
+
+            console.log("[Cloudspotting] Recent classification:", recentClassification);
+
+            if (!recentClassification) {
+                console.log("[Cloudspotting] No recent classification found");
+                return;
+            }
+
+            // Attempt to create mineral deposit
+            const mineralConfig = selectCloudMineral();
+            console.log("[Cloudspotting] Attempting mineral deposit creation with config:", mineralConfig);
+            
+            const depositCreated = await attemptMineralDepositCreation({
+                supabase,
+                userId: session.user.id,
+                anomalyId: parseInt(anomalyid),
+                classificationId: recentClassification.id,
+                mineralConfig,
+                location: `Cloud formation at anomaly ${anomalyid}`
+            });
+
+            if (depositCreated) {
+                console.log(`[Cloudspotting] ✅ SUCCESS! Created ${mineralConfig.type} deposit!`);
+            } else {
+                console.log(`[Cloudspotting] ❌ FAILED to create deposit`);
+            }
+        } catch (error) {
+            console.error("[Cloudspotting] Error in mineral deposit creation:", error);
+        }
+    };
+
     return (
         <div className="w-full h-screen flex flex-col gap-2 px-4">
             <div className="p-4 rounded-md relative w-full h-full md:h-[90vh] lg:h-[90vh] overflow-hidden">
@@ -167,6 +253,7 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
                         parentPlanetLocation={anomalyid?.toString() || ''}
                         annotationType="CoM"
                         className="h-full w-full"
+                        onClassificationComplete={handleClassificationComplete}
                     />
                 )}
             </div>
@@ -304,6 +391,40 @@ export function CloudspottingOnMarsWithId() {
                             parentClassificationId={classificationId ?? undefined}
                             parentPlanetLocation={anomaly.id.toString()}
                             annotationType="CoM"
+                            onClassificationComplete={async () => {
+                                if (!session || !anomaly) return;
+
+                                try {
+                                    const { 
+                                        attemptMineralDepositCreation, 
+                                        selectCloudMineral 
+                                    } = await import("@/src/utils/mineralDepositCreation");
+
+                                    const { data: recentClassification } = await supabase
+                                        .from("classifications")
+                                        .select("id")
+                                        .eq("author", session.user.id)
+                                        .eq("anomaly", parseInt(anomaly.id.toString()))
+                                        .eq("classificationtype", "cloud")
+                                        .order("created_at", { ascending: false })
+                                        .limit(1)
+                                        .single();
+
+                                    if (recentClassification) {
+                                        const mineralConfig = selectCloudMineral();
+                                        await attemptMineralDepositCreation({
+                                            supabase,
+                                            userId: session.user.id,
+                                            anomalyId: parseInt(anomaly.id.toString()),
+                                            classificationId: recentClassification.id,
+                                            mineralConfig,
+                                            location: `Cloud formation at anomaly ${anomaly.id}`
+                                        });
+                                    }
+                                } catch (error) {
+                                    console.error("[CoM] Error in mineral deposit creation:", error);
+                                }
+                            }}
                         />
                     )}
                 </div>

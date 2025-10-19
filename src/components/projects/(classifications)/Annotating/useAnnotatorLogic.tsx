@@ -268,10 +268,10 @@ export function useAnnotatorLogic({
       // Call the completion callback if provided (for tutorial completion)
       if (onClassificationComplete) {
         onClassificationComplete();
-      } else {
-        // Only redirect if no callback is provided
-        router.push(`/next/${classificationData.id}`);
       }
+      
+      // Always redirect after classification submission
+      router.push(`/next/${classificationData.id}`);
     } catch (err) {
       console.error("Error during classification submission:", err);
       alert("Failed to submit classification. Please try again.");
@@ -577,10 +577,10 @@ export function useAnnotatorLogic({
       // Call the completion callback if provided (for tutorial completion)
       if (onClassificationComplete) {
         onClassificationComplete();
-      } else {
-        // Only redirect if no callback is provided
-        router.push(`/next/${classificationData.id}`);
       }
+      
+      // Always redirect after classification submission
+      router.push(`/next/${classificationData.id}`);
     } catch (error: any) {
       console.error("Unexpected error: ", error);
       alert("Classification error occurred. Please try again");
