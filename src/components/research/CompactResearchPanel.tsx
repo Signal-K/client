@@ -71,6 +71,7 @@ export default function CompactResearchPanel() {
   });
 
   const [activeTab, setActiveTab] = useState("available");
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     fetchUpgradeData();
@@ -79,6 +80,7 @@ export default function CompactResearchPanel() {
   const fetchUpgradeData = async () => {
     if (!session?.user) return;
 
+    setLoading(true);
     try {
       // Get researched upgrades
       const { data: researched } = await supabase
@@ -171,6 +173,8 @@ export default function CompactResearchPanel() {
       });
     } catch (error) {
       console.error("Error fetching upgrade data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -388,7 +392,10 @@ export default function CompactResearchPanel() {
       </div>
 
       {/* Upgrade Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      {loading ? (
+        <div className="text-center py-8 text-muted-foreground">Loading upgrades...</div>
+      ) : (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="available" className="flex items-center gap-2">
             Available
@@ -439,7 +446,8 @@ export default function CompactResearchPanel() {
             </div>
           )}
         </TabsContent>
-      </Tabs>
+        </Tabs>
+      )}
 
       {/* Coming Soon Section */}
       <div className="mt-8">
