@@ -208,11 +208,7 @@ const diskDetectorOptions: ClassificationOption[] = [
   },
 ];
 
-export const planetClassificationConfig: FormConfig = {
-  // title: "Planet Classification",
-  richTextFields: 1,
-  options: planetClassificationOptions,
-};
+// planetClassificationConfig removed (unused)
 
 // export const roverImgClassificationConfig: FormConfig = {
 //   title: "Rover Image Classification",

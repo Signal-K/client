@@ -1,40 +1,18 @@
 // Utility functions for SatellitePosition time calculations
 
-export const getNextSaturdayMidnight = (): Date => {
-  const now = new Date();
-  const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
-  let daysUntilSaturday;
-  if (dayOfWeek === 6) {
-    const todayMidnight = new Date(now);
-    todayMidnight.setHours(23, 59, 59, 999);
-    if (now < todayMidnight) {
-      daysUntilSaturday = 0;
-    } else {
-      daysUntilSaturday = 7;
-    }
-  } else {
-    daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
-    if (daysUntilSaturday === 0) daysUntilSaturday = 7;
-  }
-  const nextSaturday = new Date(now);
-  nextSaturday.setDate(now.getDate() + daysUntilSaturday);
-  nextSaturday.setHours(23, 59, 59, 999);
-  return nextSaturday;
-};
-
-export const getTimeSinceDeploy = (deployTime: Date, currentTime: Date): { minutes: number; seconds: number; total: number } => {
-  const now = currentTime.getTime();
-  const deploy = deployTime.getTime();
-  const diffMs = Math.max(0, now - deploy);
-  const totalSeconds = Math.floor(diffMs / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return { minutes, seconds, total: totalSeconds };
-};
+// getNextSaturdayMidnight and getTimeSinceDeploy removed (unused)
 
 export const getTimeUntilWeekEnd = (currentTime: Date): { days: number; hours: number; minutes: number; totalMs: number } => {
   const now = currentTime.getTime();
-  const weekEnd = getNextSaturdayMidnight().getTime();
+  // Inline calculation for next Saturday midnight to avoid dependency on removed helper
+  const nowDate = new Date(currentTime);
+  const dayOfWeek = nowDate.getDay(); // 0 = Sunday, 6 = Saturday
+  let daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
+  if (daysUntilSaturday === 0) daysUntilSaturday = 7;
+  const nextSaturday = new Date(nowDate);
+  nextSaturday.setDate(nowDate.getDate() + daysUntilSaturday);
+  nextSaturday.setHours(23, 59, 59, 999);
+  const weekEnd = nextSaturday.getTime();
   const diffMs = Math.max(0, weekEnd - now);
   const totalMinutes = Math.floor(diffMs / (1000 * 60));
   const totalHours = Math.floor(diffMs / (1000 * 60 * 60));

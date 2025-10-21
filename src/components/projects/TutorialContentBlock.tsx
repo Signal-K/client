@@ -263,43 +263,4 @@ export function createTutorialSlides(slidesData: Array<{
 }
 
 // Export hook for tutorial state management
-export function useTutorial(classificationtype: string) {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-  const [shouldShowTutorial, setShouldShowTutorial] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const checkTutorialStatus = async () => {
-      if (!session?.user?.id) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('classifications')
-          .select('id')
-          .eq('author', session.user.id)
-          .eq('classificationtype', classificationtype)
-          .limit(1);
-
-        if (error) {
-          console.error('Error checking tutorial status:', error);
-          setShouldShowTutorial(false);
-        } else {
-          setShouldShowTutorial(!data || data.length === 0);
-        }
-      } catch (error) {
-        console.error('Error in tutorial status check:', error);
-        setShouldShowTutorial(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkTutorialStatus();
-  }, [session, supabase, classificationtype]);
-
-  return { shouldShowTutorial, loading, setShouldShowTutorial };
-}
+// useTutorial hook removed (deleted per cleanup request)
