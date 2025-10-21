@@ -263,6 +263,4 @@ export default function ActivityPage() {
       />
     </div>
   );
-}
-
-
+};

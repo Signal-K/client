@@ -71,6 +71,12 @@ jspm_packages/
 tmp/
 temp/
 
+# Local storage and export backups (large, not needed in image)
+storage_backup/
+storage_downloads/
+supabase_export/
+supabase_export/**
+
 # Vercel
 .vercel
 

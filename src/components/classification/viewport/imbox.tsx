@@ -1,97 +1,85 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
-import Link from "next/link";
+import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
 import Section from "@/src/components/sections/Section"
-import { useRouter } from "next/navigation";
-import { Bell, Inbox, Sparkles, Wrench } from "lucide-react";
+import React, { useState } from "react"
+import { Inbox, Bell, Wrench, MessageSquare } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
-import VotesList from "@/src/components/social/votesonyours";
-import AwaitingObjects from "@/src/components/deployment/allLinked";
-
-type TabType = "imbox" | "objects";
-
-interface ImboxViewportInterface {
-    mobileMenuOpen: boolean;
-    loading: boolean;
-    activeTab: TabType;
-};
+import VotesList from "@/src/components/social/votesonyours"
+import AwaitingObjects from "@/src/components/deployment/allLinked"
+import InterestingPosts from "@/src/components/social/activity/otherUsersPosts"
 
 export default function ImboxViewport() {
-    const router = useRouter();
+  const supabase = useSupabaseClient()
+  const session = useSession()
 
-    const [state, setState] = useState<ImboxViewportInterface>({
-        loading: true,
-        mobileMenuOpen: false,
-        activeTab: "imbox",
-    });
+  const [activeTab, setActiveTab] = useState<"activity" | "objects" | "posts">("activity")
 
-    const supabase = useSupabaseClient();
-    const session = useSession();
+  return (
+    <Section sectionId="imbox-viewport" variant="viewport" backgroundType="none" expandLink={"/imbox"}>
+      <div className="relative w-full flex flex-col py-4 md:py-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30">
+            <Inbox className="w-5 h-5 text-primary" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground">Inbox</h2>
+        </div>
 
-    const setActiveTab = (tab: TabType) => {
-        setState((prev) => ({ ...prev, activeTab: tab }));
-    };
+        {/* Tabs */}
+        <div className="flex gap-2 mb-4 p-1 bg-muted/50 rounded-lg">
+          <Button
+            size="sm"
+            variant={activeTab === "activity" ? "default" : "ghost"}
+            onClick={() => setActiveTab("activity")}
+            className="flex-1 gap-2"
+          >
+            <Bell className="w-4 h-4" />
+            Activity
+          </Button>
+          <Button
+            size="sm"
+            variant={activeTab === "objects" ? "default" : "ghost"}
+            onClick={() => setActiveTab("objects")}
+            className="flex-1 gap-2"
+          >
+            <Wrench className="w-4 h-4" />
+            Objects
+          </Button>
+          <Button
+            size="sm"
+            variant={activeTab === "posts" ? "default" : "ghost"}
+            onClick={() => setActiveTab("posts")}
+            className="flex-1 gap-2"
+          >
+            <MessageSquare className="w-4 h-4" />
+            Posts
+          </Button>
+        </div>
 
-    return (
-        <Section
-            sectionId="imbox-viewport"
-            variant="viewport"
-            backgroundType="none"
-            expandLink={"/imbox"}
-        >
-            <div className="relative w-full flex flex-col py-4 md:py-6">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30">
-                        <Inbox className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                        <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                            Inbox
-                        </h2>
-                    </div>
-                </div>
-
-                {/* Tab buttons */}
-                <div className="flex gap-2 mb-4 p-1 bg-muted/50 rounded-lg">
-                    <Button
-                        variant={state.activeTab === "imbox" ? "default" : "ghost"}
-                        onClick={() => setActiveTab("imbox")}
-                        className="flex-1 gap-2"
-                        size="sm"
-                    >
-                        <Bell className="w-4 h-4" />
-                        Votes
-                    </Button>
-                    <Button
-                        variant={state.activeTab === "objects" ? "default" : "ghost"}
-                        onClick={() => setActiveTab("objects")}
-                        className="flex-1 gap-2"
-                        size="sm"
-                    >
-                        <Wrench className="w-4 h-4" />
-                        Objects awaiting observation
-                    </Button>
-                </div>
-
-                {/* Tab content */}
-                <div className="flex-1 min-h-[180px] max-h-[400px]">
-                    {state.activeTab === "imbox" && (
-                        <section className="flex-shrink-0">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                                <VotesList />
-                            </div>
-                        </section>
-                    )}
-
-                    {state.activeTab === "objects" && (
-                        <section>
-                            <AwaitingObjects />
-                        </section>
-                    )}
-                </div>
+        {/* Tab content */}
+        <div className="min-h-[180px] max-h-[640px] overflow-auto">
+          {activeTab === "activity" && (
+            <div>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-1">Activity on Your Posts</h3>
+              <VotesList />
             </div>
-        </Section>
-    );
-};
+          )}
+
+          {activeTab === "objects" && (
+            <div>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-1">Objects Awaiting Discovery</h3>
+              <AwaitingObjects />
+            </div>
+          )}
+
+          {activeTab === "posts" && (
+            <div>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-1">Posts You May Like</h3>
+              <InterestingPosts />
+            </div>
+          )}
+        </div>
+      </div>
+    </Section>
+  )
+}
