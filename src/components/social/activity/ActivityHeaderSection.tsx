@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ActivityHeader from "../../scenes/deploy/ActivityHeader";
+import { hasUpgrade } from "@/src/utils/userUpgrades";
 
 interface ActivityHeaderSectionProps {
   classificationsCount: number;
@@ -31,22 +32,15 @@ export default function ActivityHeaderSection({
     if (!session?.user?.id) return;
 
     const fetchUpgradeStatus = async () => {
-      const { data: researched } = await supabase
-        .from("researched")
-        .select("tech_type")
-        .eq("user_id", session.user.id);
+      const hasTelescopeUpgrade = await hasUpgrade(supabase, session.user.id, "probereceptors");
+      const hasSatelliteUpgrade = await hasUpgrade(supabase, session.user.id, "satellitecount");
+      const bothUpgradesUnlocked = hasTelescopeUpgrade && hasSatelliteUpgrade;
 
-      if (researched) {
-        const hasTelescopeUpgrade = researched.some(r => r.tech_type === "probereceptors");
-        const hasSatelliteUpgrade = researched.some(r => r.tech_type === "satellitecount");
-        const bothUpgradesUnlocked = hasTelescopeUpgrade && hasSatelliteUpgrade;
-
-        setUpgradeStatus({
-          hasTelescopeUpgrade,
-          hasSatelliteUpgrade,
-          bothUpgradesUnlocked,
-        });
-      }
+      setUpgradeStatus({
+        hasTelescopeUpgrade,
+        hasSatelliteUpgrade,
+        bothUpgradesUnlocked,
+      });
     };
 
     fetchUpgradeStatus();

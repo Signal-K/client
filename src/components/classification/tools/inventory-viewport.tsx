@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
@@ -12,6 +12,7 @@ import { MineralCard } from "@/src/components/deployment/structures/mineral-card
 import { MineralConfiguration } from "@/src/utils/mineralAnalysis";
 import { Package, Wrench, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { fetchUserUpgrades } from "@/src/utils/userUpgrades";
 
 type TabType = "minerals" | "tools";
 
@@ -19,7 +20,7 @@ interface MineralDeposit {
   mineral: MineralConfiguration;
   location: string;
   quantity: number;
-}
+};
 
 interface InventoryViewportInterface {
     mobileMenuOpen: boolean;
@@ -41,7 +42,7 @@ export default function InventoryViewport() {
 
   if (!session) {
     router.push("/auth");
-  }
+  };
 
   // State management
   const [state, setState] = useState<InventoryViewportInterface>({
@@ -69,67 +70,35 @@ export default function InventoryViewport() {
     const fetchUserData = async () => {
       if (!session?.user?.id) return;
 
-      // Fetch researched upgrades
-      const { data: researchData, error: researchError } = await supabase
-        .from("researched")
-        .select("tech_type, tech_id, created_at")
-        .eq("user_id", session.user.id);
+      // Fetch upgrades using utility function
+      const upgrades = await fetchUserUpgrades(supabase, session.user.id);
 
-      if (!researchError && researchData) {
-        let hasTelescopeUpgrade = false;
-        let satelliteExtras = 0;
-        let hasFindMinerals = false;
-        let derivedRoverLevel = 1;
+      setState((prev) => ({
+        ...prev,
+        telescopeUpgrade: upgrades.telescopeUpgrade,
+        satelliteCount: upgrades.satelliteCount,
+        findMinerals: upgrades.findMinerals,
+        roverLevel: upgrades.roverLevel,
+      }));
 
-        (researchData as any[]).forEach((row) => {
-          const t = (row.tech_type || "").toString().toLowerCase();
+      // Fetch mineral deposits if unlocked
+      if (upgrades.findMinerals) {
+        const { data: deposits, error: depErr } = await supabase
+          .from("mineralDeposits")
+          .select("id, mineralconfiguration, location, roverName, created_at")
+          .not("location", "is", null)
+          .eq("owner", session.user.id);
 
-          if (t.includes("probereceptor") || t.includes("probereceptors")) {
-            hasTelescopeUpgrade = true;
-          }
-
-          if (t.includes("satellite")) {
-            satelliteExtras += 1;
-          }
-
-          if (t.includes("findmineral") || t.includes("findminerals")) {
-            hasFindMinerals = true;
-          }
-
-          if (t.includes("roverwaypoint") || t.includes("roverwaypoints")) {
-            derivedRoverLevel = Math.max(derivedRoverLevel, 2);
-          }
-        });
-
-        setState((prev) => ({
-          ...prev,
-          telescopeUpgrade: hasTelescopeUpgrade,
-          satelliteCount: 1 + satelliteExtras,
-          findMinerals: hasFindMinerals,
-          roverLevel: derivedRoverLevel,
-        }));
-
-        // Fetch mineral deposits if unlocked
-        if (hasFindMinerals) {
-          const { data: deposits, error: depErr } = await supabase
-            .from("mineralDeposits")
-            .select("id, mineralconfiguration, location, roverName, created_at")
-            .not("location", "is", null)
-            .eq("owner", session.user.id);
-
-          if (!depErr && deposits) {
-            setState((prev) => ({
-              ...prev,
-              mineralDeposits: (deposits as any[]).map((row) => ({
-                mineral: row.mineralconfiguration,
-                location: row.location,
-                quantity: row.quantity ?? 1,
-              })),
-              depositLoading: false,
-            }));
-          } else {
-            setState((prev) => ({ ...prev, depositLoading: false }));
-          }
+        if (!depErr && deposits) {
+          setState((prev) => ({
+            ...prev,
+            mineralDeposits: (deposits as any[]).map((row) => ({
+              mineral: row.mineralconfiguration,
+              location: row.location,
+              quantity: row.quantity ?? 1,
+            })),
+            depositLoading: false,
+          }));
         } else {
           setState((prev) => ({ ...prev, depositLoading: false }));
         }

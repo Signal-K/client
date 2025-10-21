@@ -14,6 +14,7 @@ import ToolCard from "@/src/components/deployment/missions/structures/tool-card"
 import { RoverIcon, SatelliteIcon, TelescopeComplexIcon } from "@/src/components/deployment/missions/structures/tool-icons";
 import { Card } from "@/src/components/ui/card";
 import { MineralCard } from "@/src/components/deployment/structures/mineral-card";
+import { fetchUserUpgrades } from "@/src/utils/userUpgrades";
 
 interface MineralDeposit {
   mineral: MineralConfiguration;
@@ -78,51 +79,19 @@ export default function UserInventoryPage() {
 
   // Fetch user's mineral deposits from Supabase
   useEffect(() => {
-    const fetchUserUpgrades = async () => {
+    const fetchUserData = async () => {
       if (!session?.user?.id) return;
 
-      const { data, error } = await supabase
-        .from("researched")
-        .select("tech_type, tech_id, created_at")
-        .eq("user_id", session.user.id);
-
-      if (error || !data) return;
-
-      // derive values from researched rows
-      let hasTelescopeUpgrade = false;
-      let satelliteExtras = 0; // extra increments beyond the base 1
-      let hasFindMinerals = false;
-      let derivedRoverLevel = 1;
-
-      (data as any[]).forEach((row) => {
-        const t = (row.tech_type || "").toString().toLowerCase();
-
-        if (t.includes("probereceptor") || t.includes("probereceptors")) {
-          hasTelescopeUpgrade = true;
-        }
-
-        if (t.includes("satellite")) {
-          // Each matching researched row increments available satellites by 1
-          satelliteExtras += 1;
-        }
-
-        if (t.includes("findmineral") || t.includes("findminerals")) {
-          hasFindMinerals = true;
-        }
-
-        if (t.includes("roverwaypoint") || t.includes("roverwaypoints")) {
-          // rover waypoint research unlocks level 2 rover capabilities
-          derivedRoverLevel = Math.max(derivedRoverLevel, 2);
-        }
-      });
-
-      setTelescopeUpgrade(hasTelescopeUpgrade);
-      setSatelliteCount(1 + satelliteExtras);
-      setFindMinerals(hasFindMinerals);
-      setRoverLevel(derivedRoverLevel);
+      // Fetch upgrades using utility function
+      const upgrades = await fetchUserUpgrades(supabase, session.user.id);
+      
+      setTelescopeUpgrade(upgrades.telescopeUpgrade);
+      setSatelliteCount(upgrades.satelliteCount);
+      setFindMinerals(upgrades.findMinerals);
+      setRoverLevel(upgrades.roverLevel);
 
       // If the user can find minerals, fetch deposits
-      if (hasFindMinerals) {
+      if (upgrades.findMinerals) {
         setDepositLoading(true);
         try {
           // The mineralDeposits table doesn't include a `quantity` column in the DB
@@ -156,7 +125,7 @@ export default function UserInventoryPage() {
       }
     };
 
-    fetchUserUpgrades();
+    fetchUserData();
   }, [session, supabase]);
 
   return (

@@ -18,6 +18,7 @@ import PlanetSelectorModal from "@/src/components/modals/PlanetSelectorModal";
 import useDeploymentStatus from "@/src/hooks/useDeploymentStatus";
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar";
 import SpannerIcon from "@/src/components/icons/SpannerIcon";
+import { hasUpgrade } from "@/src/utils/userUpgrades";
 
 export default function ActivityHeader({
   landmarksExpanded,
@@ -99,28 +100,21 @@ export default function ActivityHeader({
       }
 
       // Get researched upgrades to calculate available upgrades
-      const { data: researched, error: researchError } = await supabase
-        .from("researched")
-        .select("tech_type")
-        .eq("user_id", session.user.id);
-
-      if (!researchError && researched) {
-        const hasTelescopeUpgrade = researched.some(r => r.tech_type === "probereceptors");
-        const hasSatelliteUpgrade = researched.some(r => r.tech_type === "satellitecount");
-        
-        setBothUpgradesUnlocked(hasTelescopeUpgrade && hasSatelliteUpgrade);
-        
-        let upgradeCount = 0;
-        if (!hasTelescopeUpgrade) upgradeCount++;
-        if (!hasSatelliteUpgrade) upgradeCount++;
-        
-        // If both upgrades are unlocked, show projects instead
-        if (hasTelescopeUpgrade && hasSatelliteUpgrade) {
-          upgradeCount = 1; // Show projects notification
-        }
-        
-        setAvailableUpgrades(upgradeCount);
+      const hasTelescopeUpgrade = await hasUpgrade(supabase, session.user.id, "probereceptors");
+      const hasSatelliteUpgrade = await hasUpgrade(supabase, session.user.id, "satellitecount");
+      
+      setBothUpgradesUnlocked(hasTelescopeUpgrade && hasSatelliteUpgrade);
+      
+      let upgradeCount = 0;
+      if (!hasTelescopeUpgrade) upgradeCount++;
+      if (!hasSatelliteUpgrade) upgradeCount++;
+      
+      // If both upgrades are unlocked, show projects instead
+      if (hasTelescopeUpgrade && hasSatelliteUpgrade) {
+        upgradeCount = 1; // Show projects notification
       }
+      
+      setAvailableUpgrades(upgradeCount);
     };
 
     fetchData();

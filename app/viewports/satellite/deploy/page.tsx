@@ -6,6 +6,7 @@ import GameNavbar from "@/src/components/layout/Tes";
 import DeploySatelliteViewport from "@/src/components/scenes/deploy/satellite/DeploySatellite";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import { useEffect, useState } from "react";
+import { hasUpgrade } from "@/src/utils/userUpgrades";
 
 export default function SatelliteDeployPage() {
     const router = useRouter();
@@ -19,19 +20,8 @@ export default function SatelliteDeployPage() {
 
         const check = async () => {
             try {
-                const { data, error } = await supabase
-                    .from("researched")
-                    .select("tech_type")
-                    .eq("user_id", session.user.id)
-                    .eq("tech_type", "satellitecount")
-                    .limit(1)
-
-                if (error) {
-                    console.warn("Error checking researched tech:", error)
-                    return
-                }
-
-                setHasSatelliteUpgrade(Array.isArray(data) && data.length > 0)
+                const upgrade = await hasUpgrade(supabase, session.user.id, "satellitecount");
+                setHasSatelliteUpgrade(upgrade);
             } catch (e) {
                 console.warn("Failed to check researched tech", e)
             }

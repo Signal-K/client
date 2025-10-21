@@ -6,6 +6,7 @@ import { CompactUpgradeCard } from "./CompactUpgradeCard";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { getSatelliteCount } from "@/src/utils/userUpgrades";
 
 interface UpgradeData {
   // Telescope upgrades
@@ -112,6 +113,9 @@ export default function CompactResearchPanel() {
       const findMineralsUnlocked = researched?.some(r => r.tech_type === "findMinerals") || false;
       const p4MineralsUnlocked = researched?.some(r => r.tech_type === "p4Minerals") || false;
 
+      // Use utility function for satellite count
+      const currentSatelliteCount = await getSatelliteCount(supabase, session.user.id);
+
       // Calculate stardust with tiered pricing
       const basePoints = allClassifications?.length || 0;
       
@@ -140,7 +144,7 @@ export default function CompactResearchPanel() {
           available: availableStardust >= 10 && telescopeUpgrades < 1,
         },
         satelliteCount: {
-          current: 1 + satelliteUpgrades,
+          current: currentSatelliteCount,
           max: 2,
           available: availableStardust >= 10 && satelliteUpgrades < 1,
         },

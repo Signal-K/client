@@ -36,6 +36,7 @@ import ProjectSelectionViewport from "@/src/components/onboarding/ProjectSelecti
 import Landing from "./apt/page";
 import InventoryViewport from "@/src/components/classification/tools/inventory-viewport";
 import FeedbackTeaser from "@/src/components/viewports/FeedbackTeaser";
+import ImboxViewport from "@/src/components/classification/viewport/imbox";
 
 type PageSatellite = {
   id: string;
@@ -134,6 +135,8 @@ export default function ActivityPage() {
 
         {/* Feedback Teaser - Bumble game announcement */}
         <FeedbackTeaser />
+
+        <ImboxViewport />
 
         {/* Inventory Viewport - Only show if user has mineral deposits with roverName */}
         {hasRoverMineralDeposits && <InventoryViewport />}
@@ -261,3 +264,5 @@ export default function ActivityPage() {
     </div>
   );
 }
+
+
