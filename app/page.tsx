@@ -30,8 +30,6 @@ import SatellitePosition from "@/src/components/scenes/deploy/satellite/Satellit
 import SolarHealth from "@/src/components/scenes/deploy/solar/SolarHealth";
 import TelescopeViewportSection from "@/src/components/scenes/deploy/Telescope/TelescopeSection";
 import RoverViewportSection from "@/src/components/scenes/deploy/Rover/RoverSection";
-import ViewportSkillTree from "@/src/components/research/section/skillTreeSection";
-import ResearchSkillViewport from "@/src/components/research/section/skillTreeSection";
 import ProjectSelectionViewport from "@/src/components/onboarding/ProjectSelectionViewport";
 import Landing from "./apt/page";
 import InventoryViewport from "@/src/components/classification/tools/inventory-viewport";
@@ -175,7 +173,6 @@ export default function ActivityPage() {
               flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
             />
             <RoverViewportSection />
-            <ResearchSkillViewport />
             <SolarHealth />
           </>
         )}

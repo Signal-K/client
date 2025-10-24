@@ -7,19 +7,24 @@ import { usePageData } from "@/hooks/usePageData";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
-import { MineralConfiguration } from "@/src/utils/mineralAnalysis";
 import { Button } from "@/src/components/ui/button";
 import { ArrowRight, Wrench } from "lucide-react";
 import ToolCard from "@/src/components/deployment/missions/structures/tool-card";
 import { RoverIcon, SatelliteIcon, TelescopeComplexIcon } from "@/src/components/deployment/missions/structures/tool-icons";
 import { Card } from "@/src/components/ui/card";
-import { MineralCard } from "@/src/components/deployment/structures/mineral-card";
+import {
+  MineralExtraction,
+  type MineralConfiguration,
+} from "@/src/components/deployment/extraction/mineral-extraction";
 import { fetchUserUpgrades } from "@/src/utils/userUpgrades";
 
 interface MineralDeposit {
+  id: number;
   mineral: MineralConfiguration;
   location: string;
-  quantity: number;
+  roverName?: string;
+  projectType: "P4" | "cloudspotting" | "JVH" | "AI4M";
+  discoveryId?: number;
 }
 
 export default function UserInventoryPage() {
@@ -98,7 +103,9 @@ export default function UserInventoryPage() {
           // so only select actual columns. Provide a fallback quantity when mapping.
           const { data: deposits, error: depErr } = await supabase
             .from("mineralDeposits")
-            .select("id, mineralconfiguration, location, roverName, created_at")
+            .select(
+              "id, mineralconfiguration, location, roverName, created_at, discovery"
+            )
             .not("location", "is", null)
             .eq("owner", session.user.id);
 
@@ -107,12 +114,18 @@ export default function UserInventoryPage() {
             setMineralDeposits([]);
           } else if (deposits) {
             setMineralDeposits(
-              (deposits as any[]).map((row) => ({
-                mineral: row.mineralconfiguration,
-                location: row.location,
-                // Table doesn't have quantity column; default to 1 if missing
-                quantity: row.quantity ?? 1,
-              }))
+              (deposits as any[]).map(
+                (row) =>
+                  ({
+                    id: row.id,
+                    mineral: row.mineralconfiguration,
+                    location: row.location,
+                    roverName: row.roverName,
+                    projectType: (row.mineralconfiguration as any)?.metadata
+                      ?.source,
+                    discoveryId: row.discovery,
+                  } as MineralDeposit)
+              )
             );
           }
         } finally {
@@ -222,12 +235,15 @@ export default function UserInventoryPage() {
                 ) : (
                     <div className="overflow-y-auto pr-2 -mr-2">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pb-2">
-                            {mineralDeposits.map((deposit, idx) => (
-                                <MineralCard
-                                    key={`${deposit.mineral.mineralType}-${idx}`}
-                                    mineral={deposit.mineral}
+                            {mineralDeposits.map((deposit) => (
+                                <MineralExtraction
+                                    key={deposit.id}
+                                    id={deposit.id}
+                                    mineralConfiguration={deposit.mineral}
                                     location={deposit.location}
-                                    quantity={deposit.quantity}
+                                    roverName={deposit.roverName}
+                                    projectType={deposit.projectType}
+                                    discoveryId={deposit.discoveryId}
                                 />
                             ))}
                         </div>
