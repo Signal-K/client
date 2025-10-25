@@ -34,6 +34,8 @@ interface InventoryViewportInterface {
     satelliteCount: number;
     roverLevel: number;
     findMinerals: boolean;
+    hasRoverExtraction: boolean;
+    hasSatelliteExtraction: boolean;
 };
 
 export default function InventoryViewport() {
@@ -57,6 +59,8 @@ export default function InventoryViewport() {
     satelliteCount: 1,
     roverLevel: 1,
     findMinerals: false,
+    hasRoverExtraction: false,
+    hasSatelliteExtraction: false,
   });
 
   const setMobileMenuOpen = ( open: boolean ) => {
@@ -75,12 +79,23 @@ export default function InventoryViewport() {
       // Fetch upgrades using utility function
       const upgrades = await fetchUserUpgrades(supabase, session.user.id);
 
+      // Fetch extraction research status
+      const { data: researched } = await supabase
+        .from("researched")
+        .select("tech_type")
+        .eq("user_id", session.user.id);
+
+      const hasRoverExtraction = researched?.some(r => r.tech_type === "roverExtraction") || false;
+      const hasSatelliteExtraction = researched?.some(r => r.tech_type === "satelliteExtraction") || false;
+
       setState((prev) => ({
         ...prev,
         telescopeUpgrade: upgrades.telescopeUpgrade,
         satelliteCount: upgrades.satelliteCount,
         findMinerals: upgrades.findMinerals,
         roverLevel: upgrades.roverLevel,
+        hasRoverExtraction,
+        hasSatelliteExtraction,
       }));
 
       // Fetch mineral deposits if unlocked
@@ -130,11 +145,11 @@ export default function InventoryViewport() {
         <div className="relative w-full flex flex-col py-4 md:py-6 h-full">
             {/* Header with icon and gradient accent */}
             <div className="flex items-center gap-3 mb-4 flex-shrink-0">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center">
                     <Package className="w-5 h-5 text-primary" />
                 </div>
-                <div className="flex-1">
-                    <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                <div className="flex-1 flex items-center">
+                    <h2 className="text-xl font-bold text-foreground flex items-center gap-2 w-full">
                         Inventory
                         {state.mineralDeposits.length > 0 && (
                             <span className="text-xs font-normal text-muted-foreground">
@@ -150,7 +165,7 @@ export default function InventoryViewport() {
                 <Button
                     variant={state.activeTab === "minerals" ? "default" : "ghost"}
                     onClick={() => setActiveTab("minerals")}
-                    className="flex-1 gap-2"
+                    className="flex-1 gap-2 flex items-center justify-center"
                     size="sm"
                 >
                     <Sparkles className="w-4 h-4" />
@@ -159,7 +174,7 @@ export default function InventoryViewport() {
                 <Button
                     variant={state.activeTab === "tools" ? "default" : "ghost"}
                     onClick={() => setActiveTab("tools")}
-                    className="flex-1 gap-2"
+                    className="flex-1 gap-2 flex items-center justify-center"
                     size="sm"
                 >
                     <Wrench className="w-4 h-4" />
@@ -168,11 +183,11 @@ export default function InventoryViewport() {
             </div>
 
             {/* Tab Content - Compact height */}
-            <div className="flex-1 min-h-0 overflow-hidden">
+            <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
                 {state.activeTab === "tools" && (
-                    <section className="flex-shrink-0 h-full">
+                    <section className="flex-shrink-0 h-full flex flex-col justify-center">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 h-full">
-                            <Link href="/structures/telescope" className="flex">
+                            <Link href="/structures/telescope" className="flex h-full">
                                 <ToolCard
                                     icon={<TelescopeComplexIcon hasVisual={state.telescopeUpgrade} />}                        
                                     name="Telescope Complex"
@@ -181,7 +196,7 @@ export default function InventoryViewport() {
                                     description={state.telescopeUpgrade ? "Radio + Visual" : "Radio Telescope"}
                                 />
                             </Link>
-                            <Link href="/viewports/satellite" className="flex">
+                            <Link href="/viewports/satellite" className="flex h-full">
                                 <ToolCard
                                     icon={<SatelliteIcon count={state.satelliteCount} />}
                                     name="Weather Satellite"
@@ -190,7 +205,7 @@ export default function InventoryViewport() {
                                     description="Orbital monitoring"
                                 />
                             </Link>
-                            <Link href="/viewports/roover" className="flex">
+                            <Link href="/viewports/roover" className="flex h-full">
                                 <ToolCard
                                     icon={<RoverIcon level={state.roverLevel} />}
                                     name="Investigative Rover"
@@ -204,7 +219,7 @@ export default function InventoryViewport() {
                 )}
 
                 {state.activeTab === "minerals" && (
-                    <section className="flex-1 flex flex-col min-h-0 h-full">
+                    <section className="flex-1 flex flex-col min-h-0 h-full justify-center">
                         {state.depositLoading ? (
                             <Card className="p-4 text-center bg-muted/30 flex items-center justify-center h-full">
                                 <p className="text-sm text-muted-foreground">Loading deposits...</p>
@@ -224,19 +239,29 @@ export default function InventoryViewport() {
                                 </p>
                             </Card>
                         ) : (
-                            <div className="overflow-y-auto pr-1 -mr-1 h-full">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-1">
-                                    {state.mineralDeposits.map((deposit) => (
-                                        <MineralExtraction
-                                            key={deposit.id}
-                                            id={deposit.id}
-                                            mineralConfiguration={deposit.mineral}
-                                            location={deposit.location}
-                                            roverName={deposit.roverName}
-                                            projectType={deposit.projectType}
-                                            discoveryId={deposit.discoveryId}
-                                        />
-                                    ))}
+                            <div className="relative w-full h-full">
+                                {/* Left scroll indicator */}
+                                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/80 to-transparent pointer-events-none z-10" />
+                                {/* Right scroll indicator */}
+                                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/80 to-transparent pointer-events-none z-10" />
+                                
+                                <div className="overflow-x-auto w-full h-full scrollbar-hide">
+                                    <div className="flex flex-row gap-6 pb-4 px-2 min-w-min min-h-[360px]">
+                                        {state.mineralDeposits.map((deposit) => (
+                                            <div key={deposit.id} className="flex-shrink-0 w-[420px] h-[360px]">
+                                                <MineralExtraction
+                                                    id={deposit.id}
+                                                    mineralConfiguration={deposit.mineral}
+                                                    location={deposit.location}
+                                                    roverName={deposit.roverName}
+                                                    projectType={deposit.projectType}
+                                                    discoveryId={deposit.discoveryId}
+                                                    hasRoverExtraction={state.hasRoverExtraction}
+                                                    hasSatelliteExtraction={state.hasSatelliteExtraction}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         )}

@@ -45,6 +45,8 @@ export default function UserInventoryPage() {
   const [roverLevel, setRoverLevel] = useState<number>(1);
   const [findMinerals, setFindMinerals] = useState<boolean>(false);
   const [depositLoading, setDepositLoading] = useState<boolean>(false);
+  const [hasRoverExtraction, setHasRoverExtraction] = useState<boolean>(false);
+  const [hasSatelliteExtraction, setHasSatelliteExtraction] = useState<boolean>(false);
 
   useEffect(() => {
     let mounted = true;
@@ -94,6 +96,18 @@ export default function UserInventoryPage() {
       setSatelliteCount(upgrades.satelliteCount);
       setFindMinerals(upgrades.findMinerals);
       setRoverLevel(upgrades.roverLevel);
+
+      // Fetch extraction research status
+      const { data: researched } = await supabase
+        .from("researched")
+        .select("tech_type")
+        .eq("user_id", session.user.id);
+
+      const roverExtraction = researched?.some(r => r.tech_type === "roverExtraction") || false;
+      const satelliteExtraction = researched?.some(r => r.tech_type === "satelliteExtraction") || false;
+      
+      setHasRoverExtraction(roverExtraction);
+      setHasSatelliteExtraction(satelliteExtraction);
 
       // If the user can find minerals, fetch deposits
       if (upgrades.findMinerals) {
@@ -244,6 +258,8 @@ export default function UserInventoryPage() {
                                     roverName={deposit.roverName}
                                     projectType={deposit.projectType}
                                     discoveryId={deposit.discoveryId}
+                                    hasRoverExtraction={hasRoverExtraction}
+                                    hasSatelliteExtraction={hasSatelliteExtraction}
                                 />
                             ))}
                         </div>

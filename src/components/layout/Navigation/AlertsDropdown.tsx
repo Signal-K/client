@@ -375,11 +375,11 @@ export default function ResponsiveAlerts() {
       <div className="hidden md:block">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative group">
-              <Bell className="h-5 w-5 text-[#81A1C1] group-hover:text-[#88C0D0] transition-colors" />
-              <span className="ml-2 text-[#ECEFF4]">Alerts</span>
+            <Button variant="ghost" className="relative group flex items-center h-8">
+              <Bell className="h-4 w-4 text-[#81A1C1] group-hover:text-[#88C0D0] transition-colors flex-shrink-0" />
+              <span className="ml-1 text-[#ECEFF4] text-sm whitespace-nowrap">Alerts</span>
               {hasNewAlert && (
-                <Badge className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-500 text-white h-5 w-5 flex items-center justify-center p-0 text-xs">
+                <Badge className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-500 text-white h-4 w-4 flex items-center justify-center p-0 text-xs">
                   {newNotificationsCount}
                 </Badge>
               )}

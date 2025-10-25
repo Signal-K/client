@@ -1,4 +1,19 @@
 # Development commands for Supabase setup
+# QUICK START OPTIONS (use these first!)
+quick-start:
+	@./scripts/docker-quick-start.sh
+
+quick-stop:
+	@./scripts/docker-stop-all.sh
+
+docker-status:
+	@./scripts/docker-status.sh
+
+# FULL REBUILD (if quick-start fails)
+clean-build:
+	@./scripts/docker-clean-build.sh
+
+# Traditional Docker commands
 up:
 	docker-compose up
 

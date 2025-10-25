@@ -105,10 +105,10 @@ export function MissionsPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" className="text-white px-2">
-          <Trophy className="h-5 w-5 text-amber-400 group-hover:text-amber-300 transition-colors" />
-          <span className="ml-2 text-white">Milestones</span>
-          <Badge className="ml-1 bg-amber-600 hover:bg-amber-600 text-white">3</Badge>
+        <Button variant="ghost" className="text-white px-2 flex items-center h-8">
+          <Trophy className="h-4 w-4 text-amber-400 group-hover:text-amber-300 transition-colors flex-shrink-0" />
+          <span className="ml-1 text-white text-sm whitespace-nowrap">Milestones</span>
+          <Badge className="ml-1 bg-amber-600 hover:bg-amber-600 text-white text-xs h-5 w-5 flex items-center justify-center p-0">3</Badge>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0 bg-gradient-to-b from-[#0f172a] to-[#020617] backdrop-blur-md border border-[#581c87] shadow-[0_0_15px_rgba(124,58,237,0.5)]">

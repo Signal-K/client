@@ -31,7 +31,7 @@ export default function ImboxViewport() {
             size="sm"
             variant={activeTab === "activity" ? "default" : "ghost"}
             onClick={() => setActiveTab("activity")}
-            className="flex-1 gap-2"
+            className="flex-1 gap-2 flex items-center justify-center"
           >
             <Bell className="w-4 h-4" />
             Activity
@@ -40,7 +40,7 @@ export default function ImboxViewport() {
             size="sm"
             variant={activeTab === "objects" ? "default" : "ghost"}
             onClick={() => setActiveTab("objects")}
-            className="flex-1 gap-2"
+            className="flex-1 gap-2 flex items-center justify-center"
           >
             <Wrench className="w-4 h-4" />
             Objects
@@ -49,7 +49,7 @@ export default function ImboxViewport() {
             size="sm"
             variant={activeTab === "posts" ? "default" : "ghost"}
             onClick={() => setActiveTab("posts")}
-            className="flex-1 gap-2"
+            className="flex-1 gap-2 flex items-center justify-center"
           >
             <MessageSquare className="w-4 h-4" />
             Posts

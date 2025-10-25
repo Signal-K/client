@@ -42,6 +42,17 @@ interface UpgradeData {
     available: boolean;
   },
 
+  // Extraction method upgrades
+  roverExtraction: {
+    unlocked: boolean;
+    available: boolean;
+  };
+
+  satelliteExtraction: {
+    unlocked: boolean;
+    available: boolean;
+  };
+
   // Data/measurement upgrades
   spectroscopy: {
     unlocked: boolean;
@@ -65,6 +76,8 @@ export default function CompactResearchPanel() {
     spectroscopy: { unlocked: false, available: false },
     findMinerals: { unlocked: false, available: false },
     p4FindMinerals: { unlocked: false, available: false },
+    roverExtraction: { unlocked: false, available: false },
+    satelliteExtraction: { unlocked: false, available: false },
     asteroidClassifications: 0,
     cloudClassifications: 0,
     availableStardust: 0,
@@ -114,6 +127,8 @@ export default function CompactResearchPanel() {
       const spectroscopyUnlocked = researched?.some(r => r.tech_type === "spectroscopy") || false;
       const findMineralsUnlocked = researched?.some(r => r.tech_type === "findMinerals") || false;
       const p4MineralsUnlocked = researched?.some(r => r.tech_type === "p4Minerals") || false;
+      const roverExtractionUnlocked = researched?.some(r => r.tech_type === "roverExtraction") || false;
+      const satelliteExtractionUnlocked = researched?.some(r => r.tech_type === "satelliteExtraction") || false;
 
       // Use utility function for satellite count
       const currentSatelliteCount = await getSatelliteCount(supabase, session.user.id);
@@ -166,6 +181,14 @@ export default function CompactResearchPanel() {
         p4FindMinerals: {
           unlocked: p4MineralsUnlocked,
           available: availableStardust >= 2 && !p4MineralsUnlocked,
+        },
+        roverExtraction: {
+          unlocked: roverExtractionUnlocked,
+          available: availableStardust >= 2 && !roverExtractionUnlocked && findMineralsUnlocked,
+        },
+        satelliteExtraction: {
+          unlocked: satelliteExtractionUnlocked,
+          available: availableStardust >= 2 && !satelliteExtractionUnlocked && p4MineralsUnlocked,
         },
         asteroidClassifications: asteroidClassifications?.length || 0,
         cloudClassifications: cloudClassifications?.length || 0,
@@ -256,6 +279,28 @@ export default function CompactResearchPanel() {
       cost: 2,
       available: upgradeData.p4FindMinerals.available,
       onUpgrade: () => handleUpgrade("p4Minerals", 2),
+    }] : []),
+    
+    // Rover Extraction Method
+    ...(!upgradeData.roverExtraction.unlocked ? [{
+      id: "roverExtraction",
+      title: "Rover Mineral Extraction",
+      description: "Equip your rovers with drilling and excavation tools to extract mineral deposits from the Martian surface. Unlock the ability to harvest iron ore, silicates, and other valuable resources discovered during AI4Mars surveys.",
+      category: "rover" as const,
+      cost: 2,
+      available: upgradeData.roverExtraction.available,
+      onUpgrade: () => handleUpgrade("roverExtraction", 2),
+    }] : []),
+
+    // Satellite Extraction Method
+    ...(!upgradeData.satelliteExtraction.unlocked ? [{
+      id: "satelliteExtraction",
+      title: "Atmospheric Resource Collection",
+      description: "Deploy atmospheric collectors and spectral analysis equipment to your satellites. Extract water ice, CO2 ice, and atmospheric vapours from exoplanets discovered through P4 and cloudspotting missions.",
+      category: "satellite" as const,
+      cost: 2,
+      available: upgradeData.satelliteExtraction.available,
+      onUpgrade: () => handleUpgrade("satelliteExtraction", 2),
     }] : []),
     
     // Spectroscopy (Data/Measurement - 2 stardust)

@@ -28,6 +28,8 @@ export interface MineralDepositProps {
   roverName?: string
   projectType: "P4" | "cloudspotting" | "JVH" | "AI4M"
   onExtract?: () => void
+  hasRoverExtraction?: boolean
+  hasSatelliteExtraction?: boolean
 }
 
 const mineralConfig = {
@@ -62,6 +64,8 @@ export function MineralExtraction({
   discoveryId,
   roverName,
   projectType,
+  hasRoverExtraction = false,
+  hasSatelliteExtraction = false,
 }: MineralDepositProps) {
   const router = useRouter()
 
@@ -112,6 +116,7 @@ export function MineralExtraction({
 
   // Rover-based only for AI4M (rover surveys). P4 is satellite-based.
   const isRoverBased = projectType === "AI4M"
+  const isSatelliteBased = projectType === "P4" || projectType === "cloudspotting" || projectType === "JVH"
 
   const MineralIcon = config.icon || Gem
 
@@ -126,6 +131,16 @@ export function MineralExtraction({
   const difficultyLabel = String(config.difficulty || difficultyKey)
 
   const handleExtract = () => {
+    // Check if user has the required extraction research
+    if (isRoverBased && !hasRoverExtraction) {
+      router.push("/research")
+      return
+    }
+    if (isSatelliteBased && !hasSatelliteExtraction) {
+      router.push("/research")
+      return
+    }
+    
     router.push(`/extraction/${id}`)
   }
 
@@ -136,24 +151,24 @@ export function MineralExtraction({
   }
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      <CardHeader className="pb-3">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+      <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
-            <div className={`${config.color} p-3 rounded-lg shadow-md`}>
+            <div className={`${config.color} p-3 rounded-lg shadow-md flex-shrink-0`}>
               <MineralIcon className="w-6 h-6 text-white" />
             </div>
-            <div className="flex-1 space-y-1">
+            <div className="flex-1 space-y-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <CardTitle className="text-xl">{displayName}</CardTitle>
-                <Badge variant="outline" className="capitalize text-xs">
+                <CardTitle className="text-xl line-clamp-1">{displayName}</CardTitle>
+                <Badge variant="outline" className="capitalize text-xs flex-shrink-0">
                   {projectType}
                 </Badge>
               </div>
               {location && (
-                <CardDescription className="flex items-center gap-1 text-xs">
-                  <MapPin className="w-3 h-3" />
-                  {location}
+                <CardDescription className="flex items-center gap-1 text-xs line-clamp-2">
+                  <MapPin className="w-3 h-3 flex-shrink-0" />
+                  <span>{location}</span>
                 </CardDescription>
               )}
             </div>
@@ -161,7 +176,7 @@ export function MineralExtraction({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 flex-shrink-0 overflow-y-auto">
         <div className="grid grid-cols-3 gap-3 text-sm">
           <div className="space-y-1">
             <p className="text-muted-foreground text-xs">Purity</p>
@@ -169,7 +184,7 @@ export function MineralExtraction({
           </div>
           <div className="space-y-1">
             <p className="text-muted-foreground text-xs">Quantity</p>
-            <p className="font-semibold">{quantity} units</p>
+            <p className="font-semibold text-xs line-clamp-2">{quantity} units</p>
           </div>
           <div className="space-y-1">
             <p className="text-muted-foreground text-xs">Difficulty</p>
@@ -180,9 +195,9 @@ export function MineralExtraction({
         </div>
 
         <div className="bg-muted/50 rounded-lg p-3 space-y-1">
-          <div className="flex items-center gap-2 text-sm">
-            {isRoverBased ? <Drill className="w-4 h-4 text-primary" /> : <Satellite className="w-4 h-4 text-primary" />}
-            <span className="font-medium">
+          <div className="flex items-center gap-2 text-sm min-w-0">
+            {isRoverBased ? <Drill className="w-4 h-4 text-primary flex-shrink-0" /> : <Satellite className="w-4 h-4 text-primary flex-shrink-0" />}
+            <span className="font-medium line-clamp-1">
               {isRoverBased ? `Rover: ${roverName || "Unknown"}` : "Satellite Analysis"}
             </span>
           </div>
@@ -190,10 +205,12 @@ export function MineralExtraction({
         </div>
       </CardContent>
 
-      <CardFooter className="flex gap-2">
+      <CardFooter className="flex gap-2 mt-auto flex-shrink-0">
         <Button onClick={handleExtract} className="flex-1" size="sm">
           {isRoverBased ? <Drill className="w-4 h-4 mr-2" /> : <Satellite className="w-4 h-4 mr-2" />}
-          Extract
+          {(isRoverBased && !hasRoverExtraction) || (isSatelliteBased && !hasSatelliteExtraction) 
+            ? "Research Extraction" 
+            : "Extract"}
         </Button>
         {discoveryId && (
           <Button variant="outline" size="sm" onClick={handleViewDiscovery}>
