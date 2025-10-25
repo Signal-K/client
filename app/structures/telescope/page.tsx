@@ -7,6 +7,7 @@ import { Dialog, DialogContent } from "@/src/components/ui/dialog";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import TelescopeViewport from "@/src/components/classification/telescope/telescope-viewport";
 import { useState, useEffect } from "react";
+import Landing from "@/app/apt/page";
 
 export default function TelescopeOnEarthPage() {
   const router = useRouter();
@@ -50,7 +51,7 @@ export default function TelescopeOnEarthPage() {
     }
   }, [session, supabase, router]);
 
-  if (!session) return <Home />;
+  if (!session) return <Landing />;
 
   // Show loading state while checking access
   if (isChecking) {
