@@ -59,9 +59,16 @@ interface UpgradeData {
     available: boolean;
   };
 
+  // Planet Hunters NGTS upgrade
+  ngtsAccess: {
+    unlocked: boolean;
+    available: boolean;
+  };
+
   // Progress data
   asteroidClassifications: number;
   cloudClassifications: number;
+  planetClassifications: number;
   availableStardust: number;
 }
 
@@ -78,8 +85,10 @@ export default function CompactResearchPanel() {
     p4FindMinerals: { unlocked: false, available: false },
     roverExtraction: { unlocked: false, available: false },
     satelliteExtraction: { unlocked: false, available: false },
+    ngtsAccess: { unlocked: false, available: false },
     asteroidClassifications: 0,
     cloudClassifications: 0,
+    planetClassifications: 0,
     availableStardust: 0,
   });
 
@@ -120,6 +129,12 @@ export default function CompactResearchPanel() {
         .eq("author", session.user.id)
         .eq("classificationtype", "cloud");
 
+      const { data: planetClassifications } = await supabase
+        .from("classifications")
+        .select("id")
+        .eq("author", session.user.id)
+        .eq("classificationtype", "planet");
+
       // Calculate current upgrade levels
       const telescopeUpgrades = researched?.filter(r => r.tech_type === "probereceptors").length || 0;
       const satelliteUpgrades = researched?.filter(r => r.tech_type === "satellitecount").length || 0;
@@ -129,6 +144,7 @@ export default function CompactResearchPanel() {
       const p4MineralsUnlocked = researched?.some(r => r.tech_type === "p4Minerals") || false;
       const roverExtractionUnlocked = researched?.some(r => r.tech_type === "roverExtraction") || false;
       const satelliteExtractionUnlocked = researched?.some(r => r.tech_type === "satelliteExtraction") || false;
+      const ngtsAccessUnlocked = researched?.some(r => r.tech_type === "ngtsAccess") || false;
 
       // Use utility function for satellite count
       const currentSatelliteCount = await getSatelliteCount(supabase, session.user.id);
@@ -190,8 +206,13 @@ export default function CompactResearchPanel() {
           unlocked: satelliteExtractionUnlocked,
           available: availableStardust >= 2 && !satelliteExtractionUnlocked && p4MineralsUnlocked,
         },
+        ngtsAccess: {
+          unlocked: ngtsAccessUnlocked,
+          available: availableStardust >= 2 && !ngtsAccessUnlocked && (planetClassifications?.length || 0) >= 4,
+        },
         asteroidClassifications: asteroidClassifications?.length || 0,
         cloudClassifications: cloudClassifications?.length || 0,
+        planetClassifications: planetClassifications?.length || 0,
         availableStardust,
       });
     } catch (error) {
@@ -274,6 +295,20 @@ export default function CompactResearchPanel() {
       cost: 2,
       available: upgradeData.spectroscopy.available,
       onUpgrade: () => handleUpgrade("spectroscopy", 2),
+    }] : []),
+
+    // Planet Hunters NGTS (Project/Data - 2 stardust)
+    ...(!upgradeData.ngtsAccess.unlocked ? [{
+      id: "ngtsAccess",
+      title: "Planet Hunters: Next Generation",
+      description: "Unlock access to NGTS (Next-Generation Transit Survey) data from ESO's robotic telescope array in Chile. Detect exoplanet transits with high-precision measurements for mass and composition analysis.",
+      category: "telescope" as const,
+      subcategory: "project" as const,
+      cost: 2,
+      available: upgradeData.ngtsAccess.available,
+      isLocked: !upgradeData.ngtsAccess.available && upgradeData.planetClassifications < 4,
+      requirementText: upgradeData.planetClassifications < 4 ? `${upgradeData.planetClassifications}/4 planet classifications` : undefined,
+      onUpgrade: () => handleUpgrade("ngtsAccess", 2),
     }] : []),
 
     // MINING UPGRADES
@@ -401,6 +436,17 @@ export default function CompactResearchPanel() {
       id: "spectroscopy-complete",
       title: "Spectroscopy Data",
       description: "Spectroscopic analysis is now available for all planetary observations.",
+      category: "telescope" as const,
+      subcategory: "project" as const,
+      cost: 0,
+      available: false,
+      onUpgrade: () => {},
+    }] : []),
+
+    ...(upgradeData.ngtsAccess.unlocked ? [{
+      id: "ngtsAccess-complete",
+      title: "Planet Hunters: Next Generation",
+      description: "NGTS data access enabled. Your telescope can now detect exoplanet transits with high-precision measurements.",
       category: "telescope" as const,
       subcategory: "project" as const,
       cost: 0,

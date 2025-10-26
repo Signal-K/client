@@ -109,9 +109,13 @@ export default function InventoryViewport() {
           .eq("owner", session.user.id);
 
         if (!depErr && deposits) {
-          setState((prev) => ({
-            ...prev,
-            mineralDeposits: (deposits as any[]).map(
+          // Filter out deposits with quantity <= 0
+          const validDeposits = (deposits as any[])
+            .filter((row) => {
+              const quantity = row.mineralconfiguration?.amount || row.mineralconfiguration?.quantity || 0;
+              return quantity > 0;
+            })
+            .map(
               (row) =>
                 ({
                   id: row.id,
@@ -121,7 +125,11 @@ export default function InventoryViewport() {
                   projectType: (row.mineralconfiguration as any)?.metadata?.source,
                   discoveryId: row.discovery,
                 } as MineralDeposit)
-            ),
+            );
+
+          setState((prev) => ({
+            ...prev,
+            mineralDeposits: validDeposits,
             depositLoading: false,
           }));
         } else {

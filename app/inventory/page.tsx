@@ -127,8 +127,13 @@ export default function UserInventoryPage() {
             console.error("Error fetching mineral deposits:", depErr);
             setMineralDeposits([]);
           } else if (deposits) {
-            setMineralDeposits(
-              (deposits as any[]).map(
+            // Filter out deposits with quantity <= 0
+            const validDeposits = (deposits as any[])
+              .filter((row) => {
+                const quantity = row.mineralconfiguration?.amount || row.mineralconfiguration?.quantity || 0;
+                return quantity > 0;
+              })
+              .map(
                 (row) =>
                   ({
                     id: row.id,
@@ -139,8 +144,9 @@ export default function UserInventoryPage() {
                       ?.source,
                     discoveryId: row.discovery,
                   } as MineralDeposit)
-              )
-            );
+              );
+            
+            setMineralDeposits(validDeposits);
           }
         } finally {
           setDepositLoading(false);

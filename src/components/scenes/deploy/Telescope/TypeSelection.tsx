@@ -2,9 +2,10 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Badge } from "@/src/components/ui/badge"
-import { Telescope, Sun, Target, Info, ArrowLeft } from "lucide-react"
+import { Telescope, Sun, Target, Info, ArrowLeft, Sparkles } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
-import React from "react"
+import React, { useEffect, useState } from "react"
+import { useSupabaseClient } from "@supabase/auth-helpers-react"
 
 export default function TypeSelection({
   onChooseType,
@@ -15,6 +16,26 @@ export default function TypeSelection({
   onBack: () => void
   session?: any
 }) {
+  const supabase = useSupabaseClient()
+  const [hasNGTSAccess, setHasNGTSAccess] = useState(false)
+
+  useEffect(() => {
+    const checkNGTSAccess = async () => {
+      if (!session?.user?.id) return
+      
+      const { data } = await supabase
+        .from("researched")
+        .select("tech_type")
+        .eq("user_id", session.user.id)
+        .eq("tech_type", "ngtsAccess")
+        .single()
+      
+      setHasNGTSAccess(!!data)
+    }
+    
+    checkNGTSAccess()
+  }, [session, supabase])
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#002439] to-[#001a2a] flex items-center justify-center p-2 sm:p-4 py-4 sm:py-8 overflow-y-auto">
       <Card className="bg-[#002439]/95 border-2 border-[#78cce2] max-w-5xl w-full shadow-2xl backdrop-blur-sm my-2">
@@ -116,6 +137,18 @@ export default function TypeSelection({
                     Search for potentially habitable worlds and catalog small bodies.
                   </div>
                 </div>
+
+                {hasNGTSAccess && (
+                  <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 p-2 sm:p-3 rounded-lg border border-purple-400/30 mt-2 sm:mt-3 animate-pulse-subtle">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Sparkles className="h-3 w-3 text-purple-400" />
+                      <div className="text-purple-400 text-xs font-medium">NGTS DATA UNLOCKED</div>
+                    </div>
+                    <div className="text-[#e4eff0] text-xs leading-snug sm:leading-relaxed">
+                      Access to Next-Generation Transit Survey data from ESO's robotic telescope array in Chile. High-precision exoplanet transit measurements now available for mass and composition analysis.
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
