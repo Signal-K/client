@@ -10,6 +10,8 @@ export async function fetchAnomalies(supabase: any, deploymentType: string | nul
       setsToFetch = ['diskDetective', 'superwasp-variable', 'telescope-superwasp-variable'];
     } else if (deploymentType === "planetary") {
       setsToFetch = ['telescope-tess', 'telescope-minorPlanet'];
+      
+      // Check for active asteroids unlock
       let includeActiveAsteroids = false;
       if (session?.user?.id) {
         const { count, error: countError } = await supabase
@@ -22,6 +24,22 @@ export async function fetchAnomalies(supabase: any, deploymentType: string | nul
         }
       }
       if (includeActiveAsteroids) setsToFetch.push('active-asteroids');
+      
+      // Check for NGTS access unlock
+      let includeNGTS = false;
+      if (session?.user?.id) {
+        const { data: ngtsData, error: ngtsError } = await supabase
+          .from("researched")
+          .select("tech_type")
+          .eq("user_id", session.user.id)
+          .eq("tech_type", "ngtsAccess")
+          .single();
+        
+        if (!ngtsError && ngtsData) {
+          includeNGTS = true;
+        }
+      }
+      if (includeNGTS) setsToFetch.push('telescope-ngts');
     } else {
       return;
     }

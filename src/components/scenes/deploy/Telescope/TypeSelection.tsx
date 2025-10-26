@@ -123,10 +123,6 @@ export default function TypeSelection({
                   </div>
                   <div className="flex items-center gap-2 text-[#e4eff0]">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#78cce2] flex-shrink-0"></div>
-                    <span>Active asteroid tracking</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[#e4eff0]">
-                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#78cce2] flex-shrink-0"></div>
                     <span>Planetary system analysis</span>
                   </div>
                 </div>

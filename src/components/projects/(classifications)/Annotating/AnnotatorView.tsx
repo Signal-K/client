@@ -39,6 +39,8 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
     isActiveAsteroids,
   } = useAnnotatorLogic(props as ImageAnnotatorProps) as any;
 
+  const isNGTS = props.annotationType === "NGTS";
+
   // NOTE: we intentionally return the same JSX and structure as the original file.
   return (
     <div
@@ -80,6 +82,20 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
               <span className="text-2xl">💎</span>
               <div>
                 <h3 className="font-bold text-sm">Mineral deposits can be found here</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isNGTS && (
+        <div className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-3 mb-2 rounded-lg border-2 border-purple-400 shadow-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🔭</span>
+              <div>
+                <h3 className="font-bold text-sm">NGTS Odd Even Transit Check</h3>
+                <p className="text-xs mt-1 opacity-90">Answer the question about green and magenta points, then draw the shape of the main transit curve</p>
               </div>
             </div>
           </div>

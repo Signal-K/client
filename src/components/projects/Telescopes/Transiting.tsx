@@ -8,6 +8,7 @@ import ImageAnnotator from '../(classifications)/Annotating/Annotator';
 import { Button } from "@/src/components/ui/button";
 import { useRouter } from 'next/navigation';
 import TutorialContentBlock from "../TutorialContentBlock";
+import NGTSTutorial from "./NGTSTutorial";
 
 type Anomaly = {
   id: number;
@@ -29,8 +30,10 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
+  const [showNGTSTutorial, setShowNGTSTutorial] = useState(false)
   const [sectorsExpanded, setSectorsExpanded] = useState(false)
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState<boolean | null>(null)
+  const [isNGTSAnomaly, setIsNGTSAnomaly] = useState(false)
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
 
@@ -96,8 +99,22 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
   const handleSectorChange = (sector: number) => {
     if (selectedAnomaly) {
       setCurrentSector(sector)
-      const newImageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${selectedAnomaly.id}/Sector${sector}.png`
-      setCurrentImageUrl(newImageUrl)
+      
+      // NGTS anomalies don't use sector-based paths, use avatar_url
+      if (isNGTSAnomaly) {
+        if (selectedAnomaly.avatar_url) {
+          const newImageUrl = `${supabaseUrl}/storage/v1/object/public/${selectedAnomaly.avatar_url}`;
+          setCurrentImageUrl(newImageUrl);
+        } else {
+          // Fallback
+          const ngtsPath = selectedAnomaly.anomalySet || 'telescope/telescope-planetHunters-ngts';
+          const newImageUrl = `${supabaseUrl}/storage/v1/object/public/${ngtsPath}/${selectedAnomaly.content || selectedAnomaly.id}.png`;
+          setCurrentImageUrl(newImageUrl);
+        }
+      } else {
+        const newImageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${selectedAnomaly.id}/Sector${sector}.png`;
+        setCurrentImageUrl(newImageUrl);
+      }
     }
   }
 
@@ -180,25 +197,49 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
 
         setSelectedAnomaly(anomaly);
 
-        // Fetch available sectors for this anomaly
-        const sectors = await fetchAvailableSectors(anomaly.id)
-        setAvailableSectors(sectors)
-        setCurrentSector(sectors[0] || 1)
+        // Check if this is an NGTS anomaly
+        const isNGTS = anomaly.anomalySet?.includes('telescope-ngts') || 
+                       anomaly.anomalySet?.includes('telescope-planetHunters-ngts');
+        setIsNGTSAnomaly(isNGTS);
 
-        const urls: string[] = []
-        if (anomaly.avatar_url) urls.push(anomaly.avatar_url)
-        
-        // Set up image URLs for all sectors
-        const sectorUrls = sectors.map(sector => 
-          `${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector${sector}.png`
-        )
-        urls.push(...sectorUrls)
+        let initialImageUrl: string;
+        const urls: string[] = [];
 
-        setImageUrls(urls)
-        
-        // Set the initial current image URL to the first sector
-        const initialImageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector${sectors[0] || 1}.png`
-        setCurrentImageUrl(initialImageUrl)
+        if (isNGTS) {
+          // NGTS anomalies use avatar_url which contains the full path
+          // Format: telescope/telescope-planetHunters-ngts/104061564.png
+          if (anomaly.avatar_url) {
+            initialImageUrl = `${supabaseUrl}/storage/v1/object/public/${anomaly.avatar_url}`;
+          } else {
+            // Fallback: construct from anomalySet and content/id
+            const ngtsPath = anomaly.anomalySet || 'telescope/telescope-planetHunters-ngts';
+            initialImageUrl = `${supabaseUrl}/storage/v1/object/public/${ngtsPath}/${anomaly.content || anomaly.id}.png`;
+          }
+          urls.push(initialImageUrl);
+          
+          // NGTS doesn't use sectors, so we set a single sector
+          setAvailableSectors([1]);
+          setCurrentSector(1);
+        } else {
+          // Regular TESS anomalies use the sector system
+          const sectors = await fetchAvailableSectors(anomaly.id);
+          setAvailableSectors(sectors);
+          setCurrentSector(sectors[0] || 1);
+
+          if (anomaly.avatar_url) urls.push(anomaly.avatar_url);
+          
+          // Set up image URLs for all sectors
+          const sectorUrls = sectors.map(sector => 
+            `${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector${sector}.png`
+          );
+          urls.push(...sectorUrls);
+          
+          // Set the initial current image URL to the first sector
+          initialImageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector${sectors[0] || 1}.png`;
+        }
+
+        setImageUrls(urls);
+        setCurrentImageUrl(initialImageUrl);
 
       } catch (err: any) {
         console.error("Error fetching anomaly:", err.message || err)
@@ -218,8 +259,11 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
 
   return (
     <div className="w-full h-[calc(100vh-8rem)] overflow-hidden flex flex-col gap-2 px-4">
+      {/* NGTS Tutorial Modal */}
+      {showNGTSTutorial && <NGTSTutorial onClose={() => setShowNGTSTutorial(false)} />}
+
       {/* Top Button Bar */}
-      <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-2 flex justify-center items-center flex-shrink-0">
+      <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-2 flex justify-center items-center gap-4 flex-shrink-0">
         {hasCompletedTutorial === false ? (
           <div className="flex flex-col items-center gap-2">
             <div className="text-amber-300 text-sm font-medium">
@@ -234,9 +278,20 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
             </Button>)}
           </div>
         ) : (
-          <Button variant="outline" onClick={() => setShowTutorial(true)}>
-            Want a walkthrough? Start the tutorial
-          </Button>
+          <>
+            <Button variant="outline" onClick={() => setShowTutorial(true)}>
+              Want a walkthrough? Start the tutorial
+            </Button>
+            {isNGTSAnomaly && (
+              <Button 
+                variant="outline" 
+                onClick={() => setShowNGTSTutorial(true)}
+                className="border-purple-500/50 text-purple-300 hover:bg-purple-500/20"
+              >
+                View NGTS Tutorial
+              </Button>
+            )}
+          </>
         )}
       </div>
       
@@ -314,7 +369,7 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
                 missionNumber={1372001}
                 structureItemId={3103}
                 assetMentioned={selectedAnomaly.id.toString()}
-                annotationType="PH"
+                annotationType={isNGTSAnomaly ? "NGTS" : "PH"}
                 initialImageUrl={currentImageUrl}
                 anomalyId={selectedAnomaly.id.toString()}
                 className="h-full w-full"
