@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/src/components/ui/button"
 import { Progress } from "@/src/components/ui/progress"
 import { Drill, Satellite, Droplet, Snowflake, Gem, Beaker, Award, ChevronRight, ArrowLeft } from "lucide-react"
-import Section from "@/src/components/sections/Section"
 
 interface MineralConfiguration {
   type: string
@@ -149,15 +148,10 @@ export function ExtractionScene({
   const backgroundType = isRoverBased ? "rover" : "stars"
 
   return (
-    <Section
-      variant="viewport"
-      backgroundType={backgroundType}
-      sectionId="extraction-scene"
-      infoText="Extracting minerals and resources from discovered deposits"
-    >
-      <div className="space-y-6">
+    <div className="w-full h-full flex flex-col bg-gradient-to-b from-background to-background/80 py-4 px-4">
+      <div className="flex flex-col max-w-6xl mx-auto w-full space-y-4 h-full">
         {/* Header with back button */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-shrink-0">
           <Button variant="ghost" size="sm" onClick={() => router.push("/")} className="gap-2">
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -170,8 +164,8 @@ export function ExtractionScene({
           )}
         </div>
 
-        {/* Large immersive extraction scene */}
-        <div className="relative w-full h-[500px] md:h-[600px] rounded-lg overflow-hidden border border-border/30 shadow-2xl">
+        {/* Large immersive extraction scene - flexible height */}
+        <div className="relative w-full flex-1 rounded-lg overflow-hidden border border-border/30 shadow-2xl">
           {/* Terrain Layer */}
           <div className="absolute inset-0">
             {/* Rover-based terrain (Martian surface) */}
@@ -426,39 +420,39 @@ export function ExtractionScene({
 
         {/* Rewards Section */}
         {extracted && (
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 space-y-4">
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 space-y-3 flex-shrink-0">
             <div className="flex items-center gap-3">
-              <Award className="w-8 h-8 text-primary" />
+              <Award className="w-6 h-6 text-primary" />
               <div>
-                <h3 className="text-2xl font-bold text-foreground">Extraction Complete!</h3>
-                <p className="text-muted-foreground">Resources have been added to your inventory</p>
+                <h3 className="text-lg font-bold text-foreground">Extraction Complete!</h3>
+                <p className="text-sm text-muted-foreground">Resources added to inventory</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-background/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground">Resource</p>
-                <p className="text-lg font-semibold text-foreground">{mineralType}</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-background/50 p-3 rounded-lg">
+                <p className="text-xs text-muted-foreground">Resource</p>
+                <p className="text-sm font-semibold text-foreground">{mineralType}</p>
               </div>
-              <div className="bg-background/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground">Quantity</p>
-                <p className="text-lg font-semibold text-foreground">{quantity} units</p>
+              <div className="bg-background/50 p-3 rounded-lg">
+                <p className="text-xs text-muted-foreground">Quantity</p>
+                <p className="text-sm font-semibold text-foreground">{quantity} units</p>
               </div>
-              <div className="bg-background/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground">Purity</p>
-                <p className="text-lg font-semibold text-foreground">{purity.toFixed(0)}%</p>
+              <div className="bg-background/50 p-3 rounded-lg">
+                <p className="text-xs text-muted-foreground">Purity</p>
+                <p className="text-sm font-semibold text-foreground">{purity.toFixed(0)}%</p>
               </div>
-              <div className="bg-background/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground">Method</p>
-                <p className="text-lg font-semibold text-foreground capitalize">{projectType}</p>
+              <div className="bg-background/50 p-3 rounded-lg">
+                <p className="text-xs text-muted-foreground">Method</p>
+                <p className="text-sm font-semibold text-foreground capitalize">{projectType}</p>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground text-center">Returning to base in 3 seconds...</p>
+            <p className="text-xs text-muted-foreground text-center">Returning to base in 3 seconds...</p>
           </div>
         )}
 
         {/* Action Button */}
         {!extracted && !extracting && (
-          <Button onClick={handleExtract} className="w-full" size="lg">
+          <Button onClick={handleExtract} className="w-full flex-shrink-0" size="lg">
             {isRoverBased ? <Drill className="w-5 h-5 mr-2" /> : <Satellite className="w-5 h-5 mr-2" />}
             Begin Extraction
           </Button>
@@ -486,6 +480,6 @@ export function ExtractionScene({
           }
         }
       `}</style>
-    </Section>
+    </div>
   )
 };

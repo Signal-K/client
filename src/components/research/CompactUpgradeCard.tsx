@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 
@@ -31,8 +30,6 @@ export function CompactUpgradeCard({
   isLocked = false,
   requirementText,
 }: CompactUpgradeCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   const getCategoryColor = () => {
     switch (category) {
       case "telescope":
@@ -64,70 +61,59 @@ export function CompactUpgradeCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-lg bg-gradient-to-br ${getCategoryColor()} p-4 transition-all duration-200 hover:scale-[1.02] ${
-        isExpanded ? "h-auto" : "h-32"
-      }`}
+      className={`relative overflow-hidden rounded-lg bg-gradient-to-br ${getCategoryColor()} p-6 transition-all duration-200 hover:scale-[1.01] border min-h-[200px] flex flex-col`}
     >
       {/* Category Badge */}
-      <div className="absolute top-2 right-2">
-        <span className="text-lg">{icon || getCategoryIcon()}</span>
+      <div className="absolute top-3 right-3">
+        <span className="text-2xl">{icon || getCategoryIcon()}</span>
       </div>
 
       {/* Progress indicator */}
       {max > 1 && (
-        <div className="absolute top-2 left-2">
-          <Badge variant={isCompleted ? "default" : "secondary"} className="text-xs">
+        <div className="absolute top-3 left-3">
+          <Badge variant={isCompleted ? "default" : "secondary"} className="text-xs font-semibold">
             {current}/{max}
           </Badge>
         </div>
       )}
 
       {/* Main content */}
-      <div className="mt-6">
-        <h3 className="font-semibold text-sm mb-1 line-clamp-1">{title}</h3>
-        <p className={`text-xs text-muted-foreground mb-3 ${isExpanded ? "" : "line-clamp-2"}`}>
+      <div className="mt-8 flex-1 flex flex-col">
+        <h3 className="font-bold text-lg mb-2 pr-8">{title}</h3>
+        <p className="text-sm text-muted-foreground mb-4 flex-1 leading-relaxed">
           {description}
         </p>
 
         {/* Requirements/Status */}
         {isLocked && requirementText && (
-          <p className="text-xs text-yellow-400 mb-2">{requirementText}</p>
+          <p className="text-xs text-yellow-400 mb-3 font-medium">{requirementText}</p>
         )}
 
         {/* Action area */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center gap-2">
-            {!isCompleted && !isLocked && (
+            {!isCompleted && !isLocked && cost > 0 && (
               <Button
-                size="sm"
+                size="default"
                 variant={canUpgrade ? "default" : "secondary"}
                 disabled={!canUpgrade}
                 onClick={onUpgrade}
-                className="text-xs px-2 py-1 h-6"
+                className="text-sm font-semibold"
               >
-                {cost > 0 ? `${cost} ⭐` : "Unlock"}
+                Research for {cost} ⭐
               </Button>
             )}
             {isCompleted && (
-              <Badge variant="default" className="text-xs">
+              <Badge variant="default" className="text-sm py-1 px-3">
                 ✓ Complete
               </Badge>
             )}
             {isLocked && (
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-sm py-1 px-3">
                 🔒 Locked
               </Badge>
             )}
           </div>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-xs p-1 h-6"
-          >
-            {isExpanded ? "↑" : "↓"}
-          </Button>
         </div>
       </div>
     </div>
