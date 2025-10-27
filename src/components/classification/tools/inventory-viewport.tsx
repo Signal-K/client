@@ -149,8 +149,9 @@ export default function InventoryViewport() {
         variant="viewport"
         backgroundType="none"
         expandLink={"/inventory"}
+        hideInfoButton={true}
     >
-        <div className="relative w-full flex flex-col py-4 md:py-6 h-full">
+        <div className="relative w-full flex flex-col py-4 md:py-6 h-full inventory-texture">
             {/* Header with icon and gradient accent */}
             <div className="flex items-center gap-3 mb-4 flex-shrink-0">
                 <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center">
@@ -277,6 +278,45 @@ export default function InventoryViewport() {
                 )}
             </div>
         </div>
+
+        <style jsx>{`
+          .inventory-texture::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+              radial-gradient(ellipse at 30% 40%, rgba(120, 204, 226, 0.1) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 60%, rgba(168, 216, 234, 0.08) 0%, transparent 50%),
+              linear-gradient(135deg, transparent 0%, rgba(120, 204, 226, 0.04) 50%, transparent 100%),
+              repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 3px,
+                rgba(120, 204, 226, 0.02) 3px,
+                rgba(120, 204, 226, 0.02) 6px
+              );
+            pointer-events: none;
+            z-index: 0;
+          }
+
+          .inventory-texture::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url('/noise-2.svg');
+            background-repeat: repeat;
+            background-size: 180px 180px;
+            opacity: 0.15;
+            pointer-events: none;
+            mix-blend-mode: soft-light;
+            z-index: 0;
+          }
+
+          .inventory-texture > * {
+            position: relative;
+            z-index: 1;
+          }
+        `}</style>
     </Section>
   );
 }

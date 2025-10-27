@@ -13,6 +13,7 @@ export interface SectionProps {
   sectionId?: string; // unique id for info text
   infoText?: string | null; // unique info text for each section
   expandLink?: string | null; // optional link for expansion
+  hideInfoButton?: boolean; // hide the info button
 };
 
 const Section: React.FC<SectionProps> = ({
@@ -23,6 +24,7 @@ const Section: React.FC<SectionProps> = ({
   sectionId,
   infoText,
   expandLink = null,
+  hideInfoButton = false,
 }) => {
   const router = useRouter();
   // Expand icon SVG
@@ -100,7 +102,7 @@ const Section: React.FC<SectionProps> = ({
     <section className={sectionClass}>
       {renderBackground()}
       {/* Info icon, always left-aligned; moves up when info is open */}
-      {sectionId && variant !== "minimal" && (
+      {sectionId && variant !== "minimal" && !hideInfoButton && (
         <div
           style={{
             position: "absolute",

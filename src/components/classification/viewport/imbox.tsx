@@ -16,15 +16,15 @@ export default function ImboxViewport() {
   const [activeTab, setActiveTab] = useState<"activity" | "objects" | "posts">("activity")
 
   return (
-    <Section sectionId="imbox-viewport" variant="viewport" backgroundType="none" expandLink={"/imbox"}>
-      <div className="relative w-full flex flex-col py-4 md:py-6">
+    <Section sectionId="imbox-viewport" variant="viewport" backgroundType="none" expandLink={"/imbox"} hideInfoButton={true}>
+      <div className="relative w-full flex flex-col py-4 md:py-6 imbox-texture">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30">
             <Inbox className="w-5 h-5 text-primary" />
           </div>
           <h2 className="text-xl font-bold text-foreground">Inbox</h2>
         </div>
-
+ 
         {/* Tabs */}
         <div className="flex gap-2 mb-4 p-1 bg-muted/50 rounded-lg">
           <Button
@@ -80,6 +80,44 @@ export default function ImboxViewport() {
           )}
         </div>
       </div>
+
+      <style jsx>{`
+        .imbox-texture::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: 
+            radial-gradient(circle at 20% 30%, rgba(120, 204, 226, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(120, 204, 226, 0.06) 0%, transparent 50%),
+            repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 2px,
+              rgba(120, 204, 226, 0.02) 2px,
+              rgba(120, 204, 226, 0.02) 4px
+            );
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .imbox-texture::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image: url('/noise-2.svg');
+          background-repeat: repeat;
+          background-size: 200px 200px;
+          opacity: 0.12;
+          pointer-events: none;
+          mix-blend-mode: overlay;
+          z-index: 0;
+        }
+
+        .imbox-texture > * {
+          position: relative;
+          z-index: 1;
+        }
+      `}</style>
     </Section>
   )
 }
