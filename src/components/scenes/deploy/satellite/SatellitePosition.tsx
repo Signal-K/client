@@ -419,7 +419,7 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
 
   return (
   <Section expandLink={"/viewports/satellite"} sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Send satellites to planets you or the community have discovered to search for clouds and weather events."}>
-      <div ref={sectionRef} className="p-4 relative z-10" style={{ minHeight: '156px' }}>
+      <div ref={sectionRef} className="p-4 relative z-10" style={{ minHeight: '480px' }}>
         {positions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed px-2">

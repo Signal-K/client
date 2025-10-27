@@ -6,6 +6,7 @@ import GameNavbar from "@/src/components/layout/Tes";
 import DeploySatelliteViewport from "@/src/components/scenes/deploy/satellite/DeploySatellite";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import { useEffect, useState } from "react";
+import { hasUpgrade } from "@/src/utils/userUpgrades";
 
 export default function SatelliteDeployPage() {
     const router = useRouter();
@@ -19,19 +20,8 @@ export default function SatelliteDeployPage() {
 
         const check = async () => {
             try {
-                const { data, error } = await supabase
-                    .from("researched")
-                    .select("tech_type")
-                    .eq("user_id", session.user.id)
-                    .eq("tech_type", "satellitecount")
-                    .limit(1)
-
-                if (error) {
-                    console.warn("Error checking researched tech:", error)
-                    return
-                }
-
-                setHasSatelliteUpgrade(Array.isArray(data) && data.length > 0)
+                const upgrade = await hasUpgrade(supabase, session.user.id, "satellitecount");
+                setHasSatelliteUpgrade(upgrade);
             } catch (e) {
                 console.warn("Failed to check researched tech", e)
             }
@@ -42,15 +32,13 @@ export default function SatelliteDeployPage() {
 
     return (
         <div 
-            className={`h-screen w-full flex flex-col overflow-hidden ${
+            className={`w-full h-screen flex flex-col overflow-hidden ${
                 isDark 
                     ? "bg-gradient-to-b from-[#002439] to-[#001a2a]" 
                     : "bg-gradient-to-b from-[#004d6b] to-[#003a52]"
             }`}
         >
-            <div className="flex-shrink-0">
                 <GameNavbar />
-            </div>
             {hasSatelliteUpgrade && (
                 <div className="mx-auto w-full max-w-4xl px-4 py-2 flex-shrink-0">
                     <div className="rounded-md bg-emerald-700/10 border border-emerald-600/20 text-emerald-300 px-3 py-2 text-sm">
@@ -58,7 +46,7 @@ export default function SatelliteDeployPage() {
                     </div>
                 </div>
             )}
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 w-full">
                 <DeploySatelliteViewport />
             </div>
         </div>

@@ -7,18 +7,24 @@ import { usePageData } from "@/hooks/usePageData";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
-import { MineralConfiguration } from "@/src/utils/mineralAnalysis";
 import { Button } from "@/src/components/ui/button";
 import { ArrowRight, Wrench } from "lucide-react";
 import ToolCard from "@/src/components/deployment/missions/structures/tool-card";
 import { RoverIcon, SatelliteIcon, TelescopeComplexIcon } from "@/src/components/deployment/missions/structures/tool-icons";
 import { Card } from "@/src/components/ui/card";
-import { MineralCard } from "@/src/components/deployment/structures/mineral-card";
+import {
+  MineralExtraction,
+  type MineralConfiguration,
+} from "@/src/components/deployment/extraction/mineral-extraction";
+import { fetchUserUpgrades } from "@/src/utils/userUpgrades";
 
 interface MineralDeposit {
+  id: number;
   mineral: MineralConfiguration;
   location: string;
-  quantity: number;
+  roverName?: string;
+  projectType: "P4" | "cloudspotting" | "JVH" | "AI4M";
+  discoveryId?: number;
 }
 
 export default function UserInventoryPage() {
@@ -39,6 +45,8 @@ export default function UserInventoryPage() {
   const [roverLevel, setRoverLevel] = useState<number>(1);
   const [findMinerals, setFindMinerals] = useState<boolean>(false);
   const [depositLoading, setDepositLoading] = useState<boolean>(false);
+  const [hasRoverExtraction, setHasRoverExtraction] = useState<boolean>(false);
+  const [hasSatelliteExtraction, setHasSatelliteExtraction] = useState<boolean>(false);
 
   useEffect(() => {
     let mounted = true;
@@ -78,58 +86,40 @@ export default function UserInventoryPage() {
 
   // Fetch user's mineral deposits from Supabase
   useEffect(() => {
-    const fetchUserUpgrades = async () => {
+    const fetchUserData = async () => {
       if (!session?.user?.id) return;
 
-      const { data, error } = await supabase
+      // Fetch upgrades using utility function
+      const upgrades = await fetchUserUpgrades(supabase, session.user.id);
+      
+      setTelescopeUpgrade(upgrades.telescopeUpgrade);
+      setSatelliteCount(upgrades.satelliteCount);
+      setFindMinerals(upgrades.findMinerals);
+      setRoverLevel(upgrades.roverLevel);
+
+      // Fetch extraction research status
+      const { data: researched } = await supabase
         .from("researched")
-        .select("tech_type, tech_id, created_at")
+        .select("tech_type")
         .eq("user_id", session.user.id);
 
-      if (error || !data) return;
-
-      // derive values from researched rows
-      let hasTelescopeUpgrade = false;
-      let satelliteExtras = 0; // extra increments beyond the base 1
-      let hasFindMinerals = false;
-      let derivedRoverLevel = 1;
-
-      (data as any[]).forEach((row) => {
-        const t = (row.tech_type || "").toString().toLowerCase();
-
-        if (t.includes("probereceptor") || t.includes("probereceptors")) {
-          hasTelescopeUpgrade = true;
-        }
-
-        if (t.includes("satellite")) {
-          // Each matching researched row increments available satellites by 1
-          satelliteExtras += 1;
-        }
-
-        if (t.includes("findmineral") || t.includes("findminerals")) {
-          hasFindMinerals = true;
-        }
-
-        if (t.includes("roverwaypoint") || t.includes("roverwaypoints")) {
-          // rover waypoint research unlocks level 2 rover capabilities
-          derivedRoverLevel = Math.max(derivedRoverLevel, 2);
-        }
-      });
-
-      setTelescopeUpgrade(hasTelescopeUpgrade);
-      setSatelliteCount(1 + satelliteExtras);
-      setFindMinerals(hasFindMinerals);
-      setRoverLevel(derivedRoverLevel);
+      const roverExtraction = researched?.some(r => r.tech_type === "roverExtraction") || false;
+      const satelliteExtraction = researched?.some(r => r.tech_type === "satelliteExtraction") || false;
+      
+      setHasRoverExtraction(roverExtraction);
+      setHasSatelliteExtraction(satelliteExtraction);
 
       // If the user can find minerals, fetch deposits
-      if (hasFindMinerals) {
+      if (upgrades.findMinerals) {
         setDepositLoading(true);
         try {
           // The mineralDeposits table doesn't include a `quantity` column in the DB
           // so only select actual columns. Provide a fallback quantity when mapping.
           const { data: deposits, error: depErr } = await supabase
             .from("mineralDeposits")
-            .select("id, mineralconfiguration, location, roverName, created_at")
+            .select(
+              "id, mineralconfiguration, location, roverName, created_at, discovery"
+            )
             .not("location", "is", null)
             .eq("owner", session.user.id);
 
@@ -137,14 +127,26 @@ export default function UserInventoryPage() {
             console.error("Error fetching mineral deposits:", depErr);
             setMineralDeposits([]);
           } else if (deposits) {
-            setMineralDeposits(
-              (deposits as any[]).map((row) => ({
-                mineral: row.mineralconfiguration,
-                location: row.location,
-                // Table doesn't have quantity column; default to 1 if missing
-                quantity: row.quantity ?? 1,
-              }))
-            );
+            // Filter out deposits with quantity <= 0
+            const validDeposits = (deposits as any[])
+              .filter((row) => {
+                const quantity = row.mineralconfiguration?.amount || row.mineralconfiguration?.quantity || 0;
+                return quantity > 0;
+              })
+              .map(
+                (row) =>
+                  ({
+                    id: row.id,
+                    mineral: row.mineralconfiguration,
+                    location: row.location,
+                    roverName: row.roverName,
+                    projectType: (row.mineralconfiguration as any)?.metadata
+                      ?.source,
+                    discoveryId: row.discovery,
+                  } as MineralDeposit)
+              );
+            
+            setMineralDeposits(validDeposits);
           }
         } finally {
           setDepositLoading(false);
@@ -156,7 +158,7 @@ export default function UserInventoryPage() {
       }
     };
 
-    fetchUserUpgrades();
+    fetchUserData();
   }, [session, supabase]);
 
   return (
@@ -253,12 +255,17 @@ export default function UserInventoryPage() {
                 ) : (
                     <div className="overflow-y-auto pr-2 -mr-2">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pb-2">
-                            {mineralDeposits.map((deposit, idx) => (
-                                <MineralCard
-                                    key={`${deposit.mineral.mineralType}-${idx}`}
-                                    mineral={deposit.mineral}
+                            {mineralDeposits.map((deposit) => (
+                                <MineralExtraction
+                                    key={deposit.id}
+                                    id={deposit.id}
+                                    mineralConfiguration={deposit.mineral}
                                     location={deposit.location}
-                                    quantity={deposit.quantity}
+                                    roverName={deposit.roverName}
+                                    projectType={deposit.projectType}
+                                    discoveryId={deposit.discoveryId}
+                                    hasRoverExtraction={hasRoverExtraction}
+                                    hasSatelliteExtraction={hasSatelliteExtraction}
                                 />
                             ))}
                         </div>

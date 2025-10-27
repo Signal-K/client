@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
@@ -8,17 +8,20 @@ import { Card } from "@/src/components/ui/card";
 import Section from "@/src/components/sections/Section"
 import ToolCard from "@/src/components/deployment/missions/structures/tool-card"
 import { RoverIcon, SatelliteIcon, TelescopeComplexIcon } from "@/src/components/deployment/missions/structures/tool-icons"
-import { MineralCard } from "@/src/components/deployment/structures/mineral-card";
-import { MineralConfiguration } from "@/src/utils/mineralAnalysis";
+import { MineralExtraction, type MineralConfiguration } from "@/src/components/deployment/extraction/mineral-extraction";
 import { Package, Wrench, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { fetchUserUpgrades } from "@/src/utils/userUpgrades";
 
 type TabType = "minerals" | "tools";
 
 interface MineralDeposit {
+  id: number;
   mineral: MineralConfiguration;
   location: string;
-  quantity: number;
+  roverName?: string;
+  projectType: "P4" | "cloudspotting" | "JVH" | "AI4M";
+  discoveryId?: number;
 }
 
 interface InventoryViewportInterface {
@@ -31,6 +34,8 @@ interface InventoryViewportInterface {
     satelliteCount: number;
     roverLevel: number;
     findMinerals: boolean;
+    hasRoverExtraction: boolean;
+    hasSatelliteExtraction: boolean;
 };
 
 export default function InventoryViewport() {
@@ -41,7 +46,7 @@ export default function InventoryViewport() {
 
   if (!session) {
     router.push("/auth");
-  }
+  };
 
   // State management
   const [state, setState] = useState<InventoryViewportInterface>({
@@ -54,6 +59,8 @@ export default function InventoryViewport() {
     satelliteCount: 1,
     roverLevel: 1,
     findMinerals: false,
+    hasRoverExtraction: false,
+    hasSatelliteExtraction: false,
   });
 
   const setMobileMenuOpen = ( open: boolean ) => {
@@ -69,67 +76,62 @@ export default function InventoryViewport() {
     const fetchUserData = async () => {
       if (!session?.user?.id) return;
 
-      // Fetch researched upgrades
-      const { data: researchData, error: researchError } = await supabase
+      // Fetch upgrades using utility function
+      const upgrades = await fetchUserUpgrades(supabase, session.user.id);
+
+      // Fetch extraction research status
+      const { data: researched } = await supabase
         .from("researched")
-        .select("tech_type, tech_id, created_at")
+        .select("tech_type")
         .eq("user_id", session.user.id);
 
-      if (!researchError && researchData) {
-        let hasTelescopeUpgrade = false;
-        let satelliteExtras = 0;
-        let hasFindMinerals = false;
-        let derivedRoverLevel = 1;
+      const hasRoverExtraction = researched?.some(r => r.tech_type === "roverExtraction") || false;
+      const hasSatelliteExtraction = researched?.some(r => r.tech_type === "satelliteExtraction") || false;
 
-        (researchData as any[]).forEach((row) => {
-          const t = (row.tech_type || "").toString().toLowerCase();
+      setState((prev) => ({
+        ...prev,
+        telescopeUpgrade: upgrades.telescopeUpgrade,
+        satelliteCount: upgrades.satelliteCount,
+        findMinerals: upgrades.findMinerals,
+        roverLevel: upgrades.roverLevel,
+        hasRoverExtraction,
+        hasSatelliteExtraction,
+      }));
 
-          if (t.includes("probereceptor") || t.includes("probereceptors")) {
-            hasTelescopeUpgrade = true;
-          }
+      // Fetch mineral deposits if unlocked
+      if (upgrades.findMinerals) {
+        const { data: deposits, error: depErr } = await supabase
+          .from("mineralDeposits")
+          .select(
+            "id, mineralconfiguration, location, roverName, created_at, discovery"
+          )
+          .not("location", "is", null)
+          .eq("owner", session.user.id);
 
-          if (t.includes("satellite")) {
-            satelliteExtras += 1;
-          }
+        if (!depErr && deposits) {
+          // Filter out deposits with quantity <= 0
+          const validDeposits = (deposits as any[])
+            .filter((row) => {
+              const quantity = row.mineralconfiguration?.amount || row.mineralconfiguration?.quantity || 0;
+              return quantity > 0;
+            })
+            .map(
+              (row) =>
+                ({
+                  id: row.id,
+                  mineral: row.mineralconfiguration,
+                  location: row.location,
+                  roverName: row.roverName,
+                  projectType: (row.mineralconfiguration as any)?.metadata?.source,
+                  discoveryId: row.discovery,
+                } as MineralDeposit)
+            );
 
-          if (t.includes("findmineral") || t.includes("findminerals")) {
-            hasFindMinerals = true;
-          }
-
-          if (t.includes("roverwaypoint") || t.includes("roverwaypoints")) {
-            derivedRoverLevel = Math.max(derivedRoverLevel, 2);
-          }
-        });
-
-        setState((prev) => ({
-          ...prev,
-          telescopeUpgrade: hasTelescopeUpgrade,
-          satelliteCount: 1 + satelliteExtras,
-          findMinerals: hasFindMinerals,
-          roverLevel: derivedRoverLevel,
-        }));
-
-        // Fetch mineral deposits if unlocked
-        if (hasFindMinerals) {
-          const { data: deposits, error: depErr } = await supabase
-            .from("mineralDeposits")
-            .select("id, mineralconfiguration, location, roverName, created_at")
-            .not("location", "is", null)
-            .eq("owner", session.user.id);
-
-          if (!depErr && deposits) {
-            setState((prev) => ({
-              ...prev,
-              mineralDeposits: (deposits as any[]).map((row) => ({
-                mineral: row.mineralconfiguration,
-                location: row.location,
-                quantity: row.quantity ?? 1,
-              })),
-              depositLoading: false,
-            }));
-          } else {
-            setState((prev) => ({ ...prev, depositLoading: false }));
-          }
+          setState((prev) => ({
+            ...prev,
+            mineralDeposits: validDeposits,
+            depositLoading: false,
+          }));
         } else {
           setState((prev) => ({ ...prev, depositLoading: false }));
         }
@@ -147,15 +149,16 @@ export default function InventoryViewport() {
         variant="viewport"
         backgroundType="none"
         expandLink={"/inventory"}
+        hideInfoButton={true}
     >
-        <div className="relative w-full flex flex-col py-4 md:py-6">
+        <div className="relative w-full flex flex-col py-4 md:py-6 h-full inventory-texture">
             {/* Header with icon and gradient accent */}
-            <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30">
+            <div className="flex items-center gap-3 mb-4 flex-shrink-0">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center">
                     <Package className="w-5 h-5 text-primary" />
                 </div>
-                <div className="flex-1">
-                    <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                <div className="flex-1 flex items-center">
+                    <h2 className="text-xl font-bold text-foreground flex items-center gap-2 w-full">
                         Inventory
                         {state.mineralDeposits.length > 0 && (
                             <span className="text-xs font-normal text-muted-foreground">
@@ -167,11 +170,11 @@ export default function InventoryViewport() {
             </div>
 
             {/* Tab Buttons at Top */}
-            <div className="flex gap-2 mb-4 p-1 bg-muted/50 rounded-lg">
+            <div className="flex gap-2 mb-4 p-1 bg-muted/50 rounded-lg flex-shrink-0">
                 <Button
                     variant={state.activeTab === "minerals" ? "default" : "ghost"}
                     onClick={() => setActiveTab("minerals")}
-                    className="flex-1 gap-2"
+                    className="flex-1 gap-2 flex items-center justify-center"
                     size="sm"
                 >
                     <Sparkles className="w-4 h-4" />
@@ -180,7 +183,7 @@ export default function InventoryViewport() {
                 <Button
                     variant={state.activeTab === "tools" ? "default" : "ghost"}
                     onClick={() => setActiveTab("tools")}
-                    className="flex-1 gap-2"
+                    className="flex-1 gap-2 flex items-center justify-center"
                     size="sm"
                 >
                     <Wrench className="w-4 h-4" />
@@ -189,11 +192,11 @@ export default function InventoryViewport() {
             </div>
 
             {/* Tab Content - Compact height */}
-            <div className="flex-1 min-h-[180px] max-h-[400px]">
+            <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
                 {state.activeTab === "tools" && (
-                    <section className="flex-shrink-0">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                            <Link href="/structures/telescope">
+                    <section className="flex-shrink-0 h-full flex flex-col justify-center">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 h-full">
+                            <Link href="/structures/telescope" className="flex h-full">
                                 <ToolCard
                                     icon={<TelescopeComplexIcon hasVisual={state.telescopeUpgrade} />}                        
                                     name="Telescope Complex"
@@ -202,7 +205,7 @@ export default function InventoryViewport() {
                                     description={state.telescopeUpgrade ? "Radio + Visual" : "Radio Telescope"}
                                 />
                             </Link>
-                            <Link href="/viewports/satellite">
+                            <Link href="/viewports/satellite" className="flex h-full">
                                 <ToolCard
                                     icon={<SatelliteIcon count={state.satelliteCount} />}
                                     name="Weather Satellite"
@@ -211,7 +214,7 @@ export default function InventoryViewport() {
                                     description="Orbital monitoring"
                                 />
                             </Link>
-                            <Link href="/viewports/roover">
+                            <Link href="/viewports/roover" className="flex h-full">
                                 <ToolCard
                                     icon={<RoverIcon level={state.roverLevel} />}
                                     name="Investigative Rover"
@@ -225,36 +228,49 @@ export default function InventoryViewport() {
                 )}
 
                 {state.activeTab === "minerals" && (
-                    <section className="flex-1 flex flex-col min-h-0">
+                    <section className="flex-1 flex flex-col min-h-0 h-full justify-center">
                         {state.depositLoading ? (
-                            <Card className="p-4 text-center bg-muted/30">
+                            <Card className="p-4 text-center bg-muted/30 flex items-center justify-center h-full">
                                 <p className="text-sm text-muted-foreground">Loading deposits...</p>
                             </Card>
                         ) : !state.findMinerals ? (
-                            <Card className="p-4 text-center bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/30">
+                            <Card className="p-4 text-center bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/30 flex flex-col items-center justify-center h-full">
                                 <p className="text-sm text-muted-foreground mb-1">🔒 Mineral detection locked</p>
                                 <p className="text-xs text-muted-foreground">
                                     Research "Find Mineral Deposits" to unlock
                                 </p>
                             </Card>
                         ) : state.mineralDeposits.length === 0 ? (
-                            <Card className="p-4 text-center bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+                            <Card className="p-4 text-center bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20 flex flex-col items-center justify-center h-full">
                                 <p className="text-sm text-muted-foreground mb-1">No deposits collected yet</p>
                                 <p className="text-xs text-muted-foreground">
                                     Deploy your rover and classify terrain to discover minerals
                                 </p>
                             </Card>
                         ) : (
-                            <div className="overflow-y-auto pr-1 -mr-1 max-h-[320px]">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-1">
-                                    {state.mineralDeposits.map((deposit, idx) => (
-                                        <MineralCard
-                                            key={`${deposit.mineral.mineralType}-${idx}`}
-                                            mineral={deposit.mineral}
-                                            location={deposit.location}
-                                            quantity={deposit.quantity}
-                                        />
-                                    ))}
+                            <div className="relative w-full h-full">
+                                {/* Left scroll indicator */}
+                                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/80 to-transparent pointer-events-none z-10" />
+                                {/* Right scroll indicator */}
+                                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/80 to-transparent pointer-events-none z-10" />
+                                
+                                <div className="overflow-x-auto w-full h-full scrollbar-hide">
+                                    <div className="flex flex-row gap-6 pb-4 px-2 min-w-min min-h-[360px]">
+                                        {state.mineralDeposits.map((deposit) => (
+                                            <div key={deposit.id} className="flex-shrink-0 w-[420px] h-[360px]">
+                                                <MineralExtraction
+                                                    id={deposit.id}
+                                                    mineralConfiguration={deposit.mineral}
+                                                    location={deposit.location}
+                                                    roverName={deposit.roverName}
+                                                    projectType={deposit.projectType}
+                                                    discoveryId={deposit.discoveryId}
+                                                    hasRoverExtraction={state.hasRoverExtraction}
+                                                    hasSatelliteExtraction={state.hasSatelliteExtraction}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -262,6 +278,45 @@ export default function InventoryViewport() {
                 )}
             </div>
         </div>
+
+        <style jsx>{`
+          .inventory-texture::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+              radial-gradient(ellipse at 30% 40%, rgba(120, 204, 226, 0.1) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 60%, rgba(168, 216, 234, 0.08) 0%, transparent 50%),
+              linear-gradient(135deg, transparent 0%, rgba(120, 204, 226, 0.04) 50%, transparent 100%),
+              repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 3px,
+                rgba(120, 204, 226, 0.02) 3px,
+                rgba(120, 204, 226, 0.02) 6px
+              );
+            pointer-events: none;
+            z-index: 0;
+          }
+
+          .inventory-texture::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url('/noise-2.svg');
+            background-repeat: repeat;
+            background-size: 180px 180px;
+            opacity: 0.15;
+            pointer-events: none;
+            mix-blend-mode: soft-light;
+            z-index: 0;
+          }
+
+          .inventory-texture > * {
+            position: relative;
+            z-index: 1;
+          }
+        `}</style>
     </Section>
   );
 }

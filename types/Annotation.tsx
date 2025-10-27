@@ -285,6 +285,20 @@ export const PHCATEGORIES: Record<PHCategory, CategoryConfig> = {
   },
 };
 
+export type NGTSCategory = 'Yes' | 'No';
+export const NGTSCATEGORIES: Record<NGTSCategory, CategoryConfig> = {
+  Yes: {
+    name: 'Yes',
+    color: '#4CAF50',
+    description: 'Both green and magenta points cover most of the middle portion of the plot'
+  },
+  No: {
+    name: 'No',
+    color: '#F44336',
+    description: 'The green and magenta points do NOT cover most of the middle portion'
+  },
+};
+
 export type AI4MCategory = 'sand' | 'consolidated-soil' | 'bedrock' | 'big-rocks' | 'Custom';
 export const AI4MCATEGORIES: Record<AI4MCategory, CategoryConfig> = {
   sand: {

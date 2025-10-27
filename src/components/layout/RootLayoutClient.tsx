@@ -5,7 +5,6 @@ import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useEffect, useState, ReactNode } from "react";
 import { ActivePlanetProvider, useActivePlanet } from "@/src/core/context/ActivePlanet";
-import { UserAnomaliesProvider } from "@/src/core/context/UserAnomalies";
 import { Analytics } from "@vercel/analytics/react";
 // import Sidebar from "../ui/Panels/Sidebar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -44,7 +43,6 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
           {/* <ThemeProviders attribute="class" defaultTheme="system" enableSystem> */}
           <ActivePlanetProvider>
             {/* <MissionProvider> */}
-            <UserAnomaliesProvider>
               <LayoutContent>
                 {/* Main content layout without sidebar */}
                 <div className="flex min-h-screen w-full">
@@ -55,7 +53,6 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
               </LayoutContent>
               <Analytics />
               <SpeedInsights />
-            </UserAnomaliesProvider>
             {/* </MissionProvider> */}
           </ActivePlanetProvider>
           {/* </ThemeProviders> */}

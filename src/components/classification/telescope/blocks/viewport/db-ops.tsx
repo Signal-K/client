@@ -56,8 +56,8 @@ export function useDatabaseOperations() {
           .filter(Boolean);
         
         const processedAnomalies = anomalies.map(generateAnomalyProperties);
-        console.log("Processed linked anomalies count:", processedAnomalies.length);
-        console.log("Sample processed anomaly:", processedAnomalies[0]);
+        // console.log("Processed linked anomalies count:", processedAnomalies.length);
+        // console.log("Sample processed anomaly:", processedAnomalies[0]);
         return processedAnomalies;
       }
     } catch (error) {

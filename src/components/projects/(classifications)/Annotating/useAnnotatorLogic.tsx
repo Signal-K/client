@@ -9,6 +9,7 @@ import {
   AI4MCATEGORIES,
   P4CATEGORIES,
   PHCATEGORIES,
+  NGTSCATEGORIES,
   CACCategories,
   JVHCATEGORIES,
   CoMSCategories,
@@ -23,6 +24,7 @@ import {
   type CACCategory,
   type P4Category,
   type PHCategory,
+  type NGTSCategory,
   type CoMCategory,
   type DrawingObject,
   type Tool,
@@ -44,6 +46,7 @@ export interface ImageAnnotatorProps {
     | "AI4M"
     | "P4"
     | "PH"
+    | "NGTS"
     | "CoM"
     | "CAC"
     | "JVH"
@@ -109,6 +112,8 @@ export function useAnnotatorLogic({
       ? CoMCATEGORIES
       : annotationType === "PH"
       ? PHCATEGORIES
+      : annotationType === "NGTS"
+      ? NGTSCATEGORIES
       : annotationType === "JVH"
       ? JVHCATEGORIES
       : annotationType === "CAC"

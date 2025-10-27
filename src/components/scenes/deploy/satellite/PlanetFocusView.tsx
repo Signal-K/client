@@ -1,7 +1,9 @@
 "use client"
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/src/components/ui/button';
+import { Info } from 'lucide-react';
+import Link from 'next/link';
 import type { EnrichedDatabaseAnomaly } from "./DeploySatellite";
 
 interface PlanetFocusViewProps {
@@ -31,8 +33,47 @@ function interpretMetallicity(value: string | number | null | undefined): string
   return '(Very metal-poor, ancient star)';
 }
 
+// Helper function to calculate planet type based on density and radius
+function calculatePlanetType(density: string | number | null | undefined, radius: string | number | null | undefined): string {
+  if (!density || density === "N/A" || !radius || radius === "N/A") return "Unknown";
+  
+  const densityVal = typeof density === 'string' ? parseFloat(density) : density;
+  const radiusVal = typeof radius === 'string' ? parseFloat(radius) : radius;
+  
+  if (isNaN(densityVal) || isNaN(radiusVal)) return "Unknown";
+  
+  // Density thresholds (g/cm³):
+  // Gaseous planets (Jupiter-like): < 2 g/cm³
+  // Ice giants (Neptune-like): 1.5 - 2.5 g/cm³
+  // Terrestrial (Earth-like): > 3 g/cm³
+  // Rocky/Iron-rich: > 5 g/cm³
+  
+  // Also consider radius (Earth radii):
+  // Small terrestrial: < 2 R⊕
+  // Super-Earth: 2-4 R⊕
+  // Neptune-like: 4-8 R⊕
+  // Jupiter-like: > 8 R⊕
+  
+  if (densityVal < 1.5) {
+    return "Gaseous Giant";
+  } else if (densityVal < 2.5) {
+    if (radiusVal > 4) {
+      return "Ice Giant";
+    }
+    return "Gaseous";
+  } else if (densityVal < 4) {
+    if (radiusVal < 2) {
+      return "Terrestrial";
+    }
+    return "Super-Earth (Terrestrial)";
+  } else {
+    return "Rocky Terrestrial";
+  }
+}
+
 const PlanetFocusView: React.FC<PlanetFocusViewProps> = ({ planet, onNext, onPrev, isFirst, isLast, isDarkMode = true }) => {
   console.log('🎨 PlanetFocusView render:', planet?.id, 'stats:', planet?.stats);
+  const [showInfoTooltip, setShowInfoTooltip] = useState<string | null>(null);
   
   if (!planet) {
     return (
@@ -50,6 +91,28 @@ const PlanetFocusView: React.FC<PlanetFocusViewProps> = ({ planet, onNext, onPre
       </div>
     );
   }
+
+  const planetType = calculatePlanetType(planet.stats?.density, planet.stats?.radius);
+  const hasClassificationInfo = planet.stats?.classificationId && planet.stats?.classificationAuthor;
+
+  const InfoButton: React.FC<{ stat: string }> = ({ stat }) => {
+    if (!hasClassificationInfo) return null;
+    
+    return (
+      <button
+        className={`ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full transition-colors ${
+          isDarkMode
+            ? 'bg-blue-500/20 hover:bg-blue-500/40 text-blue-300'
+            : 'bg-blue-200 hover:bg-blue-300 text-blue-700'
+        }`}
+        onClick={() => setShowInfoTooltip(showInfoTooltip === stat ? null : stat)}
+        onMouseEnter={() => setShowInfoTooltip(stat)}
+        onMouseLeave={() => setShowInfoTooltip(null)}
+      >
+        <Info className="w-3 h-3" />
+      </button>
+    );
+  };
 
   return (
     <div className={`relative w-full h-full flex items-center justify-center ${
@@ -74,8 +137,8 @@ const PlanetFocusView: React.FC<PlanetFocusViewProps> = ({ planet, onNext, onPre
         </div>
       </div>
 
-      {/* Planet Info */}
-      <div className={`absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-full p-4 rounded-lg backdrop-blur-sm ${
+      {/* Planet Info - Positioned above planet */}
+      <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[200px] p-4 rounded-lg backdrop-blur-sm ${
         isDarkMode 
           ? 'bg-black/30' 
           : 'bg-gradient-to-br from-[#f0f4ff]/90 to-[#e6ecf5]/90 border border-[#c8d5f0]'
@@ -83,7 +146,8 @@ const PlanetFocusView: React.FC<PlanetFocusViewProps> = ({ planet, onNext, onPre
         <h2 className="text-2xl font-bold">{planet.content || `TIC ${planet.id}`}</h2>
       </div>
       
-      <div className={`absolute bottom-1/4 left-1/2 transform -translate-x-1/2 translate-y-full p-4 rounded-lg backdrop-blur-sm ${
+      {/* Planet Stats - Positioned below planet */}
+      <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-[150px] p-4 rounded-lg backdrop-blur-sm max-w-sm ${
         isDarkMode 
           ? 'bg-black/30' 
           : 'bg-gradient-to-br from-[#f0f4ff]/90 to-[#e6ecf5]/90 border border-[#c8d5f0]'
@@ -92,8 +156,39 @@ const PlanetFocusView: React.FC<PlanetFocusViewProps> = ({ planet, onNext, onPre
         <ul className={`text-sm space-y-1 ${
           isDarkMode ? '' : 'text-slate-700'
         }`}>
-          <li>Temperature: {planet.stats?.temperature || 'N/A'} K</li>
-          <li>Radius: {planet.stats?.radius || 'N/A'} R☉</li>
+          {/* Planet Type */}
+          {planetType !== "Unknown" && (
+            <li className="flex items-center">
+              <span className="font-semibold mr-1">Type:</span> {planetType}
+              {hasClassificationInfo && <InfoButton stat="type" />}
+            </li>
+          )}
+          
+          {/* Temperature */}
+          {planet.stats?.temperature && planet.stats.temperature !== "N/A" && (
+            <li className="flex items-center">
+              Temperature: {planet.stats.temperature} K
+              {hasClassificationInfo && <InfoButton stat="temperature" />}
+            </li>
+          )}
+          
+          {/* Radius */}
+          {planet.stats?.radius && planet.stats.radius !== "N/A" && (
+            <li className="flex items-center">
+              Radius: {planet.stats.radius} R☉
+              {hasClassificationInfo && <InfoButton stat="radius" />}
+            </li>
+          )}
+          
+          {/* Density */}
+          {planet.stats?.density && planet.stats.density !== "N/A" && (
+            <li className="flex items-center">
+              Density: {planet.stats.density} g/cm³
+              {hasClassificationInfo && <InfoButton stat="density" />}
+            </li>
+          )}
+          
+          {/* Metallicity */}
           {planet.stats?.metallicity && (
             <li className="text-xs">
               <span className={isDarkMode ? 'text-blue-300' : 'text-blue-600'}>
@@ -105,8 +200,34 @@ const PlanetFocusView: React.FC<PlanetFocusViewProps> = ({ planet, onNext, onPre
               </span>
             </li>
           )}
-          <li>Mass: {planet.stats?.mass || 'N/A'} M☉</li>
+          
+          {/* Mass */}
+          {planet.stats?.mass && planet.stats.mass !== "N/A" && (
+            <li className="flex items-center">
+              Mass: {planet.stats.mass} M☉
+              {hasClassificationInfo && <InfoButton stat="mass" />}
+            </li>
+          )}
         </ul>
+        
+        {/* Info Tooltip */}
+        {showInfoTooltip && hasClassificationInfo && planet.stats && (
+          <div className={`mt-3 p-2 rounded text-xs border ${
+            isDarkMode
+              ? 'bg-gray-800/90 border-gray-700 text-gray-300'
+              : 'bg-white/90 border-gray-300 text-gray-700'
+          }`}>
+            <p className="mb-1">Measured by classification #{planet.stats.classificationId}</p>
+            <Link 
+              href={`/posts/${planet.stats.classificationId}`}
+              className={`underline ${
+                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
+              }`}
+            >
+              View classification →
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}

@@ -77,9 +77,23 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
           <Button 
             onClick={onDeploy} 
             disabled={isDeploying} 
-            className={`w-full ${isMobile ? 'h-9 text-sm' : 'h-10'}`}
+            className={`w-full ${isMobile ? 'h-9 text-sm' : 'h-11'} font-bold text-base shadow-lg transition-all duration-300 ${
+              isDarkMode
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white shadow-blue-500/50 hover:shadow-blue-500/70'
+                : 'bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white shadow-blue-600/40 hover:shadow-blue-700/60'
+            } disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]`}
           >
-            {isDeploying ? 'Deploying...' : 'Deploy Satellite'}
+            {isDeploying ? (
+              <span className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Deploying...
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-2">
+                <Satellite className="w-5 h-5" />
+                Deploy Satellite
+              </span>
+            )}
           </Button>
         )}
       </div>
@@ -128,15 +142,23 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
         {(waterDiscoveryStatus.canDiscoverMinerals || waterDiscoveryStatus.hasCloudClassifications || waterDiscoveryStatus.hasValidStats) && (
           <div className={`p-2.5 sm:p-4 ${
             waterDiscoveryStatus.canDiscoverMinerals 
-              ? 'bg-gradient-to-br from-red-500/25 to-orange-500/25 border-red-400/40' 
-              : 'bg-gradient-to-br from-yellow-500/25 to-amber-500/25 border-yellow-400/40'
+              ? isDarkMode
+                ? 'bg-gradient-to-br from-red-500/25 to-orange-500/25 border-red-400/40'
+                : 'bg-gradient-to-br from-red-100 to-orange-100 border-red-400/60'
+              : isDarkMode
+                ? 'bg-gradient-to-br from-yellow-500/25 to-amber-500/25 border-yellow-400/40'
+                : 'bg-gradient-to-br from-yellow-100 to-amber-100 border-yellow-500/60'
           } rounded-lg border shadow-lg ${isMobile ? 'text-xs' : ''}`}>
             <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
               <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 ${
-                waterDiscoveryStatus.canDiscoverMinerals ? 'bg-red-400' : 'bg-yellow-400'
+                waterDiscoveryStatus.canDiscoverMinerals 
+                  ? isDarkMode ? 'bg-red-400' : 'bg-red-600'
+                  : isDarkMode ? 'bg-yellow-400' : 'bg-yellow-600'
               } rounded-full animate-pulse`}></div>
               <span className={`${
-                waterDiscoveryStatus.canDiscoverMinerals ? 'text-red-300' : 'text-yellow-300'
+                waterDiscoveryStatus.canDiscoverMinerals 
+                  ? isDarkMode ? 'text-red-300' : 'text-red-700'
+                  : isDarkMode ? 'text-yellow-300' : 'text-yellow-700'
               } font-semibold ${isMobile ? 'text-xs' : 'text-sm'}`}>
                 {waterDiscoveryStatus.canDiscoverMinerals 
                   ? '💧 Water & Minerals Detected!' 
@@ -144,7 +166,9 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
               </span>
             </div>
             <div className={`${
-              waterDiscoveryStatus.canDiscoverMinerals ? 'text-red-200' : 'text-yellow-200'
+              waterDiscoveryStatus.canDiscoverMinerals 
+                ? isDarkMode ? 'text-red-200' : 'text-red-800'
+                : isDarkMode ? 'text-yellow-200' : 'text-yellow-800'
             } leading-snug ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
               {waterDiscoveryStatus.canDiscoverMinerals ? (
                 <p>

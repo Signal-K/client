@@ -395,11 +395,6 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
   useEffect(() => {
     if (investigationType !== "weather") return;
 
-    console.log("=== WEATHER SATELLITE DEBUG ===");
-    console.log("Sorted anomalies:", sortedAnomalies);
-    console.log("Anomaly classified map:", anomalyClassifiedMap);
-    console.log("Classifications:", classifications);
-
     const ONE_HOUR_MS = 60 * 60 * 1000;
     const elapsedMs = Math.max(0, currentTime.getTime() - deploy.getTime());
 
@@ -407,9 +402,6 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
     const nextAnomaly = sortedAnomalies.find(
       (anomaly) => !anomalyClassifiedMap[anomaly.anomaly_id]
     );
-
-    console.log("Next unclassified anomaly:", nextAnomaly);
-    console.log("Elapsed ms:", elapsedMs, "Need:", ONE_HOUR_MS);
 
     if (!nextAnomaly) {
       // All anomalies are classified, or there are no anomalies

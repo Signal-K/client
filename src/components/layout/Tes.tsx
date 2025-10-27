@@ -132,9 +132,9 @@ export default function GameNavbar() {
   }, []);  
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-2">
-      <div className="relative flex items-center justify-between rounded-lg backdrop-blur-md bg-black/30 border border-white/10 shadow-lg px-4 py-2">
-      <div className="flex items-center space-x-2">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-2 py-1">
+      <div className="relative flex items-center justify-between rounded-lg backdrop-blur-md bg-black/30 border border-white/10 shadow-lg px-3 py-1">
+      <div className="flex items-center space-x-1 flex-nowrap min-w-0">
         <Link href="/" legacyBehavior>
               <a>
                 <img src="/planet.svg" alt="Logo" className="h-8 w-8 ml-1" />
@@ -144,7 +144,7 @@ export default function GameNavbar() {
             <Menu as="div" className="relative inline-block text-left">
               <div>
                 <Button
-                  className="text-lg font-bold text-white hidden sm:flex items-center space-x-2 p-2 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition"
+                  className="text-sm font-bold text-white hidden sm:flex items-center space-x-1 px-2 py-0.5 bg-[#5FCBC3]/60 rounded-lg hover:bg-[#5FCBC3]/80 transition"
                   onClick={() => setSettlementsOpen((prev) => !prev)}
                 >
                   <span>Star Sailors: Home</span>
@@ -154,7 +154,7 @@ export default function GameNavbar() {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="w-5 h-5"
+                    className="w-4 h-4"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 9l-7.5 7.5L4.5 9" />
                   </svg>
@@ -212,7 +212,7 @@ export default function GameNavbar() {
           </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-2 flex-nowrap min-w-0 overflow-hidden">
           {/* Stardust Balance */}
             <StardustDropdown />
 
@@ -240,16 +240,16 @@ export default function GameNavbar() {
           {/* Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative flex items-center gap-2 pl-2 pr-3">
-                <div className="h-8 w-8 rounded-full overflow-hidden">
+            <Button variant="ghost" className="relative flex items-center gap-2 pl-2 pr-3 h-8">
+                <div className="h-6 w-6 rounded-full overflow-hidden">
                     <div
-                                    className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-[#5FCBC3]/60 hover:bg-[#5FCBC3]/80 transition"
+                                    className="flex items-center justify-center w-6 h-6 rounded-full overflow-hidden bg-[#5FCBC3]/60 hover:bg-[#5FCBC3]/80 transition"
                                   >
                     {/* <Avatar /> */}
                     <AvatarGenerator author={session?.user.id ?? ""} />
                     </div>
                 </div>
-                <ChevronDown className="h-4 w-4 text-white/70" />
+                <ChevronDown className="h-3 w-3 text-white/70" />
             </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 bg-black/80 backdrop-blur-md border border-white/10 text-white">

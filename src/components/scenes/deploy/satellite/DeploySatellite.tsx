@@ -22,6 +22,8 @@ export type EnrichedDatabaseAnomaly = DatabaseAnomaly & {
     mass: number | string;
     type: string;
     metallicity?: string | null;
+    classificationId?: number;
+    classificationAuthor?: string;
   };
 };
 
@@ -742,7 +744,7 @@ export default function DeploySatelliteViewport() {
       try {
         const { data: classifications, error } = await supabase
           .from("classifications")
-          .select("content, anomaly, classificationtype, classificationConfiguration")
+          .select("id, content, anomaly, classificationtype, classificationConfiguration, author")
           .eq("anomaly", planetId)
           .in("classificationtype", ["planet-inspection", "planet"]);
 
@@ -794,15 +796,23 @@ export default function DeploySatelliteViewport() {
               temperature: config.planet_temp?.toFixed(0) || config.stellar_temp || "N/A",
               mass: config.planet_mass?.toFixed(2) || config.stellar_mass || "N/A",
               type: config.planet_type || "N/A",
+              classificationId: planetSurvey.id,
+              classificationAuthor: planetSurvey.author,
             };
           }
           
           // Fall back to planet-inspection classification
-          const parsedStats = classifications.map((entry) => {
-            return parsePlanetStats(entry.content);
-          });
-
-          return parsedStats.find((stats) => stats !== null) || null;
+          const inspectionClass = classifications.find(c => c.classificationtype === "planet-inspection");
+          if (inspectionClass) {
+            const parsedStats = parsePlanetStats(inspectionClass.content);
+            if (parsedStats) {
+              return {
+                ...parsedStats,
+                classificationId: inspectionClass.id,
+                classificationAuthor: inspectionClass.author,
+              };
+            }
+          }
         }
 
         return null;
@@ -864,7 +874,7 @@ export default function DeploySatelliteViewport() {
       {/* Main map/viewport area */}
       <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0 pb-0 md:pb-0">
           {/* Main viewport content (planets/clouds) */}
-          <div className="relative flex-1 flex items-center justify-center z-10 pb-48 md:pb-0">
+          <div className="relative flex-1 flex items-center justify-center z-10 pb-48 md:pb-0 md:pt-0">
             <PlanetFocusView
               planet={planetAnomalies[focusedPlanetIdx] || null}
               onNext={() => setFocusedPlanetIdx((prev) => Math.min(planetAnomalies.length - 1, prev + 1))}

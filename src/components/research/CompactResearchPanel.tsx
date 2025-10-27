@@ -6,6 +6,7 @@ import { CompactUpgradeCard } from "./CompactUpgradeCard";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { getSatelliteCount } from "@/src/utils/userUpgrades";
 
 interface UpgradeData {
   // Telescope upgrades
@@ -41,8 +42,25 @@ interface UpgradeData {
     available: boolean;
   },
 
+  // Extraction method upgrades
+  roverExtraction: {
+    unlocked: boolean;
+    available: boolean;
+  };
+
+  satelliteExtraction: {
+    unlocked: boolean;
+    available: boolean;
+  };
+
   // Data/measurement upgrades
   spectroscopy: {
+    unlocked: boolean;
+    available: boolean;
+  };
+
+  // Planet Hunters NGTS upgrade
+  ngtsAccess: {
     unlocked: boolean;
     available: boolean;
   };
@@ -50,6 +68,7 @@ interface UpgradeData {
   // Progress data
   asteroidClassifications: number;
   cloudClassifications: number;
+  planetClassifications: number;
   availableStardust: number;
 }
 
@@ -64,12 +83,17 @@ export default function CompactResearchPanel() {
     spectroscopy: { unlocked: false, available: false },
     findMinerals: { unlocked: false, available: false },
     p4FindMinerals: { unlocked: false, available: false },
+    roverExtraction: { unlocked: false, available: false },
+    satelliteExtraction: { unlocked: false, available: false },
+    ngtsAccess: { unlocked: false, available: false },
     asteroidClassifications: 0,
     cloudClassifications: 0,
+    planetClassifications: 0,
     availableStardust: 0,
   });
 
   const [activeTab, setActiveTab] = useState("available");
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     fetchUpgradeData();
@@ -78,6 +102,7 @@ export default function CompactResearchPanel() {
   const fetchUpgradeData = async () => {
     if (!session?.user) return;
 
+    setLoading(true);
     try {
       // Get researched upgrades
       const { data: researched } = await supabase
@@ -104,6 +129,12 @@ export default function CompactResearchPanel() {
         .eq("author", session.user.id)
         .eq("classificationtype", "cloud");
 
+      const { data: planetClassifications } = await supabase
+        .from("classifications")
+        .select("id")
+        .eq("author", session.user.id)
+        .eq("classificationtype", "planet");
+
       // Calculate current upgrade levels
       const telescopeUpgrades = researched?.filter(r => r.tech_type === "probereceptors").length || 0;
       const satelliteUpgrades = researched?.filter(r => r.tech_type === "satellitecount").length || 0;
@@ -111,6 +142,12 @@ export default function CompactResearchPanel() {
       const spectroscopyUnlocked = researched?.some(r => r.tech_type === "spectroscopy") || false;
       const findMineralsUnlocked = researched?.some(r => r.tech_type === "findMinerals") || false;
       const p4MineralsUnlocked = researched?.some(r => r.tech_type === "p4Minerals") || false;
+      const roverExtractionUnlocked = researched?.some(r => r.tech_type === "roverExtraction") || false;
+      const satelliteExtractionUnlocked = researched?.some(r => r.tech_type === "satelliteExtraction") || false;
+      const ngtsAccessUnlocked = researched?.some(r => r.tech_type === "ngtsAccess") || false;
+
+      // Use utility function for satellite count
+      const currentSatelliteCount = await getSatelliteCount(supabase, session.user.id);
 
       // Calculate stardust with tiered pricing
       const basePoints = allClassifications?.length || 0;
@@ -140,7 +177,7 @@ export default function CompactResearchPanel() {
           available: availableStardust >= 10 && telescopeUpgrades < 1,
         },
         satelliteCount: {
-          current: 1 + satelliteUpgrades,
+          current: currentSatelliteCount,
           max: 2,
           available: availableStardust >= 10 && satelliteUpgrades < 1,
         },
@@ -161,12 +198,27 @@ export default function CompactResearchPanel() {
           unlocked: p4MineralsUnlocked,
           available: availableStardust >= 2 && !p4MineralsUnlocked,
         },
+        roverExtraction: {
+          unlocked: roverExtractionUnlocked,
+          available: availableStardust >= 2 && !roverExtractionUnlocked && findMineralsUnlocked,
+        },
+        satelliteExtraction: {
+          unlocked: satelliteExtractionUnlocked,
+          available: availableStardust >= 2 && !satelliteExtractionUnlocked && p4MineralsUnlocked,
+        },
+        ngtsAccess: {
+          unlocked: ngtsAccessUnlocked,
+          available: availableStardust >= 2 && !ngtsAccessUnlocked && (planetClassifications?.length || 0) >= 4,
+        },
         asteroidClassifications: asteroidClassifications?.length || 0,
         cloudClassifications: cloudClassifications?.length || 0,
+        planetClassifications: planetClassifications?.length || 0,
         availableStardust,
       });
     } catch (error) {
       console.error("Error fetching upgrade data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -189,12 +241,14 @@ export default function CompactResearchPanel() {
   };
 
   const availableUpgrades = [
-    // Telescope upgrades (Quantity - 10 stardust)
+    // EQUIPMENT UPGRADES
+    // Telescope upgrades (Equipment - 10 stardust)
     ...(upgradeData.telescopeReceptors.current < upgradeData.telescopeReceptors.max ? [{
       id: "telescope-receptors",
       title: "Telescope Receptors",
-      description: "Extend your telescope's receptors to see deeper dips in lightcurves, revealing hidden anomalies. Increases anomaly detection by 2 per scan. (Quantity Upgrade)",
+      description: "Extend your telescope's receptors to see deeper dips in lightcurves, revealing hidden anomalies. Increases anomaly detection by 2 per scan.",
       category: "telescope" as const,
+      subcategory: "equipment" as const,
       current: upgradeData.telescopeReceptors.current,
       max: upgradeData.telescopeReceptors.max,
       cost: 10,
@@ -202,12 +256,13 @@ export default function CompactResearchPanel() {
       onUpgrade: () => handleUpgrade("probereceptors", 10),
     }] : []),
     
-    // Satellite upgrades (Quantity - 10 stardust)
+    // Satellite upgrades (Equipment - 10 stardust)
     ...(upgradeData.satelliteCount.current < upgradeData.satelliteCount.max ? [{
       id: "satellite-count",
       title: "Additional Satellite",
-      description: "Deploy an additional weather satellite to your fleet for enhanced planetary coverage. Increases observation capacity across multiple worlds. (Quantity Upgrade)",
+      description: "Deploy an additional weather satellite to your fleet for enhanced planetary coverage. Increases observation capacity across multiple worlds.",
       category: "satellite" as const,
+      subcategory: "equipment" as const,
       current: upgradeData.satelliteCount.current,
       max: upgradeData.satelliteCount.max,
       cost: 10,
@@ -215,12 +270,13 @@ export default function CompactResearchPanel() {
       onUpgrade: () => handleUpgrade("satellitecount", 10),
     }] : []),
     
-    // Rover upgrades (Quantity - 10 stardust)
+    // Rover upgrades (Equipment - 10 stardust)
     ...(upgradeData.roverWaypoints.current < upgradeData.roverWaypoints.max ? [{
       id: "rover-waypoints",
-      title: "Rover Navigation Upgrade",
-      description: "Upgrade your rover's navigation system to support 2 additional waypoints (total 6). Allows for more complex exploration routes and increased discovery potential. (Quantity Upgrade)",
+      title: "Rover Navigation System",
+      description: "Upgrade your rover's navigation system to support 2 additional waypoints (total 6). Allows for more complex exploration routes and increased discovery potential.",
       category: "rover" as const,
+      subcategory: "equipment" as const,
       current: upgradeData.roverWaypoints.current,
       max: upgradeData.roverWaypoints.max,
       cost: 10,
@@ -228,37 +284,80 @@ export default function CompactResearchPanel() {
       onUpgrade: () => handleUpgrade("roverwaypoints", 10),
     }] : []),
 
-    // AI4M Minerals
+    // PROJECT/DATA UPGRADES
+    // Spectroscopy (Project/Data - 2 stardust)
+    ...(!upgradeData.spectroscopy.unlocked ? [{
+      id: "spectroscopy",
+      title: "Spectroscopy Data",
+      description: "Access detailed atmospheric composition data from telescope observations of planets. Unlock spectroscopic analysis for enhanced planetary characterization.",
+      category: "telescope" as const,
+      subcategory: "project" as const,
+      cost: 2,
+      available: upgradeData.spectroscopy.available,
+      onUpgrade: () => handleUpgrade("spectroscopy", 2),
+    }] : []),
+
+    // Planet Hunters NGTS (Project/Data - 2 stardust)
+    ...(!upgradeData.ngtsAccess.unlocked ? [{
+      id: "ngtsAccess",
+      title: "Planet Hunters: Next Generation",
+      description: "Unlock access to NGTS (Next-Generation Transit Survey) data from ESO's robotic telescope array in Chile. Detect exoplanet transits with high-precision measurements for mass and composition analysis.",
+      category: "telescope" as const,
+      subcategory: "project" as const,
+      cost: 2,
+      available: upgradeData.ngtsAccess.available,
+      isLocked: !upgradeData.ngtsAccess.available && upgradeData.planetClassifications < 4,
+      requirementText: upgradeData.planetClassifications < 4 ? `${upgradeData.planetClassifications}/4 planet classifications` : undefined,
+      onUpgrade: () => handleUpgrade("ngtsAccess", 2),
+    }] : []),
+
+    // MINING UPGRADES
+    // AI4M Minerals (Mining - 2 stardust)
     ...(!upgradeData.findMinerals.unlocked ? [{
       id: "findMinerals",
       title: "Find Mineral Deposits",
-      description: "Your rovers and satellites can find mineral and soil deposits, which can be extracted and manipulated in future to produce resources and farms",
+      description: "Your rovers can now detect and locate mineral and soil deposits during AI4Mars terrain surveys. Enables future extraction of iron oxide, silicates, and other valuable resources.",
       category: "rover" as const,
+      subcategory: "mining" as const,
       cost: 2,
       available: upgradeData.findMinerals.available,
       onUpgrade: () => handleUpgrade("findMinerals", 2),
     }] : []),
 
-    // P4 + CoM Minerals
+    // P4 + CoM Minerals (Mining - 2 stardust)
     ...(!upgradeData.p4FindMinerals.unlocked ? [{
       id: "p4Minerals",
       title: "Find Icy Deposits",
-      description: "Your satellites can already track sublimation behaviour on your exoplanets, now you can combine your knowledge of clouds and ice-spiders to find water & CO2-ice sources for future extraction",
+      description: "Your satellites can now identify and track water & CO2-ice sources through Planet Four and Cloudspotting missions. Combine sublimation data with cloud patterns for precise ice location.",
       category: "satellite" as const,
+      subcategory: "mining" as const,
       cost: 2,
       available: upgradeData.p4FindMinerals.available,
       onUpgrade: () => handleUpgrade("p4Minerals", 2),
     }] : []),
     
-    // Spectroscopy (Data/Measurement - 2 stardust)
-    ...(!upgradeData.spectroscopy.unlocked ? [{
-      id: "spectroscopy",
-      title: "Spectroscopy Data",
-      description: "Access detailed atmospheric composition data from telescope observations of planets. Unlock spectroscopic analysis for enhanced planetary characterization. (Data Upgrade)",
-      category: "telescope" as const,
+    // Rover Extraction Method (Mining - 2 stardust)
+    ...(!upgradeData.roverExtraction.unlocked ? [{
+      id: "roverExtraction",
+      title: "Rover Mineral Extraction",
+      description: "Equip your rovers with drilling and excavation tools to extract mineral deposits from the Martian surface. Unlock active harvesting of iron ore, silicates, and other resources.",
+      category: "rover" as const,
+      subcategory: "mining" as const,
       cost: 2,
-      available: upgradeData.spectroscopy.available,
-      onUpgrade: () => handleUpgrade("spectroscopy", 2),
+      available: upgradeData.roverExtraction.available,
+      onUpgrade: () => handleUpgrade("roverExtraction", 2),
+    }] : []),
+
+    // Satellite Extraction Method (Mining - 2 stardust)
+    ...(!upgradeData.satelliteExtraction.unlocked ? [{
+      id: "satelliteExtraction",
+      title: "Atmospheric Resource Collection",
+      description: "Deploy atmospheric collectors and spectral analysis equipment to your satellites. Extract water ice, CO2 ice, and atmospheric vapours from exoplanets.",
+      category: "satellite" as const,
+      subcategory: "mining" as const,
+      cost: 2,
+      available: upgradeData.satelliteExtraction.available,
+      onUpgrade: () => handleUpgrade("satelliteExtraction", 2),
     }] : []),
   ];
 
@@ -291,12 +390,14 @@ export default function CompactResearchPanel() {
     },
   ];
 
-  const completedUpgrades = [
+  const researchedUpgrades = [
+    // EQUIPMENT
     ...(upgradeData.telescopeReceptors.current >= upgradeData.telescopeReceptors.max ? [{
       id: "telescope-complete",
       title: "Telescope Receptors",
       description: "Your telescope's receptors are fully enhanced for maximum anomaly detection.",
       category: "telescope" as const,
+      subcategory: "equipment" as const,
       current: upgradeData.telescopeReceptors.current,
       max: upgradeData.telescopeReceptors.max,
       cost: 0,
@@ -309,6 +410,7 @@ export default function CompactResearchPanel() {
       title: "Satellite Fleet",
       description: "Your satellite fleet is at maximum capacity for planetary observations.",
       category: "satellite" as const,
+      subcategory: "equipment" as const,
       current: upgradeData.satelliteCount.current,
       max: upgradeData.satelliteCount.max,
       cost: 0,
@@ -321,6 +423,7 @@ export default function CompactResearchPanel() {
       title: "Rover Navigation System",
       description: "Your rover's navigation system is fully upgraded for maximum waypoint capacity.",
       category: "rover" as const,
+      subcategory: "equipment" as const,
       current: upgradeData.roverWaypoints.current,
       max: upgradeData.roverWaypoints.max,
       cost: 0,
@@ -328,21 +431,36 @@ export default function CompactResearchPanel() {
       onUpgrade: () => {},
     }] : []),
     
+    // PROJECT/DATA
     ...(upgradeData.spectroscopy.unlocked ? [{
       id: "spectroscopy-complete",
       title: "Spectroscopy Data",
       description: "Spectroscopic analysis is now available for all planetary observations.",
       category: "telescope" as const,
+      subcategory: "project" as const,
       cost: 0,
       available: false,
       onUpgrade: () => {},
     }] : []),
 
+    ...(upgradeData.ngtsAccess.unlocked ? [{
+      id: "ngtsAccess-complete",
+      title: "Planet Hunters: Next Generation",
+      description: "NGTS data access enabled. Your telescope can now detect exoplanet transits with high-precision measurements.",
+      category: "telescope" as const,
+      subcategory: "project" as const,
+      cost: 0,
+      available: false,
+      onUpgrade: () => {},
+    }] : []),
+
+    // MINING
     ...(upgradeData.findMinerals.unlocked ? [{
       id: "findMinerals-complete",
       title: "Find Mineral Deposits",
-      description: "Your rovers and satellites can now find mineral and soil deposits for future extraction.",
+      description: "Your rovers can now detect mineral and soil deposits during terrain surveys.",
       category: "rover" as const,
+      subcategory: "mining" as const,
       cost: 0,
       available: false,
       onUpgrade: () => {},
@@ -351,13 +469,56 @@ export default function CompactResearchPanel() {
     ...(upgradeData.p4FindMinerals.unlocked ? [{
       id: "p4Minerals-complete",
       title: "Find Icy Deposits",
-      description: "Your satellites can now track and locate water & CO2-ice sources for future extraction.",
+      description: "Your satellites can now track and locate water & CO2-ice sources.",
       category: "satellite" as const,
+      subcategory: "mining" as const,
+      cost: 0,
+      available: false,
+      onUpgrade: () => {},
+    }] : []),
+
+    ...(upgradeData.roverExtraction.unlocked ? [{
+      id: "roverExtraction-complete",
+      title: "Rover Mineral Extraction",
+      description: "Your rovers can actively extract and harvest mineral deposits from surfaces.",
+      category: "rover" as const,
+      subcategory: "mining" as const,
+      cost: 0,
+      available: false,
+      onUpgrade: () => {},
+    }] : []),
+
+    ...(upgradeData.satelliteExtraction.unlocked ? [{
+      id: "satelliteExtraction-complete",
+      title: "Atmospheric Resource Collection",
+      description: "Your satellites can collect atmospheric resources from exoplanets.",
+      category: "satellite" as const,
+      subcategory: "mining" as const,
       cost: 0,
       available: false,
       onUpgrade: () => {},
     }] : []),
   ];
+
+  // Group upgrades by subcategory
+  const groupBySubcategory = (upgrades: any[]) => {
+    const grouped = {
+      equipment: upgrades.filter(u => u.subcategory === "equipment"),
+      project: upgrades.filter(u => u.subcategory === "project"),
+      mining: upgrades.filter(u => u.subcategory === "mining"),
+    };
+    return grouped;
+  };
+
+  const availableGrouped = groupBySubcategory(availableUpgrades);
+  const researchedGrouped = groupBySubcategory(researchedUpgrades);
+
+  // Auto-switch to researched tab if nothing is available
+  useEffect(() => {
+    if (!loading && availableUpgrades.length === 0 && researchedUpgrades.length > 0) {
+      setActiveTab("researched");
+    }
+  }, [loading, availableUpgrades.length, researchedUpgrades.length]);
 
   return (
     <div className="space-y-6">
@@ -384,8 +545,11 @@ export default function CompactResearchPanel() {
       </div>
 
       {/* Upgrade Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+      {loading ? (
+        <div className="text-center py-8 text-muted-foreground">Loading upgrades...</div>
+      ) : (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="available" className="flex items-center gap-2">
             Available
             {availableUpgrades.length > 0 && (
@@ -394,56 +558,139 @@ export default function CompactResearchPanel() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="progress">Progress</TabsTrigger>
-          <TabsTrigger value="completed">Complete</TabsTrigger>
+          <TabsTrigger value="researched" className="flex items-center gap-2">
+            Researched
+            {researchedUpgrades.length > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {researchedUpgrades.length}
+              </Badge>
+            )}
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="available" className="mt-4">
+        <TabsContent value="available" className="mt-6 space-y-6">
           {availableUpgrades.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {availableUpgrades.map((upgrade) => (
-                <CompactUpgradeCard key={upgrade.id} {...upgrade} />
-              ))}
-            </div>
+            <>
+              {/* Equipment Section */}
+              {availableGrouped.equipment.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    Equipment Upgrades
+                  </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {availableGrouped.equipment.map((upgrade) => (
+                      <CompactUpgradeCard key={upgrade.id} {...upgrade} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Project/Data Section */}
+              {availableGrouped.project.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                    Project & Data Unlocks
+                  </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {availableGrouped.project.map((upgrade) => (
+                      <CompactUpgradeCard key={upgrade.id} {...upgrade} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Mining Section */}
+              {availableGrouped.mining.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                    Mining & Extraction
+                  </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {availableGrouped.mining.map((upgrade) => (
+                      <CompactUpgradeCard key={upgrade.id} {...upgrade} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No upgrades available at the moment.</p>
+            <div className="text-center py-12 text-muted-foreground">
+              <p className="text-lg mb-2">No upgrades available at the moment.</p>
               <p className="text-sm">Complete more classifications to earn stardust!</p>
             </div>
           )}
         </TabsContent>
 
-        <TabsContent value="progress" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {progressItems.map((item) => (
-              <CompactUpgradeCard key={item.id} {...item} />
-            ))}
-          </div>
-        </TabsContent>
+        <TabsContent value="researched" className="mt-6 space-y-6">
+          {researchedUpgrades.length > 0 ? (
+            <>
+              {/* Equipment Section */}
+              {researchedGrouped.equipment.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    Equipment Upgrades
+                  </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {researchedGrouped.equipment.map((upgrade) => (
+                      <CompactUpgradeCard key={upgrade.id} {...upgrade} />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-        <TabsContent value="completed" className="mt-4">
-          {completedUpgrades.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {completedUpgrades.map((upgrade) => (
-                <CompactUpgradeCard key={upgrade.id} {...upgrade} />
-              ))}
-            </div>
+              {/* Project/Data Section */}
+              {researchedGrouped.project.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                    Project & Data Unlocks
+                  </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {researchedGrouped.project.map((upgrade) => (
+                      <CompactUpgradeCard key={upgrade.id} {...upgrade} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Mining Section */}
+              {researchedGrouped.mining.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                    Mining & Extraction
+                  </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {researchedGrouped.mining.map((upgrade) => (
+                      <CompactUpgradeCard key={upgrade.id} {...upgrade} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No completed upgrades yet.</p>
-              <p className="text-sm">Start upgrading to see your progress here!</p>
+            <div className="text-center py-12 text-muted-foreground">
+              <p className="text-lg mb-2">No researched upgrades yet.</p>
+              <p className="text-sm">Start researching to build your capabilities!</p>
             </div>
           )}
         </TabsContent>
-      </Tabs>
+        </Tabs>
+      )}
 
       {/* Coming Soon Section */}
       <div className="mt-8">
-        <h3 className="text-lg font-semibold mb-4">Coming Soon</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <span className="text-muted-foreground">Coming Soon</span>
+        </h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <CompactUpgradeCard
             title="Deep Space Probe"
-            description="Extend telescope range for observations beyond the solar system. (Quantity Upgrade)"
+            description="Extend telescope range for observations beyond the solar system."
             category="telescope"
             cost={10}
             available={false}
@@ -452,28 +699,8 @@ export default function CompactResearchPanel() {
             onUpgrade={() => {}}
           />
           <CompactUpgradeCard
-            title="Mineral deposit extraction"
-            description="Collect water, silicates & other minerals that you discover"
-            category="rover"
-            cost={2}
-            available={false}
-            isLocked={true}
-            requirementText="Coming in future update"
-            onUpgrade={() => {}}
-          />
-          {/* <CompactUpgradeCard
-            title="Rover Battery Extension"
-            description="Increase rover battery life for longer exploration missions. (Data Upgrade)"
-            category="rover"
-            cost={2}
-            available={false}
-            isLocked={true}
-            requirementText="Coming in future update"
-            onUpgrade={() => {}}
-          /> */}
-          <CompactUpgradeCard
             title="Advanced Radar System"
-            description="Enhanced atmospheric scanning for satellite observations. (Data Upgrade)"
+            description="Enhanced atmospheric scanning for satellite observations."
             category="satellite"
             cost={2}
             available={false}

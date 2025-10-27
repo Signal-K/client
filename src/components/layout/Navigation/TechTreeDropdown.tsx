@@ -67,9 +67,9 @@ export default function TechnologyPopover() {
   return (
     <Popover>
         <PopoverTrigger asChild>
-            <Button variant="ghost" className="relative group">
-                <TestTube className="mr-2" />
-                Tech Tree
+            <Button variant="ghost" className="relative group flex items-center h-8">
+                <TestTube className="h-4 w-4 flex-shrink-0" />
+                <span className="ml-1 text-sm whitespace-nowrap">Tech Tree</span>
             </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80 p-0 bg-black/80 backdrop-blur-md border border-purple-500/20 rounded-md">

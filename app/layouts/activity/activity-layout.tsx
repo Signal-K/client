@@ -4,7 +4,6 @@ import { useEffect, useState, ReactNode } from "react";
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { ActivePlanetProvider } from "@/src/core/context/ActivePlanet";
-import { UserAnomaliesProvider } from "@/src/core/context/UserAnomalies";
 import Sidebar from "@/src/components/ui/Panels/Sidebar";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -33,7 +32,7 @@ export default function ActivityLayout({ children }: { children: ReactNode }) {
       <body>
         <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
           <ActivePlanetProvider>
-            <UserAnomaliesProvider>
+            {/* <UserAnomaliesProvider> */}
               <div className="flex min-h-screen w-full">
                 {/* Sidebar: fixed to left, does not scroll, desktop only */}
                 {session && (
@@ -56,7 +55,7 @@ export default function ActivityLayout({ children }: { children: ReactNode }) {
               </div>
               <Analytics />
               <SpeedInsights />
-            </UserAnomaliesProvider>
+            {/* </UserAnomaliesProvider> */}
           </ActivePlanetProvider>
         </SessionContextProvider>
       </body>
