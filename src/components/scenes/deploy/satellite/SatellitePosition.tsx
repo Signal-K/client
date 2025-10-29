@@ -81,6 +81,12 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
   const [deploymentCount, setDeploymentCount] = useState<number | null>(null);
   const [allWeatherSatEntries, setAllWeatherSatEntries] = useState<any[]>([]);
 
+  // Orbit animation state - must be declared before any conditional returns
+  const [orbitAngle, setOrbitAngle] = useState(0);
+  const [isFlashing, setIsFlashing] = useState(false);
+  const [timelineExpanded, setTimelineExpanded] = useState(false);
+  const [showPlanetSurvey, setShowPlanetSurvey] = useState(false);
+
   // Helper to get start of week (Sunday AEST 00:01)
   function getAESTWeekStart(date: Date) {
     // Convert to AEST (UTC+10)
@@ -430,22 +436,6 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
     return () => clearInterval(interval);
   }, []);
 
-  if (missionType === 'p-4') {
-    return (
-      <Section expandLink={"/viewports/satellite"} sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Wind Survey mission is active."}>
-        <div ref={sectionRef} className="relative z-10 flex items-center justify-center w-full h-full min-h-0 overflow-hidden">
-          <SatelliteSpiderScan anomalies={windSurveyAnomalies} />
-        </div>
-      </Section>
-    );
-  }
-
-  // Orbit animation state
-  const [orbitAngle, setOrbitAngle] = useState(0);
-  const [isFlashing, setIsFlashing] = useState(false);
-  const [timelineExpanded, setTimelineExpanded] = useState(false);
-  const [showPlanetSurvey, setShowPlanetSurvey] = useState(false);
-
   // Check if anomalies are ready (weather or planet missions)
   const isWeatherAnomalyReady = () => {
     if ((missionType !== 'weather' && missionType !== 'planet') || !positions[0]?.deployTime) return false;
@@ -504,6 +494,17 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
   
   // Calculate satellite rotation to face planet
   const satelliteRotation = orbitAngle + 180;
+
+  // Early returns AFTER all hooks are declared
+  if (missionType === 'p-4') {
+    return (
+      <Section expandLink={"/viewports/satellite"} sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Wind Survey mission is active."}>
+        <div ref={sectionRef} className="relative z-10 flex items-center justify-center w-full h-full min-h-0 overflow-hidden">
+          <SatelliteSpiderScan anomalies={windSurveyAnomalies} />
+        </div>
+      </Section>
+    );
+  }
 
   // Show planet survey if button clicked for planet missions
   if (showPlanetSurvey && missionType === 'planet' && positions[0]) {

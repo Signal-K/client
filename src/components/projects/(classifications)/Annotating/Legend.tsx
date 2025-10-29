@@ -37,29 +37,29 @@ export function Legend<Category extends AI4MCategory | P4Category>({
               key={key}
               variant={currentCategory === key ? 'default' : 'outline'}
               onClick={() => setCurrentCategory(key as Category)}
-              className={`legend-button w-full text-left flex flex-col items-start gap-2 p-3 md:p-3 min-h-[120px] h-auto ${
+              className={`legend-button w-full text-left flex flex-col items-start gap-1.5 p-2 md:p-2.5 min-h-[80px] h-auto ${
                 currentCategory === key 
                   ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
                   : 'bg-background text-foreground hover:bg-accent hover:text-accent-foreground border-border'
               }`}
             >
-              <div className="flex items-start gap-3 w-full">
+              <div className="flex items-start gap-2 w-full">
                 {config.iconUrl && (
                   <img
                     src={config.iconUrl}
                     alt={config.name}
-                    className="w-8 h-8 object-contain flex-shrink-0 mt-0.5"
+                    className="w-6 h-6 object-contain flex-shrink-0 mt-0.5"
                   />
                 )}
-                <div className="flex-1 min-w-0 w-full pr-2">
-                  <div className="font-medium text-sm leading-tight mb-1 break-words text-foreground whitespace-normal">{config.name}</div>
-                  <div className="text-xs leading-relaxed break-words text-foreground/80 whitespace-normal overflow-visible">
+                <div className="flex-1 min-w-0 w-full pr-1.5">
+                  <div className="font-medium text-xs leading-tight mb-0.5 break-words text-foreground whitespace-normal">{config.name}</div>
+                  <div className="text-[10px] leading-snug break-words text-foreground/80 whitespace-normal overflow-visible line-clamp-2">
                     {config.description}
                   </div>
                 </div>
               </div>
               {categoryCount[key as Category] > 0 && (
-                <div className={`px-2 py-0.5 rounded-full text-xs mt-1 font-medium ${
+                <div className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium ${
                   currentCategory === key
                     ? 'bg-primary-foreground text-primary'
                     : 'bg-secondary text-secondary-foreground'

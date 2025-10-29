@@ -46,7 +46,7 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
     <div
       className={`max-w-full overflow-x-hidden ${
         useHorizontalLayout
-          ? "h-full flex flex-col"
+          ? "h-screen max-h-screen flex flex-col"
           : "space-y-2 px-2 md:px-4 mx-auto"
       } ${props.className ?? ""}`}
     >
@@ -64,7 +64,7 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
       `}</style>
 
       <div
-        className={`${useHorizontalLayout ? "flex-shrink-0" : ""} flex justify-between items-center px-2`}
+        className={`${useHorizontalLayout ? "flex-shrink-0 py-2" : "py-1"} flex justify-between items-center px-2`}
       >
         <AnnotationTools
           currentTool={currentTool}
@@ -76,12 +76,12 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
       </div>
 
       {hasMineralDeposit && (
-        <div className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white p-3 mb-2 rounded-lg border-2 border-amber-400 shadow-lg">
+        <div className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white p-2 mb-1 rounded-lg border border-amber-400 shadow-lg flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">💎</span>
+              <span className="text-lg">💎</span>
               <div>
-                <h3 className="font-bold text-sm">Mineral deposits can be found here</h3>
+                <h3 className="font-bold text-xs">Mineral deposits can be found here</h3>
               </div>
             </div>
           </div>
@@ -89,13 +89,13 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
       )}
 
       {isNGTS && (
-        <div className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-3 mb-2 rounded-lg border-2 border-purple-400 shadow-lg">
+        <div className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-2 mb-1 rounded-lg border border-purple-400 shadow-lg flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🔭</span>
+              <span className="text-lg">🔭</span>
               <div>
-                <h3 className="font-bold text-sm">NGTS Odd Even Transit Check</h3>
-                <p className="text-xs mt-1 opacity-90">Answer the question about green and magenta points, then draw the shape of the main transit curve</p>
+                <h3 className="font-bold text-xs">NGTS Odd Even Transit Check</h3>
+                <p className="text-[10px] mt-0.5 opacity-90">Answer the question about green and magenta points, then draw the shape of the main transit curve</p>
               </div>
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
       {selectedImage && (
         <>
           {useHorizontalLayout && (
-            <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-4 overflow-hidden px-2">
+            <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-3 overflow-hidden px-2 pb-2">
               <div
                 className={`annotation-canvas-container ${isDrawing ? "drawing" : ""} flex-1 min-h-0 overflow-hidden flex items-center justify-center bg-gray-900 rounded-lg`}
               >
@@ -129,8 +129,8 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
                 />
               </div>
 
-              <div className="w-full md:w-80 md:min-w-80 flex flex-col gap-3 overflow-y-auto">
-                <SciFiPanel className="p-3">
+              <div className="w-full md:w-72 md:min-w-72 flex flex-col gap-2 overflow-y-auto max-h-[calc(100vh-8rem)]">
+                <SciFiPanel className="p-2.5">
                   <Legend
                     currentCategory={currentCategory}
                     setCurrentCategory={setCurrentCategory}
@@ -139,19 +139,19 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
                   />
                 </SciFiPanel>
 
-                <SciFiPanel className="p-3">
-                  <div className="space-y-3">
+                <SciFiPanel className="p-2.5">
+                  <div className="space-y-2">
                     <textarea
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
-                      className="w-full p-2 h-20 text-sm text-blue-300 rounded-md border border-[#3B4252]"
+                      className="w-full p-2 h-16 text-xs text-blue-300 rounded-md border border-[#3B4252]"
                       placeholder="Describe your annotations or post any additional information"
                     />
 
                     <Button
                       onClick={handleSubmitClassification}
                       disabled={isUploading}
-                      className="w-full text-sm py-2"
+                      className="w-full text-xs py-2"
                     >
                       {isUploading ? "Submitting..." : "Submit Classification"}
                     </Button>
@@ -164,7 +164,7 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
           {!useHorizontalLayout && (
             <>
               <div
-                className={`annotation-canvas-container ${isDrawing ? "drawing" : ""} w-full text-center ${isActiveAsteroids ? "min-h-[60vh] md:max-h-[60vh]" : "max-h-[50vh] md:max-h-[60vh]"} overflow-auto`}
+                className={`annotation-canvas-container ${isDrawing ? "drawing" : ""} w-full text-center ${isActiveAsteroids ? "min-h-[40vh] max-h-[45vh]" : "max-h-[40vh] md:max-h-[45vh]"} overflow-auto`}
               >
                 <AnnotationCanvas
                   canvasRef={canvasRef}
@@ -187,8 +187,8 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
               </div>
 
               {isActiveAsteroids ? (
-                <div className="flex flex-col gap-3 md:gap-4 w-full max-w-5xl mx-auto px-2">
-                  <SciFiPanel className="p-3 md:p-4 w-full">
+                <div className="flex flex-col gap-2 md:gap-3 w-full max-w-5xl mx-auto px-2">
+                  <SciFiPanel className="p-2.5 md:p-3 w-full">
                     <Legend
                       currentCategory={currentCategory}
                       setCurrentCategory={setCurrentCategory}
@@ -197,19 +197,19 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
                     />
                   </SciFiPanel>
 
-                  <SciFiPanel className="p-3 md:p-4 w-full">
-                    <div className="space-y-3 md:space-y-4">
+                  <SciFiPanel className="p-2.5 md:p-3 w-full">
+                    <div className="space-y-2 md:space-y-3">
                       <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="w-full p-2 md:p-3 h-20 md:h-24 text-sm text-blue-300 rounded-md border border-[#3B4252]"
+                        className="w-full p-2 h-16 md:h-20 text-xs text-blue-300 rounded-md border border-[#3B4252]"
                         placeholder="Describe your annotations or post any additional information"
                       />
 
                       <Button
                         onClick={handleSubmitClassification}
                         disabled={isUploading}
-                        className="w-full"
+                        className="w-full text-xs"
                       >
                         {isUploading ? "Submitting..." : "Submit Classification"}
                       </Button>
@@ -217,8 +217,8 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
                   </SciFiPanel>
                 </div>
               ) : (
-                <div className="flex flex-col md:flex-row gap-4 w-full max-w-5xl mx-auto">
-                  <SciFiPanel className="p-4 w-full md:w-1/2">
+                <div className="flex flex-col md:flex-row gap-2 md:gap-3 w-full max-w-5xl mx-auto">
+                  <SciFiPanel className="p-2.5 md:p-3 w-full md:w-1/2">
                     <Legend
                       currentCategory={currentCategory}
                       setCurrentCategory={setCurrentCategory}
@@ -227,16 +227,20 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
                     />
                   </SciFiPanel>
 
-                  <SciFiPanel className="p-4 w-full md:w-1/2">
-                    <div className="space-y-4">
+                  <SciFiPanel className="p-2.5 md:p-3 w-full md:w-1/2">
+                    <div className="space-y-2 md:space-y-3">
                       <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="w-full p-3 h-24 text-sm text-blue-300 rounded-md border border-[#3B4252]"
+                        className="w-full p-2 h-16 md:h-20 text-xs text-blue-300 rounded-md border border-[#3B4252]"
                         placeholder="Describe your annotations or post any additional information"
                       />
 
-                      <Button onClick={handleSubmitClassification} disabled={isUploading}>
+                      <Button 
+                        onClick={handleSubmitClassification} 
+                        disabled={isUploading}
+                        className="w-full text-xs"
+                      >
                         {isUploading ? "Submitting..." : "Submit Classification"}
                       </Button>
                     </div>
