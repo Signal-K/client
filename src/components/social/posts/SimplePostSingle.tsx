@@ -18,6 +18,7 @@ interface SimplePostSingleProps {
   content: string;
   category: string;
   images: string[];
+  sourceMedia?: string[];
 };
 
 export function SimplePostSingle({
@@ -27,12 +28,15 @@ export function SimplePostSingle({
   content,
   category,
   images,
+  sourceMedia = [],
 }: SimplePostSingleProps) {
   const router = useRouter();
 
   const supabase = useSupabaseClient();
   const session = useSession();
 
+  // Combine images with sourceMedia for the slider
+  const allImages = sourceMedia.length > 0 ? [...images, ...sourceMedia] : images;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [voteTotal, setVoteTotal] = useState<number>(0);
@@ -103,8 +107,8 @@ export function SimplePostSingle({
     }
   };
 
-  const goToNextImage = () => setCurrentIndex((prev) => (prev + 1) % images.length);
-  const goToPreviousImage = () => setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  const goToNextImage = () => setCurrentIndex((prev) => (prev + 1) % allImages.length);
+  const goToPreviousImage = () => setCurrentIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
   const toggleCommentForm = () => setShowCommentForm((prev) => !prev);
 
@@ -162,15 +166,22 @@ export function SimplePostSingle({
           <p className="text-xs font-semibold text-[#5E81AC] uppercase mb-1 tracking-wide">{category}</p>
           <p className="text-[#2E3440]">{content}</p>
 
-          {images.length > 0 && (
+          {allImages.length > 0 && (
             <div className="relative">
+              {/* Show source indicator badge */}
+              {sourceMedia.length > 0 && currentIndex >= images.length && (
+                <div className="absolute top-2 left-2 z-10 bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded">
+                  📊 Source Data
+                </div>
+              )}
+              
               <img
-                src={images[currentIndex]}
+                src={allImages[currentIndex]}
                 alt={`Image ${currentIndex + 1}`}
                 className="w-full max-h-[400px] object-contain cursor-pointer rounded-lg transition-all duration-200" // 🔧 UPDATED
                 onClick={() => setIsLightboxOpen(true)}
               />
-              {images.length > 1 && (
+              {allImages.length > 1 && (
                 <>
                   <button
                     onClick={goToPreviousImage}
@@ -185,7 +196,7 @@ export function SimplePostSingle({
                     &#8594;
                   </button>
                   <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                    {images.map((_, index) => (
+                    {allImages.map((_, index) => (
                       <button
                         key={index}
                         onClick={() => setCurrentIndex(index)}
@@ -196,6 +207,18 @@ export function SimplePostSingle({
                     ))}
                   </div>
                 </>
+              )}
+              
+              {/* Image counter with source info */}
+              {allImages.length > 1 && (
+                <div className="text-center text-sm text-gray-600 mt-2">
+                  {currentIndex + 1} / {allImages.length}
+                  {sourceMedia.length > 0 && (
+                    <span className="ml-2 text-xs text-blue-600">
+                      ({images.length} classification + {sourceMedia.length} source)
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -208,8 +231,13 @@ export function SimplePostSingle({
               >
                 ✕
               </button>
+              {sourceMedia.length > 0 && currentIndex >= images.length && (
+                <div className="absolute top-4 left-4 bg-blue-600 text-white text-sm font-medium px-3 py-2 rounded">
+                  📊 Source Light Curve Data
+                </div>
+              )}
               <img
-                src={images[currentIndex]}
+                src={allImages[currentIndex]}
                 alt={`Enlarged image ${currentIndex + 1}`}
                 className="max-w-[90%] max-h-[40%] object-contain rounded-lg"
               />

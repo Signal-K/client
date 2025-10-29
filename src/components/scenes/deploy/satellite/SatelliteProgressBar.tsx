@@ -17,6 +17,7 @@ interface SatelliteProgressBarProps {
     anomaly?: number;
   };
   classificationId?: number | string;
+  hideStepCards?: boolean;
 
   style?: React.CSSProperties;
   parentWidth?: number;
@@ -31,6 +32,7 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
     investigationType = "planet",
     classification,
     parentWidth,
+    hideStepCards = false,
     // Optionally pass in missionType and segment externally if needed
     // missionType,
     // segment,
@@ -829,7 +831,7 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       pxWidth={pxWidth}
       satPos={satPos}
       satSize={satSize}
-      hideCards={hideCards}
+      hideCards={hideStepCards}
       barStart={barStart}
       barEnd={barEnd}
       segmentLength={segmentLength}

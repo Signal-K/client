@@ -34,6 +34,8 @@ export default function BalloonClassifyPage() {
         let anomalyid: string | undefined;
         if (idParam.startsWith("an-")) {
             anomalyid = idParam.replace("an-", "");
+        } else if (idParam.startsWith("db-")) {
+            anomalyid = idParam.replace("db-", "");
         } else if (!isNaN(Number(idParam))) {
             anomalyid = idParam;
         };
