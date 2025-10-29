@@ -1,14 +1,9 @@
 'use client'
 
-import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { AvatarGenerator } from "@/src/components/profile/setup/Avatar"
 import DeployTelescopeViewport from "@/src/components/scenes/deploy/TelescopeViewportRange"
-import { Button } from "@/src/components/ui/button"
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
-import { ArrowLeft, User, Sun, Moon } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Switch } from "@/src/components/ui/switch"
 import UseDarkMode from "@/src/shared/hooks/useDarkMode"
 import GameNavbar from "@/src/components/layout/Tes"
 
@@ -16,7 +11,7 @@ export default function NewDeployPage() {
   const router = useRouter()
   const session = useSession()
   const supabase = useSupabaseClient()
-  const { isDark, toggleDarkMode } = UseDarkMode()
+  const { isDark } = UseDarkMode()
   const [profileChecked, setProfileChecked] = useState(false)
 
   useEffect(() => {
@@ -43,12 +38,29 @@ export default function NewDeployPage() {
   }, [session, supabase]);
 
   if (!profileChecked) {
-    return <div className="h-screen w-full flex items-center justify-center bg-gradient-to-b from-[#002439] to-[#001a2a] text-white text-lg">Preparing your profile...</div>;
+    return (
+      <div className={`h-screen w-full flex items-center justify-center ${
+        isDark 
+          ? "bg-gradient-to-b from-[#002439] to-[#001a2a]" 
+          : "bg-gradient-to-b from-[#004d6b] to-[#003a52]"
+      } text-white text-lg`}>
+        Preparing your profile...
+      </div>
+    );
   }
 
   return (
-    <div className="h-screen w-full flex flex-col bg-gradient-to-b from-[#002439] to-[#001a2a] overflow-hidden">
-      <DeployTelescopeViewport />
+    <div 
+      className={`w-full h-screen flex flex-col overflow-hidden ${
+        isDark 
+          ? "bg-gradient-to-b from-[#002439] to-[#001a2a]" 
+          : "bg-gradient-to-b from-[#004d6b] to-[#003a52]"
+      }`}
+    >
+      <GameNavbar />
+      <div className="flex-1 min-h-0 w-full overflow-hidden">
+        <DeployTelescopeViewport />
+      </div>
     </div>
   );
 };

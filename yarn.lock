@@ -2614,7 +2614,6 @@
     "@mediapipe/tasks-vision" "0.10.17"
     "@monogrid/gainmap-js" "^3.0.6"
     "@use-gesture/react" "^10.3.1"
-    camera-controls "^3.1.0"
     cross-env "^7.0.3"
     detect-gpu "^5.0.56"
     glsl-noise "^0.0.0"
@@ -2642,7 +2641,6 @@
     "@monogrid/gainmap-js" "^3.0.6"
     "@react-spring/three" "~9.7.5"
     "@use-gesture/react" "^10.3.1"
-    camera-controls "^2.9.0"
     cross-env "^7.0.3"
     detect-gpu "^5.0.56"
     glsl-noise "^0.0.0"
@@ -4123,11 +4121,6 @@ camelcase-css@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/camelcase-css/-/camelcase-css-2.0.1.tgz"
   integrity sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA==
-
-camera-controls@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/camera-controls/-/camera-controls-3.1.1.tgz#31467f5143053f46b60454782858285283c5b6a3"
-  integrity sha512-zC3DcoQPJ0CbTZ8WHthzi8nMvVF71cppOTBcH4cMLreMkU3y3fzBPViGvz1BefWPo9+kv9BP41tvIsabsXTz+Q==
 
 caniuse-lite@^1.0.30001520, caniuse-lite@^1.0.30001579, caniuse-lite@^1.0.30001751:
   version "1.0.30001751"

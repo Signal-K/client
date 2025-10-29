@@ -10,16 +10,13 @@ import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Badge } from "@/src/components/ui/badge"
 import { CheckCircle, Telescope, X, Target, Info, Sun, ArrowLeft } from "lucide-react"
-import DeployTelescopeSidebar from "./sub/TelescopeSidebar"
-import DeployTelescopeMobileHeader from "./sub/TelescopeMobileHeader"
-import DeployTelescopeOverlay from "./sub/TelescopeOverlay"
 import TypeSelection from "./Telescope/TypeSelection"
 import DeploymentConfirmation from "./Telescope/DeploymentConfirmation"
-import MissionInfoPanel from "./Telescope/MissionInfoPanel"
-import DPadControls from "./Telescope/DPadControls"
-import SectorStatusOverlay from "./Telescope/SectorStatusOverlay"
+import TelescopeDeploySidebar from "./Telescope/TelescopeDeploySidebar"
 import { seededRandom1, generateAnomalyFromDBFactory, DatabaseAnomaly } from "./Telescope/TelescopeUtils"
 import { fetchAnomalies as fetchAnomaliesAction, checkDeployment as checkDeploymentAction, loadSector as loadSectorAction, fetchSkillProgress as fetchSkillProgressAction, handleDeployAction } from "./Telescope/TelescopeActions"
+import UseDarkMode from "@/src/shared/hooks/useDarkMode"
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
  
 export type DeploymentType = "stellar" | "planetary";
 
@@ -142,10 +139,18 @@ export default function DeployTelescopeViewport() {
     }
   }, [currentSector, loadSector, loading, tessAnomalies])
 
+  const { isDark } = UseDarkMode()
+
   if (loading) {
     return (
-      <div className="h-screen bg-[#002439] flex items-center justify-center">
-        <div className="text-[#e4eff0] text-xl font-mono">Loading telescope data....</div>
+      <div className={`h-screen flex items-center justify-center ${
+        isDark 
+          ? "bg-gradient-to-b from-[#002439] to-[#001a2a]" 
+          : "bg-gradient-to-b from-[#004d6b] to-[#003a52]"
+      }`}>
+        <div className={`text-xl font-mono ${isDark ? 'text-[#e4eff0]' : 'text-white'}`}>
+          Loading telescope data....
+        </div>
       </div>
     )
   }
@@ -161,58 +166,90 @@ export default function DeployTelescopeViewport() {
   }
 
   return (
-    <div className="h-full bg-[#002439] relative overflow-hidden flex flex-col">
-      {/* Top Sidebar controls - now as a top bar below navbar */}
-      <div className="relative z-30">
-        <DeployTelescopeSidebar
-          tessAnomalies={tessAnomalies}
-          sectorAnomalies={sectorAnomalies}
-          selectedSector={selectedSector}
-          alreadyDeployed={alreadyDeployed}
-          deploying={deploying}
-          deploymentMessage={deploymentMessage}
-          onDeploy={handleDeploy}
-          currentSector={currentSector}
-          setCurrentSector={setCurrentSector}
-          setSelectedSector={setSelectedSector}
+    <div className={`h-full w-full flex flex-col ${
+      isDark 
+        ? "bg-[#10141c]" 
+        : "bg-gradient-to-br from-[#8ba3d1] via-[#9bb3e0] to-[#7a94c7]"
+    }`}>
+      {/* Main viewport area - similar to satellite layout */}
+      <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0 mt-14">
+        {/* Telescope View with star field - takes up remaining space */}
+        <div className="relative flex-1 flex items-center justify-center z-10 pb-48 md:pb-0">
+          <div className="absolute inset-0 w-full h-full">
+            <TelescopeView
+              stars={stars}
+              filteredAnomalies={sectorAnomalies}
+              isDragging={isDragging}
+              handleMouseDown={handleMouseDown}
+              handleMouseMove={handleMouseMove}
+              handleMouseUp={handleMouseUp}
+              handleAnomalyClick={handleAnomalyClick}
+              currentSectorName=""
+              focusedAnomaly={focusedAnomaly}
+              anomalies={sectorAnomalies}
+            />
+          </div>
+        </div>
+
+        {/* Right-side sidebar (desktop) */}
+        <div className={`hidden md:flex flex-col h-full min-h-0 w-[370px] max-w-[370px] z-30 border-l ${
+          isDark 
+            ? "bg-[#002439]/95 border-[#78cce2]/30" 
+            : "bg-white border-[#b0c4de]"
+        }`}>
+          <TelescopeDeploySidebar
+            deploymentType={deploymentType}
+            currentSector={currentSector}
+            onMove={handleDPad}
+            sectorAnomalies={sectorAnomalies}
+            selectedSector={selectedSector}
+            onSelectSector={() => setSelectedSector({ ...currentSector })}
+            onDeploy={handleDeploy}
+            isDeploying={deploying}
+            alreadyDeployed={alreadyDeployed}
+            deploymentMessage={deploymentMessage}
+            onBackToTypeSelection={handleBackToTypeSelection}
+            isDarkMode={isDark}
+            tessAnomaliesCount={tessAnomalies.length}
+          />
+        </div>
+      </div>
+
+      {/* Mobile sidebar - Fixed bottom positioning */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40">
+        <TelescopeDeploySidebar
           deploymentType={deploymentType}
-          onBackToTypeSelection={handleBackToTypeSelection}
-        />
-      </div>
-
-      {/* Telescope View - Full screen background */}
-      <div className="absolute inset-0 z-0">
-        <DeployTelescopeOverlay
-          selectedSector={selectedSector}
           currentSector={currentSector}
+          onMove={handleDPad}
           sectorAnomalies={sectorAnomalies}
-        />
-        <TelescopeView
-          stars={stars}
-          filteredAnomalies={sectorAnomalies}
-          isDragging={isDragging}
-          handleMouseDown={handleMouseDown}
-          handleMouseMove={handleMouseMove}
-          handleMouseUp={handleMouseUp}
-          handleAnomalyClick={handleAnomalyClick}
-          currentSectorName=""
-          focusedAnomaly={focusedAnomaly}
-          anomalies={sectorAnomalies}
+          selectedSector={selectedSector}
+          onSelectSector={() => setSelectedSector({ ...currentSector })}
+          onDeploy={handleDeploy}
+          isDeploying={deploying}
+          alreadyDeployed={alreadyDeployed}
+          deploymentMessage={deploymentMessage}
+          onBackToTypeSelection={handleBackToTypeSelection}
+          isMobile
+          isDarkMode={isDark}
+          tessAnomaliesCount={tessAnomalies.length}
         />
       </div>
 
-
-      <MissionInfoPanel deploymentType={deploymentType} tessAnomalies={tessAnomalies} />
-
-
-      <DPadControls currentSector={currentSector} onMove={handleDPad} />
-
-
-      <SectorStatusOverlay sectorAnomaliesLength={sectorAnomalies.length} deploymentType={deploymentType} loading={loading} />
-
+      {/* Success confirmation overlay */}
       {showConfirmation && deploymentResult && (
         <DeploymentConfirmation deploymentResult={deploymentResult} onClose={handleConfirmationClose} />
       )}
+
+      {/* Background texture */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none z-0 mt-14">
+        <TelescopeBackground
+          sectorX={currentSector.x}
+          sectorY={currentSector.y}
+          variant="default"
+          isDarkTheme={isDark}
+          showAllAnomalies={false}
+        />
+      </div>
     </div>
   )
 }
