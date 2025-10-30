@@ -13,18 +13,23 @@ import { Progress } from "@/src/components/ui/progress"
 import { Card } from "@/src/components/ui/card"
 import { Loader2, Globe } from "lucide-react"
 
+type PlanetType = "Terrestrial" | "Gaseous" | "Habitable" | "Unsurveyed"
+
 interface PlanetCompletion {
   classificationId: number
   planetName: string
   anomalyId: number
+  planetType: PlanetType
+  isComplete: boolean
   completionSteps: {
     discovered: boolean // Step 1: Classification exists
     surveyed: boolean // Step 2: Has stats (radius, density, etc)
-    cloudsFound: boolean // Step 3: Has cloud classifications
-    mineralsFound: boolean // Step 4: Has mineral deposits
-    waterFound: boolean // Step 5: Has water (not yet implemented)
+    typeConfirmed: boolean // Planet type determined
+    cloudsOrDepositsFound: boolean // Step 3: Has clouds OR mineral deposits
+    waterFound: boolean // Step 4: Has liquid water (only required for potentially habitable terrestrial)
   }
   completionPercentage: number
+  requiresWater: boolean // True for terrestrial planets in habitable temperature range
 }
 
 export default function PlanetCompletionWidget() {
@@ -87,15 +92,36 @@ export default function PlanetCompletionWidget() {
           // Step 1: Discovered (classification exists - always true if we're here)
           const discovered = true
 
-          // Step 2: Surveyed (has stats from satellite deployment)
-          const surveyed = Boolean(
-            classification.anomaly?.radius ||
-            classification.anomaly?.density ||
-            classification.anomaly?.mass ||
-            classification.anomaly?.gravity
-          )
+          // Step 2: Surveyed (has density - the key stat for type determination)
+          const density = classification.anomaly?.density
+          const temperature = classification.anomaly?.temperature
+          const surveyed = Boolean(density)
 
-          // Step 3: Clouds found (satellite-planetFour or cloud classifications)
+          // Determine planet type based on density
+          let planetType: PlanetType = "Unsurveyed"
+          let requiresWater = false
+          
+          if (surveyed && density != null) {
+            // Density thresholds (g/cm³):
+            // Gaseous planets: < 2.5 g/cm³
+            // Terrestrial planets: >= 2.5 g/cm³
+            if (density < 2.5) {
+              planetType = "Gaseous"
+            } else {
+              // Terrestrial planet
+              // Check if it's in the habitable temperature range (-15°C to 50°C)
+              if (temperature != null && temperature >= -15 && temperature <= 50) {
+                planetType = "Habitable" // Potentially habitable
+                requiresWater = true // Must find water to complete
+              } else {
+                planetType = "Terrestrial"
+              }
+            }
+          }
+
+          const typeConfirmed = planetType !== "Unsurveyed"
+
+          // Step 3: Check for clouds OR mineral deposits (either one counts)
           const { data: cloudData } = await supabase
             .from("classifications")
             .select("id")
@@ -106,7 +132,6 @@ export default function PlanetCompletionWidget() {
 
           const cloudsFound = Boolean(cloudData && cloudData.length > 0)
 
-          // Step 4: Minerals found (mineralDeposits for this planet)
           const { data: mineralData } = await supabase
             .from("mineralDeposits")
             .select("id")
@@ -115,27 +140,68 @@ export default function PlanetCompletionWidget() {
             .limit(1)
 
           const mineralsFound = Boolean(mineralData && mineralData.length > 0)
+          const cloudsOrDepositsFound = cloudsFound || mineralsFound
 
-          // Step 5: Water found (not yet implemented)
-          const waterFound = false
+          // Step 4: Water found (only check for potentially habitable planets)
+          let waterFound = false
+          if (requiresWater) {
+            const { data: waterData } = await supabase
+              .from("mineralDeposits")
+              .select("id, mineralconfiguration")
+              .eq("owner", session.user.id)
+              .eq("anomaly", anomalyId)
 
-          // Calculate completion percentage
-          const steps = [discovered, surveyed, cloudsFound, mineralsFound, waterFound]
-          const completedSteps = steps.filter(Boolean).length
-          const completionPercentage = (completedSteps / steps.length) * 100
+            // Check if any deposit contains water-related minerals
+            waterFound = Boolean(
+              waterData && 
+              waterData.some((deposit: any) => {
+                const config = deposit.mineralconfiguration
+                const type = config?.type?.toLowerCase() || ""
+                return type.includes("water") || type.includes("ice") || type.includes("h2o")
+              })
+            )
+          }
+
+          // Determine if planet is complete
+          let isComplete = false
+          if (typeConfirmed && cloudsOrDepositsFound) {
+            if (requiresWater) {
+              // Potentially habitable terrestrial - needs water to be complete
+              isComplete = waterFound
+            } else {
+              // Gaseous or non-habitable terrestrial - just needs clouds/deposits
+              isComplete = true
+            }
+          }
+
+          // Calculate completion percentage based on required steps
+          let totalSteps: boolean[]
+          if (requiresWater) {
+            // Potentially habitable terrestrial: discovered, surveyed, type confirmed, clouds/deposits, water
+            totalSteps = [discovered, surveyed, typeConfirmed, cloudsOrDepositsFound, waterFound]
+          } else {
+            // Gaseous or non-habitable terrestrial: discovered, surveyed, type confirmed, clouds/deposits
+            totalSteps = [discovered, surveyed, typeConfirmed, cloudsOrDepositsFound]
+          }
+          
+          const completedSteps = totalSteps.filter(Boolean).length
+          const completionPercentage = (completedSteps / totalSteps.length) * 100
 
           return {
             classificationId: classification.id,
             planetName,
             anomalyId,
+            planetType,
+            isComplete,
             completionSteps: {
               discovered,
               surveyed,
-              cloudsFound,
-              mineralsFound,
+              typeConfirmed,
+              cloudsOrDepositsFound,
               waterFound,
             },
             completionPercentage,
+            requiresWater,
           }
         })
       )
@@ -228,6 +294,26 @@ export default function PlanetCompletionWidget() {
             </span>
           </div>
 
+          {/* Planet Type Badge */}
+          {selectedPlanet && (
+            <div className="mt-2 flex items-center gap-2">
+              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                selectedPlanet.planetType === "Habitable" 
+                  ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                  : selectedPlanet.planetType === "Terrestrial"
+                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                  : selectedPlanet.planetType === "Gaseous"
+                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                  : "bg-gray-500/20 text-gray-400 border border-gray-500/30"
+              }`}>
+                {selectedPlanet.planetType}
+              </span>
+              {selectedPlanet.isComplete && (
+                <span className="text-xs text-[#5fcbc3] font-semibold">✓ Complete</span>
+              )}
+            </div>
+          )}
+
           {/* Completion Steps Indicator */}
           {selectedPlanet && (
             <div className="mt-2 flex gap-1.5">
@@ -240,17 +326,20 @@ export default function PlanetCompletionWidget() {
                 label="Surveyed"
               />
               <StepIndicator
-                completed={selectedPlanet.completionSteps.cloudsFound}
-                label="Clouds"
+                completed={selectedPlanet.completionSteps.typeConfirmed}
+                label="Type Confirmed"
               />
               <StepIndicator
-                completed={selectedPlanet.completionSteps.mineralsFound}
-                label="Minerals"
+                completed={selectedPlanet.completionSteps.cloudsOrDepositsFound}
+                label="Clouds/Deposits"
               />
-              <StepIndicator
-                completed={selectedPlanet.completionSteps.waterFound}
-                label="Water"
-              />
+              {selectedPlanet.requiresWater && (
+                <StepIndicator
+                  completed={selectedPlanet.completionSteps.waterFound}
+                  label="Water Found"
+                  required={true}
+                />
+              )}
             </div>
           )}
         </div>
@@ -262,22 +351,28 @@ export default function PlanetCompletionWidget() {
 interface StepIndicatorProps {
   completed: boolean
   label: string
+  required?: boolean
 }
 
-function StepIndicator({ completed, label }: StepIndicatorProps) {
+function StepIndicator({ completed, label, required = false }: StepIndicatorProps) {
   return (
     <div
       className="group relative"
-      title={`${label}: ${completed ? "Complete" : "Incomplete"}`}
+      title={`${label}: ${completed ? "Complete" : "Incomplete"}${required ? " (Required for completion)" : ""}`}
     >
       <div
         className={`h-1.5 w-8 rounded-full transition-colors ${
-          completed ? "bg-[#5fcbc3]" : "bg-[#2c4f64]/50"
+          completed 
+            ? "bg-[#5fcbc3]" 
+            : required 
+            ? "bg-orange-500/50"
+            : "bg-[#2c4f64]/50"
         }`}
       />
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block">
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-10">
         <div className="bg-[#1e2a3a] border border-[#2c4f64] rounded px-2 py-1 text-xs text-[#e4f4f4] whitespace-nowrap">
           {label}
+          {required && <span className="text-orange-400 ml-1">(Required)</span>}
         </div>
       </div>
     </div>

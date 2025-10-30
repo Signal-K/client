@@ -5,6 +5,10 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ActivityHeader from "../../scenes/deploy/ActivityHeader";
 import { hasUpgrade } from "@/src/utils/userUpgrades";
 import PlanetCompletionWidget from "@/src/components/discovery/planets/PlanetCompletionWidget";
+import AllUpgradesWidget from "@/src/components/discovery/milestones/AllUpgradesWidget";
+import ClassificationDiversityWidget from "@/src/components/discovery/milestones/ClassificationDiversityWidget";
+import ResourceExtractionWidget from "@/src/components/discovery/milestones/ResourceExtractionWidget";
+import { AchievementsModal } from "@/src/components/discovery/achievements/AchievementsModal";
 import {
   Select,
   SelectContent,
@@ -12,7 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/src/components/ui/select";
-import { ChevronDown, ChevronUp, Info } from "lucide-react";
+import { ChevronDown, ChevronUp, Info, Trophy } from "lucide-react";
+import { useMilestones } from "@/src/hooks/useMilestones";
 
 interface ActivityHeaderSectionProps {
   classificationsCount: number;
@@ -41,6 +46,18 @@ export default function ActivityHeaderSection({
   const [planetCount, setPlanetCount] = useState<number>(0);
   const [completedPlanets, setCompletedPlanets] = useState<number>(0);
   const [showMilestoneInfo, setShowMilestoneInfo] = useState<boolean>(false);
+  const [showAchievementsModal, setShowAchievementsModal] = useState<boolean>(false);
+  const { milestones, loading: milestonesLoading } = useMilestones();
+
+  // Debug logging
+  useEffect(() => {
+    console.log("ActivityHeaderSection - Milestones state:", {
+      selectedMilestone,
+      milestonesLoading,
+      hasMilestones: !!milestones,
+      milestones,
+    });
+  }, [selectedMilestone, milestonesLoading, milestones]);
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -74,7 +91,8 @@ export default function ActivityHeaderSection({
             radius,
             density,
             mass,
-            gravity
+            gravity,
+            temperature
           )
         `)
         .eq("author", session.user.id)
@@ -89,16 +107,28 @@ export default function ActivityHeaderSection({
       for (const planet of planets) {
         const anomaly = Array.isArray(planet.anomaly) ? planet.anomaly[0] : planet.anomaly;
         const anomalyId = anomaly?.id;
-        if (!anomalyId) continue;
+        const density = anomaly?.density;
+        const temperature = anomaly?.temperature;
+        
+        if (!anomalyId || density == null) continue;
 
-        // Check all completion steps
-        const surveyed = Boolean(
-          anomaly?.radius ||
-          anomaly?.density ||
-          anomaly?.mass ||
-          anomaly?.gravity
-        );
+        // Determine planet type and requirements
+        let requiresWater = false
+        let planetType = "Unsurveyed"
+        
+        if (density < 2.5) {
+          planetType = "Gaseous"
+        } else {
+          // Terrestrial planet
+          if (temperature != null && temperature >= -15 && temperature <= 50) {
+            planetType = "Habitable"
+            requiresWater = true
+          } else {
+            planetType = "Terrestrial"
+          }
+        }
 
+        // Check for clouds OR mineral deposits
         const { data: clouds } = await supabase
           .from("classifications")
           .select("id")
@@ -114,12 +144,32 @@ export default function ActivityHeaderSection({
           .eq("anomaly", anomalyId)
           .limit(1);
 
-        const cloudsFound = Boolean(clouds && clouds.length > 0);
-        const mineralsFound = Boolean(minerals && minerals.length > 0);
-        const waterFound = false; // Not implemented yet
+        const cloudsOrDepositsFound = Boolean((clouds && clouds.length > 0) || (minerals && minerals.length > 0));
 
-        // All 5 steps: discovered (true), surveyed, clouds, minerals, water
-        if (surveyed && cloudsFound && mineralsFound && waterFound) {
+        // Check for water if required
+        let waterFound = false
+        if (requiresWater) {
+          const { data: waterData } = await supabase
+            .from("mineralDeposits")
+            .select("id, mineralconfiguration")
+            .eq("owner", session.user.id)
+            .eq("anomaly", anomalyId)
+
+          waterFound = Boolean(
+            waterData && 
+            waterData.some((deposit: any) => {
+              const config = deposit.mineralconfiguration
+              const type = config?.type?.toLowerCase() || ""
+              return type.includes("water") || type.includes("ice") || type.includes("h2o")
+            })
+          )
+        }
+
+        // Planet is complete if type is confirmed and has clouds/deposits
+        // For potentially habitable terrestrial, also needs water
+        const isComplete = cloudsOrDepositsFound && (!requiresWater || waterFound)
+        
+        if (isComplete) {
           completed++;
         }
       }
@@ -158,6 +208,17 @@ export default function ActivityHeaderSection({
 
   return (
     <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
+      {/* Achievements Button */}
+      <div className="flex justify-end mb-2">
+        <button
+          onClick={() => setShowAchievementsModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#5fcbc3] to-[#2c4f64] text-white rounded-lg hover:from-[#4fb3a3] hover:to-[#1e3a4a] transition-all shadow-lg hover:shadow-xl"
+        >
+          <Trophy className="w-4 h-4" />
+          <span className="text-sm font-medium">Achievements</span>
+        </button>
+      </div>
+
       <ActivityHeader
         scrolled={true}
         landmarksExpanded={landmarksExpanded}
@@ -190,7 +251,24 @@ export default function ActivityHeaderSection({
                   >
                     Planet Completion
                   </SelectItem>
-                  {/* Future milestones can be added here */}
+                  <SelectItem 
+                    value="all-upgrades"
+                    className="text-xs text-[#e4f4f4] focus:bg-[#2c4f64]/50 focus:text-[#5fcbc3]"
+                  >
+                    All Upgrades
+                  </SelectItem>
+                  <SelectItem 
+                    value="classification-diversity"
+                    className="text-xs text-[#e4f4f4] focus:bg-[#2c4f64]/50 focus:text-[#5fcbc3]"
+                  >
+                    Classification Diversity
+                  </SelectItem>
+                  <SelectItem 
+                    value="resource-extraction"
+                    className="text-xs text-[#e4f4f4] focus:bg-[#2c4f64]/50 focus:text-[#5fcbc3]"
+                  >
+                    Resource Extraction
+                  </SelectItem>
                 </SelectContent>
               </Select>
               
@@ -208,10 +286,50 @@ export default function ActivityHeaderSection({
             </div>
             
             <div className="text-xs text-muted-foreground whitespace-nowrap">
-              <span className="font-semibold text-[#5fcbc3]">{completedPlanets}</span>
-              <span className="mx-1">/</span>
-              <span>{planetCount}</span>
-              <span className="ml-1">completed</span>
+              {selectedMilestone === "planet-completion" && (
+                <>
+                  <span className="font-semibold text-[#5fcbc3]">{completedPlanets}</span>
+                  <span className="mx-1">/</span>
+                  <span>{planetCount}</span>
+                  <span className="ml-1">completed</span>
+                </>
+              )}
+              {selectedMilestone === "all-upgrades" && (
+                milestonesLoading ? (
+                  <span className="text-gray-500">Loading...</span>
+                ) : milestones ? (
+                  <>
+                    <span className="font-semibold text-[#5fcbc3]">{milestones.allUpgrades.unlocked}</span>
+                    <span className="mx-1">/</span>
+                    <span>{milestones.allUpgrades.total}</span>
+                    <span className="ml-1">unlocked</span>
+                  </>
+                ) : null
+              )}
+              {selectedMilestone === "classification-diversity" && (
+                milestonesLoading ? (
+                  <span className="text-gray-500">Loading...</span>
+                ) : milestones ? (
+                  <>
+                    <span className="font-semibold text-[#5fcbc3]">{milestones.classificationDiversity.completed}</span>
+                    <span className="mx-1">/</span>
+                    <span>{milestones.classificationDiversity.total}</span>
+                    <span className="ml-1">types done</span>
+                  </>
+                ) : null
+              )}
+              {selectedMilestone === "resource-extraction" && (
+                milestonesLoading ? (
+                  <span className="text-gray-500">Loading...</span>
+                ) : milestones ? (
+                  <>
+                    <span className="font-semibold text-[#5fcbc3]">{milestones.resourceExtraction.extracted}</span>
+                    <span className="mx-1">/</span>
+                    <span>{milestones.resourceExtraction.total}</span>
+                    <span className="ml-1">extracted</span>
+                  </>
+                ) : null
+              )}
             </div>
           </div>
 
@@ -227,7 +345,7 @@ export default function ActivityHeaderSection({
               
               {selectedMilestone === "planet-completion" && (
                 <div className="pt-2 border-t border-[#5fcbc3]/10">
-                  <h5 className="text-xs font-semibold text-foreground mb-1.5">Planet Completion Steps:</h5>
+                  <h5 className="text-xs font-semibold text-foreground mb-1.5">Planet Completion Requirements:</h5>
                   <ul className="space-y-1 text-xs text-muted-foreground">
                     <li className="flex items-start gap-2">
                       <span className="text-[#5fcbc3] mt-0.5">1.</span>
@@ -235,30 +353,86 @@ export default function ActivityHeaderSection({
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-[#5fcbc3] mt-0.5">2.</span>
-                      <span><strong>Survey</strong> - Deploy a satellite to gather planetary stats (radius, density, mass, gravity)</span>
+                      <span><strong>Survey</strong> - Deploy a satellite to determine density (Gaseous: &lt;2.5 g/cm³, Terrestrial: ≥2.5 g/cm³)</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-[#5fcbc3] mt-0.5">3.</span>
-                      <span><strong>Find Clouds</strong> - Classify atmospheric cloud formations on the planet</span>
+                      <span><strong>Type Confirmed</strong> - Planet type automatically determined after survey</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-[#5fcbc3] mt-0.5">4.</span>
-                      <span><strong>Locate Minerals</strong> - Discover mineral deposits using your rover or satellite</span>
+                      <span><strong>Find Clouds or Deposits</strong> - Classify clouds OR discover minerals (either one completes this step)</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-[#5fcbc3] mt-0.5">5.</span>
-                      <span><strong>Discover Water</strong> - Find water sources on the planet (coming soon)</span>
+                      <span className="text-orange-400 mt-0.5">5.</span>
+                      <span><strong>Discover Water</strong> - <em>Only required for potentially habitable planets</em> (Terrestrial with temp -15°C to 50°C)</span>
                     </li>
                   </ul>
+                  <div className="mt-2 p-2 bg-[#5fcbc3]/10 rounded text-xs">
+                    <strong className="text-[#5fcbc3]">Completion Rules:</strong>
+                    <ul className="mt-1 space-y-0.5 text-muted-foreground">
+                      <li>• Gaseous planets: Complete after finding clouds/deposits</li>
+                      <li>• Terrestrial (non-habitable): Complete after finding clouds/deposits</li>
+                      <li>• Habitable candidates: Must also discover liquid water</li>
+                    </ul>
+                  </div>
                 </div>
               )}
             </div>
           )}
 
           {/* Widget */}
+          <div className="text-xs text-gray-500 mb-2">
+            Debug: selectedMilestone="{selectedMilestone}", loading={milestonesLoading ? "true" : "false"}, hasMilestones={milestones ? "true" : "false"}
+          </div>
           {selectedMilestone === "planet-completion" && <PlanetCompletionWidget />}
+          {selectedMilestone === "all-upgrades" && (
+            milestonesLoading ? (
+              <div className="p-4 bg-card/30 rounded-lg border border-[#5fcbc3]/20">
+                <p className="text-sm text-muted-foreground">Loading upgrades...</p>
+              </div>
+            ) : milestones ? (
+              <AllUpgradesWidget data={milestones.allUpgrades} />
+            ) : (
+              <div className="p-4 bg-card/30 rounded-lg border border-red-500/20">
+                <p className="text-sm text-red-400">No milestone data available</p>
+              </div>
+            )
+          )}
+          {selectedMilestone === "classification-diversity" && (
+            milestonesLoading ? (
+              <div className="p-4 bg-card/30 rounded-lg border border-[#5fcbc3]/20">
+                <p className="text-sm text-muted-foreground">Loading classifications...</p>
+              </div>
+            ) : milestones ? (
+              <ClassificationDiversityWidget data={milestones.classificationDiversity} />
+            ) : (
+              <div className="p-4 bg-card/30 rounded-lg border border-red-500/20">
+                <p className="text-sm text-red-400">No milestone data available</p>
+              </div>
+            )
+          )}
+          {selectedMilestone === "resource-extraction" && (
+            milestonesLoading ? (
+              <div className="p-4 bg-card/30 rounded-lg border border-[#5fcbc3]/20">
+                <p className="text-sm text-muted-foreground">Loading resources...</p>
+              </div>
+            ) : milestones ? (
+              <ResourceExtractionWidget data={milestones.resourceExtraction} />
+            ) : (
+              <div className="p-4 bg-card/30 rounded-lg border border-red-500/20">
+                <p className="text-sm text-red-400">No milestone data available</p>
+              </div>
+            )
+          )}
         </div>
       )}
+
+      {/* Achievements Modal */}
+      <AchievementsModal
+        isOpen={showAchievementsModal}
+        onClose={() => setShowAchievementsModal(false)}
+      />
     </div>
   );
 };
