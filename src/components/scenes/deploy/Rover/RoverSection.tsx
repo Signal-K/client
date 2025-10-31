@@ -410,7 +410,7 @@ export default function RoverViewportSection() {
             }
             expandLink={"/viewports/roover"}
         >
-            <div className="relative w-full h-64 md:h-64 flex items-center justify-center py-8 md:py-12">
+            <div className="relative w-full flex items-center justify-center py-8 md:py-12" style={{ minHeight: '480px' }}>
                 {!hasRoverDeployed ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
                         <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-white leading-relaxed px-4 py-3 rounded-lg bg-black/40 drop-shadow">

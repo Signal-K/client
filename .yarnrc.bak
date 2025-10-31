@@ -1,0 +1,3 @@
+# Ensure clean installs in CI/CD
+--frozen-lockfile true
+--network-timeout 300000

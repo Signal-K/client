@@ -110,7 +110,7 @@ export default function TelescopeViewportSection() {
       }
       expandLink={"/structures/telescope"}
     >
-      <div className="relative w-full h-64 md:h-64 flex items-center justify-center py-8 md:py-12">
+      <div className="relative w-full flex items-center justify-center py-8 md:py-12" style={{ minHeight: '480px' }}>
         {!hasTelescopeDeployed ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
             <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed px-2">

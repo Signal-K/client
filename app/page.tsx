@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
 
-import LandingSS from "@/src/components/profile/auth/landing";
 import NPSPopup from "@/src/components/ui/helpers/nps-popup";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 import {
@@ -12,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/src/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import WeeklyBanner from "@/src/components/ui/update-banner";
 import CompleteProfileForm from "@/src/components/profile/setup/FinishProfile";
 import AnonymousUserPrompt from "@/src/components/profile/auth/AnonymousUserPrompt";
@@ -20,32 +20,24 @@ import MainHeader from "@/src/components/layout/Header/MainHeader";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
 import ProfileSetupRequired from "@/src/components/profile/setup/ProfileSetupRequired";
 import NotificationSubscribeButton from "@/src/components/providers/NotificationSubscribeButton";
-import GettingStartedViewport from "@/src/components/profile/setup/GettingStartedViewport";
 
 // Import custom hooks
 import { usePageData } from "@/hooks/usePageData";
 import { useNPSManagement } from "@/hooks/useNPSManagement";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
-import SatellitePosition from "@/src/components/scenes/deploy/satellite/SatellitePosition";
-import SolarHealth from "@/src/components/scenes/deploy/solar/SolarHealth";
-import TelescopeViewportSection from "@/src/components/scenes/deploy/Telescope/TelescopeSection";
-import RoverViewportSection from "@/src/components/scenes/deploy/Rover/RoverSection";
-import ProjectSelectionViewport from "@/src/components/onboarding/ProjectSelectionViewport";
 import Landing from "./apt/page";
-import InventoryViewport from "@/src/components/classification/tools/inventory-viewport";
-import FeedbackTeaser from "@/src/components/viewports/FeedbackTeaser";
-import ImboxViewport from "@/src/components/classification/viewport/imbox";
 
-type PageSatellite = {
-  id: string;
-  x: number;
-  y: number;
-  hasUnclassifiedAnomaly: boolean;
-  anomalyId: string | undefined;
-  tile: string;
-  unlocked: boolean;
-  linkedAnomalyId: string;
-};
+// Import tab components
+import TelescopeTab from "@/src/components/tabs/TelescopeTab";
+import SatelliteTab from "@/src/components/tabs/SatelliteTab";
+import RoverTab from "@/src/components/tabs/RoverTab";
+import SolarTab from "@/src/components/tabs/SolarTab";
+import InventoryTab from "@/src/components/tabs/InventoryTab";
+import UpdatesTab from "@/src/components/tabs/UpdatesTab";
+import OnboardingTab from "@/src/components/tabs/OnboardingTab";
+
+// Import icons
+import { Telescope, Satellite, Car, Package, Bell, Sun, Sparkles, FlaskConical } from "lucide-react";
 
 export default function ActivityPage() {
   const session = useSession();
@@ -53,6 +45,7 @@ export default function ActivityPage() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [landmarksExpanded, setLandmarksExpanded] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("onboarding");
 
   // Custom hooks for data management
   const {
@@ -61,7 +54,6 @@ export default function ActivityPage() {
     profile,
     classifications,
     otherClassifications,
-    hasRoverMineralDeposits,
   } = usePageData();
 
   const { showNpsModal, handleCloseNps } = useNPSManagement();
@@ -72,26 +64,6 @@ export default function ActivityPage() {
   if (!session) return <Landing />;
 
   const needsProfileSetup = !profile?.username || !profile?.full_name;
-
-  const satelliteData: (PageSatellite & { deployTime: Date }) | null = (() => {
-    const weatherSatelliteAnomaly = linkedAnomalies.find(
-      (anomaly) => anomaly.automaton === "WeatherSatellite"
-    );
-    if (weatherSatelliteAnomaly) {
-      return {
-        id: "satellite-1",
-        x: 50,
-        y: 50,
-        hasUnclassifiedAnomaly: true,
-        anomalyId: weatherSatelliteAnomaly.anomaly?.id?.toString(),
-        tile: "/assets/Viewports/Satellite/Satellite_Tile1.png",
-        unlocked: false,
-        linkedAnomalyId: weatherSatelliteAnomaly.id.toString(),
-        deployTime: new Date(),
-      };
-    }
-    return null;
-  })();
 
   return (
     <div className="min-h-screen w-full relative flex justify-center">
@@ -117,7 +89,7 @@ export default function ActivityPage() {
         otherClassifications={otherClassifications}
       />
 
-      <div className="w-full max-w-screen-xl px-4 py-6 space-y-8 pt-24 relative z-10">
+      <div className="w-full max-w-screen-xl px-4 py-6 space-y-6 pt-24 relative z-10">
         {/* Anonymous User Upgrade Prompt */}
         <AnonymousUserPrompt
           classificationsCount={classifications.length}
@@ -131,107 +103,106 @@ export default function ActivityPage() {
           onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
         />
 
-        {/* Feedback Teaser - Bumble game announcement */}
-        <FeedbackTeaser />
-
-        <ImboxViewport />
-
-        {/* Inventory Viewport - Only show if user has mineral deposits with roverName */}
-        {hasRoverMineralDeposits && <InventoryViewport />}
-
-              {/* Profile Setup or Complete Structures Section */}
-      {needsProfileSetup && (
-        <ProfileSetupRequired
-          onOpenProfileModal={() => setShowProfileModal(true)}
-        />
-      )}
-
-        {/* Getting Started Progress Card */}
-        <GettingStartedViewport 
-          classificationsCount={classifications.length}
-          classificationTypes={Array.from(new Set(classifications.map(c => c.classificationtype).filter((type): type is string => type !== null)))}
-        />
-
-        {/* Project Selection for New Users */}
-        {classifications.length === 0 && (
-          <ProjectSelectionViewport
-            classificationsCount={classifications.length}
-            showWelcomeMessage={true}
-            onProjectSelect={(projectId) => {
-              console.log("Selected project:", projectId);
-              // Here we could trigger fast deployment logic in the future
-            }}
+        {/* Profile Setup Required */}
+        {needsProfileSetup && (
+          <ProfileSetupRequired
+            onOpenProfileModal={() => setShowProfileModal(true)}
           />
         )}
 
-        {/* Only show regular viewports if user has made classifications */}
-        {classifications.length > 0 && (
-          <>
-            <TelescopeViewportSection />
-            <SatellitePosition
-              satellites={satelliteData ? [satelliteData] : []}
-              flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
-            />
-            <RoverViewportSection />
-            <SolarHealth />
-          </>
-        )}
+        {/* Main Tabbed Interface */}
+        <div className="bg-background/40 backdrop-blur-md rounded-xl border border-[#78cce2]/30 shadow-2xl overflow-hidden">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            {/* Tab Navigation */}
+            <div className="border-b border-[#78cce2]/20 bg-background/60 backdrop-blur-sm">
+              <TabsList className="w-full h-auto flex flex-wrap justify-start gap-1 p-2 bg-transparent">
+                <TabsTrigger
+                  value="updates"
+                  className="flex items-center gap-1.5 h-9 data-[state=active]:bg-primary/20 data-[state=active]:text-primary relative"
+                >
+                  <Bell className="w-4 h-4" />
+                  <span className="text-xs sm:text-sm">Updates</span>
+                </TabsTrigger>
+                {classifications.length > 0 && (
+                  <>
+                    <TabsTrigger
+                      value="telescope"
+                      className="flex items-center gap-1.5 h-9 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+                    >
+                      <Telescope className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">Telescope</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="satellite"
+                      className="flex items-center gap-1.5 h-9 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+                    >
+                      <Satellite className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">Satellite</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="rover"
+                      className="flex items-center gap-1.5 h-9 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+                    >
+                      <Car className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">Rover</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="solar"
+                      className="flex items-center gap-1.5 h-9 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+                    >
+                      <Sun className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">Solar</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="inventory"
+                      className="flex items-center gap-1.5 h-9 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+                    >
+                      <Package className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">Inventory</span>
+                    </TabsTrigger>
+                  </>
+                )}
+              </TabsList>
+            </div>
 
-        {/* Recent Discoveries */}
-        {/* <RecentDiscoveries
-          linkedAnomalies={linkedAnomalies}
-          classifications={classifications}
-          incompletePlanet={incompletePlanet}
-        /> */}
+            {/* Tab Content */}
+            <div className="p-4 md:p-6 min-h-[400px] max-h-[calc(100vh-420px)] overflow-y-auto">
+              <TabsContent value="onboarding" className="mt-0">
+                <OnboardingTab />
+              </TabsContent>
 
-        {/* <ViewportSkillTree /> */}
+              {classifications.length > 0 && (
+                <>
+                  <TabsContent value="telescope" className="mt-0">
+                    <TelescopeTab />
+                  </TabsContent>
+
+                  <TabsContent value="satellite" className="mt-0">
+                    <SatelliteTab />
+                  </TabsContent>
+
+                  <TabsContent value="rover" className="mt-0">
+                    <RoverTab />
+                  </TabsContent>
+
+                  <TabsContent value="solar" className="mt-0">
+                    <SolarTab />
+                  </TabsContent>
+
+                  <TabsContent value="inventory" className="mt-0">
+                    <InventoryTab />
+                  </TabsContent>
+                </>
+              )}
+
+              <TabsContent value="updates" className="mt-0">
+                <UpdatesTab />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
 
         {/* Notification Subscription */}
-        <NotificationSubscribeButton />
-
-        {/* Next Steps Guide - PRIORITY #1 for new users */}
-        {/* <NextStepsSection
-          incompletePlanet={incompletePlanet}
-        /> */}
-
-        {/* Milestones */}
-        {/* <MilestonesSection 
-          weeklyMissions={weeklyMissions}
-          userMissionsLoading={userMissionsLoading}
-        /> */}
-
-        {/* Structures & Equipment */}
-        {/* <StructuresEquipmentSection
-          planetTargets={planetTargets}
-          activeSatelliteMessage={activeSatelliteMessage}
-          visibleStructures={visibleStructures}
-          onSendSatellite={handleSendSatellite}
-          onCheckActiveSatellite={checkActiveSatellite}
-        /> */}
-
-        {/* Profile Setup */}
-        {/* <ProfileSetupSection
-          session={session}
-          profile={profile ? {
-            id: profile.id,
-            username: profile.username ?? undefined,
-            full_name: profile.full_name ?? undefined,
-          } : null}
-          profileCreated={profileCreated}
-          hasMadeClassifications={classifications.length > 0}
-        /> */}
-
-        {/* Legacy Milestones Section */}
-        {/* <LegacyMilestonesSection /> */}
-
-        {/* Legacy Tips Panel */}
-        {/* <LegacyTipsPanel 
-          showTipsPanel={showTipsPanel}
-          onToggleTipsPanel={() => setShowTipsPanel(!showTipsPanel)}
-        /> */}
-
-        {/* Research Progress */}
-        {/* <ResearchProgressSection /> */}
       </div>
 
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>

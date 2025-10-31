@@ -71,6 +71,10 @@ const nextConfig = {
 		alias: {
 		  ...config.resolve.alias,
 		},
+		// Ensure proper module resolution for camera-controls
+		fallback: {
+		  ...config.resolve.fallback,
+		},
 	  };
 	  
 	  if (isServer) {
