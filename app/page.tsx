@@ -123,6 +123,13 @@ export default function ActivityPage() {
                   <Bell className="w-4 h-4" />
                   <span className="text-xs sm:text-sm">Updates</span>
                 </TabsTrigger>
+                <TabsTrigger
+                  value="solar"
+                  className="flex items-center gap-1.5 h-9 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+                >
+                  <Sun className="w-4 h-4" />
+                  <span className="text-xs sm:text-sm">Solar</span>
+                </TabsTrigger>
                 {classifications.length > 0 && (
                   <>
                     <TabsTrigger
@@ -147,13 +154,6 @@ export default function ActivityPage() {
                       <span className="text-xs sm:text-sm">Rover</span>
                     </TabsTrigger>
                     <TabsTrigger
-                      value="solar"
-                      className="flex items-center gap-1.5 h-9 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
-                    >
-                      <Sun className="w-4 h-4" />
-                      <span className="text-xs sm:text-sm">Solar</span>
-                    </TabsTrigger>
-                    <TabsTrigger
                       value="inventory"
                       className="flex items-center gap-1.5 h-9 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
                     >
@@ -171,6 +171,14 @@ export default function ActivityPage() {
                 <OnboardingTab />
               </TabsContent>
 
+              <TabsContent value="updates" className="mt-0">
+                <UpdatesTab />
+              </TabsContent>
+
+              <TabsContent value="solar" className="mt-0">
+                <SolarTab />
+              </TabsContent>
+
               {classifications.length > 0 && (
                 <>
                   <TabsContent value="telescope" className="mt-0">
@@ -185,19 +193,11 @@ export default function ActivityPage() {
                     <RoverTab />
                   </TabsContent>
 
-                  <TabsContent value="solar" className="mt-0">
-                    <SolarTab />
-                  </TabsContent>
-
                   <TabsContent value="inventory" className="mt-0">
                     <InventoryTab />
                   </TabsContent>
                 </>
               )}
-
-              <TabsContent value="updates" className="mt-0">
-                <UpdatesTab />
-              </TabsContent>
             </div>
           </Tabs>
         </div>
