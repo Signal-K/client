@@ -45,7 +45,8 @@ export default function ActivityPage() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [landmarksExpanded, setLandmarksExpanded] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [activeTab, setActiveTab] = useState("onboarding");
+  const [activeTab, setActiveTab] = useState("updates");
+  const [tabContentExpanded, setTabContentExpanded] = useState(false);
 
   // Custom hooks for data management
   const {
@@ -96,12 +97,14 @@ export default function ActivityPage() {
           discoveryCount={linkedAnomalies.length}
         />
 
-        {/* Activity Header - User profile and deployment status */}
-        <ActivityHeaderSection
-          classificationsCount={classifications.length}
-          landmarksExpanded={landmarksExpanded}
-          onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
-        />
+        {/* Activity Header - User profile and deployment status - Hidden when tab content expanded */}
+        {!tabContentExpanded && (
+          <ActivityHeaderSection
+            classificationsCount={classifications.length}
+            landmarksExpanded={landmarksExpanded}
+            onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
+          />
+        )}
 
         {/* Profile Setup Required */}
         {needsProfileSetup && (
@@ -165,8 +168,12 @@ export default function ActivityPage() {
               </TabsList>
             </div>
 
-            {/* Tab Content */}
-            <div className="p-4 md:p-6 min-h-[400px] max-h-[calc(100vh-420px)] overflow-y-auto">
+            {/* Tab Content - Expands to larger height when classification mode is active */}
+            <div className={`p-4 md:p-6 min-h-[400px] overflow-y-auto ${
+              tabContentExpanded 
+                ? 'max-h-[calc(100vh-180px)]' 
+                : 'max-h-[calc(100vh-420px)]'
+            }`}>
               <TabsContent value="onboarding" className="mt-0">
                 <OnboardingTab />
               </TabsContent>
@@ -176,7 +183,7 @@ export default function ActivityPage() {
               </TabsContent>
 
               <TabsContent value="solar" className="mt-0">
-                <SolarTab />
+                <SolarTab onExpandedChange={setTabContentExpanded} />
               </TabsContent>
 
               {classifications.length > 0 && (
