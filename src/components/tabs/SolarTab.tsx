@@ -2,13 +2,14 @@
 
 import { useEffect, useState, Suspense, useMemo } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/navigation";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import { Button } from "@/src/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Progress } from "@/src/components/ui/progress";
 import { Badge } from "@/src/components/ui/badge";
-import { Sun as SunIcon, Shield, Clock, Users, TrendingUp, Sparkles, Rocket } from "lucide-react";
+import { Sun as SunIcon, Shield, Clock, Users, TrendingUp, Sparkles, Rocket, Trophy } from "lucide-react";
 import { Sun } from "@/src/components/discovery/data-sources/Solar/Sun";
 import type { SolarEvent, CommunityProgress } from "@/types/SolarEvents";
 import {
@@ -327,6 +328,7 @@ interface SolarTabProps {
 export default function SolarTab({ onExpandedChange }: SolarTabProps = {}) {
   const supabase = useSupabaseClient();
   const session = useSession();
+  const router = useRouter();
 
   const [currentEvent, setCurrentEvent] = useState<SolarEvent | null>(null);
   const [communityProgress, setCommunityProgress] = useState<CommunityProgress>({
@@ -681,10 +683,10 @@ export default function SolarTab({ onExpandedChange }: SolarTabProps = {}) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <Button
               onClick={() => setShowClassifier(true)}
-              className="flex-1 h-9"
+              className="h-9 col-span-2"
               variant="default"
               disabled={!canClassify}
               size="sm"
@@ -693,22 +695,31 @@ export default function SolarTab({ onExpandedChange }: SolarTabProps = {}) {
               {!canClassify ? `Cooldown: ${cooldownMinutes}m` : "Count Sunspots"}
             </Button>
             
-            {canLaunchProbe && (
-              <Button
-                onClick={handleLaunchProbe}
-                disabled={launchingProbe}
-                variant="outline"
-                className="flex-1 h-9 relative overflow-hidden"
-                size="sm"
-              >
-                <Shield className="w-3 h-3 mr-1" />
-                Deploy Probe
-                {probeAnimation && (
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-                )}
-              </Button>
-            )}
+            <Button
+              onClick={() => router.push('/leaderboards/sunspots')}
+              variant="outline"
+              className="h-9"
+              size="sm"
+            >
+              <Trophy className="w-3 h-3" />
+            </Button>
           </div>
+
+          {canLaunchProbe && (
+            <Button
+              onClick={handleLaunchProbe}
+              disabled={launchingProbe}
+              variant="outline"
+              className="w-full h-9 relative overflow-hidden"
+              size="sm"
+            >
+              <Shield className="w-3 h-3 mr-1" />
+              Deploy Probe
+              {probeAnimation && (
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+              )}
+            </Button>
+          )}
 
           {!canClassify && (
             <p className="text-xs text-muted-foreground text-center">

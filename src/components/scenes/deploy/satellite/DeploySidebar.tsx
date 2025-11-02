@@ -20,6 +20,7 @@ interface DeploySidebarProps {
   deploymentWarning?: string | null;
   isFastDeployEnabled?: boolean | null;
   isDarkMode?: boolean;
+  probeThresholdWarning?: string | null;
   waterDiscoveryStatus?: {
     hasCloudClassifications: boolean;
     hasValidStats: boolean;
@@ -41,6 +42,7 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
   deploymentWarning = null,
   isFastDeployEnabled = null,
   isDarkMode = true,
+  probeThresholdWarning = null,
   waterDiscoveryStatus = {
     hasCloudClassifications: false,
     hasValidStats: false,
@@ -134,6 +136,19 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
             <p className={`text-green-200 leading-snug ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
               🚀 As a new explorer, your satellite has a <strong>speed boost</strong>! 
               Anomalies available <strong>immediately</strong>.
+            </p>
+          </div>
+        )}
+
+        {/* Probe Threshold Warning */}
+        {probeThresholdWarning && (
+          <div className={`p-2.5 sm:p-4 bg-gradient-to-br from-orange-500/25 to-red-500/25 rounded-lg border border-orange-400/40 shadow-lg ${isMobile ? 'text-xs' : ''}`}>
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-orange-400 rounded-full animate-pulse"></div>
+              <span className={`text-orange-300 font-semibold ${isMobile ? 'text-xs' : 'text-sm'}`}>⚠️ Mission Alert</span>
+            </div>
+            <p className={`text-orange-200 leading-snug ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
+              {probeThresholdWarning}
             </p>
           </div>
         )}

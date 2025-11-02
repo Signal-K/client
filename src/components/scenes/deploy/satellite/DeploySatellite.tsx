@@ -114,6 +114,8 @@ export default function DeploySatelliteViewport() {
     hasValidStats: false,
     canDiscoverMinerals: false,
   });
+  const [probeThresholdWarning, setProbeThresholdWarning] = useState<string | null>(null);
+  const [deployTimeMultiplier, setDeployTimeMultiplier] = useState<number>(1.0);
 
   // Validate deployment criteria
   useEffect(() => {
@@ -532,6 +534,7 @@ export default function DeploySatelliteViewport() {
       await fetchUserCloudClassificationCount();
       await checkFastDeployStatus();
       await checkStellarMetallicitySkill();
+      await checkProbeThreshold();
       await checkDeployment();
       setLoading(false);
     };
@@ -556,6 +559,61 @@ export default function DeploySatelliteViewport() {
     } catch (err) {
       setHasStellarMetallicitySkill(false);
       return false;
+    }
+  };
+
+  // Check if enough defensive probes were launched last week
+  const checkProbeThreshold = async () => {
+    console.log('[Probe Check] Starting probe threshold check...');
+    try {
+      // Get last week's start and end (Sunday to Sunday AEST)
+      const now = new Date();
+      const aestOffset = 10 * 60 * 60 * 1000; // UTC+10
+      const nowAEST = new Date(now.getTime() + aestOffset);
+      
+      // Calculate last week's Sunday
+      const currentDay = nowAEST.getDay();
+      const lastSunday = new Date(nowAEST);
+      lastSunday.setDate(nowAEST.getDate() - currentDay);
+      lastSunday.setHours(0, 0, 0, 0);
+      
+      const previousSunday = new Date(lastSunday);
+      previousSunday.setDate(lastSunday.getDate() - 7);
+      
+      // Convert back to UTC for query
+      const lastWeekStart = new Date(previousSunday.getTime() - aestOffset);
+      const lastWeekEnd = new Date(lastSunday.getTime() - aestOffset);
+
+      console.log('[Probe Check] Querying range:', lastWeekStart.toISOString(), 'to', lastWeekEnd.toISOString());
+
+      const { count, error } = await supabase
+        .from('defensive_probes')
+        .select('id', { count: 'exact', head: true })
+        .gte('launched_at', lastWeekStart.toISOString())
+        .lt('launched_at', lastWeekEnd.toISOString());
+
+      if (error) {
+        console.error('Error checking probe threshold:', error);
+        return;
+      }
+
+      const PROBE_THRESHOLD = 10;
+      const probeCount = count || 0;
+
+      console.log(`[Probe Check] Last week: ${probeCount}/${PROBE_THRESHOLD} probes launched`);
+
+      if (probeCount < PROBE_THRESHOLD) {
+        setDeployTimeMultiplier(1.5);
+        const warning = `Only ${probeCount}/${PROBE_THRESHOLD} defensive probes were launched last week. Satellite deployment time increased by 50%.`;
+        setProbeThresholdWarning(warning);
+        console.log('[Probe Check] WARNING:', warning);
+      } else {
+        setDeployTimeMultiplier(1.0);
+        setProbeThresholdWarning(null);
+        console.log('[Probe Check] Threshold met, normal deployment time');
+      }
+    } catch (error) {
+      console.error('Error in checkProbeThreshold:', error);
     }
   };
 
@@ -872,17 +930,20 @@ export default function DeploySatelliteViewport() {
         </div> */}
 
       {/* Main map/viewport area */}
-      <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0 pb-0 md:pb-0">
+      <div className="flex-1 flex flex-row relative overflow-hidden h-full min-h-0">
           {/* Main viewport content (planets/clouds) */}
-          <div className="relative flex-1 flex items-center justify-center z-10 pb-48 md:pb-0 md:pt-0">
-            <PlanetFocusView
-              planet={planetAnomalies[focusedPlanetIdx] || null}
-              onNext={() => setFocusedPlanetIdx((prev) => Math.min(planetAnomalies.length - 1, prev + 1))}
-              onPrev={() => setFocusedPlanetIdx((prev) => Math.max(0, prev - 1))}
-              isFirst={focusedPlanetIdx === 0}
-              isLast={focusedPlanetIdx === planetAnomalies.length - 1}
-              isDarkMode={isDark}
-            />
+          <div className="relative flex-1 flex items-center justify-center z-10 md:pb-0 md:pt-0">
+            {/* Mobile: add margin-bottom to account for fixed bottom panel */}
+            <div className="w-full h-full flex items-center justify-center mb-[50vh] md:mb-0">
+              <PlanetFocusView
+                planet={planetAnomalies[focusedPlanetIdx] || null}
+                onNext={() => setFocusedPlanetIdx((prev) => Math.min(planetAnomalies.length - 1, prev + 1))}
+                onPrev={() => setFocusedPlanetIdx((prev) => Math.max(0, prev - 1))}
+                isFirst={focusedPlanetIdx === 0}
+                isLast={focusedPlanetIdx === planetAnomalies.length - 1}
+                isDarkMode={isDark}
+              />
+            </div>
           </div>
 
           {/* Right-side info panel (sidebar) */}
@@ -904,6 +965,7 @@ export default function DeploySatelliteViewport() {
               deploymentWarning={deploymentWarning}
               isFastDeployEnabled={isFastDeployEnabled}
               isDarkMode={isDark}
+              probeThresholdWarning={probeThresholdWarning}
               waterDiscoveryStatus={waterDiscoveryStatus}
             />
           </div>
@@ -925,6 +987,7 @@ export default function DeploySatelliteViewport() {
             deploymentWarning={deploymentWarning}
             isFastDeployEnabled={isFastDeployEnabled}
             isDarkMode={isDark}
+            probeThresholdWarning={probeThresholdWarning}
             waterDiscoveryStatus={waterDiscoveryStatus}
           />
         </div>
