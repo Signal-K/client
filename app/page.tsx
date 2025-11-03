@@ -20,6 +20,7 @@ import MainHeader from "@/src/components/layout/Header/MainHeader";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
 import ProfileSetupRequired from "@/src/components/profile/setup/ProfileSetupRequired";
 import NotificationSubscribeButton from "@/src/components/providers/NotificationSubscribeButton";
+import PWAPrompt from "@/src/components/pwa/PWAPrompt";
 
 // Import custom hooks
 import { usePageData } from "@/hooks/usePageData";
@@ -393,6 +394,9 @@ export default function ActivityPage() {
         buttonLabel="Play"
         buttonHref="/alpha"
       />
+
+      {/* PWA Install Prompt - Only for authenticated users */}
+      {session && <PWAPrompt />}
     </div>
   );
 };

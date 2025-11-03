@@ -2,7 +2,27 @@ const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development'
+  disable: process.env.NODE_ENV === 'development',
+  // Aggressive caching for offline support
+  runtimeCaching: [
+    {
+      urlPattern: /^https?.*/,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'offlineCache',
+        expiration: {
+          maxEntries: 200,
+          maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+        },
+        networkTimeoutSeconds: 10
+      }
+    }
+  ],
+  buildExcludes: [/middleware-manifest\.json$/],
+  fallbacks: {
+    // Fallback for document (HTML pages)
+    document: '/offline',
+  }
 });
 
 /** @type {import('next').NextConfig} */
@@ -27,6 +47,23 @@ const nextConfig = {
 			  {
 				key: 'Service-Worker-Allowed',
 				value: '/'
+			  }
+			]
+		  },
+		  {
+			source: '/service-worker.js',
+			headers: [
+			  {
+				key: 'Cache-Control',
+				value: 'public, max-age=0, must-revalidate'
+			  },
+			  {
+				key: 'Service-Worker-Allowed',
+				value: '/'
+			  },
+			  {
+				key: 'Content-Type',
+				value: 'application/javascript; charset=utf-8'
 			  }
 			]
 		  }
