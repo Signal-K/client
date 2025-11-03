@@ -27,6 +27,41 @@ export function StarterPlanetFour({
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomalyid}.jpeg`;
     const [showClassification, setShowClassification] = useState(false);
+    const [checkingTutorialStatus, setCheckingTutorialStatus] = useState(true);
+    const [showTutorialButton, setShowTutorialButton] = useState(false);
+
+    // Check if user has completed this classification type before
+    useEffect(() => {
+        const checkIfReturningUser = async () => {
+            if (!session?.user?.id) {
+                setCheckingTutorialStatus(false);
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('classifications')
+                    .select('id')
+                    .eq('author', session.user.id)
+                    .eq('classificationtype', 'satellite-planetFour')
+                    .limit(1);
+
+                if (error) {
+                    console.error('Error checking classification history:', error);
+                } else {
+                    // If user has classifications, skip tutorial and show classification interface
+                    const hasClassified = data && data.length > 0;
+                    setShowClassification(hasClassified);
+                }
+            } catch (error) {
+                console.error('Error in tutorial status check:', error);
+            } finally {
+                setCheckingTutorialStatus(false);
+            }
+        };
+
+        checkIfReturningUser();
+    }, [session, supabase]);
 
     // Tutorial slides for Planet Four
     const tutorialSlides = createTutorialSlides([
@@ -56,19 +91,68 @@ export function StarterPlanetFour({
         setShowClassification(true);
     };
 
+    if (checkingTutorialStatus) {
+        return <div className="text-center p-8">Loading...</div>;
+    }
+
     return (
         <div className="rounded-lg">
-            {/* Tutorial Component */}
-            <TutorialContentBlock
-                classificationtype="satellite-planetFour"
-                slides={tutorialSlides}
-                onComplete={handleTutorialComplete}
-                title="Planet Four Training"
-                description="Learn to analyze surface formations on planetary images"
-            />
+            {/* Show Tutorial Button for returning users */}
+            {showClassification && !showTutorialButton && (
+                <div className="mb-4">
+                    <Button 
+                        onClick={() => setShowTutorialButton(true)} 
+                        variant="default"
+                        size="default"
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                    >
+                        📚 Show Tutorial
+                    </Button>
+                </div>
+            )}
+
+            {/* Tutorial Component - for returning users clicking the button */}
+            {showTutorialButton && (
+                <div className="mb-4 p-4 bg-[#1D2833]/90 rounded-lg border border-blue-500/50">
+                    <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-xl font-bold text-white">Planet Four Tutorial</h3>
+                        <Button 
+                            onClick={() => setShowTutorialButton(false)} 
+                            variant="outline"
+                            size="sm"
+                            className="text-white"
+                        >
+                            ✕ Close Tutorial
+                        </Button>
+                    </div>
+                    <TutorialContentBlock
+                        classificationtype="satellite-planetFour"
+                        slides={tutorialSlides}
+                        forceShow={true}
+                        onComplete={() => {
+                            setShowClassification(true);
+                            setShowTutorialButton(false);
+                        }}
+                        onSkip={() => setShowTutorialButton(false)}
+                        title="Planet Four Training"
+                        description="Learn to analyze surface formations on planetary images"
+                    />
+                </div>
+            )}
+
+            {/* Tutorial Component - for first-time users */}
+            {!showClassification && !showTutorialButton && (
+                <TutorialContentBlock
+                    classificationtype="satellite-planetFour"
+                    slides={tutorialSlides}
+                    onComplete={handleTutorialComplete}
+                    title="Planet Four Training"
+                    description="Learn to analyze surface formations on planetary images"
+                />
+            )}
 
             {/* Classification Interface - shown after tutorial or for returning users */}
-            {showClassification && (
+            {showClassification && !showTutorialButton && (
                 <div className="flex flex-col items-center">
                     <div className="mb-2">
                         <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">

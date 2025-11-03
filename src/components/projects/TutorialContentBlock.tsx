@@ -20,6 +20,7 @@ interface TutorialContentBlockProps {
   onSkip?: () => void;
   title?: string;
   description?: string;
+  forceShow?: boolean; // Add prop to force tutorial display
 }
 
 export default function TutorialContentBlock({
@@ -28,7 +29,8 @@ export default function TutorialContentBlock({
   onComplete,
   onSkip,
   title = "Tutorial",
-  description = "Learn how to complete this classification"
+  description = "Learn how to complete this classification",
+  forceShow = false
 }: TutorialContentBlockProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
@@ -41,6 +43,14 @@ export default function TutorialContentBlock({
   // Check if user has completed this classification type before
   useEffect(() => {
     const checkFirstTimeUser = async () => {
+      // If forceShow is true, skip the check and always show tutorial
+      if (forceShow) {
+        setShowTutorial(true);
+        setLoading(false);
+        setIsCheckingFirstTime(false);
+        return;
+      }
+
       if (!session?.user?.id) {
         setLoading(false);
         setIsCheckingFirstTime(false);
@@ -73,7 +83,7 @@ export default function TutorialContentBlock({
     };
 
     checkFirstTimeUser();
-  }, [session, supabase, classificationtype]);
+  }, [session, supabase, classificationtype, forceShow]);
 
   const nextSlide = () => {
     if (currentSlide < slides.length - 1) {

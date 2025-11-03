@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useState } from "react";
 import ActivityHeader from "../../scenes/deploy/ActivityHeader";
-import { hasUpgrade } from "@/src/utils/userUpgrades";
+import { AchievementsModal } from "@/src/components/discovery/achievements/AchievementsModal";
+import { Trophy } from "lucide-react";
 
 interface ActivityHeaderSectionProps {
   classificationsCount: number;
@@ -16,64 +16,21 @@ export default function ActivityHeaderSection({
   landmarksExpanded,
   onToggleLandmarks,
 }: ActivityHeaderSectionProps) {
-  const session = useSession();
-  const supabase = useSupabaseClient();
-  const [upgradeStatus, setUpgradeStatus] = useState<{
-    hasTelescopeUpgrade: boolean;
-    hasSatelliteUpgrade: boolean;
-    bothUpgradesUnlocked: boolean;
-  }>({
-    hasTelescopeUpgrade: false,
-    hasSatelliteUpgrade: false,
-    bothUpgradesUnlocked: false,
-  });
-
-  useEffect(() => {
-    if (!session?.user?.id) return;
-
-    const fetchUpgradeStatus = async () => {
-      const hasTelescopeUpgrade = await hasUpgrade(supabase, session.user.id, "probereceptors");
-      const hasSatelliteUpgrade = await hasUpgrade(supabase, session.user.id, "satellitecount");
-      const bothUpgradesUnlocked = hasTelescopeUpgrade && hasSatelliteUpgrade;
-
-      setUpgradeStatus({
-        hasTelescopeUpgrade,
-        hasSatelliteUpgrade,
-        bothUpgradesUnlocked,
-      });
-    };
-
-    fetchUpgradeStatus();
-  }, [session, supabase]);
-
-  const getUpgradeMessage = () => {
-    if (upgradeStatus.bothUpgradesUnlocked) {
-      return {
-        title: "All Upgrades Complete!",
-        description: "Your telescope and satellite systems are fully enhanced. New projects are now available in the research lab.",
-      };
-    } else if (upgradeStatus.hasTelescopeUpgrade && !upgradeStatus.hasSatelliteUpgrade) {
-      return {
-        title: "Satellite Upgrade Available",
-        description: "Add an additional satellite to your fleet for enhanced planetary coverage. Cost: 10 Stardust.",
-      };
-    } else if (!upgradeStatus.hasTelescopeUpgrade && upgradeStatus.hasSatelliteUpgrade) {
-      return {
-        title: "Telescope Upgrade Available",
-        description: "Extend your telescope's receptors to increase anomaly detection per scan. Cost: 10 Stardust.",
-      };
-    } else {
-      return {
-        title: "Telescope Upgrade",
-        description: "Increase anomalies per deployment by 2. Cost: 10 Stardust.",
-      };
-    }
-  };
-
-  const upgradeMessage = getUpgradeMessage();
+  const [showAchievementsModal, setShowAchievementsModal] = useState<boolean>(false);
 
   return (
     <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
+      {/* Achievements Button */}
+      <div className="flex justify-end mb-2">
+        <button
+          onClick={() => setShowAchievementsModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#5fcbc3] to-[#2c4f64] text-white rounded-lg hover:from-[#4fb3a3] hover:to-[#1e3a4a] transition-all shadow-lg hover:shadow-xl"
+        >
+          <Trophy className="w-4 h-4" />
+          <span className="text-sm font-medium">Achievements</span>
+        </button>
+      </div>
+
       <ActivityHeader
         scrolled={true}
         landmarksExpanded={landmarksExpanded}
@@ -81,13 +38,11 @@ export default function ActivityHeaderSection({
       />
       <p className="text-lg pt-3">Welcome to Star Sailors</p>
 
-      {/* Dynamic Upgrade Section */}
-      <div className="mt-4 p-3 rounded-lg border bg-card">
-        <h4 className="text-sm font-medium text-foreground">{upgradeMessage.title}</h4>
-        <p className="text-xs text-muted-foreground">
-          {upgradeMessage.description}
-        </p>
-      </div>
+      {/* Achievements Modal */}
+      <AchievementsModal
+        isOpen={showAchievementsModal}
+        onClose={() => setShowAchievementsModal(false)}
+      />
     </div>
   );
 };

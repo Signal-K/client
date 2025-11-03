@@ -28,6 +28,47 @@ import { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { subDays } from "date-fns";
 
+const CACHE_KEY = 'pageDataCache';
+
+const getCachedData = () => {
+  if (typeof window === 'undefined') return null;
+  const cached = localStorage.getItem(CACHE_KEY);
+  if (cached) {
+    try {
+      // Basic validation
+      const data = JSON.parse(cached);
+      if (data && typeof data === 'object') {
+        return data;
+      }
+    } catch (e) {
+      console.error("Failed to parse cached data", e);
+      localStorage.removeItem(CACHE_KEY);
+    }
+  }
+  return null;
+};
+
+const setCachedData = (data: any) => {
+  if (typeof window === 'undefined') return;
+  try {
+    const dataToCache = {
+      linkedAnomalies: data.linkedAnomalies,
+      activityFeed: data.activityFeed,
+      profile: data.profile,
+      classifications: data.classifications,
+      otherClassifications: data.otherClassifications,
+      incompletePlanet: data.incompletePlanet,
+      planetTargets: data.planetTargets,
+      visibleStructures: data.visibleStructures,
+      hasRoverMineralDeposits: data.hasRoverMineralDeposits,
+      timestamp: new Date().toISOString(),
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(dataToCache));
+  } catch (e) {
+    console.error("Failed to set cached data", e);
+  }
+};
+
 export interface CommentVote {
   type: "comment" | "vote";
   created_at: string;
@@ -106,6 +147,22 @@ export function usePageData() {
   const [loading, setLoading] = useState(true);
   const [hasRoverMineralDeposits, setHasRoverMineralDeposits] = useState(false);
 
+  useEffect(() => {
+    const cachedData = getCachedData();
+    if (cachedData) {
+      setLinkedAnomalies(cachedData.linkedAnomalies || []);
+      setActivityFeed(cachedData.activityFeed || []);
+      setProfile(cachedData.profile || null);
+      setClassifications(cachedData.classifications || []);
+      setOtherClassifications(cachedData.otherClassifications || []);
+      setIncompletePlanet(cachedData.incompletePlanet || null);
+      setPlanetTargets(cachedData.planetTargets || []);
+      setVisibleStructures(cachedData.visibleStructures || { telescope: true, satellites: true, rovers: false, balloons: false });
+      setHasRoverMineralDeposits(cachedData.hasRoverMineralDeposits || false);
+      setLoading(false); // We have data, so not loading anymore
+    }
+  }, []);
+
   const fetchPlanets = async () => {
     if (!session?.user?.id) return;
 
@@ -144,8 +201,12 @@ export function usePageData() {
   };
 
   const fetchData = async () => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id) {
+      setLoading(false);
+      return;
+    }
 
+    setLoading(true);
     const userId = session.user.id;
 
     // Fetch profile data
@@ -359,6 +420,23 @@ export function usePageData() {
       satellites: transformedClassifications.length > 0, // Show if user has any classifications
       rovers: transformedClassifications.filter(c => c.classificationtype === 'planet').length >= 5, // Show after 5 planet classifications
       balloons: transformedClassifications.length >= 10 // Show after 10 total classifications
+    });
+
+    setCachedData({
+      linkedAnomalies: filteredLinked,
+      activityFeed: allActivity.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+      profile: profileData,
+      classifications: transformedClassifications,
+      otherClassifications: others ?? [],
+      incompletePlanet: mostRecentUnfinishedPlanet ?? null,
+      planetTargets,
+      visibleStructures: {
+        telescope: true,
+        satellites: transformedClassifications.length > 0,
+        rovers: transformedClassifications.filter(c => c.classificationtype === 'planet').length >= 5,
+        balloons: transformedClassifications.length >= 10
+      },
+      hasRoverMineralDeposits: (roverDeposits ?? []).length > 0,
     });
 
     setLoading(false);

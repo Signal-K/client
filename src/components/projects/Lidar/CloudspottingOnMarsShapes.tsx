@@ -34,30 +34,82 @@ export function StarterCoMShapes({
       }
 
       try {
-        const { data: anomalyData, error: anomalyError } = await supabase
-          .from("anomalies")
-          .select("*")
-          .eq("anomalySet", "balloon-marsCloudShapes")
-          .eq("content", anomalyid);
+        // First, fetch the linked_anomaly to get the actual anomaly_id
+        const { data: linkedAnomalyData, error: linkedError } = await supabase
+          .from("linked_anomalies")
+          .select(`
+            id,
+            anomaly_id,
+            anomalies (
+              id,
+              content,
+              anomalySet
+            )
+          `)
+          .eq("anomaly_id", anomalyid)
+          .eq("author", session.user.id)
+          .maybeSingle();
 
-        if (anomalyError) throw anomalyError;
+        if (linkedError) {
+          console.error("Error fetching linked anomaly:", linkedError);
+          
+          // Fallback: try direct anomalies table query
+          const { data: anomalyData, error: anomalyError } = await supabase
+            .from("anomalies")
+            .select("*")
+            .eq("anomalySet", "balloon-marsCloudShapes")
+            .eq("content", anomalyid);
 
-        if (!anomalyData || anomalyData.length === 0) { 
+          if (anomalyError) throw anomalyError;
+
+          if (!anomalyData || anomalyData.length === 0) { 
+            setAnomaly(null);
+            setLoading(false);
+            return;
+          }
+
+          const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
+          setAnomaly(randomAnomaly);
+
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          if (supabaseUrl && randomAnomaly?.id) {
+            setImageUrl(
+              `${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${randomAnomaly.id}/${randomAnomaly.id}/1.png`
+            );
+            setBaseImageUrl(
+              `${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${randomAnomaly.id}/${randomAnomaly.id}/2.png`
+            );
+          } else {
+            console.error("Supabase URL or Anomaly ID is missing!");
+            setAnomaly(null);
+          }
+          setLoading(false);
+          return;
+        }
+
+        if (!linkedAnomalyData || !linkedAnomalyData.anomalies) { 
           setAnomaly(null);
           setLoading(false);
           return;
         }
 
-        const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
-        setAnomaly(randomAnomaly);
+        const anomalyRecord = Array.isArray(linkedAnomalyData.anomalies) 
+          ? linkedAnomalyData.anomalies[0] 
+          : linkedAnomalyData.anomalies;
+
+        setAnomaly({
+          id: anomalyRecord.id,
+          name: anomalyRecord.content || "Unknown",
+          details: anomalyRecord.anomalySet
+        });
 
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        if (supabaseUrl && randomAnomaly?.id) {
+        if (supabaseUrl && anomalyRecord?.id) {
           setImageUrl(
-            `${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${randomAnomaly.id}/${randomAnomaly.id}/1.png`
+            `${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${anomalyRecord.id}/${anomalyRecord.id}/1.png`
           );
           setBaseImageUrl(
-            `${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${randomAnomaly.id}/${randomAnomaly.id}/2.png`
+            `${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${anomalyRecord.id}/${anomalyRecord.id}/2.png`
           );
         } else {
           console.error("Supabase URL or Anomaly ID is missing!");
@@ -72,7 +124,7 @@ export function StarterCoMShapes({
     }
 
     fetchAnomaly();
-  }, [session]);
+  }, [session, anomalyid, supabase]);
 
   useEffect(() => {
     async function checkMineralResearch() {

@@ -224,45 +224,40 @@ export default function ActivityHeader({
         className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent via-card/20 flex items-end p-3 sm:p-4 md:p-6">
-        <div className="flex flex-row items-end justify-between w-full gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between w-full gap-2 sm:gap-4">
           {/* User info */}
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <AvatarGenerator author={session?.user.id || ""} />
-            <h2 className="text-sm sm:text-base md:text-lg font-bold text-foreground">
+            <h2 className="text-sm sm:text-base md:text-lg font-bold text-foreground truncate">
               {profile?.username || "USERNAME"}
             </h2>
           </div>
           
           {/* Deployment status */}
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
-            {/* Stardust Balance */}
-            <StardustBalance onPointsUpdate={setStardustPoints} />
-
-            {/* Upgrades Section - Only show if user has more than 2 classifications */}
-            {classificationsCount > 2 && availableUpgrades > 0 && (
-              <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
+            {/* Stardust Balance and Upgrades Row */}
+            <div className="flex items-center justify-end gap-2 w-full">
+              <StardustBalance onPointsUpdate={setStardustPoints} />
+              
+              {/* Upgrades Section - Only show if user has more than 2 classifications */}
+              {classificationsCount > 2 && availableUpgrades > 0 && (
                 <Link 
                   href="/research"
-                  className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-0"
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-card/20 transition-colors group"
                 >
-                  <div className="relative p-2 rounded-full bg-yellow-100 dark:bg-yellow-900/30 group-hover:bg-yellow-200 dark:group-hover:bg-yellow-800/40">
+                  <div className="relative p-1.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 group-hover:bg-yellow-200 dark:group-hover:bg-yellow-800/40">
                     <SpannerIcon />
                     {/* Notification Counter */}
-                    <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                       {availableUpgrades}
                     </span>
                   </div>
-                  <div className="text-center text-xs font-medium group-hover:text-foreground transition-colors">
-                    <span className="hidden sm:inline">
-                      {bothUpgradesUnlocked ? "New Projects Available" : "Upgrades Available"}
-                    </span>
-                    <span className="sm:hidden">
-                      {bothUpgradesUnlocked ? "Projects" : "Upgrades"}
-                    </span>
-                  </div>
+                  <span className="text-xs font-medium group-hover:text-foreground transition-colors hidden sm:inline">
+                    {bothUpgradesUnlocked ? "Projects" : "Upgrades"}
+                  </span>
                 </Link>
-              </div>
-            )}
+              )}
+            </div>
 
             <div className="text-xs uppercase tracking-wide text-muted-foreground hidden sm:block">
               Deployment Status
@@ -275,11 +270,11 @@ export default function ActivityHeader({
               </div>
             )}
             
-            <div className="flex gap-2 sm:gap-3">
+            <div className="flex gap-1.5 sm:gap-3 justify-end w-full">
               {/* Telescope Status */}
               <Link 
                 href="/structures/telescope"
-                className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-0"
+                className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-[60px] max-w-[80px] sm:min-w-0 sm:max-w-none"
               >
                 <div className={`p-1 sm:p-1.5 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount)}`}>
                   <TelescopeIcon 
@@ -287,7 +282,7 @@ export default function ActivityHeader({
                     hasDiscoveries={deploymentStatus.telescope.unclassifiedCount > 0} 
                   />
                 </div>
-                <div className="text-center min-w-0">
+                <div className="text-center w-full">
                   <span className="text-xs font-medium group-hover:text-foreground transition-colors block truncate">
                     Telescope
                   </span>
@@ -301,7 +296,7 @@ export default function ActivityHeader({
               {deploymentStatus.satellites.available && (
                 <button
                   onClick={() => setShowPlanetSelector(true)}
-                  className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-0"
+                  className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-[60px] max-w-[80px] sm:min-w-0 sm:max-w-none"
                 >
                   <div className={`p-1 sm:p-1.5 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount)}`}>
                     <SatelliteIcon 
@@ -309,7 +304,7 @@ export default function ActivityHeader({
                       hasDiscoveries={deploymentStatus.satellites.unclassifiedCount > 0} 
                     />
                   </div>
-                  <div className="text-center min-w-0">
+                  <div className="text-center w-full">
                     <span className="text-xs font-medium group-hover:text-foreground transition-colors block truncate">
                       Satellites
                     </span>
@@ -323,7 +318,7 @@ export default function ActivityHeader({
               {/* Rover Status */}
               <Link 
                 href="/viewports/roover"
-                className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-0"
+                className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-[60px] max-w-[80px] sm:min-w-0 sm:max-w-none"
               >
                 <div className={`p-1 sm:p-1.5 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.rover.deployed, deploymentStatus.rover.unclassifiedCount)}`}>
                   <RoverIcon 
@@ -331,7 +326,7 @@ export default function ActivityHeader({
                     hasDiscoveries={deploymentStatus.rover.unclassifiedCount > 0} 
                   />
                 </div>
-                <div className="text-center min-w-0">
+                <div className="text-center w-full">
                   <span className="text-xs font-medium group-hover:text-foreground transition-colors block truncate">
                     Rover
                   </span>

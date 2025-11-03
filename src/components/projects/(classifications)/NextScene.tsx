@@ -17,6 +17,8 @@ import {
   getMineralDisplayName,
   getMineralDescription,
 } from "@/src/utils/mineralAnalysis";
+import { SourceClassificationCallout } from "@/src/components/classifications/SourceClassificationCallout";
+import { MediaSlider } from "@/src/components/classifications/MediaSlider";
 
 type Props = {
   id: string;
@@ -85,6 +87,7 @@ export default function ClientClassificationPage({ id }: Props) {
   const [diskDetectiveImages, setDiskDetectiveImages] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [loadingImages, setLoadingImages] = useState(false);
+  const [sourceClassificationMedia, setSourceClassificationMedia] = useState<string[]>([]);
 
   // Function to detect how many images are available for disk detective anomaly
   const detectDiskDetectiveImages = async (anomalyId: number) => {
@@ -173,6 +176,31 @@ export default function ClientClassificationPage({ id }: Props) {
       );
 
       setClassification(data);
+      
+      // Fetch source classification media if it exists
+      const sourceId = data.classificationConfiguration?.source_classification_id;
+      if (sourceId) {
+        const { data: sourceData } = await supabase
+          .from("classifications")
+          .select("media")
+          .eq("id", sourceId)
+          .single();
+
+        if (sourceData?.media) {
+          const extractedMedia: string[] = [];
+          if (Array.isArray(sourceData.media)) {
+            for (const item of sourceData.media) {
+              if (Array.isArray(item) && typeof item[0] === "string" && item[0].startsWith("http")) {
+                extractedMedia.push(item[0]);
+              } else if (typeof item === "string" && item.startsWith("http")) {
+                extractedMedia.push(item);
+              }
+            }
+          }
+          setSourceClassificationMedia(extractedMedia);
+        }
+      }
+      
       setLoading(false);
 
       // Load disk detective images if this is a disk detective classification
@@ -340,20 +368,19 @@ export default function ClientClassificationPage({ id }: Props) {
             <p className="text-md text-[#4C566A]">{classification.content}</p>
           </div>
 
+          {/* Source Classification Callout */}
+          {classification?.classificationConfiguration?.source_classification_id && (
+            <SourceClassificationCallout 
+              classificationConfiguration={classification.classificationConfiguration}
+            />
+          )}
+
+          {/* Media Slider - handles both classification and source media */}
           {mediaUrl && (
-            <div className="relative group rounded-md overflow-hidden border border-[#D8DEE9]">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Image
-                    src={mediaUrl}
-                    alt="Annotated Media"
-                    width={600}
-                    height={300}
-                    className="w-full h-[300px] object-contain cursor-zoom-in transition-transform duration-200 group-hover:scale-105"
-                  />
-                </DialogTrigger>
-              </Dialog>
-            </div>
+            <MediaSlider
+              media={[mediaUrl]}
+              sourceMedia={sourceClassificationMedia}
+            />
           )}
 
           {/* Disk Detective Classification Results */}

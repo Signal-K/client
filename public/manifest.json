@@ -8,6 +8,7 @@
     "theme_color": "#78cce2",
     "orientation": "portrait-primary",
     "scope": "/",
+    "prefer_related_applications": false,
     "icons": [
         {
             "src": "/assets/Captn.jpg",

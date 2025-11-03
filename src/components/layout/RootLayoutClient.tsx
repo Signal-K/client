@@ -25,7 +25,6 @@ function LayoutContent({ children }: { children: ReactNode }) {
 export default function RootLayoutClient({ children }: { children: ReactNode }) {
   const [supabaseClient] = useState(() => createPagesBrowserClient());
 
-
   // Get session from supabaseClient
   const [session, setSession] = useState<any>(null);
 
@@ -35,8 +34,55 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
     });
   }, [supabaseClient]);
 
+  // Register service worker for offline access
+  useEffect(() => {
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      // First, try to register our custom service worker
+      navigator.serviceWorker
+        .register("/service-worker.js", { scope: "/" })
+        .then((registration) => {
+          console.log("Custom Service Worker registered:", registration);
+          
+          // Check for updates
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New service worker available, prompt user to reload
+                  console.log('New service worker available');
+                }
+              });
+            }
+          });
+        })
+        .catch((error) => {
+          console.error("Service Worker registration failed:", error);
+          
+          // Fallback to next-pwa generated service worker
+          navigator.serviceWorker
+            .register("/sw.js", { scope: "/" })
+            .then((registration) => {
+              console.log("Fallback Service Worker registered:", registration);
+            })
+            .catch((error) => {
+              console.error("Fallback Service Worker also failed:", error);
+            });
+        });
+    }
+  }, []);
+
   return (
     <html lang="en">
+      <head>
+        {/* iOS PWA specific meta tags */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Star Sailors" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/assets/Captn.jpg" />
+        <link rel="apple-touch-startup-image" href="/assets/Captn.jpg" />
+      </head>
       <body>
         {/* <PostHogProvider> */}
         <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>

@@ -8,6 +8,7 @@ import Navbar from "@/src/components/layout/Navbar";
 import GameNavbar from "@/src/components/layout/Tes";
 import { Button } from "@/src/components/ui/button";
 import { useRouter } from "next/navigation";
+import { SourceClassificationCallout } from "@/src/components/classifications/SourceClassificationCallout";
 
 interface Classification {
   id: number;
@@ -17,7 +18,7 @@ interface Classification {
   anomaly: number | null;
   media: string[] | null;
   classificationtype: string | null;
-  classificationConfig?: any | null;
+  classificationConfiguration?: any | null;
 };
 
 export default function SinglePostPage({ params }: { params: { id: string } }) {
@@ -28,6 +29,7 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
   const [classification, setClassification] = useState<Classification | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sourceClassificationMedia, setSourceClassificationMedia] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchClassification = async () => {
@@ -56,6 +58,30 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
             ...data,
             media: flattenedMedia,
           });
+
+          // Fetch source classification media if it exists
+          const sourceId = data.classificationConfiguration?.source_classification_id;
+          if (sourceId) {
+            const { data: sourceData } = await supabase
+              .from("classifications")
+              .select("media")
+              .eq("id", sourceId)
+              .single();
+
+            if (sourceData?.media) {
+              const extractedMedia: string[] = [];
+              if (Array.isArray(sourceData.media)) {
+                for (const item of sourceData.media) {
+                  if (Array.isArray(item) && typeof item[0] === "string" && item[0].startsWith("http")) {
+                    extractedMedia.push(item[0]);
+                  } else if (typeof item === "string" && item.startsWith("http")) {
+                    extractedMedia.push(item);
+                  }
+                }
+              }
+              setSourceClassificationMedia(extractedMedia);
+            }
+          }
         }
       } catch (err) {
         console.error(err);
@@ -95,7 +121,14 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
       </div>
       <div className="relative z-10 flex items-center justify-center px-4 py-12 min-h-screen">
         {classification.author && (
-          <div className="w-full max-w-3xl">
+          <div className="w-full max-w-3xl space-y-4">
+            {/* Source Classification Callout */}
+            {classification?.classificationConfiguration?.source_classification_id && (
+              <SourceClassificationCallout 
+                classificationConfiguration={classification.classificationConfiguration}
+              />
+            )}
+            
             <SimplePostSingle
               id={classification.id.toString()}
               title={`Classification #${classification.id}`}
@@ -103,6 +136,7 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
               content={classification.content || "No content available"}
               category={classification.classificationtype || "Unknown"}
               images={classification.media || []}
+              sourceMedia={sourceClassificationMedia}
             />
             {/* <div className="mt-8">
               <StructuresOnPlanet author={classification.author} />
