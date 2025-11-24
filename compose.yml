@@ -5,10 +5,6 @@ services:
     build:
       context: ./
       dockerfile: next.dockerfile
-      cache_from:
-        - type=local,src=/tmp/.buildx-cache
-      cache_to:
-        - type=local,dest=/tmp/.buildx-cache-new
     ports:
       - "3000:3000"
     env_file:

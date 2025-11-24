@@ -315,8 +315,14 @@ export default function TestPlanetWrapper() {
       );
   
       if (orbitalPeriodComment) setSurveyorPeriod(orbitalPeriodComment.value || ""); 
-      if (radiusComment) setDensity(radiusComment.value || null); 
-      if (temperatureComment) setTemperature(temperatureComment.value || null);
+      if (radiusComment && radiusComment.value) {
+        const radiusValue = parseFloat(radiusComment.value);
+        setDensity(!isNaN(radiusValue) ? radiusValue : null);
+      }
+      if (temperatureComment && temperatureComment.value) {
+        const tempValue = parseFloat(temperatureComment.value);
+        setTemperature(!isNaN(tempValue) ? tempValue : null);
+      }
     };
   };  
 
@@ -332,8 +338,11 @@ export default function TestPlanetWrapper() {
 
     if (error) {
       console.error("Error fetching comments: ", error);
-    } else {
-      setDensity(data[0].value)
+    } else if (data && data.length > 0 && data[0].value) {
+      const densityValue = parseFloat(data[0].value);
+      if (!isNaN(densityValue)) {
+        setDensity(densityValue);
+      }
     };
   };
   

@@ -1,20 +1,32 @@
 "use client";
 
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo, useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import type { PlanetConfig } from "@/src/components/discovery/planets/physics";
+import type { PlanetConfig, MineralDeposit, ChildClassification } from "@/src/components/discovery/planets/physics";
 import { vertexShader } from "@/src/shared/utils/generators/PH/vertex-shader";
 import { fragmentShader } from "@/src/shared/utils/generators/PH/fragment-shader";
+import DepositMarker from "./DepositMarker";
+import ChildClassificationMarker from "./ChildClassificationMarker";
 
 interface PlanetProps {
-  config: PlanetConfig
+  config: PlanetConfig;
+  deposits?: MineralDeposit[];
+  childClassifications?: ChildClassification[];
+  onDepositClick?: (deposit: MineralDeposit) => void;
+  onChildClassificationClick?: (classification: ChildClassification) => void;
 };
 
-export default function Planet({ config }: PlanetProps) {
+export default function Planet({ config, deposits, childClassifications, onDepositClick, onChildClassificationClick }: PlanetProps) {
   const meshRef = useRef<THREE.Mesh>(null)
   const materialRef = useRef<THREE.ShaderMaterial | null>(null)
   const atmosphereRef = useRef<THREE.Mesh>(null)
+
+  console.log("🪐 Planet rendering with:", { 
+    deposits: deposits?.length || 0, 
+    childClassifications: childClassifications?.length || 0,
+    config: config.radius 
+  });
 
   // Create shader material with uniforms based on planet config
   const shaderMaterial = useMemo(() => {
@@ -109,6 +121,27 @@ export default function Planet({ config }: PlanetProps) {
           side={THREE.BackSide}
         />
       </mesh>
+
+      {/* Render mineral deposits */}
+      {deposits?.map((deposit, index) => (
+        <DepositMarker
+          key={deposit.id || `deposit-${index}`}
+          deposit={deposit}
+          planetRadius={config.radius}
+          temperature={config.temperature}
+          onDepositClick={onDepositClick}
+        />
+      ))}
+
+      {/* Render child classifications (clouds, waypoints, etc.) */}
+      {childClassifications?.map((classification, index) => (
+        <ChildClassificationMarker
+          key={classification.id || `child-${index}`}
+          classification={classification}
+          planetRadius={config.radius}
+          onClassificationClick={onChildClassificationClick}
+        />
+      ))}
     </group>
   );
 };
