@@ -1780,10 +1780,12 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@posthog/core@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@posthog/core/-/core-1.4.0.tgz#102e810f97a0796ac388c497eaefc6edb29ec3d3"
-  integrity sha512-jmW8/I//YOHAfjzokqas+Qtc2T57Ux8d2uIJu7FLcMGxywckHsl6od59CD18jtUzKToQdjQhV6Y3429qj+KeNw==
+"@posthog/core@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@posthog/core/-/core-1.6.0.tgz#a5b63a30950a8dfe87d4bf335ab24005c7ce1278"
+  integrity sha512-Tbh8UACwbb7jFdDC7wwXHtfNzO+4wKh3VbyMHmp2UBe6w1jliJixexTJNfkqdGZm+ht3M10mcKvGGPnoZ2zLBg==
+  dependencies:
+    cross-spawn "^7.0.6"
 
 "@radix-ui/number@1.1.1":
   version "1.1.1"
@@ -7135,23 +7137,23 @@ postcss@^8.4.30, postcss@^8.4.47, postcss@^8.5.6:
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
 
-posthog-js@^1.258.2:
-  version "1.282.0"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.282.0.tgz#f516209100aa5f951143984a670b5123e3b4d3b5"
-  integrity sha512-kx7GyVILxR+Ty4SDA5yRpiIZ73yBZht7ZecnvqqOspqiMnzyoTgdBPn2NELMR0OrhjnfU2KhLkXwooUHmD0MAA==
+posthog-js@^1.298.1:
+  version "1.298.1"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.298.1.tgz#dbe6a49fe7dbcf793419f4ac0efba83672789191"
+  integrity sha512-MynFhC2HO6sg5moUfpkd0s6RzAqcqFX75kjIi4Xrj2Gl0/YQWYvFUgvv8FCpWPKPs2mdvNWYhs+oqJg0BVVHPw==
   dependencies:
-    "@posthog/core" "1.4.0"
+    "@posthog/core" "1.6.0"
     core-js "^3.38.1"
     fflate "^0.4.8"
     preact "^10.19.3"
     web-vitals "^4.2.4"
 
-posthog-node@^5.6.0:
-  version "5.10.4"
-  resolved "https://registry.yarnpkg.com/posthog-node/-/posthog-node-5.10.4.tgz#4acd82d2635beeb0aa712ca84be78395c6cee9d1"
-  integrity sha512-sy020/Q4mt18eCkVo/cGEJD+wgdxeg5DTgNUaA85awBCbuEP43BOdCTOOw/K2Tvgw2oZfag3PFyhkVuQ6nJfBg==
+posthog-node@^5.14.1:
+  version "5.14.1"
+  resolved "https://registry.yarnpkg.com/posthog-node/-/posthog-node-5.14.1.tgz#6a88503ec6c619294b4b790299ff47fb3256f8ec"
+  integrity sha512-NbqZMCwHectzfeFOeLqes1fPg/V5bsKhrBfyH1qHEcDb4ZHcbDARcqLE6JDhwMDQKa4YHkInXHITYscMuPylFw==
   dependencies:
-    "@posthog/core" "1.4.0"
+    "@posthog/core" "1.6.0"
 
 postprocessing@^6.36.4:
   version "6.37.8"

@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import RootLayoutClient from "@/src/components/layout/RootLayoutClient";
+import { PostHogProvider } from "@/src/components/providers/PostHogProvider";
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -47,5 +48,9 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return <RootLayoutClient>{children}</RootLayoutClient>;
+  return (
+    <PostHogProvider>
+      <RootLayoutClient>{children}</RootLayoutClient>
+    </PostHogProvider>
+  );
 };
