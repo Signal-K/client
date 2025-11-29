@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import dynamic from 'next/dynamic';
 import { useSession } from "@supabase/auth-helpers-react";
+import { usePostHog } from 'posthog-js/react';
 
 // Dynamic heavy components (Three.js scene, popup, banners, forms)
 const TelescopeBackground = dynamic(() => import('@/src/components/classification/telescope/telescope-background').then(m => m.TelescopeBackground), { ssr: false, loading: () => <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background to-background/80" /> });
@@ -109,6 +110,7 @@ function SimpleTabTrigger({
 
 export default function GamePage() {
   const session = useSession();
+  const posthog = usePostHog();
 
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [landmarksExpanded, setLandmarksExpanded] = useState(false);
@@ -146,11 +148,34 @@ export default function GamePage() {
     if (tabId === activeTab) {
       // Toggle full screen when clicking active tab
       setIsFullScreen(prev => !prev);
+      posthog?.capture('tab_fullscreen_toggled', {
+        tab_id: tabId,
+        is_fullscreen: !isFullScreen,
+      });
     } else {
       // Switch to new tab, keep full screen state
       setActiveTab(tabId);
+      posthog?.capture('tab_switched', {
+        from_tab: activeTab,
+        to_tab: tabId,
+        classification_count: classifications.length,
+      });
     }
   };
+
+  // Track page view and user state
+  useEffect(() => {
+    if (session?.user) {
+      posthog?.capture('game_page_viewed', {
+        user_id: session.user.id,
+        has_classifications: classifications.length > 0,
+        classification_count: classifications.length,
+        has_discoveries: linkedAnomalies.length > 0,
+        discovery_count: linkedAnomalies.length,
+        needs_profile_setup: needsProfileSetup,
+      });
+    }
+  }, [session, posthog]);
 
   // Check if user has seen the reorder hint
   useEffect(() => {
@@ -167,6 +192,7 @@ export default function GamePage() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('tab-reorder-hint-seen', 'true');
     }
+    posthog?.capture('reorder_hint_dismissed');
   };
 
   // Define all available tabs with conditions
@@ -226,10 +252,20 @@ export default function GamePage() {
       const newOrder = [...tabIds];
       [newOrder[currentIndex - 1], newOrder[currentIndex]] = [newOrder[currentIndex], newOrder[currentIndex - 1]];
       reorderTabs(newOrder);
+      posthog?.capture('tab_reordered', {
+        tab_id: tabId,
+        direction: 'left',
+        new_index: currentIndex - 1,
+      });
     } else if (direction === 'right' && currentIndex < tabIds.length - 1) {
       const newOrder = [...tabIds];
       [newOrder[currentIndex], newOrder[currentIndex + 1]] = [newOrder[currentIndex + 1], newOrder[currentIndex]];
       reorderTabs(newOrder);
+      posthog?.capture('tab_reordered', {
+        tab_id: tabId,
+        direction: 'right',
+        new_index: currentIndex + 1,
+      });
     }
   };
 
@@ -277,9 +313,17 @@ export default function GamePage() {
       {/* Main Header */}
       <MainHeader
         isDark={isDark}
-        onThemeToggle={toggleDarkMode}
+        onThemeToggle={() => {
+          toggleDarkMode();
+          posthog?.capture('theme_toggled', { new_theme: !isDark ? 'dark' : 'light' });
+        }}
         notificationsOpen={notificationsOpen}
-        onToggleNotifications={() => setNotificationsOpen((open) => !open)}
+        onToggleNotifications={() => {
+          setNotificationsOpen((open) => {
+            posthog?.capture('notifications_toggled', { is_open: !open });
+            return !open;
+          });
+        }}
         activityFeed={activityFeed}
         otherClassifications={otherClassifications}
       />
@@ -296,14 +340,22 @@ export default function GamePage() {
           <ActivityHeaderSection
             classificationsCount={classifications.length}
             landmarksExpanded={landmarksExpanded}
-            onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
+            onToggleLandmarks={() => {
+              setLandmarksExpanded((prev) => {
+                posthog?.capture('landmarks_toggled', { is_expanded: !prev });
+                return !prev;
+              });
+            }}
           />
         )}
 
         {/* Profile Setup Required */}
         {needsProfileSetup && (
           <ProfileSetupRequired
-            onOpenProfileModal={() => setShowProfileModal(true)}
+            onOpenProfileModal={() => {
+              posthog?.capture('profile_setup_modal_opened');
+              setShowProfileModal(true);
+            }}
           />
         )}
 

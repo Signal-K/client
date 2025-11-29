@@ -7,6 +7,7 @@ import { Rocket, Users, Star, Globe, ExternalLink, Calendar, ArrowRight, Github,
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { getRecentDiscoveries, getDiscoveryTypeLabel, getDiscoveryDescription, Classification } from "@/lib/discoveries"
+import { usePostHog } from 'posthog-js/react'
 
 const teamMembers = [
   { 
@@ -41,9 +42,14 @@ const teamMembers = [
 ];
 
 export default function Landing() {
+  const posthog = usePostHog();
   const [discoveries, setDiscoveries] = useState<Classification[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    posthog?.capture('landing_page_viewed');
+  }, [posthog]);
 
   useEffect(() => {
     async function fetchDiscoveries() {
@@ -87,30 +93,33 @@ export default function Landing() {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
+            <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors" onClick={() => posthog?.capture('nav_clicked', { section: 'about' })}>
               About
             </a>
-            <a href="#media" className="text-muted-foreground hover:text-foreground transition-colors">
+            <a href="#media" className="text-muted-foreground hover:text-foreground transition-colors" onClick={() => posthog?.capture('nav_clicked', { section: 'media' })}>
               Media
             </a>
-            <a href="#news" className="text-muted-foreground hover:text-foreground transition-colors">
+            <a href="#news" className="text-muted-foreground hover:text-foreground transition-colors" onClick={() => posthog?.capture('nav_clicked', { section: 'news' })}>
               News
             </a>
-            <a href="#team" className="text-muted-foreground hover:text-foreground transition-colors">
+            <a href="#team" className="text-muted-foreground hover:text-foreground transition-colors" onClick={() => posthog?.capture('nav_clicked', { section: 'team' })}>
               Team
             </a>
           </nav>
           
           {/* Desktop CTA */}
           <Link href="/auth" className="hidden md:block">
-            <Button size="default" className="font-semibold rounded-full" style={{ borderRadius: '9999px' }}>
+            <Button size="default" className="font-semibold rounded-full" style={{ borderRadius: '9999px' }} onClick={() => posthog?.capture('cta_header_clicked', { button_text: 'Play Now' })}>
               Play Now
             </Button>
           </Link>
           
           {/* Mobile Menu Button */}
           <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => {
+              setMobileMenuOpen(!mobileMenuOpen);
+              posthog?.capture('mobile_menu_toggled', { is_open: !mobileMenuOpen });
+            }}
             className="md:hidden p-2 hover:bg-muted rounded-lg transition-colors"
             aria-label="Toggle menu"
           >
@@ -203,6 +212,7 @@ export default function Landing() {
                 size="lg" 
                 className="text-lg font-semibold group rounded-full"
                 style={{ borderRadius: '9999px' }}
+                onClick={() => posthog?.capture('cta_hero_clicked', { button_text: 'Start Exploring Now' })}
               >
                 <Rocket className="w-5 h-5 mr-2 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 Start Exploring Now
@@ -387,7 +397,14 @@ export default function Landing() {
                   </CardHeader>
                   <CardContent>
                     <Link href={`/posts/${discovery.id}`}>
-                      <Button variant="ghost" className="p-0 h-auto text-primary hover:text-primary/80">
+                      <Button 
+                        variant="ghost" 
+                        className="p-0 h-auto text-primary hover:text-primary/80"
+                        onClick={() => posthog?.capture('discovery_card_clicked', {
+                          discovery_id: discovery.id,
+                          discovery_type: discovery.classificationtype,
+                        })}
+                      >
                         Read More <ArrowRight className="w-4 h-4 ml-1" />
                       </Button>
                     </Link>

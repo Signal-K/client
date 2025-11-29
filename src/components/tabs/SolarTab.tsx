@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense, useMemo } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
+import { usePostHog } from 'posthog-js/react';
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import { Button } from "@/src/components/ui/button";
@@ -82,8 +83,18 @@ function SunspotClassifier({ onBack, weekStart }: SunspotClassifierProps) {
     fetchRandomAnomaly();
   }, [supabase]);
 
+  const posthog = usePostHog();
+
   async function handleSubmit() {
     if (!session?.user?.id || !anomaly || !sunspotCount) return;
+
+    posthog?.capture('sunspot_classification_submitted', {
+      anomaly_id: anomaly.id,
+      sunspot_count: parseInt(sunspotCount),
+      has_shape_description: !!shapeDescription,
+      has_annotations: annotations.length > 0,
+      observation_date: observationDate.toISOString(),
+    });
 
     setSubmitting(true);
     try {
@@ -494,6 +505,8 @@ export default function SolarTab({ onExpandedChange }: SolarTabProps = {}) {
 
   const canLaunchProbe = communityProgress.totalClassifications >= COMMUNITY_THRESHOLD;
 
+  const posthog = usePostHog();
+
   async function handleLaunchProbe() {
     if (!session?.user?.id || !currentEvent || !canLaunchProbe) return;
 
@@ -510,10 +523,17 @@ export default function SolarTab({ onExpandedChange }: SolarTabProps = {}) {
     if (recentProbes) {
       const timeSince = Date.now() - new Date(recentProbes.launched_at).getTime();
       if (timeSince < 60 * 60 * 1000) {
+        posthog?.capture('probe_launch_rate_limited');
         alert("You can only deploy one probe per hour!");
         return;
       }
     }
+
+    posthog?.capture('defensive_probe_launched', {
+      event_id: currentEvent.id,
+      user_total_probes: communityProgress.userProbes + 1,
+      community_total_probes: communityProgress.totalProbes + 1,
+    });
 
     setLaunchingProbe(true);
     setProbeAnimation(true);
@@ -685,7 +705,12 @@ export default function SolarTab({ onExpandedChange }: SolarTabProps = {}) {
           {/* Action Buttons */}
           <div className="grid grid-cols-3 gap-2">
             <Button
-              onClick={() => setShowClassifier(true)}
+              onClick={() => {
+                posthog?.capture('sunspot_classifier_opened', {
+                  classifications_this_week: communityProgress.userClassifications,
+                });
+                setShowClassifier(true);
+              }}
               className="h-9 col-span-2"
               variant="default"
               disabled={!canClassify}
@@ -696,7 +721,10 @@ export default function SolarTab({ onExpandedChange }: SolarTabProps = {}) {
             </Button>
             
             <Button
-              onClick={() => router.push('/leaderboards/sunspots')}
+              onClick={() => {
+                posthog?.capture('leaderboard_viewed', { leaderboard_type: 'sunspots' });
+                router.push('/leaderboards/sunspots');
+              }}
               variant="outline"
               className="h-9"
               size="sm"
