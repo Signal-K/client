@@ -33,7 +33,7 @@ export default function Navbar() {
     if (error) {
       console.error("Error signing out:", error.message);
     } else {
-      console.log("User signed out successfully");
+      // Signed out
     }
   };
 

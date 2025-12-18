@@ -350,11 +350,11 @@ export default function UpdatesTab() {
           {/* Project Selection for New Users */}
           {progress.totalClassifications === 0 && (
             <div className="mt-6">
-              <ProjectSelectionViewport
+                <ProjectSelectionViewport
                 classificationsCount={progress.totalClassifications}
                 showWelcomeMessage={true}
                 onProjectSelect={(projectId) => {
-                  console.log("Selected project:", projectId);
+                  // project selected
                 }}
               />
             </div>

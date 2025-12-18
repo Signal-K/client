@@ -218,8 +218,6 @@ export function useAnnotatorLogic({
         return;
       }
 
-      console.log("Classification created successfully: ", classificationData);
-
       // Create mineral deposit if this waypoint has one
       if (classificationData && hasMineralDeposit && anomalyId) {
         try {
@@ -237,7 +235,7 @@ export function useAnnotatorLogic({
             categories,
           });
 
-          console.log("Creating mineral deposit with config:", mineralConfig);
+          // creating mineral deposit with computed config
 
           // Create mineral deposit record
           const { data: mineralData, error: mineralError } = await supabase
@@ -258,7 +256,7 @@ export function useAnnotatorLogic({
             console.error("Error creating mineral deposit:", mineralError);
           } else {
             setMineralDepositId(mineralData.id);
-            console.log("Mineral deposit created successfully:", mineralData);
+            // mineral deposit created successfully
           }
         } catch (err) {
           console.error("Error in mineral deposit creation:", err);

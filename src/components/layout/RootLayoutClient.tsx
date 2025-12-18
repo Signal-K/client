@@ -15,7 +15,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (activePlanet) {
-      console.log("Active Planet: ", activePlanet);
+      // activePlanet updated
     }
   }, [activePlanet]);
 
@@ -41,17 +41,16 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
       navigator.serviceWorker
         .register("/service-worker.js", { scope: "/" })
         .then((registration) => {
-          console.log("Custom Service Worker registered:", registration);
+          // Custom Service Worker registered
           
           // Check for updates
           registration.addEventListener('updatefound', () => {
             const newWorker = registration.installing;
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New service worker available, prompt user to reload
-                  console.log('New service worker available');
-                }
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // New service worker available
+                  }
               });
             }
           });
@@ -63,7 +62,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
           navigator.serviceWorker
             .register("/sw.js", { scope: "/" })
             .then((registration) => {
-              console.log("Fallback Service Worker registered:", registration);
+              // Fallback Service Worker registered
             })
             .catch((error) => {
               console.error("Fallback Service Worker also failed:", error);

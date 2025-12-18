@@ -22,11 +22,7 @@ export default function Planet({ config, deposits, childClassifications, onDepos
   const materialRef = useRef<THREE.ShaderMaterial | null>(null)
   const atmosphereRef = useRef<THREE.Mesh>(null)
 
-  console.log("🪐 Planet rendering with:", { 
-    deposits: deposits?.length || 0, 
-    childClassifications: childClassifications?.length || 0,
-    config: config.radius 
-  });
+  // Planet render info: deposits and child classifications counts
 
   // Create shader material with uniforms based on planet config
   const shaderMaterial = useMemo(() => {

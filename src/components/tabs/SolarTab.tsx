@@ -63,12 +63,12 @@ function SunspotClassifier({ onBack, weekStart }: SunspotClassifierProps) {
           .select("*")
           .eq("anomalySet", "sunspot");
 
-        console.log("Fetched anomalies:", { count: anomalies?.length, error });
+        
 
         if (anomalies && anomalies.length > 0) {
           const randomIndex = Math.floor(Math.random() * anomalies.length);
           const selectedAnomaly = anomalies[randomIndex];
-          console.log("Selected anomaly:", selectedAnomaly);
+          
           setAnomaly(selectedAnomaly);
         } else {
           console.warn("No sunspot anomalies found");
@@ -103,13 +103,7 @@ function SunspotClassifier({ onBack, weekStart }: SunspotClassifierProps) {
         ? `${supabaseUrl}/storage/v1/object/public/${anomaly.avatar_url}`
         : `${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${anomaly.id}.png`;
 
-      console.log("Submitting classification with data:", {
-        author: session.user.id,
-        anomaly: anomaly.id,
-        classificationtype: "sunspot",
-        content: `Count: ${sunspotCount}. Shape: ${shapeDescription || 'Not described'}`,
-        sunspotCount: parseInt(sunspotCount),
-      });
+      
 
       const { data, error } = await supabase
         .from("classifications")
@@ -136,7 +130,7 @@ function SunspotClassifier({ onBack, weekStart }: SunspotClassifierProps) {
         throw error;
       }
 
-      console.log("Classification inserted successfully:", data);
+      
       alert("Classification submitted! Thank you for your contribution.");
       onBack();
     } catch (error: any) {

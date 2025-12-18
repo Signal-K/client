@@ -69,9 +69,6 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
 
   const handleVote = async (classificationId: number, currentConfig: any) => {
     try {
-      console.log("PHVote: Starting vote submission...");
-      console.log("PHVote: Classification ID:", classificationId);
-      console.log("PHVote: Current config:", currentConfig);
       
       const currentVotes = currentConfig?.votes || 0;
 
@@ -80,43 +77,32 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
         votes: currentVotes + 1,
       };
 
-      console.log("PHVote: Updated config:", updatedConfig);
+      
 
       const { error } = await supabase
         .from("classifications")
         .update({ classificationConfiguration: updatedConfig })
         .eq("id", classificationId);
-
-      console.log("PHVote: Database update completed, error:", error);
-
       if (error) {
         console.error("PHVote: Error updating classificationConfiguration:", error);
       } else {
-        console.log("PHVote: Vote successful, updating state...");
         setClassification((prev: any) =>
           prev ? { ...prev, votes: updatedConfig.votes } : prev
         );
         
         // Show success popup
-        console.log("PHVote: Setting vote popup to true");
         setShowSuccessPopup(true);
-        console.log("PHVote: Popup state set, current showSuccessPopup should be true");
         
         // Redirect after 3 seconds
-        console.log("PHVote: Setting vote redirect timeout");
         const redirectTimeout = setTimeout(() => {
-          console.log("PHVote: Attempting redirect to dashboard...");
           try {
             router.push('/');
-            console.log("PHVote: Router.push called successfully");
           } catch (error) {
             console.error("PHVote: Router.push error:", error);
             // Fallback to window.location
             window.location.href = '/';
           }
         }, 3000);
-        
-        console.log("PHVote: Redirect timeout set, ID:", redirectTimeout);
       };
     } catch (error) {
       console.error("PHVote: Error voting:", error);

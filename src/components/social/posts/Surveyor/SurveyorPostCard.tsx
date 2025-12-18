@@ -80,7 +80,7 @@ export function SurveyorComments({
     if (!commentInput?.trim()) return;
 
     try {
-      console.log('SurveyorComments: Starting planet type proposal submission...');
+      
       const { error } = await supabase.from("comments").insert([
         {
           content: commentInput,
@@ -92,31 +92,30 @@ export function SurveyorComments({
         },
       ]);
 
-      console.log('SurveyorComments: Database insert completed, error:', error);
+      
 
       if (error) {
-        console.log('SurveyorComments: Database error occurred:', error);
+        
         throw error;
       }
 
-      console.log('SurveyorComments: Planet type proposal submitted successfully, showing popup...');
-      console.log('SurveyorComments: About to clear input and show popup...');
+      
       
       setCommentInputs((prev) => ({ ...prev, [`${classificationId}-1`]: "" }));
-      console.log('SurveyorComments: Input cleared');
+      
       
       setShowSuccessPopup(true);
-      console.log('SurveyorComments: Popup state set to true');
+      
       
       fetchComments();
-      console.log('SurveyorComments: fetchComments called');
+      
       
       // Show popup and redirect after 3 seconds
       const redirectTimeout = setTimeout(() => {
-        console.log('SurveyorComments: Attempting redirect to dashboard...');
+        
         try {
           router.push('/');
-          console.log('SurveyorComments: Router.push called successfully');
+          
         } catch (error) {
           console.error('SurveyorComments: Router.push error:', error);
           // Fallback to window.location
@@ -124,7 +123,7 @@ export function SurveyorComments({
         }
       }, 3000);
       
-      console.log('SurveyorComments: Redirect timeout set, ID:', redirectTimeout);
+        
     } catch (error) {
       console.error("Error inserting comment:", error);
     }
@@ -136,7 +135,7 @@ export function SurveyorComments({
     if (!t1?.trim() || !t2?.trim()) return;
 
     try {
-      console.log('SurveyorComments: Starting temperature comment submission...');
+      
       const { error } = await supabase.from("comments").insert([
         {
           content: `${t1}\n\n${t2}`,
@@ -151,7 +150,7 @@ export function SurveyorComments({
 
       if (error) throw error;
       
-      console.log('SurveyorComments: Temperature comment submitted successfully, showing popup...');
+      
       setTemperatureInputs((prev) => ({
         ...prev,
         [`${classificationId}-1`]: "",
@@ -162,10 +161,10 @@ export function SurveyorComments({
       
       // Show popup and redirect after 3 seconds
       const redirectTimeout = setTimeout(() => {
-        console.log('SurveyorComments: Attempting redirect to dashboard...');
+        
         try {
           router.push('/');
-          console.log('SurveyorComments: Router.push called successfully');
+          
         } catch (error) {
           console.error('SurveyorComments: Router.push error:', error);
           // Fallback to window.location
@@ -173,7 +172,7 @@ export function SurveyorComments({
         }
       }, 3000);
       
-      console.log('SurveyorComments: Redirect timeout set, ID:', redirectTimeout);
+      
     } catch (error) {
       console.error("Error adding temperature comment:", error);
     }
@@ -185,7 +184,7 @@ export function SurveyorComments({
     if (!d1?.trim() || !d2?.trim()) return;
 
     try {
-      console.log('SurveyorComments: Starting density comment submission...');
+      
       const { error } = await supabase.from("comments").insert([
         {
           content: `${d1}\n\n${d2}`,
@@ -200,7 +199,7 @@ export function SurveyorComments({
 
       if (error) throw error;
 
-      console.log('SurveyorComments: Density comment submitted successfully, showing popup...');
+      
       setDensityInputs((prev) => ({
         ...prev,
         [`${classificationId}-1`]: "",
@@ -211,10 +210,10 @@ export function SurveyorComments({
       
       // Show popup and redirect after 3 seconds
       const redirectTimeout = setTimeout(() => {
-        console.log('SurveyorComments: Attempting redirect to dashboard...');
+        
         try {
           router.push('/');
-          console.log('SurveyorComments: Router.push called successfully');
+          
         } catch (error) {
           console.error('SurveyorComments: Router.push error:', error);
           // Fallback to window.location
@@ -222,7 +221,7 @@ export function SurveyorComments({
         }
       }, 3000);
       
-      console.log('SurveyorComments: Redirect timeout set, ID:', redirectTimeout);
+      
     } catch (error) {
       console.error("Error adding density comment:", error);
     }
@@ -359,7 +358,7 @@ export function SurveyorComments({
       {/* Success Popup */}
       {showSuccessPopup && (
         <>
-          {console.log('SurveyorComments: Rendering popup - showSuccessPopup is true')}
+          
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4 text-center">
               <div className="mb-4">
@@ -376,7 +375,6 @@ export function SurveyorComments({
                 </p>
                 <button 
                   onClick={() => {
-                    console.log('Manual redirect button clicked');
                     try {
                       router.push('/');
                     } catch (error) {

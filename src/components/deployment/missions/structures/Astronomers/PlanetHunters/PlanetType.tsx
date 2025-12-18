@@ -164,8 +164,6 @@ const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps)
         .eq("id", commentId);
 
       if (commentError) throw commentError;
-
-      console.log("Preferred comment updated successfully.");
     } catch (err) {
       console.error("Error updating preferred comment:", err);
     }
@@ -182,7 +180,6 @@ const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps)
     }
 
     try {
-      console.log("Inserting comment...");
       const { error } = await supabase.from("comments").insert([
         {
           content: commentInput,
@@ -198,16 +195,10 @@ const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps)
       }
 
       setCommentInputs((prev) => ({ ...prev, [classificationId]: "" }));
-      console.log("Comment inserted successfully with planet type.");
-      
-      // Show success popup
-      console.log("Setting popup to true");
       setShowSuccessPopup(true);
-      
+
       // Redirect after 3 seconds
-      console.log("Setting redirect timeout");
       setTimeout(() => {
-        console.log("Redirecting to dashboard");
         router.push('/');
       }, 3000);
     } catch (err) {

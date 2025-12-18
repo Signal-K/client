@@ -32,7 +32,6 @@ export default function SurveyorCalculator({ classificationId }: Props) {
     if (!newComment.trim() && !calculatedValueComment.trim()) return;
 
     try {
-      console.log('CalculatorSurveyor: Starting comment submission...');
       const { error } = await supabase.from("comments").insert([
         {
           content: `Calculated Value: ${calculatedValueComment}\nGeneral Comment: ${newComment}`,
@@ -43,26 +42,21 @@ export default function SurveyorCalculator({ classificationId }: Props) {
       ]);
 
       if (error) throw error;
-      
-      console.log('CalculatorSurveyor: Comment submitted successfully, showing popup...');
+
       setNewComment("");
       setCalculatedValueComment("");
       setShowSuccessPopup(true);
       
       // Show popup and redirect after 3 seconds
       const redirectTimeout = setTimeout(() => {
-        console.log('CalculatorSurveyor: Attempting redirect to dashboard...');
         try {
           router.push('/');
-          console.log('CalculatorSurveyor: Router.push called successfully');
         } catch (error) {
           console.error('CalculatorSurveyor: Router.push error:', error);
           // Fallback to window.location
           window.location.href = '/';
         }
       }, 3000);
-      
-      console.log('CalculatorSurveyor: Redirect timeout set, ID:', redirectTimeout);
     } catch (error: any) {
       console.error("Error adding comment:", error.message);
     }
@@ -168,13 +162,12 @@ export default function SurveyorCalculator({ classificationId }: Props) {
 
       if (error) throw error;
 
-      console.log('CalculatorSurveyor: Density comment submitted successfully, showing popup...');
+      
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
       setShowSuccessPopup(true);
       
       // Show popup and redirect after 3 seconds
       setTimeout(() => {
-        console.log('CalculatorSurveyor: Redirecting to dashboard from density...');
         try {
           router.push('/');
         } catch (error) {
@@ -214,13 +207,12 @@ export default function SurveyorCalculator({ classificationId }: Props) {
 
       if (error) throw error;
 
-      console.log('CalculatorSurveyor: Temperature comment submitted successfully, showing popup...');
+      
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
       setShowSuccessPopup(true);
       
       // Show popup and redirect after 3 seconds
       setTimeout(() => {
-        console.log('CalculatorSurveyor: Redirecting to dashboard from temperature...');
         try {
           router.push('/');
         } catch (error) {

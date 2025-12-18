@@ -55,13 +55,7 @@ export async function fetchAnomalies(supabase: any, deploymentType: string | nul
     }
 
     if (data) {
-      console.log('Fetched anomalies by set:', {
-        totalFetched: data.length,
-        deploymentType,
-        setsRequested: setsToFetch,
-        bySet: setsToFetch.map(set => ({ set, count: data.filter((a: any) => a.anomalySet === set).length }))
-      });
-      console.log('Sample anomalies:', data.slice(0, 3).map((a: any) => ({ id: a.id, content: a.content, anomalySet: a.anomalySet, anomalytype: a.anomalytype })));
+      // fetched anomalies by set
       setTessAnomalies(data as DatabaseAnomaly[]);
     }
   } catch (err) {
@@ -121,11 +115,7 @@ export async function checkDeployment(supabase: any, session: any, setAlreadyDep
   const totalAllowedDeploys = linkedCount + additionalDeploys
   const userCanRedeploy = totalAllowedDeploys > linkedCount
 
-  console.log("Linked anomalies deployed this week:", linkedCount)
-  console.log("Valid comments on others' classifications this week:", commentsCount)
-  console.log(`Valid votes on others' classifications this week: ${votesCount} (counts as ${Math.floor(votesCount / 3)} deploys)`)
-  console.log("Total allowed deploys:", totalAllowedDeploys)
-  console.log("User can redeploy?", userCanRedeploy ? "YES" : "NO")
+  // deployment counts computed: linkedCount/commentsCount/votesCount/totalAllowedDeploys
 
   if (linkedCount === 0) {
     setAlreadyDeployed(false)
@@ -206,7 +196,7 @@ export async function handleDeployAction(params: HandleDeployParams) {
       .eq("tech_type", "probereceptors")
     if (researched && researched.length > 0) {
       anomalyCount = 6
-      console.log('Telescope upgrade detected - increasing anomaly count to 6')
+      // telescope upgrade detected
     }
   }
   anomalyCount = Math.min(anomalyCount, 6)

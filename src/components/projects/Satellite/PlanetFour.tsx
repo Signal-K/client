@@ -208,7 +208,7 @@ export function StarterPlanetFour({
                                             });
 
                                             if (depositCreated) {
-                                                console.log(`[Planet Four] Created ${mineralConfig.type} deposit!`);
+                                                // mineral deposit created
                                             }
                                         }
                                     } catch (error) {

@@ -65,7 +65,6 @@ export function CommentForm({
         };
 
         setSubmitting(true);
-        console.log('CommentForm: Starting comment submission...');
 
         const { error } = await supabase
             .from("comments")
@@ -77,29 +76,26 @@ export function CommentForm({
             });
 
             if (error) {
-                console.log('CommentForm: Error submitting comment:', error);
                 showToast('Submission failed', 'Unable to post your comment');
                 console.error(error);
             } else {
-                console.log('CommentForm: Comment submitted successfully, showing popup...');
+                setContent('');
+                setShowSuccessPopup(true);
+                onSubmit?.();
                 setContent('');
                 setShowSuccessPopup(true);
                 onSubmit?.();
                 
                 // Show popup and redirect after 3 seconds
                 const redirectTimeout = setTimeout(() => {
-                    console.log('CommentForm: Attempting redirect to dashboard...');
                     try {
                         router.push('/');
-                        console.log('CommentForm: Router.push called successfully');
                     } catch (error) {
                         console.error('CommentForm: Router.push error:', error);
                         // Fallback to window.location
                         window.location.href = '/';
                     }
                 }, 3000);
-                
-                console.log('CommentForm: Redirect timeout set, ID:', redirectTimeout);
             };
 
             setSubmitting(false);

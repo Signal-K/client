@@ -126,6 +126,7 @@ export default function GamePage() {
     profile,
     classifications,
     otherClassifications,
+    loading,
   } = usePageData();
 
   const { showNpsModal, handleCloseNps } = useNPSManagement();
@@ -281,7 +282,9 @@ export default function GamePage() {
   }
 
   // Lightweight skeleton while data loads to avoid blocking on dynamic chunk hydration.
-  if (!classifications.length && activityFeed.length === 0) {
+  // Important: do not gate the entire page on having data, or new users will see the
+  // skeleton forever.
+  if (loading) {
     return (
       <div className="min-h-screen w-full relative flex justify-center">
         <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background to-background" />

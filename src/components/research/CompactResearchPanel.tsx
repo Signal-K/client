@@ -163,12 +163,7 @@ export default function CompactResearchPanel() {
       
       const availableStardust = Math.max(0, basePoints - researchPenalty);
 
-      console.log('Stardust calculation:', {
-        basePoints,
-        totalResearched: researched?.length || 0,
-        researchPenalty,
-        availableStardust
-      });
+      
 
       setUpgradeData({
         telescopeReceptors: {

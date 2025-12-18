@@ -349,7 +349,7 @@ export default function DeploySatelliteViewport() {
         };
 
         // If user has metallicity skill, fetch metallicity from local ExoFOP CSV via API
-        console.log('🔍 Skill check:', hasStellarMetallicitySkill, 'Planet:', planet.id, planet.content);
+        // skill check for stellar metallicity
         if (hasStellarMetallicitySkill) {
           try {
             const content = String(planet.content || '');
@@ -358,18 +358,18 @@ export default function DeploySatelliteViewport() {
             if (ticMatch) ticCandidate = ticMatch[1];
             if (!ticCandidate) ticCandidate = String(planet.id);
 
-            console.log('🔍 Fetching metallicity for TIC:', ticCandidate);
+            // fetching metallicity for TIC if available
             const res = await fetch(`/api/exofop?tic=${encodeURIComponent(ticCandidate)}`);
             if (res.ok) {
               const body = await res.json();
-              console.log('🔍 API result:', body);
+              // API result received
               if (body?.result?.metallicity) {
                 // Add metallicity to stats before setting
                 finalStats = {
                   ...finalStats,
                   metallicity: body.result.metallicity,
                 } as any;
-                console.log('✅ Final stats with metallicity:', finalStats);
+                // final stats updated with metallicity
               }
             }
           } catch (err) {
@@ -388,12 +388,12 @@ export default function DeploySatelliteViewport() {
 
           if (!existing || statsChanged) {
             updated[focusedPlanetIdx] = { ...existing, stats: finalStats };
-            console.log('🔍 Updated planet anomalies[' + focusedPlanetIdx + ']:', updated[focusedPlanetIdx].stats);
+            // updated planet anomalies with new stats
             return updated;
           }
 
           // No change — return previous array reference to avoid re-renders
-          console.log('🔍 Skipping planet anomalies update; stats unchanged.');
+          // skipping planet anomalies update; stats unchanged
           return prev;
         });
       });
@@ -406,10 +406,10 @@ export default function DeploySatelliteViewport() {
   // Check for water/mineral discoveries from cloud classifications
   useEffect(() => {
     const checkWaterDiscovery = async () => {
-      console.log('[checkWaterDiscovery] Starting check...');
+      // checkWaterDiscovery: starting check
       
       if (!session?.user?.id || planetAnomalies.length === 0) {
-        console.log('[checkWaterDiscovery] Early return - no session or planets');
+        // checkWaterDiscovery: early return - no session or planets
         setWaterDiscoveryStatus({
           hasCloudClassifications: false,
           hasValidStats: false,
@@ -420,7 +420,7 @@ export default function DeploySatelliteViewport() {
 
       const focusedPlanet = planetAnomalies[focusedPlanetIdx];
       if (!focusedPlanet) {
-        console.log('[checkWaterDiscovery] Early return - no focused planet');
+        // checkWaterDiscovery: early return - no focused planet
         setWaterDiscoveryStatus({
           hasCloudClassifications: false,
           hasValidStats: false,
@@ -429,7 +429,7 @@ export default function DeploySatelliteViewport() {
         return;
       }
       
-      console.log('[checkWaterDiscovery] Focused planet:', focusedPlanet.id, 'Stats:', focusedPlanet.stats);
+        // checkWaterDiscovery: focused planet and stats available
 
       // Check if planet has stats (density, radius, mass are not null/N/A)
       const hasValidStats = focusedPlanet.stats && 
@@ -446,15 +446,10 @@ export default function DeploySatelliteViewport() {
           .eq("anomaly", focusedPlanet.id)
           .eq("classificationtype", "planet");
 
-        console.log('[checkWaterDiscovery] Planet classifications query:', {
-          error: planetClassError,
-          count: planetClassifications?.length || 0,
-          userId: session.user.id,
-          anomalyId: focusedPlanet.id
-        });
+        // checkWaterDiscovery: planet classifications query completed
 
         if (planetClassError || !planetClassifications || planetClassifications.length === 0) {
-          console.log('[checkWaterDiscovery] Early return - no planet classifications found');
+          // checkWaterDiscovery: early return - no planet classifications found
           setWaterDiscoveryStatus({
             hasCloudClassifications: false,
             hasValidStats: !!hasValidStats,
@@ -465,7 +460,7 @@ export default function DeploySatelliteViewport() {
 
         // Get all planet classification IDs for this planet
         const planetClassificationIds = planetClassifications.map(c => c.id);
-        console.log('[checkWaterDiscovery] All planet classification IDs:', planetClassificationIds);
+        // checkWaterDiscovery: all planet classification IDs obtained
 
         // Check for cloud classifications that point to this planet
         const { data: cloudClassifications, error: cloudError } = await supabase
@@ -504,9 +499,7 @@ export default function DeploySatelliteViewport() {
           }
         );
 
-        console.log('[checkWaterDiscovery] Planet classification IDs:', planetClassificationIds);
-        console.log('[checkWaterDiscovery] Cloud classifications count:', cloudClassifications.length);
-        console.log('[checkWaterDiscovery] Has cloud for planet:', hasCloudForPlanet);
+        // checkWaterDiscovery: cloud classification counts and matching status computed
 
         setWaterDiscoveryStatus({
           hasCloudClassifications: hasCloudForPlanet,
@@ -564,7 +557,7 @@ export default function DeploySatelliteViewport() {
 
   // Check if enough defensive probes were launched last week
   const checkProbeThreshold = async () => {
-    console.log('[Probe Check] Starting probe threshold check...');
+  // probe threshold check starting
     try {
       // Get last week's start and end (Sunday to Sunday AEST)
       const now = new Date();
@@ -584,7 +577,7 @@ export default function DeploySatelliteViewport() {
       const lastWeekStart = new Date(previousSunday.getTime() - aestOffset);
       const lastWeekEnd = new Date(lastSunday.getTime() - aestOffset);
 
-      console.log('[Probe Check] Querying range:', lastWeekStart.toISOString(), 'to', lastWeekEnd.toISOString());
+      // probing range computed for query
 
       const { count, error } = await supabase
         .from('defensive_probes')
@@ -600,17 +593,17 @@ export default function DeploySatelliteViewport() {
       const PROBE_THRESHOLD = 10;
       const probeCount = count || 0;
 
-      console.log(`[Probe Check] Last week: ${probeCount}/${PROBE_THRESHOLD} probes launched`);
+      // probe count for last week computed
 
       if (probeCount < PROBE_THRESHOLD) {
         setDeployTimeMultiplier(1.5);
         const warning = `Only ${probeCount}/${PROBE_THRESHOLD} defensive probes were launched last week. Satellite deployment time increased by 50%.`;
         setProbeThresholdWarning(warning);
-        console.log('[Probe Check] WARNING:', warning);
+        // probe check warning set
       } else {
         setDeployTimeMultiplier(1.0);
         setProbeThresholdWarning(null);
-        console.log('[Probe Check] Threshold met, normal deployment time');
+        // probe threshold met
       }
     } catch (error) {
       console.error('Error in checkProbeThreshold:', error);
@@ -629,17 +622,17 @@ export default function DeploySatelliteViewport() {
     }, 1000);
   };
 
-  const handleDeploy = async () => {
-    console.log("handleDeploy called");
+    const handleDeploy = async () => {
+    // handleDeploy invoked
     setDeploying(true);
     
     try {
       if (!session?.user?.id) {
-        console.log("No user session");
+        // no user session
         return;
       }
       const userId = session.user.id;
-      console.log("User ID:", userId);
+      // user id obtained
       
       // Check if user has fast deploy enabled (no classifications made)
       const { count: userClassificationCount } = await supabase
@@ -648,7 +641,7 @@ export default function DeploySatelliteViewport() {
         .eq('author', userId);
 
       const isFastDeployEnabled = (userClassificationCount || 0) === 0;
-      console.log("Fast deploy enabled:", isFastDeployEnabled);
+      // fast deploy setting determined
       
       // Set deployment date - one day prior for fast deploy, current time otherwise
       const now = new Date();
@@ -657,7 +650,7 @@ export default function DeploySatelliteViewport() {
         : now;
       const deploymentDateISO = deploymentDate.toISOString();
       
-      console.log("Deployment date:", deploymentDateISO, isFastDeployEnabled ? "(fast deploy)" : "(normal)");
+      // deployment date determined
       
       // Check for satellite upgrade
       let anomalyCount = 4; // Default count
@@ -669,14 +662,14 @@ export default function DeploySatelliteViewport() {
       
       if (researched && researched.length > 0) {
         anomalyCount = 6; // Increased count with upgrade
-        console.log('Satellite upgrade detected - increasing anomaly count to 6');
+        // satellite upgrade detected
       }
 
       let rows = [];
       const planet = planetAnomalies[focusedPlanetIdx];
-      console.log("Planet:", planet, "Investigation mode:", investigationMode, "Anomaly count:", anomalyCount);
+      // planet and deployment parameters prepared
       if (!planet) {
-        console.log("No planet selected");
+        // no planet selected
         return;
       }
     if (investigationMode === 'planets') {
@@ -770,13 +763,13 @@ export default function DeploySatelliteViewport() {
         });
       });
     }
-    console.log("Rows to insert:", rows);
+    // rows to insert prepared
     if (rows.length > 0) {
-      console.log("Attempting to insert rows into linked_anomalies");
+      // attempting to insert rows into linked_anomalies
       const { error, data } = await supabase.from('linked_anomalies').insert(rows);
-      console.log("Insert result:", { error, data });
+      // insert result processed
       if (!error) {
-        console.log("Deployment successful");
+        // deployment successful
         setShowConfirmation(true);
         setDeploymentResult({
           anomalies: rows.map(r => String(r.anomaly_id)),
@@ -787,7 +780,7 @@ export default function DeploySatelliteViewport() {
         alert('Deployment failed: ' + error.message);
       }
     } else {
-      console.log("No rows to insert");
+      // no rows to insert
     }
     } catch (error) {
       console.error("Error in handleDeploy:", error);

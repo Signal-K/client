@@ -187,13 +187,11 @@ export default function PlanetGenerator({
       }));
 
       // Fetch mineral deposits by classification ID (discovery field)
-      console.log("🔍 Fetching deposits for classification:", idAsNumber);
       const { data: depositsData, error: depositsError } = await supabase
         .from("mineralDeposits")
         .select("id, mineralconfiguration, location, discovery, anomaly")
         .eq("discovery", idAsNumber);
 
-      console.log("📦 Deposits data:", depositsData, "Error:", depositsError);
 
       if (!depositsError && depositsData) {
           const parsedDeposits: MineralDeposit[] = depositsData.map((deposit: any) => {
@@ -253,7 +251,6 @@ export default function PlanetGenerator({
             };
           });
 
-          console.log("✅ Parsed deposits:", parsedDeposits);
           setDeposits(parsedDeposits);
         }
 
@@ -263,7 +260,7 @@ export default function PlanetGenerator({
         .select("id, classificationtype, content, classificationConfiguration")
         .or(`parentPlanet.eq.${idAsNumber},source_classification_id.eq.${idAsNumber},classificationConfiguration->>parentPlanetLocation.eq.${idAsNumber}`);
 
-      console.log("🔍 Child classifications data:", childClassData, "Error:", childError);
+      
 
       if (!childError && childClassData) {
         const parsedChildren: ChildClassification[] = childClassData.map((c: any) => {
@@ -293,7 +290,6 @@ export default function PlanetGenerator({
           };
         });
 
-        console.log("✅ Parsed child classifications:", parsedChildren);
         setChildClassifications(parsedChildren);
       }
     };

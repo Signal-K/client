@@ -207,20 +207,21 @@ export function usePageData() {
     }
 
     setLoading(true);
-    const userId = session.user.id;
+    try {
+      const userId = session.user.id;
 
-    // Fetch profile data
-    const { data: profileData } = await supabase
-      .from("profiles")
-      .select("id, username, full_name, classificationPoints")
-      .eq("id", userId)
-      .maybeSingle();
-    setProfile(profileData);
+      // Fetch profile data
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("id, username, full_name, classificationPoints")
+        .eq("id", userId)
+        .maybeSingle();
+      setProfile(profileData);
 
-    // Fetch user's classifications
-    const { data: myClassifications } = await supabase
-      .from("classifications")
-      .select(`
+      // Fetch user's classifications
+      const { data: myClassifications } = await supabase
+        .from("classifications")
+        .select(`
         id,
         classificationtype,
         content,
@@ -229,28 +230,28 @@ export function usePageData() {
         anomaly:anomaly(content),
         classificationConfiguration
       `)
-      .eq("author", userId)
-      .order("created_at", { ascending: false })
-      .limit(10);
-    
-    // Transform the data to match our interface
-    const transformedClassifications = (myClassifications ?? []).map(c => ({
-      ...c,
-      anomaly: Array.isArray(c.anomaly) ? c.anomaly[0] : c.anomaly
-    }));
-    setClassifications(transformedClassifications);
+        .eq("author", userId)
+        .order("created_at", { ascending: false })
+        .limit(10);
+      
+      // Transform the data to match our interface
+      const transformedClassifications = (myClassifications ?? []).map(c => ({
+        ...c,
+        anomaly: Array.isArray(c.anomaly) ? c.anomaly[0] : c.anomaly
+      }));
+      setClassifications(transformedClassifications);
 
-    // Get all anomaly IDs that have been classified by this user
-    const { data: userClassifications } = await supabase
-      .from("classifications")
-      .select("anomaly")
-      .eq("author", userId);
+      // Get all anomaly IDs that have been classified by this user
+      const { data: userClassifications } = await supabase
+        .from("classifications")
+        .select("anomaly")
+        .eq("author", userId);
 
-    const classifiedAnomalyIds = new Set(
-      (userClassifications ?? [])
-        .map(c => c.anomaly)
-        .filter((id): id is number => !!id)
-    );
+      const classifiedAnomalyIds = new Set(
+        (userClassifications ?? [])
+          .map(c => c.anomaly)
+          .filter((id): id is number => !!id)
+      );
 
     // Fetch all linked anomalies for the user
     // Note: The unlocked column may not exist in all environments, so we handle it gracefully
@@ -422,7 +423,7 @@ export function usePageData() {
       balloons: transformedClassifications.length >= 10 // Show after 10 total classifications
     });
 
-    setCachedData({
+      setCachedData({
       linkedAnomalies: filteredLinked,
       activityFeed: allActivity.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
       profile: profileData,
@@ -437,9 +438,12 @@ export function usePageData() {
         balloons: transformedClassifications.length >= 10
       },
       hasRoverMineralDeposits: (roverDeposits ?? []).length > 0,
-    });
-
-    setLoading(false);
+      });
+    } catch (e) {
+      console.error("usePageData fetchData failed", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

@@ -141,7 +141,6 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
       setUnlockedSkills(fetchedUnlockedSkillIds)
 
       // Debug: Log user ID
-      console.log("Research Skill Tree - Current user ID:", currentUserId)
 
       // Debug: Check what classifications exist for this user
       const { data: userClassifications, error: debugError } = await supabase
@@ -151,7 +150,6 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
         .limit(10)
 
       if (!debugError && userClassifications) {
-        console.log("Research Skill Tree - User's classifications:", userClassifications)
       }
 
       // Fetch classified planets
@@ -165,7 +163,6 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
         throw planetError
       }
       setClassifiedPlanets(planetCount || 0)
-      console.log("Research Skill Tree - Classified planets:", planetCount || 0)
 
       // Fetch discovered asteroids (using 'telescope-minorPlanet' as per schema)
       const { count: asteroidCount, error: asteroidError } = await supabase
@@ -178,7 +175,6 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
         throw asteroidError
       }
       setDiscoveredAsteroids(asteroidCount || 0)
-      console.log("Research Skill Tree - Discovered asteroids:", asteroidCount || 0)
     } catch (error) {
       console.error("Error fetching skill tree data:", error)
       // Optionally show an error message to the user

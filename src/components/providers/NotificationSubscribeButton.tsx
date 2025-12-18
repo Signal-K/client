@@ -68,7 +68,7 @@ export default function NotificationSubscribeButton() {
                 }
             }
         } catch (error) {
-            console.log('Could not check existing device subscription:', error);
+                // Unable to check existing device subscription
         }
 
         const { data, error } = await supabase
@@ -104,7 +104,7 @@ export default function NotificationSubscribeButton() {
 
     const handleClick = async () => {
         if (!session?.user?.id) {
-            console.log('No user session found');
+            // no user session
             return;
         }
 
@@ -115,7 +115,7 @@ export default function NotificationSubscribeButton() {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
             
-            console.log('Device info:', { isIOS, isSafari });
+            // device info collected
             
             // Check if push messaging is supported
             if (!('serviceWorker' in navigator)) {
@@ -129,7 +129,7 @@ export default function NotificationSubscribeButton() {
             }
 
             // For iOS Safari, we need to handle the permission request differently
-            console.log('Requesting notification permission...');
+            // requesting notification permission
             let permission;
             
             if (isIOS && isSafari) {
@@ -139,7 +139,7 @@ export default function NotificationSubscribeButton() {
                 permission = await Notification.requestPermission();
             }
             
-            console.log('Notification permission result:', permission);
+            // notification permission result
             
             if (permission === 'denied') {
                 alert('Notifications are blocked. Please enable them in your browser settings.');
@@ -151,14 +151,14 @@ export default function NotificationSubscribeButton() {
                 return;
             }
 
-            console.log('Registering service worker...');
+            // registering service worker
             
             // Wait for service worker to be ready
             let registration;
             try {
                 registration = await navigator.serviceWorker.register('/sw.js');
                 await navigator.serviceWorker.ready;
-                console.log('Service worker registered and ready:', registration);
+                // service worker registered and ready
             } catch (swError) {
                 console.error('Service worker registration failed:', swError);
                 alert('Failed to register service worker. Please try again.');
@@ -173,8 +173,7 @@ export default function NotificationSubscribeButton() {
                 return;
             }
             
-            console.log('Creating push subscription...');
-            console.log('VAPID key (first 20 chars):', vapidPublicKey.substring(0, 20));
+            // creating push subscription
             
             let subscription;
             try {
@@ -182,7 +181,7 @@ export default function NotificationSubscribeButton() {
                     userVisibleOnly: true,
                     applicationServerKey: vapidPublicKey
                 });
-                console.log('Push subscription created:', subscription);
+                // push subscription created
             } catch (subscribeError) {
                 console.error('Push subscription failed:', subscribeError);
                 
@@ -211,7 +210,7 @@ export default function NotificationSubscribeButton() {
                 .limit(1);
 
             if (existingEndpoint && existingEndpoint.length > 0) {
-                console.log('Subscription with this endpoint already exists');
+                // subscription with this endpoint already exists
                 setSubscribed(true);
                 alert('You are already subscribed to notifications on this device!');
                 checkExistingSubscription();
@@ -234,7 +233,7 @@ export default function NotificationSubscribeButton() {
                     p256dhKey = btoa(String.fromCharCode(...new Uint8Array(p256dhBuffer)));
                 }
                 
-                console.log('Keys extracted successfully');
+                // subscription keys extracted successfully
             } catch (keyError) {
                 console.error('Failed to extract subscription keys:', keyError);
                 alert('Failed to process subscription keys. Please try again.');
@@ -258,7 +257,7 @@ export default function NotificationSubscribeButton() {
             }
 
             setSubscribed(true);
-            console.log('Push subscription saved successfully');
+            // push subscription saved successfully
             alert('Successfully subscribed to notifications!');
             
             // Hide the section after successful subscription
@@ -277,7 +276,7 @@ export default function NotificationSubscribeButton() {
 
     const handleRejectNotifications = async () => {
         if (!session?.user?.id) {
-            console.log('No user session found');
+            // no user session
             return;
         }
 
@@ -297,7 +296,7 @@ export default function NotificationSubscribeButton() {
                 return;
             }
 
-            console.log('Notification rejection saved successfully');
+            // notification rejection saved successfully
             setHasRejected(true);
             setHideSection(true);
             
@@ -315,7 +314,7 @@ export default function NotificationSubscribeButton() {
 
         setSendingTest(true);
         try {
-            console.log('Sending test notification...');
+            // sending test notification
             
             const response = await fetch('/api/send-test-notification', {
                 method: 'POST',
@@ -328,16 +327,14 @@ export default function NotificationSubscribeButton() {
                     url: '/'
                 })
             });
-
             const result = await response.json();
-            console.log('API response:', result);
+            // API response received
             
             if (response.ok) {
                 alert('Test notification sent successfully! Check your browser notifications.');
-                console.log('Test notification result:', result);
+                // test notification result received
                 
                 // Also check if browser notifications are working
-                console.log('Current notification permission:', Notification.permission);
                 
                 // Test direct notification as fallback
                 if (Notification.permission === 'granted') {
@@ -346,7 +343,7 @@ export default function NotificationSubscribeButton() {
                             body: 'This is a direct notification test - you should see this immediately',
                             icon: 'https://github.com/Signal-K/client/blob/main/public/assets/Captn.jpg?raw=true'
                         });
-                        console.log('Direct notification sent');
+                        // direct notification sent
                     } catch (directError) {
                         console.error('Direct notification failed:', directError);
                     }
@@ -368,7 +365,7 @@ export default function NotificationSubscribeButton() {
 
         setCheckingDiscoveries(true);
         try {
-            console.log('Checking for unclassified discoveries...');
+            // checking for unclassified discoveries
             
             // Fetch linked anomalies using the authenticated client
             const { data: linkedAnomalies, error: linkedError } = await supabase
@@ -383,7 +380,7 @@ export default function NotificationSubscribeButton() {
                 return;
             }
 
-            console.log('Found linked anomalies:', linkedAnomalies?.length || 0);
+            // found linked anomalies count
 
             if (!linkedAnomalies || linkedAnomalies.length === 0) {
                 alert('🔬 No discoveries found yet. Start exploring to find some!');
@@ -419,7 +416,7 @@ export default function NotificationSubscribeButton() {
                 return;
             }
 
-            console.log('Found classifications:', classifications?.length || 0);
+            // found classifications count
 
             // Create set of classified anomaly IDs
             const classifiedAnomalies = new Set(
@@ -431,7 +428,7 @@ export default function NotificationSubscribeButton() {
                 linked => !classifiedAnomalies.has(linked.anomaly_id)
             );
 
-            console.log('Unclassified discoveries:', unclassifiedDiscoveries.length);
+            // unclassified discoveries count
 
             if (unclassifiedDiscoveries.length === 0) {
                 alert('🎉 All your discoveries have been classified! Great work!');
@@ -459,7 +456,7 @@ export default function NotificationSubscribeButton() {
             });
 
             const result = await response.json();
-            console.log('Notification API response:', result);
+            // notification API response received
             
             if (response.ok) {
                 if (result.unclassifiedCount > 0) {

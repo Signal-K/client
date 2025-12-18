@@ -141,12 +141,12 @@ export default function ClientClassificationPage({ id }: Props) {
         .maybeSingle();
 
       if (!error && data) {
-        console.log("[NextScene] Mineral deposit found:", data);
+        // mineral deposit found
         setMineralDeposit(data);
       } else if (error) {
         console.error("[NextScene] Error fetching mineral deposit:", error);
       } else {
-        console.log("[NextScene] No mineral deposit for this classification");
+        // no mineral deposit for this classification
       }
     }
 
@@ -166,14 +166,7 @@ export default function ClientClassificationPage({ id }: Props) {
         return;
       }
 
-      console.log(
-        "classificationConfiguration:",
-        data.classificationConfiguration
-      );
-      console.log(
-        "annotationOptions:",
-        data.classificationConfiguration?.annotationOptions ?? []
-      );
+      // classification configuration and annotation options loaded
 
       setClassification(data);
       

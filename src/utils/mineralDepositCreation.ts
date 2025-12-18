@@ -50,7 +50,7 @@ export async function hasMineralResearch(
     }
 
     const hasResearch = !!data && data.length > 0;
-    console.log("[Mineral Research] Has research:", hasResearch, "- Found", data?.length || 0, "items");
+    
     return hasResearch;
   } catch (error) {
     console.error("[Mineral Research] Exception checking research:", error);
@@ -88,7 +88,7 @@ export async function isPlanetCompatible(
           
           // If this classification has a parentPlanet reference, use that
           if (config.parentPlanet) {
-            console.log("[Mineral Compatibility] Found parent planet reference:", config.parentPlanet);
+            
             
             // Get the parent planet classification to find its anomaly
             const { data: parentClassification } = await supabase
@@ -99,7 +99,6 @@ export async function isPlanetCompatible(
             
             if (parentClassification) {
               planetAnomalyId = parentClassification.anomaly;
-              console.log("[Mineral Compatibility] Using parent planet anomaly:", planetAnomalyId);
             }
           }
         } catch (e) {
@@ -121,7 +120,6 @@ export async function isPlanetCompatible(
     }
 
     if (!classifications || classifications.length === 0) {
-      console.log("[Mineral Compatibility] No classifications found for anomaly", planetAnomalyId);
       return false;
     }
 
@@ -139,16 +137,15 @@ export async function isPlanetCompatible(
       }
 
       // Check if has planet stats (mass, radius, temp from satellite survey)
-      if (config.planet_mass !== undefined && 
+        if (config.planet_mass !== undefined && 
           config.planet_mass !== "N/A" &&
           config.planet_radius !== undefined && 
           config.planet_radius !== "N/A") {
-        console.log("[Mineral Compatibility] Planet is compatible - has valid stats");
-        return true;
-      }
+          return true;
+        }
     }
 
-    console.log("[Mineral Compatibility] Planet has no valid stats for anomaly", planetAnomalyId);
+    return false;
     return false;
   } catch (error) {
     console.error("[Mineral Compatibility] Exception checking planet:", error);
@@ -193,7 +190,7 @@ export async function createMineralDeposit({
       return { success: false, error };
     }
 
-    console.log(`[Mineral Deposit] Created ${mineralConfig.type} deposit (ID: ${data.id}) for classification ${classificationId}`);
+    
     return { success: true, depositId: data.id };
   } catch (error) {
     console.error("[Mineral Deposit] Exception creating deposit:", error);
@@ -216,20 +213,20 @@ export async function attemptMineralDepositCreation({
   // Check if user has mineral research
   const hasResearch = await hasMineralResearch(supabase, userId);
   if (!hasResearch) {
-    console.log("[Mineral Deposit] User does not have mineral research unlocked");
+    
     return false;
   }
 
   // Check if planet is compatible (pass classificationId to check parent planet reference)
   const isCompatible = await isPlanetCompatible(supabase, userId, anomalyId, classificationId);
   if (!isCompatible) {
-    console.log("[Mineral Deposit] Planet is not compatible for mineral discovery");
+    
     return false;
   }
 
   // Roll for deposit creation (1 in 3 chance)
   if (!rollForMineralDeposit()) {
-    console.log("[Mineral Deposit] Roll failed - no deposit created");
+    
     return false;
   }
 

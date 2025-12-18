@@ -75,8 +75,7 @@ export default function MainHeader({
     if (error) {
       console.error("Error signing out:", error.message);
     } else {
-      console.log("User signed out successfully");
-      // Optionally redirect to home page or login page
+      // Signed out
       window.location.href = '/';
     }
   };

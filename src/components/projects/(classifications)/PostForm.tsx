@@ -202,7 +202,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         .limit(1);
 
       if (routeError || !routes || routes.length === 0) {
-        console.log("No route found for mineral deposit check");
+        // no recent route found for mineral deposit check
         return;
       }
 
@@ -210,7 +210,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       const config = route.routeConfiguration;
 
       if (!config || !config.waypoints || !config.mineralWaypoints) {
-        console.log("Route does not have mineral waypoint data");
+        // route missing mineral waypoint data
         return;
       }
 
@@ -220,14 +220,14 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       );
 
       if (anomalyIndex === -1) {
-        console.log("Anomaly not found in route");
+        // anomaly not found in route
         return;
       }
 
       // Check if this waypoint is marked as having a mineral deposit
       const waypointData = config.waypoints[anomalyIndex];
       if (!waypointData?.hasMineralDeposit) {
-        console.log("This waypoint does not have a mineral deposit");
+        // waypoint does not have a mineral deposit
         return;
       }
 
@@ -275,7 +275,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       if (mineralError) {
         console.error("Error creating mineral deposit:", mineralError);
       } else {
-        console.log("Mineral deposit created successfully:", mineralDeposit);
+        // mineral deposit created successfully
       }
     } catch (error) {
       console.error("Unexpected error in mineral deposit creation:", error);

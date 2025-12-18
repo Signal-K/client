@@ -54,8 +54,6 @@ export function CommentCard({
         .eq("id", classificationId);
 
       if (error) throw error;
-
-      console.log("Confirmed comment configuration:", configuration);
     } catch (error) {
       console.error("Error confirming comment:", error);
     };

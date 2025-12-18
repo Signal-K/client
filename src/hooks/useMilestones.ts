@@ -19,12 +19,10 @@ export const useMilestones = () => {
 
   useEffect(() => {
     if (!session?.user?.id) {
-      console.log("useMilestones: No session user ID, session:", session);
       setLoading(false);
       return;
     }
-
-    console.log("useMilestones: Fetching milestones for user:", session.user.id);
+    
     fetchAchievements();
   }, [session?.user?.id]);
 
@@ -35,12 +33,9 @@ export const useMilestones = () => {
 
       const userId = session?.user?.id;
       if (!userId) {
-        console.log("useMilestones: No userId in fetchAchievements");
         setLoading(false);
         return;
       }
-
-      console.log("useMilestones: Starting fetch for user:", userId);
 
       // 1. Fetch all research upgrades
       const { data: researchData, error: researchError } = await supabase
@@ -53,7 +48,7 @@ export const useMilestones = () => {
         throw researchError;
       }
 
-      console.log("Research data:", researchData);
+      
 
       const unlockedUpgrades = new Set(researchData?.map((r: any) => r.tech_type) || []);
       
@@ -156,16 +151,11 @@ export const useMilestones = () => {
         resourceExtraction,
       });
       
-      console.log("useMilestones: Data fetched successfully", {
-        allUpgrades: allUpgrades.unlocked + "/" + allUpgrades.total,
-        classificationDiversity: classificationDiversity.completed + "/" + classificationDiversity.total,
-        resourceExtraction: resourceExtraction.extracted + "/" + resourceExtraction.total,
-      });
+      
     } catch (err: any) {
       console.error("Error fetching milestones:", err);
       setError(err.message);
     } finally {
-      console.log("useMilestones: Setting loading to false");
       setLoading(false);
     }
   };
