@@ -14,8 +14,10 @@ interface RightSidebarProps {
   filteredAnomalies: any[]
   availableMissions: any[]
   selectedProject: any | null
+  selectedAnomaly: any | null
   getSectorAnomaliesForProject: (projectId: string | null) => any[]
   handleViewClassification: (classification: any) => void
+  onClassify?: () => void
 }
 
 export function RightSidebar({
@@ -25,8 +27,10 @@ export function RightSidebar({
   filteredAnomalies,
   availableMissions,
   selectedProject,
+  selectedAnomaly,
   getSectorAnomaliesForProject,
   handleViewClassification,
+  onClassify,
 }: RightSidebarProps) {
   // Calculate statistics
   const totalAnomalies = anomalies.length
@@ -40,10 +44,72 @@ export function RightSidebar({
 
   return (
     <div 
-      className="hidden lg:flex lg:flex-col lg:w-80 overflow-hidden backdrop-blur-sm"
+      className="hidden lg:flex lg:flex-col lg:w-80 backdrop-blur-sm"
       style={{ backgroundColor: "rgba(0, 80, 102, 0.95)", borderLeft: "1px solid rgba(120, 204, 226, 0.3)" }}
     >
       <div className="flex flex-col h-full overflow-y-auto">
+        {/* Selected Anomaly Details */}
+        {selectedAnomaly && (
+          <div 
+            className="p-4 border-b flex-shrink-0"
+            style={{ 
+              borderColor: "rgba(120, 204, 226, 0.3)", 
+              background: "linear-gradient(to right, #001a29, #002439)" 
+            }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 style={{ color: "#e4eff0" }} className="font-bold text-sm tracking-wider">SELECTED TARGET</h3>
+              <Badge 
+                className="text-xs font-mono"
+                style={{ backgroundColor: "rgba(120, 204, 226, 0.2)", color: "#78cce2", border: "1px solid rgba(120, 204, 226, 0.3)" }}
+              >
+                {selectedAnomaly.type?.toUpperCase() || 'UNKNOWN'}
+              </Badge>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <div style={{ color: "#78cce2" }} className="text-xs font-mono mb-1">DESIGNATION</div>
+                <div style={{ color: "#e4eff0" }} className="font-mono text-sm">{selectedAnomaly.name || `Anomaly ${selectedAnomaly.id}`}</div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <div style={{ color: "#78cce2" }} className="font-mono mb-1">SECTOR</div>
+                  <div style={{ color: "#e4eff0" }} className="font-mono">{selectedAnomaly.sector || 'Unknown'}</div>
+                </div>
+                <div>
+                  <div style={{ color: "#78cce2" }} className="font-mono mb-1">PROJECT</div>
+                  <div style={{ color: "#e4eff0" }} className="font-mono">{selectedAnomaly.project || 'Unknown'}</div>
+                </div>
+              </div>
+              {!selectedAnomaly.classified && onClassify && (
+                <button
+                  onClick={onClassify}
+                  className="w-full py-2 px-3 text-xs font-mono rounded transition-colors"
+                  style={{
+                    backgroundColor: "rgba(120, 204, 226, 0.2)",
+                    color: "#78cce2",
+                    border: "1px solid rgba(120, 204, 226, 0.3)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "rgba(120, 204, 226, 0.3)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "rgba(120, 204, 226, 0.2)";
+                  }}
+                >
+                  CLASSIFY TARGET
+                </button>
+              )}
+              {selectedAnomaly.classified && (
+                <div className="text-center py-2">
+                  <CheckCircle className="h-4 w-4 mx-auto mb-1" style={{ color: "#78cce2" }} />
+                  <div style={{ color: "#78cce2" }} className="text-xs font-mono">CLASSIFIED</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        
         {/* Statistics */}
         <div 
           className="p-4 border-b flex-shrink-0"

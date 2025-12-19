@@ -20,6 +20,7 @@ import {
   Satellite,
   Activity,
   Eye,
+  EyeOff,
   Scan,
   Zap,
   Radar,
@@ -36,6 +37,8 @@ interface LeftSidebarProps {
   selectProject: (project: any | null) => void
   handleNavigate: (direction: "up" | "down" | "left" | "right") => void
   getSectorAnomaliesForProject: (projectId: string | null) => any[]
+  showAllAnomalies: boolean
+  setShowAllAnomalies: (show: boolean) => void
 };
 
 export function LeftSidebar({
@@ -48,10 +51,12 @@ export function LeftSidebar({
   selectProject,
   handleNavigate,
   getSectorAnomaliesForProject,
+  showAllAnomalies,
+  setShowAllAnomalies,
 }: LeftSidebarProps) {
   return (
     <div
-      className="hidden lg:flex w-56 xl:w-64 flex-col backdrop-blur-sm flex-shrink-0 h-full"
+      className="hidden lg:flex w-56 xl:w-64 flex-col backdrop-blur-sm flex-shrink-0 h-full overflow-y-auto"
       style={{ backgroundColor: "rgba(0, 80, 102, 0.95)", borderRight: "1px solid rgba(120, 204, 226, 0.3)" }}
     >
       {/* Header */}
@@ -323,6 +328,59 @@ export function LeftSidebar({
             })}
           </CardContent>
         </Card>
+
+        {/* View Options */}
+        {viewMode === "viewport" && (
+          <Card
+            className="m-4 border backdrop-blur-sm"
+            style={{ backgroundColor: "rgba(0, 36, 57, 0.8)", borderColor: "rgba(120, 204, 226, 0.3)" }}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle style={{ color: "#e4eff0" }} className="text-sm font-mono flex items-center gap-2">
+                <Eye className="h-4 w-4" style={{ color: "#78cce2" }} />
+                VIEW OPTIONS
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-xs font-mono h-8"
+                style={{
+                  backgroundColor: showAllAnomalies ? "rgba(120, 204, 226, 0.2)" : "transparent",
+                  color: "#e4eff0",
+                  borderColor: "rgba(120, 204, 226, 0.3)",
+                  border: "1px solid rgba(120, 204, 226, 0.3)",
+                }}
+                onClick={() => setShowAllAnomalies(!showAllAnomalies)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(120, 204, 226, 0.3)"
+                  e.currentTarget.style.borderColor = "#78cce2"
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = showAllAnomalies ? "rgba(120, 204, 226, 0.2)" : "transparent"
+                  e.currentTarget.style.borderColor = "rgba(120, 204, 226, 0.3)"
+                }}
+              >
+                {showAllAnomalies ? <EyeOff className="h-3 w-3 mr-2" /> : <Eye className="h-3 w-3 mr-2" />}
+                <span className="truncate">
+                  {showAllAnomalies ? "HIDE BACKGROUND STARS" : "SHOW ALL ANOMALIES"}
+                </span>
+              </Button>
+              {showAllAnomalies && (
+                <div className="mt-2 text-xs font-mono" style={{ color: "#78cce2" }}>
+                  <div className="flex items-center gap-1 mb-1">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#78cce2" }}></div>
+                    <span>Your linked targets</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "rgba(120, 204, 226, 0.4)" }}></div>
+                    <span>Background stars (view only)</span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Actions */}
         <div className="p-4 space-y-2 flex-shrink-0">

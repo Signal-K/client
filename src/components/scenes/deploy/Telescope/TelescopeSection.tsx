@@ -90,6 +90,7 @@ export default function TelescopeViewportSection() {
     showClassifyDialog: false,
     showDetailDialog: false,
     showClassificationDetailDialog: false,
+    showAllAnomalies: false,
     stars: [],
     viewMode: "viewport",
     isDragging: false,
@@ -112,15 +113,17 @@ export default function TelescopeViewportSection() {
     >
       <div className="relative w-full flex items-center justify-center py-8 md:py-12" style={{ minHeight: '480px' }}>
         {!hasTelescopeDeployed ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
-            <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed px-2">
-              Each week, you are able to point and 'deploy' your telescope in a certain direction. Over the course of the week, new anomalous objects (referred to as "anomalies") will be identified by your telescope and become available for study. Classifying these anomalies can result in the discovery of planets and asteroids, which can later be visited and explored further.
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-4">
+            <div className="mb-6 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed">
+              <p className="mb-3 font-semibold text-cyan-400">Welcome to the Telescope!</p>
+              <p className="mb-3">Each week, you can point and deploy your telescope in a certain direction. Over the course of the week, new anomalous objects (referred to as "anomalies") will be identified and become available for study.</p>
+              <p className="text-xs text-zinc-400">💡 Tip: You can start exploring right away, even without previous classifications!</p>
             </div>
             <button
-              className="px-6 py-3 bg-blue-700 text-white rounded-lg shadow text-lg font-semibold"
+              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-lg shadow-lg text-base md:text-lg font-bold transition-all duration-200 hover:scale-105 whitespace-nowrap"
               onClick={handleDeployTelescope}
             >
-              Deploy telescope
+              🔭 Deploy Telescope
             </button>
           </div>
         ) : (

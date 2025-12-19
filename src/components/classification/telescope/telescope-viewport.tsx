@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { useSession } from "@supabase/auth-helpers-react"
 import type { Anomaly, ViewMode } from "@/types/Structures/telescope"
 import type { projects } from "@/src/shared/data/projects"
@@ -11,7 +10,6 @@ import { TelescopeView } from "./telescope-view"
 import { DiscoveriesView } from "./discoveries-view"
 import { SkillTreeView } from "./blocks/skill-tree/skill-tree-view"
 import AnomalyDialog from "./anomaly-dialogue"
-import { AnomalyDetailDialog } from "../viewport/anomaly-detail-dialogue"
 import { ClassificationDetailDialog } from "../viewport/classification-detail-dialog"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
@@ -22,9 +20,18 @@ import { MobileMenu } from "./blocks/viewport/mobile-menu"
 import { LeftSidebar } from "./blocks/viewport/left-sidebar"
 import { RightSidebar } from "./blocks/viewport/right-sidebar"
 
-type ExtendedViewMode = ViewMode | "skill-tree";
+type ExtendedViewMode = ViewMode | "skill-tree"
 
-export interface TelescopeViewportState { 
+interface Star {
+  x: number
+  y: number
+  size: number
+  opacity: number
+  color: string
+  twinkleSpeed: number
+}
+
+export interface TelescopeViewportState {
   currentSector: { x: number; y: number }
   anomalies: any[]
   filteredAnomalies: any[]
@@ -36,14 +43,8 @@ export interface TelescopeViewportState {
   showClassifyDialog: boolean
   showDetailDialog: boolean
   showClassificationDetailDialog: boolean
-  stars: Array<{
-    x: number
-    y: number
-    size: number
-    opacity: number
-    color: string
-    twinkleSpeed: number
-  }>
+  showAllAnomalies: boolean
+  stars: Star[]
   viewMode: "viewport" | "discoveries" | "skill-tree"
   isDragging: boolean
   dragStart: { x: number; y: number }
@@ -51,16 +52,13 @@ export interface TelescopeViewportState {
   showAllDiscoveries: boolean
   loading: boolean
   mobileMenuOpen: boolean
-};
+}
 
-export default function TelescopeViewport() {
-  const session = useSession();
+const TelescopeViewport: React.FC = () => {
+  const session = useSession()
+  const databaseOps = useDatabaseOperations()
 
-  const { fetchAnomalies, fetchUserClassifications, fetchAllClassifications, createClassification } =
-    useDatabaseOperations()
-
-  // State management
-  const [state, setState] = useState<TelescopeViewportState>({
+  const initialState: TelescopeViewportState = {
     currentSector: { x: 0, y: 0 },
     anomalies: [],
     filteredAnomalies: [],
@@ -72,6 +70,7 @@ export default function TelescopeViewport() {
     showClassifyDialog: false,
     showDetailDialog: false,
     showClassificationDetailDialog: false,
+    showAllAnomalies: false,
     stars: [],
     viewMode: "viewport",
     isDragging: false,
@@ -80,248 +79,286 @@ export default function TelescopeViewport() {
     showAllDiscoveries: false,
     loading: true,
     mobileMenuOpen: false,
-  })
+  }
 
-  // Sector management
-  const loadSector = useCallback(
-    (sectorX: number, sectorY: number) => {
-      const sectorStars = generateStars(sectorX, sectorY)
-      const sectorAnomalies = filterAnomaliesBySector(state.anomalies, sectorX, sectorY)
+  const [viewportState, setViewportState] = useState<TelescopeViewportState>(initialState)
+
+  const createBackgroundAnomalies = (sectorX: number, sectorY: number, count: number) => {
+    const backgroundItems = []
+    const seedValue = Math.abs(sectorX * 1000 + sectorY)
+    
+    for (let index = 0; index < count; index++) {
+      const itemSeed = seedValue + index
+      const xPos = (Math.sin(itemSeed * 0.1) * 0.5 + 0.5) * 80 + 10
+      const yPos = (Math.cos(itemSeed * 0.13) * 0.5 + 0.5) * 80 + 10
       
-      let filtered = state.selectedProject
-        ? sectorAnomalies.filter((a) => a.project === state.selectedProject.id)
+      backgroundItems.push({
+        id: `background-${sectorX}-${sectorY}-${index}`,
+        name: `Background Star ${itemSeed}`,
+        type: "background",
+        x: xPos,
+        y: yPos,
+        brightness: Math.sin(itemSeed * 0.2) * 0.3 + 0.4,
+        size: Math.cos(itemSeed * 0.15) * 0.3 + 0.4,
+        color: "rgba(120, 204, 226, 0.4)",
+        shape: "circle" as const,
+        sector: generateSectorName(sectorX, sectorY),
+        isBackground: true,
+        classified: false,
+        glowIntensity: 0.2,
+        pulseSpeed: 0.5,
+        project: "background",
+      })
+    }
+    
+    return backgroundItems
+  }
+
+  const updateSectorData = useCallback(
+    (sectorX: number, sectorY: number) => {
+      const sectorName = generateSectorName(sectorX, sectorY)
+      const starField = generateStars(sectorX, sectorY)
+      const sectorAnomalies = filterAnomaliesBySector(viewportState.anomalies, sectorX, sectorY)
+      
+      let filteredItems = viewportState.selectedProject
+        ? sectorAnomalies.filter((item) => item.project === viewportState.selectedProject.id)
         : sectorAnomalies
 
-      // Limit to 10 anomalies per sector view
-      filtered = filtered.slice(0, 10)
+      if (filteredItems.length === 0 && viewportState.anomalies.length > 0) {
+        console.log("🔭 No anomalies in current sector, showing fallback items")
+        filteredItems = viewportState.anomalies.slice(0, 5)
+      }
 
-      setState((prev) => ({
-        ...prev,
-        stars: sectorStars,
-        filteredAnomalies: filtered,
-      }))
+      if (viewportState.showAllAnomalies) {
+        const backgroundItems = createBackgroundAnomalies(sectorX, sectorY, 20)
+        filteredItems = [...filteredItems, ...backgroundItems as any[]]
+      }
+
+      filteredItems = filteredItems.slice(0, viewportState.showAllAnomalies ? 25 : 10)
+
+      setViewportState((prev) => {
+        const selectedExists = filteredItems.find(item => item.id === prev.selectedAnomaly?.id)
+        const realAnomalies = filteredItems.filter(item => !(item as any).isBackground)
+        const newSelection = selectedExists ? prev.selectedAnomaly : (realAnomalies.length > 0 ? realAnomalies[0] : null)
+        
+        return {
+          ...prev,
+          stars: starField,
+          filteredAnomalies: filteredItems,
+          selectedAnomaly: newSelection,
+        }
+      })
     },
-    [state.anomalies, state.selectedProject],
+    [viewportState.anomalies, viewportState.selectedProject, viewportState.showAllAnomalies],
   )
 
-  // Data loading
-  const loadData = async () => {
-    setState((prev) => ({ ...prev, loading: true }))
+  const loadViewportData = async () => {
+    setViewportState((prev) => ({ ...prev, loading: true }))
 
     const userId = session?.user?.id || "4d9a57e6-ea3c-4836-aa18-1c3ee7f6f725"
 
-    const [anomalies, userClassifications, allClassifications] = await Promise.all([
-      fetchAnomalies(),
-      fetchUserClassifications(),
-      fetchAllClassifications(),
-    ])
+    try {
+      const [anomaliesData, userClassData, allClassData] = await Promise.all([
+        databaseOps.fetchAnomalies(),
+        databaseOps.fetchUserClassifications(),
+        databaseOps.fetchAllClassifications(),
+      ])
 
-    setState((prev) => ({
+      console.log("🔭 TELESCOPE DEBUG: Loaded anomalies:", anomaliesData.length)
+      console.log("🔭 TELESCOPE DEBUG: Anomaly data:", anomaliesData)
+
+      // Auto-select first anomaly if we have any AND show the modal
+      const firstAnomaly = anomaliesData.length > 0 ? anomaliesData[0] : null
+
+      setViewportState((prev) => ({
+        ...prev,
+        anomalies: anomaliesData,
+        classifications: userClassData,
+        allClassifications: allClassData,
+        selectedAnomaly: firstAnomaly,
+        showClassifyDialog: firstAnomaly !== null,
+        loading: false,
+      }))
+    } catch (error) {
+      console.error("Failed to load viewport data:", error)
+      setViewportState((prev) => ({ ...prev, loading: false }))
+    }
+  }
+
+  const handleMouseDownEvent = (event: React.MouseEvent) => {
+    setViewportState((prev) => ({
       ...prev,
-      anomalies,
-      classifications: userClassifications,
-      allClassifications,
-      loading: false,
+      dragStart: { x: event.clientX, y: event.clientY },
     }))
   }
 
-  // Event handlers
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setState((prev) => ({
-      ...prev,
-      isDragging: true,
-      dragStart: { x: e.clientX, y: e.clientY },
-    }))
-  }
+  const handleMouseMoveEvent = (event: React.MouseEvent) => {
+    if (!viewportState.dragStart.x && !viewportState.dragStart.y) return
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!state.isDragging) return
+    const deltaX = event.clientX - viewportState.dragStart.x
+    const deltaY = event.clientY - viewportState.dragStart.y
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
-    const deltaX = e.clientX - state.dragStart.x
-    const deltaY = e.clientY - state.dragStart.y
+    // Only start dragging if moved more than 10 pixels
+    if (distance > 10 && !viewportState.isDragging) {
+      setViewportState((prev) => ({ ...prev, isDragging: true }))
+    }
 
-    if (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50) {
-      setState((prev) => ({
+    if (viewportState.isDragging && (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50)) {
+      setViewportState((prev) => ({
         ...prev,
         currentSector: {
           x: prev.currentSector.x - Math.sign(deltaX),
           y: prev.currentSector.y - Math.sign(deltaY),
         },
-        dragStart: { x: e.clientX, y: e.clientY },
+        dragStart: { x: event.clientX, y: event.clientY },
       }))
     }
   }
 
-  const handleMouseUp = () => {
-    setState((prev) => ({ ...prev, isDragging: false }))
-  }
-
-  const handleAnomalyClick = (anomaly: Anomaly) => {
-    if (state.isDragging) return
-
-    setState((prev) => ({
-      ...prev,
-      selectedAnomaly: anomaly,
-      showDetailDialog: anomaly.classified || false,
-      showClassifyDialog: !anomaly.classified,
+  const handleMouseUpEvent = () => {
+    setViewportState((prev) => ({ 
+      ...prev, 
+      isDragging: false,
+      dragStart: { x: 0, y: 0 }
     }))
   }
 
-  const handleViewAnomaly = (anomaly: Anomaly) => {
-    setState((prev) => ({
+  const onAnomalyClick = (anomaly: Anomaly) => {
+    if (viewportState.isDragging) return
+    if ((anomaly as any).isBackground) return
+
+    setViewportState((prev) => ({
+      ...prev,
+      selectedAnomaly: anomaly,
+      showClassifyDialog: true,
+    }))
+  }
+
+  const onViewAnomaly = (anomaly: Anomaly) => {
+    setViewportState((prev) => ({
       ...prev,
       viewMode: "viewport",
       focusedAnomaly: anomaly,
       selectedAnomaly: anomaly,
     }))
-    setTimeout(() => {
-      setState((prev) => ({ ...prev, showDetailDialog: true }))
-    }, 500)
   }
 
-  const handleViewClassification = (classification: DatabaseClassification) => {
-    setState((prev) => ({
+  const onViewClassification = (classification: DatabaseClassification) => {
+    setViewportState((prev) => ({
       ...prev,
       selectedClassification: classification,
       showClassificationDetailDialog: true,
     }))
   }
 
-  const handleClassify = async () => {
-    if (!state.selectedAnomaly) return
+  const performClassification = async () => {
+    if (!viewportState.selectedAnomaly) return
 
     const userId = session?.user?.id || "4d9a57e6-ea3c-4836-aa18-1c3ee7f6f725"
 
-    // Map UI types to database classification types
-    const typeMapping = {
+    const typeMap = {
       exoplanet: "planet",
       sunspot: "sunspot",
       asteroid: "asteroid",
       accretion_disc: "disk",
-    }
+    } as const
 
-    const classificationType = typeMapping[state.selectedAnomaly?.type as keyof typeof typeMapping] || "planet"
-    const result = await createClassification(state.selectedAnomaly.id, classificationType, userId)
+    const classType = typeMap[viewportState.selectedAnomaly?.type as keyof typeof typeMap] || "planet"
+    const result = await databaseOps.createClassification(viewportState.selectedAnomaly.id, classType, userId)
 
     if (result) {
-      setState((prev) => ({
+      setViewportState((prev) => ({
         ...prev,
-        anomalies: prev.anomalies.map((a) =>
-          a.id === prev.selectedAnomaly?.id
-            ? { ...a, classified: true, discoveryDate: new Date().toLocaleDateString() }
-            : a,
+        anomalies: prev.anomalies.map((item) =>
+          item.id === prev.selectedAnomaly?.id
+            ? { ...item, classified: true, discoveryDate: new Date().toLocaleDateString() }
+            : item,
         ),
         showClassifyDialog: false,
         selectedAnomaly: null,
       }))
 
-      // Reload data
-      await loadData()
-      loadSector(state.currentSector.x, state.currentSector.y)
+      await loadViewportData()
+      updateSectorData(viewportState.currentSector.x, viewportState.currentSector.y)
     }
   }
 
-  const selectProject = (project: (typeof projects)[0] | null) => {
-    setState((prev) => ({ ...prev, selectedProject: project }))
+  const onProjectSelect = (project: (typeof projects)[0] | null) => {
+    setViewportState((prev) => ({ ...prev, selectedProject: project }))
   }
 
-  const handleNavigate = (direction: "up" | "down" | "left" | "right") => {
-    const newSector = { ...state.currentSector }
-    switch (direction) {
-      case "up":
-        newSector.y -= 1
-        break
-      case "down":
-        newSector.y += 1
-        break
-      case "left":
-        newSector.x -= 1
-        break
-      case "right":
-        newSector.x += 1
-        break
+  const onNavigate = (direction: "up" | "down" | "left" | "right") => {
+    const newSector = { ...viewportState.currentSector }
+    if (direction === "up") newSector.y -= 1
+    else if (direction === "down") newSector.y += 1
+    else if (direction === "left") newSector.x -= 1
+    else if (direction === "right") newSector.x += 1
+    
+    setViewportState((prev) => ({ ...prev, currentSector: newSector }))
+  }
+
+  const onViewModeChange = (mode: ExtendedViewMode) => {
+    setViewportState((prev) => ({ ...prev, viewMode: mode }))
+  }
+
+  const onDiscoveriesToggle = (show: boolean) => {
+    setViewportState((prev) => ({ ...prev, showAllDiscoveries: show }))
+  }
+
+  const onMobileMenuToggle = (open: boolean) => {
+    setViewportState((prev) => ({ ...prev, mobileMenuOpen: open }))
+  }
+
+  const onAnomaliesToggle = (show: boolean) => {
+    setViewportState((prev) => ({ ...prev, showAllAnomalies: show }))
+  }
+
+  const getSectorProjectAnomalies = (projectId: string | null) => {
+    const sectorItems = filterAnomaliesBySector(
+      viewportState.anomalies, 
+      viewportState.currentSector.x, 
+      viewportState.currentSector.y
+    )
+    let projectItems = projectId ? sectorItems.filter((item) => item.project === projectId) : sectorItems
+    
+    if (projectItems.length === 0 && viewportState.anomalies.length > 0) {
+      const allItems = projectId ? viewportState.anomalies.filter((item) => item.project === projectId) : viewportState.anomalies
+      return allItems
     }
-    setState((prev) => ({ ...prev, currentSector: newSector }))
+    
+    return projectItems
   }
 
-  const setViewMode = (mode: ExtendedViewMode) => {
-    setState((prev) => ({ ...prev, viewMode: mode }))
-  }
-
-  const setShowAllDiscoveries = (show: boolean) => {
-    setState((prev) => ({ ...prev, showAllDiscoveries: show }))
-  }
-
-  const setMobileMenuOpen = (open: boolean) => {
-    setState((prev) => ({ ...prev, mobileMenuOpen: open }))
-  }
-
-  // Effects
   useEffect(() => {
-    loadData()
+    loadViewportData()
   }, [session])
 
   useEffect(() => {
-    if (!state.loading) {
-      loadSector(state.currentSector.x, state.currentSector.y)
+    if (!viewportState.loading) {
+      updateSectorData(viewportState.currentSector.x, viewportState.currentSector.y)
     }
-  }, [state.currentSector, loadSector, state.loading])
+  }, [viewportState.currentSector, updateSectorData, viewportState.loading])
 
-  // useEffect(() => {
-  //   if (!state.loading && state.anomalies.length > 0) {
-  //     const alreadyClassifiedIds = new Set(state.classifications.map((c) => `db-${c.anomaly}`))
-  //     const unclassified = state.anomalies.filter((a) => !alreadyClassifiedIds.has(a.id))
-  //     const pool = unclassified.length > 0 ? unclassified : state.anomalies
-  //     const randomAnomaly = pool[Math.floor(Math.random() * pool.length)]
+  const currentSectorName = generateSectorName(viewportState.currentSector.x, viewportState.currentSector.y)
+  const projectMissions = missions.filter((mission) => !viewportState.selectedProject || mission.project === viewportState.selectedProject.id)
+  const availableMissions = projectMissions.filter((mission) => !mission.completed)
 
-  //     if (randomAnomaly) {
-  //       setState((prev) => ({
-  //         ...prev,
-  //         selectedAnomaly: randomAnomaly,
-  //         showDetailDialog: randomAnomaly.classified || false,
-  //         showClassifyDialog: !randomAnomaly.classified,
-  //       }))
-  //     }
-  //   }
-  // }, [state.loading, state.anomalies, state.classifications])
-
-  // Computed values
-  const currentSectorName = generateSectorName(state.currentSector.x, state.currentSector.y)
-  const projectMissions = missions.filter((m) => !state.selectedProject || m.project === state.selectedProject.id)
-  const availableMissions = projectMissions.filter((m) => !m.completed)
-
-  // Get sector-specific counts for projects
-  const getSectorAnomaliesForProject = (projectId: string | null) => {
-    const sectorAnomalies = filterAnomaliesBySector(state.anomalies, state.currentSector.x, state.currentSector.y)
-    const projectAnomalies = projectId ? sectorAnomalies.filter((a) => a.project === projectId) : sectorAnomalies
-    
-    if (projectId) {
-      
-    }
-    
-    return projectAnomalies
-  }
-
-  if (state.loading) {
+  if (viewportState.loading) {
     return (
       <div className="h-screen bg-[#002439] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#78cce2] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <div className="text-[#e4eff0] text-lg font-mono">INITIALIZING TELESCOPE ARRAY...</div>
-          <div className="text-[#78cce2] text-sm mt-2">Loading deep space data</div>
-        </div>
+        <div className="text-[#78cce2] font-mono">Loading...</div>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="h-screen bg-[#002439] flex flex-col overflow-hidden">
-      {/* Mobile Header */}
       <div className="lg:hidden flex items-center justify-between p-2 bg-[#005066]/95 border-b border-[#78cce2]/30 flex-shrink-0">
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setMobileMenuOpen(!state.mobileMenuOpen)}
+          onClick={() => onMobileMenuToggle(!viewportState.mobileMenuOpen)}
           className="text-[#78cce2] hover:bg-[#4e7988]/50"
         >
           <Menu className="h-4 w-4" />
@@ -332,148 +369,106 @@ export default function TelescopeViewport() {
         </div>
         <div className="flex items-center gap-2">
           <Badge className="bg-[#78cce2] text-[#002439] text-xs px-2 py-1 font-mono">
-            {state.classifications.length}
+            {viewportState.classifications.length}
           </Badge>
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <MobileMenu
-        mobileMenuOpen={state.mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        viewMode={state.viewMode}
-        setViewMode={setViewMode}
-        selectedProject={state.selectedProject}
-        selectProject={selectProject}
-        handleNavigate={handleNavigate}
+        mobileMenuOpen={viewportState.mobileMenuOpen}
+        setMobileMenuOpen={onMobileMenuToggle}
+        viewMode={viewportState.viewMode}
+        setViewMode={onViewModeChange}
+        selectedProject={viewportState.selectedProject}
+        selectProject={onProjectSelect}
+        handleNavigate={onNavigate}
       />
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
-        {/* Desktop Left Sidebar */}
         <LeftSidebar
           currentSectorName={currentSectorName}
-          filteredAnomalies={state.filteredAnomalies}
-          classifications={state.classifications}
-          viewMode={state.viewMode}
-          setViewMode={setViewMode}
-          selectedProject={state.selectedProject}
-          selectProject={selectProject}
-          handleNavigate={handleNavigate}
-          getSectorAnomaliesForProject={getSectorAnomaliesForProject}
+          filteredAnomalies={viewportState.filteredAnomalies}
+          classifications={viewportState.classifications}
+          viewMode={viewportState.viewMode}
+          setViewMode={onViewModeChange}
+          selectedProject={viewportState.selectedProject}
+          selectProject={onProjectSelect}
+          handleNavigate={onNavigate}
+          getSectorAnomaliesForProject={getSectorProjectAnomalies}
+          showAllAnomalies={viewportState.showAllAnomalies}
+          setShowAllAnomalies={onAnomaliesToggle}
         />
 
-        {/* Main Viewport */}
-        <div className="flex-1 relative overflow-hidden min-h-0">
-          {/* Telescope Frame - Hidden on mobile */}
-          <div className="hidden lg:block absolute inset-0 pointer-events-none z-10">
-            {/* Outer Ring */}
-            <div className="absolute inset-6 border-4 border-[#005066] rounded-full shadow-2xl">
-              {/* Inner Ring */}
-              <div className="absolute inset-3 border-2 border-[#78cce2]/50 rounded-full">
-                {/* Crosshair Lines */}
-                <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#78cce2]/30 to-transparent transform -translate-y-1/2"></div>
-                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#78cce2]/30 to-transparent transform -translate-x-1/2"></div>
-
-                {/* Corner Markers */}
-                <div className="absolute top-3 left-3 w-4 h-4 border-l-2 border-t-2 border-[#78cce2]/60"></div>
-                <div className="absolute top-3 right-3 w-4 h-4 border-r-2 border-t-2 border-[#78cce2]/60"></div>
-                <div className="absolute bottom-3 left-3 w-4 h-4 border-l-2 border-b-2 border-[#78cce2]/60"></div>
-                <div className="absolute bottom-3 right-3 w-4 h-4 border-r-2 border-b-2 border-[#78cce2]/60"></div>
-
-                {/* Center Crosshair */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                  <div className="w-6 h-6 border-2 border-[#78cce2] rounded-full relative">
-                    <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-[#78cce2] rounded-full transform -translate-x-1/2 -translate-y-1/2 shadow-lg"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Telescope Markings */}
-            <div className="absolute top-8 left-8 text-[#78cce2] font-mono text-xs">
-              <div>MAGNIFICATION: 1000x</div>
-              <div>FIELD: {currentSectorName}</div>
-            </div>
-
-            <div className="absolute top-8 right-8 text-[#78cce2] font-mono text-xs text-right">
-              <div>TARGETS: {state.filteredAnomalies.length}</div>
-              <div>STATUS: SCANNING</div>
-            </div>
-          </div>
-
-          {state.viewMode === "viewport" ? (
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {viewportState.viewMode === "viewport" && (
             <TelescopeView
-              stars={state.stars}
-              filteredAnomalies={state.filteredAnomalies}
-              isDragging={state.isDragging}
-              handleMouseDown={handleMouseDown}
-              handleMouseMove={handleMouseMove}
-              handleMouseUp={handleMouseUp}
-              handleAnomalyClick={handleAnomalyClick}
+              stars={viewportState.stars}
+              filteredAnomalies={viewportState.filteredAnomalies}
+              isDragging={viewportState.isDragging}
+              handleMouseDown={handleMouseDownEvent}
+              handleMouseMove={handleMouseMoveEvent}
+              handleMouseUp={handleMouseUpEvent}
+              handleAnomalyClick={onAnomalyClick}
               currentSectorName={currentSectorName}
-              focusedAnomaly={state.focusedAnomaly}
-              anomalies={state.anomalies}
+              focusedAnomaly={viewportState.focusedAnomaly}
+              anomalies={viewportState.anomalies}
             />
-          ) : state.viewMode === "discoveries" ? (
+          )}
+          {viewportState.viewMode === "discoveries" && (
             <DiscoveriesView
-              classifications={state.classifications || []}
-              allClassifications={state.allClassifications || []}
+              classifications={viewportState.classifications || []}
+              allClassifications={viewportState.allClassifications || []}
               projectMissions={projectMissions}
-              selectedProject={state.selectedProject}
-              onBack={() => setViewMode("viewport")}
-              onViewAnomaly={handleViewAnomaly}
-              onViewClassification={handleViewClassification}
-              showAllDiscoveries={state.showAllDiscoveries}
-              setShowAllDiscoveries={setShowAllDiscoveries}
-              anomalies={state.anomalies}
+              selectedProject={viewportState.selectedProject}
+              onBack={() => onViewModeChange("viewport")}
+              onViewAnomaly={onViewAnomaly}
+              onViewClassification={onViewClassification}
+              showAllDiscoveries={viewportState.showAllDiscoveries}
+              setShowAllDiscoveries={onDiscoveriesToggle}
+              anomalies={viewportState.anomalies}
             />
-          ) : state.viewMode === "skill-tree" ? (
-            <SkillTreeView onBack={() => setViewMode("viewport")} />
-          ) : null}
+          )}
+          {viewportState.viewMode === "skill-tree" && (
+            <SkillTreeView onBack={() => onViewModeChange("viewport")} />
+          )}
         </div>
 
-        {/* Desktop Right Sidebar */}
-        <RightSidebar
-          anomalies={state.anomalies}
-          classifications={state.classifications}
-          allClassifications={state.allClassifications}
-          filteredAnomalies={state.filteredAnomalies}
-          availableMissions={availableMissions}
-          selectedProject={state.selectedProject}
-          getSectorAnomaliesForProject={getSectorAnomaliesForProject}
-          handleViewClassification={handleViewClassification}
-        />
+        <div className="overflow-y-auto">
+          <RightSidebar
+            anomalies={viewportState.anomalies}
+            classifications={viewportState.classifications}
+            allClassifications={viewportState.allClassifications}
+            filteredAnomalies={viewportState.filteredAnomalies}
+            availableMissions={availableMissions}
+            selectedProject={viewportState.selectedProject}
+            selectedAnomaly={viewportState.selectedAnomaly}
+            getSectorAnomaliesForProject={getSectorProjectAnomalies}
+            handleViewClassification={onViewClassification}
+            onClassify={() => {
+              setViewportState((prev) => ({
+                ...prev,
+                showClassifyDialog: true,
+              }))
+            }}
+          />
+        </div>
       </div>
 
-      {/* Dialogs */}
       <AnomalyDialog
-        showClassifyDialog={state.showClassifyDialog}
-        setShowClassifyDialog={(show) => setState((prev) => ({ ...prev, showClassifyDialog: show }))}
-        selectedAnomaly={state.selectedAnomaly}
-        handleClassify={handleClassify}
-      />
-
-      <AnomalyDetailDialog
-        showDetailDialog={state.showDetailDialog}
-        setShowDetailDialog={(show) => setState((prev) => ({ ...prev, showDetailDialog: show }))}
-        selectedAnomaly={state.selectedAnomaly}
-        onClassify={() => {
-          setState((prev) => ({
-            ...prev,
-            showDetailDialog: false,
-            showClassifyDialog: true,
-          }))
-        }}
-        config="telescope"
+        showClassifyDialog={viewportState.showClassifyDialog}
+        setShowClassifyDialog={(show) => setViewportState((prev) => ({ ...prev, showClassifyDialog: show }))}
+        selectedAnomaly={viewportState.selectedAnomaly}
+        handleClassify={performClassification}
       />
 
       <ClassificationDetailDialog
-        showDetailDialog={state.showClassificationDetailDialog}
-        setShowDetailDialog={(show) => setState((prev) => ({ ...prev, showClassificationDetailDialog: show }))}
-        selectedClassification={state.selectedClassification}
+        showDetailDialog={viewportState.showClassificationDetailDialog}
+        setShowDetailDialog={(show) => setViewportState((prev) => ({ ...prev, showClassificationDetailDialog: show }))}
+        selectedClassification={viewportState.selectedClassification}
         config="telescope"
       />
     </div>
   )
-};
+}
+
+export default TelescopeViewport

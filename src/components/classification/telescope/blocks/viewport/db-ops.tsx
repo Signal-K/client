@@ -41,7 +41,7 @@ export function useDatabaseOperations() {
           )
         `)
         .eq("author", session.user.id)
-        .eq("automaton", "Telescope")
+        .in("automaton", ["Telescope", "TelescopePlanet"])
         .not("anomalies", "is", null);
 
       if (linkedError) {

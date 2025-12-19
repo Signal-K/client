@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import dynamic from 'next/dynamic';
 import { useSession } from "@supabase/auth-helpers-react";
 import { usePostHog } from 'posthog-js/react';
@@ -111,6 +112,7 @@ function SimpleTabTrigger({
 export default function GamePage() {
   const session = useSession();
   const posthog = usePostHog();
+  const router = useRouter();
 
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [landmarksExpanded, setLandmarksExpanded] = useState(false);
@@ -212,25 +214,21 @@ export default function GamePage() {
       id: 'telescope',
       label: 'Telescope',
       icon: <Telescope className="w-4 h-4" />,
-      condition: classifications.length > 0,
     },
     {
       id: 'satellite',
       label: 'Satellite',
       icon: <Satellite className="w-4 h-4" />,
-      condition: classifications.length > 0,
     },
     {
       id: 'rover',
       label: 'Rover',
       icon: <Car className="w-4 h-4" />,
-      condition: classifications.length > 0,
     },
     {
       id: 'inventory',
       label: 'Inventory',
       icon: <Package className="w-4 h-4" />,
-      condition: classifications.length > 0,
     },
   ], [classifications.length]);
 
@@ -272,7 +270,14 @@ export default function GamePage() {
 
   const needsProfileSetup = !profile?.username || !profile?.full_name;
 
-  // If not logged in, show minimal gate (middleware should rewrite, but fallback here prevents blank render).
+  // Redirect unauthenticated users to `/` (middleware may handle this server-side; this is a client fallback)
+  useEffect(() => {
+    if (!session) {
+      router.push('/');
+    }
+  }, [session, router]);
+
+  // If not logged in, show minimal gate while redirect happens.
   if (!session) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center text-sm text-muted-foreground">
@@ -423,25 +428,21 @@ export default function GamePage() {
                 <SolarTab onExpandedChange={setTabContentExpanded} />
               </TabsContent>
 
-              {classifications.length > 0 && (
-                <>
-                  <TabsContent value="telescope" className="mt-0">
-                    <TelescopeTab />
-                  </TabsContent>
+              <TabsContent value="telescope" className="mt-0">
+                <TelescopeTab />
+              </TabsContent>
 
-                  <TabsContent value="satellite" className="mt-0">
-                    <SatelliteTab />
-                  </TabsContent>
+              <TabsContent value="satellite" className="mt-0">
+                <SatelliteTab />
+              </TabsContent>
 
-                  <TabsContent value="rover" className="mt-0">
-                    <RoverTab />
-                  </TabsContent>
+              <TabsContent value="rover" className="mt-0">
+                <RoverTab />
+              </TabsContent>
 
-                  <TabsContent value="inventory" className="mt-0">
-                    <InventoryTab />
-                  </TabsContent>
-                </>
-              )}
+              <TabsContent value="inventory" className="mt-0">
+                <InventoryTab />
+              </TabsContent>
             </div>
           </Tabs>
         </div>

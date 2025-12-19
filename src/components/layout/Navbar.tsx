@@ -1,4 +1,7 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Menu, Transition } from "@headlessui/react";
 import { Avatar } from "../profile/setup/Avatar";
 import Link from "next/link";
@@ -12,6 +15,7 @@ import MySettlementsLocations from "@/src/components/classification/UserLocation
 export default function Navbar() {
   const supabase = useSupabaseClient();
   const { activePlanet } = useActivePlanet();
+  const router = useRouter();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [settlementsOpen, setSettlementsOpen] = useState(false);
@@ -34,6 +38,7 @@ export default function Navbar() {
       console.error("Error signing out:", error.message);
     } else {
       // Signed out
+      router.push('/');
     }
   };
 

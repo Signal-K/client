@@ -412,16 +412,17 @@ export default function RoverViewportSection() {
         >
             <div className="relative w-full flex items-center justify-center py-8 md:py-12" style={{ minHeight: '480px' }}>
                 {!hasRoverDeployed ? (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
-                        <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-white leading-relaxed px-4 py-3 rounded-lg bg-black/40 drop-shadow">
-                            Mars is one of the closest planets to us, and certainly one of the most interesting. You've been given a rover and have been asked to help 'train' it to avoid obstacles. Each week, you give it a series of commands and routes; and it will explore Mars, finding objects of interest and eventually getting stuck. It's your job to help the rover identify what it has found and why it got stuck. With enough training, you'll be able to explore the surface of the planets you and other scientists discover.
+                    <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-4">
+                        <div className="mb-6 w-full max-w-lg text-xs md:text-sm text-center text-white leading-relaxed px-4 py-3 rounded-lg bg-black/40 drop-shadow">
+                            <p className="font-semibold text-amber-400 mb-2">Ready to Train Your Rover?</p>
+                            <p>Mars is one of the closest planets to us, and certainly one of the most interesting. You've been given a rover and have been asked to help 'train' it to avoid obstacles. Each week, you give it a series of commands and routes; and it will explore Mars, finding objects of interest and eventually getting stuck.</p>
                         </div>
-                        <Button
+                        <button
                             onClick={handleDeployRover}
-                            variant='default'
+                            className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white rounded-lg shadow-lg text-base md:text-lg font-bold transition-all duration-200 hover:scale-105 whitespace-nowrap"
                         >
-                            Deploy your rover
-                        </Button>
+                            🚗 Deploy Rover
+                        </button>
                     </div>
                 ) : (
                     <div className="h-full w-full relative">

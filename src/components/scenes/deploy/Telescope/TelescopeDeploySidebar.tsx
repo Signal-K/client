@@ -175,7 +175,7 @@ const TelescopeDeploySidebar: React.FC<TelescopeDeploySidebarProps> = ({
               <span className={`font-semibold ${isMobile ? 'text-[10px]' : 'text-xs sm:text-sm'} ${
                 isDarkMode ? 'text-[#e4eff0]' : 'text-slate-800'
               }`}>
-                {deploymentType === "stellar" ? "Stellar Objects" : "Planetary Objects"}
+                {deploymentType === "stellar" ? "Stellar Objects" : "Exoplanets & Small Bodies"}
               </span>
             </div>
             <Button

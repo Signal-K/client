@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Auth } from "@supabase/auth-ui-react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Image from "next/image";
@@ -43,6 +44,7 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
   const [anonymousError, setAnonymousError] = useState<string | null>(null);
   
   const { styles } = useStyles();
+  const router = useRouter();
 
   const handleAnonymousSignIn = async () => {
     setIsLoadingAnonymous(true);
@@ -55,7 +57,8 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
         setAnonymousError(error.message);
         console.error('Anonymous sign-in error:', error);
       } else {
-        // Successfully signed in anonymously
+        // Successfully signed in anonymously — navigate to home
+        router.push('/');
       }
     } catch (err: any) {
       setAnonymousError('An unexpected error occurred');

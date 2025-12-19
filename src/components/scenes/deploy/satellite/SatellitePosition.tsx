@@ -533,15 +533,17 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
   <Section expandLink={"/viewports/satellite"} sectionId="satellite-position" variant="viewport" backgroundType="outer-solar" infoText={"Send satellites to planets you or the community have discovered to search for clouds and weather events."}>
       <div ref={sectionRef} className="p-4 relative z-10 flex flex-col items-center justify-center" style={{ minHeight: '480px' }}>
         {positions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="mb-4 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed px-2">
-              Now that we've discovered some planets, we can investigate them further with satellites. To start with, you get to send a satellite to a target location once every week. Currently, your satellites can identify weather events and storms on your planets - this is good information to have if you want to explore and maybe work on, or near, these planets!
+          <div className="flex flex-col items-center justify-center h-full px-4">
+            <div className="mb-6 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed">
+              <p className="font-semibold text-cyan-400 mb-2">Send Satellites to Explore!</p>
+              <p className="mb-2">Now that we've discovered some planets, we can investigate them further with satellites. To start with, you get to send a satellite to a target location once every week. Your satellites can identify weather events and storms on your planets.</p>
+              <p className="text-xs text-zinc-400">💡 You can start sending satellites even without discovered planets!</p>
             </div>
             <button
-              className="px-4 py-2 bg-blue-600 text-white rounded shadow"
+              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-lg shadow-lg text-base md:text-lg font-bold transition-all duration-200 hover:scale-105 whitespace-nowrap"
               onClick={() => router.push('/viewports/satellite/deploy')}
             >
-              Deploy Weather Satellite
+              🛰️ Deploy Weather Satellite
             </button>
           </div>
         ) : (

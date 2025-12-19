@@ -62,6 +62,7 @@ export default function GameNavbar() {
       console.error("Error signing out:", error.message);
     } else {
       // Signed out
+      router.push('/');
     }
   };
 

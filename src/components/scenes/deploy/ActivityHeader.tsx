@@ -195,7 +195,7 @@ export default function ActivityHeader({
     return "bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40";
   };
 
-  const displayName = profile?.username || session?.user?.email || "User";
+  const displayName = profile?.username || (session?.user?.is_anonymous ? "Guest Account" : session?.user?.email) || "User";
 
   // Determine background image based on location prop
   const getBackgroundImage = (location?: string) => {
@@ -229,7 +229,7 @@ export default function ActivityHeader({
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <AvatarGenerator author={session?.user.id || ""} />
             <h2 className="text-sm sm:text-base md:text-lg font-bold text-foreground truncate">
-              {profile?.username || "USERNAME"}
+              {displayName}
             </h2>
           </div>
           

@@ -119,7 +119,7 @@ export default function DeployTelescopeSidebar({
               </div>
               <div className="min-w-0">
                 <h1 className="text-[#e4eff0] font-medium text-xs sm:text-sm leading-tight truncate">
-                  {deploymentType === "stellar" ? "Stellar Objects" : "Planetary Objects"}
+                  {deploymentType === "stellar" ? "Stellar Objects" : "Exoplanets & Small Bodies"}
                 </h1>
                 <div className="text-[#78cce2] text-[10px] sm:text-xs flex items-center gap-1 sm:gap-2">
                   <span className="font-mono">({currentSector.x}, {currentSector.y})</span>
