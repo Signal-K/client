@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from 'next/dynamic';
-import { useSession } from "@supabase/auth-helpers-react";
+import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
 import { usePostHog } from 'posthog-js/react';
 
 // Dynamic heavy components (Three.js scene, popup, banners, forms)
@@ -113,6 +113,7 @@ type TabId = "updates" | "solar" | "telescope" | "satellite" | "rover" | "invent
 
 export default function GamePage() {
   const session = useSession();
+  const { isLoading: isAuthLoading } = useSessionContext();
   const posthog = usePostHog();
   const router = useRouter();
 
@@ -404,10 +405,10 @@ export default function GamePage() {
 
   // Redirect unauthenticated users to `/` (middleware may handle this server-side; this is a client fallback)
   useEffect(() => {
-    if (!session) {
+    if (!isAuthLoading && !session) {
       router.push('/');
     }
-  }, [session, router]);
+  }, [isAuthLoading, session, router]);
 
   // If not logged in, show minimal gate while redirect happens.
   if (!session) {

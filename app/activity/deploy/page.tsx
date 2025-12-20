@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import DeployTelescopeViewport from "@/src/components/scenes/deploy/TelescopeViewportRange"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSession, useSessionContext, useSupabaseClient } from "@supabase/auth-helpers-react"
 import { useEffect, useState } from "react"
 import UseDarkMode from "@/src/shared/hooks/useDarkMode"
 import GameNavbar from "@/src/components/layout/Tes"
@@ -10,32 +10,44 @@ import GameNavbar from "@/src/components/layout/Tes"
 export default function NewDeployPage() {
   const router = useRouter()
   const session = useSession()
+  const { isLoading: isAuthLoading } = useSessionContext()
   const supabase = useSupabaseClient()
   const { isDark } = UseDarkMode()
   const [profileChecked, setProfileChecked] = useState(false)
 
   useEffect(() => {
-    async function ensureProfile() {
-      if (!session?.user?.id) return;
-      // Check if profile exists in Supabase
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("id", session.user.id)
-        .single();
-      if (!data) {
-        // Create profile if not exists
-        const { error: insertError } = await supabase
-          .from("profiles")
-          .insert({ id: session.user.id });
-        if (insertError) {
-          console.error("Error creating profile:", insertError.message);
-        }
-      }
-      setProfileChecked(true);
+    if (isAuthLoading) return;
+
+    if (!session?.user?.id) {
+      router.replace('/auth');
+      return;
     }
+
+    const ensureProfile = async () => {
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", session.user!.id)
+          .single();
+
+        if (!data) {
+          const { error: insertError } = await supabase
+            .from("profiles")
+            .insert({ id: session.user!.id });
+          if (insertError) {
+            console.error("Error creating profile:", insertError.message);
+          }
+        }
+      } catch (error) {
+        console.error("ensureProfile failed", error);
+      } finally {
+        setProfileChecked(true);
+      }
+    };
+
     ensureProfile();
-  }, [session, supabase]);
+  }, [isAuthLoading, router, session, supabase]);
 
   if (!profileChecked) {
     return (
