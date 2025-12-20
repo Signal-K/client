@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from 'next/dynamic';
 import { useSession } from "@supabase/auth-helpers-react";
@@ -67,14 +67,14 @@ function SimpleTabTrigger({
   onTabClick
 }: SimpleTabTriggerProps) {
   return (
-    <div className="relative group flex items-center gap-0.5">
+    <div className="relative group flex flex-shrink-0 items-center gap-0.5">
       {canMoveLeft && (
         <button
           onClick={(e) => {
             e.stopPropagation();
             onMoveLeft?.();
           }}
-          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-background/40 rounded"
+          className="hidden rounded p-1 transition-opacity hover:bg-background/40 sm:flex sm:opacity-0 sm:group-hover:opacity-100"
           title="Move left"
         >
           <ArrowLeft className="w-3 h-3 text-muted-foreground" />
@@ -83,7 +83,7 @@ function SimpleTabTrigger({
       
       <TabsTrigger
         value={id}
-        className="flex items-center gap-1.5 h-9 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+        className="flex h-9 flex-shrink-0 items-center gap-1.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
         onClick={(e) => {
           e.preventDefault();
           onTabClick(id);
@@ -99,7 +99,7 @@ function SimpleTabTrigger({
             e.stopPropagation();
             onMoveRight?.();
           }}
-          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-background/40 rounded"
+          className="hidden rounded p-1 transition-opacity hover:bg-background/40 sm:flex sm:opacity-0 sm:group-hover:opacity-100"
           title="Move right"
         >
           <ArrowRight className="w-3 h-3 text-muted-foreground" />
@@ -108,6 +108,8 @@ function SimpleTabTrigger({
     </div>
   );
 }
+
+type TabId = "updates" | "solar" | "telescope" | "satellite" | "rover" | "inventory";
 
 export default function GamePage() {
   const session = useSession();
@@ -120,6 +122,23 @@ export default function GamePage() {
   const [tabContentExpanded, setTabContentExpanded] = useState(false);
   const [showReorderHint, setShowReorderHint] = useState(true);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const tabListContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const updateScrollState = useCallback(() => {
+    const container = tabListContainerRef.current;
+    if (!container) {
+      setCanScrollLeft(false);
+      setCanScrollRight(false);
+      return;
+    }
+
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    const epsilon = 1;
+    setCanScrollLeft(scrollLeft > epsilon);
+    setCanScrollRight(scrollWidth - clientWidth - scrollLeft > epsilon);
+  }, []);
 
   // Custom hooks for data management
   const {
@@ -144,6 +163,7 @@ export default function GamePage() {
     reorderTabs,
     getOrderedTabs,
     isInitialized,
+    hasSavedOrder,
   } = useTabsPersistence('updates');
 
   // Handle tab click - toggle full screen if clicking active tab, otherwise switch tabs
@@ -198,8 +218,68 @@ export default function GamePage() {
     posthog?.capture('reorder_hint_dismissed');
   };
 
-  // Define all available tabs with conditions
-  const allTabs: TabConfig[] = useMemo(() => [
+  const tabPriorityCounts = useMemo(() => {
+    const counts: Record<TabId, number> = {
+      updates: 0,
+      solar: 0,
+      telescope: 0,
+      satellite: 0,
+      rover: 0,
+      inventory: 0,
+    };
+
+    linkedAnomalies.forEach((linked) => {
+      const automaton = (linked.automaton || '').toLowerCase();
+      const anomalyType = (linked.anomaly?.anomalytype || '').toLowerCase();
+      const anomalySet = (linked.anomaly?.anomalySet || '').toLowerCase();
+
+      if (anomalyType.includes('sunspot') || anomalyType.includes('solar') || anomalySet.includes('sunspot')) {
+        counts.solar += 1;
+      }
+
+      if (
+        automaton.includes('telescope') ||
+        anomalyType.includes('planet') ||
+        anomalyType.includes('asteroid') ||
+        anomalyType.includes('variable') ||
+        anomalyType.includes('disk') ||
+        anomalySet.includes('telescope') ||
+        anomalySet.includes('planet') ||
+        anomalySet.includes('asteroid') ||
+        anomalySet.includes('variable') ||
+        anomalySet.includes('disk')
+      ) {
+        counts.telescope += 1;
+      }
+
+      if (
+        automaton.includes('satellite') ||
+        automaton.includes('weather') ||
+        anomalyType.includes('cloud') ||
+        anomalyType.includes('balloon') ||
+        anomalyType.includes('lidar') ||
+        anomalySet.includes('cloud') ||
+        anomalySet.includes('balloon') ||
+        anomalySet.includes('lidar')
+      ) {
+        counts.satellite += 1;
+      }
+
+      if (
+        automaton.includes('rover') ||
+        anomalyType.includes('rover') ||
+        anomalyType.includes('automaton') ||
+        anomalySet.includes('rover') ||
+        anomalySet.includes('automaton')
+      ) {
+        counts.rover += 1;
+      }
+    });
+
+    return counts;
+  }, [linkedAnomalies]);
+
+  const baseTabs: TabConfig[] = useMemo(() => [
     {
       id: 'updates',
       label: 'Updates',
@@ -230,17 +310,69 @@ export default function GamePage() {
       label: 'Inventory',
       icon: <Package className="w-4 h-4" />,
     },
-  ], [classifications.length]);
+  ], []);
 
-  // Get ordered and filtered tabs
-  const orderedTabs = useMemo(() => getOrderedTabs(allTabs), [allTabs, getOrderedTabs]);
+  const prioritizedTabs = useMemo(() => {
+    if (hasSavedOrder) {
+      return baseTabs;
+    }
 
-  // Initialize tab order when tabs change
+    const baseOrder: Record<TabId, number> = {
+      updates: 0,
+      solar: 1,
+      telescope: 2,
+      satellite: 3,
+      rover: 4,
+      inventory: 5,
+    };
+
+    return [...baseTabs].sort((a, b) => {
+      const aId = a.id as TabId;
+      const bId = b.id as TabId;
+      const aBoost = tabPriorityCounts[aId] > 0 ? 10 : 0;
+      const bBoost = tabPriorityCounts[bId] > 0 ? 10 : 0;
+      const aScore = baseOrder[aId] - aBoost - tabPriorityCounts[aId] * 0.01;
+      const bScore = baseOrder[bId] - bBoost - tabPriorityCounts[bId] * 0.01;
+      return aScore - bScore;
+    });
+  }, [baseTabs, tabPriorityCounts, hasSavedOrder]);
+
+  const orderedTabs = useMemo(() => getOrderedTabs(prioritizedTabs), [prioritizedTabs, getOrderedTabs]);
+
   useEffect(() => {
     if (isInitialized) {
-      initializeTabOrder(allTabs);
+      initializeTabOrder(prioritizedTabs);
     }
-  }, [allTabs, initializeTabOrder, isInitialized]);
+  }, [prioritizedTabs, initializeTabOrder, isInitialized]);
+
+  useEffect(() => {
+    const container = tabListContainerRef.current;
+    updateScrollState();
+
+    if (!container) {
+      return;
+    }
+
+    const handleScroll = () => updateScrollState();
+    const rafId = requestAnimationFrame(updateScrollState);
+
+    container.addEventListener('scroll', handleScroll);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => updateScrollState());
+      resizeObserver.observe(container);
+    }
+
+    window.addEventListener('resize', updateScrollState);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      container.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', updateScrollState);
+      resizeObserver?.disconnect();
+    };
+  }, [orderedTabs, updateScrollState]);
 
   // Move tab left or right
   const moveTab = (tabId: string, direction: 'left' | 'right') => {
@@ -372,22 +504,40 @@ export default function GamePage() {
           <Tabs value={activeTab} className="w-full">
             {/* Tab Navigation */}
             <div className="border-b border-[#78cce2]/20 bg-background/60 backdrop-blur-sm">
-              <TabsList className="w-full h-auto flex flex-wrap justify-start gap-1 p-2 bg-transparent">
-                {orderedTabs.map((tab, index) => (
-                  <SimpleTabTrigger
-                    key={tab.id}
-                    id={tab.id}
-                    icon={tab.icon}
-                    label={tab.label}
-                    onMoveLeft={() => moveTab(tab.id, 'left')}
-                    onMoveRight={() => moveTab(tab.id, 'right')}
-                    canMoveLeft={index > 0}
-                    canMoveRight={index < orderedTabs.length - 1}
-                    onTabClick={handleTabClick}
-                  />
-                ))}
-              </TabsList>
-              
+              <div className="relative">
+                {canScrollLeft && (
+                  <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-background to-transparent" />
+                )}
+                <div
+                  ref={tabListContainerRef}
+                  className="overflow-x-auto sm:overflow-visible"
+                  style={{ WebkitOverflowScrolling: "touch" }}
+                >
+                  <TabsList className="flex min-w-max flex-nowrap gap-1 p-2 bg-transparent sm:min-w-0 sm:flex-wrap">
+                    {orderedTabs.map((tab, index) => (
+                      <SimpleTabTrigger
+                        key={tab.id}
+                        id={tab.id}
+                        icon={tab.icon}
+                        label={tab.label}
+                        onMoveLeft={() => moveTab(tab.id, 'left')}
+                        onMoveRight={() => moveTab(tab.id, 'right')}
+                        canMoveLeft={index > 0}
+                        canMoveRight={index < orderedTabs.length - 1}
+                        onTabClick={handleTabClick}
+                      />
+                    ))}
+                  </TabsList>
+                </div>
+                {canScrollRight && (
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex w-14 items-center justify-end bg-gradient-to-l from-background to-transparent pr-3">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full border border-primary/40 bg-background/90 shadow-sm">
+                      <ArrowRight className="h-3.5 w-3.5 text-primary" />
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Reorder hint - shows on first visit */}
               {showReorderHint && (
                 <div className="px-3 pb-2">

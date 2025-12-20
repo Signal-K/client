@@ -14,6 +14,7 @@ export function useTabsPersistence(defaultTab: string = 'updates') {
   const [activeTab, setActiveTab] = useState<string>(defaultTab);
   const [tabOrder, setTabOrder] = useState<string[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [hasSavedOrder, setHasSavedOrder] = useState(false);
 
   // Initialize from localStorage on mount (client-side only)
   useEffect(() => {
@@ -32,6 +33,7 @@ export function useTabsPersistence(defaultTab: string = 'updates') {
           const parsedOrder = JSON.parse(savedOrder);
           if (Array.isArray(parsedOrder)) {
             setTabOrder(parsedOrder);
+            setHasSavedOrder(parsedOrder.length > 0);
           }
         } catch (e) {
           console.warn('Failed to parse saved tab order:', e);
@@ -80,6 +82,7 @@ export function useTabsPersistence(defaultTab: string = 'updates') {
   // Reorder tabs and save to localStorage
   const reorderTabs = useCallback((newOrder: string[]) => {
     setTabOrder(newOrder);
+    setHasSavedOrder(true);
     
     if (typeof window !== 'undefined') {
       try {
@@ -126,6 +129,7 @@ export function useTabsPersistence(defaultTab: string = 'updates') {
         localStorage.removeItem(TAB_ORDER_KEY);
         setActiveTab(defaultTab);
         setTabOrder([]);
+        setHasSavedOrder(false);
       } catch (e) {
         console.warn('Failed to clear tab preferences:', e);
       }
@@ -136,6 +140,7 @@ export function useTabsPersistence(defaultTab: string = 'updates') {
     activeTab,
     tabOrder,
     isInitialized,
+    hasSavedOrder,
     setActiveTab: handleTabChange,
     initializeTabOrder,
     reorderTabs,

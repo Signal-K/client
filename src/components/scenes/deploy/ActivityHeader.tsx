@@ -241,19 +241,27 @@ export default function ActivityHeader({
               
               {/* Upgrades Section - Only show if user has more than 2 classifications */}
               {classificationsCount > 2 && availableUpgrades > 0 && (
-                <Link 
+                <Link
                   href="/research"
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-card/20 transition-colors group"
+                  aria-label={bothUpgradesUnlocked ? "View research projects" : "View available upgrades"}
+                  className="group flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-200/20 px-2.5 py-1.5 text-xs font-medium text-amber-900 shadow-sm transition-all hover:border-amber-400/60 hover:bg-amber-200/30 hover:-translate-y-0.5 dark:border-amber-300/30 dark:bg-amber-300/10 dark:text-amber-100"
                 >
-                  <div className="relative p-1.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 group-hover:bg-yellow-200 dark:group-hover:bg-yellow-800/40">
+                  <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-amber-300/50 text-amber-900 transition-colors group-hover:bg-amber-300/70 dark:bg-amber-900/40 dark:group-hover:bg-amber-900/60">
                     <SpannerIcon />
-                    {/* Notification Counter */}
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                       {availableUpgrades}
                     </span>
                   </div>
-                  <span className="text-xs font-medium group-hover:text-foreground transition-colors hidden sm:inline">
-                    {bothUpgradesUnlocked ? "Projects" : "Upgrades"}
+                  <div className="flex min-w-0 flex-col text-left leading-tight text-amber-900 dark:text-amber-100">
+                    <span className="text-[11px] font-semibold tracking-wide uppercase">
+                      {bothUpgradesUnlocked ? "Projects" : "Research"}
+                    </span>
+                    <span className="text-[10px] font-normal text-amber-800/80 transition-colors group-hover:text-amber-900 dark:text-amber-200/80 dark:group-hover:text-amber-100">
+                      {bothUpgradesUnlocked ? "New expeditions available" : `${availableUpgrades} upgrade${availableUpgrades > 1 ? "s" : ""} ready`}
+                    </span>
+                  </div>
+                  <span className="ml-auto hidden text-[11px] font-semibold uppercase tracking-wide text-amber-800/90 transition-colors group-hover:text-amber-900 dark:text-amber-200/90 sm:inline">
+                    Go
                   </span>
                 </Link>
               )}
