@@ -24,7 +24,7 @@ if [ $# -eq 0 ]; then
     echo "  $0 migration list"
     echo "  $0 db reset"
     echo ""
-    echo "This script automatically loads the SUPABASE_DB_PASSWORD from .env"
+    echo "This script automatically loads the SUPABASE_DB_PASSWORD from .env (now set to fMr7jFLl97lzdx8u)"
     exit 1
 fi
 
