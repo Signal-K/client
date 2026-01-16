@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
-import { Bell, ChevronDown, HammerIcon, LogOut, Settings, Star, Trophy, User, X, Zap } from "lucide-react"
+import { Bell, ChevronDown, HammerIcon, LogOut, Settings, Star, Trophy, User, X, Zap, Sparkles } from "lucide-react"
 import { formatDistanceToNow, startOfDay, addDays } from "date-fns"
 import { Avatar, AvatarGenerator } from "../profile/setup/Avatar";
 import { Moon, Sun } from "lucide-react"
@@ -29,6 +29,8 @@ import { LocationsDropdown } from "./Navigation/LocationsDropdown"
 import TechnologyPopover, { TechnologySection } from "./Navigation/TechTreeDropdown"
 import { useRouter } from "next/navigation"
 import ResponsiveAlerts from "./Navigation/AlertsDropdown"
+import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal"
+import { useUserPreferences, ProjectType } from "@/src/hooks/useUserPreferences"
 
 // Sample data - replace with actual data in your implementation
 const techTree = [
@@ -45,6 +47,7 @@ export default function GameNavbar() {
   const router = useRouter();
 
   const { isDark, toggleDarkMode } = UseDarkMode();
+  const { preferences, savePreferences } = useUserPreferences();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string>("");
@@ -55,8 +58,18 @@ export default function GameNavbar() {
   const [userProgress, setUserProgress] = useState<{ [key: string]: number }>({});
   const [hasNewAlert, setHasNewAlert] = useState(false);
   const [newNotificationsCount, setNewNotificationsCount] = useState(0);
+  const [projectPreferencesOpen, setProjectPreferencesOpen] = useState(false);
 
   const signOut = async () => {
+    // Clear all local storage, session storage, and cookies before signing out
+    if (typeof window !== 'undefined') {
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+      // Remove all cookies for current domain
+      document.cookie.split(';').forEach(function(c) {
+        document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
+      });
+    }
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Error signing out:", error.message);
@@ -64,6 +77,10 @@ export default function GameNavbar() {
       // Signed out
       router.push('/');
     }
+  };
+
+  const handleProjectPreferencesSave = (interests: ProjectType[]) => {
+    savePreferences({ projectInterests: interests });
   };
 
   // Calculate time remaining
@@ -133,8 +150,9 @@ export default function GameNavbar() {
   }, []);  
 
   return (
+    <>
     <nav className="fixed top-0 left-0 right-0 z-50 px-2 py-1">
-      <div className="relative flex items-center justify-between rounded-lg backdrop-blur-md bg-black/30 border border-white/10 shadow-lg px-3 py-1">
+      <div className="relative flex items-center justify-between rounded-lg bg-black border border-white/10 shadow-lg px-3 py-1">
       <div className="flex items-center space-x-1 flex-nowrap min-w-0">
         <Link href="/" legacyBehavior>
               <a>
@@ -267,6 +285,13 @@ export default function GameNavbar() {
                     Settings
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="hover:bg-white/10 focus:bg-white/10 cursor-pointer"
+                  onClick={() => setProjectPreferencesOpen(true)}
+                >
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  <span>Project Preferences</span>
+                </DropdownMenuItem>
               </DropdownMenuGroup>
               {referralCode && (
     <>
@@ -381,5 +406,13 @@ export default function GameNavbar() {
 </Sheet>
       </div>
     </nav>
+
+    <ProjectPreferencesModal 
+      isOpen={projectPreferencesOpen}
+      onClose={() => setProjectPreferencesOpen(false)}
+      onSave={handleProjectPreferencesSave}
+      initialInterests={preferences?.projectInterests}
+    />
+    </>
   );
 };

@@ -91,7 +91,7 @@ export default function DeployRoverPage() {
         .eq("author", session.user.id)
         .eq("automaton", "Rover");
       if (existingDeployments && existingDeployments.length > 0) {
-        window.location.href = "/viewports/roover";
+        window.location.href = "/game?view=rover";
       }
     }
     checkExistingRoverDeployment();
@@ -231,7 +231,7 @@ export default function DeployRoverPage() {
 
   setDeployMessage("Rover deployed successfully!");
   setTimeout(() => {
-    window.location.href = "/viewports/roover";
+    window.location.href = "/game?view=rover";
   }, 2000);
   };
 

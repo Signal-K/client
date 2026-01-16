@@ -98,7 +98,8 @@ const TelescopeDeploySidebar: React.FC<TelescopeDeploySidebarProps> = ({
         {selectedSector && (
           <Button 
             onClick={onDeploy} 
-            disabled={alreadyDeployed || isDeploying} 
+            disabled={alreadyDeployed || isDeploying}
+            data-tutorial="confirm-deploy"
             className={`w-full ${isMobile ? 'h-8 text-xs px-2' : 'h-11'} font-bold shadow-lg transition-all duration-300 ${
               isDarkMode
                 ? 'bg-gradient-to-r from-[#78cce2] to-[#a8dce8] hover:from-[#a8dce8] hover:to-[#c8e8ed] text-[#002439] shadow-[#78cce2]/50 hover:shadow-[#78cce2]/70'

@@ -169,7 +169,9 @@ export default function ActivityHeader({
 
       // Refresh deployment status
       setTimeout(() => {
-        window.location.reload();
+        if (typeof window !== "undefined") {
+          window.location.reload();
+        }
       }, 2000);
 
     } catch (error) {
@@ -213,7 +215,7 @@ export default function ActivityHeader({
       'galaxy': "/assets/Backdrops/Galaxy.png",
     };
     
-    return locationBackgrounds[location.toLowerCase()] || "/assets/Backdrops/Earth.png";
+    return locationBackgrounds[location?.toLowerCase() || 'earth'] || "/assets/Backdrops/Earth.png";
   };
 
   return (

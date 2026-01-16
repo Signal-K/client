@@ -38,9 +38,12 @@ export default function SolarHealth() {
 
   // Fetch anomalies and linked anomalies
   useEffect(() => {
-    setLoading(true);
     async function fetchSunspotData() {
-      if (!session?.user?.id) return;
+      if (!session?.user?.id) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
       // Fetch sunspot anomalies
       const { data: anomalies } = await supabase
         .from("anomalies")
@@ -134,13 +137,22 @@ export default function SolarHealth() {
 
   return (
     <Section
-      sectionId="solar-health"
-      variant="viewport"
-      backgroundType="inner-solar"
-      infoText={"Investigate star activity to detect solar flares and measure the intensity of sunspots"}
-      expandLink={"/viewports/solar"}
-    >
+        sectionId="solar-health"
+        variant="viewport"
+        backgroundType="inner-solar"
+        infoText={"Investigate star activity to detect solar flares and measure the intensity of sunspots"}
+        expandLink={"/viewports/solar"}
+      >
       <div className="relative w-full h-64 md:h-96 flex items-center justify-center py-8 md:py-12">
+        {loading ? (
+          <div className="absolute inset-0 flex items-center justify-center z-20">
+            <div className="text-center">
+              <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-sm text-zinc-400">Loading solar data...</p>
+            </div>
+          </div>
+        ) : (
+          <>
         {/* 3D Sun Scene */}
         <div
           className="absolute left-0 top-0 bottom-0 flex items-center pl-8"
@@ -222,6 +234,7 @@ export default function SolarHealth() {
                 className="mt-4 w-36 text-xs"
                 onClick={handleParticipate}
                 disabled={participating || !sunspotForming}
+                data-tutorial="participate-solar"
               >
                 {participating
                   ? "Joining..."
@@ -237,7 +250,7 @@ export default function SolarHealth() {
               className="mt-3 w-36 text-xs"
               variant="outline"
               onClick={() =>
-                (window.location.href = `/structures/telescope/sunspot/db-${anomalyId}/count`)
+                (typeof window !== "undefined" && (window.location.href = `/structures/telescope/sunspot/db-${anomalyId}/count`))
               }
             >
               Count Solar Anomalies
@@ -271,6 +284,8 @@ export default function SolarHealth() {
             </span>
           )}
         </div>
+          </>
+        )}
       </div>
     </Section>
   );

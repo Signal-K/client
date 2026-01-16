@@ -41,7 +41,7 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
 
         if (profileError) throw profileError;
 
-        let location = profile?.location ?? 30;
+        let location = typeof window !== "undefined" ? profile?.location ?? 30 : 30;
 
         // If the location is null, update it to 30
         if (profile?.location === null) {

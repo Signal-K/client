@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Bell, Sun, Moon, User, UserPlus, UserX, Zap, LogOut } from "lucide-react";
+import { Bell, Sun, Moon, User, UserPlus, UserX, Zap, LogOut, Sparkles } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +21,8 @@ import { Switch } from "@/src/components/ui/switch";
 import { Badge } from "@/src/components/ui/badge";
 import RecentActivity from "@/src/components/social/activity/RecentActivity";
 import ConvertAnonymousAccount from "@/src/components/profile/auth/ConvertAnonymousAccount";
+import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal";
+import { useUserPreferences, ProjectType } from "@/src/hooks/useUserPreferences";
 import Link from "next/link";
 
 interface CommentVote {
@@ -59,6 +61,8 @@ export default function MainHeader({
   const session = useSession();
   const supabase = useSupabaseClient();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [projectPreferencesOpen, setProjectPreferencesOpen] = useState(false);
+  const { preferences, savePreferences } = useUserPreferences();
   
   const isAnonymousUser = session?.user?.is_anonymous;
 
@@ -70,13 +74,28 @@ export default function MainHeader({
     setShowUpgradeModal(false);
   };
 
+  const handleProjectPreferencesSave = (interests: ProjectType[]) => {
+    savePreferences({ projectInterests: interests });
+  };
+
   const handleLogout = async () => {
+    // Clear all browser storage before signing out
+    if (typeof window !== 'undefined') {
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+      // Remove all cookies
+      document.cookie.split(';').forEach(function(c) {
+        document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
+      });
+    }
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Error signing out:", error.message);
     } else {
       // Signed out
-      window.location.href = '/';
+      if (typeof window !== "undefined") {
+        window.location.href = '/';
+      }
     }
   };
 
@@ -174,6 +193,13 @@ export default function MainHeader({
               )}
               
               <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setProjectPreferencesOpen(true)}
+                className="cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Project Preferences
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-700 cursor-pointer">
                 <LogOut className="w-4 h-4 mr-2" />
                 Log out
@@ -206,6 +232,13 @@ export default function MainHeader({
           />
         </DialogContent>
       </Dialog>
+
+      <ProjectPreferencesModal 
+        isOpen={projectPreferencesOpen}
+        onClose={() => setProjectPreferencesOpen(false)}
+        onSave={handleProjectPreferencesSave}
+        initialInterests={preferences?.projectInterests}
+      />
     </div>
   );
 }

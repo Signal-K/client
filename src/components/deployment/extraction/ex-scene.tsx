@@ -388,7 +388,9 @@ export function ExtractionScene({
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white">{mineralType}</h3>
-                  <p className="text-sm text-gray-300">{location}</p>
+                  <p className="text-sm text-gray-300">
+                    {typeof window !== "undefined" && location}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-300">

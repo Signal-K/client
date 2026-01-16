@@ -93,7 +93,9 @@ export function CommentForm({
                     } catch (error) {
                         console.error('CommentForm: Router.push error:', error);
                         // Fallback to window.location
-                        window.location.href = '/';
+                        if (typeof window !== "undefined") {
+                            window.location.href = '/';
+                        }
                     }
                 }, 3000);
             };
@@ -146,7 +148,9 @@ export function CommentForm({
                                         router.push('/');
                                     } catch (error) {
                                         console.error('Manual redirect error:', error);
-                                        window.location.href = '/';
+                                        if (typeof window !== "undefined") {
+                                            window.location.href = '/';
+                                        }
                                     }
                                 }}
                                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4"

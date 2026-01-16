@@ -69,10 +69,12 @@ export default function Structures() {
         const itemDetail = itemMap.get(structure.item);
         if (itemDetail && !uniqueStructureMap.has(structure.item)) {
           uniqueStructureMap.set(structure.item, structure);
-          const location = itemDetail.locationType || 'Surface';
-          if (location in groups) {
-            groups[location as keyof typeof groups].push(structure);
-          };
+          if (typeof window !== "undefined") {
+            const location = itemDetail.locationType || 'Surface';
+            if (location in groups) {
+              groups[location as keyof typeof groups].push(structure);
+            };
+          }
         };
       };
 

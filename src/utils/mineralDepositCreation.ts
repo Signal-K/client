@@ -179,7 +179,7 @@ export async function createMineralDeposit({
         anomaly: anomalyId,
         discovery: classificationId,
         mineralconfiguration: mineralConfig,
-        location: location || null,
+        location: typeof window !== "undefined" ? location || null : null,
         created_at: new Date().toISOString()
       })
       .select("id")

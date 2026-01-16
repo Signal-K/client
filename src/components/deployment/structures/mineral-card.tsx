@@ -43,7 +43,9 @@ export function MineralCard({
             <div className="flex items-start justify-between mb-2">
                 <div>
                     <h3 className="font-semibold text-lg text-foreground">{getMineralDisplayName(mineral.mineralType)}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">📍 {location}</p>
+                    {typeof window !== "undefined" && (
+                        <p className="text-xs text-muted-foreground mt-0.5">📍 {location}</p>
+                    )}
                 </div>
                 <Badge variant="outline" className="text-xs">{mineral.estimatedQuantity}</Badge>
             </div>

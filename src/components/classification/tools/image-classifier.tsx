@@ -121,7 +121,9 @@ const uploadImageToSupabase = async (file: File) => {
         console.error("Entry error:", entryError.message);
       } else {
         console.log("Upload entry:", uploadEntry);
-        window.location.reload();
+        if (typeof window !== "undefined") {
+          window.location.reload();
+        }
         // saveLifeEntity();
       }
     }
@@ -170,7 +172,9 @@ const sendImage = async () => {
       console.log("Full API Response:", res.data); // Log full response
 
       if (res.data.refresh) {
-          window.location.reload();
+          if (typeof window !== "undefined") {
+            window.location.reload();
+          }
           return;
       }
 
