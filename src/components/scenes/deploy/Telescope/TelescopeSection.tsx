@@ -7,6 +7,7 @@ import { AnomalyDetailDialog } from "@/src/components/classification/viewport/an
 import { ClassificationDetailDialog } from "@/src/components/classification/viewport/classification-detail-dialog";
 import { TelescopeViewportState } from "@/src/components/classification/telescope/telescope-viewport";
 import Section from "@/src/components/sections/Section";
+import TutorialWrapper, { TELESCOPE_INTRO_STEPS } from "@/src/components/onboarding/TutorialWrapper";
 import { Anomaly } from "@/types/Structures/telescope";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
@@ -102,15 +103,21 @@ export default function TelescopeViewportSection() {
   });
 
   return (
-    <Section
-      sectionId="telescope-viewport"
-      variant="viewport"
-      backgroundType="interstellar"
-      infoText={
-        "View your telescope and everything you've discovered so far. Deploy your telescope each week and check back to browse through objects of interest and classify them."
-      }
-      expandLink={"/structures/telescope"}
+    <TutorialWrapper
+      tutorialId="telescope-intro"
+      steps={TELESCOPE_INTRO_STEPS}
+      title="Telescope Introduction"
+      showReplayButton
     >
+      <Section
+        sectionId="telescope-viewport"
+        variant="viewport"
+        backgroundType="interstellar"
+        infoText={
+          "View your telescope and everything you've discovered so far. Deploy your telescope each week and check back to browse through objects of interest and classify them."
+        }
+        expandLink={"/structures/telescope"}
+      >
       <div className="relative w-full flex items-center justify-center py-8 md:py-12" style={{ minHeight: '480px' }}>
         {!hasTelescopeDeployed ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-4">
@@ -122,6 +129,7 @@ export default function TelescopeViewportSection() {
             <button
               className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-lg shadow-lg text-base md:text-lg font-bold transition-all duration-200 hover:scale-105 whitespace-nowrap"
               onClick={handleDeployTelescope}
+              data-tutorial="deploy-telescope"
             >
               🔭 Deploy Telescope
             </button>
@@ -289,5 +297,6 @@ export default function TelescopeViewportSection() {
         )}
       </div>
     </Section>
+    </TutorialWrapper>
   );
 };

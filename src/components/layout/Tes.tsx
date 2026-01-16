@@ -57,6 +57,15 @@ export default function GameNavbar() {
   const [newNotificationsCount, setNewNotificationsCount] = useState(0);
 
   const signOut = async () => {
+    // Clear all local storage, session storage, and cookies before signing out
+    if (typeof window !== 'undefined') {
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+      // Remove all cookies for current domain
+      document.cookie.split(';').forEach(function(c) {
+        document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
+      });
+    }
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Error signing out:", error.message);
@@ -134,7 +143,7 @@ export default function GameNavbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-2 py-1">
-      <div className="relative flex items-center justify-between rounded-lg backdrop-blur-md bg-black/30 border border-white/10 shadow-lg px-3 py-1">
+      <div className="relative flex items-center justify-between rounded-lg bg-black border border-white/10 shadow-lg px-3 py-1">
       <div className="flex items-center space-x-1 flex-nowrap min-w-0">
         <Link href="/" legacyBehavior>
               <a>

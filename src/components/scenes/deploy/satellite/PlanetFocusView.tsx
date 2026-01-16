@@ -234,6 +234,7 @@ const PlanetFocusView: React.FC<PlanetFocusViewProps> = ({ planet, onNext, onPre
       <Button 
         onClick={onPrev} 
         disabled={isFirst}
+        data-tutorial="planet-nav-prev"
         className={`absolute left-8 top-1/2 -translate-y-1/2 rounded-full w-12 h-12 disabled:opacity-30 ${
           isDarkMode 
             ? 'bg-white/10 hover:bg-white/20 text-white' 
@@ -245,6 +246,7 @@ const PlanetFocusView: React.FC<PlanetFocusViewProps> = ({ planet, onNext, onPre
       <Button 
         onClick={onNext} 
         disabled={isLast}
+        data-tutorial="planet-nav-next"
         className={`absolute right-8 top-1/2 -translate-y-1/2 rounded-full w-12 h-12 disabled:opacity-30 ${
           isDarkMode 
             ? 'bg-white/10 hover:bg-white/20 text-white' 

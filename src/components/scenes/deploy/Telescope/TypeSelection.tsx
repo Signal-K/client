@@ -50,9 +50,10 @@ export default function TypeSelection({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 sm:space-y-4 md:space-y-6 px-3 sm:px-4 md:px-6 pb-4 sm:pb-6 md:pb-8">
-          <div className="grid lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+          <div className="grid lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6" data-tutorial="project-options">
             <Card className="bg-[#005066]/30 border-2 border-[#ff6b6b]/40 hover:border-[#ff6b6b]/80 transition-all duration-300 cursor-pointer group hover:bg-[#005066]/50" 
-                  onClick={() => onChooseType("stellar")}>
+                  onClick={() => onChooseType("stellar")}
+                  data-tutorial="project-stellar">
               <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4 md:pt-6">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-[#ff6b6b] to-[#e55555] rounded-full flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
                   <Sun className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-white" />
@@ -97,7 +98,8 @@ export default function TypeSelection({
             </Card>
 
             <Card className="bg-[#005066]/30 border-2 border-[#78cce2]/40 hover:border-[#78cce2]/80 transition-all duration-300 cursor-pointer group hover:bg-[#005066]/50"
-                  onClick={() => onChooseType("planetary")}>
+                  onClick={() => onChooseType("planetary")}
+                  data-tutorial="project-planetary">
               <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4 md:pt-6">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-[#78cce2] to-[#4e7988] rounded-full flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
                   <Target className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-[#002439]" />

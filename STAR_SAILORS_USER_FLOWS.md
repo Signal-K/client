@@ -19,6 +19,23 @@
 
 Star Sailors is a Next.js 14 gamified citizen science platform where users deploy virtual astronomical structures, classify real scientific data, and contribute to research. The application transforms data analysis into an exploration game with progression mechanics, resource discovery, and community collaboration.
 
+### Recent Additions & Review Summary
+
+This document was reviewed and updated to explicitly call out recently added projects, features, and system improvements. Below is a concise summary of notable additions and changes covered in this review:
+
+- **Mineral Deposit System (expanded):** Full orchestration clarified including research checks, planetary compatibility checks, deposit-roll logic, mineral selection functions, and database insertion flow. Extraction prerequisites and deposit metadata handling are documented.
+- **Extraction Minigames:** Extraction flow (rover and satellite) and yield calculation added, with state changes for deposit extraction and UI behavior described.
+- **Fast Deploy & Onboarding:** Fast deploy mechanics reaffirmed for anonymous users and effects on unlock timings documented.
+- **Research Tree Enhancements:** New and emphasized techs: `spectroscopy`, `findMinerals`, `p4Minerals`, `ngtsAccess`, `roverExtraction`, and `satelliteExtraction` with costs and deployment effects.
+- **Rover / AI4M Improvements:** Rover waypoint assignment, mineral waypoint logic, route storage schema, and AI4M terrain mineral selection and probability clarified.
+- **Satellite Unlock Schedule & Modes:** Weather, Planetary Survey, and Wind Survey modes clarified along with unlock timing and satellite-specific unlock mechanics.
+- **Sunspot & Continuous Participation:** Sunspot participation mechanics and unlock/expiration windows documented.
+- **Inventory & UI Updates:** Mineral deposit cards, filters, extraction gating, and inventory interactions described.
+- **Social Features & Community Bonuses:** Activity feed, comment/vote-based bonus deploys, leaderboards, and community recognition flows emphasized.
+- **Annotation & Media Export:** Annotation tool improvements and PNG export behavior covered.
+
+If you'd like, I can (a) expand any of the bullets into a new detailed subsection, (b) run a link/anchor consistency pass across the file, or (c) create a changelog section listing exact commit references for each feature.
+
 ### Core Mechanics
 - **Classification**: Analyze real astronomical/planetary data to earn points
 - **Deployment**: Deploy telescopes, satellites, and rovers to unlock new data

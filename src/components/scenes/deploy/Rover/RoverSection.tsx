@@ -1,6 +1,7 @@
 "use client"
 
 import Section from "@/src/components/sections/Section";
+import TutorialWrapper, { ROVER_INTRO_STEPS } from "@/src/components/onboarding/TutorialWrapper";
 import { Anomaly } from "@/types/Structures/telescope";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
@@ -13,6 +14,7 @@ export default function RoverViewportSection() {
     const supabase = useSupabaseClient();
     const session = useSession();
 
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [hasRoverDeployed, setHasRoverDeployed] = useState<Boolean>(false);
     const [linkedAnomalies, setLinkedAnomalies] = useState<Anomaly[]>([]);
 
@@ -78,6 +80,7 @@ export default function RoverViewportSection() {
         async function fetchLinkedAnomaliesAndWaypoints() {
             const now = new Date();
             if (!session) {
+                setIsLoading(false);
                 return;
             }
 
@@ -131,6 +134,7 @@ export default function RoverViewportSection() {
 
                     if (!config || !config.anomalies || !config.waypoints) {
                         setWaypoints([]);
+                        setIsLoading(false);
                         return;
                     }
                     setWaypoints(routes);
@@ -324,6 +328,7 @@ export default function RoverViewportSection() {
             } else {
                 setWaypoints([]);
             }
+            setIsLoading(false);
         }
         fetchLinkedAnomaliesAndWaypoints();
     }, [session, supabase, isFastDeployEnabled]);
@@ -409,9 +414,17 @@ export default function RoverViewportSection() {
                 "View and control your surface rovers to find and discover surface anomalies"
             }
             expandLink={"/viewports/roover"}
+            className="h-full"
         >
-            <div className="relative w-full flex items-center justify-center py-8 md:py-12" style={{ minHeight: '480px' }}>
-                {!hasRoverDeployed ? (
+            <div className="relative w-full h-full flex items-center justify-center py-8 md:py-12">
+                {isLoading ? (
+                    <div className="absolute inset-0 flex items-center justify-center z-20">
+                        <div className="text-center">
+                            <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                            <p className="text-sm text-zinc-400">Loading rover data...</p>
+                        </div>
+                    </div>
+                ) : !hasRoverDeployed ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-4">
                         <div className="mb-6 w-full max-w-lg text-xs md:text-sm text-center text-white leading-relaxed px-4 py-3 rounded-lg bg-black/40 drop-shadow">
                             <p className="font-semibold text-amber-400 mb-2">Ready to Train Your Rover?</p>
@@ -419,6 +432,7 @@ export default function RoverViewportSection() {
                         </div>
                         <button
                             onClick={handleDeployRover}
+                            data-tutorial="deploy-rover"
                             className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white rounded-lg shadow-lg text-base md:text-lg font-bold transition-all duration-200 hover:scale-105 whitespace-nowrap"
                         >
                             🚗 Deploy Rover

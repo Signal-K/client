@@ -9,33 +9,13 @@ export default function RoverViewportExpandedPage() {
     const router = useRouter();
 
     return (
-        <div className="relative min-h-screen w-full h-full flex-col">
-            <img
-                src="/assets/backdrops/Earth.png"
-                className="absolute inset-0 w-full h-full object-cover"
-                alt="Earth Background"
-            />
-
-            <div className="w-full z-50">
+        <div className="h-screen w-full flex flex-col overflow-hidden">
+            <div className="w-full z-50 flex-shrink-0">
                 <GameNavbar />
             </div>
 
-            <div className="flex justify-center items-center flex-grow z-10 px-2">
-                <Dialog
-                    defaultOpen
-                    onOpenChange={(open) => {
-                        if (!open) router.push("/");
-                    }}
-                >
-                    <DialogContent
-                        className="p-0 w-full max-w-[90vw] h-[85vh] flex flex-col bg-transparent shadow-none"
-                        style={{ color: "" }}
-                    >   
-                        <div className="h-full w-full flex">
-                            <RoverViewportSection />
-                        </div>
-                    </DialogContent>
-                </Dialog>
+            <div className="flex-1 z-10 min-h-0 pt-12">
+                <RoverViewportSection />
             </div>
         </div>
     );

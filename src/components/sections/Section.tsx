@@ -70,7 +70,7 @@ const Section: React.FC<SectionProps> = ({
 
   // Example variant styling
   const sectionClass = clsx(
-    "relative w-full rounded-lg",
+    "relative w-full h-full rounded-lg",
     {
       "bg-card border border-chart-4/30 text-white": variant === "viewport",
       "bg-card shadow-md text-zinc-900": variant === "minimal",
@@ -150,7 +150,7 @@ const Section: React.FC<SectionProps> = ({
           {expandIcon}
         </div>
       )}
-      <div className={variant === "viewport" ? "relative z-10 p-4" : variant === "minimal" ? "p-4" : "p-6"}>
+      <div className={variant === "viewport" ? "relative z-10 p-4 h-full" : variant === "minimal" ? "p-4 h-full" : "p-6 h-full"}>
         {children}
       </div>
       {/* Info area at bottom, responsive */}

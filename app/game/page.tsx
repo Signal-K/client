@@ -1,147 +1,128 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import dynamic from 'next/dynamic';
+import { useState, useEffect, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
-import { usePostHog } from 'posthog-js/react';
+import { usePostHog } from "posthog-js/react";
 
-// Dynamic heavy components (Three.js scene, popup, banners, forms)
-const TelescopeBackground = dynamic(() => import('@/src/components/classification/telescope/telescope-background').then(m => m.TelescopeBackground), { ssr: false, loading: () => <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background to-background/80" /> });
-const NPSPopup = dynamic(() => import('@/src/components/ui/helpers/nps-popup'), { loading: () => null });
-const WeeklyBanner = dynamic(() => import('@/src/components/ui/update-banner'), { loading: () => null });
-const CompleteProfileForm = dynamic(() => import('@/src/components/profile/setup/FinishProfile'), { loading: () => <div className="p-4 text-xs text-muted-foreground">Loading profile form…</div> });
-const PWAPrompt = dynamic(() => import('@/src/components/pwa/PWAPrompt'), { loading: () => null });
+// Dynamic heavy components
+const TelescopeBackground = dynamic(
+  () =>
+    import("@/src/components/classification/telescope/telescope-background").then(
+      (m) => m.TelescopeBackground
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background to-background/80" />
+    ),
+  }
+);
+const NPSPopup = dynamic(() => import("@/src/components/ui/helpers/nps-popup"), {
+  loading: () => null,
+});
+const CompleteProfileForm = dynamic(
+  () => import("@/src/components/profile/setup/FinishProfile"),
+  {
+    loading: () => (
+      <div className="p-4 text-xs text-muted-foreground">Loading profile form…</div>
+    ),
+  }
+);
+const PWAPrompt = dynamic(() => import("@/src/components/pwa/PWAPrompt"), {
+  loading: () => null,
+});
+
+// Dynamic tab content components
+const TelescopeTab = dynamic(() => import("@/src/components/tabs/TelescopeTab"), {
+  loading: () => (
+    <div className="p-4 text-xs text-muted-foreground">Loading telescope…</div>
+  ),
+});
+const SatelliteTab = dynamic(() => import("@/src/components/tabs/SatelliteTab"), {
+  loading: () => (
+    <div className="p-4 text-xs text-muted-foreground">Loading satellite…</div>
+  ),
+});
+const RoverTab = dynamic(() => import("@/src/components/tabs/RoverTab"), {
+  loading: () => <div className="p-4 text-xs text-muted-foreground">Loading rover…</div>,
+});
+const SolarTab = dynamic(() => import("@/src/components/tabs/SolarTab"), {
+  loading: () => <div className="p-4 text-xs text-muted-foreground">Loading solar…</div>,
+});
+const InventoryTab = dynamic(() => import("@/src/components/tabs/InventoryTab"), {
+  loading: () => (
+    <div className="p-4 text-xs text-muted-foreground">Loading inventory…</div>
+  ),
+});
+
+// UI Components
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/src/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/src/components/ui/sheet";
 import AnonymousUserPrompt from "@/src/components/profile/auth/AnonymousUserPrompt";
 
-import MainHeader from "@/src/components/layout/Header/MainHeader";
-const ActivityHeaderSection = dynamic(() => import('@/src/components/social/activity/ActivityHeaderSection'), { loading: () => null });
-const ProfileSetupRequired = dynamic(() => import('@/src/components/profile/setup/ProfileSetupRequired'), { loading: () => null });
-// Remove unused NotificationSubscribeButton (not rendered)
+// New redesigned components
+import GameHeader from "@/src/components/game/GameHeader";
+import PlanetHeroSection from "@/src/components/game/PlanetHeroSection";
+import MissionControlCard from "@/src/components/game/MissionControlCard";
+import StructureCard from "@/src/components/game/StructureCard";
+import BottomNavigation from "@/src/components/game/BottomNavigation";
+import RecentActivity from "@/src/components/social/activity/RecentActivity";
 
-// Import custom hooks
+// Hooks
 import { usePageData } from "@/hooks/usePageData";
 import { useNPSManagement } from "@/hooks/useNPSManagement";
-import { useTabsPersistence, TabConfig } from "@/hooks/useTabsPersistence";
+import { useUserPreferences } from "@/src/hooks/useUserPreferences";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 
-// Import tab components
-const TelescopeTab = dynamic(() => import('@/src/components/tabs/TelescopeTab'), { loading: () => <div className="p-2 text-xs text-muted-foreground">Loading telescope…</div> });
-const SatelliteTab = dynamic(() => import('@/src/components/tabs/SatelliteTab'), { loading: () => <div className="p-2 text-xs text-muted-foreground">Loading satellite…</div> });
-const RoverTab = dynamic(() => import('@/src/components/tabs/RoverTab'), { loading: () => <div className="p-2 text-xs text-muted-foreground">Loading rover…</div> });
-const SolarTab = dynamic(() => import('@/src/components/tabs/SolarTab'), { loading: () => <div className="p-2 text-xs text-muted-foreground">Loading solar…</div> });
-const InventoryTab = dynamic(() => import('@/src/components/tabs/InventoryTab'), { loading: () => <div className="p-2 text-xs text-muted-foreground">Loading inventory…</div> });
-const UpdatesTab = dynamic(() => import('@/src/components/tabs/UpdatesTab'), { loading: () => <div className="p-2 text-xs text-muted-foreground">Loading updates…</div> });
-const OnboardingTab = dynamic(() => import('@/src/components/tabs/OnboardingTab'), { loading: () => <div className="p-2 text-xs text-muted-foreground">Loading onboarding…</div> });
+// Onboarding components
+import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal";
+import { ProjectType } from "@/src/hooks/useUserPreferences";
 
-// Import icons
-import { Telescope, Satellite, Car, Package, Bell, Sun, ArrowLeft, ArrowRight } from "lucide-react";
+// Icons
+import {
+  Telescope,
+  Satellite,
+  Car,
+  Package,
+  Sun,
+  FlaskConical,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  ChevronLeft,
+} from "lucide-react";
 
-// Simple Tab Trigger with reorder buttons
-interface SimpleTabTriggerProps {
-  id: string;
-  icon: React.ReactNode;
-  label: string;
-  onMoveLeft?: () => void;
-  onMoveRight?: () => void;
-  canMoveLeft: boolean;
-  canMoveRight: boolean;
-  onTabClick: (id: string) => void;
-};
-
-function SimpleTabTrigger({ 
-  id, 
-  icon, 
-  label, 
-  onMoveLeft, 
-  onMoveRight,
-  canMoveLeft,
-  canMoveRight,
-  onTabClick
-}: SimpleTabTriggerProps) {
-  return (
-    <div className="relative group flex flex-shrink-0 items-center gap-0.5">
-      {canMoveLeft && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onMoveLeft?.();
-          }}
-          className="hidden rounded p-1 transition-opacity hover:bg-background/40 sm:flex sm:opacity-0 sm:group-hover:opacity-100"
-          title="Move left"
-        >
-          <ArrowLeft className="w-3 h-3 text-muted-foreground" />
-        </button>
-      )}
-      
-      <TabsTrigger
-        value={id}
-        className="flex h-9 flex-shrink-0 items-center gap-1.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
-        onClick={(e) => {
-          e.preventDefault();
-          onTabClick(id);
-        }}
-      >
-        {icon}
-        <span className="text-xs sm:text-sm">{label}</span>
-      </TabsTrigger>
-
-      {canMoveRight && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onMoveRight?.();
-          }}
-          className="hidden rounded p-1 transition-opacity hover:bg-background/40 sm:flex sm:opacity-0 sm:group-hover:opacity-100"
-          title="Move right"
-        >
-          <ArrowRight className="w-3 h-3 text-muted-foreground" />
-        </button>
-      )}
-    </div>
-  );
-}
-
-type TabId = "updates" | "solar" | "telescope" | "satellite" | "rover" | "inventory";
+type ViewMode = "base" | "telescope" | "satellite" | "rover" | "solar" | "inventory";
 
 export default function GamePage() {
   const session = useSession();
   const { isLoading: isAuthLoading } = useSessionContext();
   const posthog = usePostHog();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
+  // Get initial view from URL query param
+  const initialView = (searchParams.get("view") as ViewMode) || "base";
+
+  // State
+  const [activeView, setActiveView] = useState<ViewMode>(initialView);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [landmarksExpanded, setLandmarksExpanded] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [tabContentExpanded, setTabContentExpanded] = useState(false);
-  const [showReorderHint, setShowReorderHint] = useState(true);
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const tabListContainerRef = useRef<HTMLDivElement | null>(null);
+  const [showPreferencesModal, setShowPreferencesModal] = useState(false);
 
-  const updateScrollState = useCallback(() => {
-    const container = tabListContainerRef.current;
-    if (!container) {
-      setCanScrollLeft(false);
-      setCanScrollRight(false);
-      return;
-    }
-
-    const { scrollLeft, scrollWidth, clientWidth } = container;
-    const epsilon = 1;
-    setCanScrollLeft(scrollLeft > epsilon);
-    setCanScrollRight(scrollWidth - clientWidth - scrollLeft > epsilon);
-  }, []);
-
-  // Custom hooks for data management
+  // Hooks
   const {
     linkedAnomalies,
     activityFeed,
@@ -152,265 +133,178 @@ export default function GamePage() {
   } = usePageData();
 
   const { showNpsModal, handleCloseNps } = useNPSManagement();
-
-  // Use the global theme hook
-  const { isDark, toggleDarkMode } = UseDarkMode();
-
-  // Tab persistence hook
+  const { isDark } = UseDarkMode();
   const {
-    activeTab,
-    setActiveTab,
-    initializeTabOrder,
-    reorderTabs,
-    getOrderedTabs,
-    isInitialized,
-    hasSavedOrder,
-  } = useTabsPersistence('updates');
+    preferences,
+    isLoading: preferencesLoading,
+    needsPreferencesPrompt,
+    setProjectInterests,
+  } = useUserPreferences();
 
-  // Handle tab click - toggle full screen if clicking active tab, otherwise switch tabs
-  const handleTabClick = (tabId: string) => {
-    if (tabId === activeTab) {
-      // Toggle full screen when clicking active tab
-      setIsFullScreen(prev => !prev);
-      posthog?.capture('tab_fullscreen_toggled', {
-        tab_id: tabId,
-        is_fullscreen: !isFullScreen,
-      });
-    } else {
-      // Switch to new tab, keep full screen state
-      setActiveTab(tabId);
-      posthog?.capture('tab_switched', {
-        from_tab: activeTab,
-        to_tab: tabId,
-        classification_count: classifications.length,
-      });
-    }
-  };
-
-  // Track page view and user state
+  // Show preferences modal on first visit or new device
   useEffect(() => {
-    if (session?.user) {
-      posthog?.capture('game_page_viewed', {
-        user_id: session.user.id,
-        has_classifications: classifications.length > 0,
-        classification_count: classifications.length,
-        has_discoveries: linkedAnomalies.length > 0,
-        discovery_count: linkedAnomalies.length,
-        needs_profile_setup: needsProfileSetup,
-      });
+    if (!preferencesLoading && needsPreferencesPrompt && session) {
+      setShowPreferencesModal(true);
     }
-  }, [session, posthog]);
+  }, [preferencesLoading, needsPreferencesPrompt, session]);
 
-  // Check if user has seen the reorder hint
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const hasSeenHint = localStorage.getItem('tab-reorder-hint-seen');
-      if (hasSeenHint) {
-        setShowReorderHint(false);
-      }
-    }
-  }, []);
-
-  const dismissReorderHint = () => {
-    setShowReorderHint(false);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('tab-reorder-hint-seen', 'true');
-    }
-    posthog?.capture('reorder_hint_dismissed');
-  };
-
-  const tabPriorityCounts = useMemo(() => {
-    const counts: Record<TabId, number> = {
-      updates: 0,
-      solar: 0,
-      telescope: 0,
-      satellite: 0,
-      rover: 0,
-      inventory: 0,
+  // Determine which structures to show based on preferences
+  const shouldShowStructure = (structureType: "telescope" | "satellite" | "rover" | "solar") => {
+    // If no preferences set, show all
+    if (preferences.projectInterests.length === 0) return true;
+    
+    // Map structure types to project interests
+    const structureToProjects: Record<string, ProjectType[]> = {
+      telescope: ["planet-hunting", "asteroid-hunting"],
+      satellite: ["cloud-tracking", "ice-tracking"],
+      rover: ["rover-training"],
+      solar: ["solar-monitoring"],
     };
+    
+    const relatedProjects = structureToProjects[structureType] || [];
+    return relatedProjects.some(project => preferences.projectInterests.includes(project));
+  };
 
-    linkedAnomalies.forEach((linked) => {
-      const automaton = (linked.automaton || '').toLowerCase();
-      const anomalyType = (linked.anomaly?.anomalytype || '').toLowerCase();
-      const anomalySet = (linked.anomaly?.anomalySet || '').toLowerCase();
+  // Handle structure click - navigate to dedicated setup pages
+  const handleStructureClick = (
+    structureType: "telescope" | "satellite" | "rover" | "solar",
+    viewMode: ViewMode
+  ) => {
+    console.log("[DEBUG] handleStructureClick - navigating to setup page:", structureType);
+    
+    // Navigate to dedicated setup pages with onboarding
+    const setupRoutes = {
+      telescope: "/setup/telescope",
+      satellite: "/setup/satellite", 
+      rover: "/setup/rover",
+      solar: "/setup/solar"
+    };
+    
+    router.push(setupRoutes[structureType]);
+  };
 
-      if (anomalyType.includes('sunspot') || anomalyType.includes('solar') || anomalySet.includes('sunspot')) {
-        counts.solar += 1;
-      }
+  const handlePreferencesSave = (interests: ProjectType[]) => {
+    setProjectInterests(interests);
+    setShowPreferencesModal(false);
+  };
 
-      if (
-        automaton.includes('telescope') ||
-        anomalyType.includes('planet') ||
-        anomalyType.includes('asteroid') ||
-        anomalyType.includes('variable') ||
-        anomalyType.includes('disk') ||
-        anomalySet.includes('telescope') ||
-        anomalySet.includes('planet') ||
-        anomalySet.includes('asteroid') ||
-        anomalySet.includes('variable') ||
-        anomalySet.includes('disk')
-      ) {
-        counts.telescope += 1;
-      }
+  // Calculate mission control stats
+  const missionStats = useMemo(() => {
+    const unclassifiedCount = linkedAnomalies.filter((la) => {
+      // Check if this anomaly has been classified
+      return !classifications.some((c) => c.anomaly?.content === la.anomaly?.content);
+    }).length;
 
-      if (
-        automaton.includes('satellite') ||
-        automaton.includes('weather') ||
-        anomalyType.includes('cloud') ||
-        anomalyType.includes('balloon') ||
-        anomalyType.includes('lidar') ||
-        anomalySet.includes('cloud') ||
-        anomalySet.includes('balloon') ||
-        anomalySet.includes('lidar')
-      ) {
-        counts.satellite += 1;
-      }
-
-      if (
-        automaton.includes('rover') ||
-        anomalyType.includes('rover') ||
-        anomalyType.includes('automaton') ||
-        anomalySet.includes('rover') ||
-        anomalySet.includes('automaton')
-      ) {
-        counts.rover += 1;
-      }
+    const recentClassifications = classifications.filter((c) => {
+      const classDate = new Date(c.created_at);
+      const now = new Date();
+      const diffHours = (now.getTime() - classDate.getTime()) / (1000 * 60 * 60);
+      return diffHours < 24;
     });
 
-    return counts;
+    // Check for upcoming unlocks
+    const lockedAnomalies = linkedAnomalies.filter(
+      (la) => la.unlocked === false || la.unlocked === null
+    );
+    const nextUnlock = lockedAnomalies.length > 0 ? lockedAnomalies[0] : null;
+
+    return {
+      awaiting: unclassifiedCount,
+      recentCount: recentClassifications.length,
+      lastClassification: recentClassifications[0],
+      nextUnlock,
+      hasUnlockingSoon: lockedAnomalies.length > 0,
+    };
+  }, [linkedAnomalies, classifications]);
+
+  // Structure deployment status
+  const structureStatus = useMemo(() => {
+    const telescopeAnomalies = linkedAnomalies.filter(
+      (la) =>
+        la.automaton?.includes("telescope") ||
+        la.anomaly?.anomalySet?.includes("telescope") ||
+        la.anomaly?.anomalytype?.includes("planet")
+    );
+    const satelliteAnomalies = linkedAnomalies.filter(
+      (la) =>
+        la.automaton?.includes("Satellite") ||
+        la.automaton?.includes("Weather") ||
+        la.anomaly?.anomalySet?.includes("cloud")
+    );
+    const roverAnomalies = linkedAnomalies.filter(
+      (la) =>
+        la.automaton?.includes("rover") ||
+        la.anomaly?.anomalySet?.includes("automaton")
+    );
+    const solarAnomalies = linkedAnomalies.filter(
+      (la) => la.anomaly?.anomalySet?.includes("sunspot")
+    );
+
+    return {
+      telescope: {
+        deployed: telescopeAnomalies.length > 0,
+        count: telescopeAnomalies.length,
+        status: telescopeAnomalies.length > 0 ? `${telescopeAnomalies.length} targets` : "Deploy now",
+      },
+      satellite: {
+        deployed: satelliteAnomalies.length > 0,
+        count: satelliteAnomalies.length,
+        status: satelliteAnomalies.length > 0 ? `${satelliteAnomalies.length} clouds` : "Unlocking...",
+      },
+      rover: {
+        deployed: roverAnomalies.length > 0,
+        count: roverAnomalies.length,
+        status: roverAnomalies.length > 0 ? `${roverAnomalies.length} waypoints` : "Deploy now",
+      },
+      solar: {
+        deployed: solarAnomalies.length > 0,
+        count: solarAnomalies.length,
+        status: solarAnomalies.length > 0 ? "Active" : "Join mission",
+      },
+    };
   }, [linkedAnomalies]);
 
-  const baseTabs: TabConfig[] = useMemo(() => [
-    {
-      id: 'updates',
-      label: 'Updates',
-      icon: <Bell className="w-4 h-4" />,
-    },
-    {
-      id: 'solar',
-      label: 'Solar',
-      icon: <Sun className="w-4 h-4" />,
-    },
-    {
-      id: 'telescope',
-      label: 'Telescope',
-      icon: <Telescope className="w-4 h-4" />,
-    },
-    {
-      id: 'satellite',
-      label: 'Satellite',
-      icon: <Satellite className="w-4 h-4" />,
-    },
-    {
-      id: 'rover',
-      label: 'Rover',
-      icon: <Car className="w-4 h-4" />,
-    },
-    {
-      id: 'inventory',
-      label: 'Inventory',
-      icon: <Package className="w-4 h-4" />,
-    },
-  ], []);
-
-  const prioritizedTabs = useMemo(() => {
-    if (hasSavedOrder) {
-      return baseTabs;
-    }
-
-    const baseOrder: Record<TabId, number> = {
-      updates: 0,
-      solar: 1,
-      telescope: 2,
-      satellite: 3,
-      rover: 4,
-      inventory: 5,
-    };
-
-    return [...baseTabs].sort((a, b) => {
-      const aId = a.id as TabId;
-      const bId = b.id as TabId;
-      const aBoost = tabPriorityCounts[aId] > 0 ? 10 : 0;
-      const bBoost = tabPriorityCounts[bId] > 0 ? 10 : 0;
-      const aScore = baseOrder[aId] - aBoost - tabPriorityCounts[aId] * 0.01;
-      const bScore = baseOrder[bId] - bBoost - tabPriorityCounts[bId] * 0.01;
-      return aScore - bScore;
-    });
-  }, [baseTabs, tabPriorityCounts, hasSavedOrder]);
-
-  const orderedTabs = useMemo(() => getOrderedTabs(prioritizedTabs), [prioritizedTabs, getOrderedTabs]);
-
+  // Track page view
   useEffect(() => {
-    if (isInitialized) {
-      initializeTabOrder(prioritizedTabs);
+    if (session?.user) {
+      posthog?.capture("game_page_viewed", {
+        user_id: session.user.id,
+        classification_count: classifications.length,
+        discovery_count: linkedAnomalies.length,
+      });
     }
-  }, [prioritizedTabs, initializeTabOrder, isInitialized]);
+  }, [session, posthog, classifications.length, linkedAnomalies.length]);
 
+  // Redirect unauthenticated users
   useEffect(() => {
-    const container = tabListContainerRef.current;
-    updateScrollState();
-
-    if (!container) {
-      return;
+    if (!isAuthLoading && !session) {
+      router.push("/");
     }
+  }, [isAuthLoading, session, router]);
 
-    const handleScroll = () => updateScrollState();
-    const rafId = requestAnimationFrame(updateScrollState);
+  // Handle view navigation
+  const handleViewChange = (view: ViewMode) => {
+    console.log("[DEBUG] handleViewChange called with:", view);
+    console.log("[DEBUG] current activeView:", activeView);
+    setActiveView(view);
+    posthog?.capture("viewport_opened", { viewport: view });
+  };
 
-    container.addEventListener('scroll', handleScroll);
-
-    let resizeObserver: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(() => updateScrollState());
-      resizeObserver.observe(container);
-    }
-
-    window.addEventListener('resize', updateScrollState);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      container.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', updateScrollState);
-      resizeObserver?.disconnect();
-    };
-  }, [orderedTabs, updateScrollState]);
-
-  // Move tab left or right
-  const moveTab = (tabId: string, direction: 'left' | 'right') => {
-    const tabIds = orderedTabs.map(tab => tab.id);
-    const currentIndex = tabIds.indexOf(tabId);
-    
-    if (direction === 'left' && currentIndex > 0) {
-      const newOrder = [...tabIds];
-      [newOrder[currentIndex - 1], newOrder[currentIndex]] = [newOrder[currentIndex], newOrder[currentIndex - 1]];
-      reorderTabs(newOrder);
-      posthog?.capture('tab_reordered', {
-        tab_id: tabId,
-        direction: 'left',
-        new_index: currentIndex - 1,
-      });
-    } else if (direction === 'right' && currentIndex < tabIds.length - 1) {
-      const newOrder = [...tabIds];
-      [newOrder[currentIndex], newOrder[currentIndex + 1]] = [newOrder[currentIndex + 1], newOrder[currentIndex]];
-      reorderTabs(newOrder);
-      posthog?.capture('tab_reordered', {
-        tab_id: tabId,
-        direction: 'right',
-        new_index: currentIndex + 1,
-      });
+  // Handle classify now action
+  const handleClassifyNow = () => {
+    // Find the first unclassified anomaly and navigate to it
+    if (structureStatus.telescope.count > 0) {
+      handleViewChange("telescope");
+    } else if (structureStatus.satellite.count > 0) {
+      handleViewChange("satellite");
+    } else if (structureStatus.rover.count > 0) {
+      handleViewChange("rover");
     }
   };
 
   const needsProfileSetup = !profile?.username || !profile?.full_name;
 
-  // Redirect unauthenticated users to `/` (middleware may handle this server-side; this is a client fallback)
-  useEffect(() => {
-    if (!isAuthLoading && !session) {
-      router.push('/');
-    }
-  }, [isAuthLoading, session, router]);
-
-  // If not logged in, show minimal gate while redirect happens.
+  // Loading state
   if (!session) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center text-sm text-muted-foreground">
@@ -419,27 +313,77 @@ export default function GamePage() {
     );
   }
 
-  // Lightweight skeleton while data loads to avoid blocking on dynamic chunk hydration.
-  // Important: do not gate the entire page on having data, or new users will see the
-  // skeleton forever.
   if (loading) {
     return (
-      <div className="min-h-screen w-full relative flex justify-center">
+      <div className="min-h-screen w-full relative">
         <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background to-background" />
-        <div className="w-full max-w-screen-xl px-4 py-6 space-y-6 pt-24 relative z-10">
-          <div className="h-8 w-48 bg-primary/10 rounded animate-pulse" />
-          <div className="grid gap-4">
-            <div className="h-40 bg-background/40 border border-primary/10 rounded animate-pulse" />
-            <div className="h-64 bg-background/40 border border-primary/10 rounded animate-pulse" />
+        <div className="w-full max-w-screen-xl mx-auto px-4 py-20 space-y-4">
+          <div className="h-32 bg-card/20 rounded-2xl animate-pulse" />
+          <div className="h-24 bg-card/20 rounded-xl animate-pulse" />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="h-28 bg-card/20 rounded-xl animate-pulse" />
+            <div className="h-28 bg-card/20 rounded-xl animate-pulse" />
           </div>
         </div>
       </div>
     );
   }
 
+  // If in a viewport (not base), show full-screen viewport content
+  if (activeView !== "base") {
+    return (
+      <div className="min-h-screen w-full relative">
+        {/* Background */}
+        <div className="fixed inset-0 -z-10">
+          <TelescopeBackground
+            sectorX={0}
+            sectorY={0}
+            showAllAnomalies={false}
+            isDarkTheme={isDark}
+            variant="stars-only"
+            onAnomalyClick={() => {}}
+          />
+        </div>
+
+        {/* Viewport Header */}
+        <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
+          <div className="flex items-center gap-4 px-4 py-3">
+            <button
+              onClick={() => setActiveView("base")}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+              <span className="text-sm font-medium">Back</span>
+            </button>
+            <h1 className="text-lg font-semibold capitalize">{activeView}</h1>
+          </div>
+        </header>
+
+        {/* Viewport Content */}
+        <main className="pt-16 pb-4 px-4 min-h-screen">
+          <div className="max-w-screen-xl mx-auto">
+            {activeView === "telescope" && <TelescopeTab />}
+            {activeView === "satellite" && <SatelliteTab />}
+            {activeView === "rover" && <RoverTab />}
+            {activeView === "solar" && <SolarTab />}
+            {activeView === "inventory" && <InventoryTab />}
+          </div>
+        </main>
+
+        {/* NPS Popup */}
+        {showNpsModal && session && (
+          <NPSPopup userId={session.user.id} isOpen={true} onClose={handleCloseNps} />
+        )}
+
+        <PWAPrompt />
+      </div>
+    );
+  }
+
+  // Base view - main dashboard
   return (
-    <div className="min-h-screen w-full relative flex justify-center">
-      {/* Telescope Background - Full screen behind everything */}
+    <div className="min-h-screen w-full relative pb-20 md:pb-6">
+      {/* Background */}
       <div className="fixed inset-0 -z-10">
         <TelescopeBackground
           sectorX={0}
@@ -447,187 +391,216 @@ export default function GamePage() {
           showAllAnomalies={false}
           isDarkTheme={isDark}
           variant="stars-only"
-          onAnomalyClick={(anomaly) => console.log("Clicked anomaly:", anomaly)}
+          onAnomalyClick={() => {}}
         />
       </div>
 
-      {/* Main Header */}
-      <MainHeader
-        isDark={isDark}
-        onThemeToggle={() => {
-          toggleDarkMode();
-          posthog?.capture('theme_toggled', { new_theme: !isDark ? 'dark' : 'light' });
-        }}
-        notificationsOpen={notificationsOpen}
-        onToggleNotifications={() => {
-          setNotificationsOpen((open) => {
-            posthog?.capture('notifications_toggled', { is_open: !open });
-            return !open;
-          });
-        }}
-        activityFeed={activityFeed}
-        otherClassifications={otherClassifications}
+      {/* Header */}
+      <GameHeader
+        stardust={classifications.length}
+        hasNotifications={activityFeed.length > 0}
+        onNotificationsClick={() => setNotificationsOpen(true)}
       />
 
-      <div className="w-full max-w-screen-xl px-4 py-6 space-y-6 pt-24 relative z-10">
-        {/* Anonymous User Upgrade Prompt */}
-        <AnonymousUserPrompt
-          classificationsCount={classifications.length}
-          discoveryCount={linkedAnomalies.length}
+      {/* Main Content */}
+      <main className="pt-16">
+        {/* Planet Hero Section */}
+        <PlanetHeroSection
+          planetName="Earth"
+          sectorName="Home Base"
+          backgroundImage="/assets/Backdrops/Earth.png"
+          stardust={classifications.length}
+          rank={42}
         />
 
-        {/* Activity Header - User profile and deployment status - Hidden when full screen */}
-        {!tabContentExpanded && !isFullScreen && (
-          <ActivityHeaderSection
+        {/* Content Container */}
+        <div className="px-4 py-6 max-w-screen-xl mx-auto space-y-6">
+          {/* Anonymous User Prompt */}
+          <AnonymousUserPrompt
             classificationsCount={classifications.length}
-            landmarksExpanded={landmarksExpanded}
-            onToggleLandmarks={() => {
-              setLandmarksExpanded((prev) => {
-                posthog?.capture('landmarks_toggled', { is_expanded: !prev });
-                return !prev;
-              });
-            }}
+            discoveryCount={linkedAnomalies.length}
           />
-        )}
 
-        {/* Profile Setup Required */}
-        {needsProfileSetup && (
-          <ProfileSetupRequired
-            onOpenProfileModal={() => {
-              posthog?.capture('profile_setup_modal_opened');
-              setShowProfileModal(true);
-            }}
-          />
-        )}
+          {/* Profile Setup */}
+          {needsProfileSetup && (
+            <div
+              onClick={() => setShowProfileModal(true)}
+              className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 cursor-pointer hover:bg-amber-500/20 transition-colors"
+            >
+              <p className="text-sm text-amber-300">
+                <strong>Complete your profile</strong> to unlock all features
+              </p>
+            </div>
+          )}
 
-        {/* Main Tabbed Interface */}
-        <div className="bg-background/40 backdrop-blur-md rounded-xl border border-[#78cce2]/30 shadow-2xl overflow-hidden">
-          <Tabs value={activeTab} className="w-full">
-            {/* Tab Navigation */}
-            <div className="border-b border-[#78cce2]/20 bg-background/60 backdrop-blur-sm">
-              <div className="relative">
-                {canScrollLeft && (
-                  <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-background to-transparent" />
-                )}
-                <div
-                  ref={tabListContainerRef}
-                  className="overflow-x-auto sm:overflow-visible"
-                  style={{ WebkitOverflowScrolling: "touch" }}
-                >
-                  <TabsList className="flex min-w-max flex-nowrap gap-1 p-2 bg-transparent sm:min-w-0 sm:flex-wrap">
-                    {orderedTabs.map((tab, index) => (
-                      <SimpleTabTrigger
-                        key={tab.id}
-                        id={tab.id}
-                        icon={tab.icon}
-                        label={tab.label}
-                        onMoveLeft={() => moveTab(tab.id, 'left')}
-                        onMoveRight={() => moveTab(tab.id, 'right')}
-                        canMoveLeft={index > 0}
-                        canMoveRight={index < orderedTabs.length - 1}
-                        onTabClick={handleTabClick}
-                      />
-                    ))}
-                  </TabsList>
-                </div>
-                {canScrollRight && (
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex w-14 items-center justify-end bg-gradient-to-l from-background to-transparent pr-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full border border-primary/40 bg-background/90 shadow-sm">
-                      <ArrowRight className="h-3.5 w-3.5 text-primary" />
-                    </div>
-                  </div>
-                )}
-              </div>
+          {/* Mission Control Section */}
+          <section>
+            <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-3 px-1">
+              Mission Control
+            </h2>
+            <div className="space-y-3">
+              {/* Anomalies Awaiting */}
+              {missionStats.awaiting > 0 && (
+                <MissionControlCard
+                  icon={<AlertCircle className="w-5 h-5" />}
+                  title={`${missionStats.awaiting} Anomalies Awaiting`}
+                  subtitle="Telescope targets ready to classify"
+                  variant="action"
+                  actionLabel="Classify Now"
+                  onAction={handleClassifyNow}
+                />
+              )}
 
-              {/* Reorder hint - shows on first visit */}
-              {showReorderHint && (
-                <div className="px-3 pb-2">
-                  <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-primary/10 border border-primary/30">
-                    <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                      <ArrowLeft className="w-3.5 h-3.5 text-primary" />
-                      <ArrowRight className="w-3.5 h-3.5 text-primary" />
-                      <span>
-                        <strong className="text-primary">New!</strong> Hover over tabs to see arrows and reorder them. Your layout is saved automatically.
-                      </span>
-                    </p>
-                    <button
-                      onClick={dismissReorderHint}
-                      className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-0.5 rounded hover:bg-background/40"
-                    >
-                      Got it
-                    </button>
-                  </div>
-                </div>
+              {/* Recent Classification */}
+              {missionStats.lastClassification && (
+                <MissionControlCard
+                  icon={<CheckCircle className="w-5 h-5" />}
+                  title="Classification Confirmed"
+                  subtitle={`${missionStats.lastClassification.classificationtype || "Discovery"} • ${
+                    new Date(missionStats.lastClassification.created_at).toLocaleDateString()
+                  }`}
+                  variant="status"
+                />
+              )}
+
+              {/* Unlock Progress */}
+              {missionStats.hasUnlockingSoon && (
+                <MissionControlCard
+                  icon={<Clock className="w-5 h-5" />}
+                  title="Satellite Unlocks Soon"
+                  subtitle="Cloud formations awaiting analysis"
+                  variant="progress"
+                  progress={65}
+                />
               )}
             </div>
+          </section>
 
-            {/* Tab Content - Expands to full height when full screen is active */}
-            <div className={`p-4 md:p-6 min-h-[400px] overflow-y-auto ${
-              tabContentExpanded || isFullScreen
-                ? 'max-h-[calc(100vh-180px)]' 
-                : 'max-h-[calc(100vh-420px)]'
-            }`}>
-              <TabsContent value="onboarding" className="mt-0">
-                <OnboardingTab />
-              </TabsContent>
-
-              <TabsContent value="updates" className="mt-0">
-                <UpdatesTab />
-              </TabsContent>
-
-              <TabsContent value="solar" className="mt-0">
-                <SolarTab onExpandedChange={setTabContentExpanded} />
-              </TabsContent>
-
-              <TabsContent value="telescope" className="mt-0">
-                <TelescopeTab />
-              </TabsContent>
-
-              <TabsContent value="satellite" className="mt-0">
-                <SatelliteTab />
-              </TabsContent>
-
-              <TabsContent value="rover" className="mt-0">
-                <RoverTab />
-              </TabsContent>
-
-              <TabsContent value="inventory" className="mt-0">
-                <InventoryTab />
-              </TabsContent>
+          {/* Your Structures Section */}
+          <section>
+            <div className="flex items-center justify-between mb-3 px-1">
+              <h2 className="text-xs uppercase tracking-wider text-muted-foreground">
+                Your Structures
+              </h2>
+              {preferences.projectInterests.length > 0 && (
+                <button
+                  onClick={() => setShowPreferencesModal(true)}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Edit interests
+                </button>
+              )}
             </div>
-          </Tabs>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {shouldShowStructure("telescope") && (
+                <StructureCard
+                  icon={<Telescope className="w-6 h-6" />}
+                  name="Telescope"
+                  status={structureStatus.telescope.status}
+                  statusColor={structureStatus.telescope.deployed ? "green" : "muted"}
+                  hasNotification={structureStatus.telescope.count > 0}
+                  onClick={() => handleStructureClick("telescope", "telescope")}
+                  data-structure="telescope"
+                />
+              )}
+              {shouldShowStructure("satellite") && (
+                <StructureCard
+                  icon={<Satellite className="w-6 h-6" />}
+                  name="Satellite"
+                  status={structureStatus.satellite.status}
+                  statusColor={structureStatus.satellite.deployed ? "blue" : "muted"}
+                  onClick={() => handleStructureClick("satellite", "satellite")}
+                  data-structure="satellite"
+                />
+              )}
+              {shouldShowStructure("rover") && (
+                <StructureCard
+                  icon={<Car className="w-6 h-6" />}
+                  name="Rover"
+                  status={structureStatus.rover.status}
+                  statusColor={structureStatus.rover.deployed ? "green" : "muted"}
+                  onClick={() => handleStructureClick("rover", "rover")}
+                  data-structure="rover"
+                />
+              )}
+              {shouldShowStructure("solar") && (
+                <StructureCard
+                  icon={<Sun className="w-6 h-6" />}
+                  name="Solar"
+                  status={structureStatus.solar.status}
+                  statusColor={structureStatus.solar.deployed ? "amber" : "muted"}
+                  onClick={() => handleStructureClick("solar", "solar")}
+                  data-structure="solar"
+                />
+              )}
+              <StructureCard
+                icon={<FlaskConical className="w-6 h-6" />}
+                name="Research"
+                status="Upgrades available"
+                statusColor="amber"
+                onClick={() => router.push("/research")}
+              />
+              <StructureCard
+                icon={<Package className="w-6 h-6" />}
+                name="Inventory"
+                status="View minerals"
+                statusColor="muted"
+                onClick={() => handleViewChange("inventory")}
+              />
+            </div>
+          </section>
         </div>
+      </main>
 
-        {/* Notification Subscription */}
-      </div>
+      {/* Bottom Navigation (Mobile) */}
+      <BottomNavigation
+        activeItem="base"
+        onItemClick={(item) => handleViewChange(item as ViewMode)}
+        telescopeNotification={structureStatus.telescope.count > 0}
+        satelliteNotification={structureStatus.satellite.count > 0}
+        roverNotification={structureStatus.rover.count > 0}
+        solarNotification={structureStatus.solar.count > 0}
+      />
 
+      {/* Notifications Sheet */}
+      <Sheet open={notificationsOpen} onOpenChange={setNotificationsOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Activity</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4">
+            <RecentActivity
+              activityFeed={activityFeed}
+              otherClassifications={otherClassifications}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Profile Modal */}
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-primary">
-              Complete Your Profile
-            </DialogTitle>
+            <DialogTitle className="text-primary">Complete Your Profile</DialogTitle>
           </DialogHeader>
           <CompleteProfileForm onSuccess={() => setShowProfileModal(false)} />
         </DialogContent>
       </Dialog>
 
+      {/* NPS Popup */}
       {showNpsModal && session && (
-        <NPSPopup
-          userId={session.user.id}
-          isOpen={true}
-          onClose={handleCloseNps}
-        />
+        <NPSPopup userId={session.user.id} isOpen={true} onClose={handleCloseNps} />
       )}
 
-      <WeeklyBanner
-        message="🚀 The full Star Sailors experience has more projects and deeper mechanics. Feel free to explore—or stay here for a simpler start."
-        buttonLabel="Play"
-        buttonHref="/alpha"
+      {/* Project Preferences Modal */}
+      <ProjectPreferencesModal
+        isOpen={showPreferencesModal}
+        onClose={() => setShowPreferencesModal(false)}
+        onSave={handlePreferencesSave}
+        initialInterests={preferences.projectInterests}
       />
 
-      {/* PWA Install Prompt - Only for authenticated users */}
-      {session && <PWAPrompt />}
+      <PWAPrompt />
     </div>
   );
-};
+}

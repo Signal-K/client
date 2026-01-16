@@ -78,7 +78,8 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
         {!isDeployDisabled && (
           <Button 
             onClick={onDeploy} 
-            disabled={isDeploying} 
+            disabled={isDeploying}
+            data-tutorial="deploy-satellite"
             className={`w-full ${isMobile ? 'h-9 text-sm' : 'h-11'} font-bold text-base shadow-lg transition-all duration-300 ${
               isDarkMode
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white shadow-blue-500/50 hover:shadow-blue-500/70'

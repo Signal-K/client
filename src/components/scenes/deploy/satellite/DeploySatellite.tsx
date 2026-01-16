@@ -11,6 +11,7 @@ import { useState as useReactState } from "react";
 import PlanetFocusView from './PlanetFocusView';
 import DeploySidebar from './DeploySidebar';
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import TutorialWrapper, { SATELLITE_INTRO_STEPS } from "@/src/components/onboarding/TutorialWrapper";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 
 type LocalAnomaly = Anomaly & { dbData: DatabaseAnomaly };
@@ -894,11 +895,17 @@ export default function DeploySatelliteViewport() {
     };
 
     return (
-      <div className={`min-h-screen h-screen w-screen flex flex-col ${
-        isDark 
-          ? "bg-[#10141c]" 
-          : "bg-gradient-to-br from-[#8ba3d1] via-[#9bb3e0] to-[#7a94c7]"
-      }`}>
+      <TutorialWrapper
+        tutorialId="satellite-intro"
+        steps={SATELLITE_INTRO_STEPS}
+        title="Satellite Operations Introduction"
+        showReplayButton
+      >
+        <div className={`min-h-screen h-screen w-screen flex flex-col ${
+          isDark 
+            ? "bg-[#10141c]" 
+            : "bg-gradient-to-br from-[#8ba3d1] via-[#9bb3e0] to-[#7a94c7]"
+        }`}>
         {/* Top bar: controls and stats - HIDDEN to fix layout */}
         {/* <div className={`flex flex-row items-center justify-between px-6 py-3 border-b z-20 ${
           isDark 
@@ -1015,5 +1022,6 @@ export default function DeploySatelliteViewport() {
           </div>
         </div> */}
       </div>
+      </TutorialWrapper>
   );
 };
