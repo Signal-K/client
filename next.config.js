@@ -25,6 +25,11 @@ const withPWA = require('next-pwa')({
   }
 });
 
+const configuredPosthogRegion = (process.env.posthog_region || process.env.POSTHOG_REGION || 'US Cloud').toLowerCase();
+const useEUPosthog = configuredPosthogRegion.includes('eu');
+const posthogIngestHost = useEUPosthog ? 'https://eu.i.posthog.com' : 'https://us.i.posthog.com';
+const posthogAssetsHost = useEUPosthog ? 'https://eu-assets.i.posthog.com' : 'https://us-assets.i.posthog.com';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	reactStrictMode: true,
@@ -87,18 +92,18 @@ const nextConfig = {
 			  ? 'http://127.0.0.1:5328/api/:path*' // Next.js API during development
 			  : '/api/', // Next.js API in production
 		},
-		// PostHog rewrites to support local ingest proxy (EU cluster)
+		// PostHog rewrites to support local ingest proxy by region
 		{
 		  source: '/ingest/static/:path*',
-		  destination: 'https://eu-assets.i.posthog.com/static/:path*',
+		  destination: `${posthogAssetsHost}/static/:path*`,
 		},
 		{
 		  source: '/ingest/:path*',
-		  destination: 'https://eu.i.posthog.com/:path*',
+		  destination: `${posthogIngestHost}/:path*`,
 		},
 		{
 		  source: '/ingest/flags',
-		  destination: 'https://eu.i.posthog.com/flags',
+		  destination: `${posthogIngestHost}/flags`,
 		},
 	  ];
 	},

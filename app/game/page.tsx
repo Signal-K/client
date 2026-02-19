@@ -106,6 +106,9 @@ import {
 
 type ViewMode = "base" | "telescope" | "satellite" | "rover" | "solar" | "inventory";
 
+const POSTHOG_SURVEY_ID = "019bb036-6cd7-0000-fc06-1c83a01e7759";
+const POSTHOG_SURVEY_SHOWN_KEY = "posthog_survey_g5zk5h_shown_v1";
+
 // Create a separate component for the search params logic
 function GamePageContent() {
   const session = useSession();
@@ -120,6 +123,7 @@ function GamePageContent() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
+  const [openedViewports, setOpenedViewports] = useState<Set<ViewMode>>(new Set());
 
   // Hooks
   const {
@@ -274,6 +278,62 @@ function GamePageContent() {
           }
         }, [session, posthog, classifications.length, linkedAnomalies.length]);
 
+        // Show the PostHog survey once, after meaningful engagement in gameplay.
+        useEffect(() => {
+          if (!session?.user || !posthog || activeView !== "base") {
+            return;
+          }
+
+          if (showNpsModal || showPreferencesModal || showProfileModal) {
+            return;
+          }
+
+          if (typeof window === "undefined") {
+            return;
+          }
+
+          const alreadyShown = window.localStorage.getItem(POSTHOG_SURVEY_SHOWN_KEY) === "1";
+          if (alreadyShown) {
+            return;
+          }
+
+          const meaningfulViewports = ["telescope", "satellite", "rover", "solar"].filter((view) =>
+            openedViewports.has(view as ViewMode)
+          ).length;
+          const hasMeaningfulProgress =
+            classifications.length >= 3 ||
+            linkedAnomalies.length >= 5 ||
+            meaningfulViewports >= 2;
+
+          if (!hasMeaningfulProgress) {
+            return;
+          }
+
+          const timeout = window.setTimeout(() => {
+            posthog.displaySurvey(POSTHOG_SURVEY_ID);
+            posthog.capture("posthog_survey_triggered", {
+              survey_id: POSTHOG_SURVEY_ID,
+              trigger_page: "game",
+              classifications: classifications.length,
+              linked_anomalies: linkedAnomalies.length,
+              meaningful_viewports: meaningfulViewports,
+            });
+            window.localStorage.setItem(POSTHOG_SURVEY_SHOWN_KEY, "1");
+          }, 12000);
+
+          return () => window.clearTimeout(timeout);
+        }, [
+          session?.user,
+          posthog,
+          activeView,
+          showNpsModal,
+          showPreferencesModal,
+          showProfileModal,
+          classifications.length,
+          linkedAnomalies.length,
+          openedViewports,
+        ]);
+
         // Redirect unauthenticated users
         useEffect(() => {
           if (!isAuthLoading && !session) {
@@ -286,6 +346,13 @@ function GamePageContent() {
           console.log("[DEBUG] handleViewChange called with:", view);
           console.log("[DEBUG] current activeView:", activeView);
           setActiveView(view);
+          if (view !== "base" && view !== "inventory") {
+            setOpenedViewports((prev) => {
+              const next = new Set(prev);
+              next.add(view);
+              return next;
+            });
+          }
           posthog?.capture("viewport_opened", { viewport: view });
         };
 
